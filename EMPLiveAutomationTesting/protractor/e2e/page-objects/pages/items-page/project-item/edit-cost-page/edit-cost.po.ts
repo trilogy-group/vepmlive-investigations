@@ -1,7 +1,7 @@
+import {By, element} from 'protractor';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {EditCostConstants} from './edit-cost.constants';
 import {CommonPage} from '../../../common/common.po';
-import {By, element} from 'protractor';
 
 export class EditCost {
 
@@ -25,7 +25,7 @@ export class EditCost {
         return ElementHelper.getAllElementByText(EditCostConstants.category).get(index);
     }
 
-    static get costTab() {
+   static get costTab() {
         const label = EditCostConstants.costTabs;
         return {
             budgetTab: ElementHelper.getElementByText(label.budgetTab),
@@ -35,4 +35,12 @@ export class EditCost {
             timeSheetActuals: ElementHelper.getElementByText(label.timeSheetActuals)
         };
     }
+
+   static  get editCostLink() {
+        return CommonPage.ribbonItems.editCost;
+    }
+
+   static  get editCostLinkViaEllipse() {
+        return CommonPage.contextMenuOptions.editCosts;
+   }
 }

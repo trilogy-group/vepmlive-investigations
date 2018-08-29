@@ -409,7 +409,8 @@ export class CommonPage extends BasePage {
             comments: CommonPageHelper.getContextMenuItemByText(options.comments),
             editTeam: CommonPageHelper.getContextMenuItemByText(options.editTeam),
             editPlan: CommonPageHelper.getContextMenuItemByText(options.editPlan),
-            editCosts: CommonPageHelper.getContextMenuItemByText(options.editCosts)
+            editCosts: CommonPageHelper.getContextMenuItemByText(options.editCosts),
+            editResource: CommonPageHelper.getContextMenuItemByText(options.editResource)
         };
     }
 
@@ -556,6 +557,10 @@ export class CommonPage extends BasePage {
     static periodEndOptionValue(name: string) {
         return element(By.xpath(`(${this.getDropDownByParameterNameXpath
         (name)})[2]//option[last()]`));
+    }
+
+    static getNthProject(index = 1) {
+        return element.all(By.xpath(`(${this.selectorForRecordsWithoutGreenTick}//a)`)).get(index);
     }
 
     static getNthRecord(index = 1) {

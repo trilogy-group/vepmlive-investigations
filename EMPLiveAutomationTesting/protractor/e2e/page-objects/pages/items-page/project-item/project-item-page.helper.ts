@@ -15,6 +15,8 @@ import {HomePage} from '../../homepage/home.po';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import {MyTimeOffPage} from '../../my-workplace/my-time-off/my-time-off.po';
+import {ResourcePlannerConstants} from '../../resource-planner-page/resource-planner-page.constants';
+import {EditCost} from './edit-cost-page/edit-cost.po';
 
 export class ProjectItemPageHelper {
     static get getlink() {
@@ -61,18 +63,18 @@ export class ProjectItemPageHelper {
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.projectName, projectNameValue));
 
-       /* // Add portfolio name
-        stepLogger.step('Select any Portfolio from the drop down [Ex: Test Portfolio1]');
-        await PageHelper.click(ProjectItemPage.portfolioShowAllButton);
-        await WaitHelper.waitForElementToBeDisplayed(inputs.portfolio);
-        const portfolioName = await inputs.portfolio.getText();
-        stepLogger.verification('Required values selected in Portfolio Field');
+        /* // Add portfolio name
+         stepLogger.step('Select any Portfolio from the drop down [Ex: Test Portfolio1]');
+         await PageHelper.click(ProjectItemPage.portfolioShowAllButton);
+         await WaitHelper.waitForElementToBeDisplayed(inputs.portfolio);
+         const portfolioName = await inputs.portfolio.getText();
+         stepLogger.verification('Required values selected in Portfolio Field');
 
-        await PageHelper.click(inputs.portfolio);
-        await expect(await CommonPageHelper.getAutoCompleteItemByDescription(portfolioName).isPresent())
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.portfolio, portfolioName));
-*/
+         await PageHelper.click(inputs.portfolio);
+         await expect(await CommonPageHelper.getAutoCompleteItemByDescription(portfolioName).isPresent())
+             .toBe(true,
+                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.portfolio, portfolioName));
+ */
         // Add Project Description
         stepLogger.step('Enter some text [Ex: Description for Smoke Test Project 1]');
         await TextboxHelper.sendKeys(inputs.projectDescription, projectDescription);
@@ -492,5 +494,21 @@ export class ProjectItemPageHelper {
         stepLogger.verification('Project Details opened ');
         await CommonPageHelper.labelDisplayedValidation
         (CommonPage.pageHeaders.projects.projectDetails, CommonPageConstants.pageHeaders.projects.projectDetails);
+    }
+
+    static  async validateProjectOpenInNewTab(stepLogger: StepLogger) {
+        stepLogger.verification('Switch To new Tab  ');
+        await PageHelper.switchToNewTabIfAvailable(1);
+        await PageHelper.switchToNewTabIfAvailable(0);
+        await PageHelper.switchToNewTabIfAvailable(1);
+
+        stepLogger.step('Validating Top Grid Item Name is Present');
+        await CommonPageHelper.fieldDisplayedValidation(EditCost.editCostLink , ResourcePlannerConstants.topGrid.itemName );
+    }
+    static  async validateProjectOpenViaRightClickInNewTab (stepLogger: StepLogger) {
+        stepLogger.verification('Open project  In New Tab');
+        await ElementHelper.openLinkInNewTab(ProjectItemPage.clickProjectLink);
+
+        await this.validateProjectOpenInNewTab(stepLogger);
     }
 }

@@ -2,6 +2,7 @@ import {BasePage} from '../base-page';
 import {ResourcePlannerConstants} from './resource-planner-page.constants';
 import {By, element} from 'protractor';
 import {ElementHelper} from '../../../components/html/element-helper';
+import {CommonPage} from '../common/common.po';
 
 export class ResourcePlannerPage extends BasePage {
 
@@ -13,6 +14,12 @@ export class ResourcePlannerPage extends BasePage {
         // selecting User which have department Test department 1
         // tslint:disable-next-line:max-line-length
         return element(By.xpath(`//*[normalize-space(text())="${ResourcePlannerConstants.user}"]//following-sibling::td[text()="${ResourcePlannerConstants.department}"]`));
+    }
+    static get editResourceLink() {
+        return CommonPage.ribbonItems.editResource;
+    }
+    static  get editResourceLinkViaEllipse() {
+        return CommonPage.contextMenuOptions.editResource;
     }
     static getHoursHeader() {
         // selecting User which have department Test department 1

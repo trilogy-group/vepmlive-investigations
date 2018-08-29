@@ -5,6 +5,7 @@ import {WaitHelper} from '../../../components/html/wait-helper';
 import {ResourcePlannerConstants} from './resource-planner-page.constants';
 import {CommonPageHelper} from '../common/common-page.helper';
 import {ResourcePlannerPage} from './resource-planner-page.po';
+import {ElementHelper} from '../../../components/html/element-helper';
 
 export class ResourcePlannerPageHelper  {
 
@@ -180,6 +181,20 @@ export class ResourcePlannerPageHelper  {
 
          stepLogger.step('Validating Add is Present');
          await CommonPageHelper.fieldDisplayedValidation
-         (ResourcePlannerPage.buttonSection.add , ResourcePlannerConstants.buttonSection.addButton );     }
+         (ResourcePlannerPage.buttonSection.add , ResourcePlannerConstants.buttonSection.addButton );
+    }
+    static  async validateEditResourceOpenInNewTab(stepLogger: StepLogger) {
+        stepLogger.verification('Switch To new Tab  ');
+        await PageHelper.switchToNewTabIfAvailable(1);
+        await PageHelper.switchToNewTabIfAvailable(0);
+        await PageHelper.switchToNewTabIfAvailable(1);
+
+        stepLogger.step('Validating Top Grid Item Name is Present');
+        await CommonPageHelper.fieldDisplayedValidation(ResourcePlannerPage.topGrid.itemName , ResourcePlannerConstants.topGrid.itemName );
+    }
+    static  async openEditResourceViaRibbonInNewTab (stepLogger: StepLogger) {
+        stepLogger.step('Open edit resource In New Tab');
+        await ElementHelper.openLinkInNewTab(ResourcePlannerPage.editResourceLink);
+    }
 
 }

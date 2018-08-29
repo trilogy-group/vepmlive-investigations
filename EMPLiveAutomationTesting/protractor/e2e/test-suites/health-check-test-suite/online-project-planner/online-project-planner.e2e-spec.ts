@@ -40,6 +40,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         const  projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
 
         stepLogger.stepId(1);
+
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,

@@ -199,7 +199,8 @@ export class CommonPageConstants {
             editTeam: 'Edit Team',
             costPlan: 'Cost Plan',
             editPlan: 'Edit Plan',
-            editCosts: 'Edit Costs'
+            editCosts: 'Edit Costs',
+            editResource: 'Edit Resource Plan'
         };
     }
 

@@ -643,8 +643,8 @@ export class CommonPageHelper {
             await ElementHelper.scrollToElement(label.get(index));
             text = await label.get(index).getText();
             if (text === titleValue) {
-                    itemFound = true;
-                }
+                itemFound = true;
+            }
         }
         return itemFound;
     }
@@ -690,7 +690,7 @@ export class CommonPageHelper {
 
     static getDropDownViewByText(titleView: string) {
         return element(By.xpath(`${ComponentHelpers.getElementByTagXpathWithTag(HtmlHelper.tags.a, `@${HtmlHelper.attributes.class}`,
-         CommonPageConstants.dropDown, true)}${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.span, titleView, false)}`));
+            CommonPageConstants.dropDown, true)}${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.span, titleView, false)}`));
     }
 
     static getDivByText(text: string) {
@@ -724,7 +724,7 @@ export class CommonPageHelper {
             `//following-sibling::td[contains(@class,'${CommonPageConstants.classNames.headerButtonClass}')][1]` +
             `//u[contains(@class,'${sortingClass}')]`));
     }
-  static async fieldDisplayedValidation(targetElement: ElementFinder , name: string) {
+    static async fieldDisplayedValidation(targetElement: ElementFinder , name: string) {
         await expect(await PageHelper.isElementDisplayed(targetElement))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(name));
     }
@@ -785,7 +785,7 @@ export class CommonPageHelper {
         stepLogger.step('Click on Apply Button ');
         await ElementHelper.actionMouseMove(this.getApplyLink());
         await PageHelper.click(this.getApplyLink());
-       }
+    }
     static async waitForApplyButtontoDisplayed() {
         await  WaitHelper.waitForElementToBeClickable(this.getApplyLink());
     }

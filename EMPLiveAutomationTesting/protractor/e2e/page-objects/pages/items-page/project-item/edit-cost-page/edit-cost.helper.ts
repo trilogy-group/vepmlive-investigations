@@ -8,6 +8,8 @@ import {EditCostConstants} from './edit-cost.constants';
 import {HomePage} from '../../../homepage/home.po';
 import {HomePageConstants} from '../../../homepage/home-page.constants';
 import {ExpectationHelper} from '../../../../../components/misc-utils/expectation-helper';
+import {CommonPageConstants} from '../../../common/common-page.constants';
+import {ElementHelper} from '../../../../../components/html/element-helper';
 
 export class EditCostHelper {
 
@@ -94,7 +96,7 @@ export class EditCostHelper {
         const expectedValue = 'ms-cui-ctl-large ms-cui-disabled';
 
         await ExpectationHelper.verifyAttributeValue(CommonPage.ribbonItems.save,  'class', expectedValue, stepLogger);
-       }
+    }
 
     static  async validateEditCostFunctionality(stepLogger: StepLogger, value: number) {
         await this.clickActualCostsTab(stepLogger);
@@ -132,25 +134,25 @@ export class EditCostHelper {
         await this.clickBenefitsTab(stepLogger);
 
         await this.verifyValueInBenefitCost(stepLogger, value);
-   }
+    }
 
     static  async validateEditCostWebElements(stepLogger: StepLogger) {
 
-       stepLogger.verification('Validate that Actual  Cost is Present ');
-       await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.actualCostsTab, EditCostConstants.costTabs.actualCostsTab);
+        stepLogger.verification('Validate that Actual  Cost is Present ');
+        await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.actualCostsTab, EditCostConstants.costTabs.actualCostsTab);
 
-       stepLogger.verification('Validate that budget  Cost is Present ');
-       await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.budgetTab, EditCostConstants.costTabs.budgetTab);
+        stepLogger.verification('Validate that budget  Cost is Present ');
+        await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.budgetTab, EditCostConstants.costTabs.budgetTab);
 
-       stepLogger.verification('Validate that timeSheetActuals  Cost is Present ');
-       await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.timeSheetActuals, EditCostConstants.costTabs.timeSheetActuals);
+        stepLogger.verification('Validate that timeSheetActuals  Cost is Present ');
+        await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.timeSheetActuals, EditCostConstants.costTabs.timeSheetActuals);
 
-       stepLogger.verification('Validate that benefitsTab  Cost is Present ');
-       await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.benefitsTab, EditCostConstants.costTabs.benefitsTab);
+        stepLogger.verification('Validate that benefitsTab  Cost is Present ');
+        await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.benefitsTab, EditCostConstants.costTabs.benefitsTab);
 
-       stepLogger.verification('category is present for benefitsTab  Cost ');
+        stepLogger.verification('category is present for benefitsTab  Cost ');
 
-       await CommonPageHelper.fieldDisplayedValidation(EditCost.category(), EditCostConstants.category);
+        await CommonPageHelper.fieldDisplayedValidation(EditCost.category(), EditCostConstants.category);
     }
 
     static  async validateCostCategoriesInEachTab(stepLogger: StepLogger) {
@@ -201,5 +203,25 @@ export class EditCostHelper {
     static async clickEditCostFromContextMenu(stepLogger: StepLogger) {
         stepLogger.step('Select "Edit Cost" from Context Menu options displayed');
         await PageHelper.click(CommonPage.contextMenuOptions.editCosts);
+    }
+
+    static async verifiyEditCostIsPresent(stepLogger: StepLogger) {
+        stepLogger.verification('Verifiy Edit cost is present');
+        await CommonPageHelper.fieldDisplayedValidation(CommonPage.ribbonItems.editCost, CommonPageConstants.ribbonLabels.editCost);
+    }
+
+    static  async editCostOpenViaRibbonInNewTab (stepLogger: StepLogger) {
+        stepLogger.step('Open Cost In New Tab');
+        await ElementHelper.openLinkInNewTab(EditCost.editCostLink);
+    }
+
+    static  async validateEditCostOpenInNewTab(stepLogger: StepLogger) {
+        stepLogger.verification('Switch To new Tab  ');
+        await PageHelper.switchToNewTabIfAvailable(1);
+        await PageHelper.switchToNewTabIfAvailable(0);
+        await PageHelper.switchToNewTabIfAvailable(1);
+
+        stepLogger.verification('Validate that Actual  Cost is Present ');
+        await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.actualCostsTab, EditCostConstants.costTabs.actualCostsTab);
     }
 }

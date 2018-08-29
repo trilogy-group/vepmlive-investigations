@@ -41,6 +41,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     it('Launch Cost Planner from "View Item" page for Project. - [743217]', async () => {
         const stepLogger = new StepLogger(743217);
         stepLogger.stepId(1);
+
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,

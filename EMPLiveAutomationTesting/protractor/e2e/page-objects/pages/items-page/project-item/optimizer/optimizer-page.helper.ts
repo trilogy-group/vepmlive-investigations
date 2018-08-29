@@ -14,7 +14,7 @@ export class OptimizerPageHelper {
         // this is work around without it not able to work on new tab
         await WaitHelper.waitForElementToBeDisplayed(OptimizerPage.saveStrategy);
 
-        await CommonPageHelper.switchToFirstContentFrame();
+      await CommonPageHelper.switchToFirstContentFrame();
 
         stepLogger.step('Click Configration Button');
         await PageHelper.click(OptimizerPage.configure);
@@ -66,7 +66,7 @@ export class OptimizerPageHelper {
 
         await this.enterStrategyName(stepLogger, strategyName);
 
-        await this.saveNewStratedyName(stepLogger);
+      await this.saveNewStratedyName(stepLogger);
 
         await this.clickShowAllStrategyArrowDown(stepLogger);
 
@@ -79,6 +79,7 @@ export class OptimizerPageHelper {
         await CommonPageHelper.buttonDisplayedValidation(OptimizerPage.optionAvailable, OptimizerPageConstants.avaliableOption);
 
         stepLogger.verification('Optimizer Text is displayed');
+
         await CommonPageHelper.fieldDisplayedValidation(OptimizerPage.optimizerText, OptimizerPageConstants.optimizerText);
 
         stepLogger.verification('Total Field Drop Down is displayed');
@@ -92,6 +93,7 @@ export class OptimizerPageHelper {
 
         stepLogger.verification('Total Field Drop Down is displayed');
         await CommonPageHelper.buttonDisplayedValidation(OptimizerPage.okOption, OptimizerPageConstants.menuConfigure.ok);
+
     }
     static async verifyConfigrationPopUpClosed(stepLogger: StepLogger) {
         stepLogger.verification('Optimizer Configuration Popup closed');

@@ -15,6 +15,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
+
     it('Create New Strategy in Optimizer Functionality - [1124301]', async () => {
         const stepLogger = new StepLogger(1124301);
         const uniqueId = PageHelper.getUniqueId();

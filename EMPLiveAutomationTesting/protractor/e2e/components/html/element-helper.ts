@@ -16,6 +16,11 @@ export class ElementHelper {
         await WaitHelper.waitForElementToBeDisplayed(item);
         return browser.actions().mouseMove(item).perform();
     }
+    static async openLinkInNewTab(targetElement: ElementFinder) {
+        await browser.executeScript(
+            'return window.open(arguments[0].getAttribute("href"),"_blank")',
+            await  targetElement.getWebElement());
+    }
 
     static async actionMouseDown(item: ElementFinder) {
         await WaitHelper.waitForElementToBeDisplayed(item);
@@ -59,7 +64,7 @@ export class ElementHelper {
     }
 
     static async rightClickAndSelectNewTab() {
-        return browser.actions().click(protractor.Button.RIGHT).sendKeys(protractor.Key.ARROW_DOWN)
+        return browser.actions().click(protractor.Button.RIGHT).sendKeys(protractor.Key.ARROW_RIGHT)
             .sendKeys(protractor.Key.ENTER).perform();
     }
 
@@ -168,8 +173,11 @@ export class ElementHelper {
         try {
             const value = await elem.getAttribute(attribute);
             return value.trim();
-        } catch (e) { return '' ; }
+        } catch (e) {
+            return '';
+        }
     }
+
     static async getText(elem: ElementFinder) {
         await WaitHelper.waitForElementToBePresent(elem);
         const text = await elem.getText();
@@ -187,6 +195,7 @@ export class ElementHelper {
     static getAllElementByText(text: string, isContains = false) {
         return element.all(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
     }
+
     static browserRefresh() {
         browser.refresh();
     }

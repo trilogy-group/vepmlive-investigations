@@ -5,6 +5,7 @@ import {CommonPageHelper} from '../../common/common-page.helper';
 import {ProjectItemPageHelper} from './project-item-page.helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
 import {ElementHelper} from '../../../../components/html/element-helper';
+import {CommonPage} from '../../common/common.po';
 
 export class ProjectItemPage extends BasePage {
     static get inputs() {
@@ -378,5 +379,8 @@ export class ProjectItemPage extends BasePage {
     }
     static get noProjecrMsg() {
         return ElementHelper.getElementByText(ProjectItemPageConstants.noDataFound);
+    }
+    static get clickProjectLink() {
+        return CommonPage.getNthProject(2);
     }
 }

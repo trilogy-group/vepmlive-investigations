@@ -17,11 +17,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-
     it('Set Cost Plan for Project - [785226]', async () => {
         const stepLogger = new StepLogger(785226);
         const cost =  4;
         stepLogger.precondition('Creating a project');
+
         const uniqueId = PageHelper.getUniqueId();
 
         const  projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);

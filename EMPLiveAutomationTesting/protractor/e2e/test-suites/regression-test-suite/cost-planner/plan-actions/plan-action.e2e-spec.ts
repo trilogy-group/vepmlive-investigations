@@ -28,6 +28,7 @@ describe(SuiteNames.regressionTestSuite, () => {
             stepLogger);
 
         stepLogger.stepId(2);
+
         await CommonPageHelper.selectRecordAndClickItem(stepLogger);
 
         await IssueItemPageHelper.validateContentOfItemTab(stepLogger);
