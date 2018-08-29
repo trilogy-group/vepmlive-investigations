@@ -2104,7 +2104,7 @@ UPDATE CTE SET QUEUESERVER='''''' + @servername + '''''', STATUS = 0''
 exec(@sql)
 
 SELECT queueuid,timerjobuid,siteguid,webguid,listguid,itemid,jobtype,jobdata,userid,netassembly,netclass,title,[key] 
-FROM vwQueueTimer WHERE QUEUESERVER = @servername and status = 0
+FROM vwQueueTimer WHERE QUEUESERVER = @servername and status = 0 and  priority > @minPriority AND priority <= @maxPriority
 
 END
 ')
