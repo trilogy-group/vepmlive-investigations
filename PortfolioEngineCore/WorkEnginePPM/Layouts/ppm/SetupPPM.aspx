@@ -63,7 +63,20 @@
 			        </wssuc:InputFormControl>
 		        </Template_InputFormControls>
 	        </wssuc:InputFormSection>
-
+			<wssuc:InputFormSection Title="Admin Information"
+		        Description=""
+		        runat="server">
+				<Template_Description>
+		           Enter the account to use as PFE admin. Leave empty for app pool account.
+		        </Template_Description>
+		        <Template_InputFormControls>
+					<wssuc:InputFormControl LabelText="Override Admin User" runat="server">
+				         <Template_Control>
+                            <asp:TextBox id="txtAdminAccount" runat="server"></asp:TextBox>
+				         </Template_Control>
+			        </wssuc:InputFormControl>
+		        </Template_InputFormControls>
+				</wssuc:InputFormSection>
             <wssuc:InputFormSection Title="Database Information"
 		        Description=""
 		        runat="server">
