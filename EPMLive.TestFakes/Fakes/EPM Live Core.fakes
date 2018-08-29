@@ -39,5 +39,6 @@
     <Add Namespace="EPMLiveCore.SocialEngine.Core!"/>
     <Add FullName="EPMLiveCore.ExtensionMethods!"/>
     <Add FullName="EPMLiveCore.API.CommentManager!"/>
+    <Add FullName="EPMLiveCore.ReportHelper.ReportBiz!"/>
   </ShimGeneration>
 </Fakes>
