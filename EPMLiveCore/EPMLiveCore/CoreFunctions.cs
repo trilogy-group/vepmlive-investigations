@@ -92,16 +92,19 @@ namespace EPMLiveCore
                 {
                     stream = assm.GetManifestResourceStream("EPMLiveCore.LanguageFiles." + feature.ToString() + "1033.xml");
                 }
-                StreamReader sr = new StreamReader(stream);
-                doc.LoadXml(sr.ReadToEnd());
-                foreach (XmlNode nd in doc.SelectNodes("/strings/string"))
+                using (var streamReader = new StreamReader(stream))
                 {
-                    hshResources.Add(nd.Attributes["id"].Value, nd.InnerText);
+                    doc.LoadXml(streamReader.ReadToEnd());
+                    foreach (XmlNode node in doc.SelectNodes("/strings/string"))
+                    {
+                        hshResources.Add(node.Attributes["id"].Value, node.InnerText);
+                    }
                 }
             }
             catch (Exception ex)
             {
                 strError = ex.Message;
+                Trace.WriteLine(ex.ToString());
             }
         }
 
