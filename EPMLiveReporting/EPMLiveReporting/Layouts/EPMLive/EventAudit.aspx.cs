@@ -389,8 +389,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             HiddenField hdnListName;
             HiddenField hdnWebUrl;
             string sControlId;
-            var img = new Image();
-
+            
             if (e.Row.RowType != DataControlRowType.Header && e.Row.RowType != DataControlRowType.Footer)
             {
                 cb_add = new CheckBox();
@@ -478,6 +477,59 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             column.HeaderText = "Activate";
             column.DataField = "Activate";
             grdVwResults.Columns.Add(column);
+        }
+
+        public override void Dispose()
+        {
+            if (Controls != null)
+            {
+                for (var i = Controls.Count - 1; i >= 0; i--)
+                {
+                    Controls[i]?.Dispose();
+                }
+            }
+
+            DisposeGridView();
+            DisposeContentHolder();
+
+            base.Dispose();
+        }
+
+        private void DisposeGridView()
+        {
+            if (grdVwResults == null)
+            {
+                return;
+            }
+
+            foreach (SPGridViewRow row in grdVwResults.Rows)
+            {
+                foreach (TableCell cell in row.Cells)
+                {
+                    foreach (Control control in cell.Controls)
+                    {
+                        control?.Dispose();
+                    }
+                }
+            }
+
+            grdVwResults.Dispose();
+        }
+
+        private void DisposeContentHolder()
+        {
+            var contenPlaceHolder = (ContentPlaceHolder)Master?.FindControl("ctl00$PlaceHolderMain");
+            if (contenPlaceHolder == null)
+            {
+                return;
+            }
+
+            foreach(Control control in contenPlaceHolder.Controls)
+            {
+                control?.Dispose();
+            }
+
+            contenPlaceHolder.Dispose();
         }
     }
 }
