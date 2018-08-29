@@ -4111,7 +4111,6 @@ namespace TimeSheets
 
             try
             {
-
                 XmlDocument docIn = new XmlDocument();
                 docIn.LoadXml(data);
 
@@ -4144,8 +4143,6 @@ namespace TimeSheets
                 }
                 catch { }
 
-
-
                 XmlNode ndCfg = docOut.FirstChild.SelectSingleNode("//Cfg");
 
                 int temp = 0;
@@ -4154,12 +4151,16 @@ namespace TimeSheets
 
                 Dictionary<string, string> viewInfo = new Dictionary<string, string>();
 
-                EPMLiveCore.API.ViewManager views = null;
+                ViewManager views = null;
 
                 if (bNonWork)
+                {
                     views = GetNonWorkViews(oWeb);
+                }
                 else
+                {
                     views = GetWorkViews(oWeb);
+                }
 
                 foreach (KeyValuePair<string, Dictionary<string, string>> key in views.Views)
                 {
@@ -4189,28 +4190,25 @@ namespace TimeSheets
 
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-
-                    SqlConnection cn = null;
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    using (var connection = GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                     {
-                        cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                        cn.Open();
-                    });
+                        using (var command = new SqlCommand(
+                            "SELECT USER_ID, PERIOD_ID FROM dbo.TSTIMESHEET " +
+                            "INNER JOIN dbo.TSUSER ON dbo.TSTIMESHEET.TSUSER_UID = dbo.TSUSER.TSUSERUID where TS_UID=@uid",
+                            connection))
+                        {
+                            command.Parameters.AddWithValue("@uid", TSID);
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    sUser = reader.GetInt32(0).ToString();
+                                }
+                            }
+                        }
 
-                    SqlCommand cmd = new SqlCommand("SELECT USER_ID, PERIOD_ID FROM         dbo.TSTIMESHEET INNER JOIN dbo.TSUSER ON dbo.TSTIMESHEET.TSUSER_UID = dbo.TSUSER.TSUSERUID where TS_UID=@uid", cn);
-                    cmd.Parameters.AddWithValue("@uid", TSID);
-                    SqlDataReader drTS = cmd.ExecuteReader();
-
-                    if (drTS.Read())
-                    {
-                        sUser = drTS.GetInt32(0).ToString();
-
+                        FillTimesheetItemsDataset(TSID, dsCur, connection);
                     }
-                    drTS.Close();
-
-                    FillTimesheetItemsDataset(TSID, dsCur, cn);
-
-                    cn.Close();
 
                     if (sUser == "")
                     {
@@ -4279,8 +4277,6 @@ namespace TimeSheets
 
                 if (sUser != "")
                 {
-
-
                     XmlNode ndBody = docOut.SelectSingleNode("//Body/B");
 
                     DataTable work = GetWorkDT(oWeb, bOtherWork, bNonWork, sUser, settings, SearchField, SearchText);
@@ -4298,13 +4294,6 @@ namespace TimeSheets
                             attr.Value = settings.NonWorkList;
 
                         ndRow.Attributes.Append(attr);
-
-                        //if(bNonWork)
-                        //{
-                        //    attr = docOut.CreateAttribute("CanGroup");
-                        //    attr.Value = "0";
-                        //    ndRow.Attributes.Append(attr);
-                        //}
 
                         attr = docOut.CreateAttribute("UID");
                         attr.Value = Guid.NewGuid().ToString();

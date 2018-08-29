@@ -67,6 +67,7 @@
     <Reference Include="System.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Data.4.0.0.0.Fakes.dll</HintPath>
@@ -98,6 +99,7 @@
   <ItemGroup>
     <Compile Include="API\TimesheetAPI.GenerateTSFromPast.Tests.cs" />
     <Compile Include="API\TimesheetAPI.ApproveTimesheetsCore.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetWork.Tests.cs" />
     <Compile Include="API\TimesheetAPI.GetTSDataSet.Tests.cs" />
     <Compile Include="API\TimesheetAPI.FillTimesheetItemsDataset.Tests.cs" />
     <Compile Include="API\TimesheetAPI.CheckApproveStatus.Tests.cs" />
@@ -109,6 +111,11 @@
     <Compile Include="API\TimesheetAPITests.cs" />
     <Compile Include="GetTsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
     <Compile Include="SheetTestBase.cs" />
     <Compile Include="WebPageCode\GetPMApprovalsTests.cs" />
     <Compile Include="WebPageCode\GetTSApprovalsTests.cs" />
@@ -137,6 +144,12 @@
   <ItemGroup>
     <None Include="EPMLiveTimesheets.Tests.snk" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
