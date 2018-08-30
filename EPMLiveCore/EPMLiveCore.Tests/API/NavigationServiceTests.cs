@@ -165,7 +165,6 @@ namespace EPMLiveCore.Tests.API
 
         private void SetupForGetContextualMenuItems(out string data)
         {
-
             data = $@"<Root>
                         <Params>
                             <SiteId>{SiteId}</SiteId>
