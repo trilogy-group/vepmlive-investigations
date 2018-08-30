@@ -200,7 +200,8 @@ namespace EPMLiveReportsAdmin.Jobs
                 sbErrors = null;
                 var refreshLists = new RefreshLists(web, "");
                 refreshLists.SaveResults(dtListResults, base.JobUid);
-                finishJob();
+                //Already Called in TimerClass.cs
+                //finishJob();
 
                 hshMessages = null;
                 if (dtListResults != null)

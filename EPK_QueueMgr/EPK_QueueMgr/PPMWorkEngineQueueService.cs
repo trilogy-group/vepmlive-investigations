@@ -233,6 +233,7 @@ namespace WE_QueueMgr
         private void DoMonitor()
         {
             DateTime lastCheck = DateTime.Now;
+			bool firstBeat = false;
             while (!token.IsCancellationRequested)
             {
                 //If task is faulted
@@ -253,8 +254,9 @@ namespace WE_QueueMgr
                 }
 
                 DateTime newCheck = DateTime.Now;
-                if (newCheck - lastCheck > heartBeatPeriod)
+                if (!firstBeat || newCheck - lastCheck > heartBeatPeriod)
                 {
+					firstBeat = true;
                     lastCheck = newCheck;
                     List<QMSite> sites = Sites;
                     if (sites != null)

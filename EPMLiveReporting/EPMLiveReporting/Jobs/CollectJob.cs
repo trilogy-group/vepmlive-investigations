@@ -532,7 +532,8 @@ namespace EPMLiveReportsAdmin.Jobs
             {
                 sErrors = sbErrors.ToString();
                 sbErrors = null;
-                finishJob();
+                //Already calling from TimerClass
+                //finishJob();
                 hshMessages = null;
                 if (epmdata != null)
                     epmdata.Dispose();

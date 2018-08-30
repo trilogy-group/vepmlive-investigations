@@ -181,7 +181,8 @@ namespace EPMLiveCore.Jobs
                     bErrors = true;
                     sbErrors.Append("Execute Error: " + ex.Message);
                 }
-                finishJob();
+                //Already Called in TimerClass.cs
+                //finishJob();
 
                 using (cn = CreateConnection())
                 {
