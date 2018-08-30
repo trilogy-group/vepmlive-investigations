@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -89,9 +91,74 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     }
                 }
             }.Instance;
-            
+
             // Act
             _privateObj.Invoke("ProcessResources", BindingFlags.Instance | BindingFlags.NonPublic, new object[] { oResourcePool });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void ProcessNonWork_WhenCalled_UpdatesListItem()
+        {
+            // Arrange
+            const string choice1 = "choice1";
+
+            var actual = false;
+            var oResourcePool = new ShimSPList().Instance;
+
+            ShimSPWeb.AllInstances.ListsGet = (spWeb) => new ShimSPListCollection()
+            {
+                TryGetListString = input =>
+                {
+                    if (input == "Non Work")
+                    {
+                        return new ShimSPList()
+                        {
+                            ItemsGet = () => new ShimSPListItemCollection()
+                            {
+                                GetDataTable = () =>
+                                {
+                                    var dTable = new DataTable();
+
+                                    dTable.Columns.Add("Title");
+                                    var row = dTable.NewRow();
+                                    row["Title"] = $"{choice1}{choice1}";
+                                    dTable.Rows.Add(row);
+
+                                    return dTable;
+                                },
+                                Add = () => new ShimSPListItem()
+                                {
+                                    ItemGetString = (key) => choice1,
+                                    Update = () =>
+                                    {
+                                        actual = true;
+                                    }
+                                }
+                            }
+                        };
+                    }
+
+                    return new ShimSPList()
+                    {
+                        FieldsGet = () => new ShimSPFieldCollection()
+                        {
+                            GetFieldByInternalNameString = _ => new ShimSPFieldChoice()
+                        }
+                    };
+                }
+            };
+
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Choice;
+            ShimSPFieldMultiChoice.AllInstances.ChoicesGet = _ => new StringCollection()
+            {
+                choice1
+            };
+
+            // Act
+            _privateObj.Invoke("ProcessNonWork", BindingFlags.Instance | BindingFlags.NonPublic, new object[] { oResourcePool });
 
             // Assert
             actual.ShouldBeTrue();
