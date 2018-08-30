@@ -103,6 +103,10 @@
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml.Linq.4.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Xml.Linq.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">

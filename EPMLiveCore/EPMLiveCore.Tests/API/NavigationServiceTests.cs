@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml.Linq.Fakes;
 using EPMLiveCore.API;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Controls.Navigation.Providers.Fakes;
@@ -13,7 +11,6 @@ using EPMLiveCore.Infrastructure.Navigation.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
-using Microsoft.SharePoint.Workflow;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
@@ -31,6 +28,16 @@ namespace EPMLiveCore.Tests.API
         private const int DummyInt = 1;
         private const string DummyString = "DummyString";
         private const string DummyUrl = "http://xyz.com/";
+
+        private const string LinkProvidersField = "_linkProviders";
+        private const string ContextualMenusTag = "<ContextualMenus>";
+        private const string CDataTag = "<![CDATA[";
+        private const string ExceptionTag = "Exception";
+        private const string SiteId = "57AE2E9B-1E0D-448C-83B0-417DD99EDCBA";
+        private const string WebId = "F5DBB19B-0B55-4EFB-A000-DD768E3B5ADE";
+        private const string ListId = "50DBAFD2-7083-4DDD-8BCB-48B325AE1188";
+        private const string ReorderGuid = "EFFA3011-4F47-4072-B035-CC3E12DBA08A";
+        private const string LPPFEPermissionCheckMethod = "LPPFEPermissionCheck";
 
         [TestInitialize]
         public void TestInitialize()
@@ -71,7 +78,7 @@ namespace EPMLiveCore.Tests.API
             var linkProviders = new Dictionary<string, INavLinkProvider> { [DummyString] = new ShimApplicationsLinkProvider().Instance };
             _testObj = new NavigationService(DummyString, _web);
             _privateObj = new PrivateObject(_testObj);
-            _privateObj.SetFieldOrProperty("_linkProviders", linkProviders);
+            _privateObj.SetFieldOrProperty(LinkProvidersField, linkProviders);
         }
 
         private void SetupShims()
@@ -90,16 +97,85 @@ namespace EPMLiveCore.Tests.API
         public void GetContextualMenuItems_OnValidCall_ConfirmResult()
         {
             // Arrange
-            var data = $@"<Root>
-                            <Params>
-                                <SiteId>57AE2E9B-1E0D-448C-83B0-417DD99EDCBA</SiteId>
-                                <WebId>F5DBB19B-0B55-4EFB-A000-DD768E3B5ADE</WebId>
-                                <ListId>50DBAFD2-7083-4DDD-8BCB-48B325AE1188</ListId>
-                                <ItemId>{DummyInt}</ItemId>
-                                <UserId>{DummyInt}</UserId>
-                                <DebugMode>true</DebugMode>
-                            </Params>
-                          </Root>";
+            var data = string.Empty;
+            SetupForGetContextualMenuItems(out data);
+            ShimSPList.AllInstances.TitleGet = _ => DummyString;
+
+            ShimNavigationService.GetGeneralActionsBooleanSPListBooleanDictionaryOfStringStringOut =
+                (bool usePopup, SPList list, bool bFancyForms, out Dictionary<string, string> dictionary) =>
+                {
+                    dictionary = null;
+                    return new Tuple<string, string, string, string, bool>[] 
+                    {
+                        new Tuple<string, string, string, string, bool>(DummyString, DummyString, DummyString, DummyString, true)
+                    };
+                };
+
+            ShimCoreFunctions.GetPlannerListSPWebSPListItem = (_, __) => new Dictionary<string, PlannerDefinition>
+            {
+                [DummyString] = new PlannerDefinition { commandPrefix = DummyString }
+            };
+
+            // Act
+            var result = _testObj.GetContextualMenuItems(data) as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldContain(ContextualMenusTag),
+                () => result.ShouldContain(CDataTag));
+        }
+
+        [TestMethod]
+        public void GetContextualMenuItems_WhenResourcesAndErrorOnCreateMenu_ConfirmResult()
+        {
+            // Arrange
+            var data = string.Empty;
+            const string Resources = "Resources";
+            SetupForGetContextualMenuItems(out data);
+            ShimSPList.AllInstances.TitleGet = _ => Resources;
+
+            // Act
+            var result = _testObj.GetContextualMenuItems(data) as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldContain(ContextualMenusTag),
+                () => result.ShouldContain(ExceptionTag));
+        }
+
+        [TestMethod]
+        public void GetContextualMenuItems_WhenErrorOnCreateMenu_ConfirmResult()
+        {
+            // Arrange
+            var data = string.Empty;
+            SetupForGetContextualMenuItems(out data);
+            ShimSPList.AllInstances.TitleGet = _ => DummyString;
+
+            // Act
+            var result = _testObj.GetContextualMenuItems(data) as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldContain(ContextualMenusTag),
+                () => result.ShouldContain(ExceptionTag));
+        }
+
+        private void SetupForGetContextualMenuItems(out string data)
+        {
+
+            data = $@"<Root>
+                        <Params>
+                            <SiteId>{SiteId}</SiteId>
+                            <WebId>{WebId}</WebId>
+                            <ListId>{ListId}</ListId>
+                            <ItemId>{DummyInt}</ItemId>
+                            <UserId>{DummyInt}</UserId>
+                            <DebugMode>true</DebugMode>
+                        </Params>
+                      </Root>";
 
             InitConstructorSPWeb();
 
@@ -131,7 +207,19 @@ namespace EPMLiveCore.Tests.API
                                 RootWebGet = () => new ShimSPWeb()
                             }
                         },
-                        TitleGet = () => DummyString
+                        GetItemByIdInt32 = a => new ShimSPListItem
+                        {
+                            ParentListGet = () => new ShimSPList(),
+                            ModerationInformationGet = () => new ShimSPModerationInformation
+                            {
+                                StatusGet = () => SPModerationStatusType.Approved
+                            },
+                            WebGet = () => new ShimSPWeb
+                            {
+                                IDGet = () => Guid.NewGuid()
+                            },
+                            ItemGetString = b => DummyString
+                        }
                     }
                 }
             };
@@ -142,27 +230,278 @@ namespace EPMLiveCore.Tests.API
             ShimSPWeb.AllInstances.CurrentUserGet = _ => new ShimSPUser();
 
             ShimListCommands.GetGridGanttSettingsSPList = _ => new ShimGridGanttSettings();
-
-            ShimNavigationService.GetGeneralActionsBooleanSPListBooleanDictionaryOfStringStringOut =
-                (bool usePopup, SPList list, bool bFancyForms, out Dictionary<string, string> dictionary) =>
-                {
-                    dictionary = null;
-                    return new Tuple<string, string, string, string, bool>[] 
-                    {
-                        new Tuple<string, string, string, string, bool>(DummyString, DummyString, DummyString, DummyString, true)
-                    };
-                };
-
-            // Act
-            var result = _testObj.GetContextualMenuItems(data) as string;
-
-            // Assert
-            result.ShouldSatisfyAllConditions(
-                () => result.ShouldNotBeNull(),
-                () => result.ShouldContain("<ContextualMenus>"),
-                () => result.ShouldContain("<![CDATA["));
         }
 
+        [TestMethod]
+        public void GetContextualMenuItems_WhenNoRootElement_ThrowException()
+        {
+            // Arrange
+            const string data = "<Test />";
+            InitConstructorSPWeb();
+
+            ShimXDocument.AllInstances.RootGet = _ => null;
+
+            // Act
+            Action action = () => _testObj.GetContextualMenuItems(data);
+
+            // Assert
+            var exception = Should.Throw<APIException>(action);
+            this.ShouldSatisfyAllConditions(
+                () => exception.ShouldNotBeNull(),
+                () => exception.Message.ShouldContain("Root element is missing."));
+        }
+
+        [TestMethod]
+        public void GetContextualMenuItems_WhenNoParamsElement_ThrowException()
+        {
+            // Arrange
+            const string data = "<Root />";
+
+            InitConstructorSPWeb();
+
+            // Act
+            Action action = () => _testObj.GetContextualMenuItems(data);
+
+            // Assert
+            var exception = Should.Throw<APIException>(action);
+            this.ShouldSatisfyAllConditions(
+                () => exception.ShouldNotBeNull(),
+                () => exception.Message.ShouldContain("GetContextualMenuItems/Params element is missing."));
+        }
+
+        [TestMethod]
+        public void GetContextualMenuItems_WhenNoSiteIdElement_ThrowException()
+        {
+            // Arrange
+            const string data = "<Root><Params></Params></Root>";
+
+            InitConstructorSPWeb();
+
+            // Act
+            Action action = () => _testObj.GetContextualMenuItems(data);
+
+            // Assert
+            var exception = Should.Throw<APIException>(action);
+            this.ShouldSatisfyAllConditions(
+                () => exception.ShouldNotBeNull(),
+                () => exception.Message.ShouldContain("GetContextualMenuItems/Params/SiteId element is missing."));
+        }
+
+        [TestMethod]
+        public void GetContextualMenuItems_WhenInvalidSiteId_ThrowException()
+        {
+            // Arrange
+            var data = $@"<Root>
+                            <Params>
+                                <SiteId>{DummyString}</SiteId>
+                            </Params>
+                          </Root>";
+
+            InitConstructorSPWeb();
+
+            // Act
+            Action action = () => _testObj.GetContextualMenuItems(data);
+
+            // Assert
+            var exception = Should.Throw<APIException>(action);
+            this.ShouldSatisfyAllConditions(
+                () => exception.ShouldNotBeNull(),
+                () => exception.Message.ShouldContain("(SiteId)"));
+        }
+
+        [TestMethod]
+        public void GetContextualMenuItems_WhenNoWebIdElement_ThrowException()
+        {
+            // Arrange
+            var data = $@"<Root>
+                            <Params>
+                                <SiteId>{SiteId}</SiteId>
+                            </Params>
+                          </Root>";
+
+            InitConstructorSPWeb();
+
+            // Act
+            Action action = () => _testObj.GetContextualMenuItems(data);
+
+            // Assert
+            var exception = Should.Throw<APIException>(action);
+            this.ShouldSatisfyAllConditions(
+                () => exception.ShouldNotBeNull(),
+                () => exception.Message.ShouldContain("GetContextualMenuItems/Params/WebId element is missing."));
+        }
+
+        [TestMethod]
+        public void GetContextualMenuItems_WhenInvalidWebId_ThrowException()
+        {
+            // Arrange
+            var data = $@"<Root>
+                            <Params>
+                                <SiteId>{SiteId}</SiteId>
+                                <WebId>{DummyString}</WebId>
+                            </Params>
+                          </Root>";
+
+            InitConstructorSPWeb();
+
+            // Act
+            Action action = () => _testObj.GetContextualMenuItems(data);
+
+            // Assert
+            var exception = Should.Throw<APIException>(action);
+            this.ShouldSatisfyAllConditions(
+                () => exception.ShouldNotBeNull(),
+                () => exception.Message.ShouldContain("(WebId)"));
+        }
+
+        [TestMethod]
+        public void GetContextualMenuItems_WhenNoListIdElement_ThrowException()
+        {
+            // Arrange
+            var data = $@"<Root>
+                            <Params>
+                                <SiteId>{SiteId}</SiteId>
+                                <WebId>{WebId}</WebId>
+                            </Params>
+                          </Root>";
+
+            InitConstructorSPWeb();
+
+            // Act
+            Action action = () => _testObj.GetContextualMenuItems(data);
+
+            // Assert
+            var exception = Should.Throw<APIException>(action);
+            this.ShouldSatisfyAllConditions(
+                () => exception.ShouldNotBeNull(),
+                () => exception.Message.ShouldContain("GetContextualMenuItems/Params/ListId element is missing."));
+        }
+
+        [TestMethod]
+        public void GetContextualMenuItems_WhenInvalidListId_ThrowException()
+        {
+            // Arrange
+            var data = $@"<Root>
+                            <Params>
+                                <SiteId>{SiteId}</SiteId>
+                                <WebId>{WebId}</WebId>
+                                <ListId>{DummyString}</ListId>
+                            </Params>
+                          </Root>";
+
+            InitConstructorSPWeb();
+
+            // Act
+            Action action = () => _testObj.GetContextualMenuItems(data);
+
+            // Assert
+            var exception = Should.Throw<APIException>(action);
+            this.ShouldSatisfyAllConditions(
+                () => exception.ShouldNotBeNull(),
+                () => exception.Message.ShouldContain("(ListId)"));
+        }
+
+        [TestMethod]
+        public void GetContextualMenuItems_WhenNoItemIdElement_ThrowException()
+        {
+            // Arrange
+            var data = $@"<Root>
+                            <Params>
+                                <SiteId>{SiteId}</SiteId>
+                                <WebId>{WebId}</WebId>
+                                <ListId>{ListId}</ListId>
+                            </Params>
+                          </Root>";
+
+            InitConstructorSPWeb();
+
+            // Act
+            Action action = () => _testObj.GetContextualMenuItems(data);
+
+            // Assert
+            var exception = Should.Throw<APIException>(action);
+            this.ShouldSatisfyAllConditions(
+                () => exception.ShouldNotBeNull(),
+                () => exception.Message.ShouldContain("GetContextualMenuItems/Params/ItemId element is missing."));
+        }
+
+
+        [TestMethod]
+        public void GetContextualMenuItems_WhenInvalidItemId_ThrowException()
+        {
+            // Arrange
+            var data = $@"<Root>
+                            <Params>
+                                <SiteId>{SiteId}</SiteId>
+                                <WebId>{WebId}</WebId>
+                                <ListId>{ListId}</ListId>
+                                <ItemId>{DummyString}</ItemId>
+                            </Params>
+                          </Root>";
+
+            InitConstructorSPWeb();
+
+            // Act
+            Action action = () => _testObj.GetContextualMenuItems(data);
+
+            // Assert
+            var exception = Should.Throw<APIException>(action);
+            this.ShouldSatisfyAllConditions(
+                () => exception.ShouldNotBeNull(),
+                () => exception.Message.ShouldContain("(ItemId)"));
+        }
+
+        [TestMethod]
+        public void GetContextualMenuItems_WhenNoUserIdElement_ThrowException()
+        {
+            // Arrange
+            var data = $@"<Root>
+                            <Params>
+                                <SiteId>{SiteId}</SiteId>
+                                <WebId>{WebId}</WebId>
+                                <ListId>{ListId}</ListId>
+                                <ItemId>{DummyInt}</ItemId>
+                            </Params>
+                          </Root>";
+
+            InitConstructorSPWeb();
+
+            // Act
+            Action action = () => _testObj.GetContextualMenuItems(data);
+
+            // Assert
+            var exception = Should.Throw<APIException>(action);
+            this.ShouldSatisfyAllConditions(
+                () => exception.ShouldNotBeNull(),
+                () => exception.Message.ShouldContain("GetContextualMenuItems/Params/UserId element is missing."));
+        }
+
+        [TestMethod]
+        public void GetContextualMenuItems_WhenInvalidUserId_ThrowException()
+        {
+            // Arrange
+            var data = $@"<Root>
+                            <Params>
+                                <SiteId>{SiteId}</SiteId>
+                                <WebId>{WebId}</WebId>
+                                <ListId>{ListId}</ListId>
+                                <ItemId>{DummyInt}</ItemId>
+                                <UserId>{DummyString}</UserId>
+                            </Params>
+                          </Root>";
+
+            InitConstructorSPWeb();
+
+            // Act
+            Action action = () => _testObj.GetContextualMenuItems(data);
+
+            // Assert
+            var exception = Should.Throw<APIException>(action);
+            this.ShouldSatisfyAllConditions(
+                () => exception.ShouldNotBeNull(),
+                () => exception.Message.ShouldContain("(UserId)"));
+        }
+        
         [TestMethod]
         public void GetLinks_OnValidCall_ConfirmResults()
         {
@@ -177,7 +516,7 @@ namespace EPMLiveCore.Tests.API
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNull(),
                 () => result.ShouldContain(DummyString),
-                () => result.ShouldContain("<![CDATA["),
+                () => result.ShouldContain(CDataTag),
                 () => result.ShouldContain("NavLink"));
         }
 
@@ -186,16 +525,35 @@ namespace EPMLiveCore.Tests.API
         {
             // Arrange
             var removed = false;
-            var guid = "EFFA3011-4F47-4072-B035-CC3E12DBA08A";
             ShimGenericLinkProvider.ConstructorGuidGuidString = (_, __, ___, ____) => { };
             ShimGenericLinkProvider.AllInstances.RemoveGuid = (_, __) => removed = true;
             InitConstructorSPWeb();
 
             // Act
-            _testObj.RemoveNavigationLink(guid);
+            _testObj.RemoveNavigationLink(ReorderGuid);
 
             // Assert
             removed.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void RemoveNavigationLink_OnError_ThrowException()
+        {
+            // Arrange
+            var removed = false;
+            ShimGenericLinkProvider.ConstructorGuidGuidString = (_, __, ___, ____) => { };
+            ShimGenericLinkProvider.AllInstances.RemoveGuid = (_, __) => removed = true;
+            InitConstructorSPWeb();
+
+            // Act
+            Action action = () => _testObj.RemoveNavigationLink(DummyString);
+
+            // Assert
+            var exception = Should.Throw<APIException>(action);
+            this.ShouldSatisfyAllConditions(
+                () => exception.ShouldNotBeNull(),
+                () => exception.Message.ShouldContain("[NavigationService:RemoveNavigationLink]"),
+                () => removed.ShouldBeFalse());
         }
 
         [TestMethod]
@@ -203,17 +561,37 @@ namespace EPMLiveCore.Tests.API
         {
             // Arrange
             var reordered = false;
-            var guid = "EFFA3011-4F47-4072-B035-CC3E12DBA08A";
             InitConstructorSPWeb();
 
             ShimGenericLinkProvider.ConstructorGuidGuidString = (_, __, ___, ____) => { };
             ShimGenericLinkProvider.AllInstances.ReorderDictionaryOfGuidInt32 = (_, __) => reordered = true;
 
             // Act
-            _testObj.ReorderLinks($"{guid}:{DummyInt}");
+            _testObj.ReorderLinks($"{ReorderGuid}:{DummyInt}");
 
             // Assert
             reordered.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void ReorderLinks_OnError_ThrowException()
+        {
+            // Arrange
+            var reordered = false;
+            InitConstructorSPWeb();
+
+            ShimGenericLinkProvider.ConstructorGuidGuidString = (_, __, ___, ____) => { throw new Exception();  };
+            ShimGenericLinkProvider.AllInstances.ReorderDictionaryOfGuidInt32 = (_, __) => reordered = true;
+
+            // Act
+            Action action = () => _testObj.ReorderLinks($"{ReorderGuid}:{DummyInt}");
+
+            // Assert
+            var exception = Should.Throw<APIException>(action);
+            this.ShouldSatisfyAllConditions(
+                () => exception.ShouldNotBeNull(),
+                () => exception.Message.ShouldContain("[NavigationService:ReorderLinks]"),
+                () => reordered.ShouldBeFalse());
         }
 
         [TestMethod]
@@ -241,7 +619,7 @@ namespace EPMLiveCore.Tests.API
             // Act, Assert
             foreach (var permission in permissionsList)
             {
-                var result = _privateType.InvokeStatic("LPPFEPermissionCheck", new ShimSPList().Instance, permission) as bool?;
+                var result = _privateType.InvokeStatic(LPPFEPermissionCheckMethod, new ShimSPList().Instance, permission) as bool?;
 
                 result.ShouldSatisfyAllConditions(
                     () => result.ShouldNotBeNull(),
