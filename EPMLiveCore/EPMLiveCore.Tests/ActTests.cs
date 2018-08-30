@@ -24,6 +24,7 @@ namespace EPMLiveCore.Tests
         private const string ResLevelColumn = "ResLevel";
         private const string UserCountColumn = "UserCount";
         private const string QuantityColumn = "quantity";
+        private const string _checkOnlineFeatureLicenseMethod = "CheckOnlineFeatureLicense";
 
         [TestInitialize]
         public void SetUp()
@@ -105,7 +106,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actual = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", ActFeature.ProjectServer, UserName, site);
+            var actual = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, ActFeature.ProjectServer, UserName, site);
 
             // Assert
             Assert.AreEqual(expectedOutput, actual);
@@ -126,7 +127,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actual = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature, UserName, site);
+            var actual = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature, UserName, site);
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -147,7 +148,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actual = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature, UserName, site);
+            var actual = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature, UserName, site);
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -168,7 +169,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actual = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature, UserName, site);
+            var actual = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature, UserName, site);
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -189,7 +190,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actual = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature, UserName, site);
+            var actual = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature, UserName, site);
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -210,7 +211,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actual = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature, UserName, site);
+            var actual = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature, UserName, site);
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -230,7 +231,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var systemUserOutput = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature, SystemUserName, site);
+            var systemUserOutput = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature, SystemUserName, site);
 
             // Assert
             Assert.AreEqual(0, systemUserOutput);
@@ -250,7 +251,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var userLevelOutput = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature, UserName, site);
+            var userLevelOutput = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature, UserName, site);
 
             // Assert
             Assert.AreEqual(0, userLevelOutput);
@@ -273,7 +274,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actualSystemUser = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature1, SystemUserName, site);
+            var actualSystemUser = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature1, SystemUserName, site);
 
             // Assert
             Assert.AreEqual(0, actualSystemUser);
@@ -296,7 +297,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actualUserr = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature2, UserName, site);
+            var actualUserr = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature2, UserName, site);
 
             // Assert
             Assert.AreEqual(0, actualUserr);
@@ -329,7 +330,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actualNotPurchased = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature2, UserName, site);
+            var actualNotPurchased = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature2, UserName, site);
 
             // Assert
             Assert.AreEqual(5, actualNotPurchased);
@@ -362,7 +363,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actualPurchased = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature1, UserName, site);
+            var actualPurchased = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature1, UserName, site);
 
             // Assert
             Assert.AreEqual(6, actualPurchased);
@@ -385,7 +386,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actualPurchased = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature1, UserName, site);
+            var actualPurchased = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature1, UserName, site);
 
             // Assert
             Assert.AreEqual(0, actualPurchased);
@@ -408,7 +409,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actualPurchased = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature1, UserName, site);
+            var actualPurchased = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature1, UserName, site);
 
             // Assert
             Assert.AreEqual(2, actualPurchased);
@@ -430,7 +431,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actualSystemUser = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature, SystemUserName, site);
+            var actualSystemUser = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature, SystemUserName, site);
 
             // Assert
             Assert.AreEqual(0, actualSystemUser);
@@ -452,7 +453,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actualUserr = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature, UserName, site);
+            var actualUserr = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature, UserName, site);
 
             // Assert
             Assert.AreEqual(0, actualUserr);
@@ -474,7 +475,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actualUserr = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature, UserName, site);
+            var actualUserr = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature, UserName, site);
 
             // Assert
             Assert.AreEqual(6, actualUserr);
@@ -496,7 +497,7 @@ namespace EPMLiveCore.Tests
             ShimCoreFunctions.getPrefixSPSite = _ => string.Empty;
 
             // Act
-            var actualUserr = (int)_privateObj.Invoke("CheckOnlineFeatureLicense", feature, UserName, site);
+            var actualUserr = (int)_privateObj.Invoke(_checkOnlineFeatureLicenseMethod, feature, UserName, site);
 
             // Assert
             Assert.AreEqual(-1, actualUserr);
