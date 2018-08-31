@@ -34,6 +34,18 @@ namespace EPMLiveWebParts.Tests.UserProfileDisplay
         private const string RenderMethod = "Render";
         private const string SharePointSystemUser = @"sharepoint\system";
         private const string FeatureNotActivatedMessage = "This feature has not been activated.";
+        private const string LargeImageDiv = "<div id=\"imgDivLarge\">";
+        private const string ImageDiv = "<div id=\"imgDiv\">";
+        private const string LargeImageProfilePicture = "<div class=\"ms-profilepicture ms-contactcardpicture ms-largethumbnailimage\">";
+        private const string ImageProfilePicture = "<div class=\"ms-profilepicture ms-contactcardpicture ms-smallthumbnailimage\">";
+        private const string JavascriptInit = @"<script type=""text/javascript"">";
+        private const string OptionsMenuUrl = @"options.url = L_Menu_BaseUrl + ""/_layouts/epmlive/UploadProfilePicture.aspx"";";
+        private const string OptionsDialogCallback = @"options.dialogReturnValueCallback = Function.createDelegate(null, modalDialogClosedCallback);";
+        private const string ShowModalDialog = @"SP.UI.ModalDialog.showModalDialog(options);";
+        private const string ProfileImageSource = @"$('#ProfileImage').attr(""src"",";
+        string _largeProfileImage = $"<img id=\"ProfileImage\" src=\"{DummyString}\" width=\"144\" height=\"144\" onerror=\"this.src='_layouts/epmlive/images/DisplayProfilePicture/DefaultProfilePic.png';\"></img>";
+        string _userLink = $"<a href=\"/_layouts/userdisp.aspx?Source={ExampleUrl}/\">";
+        string _profileImage = $"<img id=\"ProfileImage\" src=\"{DummyString}\" width=\"93\" height=\"96\" onerror=\"this.src='_layouts/epmlive/images/DisplayProfilePicture/DefaultProfilePic.png';\"></img>";
         private DisplayProfilePictures _testObject;
         private PrivateObject _privateObject;
         private IDisposable _shimsContext;
@@ -133,11 +145,11 @@ namespace EPMLiveWebParts.Tests.UserProfileDisplay
             // Assert
             var result = _htmlBuilder.ToString();
             result.ShouldSatisfyAllConditions(
-                () => result.ShouldContain(@"<script type=""text/javascript"">"),
-                () => result.ShouldContain(@"options.url = L_Menu_BaseUrl + ""/_layouts/epmlive/UploadProfilePicture.aspx"";"),
-                () => result.ShouldContain(@"options.dialogReturnValueCallback = Function.createDelegate(null, modalDialogClosedCallback);"),
-                () => result.ShouldContain(@"SP.UI.ModalDialog.showModalDialog(options);"),
-                () => result.ShouldContain(@"$('#ProfileImage').attr(""src"","));
+                () => result.ShouldContain(JavascriptInit),
+                () => result.ShouldContain(OptionsMenuUrl),
+                () => result.ShouldContain(OptionsDialogCallback),
+                () => result.ShouldContain(ShowModalDialog),
+                () => result.ShouldContain(ProfileImageSource));
         }
 
         [TestMethod]
@@ -155,11 +167,10 @@ namespace EPMLiveWebParts.Tests.UserProfileDisplay
             var result = _htmlBuilder.ToString();
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNullOrWhiteSpace(),
-                () => result.ShouldContain("<div id=\"imgDivLarge\">"),
-                () => result.ShouldContain("<div class=\"ms-profilepicture ms-contactcardpicture ms-largethumbnailimage\">"),
-                () => result.ShouldContain($"<img id=\"ProfileImage\" src=\"{DummyString}\" width=\"144\" height=\"144\" onerror=\"this.src='_layouts/epmlive/images/DisplayProfilePicture/DefaultProfilePic.png';\"></img>"),
-                () => result.ShouldContain($"<a href=\"/_layouts/userdisp.aspx?Source={ExampleUrl}/\">")
-                );
+                () => result.ShouldContain(LargeImageDiv),
+                () => result.ShouldContain(LargeImageProfilePicture),
+                () => result.ShouldContain(_largeProfileImage),
+                () => result.ShouldContain(_userLink));
         }
 
         [TestMethod]
@@ -177,11 +188,10 @@ namespace EPMLiveWebParts.Tests.UserProfileDisplay
             var result = _htmlBuilder.ToString();
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNullOrWhiteSpace(),
-                () => result.ShouldContain("<div id=\"imgDiv\">"),
-                () => result.ShouldContain("<div class=\"ms-profilepicture ms-contactcardpicture ms-smallthumbnailimage\">"),
-                () => result.ShouldContain($"<img id=\"ProfileImage\" src=\"{DummyString}\" width=\"93\" height=\"96\" onerror=\"this.src='_layouts/epmlive/images/DisplayProfilePicture/DefaultProfilePic.png';\"></img>"),
-                () => result.ShouldContain($"<a href=\"/_layouts/userdisp.aspx?Source={ExampleUrl}/\">")
-                );
+                () => result.ShouldContain(ImageDiv),
+                () => result.ShouldContain(ImageProfilePicture),
+                () => result.ShouldContain(_profileImage),
+                () => result.ShouldContain(_userLink));
         }
     }
 }
