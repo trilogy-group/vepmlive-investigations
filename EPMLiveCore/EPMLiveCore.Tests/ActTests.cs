@@ -30,7 +30,6 @@ namespace EPMLiveCore.Tests
         public void SetUp()
         {
             _shimsContext = ShimsContext.Create();
-
             var web = new ShimSPWeb()
             {
                 SiteGet = () => new ShimSPSite()
