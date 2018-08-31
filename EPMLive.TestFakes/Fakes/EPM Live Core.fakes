@@ -40,5 +40,8 @@
     <Add FullName="EPMLiveCore.ExtensionMethods!"/>
     <Add FullName="EPMLiveCore.API.CommentManager!"/>
     <Add FullName="EPMLiveCore.ReportHelper.ReportBiz!"/>
+    <Add FullName="EPMLiveCore.Controls.Navigation.Providers.ApplicationsLinkProvider!"/>
+    <Add FullName="EPMLiveCore.Controls.Navigation.Providers.GenericLinkProvider!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.Navigation.NavLink!"/>
   </ShimGeneration>
 </Fakes>

@@ -66,9 +66,8 @@ namespace WorkEnginePPM.Layouts.ppm
 
         protected void Button1_Click(object sender, EventArgs e)
         {
-
             XmlDocument doc = new XmlDocument();
-            doc.LoadXml("<Settings><BasePath>" + txtBasePath.Text  + "</BasePath><PID>" + txtPID.Text + "</PID><Company>" + txtCompany.Text + "</Company><DBServer>" + txtDBServer.Text + "</DBServer><DB>" + txtDB.Text + "</DB><Username>" + txtUsername.Text + "</Username><Password>" + txtPassword.Text + "</Password></Settings>");
+            doc.LoadXml("<Settings><BasePath>" + txtBasePath.Text  + "</BasePath><PID>" + txtPID.Text + "</PID><Company>" + txtCompany.Text + "</Company><OverrideAdmin><![CDATA[" + txtAdminAccount.Text + "]]></OverrideAdmin><DBServer>" + txtDBServer.Text + "</DBServer><DB>" + txtDB.Text + "</DB><Username>" + txtUsername.Text + "</Username><Password>" + txtPassword.Text + "</Password></Settings>");
 
             Guid jobid = EPMLiveCore.API.Timer.AddTimerJob(Web.Site.ID, Web.ID, "Setup PfE", 82, doc.OuterXml, "", 0, 0, "");
             EPMLiveCore.API.Timer.Enqueue(jobid, 0, Web.Site);
