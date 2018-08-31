@@ -792,7 +792,7 @@ namespace EPMLiveCore.Tests.ReportHelper
             };
             _privateObject.SetFieldOrProperty("_DefaultLists", string.Empty);
             ShimCoreFunctions.getConfigSettingSPWebString = (spWeb, settings) => DummyString;
-
+            
             // Act
             var result = _EPMData.DefaultLists(rootWeb);
 
