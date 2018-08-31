@@ -518,7 +518,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void GetSnapshotResults()
+        public void GetSnapshotResults_Should_ReturnContent()
         {
             // Arrange
             ShimEPMData.AllInstances.GetTableSqlConnection =
@@ -669,7 +669,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void GetTableNames()
+        public void GetTableNames_Should_ReturnContent()
         {
             // Arrange
             ShimEPMData.AllInstances.GetTableSqlConnection = (_, connection) => new ShimDataTable().Instance;
