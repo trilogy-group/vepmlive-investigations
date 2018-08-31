@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web;
-using System.Web.Fakes;
 using System.Web.UI;
 using EPMLiveCore.Fakes;
 using EPMLiveWebParts.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
-using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
@@ -19,7 +15,7 @@ using Shouldly;
 
 namespace EPMLiveWebParts.Tests.UserProfileDisplay
 {
-    [TestClass]
+    [TestClass, ExcludeFromCodeCoverage]
     public class DisplayProfilePicturesTests
     {
         private class TestClass
