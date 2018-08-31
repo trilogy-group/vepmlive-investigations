@@ -5,22 +5,16 @@ using System.Data.Common.Fakes;
 using System.Data.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
-using System.Diagnostics;
 using System.Diagnostics.Fakes;
 using System.Globalization;
 using System.IO.Fakes;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.ReportHelper;
 using EPMLiveCore.ReportHelper.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -30,15 +24,15 @@ namespace EPMLiveCore.Tests.ReportHelper
 {
     public partial class EPMDataTest
     {
+        private const string GetListFieldsMethodName = "GetListFields";
+        private const string PopulateInstanceFromDataMethodName = "PopulateInstanceFromData";
+        private const string PopulateConnectionStringsMethodName = "PopulateConnectionStrings";
+        private const string GetTableMethodName = "GetTable";
+        private const string GetListEventsMethodName = "GetListEvents";
+        private const string UpdateListNameMethodName = "UpdateListName";
+        private const string GetDbVersionMethodName = "GetDbVersion";
         private IDisposable _shimContext;
-        //private PrivateObject _privateObject;
         private EPMData _EPMData;
-        private string GetListFieldsMethodName = "GetListFields";
-        private string PopulateInstanceFromDataMethodName = "PopulateInstanceFromData";
-        private string PopulateConnectionStringsMethodName = "PopulateConnectionStrings";
-        private string GetTableMethodName = "GetTable";
-        private string GetListEventsMethodName = "GetListEvents";
-        private string UpdateListNameMethodName = "UpdateListName";
 
         [TestInitialize]
         public void Initialize()
@@ -80,7 +74,6 @@ namespace EPMLiveCore.Tests.ReportHelper
             ShimReportData.ConstructorGuid = (_, guid) => { };
             ShimReportData.AllInstances.GetListMappingGuid = (_, guid) => null;
             ShimSqlConnection.AllInstances.Close = _ => { };
-
         }
 
         [TestMethod]
@@ -411,7 +404,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void CreateTextFile()
+        public void CreateTextFile_Should_SetFilePath()
         {
             // Arrange
             ShimStreamWriter.AllInstances.Close = _ => { };
@@ -766,7 +759,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void DefaultLists()
+        public void DefaultLists_Should_ReturnContent()
         {
             // Arrange
             const string Assembly =
@@ -825,24 +818,6 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void CheckConnection_ConnectionError_ReturnsFalse()
-        {
-            // Arrange
-            ShimSqlConnection.AllInstances.Open = null;
-            //_ =>
-            //{
-            //    throw new Exception();
-            //};
-
-            // Act
-            var result = EPMData.CheckConnection(DummyString);
-
-            // Assert
-            Assert.Fail("SqlException");
-        }
-
-
-        [TestMethod]
         public void ExecuteScalar_OnSuccess_ReturnsValue()
         {
             // Arrange
@@ -856,26 +831,6 @@ namespace EPMLiveCore.Tests.ReportHelper
                 () => result.ShouldNotBeNull(),
                 () => result.ShouldBe(DummyString));
         }
-
-        //[TestMethod]
-        //public void ExecuteScalar_OnException_ReturnsValue()
-        //{
-        //    // Arrange
-        //    ShimSqlCommand.AllInstances.ExecuteScalar = _ =>
-        //    {
-        //        _.CommandTimeout = 0;
-        //        Thread.Sleep(10);
-        //        return true;
-        //    };
-
-        //    // Act
-        //    var result = _EPMData.ExecuteScalar(null) as bool?;
-
-        //    // Assert
-        //    result.ShouldSatisfyAllConditions(
-        //        () => result.ShouldNotBeNull(),
-        //        () => result.Value.ShouldBeFalse());
-        //}
 
         [TestMethod]
         public void ExecuteNonQuery_OnSuccess_ReturnsTrue()
@@ -1051,7 +1006,6 @@ namespace EPMLiveCore.Tests.ReportHelper
             // Assert
             result.ShouldNotBeNull();
         }
-
 
         [TestMethod]
         public void PopulateInstanceFromData_UseSqlAccountFalse_ExecutesCorrectly()
@@ -1362,7 +1316,6 @@ namespace EPMLiveCore.Tests.ReportHelper
                 () => result.ShouldNotBeNull(),
                 () => result.ShouldBe(DBNull.Value));
         }
-
 
         [TestMethod]
         public void GetCalculatedFieldValue_ResultTypeDateTime_ReturnsValue()
@@ -1909,7 +1862,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         {
             // Arrange
             var count = 0;
-            ShimEPMData.AllInstances.ExecuteNonQuerySqlConnection = (_, connection) => 
+            ShimEPMData.AllInstances.ExecuteNonQuerySqlConnection = (_, connection) =>
             {
                 if (++count == 1)
                 {
@@ -1940,7 +1893,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         {
             // Arrange, Act
             _EPMData.InitializeStatusLog();
-            var statusLog = _EPMData.GetStatusLog(); 
+            var statusLog = _EPMData.GetStatusLog();
 
             // Assert
             statusLog.ShouldSatisfyAllConditions(
@@ -1971,11 +1924,11 @@ namespace EPMLiveCore.Tests.ReportHelper
 
             // Act
             var result = _EPMData.LogRefreshStatus(
-                DummyGuid, 
-                DummyString, 
-                DummyGuid, 
-                DummyString, 
-                DummyString, 
+                DummyGuid,
+                DummyString,
+                DummyGuid,
+                DummyString,
+                DummyString,
                 1);
 
             // Assert
@@ -1986,7 +1939,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         public void GetSnapshotResults()
         {
             // Arrange
-            ShimEPMData.AllInstances.GetTableSqlConnection = 
+            ShimEPMData.AllInstances.GetTableSqlConnection =
                 (_, connection) => new ShimDataTable().Instance;
 
             // Act
@@ -2005,7 +1958,7 @@ namespace EPMLiveCore.Tests.ReportHelper
             ShimEPMData.AllInstances.ExecuteNonQuerySqlConnection = (_, connection) => true;
             ShimEPMData.AllInstances.LogStatusStringStringStringStringInt32Int32String =
                 (_, listId, listName, shortMsg, LongMsg, level, type, guid) => true;
-            
+
             // Act
             var result = _EPMData.SnapshotLists(DummyGuid, DummyGuid, DummyString);
 
@@ -2031,7 +1984,6 @@ namespace EPMLiveCore.Tests.ReportHelper
             // Assert
             result.ShouldBeFalse();
         }
-
 
         [TestMethod]
         public void GetSpecificReportingDbConnection_UseSqlAccount_ReturnsConnection()
@@ -2275,5 +2227,731 @@ namespace EPMLiveCore.Tests.ReportHelper
                 () => result.ShouldBe(Guid.Empty));
         }
 
+        [TestMethod]
+        public void GetListIdGuid_OnSuccess_ReturnsGuid()
+        {
+            // Arrange
+            var expectedValue = Guid.NewGuid();
+            ShimSPWeb.AllInstances.ListsGet = _ => new ShimSPListCollection
+            {
+                ItemGetString = name => new ShimSPList
+                {
+                    IDGet = () => expectedValue
+                }
+            };
+
+            // Act
+            var result = _EPMData.GetListId(DummyName, DummyGuid);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBe(expectedValue));
+        }
+
+        [TestMethod]
+        public void GetTableName_OnSuccess_ShoudlReturnTableName()
+        {
+            // Arrange
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, conneciton) => DummyName;
+
+            // Act
+            var result = _EPMData.GetTableName(DummyGuid);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBe(DummyName));
+        }
+
+        [TestMethod]
+        public void GetTableName_OnException_ReturnsNull()
+        {
+            // Arrange
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, conneciton) =>
+            {
+                throw new Exception();
+            };
+
+            // Act
+            var result = _EPMData.GetTableName(DummyGuid);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeNull());
+        }
+
+        [TestMethod]
+        public void GetTableNameString_OnSuccess_ShoudlReturnTableName()
+        {
+            // Arrange
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, conneciton) => DummyString;
+
+            // Act
+            var result = _EPMData.GetTableName(DummyName);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void GetListName_OnSuccess_ShoudlReturnTableName()
+        {
+            // Arrange
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, conneciton) => DummyString;
+
+            // Act
+            var result = _EPMData.GetListName(DummyName);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void RefreshTimesheets_ConsolidationDone_ReturnsExpectedValue()
+        {
+            // Arrange
+            var message = string.Empty;
+            ShimReportBiz.ConstructorGuid = (_, guid) => { };
+            ShimReportBiz.AllInstances.RefreshTimesheetInstantStringOutGuid = ReportBizRefreshTimeSheet;
+            ShimReportBiz.AllInstances.RefreshTimesheetStringOutGuid = ReportBizRefreshTimeSheet;
+
+            // Act
+            var result = _EPMData.RefreshTimesheets(out message, DummyGuid, true);
+
+            // Assert
+            result.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void RefreshTimesheets_ConsolidationDoneFalse_ReturnsExpectedValue()
+        {
+            // Arrange
+            var message = string.Empty;
+            ShimReportBiz.ConstructorGuid = (_, guid) => { };
+            ShimReportBiz.AllInstances.RefreshTimesheetInstantStringOutGuid = ReportBizRefreshTimeSheet;
+            ShimReportBiz.AllInstances.RefreshTimesheetStringOutGuid = ReportBizRefreshTimeSheet;
+
+            // Act
+            var result = _EPMData.RefreshTimesheets(out message, DummyGuid, false);
+
+            // Assert
+            result.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void SaveWork_ProcessAssignmentsFalse_ReturnsFalse()
+        {
+            // Arrange
+            ShimEPMData.AllInstances.ItemHasValueSPListItemString = (_, item, valueName) => true;
+            var listItem = new ShimSPListItem
+            {
+                ItemGetString = name => DateTime.Now,
+                ParentListGet = () => new ShimSPList
+                {
+                    IDGet = () => DummyGuid
+                }
+            };
+            _privateObject.SetFieldOrProperty("_sqlError", DummyString);
+            ShimReportData.AddLookUpFieldValuesStringString = (valueNAme, valueType) => DummyString;
+            ShimEPMData.AllInstances.ProcessAssignmentsStringStringObjectObjectGuidGuidInt32String =
+                (_, work, assigned, startDate, dueDate, listId, site, itemId, listName) => false;
+            ShimEPMData.AllInstances.LogStatusStringStringStringStringInt32Int32String =
+                (_, listId, listName, shortMsg, LongMsg, level, type, guid) => true;
+
+            // Act
+            var result = _EPMData.SaveWork(listItem);
+
+            // Assert
+            result.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void SaveWork_OnException_ReturnsFalse()
+        {
+            // Arrange
+            ShimEPMData.AllInstances.ItemHasValueSPListItemString = (_, item, valueName) => true;
+            var listItem = new ShimSPListItem
+            {
+                ItemGetString = name => DateTime.Now,
+                ParentListGet = () => new ShimSPList
+                {
+                    IDGet = () => DummyGuid
+                }
+            };
+            _privateObject.SetFieldOrProperty("_sqlError", DummyString);
+            ShimReportData.AddLookUpFieldValuesStringString = (valueNAme, valueType) => DummyString;
+            ShimEPMData.AllInstances.ProcessAssignmentsStringStringObjectObjectGuidGuidInt32String =
+                (_, work, assigned, startDate, dueDate, listId, site, itemId, listName) =>
+                {
+                    throw new Exception();
+                };
+            ShimEPMData.AllInstances.LogStatusStringStringStringStringInt32Int32String =
+                (_, listId, listName, shortMsg, LongMsg, level, type, guid) => true;
+
+            // Act
+            var result = _EPMData.SaveWork(listItem);
+
+            // Assert
+            result.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void ProcessAssignments_OnSuccess_ReturnsTrue()
+        {
+            // Arrange
+            ShimEPMData.AllInstances.ProcessAssignmentsStringStringObjectObjectGuidGuidInt32String = null;
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, connection) => DummyString;
+
+            // Act
+            var result = _EPMData.ProcessAssignments(
+                DummyString,
+                DummyString,
+                DummyString,
+                DummyString,
+                DummyGuid,
+                DummyGuid,
+                1,
+                DummyString);
+
+            // Assert
+            result.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void GetDbVersion_Version1_ReturnsExpectedValue()
+        {
+            // Arrange
+            const int ExpectedValue = 2010;
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, connection) => 1;
+
+            // Act
+            var result = _privateObject.Invoke(GetDbVersionMethodName) as int?;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Value.ShouldBe(ExpectedValue));
+        }
+
+        [TestMethod]
+        public void GetDbVersion_OtherVersion_ReturnsExpectedValue()
+        {
+            // Arrange
+            const int ExpectedValue = 2005;
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, connection) => 10;
+
+            // Act
+            var result = _privateObject.Invoke(GetDbVersionMethodName) as int?;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Value.ShouldBe(ExpectedValue));
+        }
+
+        [TestMethod]
+        public void MapDataBase_GetDatabaseMappingsException_ReturnsFalse()
+        {
+            // Arrange
+            var message = string.Empty;
+            ShimReportBiz.ConstructorGuidGuid = (_, siteId, appId) => { };
+            ShimReportBiz.AllInstances.GetDatabaseMappings = _ =>
+            {
+                throw new Exception();
+            };
+
+            // Act
+            var result = _EPMData.MapDataBase(
+                DummyGuid,
+                DummyGuid,
+                DummyName,
+                DummyName,
+                DummyString,
+                DummyString,
+                true,
+                true,
+                out message);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeFalse(),
+                () => message.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void MapDataBase_MappingsContainsSiteId_ReturnsFalse()
+        {
+            // Arrange
+            var message = string.Empty;
+            ShimReportBiz.ConstructorGuidGuid = (_, siteId, appId) => { };
+            ShimReportBiz.AllInstances.GetDatabaseMappings = _ => new Dictionary<string, string>
+            {
+                [DummyGuid.ToString()] = DummyName
+            };
+
+            // Act
+            var result = _EPMData.MapDataBase(
+                DummyGuid,
+                DummyGuid,
+                DummyName,
+                DummyName,
+                DummyString,
+                DummyString,
+                true,
+                true,
+                out message);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeFalse(),
+                () => message.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void MapDataBase_ServerNameDBNameEmpty_ReturnsFalse()
+        {
+            // Arrange
+            var message = string.Empty;
+            ShimReportBiz.ConstructorGuidGuid = (_, siteId, appId) => { };
+            ShimReportBiz.AllInstances.GetDatabaseMappings = _ => new Dictionary<string, string>();
+
+            // Act
+            var result = _EPMData.MapDataBase(
+                DummyGuid,
+                DummyGuid,
+                string.Empty,
+                string.Empty,
+                DummyString,
+                DummyString,
+                true,
+                true,
+                out message);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeFalse(),
+                () => message.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void MapDataBase_CheckServerConnectionFalse_ReturnsFalse()
+        {
+            // Arrange
+            var message = string.Empty;
+            ShimReportBiz.ConstructorGuidGuid = (_, siteId, appId) => { };
+            ShimReportBiz.AllInstances.GetDatabaseMappings = _ => new Dictionary<string, string>();
+            ShimReportData.ConstructorGuidStringStringBooleanStringString =
+                (_, siteId, name, server, useAccount, username, password) => { };
+            ShimReportData.AllInstances.CheckServerConnection = _ => false;
+            ShimReportData.AllInstances.GetError = _ => string.Empty;
+
+            // Act
+            var result = _EPMData.MapDataBase(
+                DummyGuid,
+                DummyGuid,
+                DummyString,
+                DummyString,
+                DummyString,
+                DummyString,
+                true,
+                true,
+                out message);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeFalse(),
+                () => message.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void MapDataBase_DbExistsFalse_DatabaseExistsTrue_ReturnsFalse()
+        {
+            // Arrange
+            var message = string.Empty;
+            ShimReportBiz.ConstructorGuidGuid = (_, siteId, appId) => { };
+            ShimReportBiz.AllInstances.GetDatabaseMappings = _ => new Dictionary<string, string>();
+            ShimReportData.ConstructorGuidStringStringBooleanStringString =
+                (_, siteId, name, server, useAccount, username, password) => { };
+            ShimReportData.AllInstances.CheckServerConnection = _ => true;
+            ShimReportData.AllInstances.GetError = _ => DummyName;
+            ShimReportData.AllInstances.DatabaseExists = _ => true;
+
+            // Act
+            var result = _EPMData.MapDataBase(
+                DummyGuid,
+                DummyGuid,
+                DummyString,
+                DummyString,
+                DummyString,
+                DummyString,
+                true,
+                false,
+                out message);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeFalse(),
+                () => message.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void MapDataBase_DbExistsFalse_CreateDatabaseFalse_ReturnsFalse()
+        {
+            // Arrange
+            var message = string.Empty;
+            ShimReportBiz.ConstructorGuidGuid = (_, siteId, appId) => { };
+            ShimReportBiz.AllInstances.GetDatabaseMappings = _ => new Dictionary<string, string>();
+            ShimReportData.ConstructorGuidStringStringBooleanStringString =
+                (_, siteId, name, server, useAccount, username, password) => { };
+            ShimReportData.AllInstances.CheckServerConnection = _ => true;
+            ShimReportData.AllInstances.GetError = _ => string.Empty;
+            ShimReportData.AllInstances.DatabaseExists = _ => false;
+            ShimReportData.AllInstances.CreateDatabase = _ => false;
+
+            // Act
+            var result = _EPMData.MapDataBase(
+                DummyGuid,
+                DummyGuid,
+                DummyString,
+                DummyString,
+                DummyString,
+                DummyString,
+                true,
+                false,
+                out message);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeFalse(),
+                () => message.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void MapDataBase_DbExistsFalse_InitializeDatabaseFalse_ReturnsFalse()
+        {
+            // Arrange
+            var message = string.Empty;
+            ShimReportBiz.ConstructorGuidGuid = (_, siteId, appId) => { };
+            ShimReportBiz.AllInstances.GetDatabaseMappings = _ => new Dictionary<string, string>();
+            ShimReportData.ConstructorGuidStringStringBooleanStringString =
+                (_, siteId, name, server, useAccount, username, password) => { };
+            ShimReportData.AllInstances.CheckServerConnection = _ => true;
+            ShimReportData.AllInstances.GetError = _ => string.Empty;
+            ShimReportData.AllInstances.DatabaseExists = _ => false;
+            ShimReportData.AllInstances.CreateDatabase = _ => true;
+            ShimReportData.AllInstances.InitializeDatabase = _ => false;
+
+            // Act
+            var result = _EPMData.MapDataBase(
+                DummyGuid,
+                DummyGuid,
+                DummyString,
+                DummyString,
+                DummyString,
+                DummyString,
+                true,
+                false,
+                out message);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeFalse(),
+                () => message.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void MapDataBase_DbExists_DatabaseExistsFalse_ReturnsFalse()
+        {
+            // Arrange
+            var message = string.Empty;
+            ShimReportBiz.ConstructorGuidGuid = (_, siteId, appId) => { };
+            ShimReportBiz.AllInstances.GetDatabaseMappings = _ => new Dictionary<string, string>();
+            ShimReportData.ConstructorGuidStringStringBooleanStringString =
+                (_, siteId, name, server, useAccount, username, password) => { };
+            ShimReportData.AllInstances.CheckServerConnection = _ => true;
+            ShimReportData.AllInstances.GetError = _ => string.Empty;
+            ShimReportData.AllInstances.DatabaseExists = _ => false;
+
+            // Act
+            var result = _EPMData.MapDataBase(
+                DummyGuid,
+                DummyGuid,
+                DummyString,
+                DummyString,
+                DummyString,
+                DummyString,
+                true,
+                true,
+                out message);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeFalse(),
+                () => message.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void MapDataBase_DbExists_IsReportingDBFalse_ReturnsFalse()
+        {
+            // Arrange
+            var message = string.Empty;
+            ShimReportBiz.ConstructorGuidGuid = (_, siteId, appId) => { };
+            ShimReportBiz.AllInstances.GetDatabaseMappings = _ => new Dictionary<string, string>();
+            ShimReportData.ConstructorGuidStringStringBooleanStringString =
+                (_, siteId, name, server, useAccount, username, password) => { };
+            ShimReportData.AllInstances.CheckServerConnection = _ => true;
+            ShimReportData.AllInstances.GetError = _ => string.Empty;
+            ShimReportData.AllInstances.DatabaseExists = _ => true;
+            ShimReportData.AllInstances.IsReportingDB = _ => false;
+
+            // Act
+            var result = _EPMData.MapDataBase(
+                DummyGuid,
+                DummyGuid,
+                DummyString,
+                DummyString,
+                DummyString,
+                DummyString,
+                true,
+                true,
+                out message);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeFalse(),
+                () => message.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void MapDataBase_UsernamePasswordFalse_ReturnsFalse()
+        {
+            // Arrange
+            var message = string.Empty;
+            ShimReportBiz.ConstructorGuidGuid = (_, siteId, appId) => { };
+            ShimReportBiz.AllInstances.GetDatabaseMappings = _ => new Dictionary<string, string>();
+            ShimReportData.ConstructorGuidStringStringBooleanStringString =
+                (_, siteId, name, server, useAccount, username, password) => { };
+            ShimReportData.AllInstances.CheckServerConnection = _ => true;
+            ShimReportData.AllInstances.GetError = _ => string.Empty;
+            ShimReportData.AllInstances.DatabaseExists = _ => true;
+            ShimReportData.AllInstances.IsReportingDB = _ => true;
+
+            // Act
+            var result = _EPMData.MapDataBase(
+                DummyGuid,
+                DummyGuid,
+                DummyString,
+                DummyString,
+                string.Empty,
+                string.Empty,
+                true,
+                true,
+                out message);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeFalse(),
+                () => message.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void MapDataBase_InsertDbEntryOnSuccess_ReturnsTrue()
+        {
+            // Arrange
+            var message = string.Empty;
+            ShimReportBiz.ConstructorGuidGuid = (_, siteId, appId) => { };
+            ShimReportBiz.AllInstances.GetDatabaseMappings = _ => new Dictionary<string, string>();
+            ShimReportData.ConstructorGuidStringStringBooleanStringString =
+                (_, siteId, name, server, useAccount, username, password) => { };
+            ShimReportData.AllInstances.CheckServerConnection = _ => true;
+            ShimReportData.AllInstances.GetError = _ => string.Empty;
+            ShimReportData.AllInstances.DatabaseExists = _ => true;
+            ShimReportData.AllInstances.IsReportingDB = _ => true;
+            ShimReportData.AllInstances.InsertDbEntry = _ => true;
+            ShimReportData.AllInstances.UserNameSetString = (_, name) => { };
+            ShimReportData.AllInstances.PasswordSetString = (_, name) => { };
+            ShimReportData.AllInstances.UseSqlAccountSetBoolean = (_, name) => { };
+            ShimEPMData.AllInstances.DefaultListsSPWeb = (_, web) => DummyString;
+            ShimEPMData.AllInstances.GrantUserDbAccess = _ => true;
+            ShimEPMData.AllInstances.UpdateRPTSettingsStringInt32StringOut = UpdateRPTSettings;
+            ShimEPMData.AllInstances.MapDefaultListsString = (_, lists) => true;
+            ShimEPMData.AllInstances.RefreshDefaultListsString = (_, lists) => true;
+            ShimSPSite.AllInstances.RootWebGet = _ => new ShimSPWeb();
+            ShimReportData.AllInstances.Dispose = _ => { };
+
+            // Act
+            var result = _EPMData.MapDataBase(
+                DummyGuid,
+                DummyGuid,
+                DummyString,
+                DummyString,
+                DummyString,
+                DummyString,
+                true,
+                true,
+                out message);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeTrue(),
+                () => message.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void MapDataBase_OnSuccess_ReturnsTrue()
+        {
+            // Arrange
+            var message = string.Empty;
+            ShimReportBiz.ConstructorGuidGuid = (_, siteId, appId) => { };
+            ShimReportBiz.AllInstances.GetDatabaseMappings = _ => new Dictionary<string, string>();
+            ShimReportData.ConstructorGuidStringStringBooleanStringString =
+                (_, siteId, name, server, useAccount, username, password) => { };
+            ShimReportData.AllInstances.CheckServerConnection = _ => true;
+            ShimReportData.AllInstances.GetError = _ => string.Empty;
+            ShimReportData.AllInstances.DatabaseExists = _ => true;
+            ShimReportData.AllInstances.IsReportingDB = _ => true;
+            ShimReportData.AllInstances.InsertDbEntry = _ => true;
+            ShimReportData.AllInstances.UserNameSetString = (_, name) => { };
+            ShimReportData.AllInstances.PasswordSetString = (_, name) => { };
+            ShimReportData.AllInstances.UseSqlAccountSetBoolean = (_, name) => { };
+            ShimEPMData.AllInstances.DefaultListsSPWeb = (_, web) => DummyString;
+            ShimEPMData.AllInstances.GrantUserDbAccess = _ => true;
+            ShimEPMData.AllInstances.UpdateRPTSettingsStringInt32StringOut = UpdateRPTSettings;
+            ShimEPMData.AllInstances.MapDefaultListsString = (_, lists) => true;
+            ShimEPMData.AllInstances.RefreshDefaultListsString = (_, lists) => true;
+            ShimSPSite.AllInstances.RootWebGet = _ => new ShimSPWeb();
+            ShimReportData.AllInstances.Dispose = _ => { };
+
+            // Act
+            var result = _EPMData.MapDataBase(
+                DummyGuid,
+                DummyGuid,
+                DummyString,
+                DummyString,
+                DummyString,
+                DummyString,
+                false,
+                true,
+                out message);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeTrue(),
+                () => message.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void ListMappedAlready_ExecuteScalar1_ReturnsTrue()
+        {
+            // Arrange
+            ShimEPMData.AllInstances.ListMappedAlreadyGuid = null;
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, conn) => 1;
+
+            // Act
+            var result = _EPMData.ListMappedAlready(DummyGuid);
+
+            // Assert
+            result.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void ListMappedAlready_ExecuteScalar0_ReturnsFalse()
+        {
+            // Arrange
+            ShimEPMData.AllInstances.ListMappedAlreadyGuid = null;
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, conn) => 0;
+
+            // Act
+            var result = _EPMData.ListMappedAlready(DummyGuid);
+
+            // Assert
+            result.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void ListMappedAlreadyStringGuid_ExecuteScalar1_ReturnsTrue()
+        {
+            // Arrange
+            ShimEPMData.AllInstances.ListMappedAlreadyStringGuid = null;
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, conn) => 1;
+
+            // Act
+            var result = _EPMData.ListMappedAlready(DummyString, DummyGuid);
+
+            // Assert
+            result.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void ListMappedAlreadyStringGuid_ExecuteScalar0_ReturnsFalse()
+        {
+            // Arrange
+            ShimEPMData.AllInstances.ListMappedAlreadyStringGuid = null;
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, conn) => 0;
+
+            // Act
+            var result = _EPMData.ListMappedAlready(DummyString, DummyGuid);
+
+            // Assert
+            result.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void UpdateRPTSettings_SqlErrorOccurred_ReturnsFalse()
+        {
+            // Arrange
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, conn) => 0;
+            ShimEPMData.AllInstances.ExecuteNonQuerySqlConnection = (_, conn) => false;
+            var sResult = string.Empty;
+            ShimEPMData.AllInstances.LogStatusStringStringStringStringInt32Int32String =
+                (_, listId, listName, message, longMessage, level, type, guid) => true;
+            _privateObject.SetFieldOrProperty("_sqlError", DummyString);
+            _privateObject.SetFieldOrProperty("_sqlErrorOccurred", true);
+            
+            // Act
+            var result = _EPMData.UpdateRPTSettings(DummyString, 1, out sResult);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeFalse(),
+                () => sResult.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void UpdateRPTSettings_SqlErrorOccurredFalse_ReturnsTrue()
+        {
+            // Arrange
+            const string Success = "success";
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, conn) => 1;
+            ShimEPMData.AllInstances.ExecuteNonQuerySqlConnection = (_, conn) => true;
+            var sResult = string.Empty;
+            ShimEPMData.AllInstances.LogStatusStringStringStringStringInt32Int32String =
+                (_, listId, listName, message, longMessage, level, type, guid) => true;
+
+            // Act
+            var result = _EPMData.UpdateRPTSettings(DummyString, 1, out sResult);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeTrue(),
+                () => sResult.ShouldBe(Success));
+        }
+
+        private bool UpdateRPTSettings(EPMData epmData, string workingDays, int workHours, out string sResult)
+        {
+            sResult = DummyString;
+            return true;
+        }
+
+        private bool ReportBizRefreshTimeSheet(ReportBiz reportBiz, out string message, Guid jobUid)
+        {
+            message = DummyString;
+            return true;
+        }
     }
 }
