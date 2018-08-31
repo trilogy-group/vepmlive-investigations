@@ -3631,61 +3631,7 @@ namespace PortfolioEngineCore
         }
 
         #endregion
-
-        #region Method Call : (GetCFFieldName) (Return Type : void) Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_OptimizerData_GetCFFieldName_Static_Method_DirectCall_Throw_Exception_Test()
-        {
-            // Arrange
-            var lTableID = CreateType<int>();
-            var lFieldID = CreateType<int>();
-            var sTable = CreateType<string>();
-            var sField = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => OptimizerData.GetCFFieldName(lTableID, lFieldID, out sTable, out sField);
-
-            // Assert
-            Should.Throw<Exception>(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetCFFieldName) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_OptimizerData_GetCFFieldName_Static_Method_Call_Void_With_4_Parameters_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            var lTableID = CreateType<int>();
-            var lFieldID = CreateType<int>();
-            var sTable = CreateType<string>();
-            var sField = CreateType<string>();
-            var methodGetCFFieldNamePrametersTypes = new Type[] { typeof(int), typeof(int), typeof(string), typeof(string) };
-            object[] parametersOfGetCFFieldName = { lTableID, lFieldID, sTable, sField };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetCFFieldName, methodGetCFFieldNamePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_optimizerDataInstanceFixture, parametersOfGetCFFieldName);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetCFFieldName.ShouldNotBeNull();
-            parametersOfGetCFFieldName.Length.ShouldBe(4);
-            methodGetCFFieldNamePrametersTypes.Length.ShouldBe(4);
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (GetCFFieldName) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]

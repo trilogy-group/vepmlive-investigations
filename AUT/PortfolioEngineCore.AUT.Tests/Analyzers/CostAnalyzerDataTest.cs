@@ -723,34 +723,7 @@ namespace PortfolioEngineCore
         }
 
         #endregion
-
-        #region Method Call : (GrabCostViewInfo) (Return Type : int) Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CostAnalyzerData_GrabCostViewInfo_Static_Method_DirectCall_Throw_Exception_Test()
-        {
-            // Arrange
-            var sqlConnection = CreateType<SqlConnection>();
-            var costViewIdString = CreateType<string>();
-            var calculatedCostTypesString = CreateType<string>();
-            var costBreakdownId = CreateType<int>();
-            var costTypesString = CreateType<string>();
-            var otherCostTypesString = CreateType<string>();
-            var firstPeriod = CreateType<int>();
-            var lastPeriod = CreateType<int>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => CostAnalyzerData.GrabCostViewInfo(sqlConnection, costViewIdString, ref calculatedCostTypesString, out costBreakdownId, out costTypesString, out otherCostTypesString, out firstPeriod, out lastPeriod);
-
-            // Assert
-            Should.Throw<Exception>(executeAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (GrabCostViewInfo) (Return Type : int) No Exception with encapsulation Thrown
 
         [Test]

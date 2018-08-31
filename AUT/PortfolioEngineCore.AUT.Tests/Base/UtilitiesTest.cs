@@ -83,8 +83,6 @@ namespace PortfolioEngineCore
         [TestCase(MethodResolveNTNameintoWResID, 0)]
         [TestCase(MethodGetRegistryKey, 0)]
         [TestCase(MethodGetConnectionString, 0)]
-        [TestCase(MethodCheckEditResourcePlanPermission, 0)]
-        [TestCase(MethodGetRoleRates, 0)]
         public void AUT_Utilities_All_Methods_Explore_Verify_Test(string methodName, int overloadingIndex = 0)
         {
             // Arrange
@@ -165,8 +163,6 @@ namespace PortfolioEngineCore
         [TestCase(MethodResolveNTNameintoWResID)]
         [TestCase(MethodGetRegistryKey)]
         [TestCase(MethodGetConnectionString)]
-        [TestCase(MethodCheckEditResourcePlanPermission)]
-        [TestCase(MethodGetRoleRates)]
         public void AUT_Utilities_Static_Methods_Explore_Verify_Test(string methodName)
         {
             // AAA: Arrange, Act, Assert
@@ -1720,95 +1716,7 @@ namespace PortfolioEngineCore
         }
 
         #endregion
-
-        #region Method Call : (CheckEditResourcePlanPermission) (Return Type : bool) Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Utilities_CheckEditResourcePlanPermission_Static_Method_DirectCall_Throw_Exception_Test()
-        {
-            // Arrange
-            var basepath = CreateType<string>();
-            var username = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => Utilities.CheckEditResourcePlanPermission(basepath, username);
-
-            // Assert
-            Should.Throw<Exception>(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (CheckEditResourcePlanPermission) (Return Type : bool) No Exception with encapsulation Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Utilities_CheckEditResourcePlanPermission_Static_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
-        {
-            // Arrange
-            var basepath = CreateType<string>();
-            var username = CreateType<string>();
-            var methodCheckEditResourcePlanPermissionPrametersTypes = new Type[] { typeof(string), typeof(string) };
-            object[] parametersOfCheckEditResourcePlanPermission = { basepath, username };
-
-            // Act
-            Action currentAction = () => ReflectionAnalyzer.GetResultOfStaticMethod<bool>(null, _utilitiesInstanceType, MethodCheckEditResourcePlanPermission, parametersOfCheckEditResourcePlanPermission, methodCheckEditResourcePlanPermissionPrametersTypes);
-
-            // Assert
-            parametersOfCheckEditResourcePlanPermission.ShouldNotBeNull();
-            parametersOfCheckEditResourcePlanPermission.Length.ShouldBe(2);
-            methodCheckEditResourcePlanPermissionPrametersTypes.Length.ShouldBe(2);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
-        #region Method Call : (CheckEditResourcePlanPermission) (Return Type : bool) Invoke Should Not Throw
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Utilities_CheckEditResourcePlanPermission_Static_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
-        {
-            // Arrange
-            var methodCheckEditResourcePlanPermissionPrametersTypes = new Type[] { typeof(string), typeof(string) };
-            const int parametersCount = 2;
-
-            // Act
-            Action currentAction = () => ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(null, _utilitiesInstanceType, MethodCheckEditResourcePlanPermission, Fixture, methodCheckEditResourcePlanPermissionPrametersTypes);
-
-            // Assert
-            Should.NotThrow(currentAction);
-            methodCheckEditResourcePlanPermissionPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (CheckEditResourcePlanPermission) (Return Type : bool) without parameters value verify result should be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Utilities_CheckEditResourcePlanPermission_Static_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodCheckEditResourcePlanPermission, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(null, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldBeNull();
-        }
-
-        #endregion
-
+        
         #region Method Call : (CheckEditResourcePlanPermission) (Return Type : bool) Parameters Count verify
 
         [Test]
@@ -1839,157 +1747,7 @@ namespace PortfolioEngineCore
         }
 
         #endregion
-
-        #region Method Call : (GetRoleRates) (Return Type : DataSet) Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Utilities_GetRoleRates_Static_Method_DirectCall_Throw_Exception_Test()
-        {
-            // Arrange
-            var basepath = CreateType<string>();
-            var username = CreateType<string>();
-            var prd_start = CreateType<string>();
-            var prd_end = CreateType<string>();
-            var extid = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => Utilities.GetRoleRates(basepath, username, prd_start, prd_end, extid);
-
-            // Assert
-            Should.Throw<Exception>(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetRoleRates) (Return Type : DataSet) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Utilities_GetRoleRates_Static_Method_Call_With_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var basepath = CreateType<string>();
-            var username = CreateType<string>();
-            var prd_start = CreateType<string>();
-            var prd_end = CreateType<string>();
-            var extid = CreateType<string>();
-            var methodGetRoleRatesPrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string), typeof(string) };
-            object[] parametersOfGetRoleRates = { basepath, username, prd_start, prd_end, extid };
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetRoleRates, methodGetRoleRatesPrametersTypes, out exception);
-
-            // Act
-            var result1 = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(null, _utilitiesInstanceType, MethodGetRoleRates, Fixture, methodGetRoleRatesPrametersTypes);
-            var result2 = ReflectionAnalyzer.GetResultOfStaticMethod<DataSet>(null, _utilitiesInstanceType, MethodGetRoleRates, parametersOfGetRoleRates, methodGetRoleRatesPrametersTypes);
-            Action currentAction = () => methodInfo.Invoke(null, parametersOfGetRoleRates);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
-            parametersOfGetRoleRates.ShouldNotBeNull();
-            parametersOfGetRoleRates.Length.ShouldBe(5);
-            methodGetRoleRatesPrametersTypes.Length.ShouldBe(5);
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetRoleRates) (Return Type : DataSet) No Exception with encapsulation Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Utilities_GetRoleRates_Static_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
-        {
-            // Arrange
-            var basepath = CreateType<string>();
-            var username = CreateType<string>();
-            var prd_start = CreateType<string>();
-            var prd_end = CreateType<string>();
-            var extid = CreateType<string>();
-            var methodGetRoleRatesPrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string), typeof(string) };
-            object[] parametersOfGetRoleRates = { basepath, username, prd_start, prd_end, extid };
-
-            // Act
-            Action currentAction = () => ReflectionAnalyzer.GetResultOfStaticMethod<DataSet>(null, _utilitiesInstanceType, MethodGetRoleRates, parametersOfGetRoleRates, methodGetRoleRatesPrametersTypes);
-
-            // Assert
-            parametersOfGetRoleRates.ShouldNotBeNull();
-            parametersOfGetRoleRates.Length.ShouldBe(5);
-            methodGetRoleRatesPrametersTypes.Length.ShouldBe(5);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetRoleRates) (Return Type : DataSet) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Utilities_GetRoleRates_Static_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
-        {
-            // Arrange
-            var methodGetRoleRatesPrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string), typeof(string) };
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(null, _utilitiesInstanceType, MethodGetRoleRates, Fixture, methodGetRoleRatesPrametersTypes);
-
-            // Assert
-            result.ShouldBeNull();
-            methodGetRoleRatesPrametersTypes.Length.ShouldBe(5);
-        }
-
-        #endregion
-
-        #region Method Call : (GetRoleRates) (Return Type : DataSet) Invoke Should Not Throw
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Utilities_GetRoleRates_Static_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
-        {
-            // Arrange
-            var methodGetRoleRatesPrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string), typeof(string) };
-            const int parametersCount = 5;
-
-            // Act
-            Action currentAction = () => ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(null, _utilitiesInstanceType, MethodGetRoleRates, Fixture, methodGetRoleRatesPrametersTypes);
-
-            // Assert
-            Should.NotThrow(currentAction);
-            methodGetRoleRatesPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (GetRoleRates) (Return Type : DataSet) without parameters value verify result should be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Utilities_GetRoleRates_Static_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetRoleRates, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(null, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldBeNull();
-        }
-
-        #endregion
-
+        
         #region Method Call : (GetRoleRates) (Return Type : DataSet) Parameters Count verify
 
         [Test]
