@@ -118,6 +118,7 @@
     <Compile Include="API\Analytics\RecentItemsTests.cs" />
     <Compile Include="API\APITeamTests.cs" />
     <Compile Include="API\Comments\CommentManagerTests.cs" />
+    <Compile Include="API\Integration\IntegrationAdminTests.cs" />
     <Compile Include="API\Integration\IntegrationCoreTest.cs" />
     <Compile Include="API\MyWork\MyWorkTests.cs" />
     <Compile Include="API\Notification\APIEmailTests.cs" />
