@@ -123,9 +123,9 @@ namespace EPMLiveCore.Tests.API.Integration
             // Arrange
             var message = string.Empty;
             _fields.Add(ColumnId, GetDefaultSPField(ColumnId, SPFieldType.Text, false).Instance);
-            ShimIntegrationCore.AllInstances.RemoveIntegrationGuidGuidStringOut = (IntegrationCore _, Guid a, Guid b, out string c) =>
+            ShimIntegrationCore.AllInstances.RemoveIntegrationGuidGuidStringOut = (IntegrationCore _, Guid a, Guid b, out string returnMessage) =>
             {
-                c = DummyString;
+                returnMessage = DummyString;
                 return true;
             };
 
@@ -147,9 +147,9 @@ namespace EPMLiveCore.Tests.API.Integration
         {
             // Arrange
             var message = string.Empty;
-            ShimIntegrationCore.AllInstances.RemoveIntegrationGuidGuidStringOut = (IntegrationCore _, Guid a, Guid b, out string c) =>
+            ShimIntegrationCore.AllInstances.RemoveIntegrationGuidGuidStringOut = (IntegrationCore _, Guid a, Guid b, out string returnMessage) =>
             {
-                c = DummyString;
+                returnMessage = DummyString;
                 return false;
             };
 
