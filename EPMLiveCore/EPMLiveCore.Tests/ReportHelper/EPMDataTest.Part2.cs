@@ -130,7 +130,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void Constrcutor_dfsdfds_ShouldCreateInstance()
+        public void Constrcutor_WithParameters_ShouldCreateInstance()
         {
             // Arrange
             ShimSPSite.AllInstances.OpenWeb = _ => new ShimSPWeb
