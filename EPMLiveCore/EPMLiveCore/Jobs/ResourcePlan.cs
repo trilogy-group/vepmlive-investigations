@@ -134,7 +134,8 @@ namespace EPMLiveCore.Jobs
             {
                 sErrors = sbErrors.ToString();
                 sbErrors = null;
-                finishJob();
+                //Already called in TimerClass.cs
+                //finishJob();
                 if (dtResLink != null)
                     dtResLink.Dispose();
                 if (dtResInfo != null)

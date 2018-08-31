@@ -110,38 +110,28 @@ namespace EPMLiveEnterprise
 
             try
             {
-                //WebSvcWssInterop.WssInterop wssInterop = new WebSvcWssInterop.WssInterop();
-
-                //wssInterop.Url = site.Url + "/_vti_bin/psi/wssinterop.asmx";
-
-                //wssInterop.Credentials = System.Net.CredentialCache.DefaultCredentials;
-
-                //WebSvcWssInterop.ProjectWSSInfoDataSet ds = wssInterop.ReadWssData(projectUID);
-
-                //if (ds.ProjWssInfo.Count > 0)
-                //{
-                //    return ds.ProjWssInfo[0].PROJECT_WORKSPACE_URL;
-                //}
-
-                //site.Close();
-
                 string url = "";
-    
-                SPSecurity.RunWithElevatedPrivileges(delegate(){
-                    SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id));
-                    cn.Open();
 
-                    SqlCommand cmd = new SqlCommand("select weburl from publishercheck where projectguid=@projectguid",cn);
-                    cmd.Parameters.AddWithValue("@projectguid", projectUID);
-
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    if (dr.Read())
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                {
+                    using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions
+                        .getConnectionString(site.WebApplication.Id)))
                     {
-                        url = dr.GetString(0);
-                    }
-                    dr.Close();
+                        connection.Open();
 
-                    cn.Close();
+                        using (var command = new SqlCommand("select weburl from publishercheck where projectguid=@projectguid", connection))
+                        {
+                            command.Parameters.AddWithValue("@projectguid", projectUID);
+
+                            using (var dataReader = command.ExecuteReader())
+                            {
+                                if (dataReader.Read())
+                                {
+                                    url = dataReader.GetString(0);
+                                }
+                            }
+                        }
+                    }
                 });
 
                 return url;
@@ -149,10 +139,15 @@ namespace EPMLiveEnterprise
             catch (Exception ex)
             {
                 string username = HttpContext.Current.User.Identity.Name;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getProjectSite(User: " + username + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            $"Error in getProjectSite(User: {username}): {ex.Message}{ex.StackTrace}",
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
                 site.Close();
                 return "";
@@ -215,8 +210,13 @@ namespace EPMLiveEnterprise
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getDefaultPublishURL(User: " + HttpContext.Current.User.Identity.Name + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            $"Error in getDefaultPublishURL(User: {HttpContext.Current.User.Identity.Name}): {ex.Message}{ex.StackTrace}",
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
                 site.Close();
                 return "";
