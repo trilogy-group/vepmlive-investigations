@@ -10199,37 +10199,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region Method Call : (GetWebTree) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ExtensionMethods_GetWebTree_Static_Method_Call_Void_With_3_Parameters_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            var id = CreateType<Guid>();
-            var siteUrl = CreateType<string>();
-            var tree = CreateType<List<Guid>>();
-            var methodGetWebTreePrametersTypes = new Type[] { typeof(Guid), typeof(string), typeof(List<Guid>) };
-            object[] parametersOfGetWebTree = { id, siteUrl, tree };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetWebTree, methodGetWebTreePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(null, parametersOfGetWebTree);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetWebTree.ShouldNotBeNull();
-            parametersOfGetWebTree.Length.ShouldBe(3);
-            methodGetWebTreePrametersTypes.Length.ShouldBe(3);
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (GetWebTree) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]

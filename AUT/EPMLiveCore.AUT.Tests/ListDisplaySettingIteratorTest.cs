@@ -1251,52 +1251,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region Method Call : (Dispose) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ListDisplaySettingIterator_Dispose_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _listDisplaySettingIteratorInstance.Dispose();
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (Dispose) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ListDisplaySettingIterator_Dispose_Method_Call_Void_With_No_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodDisposePrametersTypes = null;
-            object[] parametersOfDispose = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodDispose, methodDisposePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_listDisplaySettingIteratorInstanceFixture, parametersOfDispose);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfDispose.ShouldBeNull();
-            methodDisposePrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (Dispose) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]

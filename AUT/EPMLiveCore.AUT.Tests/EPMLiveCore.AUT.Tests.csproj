@@ -1421,7 +1421,6 @@
     <Compile Include="WebPageCode\ViewPermissionPageTest.cs" />
     <Compile Include="WebPageCode\ViewPermissionUtilTest.cs" />
     <Compile Include="WebPageCode\ViewrollupTest.cs" />
-    <Compile Include="WebPartsHelper\WebPartsReflectorTest.cs" />
     <Compile Include="WEPeopleEditorTest.cs" />
     <Compile Include="WEPeopleQueryTest.cs" />
     <Compile Include="WEPickerDialogTest.cs" />

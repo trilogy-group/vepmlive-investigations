@@ -3336,33 +3336,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region Method Call : (getDomain) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CoreFunctions_getDomain_Static_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodgetDomainPrametersTypes = null;
-            object[] parametersOfgetDomain = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodgetDomain, methodgetDomainPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_coreFunctionsInstanceFixture, parametersOfgetDomain);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfgetDomain.ShouldBeNull();
-            methodgetDomainPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (getDomain) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -3425,28 +3399,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region Method Call : (getDomain) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CoreFunctions_getDomain_Static_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodgetDomain, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_coreFunctionsInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
+        
         #region Method Call : (getUserFromAD) (Return Type : DirectoryEntry) private call definition
 
         [ExcludeFromCodeCoverage]
@@ -4617,30 +4570,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region Method Call : (GetListEvents) (Return Type : IList<SPEventReceiverDefinition>) Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CoreFunctions_GetListEvents_Static_Method_DirectCall_Throw_Exception_Test()
-        {
-            // Arrange
-            var list = CreateType<SPList>();
-            var assemblyName = CreateType<string>();
-            var className = CreateType<string>();
-            var types = CreateType<IList<SPEventReceiverType>>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => CoreFunctions.GetListEvents(list, assemblyName, className, types);
-
-            // Assert
-            Should.Throw<Exception>(executeAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (GetListEvents) (Return Type : IList<SPEventReceiverDefinition>) No Exception Thrown
 
         [Test]
@@ -4698,27 +4628,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region Method Call : (GetListEvents) (Return Type : IList<SPEventReceiverDefinition>) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CoreFunctions_GetListEvents_Static_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
-        {
-            // Arrange
-            var methodGetListEventsPrametersTypes = new Type[] { typeof(SPList), typeof(string), typeof(string), typeof(IList<SPEventReceiverType>) };
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_coreFunctionsInstanceFixture, _coreFunctionsInstanceType, MethodGetListEvents, Fixture, methodGetListEventsPrametersTypes);
-
-            // Assert
-            result.ShouldBeNull();
-            methodGetListEventsPrametersTypes.Length.ShouldBe(4);
-        }
-
-        #endregion
-
+        
         #region Method Call : (GetListEvents) (Return Type : IList<SPEventReceiverDefinition>) Invoke Should Not Throw
 
         [Test]
@@ -13202,87 +13112,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region Method Call : (ScheduleReportingRefreshJob) (Return Type : string) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CoreFunctions_ScheduleReportingRefreshJob_Static_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var spWeb = CreateType<SPWeb>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => CoreFunctions.ScheduleReportingRefreshJob(spWeb);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (ScheduleReportingRefreshJob) (Return Type : string) Results Not Null and no exception thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CoreFunctions_ScheduleReportingRefreshJob_Static_Method_Call_With_Call_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            var spWeb = CreateType<SPWeb>();
-            var methodScheduleReportingRefreshJobPrametersTypes = new Type[] { typeof(SPWeb) };
-            object[] parametersOfScheduleReportingRefreshJob = { spWeb };
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodScheduleReportingRefreshJob, methodScheduleReportingRefreshJobPrametersTypes, out exception);
-
-            // Act
-            var result1 = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_coreFunctionsInstanceFixture, _coreFunctionsInstanceType, MethodScheduleReportingRefreshJob, Fixture, methodScheduleReportingRefreshJobPrametersTypes);
-            var result2 = ReflectionAnalyzer.GetResultOfStaticMethod<string>(_coreFunctionsInstanceFixture, _coreFunctionsInstanceType, MethodScheduleReportingRefreshJob, parametersOfScheduleReportingRefreshJob, methodScheduleReportingRefreshJobPrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfScheduleReportingRefreshJob.ShouldNotBeNull();
-            parametersOfScheduleReportingRefreshJob.Length.ShouldBe(1);
-            methodScheduleReportingRefreshJobPrametersTypes.Length.ShouldBe(1);
-            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfStaticMethod<string>(_coreFunctionsInstanceFixture, _coreFunctionsInstanceType, MethodScheduleReportingRefreshJob, parametersOfScheduleReportingRefreshJob, methodScheduleReportingRefreshJobPrametersTypes));
-        }
-
-        #endregion
-
-        #region Method Call : (ScheduleReportingRefreshJob) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CoreFunctions_ScheduleReportingRefreshJob_Static_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var spWeb = CreateType<SPWeb>();
-            var methodScheduleReportingRefreshJobPrametersTypes = new Type[] { typeof(SPWeb) };
-            object[] parametersOfScheduleReportingRefreshJob = { spWeb };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodScheduleReportingRefreshJob, methodScheduleReportingRefreshJobPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_coreFunctionsInstanceFixture, parametersOfScheduleReportingRefreshJob);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfScheduleReportingRefreshJob.ShouldNotBeNull();
-            parametersOfScheduleReportingRefreshJob.Length.ShouldBe(1);
-            methodScheduleReportingRefreshJobPrametersTypes.Length.ShouldBe(1);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (ScheduleReportingRefreshJob) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -13306,27 +13136,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region Method Call : (ScheduleReportingRefreshJob) (Return Type : string) Results Not Null Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CoreFunctions_ScheduleReportingRefreshJob_Static_Method_Call_Dynamic_Invoking_Results_Not_Null_Test()
-        {
-            // Arrange
-            var methodScheduleReportingRefreshJobPrametersTypes = new Type[] { typeof(SPWeb) };
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_coreFunctionsInstanceFixture, _coreFunctionsInstanceType, MethodScheduleReportingRefreshJob, Fixture, methodScheduleReportingRefreshJobPrametersTypes);
-
-            // Assert
-            result.ShouldNotBeNull();
-            methodScheduleReportingRefreshJobPrametersTypes.Length.ShouldBe(1);
-        }
-
-        #endregion
-
+        
         #region Method Call : (ScheduleReportingRefreshJob) (Return Type : string) Invoke Should Not Throw
 
         [Test]
@@ -13347,28 +13157,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region Method Call : (ScheduleReportingRefreshJob) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CoreFunctions_ScheduleReportingRefreshJob_Static_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodScheduleReportingRefreshJob, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_coreFunctionsInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
+        
         #region Method Call : (ScheduleReportingRefreshJob) (Return Type : string) Parameters Count verify
 
         [Test]
@@ -13501,27 +13290,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region Method Call : (IsAlphaNumeric) (Return Type : bool) Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CoreFunctions_IsAlphaNumeric_Static_Method_DirectCall_Throw_Exception_Test()
-        {
-            // Arrange
-            var strToCheck = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => CoreFunctions.IsAlphaNumeric(strToCheck);
-
-            // Assert
-            Should.Throw<Exception>(executeAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (IsAlphaNumeric) (Return Type : bool) No Exception with encapsulation Thrown
 
         [Test]
