@@ -43,5 +43,6 @@
     <Add FullName="EPMLiveCore.Controls.Navigation.Providers.ApplicationsLinkProvider!"/>
     <Add FullName="EPMLiveCore.Controls.Navigation.Providers.GenericLinkProvider!"/>
     <Add FullName="EPMLiveCore.Infrastructure.Navigation.NavLink!"/>
+    <Add FullName="EPMLiveCore.API.NavigationService!"/>
   </ShimGeneration>
 </Fakes>
