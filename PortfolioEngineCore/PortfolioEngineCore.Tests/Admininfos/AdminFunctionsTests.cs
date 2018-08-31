@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Data;
+using System.Data.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using PortfolioEngineCore;
 using PortfolioEngineCore.Fakes;
 using Shouldly;
-using System.Data.Fakes;
+using Moq;
 
 namespace PortfolioEngineCore.Tests.Admininfos
 {
@@ -98,14 +98,14 @@ namespace PortfolioEngineCore.Tests.Admininfos
             ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader();
             ShimSqlDataReader.AllInstances.Read = _ => true;
             ShimSqlDataReader.AllInstances.Close = _ => { };
-            ShimSqlDb.ReadIntValueObjectBooleanOut = (object obj, out bool bIsNull) =>
+            ShimSqlDb.ReadIntValueObjectBooleanOut = (object obj, out bool isNull) =>
             {
-                bIsNull = true;
+                isNull = true;
                 return DummyInt;
             };
-            ShimSqlDb.ReadDateValueObjectBooleanOut = (object obj, out bool bIsNull) =>
+            ShimSqlDb.ReadDateValueObjectBooleanOut = (object obj, out bool isNull) =>
             {
-                bIsNull = true;
+                isNull = true;
                 return new DateTime();
             };
         }
@@ -139,15 +139,15 @@ namespace PortfolioEngineCore.Tests.Admininfos
             // Arrange
             var parameters = new object[] { new ShimDBAccess().Instance, DummyString };
             ShimSqlDataReader.AllInstances.ItemGetString = (_, _1) => new object();
-            var x = 0;
-            ShimSqlDb.ReadStringValueObjectBooleanOut = (object obj, out bool bIsNull) =>
+            var count = 0;
+            ShimSqlDb.ReadStringValueObjectBooleanOut = (object obj, out bool isNull) =>
             {
-                x++;
-                if (x == 2)
+                count++;
+                if (count == 2)
                 {
                     ShimSqlDataReader.AllInstances.Read = _ => false;
                 }
-                bIsNull = true;
+                isNull = true;
                 return DummyString;
             };
             ShimAdminFunctions.QueueJobRequestDBAccessInt32Int32StringStringStringString = (_, _1, _2, _3, _4, _5, _6) => true;
@@ -169,11 +169,11 @@ namespace PortfolioEngineCore.Tests.Admininfos
         {
             // Arrange
             var parameters = new object[] { new ShimDBAccess().Instance, DummyString };
-            var x = 0;
+            var count = 0;
             ShimSqlDb.ReadIntValueObject = _ => 
             {
-                x++;
-                if (x == 2)
+                count++;
+                if (count == 2)
                 {
                     ShimSqlDataReader.AllInstances.Read = _1 => false;
                 }
@@ -258,12 +258,12 @@ namespace PortfolioEngineCore.Tests.Admininfos
             var parameters = new object[] { new ShimDBAccess().Instance, DummyCalenderInt, DummyString };
             ShimSqlDb.AllInstances.DBTraceStatusEnumTraceChannelEnumStringStringStringStringBoolean =
                 (_, _1, _2, _3, _4, _5, _6, _7) => { };
-            var x = 0;
+            var count = 0;
             ShimSqlDb.ReadIntValueObject = _ => DummyInt;
             ShimSqlDb.ReadDateValueObject = _ =>
             {
-                x++;
-                if (x == 2)
+                count++;
+                if (count == 2)
                 {
                     ShimSqlDataReader.AllInstances.Read = _1 => false;
                 };
@@ -328,11 +328,11 @@ namespace PortfolioEngineCore.Tests.Admininfos
             var parameters = new object[] { new ShimDBAccess().Instance, DummyCalenderInt, DummyString };
             ShimSqlDb.AllInstances.DBTraceStatusEnumTraceChannelEnumStringStringStringStringBoolean =
                 (_, _1, _2, _3, _4, _5, _6, _7) => { };
-            var x = 0;
+            var count = 0;
             ShimSqlDb.ReadIntValueObject = _ =>
             {
-                x++;
-                if (x == 2)
+                count++;
+                if (count == 2)
                 {
                     ShimSqlDataReader.AllInstances.Read = _1 => false;
                 };
@@ -640,7 +640,16 @@ namespace PortfolioEngineCore.Tests.Admininfos
         public void SubmitJobRequest_DBAccessAndBasePathIsNotNullAndSessionIsNotNull_ReturnTrue()
         {
             // Arrange
-            var parameters = new object[] { new ShimDBAccess().Instance, DummyInt, DummyInt, DummyString, DummyString, DummyString, DummyString };
+            var parameters = new object[] 
+            {
+                new ShimDBAccess().Instance,
+                DummyInt,
+                DummyInt,
+                DummyString,
+                DummyString,
+                DummyString,
+                DummyString
+            };
             ShimPfeJob.Constructor = _ => new ShimPfeJob();
             ShimPfeJob.AllInstances.QueueIDbRepositoryIMessageQueueString = (_, _1, _2, _3) => DummyInt;
             
@@ -660,7 +669,16 @@ namespace PortfolioEngineCore.Tests.Admininfos
         public void QueueJobRequest_DBAccessAndBasePathIsNotNullAndSessionIsNotNull_ReturnTrue()
         {
             // Arrange
-            var parameters = new object[] { new ShimDBAccess().Instance, DummyInt, DummyInt, DummyString, DummyString, DummyString, DummyString };
+            var parameters = new object[] 
+            {
+                new ShimDBAccess().Instance,
+                DummyInt,
+                DummyInt,
+                DummyString,
+                DummyString,
+                DummyString,
+                DummyString
+            };
             ShimPfeJob.Constructor = _ => new ShimPfeJob();
             ShimDbRepository.ConstructorDBAccess = (_, _1) => new ShimDbRepository();
             ShimDbRepository.AllInstances.QueuePfeJobPfeJob = (_, _1) => DummyInt;
@@ -1253,9 +1271,9 @@ namespace PortfolioEngineCore.Tests.Admininfos
                     return 0;
                 }
             };
-            ShimSqlDb.ReadIntValueObjectBooleanOut = (object obj, out bool bIsNull) => 
+            ShimSqlDb.ReadIntValueObjectBooleanOut = (object obj, out bool isNull) => 
             {
-                bIsNull = true;
+                isNull = true;
                 return DummyInt;
             };
             var count = 0;
@@ -1311,9 +1329,9 @@ namespace PortfolioEngineCore.Tests.Admininfos
                     return 0;
                 }
             };
-            ShimSqlDb.ReadIntValueObjectBooleanOut = (object obj, out bool bIsNull) =>
+            ShimSqlDb.ReadIntValueObjectBooleanOut = (object obj, out bool isNull) =>
             {
-                bIsNull = false;
+                isNull = false;
                 return DummyInt;
             };
             var count = 0;
@@ -1412,12 +1430,12 @@ namespace PortfolioEngineCore.Tests.Admininfos
             var parameters = new object[] { new ShimDBAccess().Instance, DummyCalenderInt, string.Empty };
             ShimSqlDb.AllInstances.DBTraceStatusEnumTraceChannelEnumStringStringStringStringBoolean =
                 (_, _1, _2, _3, _4, _5, _6, _7) => { };
-            var x = 0;
+            var count = 0;
             ShimSqlDb.ReadIntValueObject = _ => DummyInt;
             ShimSqlDb.ReadDateValueObject = _ =>
             {
-                x++;
-                if (x == 2 || x == 4 || x == 8)
+                count++;
+                if (count == 2 || count == 4 || count == 8)
                 {
                     ShimSqlDataReader.AllInstances.Read = _1 => false;
                 };
@@ -1447,11 +1465,11 @@ namespace PortfolioEngineCore.Tests.Admininfos
             var parameters = new object[] { new ShimDBAccess().Instance, DummyCalenderInt, DummyString };
             ShimSqlDb.AllInstances.DBTraceStatusEnumTraceChannelEnumStringStringStringStringBoolean =
                 (_, _1, _2, _3, _4, _5, _6, _7) => { };
-            var x = 0;
+            var count = 0;
             ShimSqlDb.ReadIntValueObject = _ =>
             {
-                x++;
-                if (x == 2 || x == 4 || x == 6)
+                count++;
+                if (count == 2 || count == 4 || count == 6)
                 {
                     ShimSqlDataReader.AllInstances.Read = _1 => false;
                 };
@@ -1481,16 +1499,16 @@ namespace PortfolioEngineCore.Tests.Admininfos
             var parameters = new object[] { new ShimDBAccess().Instance, DummyCalenderInt, string.Empty };
             ShimSqlDb.AllInstances.DBTraceStatusEnumTraceChannelEnumStringStringStringStringBoolean =
                 (_, _1, _2, _3, _4, _5, _6, _7) => { };
-            var x = 0;
+            var count = 0;
             ShimSqlDb.ReadIntValueObject = _ =>
             {
-                if (x == 1)
+                if (count == 1)
                 {
-                    x = 0;
+                    count = 0;
                     ShimSqlDataReader.AllInstances.Read = _1 => false;
                     return DummyInt + 1;
                 };
-                x++;
+                count++;
                 return DummyInt;
             };
             ShimSqlDb.ReadDateValueObject = _ => new DateTime();
