@@ -2987,27 +2987,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region Method Call : (Right) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ExtensionMethods_Right_Static_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
-        {
-            // Arrange
-            var methodRightPrametersTypes = new Type[] { typeof(string), typeof(int) };
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(null, _extensionMethodsInstanceType, MethodRight, Fixture, methodRightPrametersTypes);
-
-            // Assert
-            result.ShouldBeNull();
-            methodRightPrametersTypes.Length.ShouldBe(2);
-        }
-
-        #endregion
-
+        
         #region Method Call : (Right) (Return Type : string) Invoke Should Not Throw
 
         [Test]
