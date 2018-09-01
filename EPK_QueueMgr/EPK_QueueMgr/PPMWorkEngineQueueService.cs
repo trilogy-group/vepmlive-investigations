@@ -628,34 +628,6 @@ namespace WE_QueueMgr
             }
         }
 
-
-        Dictionary<Guid, Item> allItems = new Dictionary<Guid, Item>();
-
-        public void AddToQueue(Item item)
-        {
-            item.Priority = allItems.Count + 1;
-            allItems[item.jobid] = item;
-        }
-
-        public void PriorityUp(Item it)
-        {
-            if (it.Priority <= 1)
-                return;
-
-            it.Priority--;
-
-            foreach (var item in allItems)
-                if (item.Value.Priority == it.Priority)
-                {
-                    item.Value.Priority++;
-                    break;
-                }
-        }
-
-        public void PriorityUp(IEnumerable<Item> items)
-        {
-            //TODO
-        }
     }
 
     internal class QMSite
