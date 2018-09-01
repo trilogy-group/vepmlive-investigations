@@ -1452,42 +1452,6 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
 
         #endregion
 
-        #region Method Call : (createSite) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Createsite_createSite_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var url = CreateType<string>();
-			var subscription = CreateType<SPSiteSubscription>();
-            var title = CreateType<string>();
-            var description = CreateType<string>();
-            var user = CreateType<string>();
-            var fullName = CreateType<string>();
-            var email = CreateType<string>();
-            var template = CreateType<string>();
-            var siteid = CreateType<Guid>();
-            var methodcreateSitePrametersTypes = new Type[] { typeof(string), typeof(SPSiteSubscription), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(Guid) };
-            object[] parametersOfcreateSite = { url, subscription, title, description, user, fullName, email, template, siteid };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodcreateSite, methodcreateSitePrametersTypes, out exception);
-			 
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_createsiteInstanceFixture, parametersOfcreateSite);
-
-            // Assert
-            methodInfo.ShouldNotBeNull(); 
-            exception.ShouldBeNull();
-            parametersOfcreateSite.ShouldNotBeNull();
-            parametersOfcreateSite.Length.ShouldBe(9);
-            methodcreateSitePrametersTypes.Length.ShouldBe(9);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (createSite) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -1577,26 +1541,6 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
             // Assert
             methodInfo.ShouldNotBeNull();
             result.ShouldNotBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (createSite) (Return Type : string) Parameters Count verify
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Createsite_createSite_Method_Call_Parameters_Count_Verification_Test()
-        {
-            // Arrange
-            var methodInfo = GetMethodInfo(MethodcreateSite, 0);
-            const int parametersCount = 9;
-
-            // Act
-            var parameters = methodInfo.GetParameters();
-
-            // Assert
-            parameters.Length.ShouldBe(parametersCount);
         }
 
         #endregion

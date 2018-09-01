@@ -92,16 +92,19 @@ namespace EPMLiveCore
                 {
                     stream = assm.GetManifestResourceStream("EPMLiveCore.LanguageFiles." + feature.ToString() + "1033.xml");
                 }
-                StreamReader sr = new StreamReader(stream);
-                doc.LoadXml(sr.ReadToEnd());
-                foreach (XmlNode nd in doc.SelectNodes("/strings/string"))
+                using (var streamReader = new StreamReader(stream))
                 {
-                    hshResources.Add(nd.Attributes["id"].Value, nd.InnerText);
+                    doc.LoadXml(streamReader.ReadToEnd());
+                    foreach (XmlNode node in doc.SelectNodes("/strings/string"))
+                    {
+                        hshResources.Add(node.Attributes["id"].Value, node.InnerText);
+                    }
                 }
             }
             catch (Exception ex)
             {
                 strError = ex.Message;
+                Trace.WriteLine(ex.ToString());
             }
         }
 
@@ -1815,26 +1818,22 @@ namespace EPMLiveCore
             return cn;
         }
 
-        static private DataTable GetTable(SqlCommand cmd)
+        private static DataTable GetTable(SqlCommand command)
         {
-            SqlDataAdapter da;
-            var dt = new DataTable();
+            var dataTable = new DataTable();
             try
             {
-                da = new SqlDataAdapter(cmd);
-                da.Fill(dt);
-                da.Dispose();
+                using (var adapter = new SqlDataAdapter(command))
+                {
+                    adapter.Fill(dataTable);
+                }
             }
             catch (Exception ex)
             {
-
+                Trace.WriteLine(ex.ToString());
             }
-            finally
-            {
-
-            }
-
-            return dt;
+            
+            return dataTable;
         }
 
         /// <summary>
