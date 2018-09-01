@@ -261,7 +261,7 @@ namespace PortfolioEngineCore
             }
             catch (Exception ex)
             {
-                _dba.HandleException("SetJobCompleted", (StatusEnum)99999, ex);
+                _dba.HandleException("RequeueJob", (StatusEnum)99999, ex);
             }
             return bSuccess;
         }
