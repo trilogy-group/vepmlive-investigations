@@ -638,33 +638,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region Method Call : (ManageToolBarControls) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CustomQuikLnch_ManageToolBarControls_Method_Call_Void_With_No_Parameters_Call_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodManageToolBarControlsPrametersTypes = null;
-            object[] parametersOfManageToolBarControls = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodManageToolBarControls, methodManageToolBarControlsPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_customQuikLnchInstanceFixture, parametersOfManageToolBarControls);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfManageToolBarControls.ShouldBeNull();
-            methodManageToolBarControlsPrametersTypes.ShouldBeNull();
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (ManageToolBarControls) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]

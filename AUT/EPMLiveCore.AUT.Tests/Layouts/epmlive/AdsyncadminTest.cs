@@ -1326,28 +1326,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region Method Call : (GetFieldMappings) (Return Type : string) without parameters value verify result should be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Adsyncadmin_GetFieldMappings_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetFieldMappings, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_adsyncadminInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldBeNull();
-        }
-
-        #endregion
-
+        
         #region Method Call : (SaveJob) (Return Type : bool) private call definition
 
         [ExcludeFromCodeCoverage]
