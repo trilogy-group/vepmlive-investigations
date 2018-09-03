@@ -484,7 +484,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void InitializeStatusLogDataTable_Should_SetDataTeble()
+        public void InitializeStatusLogDataTable_Should_SetDataTable()
         {
             // Arrange
             var dataTable = new ShimDataTable().Instance;
@@ -1151,7 +1151,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void MapDataBase_DbExistsFalse_DatabaseExistsTrue_ReturnsFalse()
+        public void MapDataBase_DbExistsFalseAndDatabaseExistsTrue_ReturnsFalse()
         {
             // Arrange
             var message = string.Empty;
@@ -1182,7 +1182,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void MapDataBase_DbExistsFalse_CreateDatabaseFalse_ReturnsFalse()
+        public void MapDataBase_DbExistsFalseAndCreateDatabaseFalse_ReturnsFalse()
         {
             // Arrange
             var message = string.Empty;
@@ -1214,7 +1214,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void MapDataBase_DbExistsFalse_InitializeDatabaseFalse_ReturnsFalse()
+        public void MapDataBase_DbExistsFalseAndInitializeDatabaseFalse_ReturnsFalse()
         {
             // Arrange
             var message = string.Empty;
@@ -1247,7 +1247,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void MapDataBase_DbExists_DatabaseExistsFalse_ReturnsFalse()
+        public void MapDataBase_DbExistsAndDatabaseExistsFalse_ReturnsFalse()
         {
             // Arrange
             var message = string.Empty;
@@ -1278,7 +1278,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void MapDataBase_DbExists_IsReportingDBFalse_ReturnsFalse()
+        public void MapDataBase_DbExistsAndIsReportingDBFalse_ReturnsFalse()
         {
             // Arrange
             var message = string.Empty;
