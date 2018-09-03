@@ -780,27 +780,7 @@ namespace EPMLiveCore.API
         }
 
         #endregion
-
-        #region Method Call : (Add) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_PropertyHash_Add_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var pair = CreateType<KeyValuePair<int, Dictionary<object, object>>>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _propertyHashInstance.Add(pair);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (Add) (Return Type : void) No Exception Thrown
 
         [Test]
@@ -1055,35 +1035,6 @@ namespace EPMLiveCore.API
 
         #endregion
         
-        #region Method Call : (Add) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_PropertyHash_Add_Method_Call_Void_Overloading_Of_2_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var values = CreateType<string>();
-            var methodAddPrametersTypes = new Type[] { typeof(string) };
-            object[] parametersOfAdd = { values };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodAdd, methodAddPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_propertyHashInstanceFixture, parametersOfAdd);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfAdd.ShouldNotBeNull();
-            parametersOfAdd.Length.ShouldBe(1);
-            methodAddPrametersTypes.Length.ShouldBe(1);
-            methodAddPrametersTypes.Length.ShouldBe(parametersOfAdd.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (Add) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
