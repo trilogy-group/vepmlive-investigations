@@ -9,6 +9,7 @@ using System.Diagnostics.Fakes;
 using System.Globalization;
 using System.IO.Fakes;
 using System.Web.UI.WebControls;
+using EPMLiveCore.API;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.ReportHelper;
 using EPMLiveCore.ReportHelper.Fakes;
@@ -118,7 +119,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void Constructor_GuidGuidBool_ShoudCreateInstance()
+        public void Constructor_GuidGuidBool_ShouldCreateInstance()
         {
             // Arrange, Act
             var instance = new EPMData(DummyGuid, DummyGuid, true);
@@ -1035,8 +1036,8 @@ namespace EPMLiveCore.Tests.ReportHelper
             // Assert
             _EPMData.ShouldSatisfyAllConditions(
                 () => _EPMData.UseSqlAccount.ShouldBeFalse(),
-                () => databaseName.ShouldNotBeEmpty(),
-                () => databaseServer.ShouldNotBeEmpty());
+                () => databaseName.ShouldNotBeNullOrEmpty(),
+                () => databaseServer.ShouldNotBeNullOrEmpty());
         }
 
         [TestMethod]
