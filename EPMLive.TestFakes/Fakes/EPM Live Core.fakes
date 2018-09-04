@@ -44,5 +44,6 @@
     <Add FullName="EPMLiveCore.Controls.Navigation.Providers.GenericLinkProvider!"/>
     <Add FullName="EPMLiveCore.Infrastructure.Navigation.NavLink!"/>
     <Add FullName="EPMLiveCore.Act!"/>
+    <Add FullName="EPMLiveCore.CommentCCPeopleEditor!"/>
   </ShimGeneration>
 </Fakes>
