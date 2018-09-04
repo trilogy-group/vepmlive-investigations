@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Fakes;
 using System.Web.UI;
 using System.Web.UI.Fakes;
@@ -26,10 +24,11 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         private Comments _testObj;
         private PrivateObject _privateObj;
 
-        private const int DummyInt = 1;
+        private const int DummyIntOne = 1;
+        private const int DummyIntTwo = 2;
         private const string DummyUrl = "http://xyz.com";
         private const string DummyString = "DummyString";
-
+        private const string CCPeopleEditor = "CCPeopleEditor";
         private const string PageLoadMethod = "Page_Load";
 
         [TestInitialize]
@@ -63,7 +62,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             }
             var peopleEditor = new ShimCommentCCPeopleEditor().Instance;
             ShimPeopleEditor.AllInstances.CommaSeparatedAccountsGet = _ => string.Empty;
-            _privateObj.SetField("CCPeopleEditor", peopleEditor);
+            _privateObj.SetField(CCPeopleEditor, peopleEditor);
         }
 
         private void SetupShims()
@@ -98,7 +97,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                                         {
                                             UserGet = () => new ShimSPUser
                                             {
-                                                IDGet = () => DummyInt
+                                                IDGet = () => DummyIntOne
                                             }.Instance
                                         }.Instance
                                     }.Instance
@@ -108,7 +107,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                     },
                     CurrentUserGet = () => new ShimSPUser
                     {
-                        IDGet = () => DummyInt
+                        IDGet = () => DummyIntOne
                     }
                 }
             };
@@ -122,7 +121,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                 ParamsGet = () => new NameValueCollection
                 {
                     ["listId"] = Guid.NewGuid().ToString(),
-                    ["itemid"] = DummyInt.ToString()
+                    ["itemid"] = DummyIntOne.ToString()
                 }
             };
 
@@ -130,7 +129,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             {
                 CurrentUserGet = () => new ShimSPUser
                 {
-                    IDGet = () => DummyInt,
+                    IDGet = () => DummyIntOne,
                     NameGet = () => DummyString,
                     EmailGet = () => DummyString
                 },
@@ -197,12 +196,12 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                                             {
                                                 UserGet = () => new ShimSPUser
                                                 {
-                                                    IDGet = () => DummyInt
+                                                    IDGet = () => DummyIntOne
                                                 }
                                             }.Instance
                                         }.Instance
                                     },
-                                    ItemGetGuid = guid => DummyInt
+                                    ItemGetGuid = guid => DummyIntOne
                                 }
                             }
                         ),
@@ -225,8 +224,8 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                     {
                         GetItemByIdInt32 = __ => new ShimSPListItem
                         {
-                            IDGet = () => DummyInt,
-                            ItemGetGuid = ___ => 2,
+                            IDGet = () => DummyIntOne,
+                            ItemGetGuid = ___ => DummyIntTwo,
                             FieldsGet = () => new ShimSPFieldCollection
                             {
                                 ItemGetGuid = guid => new ShimSPFieldUser
@@ -235,7 +234,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                                     {
                                         UserGet = () => new ShimSPUser
                                         {
-                                            IDGet = () => DummyInt
+                                            IDGet = () => DummyIntOne
                                         }
                                     }.Instance
                                 }
@@ -278,7 +277,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                     {
                         GetItemByIdInt32 = id => new ShimSPListItem
                         {
-                            ItemGetString = item => DummyInt
+                            ItemGetString = item => DummyIntOne
                         }
                     }
                 },
@@ -298,9 +297,9 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
 
             ShimSPFieldLookupValue.ConstructorString = (_, __) => new ShimSPFieldLookupValue
             {
-                LookupIdGet = () => DummyInt
+                LookupIdGet = () => DummyIntOne
             };
-            ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => DummyInt;
+            ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => DummyIntOne;
 
             ShimSPFieldLookupValueCollection.ConstructorString = (_, __) => { };
 
