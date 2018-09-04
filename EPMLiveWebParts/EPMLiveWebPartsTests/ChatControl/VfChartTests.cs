@@ -11,6 +11,7 @@ using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Shouldly;
 
 namespace EPMLiveWebParts.Tests.ChatControl
 {
@@ -49,6 +50,38 @@ namespace EPMLiveWebParts.Tests.ChatControl
         private const string QChartWebPartId = "ChartWebPartId";
         private const string QLookupField = "LookupField";
         private const string QLookupFieldList = "LookupFieldList";
+        private const string True = "true";
+        private const string BubbleType = "Bubble";
+        private const string Column = "Column";
+        private const string Sum = "SUM";
+        private const string PersonalizationDataValue = "1|2|3,3|4|5|6|None Selected";
+        private const string ChartInit = "<vc:Chart xmlns:vc=\"clr-namespace:Visifire.Charts;assembly=SLVisifire.Charts\" BorderThickness=\"0\"  Watermark=\"False\"";
+        private const string ChartTitles = "<vc:Chart.Titles>";
+        private const string ChartTitle = "<vc:Title Text=";
+        private const string ChartLegends = "<vc:Chart.Legends><vc:Legend";
+        private const string ChartAxesX = "<vc:Chart.AxesX>";
+        private const string ChartAxesY = "<vc:Chart.AxesY>";
+        private const string ChartAxisDeclare = "<vc:Axis Title=";
+        private const string ChartAxisGrid = "<vc:Axis.Grids><vc:ChartGrid";
+        private const string ChartSeries = "<vc:Chart.Series>";
+        private const string ChartBubbleDataPoint = "<vc:DataPoint XValue=";
+        private const string ChartShowInLegend = "ShowInLegend=";
+        private const string VisifireJsScript = "<script type='text/javascript' src='/_layouts/epmlive/Visifire.js";
+        private const string OnLoadFunctionDeclaration = "function onLoad()";
+        private const string OnLoadFunctionCall = "addLoadEvent(onLoad);";
+        private const string GetXmlHttpFunctionCall = "var xmlHttp = GetXMLHttpObj();";
+        private const string XmlHttpOpenRequest = "xmlHttp.open('GET', L_Menu_BaseUrl";
+        private const string XmlHttpSendRequest = "xmlHttp.send(";
+        private const string SetVChartDataXml = "vChart.setDataXml(xmlHttp.responseText);";
+        private const string SetVChartSize = "vChart.setSize(";
+        private const string SetVChartCulture = "vChart.setCulture(";
+        private const string RenderVChart = "vChart.render('Visifire";
+        private const string DivVisifire = "<div style='width:100%;height:100%;' id='Visifire";
+        private const string DivDiagnostics = "<div id='ChartDiagnostics' style='width:400px;";
+        private const string ParagraphQueryString = "<p>Querystring:";
+        private const string ElementOpenChartMenu = @"<a onclick=""javascript:window.open(L_Menu_BaseUrl";
+        private const string ExceptionTrace = "**** EXCEPTION ****";
+        private const string MethodHandleException = "HandleException";
         private Guid _dummyGuid = Guid.NewGuid();
         private VfChart _testObject;
         private PrivateObject _privateObject;
@@ -107,7 +140,7 @@ namespace EPMLiveWebParts.Tests.ChatControl
                     || key.Equals(QShowZeroValueData)
                     || key.Equals(QShowBubbleChartInputs))
                     {
-                        return "true";
+                        return True;
                     }
 
                     return DummyString;
@@ -131,36 +164,45 @@ namespace EPMLiveWebParts.Tests.ChatControl
         }
 
         [TestMethod]
-        public void GetXaml_()
+        public void GetXaml_Get_ReturnsChartElements()
         {
-            // Arrange
-
-            // Act
+            // Arrange, Act
             var result = _testObject.GetXaml();
 
             // Assert
-
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldContain(ChartInit),
+                () => result.ShouldContain(ChartTitles),
+                () => result.ShouldContain(ChartTitle),
+                () => result.ShouldContain(ChartLegends),
+                () => result.ShouldContain(ChartAxesX),
+                () => result.ShouldContain(ChartAxesY),
+                () => result.ShouldContain(ChartAxisDeclare),
+                () => result.ShouldContain(ChartAxisGrid),
+                () => result.ShouldContain(ChartSeries));
         }
 
         [TestMethod]
-        public void GetXaml_Bubble_()
+        public void GetXaml_Bubble_WritesBubbleDataPoint()
         {
             // Arrange
-            _testObject.PropChartMainStyle = "Bubble";
+            _testObject.PropChartMainStyle = BubbleType;
             _testObject.PropChartShowZeroValueData = true;
 
             // Act
             var result = _testObject.GetXaml();
 
             // Assert
-
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldContain(ChartBubbleDataPoint),
+                () => result.ShouldContain(ChartShowInLegend));
         }
 
         [TestMethod]
-        public void GetXaml_BubbleWithoutLegend_()
+        public void GetXaml_BubbleWithoutLegend_DoesNotConsiderLegend()
         {
             // Arrange
-            _testObject.PropChartMainStyle = "Bubble";
+            _testObject.PropChartMainStyle = BubbleType;
             _testObject.PropChartShowZeroValueData = true;
             ShimPersonalizationDataRepository.AllInstances.GetUserSettingsPersonalizationSearchCriteria =
                 (_, __) => new PersonalizationData
@@ -170,74 +212,157 @@ namespace EPMLiveWebParts.Tests.ChatControl
                     SiteId = _dummyGuid,
                     WebId = _dummyGuid,
                     ListId = _dummyGuid,
-                    Value = "1|2|3,3|4|5|6|None Selected"
+                    Value = PersonalizationDataValue
                 };
 
             // Act
             var result = _testObject.GetXaml();
 
             // Assert
-
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldContain(ChartBubbleDataPoint),
+                () => result.ShouldContain(ChartShowInLegend));
         }
 
         [TestMethod]
-        public void GetXaml_BubbleNotShowZeroValueData_()
+        public void GetXaml_BubbleNotShowZeroValueData_WritesBubbleDataPoint()
         {
             // Arrange
-            _testObject.PropChartMainStyle = "Bubble";
+            _testObject.PropChartMainStyle = BubbleType;
             _testObject.PropChartShowZeroValueData = false;
 
             // Act
             var result = _testObject.GetXaml();
 
             // Assert
-
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotContain(ChartBubbleDataPoint),
+                () => result.ShouldContain(ChartShowInLegend));
         }
 
         [TestMethod]
-        public void GetHtml_()
+        public void GetHtml_Get_WritesJs()
         {
-            // Arrange
-
-            // Act
+            // Arrange, Act
             var result = _testObject.GetHtml(DummyString);
 
             // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldContain(VisifireJsScript),
+                () => result.ShouldContain(OnLoadFunctionDeclaration),
+                () => result.ShouldContain(OnLoadFunctionCall),
+                () => result.ShouldContain(GetXmlHttpFunctionCall),
+                () => result.ShouldContain(SetVChartDataXml),
+                () => result.ShouldContain(SetVChartSize),
+                () => result.ShouldContain(SetVChartCulture),
+                () => result.ShouldContain(RenderVChart),
+                () => result.ShouldContain(XmlHttpOpenRequest),
+                () => result.ShouldContain(XmlHttpSendRequest));
         }
 
         [TestMethod]
-        public void GetQueryString_()
+        public void GetHtml_Get_WritesHtml()
         {
-            // Arrange
+            // Arrange, Act
+            var result = _testObject.GetHtml(DummyString);
 
-            // Act
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldContain(DivVisifire),
+                () => result.ShouldContain(DivDiagnostics),
+                () => result.ShouldContain(ParagraphQueryString),
+                () => result.ShouldContain(ElementOpenChartMenu));
+        }
+
+        [TestMethod]
+        public void GetQueryString_BuildQueryString_ContainsPositioningFields()
+        {
+            // Arrange, Act
             var result = _testObject.GetQueryString();
 
             // Assert
-
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldContain($"{QXfield}="),
+                () => result.ShouldContain($"{QXfieldLabel}="),
+                () => result.ShouldContain($"{QYfieldLabel}="),
+                () => result.ShouldContain($"{QZfieldLabel}="),
+                () => result.ShouldContain($"{QYfields}="),
+                () => result.ShouldContain($"{QZfield}="),
+                () => result.ShouldContain($"{QPercentage}="),
+                () => result.ShouldContain($"{QWidth}="),
+                () => result.ShouldContain($"{QHeight}="));
         }
 
         [TestMethod]
-        public void EmptyContructor_()
+        public void GetQueryString_BuildQueryString_ContainsStylingFields()
         {
-            // Arrange
+            // Arrange, Act
+            var result = _testObject.GetQueryString();
 
-            // Act
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldContain($"{QBubbleChartColorField}="),
+                () => result.ShouldContain($"{QAggrtype}="),
+                () => result.ShouldContain($"{QList}="),
+                () => result.ShouldContain($"{QView}="),
+                () => result.ShouldContain($"{QRolluplists}="),
+                () => result.ShouldContain($"{QRollupsites}="),
+                () => result.ShouldContain($"{QChartType}="),
+                () => result.ShouldContain($"{QView3D}="),
+                () => result.ShouldContain($"{QColorSet}="));
+        }
+
+        [TestMethod]
+        public void GetQueryString_BuildQueryString_ContainsOtherFields()
+        {
+            // Arrange, Act
+            var result = _testObject.GetQueryString();
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldContain($"{QLegend}="),
+                () => result.ShouldContain($"{QCurrency}="),
+                () => result.ShouldContain($"{QGridlines}="),
+                () => result.ShouldContain($"{QLabels}="),
+                () => result.ShouldContain($"{QShowZeroValueData}="),
+                () => result.ShouldContain($"{QShowBubbleChartInputs}="),
+                () => result.ShouldContain($"{QChartWebPartId}="),
+                () => result.ShouldContain($"{QLookupField}="),
+                () => result.ShouldContain($"{QLookupFieldList}="));
+        }
+
+        [TestMethod]
+        public void EmptyContructor_Construct_InitializesVariables()
+        {
+            // Arrange, Act
             var result = new TestClass();
 
             // Assert
-
+            result.ShouldSatisfyAllConditions(
+                () => result.PropChartTitle.ShouldBeEmpty(),
+                () => result.PropChartXaxisField.ShouldBeEmpty(),
+                () => result.PropChartYaxisField.ShouldBeEmpty(),
+                () => result.PropChartZaxisField.ShouldBeEmpty(),
+                () => result.PropBubbleChartColorField.ShouldBeEmpty(),
+                () => result.PropChartRollupLists.ShouldBeEmpty(),
+                () => result.PropChartRollupSites.ShouldBeEmpty(),
+                () => result.PropChartSelectedList.ShouldBeEmpty(),
+                () => result.PropChartSelectedView.ShouldBeEmpty(),
+                () => result.PropChartMainStyle.ShouldBe(Column),
+                () => result.PropChartAggregationType.ShouldBe(Sum));
         }
 
         [TestMethod]
-        public void HandleException_()
+        public void HandleException_TraceOutput_WritesToOutput()
         {
-            // Arrange
-
-            // Act
-            _privateObject.Invoke("HandleException", new object[] { new InvalidOperationException() });
+            // Arrange, Act
+            _privateObject.Invoke(MethodHandleException, new object[] { new InvalidOperationException(DummyString) });
 
             // Assert
+            var result = _testObject.ToString();
+            _testObject.ShouldSatisfyAllConditions(
+                () => result.ShouldContain("EPMLiveWebParts"),
+                () => result.ShouldContain("VfChart"));
         }
 
         private void ShimSharePointContext()
