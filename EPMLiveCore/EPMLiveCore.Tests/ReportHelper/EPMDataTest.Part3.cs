@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common.Fakes;
 using System.Data.Fakes;
-using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
-using System.Diagnostics.Fakes;
-using System.Globalization;
-using System.IO.Fakes;
 using System.Linq;
 using System.Web.UI.WebControls;
 using EPMLiveCore.Fakes;
@@ -22,8 +17,11 @@ using Shouldly;
 
 namespace EPMLiveCore.Tests.ReportHelper
 {
-    public partial class EPMDataTest
+    public partial class EPMDataTest3
     {
+        private static readonly Guid DummyGuid = new Guid();
+        private const string DummyString = "Dummy String";
+        private const string DummyName = "Dummy Name";
         private const string GetListFieldsMethodName = "GetListFields";
         private const string PopulateInstanceFromDataMethodName = "PopulateInstanceFromData";
         private const string PopulateConnectionStringsMethodName = "PopulateConnectionStrings";
@@ -33,23 +31,24 @@ namespace EPMLiveCore.Tests.ReportHelper
         private const string GetDbVersionMethodName = "GetDbVersion";
         private IDisposable _shimContext;
         private EPMData _EPMData;
+        private PrivateObject _privateObject;
 
         [TestInitialize]
-        public void Initialize()
+        public void InitializeTests()
         {
             _shimContext = ShimsContext.Create();
-            SetupShims();
+            ArrangeShims();
             _EPMData = new EPMData(DummyGuid);
             _privateObject = new PrivateObject(_EPMData);
         }
 
         [TestCleanup]
-        public void Cleanup()
+        public void CleanupTests()
         {
             _shimContext?.Dispose();
         }
 
-        private void SetupShims()
+        private void ArrangeShims()
         {
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
             ShimEPMData.AllInstances.PopulateInstanceFromData = _ => { };
