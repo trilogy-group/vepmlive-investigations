@@ -147,6 +147,8 @@ namespace EPMLive.TestFakes.Utility
             };
             ShimSqlConnection.AllInstances.StateGet = instance => System.Data.ConnectionState.Open;
 
+            ShimSqlConnection.AllInstances.BeginTransaction = instance => new ShimSqlTransaction();
+
             ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
             {
                 instance.CommandText = commandText;

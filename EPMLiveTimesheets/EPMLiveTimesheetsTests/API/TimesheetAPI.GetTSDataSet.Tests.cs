@@ -57,7 +57,7 @@ namespace TimeSheets.Tests
         {
             ShimMyWorkReportData.ConstructorGuid = (instance, guid) => {};
 
-            ShimTimesheetAPI.iGenerateTSFromPastSqlConnectionSPWebSPUserStringMyWorkReportData
+            ShimTimesheetAPI.GenerateTSFromPastSqlConnectionSPWebSPUserStringMyWorkReportData
                 = (SqlConnection cn, 
                     SPWeb web,
                     SPUser user,
