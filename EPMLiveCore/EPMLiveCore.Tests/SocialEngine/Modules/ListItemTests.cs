@@ -809,8 +809,220 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
         }
 
         [TestMethod]
-        public void ValidateCreationActivity_WhenCalled_ThrowsException()
+        public void ValidateCommentCreationActivity_WhenCalled_ThrowsSameItemException()
         {
+            // Arrange
+            const string settingValue = "somevalue";
+            const string expected = "Cannot register more than one created activity on the same list item.";
+
+            var data = CreateDataObject();
+            var actual = string.Empty;
+            ShimCacheStore.CurrentGet = () => new ShimCacheStore()
+            {
+                GetStringStringFuncOfObjectBoolean = (_, _1, _2, _3) => new ShimCachedValue()
+                {
+                    ValueGet = () => settingValue
+                }
+            };
+            ShimSqlCommand.AllInstances.ExecuteScalar = _ => 1;
+
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Created, data, _spWeb, streamManager, threadManager, activityManager);
+
+            // Act
+            try
+            {
+                _privateObj.Invoke(
+                    "ValidateCommentCreationActivity",
+                    BindingFlags.Instance | BindingFlags.NonPublic,
+                    new object[]
+                    {
+                        args
+                    });
+            }
+            catch (SocialEngineException exception)
+            {
+                actual = exception.Message;
+            }
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void ValidateCommentCreationActivity_WhenCalled_ThrowsNotRegisteredException()
+        {
+            // Arrange
+            const string settingValue = "somevalue";
+            const string expected = "Cannot register creation activity on the same comment more than once";
+
+            var queryCount = 0;
+            var data = CreateDataObject();
+            data.Add("CommentId", _guid);
+            data.Add("Comment", "Comment");
+
+            var actual = string.Empty;
+            ShimCacheStore.CurrentGet = () => new ShimCacheStore()
+            {
+                GetStringStringFuncOfObjectBoolean = (_, _1, _2, _3) => new ShimCachedValue()
+                {
+                    ValueGet = () => settingValue
+                }
+            };
+            ShimSqlCommand.AllInstances.ExecuteScalar = _ =>
+            {
+                queryCount++;
+                if (queryCount == 1)
+                {
+                    return 0;
+                }
+                return 1;
+            };
+
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Created, data, _spWeb, streamManager, threadManager, activityManager);
+
+            // Act
+            try
+            {
+                _privateObj.Invoke(
+                    "ValidateCommentCreationActivity",
+                    BindingFlags.Instance | BindingFlags.NonPublic,
+                    new object[]
+                    {
+                        args
+                    });
+            }
+            catch (SocialEngineException exception)
+            {
+                actual = exception.Message;
+            }
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void ValidateCommentDeletionActivity_WhenCalled_ThrowsSameItemError()
+        {
+            // Arrange
+            const string settingValue = "somevalue";
+            const string expected = "Cannot register more than one deleted activity on the same item.";
+
+            var data = CreateDataObject();
+            var actual = string.Empty;
+            ShimCacheStore.CurrentGet = () => new ShimCacheStore()
+            {
+                GetStringStringFuncOfObjectBoolean = (_, _1, _2, _3) => new ShimCachedValue()
+                {
+                    ValueGet = () => settingValue
+                }
+            };
+            ShimSqlCommand.AllInstances.ExecuteScalar = _ => 1;
+
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Deleted, data, _spWeb, streamManager, threadManager, activityManager);
+
+            // Act
+            try
+            {
+                _privateObj.Invoke(
+                    "ValidateCommentDeletionActivity",
+                    BindingFlags.Instance | BindingFlags.NonPublic,
+                    new object[]
+                    {
+                        args
+                    });
+            }
+            catch (SocialEngineException exception)
+            {
+                actual = exception.Message;
+            }
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void ValidateCommentDeletionActivity_WhenCalled_ThrowsNotRegistered()
+        {
+            // Arrange
+            const string settingValue = "somevalue";
+            const string expected = "Cannot delete a comment that has not been registerd";
+
+            var data = CreateDataObject();
+            data.Add("CommentId", _guid);
+
+            var actual = string.Empty;
+            ShimCacheStore.CurrentGet = () => new ShimCacheStore()
+            {
+                GetStringStringFuncOfObjectBoolean = (_, _1, _2, _3) => new ShimCachedValue()
+                {
+                    ValueGet = () => settingValue
+                }
+            };
+            ShimSqlCommand.AllInstances.ExecuteScalar = _ => 0;
+
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Deleted, data, _spWeb, streamManager, threadManager, activityManager);
+
+            // Act
+            try
+            {
+                _privateObj.Invoke(
+                    "ValidateCommentDeletionActivity",
+                    BindingFlags.Instance | BindingFlags.NonPublic,
+                    new object[]
+                    {
+                        args
+                    });
+            }
+            catch (SocialEngineException exception)
+            {
+                actual = exception.Message;
+            }
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void ValidateCommentUpdationActivity_WhenCalled_ThrowsNotRegisteredException()
+        {
+            // Arrange
+            const string settingValue = "somevalue";
+            const string expected = "Cannot update a comment that has not been registerd";
+
+            var data = CreateDataObject();
+            data.Add("CommentId", _guid);
+            data.Add("Comment", "Comment");
+
+            var actual = string.Empty;
+            ShimCacheStore.CurrentGet = () => new ShimCacheStore()
+            {
+                GetStringStringFuncOfObjectBoolean = (_, _1, _2, _3) => new ShimCachedValue()
+                {
+                    ValueGet = () => settingValue
+                }
+            };
+            ShimSqlCommand.AllInstances.ExecuteScalar = _ => 0;
+
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Created, data, _spWeb, streamManager, threadManager, activityManager);
+
+            // Act
+            try
+            {
+                _privateObj.Invoke(
+                    "ValidateCommentUpdationActivity",
+                    BindingFlags.Instance | BindingFlags.NonPublic,
+                    new object[]
+                    {
+                        args
+                    });
+            }
+            catch (SocialEngineException exception)
+            {
+                actual = exception.Message;
+            }
+
+            // Assert
+            actual.ShouldBe(expected);
         }
     }
 }
