@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using EPMLiveCore.API.ProjectArchiver;
+using Microsoft.SharePoint.Administration.Claims;
 
 namespace EPMLiveCore.Layouts.EPMLiveCore
 {
@@ -39,6 +40,8 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
 					BtnCreateSiteTop.Enabled = true;
 				}
 			}
+		
+			
 		}
 
 		protected void Selector_ContextChange(object sender, EventArgs e)
@@ -65,6 +68,7 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
 					DdlWildcardInclusion.Items.Add(new ListItem("/" + pref.Name + "/", "0:/" + pref.Name + "/"));
 				}
 			}
+			PickerOwner.WebApplicationId = webAppSelector.CurrentItem.Id;
 		}
 
 		protected void BtnCreateSite_Click(object sender, EventArgs e)
@@ -169,12 +173,16 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
 				{
 					app = webAppSelector.CurrentItem;
 
-					string username = ((Microsoft.SharePoint.WebControls.PickerEntity)PickerOwner.ResolvedEntities[0]).Description;
+					string username; 
 					string name = ((Microsoft.SharePoint.WebControls.PickerEntity)PickerOwner.ResolvedEntities[0]).DisplayText;
 
 					if (app.UseClaimsAuthentication)
 					{
-						username = "i:0#.w|" + username;
+						username = ((Microsoft.SharePoint.WebControls.PickerEntity)PickerOwner.ResolvedEntities[0]).Claim.ToEncodedString();
+					}
+					else
+					{
+						username = ((Microsoft.SharePoint.WebControls.PickerEntity)PickerOwner.ResolvedEntities[0]).Description;
 					}
 
 					Guid siteguid = Guid.Empty;

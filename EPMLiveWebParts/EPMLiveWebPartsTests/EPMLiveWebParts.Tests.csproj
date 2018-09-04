@@ -39,6 +39,9 @@
       <HintPath>..\..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="EPM Live Core.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="EPMLiveWebParts.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPMLiveWebParts.Fakes.dll</HintPath>
     </Reference>
@@ -94,6 +97,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ChatControl\VfChartTests.cs" />
+    <Compile Include="UserProfileDisplay\DisplayProfilePicturesTests.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.cs" />
     <Compile Include="GridListView\GridListViewTests.cs" />
     <Compile Include="Helpers\SpListItemDefinition.cs" />
@@ -107,6 +111,10 @@
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
       <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
       <Name>EPMLive.TestFakes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
+      <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
+      <Name>EPMLiveCore</Name>
     </ProjectReference>
     <ProjectReference Include="..\EPMLiveWebParts\EPMLiveWebParts.csproj">
       <Project>{A7F83FD4-BE8B-49AB-BE24-39209E8FABC2}</Project>

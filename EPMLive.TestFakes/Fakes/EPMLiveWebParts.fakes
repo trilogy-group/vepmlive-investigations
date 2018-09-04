@@ -13,5 +13,6 @@
 		<Add FullName="EPMLiveWebParts.SSRS2006.ReportingService2006!"/>
     <Add FullName="EPMLiveWebParts.ReportWebPartBase!"/>
     <Add FullName="EPMLiveWebParts.Personalization.Repositories.PersonalizationDataRepository!"/>
+    <Add FullName="EPMLiveWebParts.DisplayProfilePictures!"/>
   </ShimGeneration>
 </Fakes>

@@ -714,36 +714,7 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
         }
 
         #endregion
-
-        #region Method Call : (GeneralUpgrade) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_WE432Upgrader_GeneralUpgrade_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var siteId = CreateType<Guid>();
-            var methodGeneralUpgradePrametersTypes = new Type[] { typeof(Guid) };
-            object[] parametersOfGeneralUpgrade = { siteId };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGeneralUpgrade, methodGeneralUpgradePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_wE432UpgraderInstanceFixture, parametersOfGeneralUpgrade);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGeneralUpgrade.ShouldNotBeNull();
-            parametersOfGeneralUpgrade.Length.ShouldBe(1);
-            methodGeneralUpgradePrametersTypes.Length.ShouldBe(1);
-            methodGeneralUpgradePrametersTypes.Length.ShouldBe(parametersOfGeneralUpgrade.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (GeneralUpgrade) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -840,36 +811,7 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
         }
 
         #endregion
-
-        #region Method Call : (LogError) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_WE432Upgrader_LogError_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var message = CreateType<string>();
-            var methodLogErrorPrametersTypes = new Type[] { typeof(string) };
-            object[] parametersOfLogError = { message };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodLogError, methodLogErrorPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_wE432UpgraderInstanceFixture, parametersOfLogError);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfLogError.ShouldNotBeNull();
-            parametersOfLogError.Length.ShouldBe(1);
-            methodLogErrorPrametersTypes.Length.ShouldBe(1);
-            methodLogErrorPrametersTypes.Length.ShouldBe(parametersOfLogError.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (LogError) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
