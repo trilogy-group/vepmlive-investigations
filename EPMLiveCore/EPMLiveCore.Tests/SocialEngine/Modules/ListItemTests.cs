@@ -150,6 +150,23 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             return threadTable;
         }
 
+        private Dictionary<string, object> CreateDataObject()
+        {
+            var data = new Dictionary<string, object>()
+            {
+                ["Id"] = 1,
+                ["Title"] = "Title",
+                ["URL"] = "http://sampleurl.com",
+                ["ListTitle"] = "ListTitle",
+                ["ListId"] = _guid,
+                ["WebId"] = _guid,
+                ["SiteId"] = _guid,
+                ["UserId"] = 1,
+                ["ActivityTime"] = DateTime.Now
+            };
+            return data;
+        }
+
         [TestMethod]
         public void PerformPostRegistrationSteps_WhenCalled_Updates()
         {
@@ -158,22 +175,18 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
 
             var updateActual = false;
             var dataTableCount = 1;
-            var data = new Dictionary<string, object>()
+            var data = CreateDataObject();
+            data.Add("Commenters", Commenters);
+            data.Add("IsMassOperation", true);
+            data.Add("#!Activity", new Activity()
             {
-                ["UserId"] = 1,
-                ["Commenters"] = Commenters,
-                ["WebId"] = _guid,
-                ["IsMassOperation"] = true,
-                ["#!Activity"] = new Activity()
-                {
-                    Id = _guid
-                },
-                ["AssociatedListItems"] = $"{_guid.ToString()}|1,{_guid.ToString()}|2",
-                ["#!Thread"] = new Thread()
-                {
-                    Id = _guid
-                }
-            };
+                Id = _guid
+            });
+            data.Add("AssociatedListItems", $"{_guid.ToString()}|1,{_guid.ToString()}|2");
+            data.Add("#!Thread", new Thread()
+            {
+                Id = _guid
+            });
 
             var userTable = new DataTable();
             userTable.Columns.Add(UserIdColumn, typeof(int));
@@ -256,10 +269,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             const string title = "ListTitle";
             const bool expected = true;
 
-            var data = new Dictionary<string, object>()
-            {
-                ["ListTitle"] = title
-            };
+            var data = CreateDataObject();
 
             ShimCacheStore.CurrentGet = () => new ShimCacheStore()
             {
@@ -292,10 +302,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             const string title = "ListTitle";
             const bool expected = false;
 
-            var data = new Dictionary<string, object>()
-            {
-                ["ListTitle"] = title
-            };
+            var data = CreateDataObject();
 
             ShimCacheStore.CurrentGet = () => new ShimCacheStore()
             {
@@ -356,15 +363,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
 
             var actual = false;
             var readCount = 0;
-            var data = new Dictionary<string, object>()
-            {
-                ["ActivityTime"] = DateTime.Now,
-                ["ListId"] = _guid,
-                ["Id"] = 1,
-                ["UserId"] = 1,
-                ["SiteId"] = _guid,
-                ["WebId"] = _guid
-            };
+            var data = CreateDataObject();
 
             ShimCacheStore.CurrentGet = () => new ShimCacheStore()
             {
@@ -420,22 +419,14 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             const bool registerExpected = true;
 
             var registerActual = false;
-            var data = new Dictionary<string, object>()
+            var data = CreateDataObject();
+            data.Add("CommentId", 1);
+            data.Add("Comment", "Comment");
+            data.Add("Commenters", Commenters);
+            data.Add("#!Thread", new Thread()
             {
-                ["ActivityTime"] = DateTime.Now,
-                ["ListId"] = _guid,
-                ["Id"] = 1,
-                ["UserId"] = 1,
-                ["SiteId"] = _guid,
-                ["WebId"] = _guid,
-                ["CommentId"] = 1,
-                ["Comment"] = "Comment",
-                ["Commenters"] = Commenters,
-                ["#!Thread"] = new Thread()
-                {
-                    Id = _guid
-                }
-            };
+                Id = _guid
+            });
 
             var threadTable = CreateThreadTable();
 
@@ -488,20 +479,11 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             const bool registerExpected = true;
 
             var registerActual = false;
-            var data = new Dictionary<string, object>()
-            {
-                ["Title"] = "Title",
-                ["URL"] = "http://sampleurl.com",
-                ["ActivityTime"] = DateTime.Now,
-                ["ListId"] = _guid,
-                ["Id"] = 1,
-                ["UserId"] = 1,
-                ["SiteId"] = _guid,
-                ["WebId"] = _guid,
-                ["CommentId"] = 1,
-                ["Comment"] = "Comment",
-                ["Commenters"] = Commenters
-            };
+            var data = CreateDataObject();
+            data.Add("CommentId", 1);
+            data.Add("Comment", "Comment");
+            data.Add("Commenters", Commenters);
+
             var threadTable = CreateThreadTable();
 
             ShimSqlCommand.AllInstances.ExecuteNonQuery = sqlCommand =>
@@ -553,17 +535,8 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             const bool registerExpected = true;
 
             var registerActual = false;
-            var data = new Dictionary<string, object>()
-            {
-                ["ActivityTime"] = DateTime.Now,
-                ["WebId"] = _guid,
-                ["Title"] = "Title",
-                ["URL"] = "http://sampleurl.com",
-                ["ListId"] = _guid,
-                ["Id"] = 1,
-                ["UserId"] = 1,
-                ["CommentId"] = 1
-            };
+            var data = CreateDataObject();
+            data.Add("CommentId", 1);
             var threadTable = CreateThreadTable();
 
             ShimSqlCommand.AllInstances.ExecuteNonQuery = sqlCommand =>
@@ -615,20 +588,12 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             const bool registerExpected = true;
 
             var registerActual = false;
-            var data = new Dictionary<string, object>()
-            {
-                ["ActivityTime"] = DateTime.Now,
-                ["WebId"] = _guid,
-                ["Title"] = "Title",
-                ["URL"] = "http://sampleurl.com",
-                ["ListId"] = _guid,
-                ["Id"] = 1,
-                ["UserId"] = 1,
-                ["ChangedProperties"] = "ChangedProperties,title",
-                ["CommentId"] = 1,
-                ["Comment"] = "Comment",
-                ["Commenters"] = Commenters
-            };
+            var data = CreateDataObject();
+            data.Add("ChangedProperties", "ChangedProperties,title");
+            data.Add("CommentId", 1);
+            data.Add("Comment", "Comment");
+            data.Add("Commenters", Commenters);
+
             var threadTable = CreateThreadTable();
 
             ShimSqlCommand.AllInstances.ExecuteNonQuery = sqlCommand =>
@@ -680,20 +645,11 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             const bool registerExpected = true;
 
             var registerActual = false;
-            var data = new Dictionary<string, object>()
-            {
-                ["ActivityTime"] = DateTime.Now,
-                ["WebId"] = _guid,
-                ["Title"] = "Title",
-                ["URL"] = "http://sampleurl.com",
-                ["ListId"] = _guid,
-                ["Id"] = 1,
-                ["UserId"] = 1,
-                ["ChangedProperties"] = "ChangedProperties,title",
-                ["CommentId"] = 1,
-                ["Comment"] = "Comment",
-                ["Commenters"] = Commenters
-            };
+            var data = CreateDataObject();
+            data.Add("ChangedProperties", "ChangedProperties,title");
+            data.Add("CommentId", 1);
+            data.Add("Comment", "Comment");
+            data.Add("Commenters", Commenters);
             var threadTable = CreateThreadTable();
 
             ShimSqlCommand.AllInstances.ExecuteNonQuery = sqlCommand =>
@@ -757,11 +713,8 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                     }
                 }
             };
-            var data = new Dictionary<string, object>()
-            {
-                ["UserId"] = 1,
-                ["AssignedTo"] = "1,2"
-            };
+            var data = CreateDataObject();
+            data.Add("AssignedTo", "1,2");
 
             ShimSqlCommand.AllInstances.ExecuteScalar = _ => UserRole.Assignee;
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
@@ -789,23 +742,6 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
 
             // Assert
             actualUpdate.ShouldBe(expectedUpdate);
-        }
-
-        private Dictionary<string, object> CreateDataObject()
-        {
-            var data = new Dictionary<string, object>()
-            {
-                ["Id"] = 1,
-                ["Title"] = "Title",
-                ["URL"] = "http://sampleurl.com",
-                ["ListTitle"] = "ListTitle",
-                ["ListId"] = _guid,
-                ["WebId"] = _guid,
-                ["SiteId"] = _guid,
-                ["UserId"] = 1,
-                ["ActivityTime"] = DateTime.Now
-            };
-            return data;
         }
 
         [TestMethod]
