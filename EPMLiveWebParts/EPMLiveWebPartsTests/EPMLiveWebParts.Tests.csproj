@@ -96,6 +96,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ChatControl\VfChartTests.cs" />
     <Compile Include="UserProfileDisplay\DisplayProfilePicturesTests.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.cs" />
     <Compile Include="GridListView\GridListViewTests.cs" />
