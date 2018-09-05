@@ -22,15 +22,21 @@ namespace EPMLiveCore.Tests
         private ShimSPField spField;
         private Dictionary<string, Dictionary<string, string>> fieldProperties;
         private ShimSPListItem listItem;
+        private Guid guid;
         private const string CanEditMethodName = "canEdit";
         private const string RenderFieldMethodName = "RenderField";
         private const string IsDisplayFieldMethodName = "IsDisplayField";
         private const string IsEditableFieldMethodName = "isEditableField";
         private const string GetFieldSchemaAttribValueMethodName = "getFieldSchemaAttribValue";
+        private const string IsDateMethodName = "isDate";
+        private const string IsNumericMethodName = "IsNumeric";
+        private const string WhereUserMethodName = "WhereUser";
+        private const string WhereFieldMethodName = "WhereField";
         private const string InternalNameString = "InternalName";
         private const string EditableString = "Editable";
         private const string UserDisplaySettings = ";[Me];condition;group";
         private const string FieldDisplaySettings = ";[Field];condition;group";
+        private const string UserName = "userName";
 
         [TestInitialize]
         public void Setup()
@@ -45,6 +51,8 @@ namespace EPMLiveCore.Tests
         {
             _shimsContext = ShimsContext.Create();
 
+            guid = Guid.NewGuid();
+
             spField = new ShimSPField()
             {
                 InternalNameGet = () => InternalNameString
@@ -55,6 +63,17 @@ namespace EPMLiveCore.Tests
                 [InternalNameString] = new Dictionary<string, string>()
                 {
                     [EditableString] = UserDisplaySettings
+                }
+            };
+
+            ShimSPContext.CurrentGet = () => new ShimSPContext()
+            {
+                WebGet = () => new ShimSPWeb()
+                {
+                    CurrentUserGet = () => new ShimSPUser()
+                    {
+                        NameGet = () => UserName
+                    }
                 }
             };
 
@@ -296,7 +315,7 @@ namespace EPMLiveCore.Tests
         }
 
         [TestMethod]
-        public void GetFieldSchemaAttribValue__ReturnsString()
+        public void GetFieldSchemaAttribValue_WhenCalled_ReturnsString()
         {
             // Arrange
             const string attributeName = "attributeName";
@@ -311,6 +330,1700 @@ namespace EPMLiveCore.Tests
 
             // Assert
             actual.ShouldBe(attributeValue);
+        }
+
+        [TestMethod]
+        public void IsDate_ValidDate_ReturnsTrue()
+        {
+            // Arrange
+            var input = DateTime.Now.ToString();
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                IsDateMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { input });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void IsDate_InvalidDate_ReturnsFalse()
+        {
+            // Arrange
+            const string input = "input";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                IsDateMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { input });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void isEditableField_NewKeyWhereUserFalse_ReturnsTrue()
+        {
+            // Arrange
+            const bool expected = false;
+            const string invalidKey = "InvalidKey";
+            const string customValue = "where;[Me];condition;group";
+
+            fieldProperties[InternalNameString].Add(invalidKey, customValue);
+            ShimEditableFieldDisplay.RenderFieldSPFieldStringStringStringStringStringSPListItem =
+                (_, _1, _2, _3, _4, _5, _6) => expected;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                IsEditableFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { listItem.Instance, spField.Instance, fieldProperties, invalidKey });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void isEditableField_NewKeyWhereUserTrue_ReturnsTrue()
+        {
+            // Arrange
+            const bool expected = true;
+            const string invalidKey = "InvalidKey";
+            const string customValue = "where;[Me];conditionField;condition;valueCondition";
+
+            fieldProperties[InternalNameString][EditableString] = customValue;
+            fieldProperties[InternalNameString].Add(invalidKey, customValue);
+            ShimEditableFieldDisplay.RenderFieldSPFieldStringStringStringStringStringSPListItem =
+                (_, _1, _2, _3, _4, _5, _6) => expected;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                IsEditableFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { listItem.Instance, spField.Instance, fieldProperties, invalidKey });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void isEditableField_NewKeyWhereFieldTrue_ReturnsTrue()
+        {
+            // Arrange
+            const bool expected = true;
+            const string invalidKey = "InvalidKey";
+            const string customValue = "where;[Field];conditionField;condition;valueCondition";
+
+            fieldProperties[InternalNameString][EditableString] = customValue;
+            fieldProperties[InternalNameString].Add(invalidKey, customValue);
+            ShimEditableFieldDisplay.RenderFieldSPFieldStringStringStringStringStringSPListItem =
+                (_, _1, _2, _3, _4, _5, _6) => expected;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                IsEditableFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { listItem.Instance, spField.Instance, fieldProperties, invalidKey });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void IsNumeric_ValidNumber_ReturnsTrue()
+        {
+            // Arrange
+            const string input = "12345";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                IsNumericMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { input });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void IsNumeric_InvalidNumber_ReturnsFalse()
+        {
+            // Arrange
+            const string input = "input";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                IsNumericMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { input });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void IsNumeric_Empty_ReturnsFalse()
+        {
+            // Arrange
+            var input = string.Empty;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                IsNumericMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { input });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereUser_WhenCalled_ReturnsBoolean()
+        {
+            // Arrange
+            const string condition = "IsInGroup";
+            const string group = "group";
+
+            var userGroups = new ShimSPGroupCollection().Instance;
+            userGroups.Add(group, null, null, group);
+
+            ShimSPContext.CurrentGet = () => new ShimSPContext()
+            {
+                WebGet = () => new ShimSPWeb()
+                {
+                    CurrentUserGet = () => new ShimSPUser()
+                    {
+                        GroupsGet = () => userGroups
+                    }
+                }
+            };
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPGroup>()
+            {
+                new ShimSPGroup()
+                {
+                    NameGet = () => group
+                }
+            }.GetEnumerator();
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereUserMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { condition, group });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_BooleanIsEqualTo_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsEqualTo";
+            const string value = "True";
+
+            spField.TypeGet = () => SPFieldType.Boolean;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_BooleanIsEqualTo_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsEqualTo";
+            const string value = "[Today]";
+
+            spField.TypeGet = () => SPFieldType.Boolean;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => $"NOT_{value}";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTimeIsEqualTo_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsEqualTo";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"DateTime\"";
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTimeIsEqualTo_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsEqualTo";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"DateTime\"";
+
+            listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTime2IsEqualTo_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsEqualTo";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"NotDateTime\"";
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTime2IsEqualTo_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsEqualTo";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"NotDateTime\"";
+
+            listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_NumberIsEqualTo_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsEqualTo";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Number;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_NumberIsEqualTo_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsEqualTo";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Number;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => "10";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_CurrencyIsEqualTo_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsEqualTo";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Currency;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_CurrencyIsEqualTo_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsEqualTo";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Currency;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => "10";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_TextIsEqualTo_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsEqualTo";
+            const string value = "[Me]";
+
+            spField.TypeGet = () => SPFieldType.Text;
+            spField.IdGet = () => guid;
+            spField.GetFieldValueAsTextObject = _ => UserName;
+
+            listItem.ItemGetGuid = _ => UserName;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_TextIsEqualTo_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsEqualTo";
+            const string value = "Something";
+
+            spField.TypeGet = () => SPFieldType.Text;
+            spField.IdGet = () => guid;
+            spField.GetFieldValueAsTextObject = _ => UserName;
+
+            listItem.ItemGetGuid = _ => UserName;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_BooleanIsNotEqualTo_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsNotEqualTo";
+            const string value = "True";
+
+            spField.TypeGet = () => SPFieldType.Boolean;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_BooleanIsNotEqualTo_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsNotEqualTo";
+            const string value = "[Today]";
+
+            spField.TypeGet = () => SPFieldType.Boolean;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => $"NOT_{value}";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTimeIsNotEqualTo_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsNotEqualTo";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"DateTime\"";
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTimeIsNotEqualTo_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsNotEqualTo";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"DateTime\"";
+
+            listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTime2IsNotEqualTo_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsNotEqualTo";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"NotDateTime\"";
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTime2IsNotEqualTo_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsNotEqualTo";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"NotDateTime\"";
+
+            listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_NumberIsNotEqualTo_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsNotEqualTo";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Number;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_NumberIsNotEqualTo_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsNotEqualTo";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Number;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => "10";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_CurrencyIsNotEqualTo_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsNotEqualTo";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Currency;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_CurrencyIsNotEqualTo_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsNotEqualTo";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Currency;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => "10";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_TextIsNotEqualTo_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsNotEqualTo";
+            const string value = "[Me]";
+
+            spField.TypeGet = () => SPFieldType.Text;
+            spField.IdGet = () => guid;
+            spField.GetFieldValueAsTextObject = _ => UserName;
+
+            listItem.ItemGetGuid = _ => UserName;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_TextIsNotEqualTo_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsNotEqualTo";
+            const string value = "Something";
+
+            spField.TypeGet = () => SPFieldType.Text;
+            spField.IdGet = () => guid;
+            spField.GetFieldValueAsTextObject = _ => UserName;
+
+            listItem.ItemGetGuid = _ => UserName;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTimeIsGreaterThan_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThan";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"DateTime\"";
+
+            listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTimeIsGreaterThan_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThan";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"DateTime\"";
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTime2IsGreaterThan_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThan";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"NotDateTime\"";
+
+            listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTime2IsGreaterThan_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThan";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"NotDateTime\"";
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_NumberIsGreaterThan_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThan";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Number;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => "10";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_NumberIsGreaterThan_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThan";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Number;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_CurrencyIsGreaterThan_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThan";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Currency;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => "10";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_CurrencyIsGreaterThan_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThan";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Currency;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_TextIsGreaterThan_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThan";
+            const string value = "[Me]";
+
+            spField.TypeGet = () => SPFieldType.Text;
+            spField.IdGet = () => guid;
+            spField.GetFieldValueAsTextObject = _ => UserName;
+
+            listItem.ItemGetGuid = _ => UserName;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTimeIsGreaterThanOrEqual_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThanOrEqual";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"DateTime\"";
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTimeIsGreaterThanOrEqual_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThanOrEqual";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"DateTime\"";
+
+            listItem.ItemGetGuid = _ => now.AddDays(-1).ToString();
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTime2IsGreaterThanOrEqual_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThanOrEqual";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"NotDateTime\"";
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTime2IsGreaterThanOrEqual_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThanOrEqual";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"NotDateTime\"";
+
+            listItem.ItemGetGuid = _ => now.AddDays(-1).ToString();
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_NumberIsGreaterThanOrEqual_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThanOrEqual";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Number;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_NumberIsGreaterThanOrEqual_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThanOrEqual";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Number;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => "4";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_CurrencyIsGreaterThanOrEqual_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThanOrEqual";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Currency;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_CurrencyIsGreaterThanOrEqual_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThanOrEqual";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Currency;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => "3";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_TextIsGreaterThanOrEqual_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsGreaterThanOrEqual";
+            const string value = "[Me]";
+
+            spField.TypeGet = () => SPFieldType.Text;
+            spField.IdGet = () => guid;
+            spField.GetFieldValueAsTextObject = _ => UserName;
+
+            listItem.ItemGetGuid = _ => UserName;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTimeIsLessThan_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThan";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"DateTime\"";
+
+            listItem.ItemGetGuid = _ => now.AddDays(-1).ToString();
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTimeIsLessThan_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThan";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"DateTime\"";
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTime2IsLessThan_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThan";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"NotDateTime\"";
+
+            listItem.ItemGetGuid = _ => now.AddDays(-1).ToString();
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTime2IsLessThan_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThan";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"NotDateTime\"";
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_NumberIsLessThan_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThan";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Number;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => "-10";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_NumberIsLessThan_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThan";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Number;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_CurrencyIsLessThan_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThan";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Currency;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => "-10";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_CurrencyIsLessThan_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThan";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Currency;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_TextIsLessThan_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThan";
+            const string value = "[Me]";
+
+            spField.TypeGet = () => SPFieldType.Text;
+            spField.IdGet = () => guid;
+            spField.GetFieldValueAsTextObject = _ => UserName;
+
+            listItem.ItemGetGuid = _ => UserName;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTimeIsLessThanOrEqual_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThanOrEqual";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"DateTime\"";
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTimeIsLessThanOrEqual_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThanOrEqual";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"DateTime\"";
+
+            listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTime2IsLessThanOrEqual_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThanOrEqual";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"NotDateTime\"";
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_DateTime2IsLessThanOrEqual_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThanOrEqual";
+
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.IdGet = () => guid;
+            spField.SchemaXmlGet = () => "Format=\"NotDateTime\"";
+
+            listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_NumberIsLessThanOrEqual_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThanOrEqual";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Number;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_NumberIsLessThanOrEqual_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThanOrEqual";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Number;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => "10";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_CurrencyIsLessThanOrEqual_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThanOrEqual";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Currency;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => value;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void WhereField_CurrencyIsLessThanOrEqual_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThanOrEqual";
+            const string value = "5";
+
+            spField.TypeGet = () => SPFieldType.Currency;
+            spField.IdGet = () => guid;
+
+            listItem.ItemGetGuid = _ => "10";
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_TextIsLessThanOrEqual_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "IsLessThanOrEqual";
+            const string value = "[Me]";
+
+            spField.TypeGet = () => SPFieldType.Text;
+            spField.IdGet = () => guid;
+            spField.GetFieldValueAsTextObject = _ => UserName;
+
+            listItem.ItemGetGuid = _ => UserName;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_TextContains_ReturnsFalse()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "Contains";
+            const string value = "someString";
+
+            spField.TypeGet = () => SPFieldType.Text;
+            spField.IdGet = () => guid;
+            spField.GetFieldValueAsTextObject = _ => UserName;
+
+            listItem.ItemGetGuid = _ => UserName;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void WhereField_TextContains_ReturnsTrue()
+        {
+            // Arrange
+            const string where = "";
+            const string condition = "Contains";
+            const string value = "[Me]";
+
+            spField.TypeGet = () => SPFieldType.Text;
+            spField.IdGet = () => guid;
+            spField.GetFieldValueAsTextObject = _ => UserName;
+
+            listItem.ItemGetGuid = _ => UserName;
+
+            // Act
+            var actual = (bool)_privateObj.Invoke(
+                WhereFieldMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spField.Instance, where, condition, value, listItem.Instance });
+
+            // Assert
+            actual.ShouldBeTrue();
         }
     }
 }
