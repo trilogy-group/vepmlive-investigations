@@ -3081,28 +3081,7 @@ namespace RPADataCache
         }
 
         #endregion
-
-        #region Method Call : (GetPeriodName) (Return Type : string) Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_RPAData_GetPeriodName_Static_Method_DirectCall_Throw_Exception_Test()
-        {
-            // Arrange
-            var periodName = CreateType<string>();
-            var disp_mode = CreateType<int>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => RPAData.GetPeriodName(periodName, disp_mode);
-
-            // Assert
-            Should.Throw<Exception>(executeAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (GetPeriodName) (Return Type : string) No Exception Thrown
 
         [Test]
@@ -3156,27 +3135,7 @@ namespace RPADataCache
         }
 
         #endregion
-
-        #region Method Call : (GetPeriodName) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_RPAData_GetPeriodName_Static_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
-        {
-            // Arrange
-            var methodGetPeriodNamePrametersTypes = new Type[] { typeof(string), typeof(int) };
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_rPADataInstanceFixture, _rPADataInstanceType, MethodGetPeriodName, Fixture, methodGetPeriodNamePrametersTypes);
-
-            // Assert
-            result.ShouldBeNull();
-            methodGetPeriodNamePrametersTypes.Length.ShouldBe(2);
-        }
-
-        #endregion
-
+        
         #region Method Call : (GetPeriodName) (Return Type : string) Invoke Should Not Throw
 
         [Test]
