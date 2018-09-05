@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using System.Web.Fakes;
 using System.Web.UI;
 using System.Web.UI.Fakes;
@@ -52,8 +53,8 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         private void InitializeUIControls()
         {
             var allFields = _testObj.GetType()
-                                       .GetFields(System.Reflection.BindingFlags.Instance |
-                                                  System.Reflection.BindingFlags.NonPublic)
+                                       .GetFields(BindingFlags.Instance |
+                                                  BindingFlags.NonPublic)
                                        .Where(field => field.FieldType.IsSubclassOf(typeof(Control)) &&
                                                        field.FieldType != typeof(CommentCCPeopleEditor));
             foreach (var control in allFields)
