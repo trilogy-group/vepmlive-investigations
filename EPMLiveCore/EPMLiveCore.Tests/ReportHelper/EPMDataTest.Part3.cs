@@ -17,6 +17,7 @@ using Shouldly;
 
 namespace EPMLiveCore.Tests.ReportHelper
 {
+    [TestClass]
     public partial class EPMDataTest3
     {
         private static readonly Guid DummyGuid = new Guid();
