@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Fakes;
-using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.Infrastructure.Fakes;
 using EPMLiveCore.SocialEngine.Core;
@@ -26,11 +23,11 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
     [TestClass]
     public class ListItemTests
     {
-        private ListItem _testObj;
-        private PrivateObject _privateObj;
-        private IDisposable _shimsContext;
-        private SPWeb _spWeb;
-        private Guid _guid;
+        private ListItem testObj;
+        private PrivateObject privateObj;
+        private IDisposable shimsContext;
+        private SPWeb spWeb;
+        private Guid guid;
         private const string ConnectionString = "connectionString";
         private const string Commenters = "1,2";
         private const string IdColumn = "Id";
@@ -40,7 +37,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
         private const string MassOperationColumn = "MassOperation";
         private const string ActivityKeyColumn = "ActivityKey";
         private const string DataColumnName = "Data";
-        private const string TitleColumn = "Title";
+        private const string TitleString = "Title";
         private const string UrlColumn = "URL";
         private const string LastActivityDateTimeColumn = "LastActivityDateTime";
         private const string FirstActivityDateTimeColumn = "FirstActivityDateTime";
@@ -49,6 +46,22 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
         private const string ItemIdColumn = "ItemId";
         private const string DeletedColumn = "Deleted";
         private const string RoleColumn = "Role";
+        private const string ActivityKey = "activityKey";
+        private const string ListTitle = "ListTitle";
+        private const string SiteIdColumn = "SiteId";
+        private const string ActivityTimeColumn = "ActivityTime";
+        private const string CommentersColumn = "Commenters";
+        private const string IsMassOperation = "IsMassOperation";
+        private const string ActivityValue = "#!Activity";
+        private const string AssociatedListItems = "AssociatedListItems";
+        private const string ThreadValue = "#!Thread";
+        private const string PerformPostRegistrationStepsMethod = "PerformPostRegistrationSteps";
+        private const string EnsureNotIgnoredListMethod = "EnsureNotIgnoredList";
+        private const string PerformPreRegistrationStepsMethod = "PerformPreRegistrationSteps";
+        private const string RegisterCommentCreationActivityMethod = "RegisterCommentCreationActivity";
+        private const string RegisterCommentDeletionActivityMethod = "RegisterCommentDeletionActivity";
+        private const string RegisterCommentUpdationActivityMethod = "RegisterCommentUpdationActivity";
+        private const string ValidateCommentCreationActivityMethod = "ValidateCommentCreationActivity";
         private ThreadManager threadManager;
         private ActivityManager activityManager;
         private StreamManager streamManager;
@@ -57,50 +70,44 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
         public void Setup()
         {
             SetUpShims();
-
-            _testObj = new ListItem();
-            _privateObj = new PrivateObject(_testObj);
+            testObj = new ListItem();
+            privateObj = new PrivateObject(testObj);
         }
 
         [TestCleanup]
         public void TearDown()
         {
-            _shimsContext?.Dispose();
+            shimsContext?.Dispose();
         }
 
         private void SetUpShims()
         {
-            _shimsContext = ShimsContext.Create();
-
-            _guid = Guid.NewGuid();
-
-            _spWeb = new ShimSPWeb()
+            shimsContext = ShimsContext.Create();
+            guid = Guid.NewGuid();
+            spWeb = new ShimSPWeb()
             {
-                IDGet = () => _guid,
+                IDGet = () => guid,
                 SiteGet = () => new ShimSPSite()
                 {
-                    IDGet = () => _guid,
+                    IDGet = () => guid,
                     WebApplicationGet = () => new ShimSPWebApplication(),
                     RootWebGet = () => new ShimSPWeb()
                 }
             }.Instance;
-
             ShimSqlConnection.AllInstances.Open = _ => { };
             ShimSqlConnection.AllInstances.Close = _ => { };
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = _ => { };
-            ShimSPPersistedObject.AllInstances.IdGet = _ => _guid;
+            ShimSPPersistedObject.AllInstances.IdGet = _ => guid;
             ShimCoreFunctions.getReportingConnectionStringGuidGuid = (_, _1) => ConnectionString;
             ShimCoreFunctions.getConfigSettingSPWebString = (_, _1) => string.Empty;
-
-            threadManager = new ThreadManager(new DBConnectionManager(_spWeb, false));
-            activityManager = new ActivityManager(new DBConnectionManager(_spWeb, false));
-            streamManager = new StreamManager(new DBConnectionManager(_spWeb, false));
+            threadManager = new ThreadManager(new DBConnectionManager(spWeb, false));
+            activityManager = new ActivityManager(new DBConnectionManager(spWeb, false));
+            streamManager = new StreamManager(new DBConnectionManager(spWeb, false));
         }
 
         private DataTable CreateActivityTable()
         {
             var activityTable = new DataTable();
-
             activityTable.Columns.Add(IdColumn, typeof(Guid));
             activityTable.Columns.Add(KindColumn, typeof(ActivityKind));
             activityTable.Columns.Add(DateColumn, typeof(DateTime));
@@ -108,17 +115,15 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             activityTable.Columns.Add(MassOperationColumn, typeof(bool));
             activityTable.Columns.Add(ActivityKeyColumn, typeof(string));
             activityTable.Columns.Add(DataColumnName, typeof(object));
-
             var row = activityTable.NewRow();
-            row[IdColumn] = _guid;
+            row[IdColumn] = guid;
             row[KindColumn] = ActivityKind.CommentAdded;
             row[DateColumn] = DateTime.Now;
             row[UserIdColumn] = 1;
             row[MassOperationColumn] = true;
-            row[ActivityKeyColumn] = "activityKey";
+            row[ActivityKeyColumn] = ActivityKey;
             row[DataColumnName] = Commenters;
             activityTable.Rows.Add(row);
-
             return activityTable;
         }
 
@@ -126,7 +131,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
         {
             var threadTable = new DataTable();
             threadTable.Columns.Add(IdColumn, typeof(Guid));
-            threadTable.Columns.Add(TitleColumn, typeof(string));
+            threadTable.Columns.Add(TitleString, typeof(string));
             threadTable.Columns.Add(UrlColumn, typeof(string));
             threadTable.Columns.Add(KindColumn, typeof(ObjectKind));
             threadTable.Columns.Add(LastActivityDateTimeColumn, typeof(DateTime));
@@ -136,14 +141,14 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             threadTable.Columns.Add(ItemIdColumn, typeof(int));
             threadTable.Columns.Add(DeletedColumn, typeof(int));
             var row = threadTable.NewRow();
-            row[IdColumn] = _guid;
-            row[TitleColumn] = "Title";
+            row[IdColumn] = guid;
+            row[TitleString] = TitleString;
             row[UrlColumn] = "http://www.sampleurl.com";
             row[KindColumn] = ObjectKind.List;
             row[LastActivityDateTimeColumn] = DateTime.Now;
             row[FirstActivityDateTimeColumn] = DateTime.Now;
-            row[WebIdColumn] = _guid;
-            row[ListIdColumn] = _guid;
+            row[WebIdColumn] = guid;
+            row[ListIdColumn] = guid;
             row[ItemIdColumn] = 1;
             row[DeletedColumn] = 1;
             threadTable.Rows.Add(row);
@@ -154,15 +159,15 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
         {
             var data = new Dictionary<string, object>()
             {
-                ["Id"] = 1,
-                ["Title"] = "Title",
-                ["URL"] = "http://sampleurl.com",
-                ["ListTitle"] = "ListTitle",
-                ["ListId"] = _guid,
-                ["WebId"] = _guid,
-                ["SiteId"] = _guid,
-                ["UserId"] = 1,
-                ["ActivityTime"] = DateTime.Now
+                [IdColumn] = 1,
+                [TitleString] = TitleString,
+                [UrlColumn] = "http://sampleurl.com",
+                [ListTitle] = ListTitle,
+                [ListIdColumn] = guid,
+                [WebIdColumn] = guid,
+                [SiteIdColumn] = guid,
+                [UserIdColumn] = 1,
+                [ActivityTimeColumn] = DateTime.Now
             };
             return data;
         }
@@ -176,16 +181,16 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             var updateActual = false;
             var dataTableCount = 1;
             var data = CreateDataObject();
-            data.Add("Commenters", Commenters);
-            data.Add("IsMassOperation", true);
-            data.Add("#!Activity", new Activity()
+            data.Add(CommentersColumn, Commenters);
+            data.Add(IsMassOperation, true);
+            data.Add(ActivityValue, new Activity()
             {
-                Id = _guid
+                Id = guid
             });
-            data.Add("AssociatedListItems", $"{_guid.ToString()}|1,{_guid.ToString()}|2");
-            data.Add("#!Thread", new Thread()
+            data.Add(AssociatedListItems, $"{guid.ToString()}|1,{guid.ToString()}|2");
+            data.Add(ThreadValue, new Thread()
             {
-                Id = _guid
+                Id = guid
             });
 
             var userTable = new DataTable();
@@ -200,7 +205,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             {
                 if (sqlCommand.CommandText.StartsWith("SELECT Id FROM SS_Streams"))
                 {
-                    return _guid;
+                    return guid;
                 }
                 else if (sqlCommand.CommandText.StartsWith("SELECT TOP (1) Role FROM SS_ThreadUsers"))
                 {
@@ -237,7 +242,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             };
             ShimDataRowCollection.AllInstances.CountGet = _ => 1;
 
-            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.CommentAdded, data, _spWeb, streamManager, threadManager, activityManager);
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.CommentAdded, data, spWeb, streamManager, threadManager, activityManager);
 
             ShimSqlCommand.AllInstances.ExecuteNonQuery = sqlCommand =>
             {
@@ -249,8 +254,8 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             };
 
             // Act
-            _privateObj.Invoke(
-                "PerformPostRegistrationSteps",
+            privateObj.Invoke(
+                PerformPostRegistrationStepsMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
                 new object[]
                 {
@@ -265,8 +270,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
         public void EnsureNotIgnoredList_WhenCalled_ReturnsTrue()
         {
             // Arrange
-            const string settingValue = "ListTitle";
-            const string title = "ListTitle";
+            const string settingValue = ListTitle;
             const bool expected = true;
 
             var data = CreateDataObject();
@@ -279,10 +283,10 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 }
             };
 
-            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Updated, data, _spWeb, streamManager, threadManager, activityManager);
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Updated, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
-            var actual = (bool)_privateObj.Invoke("EnsureNotIgnoredList",
+            var actual = (bool)privateObj.Invoke(EnsureNotIgnoredListMethod,
                BindingFlags.Static | BindingFlags.NonPublic,
                new object[]
                {
@@ -299,7 +303,6 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
         {
             // Arrange
             const string settingValue = "settingValue";
-            const string title = "ListTitle";
             const bool expected = false;
 
             var data = CreateDataObject();
@@ -312,11 +315,11 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 }
             };
 
-            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Updated, data, _spWeb, streamManager, threadManager, activityManager);
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Updated, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
-                "EnsureNotIgnoredList",
+            var actual = (bool)privateObj.Invoke(
+                EnsureNotIgnoredListMethod,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[]
                 {
@@ -343,12 +346,12 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             };
 
             // Act
-            var actual = (TimeSpan)_privateObj.Invoke(
+            var actual = (TimeSpan)privateObj.Invoke(
                 "GetRelatedActivityInterval",
                 BindingFlags.Instance | BindingFlags.NonPublic,
                 new object[]
                 {
-                    _spWeb
+                    spWeb
                 });
 
             // Assert
@@ -392,16 +395,16 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                     }
                     return false;
                 },
-                GetGuidInt32 = _ => _guid,
+                GetGuidInt32 = _ => guid,
                 GetBooleanInt32 = _ => false,
                 GetDateTimeInt32 = _ => DateTime.Now
             };
 
-            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.CommentAdded, data, _spWeb, streamManager, threadManager, activityManager);
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.CommentAdded, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
-            _privateObj.Invoke(
-                "PerformPreRegistrationSteps",
+            privateObj.Invoke(
+                PerformPreRegistrationStepsMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
                 new object[]
                 {
@@ -422,10 +425,10 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             var data = CreateDataObject();
             data.Add("CommentId", 1);
             data.Add("Comment", "Comment");
-            data.Add("Commenters", Commenters);
-            data.Add("#!Thread", new Thread()
+            data.Add(CommentersColumn, Commenters);
+            data.Add(ThreadValue, new Thread()
             {
-                Id = _guid
+                Id = guid
             });
 
             var threadTable = CreateThreadTable();
@@ -457,11 +460,11 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 return result;
             };
 
-            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.CommentAdded, data, _spWeb, streamManager, threadManager, activityManager);
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.CommentAdded, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
-            _privateObj.Invoke(
-                "RegisterCommentCreationActivity",
+            privateObj.Invoke(
+                RegisterCommentCreationActivityMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
                 new object[]
                 {
@@ -482,7 +485,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             var data = CreateDataObject();
             data.Add("CommentId", 1);
             data.Add("Comment", "Comment");
-            data.Add("Commenters", Commenters);
+            data.Add(CommentersColumn, Commenters);
 
             var threadTable = CreateThreadTable();
 
@@ -513,11 +516,11 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 return result;
             };
 
-            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.CommentAdded, data, _spWeb, streamManager, threadManager, activityManager);
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.CommentAdded, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
-            _privateObj.Invoke(
-                "RegisterCommentCreationActivity",
+            privateObj.Invoke(
+                RegisterCommentCreationActivityMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
                 new object[]
                 {
@@ -566,11 +569,11 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 return result;
             };
 
-            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Deleted, data, _spWeb, streamManager, threadManager, activityManager);
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Deleted, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
-            _privateObj.Invoke(
-                "RegisterCommentDeletionActivity",
+            privateObj.Invoke(
+                RegisterCommentDeletionActivityMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
                 new object[]
                 {
@@ -592,7 +595,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             data.Add("ChangedProperties", "ChangedProperties,title");
             data.Add("CommentId", 1);
             data.Add("Comment", "Comment");
-            data.Add("Commenters", Commenters);
+            data.Add(CommentersColumn, Commenters);
 
             var threadTable = CreateThreadTable();
 
@@ -623,11 +626,11 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 return result;
             };
 
-            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Updated, data, _spWeb, streamManager, threadManager, activityManager);
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Updated, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
-            _privateObj.Invoke(
-                "RegisterCommentUpdationActivity",
+            privateObj.Invoke(
+                RegisterCommentUpdationActivityMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
                 new object[]
                 {
@@ -649,7 +652,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             data.Add("ChangedProperties", "ChangedProperties,title");
             data.Add("CommentId", 1);
             data.Add("Comment", "Comment");
-            data.Add("Commenters", Commenters);
+            data.Add(CommentersColumn, Commenters);
             var threadTable = CreateThreadTable();
 
             ShimSqlCommand.AllInstances.ExecuteNonQuery = sqlCommand =>
@@ -679,11 +682,11 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 return result;
             };
 
-            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Updated, data, _spWeb, streamManager, threadManager, activityManager);
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Updated, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
-            _privateObj.Invoke(
-                "RegisterCommentUpdationActivity",
+            privateObj.Invoke(
+                RegisterCommentUpdationActivityMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
                 new object[]
                 {
@@ -703,7 +706,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             var actualUpdate = false;
             var thread = new Thread()
             {
-                Id = _guid,
+                Id = guid,
                 Users = new User[]
                 {
                     new User()
@@ -728,10 +731,10 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 };
             };
 
-            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Updated, data, _spWeb, streamManager, threadManager, activityManager);
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Updated, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
-            _privateObj.Invoke(
+            privateObj.Invoke(
                 "UpdateThreadUsers",
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[]
@@ -762,13 +765,13 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             };
             ShimSqlCommand.AllInstances.ExecuteScalar = _ => 1;
 
-            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Created, data, _spWeb, streamManager, threadManager, activityManager);
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Created, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
             try
             {
-                _privateObj.Invoke(
-                    "ValidateCommentCreationActivity",
+                privateObj.Invoke(
+                    ValidateCommentCreationActivityMethod,
                     BindingFlags.Instance | BindingFlags.NonPublic,
                     new object[]
                     {
@@ -793,7 +796,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
 
             var queryCount = 0;
             var data = CreateDataObject();
-            data.Add("CommentId", _guid);
+            data.Add("CommentId", guid);
             data.Add("Comment", "Comment");
 
             var actual = string.Empty;
@@ -814,13 +817,13 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 return 1;
             };
 
-            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Created, data, _spWeb, streamManager, threadManager, activityManager);
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Created, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
             try
             {
-                _privateObj.Invoke(
-                    "ValidateCommentCreationActivity",
+                privateObj.Invoke(
+                    ValidateCommentCreationActivityMethod,
                     BindingFlags.Instance | BindingFlags.NonPublic,
                     new object[]
                     {
@@ -854,12 +857,12 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             };
             ShimSqlCommand.AllInstances.ExecuteScalar = _ => 1;
 
-            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Deleted, data, _spWeb, streamManager, threadManager, activityManager);
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Deleted, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
             try
             {
-                _privateObj.Invoke(
+                privateObj.Invoke(
                     "ValidateCommentDeletionActivity",
                     BindingFlags.Instance | BindingFlags.NonPublic,
                     new object[]
@@ -884,7 +887,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             const string expected = "Cannot delete a comment that has not been registerd";
 
             var data = CreateDataObject();
-            data.Add("CommentId", _guid);
+            data.Add("CommentId", guid);
 
             var actual = string.Empty;
             ShimCacheStore.CurrentGet = () => new ShimCacheStore()
@@ -896,12 +899,12 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             };
             ShimSqlCommand.AllInstances.ExecuteScalar = _ => 0;
 
-            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Deleted, data, _spWeb, streamManager, threadManager, activityManager);
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Deleted, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
             try
             {
-                _privateObj.Invoke(
+                privateObj.Invoke(
                     "ValidateCommentDeletionActivity",
                     BindingFlags.Instance | BindingFlags.NonPublic,
                     new object[]
@@ -926,7 +929,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             const string expected = "Cannot update a comment that has not been registerd";
 
             var data = CreateDataObject();
-            data.Add("CommentId", _guid);
+            data.Add("CommentId", guid);
             data.Add("Comment", "Comment");
 
             var actual = string.Empty;
@@ -939,12 +942,12 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             };
             ShimSqlCommand.AllInstances.ExecuteScalar = _ => 0;
 
-            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Created, data, _spWeb, streamManager, threadManager, activityManager);
+            var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Created, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
             try
             {
-                _privateObj.Invoke(
+                privateObj.Invoke(
                     "ValidateCommentUpdationActivity",
                     BindingFlags.Instance | BindingFlags.NonPublic,
                     new object[]
