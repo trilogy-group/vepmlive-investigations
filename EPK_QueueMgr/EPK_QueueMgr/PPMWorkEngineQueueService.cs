@@ -233,7 +233,7 @@ namespace WE_QueueMgr
         private void DoMonitor()
         {
             DateTime lastCheck = DateTime.Now;
-			bool firstBeat = false;
+            bool firstBeat = false;
             while (!token.IsCancellationRequested)
             {
                 //If task is faulted
@@ -256,7 +256,7 @@ namespace WE_QueueMgr
                 DateTime newCheck = DateTime.Now;
                 if (!firstBeat || newCheck - lastCheck > heartBeatPeriod)
                 {
-					firstBeat = true;
+                    firstBeat = true;
                     lastCheck = newCheck;
                     List<QMSite> sites = Sites;
                     if (sites != null)
@@ -278,7 +278,7 @@ namespace WE_QueueMgr
                         }
                     }
                 }
-                Thread.Sleep(doMonitorPeriod);
+                Task.Delay(doMonitorPeriod);
             }
         }
         void CheckTaskFault(Task task, ref FaultItem faultItem)
@@ -287,7 +287,7 @@ namespace WE_QueueMgr
             {
                 if (faultItem == null)
                 {
-                    faultItem = new FaultItem { FaultTime = DateTime.Now, FaultCount = 1 , Recovered = false};
+                    faultItem = new FaultItem { FaultTime = DateTime.Now, FaultCount = 1, Recovered = false };
                 }
                 else if (faultItem.Recovered)
                 {
@@ -305,13 +305,14 @@ namespace WE_QueueMgr
                     }
                     faultItem.Recovered = false;
                 }
-                
+
             }
         }
 
         object longRunQueueLock = new object();
         List<QMSite> longRunQueue = new List<QMSite>();
         List<Guid> longRunJobIds = new List<Guid>();
+        
         void EnqueueSite(QMSite site, Guid jobId)
         {
             lock (longRunQueueLock)
@@ -329,6 +330,7 @@ namespace WE_QueueMgr
 
             }
         }
+
         string GetExclusionList(QMSite matchSite)
         {
             string exclusion = "";
@@ -346,6 +348,7 @@ namespace WE_QueueMgr
         }
         //Loop once every:
         TimeSpan longRunPeriod = new TimeSpan(0, 1, 0);
+        int jobMaxTimeout = 60;
         void DoLongRun()
         {
             while (!token.IsCancellationRequested)
@@ -354,19 +357,50 @@ namespace WE_QueueMgr
                 {
                     QMSite site = null;
                     Guid jobId;
+
                     lock (longRunQueueLock)
                     {
                         site = longRunQueue[0];
                         jobId = longRunJobIds[0];
                     }
-                    var s = InvokeWSSAdminRSVPRequest(site, jobId);
+                    try
+                    {
+                        jobMaxTimeout = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["jobmaxtimeout"]);
+                    }
+                    catch { }
+
+                    CancellationTokenSource tokenSource = new CancellationTokenSource();
+                    CancellationToken tasktoken = tokenSource.Token;
+                    Task task = Task.Factory.StartNew(() =>
+                    {
+                        InvokeWSSAdminRSVPRequest(site, jobId);
+                    },
+                    tasktoken);
+
+
+                    DateTime jobStarted = DateTime.Now;
+                    while (((DateTime.Now - jobStarted).Minutes < jobMaxTimeout || longRunJobIds.Count <= 1) && !token.IsCancellationRequested)
+                    {
+                        if (task.IsCompleted)
+                            break;
+                        Task.Delay(TimeSpan.FromMinutes(1));
+                    }
+                    if (token.IsCancellationRequested || !task.IsCompleted)
+                    {
+                        tokenSource.Cancel();
+                        string sXML = BuildProductInfoString(site);
+                        using (var qm = new QueueManager(sXML))
+                        {
+                            qm.RequeueJob(jobId);
+                        }
+                    }
                     lock (longRunQueueLock)
                     {
                         longRunQueue.RemoveAt(0);
                         longRunJobIds.RemoveAt(0);
                     }
                 }
-                Thread.Sleep(longRunPeriod);
+                Task.Delay(longRunPeriod);
             }
         }
 
@@ -431,7 +465,7 @@ namespace WE_QueueMgr
                 {
                     ExceptionHandler("ProcessTimerJobs", ex);
                 }
-                Thread.Sleep(doWorkPeriod);
+                Task.Delay(doWorkPeriod);
             }
         }
 
@@ -590,6 +624,7 @@ namespace WE_QueueMgr
                 comObject = null;
             }
         }
+
     }
 
     internal class QMSite
@@ -617,4 +652,12 @@ namespace WE_QueueMgr
         public int FaultCount;
         public bool Recovered = false;
     }
+
+    public class Item
+    {
+        public Guid jobid;
+        private QMSite site;
+        public int Priority;
+    }
+
 }

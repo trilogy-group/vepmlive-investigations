@@ -50,5 +50,6 @@
     <Add FullName="EPMLiveCore.WorkEngineAPI!"/>
     <Add FullName="EPMLiveCore.ReportHelper.ListBiz!"/>
     <Add FullName="EPMLiveCore.Infrastructure.CacheStore!"/>
+    <Add FullName="EPMLiveCore.CommentCCPeopleEditor!"/>
   </ShimGeneration>
 </Fakes>
