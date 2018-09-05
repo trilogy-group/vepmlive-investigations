@@ -45,5 +45,6 @@
     <Add FullName="EPMLiveCore.Infrastructure.Navigation.NavLink!"/>
     <Add FullName="EPMLiveCore.Act!"/>
     <Add FullName="EPMLiveCore.API.PropertyHash!"/>
+    <Add FullName="EPMLiveCore.CommentCCPeopleEditor!"/>
   </ShimGeneration>
 </Fakes>
