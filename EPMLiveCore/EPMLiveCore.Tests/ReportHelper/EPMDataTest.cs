@@ -16,7 +16,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EPMLiveCore.Tests.ReportHelper
 {
     [TestClass]
-    public class EPMDataTest
+    public partial class EPMDataTest
     {
         private static readonly Guid DummyGuid = new Guid();
         private const string DummyCommand = "Dummy Command";
