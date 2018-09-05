@@ -278,7 +278,7 @@ namespace WE_QueueMgr
                         }
                     }
                 }
-                Thread.Sleep(doMonitorPeriod);
+                Task.Delay(doMonitorPeriod);
             }
         }
         void CheckTaskFault(Task task, ref FaultItem faultItem)
@@ -312,13 +312,11 @@ namespace WE_QueueMgr
         object longRunQueueLock = new object();
         List<QMSite> longRunQueue = new List<QMSite>();
         List<Guid> longRunJobIds = new List<Guid>();
-        bool newJobWaiting = false;
-
+        
         void EnqueueSite(QMSite site, Guid jobId)
         {
             lock (longRunQueueLock)
             {
-                newJobWaiting = true;
                 int index = longRunQueue.IndexOf(site);
                 while (index >= 0 && !longRunJobIds[index].Equals(jobId))
                 {
@@ -350,60 +348,59 @@ namespace WE_QueueMgr
         }
         //Loop once every:
         TimeSpan longRunPeriod = new TimeSpan(0, 1, 0);
-        bool aborted = false;
         int jobMaxTimeout = 60;
-        int jobMinTimeout = 5;
         void DoLongRun()
         {
             while (!token.IsCancellationRequested)
             {
                 while (!token.IsCancellationRequested && longRunQueue.Count > 0)
                 {
+                    QMSite site = null;
+                    Guid jobId;
+
                     lock (longRunQueueLock)
                     {
-                        QMSite site = null;
-                        Guid jobId;
-                        newJobWaiting = false;
                         site = longRunQueue[0];
                         jobId = longRunJobIds[0];
-                        aborted = false;
-                        bool threadcompleted = false;
-                        Thread t = new Thread(() => InvokeWSSAdminRSVPRequest(site, jobId));
-                        t.Start();
-                        if (!t.Join(TimeSpan.FromMinutes(jobMaxTimeout)))
+                    }
+                    try
+                    {
+                        jobMaxTimeout = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["jobmaxtimeout"]);
+                    }
+                    catch { }
+
+                    CancellationTokenSource tokenSource = new CancellationTokenSource();
+                    CancellationToken tasktoken = tokenSource.Token;
+                    Task task = Task.Factory.StartNew(() =>
+                    {
+                        InvokeWSSAdminRSVPRequest(site, jobId);
+                    },
+                    tasktoken);
+
+
+                    DateTime jobStarted = DateTime.Now;
+                    while ((DateTime.Now - jobStarted).Minutes < jobMaxTimeout || longRunJobIds.Count <= 1 && !token.IsCancellationRequested)
+                    {
+                        if (task.IsCompleted)
+                            break;
+                        Task.Delay(TimeSpan.FromMinutes(1));
+                    }
+                    if (token.IsCancellationRequested || !task.IsCompleted)
+                    {
+                        tokenSource.Cancel();
+                        string sXML = BuildProductInfoString(site);
+                        using (var qm = new QueueManager(sXML))
                         {
-                            while (!newJobWaiting)
-                            {
-                                if (t.Join(TimeSpan.FromMinutes(jobMinTimeout)))
-                                {
-                                    threadcompleted = true;
-                                    break;
-                                }
-                            }
-                            if (!threadcompleted)
-                            {
-                                try
-                                {
-                                    t.Abort();
-                                }
-                                catch (ThreadAbortException ex) {
-                                    
-                                    string sXML = BuildProductInfoString(site);
-                                    using (var qm = new QueueManager(sXML))
-                                    {
-                                        qm.RequeueJob(jobId);
-                                    }
-                                    aborted = false;
-                                }
-                                
-                            }
+                            qm.RequeueJob(jobId);
                         }
+                    }
+                    lock (longRunQueueLock)
+                    {
                         longRunQueue.RemoveAt(0);
                         longRunJobIds.RemoveAt(0);
-                        newJobWaiting = false;
                     }
                 }
-                Thread.Sleep(longRunPeriod);
+                Task.Delay(longRunPeriod);
             }
         }
 
@@ -468,7 +465,7 @@ namespace WE_QueueMgr
                 {
                     ExceptionHandler("ProcessTimerJobs", ex);
                 }
-                Thread.Sleep(doWorkPeriod);
+                Task.Delay(doWorkPeriod);
             }
         }
 
