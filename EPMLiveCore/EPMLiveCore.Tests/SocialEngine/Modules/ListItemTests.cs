@@ -62,6 +62,15 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
         private const string RegisterCommentDeletionActivityMethod = "RegisterCommentDeletionActivity";
         private const string RegisterCommentUpdationActivityMethod = "RegisterCommentUpdationActivity";
         private const string ValidateCommentCreationActivityMethod = "ValidateCommentCreationActivity";
+        private const string ValidateCommentDeletionActivityMethod = "ValidateCommentDeletionActivity";
+        private const string GetRelatedActivityIntervalMethod = "GetRelatedActivityInterval";
+        private const string CommentIdString = "CommentId";
+        private const string CommentString = "Comment";
+        private const string ChangedPropertiesString = "ChangedProperties";
+        private const string ChangedPropertiesValue = "ChangedProperties,title";
+        private const string AssignedToString = "AssignedTo";
+        private const string UpdateThreadUsersMethod = "UpdateThreadUsers";
+        private const string ValidateCommentUpdationActivityMethod = "ValidateCommentUpdationActivity";
         private ThreadManager threadManager;
         private ActivityManager activityManager;
         private StreamManager streamManager;
@@ -347,7 +356,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
 
             // Act
             var actual = (TimeSpan)privateObj.Invoke(
-                "GetRelatedActivityInterval",
+                GetRelatedActivityIntervalMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
                 new object[]
                 {
@@ -423,8 +432,8 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
 
             var registerActual = false;
             var data = CreateDataObject();
-            data.Add("CommentId", 1);
-            data.Add("Comment", "Comment");
+            data.Add(CommentIdString, 1);
+            data.Add(CommentString, CommentString);
             data.Add(CommentersColumn, Commenters);
             data.Add(ThreadValue, new Thread()
             {
@@ -483,8 +492,8 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
 
             var registerActual = false;
             var data = CreateDataObject();
-            data.Add("CommentId", 1);
-            data.Add("Comment", "Comment");
+            data.Add(CommentIdString, 1);
+            data.Add(CommentString, CommentString);
             data.Add(CommentersColumn, Commenters);
 
             var threadTable = CreateThreadTable();
@@ -539,7 +548,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
 
             var registerActual = false;
             var data = CreateDataObject();
-            data.Add("CommentId", 1);
+            data.Add(CommentIdString, 1);
             var threadTable = CreateThreadTable();
 
             ShimSqlCommand.AllInstances.ExecuteNonQuery = sqlCommand =>
@@ -592,9 +601,9 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
 
             var registerActual = false;
             var data = CreateDataObject();
-            data.Add("ChangedProperties", "ChangedProperties,title");
-            data.Add("CommentId", 1);
-            data.Add("Comment", "Comment");
+            data.Add(ChangedPropertiesString, ChangedPropertiesValue);
+            data.Add(CommentIdString, 1);
+            data.Add(CommentString, CommentString);
             data.Add(CommentersColumn, Commenters);
 
             var threadTable = CreateThreadTable();
@@ -649,9 +658,9 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
 
             var registerActual = false;
             var data = CreateDataObject();
-            data.Add("ChangedProperties", "ChangedProperties,title");
-            data.Add("CommentId", 1);
-            data.Add("Comment", "Comment");
+            data.Add(ChangedPropertiesString, ChangedPropertiesValue);
+            data.Add(CommentIdString, 1);
+            data.Add(CommentString, CommentString);
             data.Add(CommentersColumn, Commenters);
             var threadTable = CreateThreadTable();
 
@@ -717,7 +726,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 }
             };
             var data = CreateDataObject();
-            data.Add("AssignedTo", "1,2");
+            data.Add(AssignedToString, Commenters);
 
             ShimSqlCommand.AllInstances.ExecuteScalar = _ => UserRole.Assignee;
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
@@ -735,7 +744,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
 
             // Act
             privateObj.Invoke(
-                "UpdateThreadUsers",
+                UpdateThreadUsersMethod,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[]
                 {
@@ -796,8 +805,8 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
 
             var queryCount = 0;
             var data = CreateDataObject();
-            data.Add("CommentId", guid);
-            data.Add("Comment", "Comment");
+            data.Add(CommentIdString, guid);
+            data.Add(CommentString, CommentString);
 
             var actual = string.Empty;
             ShimCacheStore.CurrentGet = () => new ShimCacheStore()
@@ -863,7 +872,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             try
             {
                 privateObj.Invoke(
-                    "ValidateCommentDeletionActivity",
+                    ValidateCommentDeletionActivityMethod,
                     BindingFlags.Instance | BindingFlags.NonPublic,
                     new object[]
                     {
@@ -887,7 +896,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             const string expected = "Cannot delete a comment that has not been registerd";
 
             var data = CreateDataObject();
-            data.Add("CommentId", guid);
+            data.Add(CommentIdString, guid);
 
             var actual = string.Empty;
             ShimCacheStore.CurrentGet = () => new ShimCacheStore()
@@ -905,7 +914,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             try
             {
                 privateObj.Invoke(
-                    "ValidateCommentDeletionActivity",
+                    ValidateCommentDeletionActivityMethod,
                     BindingFlags.Instance | BindingFlags.NonPublic,
                     new object[]
                     {
@@ -929,8 +938,8 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             const string expected = "Cannot update a comment that has not been registerd";
 
             var data = CreateDataObject();
-            data.Add("CommentId", guid);
-            data.Add("Comment", "Comment");
+            data.Add(CommentIdString, guid);
+            data.Add(CommentString, CommentString);
 
             var actual = string.Empty;
             ShimCacheStore.CurrentGet = () => new ShimCacheStore()
@@ -948,7 +957,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             try
             {
                 privateObj.Invoke(
-                    "ValidateCommentUpdationActivity",
+                    ValidateCommentUpdationActivityMethod,
                     BindingFlags.Instance | BindingFlags.NonPublic,
                     new object[]
                     {
