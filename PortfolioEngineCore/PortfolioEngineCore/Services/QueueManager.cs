@@ -255,7 +255,7 @@ namespace PortfolioEngineCore
                         "UPDATE EPG_JOBS SET JOB_SUBMITTED = @JOB_SUBMITTED, JOB_STATUS = 0 WHERE JOB_GUID = @JOB_GUID";
                     SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
                     oCommand.Parameters.AddWithValue("@JOB_SUBMITTED", DateTime.Now);
-                    oCommand.Parameters.AddWithValue("@JOB_GUID", m_guidJob);
+                    oCommand.Parameters.AddWithValue("@JOB_GUID", jobid);
                     bSuccess = (oCommand.ExecuteNonQuery() != 0);
                 }
             }
