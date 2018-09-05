@@ -379,7 +379,7 @@ namespace WE_QueueMgr
 
 
                     DateTime jobStarted = DateTime.Now;
-                    while ((DateTime.Now - jobStarted).Minutes < jobMaxTimeout || longRunJobIds.Count <= 1 && !token.IsCancellationRequested)
+                    while (((DateTime.Now - jobStarted).Minutes < jobMaxTimeout || longRunJobIds.Count <= 1) && !token.IsCancellationRequested)
                     {
                         if (task.IsCompleted)
                             break;
