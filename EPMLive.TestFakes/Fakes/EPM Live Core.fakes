@@ -45,6 +45,12 @@
     <Add FullName="EPMLiveCore.Infrastructure.Navigation.NavLink!"/>
     <Add FullName="EPMLiveCore.Act!"/>
     <Add FullName="EPMLiveCore.API.PropertyHash!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.EPMLiveScriptManager!"/>
+    <Add FullName="EPMLiveCore.WebPartsHelper.WebPartsReflector!"/>
+    <Add FullName="EPMLiveCore.Layouts.epmlive.gridganttsettings!"/>
+    <Add FullName="EPMLiveCore.WorkEngineAPI!"/>
+    <Add FullName="EPMLiveCore.ReportHelper.ListBiz!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.CacheStore!"/>
     <Add FullName="EPMLiveCore.CommentCCPeopleEditor!"/>
   </ShimGeneration>
 </Fakes>
