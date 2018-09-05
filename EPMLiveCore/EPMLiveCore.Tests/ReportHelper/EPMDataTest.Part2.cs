@@ -448,7 +448,10 @@ namespace EPMLiveCore.Tests.ReportHelper
             {
                 traceWasCalled = true;
             };
-            _privateObject.SetFieldOrProperty("_sTextFilePath", string.Empty);
+            ShimEPMData.AllInstances.WriteTextFileStringString = (_, filePath, text) =>
+            {
+                throw new Exception();
+            };
 
             // Act
             _EPMData.WriteToFile(DummyString);
