@@ -37,14 +37,14 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         private const string PageUnloadMethod = "Page_Unload";
         private const string PageLoadMethod = "Page_Load";
         private const string CompLevel = "CompLevel";
-        private const string timeOutField = "_timeOut";
-        private const string solutionTypeField = "_solutionType";
-        private const string lstGuidField = "_lstGuid";
-        private const string copyFromField = "_copyFrom";
-        private const string pnlWorkspaceTypeField = "pnlWorkspaceType";
-        private const string pnlCreateNewWorkspaceFromField = "pnlCreateNewWorkspaceFrom";
-        private const string navField = "_nav";
-        private const string permsField = "_perms";
+        private const string TimeOutField = "_timeOut";
+        private const string SolutionTypeField = "_solutionType";
+        private const string LstGuidField = "_lstGuid";
+        private const string CopyFromField = "_copyFrom";
+        private const string PnlWorkspaceTypeField = "pnlWorkspaceType";
+        private const string PnlCreateNewWorkspaceFromField = "pnlCreateNewWorkspaceFrom";
+        private const string NavField = "_nav";
+        private const string PermsField = "_perms";
         private const string TrueString = "True";
         private const string UniqueString = "Unique";
         private const string SiteString = "{Site}";
@@ -69,9 +69,8 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         private void InitializeUiControls()
         {
             var allFields = _testObj.GetType()
-                                       .GetFields(BindingFlags.Instance |
-                                                  BindingFlags.NonPublic)
-                                       .Where(field => field.FieldType.IsSubclassOf(typeof(Control)));
+                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+                .Where(field => field.FieldType.IsSubclassOf(typeof(Control)));
             foreach (var control in allFields)
             {
                 _privateObj.SetField(control.Name, Activator.CreateInstance(control.FieldType));
@@ -147,7 +146,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             _privateObj.Invoke(PageInitMethod, this, EventArgs.Empty);
 
             // Assert
-            var timeOut = (int)_privateObj.GetFieldOrProperty(timeOutField);
+            var timeOut = (int)_privateObj.GetFieldOrProperty(TimeOutField);
             timeOut.ShouldBe(DummyInt);
         }
 
@@ -180,13 +179,13 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             _privateObj.Invoke(PageLoadMethod, this, EventArgs.Empty);
 
             // Assert
-            var solutionType = _privateObj.GetFieldOrProperty(solutionTypeField);
-            var lstGuid = _privateObj.GetFieldOrProperty(lstGuidField);
-            var copyFrom = _privateObj.GetFieldOrProperty(copyFromField);
-            var pnlWorkspaceType = (Panel)_privateObj.GetFieldOrProperty(pnlWorkspaceTypeField);
-            var pnlCreateNewWorkspaceFrom = (Panel)_privateObj.GetFieldOrProperty(pnlCreateNewWorkspaceFromField);
-            var nav = _privateObj.GetFieldOrProperty(navField);
-            var perms = _privateObj.GetFieldOrProperty(permsField);
+            var solutionType = _privateObj.GetFieldOrProperty(SolutionTypeField);
+            var lstGuid = _privateObj.GetFieldOrProperty(LstGuidField);
+            var copyFrom = _privateObj.GetFieldOrProperty(CopyFromField);
+            var pnlWorkspaceType = (Panel)_privateObj.GetFieldOrProperty(PnlWorkspaceTypeField);
+            var pnlCreateNewWorkspaceFrom = (Panel)_privateObj.GetFieldOrProperty(PnlCreateNewWorkspaceFromField);
+            var nav = _privateObj.GetFieldOrProperty(NavField);
+            var perms = _privateObj.GetFieldOrProperty(PermsField);
 
             this.ShouldSatisfyAllConditions(
                 () => solutionType.ShouldBe(DummyString),
@@ -210,13 +209,13 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             _privateObj.Invoke(PageLoadMethod, this, EventArgs.Empty);
 
             // Assert
-            var solutionType = _privateObj.GetFieldOrProperty(solutionTypeField);
-            var lstGuid = _privateObj.GetFieldOrProperty(lstGuidField);
-            var copyFrom = _privateObj.GetFieldOrProperty(copyFromField);
-            var pnlWorkspaceType = (Panel)_privateObj.GetFieldOrProperty(pnlWorkspaceTypeField);
-            var pnlCreateNewWorkspaceFrom = (Panel)_privateObj.GetFieldOrProperty(pnlCreateNewWorkspaceFromField);
-            var nav = _privateObj.GetFieldOrProperty(navField);
-            var perms = _privateObj.GetFieldOrProperty(permsField);
+            var solutionType = _privateObj.GetFieldOrProperty(SolutionTypeField);
+            var lstGuid = _privateObj.GetFieldOrProperty(LstGuidField);
+            var copyFrom = _privateObj.GetFieldOrProperty(CopyFromField);
+            var pnlWorkspaceType = (Panel)_privateObj.GetFieldOrProperty(PnlWorkspaceTypeField);
+            var pnlCreateNewWorkspaceFrom = (Panel)_privateObj.GetFieldOrProperty(PnlCreateNewWorkspaceFromField);
+            var nav = _privateObj.GetFieldOrProperty(NavField);
+            var perms = _privateObj.GetFieldOrProperty(PermsField);
 
             this.ShouldSatisfyAllConditions(
                 () => solutionType.ShouldBe(DummyString),
@@ -240,13 +239,13 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             _privateObj.Invoke(PageLoadMethod, this, EventArgs.Empty);
 
             // Assert
-            var solutionType = _privateObj.GetFieldOrProperty(solutionTypeField);
-            var lstGuid = _privateObj.GetFieldOrProperty(lstGuidField);
-            var copyFrom = _privateObj.GetFieldOrProperty(copyFromField);
-            var pnlWorkspaceType = (Panel)_privateObj.GetFieldOrProperty(pnlWorkspaceTypeField);
-            var pnlCreateNewWorkspaceFrom = (Panel)_privateObj.GetFieldOrProperty(pnlCreateNewWorkspaceFromField);
-            var nav = _privateObj.GetFieldOrProperty(navField);
-            var perms = _privateObj.GetFieldOrProperty(permsField);
+            var solutionType = _privateObj.GetFieldOrProperty(SolutionTypeField);
+            var lstGuid = _privateObj.GetFieldOrProperty(LstGuidField);
+            var copyFrom = _privateObj.GetFieldOrProperty(CopyFromField);
+            var pnlWorkspaceType = (Panel)_privateObj.GetFieldOrProperty(PnlWorkspaceTypeField);
+            var pnlCreateNewWorkspaceFrom = (Panel)_privateObj.GetFieldOrProperty(PnlCreateNewWorkspaceFromField);
+            var nav = _privateObj.GetFieldOrProperty(NavField);
+            var perms = _privateObj.GetFieldOrProperty(PermsField);
 
             this.ShouldSatisfyAllConditions(
                 () => solutionType.ShouldBe(DummyString),
@@ -270,13 +269,13 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             _privateObj.Invoke(PageLoadMethod, this, EventArgs.Empty);
 
             // Assert
-            var solutionType = _privateObj.GetFieldOrProperty(solutionTypeField);
-            var lstGuid = _privateObj.GetFieldOrProperty(lstGuidField);
-            var copyFrom = _privateObj.GetFieldOrProperty(copyFromField);
-            var pnlWorkspaceType = (Panel)_privateObj.GetFieldOrProperty(pnlWorkspaceTypeField);
-            var pnlCreateNewWorkspaceFrom = (Panel)_privateObj.GetFieldOrProperty(pnlCreateNewWorkspaceFromField);
-            var nav = _privateObj.GetFieldOrProperty(navField);
-            var perms = _privateObj.GetFieldOrProperty(permsField);
+            var solutionType = _privateObj.GetFieldOrProperty(SolutionTypeField);
+            var lstGuid = _privateObj.GetFieldOrProperty(LstGuidField);
+            var copyFrom = _privateObj.GetFieldOrProperty(CopyFromField);
+            var pnlWorkspaceType = (Panel)_privateObj.GetFieldOrProperty(PnlWorkspaceTypeField);
+            var pnlCreateNewWorkspaceFrom = (Panel)_privateObj.GetFieldOrProperty(PnlCreateNewWorkspaceFromField);
+            var nav = _privateObj.GetFieldOrProperty(NavField);
+            var perms = _privateObj.GetFieldOrProperty(PermsField);
 
             this.ShouldSatisfyAllConditions(
                 () => solutionType.ShouldBe(DummyString),
