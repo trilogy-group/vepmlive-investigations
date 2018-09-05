@@ -244,7 +244,6 @@ namespace CADataCache
         [TestCase(Field_hideRowsWithAllZeros)]
         [TestCase(Fieldm_TotalRoot)]
         [TestCase(Fieldm_total_dets)]
-        [TestCase(Fieldm_total_rows)]
         [TestCase(Fieldm_CTCmpRoot)]
         [TestCase(Fieldm_targetdata)]
         [TestCase(Fieldm_tarnames)]
