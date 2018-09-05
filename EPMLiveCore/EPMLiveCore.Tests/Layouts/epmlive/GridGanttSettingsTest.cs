@@ -354,7 +354,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                 new ShimSPWeb().Instance, 
                 new ShimSPList().Instance);
 
-            // Asssert
+            // Assert
             updated.ShouldBeTrue();
         }
 
@@ -378,7 +378,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                 new ShimSPWeb().Instance,
                 new ShimSPList().Instance);
 
-            // Asssert
+            // Assert
             updated.ShouldBeTrue();
         }
 
