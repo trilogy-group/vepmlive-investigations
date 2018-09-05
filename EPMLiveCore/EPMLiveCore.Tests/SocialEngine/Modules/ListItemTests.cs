@@ -266,10 +266,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             privateObj.Invoke(
                 PerformPostRegistrationStepsMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
-                new object[]
-                {
-                    args
-                });
+                new object[] { args });
 
             // Assert
             updateActual.ShouldBe(updateExpected);
@@ -297,11 +294,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             // Act
             var actual = (bool)privateObj.Invoke(EnsureNotIgnoredListMethod,
                BindingFlags.Static | BindingFlags.NonPublic,
-               new object[]
-               {
-                    args,
-                    data
-               });
+               new object[] { args, data });
 
             // Assert
             actual.ShouldBe(expected);
@@ -330,11 +323,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             var actual = (bool)privateObj.Invoke(
                 EnsureNotIgnoredListMethod,
                 BindingFlags.Static | BindingFlags.NonPublic,
-                new object[]
-                {
-                    args,
-                    data
-                });
+                new object[] { args, data });
 
             // Assert
             actual.ShouldBe(expected);
@@ -358,10 +347,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             var actual = (TimeSpan)privateObj.Invoke(
                 GetRelatedActivityIntervalMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
-                new object[]
-                {
-                    spWeb
-                });
+                new object[] { spWeb });
 
             // Assert
             actual.ShouldBe(expected);
@@ -398,11 +384,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 Read = () =>
                 {
                     readCount++;
-                    if (readCount == 1)
-                    {
-                        return true;
-                    }
-                    return false;
+                    return readCount == 1;
                 },
                 GetGuidInt32 = _ => guid,
                 GetBooleanInt32 = _ => false,
@@ -415,10 +397,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             privateObj.Invoke(
                 PerformPreRegistrationStepsMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
-                new object[]
-                {
-                    args
-                });
+                new object[] { args });
 
             // Assert
             actual.ShouldBe(expected);
@@ -475,10 +454,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             privateObj.Invoke(
                 RegisterCommentCreationActivityMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
-                new object[]
-                {
-                    args
-                });
+                new object[] { args });
 
             // Assert
             registerActual.ShouldBe(registerExpected);
@@ -531,10 +507,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             privateObj.Invoke(
                 RegisterCommentCreationActivityMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
-                new object[]
-                {
-                    args
-                });
+                new object[] { args });
 
             // Assert
             registerActual.ShouldBe(registerExpected);
@@ -584,10 +557,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             privateObj.Invoke(
                 RegisterCommentDeletionActivityMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
-                new object[]
-                {
-                    args
-                });
+                new object[] { args });
 
             // Assert
             registerActual.ShouldBe(registerExpected);
@@ -641,10 +611,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             privateObj.Invoke(
                 RegisterCommentUpdationActivityMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
-                new object[]
-                {
-                    args
-                });
+                new object[] { args });
 
             // Assert
             registerActual.ShouldBe(registerExpected);
@@ -697,10 +664,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             privateObj.Invoke(
                 RegisterCommentUpdationActivityMethod,
                 BindingFlags.Instance | BindingFlags.NonPublic,
-                new object[]
-                {
-                    args
-                });
+                new object[] { args });
 
             // Assert
             registerActual.ShouldBe(registerExpected);
@@ -746,11 +710,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             privateObj.Invoke(
                 UpdateThreadUsersMethod,
                 BindingFlags.Static | BindingFlags.NonPublic,
-                new object[]
-                {
-                    args,
-                    thread
-                });
+                new object[] { args, thread });
 
             // Assert
             actualUpdate.ShouldBe(expectedUpdate);
@@ -782,10 +742,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 privateObj.Invoke(
                     ValidateCommentCreationActivityMethod,
                     BindingFlags.Instance | BindingFlags.NonPublic,
-                    new object[]
-                    {
-                        args
-                    });
+                    new object[] { args });
             }
             catch (SocialEngineException exception)
             {
@@ -834,10 +791,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 privateObj.Invoke(
                     ValidateCommentCreationActivityMethod,
                     BindingFlags.Instance | BindingFlags.NonPublic,
-                    new object[]
-                    {
-                        args
-                    });
+                    new object[] { args });
             }
             catch (SocialEngineException exception)
             {
@@ -874,10 +828,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 privateObj.Invoke(
                     ValidateCommentDeletionActivityMethod,
                     BindingFlags.Instance | BindingFlags.NonPublic,
-                    new object[]
-                    {
-                        args
-                    });
+                    new object[] { args });
             }
             catch (SocialEngineException exception)
             {
@@ -916,10 +867,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 privateObj.Invoke(
                     ValidateCommentDeletionActivityMethod,
                     BindingFlags.Instance | BindingFlags.NonPublic,
-                    new object[]
-                    {
-                        args
-                    });
+                    new object[] { args });
             }
             catch (SocialEngineException exception)
             {
@@ -959,10 +907,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                 privateObj.Invoke(
                     ValidateCommentUpdationActivityMethod,
                     BindingFlags.Instance | BindingFlags.NonPublic,
-                    new object[]
-                    {
-                        args
-                    });
+                    new object[] { args });
             }
             catch (SocialEngineException exception)
             {
