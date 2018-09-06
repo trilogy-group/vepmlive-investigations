@@ -5,9 +5,12 @@ using System.Data.Common.Fakes;
 using System.Data.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
+using System.Diagnostics;
 using System.Diagnostics.Fakes;
 using System.Globalization;
+using System.IO;
 using System.IO.Fakes;
+using System.Text;
 using System.Web.UI.WebControls;
 using EPMLiveCore.API;
 using EPMLiveCore.Fakes;
@@ -442,22 +445,27 @@ namespace EPMLiveCore.Tests.ReportHelper
         [TestMethod]
         public void WriteToFile_OnException_TraceError()
         {
-            // Arrange
-            var traceWasCalled = false;
-            ShimTrace.TraceErrorStringObjectArray = (format, args) =>
+            using (var stream = new MemoryStream())
             {
-                traceWasCalled = true;
-            };
-            ShimEPMData.AllInstances.WriteTextFileStringString = (_, filePath, text) =>
-            {
-                throw new Exception();
-            };
+                using (var traceListener = new TextWriterTraceListener(stream))
+                {
+                    // Arrange
+                    Trace.Listeners.Add(traceListener);
+                    ShimEPMData.AllInstances.WriteTextFileStringString = (_, filePath, text) =>
+                    {
+                        throw new Exception();
+                    };
 
-            // Act
-            _EPMData.WriteToFile(DummyString);
+                    // Act
+                    _EPMData.WriteToFile(DummyString);
+                    Trace.Flush();
+                    var traceResult = Encoding.Default.GetString(stream.ToArray());
 
-            // Assert
-            traceWasCalled.ShouldBeTrue();
+                    // Assert
+                    Assert.IsNotNull(traceResult);
+                    Assert.IsFalse(string.IsNullOrEmpty(traceResult));
+                }
+            }
         }
 
         [TestMethod]
