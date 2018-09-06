@@ -5,9 +5,12 @@ using System.Data.Common.Fakes;
 using System.Data.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
+using System.Diagnostics;
 using System.Diagnostics.Fakes;
 using System.Globalization;
+using System.IO;
 using System.IO.Fakes;
+using System.Text;
 using System.Web.UI.WebControls;
 using EPMLiveCore.API;
 using EPMLiveCore.Fakes;
@@ -437,24 +440,6 @@ namespace EPMLiveCore.Tests.ReportHelper
 
             // Assert
             writeLineWasCalled.ShouldBeTrue();
-        }
-
-        [TestMethod]
-        public void WriteToFile_OnException_TraceError()
-        {
-            // Arrange
-            var traceWasCalled = false;
-            ShimTrace.TraceErrorStringObjectArray = (format, args) =>
-            {
-                traceWasCalled = true;
-            };
-            _privateObject.SetFieldOrProperty("_sTextFilePath", string.Empty);
-
-            // Act
-            _EPMData.WriteToFile(DummyString);
-
-            // Assert
-            traceWasCalled.ShouldBeTrue();
         }
 
         [TestMethod]
