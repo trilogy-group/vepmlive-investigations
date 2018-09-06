@@ -341,91 +341,7 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Category : Instance
-
-        /// <summary>
-        ///     Class (<see cref="ReportingChart" />) can be created test
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT Instance")]
-        public void AUT_ReportingChart_Is_Instance_Present_Test()
-        {
-            // Assert
-            _reportingChartInstanceType.ShouldNotBeNull();
-            _reportingChartInstance.ShouldNotBeNull();
-            _reportingChartInstanceFixture.ShouldNotBeNull();
-            _reportingChartInstance.ShouldBeAssignableTo<ReportingChart>();
-            _reportingChartInstanceFixture.ShouldBeAssignableTo<ReportingChart>();
-        }
-
-        #endregion
-
-        #region Category : Constructor
-
-        #region General Constructor : Class (ReportingChart) without Parameter Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT Constructor")]
-        public void AUT_Constructor_ReportingChart_Instantiated_Without_Parameter_No_Throw_Exception_Test()
-        {
-            // Arrange
-            ReportingChart instance = null;
-
-            // Act
-            var exception = CreateAnalyzer.GetThrownExceptionWhenCreate(out instance);
-
-            // Assert
-            instance.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            _reportingChartInstanceType.ShouldNotBeNull();
-            _reportingChartInstance.ShouldNotBeNull();
-            _reportingChartInstanceFixture.ShouldNotBeNull();
-            _reportingChartInstance.ShouldBeAssignableTo<ReportingChart>();
-            _reportingChartInstanceFixture.ShouldBeAssignableTo<ReportingChart>();
-        }
-
-        #endregion
-
-        #endregion
-
         #region Category : GetterSetter
-
-        #region General Getters/Setters : Class (ReportingChart) => all properties (non-static) explore and verify type tests
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT GetterSetter")]
-        [TestCaseGeneric(typeof(Dictionary<string, string>) , PropertyDictFieldIntAndDispName)]
-        [TestCaseGeneric(typeof(Guid) , Property_filterWebPartId)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartTitle)]
-        [TestCaseGeneric(typeof(ChartType) , PropertyPropChartType)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartSelectedPaletteName)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartSelectedListTitle)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartSelectedViewTitle)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartXaxisField)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartXaxisFieldLabel)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartYaxisField)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartYaxisFieldLabel)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartZaxisField)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartZaxisFieldLabel)]
-        [TestCaseGeneric(typeof(string) , PropertyPropBubbleChartGroupBy)]
-        [TestCaseGeneric(typeof(string) , PropertyPropYaxisFormat)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartShowSeriesLabels)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartShowLegend)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartLegendPosition)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartShowGridlines)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartAggregationType)]
-        [TestCaseGeneric(typeof(string) , PropertyUpdatePanelClientId)]
-        [TestCaseGeneric(typeof(string) , PropertyRadChartClientId)]
-        public void AUT_ReportingChart_Property_Type_Verify_Explore_By_Name_Test<T>(string propertyName)
-        {
-            // AAA : Arrange, Act, Assert
-            ShouldlyExtension.PropertyTypeVerify<ReportingChart, T>(_reportingChartInstance, propertyName, Fixture);
-        }
-
-        #endregion
 
         #region General Getters/Setters : Class (ReportingChart) => Property (_filterWebPartId) Property Type Test Except String
 
@@ -696,27 +612,6 @@ namespace EPMLiveWebParts.ReportingChart
             propertyInfo.ShouldNotBeNull();
             canRead.ShouldNotBeNull();
             canRead?.ShouldBeTrue();
-        }
-
-        #endregion
-
-        #region General Getters/Setters : Class (ReportingChart) => Property (PropChartType) Property Type Test Except String
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT GetterSetter")]
-        public void AUT_ReportingChart_PropChartType_Property_Setting_String_Throw_Argument_Exception_Test()
-        {
-            // Arrange
-            var randomString = CreateType<string>();
-
-            // Act
-            var propertyInfo = GetPropertyInfo(PropertyPropChartType);
-            Action currentAction = () => propertyInfo.SetValue(_reportingChartInstance, randomString, null);
-
-            // Assert
-            propertyInfo.ShouldNotBeNull();
-            Should.Throw<ArgumentException>(currentAction);
         }
 
         #endregion
@@ -1017,55 +912,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (ReportIDConsumer) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_ReportIDConsumer_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var Provider = CreateType<IReportID>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _reportingChartInstance.ReportIDConsumer(Provider);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (ReportIDConsumer) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_ReportIDConsumer_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var Provider = CreateType<IReportID>();
-            var methodReportIDConsumerPrametersTypes = new Type[] { typeof(IReportID) };
-            object[] parametersOfReportIDConsumer = { Provider };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodReportIDConsumer, methodReportIDConsumerPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfReportIDConsumer);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfReportIDConsumer.ShouldNotBeNull();
-            parametersOfReportIDConsumer.Length.ShouldBe(1);
-            methodReportIDConsumerPrametersTypes.Length.ShouldBe(1);
-            methodReportIDConsumerPrametersTypes.Length.ShouldBe(parametersOfReportIDConsumer.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (ReportIDConsumer) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -1159,35 +1005,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodOnInitPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodOnInit, Fixture, methodOnInitPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (OnInit) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_OnInit_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var e = CreateType<EventArgs>();
-            var methodOnInitPrametersTypes = new Type[] { typeof(EventArgs) };
-            object[] parametersOfOnInit = { e };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodOnInit, methodOnInitPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfOnInit);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfOnInit.ShouldNotBeNull();
-            parametersOfOnInit.Length.ShouldBe(1);
-            methodOnInitPrametersTypes.Length.ShouldBe(1);
-            methodOnInitPrametersTypes.Length.ShouldBe(parametersOfOnInit.Length);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -1415,32 +1232,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (CreateChildControls) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_CreateChildControls_Method_Call_Void_With_No_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodCreateChildControlsPrametersTypes = null;
-            object[] parametersOfCreateChildControls = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodCreateChildControls, methodCreateChildControlsPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfCreateChildControls);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfCreateChildControls.ShouldBeNull();
-            methodCreateChildControlsPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (CreateChildControls) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -1661,32 +1452,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (AddControls) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_AddControls_Method_Call_Void_With_No_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodAddControlsPrametersTypes = null;
-            object[] parametersOfAddControls = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodAddControls, methodAddControlsPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfAddControls);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfAddControls.ShouldBeNull();
-            methodAddControlsPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (AddControls) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -1757,36 +1522,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodupdatePanel_LoadPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodupdatePanel_Load, Fixture, methodupdatePanel_LoadPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (updatePanel_Load) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_updatePanel_Load_Method_Call_Void_With_2_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sender = CreateType<object>();
-            var e = CreateType<EventArgs>();
-            var methodupdatePanel_LoadPrametersTypes = new Type[] { typeof(object), typeof(EventArgs) };
-            object[] parametersOfupdatePanel_Load = { sender, e };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodupdatePanel_Load, methodupdatePanel_LoadPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfupdatePanel_Load);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfupdatePanel_Load.ShouldNotBeNull();
-            parametersOfupdatePanel_Load.Length.ShouldBe(2);
-            methodupdatePanel_LoadPrametersTypes.Length.ShouldBe(2);
-            methodupdatePanel_LoadPrametersTypes.Length.ShouldBe(parametersOfupdatePanel_Load.Length);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -2015,32 +1750,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (ConfigureDisplayFormat) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_ConfigureDisplayFormat_Method_Call_Void_With_No_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodConfigureDisplayFormatPrametersTypes = null;
-            object[] parametersOfConfigureDisplayFormat = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodConfigureDisplayFormat, methodConfigureDisplayFormatPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfConfigureDisplayFormat);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfConfigureDisplayFormat.ShouldBeNull();
-            methodConfigureDisplayFormatPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (ConfigureDisplayFormat) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -2189,32 +1898,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (BuildYAxisItemLabels) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_BuildYAxisItemLabels_Method_Call_Void_With_No_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodBuildYAxisItemLabelsPrametersTypes = null;
-            object[] parametersOfBuildYAxisItemLabels = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodBuildYAxisItemLabels, methodBuildYAxisItemLabelsPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfBuildYAxisItemLabels);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfBuildYAxisItemLabels.ShouldBeNull();
-            methodBuildYAxisItemLabelsPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (BuildYAxisItemLabels) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -2285,25 +1968,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodBuildSeriesPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodBuildSeries, Fixture, methodBuildSeriesPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (BuildSeries) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_BuildSeries_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _reportingChartInstance.BuildSeries();
-
-            // Assert
-            Should.NotThrow(executeAction);
         }
 
         #endregion
@@ -2408,34 +2072,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetColors) (Return Type : Color[]) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetColors_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var paletteName = CreateType<string>();
-            var methodGetColorsPrametersTypes = new Type[] { typeof(string) };
-            object[] parametersOfGetColors = { paletteName };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetColors, methodGetColorsPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfGetColors);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetColors.ShouldNotBeNull();
-            parametersOfGetColors.Length.ShouldBe(1);
-            methodGetColorsPrametersTypes.Length.ShouldBe(1);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (GetColors) (Return Type : Color[]) No Exception with encapsulation Thrown
 
         [Test]
@@ -2497,27 +2133,6 @@ namespace EPMLiveWebParts.ReportingChart
             // Assert
             Should.NotThrow(currentAction);
             methodGetColorsPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (GetColors) (Return Type : Color[]) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetColors_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetColors, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_reportingChartInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
         }
 
         #endregion
@@ -3371,26 +2986,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetSeriesItems) (Return Type : Dictionary<string, List<SeriesItem>>) Results Not Null Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetSeriesItems_Method_Call_Dynamic_Invoking_Results_Not_Null_Test()
-        {
-            // Arrange
-            Type [] methodGetSeriesItemsPrametersTypes = null;
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodGetSeriesItems, Fixture, methodGetSeriesItemsPrametersTypes);
-
-            // Assert
-            result.ShouldNotBeNull();
-            methodGetSeriesItemsPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (GetSeriesItems) (Return Type : Dictionary<string, List<SeriesItem>>) Invoke Should Not Throw
 
         [Test]
@@ -3620,32 +3215,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (ThisChartIsTiedToAReportFilter) (Return Type : bool) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_ThisChartIsTiedToAReportFilter_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodThisChartIsTiedToAReportFilterPrametersTypes = null;
-            object[] parametersOfThisChartIsTiedToAReportFilter = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodThisChartIsTiedToAReportFilter, methodThisChartIsTiedToAReportFilterPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfThisChartIsTiedToAReportFilter);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfThisChartIsTiedToAReportFilter.ShouldBeNull();
-            methodThisChartIsTiedToAReportFilterPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (ThisChartIsTiedToAReportFilter) (Return Type : bool) No Exception with encapsulation Thrown
 
         [Test]
@@ -3668,46 +3237,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (ThisChartIsTiedToAReportFilter) (Return Type : bool) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_ThisChartIsTiedToAReportFilter_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
-        {
-            // Arrange
-            Type [] methodThisChartIsTiedToAReportFilterPrametersTypes = null;
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodThisChartIsTiedToAReportFilter, Fixture, methodThisChartIsTiedToAReportFilterPrametersTypes);
-
-            // Assert
-            result.ShouldNotBeNull();
-            methodThisChartIsTiedToAReportFilterPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (ThisChartIsTiedToAReportFilter) (Return Type : bool) Results Not Null Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_ThisChartIsTiedToAReportFilter_Method_Call_Dynamic_Invoking_Results_Not_Null_Test()
-        {
-            // Arrange
-            Type [] methodThisChartIsTiedToAReportFilterPrametersTypes = null;
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodThisChartIsTiedToAReportFilter, Fixture, methodThisChartIsTiedToAReportFilterPrametersTypes);
-
-            // Assert
-            result.ShouldNotBeNull();
-            methodThisChartIsTiedToAReportFilterPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (ThisChartIsTiedToAReportFilter) (Return Type : bool) Invoke Should Not Throw
 
         [Test]
@@ -3725,27 +3254,6 @@ namespace EPMLiveWebParts.ReportingChart
             // Assert
             Should.NotThrow(currentAction);
             methodThisChartIsTiedToAReportFilterPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (ThisChartIsTiedToAReportFilter) (Return Type : bool) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_ThisChartIsTiedToAReportFilter_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodThisChartIsTiedToAReportFilter, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_reportingChartInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
         }
 
         #endregion
@@ -3910,38 +3418,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetDataForBubbleSeries) (Return Type : Dictionary<string, List<SeriesItem>>) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetDataForBubbleSeries_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var dtRaw = CreateType<DataTable>();
-            var category = CreateType<string>();
-            var series = CreateType<string>();
-            var valueFld = CreateType<string>();
-            var groupBy = CreateType<string>();
-            var methodGetDataForBubbleSeriesPrametersTypes = new Type[] { typeof(DataTable), typeof(string), typeof(string), typeof(string), typeof(string) };
-            object[] parametersOfGetDataForBubbleSeries = { dtRaw, category, series, valueFld, groupBy };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetDataForBubbleSeries, methodGetDataForBubbleSeriesPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfGetDataForBubbleSeries);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetDataForBubbleSeries.ShouldNotBeNull();
-            parametersOfGetDataForBubbleSeries.Length.ShouldBe(5);
-            methodGetDataForBubbleSeriesPrametersTypes.Length.ShouldBe(5);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (GetDataForBubbleSeries) (Return Type : Dictionary<string, List<SeriesItem>>) No Exception with encapsulation Thrown
 
         [Test]
@@ -4011,27 +3487,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetDataForBubbleSeries) (Return Type : Dictionary<string, List<SeriesItem>>) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetDataForBubbleSeries_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetDataForBubbleSeries, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_reportingChartInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (GetDataForBubbleSeries) (Return Type : Dictionary<string, List<SeriesItem>>) Parameters Count verify
 
         [Test]
@@ -4059,35 +3514,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodGetCountDataForPieSeriesPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodGetCountDataForPieSeries, Fixture, methodGetCountDataForPieSeriesPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (GetCountDataForPieSeries) (Return Type : Dictionary<string, List<SeriesItem>>) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetCountDataForPieSeries_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var dtRaw = CreateType<DataTable>();
-            var category = CreateType<string>();
-            var methodGetCountDataForPieSeriesPrametersTypes = new Type[] { typeof(DataTable), typeof(string) };
-            object[] parametersOfGetCountDataForPieSeries = { dtRaw, category };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetCountDataForPieSeries, methodGetCountDataForPieSeriesPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfGetCountDataForPieSeries);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetCountDataForPieSeries.ShouldNotBeNull();
-            parametersOfGetCountDataForPieSeries.Length.ShouldBe(2);
-            methodGetCountDataForPieSeriesPrametersTypes.Length.ShouldBe(2);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -4158,27 +3584,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetCountDataForPieSeries) (Return Type : Dictionary<string, List<SeriesItem>>) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetCountDataForPieSeries_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetCountDataForPieSeries, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_reportingChartInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (GetCountDataForPieSeries) (Return Type : Dictionary<string, List<SeriesItem>>) Parameters Count verify
 
         [Test]
@@ -4206,36 +3611,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodGetSumDataForPieSeriesPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodGetSumDataForPieSeries, Fixture, methodGetSumDataForPieSeriesPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (GetSumDataForPieSeries) (Return Type : Dictionary<string, List<SeriesItem>>) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetSumDataForPieSeries_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var dtRaw = CreateType<DataTable>();
-            var category = CreateType<string>();
-            var series = CreateType<string>();
-            var methodGetSumDataForPieSeriesPrametersTypes = new Type[] { typeof(DataTable), typeof(string), typeof(string) };
-            object[] parametersOfGetSumDataForPieSeries = { dtRaw, category, series };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetSumDataForPieSeries, methodGetSumDataForPieSeriesPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfGetSumDataForPieSeries);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetSumDataForPieSeries.ShouldNotBeNull();
-            parametersOfGetSumDataForPieSeries.Length.ShouldBe(3);
-            methodGetSumDataForPieSeriesPrametersTypes.Length.ShouldBe(3);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -4307,27 +3682,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetSumDataForPieSeries) (Return Type : Dictionary<string, List<SeriesItem>>) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetSumDataForPieSeries_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetSumDataForPieSeries, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_reportingChartInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (GetSumDataForPieSeries) (Return Type : Dictionary<string, List<SeriesItem>>) Parameters Count verify
 
         [Test]
@@ -4355,36 +3709,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodGetAvgDataForPieSeriesPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodGetAvgDataForPieSeries, Fixture, methodGetAvgDataForPieSeriesPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (GetAvgDataForPieSeries) (Return Type : Dictionary<string, List<SeriesItem>>) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetAvgDataForPieSeries_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var dtRaw = CreateType<DataTable>();
-            var category = CreateType<string>();
-            var series = CreateType<string>();
-            var methodGetAvgDataForPieSeriesPrametersTypes = new Type[] { typeof(DataTable), typeof(string), typeof(string) };
-            object[] parametersOfGetAvgDataForPieSeries = { dtRaw, category, series };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetAvgDataForPieSeries, methodGetAvgDataForPieSeriesPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfGetAvgDataForPieSeries);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetAvgDataForPieSeries.ShouldNotBeNull();
-            parametersOfGetAvgDataForPieSeries.Length.ShouldBe(3);
-            methodGetAvgDataForPieSeriesPrametersTypes.Length.ShouldBe(3);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -4456,27 +3780,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetAvgDataForPieSeries) (Return Type : Dictionary<string, List<SeriesItem>>) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetAvgDataForPieSeries_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetAvgDataForPieSeries, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_reportingChartInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (GetAvgDataForPieSeries) (Return Type : Dictionary<string, List<SeriesItem>>) Parameters Count verify
 
         [Test]
@@ -4504,35 +3807,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodGetCountDataForSingleSeriesPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodGetCountDataForSingleSeries, Fixture, methodGetCountDataForSingleSeriesPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (GetCountDataForSingleSeries) (Return Type : Dictionary<string, List<SeriesItem>>) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetCountDataForSingleSeries_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var dtRaw = CreateType<DataTable>();
-            var category = CreateType<string>();
-            var methodGetCountDataForSingleSeriesPrametersTypes = new Type[] { typeof(DataTable), typeof(string) };
-            object[] parametersOfGetCountDataForSingleSeries = { dtRaw, category };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetCountDataForSingleSeries, methodGetCountDataForSingleSeriesPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfGetCountDataForSingleSeries);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetCountDataForSingleSeries.ShouldNotBeNull();
-            parametersOfGetCountDataForSingleSeries.Length.ShouldBe(2);
-            methodGetCountDataForSingleSeriesPrametersTypes.Length.ShouldBe(2);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -4599,27 +3873,6 @@ namespace EPMLiveWebParts.ReportingChart
             // Assert
             Should.NotThrow(currentAction);
             methodGetCountDataForSingleSeriesPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (GetCountDataForSingleSeries) (Return Type : Dictionary<string, List<SeriesItem>>) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetCountDataForSingleSeries_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetCountDataForSingleSeries, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_reportingChartInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
         }
 
         #endregion
@@ -4957,36 +4210,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetSumDataForMultiSeries) (Return Type : Dictionary<string, List<SeriesItem>>) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetSumDataForMultiSeries_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var dtRaw = CreateType<DataTable>();
-            var category = CreateType<string>();
-            var rawMultiSeries = CreateType<string>();
-            var methodGetSumDataForMultiSeriesPrametersTypes = new Type[] { typeof(DataTable), typeof(string), typeof(string) };
-            object[] parametersOfGetSumDataForMultiSeries = { dtRaw, category, rawMultiSeries };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetSumDataForMultiSeries, methodGetSumDataForMultiSeriesPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfGetSumDataForMultiSeries);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetSumDataForMultiSeries.ShouldNotBeNull();
-            parametersOfGetSumDataForMultiSeries.Length.ShouldBe(3);
-            methodGetSumDataForMultiSeriesPrametersTypes.Length.ShouldBe(3);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (GetSumDataForMultiSeries) (Return Type : Dictionary<string, List<SeriesItem>>) No Exception with encapsulation Thrown
 
         [Test]
@@ -5054,27 +4277,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetSumDataForMultiSeries) (Return Type : Dictionary<string, List<SeriesItem>>) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetSumDataForMultiSeries_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetSumDataForMultiSeries, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_reportingChartInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (GetSumDataForMultiSeries) (Return Type : Dictionary<string, List<SeriesItem>>) Parameters Count verify
 
         [Test]
@@ -5102,36 +4304,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodGetSumDataForMultiSeriesInPercentagePrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodGetSumDataForMultiSeriesInPercentage, Fixture, methodGetSumDataForMultiSeriesInPercentagePrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (GetSumDataForMultiSeriesInPercentage) (Return Type : Dictionary<string, List<SeriesItem>>) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetSumDataForMultiSeriesInPercentage_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var dtRaw = CreateType<DataTable>();
-            var category = CreateType<string>();
-            var rawMultiSeries = CreateType<string>();
-            var methodGetSumDataForMultiSeriesInPercentagePrametersTypes = new Type[] { typeof(DataTable), typeof(string), typeof(string) };
-            object[] parametersOfGetSumDataForMultiSeriesInPercentage = { dtRaw, category, rawMultiSeries };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetSumDataForMultiSeriesInPercentage, methodGetSumDataForMultiSeriesInPercentagePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfGetSumDataForMultiSeriesInPercentage);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetSumDataForMultiSeriesInPercentage.ShouldNotBeNull();
-            parametersOfGetSumDataForMultiSeriesInPercentage.Length.ShouldBe(3);
-            methodGetSumDataForMultiSeriesInPercentagePrametersTypes.Length.ShouldBe(3);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -5203,27 +4375,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetSumDataForMultiSeriesInPercentage) (Return Type : Dictionary<string, List<SeriesItem>>) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetSumDataForMultiSeriesInPercentage_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetSumDataForMultiSeriesInPercentage, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_reportingChartInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (GetSumDataForMultiSeriesInPercentage) (Return Type : Dictionary<string, List<SeriesItem>>) Parameters Count verify
 
         [Test]
@@ -5251,36 +4402,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodGetAvgDataForMultiSeriesPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodGetAvgDataForMultiSeries, Fixture, methodGetAvgDataForMultiSeriesPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (GetAvgDataForMultiSeries) (Return Type : Dictionary<string, List<SeriesItem>>) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetAvgDataForMultiSeries_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var dtRaw = CreateType<DataTable>();
-            var category = CreateType<string>();
-            var rawMultiSeries = CreateType<string>();
-            var methodGetAvgDataForMultiSeriesPrametersTypes = new Type[] { typeof(DataTable), typeof(string), typeof(string) };
-            object[] parametersOfGetAvgDataForMultiSeries = { dtRaw, category, rawMultiSeries };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetAvgDataForMultiSeries, methodGetAvgDataForMultiSeriesPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfGetAvgDataForMultiSeries);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetAvgDataForMultiSeries.ShouldNotBeNull();
-            parametersOfGetAvgDataForMultiSeries.Length.ShouldBe(3);
-            methodGetAvgDataForMultiSeriesPrametersTypes.Length.ShouldBe(3);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -5352,27 +4473,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetAvgDataForMultiSeries) (Return Type : Dictionary<string, List<SeriesItem>>) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetAvgDataForMultiSeries_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetAvgDataForMultiSeries, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_reportingChartInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (GetAvgDataForMultiSeries) (Return Type : Dictionary<string, List<SeriesItem>>) Parameters Count verify
 
         [Test]
@@ -5400,36 +4500,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodGetAvgDataForMultiSeriesInPercentagePrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodGetAvgDataForMultiSeriesInPercentage, Fixture, methodGetAvgDataForMultiSeriesInPercentagePrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (GetAvgDataForMultiSeriesInPercentage) (Return Type : Dictionary<string, List<SeriesItem>>) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetAvgDataForMultiSeriesInPercentage_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var dtRaw = CreateType<DataTable>();
-            var category = CreateType<string>();
-            var rawMultiSeries = CreateType<string>();
-            var methodGetAvgDataForMultiSeriesInPercentagePrametersTypes = new Type[] { typeof(DataTable), typeof(string), typeof(string) };
-            object[] parametersOfGetAvgDataForMultiSeriesInPercentage = { dtRaw, category, rawMultiSeries };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetAvgDataForMultiSeriesInPercentage, methodGetAvgDataForMultiSeriesInPercentagePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfGetAvgDataForMultiSeriesInPercentage);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetAvgDataForMultiSeriesInPercentage.ShouldNotBeNull();
-            parametersOfGetAvgDataForMultiSeriesInPercentage.Length.ShouldBe(3);
-            methodGetAvgDataForMultiSeriesInPercentagePrametersTypes.Length.ShouldBe(3);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -5501,27 +4571,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetAvgDataForMultiSeriesInPercentage) (Return Type : Dictionary<string, List<SeriesItem>>) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetAvgDataForMultiSeriesInPercentage_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetAvgDataForMultiSeriesInPercentage, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_reportingChartInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (GetAvgDataForMultiSeriesInPercentage) (Return Type : Dictionary<string, List<SeriesItem>>) Parameters Count verify
 
         [Test]
@@ -5549,36 +4598,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodApplyColorToBaseSeriesForMulticolorPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodApplyColorToBaseSeriesForMulticolor, Fixture, methodApplyColorToBaseSeriesForMulticolorPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (ApplyColorToBaseSeriesForMulticolor) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_ApplyColorToBaseSeriesForMulticolor_Method_Call_Void_With_2_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sCol = CreateType<SeriesBase>();
-            var colorIndex = CreateType<int>();
-            var methodApplyColorToBaseSeriesForMulticolorPrametersTypes = new Type[] { typeof(SeriesBase), typeof(int) };
-            object[] parametersOfApplyColorToBaseSeriesForMulticolor = { sCol, colorIndex };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodApplyColorToBaseSeriesForMulticolor, methodApplyColorToBaseSeriesForMulticolorPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfApplyColorToBaseSeriesForMulticolor);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfApplyColorToBaseSeriesForMulticolor.ShouldNotBeNull();
-            parametersOfApplyColorToBaseSeriesForMulticolor.Length.ShouldBe(2);
-            methodApplyColorToBaseSeriesForMulticolorPrametersTypes.Length.ShouldBe(2);
-            methodApplyColorToBaseSeriesForMulticolorPrametersTypes.Length.ShouldBe(parametersOfApplyColorToBaseSeriesForMulticolor.Length);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -5677,35 +4696,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodApplyColorToBaseSeriesForSingleColorPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodApplyColorToBaseSeriesForSingleColor, Fixture, methodApplyColorToBaseSeriesForSingleColorPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (ApplyColorToBaseSeriesForSingleColor) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_ApplyColorToBaseSeriesForSingleColor_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var series = CreateType<SeriesBase>();
-            var methodApplyColorToBaseSeriesForSingleColorPrametersTypes = new Type[] { typeof(SeriesBase) };
-            object[] parametersOfApplyColorToBaseSeriesForSingleColor = { series };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodApplyColorToBaseSeriesForSingleColor, methodApplyColorToBaseSeriesForSingleColorPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfApplyColorToBaseSeriesForSingleColor);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfApplyColorToBaseSeriesForSingleColor.ShouldNotBeNull();
-            parametersOfApplyColorToBaseSeriesForSingleColor.Length.ShouldBe(1);
-            methodApplyColorToBaseSeriesForSingleColorPrametersTypes.Length.ShouldBe(1);
-            methodApplyColorToBaseSeriesForSingleColorPrametersTypes.Length.ShouldBe(parametersOfApplyColorToBaseSeriesForSingleColor.Length);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -5954,51 +4944,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetToolParts) (Return Type : ToolPart[]) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetToolParts_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _reportingChartInstance.GetToolParts();
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetToolParts) (Return Type : ToolPart[]) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetToolParts_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodGetToolPartsPrametersTypes = null;
-            object[] parametersOfGetToolParts = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetToolParts, methodGetToolPartsPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfGetToolParts);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetToolParts.ShouldBeNull();
-            methodGetToolPartsPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (GetToolParts) (Return Type : ToolPart[]) No Exception with encapsulation Thrown
 
         [Test]
@@ -6017,26 +4962,6 @@ namespace EPMLiveWebParts.ReportingChart
             parametersOfGetToolParts.ShouldBeNull();
             methodGetToolPartsPrametersTypes.ShouldBeNull();
             Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetToolParts) (Return Type : ToolPart[]) Results Not Null Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetToolParts_Method_Call_Dynamic_Invoking_Results_Not_Null_Test()
-        {
-            // Arrange
-            Type [] methodGetToolPartsPrametersTypes = null;
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodGetToolParts, Fixture, methodGetToolPartsPrametersTypes);
-
-            // Assert
-            result.ShouldNotBeNull();
-            methodGetToolPartsPrametersTypes.ShouldBeNull();
         }
 
         #endregion
@@ -6062,27 +4987,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetToolParts) (Return Type : ToolPart[]) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetToolParts_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetToolParts, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_reportingChartInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (RebuildControlTree) (Return Type : void) private call definition
 
         [ExcludeFromCodeCoverage]
@@ -6090,51 +4994,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodRebuildControlTreePrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodRebuildControlTree, Fixture, methodRebuildControlTreePrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (RebuildControlTree) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_RebuildControlTree_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _reportingChartInstance.RebuildControlTree();
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (RebuildControlTree) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_RebuildControlTree_Method_Call_Void_With_No_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodRebuildControlTreePrametersTypes = null;
-            object[] parametersOfRebuildControlTree = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodRebuildControlTree, methodRebuildControlTreePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfRebuildControlTree);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfRebuildControlTree.ShouldBeNull();
-            methodRebuildControlTreePrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -6209,55 +5068,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodSetXFieldValuePrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodSetXFieldValue, Fixture, methodSetXFieldValuePrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (SetXFieldValue) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_SetXFieldValue_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var xFld = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _reportingChartInstance.SetXFieldValue(xFld);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (SetXFieldValue) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_SetXFieldValue_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var xFld = CreateType<string>();
-            var methodSetXFieldValuePrametersTypes = new Type[] { typeof(string) };
-            object[] parametersOfSetXFieldValue = { xFld };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetXFieldValue, methodSetXFieldValuePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfSetXFieldValue);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetXFieldValue.ShouldNotBeNull();
-            parametersOfSetXFieldValue.Length.ShouldBe(1);
-            methodSetXFieldValuePrametersTypes.Length.ShouldBe(1);
-            methodSetXFieldValuePrametersTypes.Length.ShouldBe(parametersOfSetXFieldValue.Length);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -6355,55 +5165,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodSetXFieldLabelPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodSetXFieldLabel, Fixture, methodSetXFieldLabelPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (SetXFieldLabel) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_SetXFieldLabel_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var xFld = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _reportingChartInstance.SetXFieldLabel(xFld);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (SetXFieldLabel) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_SetXFieldLabel_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var xFld = CreateType<string>();
-            var methodSetXFieldLabelPrametersTypes = new Type[] { typeof(string) };
-            object[] parametersOfSetXFieldLabel = { xFld };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetXFieldLabel, methodSetXFieldLabelPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfSetXFieldLabel);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetXFieldLabel.ShouldNotBeNull();
-            parametersOfSetXFieldLabel.Length.ShouldBe(1);
-            methodSetXFieldLabelPrametersTypes.Length.ShouldBe(1);
-            methodSetXFieldLabelPrametersTypes.Length.ShouldBe(parametersOfSetXFieldLabel.Length);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -6651,55 +5412,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (SetYFieldsLabels) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_SetYFieldsLabels_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var yFields = CreateType<string[]>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _reportingChartInstance.SetYFieldsLabels(yFields);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (SetYFieldsLabels) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_SetYFieldsLabels_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var yFields = CreateType<string[]>();
-            var methodSetYFieldsLabelsPrametersTypes = new Type[] { typeof(string[]) };
-            object[] parametersOfSetYFieldsLabels = { yFields };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetYFieldsLabels, methodSetYFieldsLabelsPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfSetYFieldsLabels);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetYFieldsLabels.ShouldNotBeNull();
-            parametersOfSetYFieldsLabels.Length.ShouldBe(1);
-            methodSetYFieldsLabelsPrametersTypes.Length.ShouldBe(1);
-            methodSetYFieldsLabelsPrametersTypes.Length.ShouldBe(parametersOfSetYFieldsLabels.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (SetYFieldsLabels) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -6797,25 +5509,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetYFieldsValues) (Return Type : string[]) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetYFieldsValues_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _reportingChartInstance.GetYFieldsValues();
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
         #region Method Call : (GetYFieldsValues) (Return Type : string[]) No Exception with encapsulation Thrown
 
         [Test]
@@ -6834,26 +5527,6 @@ namespace EPMLiveWebParts.ReportingChart
             parametersOfGetYFieldsValues.ShouldBeNull();
             methodGetYFieldsValuesPrametersTypes.ShouldBeNull();
             Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetYFieldsValues) (Return Type : string[]) Results Not Null Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetYFieldsValues_Method_Call_Dynamic_Invoking_Results_Not_Null_Test()
-        {
-            // Arrange
-            Type [] methodGetYFieldsValuesPrametersTypes = null;
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodGetYFieldsValues, Fixture, methodGetYFieldsValuesPrametersTypes);
-
-            // Assert
-            result.ShouldNotBeNull();
-            methodGetYFieldsValuesPrametersTypes.ShouldBeNull();
         }
 
         #endregion
@@ -6911,25 +5584,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (GetYFieldsLabel) (Return Type : string) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetYFieldsLabel_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _reportingChartInstance.GetYFieldsLabel();
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
         #region Method Call : (GetYFieldsLabel) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -6948,26 +5602,6 @@ namespace EPMLiveWebParts.ReportingChart
             parametersOfGetYFieldsLabel.ShouldBeNull();
             methodGetYFieldsLabelPrametersTypes.ShouldBeNull();
             Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetYFieldsLabel) (Return Type : string) Results Not Null Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_GetYFieldsLabel_Method_Call_Dynamic_Invoking_Results_Not_Null_Test()
-        {
-            // Arrange
-            Type [] methodGetYFieldsLabelPrametersTypes = null;
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodGetYFieldsLabel, Fixture, methodGetYFieldsLabelPrametersTypes);
-
-            // Assert
-            result.ShouldNotBeNull();
-            methodGetYFieldsLabelPrametersTypes.ShouldBeNull();
         }
 
         #endregion
@@ -7083,32 +5717,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (IsBubbleChart) (Return Type : bool) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_IsBubbleChart_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodIsBubbleChartPrametersTypes = null;
-            object[] parametersOfIsBubbleChart = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodIsBubbleChart, methodIsBubbleChartPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartInstanceFixture, parametersOfIsBubbleChart);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfIsBubbleChart.ShouldBeNull();
-            methodIsBubbleChartPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (IsBubbleChart) (Return Type : bool) No Exception with encapsulation Thrown
 
         [Test]
@@ -7131,46 +5739,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (IsBubbleChart) (Return Type : bool) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_IsBubbleChart_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
-        {
-            // Arrange
-            Type [] methodIsBubbleChartPrametersTypes = null;
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodIsBubbleChart, Fixture, methodIsBubbleChartPrametersTypes);
-
-            // Assert
-            result.ShouldNotBeNull();
-            methodIsBubbleChartPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (IsBubbleChart) (Return Type : bool) Results Not Null Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_IsBubbleChart_Method_Call_Dynamic_Invoking_Results_Not_Null_Test()
-        {
-            // Arrange
-            Type [] methodIsBubbleChartPrametersTypes = null;
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartInstance, MethodIsBubbleChart, Fixture, methodIsBubbleChartPrametersTypes);
-
-            // Assert
-            result.ShouldNotBeNull();
-            methodIsBubbleChartPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (IsBubbleChart) (Return Type : bool) Invoke Should Not Throw
 
         [Test]
@@ -7188,27 +5756,6 @@ namespace EPMLiveWebParts.ReportingChart
             // Assert
             Should.NotThrow(currentAction);
             methodIsBubbleChartPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (IsBubbleChart) (Return Type : bool) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingChart_IsBubbleChart_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodIsBubbleChart, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_reportingChartInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
         }
 
         #endregion

@@ -181,60 +181,6 @@ namespace ReportFiltering.DomainServices
 
         #endregion
 
-        #region Method Call : (GetQueryForFiltering) (Return Type : string) Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportFilterQueryService_GetQueryForFiltering_Static_Method_DirectCall_Throw_Exception_Test()
-        {
-            // Arrange
-            var fieldSelection = CreateType<ReportFilterSelection>();
-            var applyNonArchivedFilter = CreateType<bool>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => ReportFilterQueryService.GetQueryForFiltering(fieldSelection, applyNonArchivedFilter);
-
-            // Assert
-            Should.Throw<Exception>(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetQueryForFiltering) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportFilterQueryService_GetQueryForFiltering_Static_Method_Call_With_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var fieldSelection = CreateType<ReportFilterSelection>();
-            var applyNonArchivedFilter = CreateType<bool>();
-            var methodGetQueryForFilteringPrametersTypes = new Type[] { typeof(ReportFilterSelection), typeof(bool) };
-            object[] parametersOfGetQueryForFiltering = { fieldSelection, applyNonArchivedFilter };
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetQueryForFiltering, methodGetQueryForFilteringPrametersTypes, out exception);
-
-            // Act
-            var result1 = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_reportFilterQueryServiceInstanceFixture, _reportFilterQueryServiceInstanceType, MethodGetQueryForFiltering, Fixture, methodGetQueryForFilteringPrametersTypes);
-            var result2 = ReflectionAnalyzer.GetResultOfStaticMethod<string>(_reportFilterQueryServiceInstanceFixture, _reportFilterQueryServiceInstanceType, MethodGetQueryForFiltering, parametersOfGetQueryForFiltering, methodGetQueryForFilteringPrametersTypes);
-            Action currentAction = () => methodInfo.Invoke(_reportFilterQueryServiceInstanceFixture, parametersOfGetQueryForFiltering);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
-            parametersOfGetQueryForFiltering.ShouldNotBeNull();
-            parametersOfGetQueryForFiltering.Length.ShouldBe(2);
-            methodGetQueryForFilteringPrametersTypes.Length.ShouldBe(2);
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (GetQueryForFiltering) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -256,26 +202,6 @@ namespace ReportFiltering.DomainServices
             parametersOfGetQueryForFiltering.Length.ShouldBe(2);
             methodGetQueryForFilteringPrametersTypes.Length.ShouldBe(2);
             Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetQueryForFiltering) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportFilterQueryService_GetQueryForFiltering_Static_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
-        {
-            // Arrange
-            var methodGetQueryForFilteringPrametersTypes = new Type[] { typeof(ReportFilterSelection), typeof(bool) };
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_reportFilterQueryServiceInstanceFixture, _reportFilterQueryServiceInstanceType, MethodGetQueryForFiltering, Fixture, methodGetQueryForFilteringPrametersTypes);
-
-            // Assert
-            result.ShouldBeNull();
-            methodGetQueryForFilteringPrametersTypes.Length.ShouldBe(2);
         }
 
         #endregion
@@ -329,39 +255,6 @@ namespace ReportFiltering.DomainServices
         {
             var methodGetFilterForMultiSelectPrametersTypes = types;
             ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_reportFilterQueryServiceInstanceFixture, _reportFilterQueryServiceInstanceType, MethodGetFilterForMultiSelect, Fixture, methodGetFilterForMultiSelectPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (GetFilterForMultiSelect) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportFilterQueryService_GetFilterForMultiSelect_Static_Method_Call_With_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var fieldSelection = CreateType<ReportFilterSelection>();
-            var applyNonArchivedFilter = CreateType<bool>();
-            var methodGetFilterForMultiSelectPrametersTypes = new Type[] { typeof(ReportFilterSelection), typeof(bool) };
-            object[] parametersOfGetFilterForMultiSelect = { fieldSelection, applyNonArchivedFilter };
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetFilterForMultiSelect, methodGetFilterForMultiSelectPrametersTypes, out exception);
-
-            // Act
-            var result1 = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_reportFilterQueryServiceInstanceFixture, _reportFilterQueryServiceInstanceType, MethodGetFilterForMultiSelect, Fixture, methodGetFilterForMultiSelectPrametersTypes);
-            var result2 = ReflectionAnalyzer.GetResultOfStaticMethod<string>(_reportFilterQueryServiceInstanceFixture, _reportFilterQueryServiceInstanceType, MethodGetFilterForMultiSelect, parametersOfGetFilterForMultiSelect, methodGetFilterForMultiSelectPrametersTypes);
-            Action currentAction = () => methodInfo.Invoke(_reportFilterQueryServiceInstanceFixture, parametersOfGetFilterForMultiSelect);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
-            parametersOfGetFilterForMultiSelect.ShouldNotBeNull();
-            parametersOfGetFilterForMultiSelect.Length.ShouldBe(2);
-            methodGetFilterForMultiSelectPrametersTypes.Length.ShouldBe(2);
-            Should.Throw<Exception>(currentAction);
         }
 
         #endregion
@@ -460,39 +353,6 @@ namespace ReportFiltering.DomainServices
         {
             var methodGetFilterForSingleSelectPrametersTypes = types;
             ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_reportFilterQueryServiceInstanceFixture, _reportFilterQueryServiceInstanceType, MethodGetFilterForSingleSelect, Fixture, methodGetFilterForSingleSelectPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (GetFilterForSingleSelect) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportFilterQueryService_GetFilterForSingleSelect_Static_Method_Call_With_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var fieldSelection = CreateType<ReportFilterSelection>();
-            var applyNonArchivedFilter = CreateType<bool>();
-            var methodGetFilterForSingleSelectPrametersTypes = new Type[] { typeof(ReportFilterSelection), typeof(bool) };
-            object[] parametersOfGetFilterForSingleSelect = { fieldSelection, applyNonArchivedFilter };
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetFilterForSingleSelect, methodGetFilterForSingleSelectPrametersTypes, out exception);
-
-            // Act
-            var result1 = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_reportFilterQueryServiceInstanceFixture, _reportFilterQueryServiceInstanceType, MethodGetFilterForSingleSelect, Fixture, methodGetFilterForSingleSelectPrametersTypes);
-            var result2 = ReflectionAnalyzer.GetResultOfStaticMethod<string>(_reportFilterQueryServiceInstanceFixture, _reportFilterQueryServiceInstanceType, MethodGetFilterForSingleSelect, parametersOfGetFilterForSingleSelect, methodGetFilterForSingleSelectPrametersTypes);
-            Action currentAction = () => methodInfo.Invoke(_reportFilterQueryServiceInstanceFixture, parametersOfGetFilterForSingleSelect);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
-            parametersOfGetFilterForSingleSelect.ShouldNotBeNull();
-            parametersOfGetFilterForSingleSelect.Length.ShouldBe(2);
-            methodGetFilterForSingleSelectPrametersTypes.Length.ShouldBe(2);
-            Should.Throw<Exception>(currentAction);
         }
 
         #endregion
@@ -719,39 +579,6 @@ namespace ReportFiltering.DomainServices
 
         #endregion
 
-        #region Method Call : (GetFilterForDateTime) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportFilterQueryService_GetFilterForDateTime_Static_Method_Call_With_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var fieldSelection = CreateType<ReportFilterSelection>();
-            var applyNonArchivedFilter = CreateType<bool>();
-            var methodGetFilterForDateTimePrametersTypes = new Type[] { typeof(ReportFilterSelection), typeof(bool) };
-            object[] parametersOfGetFilterForDateTime = { fieldSelection, applyNonArchivedFilter };
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetFilterForDateTime, methodGetFilterForDateTimePrametersTypes, out exception);
-
-            // Act
-            var result1 = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_reportFilterQueryServiceInstanceFixture, _reportFilterQueryServiceInstanceType, MethodGetFilterForDateTime, Fixture, methodGetFilterForDateTimePrametersTypes);
-            var result2 = ReflectionAnalyzer.GetResultOfStaticMethod<string>(_reportFilterQueryServiceInstanceFixture, _reportFilterQueryServiceInstanceType, MethodGetFilterForDateTime, parametersOfGetFilterForDateTime, methodGetFilterForDateTimePrametersTypes);
-            Action currentAction = () => methodInfo.Invoke(_reportFilterQueryServiceInstanceFixture, parametersOfGetFilterForDateTime);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
-            parametersOfGetFilterForDateTime.ShouldNotBeNull();
-            parametersOfGetFilterForDateTime.Length.ShouldBe(2);
-            methodGetFilterForDateTimePrametersTypes.Length.ShouldBe(2);
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (GetFilterForDateTime) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -846,39 +673,6 @@ namespace ReportFiltering.DomainServices
         {
             var methodGetFilterForUserPrametersTypes = types;
             ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_reportFilterQueryServiceInstanceFixture, _reportFilterQueryServiceInstanceType, MethodGetFilterForUser, Fixture, methodGetFilterForUserPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (GetFilterForUser) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportFilterQueryService_GetFilterForUser_Static_Method_Call_With_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var fieldSelection = CreateType<ReportFilterSelection>();
-            var applyNonArchivedFilter = CreateType<bool>();
-            var methodGetFilterForUserPrametersTypes = new Type[] { typeof(ReportFilterSelection), typeof(bool) };
-            object[] parametersOfGetFilterForUser = { fieldSelection, applyNonArchivedFilter };
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetFilterForUser, methodGetFilterForUserPrametersTypes, out exception);
-
-            // Act
-            var result1 = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_reportFilterQueryServiceInstanceFixture, _reportFilterQueryServiceInstanceType, MethodGetFilterForUser, Fixture, methodGetFilterForUserPrametersTypes);
-            var result2 = ReflectionAnalyzer.GetResultOfStaticMethod<string>(_reportFilterQueryServiceInstanceFixture, _reportFilterQueryServiceInstanceType, MethodGetFilterForUser, parametersOfGetFilterForUser, methodGetFilterForUserPrametersTypes);
-            Action currentAction = () => methodInfo.Invoke(_reportFilterQueryServiceInstanceFixture, parametersOfGetFilterForUser);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
-            parametersOfGetFilterForUser.ShouldNotBeNull();
-            parametersOfGetFilterForUser.Length.ShouldBe(2);
-            methodGetFilterForUserPrametersTypes.Length.ShouldBe(2);
-            Should.Throw<Exception>(currentAction);
         }
 
         #endregion

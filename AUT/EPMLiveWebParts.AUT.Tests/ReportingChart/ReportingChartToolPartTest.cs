@@ -1034,35 +1034,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (SetXAxisField) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportingChartToolPart_SetXAxisField_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var chartWp = CreateType<ReportingChart>();
-            var methodSetXAxisFieldPrametersTypes = new Type[] { typeof(ReportingChart) };
-            object[] parametersOfSetXAxisField = { chartWp };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetXAxisField, methodSetXAxisFieldPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartToolPartInstanceFixture, parametersOfSetXAxisField);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetXAxisField.ShouldNotBeNull();
-            parametersOfSetXAxisField.Length.ShouldBe(1);
-            methodSetXAxisFieldPrametersTypes.Length.ShouldBe(1);
-            methodSetXAxisFieldPrametersTypes.Length.ShouldBe(parametersOfSetXAxisField.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (SetXAxisField) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -1156,35 +1127,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodSetYAxisFieldPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartToolPartInstance, MethodSetYAxisField, Fixture, methodSetYAxisFieldPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (SetYAxisField) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportingChartToolPart_SetYAxisField_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var chartWp = CreateType<ReportingChart>();
-            var methodSetYAxisFieldPrametersTypes = new Type[] { typeof(ReportingChart) };
-            object[] parametersOfSetYAxisField = { chartWp };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetYAxisField, methodSetYAxisFieldPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartToolPartInstanceFixture, parametersOfSetYAxisField);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetYAxisField.ShouldNotBeNull();
-            parametersOfSetYAxisField.Length.ShouldBe(1);
-            methodSetYAxisFieldPrametersTypes.Length.ShouldBe(1);
-            methodSetYAxisFieldPrametersTypes.Length.ShouldBe(parametersOfSetYAxisField.Length);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -1632,35 +1574,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodLoadAndSetViewsPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartToolPartInstance, MethodLoadAndSetViews, Fixture, methodLoadAndSetViewsPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (LoadAndSetViews) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportingChartToolPart_LoadAndSetViews_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var chart = CreateType<ReportingChart>();
-            var methodLoadAndSetViewsPrametersTypes = new Type[] { typeof(ReportingChart) };
-            object[] parametersOfLoadAndSetViews = { chart };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodLoadAndSetViews, methodLoadAndSetViewsPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartToolPartInstanceFixture, parametersOfLoadAndSetViews);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfLoadAndSetViews.ShouldNotBeNull();
-            parametersOfLoadAndSetViews.Length.ShouldBe(1);
-            methodLoadAndSetViewsPrametersTypes.Length.ShouldBe(1);
-            methodLoadAndSetViewsPrametersTypes.Length.ShouldBe(parametersOfLoadAndSetViews.Length);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -2288,35 +2201,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (SetDropDownListSelectedValues) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportingChartToolPart_SetDropDownListSelectedValues_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var chart = CreateType<ReportingChart>();
-            var methodSetDropDownListSelectedValuesPrametersTypes = new Type[] { typeof(ReportingChart) };
-            object[] parametersOfSetDropDownListSelectedValues = { chart };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetDropDownListSelectedValues, methodSetDropDownListSelectedValuesPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartToolPartInstanceFixture, parametersOfSetDropDownListSelectedValues);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetDropDownListSelectedValues.ShouldNotBeNull();
-            parametersOfSetDropDownListSelectedValues.Length.ShouldBe(1);
-            methodSetDropDownListSelectedValuesPrametersTypes.Length.ShouldBe(1);
-            methodSetDropDownListSelectedValuesPrametersTypes.Length.ShouldBe(parametersOfSetDropDownListSelectedValues.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (SetDropDownListSelectedValues) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -2410,35 +2294,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodSetYFieldControlValuesPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartToolPartInstance, MethodSetYFieldControlValues, Fixture, methodSetYFieldControlValuesPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (SetYFieldControlValues) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportingChartToolPart_SetYFieldControlValues_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var chart = CreateType<ReportingChart>();
-            var methodSetYFieldControlValuesPrametersTypes = new Type[] { typeof(ReportingChart) };
-            object[] parametersOfSetYFieldControlValues = { chart };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetYFieldControlValues, methodSetYFieldControlValuesPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartToolPartInstanceFixture, parametersOfSetYFieldControlValues);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetYFieldControlValues.ShouldNotBeNull();
-            parametersOfSetYFieldControlValues.Length.ShouldBe(1);
-            methodSetYFieldControlValuesPrametersTypes.Length.ShouldBe(1);
-            methodSetYFieldControlValuesPrametersTypes.Length.ShouldBe(parametersOfSetYFieldControlValues.Length);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -2765,35 +2620,6 @@ namespace EPMLiveWebParts.ReportingChart
 
         #endregion
 
-        #region Method Call : (SetupCheckBoxes) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportingChartToolPart_SetupCheckBoxes_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var chart = CreateType<ReportingChart>();
-            var methodSetupCheckBoxesPrametersTypes = new Type[] { typeof(ReportingChart) };
-            object[] parametersOfSetupCheckBoxes = { chart };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetupCheckBoxes, methodSetupCheckBoxesPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartToolPartInstanceFixture, parametersOfSetupCheckBoxes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetupCheckBoxes.ShouldNotBeNull();
-            parametersOfSetupCheckBoxes.Length.ShouldBe(1);
-            methodSetupCheckBoxesPrametersTypes.Length.ShouldBe(1);
-            methodSetupCheckBoxesPrametersTypes.Length.ShouldBe(parametersOfSetupCheckBoxes.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (SetupCheckBoxes) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -2887,35 +2713,6 @@ namespace EPMLiveWebParts.ReportingChart
         {
             var methodSetTextBoxValuesPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_reportingChartToolPartInstance, MethodSetTextBoxValues, Fixture, methodSetTextBoxValuesPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (SetTextBoxValues) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportingChartToolPart_SetTextBoxValues_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var chart = CreateType<ReportingChart>();
-            var methodSetTextBoxValuesPrametersTypes = new Type[] { typeof(ReportingChart) };
-            object[] parametersOfSetTextBoxValues = { chart };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetTextBoxValues, methodSetTextBoxValuesPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingChartToolPartInstanceFixture, parametersOfSetTextBoxValues);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetTextBoxValues.ShouldNotBeNull();
-            parametersOfSetTextBoxValues.Length.ShouldBe(1);
-            methodSetTextBoxValuesPrametersTypes.Length.ShouldBe(1);
-            methodSetTextBoxValuesPrametersTypes.Length.ShouldBe(parametersOfSetTextBoxValues.Length);
-            Should.NotThrow(currentAction);
         }
 
         #endregion

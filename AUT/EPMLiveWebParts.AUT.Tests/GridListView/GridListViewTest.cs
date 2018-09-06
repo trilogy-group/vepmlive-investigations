@@ -3975,26 +3975,6 @@ namespace EPMLiveWebParts
 
         #endregion
 
-        #region Method Call : (RenderSearchTypesSelect) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_RenderSearchTypesSelect_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
-        {
-            // Arrange
-            Type [] methodRenderSearchTypesSelectPrametersTypes = null;
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_gridListViewInstance, MethodRenderSearchTypesSelect, Fixture, methodRenderSearchTypesSelectPrametersTypes);
-
-            // Assert
-            result.ShouldBeNull();
-            methodRenderSearchTypesSelectPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (RenderSearchTypesSelect) (Return Type : string) Invoke Should Not Throw
 
         [Test]
@@ -4125,26 +4105,6 @@ namespace EPMLiveWebParts
 
         #endregion
 
-        #region Method Call : (RenderFunctionSearchKeyPress) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_RenderFunctionSearchKeyPress_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
-        {
-            // Arrange
-            Type [] methodRenderFunctionSearchKeyPressPrametersTypes = null;
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_gridListViewInstance, MethodRenderFunctionSearchKeyPress, Fixture, methodRenderFunctionSearchKeyPressPrametersTypes);
-
-            // Assert
-            result.ShouldBeNull();
-            methodRenderFunctionSearchKeyPressPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (RenderFunctionSearchKeyPress) (Return Type : string) Invoke Should Not Throw
 
         [Test]
@@ -4195,26 +4155,6 @@ namespace EPMLiveWebParts
             parametersOfRenderFunctionEnableSearcher.ShouldBeNull();
             methodRenderFunctionEnableSearcherPrametersTypes.ShouldBeNull();
             Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
-        #region Method Call : (RenderFunctionEnableSearcher) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_RenderFunctionEnableSearcher_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
-        {
-            // Arrange
-            Type [] methodRenderFunctionEnableSearcherPrametersTypes = null;
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_gridListViewInstance, MethodRenderFunctionEnableSearcher, Fixture, methodRenderFunctionEnableSearcherPrametersTypes);
-
-            // Assert
-            result.ShouldBeNull();
-            methodRenderFunctionEnableSearcherPrametersTypes.ShouldBeNull();
         }
 
         #endregion
@@ -4347,26 +4287,6 @@ namespace EPMLiveWebParts
 
         #endregion
 
-        #region Method Call : (RenderFunctionUnSearch) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_RenderFunctionUnSearch_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
-        {
-            // Arrange
-            Type [] methodRenderFunctionUnSearchPrametersTypes = null;
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_gridListViewInstance, MethodRenderFunctionUnSearch, Fixture, methodRenderFunctionUnSearchPrametersTypes);
-
-            // Assert
-            result.ShouldBeNull();
-            methodRenderFunctionUnSearchPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (RenderFunctionUnSearch) (Return Type : string) Invoke Should Not Throw
 
         [Test]
@@ -4491,26 +4411,6 @@ namespace EPMLiveWebParts
             parametersOfRenderFunctionSwitchToSearch.ShouldBeNull();
             methodRenderFunctionSwitchToSearchPrametersTypes.ShouldBeNull();
             Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
-        #region Method Call : (RenderFunctionSwitchToSearch) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_RenderFunctionSwitchToSearch_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
-        {
-            // Arrange
-            Type [] methodRenderFunctionSwitchToSearchPrametersTypes = null;
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_gridListViewInstance, MethodRenderFunctionSwitchToSearch, Fixture, methodRenderFunctionSwitchToSearchPrametersTypes);
-
-            // Assert
-            result.ShouldBeNull();
-            methodRenderFunctionSwitchToSearchPrametersTypes.ShouldBeNull();
         }
 
         #endregion
