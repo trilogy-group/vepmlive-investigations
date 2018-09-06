@@ -3086,6 +3086,12 @@
 	            var lloc = (this.UserViews[indx].Id == 0 ? 0 : 1);
 
 	            var uv = this.UserViews[indx];
+
+	            if (uv.Deflt == 1) {
+	                alert("Default view can not be deleted");
+	                return;
+	            }
+
 	            this.CurrUserView = "";
 
 	            WorkEnginePPM.Model.DeleteUserViewData(this.TicketVal, SelViewName, lloc, LoadUserViewDataCompleteDelegate);
