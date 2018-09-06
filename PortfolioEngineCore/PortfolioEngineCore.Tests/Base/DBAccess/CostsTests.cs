@@ -1,27 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.QualityTools.Testing.Fakes;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Data;
 using System.Data.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PortfolioEngineCore.Tests.Base.DBAccess
 {
-
-    using PortfolioEngineCore.Fakes;
+    using Fakes;
 
     [TestClass]
     public class CostsTests
     {
         private const string DummyString = "DummyString";
+        private const string GetDetailValuesCostTypesAndCalendarsMethodName = "GetDetailValuesCostTypesAndCalendars";
+        private static int ReadIntValueReturnValue = 1;
         private IDisposable shimContext;
         private ShimDBAccess dbaAccess;
-        private string GetDetailValuesCostTypesAndCalendarsMethodName = "GetDetailValuesCostTypesAndCalendars";
 
         [TestInitialize]
         public void Initialize()
@@ -56,10 +53,22 @@ namespace PortfolioEngineCore.Tests.Base.DBAccess
             return StatusEnum.rsSessionExpired;
         }
 
+        private StatusEnum SelectDataStatusEnumSuccess(SqlDb sqlDb, SqlCommand sqlCommand, StatusEnum statusEnum, out DataTable dataTable)
+        {
+            dataTable = new DataTable();
+            return StatusEnum.rsSuccess;
+        }
+
         private int ReadIntValueTrue(object objectValue, out bool isNull)
         {
             isNull = false;
-            return 1;
+            return ReadIntValueReturnValue;
+        }
+
+        private int ReadIntValueIsNull(object objectValue, out bool isNull)
+        {
+            isNull = true;
+            return 0;
         }
 
         private StatusEnum SelectDataSuccess(SqlDb dba, string commandText, StatusEnum statusError, out DataTable dataTable)
@@ -918,7 +927,7 @@ namespace PortfolioEngineCore.Tests.Base.DBAccess
         }
 
         [TestMethod]
-        public void UpdateCostDetailValuesWithNewDiscount_Should_ExecuteNonQuery()
+        public void UpdateCostDetailValuesWithNewDiscount_Should_ExecuteCorrectly()
         {
             // Arrange
             var queryExecuted = false;
@@ -927,6 +936,8 @@ namespace PortfolioEngineCore.Tests.Base.DBAccess
                 queryExecuted = true;
                 return 1;
             };
+            ShimdbaEditCosts.GetDetailValuesCostTypesAndCalendarsDBAccessInt32 = 
+                (dba, projectId) => new int[][] { new int[] { 1, 2 }  };
 
             // Act
             dbaEditCosts.UpdateCostValuesAfterDiscountChanged(dbaAccess, 1, 1);
@@ -936,7 +947,29 @@ namespace PortfolioEngineCore.Tests.Base.DBAccess
         }
 
         [TestMethod]
-        public void GetDetailValuesCostTypesAndCalendars()
+        public void UpdateCostDetailValuesWithNewDiscount_OnException_HandleStatusError()
+        {
+            // Arrange
+            var handleStatusError = false;
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            {
+                throw new Exception();
+            };
+            ShimSqlDb.AllInstances.HandleStatusErrorSeverityEnumStringStatusEnumStringBoolean = (_, severity, function, status, text, skipLog) =>
+            {
+                handleStatusError = true;
+                return StatusEnum.rsServerError;
+            };
+
+            // Act
+            dbaEditCosts.UpdateCostValuesAfterDiscountChanged(dbaAccess, 1, 1);
+
+            // Assert
+            Assert.IsTrue(handleStatusError);
+        }
+
+        [TestMethod]
+        public void GetDetailValuesCostTypesAndCalendars_Should_ReturnValue()
         {
             // Arrange
             var privateType = new PrivateType(typeof(dbaEditCosts));
@@ -956,10 +989,53 @@ namespace PortfolioEngineCore.Tests.Base.DBAccess
             Assert.IsNotNull(result);
         }
 
-        private StatusEnum SelectDataStatusEnumSuccess(SqlDb sqlDb, SqlCommand sqlCommand, StatusEnum statusEnum, out DataTable dataTable)
+        [TestMethod]
+        public void CheckCostTypeSecurity_IsNullReadAndIsNullEdit_ReturnsFalse()
         {
-            dataTable = new DataTable();
-            return StatusEnum.rsSuccess;
+            // Arrange
+            var costTypeEditMode = 0;
+            var dba = dbaAccess.Instance;
+            dba.UserWResID = 2;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () => true,
+                Close = () => { },
+                ItemGetString = name => new object()
+            };
+            ShimSqlDb.ReadIntValueObject = valueObject => 1;
+            ShimSqlDb.ReadIntValueObjectBooleanOut = ReadIntValueIsNull;
+
+            // Act
+            var result = dbaEditCosts.CheckCostTypeSecurity(dba, 1, ref costTypeEditMode);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void CheckCostTypeSecurity_CanEditAndCanRead0_ReturnsFalse()
+        {
+            // Arrange
+            var costTypeEditMode = 0;
+            var dba = dbaAccess.Instance;
+            dba.UserWResID = 2;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () => true,
+                Close = () => { },
+                ItemGetString = name => new object()
+            };
+            ReadIntValueReturnValue = 0;
+            ShimSqlDb.ReadIntValueObject = valueObject => 1;
+            ShimSqlDb.ReadIntValueObjectBooleanOut = ReadIntValueTrue;
+
+            // Act
+            var result = dbaEditCosts.CheckCostTypeSecurity(dba, 1, ref costTypeEditMode);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsFalse(result);
         }
     }
 }
