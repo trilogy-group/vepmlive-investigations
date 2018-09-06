@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -14,11 +15,12 @@ using Shouldly;
 namespace EPMLiveCore.Tests
 {
     [TestClass]
+    [ExcludeFromCodeCoverage]
     public class EditableFieldDisplayTests
     {
-        private EditableFieldDisplay _testObj;
-        private PrivateObject _privateObj;
-        private IDisposable _shimsContext;
+        private EditableFieldDisplay testObj;
+        private PrivateObject privateObj;
+        private IDisposable shimsContext;
         private ShimSPField spField;
         private Dictionary<string, Dictionary<string, string>> fieldProperties;
         private ShimSPListItem listItem;
@@ -41,15 +43,15 @@ namespace EPMLiveCore.Tests
         [TestInitialize]
         public void Setup()
         {
-            _testObj = new EditableFieldDisplay();
-            _privateObj = new PrivateObject(_testObj);
+            testObj = new EditableFieldDisplay();
+            privateObj = new PrivateObject(testObj);
 
             SetupShims();
         }
 
         private void SetupShims()
         {
-            _shimsContext = ShimsContext.Create();
+            shimsContext = ShimsContext.Create();
 
             guid = Guid.NewGuid();
 
@@ -83,7 +85,7 @@ namespace EPMLiveCore.Tests
         [TestCleanup]
         public void TearDown()
         {
-            _shimsContext?.Dispose();
+            shimsContext?.Dispose();
         }
 
         [TestMethod]
@@ -100,7 +102,7 @@ namespace EPMLiveCore.Tests
             };
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 CanEditMethodName,
                 BindingFlags.Static | BindingFlags.Public,
                 new object[] { spField.Instance, fieldProperties, listItem.Instance });
@@ -123,7 +125,7 @@ namespace EPMLiveCore.Tests
             };
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 CanEditMethodName,
                 BindingFlags.Static | BindingFlags.Public,
                 new object[] { spField.Instance, fieldProperties, listItem.Instance });
@@ -143,7 +145,7 @@ namespace EPMLiveCore.Tests
             ShimEditableFieldDisplay.WhereUserStringString = (_, _1) => expected;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 RenderFieldMethodName,
                 BindingFlags.Static | BindingFlags.Public,
                 new object[] { spField.Instance, where, conditionField, string.Empty, string.Empty, string.Empty, listItem.Instance });
@@ -167,7 +169,7 @@ namespace EPMLiveCore.Tests
             ShimEditableFieldDisplay.WhereFieldSPFieldStringStringStringSPListItem = (_, _1, _2, _3, _4) => expected;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 RenderFieldMethodName,
                 BindingFlags.Static | BindingFlags.Public,
                 new object[] { spField.Instance, where, conditionField, string.Empty, string.Empty, string.Empty, listItem.Instance });
@@ -186,7 +188,7 @@ namespace EPMLiveCore.Tests
             fieldProperties[InternalNameString][EditableString] = customValue;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 IsDisplayFieldMethodName,
                 BindingFlags.Static | BindingFlags.Public,
                 new object[] { spField.Instance, fieldProperties, EditableString });
@@ -205,7 +207,7 @@ namespace EPMLiveCore.Tests
             fieldProperties[InternalNameString][EditableString] = customValue;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 IsDisplayFieldMethodName,
                 BindingFlags.Static | BindingFlags.Public,
                 new object[] { spField.Instance, fieldProperties, EditableString });
@@ -225,7 +227,7 @@ namespace EPMLiveCore.Tests
             ShimEditableFieldDisplay.WhereUserStringString = (_, _1) => expected;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 IsDisplayFieldMethodName,
                 BindingFlags.Static | BindingFlags.Public,
                 new object[] { spField.Instance, fieldProperties, EditableString });
@@ -242,7 +244,7 @@ namespace EPMLiveCore.Tests
             const string invalidKey = "InvalidKey";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 IsEditableFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, fieldProperties, invalidKey });
@@ -262,7 +264,7 @@ namespace EPMLiveCore.Tests
             fieldProperties[InternalNameString].Add(invalidKey, customValue);
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 IsEditableFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, fieldProperties, invalidKey });
@@ -284,7 +286,7 @@ namespace EPMLiveCore.Tests
             fieldProperties[InternalNameString][EditableString] = customValue2;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 IsEditableFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, fieldProperties, invalidKey });
@@ -305,7 +307,7 @@ namespace EPMLiveCore.Tests
             fieldProperties[InternalNameString][EditableString] = customValue1;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 IsEditableFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, fieldProperties, invalidKey });
@@ -323,7 +325,7 @@ namespace EPMLiveCore.Tests
             var stringToSearch = $"{attributeName}=\"{attributeValue}\"";
 
             // Act
-            var actual = (string)_privateObj.Invoke(
+            var actual = (string)privateObj.Invoke(
                 GetFieldSchemaAttribValueMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { stringToSearch, attributeName });
@@ -339,7 +341,7 @@ namespace EPMLiveCore.Tests
             var input = DateTime.Now.ToString();
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 IsDateMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { input });
@@ -355,7 +357,7 @@ namespace EPMLiveCore.Tests
             const string input = "input";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 IsDateMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { input });
@@ -377,7 +379,7 @@ namespace EPMLiveCore.Tests
                 (_, _1, _2, _3, _4, _5, _6) => expected;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 IsEditableFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { listItem.Instance, spField.Instance, fieldProperties, invalidKey });
@@ -400,7 +402,7 @@ namespace EPMLiveCore.Tests
                 (_, _1, _2, _3, _4, _5, _6) => expected;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 IsEditableFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { listItem.Instance, spField.Instance, fieldProperties, invalidKey });
@@ -423,7 +425,7 @@ namespace EPMLiveCore.Tests
                 (_, _1, _2, _3, _4, _5, _6) => expected;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 IsEditableFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { listItem.Instance, spField.Instance, fieldProperties, invalidKey });
@@ -439,7 +441,7 @@ namespace EPMLiveCore.Tests
             const string input = "12345";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 IsNumericMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { input });
@@ -455,7 +457,7 @@ namespace EPMLiveCore.Tests
             const string input = "input";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 IsNumericMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { input });
@@ -471,7 +473,7 @@ namespace EPMLiveCore.Tests
             var input = string.Empty;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 IsNumericMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { input });
@@ -509,7 +511,7 @@ namespace EPMLiveCore.Tests
             }.GetEnumerator();
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereUserMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { condition, group });
@@ -522,7 +524,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_BooleanIsEqualTo_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsEqualTo";
             const string value = "True";
 
@@ -532,7 +534,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -545,7 +547,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_BooleanIsEqualTo_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsEqualTo";
             const string value = "[Today]";
 
@@ -555,7 +557,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => $"NOT_{value}";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -568,7 +570,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTimeIsEqualTo_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsEqualTo";
 
             var now = DateTime.Now;
@@ -581,7 +583,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -594,7 +596,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTimeIsEqualTo_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsEqualTo";
 
             var now = DateTime.Now;
@@ -607,7 +609,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -620,7 +622,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTime2IsEqualTo_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsEqualTo";
 
             var now = DateTime.Now;
@@ -633,7 +635,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -646,7 +648,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTime2IsEqualTo_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsEqualTo";
 
             var now = DateTime.Now;
@@ -659,7 +661,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -672,7 +674,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_NumberIsEqualTo_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsEqualTo";
             const string value = "5";
 
@@ -682,7 +684,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -695,7 +697,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_NumberIsEqualTo_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsEqualTo";
             const string value = "5";
 
@@ -705,7 +707,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => "10";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -718,7 +720,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_CurrencyIsEqualTo_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsEqualTo";
             const string value = "5";
 
@@ -728,7 +730,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -741,7 +743,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_CurrencyIsEqualTo_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsEqualTo";
             const string value = "5";
 
@@ -751,7 +753,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => "10";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -764,7 +766,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_TextIsEqualTo_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsEqualTo";
             const string value = "[Me]";
 
@@ -775,7 +777,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => UserName;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -788,7 +790,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_TextIsEqualTo_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsEqualTo";
             const string value = "Something";
 
@@ -799,7 +801,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => UserName;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -812,7 +814,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_BooleanIsNotEqualTo_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsNotEqualTo";
             const string value = "True";
 
@@ -822,7 +824,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -835,7 +837,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_BooleanIsNotEqualTo_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsNotEqualTo";
             const string value = "[Today]";
 
@@ -845,7 +847,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => $"NOT_{value}";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -858,7 +860,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTimeIsNotEqualTo_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsNotEqualTo";
 
             var now = DateTime.Now;
@@ -871,7 +873,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -884,7 +886,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTimeIsNotEqualTo_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsNotEqualTo";
 
             var now = DateTime.Now;
@@ -897,7 +899,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -910,7 +912,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTime2IsNotEqualTo_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsNotEqualTo";
 
             var now = DateTime.Now;
@@ -923,7 +925,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -936,7 +938,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTime2IsNotEqualTo_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsNotEqualTo";
 
             var now = DateTime.Now;
@@ -949,7 +951,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -962,7 +964,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_NumberIsNotEqualTo_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsNotEqualTo";
             const string value = "5";
 
@@ -972,7 +974,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -985,7 +987,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_NumberIsNotEqualTo_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsNotEqualTo";
             const string value = "5";
 
@@ -995,7 +997,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => "10";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1008,7 +1010,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_CurrencyIsNotEqualTo_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsNotEqualTo";
             const string value = "5";
 
@@ -1018,7 +1020,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1031,7 +1033,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_CurrencyIsNotEqualTo_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsNotEqualTo";
             const string value = "5";
 
@@ -1041,7 +1043,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => "10";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1054,7 +1056,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_TextIsNotEqualTo_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsNotEqualTo";
             const string value = "[Me]";
 
@@ -1065,7 +1067,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => UserName;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1078,7 +1080,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_TextIsNotEqualTo_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsNotEqualTo";
             const string value = "Something";
 
@@ -1089,7 +1091,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => UserName;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1102,7 +1104,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTimeIsGreaterThan_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThan";
 
             var now = DateTime.Now;
@@ -1115,7 +1117,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1128,7 +1130,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTimeIsGreaterThan_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThan";
 
             var now = DateTime.Now;
@@ -1141,7 +1143,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1154,7 +1156,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTime2IsGreaterThan_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThan";
 
             var now = DateTime.Now;
@@ -1167,7 +1169,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1180,7 +1182,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTime2IsGreaterThan_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThan";
 
             var now = DateTime.Now;
@@ -1193,7 +1195,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1206,7 +1208,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_NumberIsGreaterThan_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThan";
             const string value = "5";
 
@@ -1216,7 +1218,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => "10";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1229,7 +1231,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_NumberIsGreaterThan_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThan";
             const string value = "5";
 
@@ -1239,7 +1241,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1252,7 +1254,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_CurrencyIsGreaterThan_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThan";
             const string value = "5";
 
@@ -1262,7 +1264,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => "10";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1275,7 +1277,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_CurrencyIsGreaterThan_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThan";
             const string value = "5";
 
@@ -1285,7 +1287,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1298,7 +1300,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_TextIsGreaterThan_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThan";
             const string value = "[Me]";
 
@@ -1309,7 +1311,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => UserName;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1322,7 +1324,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTimeIsGreaterThanOrEqual_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThanOrEqual";
 
             var now = DateTime.Now;
@@ -1335,7 +1337,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1348,7 +1350,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTimeIsGreaterThanOrEqual_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThanOrEqual";
 
             var now = DateTime.Now;
@@ -1361,7 +1363,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => now.AddDays(-1).ToString();
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1374,7 +1376,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTime2IsGreaterThanOrEqual_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThanOrEqual";
 
             var now = DateTime.Now;
@@ -1387,7 +1389,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1400,7 +1402,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTime2IsGreaterThanOrEqual_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThanOrEqual";
 
             var now = DateTime.Now;
@@ -1413,7 +1415,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => now.AddDays(-1).ToString();
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1426,7 +1428,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_NumberIsGreaterThanOrEqual_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThanOrEqual";
             const string value = "5";
 
@@ -1436,7 +1438,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1449,7 +1451,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_NumberIsGreaterThanOrEqual_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThanOrEqual";
             const string value = "5";
 
@@ -1459,7 +1461,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => "4";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1472,7 +1474,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_CurrencyIsGreaterThanOrEqual_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThanOrEqual";
             const string value = "5";
 
@@ -1482,7 +1484,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1495,7 +1497,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_CurrencyIsGreaterThanOrEqual_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThanOrEqual";
             const string value = "5";
 
@@ -1505,7 +1507,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => "3";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1518,7 +1520,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_TextIsGreaterThanOrEqual_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsGreaterThanOrEqual";
             const string value = "[Me]";
 
@@ -1529,7 +1531,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => UserName;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1542,7 +1544,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTimeIsLessThan_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThan";
 
             var now = DateTime.Now;
@@ -1555,7 +1557,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => now.AddDays(-1).ToString();
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1568,7 +1570,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTimeIsLessThan_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThan";
 
             var now = DateTime.Now;
@@ -1581,7 +1583,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1594,7 +1596,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTime2IsLessThan_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThan";
 
             var now = DateTime.Now;
@@ -1607,7 +1609,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => now.AddDays(-1).ToString();
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1620,7 +1622,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTime2IsLessThan_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThan";
 
             var now = DateTime.Now;
@@ -1633,7 +1635,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1646,7 +1648,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_NumberIsLessThan_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThan";
             const string value = "5";
 
@@ -1656,7 +1658,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => "-10";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1669,7 +1671,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_NumberIsLessThan_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThan";
             const string value = "5";
 
@@ -1679,7 +1681,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1692,7 +1694,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_CurrencyIsLessThan_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThan";
             const string value = "5";
 
@@ -1702,7 +1704,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => "-10";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1715,7 +1717,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_CurrencyIsLessThan_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThan";
             const string value = "5";
 
@@ -1725,7 +1727,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1738,7 +1740,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_TextIsLessThan_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThan";
             const string value = "[Me]";
 
@@ -1749,7 +1751,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => UserName;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1762,7 +1764,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTimeIsLessThanOrEqual_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThanOrEqual";
 
             var now = DateTime.Now;
@@ -1775,7 +1777,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1788,7 +1790,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTimeIsLessThanOrEqual_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThanOrEqual";
 
             var now = DateTime.Now;
@@ -1801,7 +1803,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1814,7 +1816,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTime2IsLessThanOrEqual_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThanOrEqual";
 
             var now = DateTime.Now;
@@ -1827,7 +1829,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1840,7 +1842,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_DateTime2IsLessThanOrEqual_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThanOrEqual";
 
             var now = DateTime.Now;
@@ -1853,7 +1855,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => now.AddDays(1).ToString();
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1866,7 +1868,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_NumberIsLessThanOrEqual_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThanOrEqual";
             const string value = "5";
 
@@ -1876,7 +1878,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1889,7 +1891,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_NumberIsLessThanOrEqual_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThanOrEqual";
             const string value = "5";
 
@@ -1899,7 +1901,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => "10";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1912,7 +1914,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_CurrencyIsLessThanOrEqual_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThanOrEqual";
             const string value = "5";
 
@@ -1922,7 +1924,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => value;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1935,7 +1937,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_CurrencyIsLessThanOrEqual_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThanOrEqual";
             const string value = "5";
 
@@ -1945,7 +1947,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => "10";
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1958,7 +1960,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_TextIsLessThanOrEqual_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "IsLessThanOrEqual";
             const string value = "[Me]";
 
@@ -1969,7 +1971,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => UserName;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -1982,7 +1984,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_TextContains_ReturnsFalse()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "Contains";
             const string value = "someString";
 
@@ -1993,7 +1995,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => UserName;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
@@ -2006,7 +2008,7 @@ namespace EPMLiveCore.Tests
         public void WhereField_TextContains_ReturnsTrue()
         {
             // Arrange
-            const string where = "";
+            var where = string.Empty;
             const string condition = "Contains";
             const string value = "[Me]";
 
@@ -2017,7 +2019,7 @@ namespace EPMLiveCore.Tests
             listItem.ItemGetGuid = _ => UserName;
 
             // Act
-            var actual = (bool)_privateObj.Invoke(
+            var actual = (bool)privateObj.Invoke(
                 WhereFieldMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
                 new object[] { spField.Instance, where, condition, value, listItem.Instance });
