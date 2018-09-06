@@ -127,12 +127,12 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                     {
                         ItemsGet = () => new ShimSPListItemCollection()
                             .Bind(new SPListItem[]
-                                  {
-                                      new ShimSPListItem
-                                      {
-                                          TitleGet = () => $"{DummyString}_"
-                                      }
-                                  }),
+                            {
+                                new ShimSPListItem
+                                {
+                                    TitleGet = () => $"{DummyString}_"
+                                }
+                            }),
                         FieldsGet = () => new ShimSPFieldCollection
                         {
                             GetFieldByInternalNameString = __ => new ShimSPField
@@ -140,15 +140,15 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                                 Delete = () => _fieldDeleted = true
                             }
                         }.Bind(new SPField[]
-                               {
-                                   new ShimSPField
-                                   {
-                                       HiddenGet = () => false,
-                                       SealedGet = () => false,
-                                       TypeGet = () => SPFieldType.Number,
-                                       InternalNameGet = () => DummyString
-                                   }
-                               })
+                        {
+                            new ShimSPField
+                            {
+                                HiddenGet = () => false,
+                                SealedGet = () => false,
+                                TypeGet = () => SPFieldType.Number,
+                                InternalNameGet = () => DummyString
+                            }
+                        })
                     }
                 },
                 SiteGet = () => _site,
@@ -159,13 +159,13 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                         NameGet = () => DummyString
                     }
                 }.Bind(new SPRoleDefinition[]
-                       {
-                           new ShimSPRoleDefinition
-                           {
-                               NameGet = () => DummyString,
-                               IdGet = () => DummyIntOne
-                           }
-                       }),
+                {
+                    new ShimSPRoleDefinition
+                    {
+                        NameGet = () => DummyString,
+                        IdGet = () => DummyIntOne
+                    }
+                }),
                 SiteGroupsGet = () => new ShimSPGroupCollection
                 {
                     GetByIDInt32 = _ => new ShimSPGroup
@@ -173,13 +173,13 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                         NameGet = () => DummyString
                     }
                 }.Bind(new SPGroup[]
-                       {
-                           new ShimSPGroup
-                           {
-                               NameGet = () => DummyString,
-                               IDGet = () => DummyIntOne
-                           }
-                       }),
+                {
+                    new ShimSPGroup
+                    {
+                        NameGet = () => DummyString,
+                        IDGet = () => DummyIntOne
+                    }
+                }),
                 GetAvailableWebTemplatesUInt32 = _ => new ShimSPWebTemplateCollection()
                     .Bind(new SPWebTemplate[]
                     {
