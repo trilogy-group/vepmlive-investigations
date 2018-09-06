@@ -443,32 +443,6 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void WriteToFile_OnException_TraceError()
-        {
-            using (var stream = new MemoryStream())
-            {
-                using (var traceListener = new TextWriterTraceListener(stream))
-                {
-                    // Arrange
-                    Trace.Listeners.Add(traceListener);
-                    ShimEPMData.AllInstances.WriteTextFileStringString = (_, filePath, text) =>
-                    {
-                        throw new Exception();
-                    };
-
-                    // Act
-                    _EPMData.WriteToFile(DummyString);
-                    Trace.Flush();
-                    var traceResult = Encoding.Default.GetString(stream.ToArray());
-
-                    // Assert
-                    Assert.IsNotNull(traceResult);
-                    Assert.IsFalse(string.IsNullOrEmpty(traceResult));
-                }
-            }
-        }
-
-        [TestMethod]
         public void DeleteWork_ItemId0_ExecuteNonQuery()
         {
             // Arrange
