@@ -7,7 +7,7 @@ using System.Data.SqlClient.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PortfolioEngineCore.Tests.Base.DBAccess
+namespace PortfolioEngineCore.Tests.Base
 {
     using Fakes;
 
@@ -736,7 +736,7 @@ namespace PortfolioEngineCore.Tests.Base.DBAccess
 
             // Act
             var result = dbaEditCosts.GetProjectInfo(dbaAccess, 1, out dateStart, out dateFinish);
-            
+
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(StatusEnum.rsSuccess, result);
@@ -868,7 +868,7 @@ namespace PortfolioEngineCore.Tests.Base.DBAccess
             ShimSqlDb.AllInstances.SelectDataByIdStringInt32StatusEnumDataTableOut = SelectDataByIdSuccess;
             ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
             {
-                CountGet = ()=>1,
+                CountGet = () => 1,
                 ItemGetInt32 = i => new ShimDataRow
                 {
                     ItemGetInt32 = index => DecimalValue
@@ -911,7 +911,7 @@ namespace PortfolioEngineCore.Tests.Base.DBAccess
             {
                 LoadIDataReader = reader => { }
             }.Instance;
-            ShimSqlCommand.AllInstances.ExecuteReader = _ => 
+            ShimSqlCommand.AllInstances.ExecuteReader = _ =>
             {
                 throw new Exception();
             };
@@ -936,8 +936,8 @@ namespace PortfolioEngineCore.Tests.Base.DBAccess
                 queryExecuted = true;
                 return 1;
             };
-            ShimdbaEditCosts.GetDetailValuesCostTypesAndCalendarsDBAccessInt32 = 
-                (dba, projectId) => new int[][] { new int[] { 1, 2 }  };
+            ShimdbaEditCosts.GetDetailValuesCostTypesAndCalendarsDBAccessInt32 =
+                (dba, projectId) => new int[][] { new int[] { 1, 2 } };
 
             // Act
             dbaEditCosts.UpdateCostValuesAfterDiscountChanged(dbaAccess, 1, 1);
@@ -974,7 +974,7 @@ namespace PortfolioEngineCore.Tests.Base.DBAccess
             // Arrange
             var privateType = new PrivateType(typeof(dbaEditCosts));
             ShimSqlDb.AllInstances.SelectDataSqlCommandStatusEnumDataTableOut = SelectDataStatusEnumSuccess;
-            ShimDataTable.AllInstances.Select = _ => new DataRow[] 
+            ShimDataTable.AllInstances.Select = _ => new DataRow[]
             {
                 new ShimDataRow
                 {
