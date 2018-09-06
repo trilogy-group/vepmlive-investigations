@@ -1,15 +1,12 @@
 ﻿using System;
+using System.Collections;
+using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Globalization;
-using System.Security.Permissions;
+using System.Reflection;
 using EPMLiveCore.API;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.Security;
-using Microsoft.SharePoint.Utilities;
-using Microsoft.SharePoint.Workflow;
-using System.Data.SqlClient;
-using System.Data;
-using System.Reflection;
-using System.Collections;
 
 namespace EPMLiveCore
 {
@@ -55,44 +52,56 @@ namespace EPMLiveCore
                                 cn.Open();
 
 
-                                SqlCommand cmd = new SqlCommand("2012SP_GetActivationInfo", cn);
-                                cmd.CommandType = CommandType.StoredProcedure;
-                                cmd.Parameters.AddWithValue("@siteid", siteuid);
-                                cmd.Parameters.AddWithValue("@username", "");
-
-                                DataSet ds = new DataSet();
-                                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                                da.Fill(ds);
-
-                                try
+                                using (var command = new SqlCommand("2012SP_GetActivationInfo", cn))
                                 {
-                                    ActivationType = int.Parse(ds.Tables[0].Rows[0][0].ToString());
-                                }
-                                catch { }
+                                    command.CommandType = CommandType.StoredProcedure;
+                                    command.Parameters.AddWithValue("@siteid", siteuid);
+                                    command.Parameters.AddWithValue("@username", "");
 
+                                    var dataSet = new DataSet();
+                                    using (var dataAdapter = new SqlDataAdapter(command))
+                                    {
+                                        dataAdapter.Fill(dataSet);
+                                    }
 
-                                cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn);
-                                cmd.CommandType = CommandType.StoredProcedure;
-                                cmd.Parameters.AddWithValue("@siteid", siteuid);
-                                cmd.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel(site));
-
-                                SqlDataReader dr = cmd.ExecuteReader();
-
-                                if (dr.Read())
-                                {
                                     try
                                     {
-                                        expired = dr.GetBoolean(6);
+                                        ActivationType = int.Parse(dataSet.Tables[0].Rows[0][0].ToString());
                                     }
-                                    catch { }
-                                    max = dr.GetInt32(0);
-                                    count = dr.GetInt32(1);
-                                    accountid = dr.GetGuid(2);
-                                    ownerusername = dr.GetString(13);
-                                    owneremail = dr.GetString(14);
-                                    billingtype = dr.GetInt32(11);
+                                    catch (Exception ex)
+                                    {
+                                        Trace.WriteLine(ex.ToString());
+                                    }
                                 }
-                                dr.Close();
+
+
+                                using (var command = new SqlCommand("2010SP_GetSiteAccountNums", cn))
+                                {
+                                    command.CommandType = CommandType.StoredProcedure;
+                                    command.Parameters.AddWithValue("@siteid", siteuid);
+                                    command.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel(site));
+
+                                    var reader = command.ExecuteReader();
+
+                                    if (reader.Read())
+                                    {
+                                        try
+                                        {
+                                            expired = reader.GetBoolean(6);
+                                        }
+                                        catch(Exception ex)
+                                        {
+                                            Trace.WriteLine(ex.ToString());
+                                        }
+                                        max = reader.GetInt32(0);
+                                        count = reader.GetInt32(1);
+                                        accountid = reader.GetGuid(2);
+                                        ownerusername = reader.GetString(13);
+                                        owneremail = reader.GetString(14);
+                                        billingtype = reader.GetInt32(11);
+                                    }
+                                    reader.Close();
+                                }
                             }
                             catch
                             {
@@ -114,7 +123,9 @@ namespace EPMLiveCore
             try
             {
                 if (isOnline)
-                    cn.Close();
+                {
+                    cn?.Dispose();
+                }
             }
             catch { }
         }
@@ -481,10 +492,12 @@ namespace EPMLiveCore
                                 bIsNewUser = true;
                                 location = "1008";
                                 //ONLY setups the new email but doesnt send it as of now
-                                cmd = new SqlCommand("INSERT INTO NEWACCOUNTEMAIL (username) VALUES (@username)", cn);
-                                cmd.CommandType = CommandType.Text;
-                                cmd.Parameters.AddWithValue("@username", newusername);
-                                cmd.ExecuteNonQuery();
+                                using (cmd = new SqlCommand("INSERT INTO NEWACCOUNTEMAIL (username) VALUES (@username)", cn))
+                                {
+                                    cmd.CommandType = CommandType.Text;
+                                    cmd.Parameters.AddWithValue("@username", newusername);
+                                    cmd.ExecuteNonQuery();
+                                }
                                 location = "1009";
                             }
                             else
@@ -528,23 +541,25 @@ namespace EPMLiveCore
 
                     //Check if current user is associated to an Account site
                     location = "1017";
-                    cmd = new SqlCommand("SP_IsUserInAccountSite", cn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@siteuid", properties.SiteId);
-                    cmd.Parameters.AddWithValue("@username", newusername);
-
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    location = "1018";
-                    if (dr.Read())
+                    using (cmd = new SqlCommand("SP_IsUserInAccountSite", cn))
                     {
-                        if (dr.GetInt32(0) == 1)
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@siteuid", properties.SiteId);
+                        cmd.Parameters.AddWithValue("@username", newusername);
+
+                        var dataReader = cmd.ExecuteReader();
+                        location = "1018";
+                        if (dataReader.Read())
                         {
-                            bIsApproved = true;
-                            //Check if the user already exists with some other Site, set approved to true
-                            properties.AfterProperties["Approved"] = "1";
+                            if (dataReader.GetInt32(0) == 1)
+                            {
+                                bIsApproved = true;
+                                // Check if the user already exists with some other Site, set approved to true
+                                properties.AfterProperties["Approved"] = "1";
+                            }
                         }
+                        dataReader.Close();
                     }
-                    dr.Close();
 
                     location = "1019";
                     bool bhaspermsadded = setPermissions(properties, isAdd);    //SETUP PERMISSION Add/Edit mode
@@ -586,17 +601,21 @@ namespace EPMLiveCore
                                 if ((properties.AfterProperties["Approved"] == null || properties.AfterProperties["Approved"].ToString() == "1" || properties.AfterProperties["Approved"].ToString() == "True") && !bCurApproved)
                                 {
                                     location = "1026";
-                                    cmd = new SqlCommand("SELECT COUNT(*) FROM NEWACCOUNTEMAIL where username = @username", cn);
-                                    cmd.CommandType = CommandType.Text;
-                                    cmd.Parameters.AddWithValue("@username", newusername);
-                                    dr = cmd.ExecuteReader();
-                                    location = "1027";
-                                    if (dr.Read())
+                                    using (cmd = new SqlCommand("SELECT COUNT(*) FROM NEWACCOUNTEMAIL where username = @username", cn))
                                     {
-                                        if (dr.GetInt32(0) > 0)
-                                            bIsNewUser = true;
+                                        cmd.CommandType = CommandType.Text;
+                                        cmd.Parameters.AddWithValue("@username", newusername);
+                                        var dr = cmd.ExecuteReader();
+                                        location = "1027";
+                                        if (dr.Read())
+                                        {
+                                            if (dr.GetInt32(0) > 0)
+                                            {
+                                                bIsNewUser = true;
+                                            }
+                                        }
+                                        dr.Close();
                                     }
-                                    dr.Close();
                                     location = "1028";
                                     if (bIsNewUser)
                                     {
@@ -673,35 +692,40 @@ namespace EPMLiveCore
 
         private void addUserToAccount(string firstname, string lastname, string email, string username)
         {
-            SqlCommand cmd = new SqlCommand("SP_AddAccountUserByUsername", cn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@username", username);
-            cmd.Parameters.AddWithValue("@first", firstname);
-            cmd.Parameters.AddWithValue("@last", lastname);
-            cmd.Parameters.AddWithValue("@email", email);
-            cmd.Parameters.AddWithValue("@account_id", accountid);
-            cmd.ExecuteNonQuery();
+            using (var command = new SqlCommand("SP_AddAccountUserByUsername", cn))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@username", username);
+                command.Parameters.AddWithValue("@first", firstname);
+                command.Parameters.AddWithValue("@last", lastname);
+                command.Parameters.AddWithValue("@email", email);
+                command.Parameters.AddWithValue("@account_id", accountid);
+                command.ExecuteNonQuery();
+            }
         }
 
         private string getTempPassword(string username)
         {
+            using (var cmdGetPassword = new SqlCommand("SP_GetPassword", cn))
+            {
+                cmdGetPassword.CommandType = CommandType.StoredProcedure;
+                cmdGetPassword.Parameters.AddWithValue("@username", username);
 
-            DataSet ds;
-            SqlCommand cmdGetPassword;
-            SqlDataAdapter da;
+                using (var dataAdapter = new SqlDataAdapter(cmdGetPassword))
+                {
+                    var dataSet = new DataSet();
+                    dataAdapter.Fill(dataSet);
 
-            cmdGetPassword = new SqlCommand("SP_GetPassword", cn);
-            cmdGetPassword.CommandType = CommandType.StoredProcedure;
-            cmdGetPassword.Parameters.AddWithValue("@username", username);
-
-            da = new SqlDataAdapter(cmdGetPassword);
-            ds = new DataSet();
-            da.Fill(ds);
-
-            if (ds.Tables[0].Rows.Count > 0)
-                return ds.Tables[0].Rows[0][0].ToString();
-            else
-                return "";
+                    if (dataSet.Tables[0].Rows.Count > 0)
+                    {
+                        return dataSet.Tables[0].Rows[0][0].ToString();
+                    }
+                    else
+                    {
+                        return string.Empty;
+                    }
+                }
+            }
         }
 
         private bool setPermissions(SPItemEventProperties properties, bool isAdd)
@@ -941,7 +965,9 @@ namespace EPMLiveCore
             try
             {
                 if (isOnline)
-                    cn.Close();
+                {
+                    cn?.Dispose();
+                }
             }
             catch { }
         }

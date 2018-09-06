@@ -44,6 +44,7 @@
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Moq, Version=4.9.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Moq.4.9.0\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
@@ -74,10 +75,18 @@
       <HintPath>..\..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Telerik.JustMock, Version=2016.2.426.1, Culture=neutral, PublicKeyToken=721b6c5bc0326b3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\JustMock.2016.2.426.1\lib\Net35\Telerik.JustMock.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="WorkEnginePPM.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Choose>
@@ -101,6 +110,14 @@
     <Compile Include="Base\DBAccessTests.cs" />
     <Compile Include="Base\dbaCCVTests.cs" />
     <Compile Include="Base\dbaUsersTests.cs" />
+    <Compile Include="Layouts\CustomFieldFormTests\CanDeleteCustomFieldTests.cs" />
+    <Compile Include="Layouts\CustomFieldFormTests\CheckDeleteCustomFieldTests.cs" />
+    <Compile Include="Layouts\CustomFieldFormTests\PageLoadTests.cs" />
+    <Compile Include="Layouts\CustomFieldFormTests\DeleteCustomFieldTests.cs" />
+    <Compile Include="Layouts\CustomFieldFormTests\DeleteClickTests.cs" />
+    <Compile Include="Layouts\CustomFieldFormTests\OkClickTests.cs" />
+    <Compile Include="Layouts\CustomFieldFormTests\UpdateCustomFieldTests.cs" />
+    <Compile Include="Layouts\CustomFieldFormTests\CustomFieldFormTests.cs" />
     <Compile Include="OptimizerDataTest.cs" />
     <Compile Include="Analyzers\CostAnalyzerDataTest.cs" />
     <Compile Include="Analyzers\BaseDetailRowDataTest.cs" />
@@ -116,6 +133,10 @@
     <ProjectReference Include="..\PortfolioEngineCore\PortfolioEngineCore.csproj">
       <Project>{BB86B09C-CB35-4888-8639-C047A40A9C0C}</Project>
       <Name>PortfolioEngineCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WorkEnginePPM\WorkEnginePPM.csproj">
+      <Project>{51CAF42A-31AF-4B74-853F-24B672C185C2}</Project>
+      <Name>WorkEnginePPM</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

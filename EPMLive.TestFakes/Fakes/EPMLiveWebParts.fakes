@@ -12,6 +12,8 @@
 		<Add FullName="EPMLiveWebParts.SSRS2005.ReportingService2005!"/>
 		<Add FullName="EPMLiveWebParts.SSRS2006.ReportingService2006!"/>
     <Add FullName="EPMLiveWebParts.ReportWebPartBase!"/>
+    <Add FullName="EPMLiveWebParts.Personalization.Repositories.PersonalizationDataRepository!"/>
     <Add FullName="EPMLiveWebParts.DisplayProfilePictures!"/>
+    <Add FullName="EPMLiveWebParts.FancyDisplayForm!"/>
   </ShimGeneration>
 </Fakes>

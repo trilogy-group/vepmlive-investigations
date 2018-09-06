@@ -9,6 +9,8 @@
     <Add FullName="EPMLiveCore.CoreFunctions!"/>
     <Add FullName="EPMLiveCore.Infrastructure.Logging.LoggingService!"/>
     <Add FullName="EPMLiveCore.FeatureActivationSvc.Service!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.CacheStore!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.CachedValue!"/>
     <Add FullName="EPMLiveCore.Infrastructure.Setup.ActivateFeatureKey!"/>
     <Add FullName="EPMLiveCore.Infrastructure.Setup.CreateEPMLiveDB!"/>
     <Add FullName="EPMLiveCore.ReportHelper.EPMData!"/>
@@ -44,5 +46,12 @@
     <Add FullName="EPMLiveCore.Controls.Navigation.Providers.GenericLinkProvider!"/>
     <Add FullName="EPMLiveCore.Infrastructure.Navigation.NavLink!"/>
     <Add FullName="EPMLiveCore.Act!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.EPMLiveScriptManager!"/>
+    <Add FullName="EPMLiveCore.WebPartsHelper.WebPartsReflector!"/>
+    <Add FullName="EPMLiveCore.Layouts.epmlive.gridganttsettings!"/>
+    <Add FullName="EPMLiveCore.WorkEngineAPI!"/>
+    <Add FullName="EPMLiveCore.ReportHelper.ListBiz!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.CacheStore!"/>
+    <Add FullName="EPMLiveCore.CommentCCPeopleEditor!"/>
   </ShimGeneration>
 </Fakes>
