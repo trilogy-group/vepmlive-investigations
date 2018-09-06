@@ -21,6 +21,7 @@ namespace PortfolioEngineCore.Tests.Base.DBAccess
         private const string DummyString = "DummyString";
         private IDisposable shimContext;
         private ShimDBAccess dbaAccess;
+        private string GetDetailValuesCostTypesAndCalendarsMethodName = "GetDetailValuesCostTypesAndCalendars";
 
         [TestInitialize]
         public void Initialize()
@@ -47,6 +48,18 @@ namespace PortfolioEngineCore.Tests.Base.DBAccess
         {
             dataTable = new DataTable();
             return StatusEnum.rsSuccess;
+        }
+
+        private StatusEnum SelectDataByIdExpired(SqlDb dba, string commandText, int id, StatusEnum statusError, out DataTable dataTable)
+        {
+            dataTable = new DataTable();
+            return StatusEnum.rsSessionExpired;
+        }
+
+        private int ReadIntValueTrue(object objectValue, out bool isNull)
+        {
+            isNull = false;
+            return 1;
         }
 
         private StatusEnum SelectDataSuccess(SqlDb dba, string commandText, StatusEnum statusError, out DataTable dataTable)
@@ -699,7 +712,7 @@ namespace PortfolioEngineCore.Tests.Base.DBAccess
         }
 
         [TestMethod]
-        public void GetProjectInfo_OnSuccess_ReturnStatusSuccess()
+        public void GetProjectInfo_OnSuccess_ReturnsStatusSuccess()
         {
             // Arrange
             var dateStart = new DateTime();
@@ -723,7 +736,7 @@ namespace PortfolioEngineCore.Tests.Base.DBAccess
         }
 
         [TestMethod]
-        public void GetProjectInfo_OnException_ReturnStatusEeror()
+        public void GetProjectInfo_OnException_ReturnsStatusEeror()
         {
             // Arrange
             var dateStart = new DateTime();
@@ -745,5 +758,208 @@ namespace PortfolioEngineCore.Tests.Base.DBAccess
             Assert.AreEqual(DateTime.MinValue, dateFinish.Date);
         }
 
+        [TestMethod]
+        public void SelectViewCalendarInfo_OnSuccess_ReturnsStatusSuccess()
+        {
+            // Arrange
+            var calendarId = 0;
+            var firstPeriod = 0;
+            var lastPeriod = 0;
+            ShimSqlDb.AllInstances.SelectDataByIdStringInt32StatusEnumDataTableOut = SelectDataByIdSuccess;
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                CountGet = () => 1,
+                ItemGetInt32 = i => new ShimDataRow
+                {
+                    ItemGetString = name => 1
+                }
+            };
+            ShimSqlDb.ReadIntValueObjectBooleanOut = ReadIntValueTrue;
+
+            // Act
+            var result = dbaEditCosts.SelectViewCalendarInfo(dbaAccess, 1, out calendarId, out firstPeriod, out lastPeriod);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(StatusEnum.rsSuccess, result);
+            Assert.AreEqual(1, firstPeriod);
+            Assert.AreEqual(1, lastPeriod);
+        }
+
+        [TestMethod]
+        public void SelectViewCalendarInfo_SelectDataByIdStatusExpired_ReturnsStatusError()
+        {
+            // Arrange
+            var calendarId = 0;
+            var firstPeriod = 0;
+            var lastPeriod = 0;
+            ShimSqlDb.AllInstances.SelectDataByIdStringInt32StatusEnumDataTableOut = SelectDataByIdExpired;
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                CountGet = () => 1,
+                ItemGetInt32 = i => new ShimDataRow
+                {
+                    ItemGetString = name => 1
+                }
+            };
+            ShimSqlDb.ReadIntValueObjectBooleanOut = ReadIntValueTrue;
+            ShimSqlDb.AllInstances.StatusGet = _ => StatusEnum.rsSessionExpired;
+
+            // Act
+            var result = dbaEditCosts.SelectViewCalendarInfo(dbaAccess, 1, out calendarId, out firstPeriod, out lastPeriod);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(StatusEnum.rsSessionExpired, result);
+        }
+
+        [TestMethod]
+        public void SelectViewCalendarInfo_OnException_ReturnsStatusError()
+        {
+            // Arrange
+            var calendarId = 0;
+            var firstPeriod = 0;
+            var lastPeriod = 0;
+            ShimSqlDb.AllInstances.SelectDataByIdStringInt32StatusEnumDataTableOut = SelectDataByIdSuccess;
+            ShimDataTable.AllInstances.RowsGet = _ =>
+            {
+                throw new Exception();
+            };
+            ShimSqlDb.ReadIntValueObjectBooleanOut = ReadIntValueTrue;
+            ShimSqlDb.AllInstances.StatusGet = _ => StatusEnum.rsSessionExpired;
+            ShimSqlDb.AllInstances.HandleStatusErrorSeverityEnumStringStatusEnumStringBoolean =
+                (_, severity, sFunction, status, text, skipLog) => StatusEnum.rsServerError;
+
+            // Act
+            var result = dbaEditCosts.SelectViewCalendarInfo(dbaAccess, 1, out calendarId, out firstPeriod, out lastPeriod);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(StatusEnum.rsServerError, result);
+        }
+
+        [TestMethod]
+        public void GetDiscountRate_StatusError_Returns0()
+        {
+            // Arrange
+            ShimSqlDb.AllInstances.SelectDataByIdStringInt32StatusEnumDataTableOut = SelectDataByIdExpired;
+            // Act
+            var result = dbaEditCosts.GetDiscountRate(dbaAccess, 1);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result);
+        }
+
+        [TestMethod]
+        public void GetDiscountRate_StatusSuccess_ReturnsDecimalValue()
+        {
+            // Arrange
+            const decimal DecimalValue = 5.6M;
+            ShimSqlDb.AllInstances.SelectDataByIdStringInt32StatusEnumDataTableOut = SelectDataByIdSuccess;
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                CountGet = ()=>1,
+                ItemGetInt32 = i => new ShimDataRow
+                {
+                    ItemGetInt32 = index => DecimalValue
+                }
+            };
+            // Act
+            var result = dbaEditCosts.GetDiscountRate(dbaAccess, 1);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(DecimalValue, result);
+        }
+
+        [TestMethod]
+        public void SelectCostCategoryData_OnSuccess_ReturnStatusSuccess()
+        {
+            // Arrange
+            var dataTable = new ShimDataTable
+            {
+                LoadIDataReader = reader => { },
+            }.Instance;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Close = () => { }
+            };
+
+            // Act
+            var result = dbaEditCosts.SelectCostCategoryData(dbaAccess, 1, 1, 1, out dataTable);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(StatusEnum.rsSuccess, result);
+        }
+
+        [TestMethod]
+        public void SelectCostCategoryData_OnException_ReturnStatusError()
+        {
+            // Arrange
+            var dataTable = new ShimDataTable
+            {
+                LoadIDataReader = reader => { }
+            }.Instance;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => 
+            {
+                throw new Exception();
+            };
+            ShimSqlDb.AllInstances.HandleStatusErrorSeverityEnumStringStatusEnumStringBoolean =
+                (_, severity, sFunction, status, text, skipLog) => StatusEnum.rsServerError;
+
+            // Act
+            var result = dbaEditCosts.SelectCostCategoryData(dbaAccess, 1, 1, 1, out dataTable);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(StatusEnum.rsServerError, result);
+        }
+
+        [TestMethod]
+        public void UpdateCostDetailValuesWithNewDiscount_Should_ExecuteNonQuery()
+        {
+            // Arrange
+            var queryExecuted = false;
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            {
+                queryExecuted = true;
+                return 1;
+            };
+
+            // Act
+            dbaEditCosts.UpdateCostValuesAfterDiscountChanged(dbaAccess, 1, 1);
+
+            // Assert
+            Assert.IsTrue(queryExecuted);
+        }
+
+        [TestMethod]
+        public void GetDetailValuesCostTypesAndCalendars()
+        {
+            // Arrange
+            var privateType = new PrivateType(typeof(dbaEditCosts));
+            ShimSqlDb.AllInstances.SelectDataSqlCommandStatusEnumDataTableOut = SelectDataStatusEnumSuccess;
+            ShimDataTable.AllInstances.Select = _ => new DataRow[] 
+            {
+                new ShimDataRow
+                {
+                    ItemGetInt32 = i => 1
+                }
+            };
+
+            // Act
+            var result = privateType.InvokeStatic(GetDetailValuesCostTypesAndCalendarsMethodName, dbaAccess.Instance, 1) as int[][];
+
+            // Assert
+            Assert.IsNotNull(result);
+        }
+
+        private StatusEnum SelectDataStatusEnumSuccess(SqlDb sqlDb, SqlCommand sqlCommand, StatusEnum statusEnum, out DataTable dataTable)
+        {
+            dataTable = new DataTable();
+            return StatusEnum.rsSuccess;
+        }
     }
 }
