@@ -212,7 +212,6 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual(StatusEnum.rsSuccess, result);
         }
 
-
         [TestMethod]
         public void SelectCostTypeCustomFields_OnSuccess_ReturnStatusEnumSuccess()
         {
@@ -260,7 +259,7 @@ namespace PortfolioEngineCore.Tests.Base
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void IsAutoPostEnabledOnRatePerProjectChange_DBAccessNull_ThorwsException()
+        public void IsAutoPostEnabledOnRatePerProjectChange_DBAccessNull_ThrowsException()
         {
             // Arrange, Act
             var result = dbaCostTypes.IsAutoPostEnabledOnRatePerProjectChange(null, 1);
@@ -880,7 +879,7 @@ namespace PortfolioEngineCore.Tests.Base
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
 
             // Act
-            var result = dbaCostTypes.UpdateCostTypeCustomFieldInfo(dbAccess, 1, string.Empty, 
+            var result = dbaCostTypes.UpdateCostTypeCustomFieldInfo(dbAccess, 1, string.Empty,
                 DummyString, 1, 1, 1, out reply);
 
             // Assert
@@ -905,7 +904,6 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual(StatusEnum.rsRequestCannotBeCompleted, result);
             Assert.IsFalse(string.IsNullOrEmpty(reply));
         }
-
 
         [TestMethod]
         public void UpdateCostTypeCustomFieldInfo_OnSuccess_ReturnsStatusSuccess()
@@ -999,7 +997,7 @@ namespace PortfolioEngineCore.Tests.Base
             var reply = string.Empty;
 
             // Act
-            var result = dbaCostTypes.UpdateCostTypeInfo(dbAccess, ref ctId, string.Empty, 
+            var result = dbaCostTypes.UpdateCostTypeInfo(dbAccess, ref ctId, string.Empty,
                 1, 1, 1, 1, availCCs, cfs, DummyString, out reply);
 
             // Assert
@@ -1027,7 +1025,7 @@ namespace PortfolioEngineCore.Tests.Base
             };
 
             // Act
-            var result = dbaCostTypes.UpdateCostTypeInfo(dbAccess, ref ctId, DummyString, 
+            var result = dbaCostTypes.UpdateCostTypeInfo(dbAccess, ref ctId, DummyString,
                 1, 1, 1, 1, availCCs, cfs, DummyString, out reply);
 
             // Assert
@@ -1056,7 +1054,7 @@ namespace PortfolioEngineCore.Tests.Base
             ShimdbaCostTypes.ValidateAndSaveCostTypeFormulaDBAccessInt32StringRefBoolean = ValidateAndSaveCostTypeFormula;
 
             // Act
-            var result = dbaCostTypes.UpdateCostTypeInfo(dbAccess, ref ctId, DummyString, 
+            var result = dbaCostTypes.UpdateCostTypeInfo(dbAccess, ref ctId, DummyString,
                 3, 1, 1, 1, availCCs, cfs, DummyString, out reply);
 
             // Assert
@@ -1093,7 +1091,7 @@ namespace PortfolioEngineCore.Tests.Base
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
 
             // Act
-            var result = dbaCostTypes.UpdateCostTypeInfo(dbAccess, ref ctId, DummyString, 
+            var result = dbaCostTypes.UpdateCostTypeInfo(dbAccess, ref ctId, DummyString,
                 3, 1, 1, 1, availCCs, cfs, DummyString, out reply);
 
             // Assert
@@ -1141,7 +1139,7 @@ namespace PortfolioEngineCore.Tests.Base
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
 
             // Act
-            var result = dbaCostTypes.UpdateCostTypeInfo(dbAccess, ref ctId, DummyString, 
+            var result = dbaCostTypes.UpdateCostTypeInfo(dbAccess, ref ctId, DummyString,
                 1, 1, 1, 1, availCCs, cfs, DummyString, out reply);
 
             // Assert
@@ -1189,7 +1187,7 @@ namespace PortfolioEngineCore.Tests.Base
             ShimdbaCostTypes.ValidateAndSaveCostTypeFormulaDBAccessInt32StringRefBoolean = ValidateAndSaveCostTypeFormulaConditional;
 
             // Act
-            var result = dbaCostTypes.UpdateCostTypeInfo(dbAccess, ref ctId, DummyString, 
+            var result = dbaCostTypes.UpdateCostTypeInfo(dbAccess, ref ctId, DummyString,
                 3, 1, 1, 1, availCCs, cfs, DummyString, out reply);
 
             // Assert
@@ -1213,7 +1211,7 @@ namespace PortfolioEngineCore.Tests.Base
             };
 
             // Act
-            var result = dbaCostTypes.UpdateCostTypeInfo(dbAccess, ref ctId, DummyString, 
+            var result = dbaCostTypes.UpdateCostTypeInfo(dbAccess, ref ctId, DummyString,
                 3, 1, 1, 1, availCCs, cfs, DummyString, out reply);
 
             // Assert
@@ -1393,78 +1391,118 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.IsFalse(string.IsNullOrEmpty(result));
         }
 
+        /// <summary>
+        /// These methods are fakes and these parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum SelectDataStatusSuccess(SqlDb sqlDb, string text, StatusEnum statusError, out DataTable dataTable)
         {
             dataTable = new DataTable();
             return StatusEnum.rsSuccess;
         }
 
+        /// <summary>
+        /// These methods are fakes and these parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum SelectDataByIdStatusSuccess(SqlDb sqlDb, string text, int id, StatusEnum arg4, out DataTable dataTable)
         {
             dataTable = new DataTable();
             return StatusEnum.rsSuccess;
         }
 
+        /// <summary>
+        /// These methods are fakes and these parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum SelectDataSqlCommandStatusSuccess(SqlDb sqldb, SqlCommand sqlCommand, StatusEnum statusEnum, out DataTable dataTable)
         {
             dataTable = new DataTable();
             return StatusEnum.rsSuccess;
         }
 
+        /// <summary>
+        /// These methods are fakes and these parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum SelectDataSqlCommandStatusError(SqlDb sqldb, SqlCommand sqlCommand, StatusEnum statusEnum, out DataTable dataTable)
         {
             dataTable = new DataTable();
             return StatusEnum.rsServerError;
         }
 
+        /// <summary>
+        /// These methods are fakes and these parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum CanDeleteCostStatusSuccessWithMessage(DBAccess dbAccess, int id, out string message)
         {
             message = DummyString;
             return StatusEnum.rsSuccess;
         }
 
+        /// <summary>
+        /// These methods are fakes and these parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum CanDeleteCostStatusSuccess(DBAccess dbAccess, int id, out string message)
         {
             message = string.Empty;
             return StatusEnum.rsSuccess;
         }
 
+        /// <summary>
+        /// These methods are fakes and these parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum CanDeleteCostStatusError(DBAccess dbAccess, int id, out string message)
         {
             message = string.Empty;
             return StatusEnum.rsServerError;
         }
 
+        /// <summary>
+        /// These methods are fakes and these parameters are required, even though not all of them are used
+        /// </summary>
         private bool GetLastIdentityValueZero(SqlDb sqlDb, out int ctId)
         {
             ctId = 0;
             return true;
         }
 
+        /// <summary>
+        /// These methods are fakes and these parameters are required, even though not all of them are used
+        /// </summary>
         private string ValidateAndSaveCostTypeFormulaEmptyResult(DBAccess dba, int nFieldId, ref string sFormula, bool bSave)
         {
             sFormula = DummyString;
             return string.Empty;
         }
 
+        /// <summary>
+        /// These methods are fakes and these parameters are required, even though not all of them are used
+        /// </summary>
         private string ValidateAndSaveCostTypeFormula(DBAccess dba, int nFieldId, ref string sFormula, bool bSave)
         {
             sFormula = DummyString;
             return DummyString;
         }
 
+        /// <summary>
+        /// These methods are fakes and these parameters are required, even though not all of them are used
+        /// </summary>
         private string ValidateAndSaveCostTypeFormulaConditional(DBAccess dba, int nFieldId, ref string sFormula, bool bSave)
         {
             sFormula = DummyString;
             return bSave ? DummyString : string.Empty;
         }
 
+        /// <summary>
+        /// These methods are fakes and these parameters are required, even though not all of them are used
+        /// </summary>
+        /// 
         private StatusEnum SelectDataByNameSucces(SqlDb sqlDb, string text, string name, StatusEnum statusOnException, out DataTable dataTable)
         {
             dataTable = new DataTable();
             return StatusEnum.rsSuccess;
         }
 
+        /// <summary>
+        /// These methods are fakes and these parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum SelectDataByNameError(SqlDb sqlDb, string text, string name, StatusEnum statusOnException, out DataTable dataTable)
         {
             dataTable = new DataTable();
