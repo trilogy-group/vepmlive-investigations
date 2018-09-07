@@ -909,7 +909,7 @@
                         if (url === '/') {
                             sourceUrl = urlParts[0];
                         } else {
-                            sourceUrl = (url + urlParts[0].split(escape(url))[1]);
+                            sourceUrl = url + urlParts[0].substring(urlParts[0].indexOf(escape(url)) + (escape(url)).length);
                         }
                         sourceUrl = escape(sourceUrl);
                         redirectUrl += '&source=' + sourceUrl;
