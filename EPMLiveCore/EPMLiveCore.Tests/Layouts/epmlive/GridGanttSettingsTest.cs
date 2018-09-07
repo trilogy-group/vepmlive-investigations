@@ -32,6 +32,7 @@ using Microsoft.SharePoint.WebControls.Fakes;
 using Microsoft.SharePoint.WebPartPages.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
+using SystemWebPartsFakes = System.Web.UI.WebControls.WebParts.Fakes.ShimWebPart;
 
 namespace EPMLiveCore.Tests.Layouts.epmlive
 {
@@ -807,7 +808,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
 
             ShimReadOnlyCollectionBase.AllInstances.CountGet = _ => DummyInt;
 
-            ShimWebPart.AllInstances.TitleGet = _ => FancyDisplayForm;
+            SystemWebPartsFakes.AllInstances.TitleGet = _ => FancyDisplayForm;
 
             ShimListCommands.EnableTeamFeaturesSPList = _ => _teamFeaturesEnabled = true;
             ShimListCommands.EnableTimesheetsSPListSPWeb = (_, __) => _timeSheetsEnabled = true;
