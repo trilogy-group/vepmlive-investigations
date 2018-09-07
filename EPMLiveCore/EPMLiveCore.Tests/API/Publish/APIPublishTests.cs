@@ -14,6 +14,7 @@ using System.Xml;
 using EPMLiveCore.API;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
+using EPMLiveWorkPlanner.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
@@ -280,6 +281,7 @@ namespace EPMLiveCore.Tests.API.Publish
                 return result;
             };
             ShimPath.GetFileNameWithoutExtensionString = fileName => fileName;
+            ShimPlannerCore.getWorkPlannerStatusFieldsSPWebString = (_, __) => new SortedList();
             ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => 1;
             ShimSPFieldUserValue.ConstructorSPWebString = (_, _1, _2) => new ShimSPFieldUserValue();
             ShimSPFieldUserValue.AllInstances.LookupValueGet = _ => Title;

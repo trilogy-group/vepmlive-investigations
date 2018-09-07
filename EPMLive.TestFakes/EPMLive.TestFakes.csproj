@@ -56,6 +56,9 @@
     <Reference Include="EPMLiveWebParts.Fakes">
       <HintPath>FakesAssemblies\EPMLiveWebParts.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="EPMLiveWorkPlanner.Fakes">
+      <HintPath>FakesAssemblies\EPMLiveWorkPlanner.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
@@ -166,6 +169,10 @@
       <Project>{a7f83fd4-be8b-49ab-be24-39209e8fabc2}</Project>
       <Name>EPMLiveWebParts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EPMLiveWorkPlanner\EPMLiveWorkPlanner\EPMLiveWorkPlanner.csproj">
+      <Project>{fcf0c151-0a3f-4b9f-9327-3bbbf109d776}</Project>
+      <Name>EPMLiveWorkPlanner</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PortfolioEngineCore\PortfolioEngineCore\PortfolioEngineCore.csproj">
       <Project>{bb86b09c-cb35-4888-8639-c047a40a9c0c}</Project>
       <Name>PortfolioEngineCore</Name>
@@ -206,6 +213,7 @@
     <Fakes Include="Fakes\System.Xml.Linq.fakes" />
     <Fakes Include="Fakes\System.Configuration.fakes" />
     <Fakes Include="Fakes\System.Data.DataSetExtensions.fakes" />
+    <Fakes Include="Fakes\EPMLiveWorkPlanner.fakes" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>
