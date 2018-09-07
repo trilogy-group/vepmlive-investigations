@@ -15,14 +15,16 @@ import {LoginPage} from '../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('View the options on "Resource Capacity Heat map" report page" - [743179]', async () => {
-        const stepLogger = new StepLogger(743179);
+        stepLogger.caseId = 743179;
         stepLogger.stepId(1);
         stepLogger.step('Go to Navigation > Projects > Projects');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -121,7 +123,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('View the options on "Resource Commitment" report page" - [743182]', async () => {
-        const stepLogger = new StepLogger(743182);
+        stepLogger.caseId = 743182;
         stepLogger.stepId(1);
         stepLogger.step('Go to Navigation > Projects > Projects');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -214,7 +216,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('View the options on "Resource Available Vs. Planned by Dept" report page" - [743184]', async () => {
-        const stepLogger = new StepLogger(743184);
+        stepLogger.caseId = 743184;
         stepLogger.stepId(1);
         stepLogger.step('Go to Navigation > Projects > Projects');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -318,7 +320,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('View the options on "Resource Requirement" - [743186]', async () => {
-        const stepLogger = new StepLogger(743186);
+        stepLogger.caseId = 743186;
         stepLogger.stepId(1);
         stepLogger.step('Go to Navigation > Projects > Projects');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -407,7 +409,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('View the options on "Resource Work vs. Capacity" report page" - [743188]', async () => {
-        const stepLogger = new StepLogger(743188);
+        stepLogger.caseId = 743188;
         stepLogger.stepId(1);
         stepLogger.step('Go to Navigation > Projects > Projects');
         await CommonPageHelper.navigateToItemPageUnderNavigation(

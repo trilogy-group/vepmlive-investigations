@@ -6,14 +6,16 @@ import {ChangeItemPageHelper} from '../../../page-objects/pages/items-page/chang
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Add, Edit and Delete Change - [829742]', async () => {
-        const stepLogger = new StepLogger(829742);
+        stepLogger.caseId = 829742;
         stepLogger.stepId(1);
         let titleValue = await ChangeItemPageHelper.createNewChangeAndValidateIt(stepLogger);
 

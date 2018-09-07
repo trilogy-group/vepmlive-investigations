@@ -11,14 +11,16 @@ import {ProjectItemPageHelper} from '../../../page-objects/pages/items-page/proj
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Launch Cost Planner from Project center.(Ellipsis icon) - [743216]', async () => {
-        const stepLogger = new StepLogger(743216);
+        stepLogger.caseId = 743216;
 
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -39,7 +41,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await EditCostHelper.validateEditCostWebElements(stepLogger);
     });
     it('Launch Cost Planner from "View Item" page for Project. - [743217]', async () => {
-        const stepLogger = new StepLogger(743217);
+        stepLogger.caseId = 743217;
         stepLogger.stepId(1);
 
         await CommonPageHelper.navigateToItemPageUnderNavigation(

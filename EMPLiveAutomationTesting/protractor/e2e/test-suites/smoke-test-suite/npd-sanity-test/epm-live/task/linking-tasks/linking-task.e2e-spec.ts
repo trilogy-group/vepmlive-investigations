@@ -19,15 +19,17 @@ import {TextboxHelper} from '../../../../../../components/html/textbox-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Decrease Task1\'s Duration (Respective Links=ON, Start ASAP =ON) - [1035340]', async () => {
-        const stepLogger = new StepLogger(1035340);
-        stepLogger.precondition('Execute steps# 1 to 4 in test case C743761 and add 2 tasks in the project ' +
+        stepLogger.caseId = 1035340;
+        stepLogger.preCondition('Execute steps# 1 to 4 in test case C743761 and add 2 tasks in the project ' +
             'created in pre requisite# 3 [Ex: Smoke Test Project 2:: New Task 1, New Task 2]');
         const uniqueId = PageHelper.getUniqueId();
         const hours = CommonPageConstants.hours.durationHours4;
@@ -42,8 +44,8 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Increase Task1\'s Duration (Respective Links=ON, \'Start ASAP\'=ON - [1035334])', async () => {
-        const stepLogger = new StepLogger(1035334);
-        stepLogger.precondition('Execute steps# 1 to 4 in test case C743761 and add 2 tasks in the project ' +
+        stepLogger.caseId = 1035334;
+        stepLogger.preCondition('Execute steps# 1 to 4 in test case C743761 and add 2 tasks in the project ' +
             'created in pre requisite# 3 [Ex: Smoke Test Project 2:: New Task 1, New Task 2]');
         const uniqueId = PageHelper.getUniqueId();
         const operation = TaskPageConstants.increase;
@@ -58,8 +60,8 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Check the functionality of Cancel button for "Add Link" pop-up - [1035432])', async () => {
-        const stepLogger = new StepLogger(1035432);
-        stepLogger.precondition('Execute steps# 1 to 4 in test case C743761 and add 2 tasks in the project created in' +
+        stepLogger.caseId = 1035432;
+        stepLogger.preCondition('Execute steps# 1 to 4 in test case C743761 and add 2 tasks in the project created in' +
             ' pre requisite# 2 [Ex: Smoke Test Project 2:: New Task 1, New Task 2]');
         const uniqueId = PageHelper.getUniqueId();
         await CommonPageHelper.navigateToItemPageUnderNavigation(

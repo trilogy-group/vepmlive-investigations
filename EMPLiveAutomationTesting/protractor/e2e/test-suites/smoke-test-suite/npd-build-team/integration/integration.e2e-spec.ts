@@ -17,14 +17,16 @@ import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('View the Build Team-Current team members in Project Planner - [743198]', async () => {
-        const stepLogger = new StepLogger(743198);
+        stepLogger.caseId = 743198;
         const uniqueId = PageHelper.getUniqueId();
         stepLogger.stepId(1);
         stepLogger.step('Select "Navigation" icon  from left side menu');
@@ -130,7 +132,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     xit('View the options on "Resource Capacity Heat map" report page" - 743179 - Disabled Duplication', async () => {
-        const stepLogger = new StepLogger(743179);
+        stepLogger.caseId = 743179;
         stepLogger.stepId(1);
         stepLogger.step('Go to Navigation > Projects > Projects');
         await CommonPageHelper.navigateToItemPageUnderNavigation(

@@ -21,14 +21,16 @@ import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workp
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('To Verify My Shared Documents Upload Functionality from Social Stream - [743927]', async () => {
-        const stepLogger = new StepLogger(743927);
+        stepLogger.caseId = 743927;
 
         stepLogger.step('Click on +new document link under My Shared Documents on the right side bottom of the page');
         await PageHelper.click(CommonPage.uploadButton);
@@ -89,7 +91,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Validate the Comments Section & the Ability to add a Project from the Social Stream - [743926]', async () => {
-        const stepLogger = new StepLogger(743926);
+        stepLogger.caseId = 743926;
 
         stepLogger.step('Enter some comments for text area displaying text What are you working on?');
         await WaitHelper.waitForElementToBeDisplayed(HomePage.whatAreYouWorkingOnTextBox);
@@ -136,7 +138,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add Time Off - [891123]', async () => {
-        const stepLogger = new StepLogger(891123);
+        stepLogger.caseId = 891123;
 
         stepLogger.step('Click on "More" Link on the top menu bar');
         await ElementHelper.click(HomePage.toolBarMenuItems.more);
@@ -170,7 +172,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
     it('Add an item from Social Stream - [1124294]', async () => {
-        const stepLogger = new StepLogger(1124294);
+        stepLogger.caseId = 1124294;
 
         // // Step #1 and #2 and #3 Inside this function
         stepLogger.stepId(3);

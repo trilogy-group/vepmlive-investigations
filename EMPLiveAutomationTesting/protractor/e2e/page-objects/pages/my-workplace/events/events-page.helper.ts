@@ -12,7 +12,7 @@ import {MyWorkplacePage} from '../my-workplace.po';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
-import { MyWorkplaceConstants } from '../my-workplace.constants';
+import {MyWorkplaceConstants} from '../my-workplace.constants';
 
 export class EventsPageHelper {
 
@@ -79,10 +79,9 @@ export class EventsPageHelper {
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.title));
     }
 
-    static async createNewEvent() {
-        const stepLogger = new StepLogger(786942);
+    static async createNewEvent(stepLogger: StepLogger) {
 
-        stepLogger.step('PRECONDITION: navigate to Events page');
+        stepLogger.step('preCondition: navigate to Events page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(MyWorkplacePage.navigation.events,
             CommonPage.pageHeaders.myWorkplace.events,
             CommonPageConstants.pageHeaders.myWorkplace.events,

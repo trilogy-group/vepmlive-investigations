@@ -15,14 +15,16 @@ import {ElementHelper} from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Add Documents Functionality-Project Document - [1124284]', async () => {
-        const stepLogger = new StepLogger(1124284);
+        stepLogger.caseId = 1124284;
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
 
         // Step #1 and #2 Inside this function
@@ -44,9 +46,9 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add Project Documents Functionality-New version of existing document-[1175281]', async () => {
-        const stepLogger = new StepLogger(1175281);
+        stepLogger.caseId = 1175281;
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
-        stepLogger.precondition('Execute test case C1124284 and add a Project Document [Ex: testfile.txt]');
+        stepLogger.preCondition('Execute test case C1124284 and add a Project Document [Ex: testfile.txt]');
         await PageHelper.click(HomePage.navigateMenu);
         await PageHelper.click(HomePage.navigateToHome);
         await expect(await browser.getTitle())
@@ -84,7 +86,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add Project Document - [907962]', async () => {
-        const stepLogger = new StepLogger(907962);
+        stepLogger.caseId = 907962;
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
         const project = CreateNewPageConstants.navigationLabels.libraryApps.projectDocument;
 

@@ -10,14 +10,16 @@ import {ModelerPageHelper} from '../../../../page-objects/pages/items-page/proje
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Verify the Modeler page. - [744256]', async () => {
-        const stepLogger = new StepLogger(744256);
+        stepLogger.caseId = 744256;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -34,7 +36,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the content of Modeler popup window. - [744257]', async () => {
-        const stepLogger = new StepLogger(744257);
+        stepLogger.caseId = 744257;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -52,7 +54,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the content of View Modeler page. - [744260]', async () => {
-        const stepLogger = new StepLogger(744260);
+        stepLogger.caseId = 744260;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -81,7 +83,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the search setting button. - [744262]', async () => {
-        const stepLogger = new StepLogger(744262);
+        stepLogger.caseId = 744262;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -107,7 +109,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the Find next button - [744263]', async () => {
-        const stepLogger = new StepLogger(744263);
+        stepLogger.caseId = 744263;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,

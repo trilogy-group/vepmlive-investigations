@@ -16,7 +16,7 @@ const chromeHeadlessArgs = ['--headless', '--disable-gpu', '--window-size=1280x8
         - https://developers.google.com/web/tools/puppeteer/troubleshooting
 */
 const chromeOptions = {
-    args: useHeadlessBrowser ? chromeHeadlessArgs : [],
+    args: useHeadlessBrowser ? chromeHeadlessArgs : ['--disable-xss-auditor','--disable-blink-features=BlockCredentialedSubresources','--disable-web-security'],
     // Set download path and avoid prompting for download even though
     // this is already the default on Chrome but for completeness
     prefs: {
@@ -41,7 +41,8 @@ const configSetup = {
         health_tests: './e2e/test-suites/health-check-test-suite/**/*.e2e-spec.ts',
         api_tests: './e2e/test-suites/api-test-suite/**/*.e2e-spec.ts',
         smoke_tests: 'e2e/test-suites/smoke-test-suite/**/*.e2e-spec.ts',
-        regression_tests: './e2e/test-suites/regression-test-suite/**/*.e2e-spec.ts'
+        regression_tests: './e2e/test-suites/regression-test-suite/**/*.e2e-spec.ts',
+        end_to_end_tests: './e2e/test-suites/end-to-end-scenarios/**/*.e2e-spec.ts'
     },
     capabilities: {
         "browserName": "chrome",
@@ -91,7 +92,7 @@ const configSetup = {
         },
         login: {
             admin: {
-                user: "admin.user",
+                user: "AdminT01",
                 password: "Pass@word1"
             },
             projectManager: {
@@ -99,7 +100,7 @@ const configSetup = {
                 password: "Pass@word1"
             },
             teamMember: {
-                user: "team.member",
+                user: "User01T01",
                 password: "Pass@word1"
             },
             portfolioManager: {
@@ -124,7 +125,7 @@ const configSetup = {
             }
         }
     },
-    baseUrl: 'http://qaepmlive6/',
+    baseUrl: 'http://tenant01.social.com',
     framework: 'jasmine',
     jasmineNodeOpts: {
         showColors: true,

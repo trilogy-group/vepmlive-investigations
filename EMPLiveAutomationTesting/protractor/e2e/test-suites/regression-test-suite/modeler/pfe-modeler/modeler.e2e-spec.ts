@@ -10,14 +10,16 @@ import {ModelerPageHelper} from '../../../../page-objects/pages/items-page/proje
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Verify the select Version(s) Selection box. - [744210]', async () => {
-        const stepLogger = new StepLogger(744210);
+        stepLogger.caseId = 744210;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -35,7 +37,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the Cancel button of Modeler popup window. - [744211]', async () => {
-        const stepLogger = new StepLogger(744211);
+        stepLogger.caseId = 744211;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -57,7 +59,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the content of Display Tab - [744213]', async () => {
-        const stepLogger = new StepLogger(744213);
+        stepLogger.caseId = 744213;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -76,7 +78,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the Close button of the Display Tab - [744214]', async () => {
-        const stepLogger = new StepLogger(744214);
+        stepLogger.caseId = 744214;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -102,7 +104,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the Save Version button without version. - [744220]', async () => {
-        const stepLogger = new StepLogger(744220);
+        stepLogger.caseId = 744220;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -128,7 +130,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the Copy Version button - [744222]', async () => {
-        const stepLogger = new StepLogger(744222);
+        stepLogger.caseId = 744222;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -154,7 +156,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the Minus sign. - [744227]', async () => {
-        const stepLogger = new StepLogger(744227);
+        stepLogger.caseId = 744227;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -180,7 +182,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the Apply Target button. - [744229]', async () => {
-        const stepLogger = new StepLogger(744229);
+        stepLogger.caseId = 744229;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -206,7 +208,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the content of View Tab - [744239]', async () => {
-        const stepLogger = new StepLogger(744239);
+        stepLogger.caseId = 744239;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -232,7 +234,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the Close button of the View Tab - [744240]', async () => {
-        const stepLogger = new StepLogger(744240);
+        stepLogger.caseId = 744240;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,

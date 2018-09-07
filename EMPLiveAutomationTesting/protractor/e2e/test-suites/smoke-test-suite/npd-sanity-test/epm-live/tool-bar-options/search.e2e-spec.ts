@@ -11,14 +11,16 @@ import {ValidationsHelper} from '../../../../../components/misc-utils/validation
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Check Search feature - [1035924]', async () => {
-        const stepLogger = new StepLogger(1035924);
+        stepLogger.caseId = 1035924;
         stepLogger.stepId(1);
         stepLogger.verification('Navigate To Projects Page');
         await CommonPageHelper.navigateToItemPageUnderNavigation (

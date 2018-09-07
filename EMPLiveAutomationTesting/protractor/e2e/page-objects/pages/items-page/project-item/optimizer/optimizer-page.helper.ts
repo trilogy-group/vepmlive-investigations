@@ -14,7 +14,7 @@ export class OptimizerPageHelper {
         // this is work around without it not able to work on new tab
         await WaitHelper.waitForElementToBeDisplayed(OptimizerPage.saveStrategy);
 
-      await CommonPageHelper.switchToFirstContentFrame();
+        await CommonPageHelper.switchToFirstContentFrame();
 
         stepLogger.step('Click Configration Button');
         await PageHelper.click(OptimizerPage.configure);
@@ -66,7 +66,7 @@ export class OptimizerPageHelper {
 
         await this.enterStrategyName(stepLogger, strategyName);
 
-      await this.saveNewStratedyName(stepLogger);
+        await this.saveNewStratedyName(stepLogger);
 
         await this.clickShowAllStrategyArrowDown(stepLogger);
 

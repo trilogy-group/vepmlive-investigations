@@ -19,13 +19,15 @@ import {ResourcePlannerPage} from '../../../../../page-objects/pages/resource-pl
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
     it('Navigate to Edit Resource Plan- [966351]', async () => {
-        const stepLogger = new StepLogger(966351);
+        stepLogger.caseId = 966351;
         // Step #1 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -68,14 +70,14 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Check Admin user has permissions to create Public fragments - [966249]', async () => {
-        const stepLogger = new StepLogger(966249);
-        stepLogger.precondition('Select "Navigation" icon  from left side menu');
-        stepLogger.precondition('Select Projects -> Projects from the options displayed');
-        stepLogger.precondition('Select any project from project center');
+        stepLogger.caseId = 966249;
+        stepLogger.preCondition('Select "Navigation" icon  from left side menu');
+        stepLogger.preCondition('Select Projects -> Projects from the options displayed');
+        stepLogger.preCondition('Select any project from project center');
         await PageHelper.click(CommonPage.project);
-        stepLogger.precondition('Click ITEMS tab select Edit Plan');
+        stepLogger.preCondition('Click ITEMS tab select Edit Plan');
         await PageHelper.click(CommonPage.editPlan);
-        stepLogger.precondition('click on Project Planner');
+        stepLogger.preCondition('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
         await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
@@ -131,9 +133,9 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Insert Fragment - [966282]', async () => {
-        const stepLogger = new StepLogger(966282);
-        stepLogger.precondition('Select "Navigation" icon  from left side menu');
-        stepLogger.precondition('Select Projects -> Projects from the options displayed');
+        stepLogger.caseId = 966282;
+        stepLogger.preCondition('Select "Navigation" icon  from left side menu');
+        stepLogger.preCondition('Select Projects -> Projects from the options displayed');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
@@ -150,7 +152,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Select "Edit Plan" from the options displayed');
         await PageHelper.click(CommonPage.contextMenuOptions.editPlan);
-        stepLogger.precondition('Select any project from project center');
+        stepLogger.preCondition('Select any project from project center');
 
         stepLogger.verification('The Select Planner pop-up should display');
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle)).toBe(true,

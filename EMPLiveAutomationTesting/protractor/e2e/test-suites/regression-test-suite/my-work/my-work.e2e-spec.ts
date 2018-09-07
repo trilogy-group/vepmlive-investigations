@@ -14,14 +14,16 @@ import {ExpectationHelper} from '../../../components/misc-utils/expectation-help
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Verify that View should be saved - [744288]', async () => {
-        const stepLogger = new StepLogger(744288);
+        stepLogger.caseId = 744288;
         // Step 1 and Step 2 are inside below function
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
@@ -48,7 +50,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify that View should be renamed - [744291]', async () => {
-        const stepLogger = new StepLogger(744291);
+        stepLogger.caseId = 744291;
         // Step 1 are inside below function
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
@@ -77,9 +79,9 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Message while renaming the default view - [744293]', async () => {
-        const stepLogger = new StepLogger(744293);
-        // Preconditions are inside below function
-        stepLogger.step('Precondition - click on My Workplace>> Click on My Work >> Views tab');
+        stepLogger.caseId = 744293;
+        // preConditions are inside below function
+        stepLogger.step('preCondition - click on My Workplace>> Click on My Work >> Views tab');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.myWork,
             CommonPage.pageHeaders.myWorkplace.myWork,

@@ -17,14 +17,16 @@ import {SocialStreamPage} from '../../../../../../page-objects/pages/settings/so
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Validate project planner and create and assign task to resources - [743933]', async () => {
-        const stepLogger = new StepLogger(743933);
+        stepLogger.caseId = 743933;
         const uniqueId = PageHelper.getUniqueId();
 
         stepLogger.stepId(1);

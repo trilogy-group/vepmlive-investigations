@@ -17,14 +17,16 @@ import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Navigate to Discussions page - [785609]', async () => {
-        const stepLogger = new StepLogger(785609);
+        stepLogger.caseId = 785609;
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.discussions,
@@ -34,14 +36,14 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add a New Discussion - [785611]', async () => {
-        const stepLogger = new StepLogger(785611);
+        stepLogger.caseId = 785611;
         await DiscussionsPageHelper.addDiscussion(stepLogger);
     });
 
     it('Edit Discussion from Workplace - [1175265]', async () => {
-        const stepLogger = new StepLogger(1175265);
+        stepLogger.caseId = 1175265;
 
-        stepLogger.step(`Precondition: Create new discussion`);
+        stepLogger.step(`preCondition: Create new discussion`);
         const labels = DiscussionsPageConstants.inputLabels;
         const uniqueId = PageHelper.getUniqueId();
         const subject = `${labels.subject} ${uniqueId}`;
@@ -88,7 +90,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add Grid/Gantt web part - [785832]', async () => {
-        const stepLogger = new StepLogger(785832);
+        stepLogger.caseId = 785832;
         // Delete previous created Grid/Gantt
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.discussions,

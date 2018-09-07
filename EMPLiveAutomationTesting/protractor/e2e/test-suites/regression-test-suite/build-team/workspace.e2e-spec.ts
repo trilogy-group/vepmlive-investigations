@@ -9,14 +9,16 @@ import {WorkspacePageHelper} from '../../../page-objects/pages/workspaces/worksp
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Hide the panel via "Hide" button. - [743197]', async () => {
-        const stepLogger = new StepLogger(743197);
+        stepLogger.caseId = 743197;
         stepLogger.stepId(1);
         await CommonPageHelper.clickLhsSideBarMenuIcon(CommonPage.sidebarMenus.workspaces, stepLogger);
         await CommonPageHelper.verifyPanelHeaderDisplayed(CommonPage.sidebarMenuPanelHeader.workspaces,

@@ -1,4 +1,4 @@
-import {element, By, browser} from 'protractor';
+import {browser, By, element} from 'protractor';
 import {StepLogger} from '../../../../../core/logger/step-logger';
 import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {DiscussionsPage} from './discussions.po';
@@ -7,10 +7,10 @@ import {CommonPage} from '../../common/common.po';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {DiscussionsPageConstants} from './discussions-page.constants';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
-import { CommonPageHelper } from '../../common/common-page.helper';
-import { WaitHelper } from '../../../../components/html/wait-helper';
-import { MyWorkplacePage } from '../my-workplace.po';
-import { CommonPageConstants } from '../../common/common-page.constants';
+import {CommonPageHelper} from '../../common/common-page.helper';
+import {WaitHelper} from '../../../../components/html/wait-helper';
+import {MyWorkplacePage} from '../my-workplace.po';
+import {CommonPageConstants} from '../../common/common-page.constants';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {LabelHelper} from '../../../../components/html/label-helper';
 
@@ -34,7 +34,7 @@ export class DiscussionsPageHelper {
     }
 
     static async addDiscussion(stepLogger: StepLogger) {
-        stepLogger.step('PRECONDITION: navigate to Discussions page');
+        stepLogger.step('preCondition: navigate to Discussions page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.discussions,
             CommonPage.pageHeaders.myWorkplace.discussions,

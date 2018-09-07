@@ -13,14 +13,16 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('View Reports Functionality - [1124270]', async () => {
-        const stepLogger = new StepLogger(1124270);
+        stepLogger.caseId = 1124270;
         const projectReportListConstant = ReportsItemPageConstants.reportListItems.projects;
         const projectReportListElement = ReportsItemPage.reportListItems.project;
         const projectCommonPageConstant = CommonPage.pageHeaders.projects;

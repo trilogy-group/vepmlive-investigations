@@ -19,14 +19,16 @@ import {SocialStreamPageConstants} from '../../../../../page-objects/pages/setti
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Navigate to To Do page - [785576]', async () => {
-        const stepLogger = new StepLogger(785576);
+        stepLogger.caseId = 785576;
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.toDo,
@@ -36,8 +38,8 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add a To Do item - [785580]', async () => {
-        const stepLogger = new StepLogger(785580);
-        stepLogger.step('PRECONDITION: navigate to To Do page');
+        stepLogger.caseId = 785580;
+        stepLogger.step('preCondition: navigate to To Do page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.toDo,
             CommonPage.pageHeaders.myWorkplace.toDo,
@@ -76,8 +78,8 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Edit To Do from Workplace - [785584]', async () => {
-        const stepLogger = new StepLogger(785584);
-        stepLogger.step('PRECONDITION: Navigate to To Page');
+        stepLogger.caseId = 785584;
+        stepLogger.step('preCondition: Navigate to To Page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.toDo,
             CommonPage.pageHeaders.myWorkplace.toDo,
@@ -116,7 +118,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('To Do - Attach File - [852049]', async () => {
-        const stepLogger = new StepLogger(1176340);
+        stepLogger.caseId = 1176340;
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
@@ -203,7 +205,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add Grid/Gantt web part - [785834]', async () => {
-        const stepLogger = new StepLogger(785834);
+        stepLogger.caseId = 785834;
         // Delete previous created Grid/Gantt
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.toDo,
@@ -214,7 +216,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(SocialStreamPage.settingItems.editPage);
         await ToDoPageHelper.deleteGridGantt();
 
-        stepLogger.step('PRECONDITION: navigate to To Do page');
+        stepLogger.step('preCondition: navigate to To Do page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.toDo,
             CommonPage.pageHeaders.myWorkplace.toDo,

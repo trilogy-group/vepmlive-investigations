@@ -11,14 +11,16 @@ import {ReportingSettingsPageHelper} from '../../../../page-objects/pages/settin
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Run Refresh Schedule - [829793]', async () => {
-        const stepLogger = new StepLogger(829793);
+        stepLogger.caseId = 829793;
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,

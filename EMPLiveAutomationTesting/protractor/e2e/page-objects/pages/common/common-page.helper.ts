@@ -115,9 +115,9 @@ export class CommonPageHelper {
             title);
     }
 
-    static getRibbonButtonByText(title: string,  isContains = false ) {
+    static getRibbonButtonByText(title: string, isContains = false) {
         return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel')
-         and (${ComponentHelpers.getXPathFunctionForDot(title,  isContains )})]//parent::a`));
+         and (${ComponentHelpers.getXPathFunctionForDot(title, isContains)})]//parent::a`));
     }
 
     static getDisabledRibbonButtonById(id: string) {
@@ -228,7 +228,7 @@ export class CommonPageHelper {
     static async searchByTitle(linkOfThePage: ElementFinder,
                                pageHeader: ElementFinder,
                                pageName: string,
-                               stepLogger: StepLogger, titleValue: string , columnName: string ) {
+                               stepLogger: StepLogger, titleValue: string, columnName: string) {
         await this.navigateToItemPageUnderNavigation(
             linkOfThePage,
             pageHeader,
@@ -322,28 +322,30 @@ export class CommonPageHelper {
         return element(By.css(`#RibbonContainer li[title="${title}"]`));
     }
 
-    static async refreshPageIfRibbonElementIsDisable(stepLogger: StepLogger, targetElement: ElementFinder , item = CommonPage.record ) {
+    static async refreshPageIfRibbonElementIsDisable(stepLogger: StepLogger, targetElement: ElementFinder, item = CommonPage.record) {
         let maxAttempts = 0;
         await browser.sleep(PageHelper.timeout.s);
 
         while ((await CommonPageHelper.getRibbonIsDisable(targetElement, 'aria-disabled') === 'true') && maxAttempts++ < 10) {
-            browser.refresh();
-            await this.selectRecordFromGrid(stepLogger, item );
+            await browser.refresh();
+            await this.selectRecordFromGrid(stepLogger, item);
         }
     }
+
     static async editOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
 
-        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editItem );
+        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editItem);
 
         stepLogger.step('Select "Edit Item" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editItem);
 
     }
+
     static async editCostViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
 
-        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editCost );
+        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editCost);
 
         await IssueItemPageHelper.validateContentOfItemTab(stepLogger);
 
@@ -351,10 +353,11 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.editCost);
 
     }
+
     static async selectRecordAndClickItem(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
 
-        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editCost );
+        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editCost);
 
     }
 
@@ -362,20 +365,22 @@ export class CommonPageHelper {
         stepLogger.step('Select "Edit Cost" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editCost);
     }
+
     static async clickEditResourcePlanViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
 
-        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editResource );
+        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editResource);
 
         await PageHelper.click(CommonPage.ribbonItems.editResource);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
     }
+
     static async resourceAnalyzerViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Analyzer" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.resourceAnalyzer);
-        await  WaitHelper.waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
+        await WaitHelper.waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
         await PageHelper.switchToDefaultContent();
         await PageHelper.switchToFrame(CommonPage.contentFrame);
         await WaitHelper.staticWait(PageHelper.timeout.xs);
@@ -385,11 +390,12 @@ export class CommonPageHelper {
         await expect(await PageHelper.isElementDisplayed(ResourceAnalyzerPage.analyzerTab))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.resourceAnalyzer));
     }
+
     static async editTeam(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
 
-        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editTeam );
+        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editTeam);
 
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
@@ -399,6 +405,7 @@ export class CommonPageHelper {
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
     }
+
     static async clickOnEditPlan() {
         await browser.sleep(PageHelper.timeout.s);
         if (await CommonPage.editPlan.isPresent() !== true) {
@@ -407,7 +414,7 @@ export class CommonPageHelper {
             await browser.sleep(PageHelper.timeout.m);
             await PageHelper.click(CommonPage.ribbonTitles.items);
             await browser.sleep(PageHelper.timeout.s);
-            if (await  CommonPage.editPlan.isPresent() !== true) {
+            if (await CommonPage.editPlan.isPresent() !== true) {
                 await this.clickOnEditPlan();
             }
         }
@@ -428,6 +435,7 @@ export class CommonPageHelper {
             }
         }
     }
+
     static async viewOptionViaRibbon(stepLogger: StepLogger) {
         await this.selectRecordFromGrid(stepLogger);
 
@@ -450,6 +458,7 @@ export class CommonPageHelper {
         stepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
+
     static async selectTwoRecordFromGrid(stepLogger: StepLogger) {
         stepLogger.stepId(2);
         stepLogger.step('Select the check box for record');
@@ -460,6 +469,7 @@ export class CommonPageHelper {
         stepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
+
     static async clickItemTab(stepLogger: StepLogger) {
 
         stepLogger.step('Click on ITEMS on ribbon');
@@ -664,6 +674,7 @@ export class CommonPageHelper {
     static getCreateNewPublicViewOfDropDown(publicViewTitle: string) {
         return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)));
     }
+
     static async clickLhsSideBarMenuIcon(icon: ElementFinder, stepLogger: StepLogger) {
         stepLogger.step('Click on icon from the left navigation panel');
         await PageHelper.click(icon);
@@ -675,6 +686,7 @@ export class CommonPageHelper {
         await expect(panelHeadingDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             itemName));
     }
+
     static searchedItemList(text: string) {
         return AnchorHelper.getAnchorByTextInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly, text);
     }
@@ -700,6 +712,7 @@ export class CommonPageHelper {
     static getElementAllByText(text: string, isContains = false) {
         return element.all(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`)).first();
     }
+
     static getDescendingColumnSelector(columnName: string) {
         return this.getColumnSelector(columnName, CommonPageConstants.classNames.descendingClass);
     }
@@ -724,81 +737,97 @@ export class CommonPageHelper {
             `//following-sibling::td[contains(@class,'${CommonPageConstants.classNames.headerButtonClass}')][1]` +
             `//u[contains(@class,'${sortingClass}')]`));
     }
-    static async fieldDisplayedValidation(targetElement: ElementFinder , name: string) {
+
+    static async fieldDisplayedValidation(targetElement: ElementFinder, name: string) {
         await expect(await PageHelper.isElementDisplayed(targetElement))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(name));
     }
-    static async fieldNotDisplayedValidation(targetElement: ElementFinder , name: string) {
+
+    static async fieldNotDisplayedValidation(targetElement: ElementFinder, name: string) {
         await expect(await PageHelper.isElementDisplayed(targetElement))
             .toBe(false, ValidationsHelper.getNotDisplayedValidation(name));
     }
-    static async notificationDisplayedValidation(targetElement: ElementFinder , name: string) {
+
+    static async notificationDisplayedValidation(targetElement: ElementFinder, name: string) {
         await expect(await PageHelper.isElementDisplayed(targetElement))
             .toBe(true, ValidationsHelper.getNotDisplayedValidation(name));
     }
-    static async labelDisplayedValidation(targetElement: ElementFinder , name: string, expectedResult = true) {
+
+    static async labelDisplayedValidation(targetElement: ElementFinder, name: string, expectedResult = true) {
         await WaitHelper.waitForElementToBeDisplayed(targetElement);
         await expect(await PageHelper.isElementPresent(targetElement))
             .toBe(expectedResult,
                 ValidationsHelper.getLabelDisplayedValidation(name));
     }
-    static async   labelContainValidation( title: string) {
+
+    static async labelContainValidation(title: string) {
         await expect(await CommonPage.latestNotification.getText())
             .toContain(title, ValidationsHelper.getLabelDisplayedValidation(title));
     }
-    static async windowShouldNotBeDisplayedValidation( name: string) {
+
+    static async windowShouldNotBeDisplayedValidation(name: string) {
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(name));
     }
-    static async buttonDisplayedValidation(targetElement: ElementFinder , name: string ) {
+
+    static async buttonDisplayedValidation(targetElement: ElementFinder, name: string) {
         await expect(await PageHelper.isElementDisplayed(targetElement, true))
             .toBe(true, ValidationsHelper.getButtonDisplayedValidation(name));
     }
-    static async pageDisplayedValidation( name: string) {
+
+    static async pageDisplayedValidation(name: string) {
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect((await CommonPage.title.getText()).trim())
             .toBe(name,
                 ValidationsHelper.getPageDisplayedValidation(name));
     }
-    static async fieldShouldHaveValueValidation( projectName: string , labels: string ) {
+
+    static async fieldShouldHaveValueValidation(projectName: string, labels: string) {
         await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels, projectName));
     }
-    static async textPresentValidation( targetElement: ElementFinder , text: string ) {
+
+    static async textPresentValidation(targetElement: ElementFinder, text: string) {
         await WaitHelper.waitForElementToBeDisplayed(targetElement);
 
         await expect(await ElementHelper.getText(targetElement))
             .toBe(text,
                 ValidationsHelper.getImageDisplayedValidation(text));
     }
-    static async clickNewLink( stepLogger: StepLogger) {
+
+    static async clickNewLink(stepLogger: StepLogger) {
         stepLogger.step('click on add new link ');
         await PageHelper.click(CommonPage.addNewLink);
     }
+
     static getApplyLink() {
         return element(By.css(`[value="${CommonPageConstants.ribbonLabels.apply}"]`));
     }
+
     static async clickApplyButton(stepLogger: StepLogger) {
         stepLogger.step('Click on Apply Button ');
         await ElementHelper.actionMouseMove(this.getApplyLink());
         await PageHelper.click(this.getApplyLink());
     }
+
     static async waitForApplyButtontoDisplayed() {
-        await  WaitHelper.waitForElementToBeClickable(this.getApplyLink());
+        await WaitHelper.waitForElementToBeClickable(this.getApplyLink());
     }
+
     static async resourceAnalyzerPopUp(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Analyzer" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.resourceAnalyzer);
-        await  WaitHelper.waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
+        await WaitHelper.waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
         await PageHelper.switchToDefaultContent();
         await PageHelper.switchToFrame(CommonPage.contentFrame);
         await WaitHelper.staticWait(PageHelper.timeout.xs);
     }
-    static async getRibbonIsDisable( targetElement: ElementFinder, attributeName: string) {
+
+    static async getRibbonIsDisable(targetElement: ElementFinder, attributeName: string) {
         return await ElementHelper.getAttributeValue(targetElement, attributeName);
     }
 
@@ -808,7 +837,7 @@ export class CommonPageHelper {
 
     static async goToOptimizer(stepLogger: StepLogger) {
         stepLogger.step('Click on Optimizer button from the items tab.');
-        await PageHelper.click( this.getOptimizerButton());
+        await PageHelper.click(this.getOptimizerButton());
         // Takes time to load the iframe
         await browser.sleep(PageHelper.timeout.m);
         await CommonPageHelper.switchToFirstContentFrame();
@@ -816,13 +845,13 @@ export class CommonPageHelper {
 
     static async gotoModeler(stepLogger: StepLogger) {
         stepLogger.step('Click on Modeler button from the items tab.');
-        await PageHelper.click( CommonPage.modelerButton);
+        await PageHelper.click(CommonPage.modelerButton);
         // Takes time to load the iframe
         await browser.sleep(PageHelper.timeout.s);
         await CommonPageHelper.switchToFirstContentFrame();
     }
 
-    static  async selectProjectAndClickEllipsisButton (stepLogger: StepLogger, item = CommonPage.record ) {
+    static async selectProjectAndClickEllipsisButton(stepLogger: StepLogger, item = CommonPage.record) {
         await CommonPageHelper.selectRecordFromGrid(stepLogger, item);
 
         await ElementHelper.actionMouseMove(item);
@@ -830,14 +859,15 @@ export class CommonPageHelper {
         await CommonPageHelper.clickIconEllipsisHorizontal(stepLogger);
     }
 
-    static  async verifyItemDisabled(targetElement: ElementFinder, stepLogger: StepLogger) {
-        await ExpectationHelper.verifyAttributeValue(targetElement,  'aria-disabled', 'true', stepLogger);
+    static async verifyItemDisabled(targetElement: ElementFinder, stepLogger: StepLogger) {
+        await ExpectationHelper.verifyAttributeValue(targetElement, 'aria-disabled', 'true', stepLogger);
     }
 
     static async clickIconEllipsisHorizontal(stepLogger: StepLogger) {
         stepLogger.step('Click on Ellipsis Horizontal');
         await PageHelper.click(CommonPage.iconEllipsisHorizontal);
     }
+
     static async optimizerViaRibbon(stepLogger: StepLogger) {
         await this.selectTwoRecordFromGrid(stepLogger);
 
@@ -851,21 +881,22 @@ export class CommonPageHelper {
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.optimizer));
 
     }
-    static  async verifyVariousOptionsOnContextMenu (stepLogger: StepLogger ) {
+
+    static async verifyVariousOptionsOnContextMenu(stepLogger: StepLogger) {
         stepLogger.verification('On Context Menu Edit Cost is present');
         await CommonPageHelper.fieldDisplayedValidation
-        (CommonPage.contextMenuOptions.editCosts , CommonPageConstants.contextMenuOptions.editCosts);
+        (CommonPage.contextMenuOptions.editCosts, CommonPageConstants.contextMenuOptions.editCosts);
 
         stepLogger.verification('On Context Menu comments is present');
         await CommonPageHelper.fieldDisplayedValidation
-        (CommonPage.contextMenuOptions.comments , CommonPageConstants.contextMenuOptions.comments);
+        (CommonPage.contextMenuOptions.comments, CommonPageConstants.contextMenuOptions.comments);
 
         stepLogger.verification('On Context Menu deleteItem is present');
         await CommonPageHelper.fieldDisplayedValidation
-        (CommonPage.contextMenuOptions.deleteItem , CommonPageConstants.contextMenuOptions.deleteItem);
+        (CommonPage.contextMenuOptions.deleteItem, CommonPageConstants.contextMenuOptions.deleteItem);
 
         stepLogger.verification('On Context Menu editPlan is present');
         await CommonPageHelper.fieldDisplayedValidation
-        (CommonPage.contextMenuOptions.editPlan , CommonPageConstants.contextMenuOptions.editPlan);
+        (CommonPage.contextMenuOptions.editPlan, CommonPageConstants.contextMenuOptions.editPlan);
     }
 }

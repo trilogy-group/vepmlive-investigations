@@ -17,14 +17,16 @@ import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Navigate to Resources page - [910192]', async () => {
-        const stepLogger = new StepLogger(910192);
+        stepLogger.caseId = 910192;
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.resources,
@@ -34,8 +36,8 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add Generic resource - [910195]', async () => {
-        const stepLogger = new StepLogger(910195);
-        stepLogger.step('PRECONDITION: Navigate to Resources page');
+        stepLogger.caseId = 910195;
+        stepLogger.step('preCondition: Navigate to Resources page');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.resources,
             CommonPage.pageHeaders.projects.resources,

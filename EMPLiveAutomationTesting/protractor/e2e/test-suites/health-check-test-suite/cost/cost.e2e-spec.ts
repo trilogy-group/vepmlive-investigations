@@ -12,18 +12,20 @@ import {ProjectItemPageConstants} from '../../../page-objects/pages/items-page/p
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Edit Project Cost - [2488601]', async () => {
-        const stepLogger = new StepLogger(2488601);
+        stepLogger.caseId = 2488601;
         const cost =  4;
         const uniqueId = PageHelper.getUniqueId();
 
-        stepLogger.precondition('Creating New project');
+        stepLogger.preCondition('Creating New project');
         const  projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
 
         stepLogger.stepId(1);

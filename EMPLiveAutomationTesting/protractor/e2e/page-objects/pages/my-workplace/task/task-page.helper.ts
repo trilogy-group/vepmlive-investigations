@@ -59,11 +59,13 @@ export class TaskPageHelper {
         await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText())
             .toBe(CommonPageConstants.predecessorsData.predecessors1,
                 ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
-            CommonPageConstants.predecessorsData.predecessors1));
+                    CommonPageConstants.predecessorsData.predecessors1));
         await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.three,
             ProjectItemPageConstants.newTaskFields.start).click();
-        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.predecessors2, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
-            CommonPageConstants.predecessorsData.predecessors2));
+        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText())
+            .toBe(CommonPageConstants.predecessorsData.predecessors2,
+                ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
+                    CommonPageConstants.predecessorsData.predecessors2));
 
         stepLogger.stepId(4);
         stepLogger.step('Click on Project tab');

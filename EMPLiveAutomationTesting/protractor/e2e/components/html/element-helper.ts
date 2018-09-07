@@ -16,10 +16,11 @@ export class ElementHelper {
         await WaitHelper.waitForElementToBeDisplayed(item);
         return browser.actions().mouseMove(item).perform();
     }
+
     static async openLinkInNewTab(targetElement: ElementFinder) {
         await browser.executeScript(
             'return window.open(arguments[0].getAttribute("href"),"_blank")',
-            await  targetElement.getWebElement());
+            await targetElement.getWebElement());
     }
 
     static async actionMouseDown(item: ElementFinder) {
@@ -196,7 +197,7 @@ export class ElementHelper {
         return element.all(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
     }
 
-    static browserRefresh() {
-        browser.refresh();
+    static async browserRefresh() {
+        await browser.refresh();
     }
 }

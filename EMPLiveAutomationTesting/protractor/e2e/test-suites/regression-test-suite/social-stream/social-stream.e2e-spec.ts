@@ -12,14 +12,16 @@ import {MyTimeOffPageHelper} from '../../../page-objects/pages/my-workplace/my-t
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Add Time Off - [891123]', async () => {
-        const stepLogger = new StepLogger(891123);
+        stepLogger.caseId = 891123;
 
         stepLogger.step('Click on "More" Link on the top menu bar');
         await ElementHelper.click(HomePage.toolBarMenuItems.more);

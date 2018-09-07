@@ -16,14 +16,16 @@ import {ElementHelper} from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Navigate to Event Page - [785879]', async () => {
-        const stepLogger = new StepLogger(785879);
+        stepLogger.caseId = 785879;
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.events,
@@ -33,13 +35,14 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add an Event- [786942]', async () => {
-        await EventsPageHelper.createNewEvent();
+        stepLogger.caseId = 786942;
+        await EventsPageHelper.createNewEvent(stepLogger);
     });
 
     it('Create View- [855383]', async () => {
-        const stepLogger = new StepLogger(855383);
+        stepLogger.caseId = 855383;
         const uniqueId = PageHelper.getUniqueId();
-        stepLogger.precondition('User is in Event page ');
+        stepLogger.preCondition('User is in Event page ');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.events,
             CommonPage.pageHeaders.myWorkplace.events,
@@ -52,9 +55,9 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Create Default View - [855387]', async () => {
-        const stepLogger = new StepLogger(855387);
+        stepLogger.caseId = 855387;
         const uniqueId = PageHelper.getUniqueId();
-        stepLogger.precondition('User is in Event page ');
+        stepLogger.preCondition('User is in Event page ');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.events,
             CommonPage.pageHeaders.myWorkplace.events,
@@ -66,8 +69,8 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Create Column - [855530]', async () => {
-        const stepLogger = new StepLogger(855530);
-        stepLogger.precondition('User is in Event page ');
+        stepLogger.caseId = 855530;
+        stepLogger.preCondition('User is in Event page ');
         const uniqueId = PageHelper.getUniqueId();
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.events,

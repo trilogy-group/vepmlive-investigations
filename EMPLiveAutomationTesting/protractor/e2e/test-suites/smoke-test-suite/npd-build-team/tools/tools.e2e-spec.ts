@@ -14,14 +14,16 @@ import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Launch "Assignment Planner" - [743177]', async () => {
-        const stepLogger = new StepLogger(743177);
+        stepLogger.caseId = 743177;
         stepLogger.stepId(1);
         stepLogger.step('Select "Navigation" icon  from left side menu');
         stepLogger.step('Select Projects -> Projects from the options displayed');
@@ -128,7 +130,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('View the options under "Reports" drop-down" - [743178]', async () => {
-        const stepLogger = new StepLogger(743178);
+        stepLogger.caseId = 743178;
         stepLogger.stepId(1);
         stepLogger.step('Select "Navigation" icon  from left side menu');
         stepLogger.step('Select Projects -> Projects from the options displayed');

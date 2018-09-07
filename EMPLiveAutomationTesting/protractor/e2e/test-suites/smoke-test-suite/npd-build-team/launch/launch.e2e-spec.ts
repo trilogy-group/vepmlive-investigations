@@ -15,14 +15,16 @@ import {ElementHelper} from '../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Launch Build Team from Project Center - [743139]', async () => {
-        const stepLogger = new StepLogger(743139);
+        stepLogger.caseId = 743139;
         stepLogger.stepId(1);
         stepLogger.step('Select "Navigation" icon  from left side menu');
         stepLogger.step('Select Projects -> Projects from the options displayed');
@@ -88,7 +90,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Launch Build Team from Project Center - Ellipsis icon - [743140]', async () => {
-        const stepLogger = new StepLogger(743139);
+        stepLogger.caseId = 743139;
         stepLogger.stepId(1);
         stepLogger.step('Select "Navigation" icon  from left side menu');
         stepLogger.step('Select Projects -> Projects from the options displayed');
@@ -156,7 +158,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         });
 
     it('Navigate to Edit Costs page - [966345]', async () => {
-        const stepLogger = new StepLogger(966345);
+        stepLogger.caseId = 966345;
         const uniqueId = PageHelper.getUniqueId();
         const toolButtons = ProjectItemPage.toolButtons;
         const periodButtons = ProjectItemPage.periodButtons;
@@ -211,7 +213,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Validate right click for Projects > Project name." - [14119624]', async () => {
-        const stepLogger = new StepLogger(14119624);
+        stepLogger.caseId = 14119624;
         stepLogger.stepId(1);
         stepLogger.step('Under Navigations, click on Projects');
         await CommonPageHelper.navigateToItemPageUnderNavigation(

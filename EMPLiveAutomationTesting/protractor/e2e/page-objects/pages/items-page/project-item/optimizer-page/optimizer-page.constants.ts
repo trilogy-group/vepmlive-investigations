@@ -1,25 +1,25 @@
 export class OptimizerPageConstants {
     static readonly newViewName = 'New View';
-    static readonly viewTab= 'View tab';
-    static readonly saveView= 'Save view popup';
-    static readonly oneItemConfigureAlertMsg= 'You cannot Optimize only one Item!';
-    static readonly availableFieldsSection= 'Available Fields section';
-    static readonly selectedFieldsSection= 'Selected Fields section';
-    static readonly upArrow= 'Up Arrow';
-    static readonly downArrow= 'Down Arrow';
-    static readonly add= 'Add';
-    static readonly remove= 'Remove';
-    static readonly strategyName= 'Strategy';
-    static readonly currentStrategy= 'Current Strategy';
+    static readonly viewTab = 'View tab';
+    static readonly saveView = 'Save view popup';
+    static readonly oneItemConfigureAlertMsg = 'You cannot Optimize only one Item!';
+    static readonly availableFieldsSection = 'Available Fields section';
+    static readonly selectedFieldsSection = 'Selected Fields section';
+    static readonly upArrow = 'Up Arrow';
+    static readonly downArrow = 'Down Arrow';
+    static readonly add = 'Add';
+    static readonly remove = 'Remove';
+    static readonly strategyName = 'Strategy';
+    static readonly currentStrategy = 'Current Strategy';
     static readonly deleteStrategy = 'Delete strategy popup';
-    static readonly ok= 'OK';
-    static readonly cancel= 'Cancel';
+    static readonly ok = 'OK';
+    static readonly cancel = 'Cancel';
     static readonly collapsed = 'Collapsed Ribbon';
     static readonly optimizer = 'Optimizer Window';
     static readonly deleteView = 'Delete view popup';
-    static readonly currentView= 'Current View';
-    static readonly configure= 'Configure window';
-    static readonly selectColumns= 'Select Columns Window';
+    static readonly currentView = 'Current View';
+    static readonly configure = 'Configure window';
+    static readonly selectColumns = 'Select Columns Window';
     static readonly saveStrategy = 'Save strategy popup';
     static readonly renameStrategy = 'Rename strategy popup';
 
@@ -62,7 +62,7 @@ export class OptimizerPageConstants {
         };
     }
 
-    static get optimizerConfiguration(){
+    static get optimizerConfiguration() {
         return{
             heading: 'Optimizer Configuration',
             enterValueLabel: '1) Which field will be totaled and used to compare to the manually entered value?',
@@ -84,7 +84,7 @@ export class OptimizerPageConstants {
         };
     }
 
-    static get optimizerStrategyActions(){
+    static get optimizerStrategyActions() {
         return{
             saveStrategy: 'idptSaveScen',
             renameStrategy: 'idrenamestrat',
@@ -95,7 +95,7 @@ export class OptimizerPageConstants {
         };
     }
 
-    static get optimierSaveStrategyPopup(){
+    static get optimierSaveStrategyPopup() {
         return{
             strategyName: 'idSaveStratName',
             personalStrategyCheckBox: 'idStratPer',
@@ -104,7 +104,7 @@ export class OptimizerPageConstants {
         };
     }
 
-    static get deleteStrategyPopup(){
+    static get deleteStrategyPopup() {
         return{
             message: 'Are you sure you want to delete this Strategy?',
             ok: 'OK',
@@ -119,7 +119,7 @@ export class OptimizerPageConstants {
         };
     }
 
-    static get deleteViewPopup(){
+    static get deleteViewPopup() {
         return {
             deleteViewPopup: 'idDeleteViewDlg',
             deleteViewMessage: 'Are you sure you want to delete this view?',
@@ -129,7 +129,7 @@ export class OptimizerPageConstants {
         };
     }
 
-    static get renameStrategyPopup(){
+    static get renameStrategyPopup() {
         return{
             strategyName: 'idRenameStrat',
             ok: 'OK',

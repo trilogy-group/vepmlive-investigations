@@ -7,12 +7,12 @@ export class BasePage implements Page {
     url: string;
 
     async goTo() {
-        browser.waitForAngularEnabled(false);
-        return this.get(this.url);
+        await browser.waitForAngularEnabled(false);
+        await this.get(this.url);
     }
 
     async get(url: string) {
-        return browser.get(url, PageHelper.DEFAULT_TIMEOUT);
+        await browser.get(url, PageHelper.DEFAULT_TIMEOUT);
     }
 
     async verifyExistence() {

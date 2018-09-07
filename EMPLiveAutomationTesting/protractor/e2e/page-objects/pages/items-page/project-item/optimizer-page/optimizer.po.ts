@@ -19,7 +19,7 @@ export class OptimizerPage extends BasePage {
         };
     }
 
-    static get saveViewPopup(){
+    static get saveViewPopup() {
         const label = OptimizerPageConstants.saveViewPopup;
         return{
             viewName: element(By.id(label.viewName)),
@@ -30,7 +30,7 @@ export class OptimizerPage extends BasePage {
         };
     }
 
-    static get getSelectColumnsPopup(){
+    static get getSelectColumnsPopup() {
         const label = OptimizerPageConstants.selectColumnsPopup;
         return{
             ok: ElementHelper.getElementByText(label.ok),
@@ -55,7 +55,7 @@ export class OptimizerPage extends BasePage {
         };
     }
 
-    static get getCloseOptimizerWindow(){
+    static get getCloseOptimizerWindow() {
         return element(By.css('div#idOptimizerTabDiv_ribbon img[src*="close"]'));
     }
 
@@ -72,11 +72,11 @@ export class OptimizerPage extends BasePage {
         return element(By.css(`${activeWindow} input[value="${buttonName}"]`));
     }
 
-    static get getConfigure(){
+    static get getConfigure() {
         return element(By.css('ul#idOptimizerTabDiv_ul img[src*="configure"]'));
     }
 
-    static get getOptimizerConfiguration(){
+    static get getOptimizerConfiguration() {
         const label = OptimizerPageConstants.optimizerConfiguration;
         return{
             heading: CommonPageHelper.getElementByText(label.heading),
@@ -99,7 +99,7 @@ export class OptimizerPage extends BasePage {
         };
     }
 
-    static get getOptimizerStrategyActions(){
+    static get getOptimizerStrategyActions() {
         const label = OptimizerPageConstants.optimizerStrategyActions;
         return{
             saveStrategy: AnchorHelper.getAnchorById(label.saveStrategy),
@@ -112,7 +112,7 @@ export class OptimizerPage extends BasePage {
         };
     }
 
-    static get getOptimierSaveStrategyPopup(){
+    static get getOptimierSaveStrategyPopup() {
         const label = OptimizerPageConstants.optimierSaveStrategyPopup;
         return{
             strategyName: element(By.id(label.strategyName)),
@@ -122,7 +122,7 @@ export class OptimizerPage extends BasePage {
         };
     }
 
-    static get getDeleteStrategyPopup(){
+    static get getDeleteStrategyPopup() {
         const label = OptimizerPageConstants.optimierSaveStrategyPopup;
         return{
             message: element(By.xpath('//div[@id="idDeleteStratagy"]/div/div[1]')),
@@ -145,11 +145,11 @@ export class OptimizerPage extends BasePage {
         };
     }
 
-    static get getCloseOptimizerViewTab(){
+    static get getCloseOptimizerViewTab() {
         return element(By.xpath('//ul[@id="idViewTabDiv_ul"]//span[text()="Close"]'));
     }
 
-    static get getDeleteViewPopup(){
+    static get getDeleteViewPopup() {
         const label = OptimizerPageConstants.deleteViewPopup;
         return {
             deleteViewMessage: element(By.xpath(`//div[@id="${label.deleteViewPopup}"]/div/div[1]`)),
@@ -168,7 +168,7 @@ export class OptimizerPage extends BasePage {
         return element(By.xpath(`//select[@id="${label.selectedFieldsSelect}"]//option[text()="${fieldName}"]`));
     }
 
-    static get getRenameStrategyPopup(){
+    static get getRenameStrategyPopup() {
         const label = OptimizerPageConstants.renameStrategyPopup;
         return{
             strategyName: element(By.id(label.strategyName)),

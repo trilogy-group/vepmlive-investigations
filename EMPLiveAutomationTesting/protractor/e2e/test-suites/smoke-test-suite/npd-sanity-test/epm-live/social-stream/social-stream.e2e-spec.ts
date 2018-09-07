@@ -19,14 +19,16 @@ import {DocumentPageHelper} from '../../../../../page-objects/pages/documents/do
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Add Social Stream Web Part - [856165]', async () => {
-        const stepLogger = new StepLogger(856165);
+        stepLogger.caseId = 856165;
         stepLogger.stepId(1);
         stepLogger.step('Go to left panel and click on Settings  (Main Gear) icon');
         await PageHelper.click(CommonPage.sidebarMenus.settings);
@@ -88,7 +90,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Post Status - [907973]', async () => {
-        const stepLogger = new StepLogger(907973);
+        stepLogger.caseId = 907973;
         stepLogger.stepId(1);
         const uniqueId = PageHelper.getUniqueId();
         const status = SocialStreamPageConstants.message.testStatus + uniqueId;
@@ -143,7 +145,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add Shared Document - [907964]', async () => {
-        const stepLogger = new StepLogger(907964);
+        stepLogger.caseId = 907964;
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
 
         stepLogger.stepId(1);

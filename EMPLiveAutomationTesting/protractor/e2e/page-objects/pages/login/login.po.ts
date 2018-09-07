@@ -3,7 +3,7 @@ import {LoginPageConstants} from './login-page.constants';
 import {LoginPageHelper} from './login-page.helper';
 
 export class LoginPage extends BasePage {
-    url = '/sites/test2518';
+    url = '/epm';
 
     static get usernameTextBox() {
         return LoginPageHelper.getFormControlById(LoginPageConstants.signInFormIDs.userName);

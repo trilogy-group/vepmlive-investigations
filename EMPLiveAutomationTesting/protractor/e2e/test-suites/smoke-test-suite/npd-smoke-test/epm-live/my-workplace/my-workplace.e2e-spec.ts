@@ -24,21 +24,23 @@ import {ElementHelper} from '../../../../../components/html/element-helper';
 // tslint:disable-next-line:max-line-length
 import {SharedDocumentsPageConstants} from '../../../../../page-objects/pages/my-workplace/shared-documents/shared-documents-page.constants';
 import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
-import {DiscussionsPageHelper } from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.helper';
-import {DiscussionsPage } from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
-import {DiscussionsPageConstants } from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.constants';
-import {TextboxHelper } from '../../../../../components/html/textbox-helper';
+import {DiscussionsPageHelper} from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.helper';
+import {DiscussionsPage} from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
+import {DiscussionsPageConstants} from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.constants';
+import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Create A New To Do From Workplace - [1124261]', async () => {
-        const stepLogger = new StepLogger(1124261);
+        stepLogger.caseId = 1124261;
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
@@ -90,7 +92,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Edit To Do from Workplace - [1175263]', async () => {
-        const stepLogger = new StepLogger(1175263);
+        stepLogger.caseId = 1175263;
         stepLogger.stepId(1);
 
         // Step #1  and #2 Inside this function
@@ -160,7 +162,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Create new Links from Workplace - [1175272]', async () => {
-        const stepLogger = new StepLogger(1175272);
+        stepLogger.caseId = 1175272;
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
@@ -187,7 +189,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Create new Pictures from Workplace - [1175271]', async () => {
-        const stepLogger = new StepLogger(1175271);
+        stepLogger.caseId = 1175271;
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
@@ -204,7 +206,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add Time Off From My Workplace - [1124447]', async () => {
-        const stepLogger = new StepLogger(1124447);
+        stepLogger.caseId = 1124447;
 
         stepLogger.step('Navigate to My Time Off page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
@@ -252,7 +254,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Create a NewEvent from Workspace Functionality - [1124296]', async () => {
-        const stepLogger = new StepLogger(1124296);
+        stepLogger.caseId = 1124296;
 
         // Step #1 and #2 Inside this function
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
@@ -290,7 +292,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Create new Shared Document from Workplace - [1175269]', async () => {
-        const stepLogger = new StepLogger(1175269);
+        stepLogger.caseId = 1175269;
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
@@ -308,10 +310,10 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Edit Event from Workplace - [1175266]', async () => {
-        const stepLogger = new StepLogger(1175266);
+        stepLogger.caseId = 1175266;
 
-        stepLogger.step('PRECONDITION: Create a New Event using steps in test case C1124296');
-        const title = await EventsPageHelper.createNewEvent();
+        stepLogger.step('preCondition: Create a New Event using steps in test case C1124296');
+        const title = await EventsPageHelper.createNewEvent(stepLogger);
 
         stepLogger.stepId(3);
         stepLogger.step('Click on Event Name link displayed in Events Page for the event created as per pre requisites');
@@ -352,10 +354,10 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Reply to a Discussion - [785614]', async () => {
-        const stepLogger = new StepLogger(785614);
+        stepLogger.caseId = 785614;
 
         // steps 1,2,3 are inside this function
-        stepLogger.step('PRECONDITION: Create new Discussion');
+        stepLogger.step('preCondition: Create new Discussion');
         await DiscussionsPageHelper.addDiscussion(stepLogger);
 
         stepLogger.stepId(4);

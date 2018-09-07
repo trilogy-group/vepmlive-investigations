@@ -1,27 +1,29 @@
-import { browser } from 'protractor';
+import {browser} from 'protractor';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-import { WorkspacePageHelper } from '../../../../../page-objects/pages/workspaces/workspace-page.helper';
-import { CommonPage } from '../../../../../page-objects/pages/common/common.po';
-import { ValidationsHelper } from '../../../../../components/misc-utils/validation-helper';
+import {WorkspacePageHelper} from '../../../../../page-objects/pages/workspaces/workspace-page.helper';
+import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
+import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Create Workspace Functionality - [1124282]', async () => {
-        const stepLogger = new StepLogger(1124282);
+        stepLogger.caseId = 1124282;
         await WorkspacePageHelper.createWorkspace(stepLogger);
     });
 
     it('To Verify User is able to view notification after Creating Workspace Using a Project Template - [1175091]', async () => {
-        const stepLogger = new StepLogger(1175091);
+        stepLogger.caseId = 1175091;
         const title = await WorkspacePageHelper.createWorkspace(stepLogger);
 
         stepLogger.stepId(5);

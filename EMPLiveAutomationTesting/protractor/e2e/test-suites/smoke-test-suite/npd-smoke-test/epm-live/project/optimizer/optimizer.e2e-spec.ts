@@ -17,15 +17,17 @@ import {ExpectationHelper} from '../../../../../../components/misc-utils/expecta
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Save View  - [785307]', async () => {
-        const stepLogger = new StepLogger(785307);
-        // Preconditions -Navigation Panel> Projects> Select project(s)> Click on 'Optimizer'
+        stepLogger.caseId = 785307;
+        // preConditions -Navigation Panel> Projects> Select project(s)> Click on 'Optimizer'
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,

@@ -10,14 +10,16 @@ import {OptimizerPageHelper} from '../../../../page-objects/pages/items-page/pro
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Verify the Close button of the Optimizer page  - [744351]', async () => {
-        const stepLogger = new StepLogger(744351);
+        stepLogger.caseId = 744351;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -36,7 +38,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify that when user select only single project  - [744353]', async () => {
-        const stepLogger = new StepLogger(744353);
+        stepLogger.caseId = 744353;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -52,7 +54,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify that Saved Strategy name displayed in the Current Strategy drop down box  - [744366]', async () => {
-        const stepLogger = new StepLogger(744366);
+        stepLogger.caseId = 744366;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -73,7 +75,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the Delete Strategy button  - [744369]', async () => {
-        const stepLogger = new StepLogger(744369);
+        stepLogger.caseId = 744369;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -93,7 +95,7 @@ describe(SuiteNames.regressionTestSuite, () => {
 
     it('Verify the content of label name "Which fields will be used as filters? of Optimizer configuration screen. - [744356]',
         async () => {
-            const stepLogger = new StepLogger(744356);
+            stepLogger.caseId = 744356;
             // Step 1 is inside the below function
             await CommonPageHelper.navigateToItemPageUnderNavigation(
                 HomePage.navigation.projects.projects,
@@ -109,7 +111,7 @@ describe(SuiteNames.regressionTestSuite, () => {
      });
 
     it('Verify that Strategy should be Deleted.  - [744370]', async () => {
-        const stepLogger = new StepLogger(744370);
+        stepLogger.caseId = 744370;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -130,7 +132,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the Minus Sign  - [744373]', async () => {
-        const stepLogger = new StepLogger(744373);
+        stepLogger.caseId = 744373;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -149,7 +151,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the close button of the View Tab.  - [744376]', async () => {
-        const stepLogger = new StepLogger(744376);
+        stepLogger.caseId = 744376;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -171,7 +173,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify that View should be Deleted.  - [744382]', async () => {
-        const stepLogger = new StepLogger(744382);
+        stepLogger.caseId = 744382;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -194,7 +196,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the message display on the bottom of the Optimizer configuration page. - [744360]', async () => {
-        const stepLogger = new StepLogger(744360);
+        stepLogger.caseId = 744360;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -211,7 +213,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify that Current strategy drop down. - [744372]', async () => {
-        const stepLogger = new StepLogger(744372);
+        stepLogger.caseId = 744372;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -229,7 +231,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the Select column button. - [744384]', async () => {
-        const stepLogger = new StepLogger(744384);
+        stepLogger.caseId = 744384;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -249,7 +251,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify the Hide all button of the Select column to display page should be displayed - [744385]', async () => {
-        const stepLogger = new StepLogger(744385);
+        stepLogger.caseId = 744385;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -274,7 +276,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Verify that selected column should be displayed on View Management grid. - [744386]', async () => {
-        const stepLogger = new StepLogger(744386);
+        stepLogger.caseId = 744386;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,

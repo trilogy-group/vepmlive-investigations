@@ -18,14 +18,16 @@ import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Add resources under "Current Team" - [778264]', async () => {
-        const stepLogger = new StepLogger(778264);
+        stepLogger.caseId = 778264;
         stepLogger.stepId(1);
         stepLogger.step('Select "Navigation" icon  from left side menu');
         stepLogger.step('Select Projects -> Projects from the options displayed');
@@ -155,7 +157,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Check behavior of "Save and Close" button - [778301]', async () => {
-        const stepLogger = new StepLogger(778301);
+        stepLogger.caseId = 778301;
         stepLogger.stepId(1);
         stepLogger.step('Select "Navigation" icon  from left side menu');
         stepLogger.step('Select Projects -> Projects from the options displayed');
@@ -280,10 +282,10 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('View the Build Team-Current team members in Project Planner. - [778315]', async () => {
-        const stepLogger = new StepLogger(778315);
+        stepLogger.caseId = 778315;
         const uniqueId = PageHelper.getUniqueId();
 
-        stepLogger.precondition('Execute test case C778301 and add a resource to Project [Ex: Smoke Test Project 2 /' +
+        stepLogger.preCondition('Execute test case C778301 and add a resource to Project [Ex: Smoke Test Project 2 /' +
             ' Generic Resource 1]');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects, CommonPage.pageHeaders.projects.projectsCenter,
@@ -386,7 +388,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Verify functionality of "Always follow Web-Settings" check-box.. - [778281]', async () => {
-        const stepLogger = new StepLogger(778281);
+        stepLogger.caseId = 778281;
         stepLogger.stepId(1);
         stepLogger.step('Select "Navigation" icon  from left side menu');
         stepLogger.step('Select Projects -> Projects from the options displayed');

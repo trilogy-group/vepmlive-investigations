@@ -18,14 +18,16 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Add Changes Functionality - [1124277]', async () => {
-        const stepLogger = new StepLogger(1124277);
+        stepLogger.caseId = 1124277;
 
         stepLogger.stepId(1);
 
@@ -90,7 +92,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Edit Changes Functionality - [1124278]', async () => {
-        const stepLogger = new StepLogger(1124275);
+        stepLogger.caseId = 1124275;
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function

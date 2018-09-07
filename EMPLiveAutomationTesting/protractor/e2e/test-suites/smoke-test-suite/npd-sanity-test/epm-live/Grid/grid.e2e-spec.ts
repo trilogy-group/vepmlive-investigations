@@ -17,19 +17,21 @@ import {WaitHelper} from '../../../../../components/html/wait-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Add Duration. - [970519]', async () => {
-        const stepLogger = new StepLogger(970519);
+        stepLogger.caseId = 970519;
         const uniqueId = PageHelper.getUniqueId();
         const input = MyTimeOffPageConstants.inputValues;
         const finishDate = input.finishDate;
 
-        stepLogger.precondition('Execute steps# 1 to 7 in test case C855881 and add a task to resource and publish the project');
+        stepLogger.preCondition('Execute steps# 1 to 7 in test case C855881 and add a task to resource and publish the project');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,

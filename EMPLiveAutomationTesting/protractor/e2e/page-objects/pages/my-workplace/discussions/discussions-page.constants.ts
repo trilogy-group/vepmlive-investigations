@@ -6,8 +6,8 @@ export class DiscussionsPageConstants {
     static readonly pageName = `${DiscussionsPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
     static readonly discussionPage = `${DiscussionsPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.subject}`;
     static readonly editPageName = `${DiscussionsPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
-    static readonly subjectInputTitle= 'Subject Required Field';
-    static readonly question= 'Question';
+    static readonly subjectInputTitle = 'Subject Required Field';
+    static readonly question = 'Question';
     static readonly reply = 'Reply';
 
     static get inputLabels() {

@@ -10,27 +10,27 @@ import {ElementHelper} from '../../../components/html/element-helper';
 
 export class WorkSpacesPage extends BasePage {
 
-    static get titleInputField(){
+    static get titleInputField() {
         return element(By.id('tbWsName'));
     }
 
-    static get descInputField(){
+    static get descInputField() {
         return element(By.id('tbWsDescription'));
     }
 
-    static get createWorkSpaceButton(){
+    static get createWorkSpaceButton() {
         return element(By.xpath(`//button[${ComponentHelpers.getXPathFunctionForText(WorkspacesConstants.windowTitle)}]`));
     }
 
-    static get newWorkSpaceButton(){
+    static get newWorkSpaceButton() {
         return ElementHelper.getElementByText(WorkspacesConstants.newWorkspace);
     }
 
-    static get openPermission(){
+    static get openPermission() {
         return element(By.id('permsOpen'));
     }
 
-    static get projectTemplate(){
+    static get projectTemplate() {
         return element(By.xpath(`//div/span[text() = '${WorkspacesConstants.projectTemplate}']`));
     }
 
@@ -43,18 +43,18 @@ export class WorkSpacesPage extends BasePage {
         };
     }
 
-    static get allWorkspaceListing(){
+    static get allWorkspaceListing() {
         const divXpath = `//div[@id='${HtmlHelper.attributeValue.subWorkspaces}']`;
         const liXpath = `//li[contains(@class,'${HtmlHelper.attributeValue.navTrans}')]`;
         const xpath = `${divXpath}${liXpath}`;
         return element(By.xpath(xpath));
     }
 
-    static get workspaceEllipsis(){
+    static get workspaceEllipsis() {
         return element(By.css('#epm-nav-sub-workspaces .icon-ellipsis-horizontal'));
     }
 
-    static get contextMenu(){
+    static get contextMenu() {
         const option = WorkspacesConstants.contextMenu;
         return {
             editTeam: AnchorHelper.getAnchorByText(option.editTeam),
@@ -62,7 +62,7 @@ export class WorkSpacesPage extends BasePage {
         };
     }
 
-    static get editTeamPopupHeading(){
+    static get editTeamPopupHeading() {
         return CommonPageHelper.getElementByTitle(WorkspacesConstants.editTeam);
     }
 }

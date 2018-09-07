@@ -11,14 +11,16 @@ import {IssueItemPageHelper} from '../../../../page-objects/pages/items-page/iss
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Verify the "Save" button when no changes made - [743219]', async () => {
-        const stepLogger = new StepLogger(743219);
+        stepLogger.caseId = 743219;
         stepLogger.stepId(1);
         // verification for step 1 is inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(

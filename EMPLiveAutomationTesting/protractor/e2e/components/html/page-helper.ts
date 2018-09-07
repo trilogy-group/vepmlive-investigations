@@ -1,11 +1,11 @@
 /**
  * Page helper for general utility
  */
-import { browser, ElementArrayFinder, ElementFinder, protractor, WebElement } from 'protractor';
-import { WaitHelper } from './wait-helper';
-import { JsHelper } from '../misc-utils/js-helper';
-import { ElementHelper } from './element-helper';
-import { StepLogger } from '../../../core/logger/step-logger';
+import {browser, ElementArrayFinder, ElementFinder, protractor, WebElement} from 'protractor';
+import {WaitHelper} from './wait-helper';
+import {JsHelper} from '../misc-utils/js-helper';
+import {ElementHelper} from './element-helper';
+import {StepLogger} from '../../../core/logger/step-logger';
 
 const shortId = require('shortid');
 const remote = require('selenium-webdriver/remote');
@@ -39,13 +39,6 @@ export class PageHelper {
 
     static actionKeyDown(key: string) {
         return browser.actions().keyDown(key).perform();
-    }
-
-    static executeInIframe(index: number | WebElement, fn: Function) {
-        browser.switchTo().frame(index);
-        fn();
-        browser.switchTo().defaultContent();
-        browser.waitForAngular();
     }
 
     static actionSendKeys(key: string) {
@@ -246,17 +239,6 @@ export class PageHelper {
         }
     }
 
-    public static async clickAllElements(targetElements: ElementArrayFinder) {
-        targetElements.each(async function (elem) {
-            await elem.click();
-        });
-    }
-
-    static async getTextWithNoWait(elem: ElementFinder) {
-        const text = await elem.getText();
-        return text;
-    }
-
     /**
      * Gets promise for current url
      * @returns {any}
@@ -265,7 +247,7 @@ export class PageHelper {
         return browser.getCurrentUrl();
     }
 
-    public static async getPageTitle() {
+    static async getPageTitle() {
         return await browser.getTitle();
     }
 

@@ -19,14 +19,16 @@ import {ElementHelper} from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Add Risks Functionality - [1124271]', async () => {
-        const stepLogger = new StepLogger(1124271);
+        stepLogger.caseId = 1124271;
         stepLogger.stepId(1);
         stepLogger.step('Select "Create New" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.createNew);
@@ -110,7 +112,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Edit Risks Functionality - [1124272]', async () => {
-        const stepLogger = new StepLogger(1124272);
+        stepLogger.caseId = 1124272;
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
@@ -128,7 +130,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Edit view in Risk - [1176329]', async () => {
-        const stepLogger = new StepLogger(1176329);
+        stepLogger.caseId = 1176329;
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
@@ -144,7 +146,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Search Risk - [1176333]', async () => {
-        const stepLogger = new StepLogger(1176333);
+        stepLogger.caseId = 1176333;
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
@@ -179,7 +181,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('View Item in Risk - [1176338]', async () => {
-        const stepLogger = new StepLogger(1176338);
+        stepLogger.caseId = 1176338;
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
@@ -201,7 +203,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add attachment in Risk - [1176340]', async () => {
-        const stepLogger = new StepLogger(1176340);
+        stepLogger.caseId = 1176340;
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
@@ -223,7 +225,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add new Public view in Risk - [1176327]', async () => {
-        const stepLogger = new StepLogger(1176327);
+        stepLogger.caseId = 1176327;
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
@@ -277,7 +279,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Select Columns in Risk - [1176336]', async () => {
-        const stepLogger = new StepLogger(1176336);
+        stepLogger.caseId = 1176336;
         stepLogger.stepId(1);
         stepLogger.stepId(2);
         // Step #1 and #2 Inside this function

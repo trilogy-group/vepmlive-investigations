@@ -7,14 +7,16 @@ import {IssueItemPageHelper} from '../../../page-objects/pages/items-page/issue-
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Add, Edit and Delete Issue - [829740]', async () => {
-        const stepLogger = new StepLogger(829740);
+        stepLogger.caseId = 829740;
         stepLogger.stepId(1);
         let titleValue = await IssueItemPageHelper.createIssueAndValidateIt(stepLogger);
 

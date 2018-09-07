@@ -10,14 +10,16 @@ import {LoginPage} from '../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Add  resource - [829512]', async () => {
-        const stepLogger = new StepLogger(829512);
+        stepLogger.caseId = 829512;
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.resources,

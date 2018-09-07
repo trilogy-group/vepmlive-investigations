@@ -10,14 +10,16 @@ import {MyWorkPageHelper} from '../../../../page-objects/pages/my-workplace/my-w
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Edit page via Edit page option. - [745079]', async () => {
-        const stepLogger = new StepLogger(745079);
+        stepLogger.caseId = 745079;
         const pageHeader = CommonPage.pageHeaders;
         const pageHeaderName = CommonPageConstants.pageHeaders.myWorkplace;
 

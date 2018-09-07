@@ -10,14 +10,16 @@ import {OptimizerPageHelper} from '../../../../../page-objects/pages/items-page/
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Create New Strategy in Optimizer Functionality - [1124301]', async () => {
-        const stepLogger = new StepLogger(1124301);
+        stepLogger.caseId = 1124301;
         const uniqueId = PageHelper.getUniqueId();
 
         stepLogger.stepId(1);

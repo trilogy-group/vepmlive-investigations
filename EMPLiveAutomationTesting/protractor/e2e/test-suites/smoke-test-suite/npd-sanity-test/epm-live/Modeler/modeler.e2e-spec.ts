@@ -13,14 +13,16 @@ import {IssueItemPageHelper} from '../../../../../page-objects/pages/items-page/
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Validate Edit Cost Functionality in Cost Planner - [783206]', async () => {
-        const stepLogger = new StepLogger(783206);
+        stepLogger.caseId = 783206;
         const cost =  4;
 
         const uniqueId = PageHelper.getUniqueId();

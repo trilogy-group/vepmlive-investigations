@@ -15,14 +15,16 @@ import {PlannerSettingPage} from '../../../../../page-objects/pages/settings/pla
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Add new planner - [1032747]', async () => {
-        const stepLogger = new StepLogger(1032747);
+        stepLogger.caseId = 1032747;
         stepLogger.stepId(1);
         const uniqueId = PageHelper.getUniqueId();
         const plannerName = `${PlannerSettingsPageConstants.newPlannerDetails.name}${uniqueId}`;
@@ -82,9 +84,9 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Edit Planner name - [1032780]', async () => {
-        const stepLogger = new StepLogger(1032780);
+        stepLogger.caseId = 1032780;
         const uniqueId = PageHelper.getUniqueId();
-        stepLogger.precondition('Add new planner');
+        stepLogger.preCondition('Add new planner');
         const plannerName = `${PlannerSettingsPageConstants.newPlannerDetails.name}${uniqueId}`;
         const plannerUpdatedName = PlannerSettingsPageConstants.newPlannerDetails.updatedName + uniqueId;
         await PlannerSettingsPageHelper.createPlanner(plannerName);

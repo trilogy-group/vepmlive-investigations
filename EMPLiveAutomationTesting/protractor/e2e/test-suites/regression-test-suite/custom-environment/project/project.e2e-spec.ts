@@ -15,14 +15,16 @@ import {EditCost} from '../../../../page-objects/pages/items-page/project-item/e
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Validate right click for Projects > Edit Cost tab - [14119619]', async () => {
-        const stepLogger = new StepLogger(14119619);
+        stepLogger.caseId = 14119619;
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -43,7 +45,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     });
 
     it('Validate right click for Projects > Edit resource tab - [14119617]', async () => {
-        const stepLogger = new StepLogger(14119617);
+        stepLogger.caseId = 14119617;
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -63,7 +65,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await ResourcePlannerPageHelper.validateEditResourceOpenInNewTab(stepLogger);
     });
     it('Validate right click for Projects > Edit Cost tab through Ellipse link - [14119634]', async () => {
-        const stepLogger = new StepLogger(14119634);
+        stepLogger.caseId = 14119634;
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -83,7 +85,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await EditCostHelper.validateEditCostOpenInNewTab(stepLogger);
     });
     it('Validate right click for Projects > Edit resource tab through ellipse link - [14119625]', async () => {
-        const stepLogger = new StepLogger(14119625);
+        stepLogger.caseId = 14119625;
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -104,7 +106,7 @@ describe(SuiteNames.regressionTestSuite, () => {
 
     });
     it('Validate right click for Projects > Project name. - [14119624]', async () => {
-        const stepLogger = new StepLogger(14119624);
+        stepLogger.caseId = 14119624;
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,

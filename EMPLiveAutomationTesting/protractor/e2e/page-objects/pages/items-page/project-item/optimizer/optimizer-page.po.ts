@@ -32,16 +32,16 @@ export class OptimizerPage extends BasePage {
     static  get saveNewStratedyName() {
         return element(By.xpath('//*[@class="button-container"]//*[@value="OK"]'));
     }
-    static get currectstrategy(){
+    static get currectstrategy() {
         return element(By.id('idOptTab_SelView_viewinternal'));
     }
-    static get optimizerText(){
+    static get optimizerText() {
         return ElementHelper.getElementByText(OptimizerPageConstants.optimizerText , true);
     }
-    static get totalFieldDropDown(){
+    static get totalFieldDropDown() {
         return element(By.id(OptimizerPageConstants.fieldDropDownId));
     }
-    static get totalFieldDropDownOption(){
+    static get totalFieldDropDownOption() {
         return element.all(By.css(`#${OptimizerPageConstants.fieldDropDownId} option`)).get(0);
     }
 }

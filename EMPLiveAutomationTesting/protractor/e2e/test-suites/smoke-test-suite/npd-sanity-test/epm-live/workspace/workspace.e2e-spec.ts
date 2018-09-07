@@ -15,26 +15,28 @@ import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Navigate to Associated Items page - [966382]', async () => {
-        const stepLogger = new StepLogger(966382);
-        stepLogger.precondition('Select "Navigation" icon  from left side menu');
-        stepLogger.precondition('Select Projects -> Projects from the options displayed');
+        stepLogger.caseId = 966382;
+        stepLogger.preCondition('Select "Navigation" icon  from left side menu');
+        stepLogger.preCondition('Select Projects -> Projects from the options displayed');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
-        stepLogger.precondition('Select any project from project center');
+        stepLogger.preCondition('Select any project from project center');
         await PageHelper.click(CommonPage.project);
-        stepLogger.precondition('Click ITEMS tab select Edit Plan');
+        stepLogger.preCondition('Click ITEMS tab select Edit Plan');
         await PageHelper.click(CommonPage.editPlan);
-        stepLogger.precondition('click on Project Planner');
+        stepLogger.preCondition('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
         // Planner takes time to get open so sleep required
         await browser.sleep(PageHelper.timeout.m);

@@ -38,6 +38,7 @@ export class MyWorkPage {
     static get inputs() {
         const labels = MyWorkPageConstants.inputLabels;
         return {
+            heading: element(By.id(labels.heading)),
             title: CommonPageHelper.getTextBoxByLabel(labels.title),
             project: CommonPageHelper.getFirstAutoCompleteByLabel(labels.project),
             assignedTo: this.getInputByTitle(labels.assignedTo),
@@ -101,7 +102,7 @@ export class MyWorkPage {
         return element(By.xpath(`.//*[@aria-selected="true" and @title='${CommonPageConstants.ribbonMenuTitles.page}']`));
     }
 
-    static get selectRibbonTabs(){
+    static get selectRibbonTabs() {
         const tabNames = MyWorkPageConstants.ribbonTabs;
         return{
             page: this.getLinkByTitle(tabNames.page),
@@ -111,7 +112,7 @@ export class MyWorkPage {
         };
     }
 
-    static get getViewRibbonOptions(){
+    static get getViewRibbonOptions() {
         const viewRibbonlabel = MyWorkPageConstants.viewRibbonOptions;
         return{
             saveView: AnchorHelper.getAnchorById(viewRibbonlabel.saveView),
@@ -120,7 +121,7 @@ export class MyWorkPage {
         };
     }
 
-    static get viewsPopup(){
+    static get viewsPopup() {
         const viewPopuplabel = MyWorkPageConstants.viewsPopUp;
         return{
             title: AnchorHelper.getItemById(viewPopuplabel.title),
@@ -143,5 +144,29 @@ export class MyWorkPage {
 
     static saveViewElements(idOrAny: string) {
         return element(By.xpath(`//div[@class='ms-dlgBorder']//input[@*="${idOrAny}"]`));
+    }
+
+    static get stopEditing() {
+        return element(By.xpath('//li[@id= "Ribbon.WebPartPage.Edit"]//a[1]'));
+    }
+
+    static getItemByName(itemName: string) {
+        return element(By.xpath(`//td[contains(@class,"EPMLiveMyWorkTitle")] //a[text()="${itemName}"]`));
+    }
+
+    static get validationMessage() {
+        return element(By.css('span[role="alert"]'));
+    }
+
+    static get buttonsOnPopup() {
+        const buttonsNameLabel = MyWorkPageConstants.buttonsOnPopup;
+        return {
+            save: element(By.css(`input[value='${buttonsNameLabel.save}']`)),
+            cancel: element(By.css(`td > input[value='${buttonsNameLabel.cancel}']`)),
+        };
+    }
+
+    static get assignedToSuggestions() {
+        return element(By.xpath('//div[contains(@id,"AssignedTo")]//li[1]'));
     }
 }

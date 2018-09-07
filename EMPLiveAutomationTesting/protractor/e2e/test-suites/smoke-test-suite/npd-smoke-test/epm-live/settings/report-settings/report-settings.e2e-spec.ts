@@ -21,14 +21,16 @@ import {ReportingSettingsPageConstants} from '../../../../../../page-objects/pag
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Run Refresh Schedule Functionality - [1124280]', async () => {
-        const stepLogger = new StepLogger(1124280);
+        stepLogger.caseId = 1124280;
         stepLogger.stepId(1);
         stepLogger.step('Click on "Main Gear Settings" icon  displayed in left bottom corner');
         await PageHelper.click(CommonPage.sidebarMenus.settings);
@@ -78,10 +80,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         const lastRunLabel = ReportManagerPage.formControls.lastRun;
         const lastRunValue = await lastRunLabel.getText();
         let maxAttempts = 0;
-        while (!((await lastRunLabel.getText()).trim() !== Constants.EMPTY_STRING) && maxAttempts < 10) {
+        while ((await lastRunLabel.getText()).trim() === Constants.EMPTY_STRING && maxAttempts < 10) {
             await browser.sleep(PageHelper.timeout.s);
             maxAttempts++;
-            browser.refresh();
+            await browser.refresh();
         }
 
         stepLogger.verification('Last Result - commonly "No Errors" displayed (Note: Can display other results]');

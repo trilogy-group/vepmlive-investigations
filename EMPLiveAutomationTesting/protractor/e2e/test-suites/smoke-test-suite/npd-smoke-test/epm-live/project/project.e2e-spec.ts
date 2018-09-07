@@ -19,14 +19,16 @@ import {EditCostHelper} from '../../../../../page-objects/pages/items-page/proje
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Add Project Functionality - [1124170]', async () => {
-        const stepLogger = new StepLogger(1124170);
+        stepLogger.caseId = 1124170;
 
         stepLogger.stepId(1);
 
@@ -85,7 +87,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Edit Project Functionality - [1124173]', async () => {
-        const stepLogger = new StepLogger(1124173);
+        stepLogger.caseId = 1124173;
         stepLogger.stepId(1);
 
         // Step #1 Inside this function
@@ -180,7 +182,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add resources under "Current Team" - [743144]', async () => {
-        const stepLogger = new StepLogger(743144);
+        stepLogger.caseId = 743144;
         const uniqueId = PageHelper.getUniqueId();
 
         stepLogger.step('Create a new project and navigate to build team page');
@@ -199,11 +201,11 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Validate Edit Cost Functionality in Cost Planner - [743932]', async () => {
-        const stepLogger = new StepLogger(743932);
+        stepLogger.caseId = 743932;
         const cost =  4;
         const uniqueId = PageHelper.getUniqueId();
 
-        stepLogger.precondition('Creating New Project');
+        stepLogger.preCondition('Creating New Project');
         const  projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
 
         stepLogger.stepId(1);

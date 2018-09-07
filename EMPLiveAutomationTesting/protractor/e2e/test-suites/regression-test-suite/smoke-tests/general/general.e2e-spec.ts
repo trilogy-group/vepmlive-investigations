@@ -11,14 +11,16 @@ import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Check behavior of "Save and Close" button - [743175]', async () => {
-        const stepLogger = new StepLogger(743175);
+        stepLogger.caseId = 743175;
         const uniqueId = PageHelper.getUniqueId();
 
         stepLogger.step('Create a new project and navigate to build team page');

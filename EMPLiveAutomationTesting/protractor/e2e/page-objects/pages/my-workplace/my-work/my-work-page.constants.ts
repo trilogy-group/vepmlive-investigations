@@ -5,9 +5,16 @@ export class MyWorkPageConstants {
     static readonly pagePrefix = 'My Work';
     static readonly editPageName = `${MyWorkPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
     static readonly edit = 'Edit.Edit';
-    static readonly viewName= 'View';
-    static readonly renameView= 'rView';
-    static readonly currentView= 'Current View';
+    static readonly viewName = 'View';
+    static readonly renameView = 'rView';
+    static readonly currentView = 'Current View';
+    static readonly manage = 'Manage tab';
+    static readonly newItemPopupLabel = 'New Item popup';
+    static readonly toDoNewItemPopupLabel = 'ToDo New Item popup';
+    static readonly blankValidationMessage = 'You can\'t leave this blank.';
+    static readonly validationMessageLabel = 'Validation Message';
+    static readonly newItemListLabel = 'New Items list';
+    static readonly adMembersLabel = 'admembers:';
 
     static get pageName() {
         return {
@@ -33,6 +40,7 @@ export class MyWorkPageConstants {
 
     static get inputLabels() {
         return {
+            heading: 'dialogTitleSpan',
             title: 'Title *',
             project: 'Project *',
             assignedTo: 'Assigned To',
@@ -60,7 +68,7 @@ export class MyWorkPageConstants {
         };
     }
 
-    static get ribbonTabs(){
+    static get ribbonTabs() {
         return{
             page: 'Page',
             hide: 'Hide',
@@ -69,7 +77,7 @@ export class MyWorkPageConstants {
         };
     }
 
-    static get viewRibbonOptions(){
+    static get viewRibbonOptions() {
         return{
           saveView: 'Ribbon.MyWork.Views.SaveView-Medium',
           renameView: 'Ribbon.MyWork.Views.RenameView-Medium',
@@ -77,7 +85,7 @@ export class MyWorkPageConstants {
         };
     }
 
-    static get viewsPopUp(){
+    static get viewsPopUp() {
         return{
             title: 'dialogTitleSpan',
             name: 'MWG_ViewName',
@@ -86,6 +94,23 @@ export class MyWorkPageConstants {
             ok: 'OK',
             cancel: 'Cancel',
             newName: 'MWG_ViewNewName'
+        };
+    }
+
+    static get newItemTypeLabels() {
+        return {
+            changes: `Changes`,
+            issues: `Issues`,
+            risks: `Risks`,
+            timeOff: `Time Off`,
+            toDo: `To Do`,
+        };
+    }
+
+    static get buttonsOnPopup() {
+        return {
+            save: 'Save',
+            cancel: 'Cancel'
         };
     }
 }

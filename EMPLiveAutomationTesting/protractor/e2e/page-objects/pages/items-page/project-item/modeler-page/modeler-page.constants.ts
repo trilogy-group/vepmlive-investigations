@@ -2,8 +2,8 @@ export class ModelerPageConstants {
     static readonly selectModel = 'Modeler popup';
     static readonly modeler = 'Modeler page';
     static readonly findNext = 'Find Next Button';
-    static readonly ok= 'OK Button';
-    static readonly cancel= 'Cancel Button';
+    static readonly ok = 'OK Button';
+    static readonly cancel = 'Cancel Button';
     static readonly selectModelDropdown = 'Select Model Dropdown';
     static readonly selectVersions = 'Select versions selection box';
     static readonly activeTab = 'Active Tab';
@@ -64,7 +64,7 @@ export class ModelerPageConstants {
         };
     }
 
-    static get tabNames(){
+    static get tabNames() {
         return {
             display: 'Display',
             view: 'View'

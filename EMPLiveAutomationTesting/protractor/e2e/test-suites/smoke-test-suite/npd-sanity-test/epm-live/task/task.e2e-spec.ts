@@ -19,14 +19,16 @@ import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Save the changes by Save button - [965680]', async () => {
-        const stepLogger = new StepLogger(965680);
+        stepLogger.caseId = 965680;
         const uniqueId = PageHelper.getUniqueId();
         const input = MyTimeOffPageConstants.inputValues;
         const finishDate = input.finishDate;

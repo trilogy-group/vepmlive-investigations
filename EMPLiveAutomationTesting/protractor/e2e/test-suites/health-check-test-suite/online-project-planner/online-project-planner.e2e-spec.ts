@@ -12,14 +12,16 @@ import {HomePage} from '../../../page-objects/pages/homepage/home.po';
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Add, Edit and Delete Project - [829527]', async () => {
-        const stepLogger = new StepLogger(829527);
+        stepLogger.caseId = 829527;
         stepLogger.stepId(1);
         // Step #1 Inside this function
         const uniqueId = PageHelper.getUniqueId();
@@ -32,11 +34,11 @@ describe(SuiteNames.healthCheckTestSuite, () => {
     });
 
     it('Edit Project Cost - [829775]', async () => {
-        const stepLogger = new StepLogger(829775);
+        stepLogger.caseId = 829775;
         const cost =  4;
         const uniqueId = PageHelper.getUniqueId();
 
-        stepLogger.precondition('Creating New Project');
+        stepLogger.preCondition('Creating New Project');
         const  projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
 
         stepLogger.stepId(1);

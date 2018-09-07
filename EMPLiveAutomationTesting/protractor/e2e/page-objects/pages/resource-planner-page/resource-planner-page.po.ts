@@ -6,11 +6,11 @@ import {CommonPage} from '../common/common.po';
 
 export class ResourcePlannerPage extends BasePage {
 
-    static get delete(){
+    static get delete() {
         return element(By.id('DeleteBtn'));
     }
 
-    static get selectUser(){
+    static get selectUser() {
         // selecting User which have department Test department 1
         // tslint:disable-next-line:max-line-length
         return element(By.xpath(`//*[normalize-space(text())="${ResourcePlannerConstants.user}"]//following-sibling::td[text()="${ResourcePlannerConstants.department}"]`));
@@ -25,24 +25,24 @@ export class ResourcePlannerPage extends BasePage {
         // selecting User which have department Test department 1
         return element.all(By.css('#g_RPE .GMHeadRight td.GMHeaderText'));
     }
-    static get addedUser(){
+    static get addedUser() {
         // selecting User which have department Test department 1
         return ElementHelper.getElementByText(ResourcePlannerConstants.user);
     }
-    static get selectMonth(){
+    static get selectMonth() {
         return element(By.css('#g_RPE .GMBodyRight .GMDataRow td.GMClassEdit'));
     }
-    static get inputHours(){
+    static get inputHours() {
         return element(By.css('input.GMEditInput'));
     }
-    static get yesButton(){
+    static get yesButton() {
         return element(By.css('[value="Yes"]'));
     }
 
-    static get greenCheckImg(){
+    static get greenCheckImg() {
         return element(By.css('[class*="rp-commitment"]'));
     }
-    static get privateCheckImg(){
+    static get privateCheckImg() {
         return element(By.css('[class*="rp-pm-private"]'));
     }
     static getTopSectionButtonById(id: string) {

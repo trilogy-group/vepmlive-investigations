@@ -11,13 +11,15 @@ import {ResourceAnalyzerPage} from '../../../../page-objects/pages/resource-anal
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
     it('Resource Analyzer period popup window. - [744532]', async () => {
-        const stepLogger = new StepLogger(744532);
+        stepLogger.caseId = 744532;
         stepLogger.step('Select "Navigation" icon  from left side menu');
         stepLogger.step('Select Projects -> Projects from the options displayed');
         // Step #1 and #2 Inside this function
@@ -38,7 +40,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     });
     it('Verify Analyzer tab of resource analyzer page. - [744534]', async () => {
-        const stepLogger = new StepLogger(744534);
+        stepLogger.caseId = 744534;
         stepLogger.step('Select "Navigation" icon  from left side menu');
         stepLogger.step('Select Projects -> Projects from the options displayed');
         // Step #1 and #2 Inside this function

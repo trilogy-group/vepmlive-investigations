@@ -15,14 +15,16 @@ import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLoginAsTeamMember();
     });
 
     it('Navigate to My Time off page - [785492]', async () => {
-        const stepLogger = new StepLogger(785492);
+        stepLogger.caseId = 785492;
         stepLogger.stepId(1);
         // step#2 is inside this function
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
@@ -33,8 +35,8 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add a Time off request - [785495]', async () => {
-        const stepLogger = new StepLogger(785495);
-        stepLogger.step('PRECONDITION: navigate to Time Off page');
+        stepLogger.caseId = 785495;
+        stepLogger.step('preCondition: navigate to Time Off page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.myTimeOff,
             CommonPage.pageHeaders.myWorkplace.timeOff,
@@ -68,8 +70,8 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('View Time Off - [785496]', async () => {
-        const stepLogger = new StepLogger(785496);
-        stepLogger.step('PRECONDITION: Navigate Time Off Page');
+        stepLogger.caseId = 785496;
+        stepLogger.step('preCondition: Navigate Time Off Page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.myTimeOff,
             CommonPage.pageHeaders.myWorkplace.timeOff,

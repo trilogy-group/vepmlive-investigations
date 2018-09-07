@@ -13,27 +13,29 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let stepLogger: StepLogger;
     beforeEach(async () => {
+        stepLogger = new StepLogger();
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Set and Clear Baseline - [970398]', async () => {
-        const stepLogger = new StepLogger(970398);
-        stepLogger.precondition('Select "Navigation" icon  from left side menu');
-        stepLogger.precondition('Select Projects -> Projects from the options displayed');
+        stepLogger.caseId = 970398;
+        stepLogger.preCondition('Select "Navigation" icon  from left side menu');
+        stepLogger.preCondition('Select Projects -> Projects from the options displayed');
         const uniqueId = PageHelper.getUniqueId();
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
-        stepLogger.precondition('Select any project from project center');
+        stepLogger.preCondition('Select any project from project center');
         await PageHelper.click(CommonPage.project);
-        stepLogger.precondition('Click ITEMS tab select Edit Plan');
+        stepLogger.preCondition('Click ITEMS tab select Edit Plan');
         await PageHelper.click(CommonPage.editPlan);
-        stepLogger.precondition('click on Project Planner');
+        stepLogger.preCondition('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
         await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
