@@ -283,7 +283,7 @@ namespace EPMLiveCore.Tests.API.Publish
             ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => 1;
             ShimSPFieldUserValue.ConstructorSPWebString = (_, _1, _2) => new ShimSPFieldUserValue();
             ShimSPFieldUserValue.AllInstances.LookupValueGet = _ => Title;
-            ShimSPFieldUserValueCollection.ConstructorSPWebString = (_, _1, _2) => new SPFieldUserValueCollection(); ;
+            ShimSPFieldUserValueCollection.ConstructorSPWebString = (_, _1, _2) => new SPFieldUserValueCollection();
             ShimSPPersistedObject.AllInstances.IdGet = _ => guid;
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun =>
             {
@@ -531,8 +531,7 @@ namespace EPMLiveCore.Tests.API.Publish
             stringBuilder.Append("</Task>");
             stringBuilder.Append("</Project>");
             var expected = stringBuilder.ToString();
-
-            //ShimListDisplayUtils
+            
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPField>()
             {
                 new ShimSPField()
