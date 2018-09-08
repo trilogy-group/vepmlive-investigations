@@ -118,6 +118,7 @@
       <DependentUpon>Resource.resx</DependentUpon>
     </Compile>
     <Compile Include="SheetTestBase.cs" />
+    <Compile Include="TimesheetTest.cs" />
     <Compile Include="WebPageCode\GetPMApprovalsTests.cs" />
     <Compile Include="WebPageCode\GetTSApprovalsTests.cs" />
   </ItemGroup>
