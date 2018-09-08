@@ -169,4 +169,37 @@ export class MyWorkPage {
     static get assignedToSuggestions() {
         return element(By.xpath('//div[contains(@id,"AssignedTo")]//li[1]'));
     }
+
+    static get manageTabRibbonItems() {
+        const manageTabRibbonItemsLabel = MyWorkPageConstants.manageTabRibbonItems;
+        return {
+            viewItem: AnchorHelper.getAnchorById(manageTabRibbonItemsLabel.viewItem),
+            editItem: AnchorHelper.getAnchorById(manageTabRibbonItemsLabel.editItem),
+            comments: AnchorHelper.getAnchorById(manageTabRibbonItemsLabel.comments),
+        };
+    }
+
+    static get closeIconOnPopup() {
+        return element(By.id('Ribbon.ListForm.Edit.Commit.Cancel-Large'));
+    }
+
+    static get commentsPopupDetails() {
+        const commentsPopUpLabels = MyWorkPageConstants.commentsPopupDetails;
+        const commentLinksSection = `table.customCommentItem .socialcomment-cmdlink>a`;
+        const editCommentSection = `.commentsContainer .ms-socialCommentLoading`;
+        return{
+            cc: element(By.name(commentsPopUpLabels.cc)),
+            commentTextArea : element(By.id(commentsPopUpLabels.commentTextArea)),
+            post: element(By.id(commentsPopUpLabels.post)),
+            edit: element(By.css(`${commentLinksSection}:first-child`)),
+            delete: element(By.css(`${commentLinksSection}:last-child`)),
+            editCommentTextArea: element(By.css('.commentsContainer [id*="socialCommentInputBox"]')),
+            editPost: element(By.css(`${editCommentSection} [title="${commentsPopUpLabels.editPost}"]`)),
+            editCancel: element(By.css(`${editCommentSection} [title="${commentsPopUpLabels.editCancel}"]`)),
+        };
+    }
+
+    static getCommentByName(commentName: string) {
+        return element(By.xpath(`//div[@class="socialcomment-contents-TRC"  and text()="${commentName}"]`));
+    }
 }

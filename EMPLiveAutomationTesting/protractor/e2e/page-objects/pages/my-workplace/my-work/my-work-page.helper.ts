@@ -13,6 +13,7 @@ import {CommonPageConstants} from '../../common/common-page.constants';
 import {ExpectationHelper} from '../../../../components/misc-utils/expectation-helper';
 import {MyWorkplacePage} from '../my-workplace.po';
 import {browser} from 'protractor';
+import {ElementHelper} from '../../../../components/html/element-helper';
 
 export class MyWorkPageHelper {
 
@@ -91,7 +92,6 @@ export class MyWorkPageHelper {
 
     static async clickOnPageTab(stepLogger: StepLogger) {
         stepLogger.step('Click on "Page" tab');
-        await browser.sleep(PageHelper.timeout.s);
         await PageHelper.click(CommonPage.ribbonTitles.page);
     }
 
@@ -339,5 +339,114 @@ export class MyWorkPageHelper {
     static async clickRisksItem(stepLogger: StepLogger) {
         stepLogger.step('Click on "Risks Item"');
         await PageHelper.click( MyWorkPage.newItemMenu.risksItem);
+    }
+
+    static async clickOnAnyCreatedItem(stepLogger: StepLogger) {
+        stepLogger.step('Click on newly created item in the grid.');
+        await PageHelper.click(CommonPage.recordWithoutGreenTicket);
+    }
+
+    static async verifyEditItemButtonEnabled(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyEnabledStatus(
+            MyWorkPage.manageTabRibbonItems.editItem,
+            MyWorkPageConstants.editItemLabel,
+            stepLogger
+        );
+    }
+
+    static async clickOnEditItem(stepLogger: StepLogger) {
+        stepLogger.step('Click on "Edit Item" button.');
+        await PageHelper.click(MyWorkPage.manageTabRibbonItems.editItem);
+    }
+
+    static async editTitle(stepLogger: StepLogger) {
+        stepLogger.step('Edit field.');
+        const uniqueId = PageHelper.getUniqueId();
+        const itemEditedTitle = `${MyWorkPageConstants.editItemLabel} ${uniqueId}`;
+        await CommonPageHelper.switchToFirstContentFrame();
+        await TextboxHelper.sendKeys(MyWorkPage.inputs.title, itemEditedTitle);
+        return itemEditedTitle;
+    }
+
+    static async verifyChangesNotReflected(editedItemTitleForCancel: string, stepLogger: StepLogger) {
+        await ExpectationHelper.verifyNotDisplayedStatus(
+            MyWorkPage.getItemByName(editedItemTitleForCancel),
+            editedItemTitleForCancel,
+            stepLogger
+        );
+    }
+
+    static async clickCancelIcon(stepLogger: StepLogger) {
+        stepLogger.step('Click on cancel icon');
+        await PageHelper.click(MyWorkPage.closeIconOnPopup);
+    }
+
+    static async verifyCommentButtonEnabled(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyEnabledStatus(
+            MyWorkPage.manageTabRibbonItems.comments,
+            MyWorkPageConstants.commentsLabel,
+            stepLogger
+        );
+    }
+
+    static async clickOnComment(stepLogger: StepLogger) {
+        await stepLogger.step('Click on "Comment" button from ribbon panel.');
+        await PageHelper.click(MyWorkPage.manageTabRibbonItems.comments);
+        await browser.sleep(PageHelper.timeout.s);
+        await CommonPageHelper.switchToFirstContentFrame();
+    }
+
+    static async addComment(stepLogger: StepLogger) {
+        stepLogger.step('Add a comment');
+        const uniqueId = PageHelper.getUniqueId();
+        const commentText = `${MyWorkPageConstants.commentsLabel} ${uniqueId}`;
+        await TextboxHelper.sendKeys(MyWorkPage.commentsPopupDetails.commentTextArea, commentText);
+        return commentText;
+    }
+
+    static async clickOnPost(stepLogger: StepLogger) {
+        stepLogger.step('Click on "Post" button.');
+        await PageHelper.click(MyWorkPage.commentsPopupDetails.post);
+    }
+
+    static async verifyCommentedPost(commentText: string, stepLogger: StepLogger) {
+        // Dynamic wait didn't help
+        await browser.sleep(PageHelper.timeout.s);
+        await ExpectationHelper.verifyDisplayedStatus(
+            MyWorkPage.getCommentByName(commentText),
+            commentText,
+            stepLogger
+        );
+    }
+
+    static async clickEditOnAnyComment(stepLogger: StepLogger) {
+        stepLogger.step('Click on "Edit" button.');
+        await PageHelper.click(MyWorkPage.commentsPopupDetails.edit);
+    }
+
+    static async editComment(stepLogger: StepLogger) {
+        stepLogger.step('Edit the comment');
+        const uniqueId = PageHelper.getUniqueId();
+        const commentText = `${MyWorkPageConstants.editCommentsLabel} ${uniqueId}`;
+        await TextboxHelper.sendKeys(MyWorkPage.commentsPopupDetails.editCommentTextArea, commentText);
+        return commentText;
+    }
+
+    static async clickOnPostForEditComment(stepLogger: StepLogger) {
+        stepLogger.step('Click post button on edit comment section');
+        await PageHelper.click(MyWorkPage.commentsPopupDetails.editPost);
+    }
+
+    static async clickOnDelete(stepLogger: StepLogger) {
+        stepLogger.step('Click on "Delete" button.');
+        await ElementHelper.clickUsingJsNoWait(MyWorkPage.commentsPopupDetails.delete);
+    }
+
+    static async verifyCommentDeleted(commentText: string, stepLogger: StepLogger) {
+        await ExpectationHelper.verifyNotDisplayedStatus(
+            MyWorkPage.getCommentByName(commentText),
+            commentText,
+            stepLogger
+        );
     }
 }

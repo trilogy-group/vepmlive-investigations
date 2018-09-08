@@ -17,7 +17,7 @@ describe(SuiteNames.endToEndSuite, () => {
 
     });
 
-    fit('Stop Editing via Stop-Editing option. - [745080]', async () => {
+    it('Stop Editing via Stop-Editing option. - [745080]', async () => {
         stepLogger.caseId = 745080;
 
         stepLogger.stepId(2);
@@ -37,7 +37,7 @@ describe(SuiteNames.endToEndSuite, () => {
         await MyWorkPageHelper.verifyManageTabDisplayed(stepLogger);
     });
 
-    fit('Create New "Changes" Item. - [745084]', async () => {
+    it('Create New "Changes" Item. - [745084]', async () => {
         stepLogger.caseId = 745084;
 
         stepLogger.stepId(2);
@@ -53,7 +53,7 @@ describe(SuiteNames.endToEndSuite, () => {
         await MyWorkPageHelper.verifyCreateItem(changesTitle, stepLogger);
     });
 
-    fit('Create New "Issues" Item. - [745085]', async () => {
+    it('Create New "Issues" Item. - [745085]', async () => {
         stepLogger.caseId = 745085;
 
         stepLogger.stepId(2);
@@ -69,7 +69,7 @@ describe(SuiteNames.endToEndSuite, () => {
         await MyWorkPageHelper.verifyCreateItem(issuesTitle, stepLogger);
     });
 
-    fit('Create New "Risks" Item. - [745086]', async () => {
+    it('Create New "Risks" Item. - [745086]', async () => {
         stepLogger.caseId = 745086;
 
         stepLogger.stepId(2);
@@ -85,7 +85,7 @@ describe(SuiteNames.endToEndSuite, () => {
         await MyWorkPageHelper.verifyCreateItem(risksTitle, stepLogger);
     });
 
-    fit('Check validation while creating new item. - [745089]', async () => {
+    it('Check validation while creating new item. - [745089]', async () => {
         stepLogger.caseId = 745089;
 
         stepLogger.stepId(2);

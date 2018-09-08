@@ -15,6 +15,9 @@ export class MyWorkPageConstants {
     static readonly validationMessageLabel = 'Validation Message';
     static readonly newItemListLabel = 'New Items list';
     static readonly adMembersLabel = 'admembers:';
+    static readonly editItemLabel = 'Edit Item';
+    static readonly commentsLabel = 'Comments';
+    static readonly editCommentsLabel = 'Edit Comments';
 
     static get pageName() {
         return {
@@ -111,6 +114,28 @@ export class MyWorkPageConstants {
         return {
             save: 'Save',
             cancel: 'Cancel'
+        };
+    }
+
+    static get manageTabRibbonItems() {
+        const manageTabRibbon = 'Ribbon.MyWork.Manage.';
+        return {
+            viewItem: `${manageTabRibbon}ViewItem-Large`,
+            editItem: `${manageTabRibbon}EditItem-Large`,
+            comments: `${manageTabRibbon}Comments-Large`,
+        };
+    }
+
+    static get commentsPopupDetails() {
+        return{
+            cc: 'upLevelDiv',
+            commentTextArea : 'tbCommentInput',
+            post: 'postBtn',
+            edit: 'Edit',
+            delete: 'Delete',
+            editCommentTextArea: 'socialCommentInputBox',
+            editPost: 'Post',
+            editCancel: 'Cancel',
         };
     }
 }
