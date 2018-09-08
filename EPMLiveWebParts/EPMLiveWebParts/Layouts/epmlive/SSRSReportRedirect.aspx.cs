@@ -58,7 +58,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     itemUrl = itemUrl.Remove(itemUrl.IndexOf("?"));
                 }
 
-                var urlim = getReportParameters(SPUrlUtility.CombineUrl(webUrl, itemUrl));
+                var urlim = getReportParameters(webUrl,itemUrl);
                 var sServerReelativeUrl = (web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl;
 
                 //var sRedirectUrl = sServerReelativeUrl +
@@ -82,8 +82,12 @@ namespace EPMLiveWebParts.Layouts.epmlive
             }
         }
 
-        private bool SetupSSRS()
+        private bool SetupSSRS(string webUrl)
         {
+			if (_reportingServicesUrl.StartsWith("/"))
+				_reportingServicesUrl = webUrl + _reportingServicesUrl;
+
+
             var valid = false;
             try
             {
@@ -99,6 +103,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
                 if (!bool.Parse(EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportsUseIntegrated")))
                     return valid;
+
 
                 _srs2006 = new ReportingService2006 { UseDefaultCredentials = true };
                 var rptWs = _reportingServicesUrl + "/ReportService2006.asmx";
@@ -135,11 +140,12 @@ namespace EPMLiveWebParts.Layouts.epmlive
             return valid;
         }
 
-        private string getReportParameters(string url)
+        private string getReportParameters(string webUrl, string itemUrl)
         {
+			string url = SPUrlUtility.CombineUrl(webUrl, itemUrl);
 
-            var parameters = "";
-            if (!SetupSSRS())
+			var parameters = "";
+            if (!SetupSSRS(webUrl))
             {
                 return parameters;
             }
