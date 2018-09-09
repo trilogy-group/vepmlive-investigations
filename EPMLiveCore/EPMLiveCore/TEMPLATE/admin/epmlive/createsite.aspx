@@ -136,9 +136,16 @@
 				<Template_Control>
 				<table dir="ltr" border="0" width="100%" cellspacing="0" cellpadding="0" class="authoringcontrols">
 					<tr>
+						<td colspan="2">
+							<wssawc:InputFormCheckBox id="chkHostHeader" runat="Server" LabelText="Use host header site collection" OnCheckedChanged="chkHostHeader_CheckedChanged" AutoPostBack="true">
+							</wssawc:InputFormCheckBox>
+						</td>
+					</tr>
+					<asp:panel id="pnlNonHostHeader" runat="server">
+					<tr>
 						
 						<td colspan="2">
-							<asp:panel id="pnlNonHostHeader" runat="server">
+							
 								<table dir="ltr" border="0" width="100%" cellspacing="0" cellpadding="0" class="authoringcontrols">
 				
 									<tr>
@@ -165,35 +172,31 @@
 										</td>
 									</tr>
 								</table>
-							</asp:panel>
+							
 						</td>
 					</tr>
+					</asp:panel>
+					<asp:panel id="pnlHostHeader" runat="Server" Visible="false">
+					<tr>
+						<td>
+							Tenants:
+						</td>
+						
+									
+						<td  nowrap="nowrap" colspan="2">
+						
+							<asp:DropDownList id="ddlSiteCollections" runat="server" Title="<%$Resources:spadmin, createsite_siteprefix_title%>"  />
+						</td>
+							
+						
+					</tr>
+					</asp:panel>
 					<tr>
 						<td colspan="2">
 						&nbsp;
 						</td>
 					</tr>
-					<tr>
-						<td colspan="2">
-							<wssawc:InputFormCheckBox id="chkHostHeader" runat="Server" LabelText="Use host-header site collection" OnCheckedChanged="chkHostHeader_CheckedChanged" AutoPostBack="true">
-							</wssawc:InputFormCheckBox>
-						</td>
-					</tr>
-					<tr>
-						<td>&nbsp;</td>
-						<td>
-							<asp:panel id="pnlHostHeader" runat="Server" Visible="false">
-								<table  dir="ltr" border="0" width="100%" cellspacing="0" cellpadding="0" class="authoringcontrols">
-									<tr>
-										<td  nowrap="nowrap" colspan="3">
-						
-											<asp:DropDownList id="ddlSiteCollections" runat="server" Title="<%$Resources:spadmin, createsite_siteprefix_title%>" />
-										</td>
-									</tr>
-								</table>
-							</asp:panel>
-						</td>
-					</tr>
+					
 				</table>
 				</Template_Control>
 			</wssuc:InputFormControl>

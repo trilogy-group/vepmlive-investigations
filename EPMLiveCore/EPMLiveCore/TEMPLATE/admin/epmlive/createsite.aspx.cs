@@ -69,6 +69,18 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
 				}
 			}
 			PickerOwner.WebApplicationId = webAppSelector.CurrentItem.Id;
+			
+			List<string> siteCollections = new List<string>();
+			siteCollections.Add("(none)");
+			foreach (SPSite site in app.Sites)
+			{
+				if (site.HostHeaderIsSiteName && site.PrimaryUri.AbsolutePath == "/")
+				{
+					siteCollections.Add(site.Url);
+				}
+			}
+			ddlSiteCollections.DataSource = siteCollections;
+			ddlSiteCollections.DataBind();
 		}
 
 		protected void BtnCreateSite_Click(object sender, EventArgs e)
@@ -76,19 +88,24 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
 			bool sitefound = false;
 			string url = "";
 			SPSiteSubscription subscription = null;
-			if (chkHostHeader.Checked)
+			string subscriptionUrl = null;
+			if (ddlSiteCollections.SelectedIndex > 0)
 			{
+				using (SPSite site = new SPSite(ddlSiteCollections.SelectedValue))
+				{
+					subscriptionUrl = site.Url;
+					subscription = site.SiteSubscription;
+				}
+
+			}
+			if (subscriptionUrl != null && chkHostHeader.Checked)
+			{
+				url = subscriptionUrl + "/epm";
 				try
 				{
-					using (SPSite site = new SPSite(ddlSiteCollections.SelectedValue))
+					using (SPSite existing = new SPSite(url))
 					{
-						url = site.Url + "/epm";
-						subscription = site.SiteSubscription;
-						using (SPSite existing = new SPSite(url))
-						{
-							sitefound = true;
-						}
-						
+						sitefound = true;
 					}
 				}
 				catch
@@ -187,7 +204,7 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
 
 					Guid siteguid = Guid.Empty;
 
-					string error = createSite(url, subscription, TxtCreateSiteTitle.Text, TxtCreateSiteDescription.Text, username, name, "", ddlSolution.SelectedValue, out siteguid);
+					string error = createSite(url, /*subscription*/null, TxtCreateSiteTitle.Text, TxtCreateSiteDescription.Text, username, name, "", ddlSolution.SelectedValue, out siteguid, chkHostHeader.Checked);
 					if (error == "")
 					{
 						Response.Redirect("../SiteCreated.aspx?SiteId=" + HttpUtility.UrlEncode(siteguid.ToString()));
@@ -277,7 +294,7 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
 			return errors;
 		}
 
-		private string createSite(string url, SPSiteSubscription subscription, string title, string description, string user, string fullName, string email, string template, out Guid siteid)
+		private string createSite(string url, SPSiteSubscription subscription, string title, string description, string user, string fullName, string email, string template, out Guid siteid, bool useHostHeader)
 		{
 			siteid = Guid.Empty;
 			string errors = "";
@@ -285,9 +302,9 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
 			{
 				SPSite site;
 				if (subscription != null)
-					site = app.Sites.Add(subscription, url, title, description, 1033, "", user, fullName, email, null, null, null, true);
+					site = app.Sites.Add(subscription, url, title, description, 1033, "", user, fullName, email, null, null, null, useHostHeader);
 				else
-					site = app.Sites.Add(url, title, description, 1033, "", user, fullName, email);
+					site = app.Sites.Add(url, title, description, 1033, "", user, fullName, email, null, null, null, useHostHeader);
 				try
 				{                 //SPSite site = spApp.Sites.Add(bUrl + url, user, email);
 
@@ -397,23 +414,9 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
 
 		protected void chkHostHeader_CheckedChanged(object sender, EventArgs e)
 		{
-
 			pnlHostHeader.Visible = chkHostHeader.Checked;
 			pnlNonHostHeader.Visible = !chkHostHeader.Checked;
-			if (chkHostHeader.Checked)
-			{
-				app = webAppSelector.CurrentItem;
-				List<string> siteCollections = new List<string>();
-				foreach (SPSite site in app.Sites)
-				{
-					if (site.HostHeaderIsSiteName && site.PrimaryUri.AbsolutePath == "/")
-					{
-						siteCollections.Add(site.Url);
-					}
-				}
-				ddlSiteCollections.DataSource = siteCollections;
-				ddlSiteCollections.DataBind();
-			}
+			
 		}
 
 		
