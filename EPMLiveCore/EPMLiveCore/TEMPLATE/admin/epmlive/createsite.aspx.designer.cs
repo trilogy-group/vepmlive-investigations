@@ -166,6 +166,15 @@ namespace EPMLiveCore.Layouts.EPMLiveCore {
         protected global::Microsoft.SharePoint.WebControls.EncodedLiteral EncodedLiteral7;
         
         /// <summary>
+        /// chkHostHeader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.InputFormCheckBox chkHostHeader;
+        
+        /// <summary>
         /// pnlNonHostHeader control.
         /// </summary>
         /// <remarks>
@@ -218,15 +227,6 @@ namespace EPMLiveCore.Layouts.EPMLiveCore {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Microsoft.SharePoint.WebControls.UrlNameValidator CusValSiteName;
-        
-        /// <summary>
-        /// chkHostHeader control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::Microsoft.SharePoint.WebControls.InputFormCheckBox chkHostHeader;
         
         /// <summary>
         /// pnlHostHeader control.
