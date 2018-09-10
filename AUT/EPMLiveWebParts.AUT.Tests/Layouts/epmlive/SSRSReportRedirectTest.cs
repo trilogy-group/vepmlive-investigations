@@ -743,7 +743,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
         {
             // Arrange
             var methodInfo = GetMethodInfo(MethodgetReportParameters, 0);
-            const int parametersCount = 1;
+            const int parametersCount = 2;
 
             // Act
             var parameters = methodInfo.GetParameters();
