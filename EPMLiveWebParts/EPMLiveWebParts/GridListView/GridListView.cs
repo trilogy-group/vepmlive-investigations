@@ -3292,10 +3292,12 @@ namespace EPMLiveWebParts
             );
 
             output.WriteLine("<script language=\"javascript\">");
-            output.WriteLine($@"var searchfields{sFullGridId} = {{{string.Join(",", jsonFields
-                .Select(field =>
-                    $"{field.Key}: {field.Value}"
-                ))}}}");
+			string res = $@"var searchfields{sFullGridId} = {{{string.Join(",", jsonFields
+				.Select(field =>
+					$"{field.Key}: {field.Value}"
+				))}}}";
+
+			output.WriteLine(res);
 
             output.WriteLine(RenderFunctionSwitchToSearch());
             output.WriteLine(RenderFunctionUnSearch());
@@ -3479,7 +3481,7 @@ namespace EPMLiveWebParts
                     searchtypechoice.disabled = true;
                     for(var i=0; i < sList.length; i++) {{
                         var d = sList[i];
-                        searchchoice.options.add(new Option(d, d)); 
+                        searchchoice.options.add(new Option(d, d));
                         if(d=='{sSearchValue}') {{
                             searchchoice.options[searchchoice.options.length-1].selected = true;
                         }} 
@@ -3509,7 +3511,7 @@ namespace EPMLiveWebParts
                         var choiceField = (SPFieldChoice)field;
                         jsonFields.Add(field.InternalName,
                             $@"[{(string.Join(",", choiceField.Choices.Cast<string>()
-                                .Select(choice => choice.Replace("\"", "\\\""))))}]");
+                                .Select(choice => "\"" + choice.Replace("\"", "\\\"")+"\"")))}]");
                     }
                     if (field.Type == SPFieldType.Boolean)
                     {
