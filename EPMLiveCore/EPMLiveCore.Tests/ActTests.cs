@@ -24,7 +24,7 @@ namespace EPMLiveCore.Tests
     {
         private Act testObj;
         private PrivateObject privateObj;
-        private IDisposable _shimsContext;
+        private IDisposable shimsContext;
         private ShimSPSite spSite;
         private ShimSPWeb spWeb;
         private Guid guid;
@@ -70,7 +70,7 @@ namespace EPMLiveCore.Tests
 
         private void SetupShims()
         {
-            _shimsContext = ShimsContext.Create();
+            shimsContext = ShimsContext.Create();
 
             SetupVariables();
 
@@ -185,7 +185,7 @@ namespace EPMLiveCore.Tests
         [TestCleanup]
         public void TearDown()
         {
-            _shimsContext?.Dispose();
+            shimsContext?.Dispose();
         }
 
         private DataSet CreateDataSet(int activationType, int levelValue, int resLevelValue, int userCount, int quantity, string features, int userLevel)
