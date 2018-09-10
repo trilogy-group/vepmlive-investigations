@@ -182,6 +182,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="TestCheck.cs" />
+    <Compile Include="WebPageCode\CreateDatabaseTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
