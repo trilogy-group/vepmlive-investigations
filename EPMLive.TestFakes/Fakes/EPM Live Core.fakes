@@ -55,5 +55,10 @@
     <Add FullName="EPMLiveCore.ReportHelper.ListBiz!"/>
     <Add FullName="EPMLiveCore.Infrastructure.CacheStore!"/>
     <Add FullName="EPMLiveCore.CommentCCPeopleEditor!"/>
+    <Add FullName="EPMLiveCore.Controls.Navigation.Providers.WorkspaceLinkProvider!"/>
+    <Add FullName="EPMLiveCore.Controls.Navigation.Providers.FavoritesLinkProvider!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.Navigation.NavLinkProvider!"/>
+    <Add FullName="EPMLiveCore.API.WorkspaceFactory!"/>
+    <Add FullName="EPMLiveCore.API.WorkspaceData!"/>
   </ShimGeneration>
 </Fakes>
