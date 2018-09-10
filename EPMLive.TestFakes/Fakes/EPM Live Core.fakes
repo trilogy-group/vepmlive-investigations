@@ -6,6 +6,8 @@
   <ShimGeneration>
     <Clear/>
     <Add FullName="EPMLiveCore.EditableFieldDisplay!"/>
+    <Add FullName="EPMLiveCore.ActLicensing.Licensing!"/>
+    <Add FullName="EPMLiveCore.UserLevels"/>
     <Add FullName="EPMLiveCore.ReportingProxy.QueryExecutor!"/>
     <Add FullName="EPMLiveCore.CoreFunctions!"/>
     <Add FullName="EPMLiveCore.Infrastructure.Logging.LoggingService!"/>
