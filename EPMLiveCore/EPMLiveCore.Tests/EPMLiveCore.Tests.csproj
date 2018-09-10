@@ -129,7 +129,6 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="ActTests.cs" />
     <Compile Include="API\Analytics\AnalyticsDataTests.cs" />
     <Compile Include="API\Analytics\FRFQueryFactoryTests.cs" />
     <Compile Include="API\Analytics\RecentItemsTests.cs" />
