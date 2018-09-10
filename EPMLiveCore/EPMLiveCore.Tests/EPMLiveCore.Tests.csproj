@@ -199,6 +199,10 @@
       <Project>{a7f83fd4-be8b-49ab-be24-39209e8fabc2}</Project>
       <Name>EPMLiveWebParts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\EPMLiveWorkPlanner\EPMLiveWorkPlanner\EPMLiveWorkPlanner.csproj">
+      <Project>{fcf0c151-0a3f-4b9f-9327-3bbbf109d776}</Project>
+      <Name>EPMLiveWorkPlanner</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveCore\EPMLiveCore.csproj">
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
       <Name>EPMLiveCore</Name>
