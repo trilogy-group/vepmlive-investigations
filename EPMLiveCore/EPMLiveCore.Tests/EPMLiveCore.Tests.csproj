@@ -60,6 +60,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>FakesAssemblies\EPMLiveAccountManagement.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="EPMLiveWorkPlanner.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPMLiveWorkPlanner.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
@@ -140,6 +143,7 @@
     <Compile Include="API\MyWork\MyWorkTests.cs" />
     <Compile Include="API\NavigationServiceTests.cs" />
     <Compile Include="API\Notification\APIEmailTests.cs" />
+    <Compile Include="API\Publish\APIPublishTests.cs" />
     <Compile Include="API\TimerTests.cs" />
     <Compile Include="CheckOpenCloseConnections.cs" />
     <Compile Include="ControlDataBuilderTest.cs" />
@@ -195,6 +199,10 @@
     <ProjectReference Include="..\..\EPMLiveWebParts\EPMLiveWebParts\EPMLiveWebParts.csproj">
       <Project>{a7f83fd4-be8b-49ab-be24-39209e8fabc2}</Project>
       <Name>EPMLiveWebParts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EPMLiveWorkPlanner\EPMLiveWorkPlanner\EPMLiveWorkPlanner.csproj">
+      <Project>{fcf0c151-0a3f-4b9f-9327-3bbbf109d776}</Project>
+      <Name>EPMLiveWorkPlanner</Name>
     </ProjectReference>
     <ProjectReference Include="..\EPMLiveCore\EPMLiveCore.csproj">
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
