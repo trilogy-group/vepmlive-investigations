@@ -48,6 +48,16 @@ namespace EPMLiveCore
 	    private const string FirstNameKey = "FirstName";
 	    private const string LastNameKey = "LastName";
 	    private const string EmailKey = "Email";
+	    private const string New = "New";
+	    private const string Where = "where";
+	    private const string Me = "[Me]";
+	    private const string Separator = ";";
+	    private const string Edit = "Edit";
+	    private const string Always = "always";
+	    private const string Display = "Display";
+	    private const string SharePointAccount = "SharePointAccount";
+	    private const string Approved = "Approved";
+	    private const string No = "No";
 	    private Dictionary<string, Dictionary<string, string>> fieldProperties = null;
 		private SPList list = null;
 		private SPControlMode mode = 0;
@@ -58,8 +68,8 @@ namespace EPMLiveCore
 		private string lookupValue = string.Empty;
 
 		#region ResourceList
-		List<string> userPanelItems = new List<string>() { FirstNameKey, LastNameKey, EmailKey, GenericTitle, TitleKey, "SharePointAccount" };
-		List<string> permissionPanelItems = new List<string>() { PermissionsTitle, ResourceLevelTitle, "Approved", "TimesheetAdministrator", "Active", "Disable" };
+		List<string> userPanelItems = new List<string>() { FirstNameKey, LastNameKey, EmailKey, GenericTitle, TitleKey, SharePointAccount };
+		List<string> permissionPanelItems = new List<string>() { PermissionsTitle, ResourceLevelTitle, Approved, "TimesheetAdministrator", "Active", "Disable" };
 		StringBuilder userPanelSb = new StringBuilder();
 		HtmlTextWriter userPanel;
 		StringBuilder profilePanelSb = new StringBuilder();
@@ -96,6 +106,12 @@ namespace EPMLiveCore
 	    private string WhitSpaces6 = "      ";
 	    private string GenericType = "2";
 	    private string ModifiedType = "1";
+	    private string FalseConst;
+
+	    public ListDisplaySettingIterator()
+	    {
+	        FalseConst = "False";
+	    }
 
 	    private void FindSaveButtons(Control Parent, ref ArrayList Controls)
 		{
@@ -1249,7 +1265,7 @@ namespace EPMLiveCore
             RenderDisplay(writer, WhitSpaces6, LastNameKey, None);
             RenderDisplay(writer, WhitSpaces6, EmailKey, None);
             RenderDisplay(writer, WhitSpaces6, "TimesheetAdministrator", None);
-            RenderDisplay(writer, WhitSpaces6, "SharePointAccount", None);
+            RenderDisplay(writer, WhitSpaces6, SharePointAccount, None);
 
             if (dControls.ContainsKey(FirstNameKey))
             {
@@ -1271,7 +1287,7 @@ namespace EPMLiveCore
                 RenderDisplay(writer, WhitSpaces6, TitleKey, None);
             }
 
-            RenderDisplay(writer, WhitSpaces6, "SharePointAccount");            
+            RenderDisplay(writer, WhitSpaces6, SharePointAccount);            
             RenderWithManyNodes(writer, string.Empty, PermissionsTitle);
             RenderDisplay(writer, WhiteSpaces10, ResourceLevelTitle);
             RenderDisplay(writer, WhiteSpaces10, CanLoginTitle);
@@ -1511,13 +1527,13 @@ namespace EPMLiveCore
 							try
 							{
 								editable = fieldProperties[field.InternalName]["Editable"];
-								editable = editable.Split(";".ToCharArray())[0].ToLower();
+								editable = editable.Split(Separator.ToCharArray())[0].ToLower();
 							}
 							catch { }
 
-							if ((editable == "never" || editable == "where" || field.Type == SPFieldType.Calculated) && mode != SPControlMode.New)
+							if ((editable == "never" || editable == Where || field.Type == SPFieldType.Calculated) && mode != SPControlMode.New)
 							{
-								if (editable == "where" && EditableFieldDisplay.canEdit(field, fieldProperties, this.ListItem))
+								if (editable == Where && EditableFieldDisplay.canEdit(field, fieldProperties, this.ListItem))
 								{
 									TemplateContainer child = new TemplateContainer();
 									Controls.Add(child);
@@ -2411,253 +2427,290 @@ namespace EPMLiveCore
 			catch (Exception) { }
 		}
 
-		protected override bool IsFieldExcluded(SPField field)
-		{
+	    protected override bool IsFieldExcluded(SPField field)
+	    {
+	        if (field == null)
+	        {
+	            throw new ArgumentNullException(nameof(field));
+	        }
 
-			if (isFeatureActivated)
-			{
-				if (isResList)
-				{
-					try
-					{
-						switch (field.InternalName)
-						{
-							case ResourceLevelTitle:
-								if (Web.CurrentUser.IsSiteAdmin || EPMLiveCore.CoreFunctions.GetRealUserName(SPContext.Current.Web.CurrentUser.LoginName).ToLower() == ownerusername.ToLower())
-								{
-									Act act = new Act(Web);
-									int actType = 0;
+	        if (!isFeatureActivated)
+	        {
+	            return base.IsFieldExcluded(field);
+	        }
 
-									ArrayList Levels = act.GetLevelsFromSite(out actType, "");
+	        if (isResList)
+	        {
+	            try
+	            {
+	                switch (field.InternalName)
+	                {
+	                    case ResourceLevelTitle:
+	                        return IsFieldExcludedResourcesLevel();
+	                    case PermissionsTitle:
+	                        return IsFieldExcludedPermissions();
+	                    case TitleKey:
+	                        return IsFieldExcludedTitle();
+	                    case FirstNameKey:
+	                    case LastNameKey:
+	                        return IsFieldExcludedName();
+	                    case EmailKey:
+	                        return mode != SPControlMode.New;
+	                    case CanLoginTitle:
+	                        return true;
+	                    case GenericTitle:
+	                        return mode != SPControlMode.New;
+	                    case Approved:
+	                        return IsFieldExcludedApproved(field);
+	                    default:
+	                        if (IsFieldExcludedInternalName(field.InternalName))
+	                        {
+	                            return true;
+	                        }
+	                        break;
+	                }
+	            }
+	            catch(Exception ex)
+	            {
+	                Trace.WriteLine(ex.ToString());
+	            }
+	        }
 
-									if (actType > 2)
-									{
-										return false;
-									}
-									return true;
-								}
-								else
-									return true;
-							case PermissionsTitle:
-								if (this.mode != SPControlMode.New)
-								{
+	        if (fieldProperties == null)
+	        {
+	            return base.IsFieldExcluded(field);
+	        }
 
-									string generic = "";
-									try
-									{
-										generic = this.ListItem[GenericTitle].ToString();
-									}
-									catch { }
-									if (generic == "False")
-										return false;
-									else
-										return true;
+	        if (!fieldProperties.ContainsKey(field.InternalName))
+	        {
+	            return base.IsFieldExcluded(field);
+	        }
 
-								}
-								return false;
-							case TitleKey:
-								if (this.mode == SPControlMode.Edit)
-								{
-									try
-									{
-										if (!bool.Parse(this.ListItem[GenericTitle].ToString()))
-											return true;
-									}
-									catch { }
-								}
-								return false;
-							case FirstNameKey:
-							case LastNameKey:
-								if (this.mode == SPControlMode.New)
-								{
-									return false;
-								}
-								else
-								{
-									try
-									{
-										if (bool.Parse(this.ListItem[GenericTitle].ToString()))
-											return true;
-									}
-									catch { }
-								}
-								return false;
-							case EmailKey:
-								if (this.mode == SPControlMode.New)
-									return false;
-								else
-									return true;
-							case CanLoginTitle:
-								return true;
-							case GenericTitle:
-								if (this.mode == SPControlMode.New)
-									return false;
-								else
-									return true;
-							case "Approved":
-								if (field.ParentList.Fields.ContainsFieldWithInternalName(ResourceLevelTitle))
-									return true;
-								else
-								{
-									string approved = "No";
-									try
-									{
-										approved = this.ListItem["Approved"].ToString();
-									}
-									catch { }
-									if (SPContext.Current.Web.UserIsSiteAdmin && approved == "False" && this.mode != SPControlMode.New)
-										return false;
-									else
-										return true;
-								}
-							default:
-								if (isOnline)
-								{
-									switch (field.InternalName)
-									{
-										case "SharePointAccount":
-											return true;
-									}
-								}
-								if (!isOnline)
-								{
-									switch (field.InternalName)
-									{
-										case CanLoginTitle:
-										case EmailKey:
-											return true;
-									}
-								}
-								break;
-						}
-					}
-					catch { }
-				}
-				//SPFeature listDisplaySettingFeature = SPContext.Current.Site.Features[new Guid("2EACB61B-4379-46ec-94FA-38B793FDBDD5")];
+	        switch (mode)
+	        {
+	            case SPControlMode.Display:
+	                return IsFieldExcluded(field, Display);
+	            case SPControlMode.Edit:
+	                return IsFieldExcludedEdit(field);
+	            case SPControlMode.New:
+	                return IsFiedlExcludedNew(field);
+	            default:
+	                return base.IsFieldExcluded(field);
+	        }
+	    }
 
-				//if ((listDisplaySettingFeature != null) && (listDisplaySettingFeature.Definition.Status == Microsoft.SharePoint.Administration.SPObjectStatus.Online))
+	    private bool IsFieldExcludedResourcesLevel()
+	    {
+	        if (Web.CurrentUser.IsSiteAdmin ||
+	            string.Equals(
+                    CoreFunctions.GetRealUserName(SPContext.Current.Web.CurrentUser.LoginName),
+                    ownerusername, 
+                    StringComparison.InvariantCultureIgnoreCase))
+	        {
+	            var act = new Act(Web);
+	            var actType = 0;
 
-				{
-					if (fieldProperties != null)
-					{
-						//Dictionary<string, Dictionary<string, string>> fieldProperties = null;
-						//fieldProperties = ListDisplayUtils.ConvertFromString(list.ParentWeb.Properties[String.Format("DisplaySetting{0}", System.IO.Path.GetDirectoryName(list.DefaultView.Url))]);
-						string displaySettings = string.Empty;
+	            var levels = act.GetLevelsFromSite(out actType, string.Empty);
 
-						if (!fieldProperties.ContainsKey(field.InternalName))
-							return base.IsFieldExcluded(field);
-						else
-						{
-							switch (mode)
-							{
-								case SPControlMode.Display:
-									displaySettings = fieldProperties[field.InternalName]["Display"];
-									if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
-									{
-										string where = displaySettings.Split(";".ToCharArray())[1];
-										string conditionField = "";
-										string condition = "";
-										string group = "";
-										string valueCondition = "";
-										if (where.Equals("[Me]"))
-										{
-											condition = displaySettings.Split(";".ToCharArray())[2];
-											group = displaySettings.Split(";".ToCharArray())[3];
-										}
-										else // [Fielthi
-										{
-											conditionField = displaySettings.Split(";".ToCharArray())[2];
-											condition = displaySettings.Split(";".ToCharArray())[3];
-											valueCondition = displaySettings.Split(";".ToCharArray())[4];
-										}
-										return !EditableFieldDisplay.RenderField(field, where, conditionField, condition, group, valueCondition, this.ListItem);
-									}
-									else
-									{
-										return base.IsFieldExcluded(field);
-									}
-								case SPControlMode.Edit:
-									if (!fieldProperties[field.InternalName].ContainsKey("Edit"))
-										return base.IsFieldExcluded(field);
-									displaySettings = fieldProperties[field.InternalName]["Edit"];
-									if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
-									{
-										string where = displaySettings.Split(";".ToCharArray())[1];
-										string conditionField = "";
-										string condition = "";
-										string group = "";
-										string valueCondition = "";
-										if (where.Equals("[Me]"))
-										{
-											condition = displaySettings.Split(";".ToCharArray())[2];
-											group = displaySettings.Split(";".ToCharArray())[3];
-										}
-										else // [Field]
-										{
-											conditionField = displaySettings.Split(";".ToCharArray())[2];
-											condition = displaySettings.Split(";".ToCharArray())[3];
-											valueCondition = displaySettings.Split(";".ToCharArray())[4];
-										}
-										return !EditableFieldDisplay.RenderField(field, where, conditionField, condition, group, valueCondition, this.ListItem);
-									}
-									else
-									{
-										if (field.Type == SPFieldType.Calculated && displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("always"))
-										{
-											return false;
-										}
-										else
-										{
-											return base.IsFieldExcluded(field);
-										}
-									}
-								case SPControlMode.New:
-									if (!fieldProperties[field.InternalName].ContainsKey("New"))
-										return base.IsFieldExcluded(field);
-									else
-									{
-										displaySettings = fieldProperties[field.InternalName]["New"];
-										if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
-										{
-											string where = displaySettings.Split(";".ToCharArray())[1];
-											string conditionField = "";
-											string condition = "";
-											string group = "";
-											string valueCondition = "";
-											if (where.Equals("[Me]"))
-											{
-												condition = displaySettings.Split(";".ToCharArray())[2];
-												group = displaySettings.Split(";".ToCharArray())[3];
-											}
-											else // [Field]
-											{
-												conditionField = displaySettings.Split(";".ToCharArray())[2];
-												condition = displaySettings.Split(";".ToCharArray())[3];
-												valueCondition = displaySettings.Split(";".ToCharArray())[4];
-											}
-											return !EditableFieldDisplay.RenderField(field, where, conditionField, condition, group, valueCondition, this.ListItem);
-										}
-										else
-										{
-											return base.IsFieldExcluded(field);
-										}
-									}
-								default:
-									return base.IsFieldExcluded(field);
-							}
-						}
-					}
-					else
-						return base.IsFieldExcluded(field);
-				}
-				//else
-				//{
-				//    return base.IsFieldExcluded(field);
-				//}
-			}
-			else
-				return base.IsFieldExcluded(field);
-		}
+	            return actType <= 2;
+	        }
+
+            return true;
+	    }
+
+	    private bool IsFieldExcludedPermissions()
+	    {
+	        if (mode == SPControlMode.New)
+	        {
+	            return false;
+	        }
+
+	        var generic = string.Empty;
+	        try
+	        {
+	            generic = ListItem[GenericTitle].ToString();
+	        }
+	        catch (Exception ex)
+	        {
+	            Trace.WriteLine(ex.ToString());
+	        }
+	        return generic != FalseConst;
+	    }
+
+	    private bool IsFieldExcludedTitle()
+	    {
+	        if (mode != SPControlMode.Edit)
+	        {
+	            return false;
+	        }
+
+	        try
+	        {
+	            if (!bool.Parse(ListItem[GenericTitle].ToString()))
+	            {
+	                return true;
+	            }
+	        }
+	        catch (Exception ex)
+	        {
+	            Trace.WriteLine(ex.ToString());
+	        }
+	        return false;
+	    }
+
+	    private bool IsFieldExcludedName()
+	    {
+	        if (mode == SPControlMode.New)
+	        {
+	            return false;
+	        }
+	        try
+	        {
+	            if (bool.Parse(ListItem[GenericTitle].ToString()))
+	            {
+	                return true;
+	            }
+	        }
+	        catch (Exception ex)
+	        {
+	            Trace.WriteLine(ex.ToString());
+	        }
+	        return false;
+	    }
+
+	    private bool IsFieldExcludedApproved(SPField field)
+	    {
+	        if (field == null)
+	        {
+	            throw new ArgumentNullException(nameof(field));
+	        }
+
+	        if (field.ParentList.Fields.ContainsFieldWithInternalName(ResourceLevelTitle))
+	        {
+	            return true;
+	        }
+	        var approved = No;
+	        try
+	        {
+	            approved = ListItem[Approved].ToString();
+	        }
+	        catch (Exception ex)
+	        {
+                Trace.WriteLine(ex.ToString());
+	        }
+
+	        return !SPContext.Current.Web.UserIsSiteAdmin || approved != FalseConst || mode == SPControlMode.New;
+	    }
+
+	    private bool IsFieldExcludedInternalName(string fieldInternalName)
+        {
+	        if (isOnline)
+	        {
+	            switch (fieldInternalName)
+	            {
+	                case SharePointAccount:
+	                    return true;
+	            }
+	        }
+	        if (!isOnline)
+	        {
+	            switch (fieldInternalName)
+	            {
+	                case CanLoginTitle:
+	                case EmailKey:
+	                    return true;
+	            }
+	        }
+	        return false;
+	    }
+
+	    private bool IsFieldExcluded(SPField field, string key)
+	    {
+	        if (field == null)
+	        {
+	            throw new ArgumentNullException(nameof(field));
+	        }
+	        var displaySettings = fieldProperties[field.InternalName][key];
+            if (displaySettings.Split(Separator.ToCharArray())[0].Equals(Where, StringComparison.InvariantCultureIgnoreCase))
+            {
+	            return IsFieldExcluded2(field, displaySettings);
+            }
+
+            return base.IsFieldExcluded(field);
+	    }
+
+	    private bool IsFieldExcludedEdit(SPField field)
+	    {
+	        if (field == null)
+	        {
+	            throw new ArgumentNullException(nameof(field));
+	        }
+	        if (!fieldProperties[field.InternalName].ContainsKey(Edit))
+	        {
+	            return base.IsFieldExcluded(field);
+	        }
+	        var displaySettings = fieldProperties[field.InternalName][Edit];
+	        if (displaySettings.Split(Separator.ToCharArray())[0].Equals(Where, StringComparison.InvariantCultureIgnoreCase))
+	        {
+                return IsFieldExcluded2(field, displaySettings);
+            }
+
+            if (field.Type == SPFieldType.Calculated && 
+                displaySettings.Split(Separator.ToCharArray())[0].Equals(Always, StringComparison.InvariantCultureIgnoreCase))
+	        {
+	            return false;
+	        }
+
+            return base.IsFieldExcluded(field);
+	    }
+
+	    private bool IsFiedlExcludedNew(SPField field)
+        {
+            if (field == null)
+            {
+                throw new ArgumentNullException(nameof(field));
+            }
+
+            if (!fieldProperties[field.InternalName].ContainsKey(New))
+            {
+                return base.IsFieldExcluded(field);
+            }
+
+            var displaySettings = fieldProperties[field.InternalName][New];
+            if (displaySettings.Split(Separator.ToCharArray())[0].Equals(Where, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return IsFieldExcluded2(field, displaySettings);
+            }
+            return base.IsFieldExcluded(field);
+        }
+
+        private bool IsFieldExcluded2(SPField field, string displaySettings)
+	    {
+	        var whereField = displaySettings.Split(Separator.ToCharArray())[1];
+	        var conditionField = string.Empty;
+	        string condition;
+	        var groupField = string.Empty;
+	        var valueCondition = string.Empty;
+	        if (whereField.Equals(Me))
+	        {
+	            condition = displaySettings.Split(Separator.ToCharArray())[2];
+	            groupField = displaySettings.Split(Separator.ToCharArray())[3];
+	        }
+	        else
+	        {
+	            conditionField = displaySettings.Split(Separator.ToCharArray())[2];
+	            condition = displaySettings.Split(Separator.ToCharArray())[3];
+	            valueCondition = displaySettings.Split(Separator.ToCharArray())[4];
+	        }
+	        return !EditableFieldDisplay.RenderField(
+	            field,
+	            whereField,
+	            conditionField,
+	            condition,
+	            groupField,
+	            valueCondition,
+	            ListItem);
+	    }
 
         private static FieldLabel GetFieldLabel(Control control, int index1, int index2, int index3)
         {
