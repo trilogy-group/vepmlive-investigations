@@ -428,10 +428,10 @@ namespace EPMLiveCore
 
 			if (isFeatureActivated)
 			{
-
-				bool outofusers = false;
-
-				if (base.ControlMode == SPControlMode.Display)
+                
+                bool outofusers = false;
+                #region Display
+                if (base.ControlMode == SPControlMode.Display)
 				{
 					string editURL = base.List.Forms[PAGETYPE.PAGE_EDITFORM].Url;
 					editURL = ((base.Web.ServerRelativeUrl == "/") ? "" : base.Web.ServerRelativeUrl) + "/" + editURL;
@@ -455,20 +455,12 @@ namespace EPMLiveCore
 					writer.WriteLine("WEUseTeam = " + bUseTeam.ToString().ToLower() + ";");
 					writer.WriteLine("WEDLG = '" + Page.Request["IsDlg"] + "';");
 					writer.WriteLine("</script>");
-
-
-					//writer.WriteLine("<script language=\"javascript\">");
-					//writer.WriteLine("initmb();");
-					//writer.WriteLine("</script>");
 				}
-				//base.RenderControl(writer);
-				//if(arrwpFields.Count > 0)
-				//    writer.Write("<tr><td colspan='2'><font color=\"#007C17\">*</font> indicates a status field set by the administrator</td></tr>");
+                #endregion
+                
+                #region Online
 
-
-				#region Online
-
-				bool disablerequests = false;
+                bool disablerequests = false;
 				try
 				{
 					disablerequests = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(SPContext.Current.Web, "OnlineDisableResReq"));
@@ -489,7 +481,8 @@ namespace EPMLiveCore
 					}
 					else
 					{
-						if (ActivationType != 3)
+                        #region ActivationType
+                        if (ActivationType != 3)
 						{
 							if (count >= max && max != -1 && billingtype != 2)
 							{
@@ -522,30 +515,23 @@ namespace EPMLiveCore
 								}
 							}
 						}
-					}
+                        #endregion
+                    }
 
-				}
+                }
 				#endregion
 
 
 				#region processControls
 
-				// add field control to lookups
-				//foreach (SPField f in Fields)
-				//{
-				//    if (f.Type == SPFieldType.Lookup)
-				//    {
-				//        AddTypeAheadFieldControls(f);
-				//    }
-				//}
-
 				foreach (System.Web.UI.Control tc in base.Controls)
 				{
 					try
 					{
-						SPField field = ((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field;
+                        SPField field = GetFieldLabel(tc, 1, 0, 1).Field; // ((FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field;
 
-						if (field.Required == true)
+
+                        if (field.Required == true)
 						{
 							if (userPanelItems.Contains(field.InternalName))
 							{
@@ -560,14 +546,15 @@ namespace EPMLiveCore
 								profilepanelRequiredCount++;
 							}
 						}
-
-						Control parentControl = tc.Controls[1].Controls[0];
+                        #region InternalName
+                        Control parentControl = tc.Controls[1].Controls[0];
 						if (field.InternalName == "Due")
 						{
 							AddControlsToWriter(tc.Controls[0], writer, field.InternalName);
 							for (int i = 0; i < parentControl.Controls.Count; i++)
 							{
-								if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
+								//if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
+                                if (GetControlType(parentControl, i) == "Microsoft.SharePoint.WebControls.FormField")
 								{
 									writer.Write(CoreFunctions.GetDueField(base.ListItem));
 								}
@@ -581,8 +568,9 @@ namespace EPMLiveCore
 							AddControlsToWriter(tc.Controls[0], writer, field.InternalName);
 							for (int i = 0; i < parentControl.Controls.Count; i++)
 							{
-								if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
-								{
+                                //if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
+                                if (GetControlType(parentControl, i) == "Microsoft.SharePoint.WebControls.FormField")
+                                {
 									writer.Write(CoreFunctions.GetDaysOverdueField(base.ListItem));
 								}
 								else
@@ -595,19 +583,21 @@ namespace EPMLiveCore
 							AddControlsToWriter(tc.Controls[0], writer, field.InternalName);
 							for (int i = 0; i < parentControl.Controls.Count; i++)
 							{
-								if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
-								{
+                                //if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
+                                if (GetControlType(parentControl, i) == "Microsoft.SharePoint.WebControls.FormField")
+                                {
 									string color = CoreFunctions.GetScheduleStatusField(base.ListItem);
 									if (color != "")
 										writer.Write(@"<img src=""/_layouts/images/" + color + @""">");
 									else
 									{
-										string val = ((Microsoft.SharePoint.WebControls.FormField)parentControl.Controls[i]).ItemFieldValue.ToString();
-										string sVal = "";
+                                        string val = GetFormField(parentControl, i).ItemFieldValue.ToString(); //((FormField)parentControl.Controls[i]).ItemFieldValue.ToString();
+
+                                        string sVal = "";
 										try
 										{
-											sVal = ((Microsoft.SharePoint.WebControls.FieldLabel)parentControl.Controls[1]).Field.GetFieldValueAsHtml(val);
-										}
+                                            sVal = GetFieldLabel(parentControl, 1).Field.GetFieldValueAsHtml(val); //((FieldLabel)parentControl.Controls[1]).Field.GetFieldValueAsHtml(val);
+                                        }
 										catch { }
 										if (sVal.ToLower().Contains(".gif") || sVal.ToLower().Contains(".jpg"))
 											writer.Write("<img src=\"" + SPContext.Current.Web.Url + "/_layouts/images/" + sVal + "\">");
@@ -621,20 +611,24 @@ namespace EPMLiveCore
 									AddControlsToWriter(parentControl.Controls[i], writer, field.InternalName);
 							}
 							AddControlsToWriter(tc.Controls[2], writer, field.InternalName);
-						}
-						else if (field.Type == SPFieldType.Calculated)
+                        }
+                        #endregion
+                        #region field.Type 
+                        else if (field.Type == SPFieldType.Calculated)
 						{
 							AddControlsToWriter(tc.Controls[0], writer, field.InternalName);
 							for (int i = 0; i < parentControl.Controls.Count; i++)
 							{
-								if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
-								{
-									string val = ((Microsoft.SharePoint.WebControls.FormField)parentControl.Controls[i]).ItemFieldValue.ToString();
-									string sVal = "";
+                                //if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
+                                if (GetControlType(parentControl, i) == "Microsoft.SharePoint.WebControls.FormField")
+                                {
+                                    string val = GetFormField(parentControl, i).ItemFieldValue.ToString(); // ((FormField)parentControl.Controls[i]).ItemFieldValue.ToString();
+
+                                    string sVal = "";
 									try
 									{
-										sVal = ((Microsoft.SharePoint.WebControls.FieldLabel)parentControl.Controls[1]).Field.GetFieldValueAsHtml(val);
-									}
+                                        sVal = GetFieldLabel(parentControl, 1).Field.GetFieldValueAsHtml(val); //((FieldLabel)parentControl.Controls[1]).Field.GetFieldValueAsHtml(val);
+                                    }
 									catch { }
 									if (sVal.ToLower().Contains(".gif") || sVal.ToLower().Contains(".jpg"))
 										writer.Write("<img src=\"" + SPContext.Current.Web.Url + "/_layouts/images/" + sVal + "\">");
@@ -651,47 +645,22 @@ namespace EPMLiveCore
 						}
 						else if (field.Type == SPFieldType.Lookup)
 						{
-
-							//tc.Controls[0].RenderControl(writer);
-
-							//for (int i = 0; i < tc.Controls[1].Controls[0].Controls.Count; i++)
-							//{
-							//if (tc.Controls[1].Controls[0].Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
-							//{
-							//    // NOTE: tc.Controls[1].Controls[0].Controls[i].Controls[0] is the lookup field,
-							//    // so we are clearing the lookup field's child control and inserting our own
-							//    foreach (Control c in tc.Controls[1].Controls[0].Controls[i].Controls[0].Controls)
-							//    {
-							//        if (c is DropDownList)
-							//        {
-							//            string sVal = ((DropDownList)c).SelectedValue;
-							//            SPFieldLookup lookup = ((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field as SPFieldLookup;
-							//            //tc.Controls[1].Controls[0].Controls[i].Controls[0].Controls.Add(picker);
-							//            //tc.Controls[1].Controls[0].Controls[i].Controls[0].Controls.Add(new TextBox());
-							//            break;
-							//        }
-							//    }
-							//}
-							//    tc.Controls[1].Controls[0].Controls[i].RenderControl(writer);
-
-							//}
-
-							//for (int j = 2; j < tc.Controls.Count; j++)
-							//{
-							//    tc.Controls[j].RenderControl(writer);
-							//}
 							AddControlsToWriter(tc, writer, field.InternalName);
 						}
-						else if (arrwpFields.Contains(field.InternalName) && (bool)arrwpFields[field.InternalName])
+                        #endregion
+                        else if (arrwpFields.Contains(field.InternalName) && (bool)arrwpFields[field.InternalName])
 						{
 							AddControlsToWriter(tc.Controls[0], writer, field.InternalName);
 							for (int i = 0; i < parentControl.Controls.Count; i++)
 							{
-								if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FieldLabel")
-								{
-									writer.Write(((Microsoft.SharePoint.WebControls.FieldLabel)parentControl.Controls[1]).Field.Title + " <font color=\"#007C17\">*</font>");
-									if (((Microsoft.SharePoint.WebControls.FieldLabel)parentControl.Controls[1]).Field.Required)
-										writer.Write(" <font class=\"ms-formvalidation\">*</font>");
+                                //if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FieldLabel")
+                                if (GetControlType(parentControl, i) == "Microsoft.SharePoint.WebControls.FieldLabel")
+                                {
+                                    // writer.Write(((FieldLabel)parentControl.Controls[1]).Field.Title + " <font color=\"#007C17\">*</font>");
+                                    writer.Write((GetFieldLabel(parentControl, 1).Field.Title + " <font color=\"#007C17\">*</font>"));
+                                    // if (((FieldLabel)parentControl.Controls[1]).Field.Required)
+                                    if ((GetFieldLabel(parentControl, 1).Field.Required))
+                                        writer.Write(" <font class=\"ms-formvalidation\">*</font>");
 								}
 								else
 									//parentControl.Controls[i].RenderControl(writer);
@@ -705,8 +674,9 @@ namespace EPMLiveCore
 
 							try
 							{
-								SPField f = ((Microsoft.SharePoint.WebControls.CompositeField)tc.Controls[1]).Field;
-								string fname = f.InternalName + "_" + f.Id.ToString() + "_$" + f.TypeAsString + "Field";
+                                //SPField f = ((CompositeField)tc.Controls[1]).Field;
+                                SPField f = GetCompositeField(tc, 1).Field;
+                                string fname = f.InternalName + "_" + f.Id.ToString() + "_$" + f.TypeAsString + "Field";
 
 								if (f.Type == SPFieldType.User)
 									fname = f.InternalName + "_" + f.Id.ToString() + "_$ClientPeoplePicker";
@@ -732,13 +702,14 @@ namespace EPMLiveCore
 							// tc.RenderControl(writer);
 						}
 					}
-					catch
+					catch(Exception ex)
 					{
 						AddControlsToWriter(tc, writer);
 					}
 				}
+                #endregion
 
-				if (isResList)
+                if (isResList)
 				{
 					userPanel.Write("</table></div></div></td></tr>");
 					writer.Write(userPanelSb.ToString());
@@ -751,10 +722,6 @@ namespace EPMLiveCore
 						writer.Write(permissionPanelSb.ToString());
 					}
 				}
-
-				#endregion
-
-
 
 				#region worklist
 				if (isWorkList)
@@ -786,11 +753,12 @@ namespace EPMLiveCore
 				}
 				#endregion
 
-				#region ResList
+				
 				if (isResList)
 				{
-					try
-					{
+                    #region ResList
+                    try
+                    {
 						writer.WriteLine("<script language=\"javascript\">");
 						writer.WriteLine("function checkSpecialCharacters(objectName,object){");
 						writer.WriteLine("var checkPattern = /[\\|\\\\\"\'\\/\\[\\]\\:\\<\\>\\+\\=\\,\\;\\?\\*\\@]/");
@@ -1078,8 +1046,9 @@ namespace EPMLiveCore
 
 					}
 					catch { }
-				}
-				else
+                    #endregion
+                }
+                else
 				{
 					//this method is required when lookup field is disable in any list for all special character
 					writer.WriteLine("<script language=\"javascript\">");
@@ -1102,23 +1071,13 @@ namespace EPMLiveCore
 					writer.WriteLine("  }");
 					writer.WriteLine("</script>");
 				}
-
-				#endregion
-
+				
 				string newLocation = "";
 				bool bDialog = false;
 				if (Page.Request["IsDlg"] == "1")
 					bDialog = true;
 
 
-				//if (DisplayFormRedirect)
-				//{
-				//    if (bDialog && ControlMode == SPControlMode.New)
-				//    {
-				//        newLocation = list.Forms[PAGETYPE.PAGE_DISPLAYFORM].ServerRelativeUrl;
-				//    }
-				//}
-				//else 
 				if (Page.Request["GetLastID"] == "true")
 				{
 					if (bDialog)
@@ -1127,9 +1086,11 @@ namespace EPMLiveCore
 						newLocation = Page.Request["Source"];
 				}
 
-				if (!string.IsNullOrEmpty(newLocation))
+                
+                if (!string.IsNullOrEmpty(newLocation))
 				{
-					if (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && base.ControlMode == SPControlMode.Edit)
+                    #region newLocation
+                    if (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && base.ControlMode == SPControlMode.Edit)
 					{
 						writer.WriteLine(@"<script>
                     
@@ -1171,8 +1132,9 @@ namespace EPMLiveCore
                         });
                          </script>");
 					}
-				}
-				else
+                    #endregion
+                }
+                else
 				{
 					if (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && base.ControlMode == SPControlMode.New)
 					{
@@ -1189,14 +1151,14 @@ namespace EPMLiveCore
 
 					}
 				}
-			}
-			else
+            }
+            else
 				base.RenderControl(writer);
 		}
 
-		#region resourcepool methods
+        #region resourcepool methods
 
-		private void AddControlsToWriter(Control control, HtmlTextWriter writer, string internalName = "")
+        private void AddControlsToWriter(Control control, HtmlTextWriter writer, string internalName = "")
 		{
 			if (isResList)
 			{
@@ -1864,7 +1826,7 @@ namespace EPMLiveCore
 
 					if (isParent && !isEnhanced)
 					{
-						SPFieldLookup lookupFld = fld.Field as SPFieldLookup;
+                        SPFieldLookup lookupFld = GetFieldLookup(fld);
 						if (!lookupFld.AllowMultipleValues)
 						{
 							CascadingLookupRenderControl ctrl = new CascadingLookupRenderControl();
@@ -1902,8 +1864,8 @@ namespace EPMLiveCore
 							#region INSERT EPMLIVE GENERIC PICKER CONTROL
 
 							picker = new GenericEntityEditor();
-							SPFieldLookup lookupFld = fld.Field as SPFieldLookup;
-							picker.MultiSelect = lookupFld.AllowMultipleValues;
+                            SPFieldLookup lookupFld = GetFieldLookup(fld);
+                            picker.MultiSelect = lookupFld.AllowMultipleValues;
 
 							string customValue =
 								"<Data>" +
@@ -1963,7 +1925,7 @@ namespace EPMLiveCore
 						{
 							#region INSERT MODIFIED SP CONTROL
 
-							SPFieldLookup lookupFld = fld.Field as SPFieldLookup;
+							SPFieldLookup lookupFld = GetFieldLookup(fld);
 							if (!lookupFld.AllowMultipleValues)
 							{
 								CascadingLookupRenderControl cclrCtrl = new CascadingLookupRenderControl();
@@ -1999,8 +1961,8 @@ namespace EPMLiveCore
 							#region INSERT EPMLIVE GENERIC PICKER CONTROL
 
 							picker = new GenericEntityEditor();
-							SPFieldLookup lookupFld = fld.Field as SPFieldLookup;
-							picker.MultiSelect = lookupFld.AllowMultipleValues;
+                            SPFieldLookup lookupFld = GetFieldLookup(fld);
+                            picker.MultiSelect = lookupFld.AllowMultipleValues;
 
 							string customValue =
 								"<Data>" +
@@ -2058,10 +2020,10 @@ namespace EPMLiveCore
 						}
 						else if (lookupData.Type == "1")
 						{
-							#region INSERT MODIFIED SP CONTROL
+                            #region INSERT MODIFIED SP CONTROL
 
-							SPFieldLookup lookupFld = fld.Field as SPFieldLookup;
-							if (!lookupFld.AllowMultipleValues)
+                            SPFieldLookup lookupFld = GetFieldLookup(fld);
+                            if (!lookupFld.AllowMultipleValues)
 							{
 								CascadingLookupRenderControl cclrCtrl = new CascadingLookupRenderControl();
 								cclrCtrl.LookupData = lookupData;
@@ -2119,7 +2081,12 @@ namespace EPMLiveCore
 			}
 		}
 
-		private string GenerateControlDataForLookupField(FormField sourceFld, bool isMulti)
+        private static SPFieldLookup GetFieldLookup(FormField fld)
+        {
+            return fld.Field as SPFieldLookup;
+        }
+
+        private string GenerateControlDataForLookupField(FormField sourceFld, bool isMulti)
 		{
 			StringBuilder sbResult = new StringBuilder();
 			// in the case of multi select
@@ -2461,8 +2428,31 @@ namespace EPMLiveCore
 				return base.IsFieldExcluded(field);
 		}
 
+        private static FieldLabel GetFieldLabel(Control control, int index1, int index2, int index3)
+        {
+            return (FieldLabel)control.Controls[index1].Controls[index2].Controls[index3];
+        }
 
-	}
+        private static FormField GetFormField(Control control, int index)
+        {
+            return (FormField)control.Controls[index];
+        }
+
+        private static FieldLabel GetFieldLabel(Control control, int index)
+        {
+            return (FieldLabel)control.Controls[index];
+        }
+
+        private static CompositeField GetCompositeField(Control control, int index)
+        {
+            return (CompositeField)control.Controls[index];
+        }
+
+        private static string GetControlType(Control control, int index)
+        {
+            return control.Controls[index].GetType().ToString();
+        }
+    }
 
 	public static class ControlExtensions
 	{
@@ -2576,28 +2566,5 @@ namespace EPMLiveCore
 
 			return baseFieldControls;
 		}
-
-		//private static void HandleDateField(FormField formField)
-		//{
-		//    if (formField.ControlMode == SPControlMode.Display)
-		//    {
-		//        return;
-		//    }
-
-		//    Control dateFieldControl = formField.Controls[0];
-		//    if (dateFieldControl.Controls.Count > 0)
-		//    {
-		//        DateTimeControl dateTimeControl = (DateTimeControl)dateFieldControl.Controls[0].Controls[1];
-		//        TextBox dateTimeTextBox = dateTimeControl.Controls[0] as TextBox;
-		//        if (dateTimeTextBox != null)
-		//        {
-		//            if (!string.IsNullOrEmpty(dateTimeTextBox.Text))
-		//            {
-		//                formField.Value = DateTime.Parse(dateTimeTextBox.Text, CultureInfo.CurrentCulture);
-		//            }
-		//        }
-		//    }
-		//}
-
-	}
+    }
 }

@@ -33,7 +33,7 @@ namespace EPMLiveCore
         public bool EnableAutoCreation = false;
         public string AutoCreationTemplateId = "";
         public string WorkspaceParentSiteLookup = "";
-        public bool EnableWorkList = false;
+        public bool EnableWorkList { get; set; }
         public bool EnableFancyForms = false;
         public bool SendEmails = false;
         public bool DeleteRequest = false;
@@ -43,11 +43,11 @@ namespace EPMLiveCore
         public bool Search = false;
         public bool LockSearch = false;
         public bool AssociatedItems = false;
-        public bool DisplayFormRedirect = false;
+        public bool DisplayFormRedirect { get; set; }
         public string ListIcon = "icon-square";
 
 
-        public string DisplaySettings = "";
+        public string DisplaySettings { get; set; }
         public bool EnableResourcePlan = false;
         public string TotalSettings = "";
         public string AllGeneral = "";
@@ -59,6 +59,12 @@ namespace EPMLiveCore
         public bool EnableContentReporting = false;
         public bool DisableThumbnails = false;
 
+        public GridGanttSettings()
+        {
+            DisplaySettings = string.Empty;
+            EnableWorkList = false;
+            DisplayFormRedirect = false;
+        }
 
         public bool SaveSettings(SPList _list)
         {
