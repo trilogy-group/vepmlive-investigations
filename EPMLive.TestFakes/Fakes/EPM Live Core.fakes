@@ -62,5 +62,8 @@
     <Add FullName="EPMLiveCore.Infrastructure.Navigation.NavLinkProvider!"/>
     <Add FullName="EPMLiveCore.API.WorkspaceFactory!"/>
     <Add FullName="EPMLiveCore.API.WorkspaceData!"/>
+    <Add FullName="EPMLiveCore.API.Reporting!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.CacheStoreCategory!"/>
+    <Add FullName="EPMLiveCore.ReportAuth!"/>
   </ShimGeneration>
 </Fakes>
