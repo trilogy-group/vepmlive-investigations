@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.SharePoint;
 using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using System.Net;
+using Microsoft.SharePoint;
 
 namespace EPMLiveCore
 {
     public class PlatformIntegrationEvent : SPItemEventReceiver
     {
+        private const string SuccessClosingTag = "<Success/>";
         private string url = "";
         private string key = "";
         private Guid id;
@@ -40,54 +38,22 @@ namespace EPMLiveCore
                     api.Url = url;
                     string ret = api.DeleteItem(key, properties.ListItemId.ToString());
 
-                    if (ret != "<Success/>")
-                    {
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
-                        {
-                            try
-                            {
-                                using (var connection = new SqlConnection(CoreFunctions.getConnectionString(properties.Site.WebApplication.Id)))
-                                {
-                                    connection.Open();
-
-                                    using (var command = new SqlCommand(
-                                        "INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), @message, 30)",
-                                        connection))
-                                    {
-                                        command.Parameters.AddWithValue("@intid", id);
-                                        command.Parameters.AddWithValue("@message", ret);
-                                        command.ExecuteNonQuery();
-                                    }
-                                }
-                            }
-                            catch { }
-                        });
-                    }
+                    InsertPlatformIntegrationLogIfNotSuccess(properties, ret);
                 }
                 catch (Exception ex)
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
-                    {
-                        try
-                        {
-                            using (var connection = new SqlConnection(CoreFunctions.getConnectionString(properties.Site.WebApplication.Id)))
-                            {
-                                connection.Open();
-
-                                using (var command = new SqlCommand(
-                                    "INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), @message, 30)",
-                                    connection))
-                                {
-                                    command.Parameters.AddWithValue("@intid", id);
-                                    command.Parameters.AddWithValue("@message", ex.Message);
-                                    command.ExecuteNonQuery();
-                                }
-                            }
-                        }
-                        catch { }
-                    });
+                    InsertPlatformIntegrationLog(properties, ex.Message);
+                    Trace.WriteLine(ex.ToString());
                 }
 
+            }
+        }
+
+        private void InsertPlatformIntegrationLogIfNotSuccess(SPItemEventProperties properties, string ret)
+        {
+            if (ret != SuccessClosingTag)
+            {
+                InsertPlatformIntegrationLog(properties, ret);
             }
         }
 
@@ -113,54 +79,41 @@ namespace EPMLiveCore
                     api.Url = url;
                     string ret = api.PostItemSimple(key, properties.ListItemId.ToString());
 
-                    if (ret != "<Success/>")
-                    {
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
-                        {
-                            try
-                            {
-                                using (var connection = new SqlConnection(CoreFunctions.getConnectionString(properties.Site.WebApplication.Id)))
-                                {
-                                    connection.Open();
+                    InsertPlatformIntegrationLogIfNotSuccess(properties, ret);
+                }
+                catch (Exception ex)
+                {
+                    InsertPlatformIntegrationLog(properties, ex.Message);
+                    Trace.WriteLine(ex.ToString());
+                }
+            }
+        }
 
-                                    using (var command = new SqlCommand(
-                                        "INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), @message, 30)",
-                                        connection))
-                                    {
-                                        command.Parameters.AddWithValue("@intid", id);
-                                        command.Parameters.AddWithValue("@message", ret);
-                                        command.ExecuteNonQuery();
-                                    }
-                                }
-                            }
-                            catch { }
-                        });
+        private void InsertPlatformIntegrationLog(SPItemEventProperties properties, string message)
+        {
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                try
+                {
+                    using (var connection = new SqlConnection(CoreFunctions.getConnectionString(properties.Site.WebApplication.Id)))
+                    {
+                        connection.Open();
+
+                        using (var command = new SqlCommand(
+                            "INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), @message, 30)",
+                            connection))
+                        {
+                            command.Parameters.AddWithValue("@intid", id);
+                            command.Parameters.AddWithValue("@message", message);
+                            command.ExecuteNonQuery();
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
-                    {
-                        try
-                        {
-                            using (var connection = new SqlConnection(CoreFunctions.getConnectionString(properties.Site.WebApplication.Id)))
-                            {
-                                connection.Open();
-
-                                using (var command = new SqlCommand(
-                                    "INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), @message, 30)",
-                                    connection))
-                                {
-                                    command.Parameters.AddWithValue("@intid", id);
-                                    command.Parameters.AddWithValue("@message", ex.Message);
-                                    command.ExecuteNonQuery();
-                                }
-                            }
-                        }
-                        catch { }
-                    });
+                    Trace.WriteLine(ex.ToString());
                 }
-            }
+            });
         }
 
         private void GetKeyAndUrl(SPItemEventProperties properties)
