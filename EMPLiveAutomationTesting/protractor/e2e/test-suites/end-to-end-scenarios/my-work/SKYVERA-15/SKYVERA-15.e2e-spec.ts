@@ -15,7 +15,7 @@ describe(SuiteNames.endToEndSuite, () => {
         await MyWorkPageHelper.verifyMyWorkPageDisplayed(stepLogger);
     });
 
-    fit('"Edit Item" via "Edit Item" button. - [745091]', async () => {
+    it('"Edit Item" via "Edit Item" button. - [745091]', async () => {
         stepLogger.caseId = 745091;
 
         stepLogger.stepId(1);
@@ -41,7 +41,7 @@ describe(SuiteNames.endToEndSuite, () => {
         await MyWorkPageHelper.verifyChangesNotReflected(editedItemTitleForCancel, stepLogger);
     });
 
-    fit('"Close the Edit item pop-up via Close button/icon. - [745095]', async () => {
+    it('"Close the Edit item pop-up via Close button/icon. - [745095]', async () => {
         stepLogger.caseId = 745095;
 
         stepLogger.stepId(1);
@@ -58,7 +58,7 @@ describe(SuiteNames.endToEndSuite, () => {
         await MyWorkPageHelper.verifyChangesNotReflected(editedItemTitleForCancel, stepLogger);
     });
 
-    fit('Edit the comments. - [745098]', async () => {
+    it('Edit the comments. - [745098]', async () => {
         stepLogger.caseId = 745098;
 
         stepLogger.stepId(1);

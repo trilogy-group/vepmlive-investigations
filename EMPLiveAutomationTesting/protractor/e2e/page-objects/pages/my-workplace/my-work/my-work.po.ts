@@ -5,6 +5,7 @@ import {ComponentHelpers} from '../../../../components/devfactory/component-help
 import {CommonPageConstants} from '../../common/common-page.constants';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
+import {ElementHelper} from '../../../../components/html/element-helper';
 
 export class MyWorkPage {
 
@@ -117,7 +118,9 @@ export class MyWorkPage {
         return{
             saveView: AnchorHelper.getAnchorById(viewRibbonlabel.saveView),
             renameView: AnchorHelper.getAnchorById(viewRibbonlabel.renameView),
-            deleteView: AnchorHelper.getAnchorById(viewRibbonlabel.deleteView)
+            deleteView: AnchorHelper.getAnchorById(viewRibbonlabel.deleteView),
+            currentViewDropdown: AnchorHelper.getAnchorById(viewRibbonlabel.currentViewDropdown),
+            selectColumns: AnchorHelper.getAnchorById(viewRibbonlabel.selectColumns),
         };
     }
 
@@ -201,5 +204,33 @@ export class MyWorkPage {
 
     static getCommentByName(commentName: string) {
         return element(By.xpath(`//div[@class="socialcomment-contents-TRC"  and text()="${commentName}"]`));
+    }
+
+    static getCurrentViewByName(viewName: string) {
+        return element(By.xpath(`//a[@role="button"] //span[text()="${viewName}"]`));
+    }
+
+    static get selectViewNameOtherThanDefault() {
+        return element(By.xpath('//div[text()="Personal Views"]/following-sibling::ul[1]'));
+    }
+
+    static get selectColumnsPopup() {
+        const selectColumnsPopupLabel = MyWorkPageConstants.selectColumnsPopup;
+        return {
+            ok: ElementHelper.getElementByText(selectColumnsPopupLabel.ok),
+            hideAll: ElementHelper.getElementByText(selectColumnsPopupLabel.hideAll),
+            cancel: ElementHelper.getElementByText(selectColumnsPopupLabel.cancel),
+            column: element.all(By.css(`.${selectColumnsPopupLabel.column}`)),
+            columnChecked: element(By.css(`.${selectColumnsPopupLabel.columnChecked}`)),
+        };
+    }
+
+    static getColumnSelectedOnSelectColumnsPopup(column: string) {
+        const columnChecked = MyWorkPageConstants.selectColumnsPopup.columnChecked;
+        return element(By.xpath(`//div[contains(@class, "${columnChecked}")]/div[text()='${column}']`));
+    }
+
+    static columnDisplayed(column: string) {
+        return element(By.xpath(`//td[contains(@class,"GMHeaderText") and (text()='${column}')]`));
     }
 }

@@ -18,6 +18,11 @@ export class MyWorkPageConstants {
     static readonly editItemLabel = 'Edit Item';
     static readonly commentsLabel = 'Comments';
     static readonly editCommentsLabel = 'Edit Comments';
+    static readonly viewsRibbonLabel = 'Views Ribbon menu';
+    static readonly saveViewPopupLabel = 'Save view popup';
+    static readonly viewNameOtherThanDefault = 'Working On It';
+    static readonly renameViewPopupLabel = 'Rename View Popup';
+    static readonly noNameMessage = 'Please enter view name - view names cannot be blank.';
 
     static get pageName() {
         return {
@@ -81,10 +86,13 @@ export class MyWorkPageConstants {
     }
 
     static get viewRibbonOptions() {
+        const viewSection = 'Ribbon.MyWork.Views';
         return{
-          saveView: 'Ribbon.MyWork.Views.SaveView-Medium',
-          renameView: 'Ribbon.MyWork.Views.RenameView-Medium',
-          deleteView: 'Ribbon.MyWork.Views.DeleteView-Medium'
+            saveView: `${viewSection}.SaveView-Medium`,
+            renameView: `${viewSection}.RenameView-Medium`,
+            deleteView: `${viewSection}.DeleteView-Medium`,
+            currentViewDropdown: `${viewSection}.CurrentViewDropDown`,
+            selectColumns: `Ribbon.MyWork.Actions.SelectColoumns-Medium`
         };
     }
 
@@ -136,6 +144,16 @@ export class MyWorkPageConstants {
             editCommentTextArea: 'socialCommentInputBox',
             editPost: 'Post',
             editCancel: 'Cancel',
+        };
+    }
+
+    static get selectColumnsPopup() {
+        return {
+            ok: 'OK',
+            hideAll: 'Hide all',
+            cancel: 'Cancel',
+            column: 'GMColumnsMenuItemText',
+            columnChecked: 'GMMenuCheckedIconRight'
         };
     }
 }

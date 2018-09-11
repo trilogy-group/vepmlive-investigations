@@ -376,6 +376,10 @@ export class PageHelper {
         return await browser.switchTo().alert().accept();
     }
 
+    static async dismissAlert() {
+        return await browser.switchTo().alert().dismiss();
+    }
+
     static async closeAlertIfPresent() {
         try {
             await browser.sleep(PageHelper.timeout.xs);

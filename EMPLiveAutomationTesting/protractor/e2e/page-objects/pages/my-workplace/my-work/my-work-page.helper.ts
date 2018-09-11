@@ -92,6 +92,7 @@ export class MyWorkPageHelper {
 
     static async clickOnPageTab(stepLogger: StepLogger) {
         stepLogger.step('Click on "Page" tab');
+        await browser.sleep(PageHelper.timeout.s);
         await PageHelper.click(CommonPage.ribbonTitles.page);
     }
 
@@ -448,5 +449,223 @@ export class MyWorkPageHelper {
             commentText,
             stepLogger
         );
+    }
+
+    static async clickViewsTab(stepLogger: StepLogger) {
+        stepLogger.step('Click on View tab.');
+        // scripts are failing - dynamic waits couldn't help
+        await browser.sleep(PageHelper.timeout.s);
+        const isViewTabDisplayed = await PageHelper.isElementPresent(MyWorkPage.selectRibbonTabs.views);
+        if (! isViewTabDisplayed) {
+            await this.clickOnAnyCreatedItem(stepLogger);
+        }
+        await PageHelper.click(MyWorkPage.selectRibbonTabs.views);
+    }
+
+    static async verifyViewRibbonDisplayed(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(
+            MyWorkPage.getViewRibbonOptions.saveView,
+            MyWorkPageConstants.viewsRibbonLabel,
+            stepLogger
+        );
+    }
+
+    static async clickSaveView(stepLogger: StepLogger) {
+        stepLogger.step('Click on Save View');
+        await this.clickOnAnyCreatedItem(stepLogger);
+        await PageHelper.click(MyWorkPage.getViewRibbonOptions.saveView);
+    }
+
+    static async verifySaveViewPopupDisplayed(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(
+            MyWorkPage.viewsPopup.name,
+            MyWorkPageConstants.saveViewPopupLabel,
+            stepLogger
+        );
+    }
+
+    static async enterTextOnSaveViewTitle(stepLogger: StepLogger) {
+        stepLogger.step('Enter text - save view name');
+        const currentViewName = await PageHelper.getText(MyWorkPage.getCurrentView);
+        const viewsPopupItems = MyWorkPage.viewsPopup;
+        const uniqueId = PageHelper.getUniqueId();
+        const viewName = `${MyWorkPageConstants.viewName}${uniqueId}`;
+        await PageHelper.click(viewsPopupItems.name);
+        await TextboxHelper.sendKeys(viewsPopupItems.name, viewName);
+        return currentViewName;
+    }
+
+    static async clickCancelOnViewsPopup(stepLogger: StepLogger) {
+        stepLogger.step('Click on Cancel button');
+        await PageHelper.click(MyWorkPage.viewsPopup.cancel);
+    }
+
+    static async verifyViewName(currentView: string, stepLogger: StepLogger) {
+        await browser.sleep(PageHelper.timeout.s);
+        await ExpectationHelper.verifyText(
+            MyWorkPage.getCurrentView,
+            MyWorkPageConstants.currentView,
+            currentView,
+            stepLogger
+        );
+    }
+
+    static async selectViewFromCurrentView(stepLogger: StepLogger) {
+        stepLogger.step('Select some other view apart from Default view ');
+        await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
+        await browser.sleep(PageHelper.timeout.xs);
+        await PageHelper.click(MyWorkPage.selectViewNameOtherThanDefault);
+        // sometimes - stale exception
+        await browser.sleep(PageHelper.timeout.s);
+        await this.clickViewsTab(stepLogger);
+        const viewName = PageHelper.getText(MyWorkPage.getCurrentView);
+        return viewName;
+    }
+
+    static async clickRenameView(stepLogger: StepLogger) {
+        stepLogger.step('click on Rename view');
+        await this.clickOnAnyCreatedItem(stepLogger);
+        await ElementHelper.clickUsingJsNoWait(MyWorkPage.getViewRibbonOptions.renameView);
+    }
+
+    static async verifyRenameViewDisplayed(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(
+            MyWorkPage.viewsPopup.newName,
+            MyWorkPageConstants.renameViewPopupLabel,
+            stepLogger
+        );
+    }
+
+    static async enterNewName(stepLogger: StepLogger) {
+        stepLogger.step('Enter text - rename view new name');
+        const uniqueId = PageHelper.getUniqueId();
+        const viewName = `${MyWorkPageConstants.viewName}${uniqueId}`;
+        await TextboxHelper.sendKeys(MyWorkPage.viewsPopup.newName, viewName);
+    }
+
+    static async clickCancelButtonViewsPopup(stepLogger: StepLogger) {
+        stepLogger.step('Click on "Cancel" button');
+        await PageHelper.click(MyWorkPage.viewsPopup.cancel);
+    }
+
+    static async clickDeleteView(stepLogger: StepLogger) {
+        stepLogger.step('Click on Delete View button.');
+        await PageHelper.click(MyWorkPage.getViewRibbonOptions.deleteView);
+    }
+
+    static async dismissDeletePopup(stepLogger: StepLogger) {
+        stepLogger.step('Click on Cancel button.');
+        await PageHelper.dismissAlert();
+    }
+
+    static async goToSaveView(stepLogger: StepLogger) {
+        await this.clickViewsTab(stepLogger);
+        await this.clickSaveView(stepLogger);
+    }
+
+    static async fillNameAndSubmitSaveView(stepLogger: StepLogger) {
+        stepLogger.step('Enter some valid text in it and do not check default view check box.Click on "Ok" button');
+        const uniqueId = PageHelper.getUniqueId();
+        const viewName = `${MyWorkPageConstants.viewName}${uniqueId}`;
+        const viewsPopupItems = MyWorkPage.viewsPopup;
+        await PageHelper.click(viewsPopupItems.name);
+        await TextboxHelper.sendKeys(viewsPopupItems.name, viewName);
+        if (await PageHelper.isElementSelected(viewsPopupItems.defaultView)) {
+            await PageHelper.click(viewsPopupItems.defaultView);
+        }
+        if (await PageHelper.isElementSelected(viewsPopupItems.personalView)) {
+            await PageHelper.click(viewsPopupItems.personalView);
+        }
+        await PageHelper.click(viewsPopupItems.ok);
+        return viewName;
+    }
+
+    static async verifyDeleteViewPopup(viewName: string, stepLogger: StepLogger) {
+        const deletePopUpText = await PageHelper.getAlertText();
+        const expectedPopUpText = `Would you like to delete the "${viewName}" view?`;
+        await ExpectationHelper.verifyStringEqualTo(deletePopUpText, expectedPopUpText, stepLogger);
+    }
+
+    static async clickOKonDeleteViewPopup(stepLogger: StepLogger) {
+        stepLogger.step('Click on "Ok" button.');
+        await PageHelper.acceptAlert();
+    }
+
+    static async verifyViewDeleted(currentViewName: string, stepLogger: StepLogger) {
+        await browser.sleep(PageHelper.timeout.s);
+        await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
+        await ExpectationHelper.verifyNotDisplayedStatus(
+            MyWorkPage.getCurrentViewByName(currentViewName),
+            currentViewName,
+            stepLogger
+        );
+    }
+
+    static async clickSelectColumns(stepLogger: StepLogger) {
+        await this.clickOnAnyCreatedItem(stepLogger);
+        stepLogger.step('Click on "Select Columns".');
+        await ElementHelper.clickUsingJsNoWait(MyWorkPage.getViewRibbonOptions.selectColumns);
+    }
+
+    static async verifyButtonsOnSelectColumns(stepLogger: StepLogger) {
+        const selectPopupItems = MyWorkPage.selectColumnsPopup;
+        const selectPopupLabels = MyWorkPageConstants.selectColumnsPopup;
+        await ExpectationHelper.verifyDisplayedStatus(
+            selectPopupItems.ok,
+            selectPopupLabels.ok,
+            stepLogger
+        );
+        await ExpectationHelper.verifyDisplayedStatus(
+            selectPopupItems.cancel,
+            selectPopupLabels.cancel,
+            stepLogger
+        );
+        await ExpectationHelper.verifyDisplayedStatus(
+            selectPopupItems.hideAll,
+            selectPopupLabels.hideAll,
+            stepLogger
+        );
+    }
+
+    static async selectColumn(stepLogger: StepLogger) {
+        stepLogger.step('Select the check-box for any column, Click on "Ok" button');
+        const selectPopupItems = MyWorkPage.selectColumnsPopup;
+        const columnName = await PageHelper.getText(selectPopupItems.column.get(0));
+        const isColumnSelected = await PageHelper.isElementPresent(MyWorkPage.getColumnSelectedOnSelectColumnsPopup(columnName));
+        if (! isColumnSelected) {
+            await PageHelper.click(selectPopupItems.column.get(0));
+        }
+        await PageHelper.click(selectPopupItems.ok);
+        return columnName;
+    }
+
+    static async verifySelectedColumnDisplayed(selectedColumn: string, stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus (
+            MyWorkPage.columnDisplayed(selectedColumn),
+            selectedColumn,
+            stepLogger
+        );
+    }
+
+    static async deleteNameInSaveViewSubmit(stepLogger: StepLogger) {
+        stepLogger.step('Delete the text from the text-box. Click on "Ok" button.');
+        const saveViewPopupItems = await MyWorkPage.viewsPopup;
+        await PageHelper.click(saveViewPopupItems.name);
+        await TextboxHelper.clearText(saveViewPopupItems.name);
+        await PageHelper.click(saveViewPopupItems.ok);
+    }
+
+    static async verifyEmptyNameMessage(stepLogger: StepLogger) {
+        const alertMessageExpected = await PageHelper.getAlertText();
+        await ExpectationHelper.verifyStringEqualTo(
+            alertMessageExpected,
+            MyWorkPageConstants.noNameMessage,
+            stepLogger
+        );
+    }
+
+    static async clickOKAlert(stepLogger: StepLogger) {
+        stepLogger.step('Click on "Ok" button.');
+        await PageHelper.acceptAlert();
     }
 }
