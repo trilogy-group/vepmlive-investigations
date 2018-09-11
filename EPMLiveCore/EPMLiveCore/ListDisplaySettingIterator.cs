@@ -18,12 +18,19 @@ using System.Linq;
 using System.Globalization;
 using System.Xml;
 using System.Web.UI.HtmlControls;
+using System.Diagnostics;
 
 namespace EPMLiveCore
 {
 	public class ListDisplaySettingIterator : ListFieldIterator
 	{
-		private Dictionary<string, Dictionary<string, string>> fieldProperties = null;
+	    private const string FeatureId1 = "e97da3cd-4c42-44cd-ba51-2bfbb2c397cb";
+	    private const string FeatureId2 = "19e6ae14-9e68-44fa-9a08-c1c4514bf12e";
+	    private const string ModeParam = "Mode";
+	    private const string LookupFieldParam = "LookupField";
+	    private const string LookupValueParam = "LookupValue";
+	    private const string SourceParam = "Source";
+	    private Dictionary<string, Dictionary<string, string>> fieldProperties = null;
 		private SPList list = null;
 		private SPControlMode mode = 0;
 		private SortedList arrwpFields = new SortedList();
@@ -193,218 +200,298 @@ namespace EPMLiveCore
 			}
 			catch { }
 		}
+        
+        protected override void OnInit(EventArgs e)
+        {
+            var siteid = SPContext.Current.Site.ID;
 
-		protected override void OnInit(EventArgs e)
-		{
-			Guid siteid = SPContext.Current.Site.ID;
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                using (var site = new SPSite(siteid))
+                {
+                    if (site.Features[new Guid(FeatureId1)] != null || 
+                        site.WebApplication.Features[new Guid(FeatureId2)] != null)
+                    {
+                        isFeatureActivated = true;
+                    }
+                }
+            });
 
-			SPSecurity.RunWithElevatedPrivileges(delegate ()
-			{
-				using (SPSite site = new SPSite(siteid))
-				{
-					if (site.Features[new Guid("e97da3cd-4c42-44cd-ba51-2bfbb2c397cb")] != null || site.WebApplication.Features[new Guid("19e6ae14-9e68-44fa-9a08-c1c4514bf12e")] != null)
-						isFeatureActivated = true;
-				}
-			});
+            base.OnInit(e);
 
-			base.OnInit(e);
+            if (isFeatureActivated)
+            {
+                Init();
 
-			if (isFeatureActivated)
-			{
+                if (mode == SPControlMode.New || 
+                    (list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrWhiteSpace(Page.Request[ModeParam]) && 
+                    Page.Request[ModeParam] == "Upload" && mode == SPControlMode.Edit))
+                {
+                    if (!string.IsNullOrWhiteSpace(Page.Request[LookupFieldParam]))
+                    {
+                        lookupField = Page.Request[LookupFieldParam];
+                    }
 
-				try
-				{
-					try
-					{
-						list = SPContext.Current.List;
-					}
-					catch { }
+                    if (!string.IsNullOrWhiteSpace(Page.Request[LookupValueParam]))
+                    {
+                        lookupValue = Page.Request[LookupValueParam];
+                    }
+                }
+            }
+        }
 
-					GridGanttSettings gSettings = new GridGanttSettings(list);
+        private void Init()
+        {
+            try
+            {
+                InitFields();
 
-					DisplayFormRedirect = gSettings.DisplayFormRedirect;
-
-					if (DisplayFormRedirect && ControlMode == SPControlMode.New && Page.Request["IsDlg"] != "1")
-					{
-						SPContext.Current.FormContext.OnSaveHandler += new EventHandler(CustomHandler);
-					}
-					else if (!string.IsNullOrEmpty(Page.Request["Source"]))
-					{
-						RedirectUrl = Page.Request["Source"];
-						SPContext.Current.FormContext.OnSaveHandler += new EventHandler(HandleNewItemRecent);
-					}
-					else
-						SPContext.Current.FormContext.OnSaveHandler += new EventHandler(HandleNewItemRecent);
-					//string strDisplay = CoreFunctions.getListSetting(List, "DisplaySettings");
-					//string[] strGeneral = CoreFunctions.getListSetting(List, "GeneralSettings").Split('\n');
-					if (gSettings.DisplaySettings != "")
-						fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
-
-					try
-					{
-						isWorkList = gSettings.EnableWorkList;
-					}
-					catch { }
-
-					if (isWorkList)
-					{
-						SPPageContentManager.RegisterClientScriptInclude(this, this.GetType(), "WorkEngineStatusing", "/_layouts/15/epmlive/WorkEngineStatusing.js");
-						//Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "WorkEngineStatusing", "<script type=\"text/javascript\" src=\"/_layouts/epmlive/WorkEngineStatusing.js\">");
-					}
-
-
-					if (list == null)
-					{
-						list = SPContext.Current.Web.Lists[new Guid(Page.Request["ListId"])];
-					}
-
-					SPSecurity.RunWithElevatedPrivileges(delegate ()
-					{
-						using (SPSite rsite = new SPSite(SPContext.Current.Site.ID))
-						{
-							using (SPWeb web = rsite.OpenWeb(SPContext.Current.Web.ID))
-							{
-								arrwpFields = ReflectionMethods.GetWorkPlannerStatusFields(web, list.Title);
-							}
-						}
-						try
-						{
-							if (list.Title == "Resources")
-							{
-								isResList = true;
-								SPSite site1 = SPContext.Current.Site;
-								if (site1.WebApplication.Features[new Guid("19e6ae14-9e68-44fa-9a08-c1c4514bf12e")] != null)
-								{
-									isOnline = true;
-
-									try
-									{
-										SqlConnection cn = null;
-										SPSecurity.RunWithElevatedPrivileges(delegate ()
-										{
-											MethodInfo m;
-
-											Assembly assemblyInstance = Assembly.Load("EPMLiveAccountManagement, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
-											Type thisClass = assemblyInstance.GetType("EPMLiveAccountManagement.Settings", true, true);
-											m = thisClass.GetMethod("getConnectionString");
-											string sConn = (string)m.Invoke(null, new object[] { });
-
-											cn = new SqlConnection(sConn);
-											cn.Open();
-										});
-
-										SqlCommand cmd = new SqlCommand("2012SP_GetActivationInfo", cn);
-										cmd.CommandType = CommandType.StoredProcedure;
-										cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
-										cmd.Parameters.AddWithValue("@username", "");
-
-										DataSet ds = new DataSet();
-										SqlDataAdapter da = new SqlDataAdapter(cmd);
-										da.Fill(ds);
-
-										try
-										{
-											ActivationType = int.Parse(ds.Tables[0].Rows[0][0].ToString());
-										}
-										catch { }
-
-										if (ActivationType != 3)
-										{
-											cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn);
-											cmd.CommandType = CommandType.StoredProcedure;
-											cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
-											cmd.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel());
-
-											SqlDataReader dr = cmd.ExecuteReader();
-
-											if (dr.Read())
-											{
-												max = dr.GetInt32(0);
-												count = dr.GetInt32(1);
-												width = (count * 100) / max;
-
-												barcolor = "";
-
-												if (width > 100)
-													width = 100;
-
-												if ((max - count) <= 1)
-													barcolor = "FF0000";
-												else if ((max - count) < 5)
-													barcolor = "FFFF00";
-												else
-													barcolor = "009900";
-
-												ownerusername = dr.GetString(13);
-												ownername = dr.GetString(5);
-
-												accountid = dr.GetGuid(2);
-
-												billingtype = dr.GetInt32(11);
-											}
-											dr.Close();
-										}
-										else
-										{
-											cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn);
-											cmd.CommandType = CommandType.StoredProcedure;
-											cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
-											cmd.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel());
-
-											SqlDataReader dr = cmd.ExecuteReader();
-
-											if (dr.Read())
-											{
-												ownerusername = dr.GetString(13);
-												ownername = dr.GetString(5);
-											}
-											dr.Close();
-										}
-										cn.Close();
-									}
-									catch
-									{
-										max = 0;
-									}
-								}
-							}
-						}
-						catch { }
-					});
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                {
+                    using (var rsite = new SPSite(SPContext.Current.Site.ID))
+                    {
+                        using (var web = rsite.OpenWeb(SPContext.Current.Web.ID))
+                        {
+                            arrwpFields = ReflectionMethods.GetWorkPlannerStatusFields(web, list.Title);
+                        }
+                    }
+                    try
+                    {
+                        if (list.Title == "Resources")
+                        {
+                            isResList = true;
+                            var site1 = SPContext.Current.Site;
+                            if (site1.WebApplication.Features[new Guid(FeatureId2)] != null)
+                            {
+                                InitFeature2();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine(ex.ToString());
+                    }
+                });
 
 
-					if (SPContext.Current.FormContext.FormMode != SPControlMode.Invalid)
-					{
-						mode = SPContext.Current.FormContext.FormMode;
-					}
-					else
-					{
-						try
-						{
-							mode = (SPControlMode)int.Parse(Page.Request["mode"]);
-						}
-						catch { }
-					}
+                if (SPContext.Current.FormContext.FormMode != SPControlMode.Invalid)
+                {
+                    mode = SPContext.Current.FormContext.FormMode;
+                }
+                else
+                {
+                    try
+                    {
+                        mode = (SPControlMode)int.Parse(Page.Request["mode"]);
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine(ex.ToString());
+                    }
+                }
 
-				}
-				catch { }
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.ToString());
+            }
+        }
 
-				if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request["Mode"]) && Page.Request["Mode"] == "Upload" && mode == SPControlMode.Edit))
-				{
-					if (!string.IsNullOrEmpty(Page.Request["LookupField"]))
-					{
-						lookupField = Page.Request["LookupField"];
-					}
+        private void InitFields()
+        {
+            try
+            {
+                list = SPContext.Current.List;
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.ToString());
+            }
 
-					if (!string.IsNullOrEmpty(Page.Request["LookupValue"]))
-					{
-						lookupValue = Page.Request["LookupValue"];
-					}
-				}
-			}
-		}
+            var gridSettings = new GridGanttSettings(list);
 
-		public override void RenderControl(System.Web.UI.HtmlTextWriter writer)
+            DisplayFormRedirect = gridSettings.DisplayFormRedirect;
+
+            if (DisplayFormRedirect && ControlMode == SPControlMode.New && Page.Request["IsDlg"] != "1")
+            {
+                SPContext.Current.FormContext.OnSaveHandler += new EventHandler(CustomHandler);
+            }
+            else if (!string.IsNullOrWhiteSpace(Page.Request[SourceParam]))
+            {
+                RedirectUrl = Page.Request[SourceParam];
+                SPContext.Current.FormContext.OnSaveHandler += new EventHandler(HandleNewItemRecent);
+            }
+            else
+            {
+                SPContext.Current.FormContext.OnSaveHandler += new EventHandler(HandleNewItemRecent);
+            }
+
+            if (gridSettings.DisplaySettings != string.Empty)
+            {
+                fieldProperties = ListDisplayUtils.ConvertFromString(gridSettings.DisplaySettings);
+            }
+
+            try
+            {
+                isWorkList = gridSettings.EnableWorkList;
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.ToString());
+            }
+
+            if (isWorkList)
+            {
+                SPPageContentManager.RegisterClientScriptInclude(
+                    this,
+                    GetType(),
+                    "WorkEngineStatusing",
+                    "/_layouts/15/epmlive/WorkEngineStatusing.js");
+            }
+
+
+            if (list == null)
+            {
+                list = SPContext.Current.Web.Lists[new Guid(Page.Request["ListId"])];
+            }
+        }
+
+        private void InitFeature2()
+        {
+            isOnline = true;
+
+            try
+            {
+                SqlConnection connection = null;
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                {
+                    var assemblyInstance = Assembly.Load("EPMLiveAccountManagement, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
+                    var thisClass = assemblyInstance.GetType("EPMLiveAccountManagement.Settings", true, true);
+                    var methodInfo = thisClass.GetMethod("getConnectionString");
+                    var connectionString = (string)methodInfo.Invoke(null, new object[] { });
+
+                    connection = new SqlConnection(connectionString);
+                    connection.Open();
+                });
+
+                using (var command = new SqlCommand("2012SP_GetActivationInfo", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
+                    command.Parameters.AddWithValue("@username", string.Empty);
+
+                    using (var dataSet = new DataSet())
+                    {
+                        using (var adapter = new SqlDataAdapter(command))
+                        {
+                            adapter.Fill(dataSet);
+                        }
+
+                        try
+                        {
+                            ActivationType = int.Parse(dataSet.Tables[0].Rows[0][0].ToString());
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine(ex.ToString());
+                        }
+                    }
+
+                    if (ActivationType != 3)
+                    {
+                        InitActivationType(connection);
+                    }
+                    else
+                    {
+                        InitOwner(connection);
+                    }
+                }
+                connection?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                max = 0;
+                Trace.WriteLine(ex.ToString());
+            }
+        }
+
+        private void InitActivationType(SqlConnection connection)
+        {
+            if (connection == null)
+            {
+                throw new ArgumentNullException(nameof(connection));
+            }
+
+            using (var command = new SqlCommand("2010SP_GetSiteAccountNums", connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
+                command.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel());
+
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        max = reader.GetInt32(0);
+                        count = reader.GetInt32(1);
+                        width = (count * 100) / max;
+
+                        barcolor = string.Empty; ;
+
+                        if (width > 100)
+                        {
+                            width = 100;
+                        }
+
+                        if ((max - count) <= 1)
+                        {
+                            barcolor = "FF0000";
+                        }
+                        else if ((max - count) < 5)
+                        {
+                            barcolor = "FFFF00";
+                        }
+                        else
+                        {
+                            barcolor = "009900";
+                        }
+
+                        ownerusername = reader.GetString(13);
+                        ownername = reader.GetString(5);
+
+                        accountid = reader.GetGuid(2);
+
+                        billingtype = reader.GetInt32(11);
+                    }
+                }
+            }
+        }
+
+        private void InitOwner(SqlConnection connection)
+        {
+            if (connection == null)
+            {
+                throw new ArgumentNullException(nameof(connection));
+            }
+
+            using (var command = new SqlCommand("2010SP_GetSiteAccountNums", connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
+                command.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel());
+
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        ownerusername = reader.GetString(13);
+                        ownername = reader.GetString(5);
+                    }
+                }
+            }
+        }
+        
+        public override void RenderControl(System.Web.UI.HtmlTextWriter writer)
 		{
 			string sRelUrl = ((base.Web.ServerRelativeUrl == "/") ? "" : base.Web.ServerRelativeUrl);
 
@@ -1083,7 +1170,7 @@ namespace EPMLiveCore
 					if (bDialog)
 						newLocation = "close";
 					else
-						newLocation = Page.Request["Source"];
+						newLocation = Page.Request[SourceParam];
 				}
 
                 
@@ -1284,7 +1371,7 @@ namespace EPMLiveCore
 
 		private void InsertLookupValueByQueryString()
 		{
-			if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request["Mode"]) && Page.Request["Mode"] == "Upload" && mode == SPControlMode.Edit))
+			if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request[ModeParam]) && Page.Request[ModeParam] == "Upload" && mode == SPControlMode.Edit))
 			{
 				// assume single lookup
 				bool valIsMulti = false;
@@ -1572,7 +1659,7 @@ namespace EPMLiveCore
 
 						SPFieldLookupValueCollection lookupValCol = null;
 
-						if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request["Mode"]) && Page.Request["Mode"] == "Upload" && mode == SPControlMode.Edit))
+						if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request[ModeParam]) && Page.Request[ModeParam] == "Upload" && mode == SPControlMode.Edit))
 						{
 							lookupValCol = GetQueryStringLookupVal(fld);
 						}
@@ -1679,7 +1766,7 @@ namespace EPMLiveCore
 
 						SPFieldLookupValueCollection lookupValCol = null;
 
-						if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request["Mode"]) && Page.Request["Mode"] == "Upload" && mode == SPControlMode.Edit))
+						if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request[ModeParam]) && Page.Request[ModeParam] == "Upload" && mode == SPControlMode.Edit))
 						{
 							lookupValCol = GetQueryStringLookupVal(fld);
 						}
