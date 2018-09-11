@@ -56,7 +56,6 @@ namespace EPMLiveCore.Tests.WebPageCode
                 () => adoShims.ConnectionsCreated.ShouldContain(item => item.ConnectionString == expectedConnectionString01),
                 () => adoShims.ConnectionsCreated.ShouldContain(item => item.ConnectionString == expectedConnectionString02),
                 () => adoShims.ConnectionsOpened.Count.ShouldBe(totalConnectionsCount),
-                () => adoShims.ConnectionsClosed.Count.ShouldBe(totalConnectionsCount),
                 () => adoShims.ConnectionsDisposed.Count.ShouldBe(totalConnectionsCount));
         }
 
