@@ -95,6 +95,10 @@ namespace EPMLiveCore
             {
                 try
                 {
+                    if (properties?.Site?.WebApplication?.Id == null)
+                    {
+                        throw new ArgumentNullException("properties.Site.WebApplication.Id");
+                    }
                     using (var connection = new SqlConnection(CoreFunctions.getConnectionString(properties.Site.WebApplication.Id)))
                     {
                         connection.Open();
