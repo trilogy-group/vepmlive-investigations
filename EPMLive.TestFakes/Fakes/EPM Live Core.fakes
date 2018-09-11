@@ -23,6 +23,8 @@
     <Add FullName="EPMLiveCore.Jobs.ResourceImportJob!"/>
     <Add FullName="EPMLiveCore.API.ResourceImporter!"/>
     <Add FullName="EPMLiveCore.API.ListCommands!"/>
+    <Add FullName="EPMLiveCore.API.Utils!"/>
+    <Add FullName="EPMLiveCore.API.MyWork!"/>
     <Add FullName="EPMLiveCore.GridGanttSettings!"/>
     <Add FullName="EPMLiveCore.EnhancedLookupConfigValuesHelper!"/>
     <Add FullName="EPMLiveCore.ReportHelper.ReportData!"/>
