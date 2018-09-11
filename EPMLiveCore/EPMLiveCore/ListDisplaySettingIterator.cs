@@ -58,6 +58,11 @@ namespace EPMLiveCore
 	    private const string SharePointAccount = "SharePointAccount";
 	    private const string Approved = "Approved";
 	    private const string No = "No";
+	    private const string Upload = "Upload";
+	    private const string Resources = "Resources";
+	    private const string Mode = "mode";
+	    private const string Listid = "ListId";
+	    private const string ForwardSlash = "/";
 	    private Dictionary<string, Dictionary<string, string>> fieldProperties = null;
 		private SPList list = null;
 		private SPControlMode mode = 0;
@@ -130,9 +135,9 @@ namespace EPMLiveCore
 		{
 			if (SaveButton.SaveItem(SPContext.Current, this.list.BaseTemplate == SPListTemplateType.DocumentLibrary, ""))
 			{
-				string sUrl = (List.ParentWeb.ServerRelativeUrl == "/") ? "" : List.ParentWeb.ServerRelativeUrl;
+				string sUrl = (List.ParentWeb.ServerRelativeUrl == ForwardSlash) ? "" : List.ParentWeb.ServerRelativeUrl;
 
-				RedirectUrl = String.Concat(sUrl, "/", List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url, @"?ID=", ListItem.ID, @"&Source=", ListItem.ParentList.DefaultViewUrl);
+				RedirectUrl = String.Concat(sUrl, ForwardSlash, List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url, @"?ID=", ListItem.ID, @"&Source=", ListItem.ParentList.DefaultViewUrl);
 
 				ProcessNewItemRecent(ListItem);
 			}
@@ -259,11 +264,11 @@ namespace EPMLiveCore
 
             if (isFeatureActivated)
             {
-                Init();
+                OnInit();
 
                 if (mode == SPControlMode.New || 
                     (list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrWhiteSpace(Page.Request[ModeParam]) && 
-                    Page.Request[ModeParam] == "Upload" && mode == SPControlMode.Edit))
+                    Page.Request[ModeParam] == Upload && mode == SPControlMode.Edit))
                 {
                     if (!string.IsNullOrWhiteSpace(Page.Request[LookupFieldParam]))
                     {
@@ -278,7 +283,7 @@ namespace EPMLiveCore
             }
         }
 
-        private void Init()
+        private void OnInit()
         {
             try
             {
@@ -295,7 +300,7 @@ namespace EPMLiveCore
                     }
                     try
                     {
-                        if (list.Title == "Resources")
+                        if (list.Title == Resources)
                         {
                             isResList = true;
                             var site1 = SPContext.Current.Site;
@@ -320,7 +325,7 @@ namespace EPMLiveCore
                 {
                     try
                     {
-                        mode = (SPControlMode)int.Parse(Page.Request["mode"]);
+                        mode = (SPControlMode)int.Parse(Page.Request[Mode]);
                     }
                     catch (Exception ex)
                     {
@@ -352,16 +357,16 @@ namespace EPMLiveCore
 
             if (DisplayFormRedirect && ControlMode == SPControlMode.New && Page.Request[IsDialogParameter] != ModifiedType)
             {
-                SPContext.Current.FormContext.OnSaveHandler += new EventHandler(CustomHandler);
+                SPContext.Current.FormContext.OnSaveHandler += CustomHandler;
             }
             else if (!string.IsNullOrWhiteSpace(Page.Request[SourceParam]))
             {
                 RedirectUrl = Page.Request[SourceParam];
-                SPContext.Current.FormContext.OnSaveHandler += new EventHandler(HandleNewItemRecent);
+                SPContext.Current.FormContext.OnSaveHandler += HandleNewItemRecent;
             }
             else
             {
-                SPContext.Current.FormContext.OnSaveHandler += new EventHandler(HandleNewItemRecent);
+                SPContext.Current.FormContext.OnSaveHandler += HandleNewItemRecent;
             }
 
             if (gridSettings.DisplaySettings != string.Empty)
@@ -390,7 +395,7 @@ namespace EPMLiveCore
 
             if (list == null)
             {
-                list = SPContext.Current.Web.Lists[new Guid(Page.Request["ListId"])];
+                list = SPContext.Current.Web.Lists[new Guid(Page.Request[Listid])];
             }
         }
 
@@ -535,7 +540,7 @@ namespace EPMLiveCore
             {
                 throw new ArgumentNullException(nameof(writer));
             }
-            var relativeUrl = (Web.ServerRelativeUrl == "/") ? string.Empty : Web.ServerRelativeUrl;
+            var relativeUrl = Web.ServerRelativeUrl == ForwardSlash ? string.Empty : Web.ServerRelativeUrl;
 
             if (isResList)
             {
@@ -638,7 +643,7 @@ namespace EPMLiveCore
             }
 
             var editUrl = List.Forms[PAGETYPE.PAGE_EDITFORM].Url;
-            editUrl = ((Web.ServerRelativeUrl == "/") ? string.Empty : Web.ServerRelativeUrl) + "/" + editUrl;
+            editUrl = ((Web.ServerRelativeUrl == ForwardSlash) ? string.Empty : Web.ServerRelativeUrl) + ForwardSlash + editUrl;
             var extraParams = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(Page.Request[IsDialogParameter]))
@@ -648,7 +653,7 @@ namespace EPMLiveCore
 
             writer.WriteLine("<script language=\"javascript\">");
 
-            writer.WriteLine($"WETitle = \"{HttpUtility.JavaScriptStringEncode(base.ListItem.Title)}\";");
+            writer.WriteLine($"WETitle = \"{HttpUtility.JavaScriptStringEncode(ListItem.Title)}\";");
             writer.WriteLine($"WEWebUrl = '{relativeUrl}';");
             writer.WriteLine($"WEWebId = '{Web.ID}';");
             writer.WriteLine($"WEEditForm = '{editUrl}';");
@@ -668,7 +673,7 @@ namespace EPMLiveCore
                 throw new ArgumentNullException(nameof(writer));
             }
 
-            var disableRequests = false;
+            bool disableRequests;
             bool.TryParse(CoreFunctions.getConfigSetting(SPContext.Current.Web, "OnlineDisableResReq"), out disableRequests);
             var isAdmin = SPContext.Current.Web.CurrentUser.IsSiteAdmin;
             if (isOnline && isResList)
@@ -693,7 +698,7 @@ namespace EPMLiveCore
                             {
                                 writer.Write(@"<tr><td colspan='2'><table cellpadding=""5"" id=""divuCount"" cellspacing=""0"" class=""tblResourceWarningMessages"">
                                     <tr>
-                                    <td>You cannot create a new user that has login access because your account limit of " + max + @" has been reached.  Purchasing additional accounts is easy, just click <a href=""" + ((SPContext.Current.Web.ServerRelativeUrl == "/") ? "" : SPContext.Current.Web.ServerRelativeUrl) + @"/_layouts/epmlive/purchase.aspx?accountid=" + accountid + @""">Purchase Accounts</a>.</tr>
+                                    <td>You cannot create a new user that has login access because your account limit of " + max + @" has been reached.  Purchasing additional accounts is easy, just click <a href=""" + ((SPContext.Current.Web.ServerRelativeUrl == ForwardSlash) ? "" : SPContext.Current.Web.ServerRelativeUrl) + @"/_layouts/epmlive/purchase.aspx?accountid=" + accountid + @""">Purchase Accounts</a>.</tr>
                                     </table><br></td></tr>");
                             }
                             else
@@ -782,7 +787,6 @@ namespace EPMLiveCore
 
             try
             {
-                
                 var field = GetCompositeField(control, 1).Field;
                 var fieldName = $"{field.InternalName}_{field.Id}_${field.TypeAsString}Field";
 
@@ -792,14 +796,9 @@ namespace EPMLiveCore
                 }
                 else if (field.TypeAsString == "ResourcePermissions" || field.TypeAsString == "ResourceLevels")
                 {
-                    if (ControlMode == SPControlMode.Display)
-                    {
-                        fieldName = parentControl.Controls[13].ClientID;
-                    }
-                    else
-                    {
-                        fieldName = parentControl.Controls[9].Controls[0].Controls[0].Controls[1].ClientID;
-                    }
+                    fieldName = ControlMode == SPControlMode.Display 
+                        ? parentControl.Controls[13].ClientID 
+                        : parentControl.Controls[9].Controls[0].Controls[0].Controls[1].ClientID;
                 }
                 else if (field.InternalName == "Status")
                 {
@@ -854,11 +853,6 @@ namespace EPMLiveCore
 
         private void ProcessCalculated(HtmlTextWriter writer, Control control, string fieldInternalName, Control parentControl)
         {
-            if (writer == null)
-            {
-                throw new ArgumentNullException(nameof(writer));
-            }
-
             if (control == null)
             {
                 throw new ArgumentNullException(nameof(control));
@@ -965,6 +959,10 @@ namespace EPMLiveCore
 
         private void ProcessDaysOverdue(HtmlTextWriter writer, Control control, string fieldInternalName, Control parentControl)
         {
+            if (writer == null)
+            {
+                throw new ArgumentNullException(nameof(writer));
+            }
             if (control == null)
             {
                 throw new ArgumentNullException(nameof(control));
@@ -990,6 +988,10 @@ namespace EPMLiveCore
 
         private void ProcessDue(HtmlTextWriter writer, Control control, string fieldInternalName, Control parentControl)
         {
+            if (writer == null)
+            {
+                throw new ArgumentNullException(nameof(writer));
+            }
             if (control == null)
             {
                 throw new ArgumentNullException(nameof(control));
@@ -1103,7 +1105,7 @@ namespace EPMLiveCore
                     {
                         RenderGeneric(writer);
                     }
-                    //to check validtion for special character at the time of edit resources
+                    // to check validtion for special character at the time of edit resources
                     else if ((dControls.ContainsKey(FirstNameKey) || dControls.ContainsKey(LastNameKey)))
                     {
                         Render(writer, WhitSpaces6, FirstNameKey, "First Name", "checkSpecialCharactersForNonGeneric");
@@ -1431,7 +1433,7 @@ namespace EPMLiveCore
                                                     var elementName = $(this).attr('name');
                                                     var aspForm = $('#aspnetForm');
                     
-                                                    var editPostbackUrl = '" + Web.Url + "/" + list.Forms[PAGETYPE.PAGE_EDITFORM].Url + "?id=" + ListItem.ID + "&Source=" + HttpUtility.UrlEncode(Web.Url + "/_layouts/15/epmlive/getlastid.aspx?BackTo=" + HttpUtility.UrlEncode(newLocation) + "&listid=" + list.ID + ((isDialog) ? "&isdlg=1" : "")) + @"';
+                                                    var editPostbackUrl = '" + Web.Url + ForwardSlash + list.Forms[PAGETYPE.PAGE_EDITFORM].Url + "?id=" + ListItem.ID + "&Source=" + HttpUtility.UrlEncode(Web.Url + "/_layouts/15/epmlive/getlastid.aspx?BackTo=" + HttpUtility.UrlEncode(newLocation) + "&listid=" + list.ID + ((isDialog) ? "&isdlg=1" : "")) + @"';
                     
                                                     if (!PreSaveItem()) return false;
                                                     if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
@@ -1452,7 +1454,7 @@ namespace EPMLiveCore
                                 var elementName = $(this).attr('name');
                                 var aspForm = $('#aspnetForm');
 
-                                var newPostbackUrl = '" + Web.Url + "/" + list.Forms[PAGETYPE.PAGE_NEWFORM].Url + "?Source=" + HttpUtility.UrlEncode(Web.Url + "/_layouts/15/epmlive/getlastid.aspx?BackTo=" + HttpUtility.UrlEncode(newLocation) + "&listid=" + list.ID + ((isDialog) ? "&isdlg=1" : "")) + @"';
+                                var newPostbackUrl = '" + Web.Url + ForwardSlash + list.Forms[PAGETYPE.PAGE_NEWFORM].Url + "?Source=" + HttpUtility.UrlEncode(Web.Url + "/_layouts/15/epmlive/getlastid.aspx?BackTo=" + HttpUtility.UrlEncode(newLocation) + "&listid=" + list.ID + ((isDialog) ? "&isdlg=1" : "")) + @"';
 
                                if (!PreSaveItem()) return false;
                                 if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
@@ -1592,7 +1594,7 @@ namespace EPMLiveCore
 
 		private void InsertLookupValueByQueryString()
 		{
-			if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request[ModeParam]) && Page.Request[ModeParam] == "Upload" && mode == SPControlMode.Edit))
+			if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request[ModeParam]) && Page.Request[ModeParam] == Upload && mode == SPControlMode.Edit))
 			{
 				// assume single lookup
 				bool valIsMulti = false;
@@ -1880,7 +1882,7 @@ namespace EPMLiveCore
 
 						SPFieldLookupValueCollection lookupValCol = null;
 
-						if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request[ModeParam]) && Page.Request[ModeParam] == "Upload" && mode == SPControlMode.Edit))
+						if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request[ModeParam]) && Page.Request[ModeParam] == Upload && mode == SPControlMode.Edit))
 						{
 							lookupValCol = GetQueryStringLookupVal(fld);
 						}
@@ -1987,7 +1989,7 @@ namespace EPMLiveCore
 
 						SPFieldLookupValueCollection lookupValCol = null;
 
-						if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request[ModeParam]) && Page.Request[ModeParam] == "Upload" && mode == SPControlMode.Edit))
+						if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request[ModeParam]) && Page.Request[ModeParam] == Upload && mode == SPControlMode.Edit))
 						{
 							lookupValCol = GetQueryStringLookupVal(fld);
 						}
@@ -2761,119 +2763,5 @@ namespace EPMLiveCore
 
             return control.Controls[index].GetType().ToString();
         }
-    }
-
-	public static class ControlExtensions
-	{
-		public static Control FindControlRecursive(this Control control, Func<Control, bool> evaluate)
-		{
-			if (evaluate.Invoke(control))
-			{
-				return control;
-			}
-
-			foreach (Control childControl in control.Controls)
-			{
-				Control foundControl = FindControlRecursive(childControl, evaluate);
-				if (foundControl != null)
-				{
-					return foundControl;
-				}
-			}
-
-			return null;
-		}
-	}
-
-	public static class ControlCollectionExtensions
-	{
-		public static void AddAfter(this ControlCollection collection, Control after, Control control)
-		{
-			int indexFound = -1;
-			int currentIndex = 0;
-			foreach (Control controlToEvaluate in collection)
-			{
-				if (controlToEvaluate == after)
-				{
-					indexFound = currentIndex;
-					break;
-				}
-
-				currentIndex = currentIndex + 1;
-			}
-
-			if (indexFound == -1)
-			{
-				throw new ArgumentOutOfRangeException("control", "Control not found");
-			}
-
-			collection.AddAt(indexFound + 1, control);
-		}
-	}
-
-	public static class ListFieldIteratorExtensions
-	{
-		public static FormField GetFormFieldByField(this ListFieldIterator listFieldIterator, SPField field)
-		{
-			return GetFormField(listFieldIterator, GetFormFields(listFieldIterator), field);
-		}
-
-		public static List<FormField> GetFormFieldByType(this ListFieldIterator listFieldIterator, Type fieldType)
-		{
-			return GetFormField(listFieldIterator, GetFormFields(listFieldIterator), fieldType);
-		}
-
-		public static List<FormField> GetFormField(this ListFieldIterator listFieldITerator, List<FormField> formFields, Type fieldType)
-		{
-			List<FormField> fields = (from form in formFields
-									  where form.Field.GetType().Equals(fieldType)
-									  select form).ToList<FormField>();
-
-			return fields;
-		}
-
-		public static FormField GetFormField(this ListFieldIterator listFieldITerator, List<FormField> formFields, SPField field)
-		{
-			FormField ff = (from form in formFields
-							where form.Field.Equals(field)
-							select form).FirstOrDefault();
-
-			return ff;
-		}
-
-		public static List<FormField> GetFormFields(this ListFieldIterator listFieldIterator)
-		{
-			if (listFieldIterator == null)
-			{
-				return null;
-			}
-
-			return FindFieldFormControls(listFieldIterator);
-		}
-
-		private static List<FormField> FindFieldFormControls(System.Web.UI.Control root)
-		{
-			List<FormField> baseFieldControls = new List<FormField>();
-
-			foreach (System.Web.UI.Control control in root.Controls)
-			{
-				if (control is FormField && control.Visible)
-				{
-					FormField formField = control as FormField;
-					if (formField.Field.FieldValueType == typeof(DateTime))
-					{
-						//HandleDateField(formField);
-					}
-
-					baseFieldControls.Add(formField);
-				}
-				else
-				{
-					baseFieldControls.AddRange(FindFieldFormControls(control));
-				}
-			}
-
-			return baseFieldControls;
-		}
     }
 }

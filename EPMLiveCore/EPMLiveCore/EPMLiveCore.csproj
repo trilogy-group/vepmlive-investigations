@@ -231,7 +231,9 @@
     </Compile>
     <Compile Include="ChildParentSync.cs" />
     <Compile Include="CommentCCPeopleEditor.cs" />
+    <Compile Include="ControlCollectionExtensions.cs" />
     <Compile Include="ControlDataBuilder.cs" />
+    <Compile Include="ControlExtensions.cs" />
     <Compile Include="Controls\Navigation\EPMLiveNavigation.cs" />
     <Compile Include="Controls\Navigation\EPMLiveQuickLaunchProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\ApplicationsLinkProvider.cs" />
@@ -1294,6 +1296,7 @@
     <Compile Include="ListDefinitions\EPMLiveLists.cs" />
     <Compile Include="ListDisplaySettingIterator.cs" />
     <Compile Include="ListDisplayUtils.cs" />
+    <Compile Include="ListFieldIteratorExtensions.cs" />
     <Compile Include="MultiAppCustomSiteMapProvider.cs" />
     <Compile Include="NotificationCounter.cs" />
     <Compile Include="NotificationCounterV2.cs" />
