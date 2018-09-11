@@ -143,7 +143,6 @@
     <Compile Include="API\MyWork\MyWorkTests.cs" />
     <Compile Include="API\NavigationServiceTests.cs" />
     <Compile Include="API\Notification\APIEmailTests.cs" />
-    <Compile Include="API\Publish\APIPublishTests.cs" />
     <Compile Include="API\TimerTests.cs" />
     <Compile Include="CheckOpenCloseConnections.cs" />
     <Compile Include="ControlDataBuilderTest.cs" />
