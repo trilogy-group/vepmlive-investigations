@@ -1122,7 +1122,7 @@ function GEInit() {
                     if (!controlProps.ControlInfo.IsMultiSelect) {
                         if (controlProps.ControlType == "1") {
                             var value = $('#' + controlProps.ControlInfo.DropDownClientId).val();
-                            controlProps.ControlInfo.SingleSelectLookupVal = value.trim();
+                            controlProps.ControlInfo.SingleSelectLookupVal = value == undefined ? "" : value.trim();
                         }
                         else if (controlProps.ControlType == "2") {
                             //                        var html = $('#' + controlProps.ControlInfo.GenericEntityDivId).html();

@@ -1,0 +1,644 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props')" />
+  <Import Project="..\packages\NUnit.3.10.1\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{670D1BA3-2AE2-4305-AC30-E29A95538A44}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>EPMLiveWebParts.AUT.Tests</RootNamespace>
+    <AssemblyName>EPMLiveWebParts.AUT.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AUT.ConfigureTestProjects, Version=4.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AUT.ConfigureTestProjects.4.2.2\lib\net462\AUT.ConfigureTestProjects.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AutoFixture, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.4.5.0\lib\net452\AutoFixture.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AutoFixture.AutoMoq, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.AutoMoq.4.5.0\lib\net452\AutoFixture.AutoMoq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AutoFixture.NUnit3, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.NUnit3.4.5.0\lib\net452\AutoFixture.NUnit3.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Castle.Core.4.3.1\lib\net45\Castle.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Fare, Version=2.1.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fare.2.1.1\lib\net35\Fare.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Moq, Version=4.9.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.9.0\lib\net45\Moq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=3.10.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.10.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Shouldly, Version=3.0.0.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
+      <HintPath>..\packages\Shouldly.3.0.0\lib\net451\Shouldly.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.1\lib\netstandard1.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.1\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Telerik.Web.UI, Version=2013.1.220.35, Culture=neutral, PublicKeyToken=121fae78165ba3d4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Telerik.Web.UI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="API\WPAPITest.cs" />
+    <Compile Include="BackButton\BackButtonTest.cs" />
+    <Compile Include="BuyNow\BuyNowTest.cs" />
+    <Compile Include="ChartControl\ChartControlTest.cs" />
+    <Compile Include="ChartControl\ChartControlToolpartBaseTest.cs" />
+    <Compile Include="ChartControl\EpmChartTest.cs" />
+    <Compile Include="ChartControl\ExtensionsTest.cs" />
+    <Compile Include="ChartControl\VfChartSeriesTest.cs" />
+    <Compile Include="ChartControl\VfChartTest.cs" />
+    <Compile Include="ChartControl\VfPointTest.cs" />
+    <Compile Include="Comments\CommentsTest.cs" />
+    <Compile Include="Comments\CommentsToolPartTest.cs" />
+    <Compile Include="ContentView\ContentViewTest.cs" />
+    <Compile Include="ContextualHelpSlideOut\ContextualHelpSlideOutTest.cs" />
+    <Compile Include="CONTROLTEMPLATES\MyWork\MyWorkParamsTest.cs" />
+    <Compile Include="CONTROLTEMPLATES\MyWork\WorkingOnParamsTest.cs" />
+    <Compile Include="DomainModel\ExcelConnectionInfoTest.cs" />
+    <Compile Include="DomainServices\ExcelConnectionUpdatorServiceTest.cs" />
+    <Compile Include="DomainServices\SharepointServiceTest.cs" />
+    <Compile Include="EpmCharting\DomainModel\BubbleChartAxisToColumnMappingTest.cs" />
+    <Compile Include="EpmCharting\DomainModel\EpmChartAggregateTypeTest.cs" />
+    <Compile Include="EpmCharting\DomainModel\EpmChartDataPointTest.cs" />
+    <Compile Include="EpmCharting\DomainModel\EpmChartDataSeriesListTest.cs" />
+    <Compile Include="EpmCharting\DomainModel\EpmChartDataSeriesTest.cs" />
+    <Compile Include="EpmCharting\DomainModel\EpmChartUserSettingsTest.cs" />
+    <Compile Include="EpmCharting\DomainModel\EpmChartYaxisFormatTest.cs" />
+    <Compile Include="EpmCharting\DomainServices\ChartHelperTest.cs" />
+    <Compile Include="EpmCharting\DomainServices\HtmlColorServiceTest.cs" />
+    <Compile Include="EpmCharting\Mappers\EpmChartSeriesToVisifireChartSeriesMapperTest.cs" />
+    <Compile Include="EpmCharting\Mappers\EpmChartUserSettingsToPersonalizationDataMapperTest.cs" />
+    <Compile Include="EpmCharting\Repositories\EpmChartUserSettingsRepositoryTest.cs" />
+    <Compile Include="EPMLiveQuickLaunchModifier\EPMLiveQuickLaunchModifierTest.cs" />
+    <Compile Include="GridListView\DependencyTest.cs" />
+    <Compile Include="GridListView\FieldValuesTest.cs" />
+    <Compile Include="GridListView\GanttUtilitiesTest.cs" />
+    <Compile Include="GridListView\GridDataTest.cs" />
+    <Compile Include="GridListView\GridDelegatesTest.cs" />
+    <Compile Include="GridListView\GridImageTest.cs" />
+    <Compile Include="GridListView\GridListViewTest.cs" />
+    <Compile Include="GridListView\GridListViewToolpartTest.cs" />
+    <Compile Include="GridListView\GridViewSessionTest.cs" />
+    <Compile Include="GridListView\ViewsModelTest.cs" />
+    <Compile Include="IntegrationModuleDisplay\IntegrationModuleDisplayTest.cs" />
+    <Compile Include="Layouts\epmlive\Admin\SSLogsTest.cs" />
+    <Compile Include="Layouts\epmlive\AssignmentPlannerTest.cs" />
+    <Compile Include="Layouts\epmlive\AttachFileMultiTest.cs" />
+    <Compile Include="Layouts\epmlive\CalendarTest.cs" />
+    <Compile Include="Layouts\epmlive\ChartWizardDataGridTest.cs" />
+    <Compile Include="Layouts\epmlive\ChartWizardTest.cs" />
+    <Compile Include="Layouts\epmlive\ExtensionMethodsTest.cs" />
+    <Compile Include="Layouts\epmlive\GetreportfiltertitlesTest.cs" />
+    <Compile Include="Layouts\epmlive\MyWorkGridActionTest.cs" />
+    <Compile Include="Layouts\epmlive\MyWorkRichTextEditorTest.cs" />
+    <Compile Include="Layouts\epmlive\MyWorkTest.cs" />
+    <Compile Include="Layouts\epmlive\RedirectionProxyTest.cs" />
+    <Compile Include="Layouts\epmlive\SSRSNativeReportViewerTest.cs" />
+    <Compile Include="Layouts\epmlive\SSRSReportRedirectTest.cs" />
+    <Compile Include="Layouts\epmlive\TlwizardTest.cs" />
+    <Compile Include="Layouts\epmlive\UpdateWebPartTest.cs" />
+    <Compile Include="Layouts\epmlive\UploadProfilePictureTest.cs" />
+    <Compile Include="Layouts\epmlive\VfDataTest.cs" />
+    <Compile Include="ListReportView\ListReportViewTest.cs" />
+    <Compile Include="ListReportView\ListReportViewToolPartTest.cs" />
+    <Compile Include="ListReportView\ReportingServicesToolPartTest.cs" />
+    <Compile Include="ListSummary\ListSummaryTest.cs" />
+    <Compile Include="ListSummary\ListSummaryToolpartTest.cs" />
+    <Compile Include="MyWorkWebPart\ExtensionMethodsTest.cs" />
+    <Compile Include="MyWorkWebPart\MyWorkToolpartTest.cs" />
+    <Compile Include="MyWorkWebPart\MyWorkWebPartTest.cs" />
+    <Compile Include="Personalization\DomainModel\PersonalizationDataTest.cs" />
+    <Compile Include="Personalization\DomainModel\PersonalizationSearchCriteriaTest.cs" />
+    <Compile Include="Personalization\Repositories\PersonalizationDataRepositoryTest.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReportFiltering\DomainModel\CamlComparisonOperatorTest.cs" />
+    <Compile Include="ReportFiltering\DomainModel\ReportFilterSearchCriteriaTest.cs" />
+    <Compile Include="ReportFiltering\DomainModel\ReportFilterSelectionTest.cs" />
+    <Compile Include="ReportFiltering\DomainModel\ReportFilterUserSettingsTest.cs" />
+    <Compile Include="ReportFiltering\DomainServices\ReportFilterQueryServiceTest.cs" />
+    <Compile Include="ReportFiltering\DomainServices\SPFieldTypeHelperTest.cs" />
+    <Compile Include="ReportFiltering\DomainServices\TitleFilterQueryServiceTest.cs" />
+    <Compile Include="ReportFiltering\DomainServices\WebPartHelperTest.cs" />
+    <Compile Include="ReportFiltering\ListExtensionsTest.cs" />
+    <Compile Include="ReportFiltering\Repositories\ReportFilterUserSettingsRepositoryTest.cs" />
+    <Compile Include="ReportFiltering\SPListExtensionsTest.cs" />
+    <Compile Include="ReportingChart\ColorPalettesTest.cs" />
+    <Compile Include="ReportingChart\ReportingChartTest.cs" />
+    <Compile Include="ReportingChart\ReportingChartToolPartTest.cs" />
+    <Compile Include="ReportingFilter\NoEventValidationDropDownListTest.cs" />
+    <Compile Include="ReportingFilter\QueryHelperTest.cs" />
+    <Compile Include="ReportingFilter\ReportingFilterTest.cs" />
+    <Compile Include="ReportingFilter\ReportingFilterToolpartTest.cs" />
+    <Compile Include="ReportsCenter\ReportsCenterTest.cs" />
+    <Compile Include="ReportViewerSingle\ReportViewerSingleTest.cs" />
+    <Compile Include="ReportViewer\ReportViewerTest.cs" />
+    <Compile Include="ResourceGrid\ResourceGridTest.cs" />
+    <Compile Include="ResourcePlanning\ResourcePlanningTest.cs" />
+    <Compile Include="RollupSummary\RollupSummaryTest.cs" />
+    <Compile Include="RollupSummary\SummaryRollupToolpartTest.cs" />
+    <Compile Include="SiteCollectionSetupWizard\SiteCollectionSetupWizardTest.cs" />
+    <Compile Include="SocialStream\SocialStreamTest.cs" />
+    <Compile Include="UserProfileDisplay\DisplayProfilePicturesTest.cs" />
+    <Compile Include="UserProfileDisplay\UserProfileToolPartTest.cs" />
+    <Compile Include="Utilities\ExtensionsTest.cs" />
+    <Compile Include="Utilities\LookupFilterHelperTest.cs" />
+    <Compile Include="Web References\SSRS2005\ActiveStateTest.cs" />
+    <Compile Include="Web References\SSRS2005\BatchHeaderTest.cs" />
+    <Compile Include="Web References\SSRS2005\CancelJobCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\CatalogItemTest.cs" />
+    <Compile Include="Web References\SSRS2005\CreateBatchCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\CreateDataDrivenSubscriptionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\CreateModelCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\CreateReportCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\CreateReportHistorySnapshotCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\CreateScheduleCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\CreateSubscriptionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\DailyRecurrenceTest.cs" />
+    <Compile Include="Web References\SSRS2005\DataRetrievalPlanTest.cs" />
+    <Compile Include="Web References\SSRS2005\DataSetDefinitionTest.cs" />
+    <Compile Include="Web References\SSRS2005\DataSourceCredentialsTest.cs" />
+    <Compile Include="Web References\SSRS2005\DataSourceDefinitionOrReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2005\DataSourceDefinitionTest.cs" />
+    <Compile Include="Web References\SSRS2005\DataSourcePromptTest.cs" />
+    <Compile Include="Web References\SSRS2005\DataSourceReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2005\DataSourceTest.cs" />
+    <Compile Include="Web References\SSRS2005\DaysOfWeekSelectorTest.cs" />
+    <Compile Include="Web References\SSRS2005\EventTest.cs" />
+    <Compile Include="Web References\SSRS2005\ExpirationDefinitionTest.cs" />
+    <Compile Include="Web References\SSRS2005\ExtensionParameterTest.cs" />
+    <Compile Include="Web References\SSRS2005\ExtensionSettingsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ExtensionTest.cs" />
+    <Compile Include="Web References\SSRS2005\FieldTest.cs" />
+    <Compile Include="Web References\SSRS2005\FindItemsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GenerateModelCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetCacheOptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetDataDrivenSubscriptionPropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetDataSourceContentsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetExecutionOptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetExtensionSettingsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetItemDataSourcePromptsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetItemDataSourcesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetItemTypeCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetModelDefinitionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetModelItemPermissionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetModelItemPoliciesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetPermissionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetPoliciesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetPropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetRenderResourceCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetReportDefinitionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetReportHistoryLimitCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetReportHistoryOptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetReportLinkCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetReportParametersCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetResourceContentsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetRolePropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetSchedulePropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetSubscriptionPropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetSystemPermissionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetSystemPoliciesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetSystemPropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\GetUserModelCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\InvalidDataSourceReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2005\ItemNamespaceHeaderTest.cs" />
+    <Compile Include="Web References\SSRS2005\JobTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListChildrenCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListDependentItemsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListEventsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListExtensionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListJobsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListModelDrillthroughReportsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListModelItemChildrenCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListModelPerspectivesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListReportHistoryCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListRolesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListScheduledReportsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListSchedulesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListSecureMethodsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListSubscriptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListSubscriptionsUsingDataSourceCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ListTasksCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\MinuteRecurrenceTest.cs" />
+    <Compile Include="Web References\SSRS2005\ModelCatalogItemTest.cs" />
+    <Compile Include="Web References\SSRS2005\ModelDrillthroughReportTest.cs" />
+    <Compile Include="Web References\SSRS2005\ModelItemTest.cs" />
+    <Compile Include="Web References\SSRS2005\ModelPerspectiveTest.cs" />
+    <Compile Include="Web References\SSRS2005\MonthlyDOWRecurrenceTest.cs" />
+    <Compile Include="Web References\SSRS2005\MonthlyRecurrenceTest.cs" />
+    <Compile Include="Web References\SSRS2005\MonthsOfYearSelectorTest.cs" />
+    <Compile Include="Web References\SSRS2005\NoScheduleTest.cs" />
+    <Compile Include="Web References\SSRS2005\ParameterFieldReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2005\ParameterValueOrFieldReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2005\ParameterValueTest.cs" />
+    <Compile Include="Web References\SSRS2005\PolicyTest.cs" />
+    <Compile Include="Web References\SSRS2005\PrepareQueryCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\PropertyTest.cs" />
+    <Compile Include="Web References\SSRS2005\QueryDefinitionTest.cs" />
+    <Compile Include="Web References\SSRS2005\RecurrencePatternTest.cs" />
+    <Compile Include="Web References\SSRS2005\RegenerateModelCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ReportHistorySnapshotTest.cs" />
+    <Compile Include="Web References\SSRS2005\ReportParameterTest.cs" />
+    <Compile Include="Web References\SSRS2005\RoleTest.cs" />
+    <Compile Include="Web References\SSRS2005\ScheduleDefinitionOrReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2005\ScheduleDefinitionTest.cs" />
+    <Compile Include="Web References\SSRS2005\ScheduleExpirationTest.cs" />
+    <Compile Include="Web References\SSRS2005\ScheduleReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2005\ScheduleTest.cs" />
+    <Compile Include="Web References\SSRS2005\SearchConditionTest.cs" />
+    <Compile Include="Web References\SSRS2005\ServerInfoHeaderTest.cs" />
+    <Compile Include="Web References\SSRS2005\SetModelDefinitionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\SetReportDefinitionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\SubscriptionTest.cs" />
+    <Compile Include="Web References\SSRS2005\TaskTest.cs" />
+    <Compile Include="Web References\SSRS2005\TimeExpirationTest.cs" />
+    <Compile Include="Web References\SSRS2005\ValidateExtensionSettingsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2005\ValidValueTest.cs" />
+    <Compile Include="Web References\SSRS2005\WarningTest.cs" />
+    <Compile Include="Web References\SSRS2005\WeeklyRecurrenceTest.cs" />
+    <Compile Include="Web References\SSRS2006\ActiveStateTest.cs" />
+    <Compile Include="Web References\SSRS2006\CancelJobCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\CatalogItemTest.cs" />
+    <Compile Include="Web References\SSRS2006\CreateDataDrivenSubscriptionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\CreateDataSourceCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\CreateFolderCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\CreateModelCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\CreateReportCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\CreateReportHistorySnapshotCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\CreateResourceCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\CreateScheduleCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\CreateSubscriptionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\DailyRecurrenceTest.cs" />
+    <Compile Include="Web References\SSRS2006\DataRetrievalPlanTest.cs" />
+    <Compile Include="Web References\SSRS2006\DataSetDefinitionTest.cs" />
+    <Compile Include="Web References\SSRS2006\DataSourceCredentialsTest.cs" />
+    <Compile Include="Web References\SSRS2006\DataSourceDefinitionOrReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2006\DataSourceDefinitionTest.cs" />
+    <Compile Include="Web References\SSRS2006\DataSourcePromptTest.cs" />
+    <Compile Include="Web References\SSRS2006\DataSourceReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2006\DataSourceTest.cs" />
+    <Compile Include="Web References\SSRS2006\DaysOfWeekSelectorTest.cs" />
+    <Compile Include="Web References\SSRS2006\EventTest.cs" />
+    <Compile Include="Web References\SSRS2006\ExpirationDefinitionTest.cs" />
+    <Compile Include="Web References\SSRS2006\ExtensionParameterTest.cs" />
+    <Compile Include="Web References\SSRS2006\ExtensionSettingsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ExtensionTest.cs" />
+    <Compile Include="Web References\SSRS2006\FieldTest.cs" />
+    <Compile Include="Web References\SSRS2006\GenerateModelCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetCacheOptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetDataDrivenSubscriptionPropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetDataSourceContentsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetExecutionOptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetExtensionSettingsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetItemDataSourcePromptsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetItemDataSourcesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetItemTypeCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetModelDefinitionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetModelItemPermissionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetModelItemPoliciesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetPermissionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetPoliciesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetPropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetReportDefinitionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetReportHistoryLimitCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetReportHistoryOptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetReportParametersCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetResourceContentsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetRolePropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetSchedulePropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetSubscriptionPropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetSystemPropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\GetUserModelCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\InvalidDataSourceReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2006\JobTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListAllSubscriptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListChildrenCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListDependentItemsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListEventsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListExtensionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListJobsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListModelDrillthroughReportsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListModelItemChildrenCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListModelPerspectivesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListMySubscriptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListParentsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListReportHistoryCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListReportSubscriptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListRolesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListScheduledReportsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListSchedulesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListSecureMethodsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ListTasksCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\MinuteRecurrenceTest.cs" />
+    <Compile Include="Web References\SSRS2006\ModelCatalogItemTest.cs" />
+    <Compile Include="Web References\SSRS2006\ModelDrillthroughReportTest.cs" />
+    <Compile Include="Web References\SSRS2006\ModelItemTest.cs" />
+    <Compile Include="Web References\SSRS2006\ModelPerspectiveTest.cs" />
+    <Compile Include="Web References\SSRS2006\MonthlyDOWRecurrenceTest.cs" />
+    <Compile Include="Web References\SSRS2006\MonthlyRecurrenceTest.cs" />
+    <Compile Include="Web References\SSRS2006\MonthsOfYearSelectorTest.cs" />
+    <Compile Include="Web References\SSRS2006\NoScheduleTest.cs" />
+    <Compile Include="Web References\SSRS2006\ParameterFieldReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2006\ParameterValueOrFieldReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2006\ParameterValueTest.cs" />
+    <Compile Include="Web References\SSRS2006\PolicyTest.cs" />
+    <Compile Include="Web References\SSRS2006\PrepareQueryCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\PropertyTest.cs" />
+    <Compile Include="Web References\SSRS2006\QueryDefinitionTest.cs" />
+    <Compile Include="Web References\SSRS2006\RecurrencePatternTest.cs" />
+    <Compile Include="Web References\SSRS2006\RegenerateModelCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ReportHistorySnapshotTest.cs" />
+    <Compile Include="Web References\SSRS2006\ReportParameterTest.cs" />
+    <Compile Include="Web References\SSRS2006\RoleTest.cs" />
+    <Compile Include="Web References\SSRS2006\ScheduleDefinitionOrReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2006\ScheduleDefinitionTest.cs" />
+    <Compile Include="Web References\SSRS2006\ScheduleExpirationTest.cs" />
+    <Compile Include="Web References\SSRS2006\ScheduleReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2006\ScheduleTest.cs" />
+    <Compile Include="Web References\SSRS2006\ServerInfoHeaderTest.cs" />
+    <Compile Include="Web References\SSRS2006\SetModelDefinitionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\SetReportDefinitionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\SubscriptionTest.cs" />
+    <Compile Include="Web References\SSRS2006\SYSTEMTIMETest.cs" />
+    <Compile Include="Web References\SSRS2006\TaskTest.cs" />
+    <Compile Include="Web References\SSRS2006\TimeExpirationTest.cs" />
+    <Compile Include="Web References\SSRS2006\TimeZoneInformationTest.cs" />
+    <Compile Include="Web References\SSRS2006\TrustedUserHeaderTest.cs" />
+    <Compile Include="Web References\SSRS2006\ValidateExtensionSettingsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2006\ValidValueTest.cs" />
+    <Compile Include="Web References\SSRS2006\WarningTest.cs" />
+    <Compile Include="Web References\SSRS2006\WeeklyRecurrenceTest.cs" />
+    <Compile Include="Web References\SSRS2010\ActiveStateTest.cs" />
+    <Compile Include="Web References\SSRS2010\CacheRefreshPlanStateTest.cs" />
+    <Compile Include="Web References\SSRS2010\CacheRefreshPlanTest.cs" />
+    <Compile Include="Web References\SSRS2010\CancelJobCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\CatalogItemTest.cs" />
+    <Compile Include="Web References\SSRS2010\CreateCacheRefreshPlanCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\CreateCatalogItemCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\CreateDataDrivenSubscriptionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\CreateDataSourceCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\CreateFolderCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\CreateItemHistorySnapshotCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\CreateReportEditSessionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\CreateScheduleCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\CreateSubscriptionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\DailyRecurrenceTest.cs" />
+    <Compile Include="Web References\SSRS2010\DataRetrievalPlanTest.cs" />
+    <Compile Include="Web References\SSRS2010\DataSetDefinitionTest.cs" />
+    <Compile Include="Web References\SSRS2010\DataSourceCredentialsTest.cs" />
+    <Compile Include="Web References\SSRS2010\DataSourceDefinitionOrReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2010\DataSourceDefinitionTest.cs" />
+    <Compile Include="Web References\SSRS2010\DataSourcePromptTest.cs" />
+    <Compile Include="Web References\SSRS2010\DataSourceReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2010\DataSourceTest.cs" />
+    <Compile Include="Web References\SSRS2010\DaysOfWeekSelectorTest.cs" />
+    <Compile Include="Web References\SSRS2010\EventTest.cs" />
+    <Compile Include="Web References\SSRS2010\ExpirationDefinitionTest.cs" />
+    <Compile Include="Web References\SSRS2010\ExtensionParameterTest.cs" />
+    <Compile Include="Web References\SSRS2010\ExtensionSettingsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ExtensionTest.cs" />
+    <Compile Include="Web References\SSRS2010\FieldTest.cs" />
+    <Compile Include="Web References\SSRS2010\FindItemsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GenerateModelCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetCacheOptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetCacheRefreshPlanPropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetDataDrivenSubscriptionPropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetDataSourceContentsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetExecutionOptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetExtensionSettingsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetItemDataSourcePromptsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetItemDataSourcesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetItemDefinitionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetItemHistoryLimitCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetItemHistoryOptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetItemLinkCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetItemParametersCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetItemReferencesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetItemTypeCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetModelItemPermissionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetModelItemPoliciesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetPermissionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetPoliciesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetPropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetReportServerConfigInfoCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetRolePropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetSchedulePropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetSubscriptionPropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetSystemPermissionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetSystemPoliciesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetSystemPropertiesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\GetUserModelCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\InvalidDataSourceReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2010\IsSSLRequiredCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ItemHistorySnapshotTest.cs" />
+    <Compile Include="Web References\SSRS2010\ItemNamespaceHeaderTest.cs" />
+    <Compile Include="Web References\SSRS2010\ItemParameterTest.cs" />
+    <Compile Include="Web References\SSRS2010\ItemReferenceDataTest.cs" />
+    <Compile Include="Web References\SSRS2010\ItemReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2010\JobTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListCacheRefreshPlansCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListChildrenCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListDatabaseCredentialRetrievalOptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListDependentItemsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListEventsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListExecutionSettingsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListExtensionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListExtensionTypesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListItemHistoryCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListItemTypesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListJobActionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListJobsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListJobStatesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListJobTypesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListModelDrillthroughReportsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListModelItemChildrenCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListModelItemTypesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListModelPerspectivesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListMySubscriptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListParameterStatesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListParameterTypesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListParentsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListRolesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListScheduledItemsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListSchedulesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListScheduleStatesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListSecurityScopesCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListSubscriptionsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListSubscriptionsUsingDataSourceCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ListTasksCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\MinuteRecurrenceTest.cs" />
+    <Compile Include="Web References\SSRS2010\ModelCatalogItemTest.cs" />
+    <Compile Include="Web References\SSRS2010\ModelDrillthroughReportTest.cs" />
+    <Compile Include="Web References\SSRS2010\ModelItemTest.cs" />
+    <Compile Include="Web References\SSRS2010\ModelPerspectiveTest.cs" />
+    <Compile Include="Web References\SSRS2010\MonthlyDOWRecurrenceTest.cs" />
+    <Compile Include="Web References\SSRS2010\MonthlyRecurrenceTest.cs" />
+    <Compile Include="Web References\SSRS2010\MonthsOfYearSelectorTest.cs" />
+    <Compile Include="Web References\SSRS2010\NoScheduleTest.cs" />
+    <Compile Include="Web References\SSRS2010\ParameterFieldReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2010\ParameterValueOrFieldReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2010\ParameterValueTest.cs" />
+    <Compile Include="Web References\SSRS2010\PolicyTest.cs" />
+    <Compile Include="Web References\SSRS2010\PrepareQueryCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\PropertyTest.cs" />
+    <Compile Include="Web References\SSRS2010\QueryDefinitionTest.cs" />
+    <Compile Include="Web References\SSRS2010\RecurrencePatternTest.cs" />
+    <Compile Include="Web References\SSRS2010\RegenerateModelCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\RoleTest.cs" />
+    <Compile Include="Web References\SSRS2010\ScheduleDefinitionOrReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2010\ScheduleDefinitionTest.cs" />
+    <Compile Include="Web References\SSRS2010\ScheduleExpirationTest.cs" />
+    <Compile Include="Web References\SSRS2010\ScheduleReferenceTest.cs" />
+    <Compile Include="Web References\SSRS2010\ScheduleTest.cs" />
+    <Compile Include="Web References\SSRS2010\SearchConditionTest.cs" />
+    <Compile Include="Web References\SSRS2010\ServerInfoHeaderTest.cs" />
+    <Compile Include="Web References\SSRS2010\SetItemDefinitionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\SubscriptionTest.cs" />
+    <Compile Include="Web References\SSRS2010\SYSTEMTIMETest.cs" />
+    <Compile Include="Web References\SSRS2010\TaskTest.cs" />
+    <Compile Include="Web References\SSRS2010\TestConnectForDataSourceDefinitionCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\TestConnectForItemDataSourceCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\TimeExpirationTest.cs" />
+    <Compile Include="Web References\SSRS2010\TimeZoneInformationTest.cs" />
+    <Compile Include="Web References\SSRS2010\ValidateExtensionSettingsCompletedEventArgsTest.cs" />
+    <Compile Include="Web References\SSRS2010\ValidValueTest.cs" />
+    <Compile Include="Web References\SSRS2010\WarningTest.cs" />
+    <Compile Include="Web References\SSRS2010\WeeklyRecurrenceTest.cs" />
+    <Compile Include="WebPageCode\AjaxpostTest.cs" />
+    <Compile Include="WebPageCode\CheckresganttTest.cs" />
+    <Compile Include="WebPageCode\ContextualslideoutTest.cs" />
+    <Compile Include="WebPageCode\GetedititemTest.cs" />
+    <Compile Include="WebPageCode\GetganttitemsTest.cs" />
+    <Compile Include="WebPageCode\GetgantttasksTest.cs" />
+    <Compile Include="WebPageCode\GetgriditemsTest.cs" />
+    <Compile Include="WebPageCode\GetitemsTest.cs" />
+    <Compile Include="WebPageCode\GetlistinfoTest.cs" />
+    <Compile Include="WebPageCode\GetlistreportitemsTest.cs" />
+    <Compile Include="WebPageCode\GetplanlistTest.cs" />
+    <Compile Include="WebPageCode\GetresourcecheckplanTest.cs" />
+    <Compile Include="WebPageCode\GetresourceplanTest.cs" />
+    <Compile Include="WebPageCode\GetresourcepoolTest.cs" />
+    <Compile Include="WebPageCode\GetsingleitemTest.cs" />
+    <Compile Include="WebPageCode\GetworkspacelistTest.cs" />
+    <Compile Include="WebPageCode\GridactionTest.cs" />
+    <Compile Include="WebPageCode\ListedititemTest.cs" />
+    <Compile Include="WebPageCode\RibbonjsTest.cs" />
+    <Compile Include="WebPageCode\SavegridTest.cs" />
+    <Compile Include="WebPageCode\SaveresplanTest.cs" />
+    <Compile Include="WebPageCode\ShowlisterrorTest.cs" />
+    <Compile Include="WorkEngineAccountManagement\WorkEngineAccountManagementTest.cs" />
+    <Compile Include="WorkspaceList\WorkspaceListTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
+      <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
+      <Name>EPMLiveCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EPMLiveIntegration\EPMLiveIntegration\EPMLiveIntegration.csproj">
+      <Project>{4c63f23f-463c-409b-89ad-adc2e138b8e3}</Project>
+      <Name>EPMLiveIntegration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EPMLiveWebParts\EPMLiveWebParts\EPMLiveWebParts.csproj">
+      <Project>{a7f83fd4-be8b-49ab-be24-39209e8fabc2}</Project>
+      <Name>EPMLiveWebParts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PortfolioEngineCore\PortfolioEngineCore\PortfolioEngineCore.csproj">
+      <Project>{bb86b09c-cb35-4888-8639-c047a40a9c0c}</Project>
+      <Name>PortfolioEngineCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PortfolioEngineCore\WorkEnginePPM\WorkEnginePPM.csproj">
+      <Project>{51caf42a-31af-4b74-853f-24b672c185c2}</Project>
+      <Name>WorkEnginePPM</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.10.1\build\NUnit.props'))" />
+    <Error Condition="!Exists('..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
