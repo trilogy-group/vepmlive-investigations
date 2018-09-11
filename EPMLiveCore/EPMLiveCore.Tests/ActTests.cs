@@ -18,8 +18,7 @@ using Shouldly;
 
 namespace EPMLiveCore.Tests
 {
-    [TestClass]
-    [ExcludeFromCodeCoverage]
+    [TestClass, ExcludeFromCodeCoverage]
     public class ActTests
     {
         private Act testObj;
