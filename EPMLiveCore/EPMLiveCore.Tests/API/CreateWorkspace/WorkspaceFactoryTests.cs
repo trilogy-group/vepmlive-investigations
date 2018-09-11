@@ -764,7 +764,8 @@ namespace EPMLiveCore.Tests.API.CreateWorkspace
                         return DummyInt.ToString();
                     case AttachedItemId:
                         return value.ToString();
-                    default: return DummyString;
+                    default:
+                        return DummyString;
                 }
             };
 
