@@ -571,37 +571,6 @@ namespace TimeSheets
 
             //=============end time editor======================
 
-            //output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid.css\"/>");
-            //output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid_skins.css\"/>");
-            //output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/calendar/dhtmlxcalendar.css\"/>");
-            //output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xmenu/dhtmlxmenu.css\">");
-            //output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xmenu/context.css\">");
-            //output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xcombo/dhtmlxcombo.css\">");
-
-            //output.Write("<script>_css_prefix=\"/_layouts/epmlive/DHTML/xgrid/\"; _js_prefix=\"/_layouts/epmlive/DHTML/xgrid/\"; </script>");
-            //output.Write("<link rel=\"stylesheet\" href=\"/_layouts/epmlive/modal/modalmain.css\" type=\"text/css\" /> ");
-            //output.Write("<script type=\"text/javascript\" src=\"/_layouts/epmlive/modal/modal.js\"></script>");
-            //output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/dhtmlxcommon.js\"></script>");
-            //output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/dhtmlxgrid.js\"></script>");
-            //output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/dhtmlxgridcell.js\"></script>");
-            //output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/dhtmlxgrid_post.js\"></script>");
-
-            //output.Write("<script src=\"/_layouts/epmlive/DHTML/xtreegrid/dhtmlxtreegrid.js\"></script>");
-            //output.Write("<script src=\"/_layouts/epmlive/DHTML/xtreegrid/ext/dhtmlxtreegrid_filter.js\"></script>");
-
-            //output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_nxml.js\"></script>");
-            //output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_filter.js\"></script>");
-            //output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_math.js\"></script>");
-            //output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_srnd.js\"></script>");
-
-            //output.Write("<script src=\"/_layouts/epmlive/DHTML/xcombo/dhtmlxcombo.js\"></script>");
-
-            //output.Write("<script src=\"/_layouts/epmlive/DHTML/dhtmlxajax.js\"></script>");
-
-            //output.Write("<script language=\"JavaScript\" src=\"/_layouts/epmlive/dhtml/xmenu/dhtmlxprotobar.js\"></script>");
-            //output.Write("<script language=\"JavaScript\" src=\"/_layouts/epmlive/dhtml/xmenu/dhtmlxmenubar.js\"></script>");
-            //output.Write("<script language=\"JavaScript\" src=\"/_layouts/epmlive/dhtml/xmenu/dhtmlxmenubar_cp.js\"></script>");
-
             output.Write("<link rel=\"stylesheet\" href=\"/_layouts/epmlive/modal/modalmain.css\" type=\"text/css\" /> ");
 
 
@@ -611,7 +580,6 @@ namespace TimeSheets
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid_skins.css\"/>");
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/calendar/dhtmlxcalendar.css\"/>");
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/skins/dhtmlxmenu_dhx_blue.css\">");
-            //output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xmenu/context.css\">");
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xcombo/dhtmlxcombo.css\">");
 
             output.Write("<script>_css_prefix=\"/_layouts/epmlive/DHTML/xgrid/\"; _js_prefix=\"/_layouts/epmlive/DHTML/xgrid/\"; </script>");
@@ -681,9 +649,7 @@ namespace TimeSheets
             output.Write("</div>");
 
             output.Write("<div id=\"tsnotesgrid" + this.ID + "\" style=\"display:none; border: 1px solid #808080; padding: 3px; background-color: #F9F9F9; width:220px;height:115px\">");
-            //output.Write("<div id=\"multichoiceinner" + sFullGridId + "\" style=\"width: 100%; height: 100%;  background-color: #FFFFFF; border: 1px solid #808080; margin-top:2px; padding:0px;\" class=\"ms-descriptiontext\">");
-            //output.Write("test");
-            //output.Write("</div>");
+
             string dbed = "";
 
             if (status != "Open")
@@ -703,19 +669,6 @@ namespace TimeSheets
             output.Write("var vals = value.split('|');");
             output.Write("mygrid" + sFullGridId + ".filterBy(vals[0]+4,vals[1]);");
             output.Write("}");
-
-
-
-            //output.Write("function changeview" + sFullGridId + "(view){");
-            //output.Write("try{");
-            //output.Write("document.getElementById('zz35_ViewSelectorMenu').innerText = view.replace(new RegExp( \"%20\", \"g\" ), \" \");");
-            //output.Write("document.getElementById(\"grid" + this.ID + "\").style.display = \"none\";");
-            //output.Write("document.getElementById(\"loadinggrid" + this.ID + "\").style.display = \"\";");
-            //output.Write("mygrid" + sFullGridId + ".detachHeader(1);");
-            //output.Write("mygrid" + sFullGridId + ".clearAll(true);");
-            //output.Write("mygrid" + sFullGridId + ".loadXML(\"" + resWeb.Url + "/_layouts/epmlive/gettsapprovals.aspx?view=\" + view + \"&gridname=" + sFullGridId + "&period=" + intPeriod.ToString() + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "\");");
-            //output.Write("}catch(e){alert(e);}");
-            //output.Write("}");
 
             output.Write("function setSize" + sFullGridId + "(){mygrid" + sFullGridId + "._askRealRows();}");
 
@@ -771,15 +724,11 @@ namespace TimeSheets
             output.Write("mygrid" + sFullGridId + ".enableSmartXMLParsing(false);");
             output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",clearLoader);");
             output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",disableChecks" + sFullGridId + ");");
-
-            //output.Write("mygrid" + sFullGridId + ".attachEvent(\"onCheck\", doOnCheck" + sFullGridId + ");");
-
             output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",switchFilterLoad" + sFullGridId + ");");
 
             if (status != "Open")
                 output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",hideCol" + sFullGridId + ");");
 
-            //output.Write("mygrid" + sFullGridId + ".attachEvent(\"onBeforeContextMenu\",onShowMenu);");
 
             output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",function(){");
             output.Write("mygrid" + sFullGridId + ".callEvent(\"onGridReconstructed\",[]);");
