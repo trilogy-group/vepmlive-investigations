@@ -62,5 +62,6 @@
     <Add FullName="EPMLiveCore.Infrastructure.Navigation.NavLinkProvider!"/>
     <Add FullName="EPMLiveCore.API.WorkspaceFactory!"/>
     <Add FullName="EPMLiveCore.API.WorkspaceData!"/>
+    <Add FullName="EPMLiveCore.UplandPlatformAPI.IntegrationAPI!"/>
   </ShimGeneration>
 </Fakes>
