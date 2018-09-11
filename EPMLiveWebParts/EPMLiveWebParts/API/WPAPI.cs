@@ -8,11 +8,16 @@ using System.Xml;
 using System.Globalization;
 using System.Data;
 using System.Collections;
+using EPMLiveCore;
 
 namespace EPMLiveWebParts
 {
     public class WPAPI
     {
+        private const string FieldCompleteName = "Complete";
+        private const string FieldCompletePercentName = "PercentComplete";
+        private const string FieldProjectCompletePercentName = "ProjectPercentComplete";
+        private const string ListProjectCenterName = "Project Center";
         public static string GetGrid(string data, SPWeb web)
         {
 
@@ -232,7 +237,7 @@ namespace EPMLiveWebParts
 
             SPList list = oWeb.Lists[ListId];
             SPListItem li = list.GetItemById(itemid);
-
+            var gSettings = new GridGanttSettings(list);
             oWeb.AllowUnsafeUpdates = true;
 
             foreach (XmlNode nd in DocIn.FirstChild.SelectNodes("//Field"))
@@ -326,6 +331,25 @@ namespace EPMLiveWebParts
                     }
                 }
             }
+
+            try
+            {
+                if (gSettings.EnableWorkList)
+                {
+                    if (li.Fields.ContainsField(FieldCompleteName))
+                    {
+                        if ((bool)li[FieldCompleteName])
+                        {
+                            li[FieldCompletePercentName] = 1;
+                            if (list.Title == ListProjectCenterName)
+                            {
+                                li[FieldProjectCompletePercentName] = 1;
+                            }
+                        }
+                    }
+                }
+            }
+            catch {}
 
             li.Update();
 
