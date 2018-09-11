@@ -66,8 +66,6 @@ namespace EPMLiveCore
                 ExecuteCommand(Properties.Resources._9Data02, sqlConnection);
                 InsertVersions(sqlConnection);
 
-                sqlConnection.Close();
-
                 string error;
                 SPContext.Current.Web.AllowUnsafeUpdates = true;
                 SPContext.Current.Site.AllowUnsafeUpdates = true;
@@ -93,36 +91,35 @@ namespace EPMLiveCore
             output = "Success";
         }
 
-        private void InsertVersions(SqlConnection cn)
+        private void InsertVersions(SqlConnection sqlConnection)
         {
-            using (var cmd = new SqlCommand("INSERT INTO VERSIONS (VERSION, DTINSTALLED) VALUES (@version, GETDATE())", cn))
+            using (var command = new SqlCommand("INSERT INTO VERSIONS (VERSION, DTINSTALLED) VALUES (@version, GETDATE())", sqlConnection))
             {
-                cmd.Parameters.AddWithValue("@version", CoreFunctions.GetFullAssemblyVersion());
-                cmd.ExecuteNonQuery();
+                command.Parameters.AddWithValue("@version", CoreFunctions.GetFullAssemblyVersion());
+                command.ExecuteNonQuery();
             }
         }
 
         private void CreateDatabase(string databaseName, string connectionString)
         {
             using (var connection = new SqlConnection(connectionString))
-            using (var cmd = new SqlCommand($"CREATE DATABASE {databaseName}", connection))
+            using (var command = new SqlCommand($"CREATE DATABASE {databaseName}", connection))
             {
                 connection.Open();
-                cmd.ExecuteNonQuery();
-                connection.Close();
+                command.ExecuteNonQuery();
             }
         }
 
         private void AddRoles(string username, SqlConnection sqlConnection)
         {
-            var cmd = default(SqlCommand);
+            var command = default(SqlCommand);
             try
             {
-                cmd = new SqlCommand("sp_addrolemember", sqlConnection);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@rolename", "db_owner");
-                cmd.Parameters.AddWithValue("@membername", username);
-                cmd.ExecuteNonQuery();
+                command = new SqlCommand("sp_addrolemember", sqlConnection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@rolename", "db_owner");
+                command.Parameters.AddWithValue("@membername", username);
+                command.ExecuteNonQuery();
             }
             catch (Exception ex)
             {
@@ -130,7 +127,7 @@ namespace EPMLiveCore
             }
             finally
             {
-                cmd?.Dispose();
+                command?.Dispose();
             }
         }
 
@@ -154,9 +151,9 @@ namespace EPMLiveCore
 
         private void ExecuteCommand(string commandText, SqlConnection sqlConnection)
         {
-            using (var cmd = new SqlCommand(commandText, sqlConnection))
+            using (var command = new SqlCommand(commandText, sqlConnection))
             {
-                cmd.ExecuteNonQuery();
+                command.ExecuteNonQuery();
             }
         }
     }
