@@ -4,8 +4,6 @@ using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Fakes;
 using System.Web.UI;
 using System.Web.UI.Fakes;
@@ -28,11 +26,22 @@ namespace EPMLiveCore.Tests.WebPageCode
         private ShimSPWeb _web;
         private bool _fieldUpdated;
         private bool _redirected;
+        private bool _scriptRegistered;
 
         private const int DummyInt = 1;
         private const string DummyString = "DummyString";
         private const string PageRenderField = "pageRender";
         private const string DisplayableFields = "displayableFields";
+        private const string FieldProperties = "fieldProperties";
+        private const string GroupsProperty = "groups";
+        private const string MemOptionFieldWhere = "[Me]";
+        private const string MemModeValue = "where";
+        private const string NewMode = "New";
+        private const string EditMode = "Edit";
+        private const string DisplayMode = "Display";
+        private const string EditableMode = "Editable";
+        private const string GeneralSettings = "GeneralSettings";
+        private const string AlwaysValue = "always";
 
         private const string OnLoadMethod = "OnLoad";
         private const string SaveCustomDisplayMethod = "SaveCustomDisplay";
@@ -43,6 +52,7 @@ namespace EPMLiveCore.Tests.WebPageCode
         {
             _fieldUpdated = false;
             _redirected = false;
+            _scriptRegistered = false;
             _shimsObject = ShimsContext.Create();
             _testObj = new ListDisplayPage();
             _privateObj = new PrivateObject(_testObj);
@@ -73,9 +83,9 @@ namespace EPMLiveCore.Tests.WebPageCode
         {
             ShimCoreFunctions.getListSettingStringSPList = (setting, list) =>
             {
-                if (setting == "GeneralSettings")
+                if (setting == GeneralSettings)
                 {
-                    return "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+                    return $"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n{DummyString}";
                 }
                 return $"{DummyString}|{DummyString}|{DummyString}";
             };
@@ -132,9 +142,9 @@ namespace EPMLiveCore.Tests.WebPageCode
                 {
                     ParamsGet = () => new NameValueCollection
                     {
-                        [$"Hidden{DummyString}New"] = "always",
-                        [$"Hidden{DummyString}Display"] = "always",
-                        [$"Hidden{DummyString}Edit"] = "always",
+                        [$"Hidden{DummyString}New"] = AlwaysValue,
+                        [$"Hidden{DummyString}Display"] = AlwaysValue,
+                        [$"Hidden{DummyString}Edit"] = AlwaysValue,
                         [$"Hidden{DummyString}Editable"] = DummyString,
                     }
                 }
@@ -180,32 +190,17 @@ namespace EPMLiveCore.Tests.WebPageCode
         }
 
         [TestMethod]
-        public void RenderOptions_OnValidCall_ConfirmResult()
+        public void RenderOptions_FirstSituation_ConfirmResult()
         {
             // Arrange
-            var scriptRegistered = false;
             var field = new ShimSPField
             {
                 TypeGet = () => SPFieldType.Text,
                 RequiredGet = () => false,
                 InternalNameGet = () => DummyString
             }.Instance;
-            var fieldProperties = new Dictionary<string, Dictionary<string, string>>();
-            fieldProperties.Add(DummyString, new Dictionary<string, string> { ["New"] = $"where;{DummyString};{DummyString};{DummyString};{DummyString}" });
-            _privateObj.SetFieldOrProperty("fieldProperties", fieldProperties);
-            var displayableFields = (SortedList<string, SPField>)_privateObj.GetFieldOrProperty(DisplayableFields);
-            displayableFields.Add(DummyString, new ShimSPField
-            {
-                InternalNameGet = () => DummyString,
-                TitleGet = () => DummyString
-            });
-            var groups = (List<SPGroup>)_privateObj.GetFieldOrProperty("groups");
-            groups.Add(new ShimSPGroup
-            {
-                NameGet = () => DummyString
-            });
 
-            ShimClientScriptManager.AllInstances.RegisterHiddenFieldStringString = (_, __, ___) => scriptRegistered = true;
+            SetupForRenderOptions(MemModeValue, DummyString, NewMode);
 
             // Act
             var result = (string)_privateObj.Invoke(RenderOptionsMethod, field);
@@ -213,7 +208,232 @@ namespace EPMLiveCore.Tests.WebPageCode
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNullOrEmpty(),
-                () => scriptRegistered.ShouldBeTrue());
+                () => _scriptRegistered.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void RenderOptions_SecondSituation_ConfirmResult()
+        {
+            // Arrange
+            var field = new ShimSPField
+            {
+                TypeGet = () => SPFieldType.Text,
+                RequiredGet = () => false,
+                InternalNameGet = () => DummyString
+            }.Instance;
+
+            SetupForRenderOptions(MemModeValue, MemOptionFieldWhere, NewMode);
+
+            // Act
+            var result = (string)_privateObj.Invoke(RenderOptionsMethod, field);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => _scriptRegistered.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void RenderOptions_ThirdSituation_ConfirmResult()
+        {
+            // Arrange
+            var field = new ShimSPField
+            {
+                TypeGet = () => SPFieldType.Text,
+                RequiredGet = () => false,
+                InternalNameGet = () => DummyString
+            }.Instance;
+
+            SetupForRenderOptions(DummyString, MemOptionFieldWhere, NewMode);
+
+            // Act
+            var result = (string)_privateObj.Invoke(RenderOptionsMethod, field);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => _scriptRegistered.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void RenderOptions_ForthSituation_ConfirmResult()
+        {
+            // Arrange
+            var field = new ShimSPField
+            {
+                TypeGet = () => SPFieldType.Text,
+                RequiredGet = () => false,
+                InternalNameGet = () => DummyString
+            }.Instance;
+
+            SetupForRenderOptions(DummyString, MemOptionFieldWhere, EditMode);
+
+            // Act
+            var result = (string)_privateObj.Invoke(RenderOptionsMethod, field);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => _scriptRegistered.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void RenderOptions_FifthSituation_ConfirmResult()
+        {
+            // Arrange
+            var field = new ShimSPField
+            {
+                TypeGet = () => SPFieldType.Text,
+                RequiredGet = () => false,
+                InternalNameGet = () => DummyString
+            }.Instance;
+
+            SetupForRenderOptions(DummyString, MemOptionFieldWhere, DisplayMode);
+
+            // Act
+            var result = (string)_privateObj.Invoke(RenderOptionsMethod, field);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => _scriptRegistered.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void RenderOptions_SixthSituation_ConfirmResult()
+        {
+            // Arrange
+            var field = new ShimSPField
+            {
+                TypeGet = () => SPFieldType.Text,
+                RequiredGet = () => false,
+                InternalNameGet = () => DummyString
+            }.Instance;
+
+            SetupForRenderOptions(DummyString, MemOptionFieldWhere, EditableMode);
+
+            // Act
+            var result = (string)_privateObj.Invoke(RenderOptionsMethod, field);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => _scriptRegistered.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void RenderOptions_Situation7_ConfirmResult()
+        {
+            // Arrange
+            var field = new ShimSPField
+            {
+                TypeGet = () => SPFieldType.Text,
+                RequiredGet = () => false,
+                InternalNameGet = () => $"{DummyString}_"
+            }.Instance;
+
+            SetupForRenderOptions(DummyString, MemOptionFieldWhere, NewMode);
+
+            // Act
+            var result = (string)_privateObj.Invoke(RenderOptionsMethod, field);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => _scriptRegistered.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void RenderOptions_Situation8_ConfirmResult()
+        {
+            // Arrange
+            var field = new ShimSPField
+            {
+                TypeGet = () => SPFieldType.Text,
+                RequiredGet = () => false,
+                InternalNameGet = () => $"{DummyString}_"
+            }.Instance;
+
+            SetupForRenderOptions(DummyString, MemOptionFieldWhere, EditMode);
+
+            // Act
+            var result = (string)_privateObj.Invoke(RenderOptionsMethod, field);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => _scriptRegistered.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void RenderOptions_Situation9_ConfirmResult()
+        {
+            // Arrange
+            var field = new ShimSPField
+            {
+                TypeGet = () => SPFieldType.Text,
+                RequiredGet = () => false,
+                InternalNameGet = () => $"{DummyString}_",
+                ShowInEditFormGet = () => true
+            }.Instance;
+
+            SetupForRenderOptions(DummyString, MemOptionFieldWhere, NewMode);
+
+            // Act
+            var result = (string)_privateObj.Invoke(RenderOptionsMethod, field);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => _scriptRegistered.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void RenderOptions_Situation10_ConfirmResult()
+        {
+            // Arrange
+            var field = new ShimSPField
+            {
+                TypeGet = () => SPFieldType.Text,
+                RequiredGet = () => false,
+                InternalNameGet = () => $"{DummyString}_",
+                ShowInEditFormGet = () => true
+            }.Instance;
+
+            SetupForRenderOptions(DummyString, MemOptionFieldWhere, EditMode);
+
+            // Act
+            var result = (string)_privateObj.Invoke(RenderOptionsMethod, field);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => _scriptRegistered.ShouldBeTrue());
+        }
+
+        private void SetupForRenderOptions(string memModeValue, string memOptionFieldWhere, string mode)
+        {
+            var fieldProperties = new Dictionary<string, Dictionary<string, string>>();
+            fieldProperties.Add(DummyString, new Dictionary<string, string>
+            {
+                [mode] = $"{memModeValue};{memOptionFieldWhere};{DummyString};{DummyString};{DummyString}"
+            });
+            _privateObj.SetFieldOrProperty(FieldProperties, fieldProperties);
+
+            var displayableFields = (SortedList<string, SPField>)_privateObj.GetFieldOrProperty(DisplayableFields);
+            displayableFields.Add(DummyString, new ShimSPField
+            {
+                InternalNameGet = () => DummyString,
+                TitleGet = () => DummyString
+            });
+
+            var groups = (List<SPGroup>)_privateObj.GetFieldOrProperty(GroupsProperty);
+            groups.Add(new ShimSPGroup
+            {
+                NameGet = () => DummyString
+            });
+
+            ShimClientScriptManager.AllInstances.RegisterHiddenFieldStringString = (_, __, ___) => _scriptRegistered = true;
         }
     }
 }
