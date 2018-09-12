@@ -121,6 +121,7 @@ export class MyWorkPage {
             deleteView: AnchorHelper.getAnchorById(viewRibbonlabel.deleteView),
             currentViewDropdown: AnchorHelper.getAnchorById(viewRibbonlabel.currentViewDropdown),
             selectColumns: AnchorHelper.getAnchorById(viewRibbonlabel.selectColumns),
+            currentView: ElementHelper.getElementByText(viewRibbonlabel.currentView),
         };
     }
 
@@ -232,5 +233,47 @@ export class MyWorkPage {
 
     static columnDisplayed(column: string) {
         return element(By.xpath(`//td[contains(@class,"GMHeaderText") and (text()='${column}')]`));
+    }
+
+    static get headerOptions() {
+        const headerOptionLabels = MyWorkPageConstants.headerOptions;
+        return {
+            active: element(By.id(headerOptionLabels.active)),
+            completed: element(By.id(headerOptionLabels.completed)),
+            ellipses: element(By.id(headerOptionLabels.ellipses)),
+        };
+    }
+
+    static get ellipsesDropdown() {
+        const ellipsesDropdown = MyWorkPageConstants.ellipsesDropdown;
+        return {
+            dropDownSection: element(By.id(ellipsesDropdown.dropDownSection)),
+            workTypes: element(By.xpath(`//div[@id='MWG_PivotMenu']//span[text()="${ellipsesDropdown.workTypes}"]`)),
+            close: element(By.id(ellipsesDropdown.close)),
+            workTypeSubmenuItem: element(By.css(`#${ellipsesDropdown.workTypeSubmenu}>li:first-child`)),
+        };
+    }
+
+    static get gridDetails() {
+        const gridLabels = MyWorkPageConstants.gridDetails;
+        return {
+            title: element.all(By.css(`.${gridLabels.title} a`)),
+            workingOn: element.all(By.css(`.${gridLabels.workingOn}`)),
+            workType: element.all(By.css(`.${gridLabels.workingOn}>div`)),
+            editTitle: element(By.css(`.${gridLabels.editTitle}`)),
+            toEdit: element.all(By.css(`.${gridLabels.title}.GMCell.GMRightHtml.HideCol0Title`)),
+        };
+    }
+
+    static getGridRowByTitle(titleName: string) {
+        return element(By.xpath(`//td[contains(@class,"${MyWorkPageConstants.gridDetails.title}")]//a[text()="${titleName}"]`));
+    }
+
+    static get ellipsesDropdownForItem() {
+        const ellipsesDropdownForItemLabels = MyWorkPageConstants.ellipsesDropdownForItem;
+        return {
+            viewItem: ElementHelper.getElementByText(ellipsesDropdownForItemLabels.viewItem),
+            deleteItem: ElementHelper.getElementByText(ellipsesDropdownForItemLabels.deleteItem),
+        };
     }
 }

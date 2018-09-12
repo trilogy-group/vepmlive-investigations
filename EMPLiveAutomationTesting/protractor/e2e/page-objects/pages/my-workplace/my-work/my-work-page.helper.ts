@@ -14,6 +14,7 @@ import {ExpectationHelper} from '../../../../components/misc-utils/expectation-h
 import {MyWorkplacePage} from '../my-workplace.po';
 import {browser} from 'protractor';
 import {ElementHelper} from '../../../../components/html/element-helper';
+import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 
 export class MyWorkPageHelper {
 
@@ -667,5 +668,184 @@ export class MyWorkPageHelper {
     static async clickOKAlert(stepLogger: StepLogger) {
         stepLogger.step('Click on "Ok" button.');
         await PageHelper.acceptAlert();
+    }
+
+    static async clickEllipsesIcon(stepLogger: StepLogger) {
+        stepLogger.step('Click on ellipses icon.');
+        await browser.sleep(PageHelper.timeout.s);
+        await ElementHelper.clickUsingJsNoWait(MyWorkPage.headerOptions.ellipses);
+    }
+
+    static async verifyEllipsesDropdownDisplayed(stepLogger: StepLogger) {
+        await browser.sleep(PageHelper.timeout.s);
+        await ExpectationHelper.verifyDisplayedStatus(
+            MyWorkPage.ellipsesDropdown.workTypes,
+            MyWorkPageConstants.ellipsesDropdownLabel,
+            stepLogger
+        );
+    }
+
+    static async clickCloseOnEllipsesDropdown(stepLogger: StepLogger) {
+        stepLogger.step('Click on "Close" button.');
+        await PageHelper.click(MyWorkPage.ellipsesDropdown.close);
+    }
+
+    static async verifyEllipsesDropdownClosed(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyHiddenStatus(
+            MyWorkPage.ellipsesDropdown.workTypes,
+            MyWorkPageConstants.ellipsesDropdownLabel,
+            stepLogger
+        );
+    }
+
+    static async clickOnWorkingOnForAnyItem(stepLogger: StepLogger) {
+        stepLogger.step('Click on the "Working on" column for any of the items');
+        const gridItems = MyWorkPage.gridDetails;
+        const radioButtonClassAttribute = await PageHelper.getAttributeValue(
+            gridItems.workingOn.get(0), HtmlHelper.attributes.class);
+        const isChecked = radioButtonClassAttribute.includes(MyWorkPageConstants.radioCheckedLabel);
+        if ( ! isChecked) {
+            await PageHelper.click(gridItems.workingOn.get(0));
+        }
+        await this.clickOnAnyCreatedItem(stepLogger);
+        const selectedItemTitle = await PageHelper.getText(gridItems.title.get(0));
+        return selectedItemTitle;
+    }
+
+    static async selectWorkingOnView(stepLogger: StepLogger) {
+        stepLogger.step('Expand the "Current View" drop-down and click on Click on "Working on it"');
+        await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
+        await browser.sleep(PageHelper.timeout.xs);
+        await ElementHelper.clickUsingJsNoWait(MyWorkPage.getCurrentViewByName(MyWorkPageConstants.workingOnItLabel));
+        // sometimes - stale exception
+        await browser.sleep(PageHelper.timeout.s);
+        await this.clickViewsTab(stepLogger);
+    }
+
+    static async verifyWorkingOnItemDisplayed(itemTitle: any, stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(
+            MyWorkPage.getGridRowByTitle(itemTitle),
+            `${MyWorkPageConstants.workingOnItLabel} item`,
+            stepLogger
+        );
+    }
+
+    static async verifyRadioButtonSelected(stepLogger: StepLogger) {
+        const gridItems = MyWorkPage.gridDetails;
+        await ExpectationHelper.verifyAttributeContains(
+            gridItems.workingOn.get(0),
+            HtmlHelper.attributes.class,
+            MyWorkPageConstants.radioCheckedLabel,
+            stepLogger
+        );
+    }
+
+    static async hoverOnAnyOption(stepLogger: StepLogger) {
+        stepLogger.step('Hover the mouse for any of the options.');
+        await ElementHelper.actionHoverOver(MyWorkPage.ellipsesDropdown.workTypes);
+    }
+
+    static async verifySubmenuDisplayed(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(
+            MyWorkPage.ellipsesDropdown.workTypeSubmenuItem,
+            MyWorkPageConstants.workTypeSubMenuLabel,
+            stepLogger
+        );
+    }
+
+    static async clickWorkTypeOption(stepLogger: StepLogger) {
+        stepLogger.step('Click on any option');
+        const ellipseMyWorkPageItems = MyWorkPage.ellipsesDropdown;
+        await ElementHelper.actionHoverOver(ellipseMyWorkPageItems.workTypes);
+        const workType = await PageHelper.getText(ellipseMyWorkPageItems.workTypeSubmenuItem);
+        await ElementHelper.actionHoverOverAndClick(ellipseMyWorkPageItems.workTypes, ellipseMyWorkPageItems.workTypeSubmenuItem);
+        return workType;
+    }
+
+    static async verifySearchResults(workType: string, stepLogger: StepLogger) {
+        const rowCount = await MyWorkPage.gridDetails.workType.count();
+        for (let i = 0 ; i < rowCount; i++) {
+            await ExpectationHelper.verifyText(
+                MyWorkPage.gridDetails.workType.get(i),
+                MyWorkPageConstants.searchResultsLabel,
+                workType,
+                stepLogger
+            );
+        }
+    }
+
+    static async doubleClickOnTitle(stepLogger: StepLogger) {
+        stepLogger.step('Double Click on the right side of item name.');
+        await browser.sleep(PageHelper.timeout.s);
+        await browser.actions().doubleClick(MyWorkPage.gridDetails.title.get(0)).perform();
+    }
+
+    static async verifyTitleInEditableMode(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(
+            MyWorkPage.gridDetails.editTitle,
+            MyWorkPageConstants.editTitleLabel,
+            stepLogger
+        );
+    }
+
+    static async editTitleInGrid(stepLogger: StepLogger) {
+        stepLogger.step('Make the necessary changes. - edit title');
+        const uniqueId = PageHelper.getUniqueId();
+        const title = `${MyWorkPageConstants.editItemLabel}${uniqueId}`;
+        await TextboxHelper.sendKeys(MyWorkPage.gridDetails.editTitle, title);
+        return title;
+    }
+
+    static async clickAnyWhereElseOnPage(stepLogger: StepLogger) {
+        stepLogger.step('Click on anywhere else on the page.');
+        await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentView);
+    }
+
+    static async verifyTitleEdited(editedTitle: string, stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(
+            MyWorkPage.getGridRowByTitle(editedTitle),
+            editedTitle,
+            stepLogger
+        );
+    }
+
+    static async clickOnEllipsesForAnyItem(stepLogger: StepLogger) {
+        stepLogger.step('Expand the ellipsis icon for a grid item.');
+        const gridItems = MyWorkPage.gridDetails;
+        const title = await PageHelper.getText(gridItems.title.get(0));
+        await PageHelper.click(gridItems.toEdit.get(0));
+        return title;
+    }
+
+    static async verifyEllipsesDropdownForItemDisplayed(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(
+            MyWorkPage.ellipsesDropdownForItem.deleteItem,
+            MyWorkPageConstants.ellipsesDropdownLabel,
+            stepLogger
+        );
+    }
+
+    static async clickOnDeleteItem(stepLogger: StepLogger) {
+        stepLogger.step('Click on "Delete Item" option.');
+        await PageHelper.click(MyWorkPage.ellipsesDropdownForItem.deleteItem);
+    }
+
+    static async verifyDeleteItemPopup(stepLogger: StepLogger) {
+        const actualMessage = await PageHelper.getAlertText();
+        await ExpectationHelper.verifyStringEqualTo(
+            actualMessage,
+            MyWorkPageConstants.deleteItemMessage,
+            stepLogger
+        );
+    }
+
+    static async verifyItemDeleted(itemTitle: any, stepLogger: StepLogger) {
+        await PageHelper.refreshPage();
+        await browser.sleep(PageHelper.timeout.s);
+        await ExpectationHelper.verifyNotDisplayedStatus(
+            MyWorkPage.getGridRowByTitle(itemTitle),
+            itemTitle,
+            stepLogger
+        );
     }
 }

@@ -23,6 +23,13 @@ export class MyWorkPageConstants {
     static readonly viewNameOtherThanDefault = 'Working On It';
     static readonly renameViewPopupLabel = 'Rename View Popup';
     static readonly noNameMessage = 'Please enter view name - view names cannot be blank.';
+    static readonly ellipsesDropdownLabel = 'Ellipses Dropdown';
+    static readonly workingOnItLabel = 'Working On It';
+    static readonly radioCheckedLabel = 'radio-checked';
+    static readonly workTypeSubMenuLabel = 'Work Type Sub Menu';
+    static readonly searchResultsLabel = 'Search Results';
+    static readonly editTitleLabel = 'Editable title Textbox';
+    static readonly deleteItemMessage = 'Are you sure you want to send the item(s) to the Recycle Bin?';
 
     static get pageName() {
         return {
@@ -92,7 +99,8 @@ export class MyWorkPageConstants {
             renameView: `${viewSection}.RenameView-Medium`,
             deleteView: `${viewSection}.DeleteView-Medium`,
             currentViewDropdown: `${viewSection}.CurrentViewDropDown`,
-            selectColumns: `Ribbon.MyWork.Actions.SelectColoumns-Medium`
+            selectColumns: `Ribbon.MyWork.Actions.SelectColoumns-Medium`,
+            currentView: 'Current View:',
         };
     }
 
@@ -154,6 +162,39 @@ export class MyWorkPageConstants {
             cancel: 'Cancel',
             column: 'GMColumnsMenuItemText',
             columnChecked: 'GMMenuCheckedIconRight'
+        };
+    }
+
+    static get headerOptions() {
+        return {
+            active: 'MWG_Pivot_Active',
+            completed: 'MWG_Pivot_Completed',
+            ellipses: 'MWG_Pivot_Selector',
+        };
+    }
+
+    static get ellipsesDropdown() {
+        return {
+            dropDownSection: 'MWG_PivotMenu',
+            workTypes: 'Work Types',
+            close: 'MWG_PivotClose',
+            workTypeSubmenu: 'MWG_WorkType_Menu',
+        };
+    }
+
+    static get gridDetails() {
+        return {
+            title: 'EPMLiveMyWorkTitle',
+            workingOn: 'epmlive-toggle-switch',
+            workType: 'HideCol0Work0000Type',
+            editTitle: 'GMEditInput'
+        };
+    }
+
+    static get ellipsesDropdownForItem() {
+        return {
+            viewItem: 'View Item',
+            deleteItem: 'Delete Item'
         };
     }
 }
