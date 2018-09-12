@@ -106,6 +106,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ChatControl\VfChartTests.cs" />
+    <Compile Include="GridListView\GridListViewTests.RenderGantt.cs" />
     <Compile Include="ResourcePlanningTest.cs" />
     <Compile Include="ReportingFilter\ReportingFilterTests.cs" />
     <Compile Include="UserProfileDisplay\DisplayProfilePicturesTests.cs" />

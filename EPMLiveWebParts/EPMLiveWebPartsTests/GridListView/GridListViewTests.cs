@@ -16,11 +16,13 @@ using Microsoft.QualityTools.Testing.Fakes;
 using System.Web.UI;
 using System.IO;
 using System.Text;
+using EPMLiveCore.Fakes;
+using EPMLiveWebParts.Fakes;
 
 namespace EPMLiveWebParts.Tests
 {
     [TestClass]
-    public class GridListViewTests
+    public partial class GridListViewTests
     {
         private IDisposable _shimsContext;
         private SharepointShims _sharepointShims;
@@ -64,6 +66,17 @@ namespace EPMLiveWebParts.Tests
             _testablePrivate.SetField("sSearchField", _searchField);
             _testablePrivate.SetField("sSearchValue", _searchString);
             _testablePrivate.SetField("list", _sharepointShims.ListShim.Instance);
+            _testablePrivate.SetField("view", _sharepointShims.ViewShim.Instance);
+            _testablePrivate.SetField("gSettings", new ShimGridGanttSettings().Instance);
+            _testablePrivate.SetField("gvs", new ShimGridViewSession().Instance);
+            ShimSPContext.AllInstances.ViewContextGet = _ => new ShimSPViewContext()
+            {
+                ViewGet = () => _sharepointShims.ViewShim.Instance,
+            }.Instance;
+            ShimControl.AllInstances.PageGet = _ => new ShimPage()
+            {
+                RequestGet = () => new ShimHttpRequest().Instance,
+            }.Instance;
 
             _outputBuilder = new StringBuilder();
             _outputWriterString = new StringWriter(_outputBuilder);
