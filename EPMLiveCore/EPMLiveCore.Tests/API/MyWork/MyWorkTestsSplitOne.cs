@@ -1,27 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Fakes;
+using System.Data.SqlClient;
+using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.Linq.Fakes;
 using EPMLiveCore.API;
+using EPMLiveCore.API.Fakes;
+using EPMLiveCore.Fakes;
+using EPMLiveCore.ReportHelper.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
-using System.Data.SqlClient.Fakes;
-using System.Data.SqlClient;
-using EPMLiveCore.Fakes;
-using EPMLiveCore.ReportHelper.Fakes;
 using Shouldly;
-using System.Reflection;
-using System.Data.Fakes;
-using Microsoft.SharePoint;
-using System.Xml.Linq;
-using EPMLiveCore.API.Fakes;
-using System.Globalization;
-using System.Data;
-using System.Xml.Linq.Fakes;
-using System.Xml;
+using TypeToTest = EPMLiveCore.API.MyWork;
 
 namespace EPMLiveCore.Tests.API.MyWork
 {
@@ -29,14 +30,14 @@ namespace EPMLiveCore.Tests.API.MyWork
     [TestClass]
     public partial class MyWorkRemTests
     {
-        private EPMLiveCore.API.MyWork testObj;
+        private TypeToTest testObj;
         private PrivateObject privateObj;
         private IDisposable shimsContext;
         private Guid guid;
         private ShimSPWeb spWeb;
         private ShimSPSite spSite;
         private ShimSPWebApplication webApplication;
-        private const string guidString = "83e81819-0112-4c22-bb70-d8ba101e9e0c";
+        private const string GuidString = "83e81819-0112-4c22-bb70-d8ba101e9e0c";
         private const string GetArchivedWebsMethodName = "GetArchivedWebs";
         private const string GetGlobalViewsMethodName = "GetGlobalViews";
         private const string GetListFieldsAndTypesFromDbMethodName = "GetListFieldsAndTypesFromDb";
@@ -78,7 +79,7 @@ namespace EPMLiveCore.Tests.API.MyWork
         {
             SetupShims();
 
-            testObj = new EPMLiveCore.API.MyWork();
+            testObj = new TypeToTest();
             privateObj = new PrivateObject(testObj);
         }
 
@@ -127,7 +128,7 @@ namespace EPMLiveCore.Tests.API.MyWork
 
         private void SetupVariables()
         {
-            guid = new Guid(guidString);
+            guid = new Guid(GuidString);
 
             spSite = new ShimSPSite()
             {
@@ -212,7 +213,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual.Count.ShouldBe(expectedCount),
-                () => actual.Where(x => x.ToString() == guid.ToString()).Count().ShouldBe(expectedCount));
+                () => actual.Count(x => x.ToString() == guid.ToString()).ShouldBe(expectedCount));
         }
 
         [TestMethod]
