@@ -74,6 +74,8 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
         private const string FieldTitle = "Title";
         private const string FieldId = "ID";
         private const string FieldDisplayName = "DisplayName";
+        private const int StatusSkipped = 2;
+        private const int StatusError = 3;
         private readonly Guid DummyGuid = Guid.NewGuid();
         private UpdateResourcePool _testObject;
         private PrivateObject _privateObject;
@@ -118,11 +120,11 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
             ShimStep.AllInstances.LogMessageString = (_, log) => _logs.Add(log);
             ShimStep.AllInstances.LogMessageStringStringInt32 = (_, __, log, status) =>
             {
-                if (status == 2)
+                if (status == StatusSkipped)
                 {
                     _skipped.Add(log);
                 }
-                else if (status == 3)
+                else if (status == StatusError)
                 {
                     _errors.Add(log);
                 }
