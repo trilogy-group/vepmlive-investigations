@@ -69,6 +69,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint.Security\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.Security.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Web.CommandUI.16.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\Microsoft.Web.CommandUI.16.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
@@ -198,7 +202,9 @@
     <Fakes Include="Fakes\System.fakes" />
     <Fakes Include="Fakes\EPMLiveTimerService.fakes" />
     <Fakes Include="Fakes\PortfolioEngineCore.fakes" />
-    <Fakes Include="Fakes\EPM Live Core.fakes" />
+    <Fakes Include="Fakes\EPM Live Core.fakes">
+      <SubType>Designer</SubType>
+    </Fakes>
     <Fakes Include="Fakes\EPMLiveEnterprise.fakes" />
     <None Include="EPMLive.TestFakes.snk" />
     <Fakes Include="Fakes\EPMLiveIntegrationService.fakes" />
@@ -207,6 +213,7 @@
     <Fakes Include="Fakes\System.Xml.Linq.fakes" />
     <Fakes Include="Fakes\System.Configuration.fakes" />
     <Fakes Include="Fakes\System.Data.DataSetExtensions.fakes" />
+    <Fakes Include="Fakes\Microsoft.Web.CommandUI.fakes" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>
