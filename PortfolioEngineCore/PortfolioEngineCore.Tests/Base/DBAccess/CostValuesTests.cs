@@ -6,8 +6,6 @@ using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortfolioEngineCore.Base.DBAccess;
@@ -19,30 +17,27 @@ namespace PortfolioEngineCore.Tests.Base
     [TestClass]
     public class CostValuesTests
     {
+        private const string PfEPeriodTypeFullName = "PortfolioEngineCore.dbaCostValues+PfEPeriod";
+        private const string PfENamedRatesTypeFullName = "PortfolioEngineCore.dbaCostValues+PfENamedRates";
+        private const string PfENamedRateTypeFullName = "PortfolioEngineCore.dbaCostValues+PfENamedRate";
+        private const string PfEAdminTypeFullName = "PortfolioEngineCore.dbaCostValues+PfEAdmin";
+        private const string GetAutoPostsMethodName = "GetAutoPosts";
+        private const string CopyCostValuesMethodName = "CopyCostValues";
+        private const string PortfolioEngineCoreDll = "PortfolioEngineCore.dll";
+        private const string GetPeriodStartDateMethodName = "GetPeriodStartDate";
+        private const string GetCostCategoryRatesMethodName = "GetCostCategoryRates";
+        private const string GetXrefsMethodName = "GetXrefs";
+        private const string GetRateMethodName = "GetRate";
+        private const string UpdateCostTotalMethodName = "UpdateCostTotal";
+        private const string GetAdminInfoMethodName = "GetAdminInfo";
         private const string DummyString = "DummyString";
         private readonly DateTime DummyDate = DateTime.Now;
         private IDisposable shimContext;
         private DBAccess dbAccess;
         private int count = 0;
-        private const string PfEPeriodTypeFullName = "PortfolioEngineCore.dbaCostValues+PfEPeriod";
-        private const string PfENamedRatesTypeFullName = "PortfolioEngineCore.dbaCostValues+PfENamedRates";
-        private const string PfENamedRateTypeFullName = "PortfolioEngineCore.dbaCostValues+PfENamedRate";
-        private const string PfEAdminTypeFullName = "PortfolioEngineCore.dbaCostValues+PfEAdmin";
-
-
-
-        private const string GetAutoPostsMethodName = "GetAutoPosts";
-        private string CopyCostValuesMethodName = "CopyCostValues";
-        private const string PortfolioEngineCoreDll = "PortfolioEngineCore.dll";
         private PrivateType privateType;
-        private string GetPeriodStartDateMethodName = "GetPeriodStartDate";
-        private string GetCostCategoryRatesMethodName = "GetCostCategoryRates";
-        private string GetXrefsMethodName = "GetXrefs";
-        private string GetRateMethodName = "GetRate";
-        private string UpdateCostTotalMethodName = "UpdateCostTotal";
-        private string GetAdminInfoMethodName = "GetAdminInfo";
 
-        private Type PfEPeriodType
+        private static Type PfEPeriodType
         {
             get
             {
@@ -52,7 +47,7 @@ namespace PortfolioEngineCore.Tests.Base
             }
         }
 
-        private Type PfENamedRatesType
+        private static Type PfENamedRatesType
         {
             get
             {
@@ -62,17 +57,7 @@ namespace PortfolioEngineCore.Tests.Base
             }
         }
 
-        private Type PfENamedRateType
-        {
-            get
-            {
-                var assembly = GetPortifolioEngineCoreAssembly();
-                var type = assembly.GetTypes().FirstOrDefault(p => p.FullName == PfENamedRateTypeFullName);
-                return type;
-            }
-        }
-
-        public Type PfEAdminType
+        public static  Type PfEAdminType
         {
             get
             {
@@ -81,8 +66,6 @@ namespace PortfolioEngineCore.Tests.Base
                 return type;
             }
         }
-
-        //PfENamedRateType
 
         [TestInitialize]
         public void Initialize()
@@ -131,12 +114,6 @@ namespace PortfolioEngineCore.Tests.Base
                     return false;
                 }
             };
-            //ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
-            //{
-            //    Read = () => ++count < 2,
-            //    ItemGetString = name => DummyString,
-            //    Close = () => { }
-            //};
         }
 
         [TestMethod]
@@ -219,19 +196,19 @@ namespace PortfolioEngineCore.Tests.Base
                     return 1;
                 }
             };
-            ShimSqlDataReader.AllInstances.Read = _ =>
-            {
-                if (count < 2)
-                {
-                    count++;
-                    return true;
-                }
-                else
-                {
-                    count = 0;
-                    return false;
-                }
-            };
+            //ShimSqlDataReader.AllInstances.Read = _ =>
+            //{
+            //    if (count < 2)
+            //    {
+            //        count++;
+            //        return true;
+            //    }
+            //    else
+            //    {
+            //        count = 0;
+            //        return false;
+            //    }
+            //};
             ShimdbaUsers.ExecuteSQLSelectSqlCommandSqlDataReaderOut = ExecuteSQLSelectSuccess;
             ShimSqlDb.ReadIntValueObject = valueObject => (int)CTEditMode.ctDisplay;
 
@@ -805,7 +782,6 @@ namespace PortfolioEngineCore.Tests.Base
             // Arrange
             const string CommandText = "EPG_SP_PCTReadCommitments";
             const string GetPeriodsCommand = "SELECT PRD_ID,PRD_NAME,PRD_START_DATE,PRD_FINISH_DATE FROM EPG_PERIODS";
-            var readCount = 0;
             var command = string.Empty;
             var stringResult = string.Empty;
             var postInstruction = string.Empty;
@@ -863,7 +839,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void PostCostValues_CTEditModeCommitmentsSuccess_RetudfgdfgdfgdfdfgrnsTrue()
+        public void PostCostValues_CTEditModeCommitmentsSuccessAndPostToWE_ReturnsTrue()
         {
             // Arrange
             var stringResult = string.Empty;
@@ -950,7 +926,6 @@ namespace PortfolioEngineCore.Tests.Base
             var date = DateTime.Now;
             var periods = CreateGenericListOfType(pfEPeriodType);
             var period = CreatePfEPeriodInstance(DateTime.Now.AddHours(-2), DateTime.Now.AddHours(2));
-
             periods.GetType()
                 .GetMethod("Add")?
                 .Invoke(periods, new[] { period });
@@ -1158,51 +1133,6 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual(StatusEnum.rsServerError, result.Value);
         }
 
-        //[TestMethod]
-        //public void GetRate_GetValuesFromRateConfiguration_ShouldUpdateValues()
-        //{
-        //    // Arrange
-        //    const int WresId = 1;
-        //    var namedRates = Activator.CreateInstance(PfENamedRatesType);
-        //    var resourceRates = new Dictionary<int, int>
-        //    {
-        //        [WresId] = 1
-        //    };
-        //    var rates = new Dictionary<int, List<>>
-        //    {
-        //    };
-        //    namedRates.GetType()
-        //        .GetField("resourcerates")
-        //        .SetValue(namedRates, resourceRates);
-        //    namedRates.GetType()
-        //        .GetField("rates")
-        //        .SetValue(namedRates, rates);
-        //    var projectRates = new List<ProjectResourceRate>();
-
-        //    var categoryRates = new Dictionary<int, Dictionary<int, double>>();
-        //    //{
-        //    //    [1] = new Dictionary<int, double>
-        //    //    {
-        //    //        [1] = 3.4D
-        //    //    }
-        //    //};
-
-        //    var args = new object[] { namedRates, projectRates, categoryRates, 1, WresId, 1, DateTime.Now, 0D, 0D };
-
-        //    // Act
-        //    var result = privateType.InvokeStatic(GetRateMethodName, args) as bool?;
-        //    var rate = args[args.Length - 2] as double?;
-        //    var overtimeRate = args[args.Length - 1] as double?;
-
-        //    // Assert
-        //    Assert.IsNotNull(result);
-        //    Assert.IsTrue(result.Value);
-        //    Assert.IsNotNull(rate);
-        //    Assert.AreNotEqual(0D, rate);
-        //    Assert.IsNotNull(overtimeRate);
-        //    Assert.AreNotEqual(0D, overtimeRate);
-        //}
-
         [TestMethod]
         public void GetXrefs_OnSuccess_ReturnsStatusSuccess()
         {
@@ -1294,13 +1224,7 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.IsTrue(result.Value);
             Assert.IsTrue(commandText.Contains(ExpectedParameter));
         }
-
-        private StatusEnum CalculateCostValuesError(DBAccess dbAccess, int ctId, int cbId, int projectId, out string result)
-        {
-            result = DummyString;
-            return StatusEnum.rsServerError;
-        }
-
+      
         private object CreatePfEPeriodInstance(DateTime? startDate , DateTime? finishDate)
         {
             var instance = Activator.CreateInstance(PfEPeriodType);
@@ -1322,7 +1246,7 @@ namespace PortfolioEngineCore.Tests.Base
             return instance;
         }
 
-        private Assembly GetPortifolioEngineCoreAssembly()
+        private static Assembly GetPortifolioEngineCoreAssembly()
         {
             return Assembly.LoadFrom(PortfolioEngineCoreDll);
         }
@@ -1349,6 +1273,15 @@ namespace PortfolioEngineCore.Tests.Base
                 default:
                     return defaultValue;
             }
+        }
+
+        /// <summary>
+        /// This method is fake and these parameters are required, even though not all of them are used
+        /// </summary>
+        private StatusEnum CalculateCostValuesError(DBAccess dbAccess, int ctId, int cbId, int projectId, out string result)
+        {
+            result = DummyString;
+            return StatusEnum.rsServerError;
         }
 
         /// <summary>
