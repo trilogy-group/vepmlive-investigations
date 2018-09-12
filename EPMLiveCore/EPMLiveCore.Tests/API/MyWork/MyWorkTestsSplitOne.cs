@@ -111,6 +111,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             ShimSPSite.ConstructorGuid = (_, __) => new ShimSPSite();
             ShimSPSite.ConstructorStringSPUserToken = (_, _1, _2) => new ShimSPSite();
             ShimSPSite.AllInstances.WebApplicationGet = _ => webApplication;
+            ShimSPSite.AllInstances.OpenWebGuid = (_, __) => spWeb;
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = (codeToRun) =>
             {
                 codeToRun();
