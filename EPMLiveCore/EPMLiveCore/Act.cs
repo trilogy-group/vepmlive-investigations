@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.SharePoint;
 using System.Collections;
-using Microsoft.SharePoint.Administration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Reflection;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveCore
 {
@@ -160,9 +158,9 @@ namespace EPMLiveCore
 
         private int CheckNewPurchaseMethod(ActFeature feature, string username, DataSet dsInfo)
         {
-            if (dsInfo.Tables.Count < 2)
+            if (dsInfo.Tables.Count < 3)
             {
-                throw new ArgumentNullException("dsInfo.Tables[1] should not be null.");
+                throw new ArgumentNullException("dsInfo.Tables should have at least 3 tables.");
             }
             var hasPurchased = false;
             var hasAccess = false;
@@ -198,18 +196,18 @@ namespace EPMLiveCore
                 {
                     int usercount;
                     int maxusers;
-                    if (!int.TryParse(dataRows[0][UserCountColumn].ToString(), out usercount))
+                    if (!int.TryParse(dataRows[0][UserCountColumn]?.ToString(), out usercount))
                     {
                         usercount = 0;
                     }
-                    if (!int.TryParse(dataRows[0][QuantityColumn].ToString(), out maxusers))
+                    if (!int.TryParse(dataRows[0][QuantityColumn]?.ToString(), out maxusers))
                     {
                         maxusers = 0;
                     }
 
                     if (maxusers >= usercount)
                     {
-                        var arrFeatures = new ArrayList(dataRows[0][FeaturesColumn].ToString().Split(','));
+                        var arrFeatures = new ArrayList(dataRows[0][FeaturesColumn]?.ToString().Split(','));
                         if (arrFeatures.Contains(((int)feature).ToString()))
                         {
                             hasAccess = true;
@@ -253,17 +251,21 @@ namespace EPMLiveCore
             }
 
             var userLevels = new UserLevels();
-            var userlevel = userLevels.GetById(1);
+            var userLevel = userLevels.GetById(1);
             if (contractlevel == 2)
             {
-                userlevel = userLevels.GetById(2);
+                userLevel = userLevels.GetById(2);
             }
             else if (contractlevel == 4)
             {
-                userlevel = userLevels.GetById(3);
+                userLevel = userLevels.GetById(3);
             }
 
-            if (userlevel.levels.Contains((int)feature))
+            if (userLevel == null || userLevel.levels == null)
+            {
+                throw new InvalidOperationException("userLevel.levels should not be null.");
+            }
+            if (userLevel.levels.Contains((int)feature))
             {
                 if (HasAccess(username, dsInfo))
                 {
