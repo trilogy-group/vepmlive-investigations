@@ -62,5 +62,7 @@
     <Add FullName="EPMLiveCore.Infrastructure.Navigation.NavLinkProvider!"/>
     <Add FullName="EPMLiveCore.API.WorkspaceFactory!"/>
     <Add FullName="EPMLiveCore.API.WorkspaceData!"/>
+    <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.Step!"/>
+    <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps.UpdateResourcePool!"/>
   </ShimGeneration>
 </Fakes>
