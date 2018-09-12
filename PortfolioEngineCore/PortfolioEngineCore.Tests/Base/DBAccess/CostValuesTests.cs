@@ -34,7 +34,7 @@ namespace PortfolioEngineCore.Tests.Base
         private readonly DateTime DummyDate = DateTime.Now;
         private IDisposable shimContext;
         private DBAccess dbAccess;
-        private int count = 0;
+        private int count;
         private PrivateType privateType;
 
         private static Type PfEPeriodType
@@ -196,19 +196,6 @@ namespace PortfolioEngineCore.Tests.Base
                     return 1;
                 }
             };
-            //ShimSqlDataReader.AllInstances.Read = _ =>
-            //{
-            //    if (count < 2)
-            //    {
-            //        count++;
-            //        return true;
-            //    }
-            //    else
-            //    {
-            //        count = 0;
-            //        return false;
-            //    }
-            //};
             ShimdbaUsers.ExecuteSQLSelectSqlCommandSqlDataReaderOut = ExecuteSQLSelectSuccess;
             ShimSqlDb.ReadIntValueObject = valueObject => (int)CTEditMode.ctDisplay;
 
@@ -895,7 +882,6 @@ namespace PortfolioEngineCore.Tests.Base
             // Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result.Value);
-            Assert.IsNotNull(autoposts);
         }
 
         [TestMethod]
@@ -1232,15 +1218,15 @@ namespace PortfolioEngineCore.Tests.Base
             if (startDate != null)
             {
                 instance.GetType()
-                .GetField("StartDate")
-                .SetValue(instance, startDate.Value);
+                    .GetField("StartDate")
+                    .SetValue(instance, startDate.Value);
             }
 
             if (finishDate != null)
             {
                 instance.GetType()
-                .GetField("FinishDate")
-                .SetValue(instance, finishDate.Value);
+                    .GetField("FinishDate")
+                    .SetValue(instance, finishDate.Value);
             }
 
             return instance;
