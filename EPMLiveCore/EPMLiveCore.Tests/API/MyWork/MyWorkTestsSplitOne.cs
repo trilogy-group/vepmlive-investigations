@@ -27,7 +27,7 @@ namespace EPMLiveCore.Tests.API.MyWork
 {
     [ExcludeFromCodeCoverage]
     [TestClass]
-    public partial class MyWorkTestsSplitOne
+    public partial class MyWorkRemTests
     {
         private EPMLiveCore.API.MyWork testObj;
         private PrivateObject privateObj;
