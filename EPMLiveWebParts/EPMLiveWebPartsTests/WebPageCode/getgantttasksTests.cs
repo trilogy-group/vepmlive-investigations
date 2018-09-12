@@ -72,8 +72,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         {
             ProcessList_FieldsProvided_CollectionsField(SPFieldType.Number);
         }
-
-        [TestMethod]
+        
         public void ProcessList_FieldsProvided_CollectionsField(SPFieldType fieldType)
         {
             // Arrange
