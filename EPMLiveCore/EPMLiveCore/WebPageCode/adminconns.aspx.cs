@@ -1,22 +1,12 @@
 using System;
-using System.Data;
 using System.Data.SqlClient;
-using System.Configuration;
-using System.Collections;
-using System.Web;
+using System.Drawing;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using System.Xml;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Administration;
-using System.Drawing;
-using System.Linq;
-using System.IO;
-using System.Text;
-using System.Collections.Generic;
+using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveCore
 {
@@ -66,77 +56,64 @@ namespace EPMLiveCore
         {
             try
             {
-                
                 txtConnString.Text = "";
-                //string sVal =  
                 SPWebApplication webApp = WebApplicationSelector1.CurrentItem;
-                //SPWebService.ContentService.WebApplications[new Guid(DropDownList1.SelectedValue)];
                 webappid = webApp.Id.ToString();
-                //SPIisSettings iis = webApp.IisSettings[SPUrlZone.Default];
                 string sConn = CoreFunctions.getConnectionString(webApp.Id);
-                //if (File.Exists(iis.Path + "\\web.config"))
-                //{
-                    //xWebConfig.InnerXml = File.ReadAllText(iis.Path + "\\web.config");
-                    //XmlNode nConnStr = xWebConfig.SelectSingleNode("configuration/connectionStrings/add[@name='epmlive']");
 
-                    if (sConn != "")
+                if (sConn != "")
+                {
+                    txtConnString.Text = sConn;
+                    lblStatusDyn.Text = "Active";
+
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        //txtConnString.Text = nConnStr.Attributes["connectionString"].Value;
-                        txtConnString.Text = sConn;
-                        lblStatusDyn.Text = "Active";
-
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        try
                         {
-                            try
+                            var curVersion = "";
+                            using (var cn = new SqlConnection(sConn))
                             {
-                                SqlConnection cn = new SqlConnection(sConn);
                                 cn.Open();
-
-                                SqlCommand cmd = new SqlCommand("SELECT TOP 1 VERSION FROM VERSIONS order by dtInstalled DESC", cn);
-                                SqlDataReader dr = cmd.ExecuteReader();
-                                string curVersion = "";
-                                if(dr.Read())
+                                using (var cmd = new SqlCommand("SELECT TOP 1 VERSION FROM VERSIONS order by dtInstalled DESC", cn))
                                 {
-                                    curVersion = dr.GetString(0);
+                                    using (var dr = cmd.ExecuteReader())
+                                    {
+                                        if (dr.Read())
+                                        {
+                                            curVersion = dr.GetString(0);
+                                        }
+                                    }
                                 }
-                                dr.Close();
-                                cn.Close();
-                                lblVersion.Text = curVersion;
-                                if(curVersion != CoreFunctions.GetFullAssemblyVersion())
-                                {
-                                    btnUpgrade.Visible = true;
-                                    
-                                    lblVersion.BackColor = Color.Red;
-                                }
-
                             }
-                            catch(Exception ex)
+
+                            lblVersion.Text = curVersion;
+                            if (curVersion != CoreFunctions.GetFullAssemblyVersion())
                             {
-                                lblStatusDyn.Text = "Error: " + ex.Message;
+                                btnUpgrade.Visible = true;
+                                lblVersion.BackColor = Color.Red;
                             }
-                        });
-                    }
-                    else
-                    {
-                        lblStatusDyn.Text = "No connection string configured.";
-                        con1.Visible = false;
-                        con3.Visible = false;
-                        btnInstallDB.Visible = true;
-                    }
-                //}
-                //else
-                //{
-                //    lblStatusDyn.Text = "Web config file '" + iis.Path + "\\web.config" + "' not found.";
-                //    lblStatusDyn.BackColor = System.Drawing.Color.Red;
-                //}
+                        }
+                        catch (Exception ex)
+                        {
+                            lblStatusDyn.Text = "Error: " + ex.Message;
+                        }
+                    });
+                }
+                else
+                {
+                    lblStatusDyn.Text = "No connection string configured.";
+                    con1.Visible = false;
+                    con3.Visible = false;
+                    btnInstallDB.Visible = true;
+                }
 
-                    ReportAuth _chrono = webApp.GetChild<ReportAuth>("ReportAuth");
-                    if (_chrono != null)
-                    {
-                        txtUsername.Text = _chrono.Username;
-                    }
-                
-                if(SPFarm.Local.Solutions[new Guid("55aca119-d7c7-494a-b5a7-c3ade07d06eb")].DeployedWebApplications.Contains(webApp))
+                ReportAuth _chrono = webApp.GetChild<ReportAuth>("ReportAuth");
+                if (_chrono != null)
+                {
+                    txtUsername.Text = _chrono.Username;
+                }
+
+                if (SPFarm.Local.Solutions[new Guid("55aca119-d7c7-494a-b5a7-c3ade07d06eb")].DeployedWebApplications.Contains(webApp))
                     sCoreStatus = "Deployed";
                 else
                     sCoreStatus = "Not Deployed";
@@ -184,25 +161,40 @@ namespace EPMLiveCore
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
                 SPWebApplication webApp = WebApplicationSelector1.CurrentItem;
-                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(webApp.Id));
-                cn.Open();
+                using (var cn = new SqlConnection(CoreFunctions.getConnectionString(webApp.Id)))
+                {
+                    cn.Open();
 
-                SqlCommand cmd = new SqlCommand(Properties.Resources._0Tables01, cn);
-                cmd.ExecuteNonQuery();
-                cmd = new SqlCommand(Properties.Resources._0Tables02, cn);
-                cmd.ExecuteNonQuery();
-                cmd = new SqlCommand(Properties.Resources._1Views01, cn);
-                cmd.ExecuteNonQuery();
-                cmd = new SqlCommand(Properties.Resources._2SPs01, cn);
-                cmd.ExecuteNonQuery();
-                cmd = new SqlCommand(Properties.Resources._9Data01, cn);
-                cmd.ExecuteNonQuery();
-                cmd = new SqlCommand(Properties.Resources._9Data02, cn);
-                cmd.ExecuteNonQuery();
-                cmd = new SqlCommand("INSERT INTO VERSIONS (VERSION, DTINSTALLED) VALUES (@version, GETDATE())", cn);
-                cmd.Parameters.AddWithValue("@version", CoreFunctions.GetFullAssemblyVersion());
-                cmd.ExecuteNonQuery();
-                cn.Close();
+                    using (var cmd = new SqlCommand(Properties.Resources._0Tables01, cn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    using (var cmd = new SqlCommand(Properties.Resources._0Tables02, cn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    using (var cmd = new SqlCommand(Properties.Resources._1Views01, cn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    using (var cmd = new SqlCommand(Properties.Resources._2SPs01, cn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    using (var cmd = new SqlCommand(Properties.Resources._9Data01, cn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    using (var cmd = new SqlCommand(Properties.Resources._9Data02, cn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    using (var cmd = new SqlCommand("INSERT INTO VERSIONS (VERSION, DTINSTALLED) VALUES (@version, GETDATE())", cn))
+                    {
+                        cmd.Parameters.AddWithValue("@version", CoreFunctions.GetFullAssemblyVersion());
+                        cmd.ExecuteNonQuery();
+                    }
+                }
 
                 Response.Redirect("/_admin/epmlive/wcsettings.aspx?WebApplicationId=" + webApp.Id);
             });
@@ -299,11 +291,11 @@ namespace EPMLiveCore
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    SqlConnection cn = new SqlConnection();
-                    cn.ConnectionString = sDBConnStr;
-                    cn.Open();
-                    cn.Close();
-                    cn.Dispose();
+                    using (var cn = new SqlConnection())
+                    {
+                        cn.ConnectionString = sDBConnStr;
+                        cn.Open();
+                    }
                 });
 
                 return true; // success
