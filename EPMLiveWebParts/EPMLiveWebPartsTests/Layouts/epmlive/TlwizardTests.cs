@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized.Fakes;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Fakes;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Fakes;
 using System.Web.UI;
 using System.Web.UI.Fakes;
@@ -29,6 +26,7 @@ using Microsoft.SharePoint.Navigation.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
+using DataSource = EPMLiveWebParts.SSRS2006.DataSource;
 
 namespace EPMLiveWebParts.Tests.Layouts.epmlive
 {
@@ -73,6 +71,7 @@ namespace EPMLiveWebParts.Tests.Layouts.epmlive
         private const string DummyString = "DummyString";
         private const string DummyUrl = "http://xyz.com";
         private const string DummyUser = "DummyDomain\\DummyUser";
+        private const string DummyReportUrl = "/reportService";
         private const int IntValueOne = 1;
         private const int IntValueTwo = 2;
         private const int IntValueThree = 3;
@@ -84,9 +83,33 @@ namespace EPMLiveWebParts.Tests.Layouts.epmlive
         private const string BtnSkipClickMethod = "btnSkip_Click";
         private const string BtnNextClickMethod = "btnNext_Click";
         private const string BtnYesClickMethod = "btnYes_Click";
+        private const string BtnCancelClickMethod = "btnCancel_Click";
+        private const string GetSiteGroupMethod = "GetSiteGroup";
+        private const string CheckConnectionMethod = "checkConnection";
         private const string Ssrsurl = "ssrsurl";
+        private const string EPMLiveReportDB = "EPMLiveReportDB";
+        private const string ReportingServicesURL = "ReportingServicesURL";
+        private const string DataSources = "Data Sources";
 
         private const string NoReportingUrlEntered = "No reporting url has been entered in Central Admin.";
+        private const string InvalidUserName = "Invalid username or password";
+
+        private const string TxtReportDatabase = "txtReportDatabase";
+        private const string TxtReportServer = "txtReportServer";
+        private const string TxtReportPassword = "txtReportPassword";
+        private const string TxtReportUsername = "txtReportUsername";
+        private const string HdnSaveReportPassword = "hdnSaveReportPassword";
+        private const string HdnStep = "hdnStep";
+        private const string HdnReportPassword = "hdnReportPassword";
+        private const string ChkWindows = "chkWindows";
+        private const string LblNoReporting = "lblNoReporting";
+        private const string LblReportingError = "lblReportingError";
+        private const string Pnl1 = "pnl1";
+        private const string Pnl2 = "pnl2";
+        private const string Pnl3 = "pnl3";
+        private const string PnlDone = "pnlDone";
+        private const string PnlMessage = "pnlMessage";
+        private const string PnlProcessing = "pnlProcessing";
 
         [TestInitialize]
         public void TestInitialize()
@@ -129,26 +152,27 @@ namespace EPMLiveWebParts.Tests.Layouts.epmlive
                 _privateObj.SetField(control.Name, Activator.CreateInstance(control.FieldType));
             }
 
-            _txtReportDatabase = (TextBox)_privateObj.GetFieldOrProperty("txtReportDatabase");
-            _txtReportServer = (TextBox)_privateObj.GetFieldOrProperty("txtReportServer");
-            _txtReportPassword = (TextBox)_privateObj.GetFieldOrProperty("txtReportPassword");
-            _txtReportUsername = (TextBox)_privateObj.GetFieldOrProperty("txtReportUsername");
-            _hdnSaveReportPassword = (HiddenField)_privateObj.GetFieldOrProperty("hdnSaveReportPassword");
-            _hdnStep = (HiddenField)_privateObj.GetFieldOrProperty("hdnStep");
-            _hdnReportPassword = (HiddenField)_privateObj.GetFieldOrProperty("hdnReportPassword");
-            _chkWindows = (CheckBox)_privateObj.GetFieldOrProperty("chkWindows");
-            _lblNoReporting = (Label)_privateObj.GetFieldOrProperty("lblNoReporting");
-            _lblReportingError = (Label)_privateObj.GetFieldOrProperty("lblReportingError");
-            _pnl1 = (Panel)_privateObj.GetFieldOrProperty("pnl1");
-            _pnl2 = (Panel)_privateObj.GetFieldOrProperty("pnl2");
-            _pnl3 = (Panel)_privateObj.GetFieldOrProperty("pnl3");
-            _pnlDone = (Panel)_privateObj.GetFieldOrProperty("pnlDone");
-            _pnlMessage = (Panel)_privateObj.GetFieldOrProperty("pnlMessage");
-            _pnlProcessing = (Panel)_privateObj.GetFieldOrProperty("pnlProcessing");
+            _txtReportDatabase = (TextBox)_privateObj.GetFieldOrProperty(TxtReportDatabase);
+            _txtReportServer = (TextBox)_privateObj.GetFieldOrProperty(TxtReportServer);
+            _txtReportPassword = (TextBox)_privateObj.GetFieldOrProperty(TxtReportPassword);
+            _txtReportUsername = (TextBox)_privateObj.GetFieldOrProperty(TxtReportUsername);
+            _hdnSaveReportPassword = (HiddenField)_privateObj.GetFieldOrProperty(HdnSaveReportPassword);
+            _hdnStep = (HiddenField)_privateObj.GetFieldOrProperty(HdnStep);
+            _hdnReportPassword = (HiddenField)_privateObj.GetFieldOrProperty(HdnReportPassword);
+            _chkWindows = (CheckBox)_privateObj.GetFieldOrProperty(ChkWindows);
+            _lblNoReporting = (Label)_privateObj.GetFieldOrProperty(LblNoReporting);
+            _lblReportingError = (Label)_privateObj.GetFieldOrProperty(LblReportingError);
+            _pnl1 = (Panel)_privateObj.GetFieldOrProperty(Pnl1);
+            _pnl2 = (Panel)_privateObj.GetFieldOrProperty(Pnl2);
+            _pnl3 = (Panel)_privateObj.GetFieldOrProperty(Pnl3);
+            _pnlDone = (Panel)_privateObj.GetFieldOrProperty(PnlDone);
+            _pnlMessage = (Panel)_privateObj.GetFieldOrProperty(PnlMessage);
+            _pnlProcessing = (Panel)_privateObj.GetFieldOrProperty(PnlProcessing);
         }
 
         private void SetupShims()
         {
+            var count = 0;
             _site = new ShimSPSite
             {
                 WebApplicationGet = () => new ShimSPWebApplication(),
@@ -200,13 +224,54 @@ namespace EPMLiveWebParts.Tests.Layouts.epmlive
                             }
                         })
                     },
-                    ItemGetString = _ => new ShimSPDocumentLibrary()
+                    ItemGetString = _ => new ShimSPDocumentLibrary
+                    {
+                        GetItemsInFolderSPViewSPFolder = (x, y) =>
+                        {
+                            count++;
+                            if (count < 3)
+                            {
+                                return new ShimSPListItemCollection().Bind(new SPListItem[]
+                                {
+                                    new ShimSPListItem
+                                    {
+                                        FileSystemObjectTypeGet = () => SPFileSystemObjectType.Folder,
+                                        NameGet = () => DataSources,
+                                        UrlGet = () => DummyString
+                                    }
+                                });
+                            }
+                            else if (count < 4)
+                            {
+                                return new ShimSPListItemCollection().Bind(new SPListItem[]
+                                {
+                                    new ShimSPListItem
+                                    {
+                                        FileSystemObjectTypeGet = () => SPFileSystemObjectType.File,
+                                        NameGet = () => DummyString,
+                                        UrlGet = () => DummyString
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                return null;
+                            }
+                        }
+                    }
                 },
                 CurrentUserGet = () => new ShimSPUser(),
                 FeaturesGet = () => new ShimSPFeatureCollection
                 {
                     AddGuid = _ => new ShimSPFeature()
-                }
+                },
+                SiteGroupsGet = () => new ShimSPGroupCollection().Bind(new SPGroup[]
+                {
+                    new ShimSPGroup
+                    {
+                        NameGet = () => DummyString
+                    }
+                })
             };
             ShimSPWeb.AllInstances.Dispose = _ => { };
 
@@ -220,7 +285,7 @@ namespace EPMLiveWebParts.Tests.Layouts.epmlive
             };
 
             ShimSPPersistedObject.AllInstances.IdGet = _ => Guid.NewGuid();
-            ShimSPPersistedObject.AllInstances.GetChildOf1String<ReportAuth>((_, _1) => new ShimReportAuth
+            ShimSPPersistedObject.AllInstances.GetChildOf1String<ReportAuth>((_, __) => new ShimReportAuth
             {
                 UsernameGet = () => DummyString,
                 PasswordGet = () => DummyString
@@ -236,8 +301,8 @@ namespace EPMLiveWebParts.Tests.Layouts.epmlive
             {
                 switch (setting)
                 {
-                    case "ReportingServicesURL":
-                        return "/reportService";
+                    case ReportingServicesURL:
+                        return DummyReportUrl;
                     default:
                         return DummyString;
                 }
@@ -479,8 +544,7 @@ namespace EPMLiveWebParts.Tests.Layouts.epmlive
             // Arrange
             _hdnStep.Value = IntValueTwo.ToString();
             _txtReportPassword.Text = DummyString;
-
-            Shimtlwizard.AllInstances.checkConnection = _ => string.Empty;
+            _chkWindows.Checked = false;
 
             // Act
             _privateObj.Invoke(BtnNextClickMethod, this, EventArgs.Empty);
@@ -606,6 +670,7 @@ namespace EPMLiveWebParts.Tests.Layouts.epmlive
         {
             // Arrange
             _pnlMessage.Visible = false;
+            _chkWindows.Checked = true;
             SetupForBtnYesClick(DummyUrl, false, false, null, null, true);
 
             // Act
@@ -637,7 +702,7 @@ namespace EPMLiveWebParts.Tests.Layouts.epmlive
             ShimSqlDataReader.AllInstances.Read = _ => dataReaderRead;
             ShimSqlCommand.AllInstances.ExecuteScalar = _ => scalarValue;
             ShimControl.AllInstances.FindControlString = (_, __) => control;
-            ShimCoreFunctions.getWebAppSettingGuidString = (guid, setting) => reportingIntegratedMode.ToString();
+            ShimCoreFunctions.getWebAppSettingGuidString = (_, __) => reportingIntegratedMode.ToString();
             ShimPage.AllInstances.RequestGet = _ => new ShimHttpRequest
             {
                 ItemGetString = x => IntValueOne.ToString()
@@ -659,11 +724,27 @@ namespace EPMLiveWebParts.Tests.Layouts.epmlive
             };
 
             ShimReportingService2006.Constructor = _ => { };
+            ShimReportingService2006.AllInstances.CreateDataSourceStringStringBooleanDataSourceDefinitionPropertyArray =
+                (_1, _2, _3, _4, _5, _6) => null;
+            ShimReportingService2006.AllInstances.GetItemDataSourcesString = (_, __) => new DataSource[] 
+            {
+                new ShimDataSource
+                {
+                    NameGet = () => EPMLiveReportDB,
+                    ItemGet = () => new ShimDataSourceDefinitionOrReference()
+                }
+            };
+            ShimReportingService2006.AllInstances.SetItemDataSourcesStringDataSourceArray = (_, __, ___) => { };
+
+            ShimDataSourceDefinition.Constructor = _ => { };
+
+            ShimDataSourceReference.Constructor = _ => { };
 
             ShimNetworkCredential.ConstructorStringString = (_, __, ___) => { };
 
             ShimCookie.ConstructorStringStringStringString = (_, _1, _2, _3, _4) => { };
             ShimCookieContainer.Constructor = _ => { };
+            ShimCookieContainer.AllInstances.AddCookie = (_, __) => { };
 
             ShimHttpContext.CurrentGet = () => new ShimHttpContext
             {
@@ -681,6 +762,59 @@ namespace EPMLiveWebParts.Tests.Layouts.epmlive
                     UrlGet = () => new Uri(DummyUrl)
                 }
             };
+        }
+
+        [TestMethod]
+        public void BtnCancelClick_OnValidCall_ConfirmResult()
+        {
+            // Arrange, Act
+            _privateObj.Invoke(BtnCancelClickMethod, this, EventArgs.Empty);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _pnlDone.Visible.ShouldBeFalse(),
+                () => _pnl1.Visible.ShouldBeFalse(),
+                () => _pnl2.Visible.ShouldBeFalse(),
+                () => _navigationNodeUpdated.ShouldBeTrue(),
+                () => _webUpdated.ShouldBeTrue(),
+                () => _scriptRegistered.ShouldBeTrue(),
+                () => _categoryRemoved.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void CheckConnection_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            _chkWindows.Checked = true;
+            _txtReportUsername.Text = DummyUser;
+
+            // Act
+            var result = (string)_privateObj.Invoke(CheckConnectionMethod);
+
+            // Assert
+            result.ShouldBe(InvalidUserName);
+        }
+
+        [TestMethod]
+        public void GetSiteGroup_WhenNameIsTheSame_ConfirmResult()
+        {
+            // Arrange, Act
+            var result = (SPGroup)_privateType.InvokeStatic(GetSiteGroupMethod, _web.Instance, DummyString);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Name.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void GetSiteGroup_WhenNameIsNotTheSame_ConfirmResult()
+        {
+            // Arrange, Act
+            var result = (SPGroup)_privateType.InvokeStatic(GetSiteGroupMethod, _web.Instance, DummyUser);
+
+            // Assert
+            result.ShouldBeNull();
         }
     }
 }
