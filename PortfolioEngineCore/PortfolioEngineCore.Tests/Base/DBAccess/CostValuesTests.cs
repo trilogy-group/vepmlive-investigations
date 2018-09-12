@@ -500,22 +500,36 @@ namespace PortfolioEngineCore.Tests.Base
         public void PostCostValues_CTEditModectWEActualsAndPostWETimesheetsError_ReturnsFalse()
         {
             // Arrange
-            const string OvertimeRate = "RT_OVERTIME_RATE";
+            const string OvertimeRate = "WEH_OVERTIMEHOURS";
             var stringResult = string.Empty;
             var postInstruction = string.Empty;
             ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader();
             ShimSqlDb.ReadIntValueObject = valueObject => (int)CTEditMode.ctWEActuals;
-            ShimSqlDataReader.AllInstances.ItemGetString = (_, name) => 1;
-            //{
-            //    if (name == OvertimeRate)
-            //    {
-            //        throw new Exception();
-            //    }
-            //    else
-            //    {
-            //        return 1;
-            //    }
-            //};
+            ShimSqlDataReader.AllInstances.ItemGetString = (_, name) =>
+            {
+                if (name == OvertimeRate)
+                {
+                    throw new Exception();
+                }
+                else
+                {
+                    return 1;
+                }
+            };
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (count < 1)
+                {
+                    count++;
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
+            };
+            ShimProjectResourceRates.GetRatesDBAccessInt32 = (db, id) => new List<ProjectResourceRate>();
             ShimdbaCostValues.GetXrefsDBAccessDictionaryOfInt32Int32StringRef = GetXrefsSuccess;
             ShimdbaCostValues.GetCostCategoryRatesDBAccessInt32DictionaryOfInt32DictionaryOfInt32DoubleStringRef = GetCostCategoryRatesSuccess;
             ShimProjectDiscountRates.GetProjectDiscountRateDBAccessInt32 = (db, projectId) => 1;
@@ -536,20 +550,27 @@ namespace PortfolioEngineCore.Tests.Base
         public void PostCostValues_CTEditModectWEActualsSuccess_ReturnsTrue()
         {
             // Arrange
+            const string CommandText = "EPG_SP_PCTReadWEActuals";
+            var command = string.Empty;
             var stringResult = string.Empty;
             var postInstruction = string.Empty;
-            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader();
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                command = instance.CommandText;
+                return new ShimSqlDataReader();
+            };
             ShimSqlDb.ReadIntValueObject = valueObject => (int)CTEditMode.ctWEActuals;
             ShimSqlDataReader.AllInstances.ItemGetString = (_, name) => 1;
             ShimdbaCostValues.GetXrefsDBAccessDictionaryOfInt32Int32StringRef = GetXrefsSuccess;
             ShimdbaCostValues.GetCostCategoryRatesDBAccessInt32DictionaryOfInt32DictionaryOfInt32DoubleStringRef = GetCostCategoryRatesSuccess;
             ShimProjectDiscountRates.GetProjectDiscountRateDBAccessInt32 = (db, projectId) => 1;
             ShimProjectResourceRates.GetRatesDBAccessInt32 = (db, projectId) => new List<ProjectResourceRate>();
-            ShimSqlDataReader.AllInstances.Read = _ =>
+            ShimSqlDataReader.AllInstances.Read = instance =>
             {
-                if (count < 1)
+                if (count < 1 || command == CommandText)
                 {
                     count++;
+                    command = string.Empty;
                     return true;
                 }
                 else
@@ -782,8 +803,36 @@ namespace PortfolioEngineCore.Tests.Base
         public void PostCostValues_CTEditModeCommitmentsSuccess_ReturnsTrue()
         {
             // Arrange
+            const string CommandText = "EPG_SP_PCTReadCommitments";
+            const string GetPeriodsCommand = "SELECT PRD_ID,PRD_NAME,PRD_START_DATE,PRD_FINISH_DATE FROM EPG_PERIODS";
+            var readCount = 0;
+            var command = string.Empty;
             var stringResult = string.Empty;
             var postInstruction = string.Empty;
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                command = instance.CommandText;
+                if (instance.CommandText.Contains(GetPeriodsCommand))
+                {
+                    var count = 0;
+                    return new ShimSqlDataReader
+                    {
+                        Read = () => ++count <= 10
+                    };
+                }
+                else if (command == CommandText)
+                {
+                    var count = 0;
+                    return new ShimSqlDataReader
+                    {
+                        Read = () => ++count <=2
+                    };
+                }
+                else
+                {
+                    return new ShimSqlDataReader();
+                }
+            };
             ShimSqlDb.ReadIntValueObject = valueObject => (int)CTEditMode.ctCommitments;
             ShimSqlDataReader.AllInstances.ItemGetString = (_, name) => 1;
             ShimProjectDiscountRates.GetProjectDiscountRateDBAccessInt32 = (db, projectId) => 1;
@@ -792,9 +841,10 @@ namespace PortfolioEngineCore.Tests.Base
             ShimdbaCostValues.GetXrefsDBAccessDictionaryOfInt32Int32StringRef = GetXrefsSuccess;
             ShimSqlDataReader.AllInstances.Read = _ =>
             {
-                if (count < 1)
+                if (count < 1 )
                 {
                     count++;
+                    command = string.Empty;
                     return true;
                 }
                 else
