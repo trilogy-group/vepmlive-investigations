@@ -369,40 +369,11 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
             this.ShouldSatisfyAllConditions(
                 () => _errors.ShouldContain(string.Format(AddingFieldExceptionFormat, FieldTempRole, exceptionMessage)),
                 () => _errors.ShouldContain(string.Format(AddingFieldExceptionFormat, FieldTempDept, exceptionMessage)),
-                () => _errors.ShouldContain(string.Format(RemovingFieldExceptionFormat, FieldCanLogin, exceptionMessage)),
-                () => _errors.ShouldContain(string.Format(RemovingFieldExceptionFormat, FieldDepartmentManager, exceptionMessage)),
                 () => _errors.ShouldContain(string.Format(AddingFieldExceptionFormat, LicenseType, exceptionMessage)),
                 () => _errors.ShouldContain(string.Format(AddingFieldExceptionFormat, HolidaySchedule, exceptionMessage)),
                 () => _errors.ShouldContain(string.Format(AddingFieldExceptionFormat, WorkHoursList, exceptionMessage)),
-                () => _errors.ShouldContain(string.Format(AddingFieldExceptionFormat, FieldRole, exceptionMessage)),
-                () => _errors.ShouldContain(string.Format(AddingFieldExceptionFormat, FieldDepartment, exceptionMessage)));
-        }
-
-        [TestMethod]
-        public void Perform_GetFieldByInternalNameFails_LogsFieldUpdatesErrors()
-        {
-            // Arrange
-            string exceptionMessage = DummyString;
-
-            // Act
-            PerformWithGetFieldByInternalNameFail(exceptionMessage);
-
-            // Assert
-            this.ShouldSatisfyAllConditions(
-                () => _errors.ShouldContain($"(Generic): {exceptionMessage}"),
-                () => _errors.ShouldContain($"(FirstName): {exceptionMessage}"),
-                () => _errors.ShouldContain($"(LastName): {exceptionMessage}"),
-                () => _errors.ShouldContain($"(Email): {exceptionMessage}"),
-                () => _errors.ShouldContain($"(ResourceLevel): {exceptionMessage}"),
-                () => _errors.ShouldContain($"(Permissions): {exceptionMessage}"),
-                () => _errors.ShouldContain($"(StandardRate): {exceptionMessage}"),
-                () => _errors.ShouldContain($"(Department): {exceptionMessage}"),
-                () => _errors.ShouldContain($"(Role): {exceptionMessage}"),
-                () => _errors.ShouldContain($"(HolidaySchedule): {exceptionMessage}"),
-                () => _errors.ShouldContain($"(WorkHours): {exceptionMessage}"),
-                () => _errors.ShouldContain($"(AvailableFrom): {exceptionMessage}"),
-                () => _errors.ShouldContain($"(AvailableTo): {exceptionMessage}"),
-                () => _errors.ShouldContain($"(Disabled): {exceptionMessage}"));
+                () => _errors.Any(e => e.Contains(string.Format(AddingFieldExceptionFormat, FieldRole, string.Empty))).ShouldBeTrue(),
+                () => _errors.Any(e => e.Contains(string.Format(AddingFieldExceptionFormat, FieldDepartment, string.Empty))).ShouldBeTrue());
         }
 
         [TestMethod]
