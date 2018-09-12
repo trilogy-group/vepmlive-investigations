@@ -25,10 +25,64 @@ namespace PortfolioEngineCore.Tests.Base
         private DBAccess dbAccess;
         private int count = 0;
         private const string PfEPeriodTypeFullName = "PortfolioEngineCore.dbaCostValues+PfEPeriod";
+        private const string PfENamedRatesTypeFullName = "PortfolioEngineCore.dbaCostValues+PfENamedRates";
+        private const string PfENamedRateTypeFullName = "PortfolioEngineCore.dbaCostValues+PfENamedRate";
+        private const string PfEAdminTypeFullName = "PortfolioEngineCore.dbaCostValues+PfEAdmin";
+
+
 
         private const string GetAutoPostsMethodName = "GetAutoPosts";
         private string CopyCostValuesMethodName = "CopyCostValues";
         private const string PortfolioEngineCoreDll = "PortfolioEngineCore.dll";
+        private PrivateType privateType;
+        private string GetPeriodStartDateMethodName = "GetPeriodStartDate";
+        private string GetCostCategoryRatesMethodName = "GetCostCategoryRates";
+        private string GetXrefsMethodName = "GetXrefs";
+        private string GetRateMethodName = "GetRate";
+        private string UpdateCostTotalMethodName = "UpdateCostTotal";
+        private string GetAdminInfoMethodName = "GetAdminInfo";
+
+        private Type PfEPeriodType
+        {
+            get
+            {
+                var assembly = GetPortifolioEngineCoreAssembly();
+                var type = assembly.GetTypes().FirstOrDefault(p => p.FullName == PfEPeriodTypeFullName);
+                return type;
+            }
+        }
+
+        private Type PfENamedRatesType
+        {
+            get
+            {
+                var assembly = GetPortifolioEngineCoreAssembly();
+                var type = assembly.GetTypes().FirstOrDefault(p => p.FullName == PfENamedRatesTypeFullName);
+                return type;
+            }
+        }
+
+        private Type PfENamedRateType
+        {
+            get
+            {
+                var assembly = GetPortifolioEngineCoreAssembly();
+                var type = assembly.GetTypes().FirstOrDefault(p => p.FullName == PfENamedRateTypeFullName);
+                return type;
+            }
+        }
+
+        public Type PfEAdminType
+        {
+            get
+            {
+                var assembly = GetPortifolioEngineCoreAssembly();
+                var type = assembly.GetTypes().FirstOrDefault(p => p.FullName == PfEAdminTypeFullName);
+                return type;
+            }
+        }
+
+        //PfENamedRateType
 
         [TestInitialize]
         public void Initialize()
@@ -36,8 +90,8 @@ namespace PortfolioEngineCore.Tests.Base
             shimContext = ShimsContext.Create();
             SetupShims();
             dbAccess = new ShimDBAccess();
-
-
+            privateType = new PrivateType(typeof(dbaCostValues));
+            
         }
 
         [TestCleanup]
@@ -66,7 +120,7 @@ namespace PortfolioEngineCore.Tests.Base
             ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader();
             ShimSqlDataReader.AllInstances.Read = _ =>
             {
-                if (count < 1)
+                if (count < 2)
                 {
                     count++;
                     return true;
@@ -165,8 +219,21 @@ namespace PortfolioEngineCore.Tests.Base
                     return 1;
                 }
             };
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (count < 2)
+                {
+                    count++;
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
+            };
             ShimdbaUsers.ExecuteSQLSelectSqlCommandSqlDataReaderOut = ExecuteSQLSelectSuccess;
-            ShimSqlDb.ReadIntValueObject = valueObject => 1;
+            ShimSqlDb.ReadIntValueObject = valueObject => (int)CTEditMode.ctDisplay;
 
             // Act
             var result = dbaCostValues.PostCostValues(dbAccess, DummyString, out stringResult, out postInstruction);
@@ -247,7 +314,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void PostCostVal_CTEditModectWEActualsAndGetPeriodsError_ReturnsFalse()
+        public void PostCostValues_CTEditModectWEActualsAndGetPeriodsError_ReturnsFalse()
         {
             // Arrange
             const string PrdId = "PRD_ID";
@@ -266,6 +333,23 @@ namespace PortfolioEngineCore.Tests.Base
                     return 1;
                 }
             };
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (count < 2)
+                {
+                    count++;
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
+            };
+            ShimCStruct.AllInstances.GetListString = (_, name) => new List<CStruct>()
+            {
+                new CStruct()
+            };
 
             // Act
             var result = dbaCostValues.PostCostValues(dbAccess, DummyString, out stringResult, out postInstruction);
@@ -276,7 +360,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void PostCostVal_CTEditModectWEActualsAndGetXrefsError_ReturnsFalse()
+        public void PostCostValues_CTEditModectWEActualsAndGetXrefsError_ReturnsFalse()
         {
             // Arrange
             const string WresId = "WRES_ID";
@@ -306,7 +390,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void PostCostVal_CTEditModectWEActualsAndGetCostCategoriesError_ReturnsFalse()
+        public void PostCostValues_CTEditModectWEActualsAndGetCostCategoriesError_ReturnsFalse()
         {
             // Arrange
             const string McUid = "MC_UID";
@@ -336,7 +420,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void PostCostVal_CTEditModectWEActualsAndGetCostCategoryRatesError_ReturnsFalse()
+        public void PostCostValues_CTEditModectWEActualsAndGetCostCategoryRatesError_ReturnsFalse()
         {
             // Arrange
             var stringResult = string.Empty;
@@ -346,6 +430,19 @@ namespace PortfolioEngineCore.Tests.Base
             ShimSqlDataReader.AllInstances.ItemGetString = (_, name) => 1;
             ShimdbaCostValues.GetXrefsDBAccessDictionaryOfInt32Int32StringRef = GetXrefsSuccess;
             ShimdbaCostValues.GetCostCategoryRatesDBAccessInt32DictionaryOfInt32DictionaryOfInt32DoubleStringRef = GetCostCategoryRatesError;
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (count < 1)
+                {
+                    count++;
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
+            };
 
             // Act
             var result = dbaCostValues.PostCostValues(dbAccess, DummyString, out stringResult, out postInstruction);
@@ -356,7 +453,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void PostCostVal_CTEditModectWEActualsAndGetNamedRatesError_ReturnsFalse()
+        public void PostCostValues_CTEditModectWEActualsAndGetNamedRatesError_ReturnsFalse()
         {
             // Arrange
             const string OvertimeRate = "RT_OVERTIME_RATE";
@@ -375,6 +472,19 @@ namespace PortfolioEngineCore.Tests.Base
                     return 1;
                 }
             };
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (count < 1)
+                {
+                    count++;
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
+            };
             ShimdbaCostValues.GetXrefsDBAccessDictionaryOfInt32Int32StringRef = GetXrefsSuccess;
             ShimdbaCostValues.GetCostCategoryRatesDBAccessInt32DictionaryOfInt32DictionaryOfInt32DoubleStringRef = GetCostCategoryRatesSuccess;
 
@@ -387,7 +497,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void PostCostVal_CTEditModectWEActualsAndPostWETimesheetsError_ReturnsFalse()
+        public void PostCostValues_CTEditModectWEActualsAndPostWETimesheetsError_ReturnsFalse()
         {
             // Arrange
             const string OvertimeRate = "RT_OVERTIME_RATE";
@@ -423,7 +533,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void PostCostVal_CTEditModectWEActualsSuccess_ReturnsTrue()
+        public void PostCostValues_CTEditModectWEActualsSuccess_ReturnsTrue()
         {
             // Arrange
             var stringResult = string.Empty;
@@ -435,6 +545,19 @@ namespace PortfolioEngineCore.Tests.Base
             ShimdbaCostValues.GetCostCategoryRatesDBAccessInt32DictionaryOfInt32DictionaryOfInt32DoubleStringRef = GetCostCategoryRatesSuccess;
             ShimProjectDiscountRates.GetProjectDiscountRateDBAccessInt32 = (db, projectId) => 1;
             ShimProjectResourceRates.GetRatesDBAccessInt32 = (db, projectId) => new List<ProjectResourceRate>();
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (count < 1)
+                {
+                    count++;
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
+            };
 
             // Act
             var result = dbaCostValues.PostCostValues(dbAccess, DummyString, out stringResult, out postInstruction);
@@ -445,7 +568,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void PostCostVal_CTEditModeCommitmentsAndGetPeriodsError_ReturnsFalse()
+        public void PostCostValues_CTEditModeCommitmentsAndGetPeriodsError_ReturnsFalse()
         {
             // Arrange
             const string PrdId = "PRD_ID";
@@ -464,6 +587,19 @@ namespace PortfolioEngineCore.Tests.Base
                     return 1;
                 }
             };
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (count < 2)
+                {
+                    count++;
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
+            };
 
             // Act
             var result = dbaCostValues.PostCostValues(dbAccess, DummyString, out stringResult, out postInstruction);
@@ -474,7 +610,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void PostCostVal_CTEditModeCommitmentsAndGetXRefsError_ReturnsFalse()
+        public void PostCostValues_CTEditModeCommitmentsAndGetXRefsError_ReturnsFalse()
         {
             // Arrange
             var stringResult = string.Empty;
@@ -493,7 +629,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void PostCostVal_CTEditModeCommitmentsAndGetCostCategoriesError_ReturnsFalse()
+        public void PostCostValues_CTEditModeCommitmentsAndGetCostCategoriesError_ReturnsFalse()
         {
             // Arrange
             const string McUid = "MC_UID";
@@ -523,7 +659,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void PostCostVal_CTEditModeCommitmentsAndGetCostCategoryRatesError_ReturnsFalse()
+        public void PostCostValues_CTEditModeCommitmentsAndGetCostCategoryRatesError_ReturnsFalse()
         {
             // Arrange
             //const string McUid = "MC_UID";
@@ -534,6 +670,19 @@ namespace PortfolioEngineCore.Tests.Base
             ShimSqlDataReader.AllInstances.ItemGetString = (_, name) => 1;
             ShimdbaCostValues.GetCostCategoryRatesDBAccessInt32DictionaryOfInt32DictionaryOfInt32DoubleStringRef = GetCostCategoryRatesError;
             ShimdbaCostValues.GetXrefsDBAccessDictionaryOfInt32Int32StringRef = GetXrefsSuccess;
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (count < 1)
+                {
+                    count++;
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
+            };
 
             // Act
             var result = dbaCostValues.PostCostValues(dbAccess, DummyString, out stringResult, out postInstruction);
@@ -544,7 +693,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void PostCostVal_CTEditModeCommitmentsAndGetNamedRatesError_ReturnsFalse()
+        public void PostCostValues_CTEditModeCommitmentsAndGetNamedRatesError_ReturnsFalse()
         {
             // Arrange
             const string EffectiveDate = "RT_EFFECTIVE_DATE";
@@ -562,6 +711,19 @@ namespace PortfolioEngineCore.Tests.Base
                     return 1;
                 }
             };
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (count < 1)
+                {
+                    count++;
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
+            };
             ShimdbaCostValues.GetCostCategoryRatesDBAccessInt32DictionaryOfInt32DictionaryOfInt32DoubleStringRef = GetCostCategoryRatesSuccess;
             ShimdbaCostValues.GetXrefsDBAccessDictionaryOfInt32Int32StringRef = GetXrefsSuccess;
 
@@ -574,7 +736,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void PostCostVal_CTEditModeCommitmentsAndPostCommitmentsError_ReturnsFalse()
+        public void PostCostValues_CTEditModeCommitmentsAndPostCommitmentsError_ReturnsFalse()
         {
             // Arrange
             const string PrdFinishDate = "PRD_FINISH_DATE";
@@ -592,6 +754,19 @@ namespace PortfolioEngineCore.Tests.Base
                     return 1;
                 }
             };
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (count < 1)
+                {
+                    count++;
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
+            };
             ShimdbaCostValues.GetCostCategoryRatesDBAccessInt32DictionaryOfInt32DictionaryOfInt32DoubleStringRef = GetCostCategoryRatesSuccess;
             ShimdbaCostValues.GetXrefsDBAccessDictionaryOfInt32Int32StringRef = GetXrefsSuccess;
 
@@ -604,7 +779,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void PostCostVal_CTEditModeCommitmentsSuccess_ReturnsTrue()
+        public void PostCostValues_CTEditModeCommitmentsSuccess_ReturnsTrue()
         {
             // Arrange
             var stringResult = string.Empty;
@@ -615,6 +790,19 @@ namespace PortfolioEngineCore.Tests.Base
             ShimProjectResourceRates.GetRatesDBAccessInt32 = (db, projectId) => new List<ProjectResourceRate>();
             ShimdbaCostValues.GetCostCategoryRatesDBAccessInt32DictionaryOfInt32DictionaryOfInt32DoubleStringRef = GetCostCategoryRatesSuccess;
             ShimdbaCostValues.GetXrefsDBAccessDictionaryOfInt32Int32StringRef = GetXrefsSuccess;
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (count < 1)
+                {
+                    count++;
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
+            };
 
             // Act
             var result = dbaCostValues.PostCostValues(dbAccess, DummyString, out stringResult, out postInstruction);
@@ -624,9 +812,8 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.IsTrue(string.IsNullOrEmpty(stringResult));
         }
 
-
         [TestMethod]
-        public void PostCostVal_CTEditModeCommitmentsSuccess_RetudfgdfgdfgdfdfgrnsTrue()
+        public void PostCostValues_CTEditModeCommitmentsSuccess_RetudfgdfgdfgdfdfgrnsTrue()
         {
             // Arrange
             var stringResult = string.Empty;
@@ -645,6 +832,19 @@ namespace PortfolioEngineCore.Tests.Base
                 {
                     new ShimDataRow().Instance
                 }.GetEnumerator()
+            };
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (count < 1)
+                {
+                    count++;
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
             };
 
             // Act
@@ -691,34 +891,386 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.IsFalse(result.Value);
         }
 
+        [TestMethod]
+        public void MapToPeriod_WithPEriod_ReturnInteger()
+        {
+            // Arrange
+            var assembly = GetPortifolioEngineCoreAssembly();
+            var pfEPeriodType = assembly.GetTypes().FirstOrDefault(p => p.FullName == PfEPeriodTypeFullName);
+            var date = DateTime.Now;
+            var periods = CreateGenericListOfType(pfEPeriodType);
+            var period = CreatePfEPeriodInstance(DateTime.Now.AddHours(-2), DateTime.Now.AddHours(2));
+
+            periods.GetType()
+                .GetMethod("Add")?
+                .Invoke(periods, new[] { period });
+
+            // Act
+            var result = privateType.InvokeStatic("MapToPeriod", date, periods) as int?;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreNotEqual(0, result.Value);
+        }
+
+        [TestMethod]
+        public void CopyCostValues_CalculateCostValuesError_ReturnsFalse()
+        {
+            // Arrange
+            var count = 1;
+            var assembly = GetPortifolioEngineCoreAssembly();
+            var pfEPeriodType = assembly.GetTypes().FirstOrDefault(p => p.FullName == PfEPeriodTypeFullName);
+            var privateType = new PrivateType(typeof(dbaCostValues));
+            var piList = new List<int> { 1 };
+            var reply = string.Empty;
+            var periods = CreateGenericListOfType(pfEPeriodType);
+            var period = CreatePfEPeriodInstance(DateTime.Now.AddDays(-1), DateTime.Now.AddDays(1));
+            periods.GetType()
+                .GetMethod("Add")
+                .Invoke(periods, new[] { period });
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                GetEnumerator = () => new List<DataRow>
+                {
+                    new ShimDataRow(),
+                    new ShimDataRow()
+                }.GetEnumerator()
+            };
+            ShimProjectDiscountRates.GetProjectDiscountRateDBAccessInt32 = (db, projectId) => 1;
+            ShimSqlDb.ReadDecimalValueObject = objetcValue => 1.0M;
+            ShimSqlDb.ReadIntValueObject = valueObject => ++count;
+            ShimdbaCCV.CalculateCostValuesDBAccessInt32Int32Int32StringOut = CalculateCostValuesError;
+
+            // Act
+            var result = privateType.InvokeStatic(CopyCostValuesMethodName, dbAccess, 1, 1, 1, piList, periods, reply) as bool?;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsFalse(result.Value);
+        }
+
+        [TestMethod]
+        public void GetPeriodStartDate_PeriodList_ReturnsPeriodStartDate()
+        {
+            // Arrange
+            var periods = CreateGenericListOfType(PfEPeriodType);
+            var newPeriod = CreatePfEPeriodInstance(DateTime.Now, DateTime.Now.AddDays(1));
+            periods.GetType()
+                .GetMethod("Add")
+                .Invoke(periods, new object[] { newPeriod });
+            periods.GetType()
+                .GetMethod("Add")
+                .Invoke(periods, new object[] { newPeriod });
+
+            // Act
+            var result = privateType.InvokeStatic(GetPeriodStartDateMethodName, 1, periods) as DateTime?;
+
+            // Assert
+            Assert.IsNotNull(result);
+        }
+
+        [TestMethod]
+        public void GetPeriodStartDate_PeriodListEmpty_ReturnsDateTimeMinValue()
+        {
+            // Arrange
+            var periods = CreateGenericListOfType(PfEPeriodType);
+
+            // Act
+            var result = privateType.InvokeStatic(GetPeriodStartDateMethodName, 1, periods) as DateTime?;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(DateTime.MinValue, result);
+        }
+
+        [TestMethod]
+        public void GetCostCategoryRates_OnSuccess_ReturnsStatusSuccess()
+        {
+            // Arrange
+            var rates = new Dictionary<int, Dictionary<int, double>>();
+            var message = string.Empty;
+            var count = 1;
+            ShimdbaCostValues.GetCostCategoryRatesDBAccessInt32DictionaryOfInt32DictionaryOfInt32DoubleStringRef = null;
+            ShimSqlDb.ReadIntValueObject = valueObject => ++count;
+
+            // Act
+            var result = privateType.InvokeStatic(GetCostCategoryRatesMethodName, dbAccess, 1, rates, message) as StatusEnum?;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(StatusEnum.rsSuccess, result.Value);
+            Assert.AreNotEqual(0, rates.Count);
+        }
+
+        [TestMethod]
+        public void GetCostCategoryRates_OnException_ReturnsStatusServerError()
+        {
+            // Arrange
+            var rates = new Dictionary<int, Dictionary<int, double>>();
+            var message = string.Empty;
+            ShimdbaCostValues.GetCostCategoryRatesDBAccessInt32DictionaryOfInt32DictionaryOfInt32DoubleStringRef = null;
+            ShimSqlDb.ReadIntValueObject = valueObject =>
+            {
+                throw new Exception();
+            };
+
+            // Act
+            var result = privateType.InvokeStatic(GetCostCategoryRatesMethodName, dbAccess, 1, rates, message) as StatusEnum?;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(StatusEnum.rsServerError, result.Value);
+        }
+
+        [TestMethod]
+        public void GetRate_GetValuesFromProjectRate_ShouldUpdateValues()
+        {
+            // Arrange
+            var namedRates = Activator.CreateInstance(PfENamedRatesType);
+            namedRates.GetType()
+                .GetField("resourcerates")
+                .SetValue(namedRates, new Dictionary<int, int>());
+            var projectRates = new List<ProjectResourceRate>
+            {
+                new ProjectResourceRate
+                {
+                    EffectiveDate = DateTime.Now.AddDays(-1),
+                    ResourceId = 1,
+                    Rate = 1.3M
+                }
+            };
+            var categoryRates = new Dictionary<int, Dictionary<int, double>>();
+            var args = new object[] { namedRates, projectRates, categoryRates, 1, 1, 1, DateTime.Now, 0D, 0D};
+
+            // Act
+            var result = privateType.InvokeStatic(GetRateMethodName, args) as bool?;
+            var rate = args[args.Length - 2] as double?;
+            var overtimeRate = args[args.Length - 1] as double?;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Value);
+            Assert.IsNotNull(rate);
+            Assert.AreNotEqual(0D, rate);
+            Assert.IsNotNull(overtimeRate);
+            Assert.AreNotEqual(0D, overtimeRate);
+        }
+
+        [TestMethod]
+        public void GetRate_GetValuesFromCostCategoryRates_ShouldUpdateValues()
+        {
+            // Arrange
+            var namedRates = Activator.CreateInstance(PfENamedRatesType);
+            var resourceRates = new Dictionary<int, int>();
+            namedRates.GetType()
+                .GetField("resourcerates")
+                .SetValue(namedRates, resourceRates);
+            var projectRates = new List<ProjectResourceRate>();
+
+            var categoryRates = new Dictionary<int, Dictionary<int, double>>
+            {
+                [1] = new Dictionary<int, double>
+                {
+                    [1] = 3.4D
+                }
+            };
+            var args = new object[] { namedRates, projectRates, categoryRates, 1, 1, 1, DateTime.Now, 0D, 0D };
+
+            // Act
+            var result = privateType.InvokeStatic(GetRateMethodName, args) as bool?;
+            var rate = args[args.Length - 2] as double?;
+            var overtimeRate = args[args.Length - 1] as double?;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Value);
+            Assert.IsNotNull(rate);
+            Assert.AreNotEqual(0D, rate);
+            Assert.IsNotNull(overtimeRate);
+            Assert.AreNotEqual(0D, overtimeRate);
+        }
+
+        [TestMethod]
+        public void GetAdminInfo_OnException_ReturnsStatusServerError()
+        {
+            // Arrange
+            var pfeAdmin = Activator.CreateInstance(PfEAdminType);
+            ShimSqlCommand.AllInstances.ExecuteReader = _ =>
+            {
+                throw new Exception();
+            };
+
+            // Act
+            var result = privateType.InvokeStatic(GetAdminInfoMethodName, dbAccess, pfeAdmin) as StatusEnum?;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(StatusEnum.rsServerError, result.Value);
+        }
+
         //[TestMethod]
-        //public void CopyCostValues_InputCalendar_ReturnsFalse()
+        //public void GetRate_GetValuesFromRateConfiguration_ShouldUpdateValues()
         //{
         //    // Arrange
-        //    var assembly = GetPortifolioEngineCoreAssembly();
-        //    var pfEPeriodType = assembly.GetTypes().FirstOrDefault(p => p.FullName == PfEPeriodTypeFullName);
-        //    var privateType = new PrivateType(typeof(dbaCostValues));
-        //    var piList = new List<int> { 1 };
-        //    var reply = string.Empty;
-        //    var periods = CreateGenericListOfType(pfEPeriodType);
-        //    ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+        //    const int WresId = 1;
+        //    var namedRates = Activator.CreateInstance(PfENamedRatesType);
+        //    var resourceRates = new Dictionary<int, int>
         //    {
-        //        GetEnumerator = () => new List<DataRow>
-        //        {
-        //            new ShimDataRow()
-        //        }.GetEnumerator()
+        //        [WresId] = 1
         //    };
-        //    ShimProjectDiscountRates.GetProjectDiscountRateDBAccessInt32 = (db, projectId) => 1;
-        //    ShimSqlDb.ReadDecimalValueObject = objetcValue => 1.0M;
+        //    var rates = new Dictionary<int, List<>>
+        //    {
+        //    };
+        //    namedRates.GetType()
+        //        .GetField("resourcerates")
+        //        .SetValue(namedRates, resourceRates);
+        //    namedRates.GetType()
+        //        .GetField("rates")
+        //        .SetValue(namedRates, rates);
+        //    var projectRates = new List<ProjectResourceRate>();
 
+        //    var categoryRates = new Dictionary<int, Dictionary<int, double>>();
+        //    //{
+        //    //    [1] = new Dictionary<int, double>
+        //    //    {
+        //    //        [1] = 3.4D
+        //    //    }
+        //    //};
+
+        //    var args = new object[] { namedRates, projectRates, categoryRates, 1, WresId, 1, DateTime.Now, 0D, 0D };
 
         //    // Act
-        //    var result = privateType.InvokeStatic(CopyCostValuesMethodName, dbAccess, 1, 1, 1, piList, periods, reply) as bool?;
+        //    var result = privateType.InvokeStatic(GetRateMethodName, args) as bool?;
+        //    var rate = args[args.Length - 2] as double?;
+        //    var overtimeRate = args[args.Length - 1] as double?;
 
         //    // Assert
         //    Assert.IsNotNull(result);
-        //    Assert.IsFalse(result.Value);
+        //    Assert.IsTrue(result.Value);
+        //    Assert.IsNotNull(rate);
+        //    Assert.AreNotEqual(0D, rate);
+        //    Assert.IsNotNull(overtimeRate);
+        //    Assert.AreNotEqual(0D, overtimeRate);
         //}
+
+        [TestMethod]
+        public void GetXrefs_OnSuccess_ReturnsStatusSuccess()
+        {
+            // Arrange
+            var message = string.Empty;
+            var xrefs = new Dictionary<int, int>();
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (count < 1)
+                {
+                    count++;
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
+            };
+
+            // Act
+            var result = privateType.InvokeStatic(GetXrefsMethodName, dbAccess, xrefs, message) as StatusEnum?;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(StatusEnum.rsSuccess, result);
+            Assert.AreNotEqual(0, xrefs.Count);
+        }
+
+        [TestMethod]
+        public void GetXrefs_OnException_ReturnsStatusServerError()
+        {
+            // Arrange
+            var message = string.Empty;
+            var xrefs = new Dictionary<int, int>();
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                throw new Exception();
+            };
+
+            // Act
+            var result = privateType.InvokeStatic(GetXrefsMethodName, dbAccess, xrefs, message) as StatusEnum?;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(StatusEnum.rsServerError, result);
+        }
+
+        [TestMethod]
+        public void UpdateCostTotal_ProjectIDZeroAndEditMode101_ReturnsTrue()
+        {
+            // Arrange
+            const int ProjectId = 0;
+            const string ExpectedParameter = "BD_IS_SUMMARY";
+            var commandText = string.Empty;
+            ShimSqlDb.ReadIntValueObject = valueObject => 101;
+            ShimSqlCommand.ConstructorStringSqlConnection = (_, text, connection) =>
+            {
+                commandText = text;
+            };
+            
+            // Act
+            var result = privateType.InvokeStatic(UpdateCostTotalMethodName, dbAccess, ProjectId, 1, 1, 20000) as bool?;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Value);
+            Assert.IsTrue(commandText.Contains(ExpectedParameter));
+        }
+
+        [TestMethod]
+        public void UpdateCostTotal_ProjectIDZeroAndEditMode2_ReturnsTrue()
+        {
+            // Arrange
+            const int ProjectId = 0;
+            const string ExpectedParameter = "BC_UID";
+            var commandText = string.Empty;
+            ShimSqlDb.ReadIntValueObject = valueObject => 2;
+            ShimSqlCommand.ConstructorStringSqlConnection = (_, text, connection) =>
+            {
+                commandText = text;
+            };
+
+            // Act
+            var result = privateType.InvokeStatic(UpdateCostTotalMethodName, dbAccess, ProjectId, 1, 1, 20000) as bool?;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Value);
+            Assert.IsTrue(commandText.Contains(ExpectedParameter));
+        }
+
+        private StatusEnum CalculateCostValuesError(DBAccess dbAccess, int ctId, int cbId, int projectId, out string result)
+        {
+            result = DummyString;
+            return StatusEnum.rsServerError;
+        }
+
+        private object CreatePfEPeriodInstance(DateTime? startDate , DateTime? finishDate)
+        {
+            var instance = Activator.CreateInstance(PfEPeriodType);
+
+            if (startDate != null)
+            {
+                instance.GetType()
+                .GetField("StartDate")
+                .SetValue(instance, startDate.Value);
+            }
+
+            if (finishDate != null)
+            {
+                instance.GetType()
+                .GetField("FinishDate")
+                .SetValue(instance, finishDate.Value);
+            }
+
+            return instance;
+        }
 
         private Assembly GetPortifolioEngineCoreAssembly()
         {
