@@ -38,8 +38,13 @@ namespace EPMLiveCore.ReportHelper
         {
             var dataTable = new DataTable();
 
-            _cmdWithParams = new SqlCommand(sql, _DAO.GetEPMLiveConnection);
-            dataTable.Load(_cmdWithParams.ExecuteReader());
+            using (var cmd = new SqlCommand(sql, _DAO.GetEPMLiveConnection))
+            {
+                using (var sqlDataReader = cmd.ExecuteReader())
+                {
+                    dataTable.Load(sqlDataReader);
+                }
+            }
 
             return dataTable;
         }
@@ -53,8 +58,13 @@ namespace EPMLiveCore.ReportHelper
         {
             var dataTable = new DataTable();
 
-            _cmdWithParams = new SqlCommand(sql, _DAO.GetClientReportingConnection);
-            dataTable.Load(_cmdWithParams.ExecuteReader());
+            using (var cmd = new SqlCommand(sql, _DAO.GetClientReportingConnection))
+            {
+                using (var sqlDataReader = cmd.ExecuteReader())
+                {
+                    dataTable.Load(sqlDataReader);
+                }
+            }
 
             return dataTable;
         }
@@ -70,11 +80,15 @@ namespace EPMLiveCore.ReportHelper
             SPWeb spWeb)
         {
             string sql = BuildSelectSql(filterValues, reportingScope, spWeb);
-
-            _cmdWithParams = new SqlCommand(sql, _DAO.GetClientReportingConnection);
-
             var dataTable = new DataTable();
-            dataTable.Load(_cmdWithParams.ExecuteReader());
+
+            using (var cmd = new SqlCommand(sql, _DAO.GetClientReportingConnection))
+            {
+                using (var sqlDataReader = cmd.ExecuteReader())
+                {
+                    dataTable.Load(sqlDataReader);
+                }
+            }
 
             return dataTable;
         }
@@ -90,13 +104,15 @@ namespace EPMLiveCore.ReportHelper
             string sql = string.Format(@"SELECT DISTINCT InternalName FROM RPTColumn WHERE RPTListId = N'{0}'",
                 _DAO.GetListId("My Work"));
 
-            _cmdWithParams = new SqlCommand(sql, _DAO.GetClientReportingConnection);
-
-            SqlDataReader sqlDataReader = _cmdWithParams.ExecuteReader();
-
-            while (sqlDataReader.Read())
+            using (var cmd = new SqlCommand(sql, _DAO.GetClientReportingConnection))
             {
-                fields.Add(sqlDataReader.GetString(sqlDataReader.GetOrdinal("InternalName")));
+                using (var sqlDataReader = cmd.ExecuteReader())
+                {
+                    while (sqlDataReader.Read())
+                    {
+                        fields.Add(sqlDataReader.GetString(sqlDataReader.GetOrdinal("InternalName")));
+                    }
+                }
             }
 
             return fields;
@@ -674,12 +690,6 @@ namespace EPMLiveCore.ReportHelper
         {
             string identifier = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
 
-            //cols = cols.Replace(")", ",[Commenters],[CommentersRead],[CommentCount],[WorkType],[DataSource])");
-            //values = values.Replace(")",
-            //                        string.Format(
-            //                            ",@Commenters_{0},@CommentersRead_{0},@CommentCount_{0},@WorkType_{0},@DataSource_{0})",
-            //                            identifier));
-
             cols = cols.Replace(")", ",[WorkType],[DataSource])");
             values = values.Replace(")",
                 string.Format(
@@ -687,20 +697,6 @@ namespace EPMLiveCore.ReportHelper
                     identifier));
 
             if (_cmdWithParams == null) _cmdWithParams = new SqlCommand();
-
-            //foreach (string col in new[] {"Commenters", "CommentersRead", "CommentCount"})
-            //{
-            //    object value = DBNull.Value;
-
-            //    if (spListItem.Fields.ContainsFieldWithInternalName(col) && spListItem[col] != null)
-            //        value = spListItem[col].ToString();
-
-            //    _cmdWithParams.Parameters.Add(new SqlParameter
-            //                                      {
-            //                                          ParameterName = string.Format("@{0}_{1}", col, identifier),
-            //                                          Value = value
-            //                                      });
-            //}
 
             _cmdWithParams.Parameters.Add(new SqlParameter
             {
@@ -727,8 +723,11 @@ namespace EPMLiveCore.ReportHelper
                     @"SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE (TABLE_NAME = N'LSTMyWork') AND (COLUMN_NAME = N'{0}')",
                     columnName);
 
-            _cmdWithParams = new SqlCommand(sql, _DAO.GetClientReportingConnection);
-            object columnType = _cmdWithParams.ExecuteScalar();
+            object columnType;
+            using (var cmd = new SqlCommand(sql, _DAO.GetClientReportingConnection))
+            {
+                columnType = cmd.ExecuteScalar();
+            }
 
             if (columnType == null || columnType == DBNull.Value)
                 throw new Exception(string.Format("Cannot find column: {0}", columnName));
@@ -749,11 +748,12 @@ namespace EPMLiveCore.ReportHelper
                 EventLog.CreateEventSource("EPMLive My Work Reporting GetColumnValue", "EPM Live");
             }
 
-            var errorLog = new EventLog("EPM Live", ".", "EPMLive My Work Reporting GetColumnValue") { MaximumKilobytes = 32768 };
-
-            errorLog.WriteEntry(
-                "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteId + " : " + ex.Message +
-                " ColumnName: " + columnName + " InternalName: " + internalName, EventLogEntryType.Error, 9000);
+            using (var errorLog = new EventLog("EPM Live", ".", "EPMLive My Work Reporting GetColumnValue") { MaximumKilobytes = 32768 })
+            {
+                errorLog.WriteEntry(
+                    "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteId + " : " + ex.Message +
+                    " ColumnName: " + columnName + " InternalName: " + internalName, EventLogEntryType.Error, 9000);
+            }
         }
 
         #endregion Methods

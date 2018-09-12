@@ -1308,6 +1308,7 @@ namespace EPMLiveCore.ReportHelper
         public void Dispose()
         {
             _DAO.Dispose();
+            _cmdWithParams.Dispose();
         }
 
         public bool BulkInsert(DataSet dsLists, Guid timerjobguid)
