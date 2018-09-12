@@ -50,9 +50,15 @@ namespace EPMLiveCore.Tests.API.MyWork
         private const string GetDataFromListsMethodName = "GetDataFromLists";
         private const string GetDataFromReportingDBMethodName = "GetDataFromReportingDB";
         private const string DeleteGlobalViewMethodName = "DeleteGlobalView";
+        private const string GetDataFromSPMethodName = "GetDataFromSP";
+        private const string GetExampleDateFormatMethodName = "GetExampleDateFormat";
+        private const string GetGridSafeValueMethodName = "GetGridSafeValue";
+        private const string GetLeftColsMethodName = "GetLeftCols";
+        private const string GetMyWorkElementMethodName = "GetMyWorkElement";
         private const string ConnectionString = "ConnectionString";
         private const string ConfigSetting = "ConfigSetting";
         private const string ServerRelativeUrl = "/ServerRelativeUrl";
+        private const string IDColumn = "ID";
         private const string ListIdColumn = "ListId";
         private const string ItemIdColumn = "ItemId";
         private const string SiteIdColumn = "SiteId";
@@ -62,6 +68,7 @@ namespace EPMLiveCore.Tests.API.MyWork
         private const string WorkTypeColumn = "WorkType";
         private const string WorkingOnColumn = "WorkingOn";
         private const string DummyString = "1";
+        private const string DateSeparator = "-";
         private const string Title = "Title";
         private const string Url = "Url";
         private string SerializedGlobalViews;
@@ -102,12 +109,19 @@ namespace EPMLiveCore.Tests.API.MyWork
             ShimSPDatabase.AllInstances.DatabaseConnectionStringGet = _ => ConnectionString;
             ShimSPPersistedObject.AllInstances.IdGet = _ => guid;
             ShimSPSite.ConstructorGuid = (_, __) => new ShimSPSite();
+            ShimSPSite.ConstructorStringSPUserToken = (_, _1, _2) => new ShimSPSite();
             ShimSPSite.AllInstances.WebApplicationGet = _ => webApplication;
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = (codeToRun) =>
             {
                 codeToRun();
             };
+            ShimSPContext.CurrentGet = () => new ShimSPContext();
+            ShimSPContext.GetContextSPWeb = _ => new ShimSPContext();
+            ShimSPContext.AllInstances.WebGet = _ => spWeb;
+            ShimSPContext.AllInstances.RegionalSettingsGet = _ => new ShimSPRegionalSettings();
+            ShimSPRegionalSettings.AllInstances.DateSeparatorGet = _ => DateSeparator;
             ShimUtils.GetConfigWebSPWebGuid = (_, _1) => spWeb;
+            ShimUtils.GetCleanFieldValueXElement = element => element.Value;
         }
 
         private void SetupVariables()
@@ -125,7 +139,8 @@ namespace EPMLiveCore.Tests.API.MyWork
             var currentUser = new ShimSPUser()
             {
                 IDGet = () => 1,
-                LoginNameGet = () => DummyString
+                LoginNameGet = () => DummyString,
+                RegionalSettingsGet = () => new ShimSPRegionalSettings()
             };
 
             spWeb = new ShimSPWeb()
@@ -243,6 +258,8 @@ namespace EPMLiveCore.Tests.API.MyWork
 
             // Assert
             actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldNotBeNull(),
+                () => actual.ShouldNotBeEmpty(),
                 () => actual.Count.ShouldBe(2),
                 () => actual[0].HasPermission.ShouldBeTrue(),
                 () => actual[1].HasPermission.ShouldBeFalse());
@@ -257,30 +274,25 @@ namespace EPMLiveCore.Tests.API.MyWork
             sb.Append(@"<Field Name=""1"" Type=""Type1""></Field>");
             sb.Append(@"<Field Name=""2"" Type=""Type2""></Field>");
             var fields = sb.ToString();
-            var actual = new Dictionary<string, string>();
 
             ShimSqlCommand.AllInstances.ExecuteScalar = _ => new byte[] { 1 };
             ShimExtensionMethods.SpDecompressByteArray = _ => fields;
 
             // Act
-            var returnValue = (IOrderedEnumerable<KeyValuePair<string, string>>)privateObj.Invoke(
+            var actual = (IOrderedEnumerable<KeyValuePair<string, string>>)privateObj.Invoke(
                 GetListFieldsAndTypesFromDbMethodName,
                 BindingFlags.Static | BindingFlags.Public,
                 new object[] { guid, guid, spWeb.Instance });
-            foreach (KeyValuePair<string, string> item in returnValue)
-            {
-                actual.Add(item.Key, item.Value);
-            }
 
             // Assert
             actual.ShouldSatisfyAllConditions(
-                () => actual.Keys.Count.ShouldBe(3),
-                () => actual.Keys.Contains("1").ShouldBeTrue(),
-                () => actual.Keys.Contains("2").ShouldBeTrue(),
-                () => actual.Keys.Contains("3").ShouldBeTrue(),
-                () => actual["1"].ShouldBe("Type1"),
-                () => actual["2"].ShouldBe("Type2"),
-                () => actual["3"].ShouldBe("Type3"));
+                () => actual.Count().ShouldBe(3),
+                () => actual.ElementAt(0).Key.ShouldBe("1"),
+                () => actual.ElementAt(1).Key.ShouldBe("2"),
+                () => actual.ElementAt(2).Key.ShouldBe("3"),
+                () => actual.ElementAt(0).Value.ShouldBe("Type1"),
+                () => actual.ElementAt(1).Value.ShouldBe("Type2"),
+                () => actual.ElementAt(2).Value.ShouldBe("Type3"));
         }
 
         [TestMethod]
@@ -719,6 +731,338 @@ namespace EPMLiveCore.Tests.API.MyWork
                 () => actual.Count.ShouldBe(1),
                 () => actual[0].Id.ShouldBe(dvId),
                 () => actual[0].Default.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void GetDataFromSP_WhenCalled_ReturnsDataTables()
+        {
+            // Arrange
+            var selectedListIds = new List<string>();
+            var spSiteDataQuery = new SPSiteDataQuery();
+            var row = default(DataRow);
+            var selectedLists = new List<string>()
+            {
+                DummyString
+            };
+            var archivedWebs = new List<Guid>()
+            {
+                guid
+            };
+
+            var dataTable = new DataTable();
+            dataTable.Columns.Add(ListIdColumn);
+            dataTable.Columns.Add(IDColumn);
+            dataTable.Columns.Add(WorkingOnColumn);
+            row = dataTable.NewRow();
+            row[ListIdColumn] = DummyString;
+            row[IDColumn] = DummyString;
+            row[WorkingOnColumn] = DummyString;
+            dataTable.Rows.Add(row);
+
+            var workingTable = new DataTable();
+            workingTable.Columns.Add(ListIdColumn);
+            workingTable.Columns.Add(ItemIdColumn);
+            row = workingTable.NewRow();
+            row[ListIdColumn] = DummyString;
+            row[ItemIdColumn] = DummyString;
+            workingTable.Rows.Add(row);
+
+            ShimMyWork.GetListIdsFromDbStringSPWebListOfGuid = (_, _1, _2) => new List<string>()
+            {
+                $"{DummyString}{DummyString}"
+            };
+            spWeb.GetSiteDataSPSiteDataQuery = _ => dataTable;
+            ShimMyWork.GetWorkingOnSPWeb = _ => workingTable;
+
+            // Act
+            var actual = (List<DataTable>)privateObj.Invoke(
+                GetDataFromSPMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { selectedListIds, spSiteDataQuery, spWeb.Instance, spSite.Instance, archivedWebs, selectedLists });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Count.ShouldBe(1),
+                () => actual[0].Rows.Count.ShouldBe(1),
+                () => actual[0].Rows[0][WorkingOnColumn].ToString().ToLower().ShouldBe("true"));
+        }
+
+        [TestMethod]
+        public void GetExampleDateFormat_MDYFormat_ReturnsString()
+        {
+            // Arrange
+            const string yearLabel = "yearLabel";
+            const string monthLabel = "monthLabel";
+            const string dayLabel = "dayLabel";
+
+            var expected = $"{monthLabel}{DateSeparator}{dayLabel}{DateSeparator}{yearLabel}";
+
+            ShimSPRegionalSettings.AllInstances.DateFormatGet = _ => (uint)SPCalendarOrderType.MDY;
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                GetExampleDateFormatMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spWeb.Instance, yearLabel, monthLabel, dayLabel });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetExampleDateFormat_DMYFormat_ReturnsString()
+        {
+            // Arrange
+            const string yearLabel = "yearLabel";
+            const string monthLabel = "monthLabel";
+            const string dayLabel = "dayLabel";
+
+            var expected = $"{dayLabel}{DateSeparator}{monthLabel}{DateSeparator}{yearLabel}";
+
+            ShimSPRegionalSettings.AllInstances.DateFormatGet = _ => (uint)SPCalendarOrderType.DMY;
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                GetExampleDateFormatMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spWeb.Instance, yearLabel, monthLabel, dayLabel });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetExampleDateFormat_YMDormat_ReturnsString()
+        {
+            // Arrange
+            const string yearLabel = "yearLabel";
+            const string monthLabel = "monthLabel";
+            const string dayLabel = "dayLabel";
+
+            var expected = $"{yearLabel}{DateSeparator}{monthLabel}{DateSeparator}{dayLabel}";
+
+            ShimSPRegionalSettings.AllInstances.DateFormatGet = _ => (uint)SPCalendarOrderType.YMD;
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                GetExampleDateFormatMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { spWeb.Instance, yearLabel, monthLabel, dayLabel });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetGridSafeValue_NameCommentCount_ReturnsString()
+        {
+            // Arrange
+            const string value = "10.10";
+            const string elementName = "field";
+            const string name = "CommentCount";
+            const string format = "*";
+            const string type = "Other";
+            const string expected = "10";
+
+            var sb = new StringBuilder();
+            sb.Append("<xmlcfg>");
+            sb.AppendFormat(@"<{0} Name=""{1}"" Format=""{2}"" Type=""{3}"">", elementName, name, format, type);
+            sb.AppendFormat("{0}", value);
+            sb.AppendFormat("</{0}>", elementName);
+            sb.Append("</xmlcfg>");
+
+            var xml = XDocument.Parse(sb.ToString());
+
+            var field = xml.Root.Element(elementName);
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                GetGridSafeValueMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { field });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetGridSafeValue_NamePriority_ReturnsString()
+        {
+            // Arrange
+            const string value = "10.1000000001123";
+            const string elementName = "field";
+            const string name = "Priority";
+            const string format = "*";
+            const string type = "Number";
+            const string expected = "10.1000000001";
+
+            var sb = new StringBuilder();
+            sb.Append("<xmlcfg>");
+            sb.AppendFormat(@"<{0} Name=""{1}"" Format=""{2}"" Type=""{3}"">", elementName, name, format, type);
+            sb.AppendFormat("{0}", value);
+            sb.AppendFormat("</{0}>", elementName);
+            sb.Append("</xmlcfg>");
+
+            var xml = XDocument.Parse(sb.ToString());
+
+            var field = xml.Root.Element(elementName);
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                GetGridSafeValueMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { field });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetGridSafeValue_NameOtherFormatIndicator_ReturnsString()
+        {
+            // Arrange
+            const string value = "10.10";
+            const string elementName = "field";
+            const string name = "Other";
+            const string format = "Indicator";
+            const string type = "Other";
+            const string expected = "/_layouts/images/10.10";
+
+            var sb = new StringBuilder();
+            sb.Append("<xmlcfg>");
+            sb.AppendFormat(@"<{0} Name=""{1}"" Format=""{2}"" Type=""{3}"">", elementName, name, format, type);
+            sb.AppendFormat("{0}", value);
+            sb.AppendFormat("</{0}>", elementName);
+            sb.Append("</xmlcfg>");
+
+            var xml = XDocument.Parse(sb.ToString());
+
+            var field = xml.Root.Element(elementName);
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                GetGridSafeValueMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { field });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetGridSafeValue_NameOtherTypeNumber_ReturnsString()
+        {
+            // Arrange
+            const string value = "10";
+            const string elementName = "field";
+            const string name = "Other";
+            const string format = "some%";
+            const string type = "Number";
+            const string expected = "1000";
+
+            var sb = new StringBuilder();
+            sb.Append("<xmlcfg>");
+            sb.AppendFormat(@"<{0} Name=""{1}"" Format=""{2}"" Type=""{3}"">", elementName, name, format, type);
+            sb.AppendFormat("{0}", value);
+            sb.AppendFormat("</{0}>", elementName);
+            sb.Append("</xmlcfg>");
+
+            var xml = XDocument.Parse(sb.ToString());
+
+            var field = xml.Root.Element(elementName);
+
+            ShimSPRegionalSettings.AllInstances.LocaleIdGet = _ => 1033;
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                GetGridSafeValueMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { field });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetGridSafeValue_NameOtherTypeDate_ReturnsString()
+        {
+            // Arrange
+            const string value = "2018-09-12 18:00:00";
+            const string elementName = "field";
+            const string name = "Other";
+            const string format = "Other";
+            const string type = "Date";
+            const string expected = "2018-9-12 18:00:00";
+
+            var sb = new StringBuilder();
+            sb.Append("<xmlcfg>");
+            sb.AppendFormat(@"<{0} Name=""{1}"" Format=""{2}"" Type=""{3}"">", elementName, name, format, type);
+            sb.AppendFormat("{0}", value);
+            sb.AppendFormat("</{0}>", elementName);
+            sb.Append("</xmlcfg>");
+
+            var xml = XDocument.Parse(sb.ToString());
+
+            var field = xml.Root.Element(elementName);
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                GetGridSafeValueMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { field });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetLeftCols_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string input = "Complete:100,CommentCount:100,Priority:100,Other:100";
+
+            var myWorkGridView = new MyWorkGridView()
+            {
+                LeftCols = input
+            };
+
+            // Act
+            var actual = ((string)privateObj.Invoke(
+                GetLeftColsMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { myWorkGridView })).Split(',');
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Length.ShouldBe(4),
+                () => actual[0].Split(':')[0].ShouldBe("Complete"),
+                () => actual[0].Split(':')[1].ShouldBe("25"),
+                () => actual[1].Split(':')[0].ShouldBe("CommentCount"),
+                () => actual[1].Split(':')[1].ShouldBe("36"),
+                () => actual[2].Split(':')[0].ShouldBe("Priority"),
+                () => actual[2].Split(':')[1].ShouldBe("25"),
+                () => actual[3].Split(':')[0].ShouldBe("Other"),
+                () => actual[3].Split(':')[1].ShouldBe("100"));
+        }
+
+        [TestMethod]
+        public void GetMyWorkElement_WhenCalled_ReturnsXElement()
+        {
+            // Arrange
+            const string expected = "MyWork";
+            var data = string.Format(@"<{0} name=""{0}"">{0}</{0}>", expected);
+
+            // Act
+            var actual = (XElement)privateObj.Invoke(
+                GetMyWorkElementMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { data });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Name.LocalName.ShouldBe(expected),
+                () => actual.Value.ShouldBe(expected),
+                () => actual.Attribute("name").Value.ShouldBe(expected));
         }
     }
 }
