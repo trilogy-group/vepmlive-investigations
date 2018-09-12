@@ -110,6 +110,7 @@
     <Compile Include="Base\DBAccessTests.cs" />
     <Compile Include="Base\DBAccess\CostsTests.cs" />
     <Compile Include="Base\DBAccess\CostValuesTests.cs" />
+    <Compile Include="Base\DBAccess\CostTypesTests.cs" />
     <Compile Include="Base\dbaCCVTests.cs" />
     <Compile Include="Base\dbaUsersTests.cs" />
     <Compile Include="Layouts\CustomFieldFormTests\CanDeleteCustomFieldTests.cs" />
