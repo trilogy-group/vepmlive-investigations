@@ -36,14 +36,44 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
         private const string MessageNullRoles = "Roles list missing";
         private const string MessageNullDepartments = "Departments list missing";
         private const string MessageNullHolidaySchedules = "HolidaySchedules list missing";
+        private const string MessageNullHolidaySchedule = "Holiday schedule list missing";
         private const string MessageNullWorkHours = "WorkHours list missing";
         private const string ResourcesList = "Resources";
         private const string RolesList = "Roles";
         private const string DepartmentsList = "Departments";
         private const string HolidaySchedulesList = "Holiday Schedules";
         private const string WorkHoursList = "Work Hours";
+        private const string LicenseType = "License Type";
+        private const string HolidaySchedule = "Holiday Schedule";
+        private const string AddFeatureEvent = @"<AddRemoveFeatureEvents><Data><Feature Name=""pferesourcemanagement"" Operation=""ADD""/></Data></AddRemoveFeatureEvents>";
+        private const string ProviderSetting = "provider";
+        private const string EpkBasePathSetting = "epkbasepath";
+        private const string MessageUpdatingAllFields = "\tUpdating Role, Department, Holiday Schedule and Work Hours";
+        private const string MessageNotSettingFields = "Not setting Holiday Schedule and Work Hours. Cannot load from PFE.";
+        private const string MessageDepartmentFieldReplaced = "The Department field is replaced";
+        private const string AddingFieldExceptionFormat = "Adding {0} field: {1}";
+        private const string RemovingFieldExceptionFormat = "Removing {0} field: {1}";
+        private const string FieldCanLogin = "CanLogin";
+        private const string FieldDepartmentManager = "DepartmentManager";
+        private const string FieldTempRole = "TempRole";
+        private const string FieldTempDept = "TempDept";
+        private const string FieldResourceLevel = "ResourceLevel";
+        private const string FieldHolidaySchedule = "HolidaySchedule";
+        private const string FieldWorkHours = "WorkHours";
+        private const string FieldRole = "Role";
+        private const string FieldDepartment = "Department";
+        private const string KeyConnectionString = "ConnectionString";
+        private const string KeyEPMLive = "EPMLive";
+        private const string KeyWow6432Node = "Wow6432Node";
+        private const string KeyExtid = "EXTID";
         private const string MethodProcessFields = "ProcessFields";
         private const string MethodGetDatabaseFromRegistry = "GetDatabaseFromRegistry";
+        private const string MessageUpdatingResourcePool = "Updating Resource Pool";
+        private const string MethodGetConnectionString = "GetConnectionString";
+        private const string FieldAccount = "Account";
+        private const string FieldTitle = "Title";
+        private const string FieldId = "ID";
+        private const string FieldDisplayName = "DisplayName";
         private readonly Guid DummyGuid = Guid.NewGuid();
         private UpdateResourcePool _testObject;
         private PrivateObject _privateObject;
@@ -194,7 +224,7 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
                 () => result.ShouldBeTrue(),
                 () => _logs.ShouldContain(MessageLoadingPool),
                 () => _errors.ShouldContain(MessageNullWorkHours),
-                () => _testObject.Description.ShouldBe("Updating Resource Pool"));
+                () => _testObject.Description.ShouldBe(MessageUpdatingResourcePool));
         }
 
         [TestMethod]
@@ -241,12 +271,12 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
                 () => result.ShouldBeTrue(),
                 () => _listUpdates.ShouldBe(2),
                 () => _listItemUpdates.ShouldBe(2),
-                () => _updatedFields.ShouldContain("CanLogin"),
-                () => _updatedFields.ShouldContain("DepartmentManager"),
-                () => _deletedFields.ShouldContain("CanLogin"),
-                () => _deletedFields.ShouldContain("DepartmentManager"),
-                () => _logs.ShouldContain("\tUpdating Role, Department, Holiday Schedule and Work Hours"),
-                () => events.Contains(@"<AddRemoveFeatureEvents><Data><Feature Name=""pferesourcemanagement"" Operation=""ADD""/></Data></AddRemoveFeatureEvents>"),
+                () => _updatedFields.ShouldContain(FieldCanLogin),
+                () => _updatedFields.ShouldContain(FieldDepartmentManager),
+                () => _deletedFields.ShouldContain(FieldCanLogin),
+                () => _deletedFields.ShouldContain(FieldDepartmentManager),
+                () => _logs.ShouldContain(MessageUpdatingAllFields),
+                () => events.Contains(AddFeatureEvent),
                 () => _siteSaved.ShouldBeTrue(),
                 () => _connectionOpened.ShouldBeFalse());
         }
@@ -263,7 +293,7 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
                 field.Sealed = true;
                 return field;
             };
-            ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => "provider";
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => ProviderSetting;
             ShimSqlConnection.ConstructorString = (_, __) => { };
             ShimSqlConnection.AllInstances.Open = _ => { _connectionOpened = true; };
             ShimComponent.AllInstances.Dispose = _ => { _connectionOpened = false; };
@@ -294,7 +324,7 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
             this.ShouldSatisfyAllConditions(
                 () => result.ShouldBeTrue(),
                 () => _connectionOpened.ShouldBeFalse(),
-                () => _errors.Any(e => e.Contains("Not setting Holiday Schedule and Work Hours. Cannot load from PFE.")).ShouldBeTrue());
+                () => _errors.Any(e => e.Contains(MessageNotSettingFields)).ShouldBeTrue());
         }
 
         [TestMethod]
@@ -315,67 +345,64 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => _addedFields.ShouldContain("TempRole"),
-                () => _addedFields.ShouldContain("TempDept"),
-                () => _updatedFields.ShouldContain("TempRole"),
-                () => _updatedFields.ShouldContain("TempDept"),
-                () => _updatedFields.ShouldContain("ResourceLevel"),
-                () => _updatedFields.ShouldContain("HolidaySchedule"),
-                () => _updatedFields.ShouldContain("WorkHours"),
-                () => _updatedFields.ShouldContain("Role"),
-                () => _updatedFields.ShouldContain("Department"));
+                () => _addedFields.ShouldContain(FieldTempRole),
+                () => _addedFields.ShouldContain(FieldTempDept),
+                () => _updatedFields.ShouldContain(FieldTempRole),
+                () => _updatedFields.ShouldContain(FieldTempDept),
+                () => _updatedFields.ShouldContain(FieldResourceLevel),
+                () => _updatedFields.ShouldContain(FieldHolidaySchedule),
+                () => _updatedFields.ShouldContain(FieldWorkHours),
+                () => _updatedFields.ShouldContain(FieldRole),
+                () => _updatedFields.ShouldContain(FieldDepartment));
         }
 
         [TestMethod]
-        public void Perform_GetFieldByInternalNameFails_LogsErrors()
+        public void Perform_GetFieldByInternalNameFails_LogsAddAndRemoveErrors()
         {
             // Arrange
-            var createdFields = new List<string>();
-            var exceptionMessage = DummyString;
-            ShimExtensionMethods.ContainsFieldWithInternalNameSPFieldCollectionString = (_, __) => false;
-            _shimFields.GetFieldByInternalNameString = fieldName =>
-            {
-                if (!createdFields.Contains(fieldName))
-                {
-                    throw new InvalidOperationException(exceptionMessage);
-                }
-
-                return GetShimSPField(fieldName, SPFieldType.Lookup);
-            };
-            _shimFields.CreateNewFieldStringString = (_, fieldName) =>
-            {
-                createdFields.Add(fieldName);
-                return GetShimSPField(fieldName);
-            };
+            string exceptionMessage = DummyString;
 
             // Act
-            var result = _testObject.Perform();
+            PerformWithGetFieldByInternalNameFail(exceptionMessage);
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => _errors.Contains($"Adding TempRole field: {exceptionMessage}"),
-                () => _errors.Contains($"Adding TempDept field: {exceptionMessage}"),
-                () => _errors.Contains($"Removing CanLogin field: {exceptionMessage}"),
-                () => _errors.Contains($"Removing DepartmentManager field: {exceptionMessage}"),
-                () => _errors.Contains($"Adding License Type field: {exceptionMessage}"),
-                () => _errors.Contains($"Adding Holiday Schedule field: {exceptionMessage}"),
-                () => _errors.Contains($"Adding Work Hours field: {exceptionMessage}"),
-                () => _errors.Contains($"Adding Role field: {exceptionMessage}"),
-                () => _errors.Contains($"Adding Department field: {exceptionMessage}"),
-                () => _errors.Contains($"(Generic): {exceptionMessage}"),
-                () => _errors.Contains($"(FirstName): {exceptionMessage}"),
-                () => _errors.Contains($"(LastName): {exceptionMessage}"),
-                () => _errors.Contains($"(Email): {exceptionMessage}"),
-                () => _errors.Contains($"(ResourceLevel): {exceptionMessage}"),
-                () => _errors.Contains($"(Permissions): {exceptionMessage}"),
-                () => _errors.Contains($"(StandardRate): {exceptionMessage}"),
-                () => _errors.Contains($"(Department): {exceptionMessage}"),
-                () => _errors.Contains($"(Role): {exceptionMessage}"),
-                () => _errors.Contains($"(HolidaySchedule): {exceptionMessage}"),
-                () => _errors.Contains($"(WorkHours): {exceptionMessage}"),
-                () => _errors.Contains($"(AvailableFrom): {exceptionMessage}"),
-                () => _errors.Contains($"(AvailableTo): {exceptionMessage}"),
-                () => _errors.Contains($"(Disabled): {exceptionMessage}"));
+                () => _errors.ShouldContain(string.Format(AddingFieldExceptionFormat, FieldTempRole, exceptionMessage)),
+                () => _errors.ShouldContain(string.Format(AddingFieldExceptionFormat, FieldTempDept, exceptionMessage)),
+                () => _errors.ShouldContain(string.Format(RemovingFieldExceptionFormat, FieldCanLogin, exceptionMessage)),
+                () => _errors.ShouldContain(string.Format(RemovingFieldExceptionFormat, FieldDepartmentManager, exceptionMessage)),
+                () => _errors.ShouldContain(string.Format(AddingFieldExceptionFormat, LicenseType, exceptionMessage)),
+                () => _errors.ShouldContain(string.Format(AddingFieldExceptionFormat, HolidaySchedule, exceptionMessage)),
+                () => _errors.ShouldContain(string.Format(AddingFieldExceptionFormat, WorkHoursList, exceptionMessage)),
+                () => _errors.ShouldContain(string.Format(AddingFieldExceptionFormat, FieldRole, exceptionMessage)),
+                () => _errors.ShouldContain(string.Format(AddingFieldExceptionFormat, FieldDepartment, exceptionMessage)));
+        }
+
+        [TestMethod]
+        public void Perform_GetFieldByInternalNameFails_LogsFieldUpdatesErrors()
+        {
+            // Arrange
+            string exceptionMessage = DummyString;
+
+            // Act
+            PerformWithGetFieldByInternalNameFail(exceptionMessage);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _errors.ShouldContain($"(Generic): {exceptionMessage}"),
+                () => _errors.ShouldContain($"(FirstName): {exceptionMessage}"),
+                () => _errors.ShouldContain($"(LastName): {exceptionMessage}"),
+                () => _errors.ShouldContain($"(Email): {exceptionMessage}"),
+                () => _errors.ShouldContain($"(ResourceLevel): {exceptionMessage}"),
+                () => _errors.ShouldContain($"(Permissions): {exceptionMessage}"),
+                () => _errors.ShouldContain($"(StandardRate): {exceptionMessage}"),
+                () => _errors.ShouldContain($"(Department): {exceptionMessage}"),
+                () => _errors.ShouldContain($"(Role): {exceptionMessage}"),
+                () => _errors.ShouldContain($"(HolidaySchedule): {exceptionMessage}"),
+                () => _errors.ShouldContain($"(WorkHours): {exceptionMessage}"),
+                () => _errors.ShouldContain($"(AvailableFrom): {exceptionMessage}"),
+                () => _errors.ShouldContain($"(AvailableTo): {exceptionMessage}"),
+                () => _errors.ShouldContain($"(Disabled): {exceptionMessage}"));
         }
 
         [TestMethod]
@@ -416,7 +443,7 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
             ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => string.Empty;
 
             // Act
-            var result = _privateObject.Invoke("GetConnectionString");
+            var result = _privateObject.Invoke(MethodGetConnectionString);
 
             // Assert Expected Exception
         }
@@ -426,11 +453,11 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
         {
             // Arrange
             ShimCoreFunctions.getConfigSettingSPWebString =
-                (_, setting) => setting.Equals("epkbasepath") ? DummyString : string.Empty;
+                (_, setting) => setting.Equals(EpkBasePathSetting) ? DummyString : string.Empty;
             ShimUpdateResourcePool.GetDatabaseFromRegistryString = _ => string.Empty;
 
             // Act
-            var result = _privateObject.Invoke("GetConnectionString");
+            var result = _privateObject.Invoke(MethodGetConnectionString);
 
             // Assert Expected Exception
         }
@@ -439,7 +466,7 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
         public void ProcessFields_NoListAndFieldUpdateFail_LogsErrors()
         {
             // Arrange
-            var nonExistingLists = new string[] { "HolidaySchedule", "WorkHours", "Role", "Department" };
+            var nonExistingLists = new string[] { FieldHolidaySchedule, FieldWorkHours, FieldRole, FieldDepartment };
             var exceptionMessage = DummyString;
             _shimFields.GetFieldByInternalNameString = fieldName =>
             {
@@ -462,70 +489,36 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => _errors.ShouldContain($"Removing CanLogin field: {exceptionMessage}"),
-                () => _errors.ShouldContain($"Removing DepartmentManager field: {exceptionMessage}"),
-                () => _errors.ShouldContain("Holiday schedule list missing"),
-                () => _errors.ShouldContain("WorkHours list missing"),
-                () => _errors.ShouldContain("Roles list missing"));
+                () => _errors.ShouldContain(string.Format(RemovingFieldExceptionFormat, FieldCanLogin, exceptionMessage)),
+                () => _errors.ShouldContain(string.Format(RemovingFieldExceptionFormat, FieldDepartmentManager, exceptionMessage)),
+                () => _errors.ShouldContain(MessageNullHolidaySchedule),
+                () => _errors.ShouldContain(MessageNullWorkHours),
+                () => _errors.ShouldContain(MessageNullRoles));
         }
 
         [TestMethod]
         public void ProcessFields_UpdateLookupFields_DeletesAndCreatesFields()
         {
             // Arrange
-            _shimFields.GetFieldByInternalNameString = fieldName =>
-            {
-                if (_lookupFields.Contains(fieldName))
-                {
-                    return new ShimSPField(new ShimSPFieldLookup().Instance)
-                    {
-                        Update = () => _updatedFields.Add(fieldName)
-                    }.Instance;
-                }
-                else
-                {
-                    var field = GetShimSPField(fieldName);
-                    var fieldSealed = true;
-                    field.SealedGet = () => fieldSealed;
-                    field.SealedSetBoolean = seal => fieldSealed = seal;
-                    return field.Instance;
-                }
-            };
+            SetShimForLookupFields();
 
             // Act
             _privateObject.Invoke(MethodProcessFields, new object[] { _shimList.Instance });
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => _deletedFields.ShouldContain("Role"),
-                () => _deletedFields.ShouldContain("Department"),
-                () => _lookupFields.ShouldContain("Role"),
-                () => _lookupFields.ShouldContain("Department"),
-                () => _success.ShouldContain("The Department field is replaced"));
+                () => _deletedFields.ShouldContain(FieldRole),
+                () => _deletedFields.ShouldContain(FieldDepartment),
+                () => _lookupFields.ShouldContain(FieldRole),
+                () => _lookupFields.ShouldContain(FieldDepartment),
+                () => _success.ShouldContain(MessageDepartmentFieldReplaced));
         }
 
         [TestMethod]
         public void ProcessFields_UpdateLookupFieldsBIsNotPfe_DeletesAndCreatesFields()
         {
             // Arrange
-            _shimFields.GetFieldByInternalNameString = fieldName =>
-            {
-                if (_lookupFields.Contains(fieldName))
-                {
-                    return new ShimSPField(new ShimSPFieldLookup().Instance)
-                    {
-                        Update = () => _updatedFields.Add(fieldName)
-                    }.Instance;
-                }
-                else
-                {
-                    var field = GetShimSPField(fieldName);
-                    var fieldSealed = true;
-                    field.SealedGet = () => fieldSealed;
-                    field.SealedSetBoolean = seal => fieldSealed = seal;
-                    return field.Instance;
-                }
-            };
+            SetShimForLookupFields();
             _testObject = new UpdateResourcePool(_shimWeb.Instance, DummyString, 0, false);
             _privateObject = new PrivateObject(_testObject);
 
@@ -534,11 +527,11 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => _deletedFields.ShouldContain("Role"),
-                () => _deletedFields.ShouldContain("Department"),
-                () => _lookupFields.ShouldContain("Role"),
-                () => _lookupFields.ShouldContain("Department"),
-                () => _success.ShouldContain("The Department field is replaced"));
+                () => _deletedFields.ShouldContain(FieldRole),
+                () => _deletedFields.ShouldContain(FieldDepartment),
+                () => _lookupFields.ShouldContain(FieldRole),
+                () => _lookupFields.ShouldContain(FieldDepartment),
+                () => _success.ShouldContain(MessageDepartmentFieldReplaced));
         }
 
         [TestMethod]
@@ -547,7 +540,7 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
             // Arrange
             ShimRegistryKey.AllInstances.OpenSubKeyStringBoolean = (a, b, c) => new ShimRegistryKey().Instance;
             ShimRegistryKey.AllInstances.OpenSubKeyString = (_, __) => new ShimRegistryKey().Instance;
-            ShimRegistryKey.AllInstances.GetValueString = (_, key) => key.Equals("ConnectionString") ? DummyString : null;
+            ShimRegistryKey.AllInstances.GetValueString = (_, key) => key.Equals(KeyConnectionString) ? DummyString : null;
             var type = new PrivateType(typeof(UpdateResourcePool));
 
             // Act
@@ -566,11 +559,11 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
             var openedWow6432Node = false;
             ShimRegistryKey.AllInstances.OpenSubKeyStringBoolean = (_, key, __) =>
             {
-                if (key.Equals("EPMLive") && !openedWow6432Node)
+                if (key.Equals(KeyEPMLive) && !openedWow6432Node)
                 {
                     throw new InvalidOperationException();
                 }
-                else if (key.Equals("Wow6432Node"))
+                else if (key.Equals(KeyWow6432Node))
                 {
                     openedWow6432Node = true;
                 }
@@ -578,7 +571,7 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
                 return new ShimRegistryKey().Instance;
             };
             ShimRegistryKey.AllInstances.OpenSubKeyString = (_, __) => new ShimRegistryKey().Instance;
-            ShimRegistryKey.AllInstances.GetValueString = (_, key) => key.Equals("ConnectionString") ? DummyString : null;
+            ShimRegistryKey.AllInstances.GetValueString = (_, key) => key.Equals(KeyConnectionString) ? DummyString : null;
             var type = new PrivateType(typeof(UpdateResourcePool));
 
             // Act
@@ -596,7 +589,7 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
             // Arrange
             ShimRegistryKey.AllInstances.OpenSubKeyStringBoolean = (_, key, __) =>
             {
-                if (key.Equals("EPMLive") || key.Equals("Wow6432Node"))
+                if (key.Equals(KeyEPMLive) || key.Equals(KeyWow6432Node))
                 {
                     throw new InvalidOperationException();
                 }
@@ -604,7 +597,7 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
                 return new ShimRegistryKey().Instance;
             };
             ShimRegistryKey.AllInstances.OpenSubKeyString = (_, __) => new ShimRegistryKey().Instance;
-            ShimRegistryKey.AllInstances.GetValueString = (_, key) => key.Equals("ConnectionString") ? DummyString : null;
+            ShimRegistryKey.AllInstances.GetValueString = (_, key) => key.Equals(KeyConnectionString) ? DummyString : null;
             var type = new PrivateType(typeof(UpdateResourcePool));
 
             // Act
@@ -618,10 +611,33 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
         private void ShimSharePointContext()
         {
-            var user = new ShimSPUser
+            ShimSPFieldCollectionMethods();
+            ShimSPListMethods();
+            ShimSPListCollectionMethods();
+            ShimSPWebMethods();
+
+            var site = new ShimSPSite
             {
-                IDGet = () => Id
+                IDGet = () => DummyGuid,
+                RootWebGet = () => _shimWeb.Instance,
+                WebApplicationGet = () => new ShimSPWebApplication
+                {
+                    ApplicationPoolGet = () => new SPApplicationPool()
+                }.Instance
             };
+            _shimWeb.SiteGet = () => site.Instance;
+            ShimSPContext.CurrentGet = () => new ShimSPContext
+            {
+                WebGet = () => _shimWeb.Instance,
+                SiteGet = () => site.Instance
+            }.Instance;
+
+            ShimSPSite.ConstructorGuid = (_, __) => { };
+            ShimSPSite.AllInstances.OpenWebGuid = (_, __) => _shimWeb;
+        }
+
+        private void ShimSPFieldCollectionMethods()
+        {
             _shimFields = new ShimSPFieldCollection
             {
                 GetFieldByInternalNameString = _ => new ShimSPField()
@@ -644,6 +660,38 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     return field;
                 }
             };
+        }
+
+        private void ShimSPWebMethods()
+        {
+            var user = new ShimSPUser
+            {
+                IDGet = () => Id
+            };
+
+            _shimWeb = new ShimSPWeb
+            {
+                IDGet = () => DummyGuid,
+                CurrentUserGet = () => user,
+                EnsureUserString = _ => user,
+                SiteUserInfoListGet = () => _shimList.Instance,
+                ListsGet = () => _shimListCollection.Instance
+            };
+        }
+
+        private void ShimSPListCollectionMethods()
+        {
+            _shimListCollection = new ShimSPListCollection
+            {
+                ItemGetString = _ => _shimList,
+                ItemGetGuid = _ => _shimList,
+                GetListGuidBoolean = (_, __) => _shimList,
+                TryGetListString = list => _shimList.Instance
+            };
+        }
+
+        private void ShimSPListMethods()
+        {
             _shimList = new ShimSPList
             {
                 IDGet = () => DummyGuid,
@@ -654,7 +702,7 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
                         new ShimSPListItem()
                         {
                             ItemGetGuid = _ => DummyString,
-                            ItemGetString = key => key.Equals("EXTID") ? null : DummyString,
+                            ItemGetString = key => key.Equals(KeyExtid) ? null : DummyString,
                             ItemSetStringObject = (_, __) => { },
                             Update = () => { _listItemUpdates++; }
                         }
@@ -662,42 +710,9 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     GetDataTable = () => GetDataTable()
                 },
                 FieldsGet = () => _shimFields.Instance,
-                Update = () => { _listUpdates++; }
+                Update = () => { _listUpdates++; },
+                ParentWebGet = () => _shimWeb
             };
-            var webApp = new ShimSPWebApplication
-            {
-                ApplicationPoolGet = () => new SPApplicationPool()
-            }.Instance;
-            _shimListCollection = new ShimSPListCollection
-            {
-                ItemGetString = _ => _shimList,
-                ItemGetGuid = _ => _shimList,
-                GetListGuidBoolean = (_, __) => _shimList,
-                TryGetListString = list => _shimList.Instance
-            };
-            _shimWeb = new ShimSPWeb
-            {
-                IDGet = () => DummyGuid,
-                CurrentUserGet = () => user,
-                EnsureUserString = _ => user,
-                SiteUserInfoListGet = () => _shimList.Instance,
-                ListsGet = () => _shimListCollection.Instance
-            };
-            _shimList.ParentWebGet = () => _shimWeb;
-            var site = new ShimSPSite
-            {
-                IDGet = () => DummyGuid,
-                RootWebGet = () => _shimWeb.Instance,
-                WebApplicationGet = () => webApp
-            };
-            _shimWeb.SiteGet = () => site.Instance;
-            ShimSPContext.CurrentGet = () => new ShimSPContext
-            {
-                WebGet = () => _shimWeb.Instance,
-                SiteGet = () => site.Instance
-            }.Instance;
-            ShimSPSite.ConstructorGuid = (_, __) => { };
-            ShimSPSite.AllInstances.OpenWebGuid = (_, __) => _shimWeb;
         }
 
         private void AppendAttributeToNode(XmlNode node, XmlDocument propdoc, string name, string value)
@@ -739,23 +754,23 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
         private void CreateColumnsForTable(DataTable dataTable)
         {
-            dataTable.Columns.Add("Account");
-            dataTable.Columns.Add("HolidaySchedule");
-            dataTable.Columns.Add("Title");
-            dataTable.Columns.Add("ID");
-            dataTable.Columns.Add("WorkHours");
-            dataTable.Columns.Add("DisplayName");
+            dataTable.Columns.Add(FieldAccount);
+            dataTable.Columns.Add(FieldHolidaySchedule);
+            dataTable.Columns.Add(FieldTitle);
+            dataTable.Columns.Add(FieldId);
+            dataTable.Columns.Add(FieldWorkHours);
+            dataTable.Columns.Add(FieldDisplayName);
         }
 
         private void CreateRowForTable(DataTable dataTable)
         {
             var row = dataTable.NewRow();
-            row["Account"] = DummyString;
-            row["HolidaySchedule"] = DummyString;
-            row["Title"] = DummyString;
-            row["ID"] = One;
-            row["WorkHours"] = DummyString;
-            row["DisplayName"] = DummyString;
+            row[FieldAccount] = DummyString;
+            row[FieldHolidaySchedule] = DummyString;
+            row[FieldTitle] = DummyString;
+            row[FieldId] = One;
+            row[FieldWorkHours] = DummyString;
+            row[FieldDisplayName] = DummyString;
             dataTable.Rows.Add(row);
         }
 
@@ -768,6 +783,50 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps.WE43UpgraderSteps
                 TypeGet = () => fieldType,
                 Update = () => _updatedFields.Add(fieldName),
                 Delete = () => _deletedFields.Add(fieldName),
+            };
+        }
+
+        private void PerformWithGetFieldByInternalNameFail(string exceptionMessage)
+        {
+            var createdFields = new List<string>();
+            ShimExtensionMethods.ContainsFieldWithInternalNameSPFieldCollectionString = (_, __) => false;
+            _shimFields.GetFieldByInternalNameString = fieldName =>
+            {
+                if (!createdFields.Contains(fieldName))
+                {
+                    throw new InvalidOperationException(exceptionMessage);
+                }
+
+                return GetShimSPField(fieldName, SPFieldType.Lookup);
+            };
+            _shimFields.CreateNewFieldStringString = (_, fieldName) =>
+            {
+                createdFields.Add(fieldName);
+                return GetShimSPField(fieldName);
+            };
+
+            _testObject.Perform();
+        }
+
+        private void SetShimForLookupFields()
+        {
+            _shimFields.GetFieldByInternalNameString = fieldName =>
+            {
+                if (_lookupFields.Contains(fieldName))
+                {
+                    return new ShimSPField(new ShimSPFieldLookup().Instance)
+                    {
+                        Update = () => _updatedFields.Add(fieldName)
+                    }.Instance;
+                }
+                else
+                {
+                    var field = GetShimSPField(fieldName);
+                    var fieldSealed = true;
+                    field.SealedGet = () => fieldSealed;
+                    field.SealedSetBoolean = seal => fieldSealed = seal;
+                    return field.Instance;
+                }
             };
         }
     }
