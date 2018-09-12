@@ -145,11 +145,11 @@ namespace EPMLiveCore.Tests
             ShimSPField.AllInstances.RequiredGet = _ => true;
             ShimSPField.AllInstances.GetFieldValueAsHtmlObject = (a, b) => "picture.jpg";
 
-            ShimListDisplaySettingIterator.GetCompositeFieldControlInt32 = (a, b) => new ShimCompositeField();
-            ShimListDisplaySettingIterator.GetFieldLabelControlInt32 = (a, b) => new ShimFieldLabel();
-            ShimListDisplaySettingIterator.GetFieldLabelControlInt32Int32Int32= (a, b, c, d) => new ShimFieldLabel();
-            ShimListDisplaySettingIterator.GetFormFieldControlInt32  = (a, b) => new ShimFormField();            
-            ShimListDisplaySettingIterator.GetControlTypeControlInt32 = (a, b) => "Microsoft.SharePoint.WebControls.FormField";
+            ShimListDisplaySettingIteratorHelpers.GetCompositeFieldControlInt32 = (a, b) => new ShimCompositeField();
+            ShimListDisplaySettingIteratorHelpers.GetFieldLabelControlInt32 = (a, b) => new ShimFieldLabel();
+            ShimListDisplaySettingIteratorHelpers.GetFieldLabelControlInt32Int32Int32= (a, b, c, d) => new ShimFieldLabel();
+            ShimListDisplaySettingIteratorHelpers.GetFormFieldControlInt32  = (a, b) => new ShimFormField();
+            ShimListDisplaySettingIteratorHelpers.GetControlTypeControlInt32 = (a, b) => "Microsoft.SharePoint.WebControls.FormField";
 
             ShimBaseFieldControl.AllInstances.ItemFieldValueGet = _ => "fieldValue";
         }

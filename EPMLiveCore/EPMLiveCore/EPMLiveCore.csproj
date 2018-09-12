@@ -1295,6 +1295,8 @@
     </Compile>
     <Compile Include="ListDefinitions\EPMLiveLists.cs" />
     <Compile Include="ListDisplaySettingIterator.cs" />
+    <Compile Include="ListDisplaySettingIteratorHelpers.cs" />
+    <Compile Include="ListDisplaySettingIteratorRenderHelpers.cs" />
     <Compile Include="ListDisplayUtils.cs" />
     <Compile Include="ListFieldIteratorExtensions.cs" />
     <Compile Include="MultiAppCustomSiteMapProvider.cs" />

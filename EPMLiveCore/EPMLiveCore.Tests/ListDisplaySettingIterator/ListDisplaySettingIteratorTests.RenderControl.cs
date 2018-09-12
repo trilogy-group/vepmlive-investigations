@@ -457,7 +457,7 @@ namespace EPMLiveCore.Tests
 
             ShimFormComponent.AllInstances.ControlModeGet = _ => SPControlMode.Display;
             ShimPage.AllInstances.RequestGet = page => new HttpRequest(string.Empty, "http://site.com", "IsDlg=1&GetLastID=true");
-            ShimListDisplaySettingIterator.GetControlTypeControlInt32 = (a, b) => "Microsoft.SharePoint.WebControls.FieldLabel";
+            ShimListDisplaySettingIteratorHelpers.GetControlTypeControlInt32 = (a, b) => "Microsoft.SharePoint.WebControls.FieldLabel";
 
             // Act
             _listDisplaySettingIterator.RenderControl(writer);
