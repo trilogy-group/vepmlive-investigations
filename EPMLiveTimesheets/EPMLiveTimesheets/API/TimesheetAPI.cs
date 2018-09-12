@@ -776,13 +776,13 @@ namespace TimeSheets
         }
 
         // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of.
-        public static void CheckNonTeamMemberAllocation(SPWeb oWeb, string tsuid, SqlConnection cn, string data)
+        public static void CheckNonTeamMemberAllocation(SPWeb oWeb, string tsuid, string cn, string data)
         {
             List<TimeSheetItem> timeSheetItems;
             double qtdAllocatedHours = 0;
-
-            timeSheetItems = GetTimeSheetItems(data, cn.ConnectionString);
-            qtdAllocatedHours = CalculateAllocatedHours(timeSheetItems, cn.ConnectionString);
+			
+            timeSheetItems = GetTimeSheetItems(data, cn);
+            qtdAllocatedHours = CalculateAllocatedHours(timeSheetItems, cn);
 
             if (qtdAllocatedHours > 0)
                 RunPermissionsChecks(timeSheetItems, qtdAllocatedHours, oWeb);
@@ -1161,9 +1161,12 @@ namespace TimeSheets
                 SqlConnection connection = null;
                 try
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+					string connectionString = null;
+
+					SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        connection = new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+						connectionString = EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id); 
+						connection = new SqlConnection(connectionString);
                         connection.Open();
                     });
 
@@ -1201,7 +1204,7 @@ namespace TimeSheets
                             // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of
                             if (bool.Parse(EpmCoreFunctions.getConfigSetting(oWeb, "EPMLiveEnableNonTeamNotf")))
                             {
-                                CheckNonTeamMemberAllocation(oWeb, tsuid, connection, data);
+                                CheckNonTeamMemberAllocation(oWeb, tsuid, connectionString, data);
                             }
 
                             using (var command = new SqlCommand(
