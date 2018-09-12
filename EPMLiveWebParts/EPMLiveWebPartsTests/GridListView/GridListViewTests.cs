@@ -18,6 +18,8 @@ using System.IO;
 using System.Text;
 using EPMLiveCore.Fakes;
 using EPMLiveWebParts.Fakes;
+using System.Globalization;
+using System.Threading;
 
 namespace EPMLiveWebParts.Tests
 {
@@ -33,6 +35,8 @@ namespace EPMLiveWebParts.Tests
         private StringBuilder _outputBuilder;
         private StringWriter _outputWriterString;
         private HtmlTextWriter _outputWriterHtml;
+        private CultureInfo _currentCulture;
+
         private string Output
         {
             get
@@ -52,6 +56,8 @@ namespace EPMLiveWebParts.Tests
         [TestInitialize]
         public void SetUp()
         {
+            _currentCulture = Thread.CurrentThread.CurrentCulture;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             _shimsContext = ShimsContext.Create();
             _sharepointShims = SharepointShims.ShimSharepointCalls();
 
@@ -99,6 +105,7 @@ namespace EPMLiveWebParts.Tests
 
             _outputWriterString.Dispose();
             _outputWriterHtml.Dispose();
+            Thread.CurrentThread.CurrentCulture = _currentCulture;
         }
 
         [TestMethod()]
