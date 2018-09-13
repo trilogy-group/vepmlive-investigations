@@ -72,7 +72,8 @@ namespace EPMLiveCore.Tests.ReportHelper
             _testObj.ExecuteEpmLiveSql(Sql);
 
             // Assert
-            Assert.IsTrue(_adoShims.IsCommandManagedCorrectly(Sql));
+            Assert.IsTrue(_adoShims.IsCommandCreated(Sql));
+            Assert.IsTrue(_adoShims.IsCommandExecuted(Sql));
             Assert.IsTrue(_adoShims.IsDataReaderCreatedForCommand(Sql));
             Assert.IsTrue(_adoShims.IsDataReaderDisposedForCommand(Sql));
         }
@@ -84,7 +85,8 @@ namespace EPMLiveCore.Tests.ReportHelper
             _testObj.ExecuteSql(Sql);
 
             // Assert
-            Assert.IsTrue(_adoShims.IsCommandManagedCorrectly(Sql));
+            Assert.IsTrue(_adoShims.IsCommandCreated(Sql));
+            Assert.IsTrue(_adoShims.IsCommandExecuted(Sql));
             Assert.IsTrue(_adoShims.IsDataReaderCreatedForCommand(Sql));
             Assert.IsTrue(_adoShims.IsDataReaderDisposedForCommand(Sql));
         }
@@ -99,7 +101,8 @@ namespace EPMLiveCore.Tests.ReportHelper
             _testObj.GetData(new Dictionary<string, IEnumerable<object>>(), ReportingScope.Web, new ShimSPWeb());
 
             // Assert
-            Assert.IsTrue(_adoShims.IsCommandManagedCorrectly(GetDataSql));
+            Assert.IsTrue(_adoShims.IsCommandCreated(GetDataSql));
+            Assert.IsTrue(_adoShims.IsCommandExecuted(GetDataSql));
             Assert.IsTrue(_adoShims.IsDataReaderCreatedForCommand(GetDataSql));
             Assert.IsTrue(_adoShims.IsDataReaderDisposedForCommand(GetDataSql));
         }
@@ -111,7 +114,8 @@ namespace EPMLiveCore.Tests.ReportHelper
             _testObj.GetFields();
 
             // Assert
-            Assert.IsTrue(_adoShims.IsCommandManagedCorrectly(GetFieldsSql));
+            Assert.IsTrue(_adoShims.IsCommandCreated(GetFieldsSql));
+            Assert.IsTrue(_adoShims.IsCommandExecuted(GetFieldsSql));
             Assert.IsTrue(_adoShims.IsDataReaderCreatedForCommand(GetFieldsSql));
             Assert.IsTrue(_adoShims.IsDataReaderDisposedForCommand(GetFieldsSql));
         }
@@ -134,7 +138,7 @@ namespace EPMLiveCore.Tests.ReportHelper
             var spListItem = new ShimSPListItem();
             spListItem.IDGet = () => { return 1; };
 
-            object[] args = new object[] { (SPListItem)spListItem, dataTable, defColumns, new ArrayList(), Insert, string.Empty };
+            var args = new object[] { (SPListItem)spListItem, dataTable, defColumns, new ArrayList(), Insert, string.Empty };
 
             // Act
             var actual = _privateObj.Invoke(AddColumnValuesMethod, args);
@@ -154,7 +158,7 @@ namespace EPMLiveCore.Tests.ReportHelper
             ShimSqlCommand.AllInstances.ParametersGet = (_) => { return parameters; };
 
             var spListItem = new ShimSPListItem();
-            object[] args = new object[] { ListItem, (SPListItem)spListItem, Columns, Values };
+            var args = new object[] { ListItem, (SPListItem)spListItem, Columns, Values };
 
             // Act
             _privateObj.Invoke(AddMetaInfoColsMethod, args);
@@ -169,7 +173,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         {
             // Arrange
             ShimSqlCommand.AllInstances.ExecuteScalar = (_) => { return ColumnType; };
-            object[] args = new object[] { ColumnName };
+            var args = new object[] { ColumnName };
 
             // Act
             var actual = _privateObj.Invoke(GetColumnTypeMethod, args);
@@ -185,7 +189,7 @@ namespace EPMLiveCore.Tests.ReportHelper
             // Arrange
             string entry = null;
             ShimEventLog.AllInstances.WriteEntryStringEventLogEntryTypeInt32 = (_, message, type, eventId) => { entry = message; };
-            object[] args = new object[] { InternalName, new Exception(Message), ColumnName };
+            var args = new object[] { InternalName, new Exception(Message), ColumnName };
 
             // Act
             _privateObj.Invoke(LogErrorMethod, args);

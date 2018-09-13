@@ -38,12 +38,10 @@ namespace EPMLiveCore.ReportHelper
         {
             var dataTable = new DataTable();
 
-            using (var cmd = new SqlCommand(sql, _DAO.GetEPMLiveConnection))
+            _cmdWithParams = new SqlCommand(sql, _DAO.GetEPMLiveConnection);
+            using (var sqlDataReader = _cmdWithParams.ExecuteReader())
             {
-                using (var sqlDataReader = cmd.ExecuteReader())
-                {
-                    dataTable.Load(sqlDataReader);
-                }
+                dataTable.Load(sqlDataReader);
             }
 
             return dataTable;
@@ -58,12 +56,10 @@ namespace EPMLiveCore.ReportHelper
         {
             var dataTable = new DataTable();
 
-            using (var cmd = new SqlCommand(sql, _DAO.GetClientReportingConnection))
+            _cmdWithParams = new SqlCommand(sql, _DAO.GetClientReportingConnection);
+            using (var sqlDataReader = _cmdWithParams.ExecuteReader())
             {
-                using (var sqlDataReader = cmd.ExecuteReader())
-                {
-                    dataTable.Load(sqlDataReader);
-                }
+                dataTable.Load(sqlDataReader);
             }
 
             return dataTable;
@@ -82,12 +78,10 @@ namespace EPMLiveCore.ReportHelper
             string sql = BuildSelectSql(filterValues, reportingScope, spWeb);
             var dataTable = new DataTable();
 
-            using (var cmd = new SqlCommand(sql, _DAO.GetClientReportingConnection))
+            _cmdWithParams = new SqlCommand(sql, _DAO.GetClientReportingConnection);
+            using (var sqlDataReader = _cmdWithParams.ExecuteReader())
             {
-                using (var sqlDataReader = cmd.ExecuteReader())
-                {
-                    dataTable.Load(sqlDataReader);
-                }
+                dataTable.Load(sqlDataReader);
             }
 
             return dataTable;
@@ -104,14 +98,12 @@ namespace EPMLiveCore.ReportHelper
             string sql = string.Format(@"SELECT DISTINCT InternalName FROM RPTColumn WHERE RPTListId = N'{0}'",
                 _DAO.GetListId("My Work"));
 
-            using (var cmd = new SqlCommand(sql, _DAO.GetClientReportingConnection))
+            _cmdWithParams = new SqlCommand(sql, _DAO.GetClientReportingConnection);
+            using (var sqlDataReader = _cmdWithParams.ExecuteReader())
             {
-                using (var sqlDataReader = cmd.ExecuteReader())
+                while (sqlDataReader.Read())
                 {
-                    while (sqlDataReader.Read())
-                    {
-                        fields.Add(sqlDataReader.GetString(sqlDataReader.GetOrdinal("InternalName")));
-                    }
+                    fields.Add(sqlDataReader.GetString(sqlDataReader.GetOrdinal("InternalName")));
                 }
             }
 
@@ -724,10 +716,8 @@ namespace EPMLiveCore.ReportHelper
                     columnName);
 
             object columnType;
-            using (var cmd = new SqlCommand(sql, _DAO.GetClientReportingConnection))
-            {
-                columnType = cmd.ExecuteScalar();
-            }
+            _cmdWithParams = new SqlCommand(sql, _DAO.GetClientReportingConnection);
+            columnType = _cmdWithParams.ExecuteScalar();
 
             if (columnType == null || columnType == DBNull.Value)
                 throw new Exception(string.Format("Cannot find column: {0}", columnName));
