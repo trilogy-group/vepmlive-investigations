@@ -66,6 +66,9 @@
     <Add FullName="EPMLiveCore.API.Reporting!"/>
     <Add FullName="EPMLiveCore.Infrastructure.CacheStoreCategory!"/>
     <Add FullName="EPMLiveCore.ReportAuth!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.EPMLiveFileStore!"/>
+    <Add FullName="EPMLiveCore.API.ResourceExporter!"/>
+    <Add FullName="EPMLiveCore.DisabledItemEventScope!"/>
     <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.Step!"/>
     <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps.UpdateResourcePool!"/>
   </ShimGeneration>
