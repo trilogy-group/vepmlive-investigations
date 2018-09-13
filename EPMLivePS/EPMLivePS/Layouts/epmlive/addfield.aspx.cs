@@ -88,31 +88,43 @@ namespace EPMLiveEnterprise
                             {
                                 WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow customField = dsF.CustomFields[i];
 
-                                SqlCommand cmd = new SqlCommand("SELECT fieldname from customfields where fieldname=@fieldname and " + modifier, cn);
-                                cmd.Parameters.AddWithValue("@fieldname", customField.MD_PROP_ID.ToString());
-                                SqlDataReader dr = cmd.ExecuteReader();
-                                if (!dr.Read())
+                                using (var command = new SqlCommand("SELECT fieldname from customfields where fieldname=@fieldname and " + modifier, cn))
                                 {
-                                    string table = "";
-                                    try
+                                    command.Parameters.AddWithValue("@fieldname", customField.MD_PROP_ID.ToString());
+                                    using (var reader = command.ExecuteReader())
                                     {
-                                        table = customField.MD_LOOKUP_TABLE_UID.ToString();
+                                        if (!reader.Read())
+                                        {
+                                            var table = string.Empty;
+                                            try
+                                            {
+                                                table = customField.MD_LOOKUP_TABLE_UID.ToString();
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                SystemTrace.WriteLine(ex.ToString());
+                                            }
+                                            var cfData = string.Empty;
+                                            var choice = "CHOICE";
+                                            if (table == string.Empty)
+                                            {
+                                                choice = ((PSLibrary.PropertyType)customField.MD_PROP_TYPE_ENUM).ToString();
+                                            }
+
+                                            if (customField.IsMD_PROP_FORMULANull())
+                                            {
+                                                cfData = customField.MD_PROP_ID + "#" + choice + "#" + customField.MD_PROP_UID_SECONDARY + "#" + customField.MD_PROP_UID_SECONDARY;
+                                            }
+                                            else
+                                            {
+                                                cfData = customField.MD_PROP_ID + "#" + choice + "#" + customField.MD_PROP_UID_SECONDARY + "#";
+                                            }
+
+                                            var listItem = new ListItem(customField.MD_PROP_NAME, cfData);
+                                            ListBox1.Items.Add(listItem);
+                                        }
                                     }
-                                    catch { }
-                                    string cfData = "";
-                                    string choice = "CHOICE";
-                                    if (table == "")
-                                        choice = ((PSLibrary.PropertyType)customField.MD_PROP_TYPE_ENUM).ToString();
-
-                                    if (customField.IsMD_PROP_FORMULANull())
-                                        cfData = customField.MD_PROP_ID + "#" + choice + "#" + customField.MD_PROP_UID_SECONDARY + "#" + customField.MD_PROP_UID_SECONDARY;
-                                    else
-                                        cfData = customField.MD_PROP_ID + "#" + choice + "#" + customField.MD_PROP_UID_SECONDARY + "#";
-
-                                    ListItem li = new ListItem(customField.MD_PROP_NAME, cfData);
-                                    ListBox1.Items.Add(li);
                                 }
-                                dr.Close();
                             }
                         }
                         else if (Request["type"] == "4")
@@ -152,7 +164,7 @@ namespace EPMLiveEnterprise
                                                 SystemTrace.WriteLine(ex.ToString());
                                             }
                                             var cfData = string.Empty;
-                                            if (table == "")
+                                            if (table == string.Empty)
                                             {
                                                 cfData = customField.MD_PROP_ID + "#" + ((PSLibrary.PropertyType)customField.MD_PROP_TYPE_ENUM).ToString() + "##";
                                             }
