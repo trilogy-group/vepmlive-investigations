@@ -15,7 +15,7 @@ namespace EPMLiveCore.Tests.API.CreateWorkspace
     [TestClass]
     public class DALTests
     {
-        private readonly Guid DummyGuid = Guid.NewGuid();
+        private static readonly Guid DummyGuid = Guid.NewGuid();
         private const string DummyString = "DummyString";
         private IDisposable shimContext;
 
@@ -67,7 +67,6 @@ namespace EPMLiveCore.Tests.API.CreateWorkspace
             var result = WorkspaceData.IsFirstAttempt(site, web, DummyString, DummyString);
 
             // Assert
-            Assert.IsNotNull(result);
             Assert.IsTrue(result);
         }
 
@@ -90,7 +89,6 @@ namespace EPMLiveCore.Tests.API.CreateWorkspace
             var result = WorkspaceData.IsFirstAttempt(site, web, DummyString, DummyString);
 
             // Assert
-            Assert.IsNotNull(result);
             Assert.IsFalse(result);
         }
 
@@ -189,7 +187,6 @@ namespace EPMLiveCore.Tests.API.CreateWorkspace
             var result = WorkspaceData.DoesWorkspaceExist(DummyGuid, DummyGuid, DummyGuid, 1);
 
             // Assert
-            Assert.IsNotNull(result);
             Assert.IsTrue(result);
         }
 
