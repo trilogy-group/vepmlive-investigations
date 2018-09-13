@@ -66,5 +66,6 @@
     <Add FullName="EPMLiveCore.API.Reporting!"/>
     <Add FullName="EPMLiveCore.Infrastructure.CacheStoreCategory!"/>
     <Add FullName="EPMLiveCore.ReportAuth!"/>
+    <Add FullName="EPMLiveCore.CascadingLookupRenderControl!"/>
   </ShimGeneration>
 </Fakes>
