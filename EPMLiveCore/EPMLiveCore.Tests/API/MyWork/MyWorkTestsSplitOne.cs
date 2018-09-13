@@ -189,6 +189,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             shimsContext?.Dispose();
         }
 
+        /**
         [TestMethod]
         public void GetArchivedWebs_WhenCalled_ReturnsList()
         {
@@ -1065,5 +1066,6 @@ namespace EPMLiveCore.Tests.API.MyWork
                 () => actual.Value.ShouldBe(expected),
                 () => actual.Attribute("name").Value.ShouldBe(expected));
         }
+    **/
     }
 }
