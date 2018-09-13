@@ -215,7 +215,7 @@ namespace EPMLiveCore.Tests.API.MyWork
                 () => actual.Count.ShouldBe(expectedCount),
                 () => actual.Count(x => x.ToString() == guid.ToString()).ShouldBe(expectedCount));
         }
-        /**
+        
        [TestMethod]
        public void GetGlobalViews_WhenCalled_ReturnsList()
        {
@@ -328,6 +328,7 @@ namespace EPMLiveCore.Tests.API.MyWork
                () => actual.Where(x => x.ToString() == guid.ToString()).Count().ShouldBe(expected));
        }
 
+        /**
        [TestMethod]
        public void GetListNameFromDb_WhenCalled_ReturnsString()
        {
