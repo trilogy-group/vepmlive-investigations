@@ -45,14 +45,16 @@ namespace EPMLiveEnterprise
                                 SqlCommand cmd = new SqlCommand("SELECT fieldname,displayname from customfields where fieldcategory=@type and pjvisible=0 order by displayname", cn);
                                 cmd.Parameters.AddWithValue("@type", Request["type"]);
 
-                                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                                DataSet ds = new DataSet();
-                                da.Fill(ds);
+                                using (var adapter = new SqlDataAdapter(cmd))
+                                {
+                                    var dataSet = new DataSet();
+                                    adapter.Fill(dataSet);
 
-                                ListBox1.DataSource = ds.Tables[0];
-                                ListBox1.DataTextField = "displayname";
-                                ListBox1.DataValueField = "fieldname";
-                                ListBox1.DataBind();
+                                    ListBox1.DataSource = dataSet.Tables[0];
+                                    ListBox1.DataTextField = "displayname";
+                                    ListBox1.DataValueField = "fieldname";
+                                    ListBox1.DataBind();
+                                }
                             }
                             else
                             {
