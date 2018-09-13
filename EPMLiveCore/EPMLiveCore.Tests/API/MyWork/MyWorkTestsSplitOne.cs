@@ -26,8 +26,7 @@ using TypeToTest = EPMLiveCore.API.MyWork;
 
 namespace EPMLiveCore.Tests.API.MyWork
 {
-    [ExcludeFromCodeCoverage]
-    [TestClass]
+    [TestClass, ExcludeFromCodeCoverage]
     public partial class MyWorkRemTests
     {
         private TypeToTest testObj;
