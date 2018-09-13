@@ -164,17 +164,19 @@ namespace EPMLiveCore.API
                             SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
                             cn.Open();
 
-                            SqlCommand command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONLOG where PlatformIntegrationId=@id", cn);
-                            command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
-                            command.ExecuteNonQuery();
-
-                            using (command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONCONTROLS where PlatformIntegrationId=@id", cn))
+                            using (var command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONLOG where PlatformIntegrationId=@id", cn))
                             {
                                 command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
                                 command.ExecuteNonQuery();
                             }
 
-                            using (command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONS where PlatformIntegrationId=@id", cn))
+                            using (var command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONCONTROLS where PlatformIntegrationId=@id", cn))
+                            {
+                                command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
+                                command.ExecuteNonQuery();
+                            }
+
+                            using (var command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONS where PlatformIntegrationId=@id", cn))
                             {
                                 command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
                                 command.ExecuteNonQuery();
