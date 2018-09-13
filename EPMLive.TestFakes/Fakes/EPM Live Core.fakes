@@ -67,5 +67,7 @@
     <Add FullName="EPMLiveCore.Infrastructure.CacheStoreCategory!"/>
     <Add FullName="EPMLiveCore.ReportAuth!"/>
     <Add FullName="EPMLiveCore.CascadingLookupRenderControl!"/>
+    <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.Step!"/>
+    <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps.UpdateResourcePool!"/>
   </ShimGeneration>
 </Fakes>
