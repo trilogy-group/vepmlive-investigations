@@ -298,7 +298,7 @@ namespace EPMLiveReporting.Tests
 
             ShimSPListCollection.AllInstances.ItemGetString = (a, b) => new ShimSPList();
 
-            ShimEventAudit.AllInstances.GetListEventsSPListStringStringListOfSPEventReceiverType = (a, b, c, e, f) => new List<SPEventReceiverDefinition> { new ShimSPEventReceiverDefinition().Instance};
+            ShimEventAudit.AllInstances.GetListEventsSPListStringStringIListOfSPEventReceiverType = (a, b, c, e, f) => new List<SPEventReceiverDefinition> { new ShimSPEventReceiverDefinition().Instance};
 
             ShimSPList.AllInstances.EventReceiversGet = _ => new ShimSPEventReceiverDefinitionCollection();
 
