@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using EPMLiveCore.API;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
+using EPMLiveCore.Infrastructure.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
