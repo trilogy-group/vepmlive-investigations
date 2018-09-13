@@ -168,9 +168,11 @@ namespace EPMLiveCore.API
                             command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
                             command.ExecuteNonQuery();
 
-                            command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONCONTROLS where PlatformIntegrationId=@id", cn);
-                            command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
-                            command.ExecuteNonQuery();
+                            using (command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONCONTROLS where PlatformIntegrationId=@id", cn))
+                            {
+                                command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
+                                command.ExecuteNonQuery();
+                            }
 
                             using (command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONS where PlatformIntegrationId=@id", cn))
                             {
