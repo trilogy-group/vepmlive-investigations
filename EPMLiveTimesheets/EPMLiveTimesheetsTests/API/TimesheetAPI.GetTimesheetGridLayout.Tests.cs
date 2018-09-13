@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Data;
 using System.Data.SqlClient.Fakes;
 using System.Linq;
@@ -11,34 +12,31 @@ using TimeSheets.Fakes;
 namespace TimeSheets.Tests
 {
     [TestClass]
-    public class TimesheetAPIAutoAddWorkTests : SheetTestBase
+    public class TimesheetAPIGetTimesheetGridLayoutTests : SheetTestBase
     {
         private const int UserId = 23;
-        private const int StatusId = 5;
-        private const int PictureId = 7;
-        private static readonly string XmlSample = $"<root ID=\"10\" UserId=\"{UserId}\"><a></a></root>";
-        private const int ApprovalStatusId = 9;
+        private static readonly string XmlSample = $"<root GridType=\"10\" Period=\"may\" GridId=\"91\" Editable=\"true\" UserId=\"{UserId}\"></root>";
         private const string Result = "result-sample";
         private const string ResultText = "result-text-sample";
         private const int ResultFieldIndex = 2;
         private const int ResultTextFieldIndex = 3;
 
         [TestMethod]
-        public void AutoAddWork_Called_SqlDisposed()
+        public void GetTimesheetGridLayout_Called_SqlDisposed()
         {
             // Arrange
             SetupShims();
 
             // Act
-            var message = TimesheetAPI.AutoAddWork(XmlSample, _sharepointShims.WebShim);
+            var message = TimesheetAPI.GetTimesheetGridLayout(XmlSample, _sharepointShims.WebShim);
 
             // Assert
             Assert.AreEqual(
-                "<AutoAddWork Status=\"0\"></AutoAddWork>",
+                Resource.GetTimesheetGridLayout_Called_SqlDisposed_ExpectedResult,
                 message);
             Assert.IsTrue(_adoShims.ConnectionsDisposed.Any());
-            Assert.AreEqual(3, _adoShims.CommandsDisposed.Count);
-            Assert.AreEqual(3, _adoShims.DataReadersDisposed.Count);
+            Assert.AreEqual(1, _adoShims.CommandsDisposed.Count);
+            Assert.AreEqual(1, _adoShims.DataAdaptersDisposed.Count);
         }
 
         private void SetupShims()
@@ -51,24 +49,15 @@ namespace TimeSheets.Tests
             };
 
             ShimSqlDataReader.AllInstances.GetInt32Int32 = (instance, num) => 0;
-            ShimSqlDataReader.AllInstances.GetStringInt32 = (instance, num) =>
-            {
-                if (readNum == 0)
-                {
-                    if (num == ResultFieldIndex)
-                    {
-                        return Result;
-                    }
-                    else if (num == ResultTextFieldIndex)
-                    {
-                        return ResultText;
-                    }
-                }
-                throw new Exception("Unexpected call to GetString.");
-            };
+            ShimSqlDataReader.AllInstances.GetStringInt32 = (instance, num) => string.Empty;
             ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => true.ToString();
             ShimTimesheetAPI.CheckNonTeamMemberAllocationSPWebStringStringString
                 = (_, __, ___, ____) => { };
+            ShimTimesheetAPI.GetPeriodDaysArraySqlConnectionTimesheetSettingsSPWebString =
+                (cn, settings, web, sPeriod) =>
+                {
+                    return new ArrayList(new [] { new DateTime(2018, 01, 22) });
+                };
 
             ShimMyWorkReportData.ConstructorGuid = (instance, __) =>
             {
@@ -77,6 +66,8 @@ namespace TimeSheets.Tests
                     ExecuteSqlString = _ => new DataTable()
                 };
             };
+
+            ShimTimesheetSettings.ConstructorSPWeb = (_, __) => { };
         }
     }
 }
