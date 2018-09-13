@@ -1345,7 +1345,6 @@ namespace TimeSheets
 
         public static string CheckSaveStatus(string data, SPWeb oWeb)
         {
-
             try
             {
                 XmlDocument doc = new XmlDocument();
@@ -1353,40 +1352,49 @@ namespace TimeSheets
 
                 string tsuid = doc.FirstChild.Attributes["ID"].Value;
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                using (var connection =
+                    GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
+                    using (var command = new SqlCommand(
+                        "SELECT STATUS,PERCENTCOMPLETE,RESULT,RESULTTEXT FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@tsuid", tsuid);
 
-                SqlCommand cmd = new SqlCommand("SELECT STATUS,PERCENTCOMPLETE,RESULT,RESULTTEXT FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31", cn);
-                cmd.Parameters.AddWithValue("@tsuid", tsuid);
+                        var status = -1;
+                        var percentComplete = 0;
+                        var result = string.Empty;
+                        var resultText = string.Empty;
 
-                int status = -1;
-                int pct = 0;
-                string result = "";
-                string resulttext = "";
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                status = reader.GetInt32(0);
+                                if (!reader.IsDBNull(1))
+                                {
+                                    percentComplete = reader.GetInt32(1);
+                                }
+                                if (!reader.IsDBNull(2))
+                                {
+                                    result = reader.GetString(2);
+                                }
+                                if (!reader.IsDBNull(3))
+                                {
+                                    resultText = reader.GetString(3);
+                                }
+                            }
+                        }
 
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
-                {
-                    status = dr.GetInt32(0);
-                    if (!dr.IsDBNull(1))
-                        pct = dr.GetInt32(1);
-                    if (!dr.IsDBNull(2))
-                        result = dr.GetString(2);
-                    if (!dr.IsDBNull(3))
-                        resulttext = dr.GetString(3);
+                        return string.Format(
+                            "<SaveStatus Result=\"0\" Status=\"{0}\" PercentComplete=\"{1}\" " +
+                            "ErrorResult=\"{2}\" ResultText=\"{3}\"></SaveStatus>",
+                            status,
+                            percentComplete,
+                            result,
+                            resultText);
+                    }
                 }
-                dr.Close();
-
-                cn.Close();
-
-
-                return "<SaveStatus Result=\"0\" Status=\"" + status + "\" PercentComplete=\"" + pct + "\" ErrorResult=\"" + result + "\" ResultText=\"" + resulttext + "\"></SaveStatus>";
-
-
             }
             catch (Exception ex)
             {
