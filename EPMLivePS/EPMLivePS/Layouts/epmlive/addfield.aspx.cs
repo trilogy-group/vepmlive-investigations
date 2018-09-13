@@ -134,29 +134,38 @@ namespace EPMLiveEnterprise
                             {
                                 WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow customField = dsF.CustomFields[i];
 
-                                SqlCommand cmd = new SqlCommand("SELECT fieldname from customfields where fieldname=@fieldname and " + modifier, cn);
-                                cmd.Parameters.AddWithValue("@fieldname", customField.MD_PROP_ID.ToString());
-                                SqlDataReader dr = cmd.ExecuteReader();
-                                if (!dr.Read())
+                                using (var command = new SqlCommand("SELECT fieldname from customfields where fieldname=@fieldname and " + modifier, cn))
                                 {
-                                    string table = "";
-                                    try
+                                    command.Parameters.AddWithValue("@fieldname", customField.MD_PROP_ID.ToString());
+
+                                    using (var reader = command.ExecuteReader())
                                     {
-                                        table = customField.MD_LOOKUP_TABLE_UID.ToString();
+                                        if (!reader.Read())
+                                        {
+                                            var table = string.Empty;
+                                            try
+                                            {
+                                                table = customField.MD_LOOKUP_TABLE_UID.ToString();
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                SystemTrace.WriteLine(ex.ToString());
+                                            }
+                                            var cfData = string.Empty;
+                                            if (table == "")
+                                            {
+                                                cfData = customField.MD_PROP_ID + "#" + ((PSLibrary.PropertyType)customField.MD_PROP_TYPE_ENUM).ToString() + "##";
+                                            }
+                                            else
+                                            {
+                                                cfData = customField.MD_PROP_ID + "#CHOICE##";
+                                            }
+
+                                            var listItem = new ListItem(customField.MD_PROP_NAME, cfData);
+                                            ListBox1.Items.Add(listItem);
+                                        }
                                     }
-                                    catch { }
-                                    string cfData = "";
-                                    if (table == "")
-                                        cfData = customField.MD_PROP_ID + "#" + ((PSLibrary.PropertyType)customField.MD_PROP_TYPE_ENUM).ToString() + "##";
-                                    else
-                                        cfData = customField.MD_PROP_ID + "#CHOICE##";
-
-                                    
-
-                                    ListItem li = new ListItem(customField.MD_PROP_NAME, cfData);
-                                    ListBox1.Items.Add(li);
                                 }
-                                dr.Close();
                             }
                         }
 
@@ -231,7 +240,7 @@ namespace EPMLiveEnterprise
                                         break;
                                 }
 
-                                wssFieldName = $"ENT{sData[0]};
+                                wssFieldName = $"ENT{sData[0]}";
 
                                 fieldName = sData[0];
                                 displayname = listItem.Text;
