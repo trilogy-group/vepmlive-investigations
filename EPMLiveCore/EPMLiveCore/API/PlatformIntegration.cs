@@ -164,18 +164,19 @@ namespace EPMLiveCore.API
                             SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
                             cn.Open();
 
-                            SqlCommand cmd = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONLOG where PlatformIntegrationId=@id", cn);
-                            cmd.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
-                            cmd.ExecuteNonQuery();
+                            SqlCommand command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONLOG where PlatformIntegrationId=@id", cn);
+                            command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
+                            command.ExecuteNonQuery();
 
-                            cmd = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONCONTROLS where PlatformIntegrationId=@id", cn);
-                            cmd.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
-                            cmd.ExecuteNonQuery(); 
-                            
-                            cmd = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONS where PlatformIntegrationId=@id", cn);
-                            cmd.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
-                            cmd.ExecuteNonQuery();
-                          
+                            command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONCONTROLS where PlatformIntegrationId=@id", cn);
+                            command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
+                            command.ExecuteNonQuery();
+
+                            using (command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONS where PlatformIntegrationId=@id", cn))
+                            {
+                                command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
+                                command.ExecuteNonQuery();
+                            }
 
                             cn.Close();
 
