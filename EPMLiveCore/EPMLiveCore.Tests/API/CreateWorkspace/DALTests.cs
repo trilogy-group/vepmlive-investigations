@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.QualityTools.Testing.Fakes;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EPMLiveCore.API;
-using Microsoft.SharePoint.Fakes;
-using Microsoft.SharePoint.Administration;
-using Microsoft.SharePoint.Administration.Fakes;
-using EPMLiveCore.Fakes;
 using System.Data.SqlClient.Fakes;
+using System.Linq;
+using EPMLiveCore.API;
+using EPMLiveCore.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
-using System.Data.SqlClient;
+using Microsoft.SharePoint.Administration.Fakes;
+using Microsoft.SharePoint.Fakes;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EPMLiveCore.Tests.API.CreateWorkspace
 {
@@ -29,6 +25,12 @@ namespace EPMLiveCore.Tests.API.CreateWorkspace
             shimContext = ShimsContext.Create();
             SetupShims();
         }
+        
+        [TestCleanup]
+        public void Cleanup()
+        {
+            shimContext?.Dispose();
+        }
 
         private void SetupShims()
         {
@@ -40,23 +42,10 @@ namespace EPMLiveCore.Tests.API.CreateWorkspace
             ShimSqlConnection.AllInstances.Open = _ => { };
             ShimSqlConnection.AllInstances.Close = _ => { };
             ShimSqlCommand.AllInstances.ExecuteScalar = _ => 1;
-
-            ShimSPSite.AllInstances.RootWebGet = _ => new ShimSPWeb
-            {
-
-            };
-
-            ShimSPSite.AllInstances.WebApplicationGet = _ => new ShimSPWebApplication
-            {
-
-            };
-
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            shimContext?.Dispose();
+            ShimSPSite.AllInstances.RootWebGet = _ => new ShimSPWeb();
+            ShimSPSite.AllInstances.WebApplicationGet = _ => new ShimSPWebApplication();
+            ShimSPSite.AllInstances.OpenWebGuid = (_, guid) => new ShimSPWeb();
+            ShimSPSite.AllInstances.OpenWeb = _ => new ShimSPWeb();
         }
 
         [TestMethod]
@@ -106,7 +95,7 @@ namespace EPMLiveCore.Tests.API.CreateWorkspace
         }
 
         [TestMethod]
-        public void SendCompletedSignalsToDB_Should_ExecuteCorrectly()
+        public void SendCompletedSignalsToDBSPWeb_Should_ExecuteCorrectly()
         {
             // Arrange
             var executeNonQuery = false;
@@ -128,7 +117,7 @@ namespace EPMLiveCore.Tests.API.CreateWorkspace
         }
 
         [TestMethod]
-        public void SendCompletedSignalsToDB_____Should_ExecuteCorrectly()
+        public void SendCompletedSignalsToDB_Should_ExecuteCorrectly()
         {
             // Arrange
             var executeNonQuery = false;
@@ -150,7 +139,7 @@ namespace EPMLiveCore.Tests.API.CreateWorkspace
         }
 
         [TestMethod]
-        public void AddToFRF()
+        public void AddToFRFGuid_Should_ExecuteCorrectly()
         {
             // Arrange
             var executeNonQuery = false;
@@ -167,9 +156,8 @@ namespace EPMLiveCore.Tests.API.CreateWorkspace
             Assert.IsTrue(executeNonQuery);
         }
 
-
         [TestMethod]
-        public void AddToFRF_()
+        public void AddToFRF_Should_ExecuteCorrectly()
         {
             // Arrange
             var executeNonQuery = false;
@@ -206,7 +194,7 @@ namespace EPMLiveCore.Tests.API.CreateWorkspace
         }
 
         [TestMethod]
-        public void GetWorkspaceStatus()
+        public void GetWorkspaceStatus_Should_ReturnExpectedStatus()
         {
             // Arrange
             const string ExpectedStatus = "Ready";
@@ -223,10 +211,103 @@ namespace EPMLiveCore.Tests.API.CreateWorkspace
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(ExpectedStatus, result);
-
         }
 
+        [TestMethod]
+        public void GetWorkspaceUrl_Should_ReturnExpectedUrl()
+        {
+            // Arrange
+            const string Url = "https://dummy.org/url";
+            ShimSPWeb.AllInstances.ListsGet = _ => new ShimSPListCollection
+            {
+                ItemGetGuid = guid => new ShimSPList
+                {
+                    GetItemByIdInt32 = id => new ShimSPListItem
+                    {
+                        ItemGetString = name => Url
+                    }
+                }
+            };
 
+            // Act
+            var result = WorkspaceData.GetWorkspaceUrl(DummyGuid, DummyGuid, DummyGuid, 1);
 
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(Url, result);
+        }
+
+        [TestMethod]
+        public void GetParentWebId_Should_ReturnExpectedResult()
+        {
+            // Arrange
+            const string Url = "https://dummy.org/url";
+            ShimSPWeb.AllInstances.ListsGet = _ => new ShimSPListCollection
+            {
+                ItemGetGuid = guid => new ShimSPList
+                {
+                    GetItemByIdInt32 = id => new ShimSPListItem
+                    {
+                        ItemGetString = name => Url
+                    }
+                }
+            };
+            ShimSPSite.ConstructorString = (_, url) => { };
+            ShimSPWeb.AllInstances.IDGet = _ => DummyGuid;
+            ShimSPWeb.AllInstances.ExistsGet = _ => true;
+
+            // Act
+            var result = WorkspaceData.GetParentWebId(DummyGuid, DummyGuid, DummyGuid, 1);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(DummyGuid, result);
+        }
+
+        [TestMethod]
+        public void AddWsPermission_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            var queryExecuted = false;
+            var bulkInserted = false;
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            {
+                queryExecuted = true;
+                return 1;
+            };
+            ShimSPSecurableObject.AllInstances.RoleAssignmentsGet = _ =>
+            {
+                var list = new List<SPRoleAssignment>
+                {
+                    new ShimSPRoleAssignment
+                    {
+                        MemberGet = () => new ShimSPGroup(),
+                        RoleDefinitionBindingsGet = () =>
+                        {
+                            var assignments = new List<SPRoleDefinition>
+                            {
+                                new ShimSPRoleDefinition
+                                {
+                                    BasePermissionsGet = () => SPBasePermissions.ViewListItems
+                                }
+                            }.AsEnumerable();
+                            return new ShimSPRoleDefinitionBindingCollection().Bind(assignments);
+                        }
+                    }
+                }.AsEnumerable();
+                return new ShimSPRoleAssignmentCollection().Bind(list);
+            };
+            ShimSqlBulkCopy.AllInstances.WriteToServerDataTable = (_, dataTable) =>
+            {
+                bulkInserted = true;
+            };
+
+            // Act
+            WorkspaceData.AddWsPermission(DummyGuid, DummyGuid);
+
+            // Assert
+            Assert.IsTrue(bulkInserted);
+            Assert.IsTrue(queryExecuted);
+        }
     }
 }
