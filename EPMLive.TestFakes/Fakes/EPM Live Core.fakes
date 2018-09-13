@@ -18,6 +18,7 @@
     <Add FullName="EPMLiveCore.Infrastructure.Setup.CreateEPMLiveDB!"/>
     <Add FullName="EPMLiveCore.ReportHelper.EPMData!"/>
     <Add FullName="EPMLiveCore.ReportHelper.ReportBiz!"/>
+    <Add Namespace="EPMLiveCore.API"/>
     <Add FullName="EPMLiveCore.API.APITeam!"/>
     <Add FullName="EPMLiveCore.Utilities!"/>
     <Add FullName="EPMLiveCore.Jobs.ResourceImportJob!"/>
@@ -63,5 +64,8 @@
     <Add FullName="EPMLiveCore.API.WorkspaceFactory!"/>
     <Add FullName="EPMLiveCore.API.WorkspaceData!"/>
     <Add FullName="EPMLiveCore.UplandPlatformAPI.IntegrationAPI!"/>
+    <Add FullName="EPMLiveCore.API.Reporting!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.CacheStoreCategory!"/>
+    <Add FullName="EPMLiveCore.ReportAuth!"/>
   </ShimGeneration>
 </Fakes>
