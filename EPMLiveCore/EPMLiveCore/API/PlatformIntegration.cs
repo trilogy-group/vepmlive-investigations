@@ -79,10 +79,11 @@ namespace EPMLiveCore.API
                             command.Parameters.AddWithValue("@key", doc.FirstChild.Attributes["IntKey"].Value);
                             command.ExecuteNonQuery();
 
-                            command = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), 'Successfully installed integration', 10)", cn);
-                            command.Parameters.AddWithValue("@intid", doc.FirstChild.Attributes["IntID"].Value);
-                            command.ExecuteNonQuery();
-
+                            using (command = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), 'Successfully installed integration', 10)", cn))
+                            {
+                                command.Parameters.AddWithValue("@intid", doc.FirstChild.Attributes["IntID"].Value);
+                                command.ExecuteNonQuery();
+                            }
      
                             foreach (XmlNode ndControl in doc.FirstChild.SelectSingleNode("Controls").SelectNodes("Control"))
                             {
