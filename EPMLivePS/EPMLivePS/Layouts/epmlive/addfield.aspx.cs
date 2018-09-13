@@ -42,18 +42,20 @@ namespace EPMLiveEnterprise
                         {
                             if (Request["pj"] == "1")
                             {
-                                SqlCommand cmd = new SqlCommand("SELECT fieldname,displayname from customfields where fieldcategory=@type and pjvisible=0 order by displayname", cn);
-                                cmd.Parameters.AddWithValue("@type", Request["type"]);
-
-                                using (var adapter = new SqlDataAdapter(cmd))
+                                using (var command = new SqlCommand("SELECT fieldname,displayname from customfields where fieldcategory=@type and pjvisible=0 order by displayname", cn))
                                 {
-                                    var dataSet = new DataSet();
-                                    adapter.Fill(dataSet);
+                                    command.Parameters.AddWithValue("@type", Request["type"]);
 
-                                    ListBox1.DataSource = dataSet.Tables[0];
-                                    ListBox1.DataTextField = "displayname";
-                                    ListBox1.DataValueField = "fieldname";
-                                    ListBox1.DataBind();
+                                    using (var adapter = new SqlDataAdapter(command))
+                                    {
+                                        var dataSet = new DataSet();
+                                        adapter.Fill(dataSet);
+
+                                        ListBox1.DataSource = dataSet.Tables[0];
+                                        ListBox1.DataTextField = "displayname";
+                                        ListBox1.DataValueField = "fieldname";
+                                        ListBox1.DataBind();
+                                    }
                                 }
                             }
                             else
