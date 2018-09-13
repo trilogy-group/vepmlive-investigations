@@ -122,6 +122,9 @@
     <Reference Include="System.Xml.Linq.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Xml.Linq.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="WorkEnginePPM.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -147,6 +150,7 @@
     <Compile Include="API\Notification\APIEmailTests.cs" />
     <Compile Include="API\Publish\APIPublishTests.cs" />
     <Compile Include="API\ResourceGrid\ResourceExporterTests.cs" />
+    <Compile Include="API\ResourceGrid\ResourceGridTests.cs" />
     <Compile Include="API\TimerTests.cs" />
     <Compile Include="CheckOpenCloseConnections.cs" />
     <Compile Include="ControlDataBuilderTest.cs" />
@@ -208,6 +212,10 @@
     <ProjectReference Include="..\..\EPMLiveWorkPlanner\EPMLiveWorkPlanner\EPMLiveWorkPlanner.csproj">
       <Project>{fcf0c151-0a3f-4b9f-9327-3bbbf109d776}</Project>
       <Name>EPMLiveWorkPlanner</Name>
+    </ProjectReference>
+	<ProjectReference Include="..\..\PortfolioEngineCore\WorkEnginePPM\WorkEnginePPM.csproj">
+      <Project>{51caf42a-31af-4b74-853f-24b672c185c2}</Project>
+      <Name>WorkEnginePPM</Name>
     </ProjectReference>
     <ProjectReference Include="..\EPMLiveCore\EPMLiveCore.csproj">
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
