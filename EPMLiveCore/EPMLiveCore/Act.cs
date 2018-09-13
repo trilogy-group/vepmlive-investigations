@@ -151,6 +151,9 @@ namespace EPMLiveCore
                         : PurchasedLicense;
                 case NewPurchaseMethod:
                     return CheckNewPurchaseMethod(feature, username, dsInfo);
+                default:
+                    Trace.WriteLine("Unexpected activationType: " + activationType);
+                    break;
             }
 
             return -1;
@@ -160,7 +163,7 @@ namespace EPMLiveCore
         {
             if (dsInfo.Tables.Count < 3)
             {
-                throw new ArgumentNullException("dsInfo.Tables should have at least 3 tables.");
+                throw new ArgumentException("dsInfo.Tables should have at least 3 tables.", nameof(dsInfo));
             }
             var hasPurchased = false;
             var hasAccess = false;
