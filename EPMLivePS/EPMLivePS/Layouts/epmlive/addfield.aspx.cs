@@ -234,20 +234,22 @@ namespace EPMLiveEnterprise
                         else
                             fieldName = li.Value;
 
-                        SqlCommand cmd = new SqlCommand("spShowField", cn);
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddWithValue("@fieldname", fieldName);
-                        cmd.Parameters.AddWithValue("@displayname", displayname);
-                        cmd.Parameters.AddWithValue("@fieldtype", fieldtype);
-                        cmd.Parameters.AddWithValue("@wssfieldname", wssFieldName);
-                        cmd.Parameters.AddWithValue("@assnfieldname", assnfieldname);
-                        cmd.Parameters.AddWithValue("@isPj", isPj);
-                        cmd.Parameters.AddWithValue("@fieldcategory", Request["type"].ToString());
-                        if(assnupdatefield != "")
-                            cmd.Parameters.AddWithValue("@assnupdatefield", assnupdatefield);
-
-
-                        cmd.ExecuteNonQuery();
+                        using (var command = new SqlCommand("spShowField", cn))
+                        {
+                            command.CommandType = CommandType.StoredProcedure;
+                            command.Parameters.AddWithValue("@fieldname", fieldName);
+                            command.Parameters.AddWithValue("@displayname", displayname);
+                            command.Parameters.AddWithValue("@fieldtype", fieldtype);
+                            command.Parameters.AddWithValue("@wssfieldname", wssFieldName);
+                            command.Parameters.AddWithValue("@assnfieldname", assnfieldname);
+                            command.Parameters.AddWithValue("@isPj", isPj);
+                            command.Parameters.AddWithValue("@fieldcategory", Request["type"].ToString());
+                            if (assnupdatefield != string.Empty)
+                            {
+                                command.Parameters.AddWithValue("@assnupdatefield", assnupdatefield);
+                            }
+                            command.ExecuteNonQuery();
+                        }
                     }
                 }
                 cn.Close();
