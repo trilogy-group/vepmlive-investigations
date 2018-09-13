@@ -280,313 +280,414 @@ namespace EPMLiveCore
             }
         }
 
-        private static Dictionary<string, PlannerDefinition> iGetPlannerList(SPWeb lweb, SPWeb web, SPListItem li)
+        private static Dictionary<string, PlannerDefinition> iGetPlannerList(SPWeb lockedWeb, SPWeb inWeb, SPListItem listItem)
         {
-            Dictionary<string, PlannerDefinition> pList = new Dictionary<string, PlannerDefinition>();
-
+            var plannerList = new Dictionary<string, PlannerDefinition>();
             try
             {
-                if (li == null)
+                if (listItem == null)
                 {
-                    string planners = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlannerPlanners");
-
-                    bool bDisableProject = false;
-                    bool bDisablePlan = false;
-
-                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveDisablePublishing"), out bDisableProject);
-                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveDisablePlanners"), out bDisablePlan);
-
-                    bool foundpj = false;
-
-                    foreach (string planner in planners.Split(','))
-                    {
-                        if (!String.IsNullOrEmpty(planner))
-                        {
-
-                            string[] sPlanner = planner.Split('|');
-                            string tc = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "TaskCenter");
-                            string pc = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "ProjectCenter");
-                            string desc = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "Description");
-
-                            bool canProject = false;
-                            bool canOnline = false;
-
-                            if (EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "EnableOnline") == "")
-                                canOnline = true;
-                            else
-                                bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "EnableOnline"), out canOnline);
-
-                            if (!canOnline)
-                                bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "EnableKanban"), out canOnline);
-
-                            bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "EnableProject"), out canProject);
-
-                            if ((!bDisablePlan && canOnline) || (!bDisableProject && canProject))
-                            {
-                                if (canProject)
-                                    foundpj = true;
-
-                                SPList oPC = web.Lists.TryGetList(pc);
-                                SPList oTC = web.Lists.TryGetList(tc);
-
-                                if (oPC != null && oTC != null)
-                                {
-                                    pList.Add(sPlanner[0], CreatePlannerDef(sPlanner[1], "/_layouts/epmlive/images/planner16.png", true, oTC.Title, desc, 1, oPC.Title));
-                                }
-                            }
-                        }
-                    }
-
-                    if (!foundpj)
-                    {
-                        if (lweb.Lists.TryGetList("Planner Templates") == null)
-                        {
-                            pList.Add("MPP", CreatePlannerDef("Microsoft Office Project", "/_layouts/epmlive/images/planner16.png", true, "Task Center", "", 1, "Project Center"));
-                        }
-                    }
-
-                    if (!bDisablePlan)
-                    {
-                        if (web.Site.Features[new Guid("91f0c887-2db2-44b2-b15c-47c69809c767")] != null)
-                        {
-                            bool enableWP = false;
-                            string spc = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLiveWPProjectCenter");
-                            string stc = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLiveWPTaskCenter");
-                            try
-                            {
-                                enableWP = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLiveWPEnable"));
-                            }
-                            catch { }
-                            SPList oPC = web.Lists.TryGetList(spc);
-                            SPList oTC = web.Lists.TryGetList(stc);
-                            if (enableWP && oPC != null && oTC != null)
-                            {
-                                pList.Add("WorkEngineWorkPlanner", CreatePlannerDef("Work Planner", "/_layouts/epmlive/images/planner16.png", true, oTC.Title, "WorkEngine Work Planner", 3, oPC.Title));
-                            }
-                        }
-                        //================Old Agile planner===============
-                        {
-                            bool enableAgile = false;
-                            string spca = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLiveAgileProjectCenter");
-                            string stca = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLiveAgileTaskCenter");
-                            try
-                            {
-                                enableAgile = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLiveAgileEnable"));
-                            }
-                            catch { }
-
-                            SPList oPC = web.Lists.TryGetList(spca);
-                            SPList oTC = web.Lists.TryGetList(stca);
-                            if (enableAgile && oPC != null && oTC != null)
-                            {
-                                pList.Add("WorkEngineAgilePlanner", CreatePlannerDef("Agile Planner", "/_layouts/epmlive/images/planner16.png", true, oTC.Title, "WorkEngine Agile Planner", 3, oPC.Title));
-                            }
-                        }
-                    }
-
-                    bool disableProject = false;
-                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveDisablePublishing"), out disableProject);
-
-                    if (!disableProject)
-                    {
-                        string pubPC = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "epmlivepub-pc", false);
-                        string pubTC = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "epmlivepub-tc", false);
-                        bool foundmpp = false;
-                        SPList oPC = web.Lists.TryGetList(pubPC);
-                        SPList oTC = web.Lists.TryGetList(pubTC);
-                        if (oPC != null && oTC != null)
-                        {
-                            try
-                            {
-                                SPDocumentLibrary lib = (SPDocumentLibrary)web.Lists["Project Schedules"];
-                                if (lib != null)
-                                {
-                                    if (lib.ContentTypesEnabled)
-                                    {
-                                        foreach (SPContentType ct in lib.ContentTypes)
-                                        {
-                                            string template = ct.DocumentTemplateUrl;
-                                            if (template.Substring(template.Length - 3, 3) == "mpp")
-                                            {
-                                                foundmpp = true;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        string template = lib.DocumentTemplateUrl;
-                                        if (template.Substring(template.Length - 3, 3) == "mpp")
-                                        {
-                                            foundmpp = true;
-                                        }
-                                    }
-                                }
-                            }
-                            catch { }
-                            if (foundmpp)
-                            {
-                                pList.Add("EditInMicrosoftProject", CreatePlannerDef("Microsoft Project", "/_layouts/images/Project2007LogoSmall.gif", true, oTC.Title, "Edit Schedule in Microsoft Office Project", 2, oPC.Title));
-                            }
-                        }
-                    }
+                    AddProjectIfFound(lockedWeb, inWeb, plannerList);
                 }
                 else
                 {
-
-
-                    SPList list = li.ParentList;
-
-                    string planners = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlannerPlanners");
-
-                    bool bDisableProject = false;
-                    bool bDisablePlan = false;
-
-                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveDisablePublishing"), out bDisableProject);
-                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveDisablePlanners"), out bDisablePlan);
-
-                    bool foundpj = false;
-
-                    foreach (string planner in planners.Split(','))
+                    var list = listItem.ParentList;
+                    var planners = getConfigSetting(lockedWeb, "EPMLivePlannerPlanners");
+                    var bDisableProject = false;
+                    var bDisablePlan = false;
+                    bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePublishing"), out bDisableProject);
+                    bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePlanners"), out bDisablePlan);
+                    if (list == null)
                     {
-                        if (!String.IsNullOrEmpty(planner))
-                        {
-
-                            string[] sPlanner = planner.Split('|');
-
-                            bool canProject = false;
-                            bool canOnline = false;
-
-                            bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + sPlanner[0] + "EnableOnline"), out canOnline);
-                            bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + sPlanner[0] + "EnableProject"), out canProject);
-
-                            if ((!bDisablePlan && canOnline) || (!bDisableProject && canProject))
-                            {
-                                string tc = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "TaskCenter");
-                                string pc = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "ProjectCenter");
-                                string desc = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "Description");
-
-                                SPList oPC = web.Lists.TryGetList(pc);
-                                SPList oTC = web.Lists.TryGetList(tc);
-
-                                if (oPC != null && oTC != null)
-                                {
-                                    foundpj = true;
-                                    if (list.Title == oPC.Title)
-                                    {
-                                        pList.Add(sPlanner[0], CreatePlannerDef(sPlanner[1], "/_layouts/epmlive/images/planner16.png", true, "ListEPMLivePlanner", desc, 1, "planner:"));
-                                    }
-                                    else if (list.Title == oTC.Title)
-                                    {
-                                        pList.Add(sPlanner[0], CreatePlannerDef(sPlanner[1], "/_layouts/epmlive/images/planner16.png", true, "ListEPMLiveTaskPlanner", desc, 1, "taskplanner:"));
-                                    }
-                                }
-                            }
-                        }
+                        throw new InvalidOperationException("list should not be null.");
                     }
 
-                    if (!foundpj && li.ParentList.Title == "Project Center")
+                    var foundpj = AddParentPlanners(lockedWeb, inWeb, plannerList, list.Title, planners, bDisableProject, bDisablePlan);
+                    if (!foundpj && list.Title == "Project Center")
                     {
-                        if (lweb.Lists.TryGetList("Planner Templates") == null)
+                        if (lockedWeb.Lists.TryGetList("Planner Templates") == null)
                         {
-                            pList.Add("MPP", CreatePlannerDef("Microsoft Office Project", "/_layouts/epmlive/images/planner16.png", true, "ListEPMLivePlanner", "", 1, "planner:"));
+                            plannerList.Add(
+                                "MPP",
+                                CreatePlannerDef(
+                                    "Microsoft Office Project",
+                                    "/_layouts/epmlive/images/planner16.png",
+                                    true,
+                                    "ListEPMLivePlanner",
+                                    string.Empty,
+                                    1,
+                                    "planner:"));
                         }
                     }
 
                     if (!bDisablePlan)
                     {
-                        //================Old Work planner===============
-                        if (web.Site.Features[new Guid("91f0c887-2db2-44b2-b15c-47c69809c767")] != null)
+                        if (FeatureExists(inWeb, "91f0c887-2db2-44b2-b15c-47c69809c767"))
                         {
-                            bool enableWP = false;
-                            string spc = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLiveWPProjectCenter");
-                            string stc = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLiveWPTaskCenter");
-                            try
-                            {
-                                enableWP = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLiveWPEnable"));
-                            }
-                            catch { }
-
-                            if (enableWP && web.Lists.TryGetList(spc) != null && web.Lists.TryGetList(stc) != null && String.Equals(spc, list.Title, StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                pList.Add("WorkEngineWorkPlanner", CreatePlannerDef("Work Planner", "/_layouts/images/epmlivelogosmall.gif", true, "PlannerWP", "WorkEngine Work Planner", 3, ""));
-                            }
+                            AddParentWorkOrAgilePlanner(lockedWeb, inWeb, plannerList, list.Title, "WP", "Work");
                         }
-                        //================Old Agile planner===============
-                        bool enableAgile = false;
-                        string spca = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLiveAgileProjectCenter");
-                        string stca = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLiveAgileTaskCenter");
-                        try
-                        {
-                            enableAgile = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLiveAgileEnable"));
-                        }
-                        catch { }
-
-                        if (enableAgile && web.Lists.TryGetList(spca) != null && web.Lists.TryGetList(stca) != null && String.Equals(spca, list.Title, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            pList.Add("WorkEngineAgilePlanner", CreatePlannerDef("Agile Planner", "/_layouts/images/epmlivelogosmall.gif", true, "PlannerAgile", "WorkEngine Agile Planner", 3, ""));
-                        }
+                        AddParentWorkOrAgilePlanner(lockedWeb, inWeb, plannerList, list.Title, "Agile", "Agile");
                     }
 
-                    //======================Project Pro=====================
+                    AddEditInProject(inWeb, plannerList, list);
+                }
 
-                    bool disableProject = false;
-                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveDisablePublishing"), out disableProject);
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.ToString());
+            }
+            return plannerList;
+        }
 
-                    if (!disableProject)
+        private static void AddProjectIfFound(SPWeb lockedWeb, SPWeb inWeb, Dictionary<string, PlannerDefinition> plannerList)
+        {
+            var planners = getConfigSetting(lockedWeb, "EPMLivePlannerPlanners");
+            var bDisableProject = false;
+            var bDisablePlan = false;
+            bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePublishing"), out bDisableProject);
+            bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePlanners"), out bDisablePlan);
+
+            var isProjectFound = AddPlannersToPlannersList(lockedWeb, inWeb, plannerList, planners, bDisableProject, bDisablePlan);
+            if (!isProjectFound)
+            {
+                if (lockedWeb.Lists.TryGetList("Planner Templates") == null)
+                {
+                    plannerList.Add(
+                        "MPP",
+                        CreatePlannerDef("Microsoft Office Project",
+                        "/_layouts/epmlive/images/planner16.png",
+                        true,
+                        "Task Center",
+                        string.Empty,
+                        1,
+                        "Project Center"));
+                }
+            }
+
+            if (!bDisablePlan)
+            {
+                if (FeatureExists(inWeb, "91f0c887-2db2-44b2-b15c-47c69809c767"))
+                {
+                    AddWorkOrAgilePlanner(lockedWeb, inWeb, plannerList, "WP", "Work");
+                }
+                AddWorkOrAgilePlanner(lockedWeb, inWeb, plannerList, "Agile", "Agile");
+            }
+
+            var disableProject = false;
+            bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePublishing"), out disableProject);
+
+            if (!disableProject)
+            {
+                var publisherProjectCenter = getLockConfigSetting(inWeb, "epmlivepub-pc", false);
+                var publisherTaskCenter = getLockConfigSetting(inWeb, "epmlivepub-tc", false);
+
+                var projectCenterList = inWeb.Lists.TryGetList(publisherProjectCenter);
+                var taskCenterList = inWeb.Lists.TryGetList(publisherTaskCenter);
+                if (projectCenterList != null && taskCenterList != null)
+                {
+                    var foundmpp = HasMicrosoftProjectTemplate(inWeb);
+                    if (foundmpp)
                     {
-                        string pubPC = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "epmlivepub-pc", false);
-                        if (String.Equals(pubPC, list.Title, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            string pubTC = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "epmlivepub-tc", false);
-                            bool foundmpp = false;
+                        plannerList.Add(
+                            "EditInMicrosoftProject",
+                            CreatePlannerDef(
+                                "Microsoft Project",
+                                "/_layouts/images/Project2007LogoSmall.gif",
+                                true,
+                                taskCenterList.Title,
+                                "Edit Schedule in Microsoft Office Project",
+                                2,
+                                projectCenterList.Title));
+                    }
+                }
+            }
+        }
 
-                            try
+        private static bool AddParentPlanners(
+            SPWeb lockedWeb,
+            SPWeb inWeb,
+            Dictionary<string, PlannerDefinition> plannerList,
+            string listTitle,
+            string planners,
+            bool bDisableProject,
+            bool bDisablePlan)
+        {
+            var isProjectFound = false;
+            var allPlanners = planners.Split(',');
+            foreach (string planner in allPlanners)
+            {
+                if (!string.IsNullOrWhiteSpace(planner))
+                {
+                    var sPlanner = planner.Split('|');
+
+                    var canProject = false;
+                    var canOnline = false;
+                    bool.TryParse(getConfigSetting(inWeb, $"EPMLivePlanner{sPlanner[0]}EnableOnline"), out canOnline);
+                    bool.TryParse(getConfigSetting(inWeb, $"EPMLivePlanner{sPlanner[0]}EnableProject"), out canProject);
+
+                    if ((!bDisablePlan && canOnline) ||
+                        (!bDisableProject && canProject))
+                    {
+                        var taskCenter = getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}TaskCenter");
+                        var projectCenter = getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}ProjectCenter");
+                        var description = getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}Description");
+
+                        var projectCenterList = inWeb.Lists.TryGetList(projectCenter);
+                        var taskCenterList = inWeb.Lists.TryGetList(taskCenter);
+
+                        if (projectCenterList != null && taskCenterList != null)
+                        {
+                            isProjectFound = true;
+                            if (listTitle == projectCenterList.Title)
                             {
-                                SPDocumentLibrary lib = (SPDocumentLibrary)web.Lists["Project Schedules"];
-                                if (lib != null)
-                                {
-                                    if (lib.ContentTypesEnabled)
-                                    {
-                                        foreach (SPContentType ct in lib.ContentTypes)
-                                        {
-                                            string template = ct.DocumentTemplateUrl;
-                                            if (template.Substring(template.Length - 3, 3) == "mpp")
-                                            {
-                                                foundmpp = true;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        string template = lib.DocumentTemplateUrl;
-                                        if (template.Substring(template.Length - 3, 3) == "mpp")
-                                        {
-                                            foundmpp = true;
-                                        }
-                                    }
-                                }
+                                plannerList.Add(
+                                    sPlanner[0],
+                                    CreatePlannerDef(
+                                        sPlanner[1],
+                                        "/_layouts/epmlive/images/planner16.png",
+                                        true,
+                                        "ListEPMLivePlanner",
+                                        description,
+                                        1,
+                                        "planner:"));
                             }
-                            catch { }
-                            if (foundmpp)
+                            else if (listTitle == taskCenterList.Title)
                             {
-                                if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null)
-                                {
-                                    pList.Add("EditInMicrosoftProject", CreatePlannerDef("Microsoft Project", "/_layouts/images/Project2007LogoSmall.gif", true, "EditInProject", "Edit Schedule in Microsoft Office Project", 2, ""));
-                                }
-                                else
-                                {
-                                    pList.Add("EditInMicrosoftProject", CreatePlannerDef("Microsoft Project", "/_layouts/images/Project2007LogoSmall.gif", true, "EditInPSProject", "Edit Schedule in Microsoft Office Project", 2, ""));
-                                }
+                                plannerList.Add(
+                                    sPlanner[0],
+                                    CreatePlannerDef(
+                                        sPlanner[1],
+                                        "/_layouts/epmlive/images/planner16.png",
+                                        true,
+                                        "ListEPMLiveTaskPlanner",
+                                        description,
+                                        1,
+                                        "taskplanner:"));
                             }
                         }
                     }
                 }
-
             }
-            catch { }
-            return pList;
+
+            return isProjectFound;
+        }
+
+        private static void AddEditInProject(SPWeb inWeb, Dictionary<string, PlannerDefinition> plannerList, SPList list)
+        {
+            var disableProject = false;
+            bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePublishing"), out disableProject);
+
+            if (!disableProject)
+            {
+                var publisherProjectCenter = getLockConfigSetting(inWeb, "epmlivepub-pc", false);
+                if (string.Equals(publisherProjectCenter, list.Title, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var publisherTaskCenter = getLockConfigSetting(inWeb, "epmlivepub-tc", false);
+                    var foundmpp = HasMicrosoftProjectTemplate(inWeb);
+                    if (foundmpp)
+                    {
+                        plannerList.Add(
+                            "EditInMicrosoftProject",
+                            CreatePlannerDef(
+                                "Microsoft Project",
+                                "/_layouts/images/Project2007LogoSmall.gif",
+                                true,
+                                FeatureExists(inWeb, "91f0c887-2db2-44b2-b15c-47c69809c767")
+                                    ? "EditInPSProject"
+                                    : "EditInProject",
+                                "Edit Schedule in Microsoft Office Project",
+                                2,
+                                string.Empty));
+                    }
+                }
+            }
+        }
+
+        private static bool FeatureExists(SPWeb inWeb, string featureGuidString)
+        {
+            Guid featureGuid;
+            if (!Guid.TryParse(featureGuidString, out featureGuid))
+            {
+                throw new InvalidOperationException("Unable to parse featureGuid");
+            }
+            return inWeb.Site.Features[featureGuid] != null;
+        }
+
+        private static void AddParentWorkOrAgilePlanner(
+            SPWeb lockedWeb, 
+            SPWeb inWeb, 
+            Dictionary<string, PlannerDefinition> plannerList, 
+            string listTitle,
+            string settingKey,
+            string plannerDefinition)
+        {
+            string projectCenter;
+            SPList projectCenterList, taskCenterList;
+            if (CanAddPlanner(lockedWeb, inWeb, settingKey, out projectCenter, out projectCenterList, out taskCenterList)
+                && string.Equals(projectCenter, listTitle, StringComparison.InvariantCultureIgnoreCase))
+            {
+                plannerList.Add(
+                    $"WorkEngine{plannerDefinition}Planner", 
+                    CreatePlannerDef(
+                        $"{plannerDefinition} Planner",
+                        "/_layouts/images/epmlivelogosmall.gif",
+                        true,
+                        $"Planner{settingKey}",
+                        $"WorkEngine {plannerDefinition} Planner", 
+                        3, 
+                        string.Empty));
+            }
+        }
+
+        private static bool HasMicrosoftProjectTemplate(SPWeb inWeb)
+        {
+            var isMppFound = false;
+            try
+            {
+                var documentLibrary = inWeb.Lists["Project Schedules"] as SPDocumentLibrary;
+                if (documentLibrary != null)
+                {
+                    if (documentLibrary.ContentTypesEnabled)
+                    {
+                        foreach (SPContentType contentType in documentLibrary.ContentTypes)
+                        {
+                            var template = contentType.DocumentTemplateUrl;
+                            if (template.Substring(template.Length - 3, 3) == "mpp")
+                            {
+                                isMppFound = true;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var template = documentLibrary.DocumentTemplateUrl;
+                        if (template.Substring(template.Length - 3, 3) == "mpp")
+                        {
+                            isMppFound = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.ToString());
+            }
+
+            return isMppFound;
+        }
+
+        private static void AddWorkOrAgilePlanner(
+            SPWeb lockedWeb,
+            SPWeb inWeb,
+            Dictionary<string, PlannerDefinition> plannerList,
+            string settingKey,
+            string plannerDefinition)
+        {
+            string projectCenter;
+            SPList projectCenterList, taskCenterList;
+            if (CanAddPlanner(lockedWeb, inWeb, settingKey, out projectCenter, out projectCenterList, out taskCenterList))
+            {
+                plannerList.Add(
+                    $"WorkEngine{plannerDefinition}Planner",
+                    CreatePlannerDef(
+                        $"{plannerDefinition} Planner",
+                        "/_layouts/epmlive/images/planner16.png",
+                        true,
+                        taskCenterList.Title,
+                        $"WorkEngine {plannerDefinition} Planner",
+                        3,
+                        projectCenterList.Title));
+            }
+        }
+
+        private static bool CanAddPlanner(
+            SPWeb lockedWeb,
+            SPWeb inWeb, 
+            string settingKey, 
+            out string projectCenter, 
+            out SPList projectCenterList, 
+            out SPList taskCenterList)
+        {
+            var isEnable = false;
+            projectCenter = getConfigSetting(lockedWeb, $"EPMLive{settingKey}ProjectCenter");
+
+            var taskCenter = getConfigSetting(lockedWeb, $"EPMLive{settingKey}TaskCenter");
+            bool.TryParse(getConfigSetting(lockedWeb, $"EPMLive{settingKey}Enable"), out isEnable);
+
+            projectCenterList = inWeb.Lists.TryGetList(projectCenter);
+            taskCenterList = inWeb.Lists.TryGetList(taskCenter);
+
+            return isEnable && projectCenterList != null && taskCenterList != null;
+        }
+
+        private static bool AddPlannersToPlannersList(
+            SPWeb lockedWeb,
+            SPWeb inWeb,
+            Dictionary<string, PlannerDefinition> plannerList,
+            string planners,
+            bool bDisableProject,
+            bool bDisablePlan)
+        {
+            var isProjectFound = false;
+            var allPlanners = planners.Split(',');
+            foreach (string planner in allPlanners)
+            {
+                if (!string.IsNullOrWhiteSpace(planner))
+                {
+                    var sPlanner = planner.Split('|');
+                    var taskCenter = getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}TaskCenter");
+                    var projectCenter = getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}ProjectCenter");
+                    var description = getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}Description");
+
+                    var canProject = false;
+                    var canOnline = false;
+                    if (string.IsNullOrWhiteSpace(getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}EnableOnline")))
+                    {
+                        canOnline = true;
+                    }
+                    else
+                    {
+                        bool.TryParse(getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}EnableOnline"), out canOnline);
+                    }
+
+                    if (!canOnline)
+                    {
+                        bool.TryParse(getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}EnableKanban"), out canOnline);
+                    }
+
+                    bool.TryParse(getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}EnableProject"), out canProject);
+
+                    if ((!bDisablePlan && canOnline) ||
+                        (!bDisableProject && canProject))
+                    {
+                        if (canProject)
+                        {
+                            isProjectFound = true;
+                        }
+
+                        var projectCenterList = inWeb.Lists.TryGetList(projectCenter);
+                        var taskCenterList = inWeb.Lists.TryGetList(taskCenter);
+
+                        if (projectCenterList != null && taskCenterList != null)
+                        {
+                            plannerList.Add(
+                                sPlanner[0],
+                                CreatePlannerDef(
+                                    sPlanner[1],
+                                    "/_layouts/epmlive/images/planner16.png",
+                                    true,
+                                    taskCenterList.Title,
+                                    description,
+                                    1,
+                                    projectCenterList.Title));
+                        }
+                    }
+                }
+            }
+
+            return isProjectFound;
         }
 
         public static Dictionary<string, PlannerDefinition> GetPlannerList(SPWeb inweb, SPListItem li)
