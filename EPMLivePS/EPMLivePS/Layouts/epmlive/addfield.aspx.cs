@@ -34,167 +34,171 @@ namespace EPMLiveEnterprise
                 {
                     if (!IsPostBack)
                     {
-
-                        SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
-                        cn.Open();
-
-                        if (Request["type"] == "1" || Request["type"] == "2")
+                        using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
                         {
-                            if (Request["pj"] == "1")
+                            connection.Open();
+
+                            if (Request["type"] == "1" || Request["type"] == "2")
                             {
-                                using (var command = new SqlCommand("SELECT fieldname,displayname from customfields where fieldcategory=@type and pjvisible=0 order by displayname", cn))
+                                if (Request["pj"] == "1")
                                 {
-                                    command.Parameters.AddWithValue("@type", Request["type"]);
-
-                                    using (var adapter = new SqlDataAdapter(command))
+                                    using (var command = new SqlCommand("SELECT fieldname,displayname from customfields where fieldcategory=@type and pjvisible=0 order by displayname", connection))
                                     {
-                                        var dataSet = new DataSet();
-                                        adapter.Fill(dataSet);
+                                        command.Parameters.AddWithValue("@type", Request["type"]);
 
-                                        ListBox1.DataSource = dataSet.Tables[0];
-                                        ListBox1.DataTextField = "displayname";
-                                        ListBox1.DataValueField = "fieldname";
-                                        ListBox1.DataBind();
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                using (var command = new SqlCommand("SELECT fieldname,displayname from customfields where fieldcategory=@type and visible=0 order by displayname", cn))
-                                {
-                                    command.Parameters.AddWithValue("@type", Request["type"]);
-
-                                    using (var adapter = new SqlDataAdapter(command))
-                                    {
-                                        var dataSet = new DataSet();
-                                        adapter.Fill(dataSet);
-
-                                        ListBox1.DataSource = dataSet.Tables[0];
-                                        ListBox1.DataTextField = "displayname";
-                                        ListBox1.DataValueField = "fieldname";
-                                        ListBox1.DataBind();
-                                    }
-                                }
-                            }
-                        }
-                        else if (Request["type"] == "3")
-                        {
-                            string modifier = "";
-                            if (Request["pj"] == "1")
-                            {
-                                modifier = " pjvisible = 1";
-                            }
-                            else
-                                modifier = " visible = 1";
-
-                            WebSvcCustomFields.CustomFields cf = new WebSvcCustomFields.CustomFields();
-                            cf.Url = SPContext.Current.Site.Url + "/_vti_bin/PSI/customfields.asmx";
-                            cf.UseDefaultCredentials = true;
-
-                            WebSvcCustomFields.CustomFieldDataSet dsF = cf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
-                            for (int i = 0; i < dsF.CustomFields.Count; i++)
-                            {
-                                WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow customField = dsF.CustomFields[i];
-
-                                using (var command = new SqlCommand("SELECT fieldname from customfields where fieldname=@fieldname and " + modifier, cn))
-                                {
-                                    command.Parameters.AddWithValue("@fieldname", customField.MD_PROP_ID.ToString());
-                                    using (var reader = command.ExecuteReader())
-                                    {
-                                        if (!reader.Read())
+                                        using (var adapter = new SqlDataAdapter(command))
                                         {
-                                            var table = string.Empty;
-                                            try
-                                            {
-                                                table = customField.MD_LOOKUP_TABLE_UID.ToString();
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                SystemTrace.WriteLine(ex.ToString());
-                                            }
-                                            var cfData = string.Empty;
-                                            var choice = "CHOICE";
-                                            if (table == string.Empty)
-                                            {
-                                                choice = ((PSLibrary.PropertyType)customField.MD_PROP_TYPE_ENUM).ToString();
-                                            }
+                                            var dataSet = new DataSet();
+                                            adapter.Fill(dataSet);
 
-                                            if (customField.IsMD_PROP_FORMULANull())
-                                            {
-                                                cfData = customField.MD_PROP_ID + "#" + choice + "#" + customField.MD_PROP_UID_SECONDARY + "#" + customField.MD_PROP_UID_SECONDARY;
-                                            }
-                                            else
-                                            {
-                                                cfData = customField.MD_PROP_ID + "#" + choice + "#" + customField.MD_PROP_UID_SECONDARY + "#";
-                                            }
+                                            ListBox1.DataSource = dataSet.Tables[0];
+                                            ListBox1.DataTextField = "displayname";
+                                            ListBox1.DataValueField = "fieldname";
+                                            ListBox1.DataBind();
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    using (var command = new SqlCommand("SELECT fieldname,displayname from customfields where fieldcategory=@type and visible=0 order by displayname", connection))
+                                    {
+                                        command.Parameters.AddWithValue("@type", Request["type"]);
 
-                                            var listItem = new ListItem(customField.MD_PROP_NAME, cfData);
-                                            ListBox1.Items.Add(listItem);
+                                        using (var adapter = new SqlDataAdapter(command))
+                                        {
+                                            var dataSet = new DataSet();
+                                            adapter.Fill(dataSet);
+
+                                            ListBox1.DataSource = dataSet.Tables[0];
+                                            ListBox1.DataTextField = "displayname";
+                                            ListBox1.DataValueField = "fieldname";
+                                            ListBox1.DataBind();
+                                        }
+                                    }
+                                }
+                            }
+                            else if (Request["type"] == "3")
+                            {
+                                string modifier = "";
+                                if (Request["pj"] == "1")
+                                {
+                                    modifier = " pjvisible = 1";
+                                }
+                                else
+                                {
+                                    modifier = " visible = 1";
+                                }
+
+                                WebSvcCustomFields.CustomFields cf = new WebSvcCustomFields.CustomFields();
+                                cf.Url = SPContext.Current.Site.Url + "/_vti_bin/PSI/customfields.asmx";
+                                cf.UseDefaultCredentials = true;
+
+                                WebSvcCustomFields.CustomFieldDataSet dsF = cf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                                for (int i = 0; i < dsF.CustomFields.Count; i++)
+                                {
+                                    WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow customField = dsF.CustomFields[i];
+
+                                    using (var command = new SqlCommand("SELECT fieldname from customfields where fieldname=@fieldname and " + modifier, connection))
+                                    {
+                                        command.Parameters.AddWithValue("@fieldname", customField.MD_PROP_ID.ToString());
+                                        using (var reader = command.ExecuteReader())
+                                        {
+                                            if (!reader.Read())
+                                            {
+                                                var table = string.Empty;
+                                                try
+                                                {
+                                                    table = customField.MD_LOOKUP_TABLE_UID.ToString();
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    SystemTrace.WriteLine(ex.ToString());
+                                                }
+                                                var cfData = string.Empty;
+                                                var choice = "CHOICE";
+                                                if (table == string.Empty)
+                                                {
+                                                    choice = ((PSLibrary.PropertyType)customField.MD_PROP_TYPE_ENUM).ToString();
+                                                }
+
+                                                if (customField.IsMD_PROP_FORMULANull())
+                                                {
+                                                    cfData = customField.MD_PROP_ID + "#" + choice + "#" + customField.MD_PROP_UID_SECONDARY + "#" + customField.MD_PROP_UID_SECONDARY;
+                                                }
+                                                else
+                                                {
+                                                    cfData = customField.MD_PROP_ID + "#" + choice + "#" + customField.MD_PROP_UID_SECONDARY + "#";
+                                                }
+
+                                                var listItem = new ListItem(customField.MD_PROP_NAME, cfData);
+                                                ListBox1.Items.Add(listItem);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else if (Request["type"] == "4")
+                            {
+                                string modifier = "";
+                                if (Request["pj"] == "1")
+                                {
+                                    modifier = " pjvisible = 1";
+                                }
+                                else
+                                {
+                                    modifier = " visible = 1";
+                                }
+
+                                WebSvcCustomFields.CustomFields cf = new WebSvcCustomFields.CustomFields();
+                                cf.Url = SPContext.Current.Site.Url + "/_vti_bin/PSI/customfields.asmx";
+                                cf.UseDefaultCredentials = true;
+
+                                WebSvcCustomFields.CustomFieldDataSet dsF = cf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.ProjectEntity.UniqueId));
+                                for (int i = 0; i < dsF.CustomFields.Count; i++)
+                                {
+                                    WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow customField = dsF.CustomFields[i];
+
+                                    using (var command = new SqlCommand("SELECT fieldname from customfields where fieldname=@fieldname and " + modifier, connection))
+                                    {
+                                        command.Parameters.AddWithValue("@fieldname", customField.MD_PROP_ID.ToString());
+
+                                        using (var reader = command.ExecuteReader())
+                                        {
+                                            if (!reader.Read())
+                                            {
+                                                var table = string.Empty;
+                                                try
+                                                {
+                                                    table = customField.MD_LOOKUP_TABLE_UID.ToString();
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    SystemTrace.WriteLine(ex.ToString());
+                                                }
+                                                var cfData = string.Empty;
+                                                if (table == string.Empty)
+                                                {
+                                                    cfData = customField.MD_PROP_ID + "#" + ((PSLibrary.PropertyType)customField.MD_PROP_TYPE_ENUM).ToString() + "##";
+                                                }
+                                                else
+                                                {
+                                                    cfData = customField.MD_PROP_ID + "#CHOICE##";
+                                                }
+
+                                                var listItem = new ListItem(customField.MD_PROP_NAME, cfData);
+                                                ListBox1.Items.Add(listItem);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                        else if (Request["type"] == "4")
-                        {
-                            string modifier = "";
-                            if (Request["pj"] == "1")
-                            {
-                                modifier = " pjvisible = 1";
-                            }
-                            else
-                                modifier = " visible = 1";
-
-                            WebSvcCustomFields.CustomFields cf = new WebSvcCustomFields.CustomFields();
-                            cf.Url = SPContext.Current.Site.Url + "/_vti_bin/PSI/customfields.asmx";
-                            cf.UseDefaultCredentials = true;
-
-                            WebSvcCustomFields.CustomFieldDataSet dsF = cf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.ProjectEntity.UniqueId));
-                            for (int i = 0; i < dsF.CustomFields.Count; i++)
-                            {
-                                WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow customField = dsF.CustomFields[i];
-
-                                using (var command = new SqlCommand("SELECT fieldname from customfields where fieldname=@fieldname and " + modifier, cn))
-                                {
-                                    command.Parameters.AddWithValue("@fieldname", customField.MD_PROP_ID.ToString());
-
-                                    using (var reader = command.ExecuteReader())
-                                    {
-                                        if (!reader.Read())
-                                        {
-                                            var table = string.Empty;
-                                            try
-                                            {
-                                                table = customField.MD_LOOKUP_TABLE_UID.ToString();
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                SystemTrace.WriteLine(ex.ToString());
-                                            }
-                                            var cfData = string.Empty;
-                                            if (table == string.Empty)
-                                            {
-                                                cfData = customField.MD_PROP_ID + "#" + ((PSLibrary.PropertyType)customField.MD_PROP_TYPE_ENUM).ToString() + "##";
-                                            }
-                                            else
-                                            {
-                                                cfData = customField.MD_PROP_ID + "#CHOICE##";
-                                            }
-
-                                            var listItem = new ListItem(customField.MD_PROP_NAME, cfData);
-                                            ListBox1.Items.Add(listItem);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        cn.Close();
                     }
                 }
                 catch (Exception ex)
                 {
                     Response.Write(ex.Message);
+                    SystemTrace.WriteLine(ex.ToString());
                 }
             });
         }
