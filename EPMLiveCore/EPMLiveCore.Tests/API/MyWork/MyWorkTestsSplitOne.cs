@@ -328,7 +328,6 @@ namespace EPMLiveCore.Tests.API.MyWork
                () => actual.Where(x => x.ToString() == guid.ToString()).Count().ShouldBe(expected));
        }
 
-        /**
        [TestMethod]
        public void GetListNameFromDb_WhenCalled_ReturnsString()
        {
@@ -390,6 +389,7 @@ namespace EPMLiveCore.Tests.API.MyWork
                () => actual.Attribute("Format").Value.ShouldBe(expectedFormat));
        }
 
+        /**
        [TestMethod]
        public void SaveGlobalViews_WhenCalled_SavesViews()
        {
