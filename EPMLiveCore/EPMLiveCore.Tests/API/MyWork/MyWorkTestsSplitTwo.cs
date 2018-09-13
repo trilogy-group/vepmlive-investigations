@@ -42,6 +42,7 @@ namespace EPMLiveCore.Tests.API.MyWork
         private const string TagSiteIdExistsMethodName = "TagSiteIdExists";
         private const string CheckListEditPermissionMethodName = "CheckListEditPermission";
         private const string DeleteMyWorkGridViewMethodName = "DeleteMyWorkGridView";
+        private const string GetMyWorkMethodName = "GetMyWork";
         private const string ValueColumn = "Value";
         private const string SharePointTypeColumn = "SharePointType";
         private const string ColColumn = "Col";
@@ -60,6 +61,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             ShimSPSite.ConstructorString = (_, __) => new ShimSPSite();
             ShimUtils.CleanGuidObject = _ => guid.ToString();
             ShimUtils.GetConfigWeb = () => spWeb;
+            ShimSPSite.AllInstances.OpenWeb = _ => spWeb;
         }
 
         [TestMethod]
@@ -761,7 +763,9 @@ namespace EPMLiveCore.Tests.API.MyWork
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual.Count.ShouldBe(3),
-                () => actual.Count(x => x.Id == viewId).ShouldBe(2));
+                () => actual.Count(x => x.Id == viewId).ShouldBe(2),
+                () => actualSave.ShouldBeTrue(),
+                () => actualKey.ShouldBe(expectedKey));
         }
 
         [TestMethod]
@@ -894,6 +898,139 @@ namespace EPMLiveCore.Tests.API.MyWork
             actual.ShouldSatisfyAllConditions(
                 () => actual.ShouldBeTrue(),
                 () => actualOutput.Element("MyWork").ShouldNotBeNull());
+        }
+
+        [TestMethod]
+        public void GetMyWork_NotPerformanceMode_ReturnsString()
+        {
+            // Arrange
+            const string siteUrl = "siteUrl";
+
+            var archivedWebs = new List<Guid>();
+            var fieldTypes = new Dictionary<string, SPField>();
+            var methodEntered = false;
+
+            ShimUtils.GetFieldTypes = () => fieldTypes;
+            ShimMyWork.GetArchivedWebsGuid = _ => archivedWebs;
+            ShimMyWork.GetQueryString = _ => string.Empty;
+            ShimMyWork.GetDataFromListsXDocumentDictionaryOfStringSPFieldStringSPSiteSPWebListOfStringListOfString = (_, _1, _2, _3, _4, _5, _6) =>
+            {
+                methodEntered = true;
+            };
+            ShimMyWork.GetSettingsStringListOfStringRefListOfStringRefListOfStringRefBooleanRefBooleanRef =
+                (string data, ref List<string> selectedFields, ref List<string> selectedLists,
+                ref List<string> siteUrls, ref bool performanceMode, ref bool noListsSelected) =>
+                {
+                    siteUrls.Add(siteUrl);
+                    performanceMode = false;
+                };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObj.Invoke(
+                GetMyWorkMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { string.Empty }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Element("MyWork").Element("Params").Element("ProcessFlag").Value.ToLower().ShouldBe("false"),
+                () => methodEntered.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void GetMyWork_ReportingDBTrue_ReturnsString()
+        {
+            // Arrange
+            const string siteUrl = "siteUrl";
+
+            var archivedWebs = new List<Guid>();
+            var fieldTypes = new Dictionary<string, SPField>();
+            var methodEntered = false;
+
+            ShimUtils.GetFieldTypes = () => fieldTypes;
+            ShimMyWork.GetArchivedWebsGuid = _ => archivedWebs;
+            ShimMyWork.GetQueryString = _ => string.Empty;
+            ShimMyWork.ShouldUseReportingDbSPWeb = _ => true;
+            ShimMyWork.GetDataFromReportingDBDictionaryOfStringStringIEnumerableOfStringListOfGuidSPWebListOfStringString =
+                (_, _1, _2, _3, _4, _5) => new List<DataTable>()
+                {
+                    new DataTable()
+                };
+            ShimMyWork.ProcessMyWorkDataTableSPSiteSPWebIEnumerableOfStringDictionaryOfStringSPFieldDictionaryOfStringStringDictionaryOfStringStringXDocumentRef =
+                (DataTable dataTable, SPSite spSite, SPWeb spWeb,
+                IEnumerable<string> selectedFields, Dictionary<string,
+                SPField> fieldTypesParam, Dictionary<string, string> workTypes,
+                Dictionary<string, string> workspaces, ref XDocument result) =>
+                {
+                    methodEntered = true;
+                };
+            ShimMyWork.GetSettingsStringListOfStringRefListOfStringRefListOfStringRefBooleanRefBooleanRef =
+                (string data, ref List<string> selectedFields, ref List<string> selectedLists,
+                ref List<string> siteUrls, ref bool performanceMode, ref bool noListsSelected) =>
+                {
+                    siteUrls.Add(siteUrl);
+                    performanceMode = true;
+                };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObj.Invoke(
+                GetMyWorkMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { string.Empty }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Element("MyWork").Element("Params").Element("ProcessFlag").Value.ToLower().ShouldBe("false"),
+                () => methodEntered.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void GetMyWork_ReportingDBFalse_ReturnsString()
+        {
+            // Arrange
+            const string siteUrl = "siteUrl";
+
+            var archivedWebs = new List<Guid>();
+            var fieldTypes = new Dictionary<string, SPField>();
+            var methodEntered = false;
+
+            ShimUtils.GetFieldTypes = () => fieldTypes;
+            ShimMyWork.GetArchivedWebsGuid = _ => archivedWebs;
+            ShimMyWork.GetQueryString = _ => string.Empty;
+            ShimMyWork.ShouldUseReportingDbSPWeb = _ => false;
+            ShimMyWork.GetDataFromSPListOfStringSPSiteDataQuerySPWebSPSiteListOfGuidIEnumerableOfString =
+                (_, _1, _2, _3, _4, _5) => new List<DataTable>()
+                {
+                    new DataTable()
+                };
+            ShimMyWork.ProcessMyWorkDataTableSPSiteSPWebIEnumerableOfStringDictionaryOfStringSPFieldDictionaryOfStringStringDictionaryOfStringStringXDocumentRef =
+                (DataTable dataTable, SPSite spSite, SPWeb spWeb,
+                IEnumerable<string> selectedFields, Dictionary<string,
+                SPField> fieldTypesParam, Dictionary<string, string> workTypes,
+                Dictionary<string, string> workspaces, ref XDocument result) =>
+                {
+                    methodEntered = true;
+                };
+            ShimMyWork.GetSettingsStringListOfStringRefListOfStringRefListOfStringRefBooleanRefBooleanRef =
+                (string data, ref List<string> selectedFields, ref List<string> selectedLists,
+                ref List<string> siteUrls, ref bool performanceMode, ref bool noListsSelected) =>
+                {
+                    siteUrls.Add(siteUrl);
+                    performanceMode = true;
+                    noListsSelected = false;
+                    selectedFields.Add(ListIdColumn);
+                };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObj.Invoke(
+                GetMyWorkMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { string.Empty }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Element("MyWork").Element("Params").Element("ProcessFlag").Value.ToLower().ShouldBe("true"),
+                () => methodEntered.ShouldBeTrue());
         }
     }
 }
