@@ -93,15 +93,15 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             {
                 FieldsGet = () => new ShimSPFieldCollection().Bind(new SPField[]
                 {
-                            new ShimSPFieldLookup
-                            {
-                                LookupFieldGet = () => DummyString,
-                                LookupWebIdGet = () => Guid.NewGuid(),
-                                LookupListGet = () => Guid.NewGuid().ToString()
-                            },
-                            new ShimSPFieldChoice(),
-                            new ShimSPFieldMultiChoice(),
-                            new ShimSPFieldUser()
+                    new ShimSPFieldLookup
+                    {
+                        LookupFieldGet = () => DummyString,
+                        LookupWebIdGet = () => Guid.NewGuid(),
+                        LookupListGet = () => Guid.NewGuid().ToString()
+                    },
+                    new ShimSPFieldChoice(),
+                    new ShimSPFieldMultiChoice(),
+                    new ShimSPFieldUser()
                 }),
                 ParentWebGet = () => _web,
                 GetItemsSPQuery = query => listItemCollection,
@@ -241,7 +241,8 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         public void Export_OnValidCall_ConfirmResult()
         {
             // Arrange
-            string file, message;
+            string file;
+            string message;
             var row1 = _dataTable.NewRow();
             var row2 = _dataTable.NewRow();
 
