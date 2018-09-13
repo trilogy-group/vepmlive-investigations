@@ -389,7 +389,6 @@ namespace EPMLiveCore.Tests.API.MyWork
                () => actual.Attribute("Format").Value.ShouldBe(expectedFormat));
        }
 
-        /**
        [TestMethod]
        public void SaveGlobalViews_WhenCalled_SavesViews()
        {
@@ -1067,6 +1066,6 @@ namespace EPMLiveCore.Tests.API.MyWork
                () => actual.Value.ShouldBe(expected),
                () => actual.Attribute("name").Value.ShouldBe(expected));
        }
-   **/
+
     }
 }
