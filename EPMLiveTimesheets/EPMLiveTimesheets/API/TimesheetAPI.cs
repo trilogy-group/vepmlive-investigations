@@ -5,9 +5,11 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 using System.Xml;
 using System.Xml.Linq;
 using EPMLiveCore.API;
@@ -17,8 +19,7 @@ using TimeSheets.Log;
 using TimeSheets.Models;
 using CoreReportHelper = EPMLiveCore.ReportHelper;
 using EpmCoreFunctions = EPMLiveCore.CoreFunctions;
-using System.IO;
-using System.Web;
+using EpmWorkReportData = EPMLiveCore.ReportHelper.MyWorkReportData;
 
 namespace TimeSheets
 {
@@ -3595,117 +3596,140 @@ namespace TimeSheets
                 }
 
             }
-
-
-
         }
 
         public static string AutoAddWork(string data, SPWeb oWeb)
         {
-            XmlDocument docTimesheet = new XmlDocument();
+            if (oWeb == null)
+            {
+                throw new ArgumentNullException(nameof(oWeb));
+            }
+
+            var docTimesheet = new XmlDocument();
             docTimesheet.LoadXml(data);
 
-            string tsuid = docTimesheet.FirstChild.Attributes["ID"].Value;
+            var timeSheetId = docTimesheet.FirstChild.Attributes["ID"].Value;
 
-            SqlConnection cn = null;
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            using (var connection = GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
             {
-                cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                cn.Open();
-            });
+                var submitted = false;
+                var period = 0;
 
-            bool submitted = false;
+                using (var command =
+                    new SqlCommand("SELECT submitted, period_id FROM TSTIMESHEET where TS_UID=@tsuid ", connection))
+                {
+                    command.Parameters.AddWithValue("@tsuid", timeSheetId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            submitted = reader.GetBoolean(0);
+                            period = reader.GetInt32(1);
+                        }
+                    }
+                }
 
-            int period = 0;
-
-            SqlCommand cmd = new SqlCommand("SELECT submitted, period_id FROM TSTIMESHEET where TS_UID=@tsuid ", cn);
-            cmd.Parameters.AddWithValue("@tsuid", tsuid);
-            SqlDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
-            {
-                submitted = dr.GetBoolean(0);
-                period = dr.GetInt32(1);
-            }
-            dr.Close();
-
-            string sUserId = "";
-            try
-            {
-                sUserId = docTimesheet.FirstChild.Attributes["UserId"].Value;
-            }
-            catch { }
-
-            cmd = new SqlCommand("SELECT period_start,period_end FROM TSPERIOD WHERE SITE_ID=@siteid and PERIOD_ID=@periodid", cn);
-            cmd.Parameters.AddWithValue("@siteid", oWeb.Site.ID);
-            cmd.Parameters.AddWithValue("@periodid", period);
-            dr = cmd.ExecuteReader();
-
-            DateTime fn = DateTime.MinValue;
-            DateTime st = DateTime.MaxValue;
-
-            if (dr.Read())
-            {
-                st = dr.GetDateTime(0);
-                fn = dr.GetDateTime(1);
-            }
-            dr.Close();
-
-            if (!submitted)
-            {
-                EPMLiveCore.ReportHelper.MyWorkReportData rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(oWeb.Site.ID);
-
-                ArrayList arrRows = new ArrayList();
+                var userId = string.Empty;
                 try
                 {
-                    if (docTimesheet.FirstChild.Attributes["Rows"] != null)
+                    userId = docTimesheet.FirstChild.Attributes["UserId"].Value;
+                }
+                catch (Exception exception)
+                {
+                    Trace.TraceError(exception.ToString());
+                }
+
+                DateTime finish;
+                DateTime start;
+                using (var command = new SqlCommand(
+                    "SELECT period_start,period_end FROM TSPERIOD WHERE SITE_ID=@siteid and PERIOD_ID=@periodid",
+                    connection))
+                {
+                    command.Parameters.AddWithValue("@siteid", oWeb.Site.ID);
+                    command.Parameters.AddWithValue("@periodid", period);
+                    using (var reader = command.ExecuteReader())
                     {
-                        string[] sTempRows = docTimesheet.FirstChild.Attributes["Rows"].Value.ToLower().Split(',');
-                        foreach (string sTempRow in sTempRows)
+                        finish = DateTime.MinValue;
+                        start = DateTime.MaxValue;
+
+                        if (reader.Read())
                         {
-                            if (sTempRow != "" && !arrRows.Contains(sTempRow))
-                                arrRows.Add(sTempRow);
+                            start = reader.GetDateTime(0);
+                            finish = reader.GetDateTime(1);
+                        }
+                    }
+                }
+
+                if (!submitted)
+                {
+                    var reportData = new EpmWorkReportData(oWeb.Site.ID);
+                    var rows = new List<string>();
+                    try
+                    {
+                        if (docTimesheet.FirstChild.Attributes["Rows"] != null)
+                        {
+                            var tempRows = docTimesheet.FirstChild.Attributes["Rows"].Value.Split(',');
+                            foreach (var tempRow in tempRows)
+                            {
+                                if (!string.IsNullOrWhiteSpace(tempRow) &&
+                                    !rows.Contains(tempRow, StringComparer.CurrentCultureIgnoreCase))
+                                {
+                                    rows.Add(tempRow);
+                                }
+                            }
+                        }
+
+                        var dataSet = new DataSet();
+                        using (var command =
+                            new SqlCommand("SELECT list_uid,item_id FROM TSITEM WHERE TS_UID=@tsuid", connection))
+                        {
+                            command.Parameters.AddWithValue("@tsuid", timeSheetId);
+                            using (var reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    var idValue = string.Format("{0}.{1}", reader.GetGuid(0), reader.GetInt32(1));
+                                    if (!rows.Contains(idValue))
+                                    {
+                                        rows.Add(idValue);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch(Exception exception)
+                    {
+                        Trace.TraceError(exception.ToString());
+                    }
+
+                    var user = GetUser(oWeb, userId);
+
+                    var workTable = reportData.ExecuteSql(
+                        string.Format(
+                        "SELECT * FROM lstmywork where Timesheet=1 and StartDate < '{0}' AND DueDate > '{1}' AND AssignedToID='{2}'",
+                        finish.ToString("s"),
+                        start.ToString("s"),
+                        user.ID));
+
+                    foreach (DataRow rowWork in workTable.Rows)
+                    {
+                        var workValue = string.Format(
+                            "{0}.{1}",
+                            rowWork["ListId"],
+                            rowWork["ItemId"]);
+                        if (!rows.Contains(workValue, StringComparer.CurrentCultureIgnoreCase))
+                        {
+                            AddWorkItem(rowWork, oWeb.Site, timeSheetId, Guid.NewGuid(), connection);
                         }
                     }
 
-                    DataSet dsTs = new DataSet();
-                    cmd = new SqlCommand("SELECT list_uid,item_id FROM TSITEM WHERE TS_UID=@tsuid", cn);
-                    cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                    dr = cmd.ExecuteReader();
-
-                    while (dr.Read())
-                    {
-                        string s = dr.GetGuid(0).ToString() + "." + dr.GetInt32(1);
-                        if (!arrRows.Contains(s))
-                            arrRows.Add(s);
-                    }
-                    dr.Close();
-
+                    return "<AutoAddWork Status=\"0\"></AutoAddWork>";
                 }
-                catch { }
-
-                SPUser user = GetUser(oWeb, sUserId);
-
-                DataTable dtWork = rptData.ExecuteSql("SELECT * FROM lstmywork where Timesheet=1 and StartDate < '" + fn.ToString("s") + "' AND DueDate > '" + st.ToString("s") + "' AND AssignedToID='" + user.ID + "'");
-
-                foreach (DataRow drWork in dtWork.Rows)
+                else
                 {
-                    if (!arrRows.Contains(drWork["ListId"].ToString().ToLower() + "." + drWork["ItemId"].ToString().ToLower()))
-                        AddWorkItem(drWork, oWeb.Site, tsuid, Guid.NewGuid(), cn);
+                    return "<AutoAddWork Status=\"3\">Timesheet is submitted and cannot add work.</AutoAddWork>";
                 }
-
-                cn.Close();
-
-                return "<AutoAddWork Status=\"0\"></AutoAddWork>";
             }
-            else
-            {
-                cn.Close();
-
-                return "<AutoAddWork Status=\"3\">Timesheet is submitted and cannot add work.</AutoAddWork>";
-            }
-
-
-
         }
 
         private static bool isValidMyWorkColumn(string colName)
