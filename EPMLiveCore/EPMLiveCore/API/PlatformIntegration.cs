@@ -160,33 +160,29 @@ namespace EPMLiveCore.API
 
                         SPSecurity.RunWithElevatedPrivileges(delegate()
                         {
-
-                            SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                            cn.Open();
-
-                            using (var command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONLOG where PlatformIntegrationId=@id", cn))
+                            using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
                             {
-                                command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
-                                command.ExecuteNonQuery();
+                                connection.Open();
+
+                                using (var command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONLOG where PlatformIntegrationId=@id", connection))
+                                {
+                                    command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
+                                    command.ExecuteNonQuery();
+                                }
+
+                                using (var command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONCONTROLS where PlatformIntegrationId=@id", connection))
+                                {
+                                    command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
+                                    command.ExecuteNonQuery();
+                                }
+
+                                using (var command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONS where PlatformIntegrationId=@id", connection))
+                                {
+                                    command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
+                                    command.ExecuteNonQuery();
+                                }
                             }
-
-                            using (var command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONCONTROLS where PlatformIntegrationId=@id", cn))
-                            {
-                                command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
-                                command.ExecuteNonQuery();
-                            }
-
-                            using (var command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONS where PlatformIntegrationId=@id", cn))
-                            {
-                                command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
-                                command.ExecuteNonQuery();
-                            }
-
-                            cn.Close();
-
-
                         });
-
                     }
                     else
                     {
