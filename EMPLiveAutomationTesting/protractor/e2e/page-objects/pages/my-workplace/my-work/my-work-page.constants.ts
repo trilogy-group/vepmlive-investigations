@@ -30,6 +30,19 @@ export class MyWorkPageConstants {
     static readonly searchResultsLabel = 'Search Results';
     static readonly editTitleLabel = 'Editable title Textbox';
     static readonly deleteItemMessage = 'Are you sure you want to send the item(s) to the Recycle Bin?';
+    static readonly defaultViewLabel = 'Default View';
+    static readonly deleteDefaultViewMessage = 'You cannot delete the Default View';
+    static readonly renameDefaultViewMessage = 'The default view cannot be renamed. If you want to create a new view that' +
+        ' will act as the default for all users, select the Default View and click "Save View" - this will let you create ' +
+        'a new view from the Default View schema.';
+    static readonly alertLabel = 'Alert for Default View';
+    static readonly filterRowLabel = 'Filter Row';
+    static readonly sortedColumnsLabel = 'Sorted Column';
+    static readonly workSummaryLabel = 'Work Summary';
+    static readonly newlyCreatedViewLabel = 'Newly Created view';
+    static readonly selectColumnsPopupLabel = 'Select Columns Popup';
+    static readonly selectedCheckboxLabel = 'Selected Checkbox';
+    static readonly unSelectedCheckboxLabel = 'Unselected Checkbox';
 
     static get pageName() {
         return {
@@ -101,6 +114,9 @@ export class MyWorkPageConstants {
             currentViewDropdown: `${viewSection}.CurrentViewDropDown`,
             selectColumns: `Ribbon.MyWork.Actions.SelectColoumns-Medium`,
             currentView: 'Current View:',
+            showFilters: `${viewSection}.ShowHideFilters-Medium`,
+            removeSorting: `${viewSection}.ClearSort-Medium`,
+            manageCurrentViewDropdown: 'Ribbon.MyWork.ViewsM.CurrentViewDropDown'
         };
     }
 
@@ -155,16 +171,6 @@ export class MyWorkPageConstants {
         };
     }
 
-    static get selectColumnsPopup() {
-        return {
-            ok: 'OK',
-            hideAll: 'Hide all',
-            cancel: 'Cancel',
-            column: 'GMColumnsMenuItemText',
-            columnChecked: 'GMMenuCheckedIconRight'
-        };
-    }
-
     static get headerOptions() {
         return {
             active: 'MWG_Pivot_Active',
@@ -179,15 +185,6 @@ export class MyWorkPageConstants {
             workTypes: 'Work Types',
             close: 'MWG_PivotClose',
             workTypeSubmenu: 'MWG_WorkType_Menu',
-        };
-    }
-
-    static get gridDetails() {
-        return {
-            title: 'EPMLiveMyWorkTitle',
-            workingOn: 'epmlive-toggle-switch',
-            workType: 'HideCol0Work0000Type',
-            editTitle: 'GMEditInput'
         };
     }
 

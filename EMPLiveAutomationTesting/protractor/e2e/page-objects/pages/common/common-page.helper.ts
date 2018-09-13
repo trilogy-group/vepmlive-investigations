@@ -899,4 +899,14 @@ export class CommonPageHelper {
         await CommonPageHelper.fieldDisplayedValidation
         (CommonPage.contextMenuOptions.editPlan, CommonPageConstants.contextMenuOptions.editPlan);
     }
+
+    static async filterColumnByText(elem: ElementFinder, textToSearch: string , stepLogger: StepLogger) {
+        stepLogger.step('Enter text to filter in column');
+        await browser.actions().mouseMove(elem, {x: -5, y: -5}).perform();
+        await browser.actions().click(elem).perform();
+        await browser.actions().doubleClick(elem).perform();
+        // Takes time to enable input field
+        await browser.sleep(PageHelper.timeout.xs);
+        await TextboxHelper.sendKeys(CommonPage.gridDetails.editField, textToSearch, true);
+    }
 }

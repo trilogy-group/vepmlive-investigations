@@ -570,4 +570,16 @@ export class CommonPage extends BasePage {
     static get modelerButton() {
         return CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.modeler);
     }
+
+    static getGridRowByTitle(titleName: string) {
+        return element(By.xpath(`//td[contains(@class,"${CommonPageConstants.gridDetails.title}")]//a[text()="${titleName}"]`));
+    }
+
+    static get gridDetails() {
+        const gridLabels = CommonPageConstants.gridDetails;
+        return {
+            editField: element(By.css(`.${gridLabels.editTitle}`)),
+            scroll: element(By.css(`.${gridLabels.scroll}`)),
+        };
+    }
 }

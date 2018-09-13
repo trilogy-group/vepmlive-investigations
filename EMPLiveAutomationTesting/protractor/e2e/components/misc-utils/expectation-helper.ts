@@ -487,4 +487,18 @@ export class ExpectationHelper {
         await expect(await TextboxHelper.hasValue(elementLocator, locatorValue))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(locatorValue));
     }
+
+    static async verifyAlertDisplayed( alertName = 'Alert', stepLogger: StepLogger) {
+        stepLogger.verification(`${alertName} should display`);
+        await expect(await PageHelper.isAlertPresent())
+            .toBe(true,
+                ValidationsHelper.getDisplayedValidation(alertName));
+    }
+
+    static async verifyAlertNotDisplayed( alertName = 'Alert', stepLogger: StepLogger) {
+        stepLogger.verification(`${alertName} should not display`);
+        await expect(await PageHelper.isAlertPresent())
+            .toBe(false,
+                ValidationsHelper.getNotDisplayedValidation(alertName));
+    }
 }

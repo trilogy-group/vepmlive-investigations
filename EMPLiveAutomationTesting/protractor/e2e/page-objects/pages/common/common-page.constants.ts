@@ -393,4 +393,30 @@ export class CommonPageConstants {
             predecessors2: '2',
         };
     }
+
+    static get gridDetails() {
+        return {
+            title: 'EPMLiveMyWorkTitle',
+            workingOn: 'epmlive-toggle-switch',
+            workType: 'HideCol0Work0000Type',
+            editTitle: 'GMEditInput',
+            filter: 'GMCellFilter',
+            header: 'GMHeaderText',
+            sorted: 'GMImage',
+            scroll: 'GMHScrollMid',
+            cell: 'GMCell'
+        };
+    }
+
+    static get selectColumnsPopup() {
+        return {
+            ok: 'OK',
+            hideAll: 'Hide all',
+            cancel: 'Cancel',
+            column: 'GMColumnsMenuItemText',
+            columnChecked: 'GMMenuCheckedIconRight',
+            showAll: 'Show all',
+            columnUnchecked: 'GMColumnsMenuUncheckedIconRight'
+        };
+    }
 }

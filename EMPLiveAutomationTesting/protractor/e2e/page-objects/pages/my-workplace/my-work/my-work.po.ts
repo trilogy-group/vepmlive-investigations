@@ -122,6 +122,9 @@ export class MyWorkPage {
             currentViewDropdown: AnchorHelper.getAnchorById(viewRibbonlabel.currentViewDropdown),
             selectColumns: AnchorHelper.getAnchorById(viewRibbonlabel.selectColumns),
             currentView: ElementHelper.getElementByText(viewRibbonlabel.currentView),
+            showFilters: AnchorHelper.getAnchorById(viewRibbonlabel.showFilters),
+            removeSorting: AnchorHelper.getAnchorById(viewRibbonlabel.removeSorting),
+            manageCurrentViewDropdown: AnchorHelper.getAnchorById(viewRibbonlabel.manageCurrentViewDropdown),
         };
     }
 
@@ -215,19 +218,8 @@ export class MyWorkPage {
         return element(By.xpath('//div[text()="Personal Views"]/following-sibling::ul[1]'));
     }
 
-    static get selectColumnsPopup() {
-        const selectColumnsPopupLabel = MyWorkPageConstants.selectColumnsPopup;
-        return {
-            ok: ElementHelper.getElementByText(selectColumnsPopupLabel.ok),
-            hideAll: ElementHelper.getElementByText(selectColumnsPopupLabel.hideAll),
-            cancel: ElementHelper.getElementByText(selectColumnsPopupLabel.cancel),
-            column: element.all(By.css(`.${selectColumnsPopupLabel.column}`)),
-            columnChecked: element(By.css(`.${selectColumnsPopupLabel.columnChecked}`)),
-        };
-    }
-
     static getColumnSelectedOnSelectColumnsPopup(column: string) {
-        const columnChecked = MyWorkPageConstants.selectColumnsPopup.columnChecked;
+        const columnChecked = CommonPageConstants.selectColumnsPopup.columnChecked;
         return element(By.xpath(`//div[contains(@class, "${columnChecked}")]/div[text()='${column}']`));
     }
 
@@ -244,6 +236,30 @@ export class MyWorkPage {
         };
     }
 
+    static get ellipsesDropdownForItem() {
+        const ellipsesDropdownForItemLabels = MyWorkPageConstants.ellipsesDropdownForItem;
+        return {
+            viewItem: ElementHelper.getElementByText(ellipsesDropdownForItemLabels.viewItem),
+            deleteItem: ElementHelper.getElementByText(ellipsesDropdownForItemLabels.deleteItem),
+        };
+    }
+
+    static get selectColumnsPopup() {
+        const selectColumnsPopupLabel = CommonPageConstants.selectColumnsPopup;
+        return {
+            ok: ElementHelper.getElementByText(selectColumnsPopupLabel.ok),
+            hideAll: ElementHelper.getElementByText(selectColumnsPopupLabel.hideAll),
+            cancel: ElementHelper.getElementByText(selectColumnsPopupLabel.cancel),
+            column: element.all(By.css(`.${selectColumnsPopupLabel.column}`)),
+            columnChecked: element(By.css(`.${selectColumnsPopupLabel.columnChecked}`)),
+            eachSelectedColumn: element(By.css(`.${selectColumnsPopupLabel.columnChecked}>div`)),
+            showAll: ElementHelper.getElementByText(selectColumnsPopupLabel.showAll),
+            columnUnchecked: element(By.css(`.${selectColumnsPopupLabel.columnUnchecked}`)),
+            columnNameWithImages: element.all(By.css(`.${selectColumnsPopupLabel.column}>img`)),
+            allSelectedColumn: element.all(By.css(`.${selectColumnsPopupLabel.columnChecked}>div`)),
+        };
+    }
+
     static get ellipsesDropdown() {
         const ellipsesDropdown = MyWorkPageConstants.ellipsesDropdown;
         return {
@@ -255,25 +271,28 @@ export class MyWorkPage {
     }
 
     static get gridDetails() {
-        const gridLabels = MyWorkPageConstants.gridDetails;
+        const gridLabels = CommonPageConstants.gridDetails;
         return {
             title: element.all(By.css(`.${gridLabels.title} a`)),
             workingOn: element.all(By.css(`.${gridLabels.workingOn}`)),
-            workType: element.all(By.css(`.${gridLabels.workingOn}>div`)),
+            workType: element.all(By.css(`.${gridLabels.workType}>div`)),
             editTitle: element(By.css(`.${gridLabels.editTitle}`)),
             toEdit: element.all(By.css(`.${gridLabels.title}.GMCell.GMRightHtml.HideCol0Title`)),
+            filter: element(By.css(`.${gridLabels.filter}`)),
+            workTypeFilter: element(By.css(`.${gridLabels.workType}.${gridLabels.filter}`)),
+            workTypeHeader: element(By.css(`.${gridLabels.workType}.${gridLabels.header}`)),
+            sorted: element(By.css(`.${gridLabels.workType} + td > u.${gridLabels.sorted}`)),
+            scroll: element(By.css(`.${gridLabels.scroll}`)),
+            workTypeValues: element.all(By.css(`.${gridLabels.workType}.${gridLabels.cell}>div`)),
         };
     }
 
-    static getGridRowByTitle(titleName: string) {
-        return element(By.xpath(`//td[contains(@class,"${MyWorkPageConstants.gridDetails.title}")]//a[text()="${titleName}"]`));
+    static get newlyCreatedView() {
+        const workSummary = MyWorkPageConstants.workSummaryLabel;
+        return element(By.xpath(`//span[text()="${workSummary}"]/ancestor::li[1]/following-sibling::li[1]//span[@class="ms-cui-ctl-mediumlabel"]`));
     }
 
-    static get ellipsesDropdownForItem() {
-        const ellipsesDropdownForItemLabels = MyWorkPageConstants.ellipsesDropdownForItem;
-        return {
-            viewItem: ElementHelper.getElementByText(ellipsesDropdownForItemLabels.viewItem),
-            deleteItem: ElementHelper.getElementByText(ellipsesDropdownForItemLabels.deleteItem),
-        };
+    static getColumnByNameOnSelectColumnsPopup(columnName: string) {
+        return element(By.xpath(`//div[contains(@class,'GMColumnsMenuItemText') and text()='${columnName}']`));
     }
 }

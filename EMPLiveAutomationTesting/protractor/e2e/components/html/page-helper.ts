@@ -488,4 +488,8 @@ export class PageHelper {
         await this.click(elem);
         await this.enterPressForBrowser();
     }
+
+    static async isAlertPresent() {
+        return await browser.wait(this.EC.alertIsPresent(), 1000).then(() => true).catch(() => false);
+    }
 }
