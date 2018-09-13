@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 using System.Data.SqlClient;
 using Microsoft.SharePoint;
 using PSLibrary = Microsoft.Office.Project.Server.Library;
+using SystemTrace = System.Diagnostics.Trace;
 
 namespace EPMLiveEnterprise
 {
@@ -174,85 +175,94 @@ namespace EPMLiveEnterprise
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
-                cn.Open();
-                string isPj = "0";
-                try
+                using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
                 {
-                    isPj = Request["pj"].ToString();
-                }
-                catch { }
-
-                foreach (ListItem li in ListBox1.Items)
-                {
-                    if (li.Selected)
+                    connection.Open();
+                    string isPj = "0";
+                    try
                     {
-                        string fieldName = "";
-                        string displayname = "";
-                        string fieldtype = "";
-                        string wssFieldName = "";
-                        string assnfieldname = "";
-                        string assnupdatefield = "";
+                        isPj = Request["pj"].ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        SystemTrace.WriteLine(ex.ToString());
+                    }
 
-                        if (Request["type"] == "3" || Request["type"] == "4")
+                    foreach (ListItem listItem in ListBox1.Items)
+                    {
+                        if (listItem.Selected)
                         {
-                            string[] sData = li.Value.Split('#');
-                            string xml = "";
-                            switch (sData[1])
+                            var fieldName = string.Empty;
+                            var displayname = string.Empty;
+                            var fieldtype = string.Empty;
+                            var wssFieldName = string.Empty;
+                            var assnfieldname = string.Empty;
+                            var assnupdatefield = string.Empty;
+
+                            if (Request["type"] == "3" || Request["type"] == "4")
                             {
-                                case "NumberEng96":
-                                    xml = "NUMBER";
-                                    break;
-                                case "CostEng96":
-                                    xml = "CURRENCY";
-                                    break;
-                                case "StringEng96":
-                                    xml = "TEXT";
-                                    break;
-                                case "YesNoEng96":
-                                    xml = "BOOLEAN";
-                                    break;
-                                case "DurationEng96":
-                                    xml = "DURATION";
-                                    break;
-                                case "StartDateEng96":
-                                    xml = "DATETIME";
-                                    break;
-                                case "CHOICE":
-                                    xml = "CHOICE";
-                                    break;
+                                string[] sData = listItem.Value.Split('#');
+                                var xml = string.Empty;
+                                switch (sData[1])
+                                {
+                                    case "NumberEng96":
+                                        xml = "NUMBER";
+                                        break;
+                                    case "CostEng96":
+                                        xml = "CURRENCY";
+                                        break;
+                                    case "StringEng96":
+                                        xml = "TEXT";
+                                        break;
+                                    case "YesNoEng96":
+                                        xml = "BOOLEAN";
+                                        break;
+                                    case "DurationEng96":
+                                        xml = "DURATION";
+                                        break;
+                                    case "StartDateEng96":
+                                        xml = "DATETIME";
+                                        break;
+                                    case "CHOICE":
+                                        xml = "CHOICE";
+                                        break;
+                                    default:
+                                        SystemTrace.WriteLine("Argument out of range: sData[1] = {0}", sData[1]);
+                                        break;
+                                }
+
+                                wssFieldName = $"ENT{sData[0]};
+
+                                fieldName = sData[0];
+                                displayname = listItem.Text;
+                                fieldtype = xml;
+                                assnfieldname = sData[2];
+                                assnupdatefield = sData[3];
+                            }
+                            else
+                            {
+                                fieldName = listItem.Value;
                             }
 
-                            wssFieldName = "ENT" + sData[0];
-
-                            fieldName = sData[0];
-                            displayname = li.Text;
-                            fieldtype = xml;
-                            assnfieldname = sData[2];
-                            assnupdatefield = sData[3];
-                        }
-                        else
-                            fieldName = li.Value;
-
-                        using (var command = new SqlCommand("spShowField", cn))
-                        {
-                            command.CommandType = CommandType.StoredProcedure;
-                            command.Parameters.AddWithValue("@fieldname", fieldName);
-                            command.Parameters.AddWithValue("@displayname", displayname);
-                            command.Parameters.AddWithValue("@fieldtype", fieldtype);
-                            command.Parameters.AddWithValue("@wssfieldname", wssFieldName);
-                            command.Parameters.AddWithValue("@assnfieldname", assnfieldname);
-                            command.Parameters.AddWithValue("@isPj", isPj);
-                            command.Parameters.AddWithValue("@fieldcategory", Request["type"].ToString());
-                            if (assnupdatefield != string.Empty)
+                            using (var command = new SqlCommand("spShowField", connection))
                             {
-                                command.Parameters.AddWithValue("@assnupdatefield", assnupdatefield);
+                                command.CommandType = CommandType.StoredProcedure;
+                                command.Parameters.AddWithValue("@fieldname", fieldName);
+                                command.Parameters.AddWithValue("@displayname", displayname);
+                                command.Parameters.AddWithValue("@fieldtype", fieldtype);
+                                command.Parameters.AddWithValue("@wssfieldname", wssFieldName);
+                                command.Parameters.AddWithValue("@assnfieldname", assnfieldname);
+                                command.Parameters.AddWithValue("@isPj", isPj);
+                                command.Parameters.AddWithValue("@fieldcategory", Request["type"].ToString());
+                                if (assnupdatefield != string.Empty)
+                                {
+                                    command.Parameters.AddWithValue("@assnupdatefield", assnupdatefield);
+                                }
+                                command.ExecuteNonQuery();
                             }
-                            command.ExecuteNonQuery();
                         }
                     }
                 }
-                cn.Close();
 
                 RegisterStartupScript("closeindow", "<script language=\"javascript\">opener.location.href='enterprisefields.aspx';window.close();</script>");
             });
