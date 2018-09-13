@@ -293,17 +293,17 @@ namespace EPMLiveCore
                 {
                     var list = listItem.ParentList;
                     var planners = getConfigSetting(lockedWeb, "EPMLivePlannerPlanners");
-                    var bDisableProject = false;
-                    var bDisablePlan = false;
-                    bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePublishing"), out bDisableProject);
-                    bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePlanners"), out bDisablePlan);
+                    var disableProject = false;
+                    var disablePlan = false;
+                    bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePublishing"), out disableProject);
+                    bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePlanners"), out disablePlan);
                     if (list == null)
                     {
                         throw new InvalidOperationException("list should not be null.");
                     }
 
-                    var foundpj = AddParentPlanners(lockedWeb, inWeb, plannerList, list.Title, planners, bDisableProject, bDisablePlan);
-                    if (!foundpj && list.Title == "Project Center")
+                    var isProjectFound = AddParentPlanners(lockedWeb, inWeb, plannerList, list.Title, planners, disableProject, disablePlan);
+                    if (!isProjectFound && list.Title == "Project Center")
                     {
                         if (lockedWeb.Lists.TryGetList("Planner Templates") == null)
                         {
@@ -320,7 +320,7 @@ namespace EPMLiveCore
                         }
                     }
 
-                    if (!bDisablePlan)
+                    if (!disablePlan)
                     {
                         if (FeatureExists(inWeb, "91f0c887-2db2-44b2-b15c-47c69809c767"))
                         {
@@ -343,12 +343,12 @@ namespace EPMLiveCore
         private static void AddProjectIfFound(SPWeb lockedWeb, SPWeb inWeb, Dictionary<string, PlannerDefinition> plannerList)
         {
             var planners = getConfigSetting(lockedWeb, "EPMLivePlannerPlanners");
-            var bDisableProject = false;
-            var bDisablePlan = false;
-            bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePublishing"), out bDisableProject);
-            bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePlanners"), out bDisablePlan);
+            var disableProject = false;
+            var disablePlan = false;
+            bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePublishing"), out disableProject);
+            bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePlanners"), out disablePlan);
 
-            var isProjectFound = AddPlannersToPlannersList(lockedWeb, inWeb, plannerList, planners, bDisableProject, bDisablePlan);
+            var isProjectFound = AddPlannersToPlannersList(lockedWeb, inWeb, plannerList, planners, disableProject, disablePlan);
             if (!isProjectFound)
             {
                 if (lockedWeb.Lists.TryGetList("Planner Templates") == null)
@@ -365,7 +365,7 @@ namespace EPMLiveCore
                 }
             }
 
-            if (!bDisablePlan)
+            if (!disablePlan)
             {
                 if (FeatureExists(inWeb, "91f0c887-2db2-44b2-b15c-47c69809c767"))
                 {
@@ -374,7 +374,7 @@ namespace EPMLiveCore
                 AddWorkOrAgilePlanner(lockedWeb, inWeb, plannerList, "Agile", "Agile");
             }
 
-            var disableProject = false;
+            disableProject = false;
             bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePublishing"), out disableProject);
 
             if (!disableProject)
@@ -410,12 +410,12 @@ namespace EPMLiveCore
             Dictionary<string, PlannerDefinition> plannerList,
             string listTitle,
             string planners,
-            bool bDisableProject,
-            bool bDisablePlan)
+            bool disableProject,
+            bool disablePlan)
         {
             var isProjectFound = false;
             var allPlanners = planners.Split(',');
-            foreach (string planner in allPlanners)
+            foreach (var planner in allPlanners)
             {
                 if (!string.IsNullOrWhiteSpace(planner))
                 {
@@ -426,8 +426,8 @@ namespace EPMLiveCore
                     bool.TryParse(getConfigSetting(inWeb, $"EPMLivePlanner{sPlanner[0]}EnableOnline"), out canOnline);
                     bool.TryParse(getConfigSetting(inWeb, $"EPMLivePlanner{sPlanner[0]}EnableProject"), out canProject);
 
-                    if ((!bDisablePlan && canOnline) ||
-                        (!bDisableProject && canProject))
+                    if ((!disablePlan && canOnline) ||
+                        (!disableProject && canProject))
                     {
                         var taskCenter = getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}TaskCenter");
                         var projectCenter = getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}ProjectCenter");
@@ -627,12 +627,12 @@ namespace EPMLiveCore
             SPWeb inWeb,
             Dictionary<string, PlannerDefinition> plannerList,
             string planners,
-            bool bDisableProject,
-            bool bDisablePlan)
+            bool disableProject,
+            bool disablePlan)
         {
             var isProjectFound = false;
             var allPlanners = planners.Split(',');
-            foreach (string planner in allPlanners)
+            foreach (var planner in allPlanners)
             {
                 if (!string.IsNullOrWhiteSpace(planner))
                 {
@@ -659,8 +659,8 @@ namespace EPMLiveCore
 
                     bool.TryParse(getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}EnableProject"), out canProject);
 
-                    if ((!bDisablePlan && canOnline) ||
-                        (!bDisableProject && canProject))
+                    if ((!disablePlan && canOnline) ||
+                        (!disableProject && canProject))
                     {
                         if (canProject)
                         {
@@ -706,7 +706,9 @@ namespace EPMLiveCore
                         {
                             Guid ulWeb = EPMLiveCore.CoreFunctions.getLockedWeb(web);
                             if (ulWeb == web.ID)
+                            {
                                 pList = ItemGetPlannerList(web, web, li);
+                            }
                             else
                             {
                                 using (SPWeb lweb = site.OpenWeb(ulWeb))
