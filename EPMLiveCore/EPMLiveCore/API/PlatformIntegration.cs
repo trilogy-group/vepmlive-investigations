@@ -68,11 +68,13 @@ namespace EPMLiveCore.API
                             SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
                             cn.Open();
 
-                            SqlCommand command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONS where PlatformIntegrationId=@id", cn);
-                            command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
-                            command.ExecuteNonQuery();
+                            using (var command = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONS where PlatformIntegrationId=@id", cn))
+                            {
+                                command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
+                                command.ExecuteNonQuery();
+                            }
 
-                            using (command = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONS (PlatformIntegrationId,ListId,IntegrationKey,IntegrationUrl) VALUES (@id,@listid,@key,@url)", cn))
+                            using (var command = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONS (PlatformIntegrationId,ListId,IntegrationKey,IntegrationUrl) VALUES (@id,@listid,@key,@url)", cn))
                             {
                                 command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
                                 command.Parameters.AddWithValue("@listid", doc.FirstChild.Attributes["List"].Value);
@@ -81,7 +83,7 @@ namespace EPMLiveCore.API
                                 command.ExecuteNonQuery();
                             }
 
-                            using (command = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), 'Successfully installed integration', 10)", cn))
+                            using (var command = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), 'Successfully installed integration', 10)", cn))
                             {
                                 command.Parameters.AddWithValue("@intid", doc.FirstChild.Attributes["IntID"].Value);
                                 command.ExecuteNonQuery();
@@ -89,7 +91,7 @@ namespace EPMLiveCore.API
      
                             foreach (XmlNode ndControl in doc.FirstChild.SelectSingleNode("Controls").SelectNodes("Control"))
                             {
-                                using (command = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONCONTROLS (PlatformIntegrationId, ControlId, DisplayName, Image, Global, ButtonStyle, WindowStyle) VALUES (@PlatformIntegrationId, @ControlId, @DisplayName, @Image, @Global, @ButtonStyle, @WindowStyle)", cn))
+                                using (var command = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONCONTROLS (PlatformIntegrationId, ControlId, DisplayName, Image, Global, ButtonStyle, WindowStyle) VALUES (@PlatformIntegrationId, @ControlId, @DisplayName, @Image, @Global, @ButtonStyle, @WindowStyle)", cn))
                                 {
                                     command.Parameters.AddWithValue("@PlatformIntegrationId", doc.FirstChild.Attributes["IntID"].Value);
                                     command.Parameters.AddWithValue("@ControlId", ndControl.Attributes["Id"].Value);
