@@ -72,12 +72,14 @@ namespace EPMLiveCore.API
                             command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
                             command.ExecuteNonQuery();
 
-                            command = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONS (PlatformIntegrationId,ListId,IntegrationKey,IntegrationUrl) VALUES (@id,@listid,@key,@url)", cn);
-                            command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
-                            command.Parameters.AddWithValue("@listid", doc.FirstChild.Attributes["List"].Value);
-                            command.Parameters.AddWithValue("@url", doc.FirstChild.Attributes["APIUrl"].Value);
-                            command.Parameters.AddWithValue("@key", doc.FirstChild.Attributes["IntKey"].Value);
-                            command.ExecuteNonQuery();
+                            using (command = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONS (PlatformIntegrationId,ListId,IntegrationKey,IntegrationUrl) VALUES (@id,@listid,@key,@url)", cn))
+                            {
+                                command.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
+                                command.Parameters.AddWithValue("@listid", doc.FirstChild.Attributes["List"].Value);
+                                command.Parameters.AddWithValue("@url", doc.FirstChild.Attributes["APIUrl"].Value);
+                                command.Parameters.AddWithValue("@key", doc.FirstChild.Attributes["IntKey"].Value);
+                                command.ExecuteNonQuery();
+                            }
 
                             using (command = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), 'Successfully installed integration', 10)", cn))
                             {
