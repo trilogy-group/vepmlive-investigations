@@ -74,14 +74,18 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
         public void TestInitialize()
         {
             _shimsContext = ShimsContext.Create();
-            _testObject = new CascadingLookupRenderControl();
-            _privateObject = new PrivateObject(_testObject);
 
             _scriptRegistered = false;
             _webClosed = false;
             _baseOnInitCalled = false;
 
             _page = new Page();
+
+            ShimSharePointContext();
+            ShimScriptLink.RegisterPageStringBoolean = (a, b, c) => { _scriptRegistered = true; };
+            ShimSPResource.GetStringStringObjectArray = (key, _) => key;
+            
+            _testObject = new CascadingLookupRenderControl();
             _testObject.Page = _page;
             _testObject.TabIndex = 0;
             _testObject.CustomProperty = GetDocument().ToString();
@@ -93,10 +97,7 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
                 ParentListField = DummyString
             };
 
-            ShimSharePointContext();
-            ShimScriptLink.RegisterPageStringBoolean = (a, b, c) => { _scriptRegistered = true; };
-            ShimSPResource.GetStringStringObjectArray = (key, _) => key;
-
+            _privateObject = new PrivateObject(_testObject);
             _privateObject.SetFieldOrProperty(FieldWebForeign, _shimWeb.Instance);
             _privateObject.Invoke(MethodOnInit, new object[] { EventArgs.Empty });
         }
