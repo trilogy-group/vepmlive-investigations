@@ -280,7 +280,7 @@ namespace EPMLiveCore
             }
         }
 
-        private static Dictionary<string, PlannerDefinition> iGetPlannerList(SPWeb lockedWeb, SPWeb inWeb, SPListItem listItem)
+        private static Dictionary<string, PlannerDefinition> ItemGetPlannerList(SPWeb lockedWeb, SPWeb inWeb, SPListItem listItem)
         {
             var plannerList = new Dictionary<string, PlannerDefinition>();
             try
@@ -706,12 +706,12 @@ namespace EPMLiveCore
                         {
                             Guid ulWeb = EPMLiveCore.CoreFunctions.getLockedWeb(web);
                             if (ulWeb == web.ID)
-                                pList = iGetPlannerList(web, web, li);
+                                pList = ItemGetPlannerList(web, web, li);
                             else
                             {
                                 using (SPWeb lweb = site.OpenWeb(ulWeb))
                                 {
-                                    pList = iGetPlannerList(lweb, web, li);
+                                    pList = ItemGetPlannerList(lweb, web, li);
                                 }
                             }
                         }
