@@ -1,8 +1,7 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Web;
 using System.Web.UI;
@@ -11,110 +10,45 @@ using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveCore
 {
-    public class ListDisplaySettingIteratorRenderHelpers
+    public partial class ListDisplaySettingIterator
     {
-        private const string SourceParam = "Source";
-        private const string FormFieldType = "Microsoft.SharePoint.WebControls.FormField";
-        private const string PermissionsTitle = "Permissions";
-        private const string IsDialogParameter = "IsDlg";
-        private const string GetLastIdParameter = "GetLastID";
-        private const string DueName = "Due";
-        private const string DaysOverdueName = "DaysOverdue";
-        private const string ScheduleStatusName = "ScheduleStatus";
-        private const string ResourceLevelTitle = "ResourceLevel";
-        private const string CanLoginTitle = "CanLogin";
-        private const string GenericTitle = "Generic";
-        private const string TitleKey = "Title";
-        private const string None = "none";
-        private const string FirstNameKey = "FirstName";
-        private const string LastNameKey = "LastName";
-        private const string EmailKey = "Email";
-        private const string SharePointAccount = "SharePointAccount";
-        private const string Approved = "Approved";
-        private const string ForwardSlash = "/";
-        private string WhiteSpaces10 = "          ";
-        private string WhitSpaces6 = "      ";
-
-        private string ModifiedType = "1";
-
-        private bool bUseTeam = false;
-
-        private readonly List<string> userPanelItems = new List<string>() { FirstNameKey, LastNameKey, EmailKey, GenericTitle, TitleKey, SharePointAccount };
-        private readonly List<string> permissionPanelItems = new List<string>() { PermissionsTitle, ResourceLevelTitle, Approved, "TimesheetAdministrator", "Active", "Disable" };
-
-        int userpanelRequiredCount = 0;
-        int permissionPanelRequiredCount = 0;
-        int profilepanelRequiredCount = 0;
-
-        private HtmlTextWriter writer;
-        private string relativeUrl;
-        private int ActivationType;
-        private bool isOnline;
-        private bool isResList;
-        private bool isWorkList;
-        private string ownerusername;
-        private string ownername;
-        private int max;
-        private int count;
-        private Guid ListId;
-        private int ItemId;
-        private ControlCollection controls;
-        private Guid accountid;
-        private int billingtype;
-        private SortedList arrwpFields;
-        private SPWeb Web;
-        private SPList List;
-        private SPControlMode ControlMode;
-        private Page Page;
-        private SPList list;
-        private SPListItem ListItem;
-        private SPListItem BaseListItem;
-
-        private StringBuilder userPanelSb;
-        private HtmlTextWriter userPanel;
-        private StringBuilder profilePanelSb;
-        private HtmlTextWriter profilePanel;
-        private StringBuilder permissionPanelSb;
-        private HtmlTextWriter permissionPanel;
-        private ControlCollection Controls;
-        private Dictionary<string, string> dControls;
-
-        public void Init(RenderParameters parameters)
+        public override void RenderControl(HtmlTextWriter writer)
         {
-            ActivationType = parameters.activationType;
-            isOnline = parameters.isOnline;
-            isResList = parameters.isResList;
-            isWorkList = parameters.isWorkList;
-            ownerusername = parameters.ownerUsername;
-            ownername = parameters.ownerName;
-            max = parameters.max;
-            count = parameters.count;
-            ListId = parameters.listId;
-            ItemId = parameters.itemId;
-            controls = parameters.controls;
-            accountid = parameters.accountId;
-            billingtype = parameters.billingType;
-            arrwpFields = parameters.arrwpFields;
-            Web = parameters.Web;
-            List = parameters.List;
-            ControlMode = parameters.ControlMode;
-            Page = parameters.Page;
-            list = parameters.list;
-            ListItem = parameters.ListItem;
-            BaseListItem = parameters.BaseListItem;
+            if (writer == null)
+            {
+                throw new ArgumentNullException(nameof(writer));
+            }
+            var relativeUrl = Web.ServerRelativeUrl == ForwardSlash ? string.Empty : Web.ServerRelativeUrl;
 
-            userPanelSb = parameters.userPanelSb;
-            userPanel = parameters.userPanel;
-            profilePanelSb = parameters.profilePanelSb;
-            profilePanel = parameters.profilePanel;
-            permissionPanelSb = parameters.permissionPanelSb;
-            permissionPanel = parameters.permissionPanel;
+            if (isResList)
+            {
+                writer.WriteLine(" <script>$(document).ready(function () {$(\".imgArrow\").addClass(\"hideImage\"); $(\".upheader\").click(function () {$header = $(this);$arrowImage = $header.find(\".imgArrow\");$downArrowImage = $header.find(\".imgDownArrow\");$content = $header.next();");
+                writer.Write("$content.slideToggle(100,function (){  if ($arrowImage.hasClass(\"hideImage\")) {$downArrowImage.addClass(\"hideImage\");$arrowImage.removeClass(\"hideImage\");$(\"#onetIDListForm\").attr(\"style\",\"width:95%\");}else {$arrowImage.addClass(\"hideImage\");$downArrowImage.removeClass(\"hideImage\");}});});});</script>");
 
-            Controls = parameters.Controls;
-            dControls = parameters.dControls;
+                userPanel = new HtmlTextWriter(new StringWriter(userPanelSb, CultureInfo.InvariantCulture));
+                userPanel.Write(CreateHtmlPanelText(UserTitle));
+
+                profilePanel = new HtmlTextWriter(new StringWriter(profilePanelSb, CultureInfo.InvariantCulture));
+                profilePanel.Write(CreateHtmlPanelText(ProfileTitle));
+
+                if (CoreFunctions.DoesCurrentUserHaveFullControl(Web))
+                {
+                    permissionPanel = new HtmlTextWriter(new StringWriter(permissionPanelSb, CultureInfo.InvariantCulture));
+                    permissionPanel.Write(CreateHtmlPanelText(PermissionsTitle));
+                }
+            }
+
+            if (isFeatureActivated)
+            {
+                RenderControl(writer, relativeUrl);
+            }
+            else
+            {
+                base.RenderControl(writer);
+            }
         }
 
-        public void RenderControl(HtmlTextWriter writer, string relativeUrl)
+        private void RenderControl(HtmlTextWriter writer, string relativeUrl)
         {
             if (writer == null)
             {
@@ -276,7 +210,7 @@ namespace EPMLiveCore
             {
                 try
                 {
-                    var field = ListDisplaySettingIteratorHelpers.GetFieldLabel(control, 1, 0, 1).Field;
+                    var field = GetFieldLabel(control, 1, 0, 1).Field;
 
                     if (field.Required)
                     {
@@ -331,7 +265,7 @@ namespace EPMLiveCore
 
             try
             {
-                var field = ListDisplaySettingIteratorHelpers.GetCompositeField(control, 1).Field;
+                var field = GetCompositeField(control, 1).Field;
                 var fieldName = $"{field.InternalName}_{field.Id}_${field.TypeAsString}Field";
 
                 if (field.Type == SPFieldType.User)
@@ -379,10 +313,10 @@ namespace EPMLiveCore
             AddControlsToWriter(control.Controls[0], writer, fieldInternalName);
             for (var i = 0; i < parentControl.Controls.Count; i++)
             {
-                if (ListDisplaySettingIteratorHelpers.GetControlType(parentControl, i) == "Microsoft.SharePoint.WebControls.FieldLabel")
+                if (GetControlType(parentControl, i) == "Microsoft.SharePoint.WebControls.FieldLabel")
                 {
-                    writer.Write((ListDisplaySettingIteratorHelpers.GetFieldLabel(parentControl, 1).Field.Title + " <font color=\"#007C17\">*</font>"));
-                    if ((ListDisplaySettingIteratorHelpers.GetFieldLabel(parentControl, 1).Field.Required))
+                    writer.Write((GetFieldLabel(parentControl, 1).Field.Title + " <font color=\"#007C17\">*</font>"));
+                    if ((GetFieldLabel(parentControl, 1).Field.Required))
                     {
                         writer.Write(" <font class=\"ms-formvalidation\">*</font>");
                     }
@@ -410,7 +344,7 @@ namespace EPMLiveCore
             AddControlsToWriter(control.Controls[0], writer, fieldInternalName);
             for (var i = 0; i < parentControl.Controls.Count; i++)
             {
-                if (ListDisplaySettingIteratorHelpers.GetControlType(parentControl, i) == FormFieldType)
+                if (GetControlType(parentControl, i) == FormFieldType)
                 {
                     ProcessControl(writer, parentControl, i);
                 }
@@ -443,9 +377,9 @@ namespace EPMLiveCore
             AddControlsToWriter(control.Controls[0], writer, fieldInternalName);
             for (var i = 0; i < parentControl.Controls.Count; i++)
             {
-                if (ListDisplaySettingIteratorHelpers.GetControlType(parentControl, i) == FormFieldType)
+                if (GetControlType(parentControl, i) == FormFieldType)
                 {
-                    var color = CoreFunctions.GetScheduleStatusField(BaseListItem);
+                    var color = CoreFunctions.GetScheduleStatusField(base.ListItem);
                     if (color != string.Empty)
                     {
                         writer.Write(@"<img src=""/_layouts/images/" + color + @""">");
@@ -475,12 +409,12 @@ namespace EPMLiveCore
                 throw new ArgumentNullException(nameof(parentControl));
             }
 
-            var value = ListDisplaySettingIteratorHelpers.GetFormField(parentControl, index).ItemFieldValue.ToString();
+            var value = GetFormField(parentControl, index).ItemFieldValue.ToString();
 
             var stringValue = string.Empty;
             try
             {
-                stringValue = ListDisplaySettingIteratorHelpers.GetFieldLabel(parentControl, 1).Field.GetFieldValueAsHtml(value);
+                stringValue = GetFieldLabel(parentControl, 1).Field.GetFieldValueAsHtml(value);
             }
             catch (Exception ex)
             {
@@ -518,7 +452,7 @@ namespace EPMLiveCore
             AddControlsToWriter(control.Controls[0], writer, fieldInternalName);
             for (var i = 0; i < parentControl.Controls.Count; i++)
             {
-                if (ListDisplaySettingIteratorHelpers.GetControlType(parentControl, i) == FormFieldType)
+                if (GetControlType(parentControl, i) == FormFieldType)
                 {
                     writer.Write(CoreFunctions.GetDaysOverdueField(ListItem));
                 }
@@ -548,7 +482,7 @@ namespace EPMLiveCore
             for (var i = 0; i < parentControl.Controls.Count; i++)
             {
 
-                if (ListDisplaySettingIteratorHelpers.GetControlType(parentControl, i) == FormFieldType)
+                if (GetControlType(parentControl, i) == FormFieldType)
                 {
                     writer.Write(CoreFunctions.GetDueField(ListItem));
                 }
@@ -609,6 +543,11 @@ namespace EPMLiveCore
             writer.WriteLine("<script language=\"javascript\">");
             writer.WriteLine($"_spBodyOnLoadFunctionNames.push(\"InitStatusingControls('{compControl}', '{pctControl}', '{statusControl}')\");");
             writer.WriteLine("</script>");
+        }
+
+        private string GetValue(string key)
+        {
+            return dControls.ContainsKey(key) ? dControls[key] : string.Empty;
         }
 
         private void RenderResultList(HtmlTextWriter writer, bool isOutOfUsers)
@@ -1004,72 +943,5 @@ namespace EPMLiveCore
                          </script>");
             }
         }
-
-        private void AddControlsToWriter(Control control, HtmlTextWriter writer, string internalName = "")
-        {
-            if (isResList)
-            {
-                if (userPanelItems.Contains(internalName))
-                {
-                    control.RenderControl(userPanel);
-                }
-                else if (permissionPanelItems.Contains(internalName))
-                {
-                    control.RenderControl(permissionPanel);
-                }
-                else
-                {
-                    control.RenderControl(profilePanel);
-                }
-            }
-            else
-            {
-                control.RenderControl(writer);
-            }
-
-        }
-
-
-
-        private string GetValue(string key)
-        {
-            return dControls.ContainsKey(key) ? dControls[key] : string.Empty;
-        }
-    }
-
-    public class RenderParameters
-    {
-        public int activationType { get; set; }
-        public bool isOnline { get; set; }
-        public bool isResList { get; set; }
-        public bool isWorkList { get; set; }
-        public string ownerUsername { get; set; }
-        public string ownerName { get; set; }
-        public int max { get; set; }
-        public int count { get; set; }
-        public Guid listId { get; set; }
-        public int itemId { get; set; }
-        public ControlCollection controls { get; set; }
-        public Guid accountId { get; set; }
-        public int billingType { get; set; }
-        public SortedList arrwpFields { get; set; }
-        public SPWeb Web { get; set; }
-        public SPList List { get; set; }
-        public SPControlMode ControlMode { get; set; }
-        public Page Page { get; set; }
-        public SPList list { get; set; }
-        public SPListItem ListItem { get; set; }
-        public SPListItem BaseListItem { get; set; }
-
-        public StringBuilder userPanelSb { get; set; }
-        public HtmlTextWriter userPanel { get; set; }
-        public StringBuilder profilePanelSb { get; set; }
-        public HtmlTextWriter profilePanel { get; set; }
-        public StringBuilder permissionPanelSb { get; set; }
-        public HtmlTextWriter permissionPanel { get; set; }
-
-        public ControlCollection Controls { get; set; }
-
-        public Dictionary<string, string> dControls { get; set; }
     }
 }

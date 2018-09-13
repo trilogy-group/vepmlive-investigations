@@ -230,6 +230,10 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="ChildParentSync.cs" />
+    <Compile Include="ListDisplaySettingIterator.OnInit.cs" />
+    <Compile Include="ListDisplaySettingIterator.RenderControl.cs" />
+    <Compile Include="ListDisplaySettingIterator.IsFieldExcluded.cs" />
+    <Compile Include="ListDisplaySettingIterator.AddEntityPickersToLookups.cs" />
     <Compile Include="CommentCCPeopleEditor.cs" />
     <Compile Include="ControlCollectionExtensions.cs" />
     <Compile Include="ControlDataBuilder.cs" />
@@ -1295,8 +1299,6 @@
     </Compile>
     <Compile Include="ListDefinitions\EPMLiveLists.cs" />
     <Compile Include="ListDisplaySettingIterator.cs" />
-    <Compile Include="ListDisplaySettingIteratorHelpers.cs" />
-    <Compile Include="ListDisplaySettingIteratorRenderHelpers.cs" />
     <Compile Include="ListDisplayUtils.cs" />
     <Compile Include="ListFieldIteratorExtensions.cs" />
     <Compile Include="MultiAppCustomSiteMapProvider.cs" />

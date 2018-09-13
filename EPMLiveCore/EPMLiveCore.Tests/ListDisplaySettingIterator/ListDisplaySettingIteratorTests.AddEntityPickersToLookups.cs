@@ -188,7 +188,7 @@ namespace EPMLiveCore.Tests
             ShimEnhancedLookupConfigValuesHelper.AllInstances.ContainsKeyString = (a, b) => isEnhanced;
             ShimEnhancedLookupConfigValuesHelper.AllInstances.IsParentFieldString = (a, b) => isParent;
 
-            ShimListDisplaySettingIteratorHelpers.GetFieldLookupFormField = _ => new ShimSPFieldLookup();
+            ShimListDisplaySettingIterator.GetFieldLookupFormField = _ => new ShimSPFieldLookup();
             ShimListDisplaySettingIterator.AllInstances.GenerateControlDataForLookupFieldFormFieldBoolean = (a, b, c) => "param";
             ShimListDisplaySettingIterator.AllInstances.GetQueryStringLookupValFormField = (a, b) => new SPFieldLookupValueCollection { new ShimSPFieldLookupValue().Instance };
             ShimListFieldIteratorExtensions.GetFormFieldByTypeListFieldIteratorType = (a, b) => new List<FormField> { new ShimFormField().Instance };

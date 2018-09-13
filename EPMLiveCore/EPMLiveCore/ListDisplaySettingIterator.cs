@@ -1,26 +1,21 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
 using EPMLiveCore.API;
+using EPMLiveCore.Controls.Navigation.Providers;
+using EPMLiveCore.Infrastructure;
 using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using System.Collections;
-using System.Data.SqlClient;
-using System.Data;
-using System.Web.UI.WebControls;
-using System.Web.UI;
-using System.Linq;
-using System.Globalization;
-using System.Xml;
-using System.Web.UI.HtmlControls;
-using System.Diagnostics;
-using System.IO;
 
 namespace EPMLiveCore
 {
-    public class ListDisplaySettingIterator : ListFieldIterator
+    public partial class ListDisplaySettingIterator : ListFieldIterator
     {
         private const string FeatureId1 = "e97da3cd-4c42-44cd-ba51-2bfbb2c397cb";
         private const string FeatureId2 = "19e6ae14-9e68-44fa-9a08-c1c4514bf12e";
@@ -28,14 +23,20 @@ namespace EPMLiveCore
         private const string LookupFieldParam = "LookupField";
         private const string LookupValueParam = "LookupValue";
         private const string SourceParam = "Source";
+        private const string FormFieldType = "Microsoft.SharePoint.WebControls.FormField";
         private const string UserTitle = "User";
         private const string ProfileTitle = "Profile";
         private const string PermissionsTitle = "Permissions";
         private const string IsDialogParameter = "IsDlg";
+        private const string GetLastIdParameter = "GetLastID";
+        private const string DueName = "Due";
+        private const string DaysOverdueName = "DaysOverdue";
+        private const string ScheduleStatusName = "ScheduleStatus";
         private const string ResourceLevelTitle = "ResourceLevel";
         private const string CanLoginTitle = "CanLogin";
         private const string GenericTitle = "Generic";
         private const string TitleKey = "Title";
+        private const string None = "none";
         private const string FirstNameKey = "FirstName";
         private const string LastNameKey = "LastName";
         private const string EmailKey = "Email";
@@ -64,6 +65,8 @@ namespace EPMLiveCore
         private string lookupValue = string.Empty;
 
         #region ResourceList
+        List<string> userPanelItems = new List<string>() { FirstNameKey, LastNameKey, EmailKey, GenericTitle, TitleKey, SharePointAccount };
+        List<string> permissionPanelItems = new List<string>() { PermissionsTitle, ResourceLevelTitle, Approved, "TimesheetAdministrator", "Active", "Disable" };
         StringBuilder userPanelSb = new StringBuilder();
         HtmlTextWriter userPanel;
         StringBuilder profilePanelSb = new StringBuilder();
@@ -83,6 +86,9 @@ namespace EPMLiveCore
         Guid accountid;
         bool isWorkList = true;
         int billingtype = 0;
+        int userpanelRequiredCount = 0;
+        int permissionPanelRequiredCount = 0;
+        int profilepanelRequiredCount = 0;
 
         GenericEntityEditor picker;
 
@@ -90,17 +96,18 @@ namespace EPMLiveCore
 
         private bool DisplayFormRedirect = false;
 
-        private int ActivationType = 0;
+        private bool bUseTeam = false;
 
+        private int ActivationType = 0;
+        private string WhiteSpaces10 = "          ";
+        private string WhitSpaces6 = "      ";
         private string GenericType = "2";
         private string ModifiedType = "1";
         private string FalseConst;
-        private ListDisplaySettingIteratorRenderHelpers _renderHelpers;
 
         public ListDisplaySettingIterator()
         {
             FalseConst = "False";
-            _renderHelpers = new ListDisplaySettingIteratorRenderHelpers();
         }
 
         private void FindSaveButtons(Control Parent, ref ArrayList Controls)
@@ -208,376 +215,52 @@ namespace EPMLiveCore
 
                 var exec = new QueryExecutor(SPContext.Current.Web);
                 exec.ExecuteEpmLiveQuery(queryCreateRecentItem, qParams);
-                ListDisplaySettingIteratorHelpers.ClearCache();
+                ClearCache();
             }
             catch { }
         }
 
-        protected override void OnInit(EventArgs e)
-        {
-            var siteid = SPContext.Current.Site.ID;
-
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
-            {
-                using (var site = new SPSite(siteid))
-                {
-                    if (site.Features[new Guid(FeatureId1)] != null ||
-                        site.WebApplication.Features[new Guid(FeatureId2)] != null)
-                    {
-                        isFeatureActivated = true;
-                    }
-                }
-            });
-
-            base.OnInit(e);
-
-            if (isFeatureActivated)
-            {
-                OnInit();
-
-                if (mode == SPControlMode.New ||
-                    (list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrWhiteSpace(Page.Request[ModeParam]) &&
-                    Page.Request[ModeParam] == Upload && mode == SPControlMode.Edit))
-                {
-                    if (!string.IsNullOrWhiteSpace(Page.Request[LookupFieldParam]))
-                    {
-                        lookupField = Page.Request[LookupFieldParam];
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(Page.Request[LookupValueParam]))
-                    {
-                        lookupValue = Page.Request[LookupValueParam];
-                    }
-                }
-            }
-        }
-
-        private void OnInit()
+        private static void ClearCache()
         {
             try
             {
-                InitFields();
-
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                try
                 {
-                    using (var rsite = new SPSite(SPContext.Current.Site.ID))
-                    {
-                        using (var web = rsite.OpenWeb(SPContext.Current.Web.ID))
-                        {
-                            arrwpFields = ReflectionMethods.GetWorkPlannerStatusFields(web, list.Title);
-                        }
-                    }
-                    try
-                    {
-                        if (list.Title == Resources)
-                        {
-                            isResList = true;
-                            var site1 = SPContext.Current.Site;
-                            if (site1.WebApplication.Features[new Guid(FeatureId2)] != null)
-                            {
-                                InitFeature2();
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.WriteLine(ex.ToString());
-                    }
-                });
-
-
-                if (SPContext.Current.FormContext.FormMode != SPControlMode.Invalid)
-                {
-                    mode = SPContext.Current.FormContext.FormMode;
+                    new RecentItemsLinkProvider(SPContext.Current.Site.ID, SPContext.Current.Web.ID, SPContext.Current.Web.CurrentUser.LoginName).ClearCache();
                 }
-                else
+                catch
                 {
-                    try
-                    {
-                        mode = (SPControlMode)int.Parse(Page.Request[Mode]);
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.WriteLine(ex.ToString());
-                    }
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex.ToString());
-            }
-        }
-
-        private void InitFields()
-        {
-            try
-            {
-                list = SPContext.Current.List;
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex.ToString());
-            }
-
-            var gridSettings = new GridGanttSettings(list);
-
-            DisplayFormRedirect = gridSettings.DisplayFormRedirect;
-
-            if (DisplayFormRedirect && ControlMode == SPControlMode.New && Page.Request[IsDialogParameter] != ModifiedType)
-            {
-                SPContext.Current.FormContext.OnSaveHandler += CustomHandler;
-            }
-            else if (!string.IsNullOrWhiteSpace(Page.Request[SourceParam]))
-            {
-                RedirectUrl = Page.Request[SourceParam];
-                SPContext.Current.FormContext.OnSaveHandler += HandleNewItemRecent;
-            }
-            else
-            {
-                SPContext.Current.FormContext.OnSaveHandler += HandleNewItemRecent;
-            }
-
-            if (gridSettings.DisplaySettings != string.Empty)
-            {
-                fieldProperties = ListDisplayUtils.ConvertFromString(gridSettings.DisplaySettings);
-            }
-
-            try
-            {
-                isWorkList = gridSettings.EnableWorkList;
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex.ToString());
-            }
-
-            if (isWorkList)
-            {
-                SPPageContentManager.RegisterClientScriptInclude(
-                    this,
-                    GetType(),
-                    "WorkEngineStatusing",
-                    "/_layouts/15/epmlive/WorkEngineStatusing.js");
-            }
-
-
-            if (list == null)
-            {
-                list = SPContext.Current.Web.Lists[new Guid(Page.Request[Listid])];
-            }
-        }
-
-        private void InitFeature2()
-        {
-            isOnline = true;
-
-            try
-            {
-                SqlConnection connection = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
-                {
-                    var assemblyInstance = Assembly.Load("EPMLiveAccountManagement, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
-                    var thisClass = assemblyInstance.GetType("EPMLiveAccountManagement.Settings", true, true);
-                    var methodInfo = thisClass.GetMethod("getConnectionString");
-                    var connectionString = (string)methodInfo.Invoke(null, new object[] { });
-
-                    connection = new SqlConnection(connectionString);
-                    connection.Open();
-                });
-
-                using (var command = new SqlCommand("2012SP_GetActivationInfo", connection))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
-                    command.Parameters.AddWithValue("@username", string.Empty);
-
-                    using (var dataSet = new DataSet())
-                    {
-                        using (var adapter = new SqlDataAdapter(command))
-                        {
-                            adapter.Fill(dataSet);
-                        }
-
-                        try
-                        {
-                            ActivationType = int.Parse(dataSet.Tables[0].Rows[0][0].ToString());
-                        }
-                        catch (Exception ex)
-                        {
-                            Trace.WriteLine(ex.ToString());
-                        }
-                    }
-
-                    if (ActivationType != 3)
-                    {
-                        InitActivationType(connection);
-                    }
-                    else
-                    {
-                        InitOwner(connection);
-                    }
-                }
-                connection?.Dispose();
-            }
-            catch (Exception ex)
-            {
-                max = 0;
-                Trace.WriteLine(ex.ToString());
-            }
-        }
-
-        private void InitActivationType(SqlConnection connection)
-        {
-            if (connection == null)
-            {
-                throw new ArgumentNullException(nameof(connection));
-            }
-
-            using (var command = new SqlCommand("2010SP_GetSiteAccountNums", connection))
-            {
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
-                command.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel());
-
-                using (var reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        max = reader.GetInt32(0);
-                        count = reader.GetInt32(1);
-                        width = (count * 100) / max;
-
-                        barcolor = string.Empty; ;
-
-                        if (width > 100)
-                        {
-                            width = 100;
-                        }
-
-                        if ((max - count) <= 1)
-                        {
-                            barcolor = "FF0000";
-                        }
-                        else if ((max - count) < 5)
-                        {
-                            barcolor = "FFFF00";
-                        }
-                        else
-                        {
-                            barcolor = "009900";
-                        }
-
-                        ownerusername = reader.GetString(13);
-                        ownername = reader.GetString(5);
-
-                        accountid = reader.GetGuid(2);
-
-                        billingtype = reader.GetInt32(11);
-                    }
+                    CacheStore.Current.RemoveCategory(new CacheStoreCategory().Navigation);
                 }
             }
-        }
-
-        private void InitOwner(SqlConnection connection)
-        {
-            if (connection == null)
-            {
-                throw new ArgumentNullException(nameof(connection));
-            }
-
-            using (var command = new SqlCommand("2010SP_GetSiteAccountNums", connection))
-            {
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
-                command.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel());
-
-                using (var reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        ownerusername = reader.GetString(13);
-                        ownername = reader.GetString(5);
-                    }
-                }
-            }
-        }
-
-        public override void RenderControl(HtmlTextWriter writer)
-        {
-            if (writer == null)
-            {
-                throw new ArgumentNullException(nameof(writer));
-            }
-            var relativeUrl = Web.ServerRelativeUrl == ForwardSlash ? string.Empty : Web.ServerRelativeUrl;
-
-            if (isResList)
-            {
-                writer.WriteLine(" <script>$(document).ready(function () {$(\".imgArrow\").addClass(\"hideImage\"); $(\".upheader\").click(function () {$header = $(this);$arrowImage = $header.find(\".imgArrow\");$downArrowImage = $header.find(\".imgDownArrow\");$content = $header.next();");
-                writer.Write("$content.slideToggle(100,function (){  if ($arrowImage.hasClass(\"hideImage\")) {$downArrowImage.addClass(\"hideImage\");$arrowImage.removeClass(\"hideImage\");$(\"#onetIDListForm\").attr(\"style\",\"width:95%\");}else {$arrowImage.addClass(\"hideImage\");$downArrowImage.removeClass(\"hideImage\");}});});});</script>");
-
-                userPanel = new HtmlTextWriter(new StringWriter(userPanelSb, CultureInfo.InvariantCulture));
-                userPanel.Write(CreateHtmlPanelText(UserTitle));
-
-                profilePanel = new HtmlTextWriter(new StringWriter(profilePanelSb, CultureInfo.InvariantCulture));
-                profilePanel.Write(CreateHtmlPanelText(ProfileTitle));
-
-                if (CoreFunctions.DoesCurrentUserHaveFullControl(Web))
-                {
-                    permissionPanel = new HtmlTextWriter(new StringWriter(permissionPanelSb, CultureInfo.InvariantCulture));
-                    permissionPanel.Write(CreateHtmlPanelText(PermissionsTitle));
-                }
-            }
-
-            if (isFeatureActivated)
-            {
-                _renderHelpers.Init(CreateRenderParameters());
-                _renderHelpers.RenderControl(writer, relativeUrl);
-            }
-            else
-            {
-                base.RenderControl(writer);
-            }
-        }
-
-        private RenderParameters CreateRenderParameters()
-        {
-            return new RenderParameters
-            {
-                activationType = ActivationType,
-                isOnline = isOnline,
-                isResList = isResList,
-                isWorkList = isWorkList,
-                ownerUsername = ownerusername,
-                ownerName = ownername,
-                max = max,
-                count = count,
-                listId = ListId,
-                itemId = ItemId,
-                controls = Controls,
-                accountId = accountid,
-                billingType = billingtype,
-                arrwpFields = arrwpFields,
-                Web = Web,
-                List = List,
-                ControlMode = ControlMode,
-                Page = Page,
-                list = list,
-                ListItem = ListItem,
-                BaseListItem = base.ListItem,
-                userPanel = userPanel,
-                userPanelSb = userPanelSb,
-                permissionPanel = permissionPanel,
-                permissionPanelSb = permissionPanelSb,
-                profilePanel = profilePanel,
-                profilePanelSb = profilePanelSb,
-                Controls = Controls,
-                dControls = dControls
-            };
+            catch { }
         }
 
         #region resourcepool methods
 
+        private void AddControlsToWriter(Control control, HtmlTextWriter writer, string internalName = "")
+        {
+            if (isResList)
+            {
+                if (userPanelItems.Contains(internalName))
+                {
+                    control.RenderControl(userPanel);
+                }
+                else if (permissionPanelItems.Contains(internalName))
+                {
+                    control.RenderControl(permissionPanel);
+                }
+                else
+                {
+                    control.RenderControl(profilePanel);
+                }
+            }
+            else
+            {
+                control.RenderControl(writer);
+            }
+
+        }
 
         private string CreateHtmlPanelText(string panelTitle)
         {
@@ -603,8 +286,8 @@ namespace EPMLiveCore
                                 TemplateContainer child = new TemplateContainer();
                                 Controls.Add(child);
 
-                                ListDisplaySettingIteratorHelpers.SetFieldName(child, field.InternalName);
-                                ListDisplaySettingIteratorHelpers.SetControlMode(child, mode);
+                                SetFieldName(child, field.InternalName);
+                                SetControlMode(child, mode);
 
                                 ControlTemplate.InstantiateIn(child);
                             }
@@ -627,8 +310,8 @@ namespace EPMLiveCore
                                     TemplateContainer child = new TemplateContainer();
                                     Controls.Add(child);
 
-                                    ListDisplaySettingIteratorHelpers.SetFieldName(child, field.InternalName);
-                                    ListDisplaySettingIteratorHelpers.SetControlMode(child, mode);
+                                    SetFieldName(child, field.InternalName);
+                                    SetControlMode(child, mode);
 
                                     ControlTemplate.InstantiateIn(child);
                                 }
@@ -637,8 +320,8 @@ namespace EPMLiveCore
                                     TemplateContainer child = new TemplateContainer();
                                     Controls.Add(child);
 
-                                    ListDisplaySettingIteratorHelpers.SetFieldName(child, field.InternalName);
-                                    ListDisplaySettingIteratorHelpers.SetControlMode(child, SPControlMode.Display);
+                                    SetFieldName(child, field.InternalName);
+                                    SetControlMode(child, SPControlMode.Display);
 
                                     ControlTemplate.InstantiateIn(child);
                                 }
@@ -648,8 +331,8 @@ namespace EPMLiveCore
                                 TemplateContainer child = new TemplateContainer();
                                 Controls.Add(child);
 
-                                ListDisplaySettingIteratorHelpers.SetFieldName(child, field.InternalName);
-                                ListDisplaySettingIteratorHelpers.SetControlMode(child, mode);
+                                SetFieldName(child, field.InternalName);
+                                SetControlMode(child, mode);
 
 
 
@@ -1185,570 +868,94 @@ namespace EPMLiveCore
             }
         }
 
-
-        private void AddEntityPickersToLookups()
+        private static Control GetControl(FieldMetadata formField)
         {
-            if (mode == SPControlMode.New || mode == SPControlMode.Edit)
-            {
-                // this represents a comma separated list of lookup field internal names to modify
-                EnhancedLookupConfigValuesHelper valueHelper = null;
-                var gSettings = new GridGanttSettings(list);
-
-                try
-                {
-                    var rawValue = gSettings.Lookups;
-                    valueHelper = new EnhancedLookupConfigValuesHelper(rawValue);
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine(ex.ToString());
-                }
-
-                if (valueHelper == null)
-                {
-                    return;
-                }
-
-                var formFields = this.GetFormFieldByType(typeof(SPFieldLookup));
-                foreach (var formField in formFields)
-                {
-                    var isEnhanced = valueHelper.ContainsKey(formField.Field.InternalName);
-                    var isParent = valueHelper.IsParentField(formField.Field.InternalName);
-
-                    if (!isEnhanced && !isParent)
-                    {
-                        continue;
-                    }
-
-                    var lookupData = valueHelper.GetFieldData(formField.Field.InternalName);
-
-                    if (isParent && !isEnhanced)
-                    {
-                        InsertModifiedSPControl1(formField, lookupData);
-                    }
-                    else if (isParent && isEnhanced)
-                    {
-                        if (lookupData.Type == GenericType)
-                        {
-                            InsertEPMLiveGenericPickerControl(formField, lookupData, string.Empty);
-                        }
-                        else if (lookupData.Type == ModifiedType)
-                        {
-                            InsertModifiedSPControl1(formField, lookupData);
-                        }
-                    }
-                    else if (!isParent && isEnhanced)
-                    {
-                        if (lookupData.Type == GenericType)
-                        {
-                            InsertEPMLiveGenericPickerControl(formField, lookupData, "SPFieldUser");
-                        }
-                        else if (lookupData.Type == ModifiedType)
-                        {
-                            InsertModifiedSPControl2(formField, lookupData);
-                        }
-                    }
-                }
-            }
+            return formField.FindControlRecursive(x => x.GetType() == GetChildControlBasedOnFieldType(formField.Field.FieldRenderingControl));
         }
 
-        private void InsertEPMLiveGenericPickerControl(FormField formField, LookupConfigData lookupData, string fieldType)
+        private static Type GetChildControlBasedOnFieldType(object field)
         {
-            if (formField == null)
+            if (field.GetType().Equals(typeof(MultipleLookupField)))
             {
-                throw new ArgumentNullException(nameof(formField));
-            }
-            picker = new GenericEntityEditor();
-            var fieldLookup = ListDisplaySettingIteratorHelpers.GetFieldLookup(formField);
-            picker.MultiSelect = fieldLookup.AllowMultipleValues;
-
-            var customValue = GetCustomValue(formField, lookupData, fieldLookup, fieldType);
-
-            SPFieldLookupValueCollection lookupValCol = null;
-
-            if (mode == SPControlMode.New)
-            {
-                lookupValCol = GetQueryStringLookupVal(formField);
-            }
-            else
-            {
-                try
-                {
-                    lookupValCol = new SPFieldLookupValueCollection(ListItem[fieldLookup.Id].ToString());
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine(ex.ToString());
-                }
+                return typeof(MultipleLookupField);
             }
 
-            if (lookupValCol?.Count > 0)
+            if (field.GetType().Equals(typeof(LookupField)))
             {
-                var alItems = new ArrayList();
-                foreach (var field in lookupValCol)
-                {
-                    var entity = new PickerEntity
-                    {
-                        Key = field.LookupId.ToString(),
-                        DisplayText = field.LookupValue,
-                        IsResolved = true
-                    };
-                    alItems.Add(entity);
-                }
-                picker.UpdateEntities(alItems);
+                return typeof(LookupField);
             }
 
-            picker.CustomProperty = customValue;
-            formField.Controls.Add(picker);
+            return null;
         }
 
-        private string GetCustomValue(FormField formField, LookupConfigData lookupData, SPFieldLookup fieldLookup, string fieldType)
+        private static void SetFieldName(TemplateContainer child, string fieldName)
         {
-            if (lookupData == null)
-            {
-                throw new ArgumentNullException(nameof(lookupData));
-            }
-            if (fieldLookup == null)
-            {
-                throw new ArgumentNullException(nameof(fieldLookup));
-            }
-            var stringBuilder = new StringBuilder();
-            stringBuilder.Append("<Data>")
-                .AppendFormat("<Param key=\"SPFieldType\">{0}</Param>", fieldType)
-                .AppendFormat("<Param key=\"ParentWebID\">{0}</Param>", fieldLookup.ParentList.ParentWeb.ID)
-                .AppendFormat("<Param key=\"LookupWebID\">{0}</Param>", fieldLookup.LookupWebId)
-                .AppendFormat("<Param key=\"LookupListID\">{0}</Param>", fieldLookup.LookupList)
-                .AppendFormat("<Param key=\"LookupFieldInternalName\">{0}</Param>", fieldLookup.LookupField)
-                .AppendFormat("<Param key=\"LookupFieldID\">{0}</Param>", fieldLookup.Id)
-                .AppendFormat("<Param key=\"IsMultiSelect\">{0}</Param>", fieldLookup.AllowMultipleValues)
-                .AppendFormat("<Param key=\"ListID\">{0}</Param>", ListId)
-                .AppendFormat("<Param key=\"ItemID\">{0}</Param>", ItemId)
-                .Append(GenerateControlDataForLookupField(formField, fieldLookup.AllowMultipleValues))
-                .AppendFormat("<Param key=\"Field\">{0}</Param>", lookupData.Field)
-                .AppendFormat("<Param key=\"ControlType\">{0}</Param>", lookupData.Type)
-                .AppendFormat("<Param key=\"Parent\">{0}</Param>", lookupData.Parent)
-                .AppendFormat("<Param key=\"ParentListField\">{0}</Param>", lookupData.ParentListField)
-                .AppendFormat("<Param key=\"Required\">{0}</Param>", fieldLookup.Required)
-                .Append("</Data>");
-
-            return stringBuilder.ToString();
-        }
-
-        private void InsertModifiedSPControl1(FormField formField, LookupConfigData lookupData)
-        {
-            if (formField == null)
-            {
-                throw new ArgumentNullException(nameof(formField));
-            }
-
-            var fieldLookup = ListDisplaySettingIteratorHelpers.GetFieldLookup(formField);
-            if (!fieldLookup.AllowMultipleValues)
-            {
-                var renderControl = new CascadingLookupRenderControl
-                {
-                    LookupData = lookupData,
-                    LookupField = fieldLookup,
-                    CustomProperty = GetCustomValue(formField, fieldLookup)
-                };
-
-                formField.Controls.Add(renderControl);
-            }
-        }
-
-        private void InsertModifiedSPControl2(FormField formField, LookupConfigData lookupData)
-        {
-            if (formField == null)
-            {
-                throw new ArgumentNullException(nameof(formField));
-            }
-
-            var fieldLookup = ListDisplaySettingIteratorHelpers.GetFieldLookup(formField);
-            if (!fieldLookup.AllowMultipleValues)
-            {
-                var renderControl = new CascadingLookupRenderControl
-                {
-                    LookupData = lookupData,
-                    LookupField = fieldLookup,
-                    CustomProperty = GetCustomValue(formField, fieldLookup)
-                };
-
-                formField.Controls.Add(renderControl);
-            }
-            else
-            {
-                var renderControl = new CascadingMultiLookupRenderControl
-                {
-                    LookupData = lookupData,
-                    LookupField = fieldLookup,
-                    CustomProperty = GetCustomValue(formField, fieldLookup)
-                };
-
-                formField.Controls.Add(renderControl);
-            }
-        }
-
-        private string GetCustomValue(FormField formField, SPFieldLookup fieldLookup)
-        {
-            if (fieldLookup == null)
-            {
-                throw new ArgumentNullException(nameof(fieldLookup));
-            }
-
-            var stringBuilder = new StringBuilder();
-            stringBuilder.Append("<Data>")
-                .Append("<Param key=\"SPFieldType\">SPFieldUser</Param>")
-                .AppendFormat("<Param key=\"ParentWebID\">{0}</Param>", fieldLookup.ParentList.ParentWeb.ID)
-                .AppendFormat("<Param key=\"LookupWebID\">{0}</Param>", fieldLookup.LookupWebId)
-                .AppendFormat("<Param key=\"LookupListID\">{0}</Param>", fieldLookup.LookupList)
-                .AppendFormat("<Param key=\"LookupFieldInternalName\">{0}</Param>", fieldLookup.LookupField)
-                .AppendFormat("<Param key=\"LookupFieldID\">{0}</Param>", fieldLookup.Id)
-                .AppendFormat("<Param key=\"IsMultiSelect\">{0}</Param>", fieldLookup.AllowMultipleValues)
-                .AppendFormat("<Param key=\"ListID\">{0}</Param>", ListId)
-                .AppendFormat("<Param key=\"ItemID\">{0}</Param>", ItemId)
-                .AppendFormat("<Param key=\"Required\">{0}</Param>", fieldLookup.Required)
-                .Append(GenerateControlDataForLookupField(formField, fieldLookup.AllowMultipleValues))
-                .Append("</Data>");
-
-            return stringBuilder.ToString();
-        }
-
-        private string GenerateControlDataForLookupField(FormField sourceFld, bool isMulti)
-        {
-            StringBuilder sbResult = new StringBuilder();
-            // in the case of multi select
-            // we need the ids of four controls
-            // to post back data
-            if (isMulti)
-            {
-                // need control id for the addbutton, removeButton, selectCandidate, selectResult controls
-                sbResult.Append("<Param key=\"SelectCandidateID\">" + (sourceFld.Field.InternalName + "_" + sourceFld.Field.Id.ToString() + "_SelectCandidate") + "</Param>" +
-                                "<Param key=\"AddButtonID\">" + (sourceFld.Field.InternalName + "_" + sourceFld.Field.Id.ToString() + "_AddButton") + "</Param>" +
-                                "<Param key=\"RemoveButtonID\">" + (sourceFld.Field.InternalName + "_" + sourceFld.Field.Id.ToString() + "_RemoveButton") + "</Param>" +
-                                "<Param key=\"SelectResultID\">" + (sourceFld.Field.InternalName + "_" + sourceFld.Field.Id.ToString() + "_SelectResult") + "</Param>");
-
-            }
-            // in the case of a single select
-            // we just need the input or the dropdown
-            // controls id to post back data
-            else
-            {
-                sbResult.Append("<Param key=\"SourceDropDownID\">" + (sourceFld.Field.InternalName + "_" + sourceFld.Field.Id.ToString() + "_$" + sourceFld.Field.FieldRenderingControl.GetType().Name) + "</Param>");
-                sbResult.Append("<Param key=\"SourceControlID\">" + (sourceFld.Field.InternalName + "_" + sourceFld.Field.Id.ToString() + "_$" + sourceFld.Field.FieldRenderingControl.GetType().Name) + "</Param>");
-            }
-
-            return sbResult.ToString();
-        }
-
-        private string GenerateControlDataForLookupField(SPField fld, bool isMulti)
-        {
-            StringBuilder sbResult = new StringBuilder();
-            // in the case of multi select
-            // we need the ids of four controls
-            // to post back data
-            if (isMulti)
-            {
-                // need control id for the addbutton, removeButton, selectCandidate, selectResult controls
-                sbResult.Append("<Param key=\"SelectCandidateID\">" + (fld.InternalName + "_" + fld.Id.ToString() + "_SelectCandidate") + "</Param>" +
-                                "<Param key=\"AddButtonID\">" + (fld.InternalName + "_" + fld.Id.ToString() + "_AddButton") + "</Param>" +
-                                "<Param key=\"RemoveButtonID\">" + (fld.InternalName + "_" + fld.Id.ToString() + "_RemoveButton") + "</Param>" +
-                                "<Param key=\"SelectResultID\">" + (fld.InternalName + "_" + fld.Id.ToString() + "_SelectResult") + "</Param>");
-
-            }
-            // in the case of a single select
-            // we just need the input or the dropdown
-            // controls id to post back data
-            else
-            {
-                sbResult.Append("<Param key=\"SourceDropDownID\">" + (fld.InternalName + "_" + fld.Id.ToString() + "_$" + fld.FieldRenderingControl.GetType().Name) + "</Param>");
-                sbResult.Append("<Param key=\"SourceControlID\">" + (fld.InternalName + "_" + fld.Id.ToString() + "_$" + fld.FieldRenderingControl.GetType().Name) + "</Param>");
-            }
-
-            return sbResult.ToString();
-        }
-
-        protected override bool IsFieldExcluded(SPField field)
-        {
-            if (field == null)
-            {
-                throw new ArgumentNullException(nameof(field));
-            }
-
-            if (!isFeatureActivated)
-            {
-                return base.IsFieldExcluded(field);
-            }
-
-            if (isResList)
-            {
-                try
-                {
-                    switch (field.InternalName)
-                    {
-                        case ResourceLevelTitle:
-                            return IsFieldExcludedResourcesLevel();
-                        case PermissionsTitle:
-                            return IsFieldExcludedPermissions();
-                        case TitleKey:
-                            return IsFieldExcludedTitle();
-                        case FirstNameKey:
-                        case LastNameKey:
-                            return IsFieldExcludedName();
-                        case EmailKey:
-                            return mode != SPControlMode.New;
-                        case CanLoginTitle:
-                            return true;
-                        case GenericTitle:
-                            return mode != SPControlMode.New;
-                        case Approved:
-                            return IsFieldExcludedApproved(field);
-                        default:
-                            if (IsFieldExcludedInternalName(field.InternalName))
-                            {
-                                return true;
-                            }
-                            break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine(ex.ToString());
-                }
-            }
-
-            if (fieldProperties == null)
-            {
-                return base.IsFieldExcluded(field);
-            }
-
-            if (!fieldProperties.ContainsKey(field.InternalName))
-            {
-                return base.IsFieldExcluded(field);
-            }
-
-            switch (mode)
-            {
-                case SPControlMode.Display:
-                    return IsFieldExcluded(field, Display);
-                case SPControlMode.Edit:
-                    return IsFieldExcludedEdit(field);
-                case SPControlMode.New:
-                    return IsFiedlExcludedNew(field);
-                default:
-                    return base.IsFieldExcluded(field);
-            }
-        }
-
-        private bool IsFieldExcludedResourcesLevel()
-        {
-            if (Web.CurrentUser.IsSiteAdmin ||
-                string.Equals(
-                    CoreFunctions.GetRealUserName(SPContext.Current.Web.CurrentUser.LoginName),
-                    ownerusername,
-                    StringComparison.InvariantCultureIgnoreCase))
-            {
-                var act = new Act(Web);
-                var actType = 0;
-
-                var levels = act.GetLevelsFromSite(out actType, string.Empty);
-
-                return actType <= 2;
-            }
-
-            return true;
-        }
-
-        private bool IsFieldExcludedPermissions()
-        {
-            if (mode == SPControlMode.New)
-            {
-                return false;
-            }
-
-            var generic = string.Empty;
             try
             {
-                generic = ListItem[GenericTitle].ToString();
+                PropertyInfo property = child.GetType().GetProperty("FieldName", BindingFlags.NonPublic | BindingFlags.Instance);
+                property.SetValue(child, fieldName, null);
             }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex.ToString());
-            }
-            return generic != FalseConst;
+            catch (Exception) { }
         }
 
-        private bool IsFieldExcludedTitle()
+        private static void SetControlMode(TemplateContainer child, SPControlMode controlMode)
         {
-            if (mode != SPControlMode.Edit)
-            {
-                return false;
-            }
-
             try
             {
-                if (!bool.Parse(ListItem[GenericTitle].ToString()))
-                {
-                    return true;
-                }
+                PropertyInfo property = child.GetType().GetProperty("ControlMode", BindingFlags.NonPublic | BindingFlags.Instance);
+                property.SetValue(child, controlMode, null);
             }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex.ToString());
-            }
-            return false;
+            catch (Exception) { }
         }
 
-        private bool IsFieldExcludedName()
+        private static FieldLabel GetFieldLabel(Control control, int index1, int index2, int index3)
         {
-            if (mode == SPControlMode.New)
+            if (control == null)
             {
-                return false;
+                throw new ArgumentNullException(nameof(control));
             }
-            try
-            {
-                if (bool.Parse(ListItem[GenericTitle].ToString()))
-                {
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex.ToString());
-            }
-            return false;
+
+            return (FieldLabel)control.Controls[index1].Controls[index2].Controls[index3];
         }
 
-        private bool IsFieldExcludedApproved(SPField field)
+        private static FormField GetFormField(Control control, int index)
         {
-            if (field == null)
+            if (control == null)
             {
-                throw new ArgumentNullException(nameof(field));
+                throw new ArgumentNullException(nameof(control));
             }
 
-            if (field.ParentList.Fields.ContainsFieldWithInternalName(ResourceLevelTitle))
-            {
-                return true;
-            }
-            var approved = No;
-            try
-            {
-                approved = ListItem[Approved].ToString();
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex.ToString());
-            }
-
-            return !SPContext.Current.Web.UserIsSiteAdmin || approved != FalseConst || mode == SPControlMode.New;
+            return (FormField)control.Controls[index];
         }
 
-        private bool IsFieldExcludedInternalName(string fieldInternalName)
+        private static FieldLabel GetFieldLabel(Control control, int index)
         {
-            if (isOnline)
+            if (control == null)
             {
-                switch (fieldInternalName)
-                {
-                    case SharePointAccount:
-                        return true;
-                }
+                throw new ArgumentNullException(nameof(control));
             }
-            if (!isOnline)
-            {
-                switch (fieldInternalName)
-                {
-                    case CanLoginTitle:
-                    case EmailKey:
-                        return true;
-                }
-            }
-            return false;
+
+            return (FieldLabel)control.Controls[index];
         }
 
-        private bool IsFieldExcluded(SPField field, string key)
+        private static CompositeField GetCompositeField(Control control, int index)
         {
-            if (field == null)
+            if (control == null)
             {
-                throw new ArgumentNullException(nameof(field));
-            }
-            var displaySettings = fieldProperties[field.InternalName][key];
-            if (displaySettings.Split(Separator.ToCharArray())[0].Equals(Where, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return IsFieldExcluded2(field, displaySettings);
+                throw new ArgumentNullException(nameof(control));
             }
 
-            return base.IsFieldExcluded(field);
+            return (CompositeField)control.Controls[index];
         }
 
-        private bool IsFieldExcludedEdit(SPField field)
+        private static string GetControlType(Control control, int index)
         {
-            if (field == null)
+            if (control == null)
             {
-                throw new ArgumentNullException(nameof(field));
-            }
-            if (!fieldProperties[field.InternalName].ContainsKey(Edit))
-            {
-                return base.IsFieldExcluded(field);
-            }
-            var displaySettings = fieldProperties[field.InternalName][Edit];
-            if (displaySettings.Split(Separator.ToCharArray())[0].Equals(Where, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return IsFieldExcluded2(field, displaySettings);
+                throw new ArgumentNullException(nameof(control));
             }
 
-            if (field.Type == SPFieldType.Calculated &&
-                displaySettings.Split(Separator.ToCharArray())[0].Equals(Always, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return false;
-            }
-
-            return base.IsFieldExcluded(field);
-        }
-
-        private bool IsFiedlExcludedNew(SPField field)
-        {
-            if (field == null)
-            {
-                throw new ArgumentNullException(nameof(field));
-            }
-
-            if (!fieldProperties[field.InternalName].ContainsKey(New))
-            {
-                return base.IsFieldExcluded(field);
-            }
-
-            var displaySettings = fieldProperties[field.InternalName][New];
-            if (displaySettings.Split(Separator.ToCharArray())[0].Equals(Where, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return IsFieldExcluded2(field, displaySettings);
-            }
-            return base.IsFieldExcluded(field);
-        }
-
-        private bool IsFieldExcluded2(SPField field, string displaySettings)
-        {
-            var whereField = displaySettings.Split(Separator.ToCharArray())[1];
-            var conditionField = string.Empty;
-            string condition;
-            var groupField = string.Empty;
-            var valueCondition = string.Empty;
-            if (whereField.Equals(Me))
-            {
-                condition = displaySettings.Split(Separator.ToCharArray())[2];
-                groupField = displaySettings.Split(Separator.ToCharArray())[3];
-            }
-            else
-            {
-                conditionField = displaySettings.Split(Separator.ToCharArray())[2];
-                condition = displaySettings.Split(Separator.ToCharArray())[3];
-                valueCondition = displaySettings.Split(Separator.ToCharArray())[4];
-            }
-            return !EditableFieldDisplay.RenderField(
-                field,
-                whereField,
-                conditionField,
-                condition,
-                groupField,
-                valueCondition,
-                ListItem);
+            return control.Controls[index].GetType().ToString();
         }
     }
 }
