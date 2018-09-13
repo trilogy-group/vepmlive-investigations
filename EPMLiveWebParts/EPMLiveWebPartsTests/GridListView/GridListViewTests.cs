@@ -2,14 +2,12 @@
 using System;
 using System.Web.UI.Fakes;
 using System.Web.Fakes;
-//using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using System.Xml;
 using System.Collections;
 using System.Web.Script.Serialization.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
 using System.Collections.Specialized.Fakes;
-using System.Collections.Generic;
 using Microsoft.SharePoint;
 using EPMLive.TestFakes.Utility;
 using Microsoft.QualityTools.Testing.Fakes;
@@ -20,10 +18,12 @@ using EPMLiveCore.Fakes;
 using EPMLiveWebParts.Fakes;
 using System.Globalization;
 using System.Threading;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EPMLiveWebParts.Tests
 {
     [TestClass]
+    [ExcludeFromCodeCoverage]
     public partial class GridListViewTests
     {
         private IDisposable _shimsContext;
