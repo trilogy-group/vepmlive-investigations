@@ -592,9 +592,9 @@ namespace TimeSheets
 
         private void renderGrid(HtmlTextWriter output, SPWeb web)
         {
-            string firsteditorbox = "";
-            string editEvents = "false";
-            output.Write(SharedFunctions.getTimeEditorDiv(editEvents, sFullGridId, cn, web, out firsteditorbox));
+            string firstEditorBox;
+            var editEvents = "false";
+            output.Write(SharedFunctions.getTimeEditorDiv(editEvents, sFullGridId, cn, web, out firstEditorBox));
 
             AppendCssAndJsLibraries(output);
             AppendStyles(output);
@@ -602,14 +602,14 @@ namespace TimeSheets
             AppendGridScripts(output, web);
             AppendMyGridScripts(output, web);
 
-            output.Write("function loadX" + sFullGridId + "(){");
-            output.Write("var w = document.getElementById('WebPart" + this.Qualifier + "').offsetWidth - 20;");
-            output.Write("mygrid" + sFullGridId + ".loadXML(\"" + web.Url + "/_layouts/epmlive/getpmapprovals.aspx?data=" + sFullParamList + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "&rnd=" + Guid.NewGuid() + "&period=" + intPeriod + "&width=\" + w);");
-
+            output.Write($"function loadX{sFullGridId}(){{");
+            output.Write($"var w = document.getElementById('WebPart{Qualifier}').offsetWidth - 20;");
+            output.Write($"mygrid{sFullGridId}.loadXML(\"{web.Url}/_layouts/epmlive/getpmapprovals.aspx?data={sFullParamList}");
+            output.Write($"&source={HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString())}&rnd={Guid.NewGuid()}&period={intPeriod}&width=\" + w);");
             output.Write("}");
 
             output.WriteLine("function clickTab(){");
-            output.WriteLine("var wp = document.getElementById('MSOZoneCell_WebPart" + this.Qualifier + "');");
+            output.WriteLine($"var wp = document.getElementById('MSOZoneCell_WebPart{Qualifier}');");
             output.WriteLine("fireEvent(wp, 'mouseup');");
             output.WriteLine("setTimeout(\"clickbrowse()\",1000);");
             output.WriteLine("}");
@@ -620,9 +620,7 @@ namespace TimeSheets
             output.WriteLine("}");
 
             output.Write("SP.SOD.executeOrDelayUntilScriptLoaded(clickTab, \"GridViewContextualTabPageComponent.js\");");
-
-            output.Write("_spBodyOnLoadFunctionNames.push(\"loadX" + sFullGridId + "\");");
-
+            output.Write($"_spBodyOnLoadFunctionNames.push(\"loadX{sFullGridId}\");");
             output.Write("initmb();");
 
             output.Write(Properties.Resources.txtPMApprovalsJS.Replace("#gridid#", sFullGridId));
