@@ -2,25 +2,29 @@
 using System;
 using System.Web.UI.Fakes;
 using System.Web.Fakes;
-//using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using System.Xml;
 using System.Collections;
 using System.Web.Script.Serialization.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
 using System.Collections.Specialized.Fakes;
-using System.Collections.Generic;
 using Microsoft.SharePoint;
 using EPMLive.TestFakes.Utility;
 using Microsoft.QualityTools.Testing.Fakes;
 using System.Web.UI;
 using System.IO;
 using System.Text;
+using EPMLiveCore.Fakes;
+using EPMLiveWebParts.Fakes;
+using System.Globalization;
+using System.Threading;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EPMLiveWebParts.Tests
 {
     [TestClass]
-    public class GridListViewTests
+    [ExcludeFromCodeCoverage]
+    public partial class GridListViewTests
     {
         private IDisposable _shimsContext;
         private SharepointShims _sharepointShims;
@@ -31,6 +35,8 @@ namespace EPMLiveWebParts.Tests
         private StringBuilder _outputBuilder;
         private StringWriter _outputWriterString;
         private HtmlTextWriter _outputWriterHtml;
+        private CultureInfo _currentCulture;
+
         private string Output
         {
             get
@@ -50,6 +56,8 @@ namespace EPMLiveWebParts.Tests
         [TestInitialize]
         public void SetUp()
         {
+            _currentCulture = Thread.CurrentThread.CurrentCulture;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             _shimsContext = ShimsContext.Create();
             _sharepointShims = SharepointShims.ShimSharepointCalls();
 
@@ -64,6 +72,17 @@ namespace EPMLiveWebParts.Tests
             _testablePrivate.SetField("sSearchField", _searchField);
             _testablePrivate.SetField("sSearchValue", _searchString);
             _testablePrivate.SetField("list", _sharepointShims.ListShim.Instance);
+            _testablePrivate.SetField("view", _sharepointShims.ViewShim.Instance);
+            _testablePrivate.SetField("gSettings", new ShimGridGanttSettings().Instance);
+            _testablePrivate.SetField("gvs", new ShimGridViewSession().Instance);
+            ShimSPContext.AllInstances.ViewContextGet = _ => new ShimSPViewContext()
+            {
+                ViewGet = () => _sharepointShims.ViewShim.Instance,
+            }.Instance;
+            ShimControl.AllInstances.PageGet = _ => new ShimPage()
+            {
+                RequestGet = () => new ShimHttpRequest().Instance,
+            }.Instance;
 
             _outputBuilder = new StringBuilder();
             _outputWriterString = new StringWriter(_outputBuilder);
@@ -86,6 +105,7 @@ namespace EPMLiveWebParts.Tests
 
             _outputWriterString.Dispose();
             _outputWriterHtml.Dispose();
+            Thread.CurrentThread.CurrentCulture = _currentCulture;
         }
 
         [TestMethod()]

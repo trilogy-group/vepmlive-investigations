@@ -56,9 +56,17 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\Microsoft.SharePoint.16.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Web.CommandUI.16.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\Microsoft.Web.CommandUI.16.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="Moq, Version=4.5.30.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Moq.4.5.30\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="mscorlib.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="Shouldly, Version=3.0.0.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Shouldly.3.0.0\lib\net40\Shouldly.dll</HintPath>
@@ -106,6 +114,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ChatControl\VfChartTests.cs" />
+    <Compile Include="GridListView\GridListViewTests.AddContextualTab.cs" />
+    <Compile Include="GridListView\GridListViewTests.RenderGantt.cs" />
     <Compile Include="Layouts\epmlive\TlwizardTests.cs" />
     <Compile Include="ResourcePlanningTest.cs" />
     <Compile Include="ReportingFilter\ReportingFilterTests.cs" />
