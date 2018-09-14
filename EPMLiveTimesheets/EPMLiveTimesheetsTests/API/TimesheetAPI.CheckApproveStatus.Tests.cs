@@ -87,7 +87,7 @@ namespace TimeSheets.Tests
                 throw new Exception("Unexpected call to GetString.");
             };
             ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => true.ToString();
-            ShimTimesheetAPI.CheckNonTeamMemberAllocationSPWebStringSqlConnectionString
+            ShimTimesheetAPI.CheckNonTeamMemberAllocationSPWebStringStringString
                 = (_, __, ___, ____) => { };
         }
     }

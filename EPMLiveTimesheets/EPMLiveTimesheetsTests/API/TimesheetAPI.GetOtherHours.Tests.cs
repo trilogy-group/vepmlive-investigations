@@ -47,7 +47,7 @@ namespace TimeSheets.Tests
                 return false;
             };
             ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => true.ToString();
-            ShimTimesheetAPI.CheckNonTeamMemberAllocationSPWebStringSqlConnectionString
+            ShimTimesheetAPI.CheckNonTeamMemberAllocationSPWebStringStringString
                 = (_, __, ___, ____) => { };
         }
     }

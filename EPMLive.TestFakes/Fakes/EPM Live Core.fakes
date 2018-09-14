@@ -6,6 +6,8 @@
   <ShimGeneration>
     <Clear/>
     <Add FullName="EPMLiveCore.EditableFieldDisplay!"/>
+    <Add FullName="EPMLiveCore.ActLicensing.Licensing!"/>
+    <Add FullName="EPMLiveCore.UserLevels"/>
     <Add FullName="EPMLiveCore.ReportingProxy.QueryExecutor!"/>
     <Add FullName="EPMLiveCore.CoreFunctions!"/>
     <Add FullName="EPMLiveCore.Infrastructure.Logging.LoggingService!"/>
@@ -16,6 +18,7 @@
     <Add FullName="EPMLiveCore.Infrastructure.Setup.CreateEPMLiveDB!"/>
     <Add FullName="EPMLiveCore.ReportHelper.EPMData!"/>
     <Add FullName="EPMLiveCore.ReportHelper.ReportBiz!"/>
+    <Add Namespace="EPMLiveCore.API"/>
     <Add FullName="EPMLiveCore.API.APITeam!"/>
     <Add FullName="EPMLiveCore.Utilities!"/>
     <Add FullName="EPMLiveCore.Jobs.ResourceImportJob!"/>
@@ -55,5 +58,18 @@
     <Add FullName="EPMLiveCore.ReportHelper.ListBiz!"/>
     <Add FullName="EPMLiveCore.Infrastructure.CacheStore!"/>
     <Add FullName="EPMLiveCore.CommentCCPeopleEditor!"/>
+    <Add FullName="EPMLiveCore.Controls.Navigation.Providers.WorkspaceLinkProvider!"/>
+    <Add FullName="EPMLiveCore.Controls.Navigation.Providers.FavoritesLinkProvider!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.Navigation.NavLinkProvider!"/>
+    <Add FullName="EPMLiveCore.API.WorkspaceFactory!"/>
+    <Add FullName="EPMLiveCore.API.WorkspaceData!"/>
+    <Add FullName="EPMLiveCore.API.Reporting!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.CacheStoreCategory!"/>
+    <Add FullName="EPMLiveCore.ReportAuth!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.EPMLiveFileStore!"/>
+    <Add FullName="EPMLiveCore.API.ResourceExporter!"/>
+    <Add FullName="EPMLiveCore.DisabledItemEventScope!"/>
+    <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.Step!"/>
+    <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps.UpdateResourcePool!"/>
   </ShimGeneration>
 </Fakes>
