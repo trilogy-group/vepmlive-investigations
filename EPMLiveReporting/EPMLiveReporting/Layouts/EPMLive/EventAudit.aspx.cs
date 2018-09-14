@@ -35,19 +35,21 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             AuditLists();
         }
 
-        protected void Page_Load(object sender, EventArgs e) { }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+        }
 
         private void save_ServerClick(object sender, EventArgs e)
         {
             foreach (SPGridViewRow row in grdVwResults.Rows)
             {
-                var checkBock = (CheckBox) row.Cells[3].Controls[1];
+                var checkBock = (CheckBox)row.Cells[3].Controls[1];
                 if (checkBock.Checked)
                 {
-                    var hiddenField = (HiddenField) row.Cells[3].Controls[3];
+                    var hiddenField = (HiddenField)row.Cells[3].Controls[3];
                     var sListName = hiddenField.Value;
 
-                    hiddenField = (HiddenField) row.Cells[3].Controls[2];
+                    hiddenField = (HiddenField)row.Cells[3].Controls[2];
                     var sWebUrl = hiddenField.Value;
 
                     AddEventHandler(sWebUrl, sListName);
@@ -57,8 +59,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         }
 
         private IList<SPEventReceiverDefinition> GetListEvents(
-            SPList list, 
-            string assemblyName, 
+            SPList list,
+            string assemblyName,
             string className,
             IList<SPEventReceiverType> types)
         {
@@ -104,14 +106,13 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     Text = "Audit not run. No siteId and/or list name provided."
                 };
                 var masterPage = Master;
-                var placeHolder = (ContentPlaceHolder) masterPage.FindControl(PlaceHolderId);
+                var placeHolder = (ContentPlaceHolder)masterPage.FindControl(PlaceHolderId);
                 placeHolder.Controls.Add(label);
             }
         }
 
         private void grdVwResults_RowCreated(object sender, GridViewRowEventArgs e)
         {
-            //var checkBox = new CheckBox();
             var cell = new TableCell();
 
             if (e.Row.RowType != DataControlRowType.Header && e.Row.RowType != DataControlRowType.Footer)
@@ -135,7 +136,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 };
                 cell.Controls.Add(literal);
 
-                if (_dtAuditRecs.Rows[e.Row.RowIndex][MessageColumn].ToString().Equals("list not present.", StringComparison.InvariantCultureIgnoreCase))
+                if (_dtAuditRecs.Rows[e.Row.RowIndex][MessageColumn].ToString()
+                    .Equals("list not present.", StringComparison.InvariantCultureIgnoreCase))
                 {
                     checkBox.Enabled = false;
                 }
@@ -256,7 +258,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 return;
             }
 
-            foreach(Control control in contenPlaceHolder.Controls)
+            foreach (Control control in contenPlaceHolder.Controls)
             {
                 control?.Dispose();
             }
