@@ -42,6 +42,23 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         private const string DummyUrl = "http://xyz.com";
         private const string WebId = "fb46c327-ce29-4616-9ecd-a6615cfae015";
         private const string ListId = "8a64acf5-3c03-46a2-90dd-3077a9af0b48";
+        private const string TrueString = "true";
+        private const string GridViewId = "dv";
+        private const string DeleteResourcePoolResourceTag = "<DeleteResourcePoolResource>";
+        private const string ResourcePoolViewsTag = "<ResourcePoolViews>";
+        private const string ResourcePoolViewsClosedTag = "<ResourcePoolViews/>";
+        private const string RefreshResourcesSucess = "<RefreshResources Success=\"0\" />";
+        private const string GridTag = "<Grid>";
+        private const string BodyTag = "<Body>";
+        private const string ResourceID = "ResourceID";
+        private const string ProfilePic = "ProfilePic";
+        private const string ProfilePicUrl = "/_layouts/15/epmlive/images/default-avatar.png";
+        private const string IsMyResource = "IsMyResource";
+        private const string ResourcePoolDataGridChangesTag = "<ResourcePoolDataGridChanges>";
+        private const string IAdded = "<I Added=\"1\"";
+        private const string CfgTag = "<Cfg Code=\"GTACCNPSQEBSLC\" Version=\"4.3.2.120412\" />";
+        private const string ViewsTag = "<Views>";
+        private const string RootTags = "<Root></Root>";
 
         [TestInitialize]
         public void TestInitialize()
@@ -97,7 +114,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                             {
                                 IdGet = () => Guid.NewGuid(),
                                 InternalNameGet = () => DummyString,
-                                GetFieldValueAsHtmlObject = _ => "true",
+                                GetFieldValueAsHtmlObject = _ => TrueString,
                                 TypeGet = () => SPFieldType.Boolean
                             }
                         }),
@@ -182,7 +199,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 {
                     new GridView
                     {
-                        Definition = "<Root></Root>"
+                        Definition = RootTags
                     }
                 }
             };
@@ -191,7 +208,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             {
                 new GridView
                 {
-                    Id = "dv"
+                    Id = GridViewId
                 }
             };
 
@@ -234,14 +251,14 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => _itemDeleted.ShouldBeTrue(),
-                () => result.ShouldContain("<DeleteResourcePoolResource>"));
+                () => result.ShouldContain(DeleteResourcePoolResourceTag));
         }
 
         private string CreateXMLString()
         {
             var xmlString = $@"
                 <Root>
-                    <Resource Id='{DummyInt}' ConfirmDelete='true'></Resource>
+                    <Resource Id='{DummyInt}' ConfirmDelete='{TrueString}'></Resource>
                 </Root>";
 
             return xmlString;
@@ -260,7 +277,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             this.ShouldSatisfyAllConditions(
                 () => _gridViewRemoved.ShouldBeTrue(),
                 () => _cacheRemoved.ShouldBeTrue(),
-                () => result.ShouldBe("<ResourcePoolViews/>"));
+                () => result.ShouldBe(ResourcePoolViewsClosedTag));
         }
 
         [TestMethod]
@@ -301,8 +318,8 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                     <Resource ID='{DummyInt}'>
                         <Data Field='ID' HtmlValue='{DummyInt}' Type='Number'>{DummyInt}</Data>
                     </Resource>
-                    <IncludeHidden>true</IncludeHidden>
-                    <IncludeReadOnly>true</IncludeReadOnly>
+                    <IncludeHidden>{true}</IncludeHidden>
+                    <IncludeReadOnly>{true}</IncludeReadOnly>
                     <Department ID='{DummyString}'>
                         <Fields Field='Title' />
                         <Fields Field='RBS'>{DummyString}</Fields>
@@ -340,12 +357,12 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => result.ShouldContain("<Grid>"),
-                () => result.ShouldContain("<Body>"),
-                () => result.ShouldContain("ResourceID"),
-                () => result.ShouldContain("ProfilePic"),
-                () => result.ShouldContain("/_layouts/15/epmlive/images/default-avatar.png"),
-                () => result.ShouldContain("IsMyResource"));
+                () => result.ShouldContain(GridTag),
+                () => result.ShouldContain(BodyTag),
+                () => result.ShouldContain(ResourceID),
+                () => result.ShouldContain(ProfilePic),
+                () => result.ShouldContain(ProfilePicUrl),
+                () => result.ShouldContain(IsMyResource));
         }
 
         [TestMethod]
@@ -365,8 +382,8 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => result.ShouldContain("<ResourcePoolDataGridChanges>"),
-                () => result.ShouldContain("<I Added=\"1\""));
+                () => result.ShouldContain(ResourcePoolDataGridChangesTag),
+                () => result.ShouldContain(IAdded));
         }
 
         [TestMethod]
@@ -384,8 +401,8 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNullOrEmpty(),
-                () => result.ShouldContain("<Grid>"),
-                () => result.ShouldContain("<Cfg Code=\"GTACCNPSQEBSLC\" Version=\"4.3.2.120412\" />"));
+                () => result.ShouldContain(GridTag),
+                () => result.ShouldContain(CfgTag));
         }
 
         [TestMethod]
@@ -398,9 +415,9 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             this.ShouldSatisfyAllConditions(
                 () => _gridViewInitialized.ShouldBeTrue(),
                 () => result.ShouldNotBeNullOrEmpty(),
-                () => result.ShouldContain("<ResourcePoolViews>"),
-                () => result.ShouldContain("<Views>"),
-                () => result.ShouldContain("<Root></Root>"));
+                () => result.ShouldContain(ResourcePoolViewsTag),
+                () => result.ShouldContain(ViewsTag),
+                () => result.ShouldContain(RootTags));
         }
 
         [TestMethod]
@@ -414,7 +431,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 () => _gridViewAdded.ShouldBeTrue(),
                 () => _cacheRemoved.ShouldBeTrue(),
                 () => result.ShouldNotBeNullOrEmpty(),
-                () => result.ShouldBe("<ResourcePoolViews/>"));
+                () => result.ShouldBe(ResourcePoolViewsClosedTag));
         }
 
         [TestMethod]
@@ -428,7 +445,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 () => _gridViewUpdated.ShouldBeTrue(),
                 () => _cacheRemoved.ShouldBeTrue(),
                 () => result.ShouldNotBeNullOrEmpty(),
-                () => result.ShouldBe("<ResourcePoolViews/>"));
+                () => result.ShouldBe(ResourcePoolViewsClosedTag));
         }
 
         [TestMethod]
@@ -453,7 +470,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 () => jobAdded.ShouldBeTrue(),
                 () => jobEnqueued.ShouldBeTrue(),
                 () => result.ShouldNotBeNullOrEmpty(),
-                () => result.ShouldBe("<RefreshResources Success=\"0\" />"));
+                () => result.ShouldBe(RefreshResourcesSucess));
         }
     }
 }
