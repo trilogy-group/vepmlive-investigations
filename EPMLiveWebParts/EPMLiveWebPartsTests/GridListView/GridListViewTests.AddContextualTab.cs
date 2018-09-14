@@ -35,7 +35,6 @@ namespace EPMLiveWebParts.Tests
         private StringBuilder loadXmlString;
         private StringBuilder registerDataExtensionString;
 
-
         private void SetupForAddContextualTab()
         {
             trimByIdString = new StringBuilder();
@@ -44,17 +43,17 @@ namespace EPMLiveWebParts.Tests
             SetupShims();
             _testablePrivate.SetField("tb", new TimeDebug(DummyString, DummyString));
             ShimSPRibbon.GetCurrentPage = (_) => new ShimSPRibbon().Instance;
-            ShimRibbon.AllInstances.TrimByIdString = (_, value) =>
+            ShimRibbon.AllInstances.TrimByIdString = (_, inputValue) =>
             {
-                trimByIdString.Append(value.Replace("\r\n", "").Replace("\n", ""));
+                trimByIdString.Append(inputValue.Replace("\r\n", "").Replace("\n", ""));
             };
-            ShimXmlDocument.AllInstances.LoadXmlString = (_, value) =>
+            ShimXmlDocument.AllInstances.LoadXmlString = (_, inputValue) =>
             {
-                loadXmlString.Append(value.Replace("\r\n", "").Replace("\n", ""));
+                loadXmlString.Append(inputValue.Replace("\r\n", "").Replace("\n", ""));
             };
-            ShimRibbon.AllInstances.RegisterDataExtensionXmlNodeString = (_, __, value) =>
+            ShimRibbon.AllInstances.RegisterDataExtensionXmlNodeString = (_, __, inputValue) =>
             {
-                registerDataExtensionString.Append(value.Replace("\r\n", "").Replace("\n", ""));
+                registerDataExtensionString.Append(inputValue.Replace("\r\n", "").Replace("\n", ""));
             };
             ShimSPWeb.AllInstances.PropertiesGet = (_) =>
             {
