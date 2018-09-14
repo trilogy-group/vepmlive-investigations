@@ -77,6 +77,7 @@ namespace EPMLiveCore.Tests.API.MyWork
         public void Setup()
         {
             SetupShims();
+            SetupShimsSplitTwo();
 
             testObj = new TypeToTest();
             privateObj = new PrivateObject(testObj);

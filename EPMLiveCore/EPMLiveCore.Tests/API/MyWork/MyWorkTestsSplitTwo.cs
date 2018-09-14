@@ -350,38 +350,38 @@ namespace EPMLiveCore.Tests.API.MyWork
         public void GetPersonalViews_WhenCalled_ReturnsMyWorkGridViewList()
         {
             // Arrange
-            var sb = new StringBuilder();
-            sb.Append(@"<?xml version=""1.0"" encoding=""utf-8""?>");
-            sb.Append("<ArrayOfMyWorkGridView>");
-            sb.Append("<MyWorkGridView>");
-            sb.Append("<Cols>Cols</Cols>");
-            sb.Append("<Default>true</Default>");
-            sb.Append("<Filters>Filters</Filters>");
-            sb.Append("<Grouping>Grouping</Grouping>");
-            sb.Append("<Id>Id</Id>");
-            sb.Append("<LeftCols>LeftCols</LeftCols>");
-            sb.Append("<Name>Name</Name>");
-            sb.Append("<Personal>true</Personal>");
-            sb.Append("<RightCols>RightCols</RightCols>");
-            sb.Append("<Sorting>Sorting</Sorting>");
-            sb.Append("<HasPermission>true</HasPermission>");
-            sb.Append("</MyWorkGridView>");
-            sb.Append("<MyWorkGridView>");
-            sb.Append("<Cols>Cols</Cols>");
-            sb.Append("<Default>true</Default>");
-            sb.Append("<Filters>Filters</Filters>");
-            sb.Append("<Grouping>Grouping</Grouping>");
-            sb.Append("<Id>Id</Id>");
-            sb.Append("<LeftCols>LeftCols</LeftCols>");
-            sb.Append("<Name>Name</Name>");
-            sb.Append("<Personal>true</Personal>");
-            sb.Append("<RightCols>RightCols</RightCols>");
-            sb.Append("<Sorting>Sorting</Sorting>");
-            sb.Append("<HasPermission>false</HasPermission>");
-            sb.Append("</MyWorkGridView>");
-            sb.Append("</ArrayOfMyWorkGridView>");
+            var stringBuilder = new StringBuilder();
+            stringBuilder.Append(@"<?xml version=""1.0"" encoding=""utf-8""?>")
+                .Append("<ArrayOfMyWorkGridView>")
+                .Append("<MyWorkGridView>")
+                .Append("<Cols>Cols</Cols>")
+                .Append("<Default>true</Default>")
+                .Append("<Filters>Filters</Filters>")
+                .Append("<Grouping>Grouping</Grouping>")
+                .Append("<Id>Id</Id>")
+                .Append("<LeftCols>LeftCols</LeftCols>")
+                .Append("<Name>Name</Name>")
+                .Append("<Personal>true</Personal>")
+                .Append("<RightCols>RightCols</RightCols>")
+                .Append("<Sorting>Sorting</Sorting>")
+                .Append("<HasPermission>true</HasPermission>")
+                .Append("</MyWorkGridView>")
+                .Append("<MyWorkGridView>")
+                .Append("<Cols>Cols</Cols>")
+                .Append("<Default>true</Default>")
+                .Append("<Filters>Filters</Filters>")
+                .Append("<Grouping>Grouping</Grouping>")
+                .Append("<Id>Id</Id>")
+                .Append("<LeftCols>LeftCols</LeftCols>")
+                .Append("<Name>Name</Name>")
+                .Append("<Personal>true</Personal>")
+                .Append("<RightCols>RightCols</RightCols>")
+                .Append("<Sorting>Sorting</Sorting>")
+                .Append("<HasPermission>false</HasPermission>")
+                .Append("</MyWorkGridView>")
+                .Append("</ArrayOfMyWorkGridView>");
 
-            ShimSqlCommand.AllInstances.ExecuteScalar = _ => sb.ToString();
+            ShimSqlCommand.AllInstances.ExecuteScalar = _ => stringBuilder.ToString();
 
             // Act
             var actual = (List<MyWorkGridView>)privateObj.Invoke(
@@ -417,20 +417,20 @@ namespace EPMLiveCore.Tests.API.MyWork
             // Arrange
             const string expected = "where condition";
 
-            var sb = new StringBuilder();
-            sb.Append("<MyWork>");
-            sb.Append("<Query>");
-            sb.Append("<Where>");
-            sb.Append(expected);
-            sb.Append("</Where>");
-            sb.Append("</Query>");
-            sb.Append("</MyWork>");
+            var stringBuilder = new StringBuilder();
+            stringBuilder.Append("<MyWork>")
+                .Append("<Query>")
+                .Append("<Where>")
+                .Append(expected)
+                .Append("</Where>")
+                .Append("</Query>")
+                .Append("</MyWork>");
 
             // Act
             var actual = (string)privateObj.Invoke(
                 GetQueryMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
-                new object[] { sb.ToString() });
+                new object[] { stringBuilder.ToString() });
 
             // Assert
             actual.ShouldBe(expected);
