@@ -35,9 +35,9 @@ namespace TimeSheets.Tests
                 "<SaveStatus Result=\"0\" Status=\"5\" PercentComplete=\"7\" ErrorResult=\"result-sample\"" +
                 " ResultText=\"result-text-sample\"></SaveStatus>",
                 message);
-            //Assert.IsTrue(_adoShims.ConnectionsDisposed.Any());
-            //Assert.AreEqual(1, _adoShims.CommandsDisposed.Count);
-            //Assert.AreEqual(1, _adoShims.DataReadersDisposed.Count);
+            Assert.IsTrue(_adoShims.ConnectionsDisposed.Any());
+            Assert.AreEqual(1, _adoShims.CommandsDisposed.Count);
+            Assert.AreEqual(1, _adoShims.DataReadersDisposed.Count);
         }
 
         private void SetupShims()
