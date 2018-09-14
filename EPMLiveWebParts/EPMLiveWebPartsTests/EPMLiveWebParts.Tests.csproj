@@ -114,6 +114,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ChatControl\VfChartTests.cs" />
+    <Compile Include="GridListView\GridListViewTests.AddContextualTab.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderGantt.cs" />
     <Compile Include="Layouts\epmlive\TlwizardTests.cs" />
     <Compile Include="ResourcePlanningTest.cs" />
