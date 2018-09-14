@@ -138,13 +138,17 @@
     <Compile Include="API\Analytics\RecentItemsTests.cs" />
     <Compile Include="API\APITeamTests.cs" />
     <Compile Include="API\Comments\CommentManagerTests.cs" />
+    <Compile Include="API\CreateWorkspace\DALTests.cs" />
     <Compile Include="API\CreateWorkspace\WorkspaceFactoryTests.cs" />
     <Compile Include="API\Integration\IntegrationAdminTests.cs" />
     <Compile Include="API\Integration\IntegrationCoreTest.cs" />
     <Compile Include="API\MyWork\MyWorkTests.cs" />
+    <Compile Include="API\MyWork\MyWorkTestsSplitOne.cs" />
+    <Compile Include="API\MyWork\MyWorkTestsSplitTwo.cs" />
     <Compile Include="API\NavigationServiceTests.cs" />
     <Compile Include="API\Notification\APIEmailTests.cs" />
     <Compile Include="API\Publish\APIPublishTests.cs" />
+    <Compile Include="API\ResourceGrid\ResourceExporterTests.cs" />
     <Compile Include="API\TimerTests.cs" />
     <Compile Include="CheckOpenCloseConnections.cs" />
     <Compile Include="ControlDataBuilderTest.cs" />
@@ -157,6 +161,7 @@
     <Compile Include="Jobs\ResourcePlanTest.cs" />
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AddListDataTests.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePoolTests.cs" />
     <Compile Include="Layouts\epmlive\CreateNewWorkspaceTest.cs" />
     <Compile Include="Layouts\epmlive\CommentsTests.cs" />
     <Compile Include="Layouts\epmlive\GenericQueryControlTests.cs" />
@@ -164,6 +169,7 @@
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
     <Compile Include="NewAppTest.cs" />
+    <Compile Include="PlatformIntegrationEventTest.cs" />
     <Compile Include="ReportHelper\EPMDataTest.Part3.cs" />
     <Compile Include="ReportHelper\EPMDataTest.Part2.cs" />
     <Compile Include="RequestWorkspaceTest.cs" />
@@ -187,7 +193,8 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="TestCheck.cs" />
-    <Compile Include="WebPageCode\CreateDatabaseTest.cs" />
+    <Compile Include="WebPageCode\AdminConnsTest.cs" />
+    <Compile Include="WebPageCode\ListDisplayPageTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">

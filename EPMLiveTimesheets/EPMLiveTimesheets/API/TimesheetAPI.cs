@@ -5,9 +5,11 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 using System.Xml;
 using System.Xml.Linq;
 using EPMLiveCore.API;
@@ -17,8 +19,7 @@ using TimeSheets.Log;
 using TimeSheets.Models;
 using CoreReportHelper = EPMLiveCore.ReportHelper;
 using EpmCoreFunctions = EPMLiveCore.CoreFunctions;
-using System.IO;
-using System.Web;
+using EpmWorkReportData = EPMLiveCore.ReportHelper.MyWorkReportData;
 
 namespace TimeSheets
 {
@@ -776,13 +777,13 @@ namespace TimeSheets
         }
 
         // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of.
-        public static void CheckNonTeamMemberAllocation(SPWeb oWeb, string tsuid, SqlConnection cn, string data)
+        public static void CheckNonTeamMemberAllocation(SPWeb oWeb, string tsuid, string cn, string data)
         {
             List<TimeSheetItem> timeSheetItems;
             double qtdAllocatedHours = 0;
-
-            timeSheetItems = GetTimeSheetItems(data, cn.ConnectionString);
-            qtdAllocatedHours = CalculateAllocatedHours(timeSheetItems, cn.ConnectionString);
+			
+            timeSheetItems = GetTimeSheetItems(data, cn);
+            qtdAllocatedHours = CalculateAllocatedHours(timeSheetItems, cn);
 
             if (qtdAllocatedHours > 0)
                 RunPermissionsChecks(timeSheetItems, qtdAllocatedHours, oWeb);
@@ -1161,9 +1162,12 @@ namespace TimeSheets
                 SqlConnection connection = null;
                 try
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+					string connectionString = null;
+
+					SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        connection = new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+						connectionString = EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id); 
+						connection = new SqlConnection(connectionString);
                         connection.Open();
                     });
 
@@ -1201,7 +1205,7 @@ namespace TimeSheets
                             // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of
                             if (bool.Parse(EpmCoreFunctions.getConfigSetting(oWeb, "EPMLiveEnableNonTeamNotf")))
                             {
-                                CheckNonTeamMemberAllocation(oWeb, tsuid, connection, data);
+                                CheckNonTeamMemberAllocation(oWeb, tsuid, connectionString, data);
                             }
 
                             using (var command = new SqlCommand(
@@ -1341,7 +1345,6 @@ namespace TimeSheets
 
         public static string CheckSaveStatus(string data, SPWeb oWeb)
         {
-
             try
             {
                 XmlDocument doc = new XmlDocument();
@@ -1349,40 +1352,49 @@ namespace TimeSheets
 
                 string tsuid = doc.FirstChild.Attributes["ID"].Value;
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                using (var connection =
+                    GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
+                    using (var command = new SqlCommand(
+                        "SELECT STATUS,PERCENTCOMPLETE,RESULT,RESULTTEXT FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@tsuid", tsuid);
 
-                SqlCommand cmd = new SqlCommand("SELECT STATUS,PERCENTCOMPLETE,RESULT,RESULTTEXT FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31", cn);
-                cmd.Parameters.AddWithValue("@tsuid", tsuid);
+                        var status = -1;
+                        var percentComplete = 0;
+                        var result = string.Empty;
+                        var resultText = string.Empty;
 
-                int status = -1;
-                int pct = 0;
-                string result = "";
-                string resulttext = "";
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                status = reader.GetInt32(0);
+                                if (!reader.IsDBNull(1))
+                                {
+                                    percentComplete = reader.GetInt32(1);
+                                }
+                                if (!reader.IsDBNull(2))
+                                {
+                                    result = reader.GetString(2);
+                                }
+                                if (!reader.IsDBNull(3))
+                                {
+                                    resultText = reader.GetString(3);
+                                }
+                            }
+                        }
 
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
-                {
-                    status = dr.GetInt32(0);
-                    if (!dr.IsDBNull(1))
-                        pct = dr.GetInt32(1);
-                    if (!dr.IsDBNull(2))
-                        result = dr.GetString(2);
-                    if (!dr.IsDBNull(3))
-                        resulttext = dr.GetString(3);
+                        return string.Format(
+                            "<SaveStatus Result=\"0\" Status=\"{0}\" PercentComplete=\"{1}\" " +
+                            "ErrorResult=\"{2}\" ResultText=\"{3}\"></SaveStatus>",
+                            status,
+                            percentComplete,
+                            result,
+                            resultText);
+                    }
                 }
-                dr.Close();
-
-                cn.Close();
-
-
-                return "<SaveStatus Result=\"0\" Status=\"" + status + "\" PercentComplete=\"" + pct + "\" ErrorResult=\"" + result + "\" ResultText=\"" + resulttext + "\"></SaveStatus>";
-
-
             }
             catch (Exception ex)
             {
@@ -1931,7 +1943,6 @@ namespace TimeSheets
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(data);
 
-
                 int iGridType = int.Parse(doc.FirstChild.Attributes["GridType"].Value);
                 string sPeriod = doc.FirstChild.Attributes["Period"].Value;
                 string sGridId = doc.FirstChild.Attributes["GridId"].Value;
@@ -1964,12 +1975,12 @@ namespace TimeSheets
                 ndCfg.Attributes.Append(attr);
 
 
-                XmlNode ndRightCols = docLayout.FirstChild.SelectSingleNode("//RightCols");
+                XmlNode nodeRightCols = docLayout.FirstChild.SelectSingleNode("//RightCols");
                 XmlNode ndLeftCols = docLayout.FirstChild.SelectSingleNode("//LeftCols");
                 XmlNode ndFooter = docLayout.FirstChild.SelectSingleNode("//Foot/I[@id='-1']");
-                XmlNode ndHeader = docLayout.FirstChild.SelectSingleNode("//Head/Header[@id='Header']");
-                XmlNode ndGroupDef = docLayout.FirstChild.SelectSingleNode("//Def/D[@Name='Group']");
-                XmlNode ndRDef = docLayout.FirstChild.SelectSingleNode("//Def/D[@Name='R']");
+                XmlNode nodeHeader = docLayout.FirstChild.SelectSingleNode("//Head/Header[@id='Header']");
+                XmlNode nodeGroupDef = docLayout.FirstChild.SelectSingleNode("//Def/D[@Name='Group']");
+                XmlNode nodeRDef = docLayout.FirstChild.SelectSingleNode("//Def/D[@Name='R']");
 
                 TimesheetSettings settings = new TimesheetSettings(web);
 
@@ -1988,7 +1999,7 @@ namespace TimeSheets
                     ndSW.Attributes["Visible"].Value = "0";
                 }
 
-                string TotalColumnCalc = "";
+                var totalColumnCalc = new StringBuilder();
 
                 Dictionary<string, string> viewInfo = new Dictionary<string, string>();
 
@@ -2016,123 +2027,144 @@ namespace TimeSheets
 
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                    cn.Open();
-
-                    SqlCommand cmd = new SqlCommand("SELECT TSTYPE_ID, TSTYPE_NAME FROM TSTYPE where SITE_UID=@siteid", cn);
-                    cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-
-                    DataSet dsTypes = new DataSet();
-                    SqlDataAdapter daTypes = new SqlDataAdapter(cmd);
-                    daTypes.Fill(dsTypes);
-
-                    ArrayList arrPeriods = GetPeriodDaysArray(cn, settings, web, sPeriod);
-
-                    foreach (DateTime dtStart in arrPeriods)
+                    using (var connection =
+                        GetOpenedConnection(EpmCoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
                     {
-                        //Col
-                        XmlNode ndCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
-                        XmlAttribute attr1 = docLayout.CreateAttribute("Name");
-                        attr1.Value = "P" + dtStart.Ticks;
-                        ndCol.Attributes.Append(attr1);
-
-                        attr1 = docLayout.CreateAttribute("Visible");
-                        attr1.Value = "1";
-                        ndCol.Attributes.Append(attr1);
-
-                        attr1 = docLayout.CreateAttribute("CanHide");
-                        attr1.Value = "0";
-                        ndCol.Attributes.Append(attr1);
-
-                        attr1 = docLayout.CreateAttribute("CanSort");
-                        attr1.Value = "0";
-                        ndCol.Attributes.Append(attr1);
-
-                        attr1 = docLayout.CreateAttribute("CanResize");
-                        attr1.Value = "0";
-                        ndCol.Attributes.Append(attr1);
-
-                        attr1 = docLayout.CreateAttribute("CanEdit");
-                        attr1.Value = "1";
-                        ndCol.Attributes.Append(attr1);
-
-                        attr1 = docLayout.CreateAttribute("Width");
-                        attr1.Value = TSCellWidth.ToString();
-                        ndCol.Attributes.Append(attr1);
-
-                        attr1 = docLayout.CreateAttribute("Align");
-                        attr1.Value = "Right";
-                        ndCol.Attributes.Append(attr1);
-
-                        attr1 = docLayout.CreateAttribute("Type");
-                        attr1.Value = "Text";
-                        ndCol.Attributes.Append(attr1);
-
-                        attr1 = docLayout.CreateAttribute("Format");
-                        //attr1.Value = "0.##";
-                        attr1.Value = ",0.00";
-                        ndCol.Attributes.Append(attr1);
-
-                        attr1 = docLayout.CreateAttribute("EditFormat");
-                        attr1.Value = ",0.00";
-                        ndCol.Attributes.Append(attr1);
-
-                        if (dsTypes.Tables[0].Rows.Count > 0 || settings.AllowNotes)
+                        DataSet dataSet;
+                        using (var command =
+                            new SqlCommand("SELECT TSTYPE_ID, TSTYPE_NAME FROM TSTYPE where SITE_UID=@siteid", connection))
                         {
-                            XmlNode ndCol2 = ndCol.CloneNode(true);
-                            ndCol2.Attributes["Name"].Value = "TS" + ndCol2.Attributes["Name"].Value;
-                            ndCol2.Attributes["Type"].Value = "Text";
-                            ndCol2.Attributes["Visible"].Value = "0";
+                            command.Parameters.AddWithValue("@siteid", web.Site.ID);
 
-                            ndRightCols.AppendChild(ndCol2);
+                            dataSet = new DataSet();
+                            using (var adapter = new SqlDataAdapter(command))
+                            {
+                                adapter.Fill(dataSet);
+                            }
                         }
 
-                        //if(dsTypes.Tables[0].Rows.Count > 0)
-                        //    ndCol.Attributes["CanEdit"].Value = "0";
+                        var calcOrder = new StringBuilder();
+                        var starts = GetPeriodDaysArray(connection, settings, web, sPeriod);
+                        foreach (DateTime start in starts)
+                        {
+                            var nodeColumn = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+                            var createdAttribute = docLayout.CreateAttribute("Name");
+                            createdAttribute.Value = string.Format("P{0}", start.Ticks);
+                            nodeColumn.Attributes.Append(createdAttribute);
 
-                        ndRightCols.AppendChild(ndCol);
+                            createdAttribute = docLayout.CreateAttribute("Visible");
+                            createdAttribute.Value = "1";
+                            nodeColumn.Attributes.Append(createdAttribute);
 
+                            createdAttribute = docLayout.CreateAttribute("CanHide");
+                            createdAttribute.Value = "0";
+                            nodeColumn.Attributes.Append(createdAttribute);
 
-                        //Header
-                        attr1 = docLayout.CreateAttribute("P" + dtStart.Ticks);
-                        attr1.Value = dtStart.ToString("ddd<br>MMM dd");
-                        ndHeader.Attributes.Append(attr1);
+                            createdAttribute = docLayout.CreateAttribute("CanSort");
+                            createdAttribute.Value = "0";
+                            nodeColumn.Attributes.Append(createdAttribute);
 
-                        attr1 = docLayout.CreateAttribute("P" + dtStart.Ticks + "Formula");
-                        attr1.Value = "sum()";
-                        ndGroupDef.Attributes.Append(attr1);
+                            createdAttribute = docLayout.CreateAttribute("CanResize");
+                            createdAttribute.Value = "0";
+                            nodeColumn.Attributes.Append(createdAttribute);
 
-                        attr1 = docLayout.CreateAttribute("P" + dtStart.Ticks + "Type");
-                        attr1.Value = "Float";
-                        ndGroupDef.Attributes.Append(attr1);
+                            createdAttribute = docLayout.CreateAttribute("CanEdit");
+                            createdAttribute.Value = "1";
+                            nodeColumn.Attributes.Append(createdAttribute);
 
-                        TotalColumnCalc += "+" + "P" + dtStart.Ticks;
+                            createdAttribute = docLayout.CreateAttribute("Width");
+                            createdAttribute.Value = TSCellWidth.ToString();
+                            nodeColumn.Attributes.Append(createdAttribute);
 
-                        ndRDef.Attributes["CalcOrder"].Value += "," + "P" + dtStart.Ticks;
-                        ndGroupDef.Attributes["CalcOrder"].Value += "," + "P" + dtStart.Ticks;
+                            createdAttribute = docLayout.CreateAttribute("Align");
+                            createdAttribute.Value = "Right";
+                            nodeColumn.Attributes.Append(createdAttribute);
 
-                        RightWidth += TSCellWidth;
+                            createdAttribute = docLayout.CreateAttribute("Type");
+                            createdAttribute.Value = "Text";
+                            nodeColumn.Attributes.Append(createdAttribute);
+
+                            createdAttribute = docLayout.CreateAttribute("Format");
+                            createdAttribute.Value = ",0.00";
+                            nodeColumn.Attributes.Append(createdAttribute);
+
+                            createdAttribute = docLayout.CreateAttribute("EditFormat");
+                            createdAttribute.Value = ",0.00";
+                            nodeColumn.Attributes.Append(createdAttribute);
+
+                            if (dataSet.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0 || settings.AllowNotes)
+                            {
+                                var clonedNode = nodeColumn.CloneNode(true);
+                                clonedNode.Attributes["Name"].Value =
+                                    string.Format("TS{0}", clonedNode.Attributes["Name"].Value);
+                                clonedNode.Attributes["Type"].Value = "Text";
+                                clonedNode.Attributes["Visible"].Value = "0";
+
+                                nodeRightCols.AppendChild(clonedNode);
+                            }
+
+                            nodeRightCols.AppendChild(nodeColumn);
+
+                            //Header
+                            createdAttribute = docLayout.CreateAttribute(string.Format("P{0}", start.Ticks));
+                            createdAttribute.Value = start.ToString("ddd<br>MMM dd");
+                            nodeHeader.Attributes.Append(createdAttribute);
+
+                            createdAttribute = docLayout.CreateAttribute(string.Format("P{0}Formula", start.Ticks));
+                            createdAttribute.Value = "sum()";
+                            nodeGroupDef.Attributes.Append(createdAttribute);
+
+                            createdAttribute = docLayout.CreateAttribute(string.Format("P{0}Type", start.Ticks));
+                            createdAttribute.Value = "Float";
+                            nodeGroupDef.Attributes.Append(createdAttribute);
+
+                            totalColumnCalc.AppendFormat("+P{0}", start.Ticks);
+
+                            calcOrder.AppendFormat(",P{0}", start.Ticks);
+
+                            RightWidth += TSCellWidth;
+                        }
+
+                        if (starts.Count > 0)
+                        {
+                            nodeRDef.Attributes["CalcOrder"].Value = 
+                                string.Concat(nodeRDef.Attributes["CalcOrder"].Value, calcOrder.ToString());
+                            nodeGroupDef.Attributes["CalcOrder"].Value =
+                                string.Concat(nodeGroupDef.Attributes["CalcOrder"].Value, calcOrder.ToString());
+                        }
                     }
-
-                    cn.Close();
 
                     if (iGridType == 0)
                     {
-                        using (SPSite rsite = new SPSite(web.Site.ID))
+                        using (var rsite = new SPSite(web.Site.ID))
                         {
-                            using (SPWeb rweb = rsite.OpenWeb(web.ID))
+                            using (var rweb = rsite.OpenWeb(web.ID))
                             {
-                                Guid lWebGuid = EPMLiveCore.CoreFunctions.getLockedWeb(rweb);
-                                if (lWebGuid != rweb.ID)
+                                var lockedWebGuid = EpmCoreFunctions.getLockedWeb(rweb);
+                                if (lockedWebGuid != rweb.ID)
                                 {
-                                    using (SPWeb lweb = rsite.OpenWeb(lWebGuid))
+                                    using (var lockWeb = rsite.OpenWeb(lockedWebGuid))
                                     {
-                                        PopulateTimesheetGridLayout(lweb, ref docLayout, settings, ref MidWidth, viewInfo, false, "My Work");
+                                        PopulateTimesheetGridLayout(
+                                            lockWeb,
+                                            ref docLayout,
+                                            settings,
+                                            ref MidWidth,
+                                            viewInfo,
+                                            false,
+                                            "My Work");
                                     }
                                 }
                                 else
                                 {
-                                    PopulateTimesheetGridLayout(rweb, ref docLayout, settings, ref MidWidth, viewInfo, false, "My Work");
+                                    PopulateTimesheetGridLayout(
+                                        rweb,
+                                        ref docLayout,
+                                        settings,
+                                        ref MidWidth,
+                                        viewInfo,
+                                        false,
+                                        "My Work");
                                 }
                             }
                         }
@@ -2178,7 +2210,7 @@ namespace TimeSheets
                 attr2.Value = "Work>0?((TSOtherHours + TSTotals)/Work):0";
                 ndProgressCol.Attributes.Append(attr2);
 
-                ndRightCols.AppendChild(ndProgressCol);
+                nodeRightCols.AppendChild(ndProgressCol);
 
 
                 XmlNode ndTotalsCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
@@ -2215,24 +2247,24 @@ namespace TimeSheets
                 ndTotalsCol.Attributes.Append(attr2);
 
                 attr2 = docLayout.CreateAttribute("Formula");
-                attr2.Value = TotalColumnCalc.Trim('+');
+                attr2.Value = totalColumnCalc.ToString().Trim('+');
                 ndTotalsCol.Attributes.Append(attr2);
 
                 attr2 = docLayout.CreateAttribute("Format");
                 attr2.Value = ",0.00";
                 ndTotalsCol.Attributes.Append(attr2);
 
-                ndRightCols.AppendChild(ndTotalsCol);
+                nodeRightCols.AppendChild(ndTotalsCol);
 
                 attr2 = docLayout.CreateAttribute("TSTotals");
                 attr2.Value = "Totals";
                 ndTotalsCol.Attributes.Append(attr2);
 
-                ndHeader.Attributes.Append(attr2);
+                nodeHeader.Attributes.Append(attr2);
 
                 attr2 = docLayout.CreateAttribute("TSTotalsFormula");
-                attr2.Value = TotalColumnCalc.Trim('+');
-                ndGroupDef.Attributes.Append(attr2);
+                attr2.Value = totalColumnCalc.ToString().Trim('+');
+                nodeGroupDef.Attributes.Append(attr2);
 
 
 
@@ -2252,7 +2284,7 @@ namespace TimeSheets
                 ndCfg.Attributes.Append(attr2);
 
 
-                ndGroupDef.Attributes["CalcOrder"].Value += ",TSTotals";
+                nodeGroupDef.Attributes["CalcOrder"].Value += ",TSTotals";
 
 
                 XmlNode ndCols = docLayout.FirstChild.SelectSingleNode("//Cols");
@@ -2415,7 +2447,6 @@ namespace TimeSheets
 
                     ndLeftCols.AppendChild(ndNewCol);
 
-
                     ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
                     attr2 = docLayout.CreateAttribute("Name");
                     attr2.Value = "Submitted";
@@ -2431,8 +2462,6 @@ namespace TimeSheets
 
                     ndLeftCols.AppendChild(ndNewCol);
 
-
-
                     ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
                     attr2 = docLayout.CreateAttribute("Name");
                     attr2.Value = "Approved";
@@ -2447,7 +2476,6 @@ namespace TimeSheets
                     ndNewCol.Attributes.Append(attr2);
 
                     ndLeftCols.AppendChild(ndNewCol);
-
                 }
 
                 return docLayout.OuterXml;
@@ -3592,117 +3620,140 @@ namespace TimeSheets
                 }
 
             }
-
-
-
         }
 
         public static string AutoAddWork(string data, SPWeb oWeb)
         {
-            XmlDocument docTimesheet = new XmlDocument();
+            if (oWeb == null)
+            {
+                throw new ArgumentNullException(nameof(oWeb));
+            }
+
+            var docTimesheet = new XmlDocument();
             docTimesheet.LoadXml(data);
 
-            string tsuid = docTimesheet.FirstChild.Attributes["ID"].Value;
+            var timeSheetId = docTimesheet.FirstChild.Attributes["ID"].Value;
 
-            SqlConnection cn = null;
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            using (var connection = GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
             {
-                cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                cn.Open();
-            });
+                var submitted = false;
+                var period = 0;
 
-            bool submitted = false;
+                using (var command =
+                    new SqlCommand("SELECT submitted, period_id FROM TSTIMESHEET where TS_UID=@tsuid ", connection))
+                {
+                    command.Parameters.AddWithValue("@tsuid", timeSheetId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            submitted = reader.GetBoolean(0);
+                            period = reader.GetInt32(1);
+                        }
+                    }
+                }
 
-            int period = 0;
-
-            SqlCommand cmd = new SqlCommand("SELECT submitted, period_id FROM TSTIMESHEET where TS_UID=@tsuid ", cn);
-            cmd.Parameters.AddWithValue("@tsuid", tsuid);
-            SqlDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
-            {
-                submitted = dr.GetBoolean(0);
-                period = dr.GetInt32(1);
-            }
-            dr.Close();
-
-            string sUserId = "";
-            try
-            {
-                sUserId = docTimesheet.FirstChild.Attributes["UserId"].Value;
-            }
-            catch { }
-
-            cmd = new SqlCommand("SELECT period_start,period_end FROM TSPERIOD WHERE SITE_ID=@siteid and PERIOD_ID=@periodid", cn);
-            cmd.Parameters.AddWithValue("@siteid", oWeb.Site.ID);
-            cmd.Parameters.AddWithValue("@periodid", period);
-            dr = cmd.ExecuteReader();
-
-            DateTime fn = DateTime.MinValue;
-            DateTime st = DateTime.MaxValue;
-
-            if (dr.Read())
-            {
-                st = dr.GetDateTime(0);
-                fn = dr.GetDateTime(1);
-            }
-            dr.Close();
-
-            if (!submitted)
-            {
-                EPMLiveCore.ReportHelper.MyWorkReportData rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(oWeb.Site.ID);
-
-                ArrayList arrRows = new ArrayList();
+                var userId = string.Empty;
                 try
                 {
-                    if (docTimesheet.FirstChild.Attributes["Rows"] != null)
+                    userId = docTimesheet.FirstChild.Attributes["UserId"].Value;
+                }
+                catch (Exception exception)
+                {
+                    Trace.TraceError(exception.ToString());
+                }
+
+                DateTime finish;
+                DateTime start;
+                using (var command = new SqlCommand(
+                    "SELECT period_start,period_end FROM TSPERIOD WHERE SITE_ID=@siteid and PERIOD_ID=@periodid",
+                    connection))
+                {
+                    command.Parameters.AddWithValue("@siteid", oWeb.Site.ID);
+                    command.Parameters.AddWithValue("@periodid", period);
+                    using (var reader = command.ExecuteReader())
                     {
-                        string[] sTempRows = docTimesheet.FirstChild.Attributes["Rows"].Value.ToLower().Split(',');
-                        foreach (string sTempRow in sTempRows)
+                        finish = DateTime.MinValue;
+                        start = DateTime.MaxValue;
+
+                        if (reader.Read())
                         {
-                            if (sTempRow != "" && !arrRows.Contains(sTempRow))
-                                arrRows.Add(sTempRow);
+                            start = reader.GetDateTime(0);
+                            finish = reader.GetDateTime(1);
+                        }
+                    }
+                }
+
+                if (!submitted)
+                {
+                    var reportData = new EpmWorkReportData(oWeb.Site.ID);
+                    var rows = new List<string>();
+                    try
+                    {
+                        if (docTimesheet.FirstChild.Attributes["Rows"] != null)
+                        {
+                            var tempRows = docTimesheet.FirstChild.Attributes["Rows"].Value.Split(',');
+                            foreach (var tempRow in tempRows)
+                            {
+                                if (!string.IsNullOrWhiteSpace(tempRow) &&
+                                    !rows.Contains(tempRow, StringComparer.CurrentCultureIgnoreCase))
+                                {
+                                    rows.Add(tempRow);
+                                }
+                            }
+                        }
+
+                        var dataSet = new DataSet();
+                        using (var command =
+                            new SqlCommand("SELECT list_uid,item_id FROM TSITEM WHERE TS_UID=@tsuid", connection))
+                        {
+                            command.Parameters.AddWithValue("@tsuid", timeSheetId);
+                            using (var reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    var idValue = string.Format("{0}.{1}", reader.GetGuid(0), reader.GetInt32(1));
+                                    if (!rows.Contains(idValue))
+                                    {
+                                        rows.Add(idValue);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch(Exception exception)
+                    {
+                        Trace.TraceError(exception.ToString());
+                    }
+
+                    var user = GetUser(oWeb, userId);
+
+                    var workTable = reportData.ExecuteSql(
+                        string.Format(
+                        "SELECT * FROM lstmywork where Timesheet=1 and StartDate < '{0}' AND DueDate > '{1}' AND AssignedToID='{2}'",
+                        finish.ToString("s"),
+                        start.ToString("s"),
+                        user.ID));
+
+                    foreach (DataRow rowWork in workTable.Rows)
+                    {
+                        var workValue = string.Format(
+                            "{0}.{1}",
+                            rowWork["ListId"],
+                            rowWork["ItemId"]);
+                        if (!rows.Contains(workValue, StringComparer.CurrentCultureIgnoreCase))
+                        {
+                            AddWorkItem(rowWork, oWeb.Site, timeSheetId, Guid.NewGuid(), connection);
                         }
                     }
 
-                    DataSet dsTs = new DataSet();
-                    cmd = new SqlCommand("SELECT list_uid,item_id FROM TSITEM WHERE TS_UID=@tsuid", cn);
-                    cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                    dr = cmd.ExecuteReader();
-
-                    while (dr.Read())
-                    {
-                        string s = dr.GetGuid(0).ToString() + "." + dr.GetInt32(1);
-                        if (!arrRows.Contains(s))
-                            arrRows.Add(s);
-                    }
-                    dr.Close();
-
+                    return "<AutoAddWork Status=\"0\"></AutoAddWork>";
                 }
-                catch { }
-
-                SPUser user = GetUser(oWeb, sUserId);
-
-                DataTable dtWork = rptData.ExecuteSql("SELECT * FROM lstmywork where Timesheet=1 and StartDate < '" + fn.ToString("s") + "' AND DueDate > '" + st.ToString("s") + "' AND AssignedToID='" + user.ID + "'");
-
-                foreach (DataRow drWork in dtWork.Rows)
+                else
                 {
-                    if (!arrRows.Contains(drWork["ListId"].ToString().ToLower() + "." + drWork["ItemId"].ToString().ToLower()))
-                        AddWorkItem(drWork, oWeb.Site, tsuid, Guid.NewGuid(), cn);
+                    return "<AutoAddWork Status=\"3\">Timesheet is submitted and cannot add work.</AutoAddWork>";
                 }
-
-                cn.Close();
-
-                return "<AutoAddWork Status=\"0\"></AutoAddWork>";
             }
-            else
-            {
-                cn.Close();
-
-                return "<AutoAddWork Status=\"3\">Timesheet is submitted and cannot add work.</AutoAddWork>";
-            }
-
-
-
         }
 
         private static bool isValidMyWorkColumn(string colName)
