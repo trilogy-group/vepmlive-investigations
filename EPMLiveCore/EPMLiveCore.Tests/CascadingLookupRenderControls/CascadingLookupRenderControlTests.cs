@@ -80,12 +80,12 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
             _baseOnInitCalled = false;
 
             _page = new Page();
-
-            ShimSharePointContext();
             ShimScriptLink.RegisterPageStringBoolean = (a, b, c) => { _scriptRegistered = true; };
             ShimSPResource.GetStringStringObjectArray = (key, _) => key;
             
             _testObject = new CascadingLookupRenderControl();
+            ShimSharePointContext();
+            
             _testObject.Page = _page;
             _testObject.TabIndex = 0;
             _testObject.CustomProperty = GetDocument().ToString();
