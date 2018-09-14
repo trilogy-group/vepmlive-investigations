@@ -564,7 +564,6 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
                 },
                 FieldsGet = () => _shimFields.Instance,
                 ParentWebGet = () => _shimWeb,
-
                 IsThrottledGet = () => true
             };
         }
