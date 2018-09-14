@@ -9,6 +9,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.Data.SqlClient;
+using EPMLiveEnterprise.WebSvcCustomFields;
 using Microsoft.SharePoint;
 using PSLibrary = Microsoft.Office.Project.Server.Library;
 using SystemTrace = System.Diagnostics.Trace;
@@ -17,7 +18,15 @@ namespace EPMLiveEnterprise
 {
     public partial class addfield : System.Web.UI.Page
     {
+        private const string TypeParameter = "type";
+        private const string Type1 = "1";
         protected ListBox ListBox1;
+        private string Type2;
+
+        public addfield()
+        {
+            Type2 = "2";
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -38,13 +47,13 @@ namespace EPMLiveEnterprise
                         {
                             connection.Open();
 
-                            if (Request["type"] == "1" || Request["type"] == "2")
+                            if (Request[TypeParameter] == Type1 || Request[TypeParameter] == Type2)
                             {
-                                if (Request["pj"] == "1")
+                                if (Request["pj"] == Type1)
                                 {
                                     using (var command = new SqlCommand("SELECT fieldname,displayname from customfields where fieldcategory=@type and pjvisible=0 order by displayname", connection))
                                     {
-                                        command.Parameters.AddWithValue("@type", Request["type"]);
+                                        command.Parameters.AddWithValue("@type", Request[TypeParameter]);
 
                                         using (var adapter = new SqlDataAdapter(command))
                                         {
@@ -62,7 +71,7 @@ namespace EPMLiveEnterprise
                                 {
                                     using (var command = new SqlCommand("SELECT fieldname,displayname from customfields where fieldcategory=@type and visible=0 order by displayname", connection))
                                     {
-                                        command.Parameters.AddWithValue("@type", Request["type"]);
+                                        command.Parameters.AddWithValue("@type", Request[TypeParameter]);
 
                                         using (var adapter = new SqlDataAdapter(command))
                                         {
@@ -77,10 +86,10 @@ namespace EPMLiveEnterprise
                                     }
                                 }
                             }
-                            else if (Request["type"] == "3")
+                            else if (Request[TypeParameter] == "3")
                             {
                                 string modifier = "";
-                                if (Request["pj"] == "1")
+                                if (Request["pj"] == Type1)
                                 {
                                     modifier = " pjvisible = 1";
                                 }
@@ -89,14 +98,14 @@ namespace EPMLiveEnterprise
                                     modifier = " visible = 1";
                                 }
 
-                                WebSvcCustomFields.CustomFields cf = new WebSvcCustomFields.CustomFields();
+                                CustomFields cf = new CustomFields();
                                 cf.Url = SPContext.Current.Site.Url + "/_vti_bin/PSI/customfields.asmx";
                                 cf.UseDefaultCredentials = true;
 
-                                WebSvcCustomFields.CustomFieldDataSet dsF = cf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                                CustomFieldDataSet dsF = cf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
                                 for (int i = 0; i < dsF.CustomFields.Count; i++)
                                 {
-                                    WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow customField = dsF.CustomFields[i];
+                                    CustomFieldDataSet.CustomFieldsRow customField = dsF.CustomFields[i];
 
                                     using (var command = new SqlCommand("SELECT fieldname from customfields where fieldname=@fieldname and " + modifier, connection))
                                     {
@@ -123,7 +132,7 @@ namespace EPMLiveEnterprise
 
                                                 if (customField.IsMD_PROP_FORMULANull())
                                                 {
-                                                    cfData = customField.MD_PROP_ID + "#" + choice + "#" + customField.MD_PROP_UID_SECONDARY + "#" + customField.MD_PROP_UID_SECONDARY;
+                                                    cfData = $"{customField.MD_PROP_ID}#{choice}#{customField.MD_PROP_UID_SECONDARY}#{customField.MD_PROP_UID_SECONDARY}";
                                                 }
                                                 else
                                                 {
@@ -137,10 +146,10 @@ namespace EPMLiveEnterprise
                                     }
                                 }
                             }
-                            else if (Request["type"] == "4")
+                            else if (Request[TypeParameter] == "4")
                             {
-                                string modifier = "";
-                                if (Request["pj"] == "1")
+                                string modifier = string.Empty;
+                                if (Request["pj"] == Type1)
                                 {
                                     modifier = " pjvisible = 1";
                                 }
@@ -149,14 +158,14 @@ namespace EPMLiveEnterprise
                                     modifier = " visible = 1";
                                 }
 
-                                WebSvcCustomFields.CustomFields cf = new WebSvcCustomFields.CustomFields();
+                                var cf = new CustomFields();
                                 cf.Url = SPContext.Current.Site.Url + "/_vti_bin/PSI/customfields.asmx";
                                 cf.UseDefaultCredentials = true;
 
-                                WebSvcCustomFields.CustomFieldDataSet dsF = cf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.ProjectEntity.UniqueId));
+                                CustomFieldDataSet dsF = cf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.ProjectEntity.UniqueId));
                                 for (int i = 0; i < dsF.CustomFields.Count; i++)
                                 {
-                                    WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow customField = dsF.CustomFields[i];
+                                    CustomFieldDataSet.CustomFieldsRow customField = dsF.CustomFields[i];
 
                                     using (var command = new SqlCommand("SELECT fieldname from customfields where fieldname=@fieldname and " + modifier, connection))
                                     {
@@ -232,7 +241,7 @@ namespace EPMLiveEnterprise
                             var assnfieldname = string.Empty;
                             var assnupdatefield = string.Empty;
 
-                            if (Request["type"] == "3" || Request["type"] == "4")
+                            if (Request[TypeParameter] == "3" || Request[TypeParameter] == "4")
                             {
                                 string[] sData = listItem.Value.Split('#');
                                 var xml = string.Empty;
@@ -286,7 +295,7 @@ namespace EPMLiveEnterprise
                                 command.Parameters.AddWithValue("@wssfieldname", wssFieldName);
                                 command.Parameters.AddWithValue("@assnfieldname", assnfieldname);
                                 command.Parameters.AddWithValue("@isPj", isPj);
-                                command.Parameters.AddWithValue("@fieldcategory", Request["type"].ToString());
+                                command.Parameters.AddWithValue("@fieldcategory", Request[TypeParameter].ToString());
                                 if (assnupdatefield != string.Empty)
                                 {
                                     command.Parameters.AddWithValue("@assnupdatefield", assnupdatefield);
