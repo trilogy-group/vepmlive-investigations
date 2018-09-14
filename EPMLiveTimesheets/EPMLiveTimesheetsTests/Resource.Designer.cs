@@ -61,6 +61,15 @@ namespace EPMLiveTimesheets.Tests {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;Grid&gt;&lt;Cfg Code=&quot;GTACCNPSQEBSLC&quot; Version=&quot;4.0&quot; NoVScroll=&quot;0&quot; id=&quot;TS91&quot; GridEditable=&quot;true&quot; PeriodId=&quot;may&quot; SaveAndSubmit=&quot;false&quot; MinRightWidth=&quot;260&quot; MinMidWidth=&quot;0&quot; /&gt;&lt;Cfg SuppressCfg=&quot;1&quot; Style=&quot;GM&quot; CSS=&quot;/_layouts/15/epmlive/treegrid/grid/grid.min.css&quot; /&gt;&lt;Cfg MainCol=&quot;Title&quot; NameCol=&quot;Title&quot; /&gt;&lt;Cfg ConstWidth=&quot;1&quot; /&gt;&lt;Cfg Undo=&quot;0&quot; /&gt;&lt;Cfg NumberId=&quot;1&quot; FullId=&quot;0&quot; IdChars=&quot;1234567890&quot; AddFocusCol=&quot;Title&quot; SortIcons=&quot;1&quot; /&gt;&lt;Cfg Searching=&quot;1&quot; /&gt;&lt;Cfg StaticCursor=&quot;1&quot; Dragging=&quot;0&quot; SelectingCells=&quot;0&quot; SelectClass=&quot;0&quot; Sele [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GetTimesheetGridLayout_Called_SqlDisposed_ExpectedResult {
+            get {
+                return ResourceManager.GetString("GetTimesheetGridLayout_Called_SqlDisposed_ExpectedResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;Grid&gt;&lt;Cfg Code=&quot;GTACCNPSQEBSLC&quot; Version=&quot;4.0&quot; id=&quot;TSWork&quot; /&gt;&lt;Cfg SuppressCfg=&quot;1&quot; Style=&quot;GM&quot; CSS=&quot;/_layouts/epmlive/treegrid/myts/gridwork.css&quot; /&gt;&lt;Cfg MainCol=&quot;Title&quot; NameCol=&quot;Title&quot; /&gt;&lt;Cfg ConstHeight=&quot;0&quot; ConstWidth=&quot;1&quot; NoVScroll=&quot;1&quot; /&gt;&lt;Cfg Undo=&quot;0&quot; /&gt;&lt;Cfg NumberId=&quot;1&quot; FullId=&quot;0&quot; IdChars=&quot;1234567890&quot; AddFocusCol=&quot;Title&quot; SortIcons=&quot;1&quot; /&gt;&lt;Cfg Searching=&quot;1&quot; /&gt;&lt;Cfg StaticCursor=&quot;1&quot; Dragging=&quot;0&quot; SelectingCells=&quot;1&quot; SelectClass=&quot;0&quot; /&gt;&lt;Cfg NoTreeLines=&quot;1&quot; DetailOn=&quot;0&quot; MinRowHeight=&quot;25&quot; MaxRowHeight=&quot;25&quot; MenuColumn [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetWork_Called_SqlDisposed_ExpectedResult {

@@ -28,13 +28,17 @@ namespace EPMLiveCore
             propBag = new GenericEntityPickerPropertyBag(CustomProperty);
             base.OnInit(e);
         }
-        private DataView m_dataSource;
+        private Literal _throttleMessageLiteral;
+        private Literal _spanLiteral;
+        private Literal _spanClosingLiteral;
+        private LiteralControl _BrClosingLiteral;
+        private DataView _dataSource;
         private SPList _lookupList;
         private SPList _parentLookupList;
         private bool m_throttled;
-        private DropDownList m_dropList;
-        private TextBox m_tbx;
-        private Image m_dropImage;
+        private DropDownList _dropList;
+        private TextBox _textBox;
+        private Image _dropImage;
         private List<int> m_ids;
         private object m_value;
         private int m_selectedValueIndex;
@@ -86,7 +90,7 @@ namespace EPMLiveCore
         {
             get
             {
-                if (m_dataSource == null)
+                if (_dataSource == null)
                 {
                     DataTable table = new DataTable();
                     table.Columns.Add("ValueField", typeof(int));
@@ -186,10 +190,10 @@ namespace EPMLiveCore
 
                     //}
 
-                    m_dataSource = new DataView(table);
+                    _dataSource = new DataView(table);
                 }
 
-                return m_dataSource;
+                return _dataSource;
             }
         }
 
@@ -246,9 +250,9 @@ namespace EPMLiveCore
                 "                                             FieldInfo: { LookupWebId: '" + LookupField.LookupWebId.ToString() + "', " +
                 "                                                          LookupListId: '" + LookupField.LookupList.ToString() + "', " +
                 "                                                          LookupField: '" + LookupField.LookupField.ToString() + "' }, " +
-                "                                             ControlInfo:  { DropDownClientId: '" + (m_dropList != null ? m_dropList.ClientID : string.Empty) + "', " +
-                "                                                             TextBoxClientId: '" + (m_tbx != null ? m_tbx.ClientID : string.Empty) + "', " +
-                "                                                             DropImageClientId: '" + (m_dropImage != null ? m_dropImage.ClientID : string.Empty) + "', " +
+                "                                             ControlInfo:  { DropDownClientId: '" + (_dropList != null ? _dropList.ClientID : string.Empty) + "', " +
+                "                                                             TextBoxClientId: '" + (_textBox != null ? _textBox.ClientID : string.Empty) + "', " +
+                "                                                             DropImageClientId: '" + (_dropImage != null ? _dropImage.ClientID : string.Empty) + "', " +
                 "                                                             CurWebURL: '" + SPContext.Current.Web.Url + "', " +
                 "                                                             IsMultiSelect: " + propBag.IsMultiSelect.ToLower() + ", " +
                 "                                                             SourceControlId: '" + propBag.SourceControlID + "', " +
@@ -318,34 +322,34 @@ namespace EPMLiveCore
                             {
                                 str = SPResource.GetString("LookupThrottleMessage", new object[] { maxItemsPerThrottledOperation.ToString(CultureInfo.InvariantCulture) });
                             }
-                            Literal child = new Literal
+                            _throttleMessageLiteral = new Literal
                             {
                                 Text = SPHttpUtility.HtmlEncode(str)
                             };
-                            Literal literal2 = new Literal
+                            _spanLiteral = new Literal
                             {
                                 Text = "<span style=\"vertical-align:middle\">"
                             };
-                            Literal literal3 = new Literal
+                            _spanClosingLiteral = new Literal
                             {
                                 Text = "</span>"
                             };
-                            this.Controls.Add(literal2);
-                            this.Controls.Add(child);
-                            this.Controls.Add(literal3);
+                            this.Controls.Add(_spanLiteral);
+                            this.Controls.Add(_throttleMessageLiteral);
+                            this.Controls.Add(_spanClosingLiteral);
                         }
                         else
                         {
                             if (((this.DataSource == null) || (this.DataSource.Count <= 20))) // || ((base.InDesign || !SPUtility.IsIE55Up(this.Page.Request)) || SPUtility.IsAccessibilityMode(this.Page.Request)))
                             {
-                                this.m_dropList = new DropDownList();
-                                this.m_dropList.ID = "Lookup";
-                                this.m_dropList.TabIndex = this.TabIndex;
-                                this.m_dropList.DataSource = this.DataSource;
-                                this.m_dropList.DataValueField = "ValueField";
-                                this.m_dropList.DataTextField = "TextField";
-                                this.m_dropList.ToolTip = SPHttpUtility.NoEncode(field.Title);
-                                this.m_dropList.DataBind();
+                                this._dropList = new DropDownList();
+                                this._dropList.ID = "Lookup";
+                                this._dropList.TabIndex = this.TabIndex;
+                                this._dropList.DataSource = this.DataSource;
+                                this._dropList.DataValueField = "ValueField";
+                                this._dropList.DataTextField = "TextField";
+                                this._dropList.ToolTip = SPHttpUtility.NoEncode(field.Title);
+                                this._dropList.DataBind();
 
 
                                 object fv = null;
@@ -365,61 +369,62 @@ namespace EPMLiveCore
                                     this.m_value = lookupVal.ToString();
                                     if (base.Field.Required)
                                     {
-                                        this.m_dropList.SelectedIndex = ((lookupVal.LookupId - 1) >= 0) ? (lookupVal.LookupId - 1) : 0;
+                                        this._dropList.SelectedIndex = ((lookupVal.LookupId - 1) >= 0) ? (lookupVal.LookupId - 1) : 0;
                                     }
                                     else
                                     {
-                                        this.m_dropList.SelectedIndex = lookupVal.LookupId;
+                                        this._dropList.SelectedIndex = lookupVal.LookupId;
                                     }
                                     this.m_hasValueSet = true;
                                 }
 
-                                this.m_dropList.Attributes.Add("onchange", "window.ModifiedDropDown.UpdateChildrenValues('" + field.InternalName + "');");
+                                this._dropList.Attributes.Add("onchange", "window.ModifiedDropDown.UpdateChildrenValues('" + field.InternalName + "');");
 
                                 if (LookupData.Parent != "" && lookupVal == null)
                                 {
-                                    this.m_dropList.Enabled = false;
+                                    this._dropList.Enabled = false;
                                 }
 
-                                this.Controls.Add(this.m_dropList);
+                                this.Controls.Add(this._dropList);
                             }
                             else
                             {
-                                this.m_tbx = new TextBox();
-                                this.m_tbx.Attributes.Add("choices", this.Choices);
-                                this.m_tbx.Attributes.Add("match", "");
-                                this.m_tbx.Attributes.Add("onkeydown", "CoreInvoke('HandleKey')");
-                                this.m_tbx.Attributes.Add("onkeypress", "CoreInvoke('HandleChar')");
-                                this.m_tbx.Attributes.Add("onfocusout", "CoreInvoke('HandleLoseFocus')");
-                                this.m_tbx.Attributes.Add("onchange", "CoreInvoke('HandleChange')");
-                                this.m_tbx.Attributes.Add("class", "ms-lookuptypeintextbox");
-                                this.m_tbx.Attributes.Add("title", SPHttpUtility.HtmlEncode(field.Title));
-                                this.m_tbx.TabIndex = this.TabIndex;
-                                this.m_tbx.Attributes["optHid"] = this.HiddenFieldName;
-                                Literal literal4 = new Literal
+                                this._textBox = new TextBox();
+                                this._textBox.Attributes.Add("choices", this.Choices);
+                                this._textBox.Attributes.Add("match", "");
+                                this._textBox.Attributes.Add("onkeydown", "CoreInvoke('HandleKey')");
+                                this._textBox.Attributes.Add("onkeypress", "CoreInvoke('HandleChar')");
+                                this._textBox.Attributes.Add("onfocusout", "CoreInvoke('HandleLoseFocus')");
+                                this._textBox.Attributes.Add("onchange", "CoreInvoke('HandleChange')");
+                                this._textBox.Attributes.Add("class", "ms-lookuptypeintextbox");
+                                this._textBox.Attributes.Add("title", SPHttpUtility.HtmlEncode(field.Title));
+                                this._textBox.TabIndex = this.TabIndex;
+                                this._textBox.Attributes["optHid"] = this.HiddenFieldName;
+                                _spanLiteral = new Literal
                                 {
                                     Text = "<span style=\"vertical-align:middle\">"
                                 };
-                                Literal literal5 = new Literal
+                                _spanClosingLiteral = new Literal
                                 {
                                     Text = "</span>"
                                 };
-                                this.Controls.Add(literal4);
-                                this.Controls.Add(this.m_tbx);
-                                this.m_tbx.Attributes.Add("opt", "_Select");
-                                this.m_dropImage = new Image();
-                                this.m_dropImage.ImageUrl = "/_layouts/images/dropdown.gif";
-                                this.m_dropImage.Attributes.Add("alt", SPResource.GetString("LookupWordWheelDropdownAlt", new object[0]));
-                                this.m_dropImage.Attributes.Add("style", "vertical-align:middle;");
-                                this.Controls.Add(this.m_dropImage);
-                                this.Controls.Add(literal5);
+                                this.Controls.Add(_spanLiteral);
+                                this.Controls.Add(this._textBox);
+                                this._textBox.Attributes.Add("opt", "_Select");
+                                this._dropImage = new Image();
+                                this._dropImage.ImageUrl = "/_layouts/images/dropdown.gif";
+                                this._dropImage.Attributes.Add("alt", SPResource.GetString("LookupWordWheelDropdownAlt", new object[0]));
+                                this._dropImage.Attributes.Add("style", "vertical-align:middle;");
+                                this.Controls.Add(this._dropImage);
+                                this.Controls.Add(_spanClosingLiteral);
                             }
                             if (this.m_webForeign != null)
                             {
                                 this.m_webForeign.Close();
                                 this.m_webForeign = null;
                             }
-                            this.Controls.Add(new LiteralControl("<br/>"));
+                            _BrClosingLiteral = new LiteralControl("<br/>");
+                            this.Controls.Add(_BrClosingLiteral);
 
                             object fv2 = null;
                             try
@@ -443,7 +448,7 @@ namespace EPMLiveCore
         private void Clear()
         {
             this.m_ids = null;
-            this.m_dataSource = null;
+            this._dataSource = null;
             this.m_selectedValueIndex = -1;
         }
 
@@ -456,31 +461,31 @@ namespace EPMLiveCore
                 this.m_hasValueSet = true;
                 if (this.DataSource != null)
                 {
-                    if (this.m_dropList != null)
+                    if (this._dropList != null)
                     {
                         if (this.m_selectedValueIndex >= 0)
                         {
-                            this.m_dropList.SelectedIndex = this.m_selectedValueIndex;
+                            this._dropList.SelectedIndex = this.m_selectedValueIndex;
                         }
                         else
                         {
-                            this.m_dropList.SelectedIndex = -1;
+                            this._dropList.SelectedIndex = -1;
                         }
                     }
-                    else if (this.m_tbx != null)
+                    else if (this._textBox != null)
                     {
                         DataRowView view = null;
                         if (this.m_selectedValueIndex >= 0)
                         {
-                            view = this.m_dataSource[this.m_selectedValueIndex];
-                            this.m_tbx.Text = view["TextField"] as string;
+                            view = this._dataSource[this.m_selectedValueIndex];
+                            this._textBox.Text = view["TextField"] as string;
                         }
                         if (this.Page != null)
                         {
                             string str = "0";
                             if (this.m_selectedValueIndex >= 0)
                             {
-                                view = this.m_dataSource[this.m_selectedValueIndex];
+                                view = this._dataSource[this.m_selectedValueIndex];
                                 str = ((int)view["ValueField"]).ToString(CultureInfo.InvariantCulture);
                             }
                             else if (this.Page.IsPostBack)
@@ -504,11 +509,23 @@ namespace EPMLiveCore
             //base.UpdateFieldValueInItem();
             try
             {
-                ListItem[LookupField.InternalName] = new SPFieldLookupValue(int.Parse(this.m_dropList.SelectedValue), this.m_dropList.SelectedItem.ToString());
+                ListItem[LookupField.InternalName] = new SPFieldLookupValue(int.Parse(this._dropList.SelectedValue), this._dropList.SelectedItem.ToString());
             }
             catch { }
 
         }
 
+        public override void Dispose()
+        {
+            _dataSource?.Dispose();
+            _throttleMessageLiteral?.Dispose();
+            _dropList?.Dispose();
+            _textBox?.Dispose();
+            _spanLiteral?.Dispose();
+            _spanClosingLiteral?.Dispose();
+            _BrClosingLiteral?.Dispose();
+            _dropImage?.Dispose();
+            base.Dispose();
+        }
     }
 }

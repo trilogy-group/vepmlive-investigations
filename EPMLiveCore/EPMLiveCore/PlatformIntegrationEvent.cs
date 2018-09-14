@@ -36,8 +36,7 @@ namespace EPMLiveCore
                 {
                     UplandPlatformAPI.IntegrationAPI api = new UplandPlatformAPI.IntegrationAPI();
                     api.Url = url;
-                    string ret = api.DeleteItem(key, properties.ListItemId.ToString());
-
+                    var ret = api.DeleteItem(key, properties.ListItemId.ToString());
                     InsertPlatformIntegrationLogIfNotSuccess(properties, ret);
                 }
                 catch (Exception ex)
@@ -77,8 +76,7 @@ namespace EPMLiveCore
                 {
                     UplandPlatformAPI.IntegrationAPI api = new UplandPlatformAPI.IntegrationAPI();
                     api.Url = url;
-                    string ret = api.PostItemSimple(key, properties.ListItemId.ToString());
-
+                    var ret = api.PostItemSimple(key, properties.ListItemId.ToString());
                     InsertPlatformIntegrationLogIfNotSuccess(properties, ret);
                 }
                 catch (Exception ex)

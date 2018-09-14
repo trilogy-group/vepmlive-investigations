@@ -26,7 +26,8 @@ using TypeToTest = EPMLiveCore.API.MyWork;
 
 namespace EPMLiveCore.Tests.API.MyWork
 {
-    [TestClass, ExcludeFromCodeCoverage]
+    [TestClass]
+    [ExcludeFromCodeCoverage]
     public partial class MyWorkRemTests
     {
         private TypeToTest testObj;
@@ -77,6 +78,7 @@ namespace EPMLiveCore.Tests.API.MyWork
         public void Setup()
         {
             SetupShims();
+            SetupShimsSplitTwo();
 
             testObj = new TypeToTest();
             privateObj = new PrivateObject(testObj);
