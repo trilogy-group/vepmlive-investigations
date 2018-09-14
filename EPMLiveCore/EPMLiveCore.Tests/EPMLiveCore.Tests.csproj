@@ -168,6 +168,7 @@
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
     <Compile Include="NewAppTest.cs" />
+    <Compile Include="PlatformIntegrationEventTest.cs" />
     <Compile Include="ReportHelper\EPMDataTest.Part3.cs" />
     <Compile Include="ReportHelper\EPMDataTest.Part2.cs" />
     <Compile Include="RequestWorkspaceTest.cs" />
