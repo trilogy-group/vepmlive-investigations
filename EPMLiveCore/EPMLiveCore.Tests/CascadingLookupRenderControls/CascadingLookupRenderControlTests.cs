@@ -484,7 +484,6 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
                 WebApplicationGet = () => new ShimSPWebApplication
                 {
                     ApplicationPoolGet = () => new SPApplicationPool(),
-
                     CurrentUserIgnoreThrottle = () => false,
                     MaxItemsPerThrottledOperationGet = () => 5
                 }.Instance
