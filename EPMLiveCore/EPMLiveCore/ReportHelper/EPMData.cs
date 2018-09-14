@@ -1509,9 +1509,9 @@ namespace EPMLiveCore.ReportHelper
                     {
                         using (web)
                         {
-                            foreach (SPList l in web.Lists)
+                            foreach (SPList list in web.Lists)
                             {
-                                var events = GetListEvents(l,
+                                var events = GetListEvents(list,
                                     "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
                                     "EPMLiveReportsAdmin.ListEvents",
                                     new List<SPEventReceiverType>
@@ -1521,13 +1521,13 @@ namespace EPMLiveCore.ReportHelper
                                         SPEventReceiverType.ItemDeleting
                                     });
 
-                                if (events.Count > 0 && !lLists.Contains(l.Title))
+                                if (events.Count > 0 && !lLists.Contains(list.Title))
                                 {
-                                    lLists.Add(l.Title);
+                                    lLists.Add(list.Title);
                                     continue;
                                 }
 
-                                var mwEvents = GetListEvents(l,
+                                var mwEvents = GetListEvents(list,
                                     "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
                                     "EPMLiveReportsAdmin.MyWorkListEvents",
                                     new List<SPEventReceiverType>
@@ -1537,9 +1537,9 @@ namespace EPMLiveCore.ReportHelper
                                         SPEventReceiverType.ItemDeleting
                                     });
 
-                                if (mwEvents.Count > 0 && !lLists.Contains(l.Title))
+                                if (mwEvents.Count > 0 && !lLists.Contains(list.Title))
                                 {
-                                    lLists.Add(l.Title);
+                                    lLists.Add(list.Title);
                                 }
                             }
                         }
