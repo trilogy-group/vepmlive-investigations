@@ -82,7 +82,9 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
             _page = new Page();
             ShimScriptLink.RegisterPageStringBoolean = (a, b, c) => { _scriptRegistered = true; };
             ShimSPResource.GetStringStringObjectArray = (key, _) => key;
-            
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated =
+                code => code.Invoke();
+
             _testObject = new CascadingLookupRenderControl();
             ShimSharePointContext();
             
