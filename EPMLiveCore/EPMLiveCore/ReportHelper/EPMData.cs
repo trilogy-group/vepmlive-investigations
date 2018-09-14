@@ -1450,13 +1450,13 @@ namespace EPMLiveCore.ReportHelper
 
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
-                using (var s = new SPSite(SiteId))
+                using (var site = new SPSite(SiteId))
                 {
-                    using (SPWeb w = s.OpenWeb(_webId))
+                    using (SPWeb web = site.OpenWeb(_webId))
                     {
-                        foreach (SPList l in w.Lists)
+                        foreach (SPList list in web.Lists)
                         {
-                            List<SPEventReceiverDefinition> evts = GetListEvents(l,
+                            var events = GetListEvents(list,
                                 "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
                                 "EPMLiveReportsAdmin.ListEvents",
                                 new List<SPEventReceiverType>
@@ -1466,13 +1466,13 @@ namespace EPMLiveCore.ReportHelper
                                     SPEventReceiverType.ItemDeleting
                                 });
 
-                            if (evts.Count > 0 && !lListIDs.Contains(l.ID.ToString()))
+                            if (events.Count > 0 && !lListIDs.Contains(list.ID.ToString()))
                             {
-                                lListIDs.Add(l.ID.ToString());
+                                lListIDs.Add(list.ID.ToString());
                                 continue;
                             }
 
-                            List<SPEventReceiverDefinition> mwEvts = GetListEvents(l,
+                            var mwEvents = GetListEvents(list,
                                 "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
                                 "EPMLiveReportsAdmin.MyWorkListEvents",
                                 new List<SPEventReceiverType>
@@ -1482,13 +1482,11 @@ namespace EPMLiveCore.ReportHelper
                                     SPEventReceiverType.ItemDeleting
                                 });
 
-                            if (mwEvts.Count > 0 && !lListIDs.Contains(l.ID.ToString()))
+                            if (mwEvents.Count > 0 && !lListIDs.Contains(list.ID.ToString()))
                             {
-                                lListIDs.Add(l.ID.ToString());
+                                lListIDs.Add(list.ID.ToString());
                             }
                         }
-
-                        w?.Dispose();
                     }
                 }
             });
@@ -1505,45 +1503,46 @@ namespace EPMLiveCore.ReportHelper
 
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
-                using (var s = new SPSite(SiteId))
+                using (var site = new SPSite(SiteId))
                 {
-                    foreach (SPWeb w in s.AllWebs)
+                    foreach (SPWeb web in site.AllWebs)
                     {
-                        foreach (SPList l in w.Lists)
+                        using (web)
                         {
-                            List<SPEventReceiverDefinition> evts = GetListEvents(l,
-                                "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
-                                "EPMLiveReportsAdmin.ListEvents",
-                                new List<SPEventReceiverType>
-                                {
-                                    SPEventReceiverType.ItemAdded,
-                                    SPEventReceiverType.ItemUpdated,
-                                    SPEventReceiverType.ItemDeleting
-                                });
-
-                            if (evts.Count > 0 && !lLists.Contains(l.Title))
+                            foreach (SPList l in web.Lists)
                             {
-                                lLists.Add(l.Title);
-                                continue;
-                            }
+                                var events = GetListEvents(l,
+                                    "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
+                                    "EPMLiveReportsAdmin.ListEvents",
+                                    new List<SPEventReceiverType>
+                                    {
+                                        SPEventReceiverType.ItemAdded,
+                                        SPEventReceiverType.ItemUpdated,
+                                        SPEventReceiverType.ItemDeleting
+                                    });
 
-                            List<SPEventReceiverDefinition> mwEvts = GetListEvents(l,
-                                "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
-                                "EPMLiveReportsAdmin.MyWorkListEvents",
-                                new List<SPEventReceiverType>
+                                if (events.Count > 0 && !lLists.Contains(l.Title))
                                 {
-                                    SPEventReceiverType.ItemAdded,
-                                    SPEventReceiverType.ItemUpdated,
-                                    SPEventReceiverType.ItemDeleting
-                                });
+                                    lLists.Add(l.Title);
+                                    continue;
+                                }
 
-                            if (mwEvts.Count > 0 && !lLists.Contains(l.Title))
-                            {
-                                lLists.Add(l.Title);
+                                var mwEvents = GetListEvents(l,
+                                    "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
+                                    "EPMLiveReportsAdmin.MyWorkListEvents",
+                                    new List<SPEventReceiverType>
+                                    {
+                                        SPEventReceiverType.ItemAdded,
+                                        SPEventReceiverType.ItemUpdated,
+                                        SPEventReceiverType.ItemDeleting
+                                    });
+
+                                if (mwEvents.Count > 0 && !lLists.Contains(l.Title))
+                                {
+                                    lLists.Add(l.Title);
+                                }
                             }
                         }
-
-                        w?.Dispose();
                     }
                 }
             });
