@@ -43,10 +43,10 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
         private const string DataElement = "Data";
         private const string KeyAttribute = "key";
         private const string FieldWebForeign = "m_webForeign";
-        private const string FieldDropList = "m_dropList";
+        private const string FieldDropList = "_dropList";
         private const string FieldSelectedValueIndex = "m_selectedValueIndex";
-        private const string FieldTbx = "m_tbx";
-        private const string FieldDataSource = "m_dataSource";
+        private const string FieldTextBox = "_textBox";
+        private const string FieldDataSource = "_dataSource";
         private const string MethodCreateChildControls = "CreateChildControls";
         private const string MethodOnPreRender = "OnPreRender";
         private const string MethodOnInit = "OnInit";
@@ -69,6 +69,8 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
         private Page _page;
         private StringWriter _responseWriter;
         private SPFieldLookupValue _item;
+        private DropDownList _dropDownList;
+        private TextBox _textBox;
 
         [TestInitialize]
         public void TestInitialize()
@@ -109,6 +111,10 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
         {
             _shimsContext?.Dispose();
             _responseWriter?.Dispose();
+            _dropDownList?.Dispose();
+            _textBox?.Dispose();
+            _page?.Dispose();
+            _testObject?.Dispose();
         }
 
         [TestMethod]
@@ -320,8 +326,8 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
         public void SetFieldControlValue_DropDownListNothingSelected_SetsNotSelectedIndex()
         {
             // Arrange
-            var dropdown = new DropDownList();
-            _privateObject.SetFieldOrProperty(FieldDropList, dropdown);
+            _dropDownList = new DropDownList();
+            _privateObject.SetFieldOrProperty(FieldDropList, _dropDownList);
             _privateObject.SetFieldOrProperty(FieldSelectedValueIndex, -1);
 
             // Act
@@ -329,15 +335,15 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => dropdown.SelectedIndex.ShouldBe(-1));
+                () => _dropDownList.SelectedIndex.ShouldBe(-1));
         }
 
         [TestMethod]
         public void SetFieldControlValue_DropDownListSelected_SetsNotSelectedIndex()
         {
             // Arrange
-            var dropdown = new DropDownList();
-            _privateObject.SetFieldOrProperty(FieldDropList, dropdown);
+            _dropDownList = new DropDownList();
+            _privateObject.SetFieldOrProperty(FieldDropList, _dropDownList);
             _privateObject.SetFieldOrProperty(FieldSelectedValueIndex, 0);
 
             // Act
@@ -345,16 +351,16 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => dropdown.SelectedIndex.ShouldBe(-1));
+                () => _dropDownList.SelectedIndex.ShouldBe(-1));
         }
 
         [TestMethod]
         public void SetFieldControlValue_TextBox_SetsText()
         {
             // Arrange
+            _textBox = new TextBox();
             var registeredField = string.Empty;
-            var textBox = new TextBox();
-            _privateObject.SetFieldOrProperty(FieldTbx, textBox);
+            _privateObject.SetFieldOrProperty(FieldTextBox, _textBox);
             _privateObject.SetFieldOrProperty(FieldDataSource, _privateObject.GetFieldOrProperty(PropertyDataSource));
             _privateObject.SetFieldOrProperty(FieldSelectedValueIndex, 0);
             ShimClientScriptManager.AllInstances.RegisterHiddenFieldStringString =
@@ -365,7 +371,7 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => textBox.Text.ShouldBeNullOrEmpty(),
+                () => _textBox.Text.ShouldBeNullOrEmpty(),
                 () => registeredField.ShouldBe("0"));
         }
 
@@ -373,10 +379,10 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
         public void SetFieldControlValue_TextBoxNotSelectedValue_SetsText()
         {
             // Arrange
+            _textBox = new TextBox();
             var registeredField = string.Empty;
-            var textBox = new TextBox();
             var hiddenFieldName = _privateObject.GetFieldOrProperty(PropertyHiddenFieldName) as string;
-            _privateObject.SetFieldOrProperty(FieldTbx, textBox);
+            _privateObject.SetFieldOrProperty(FieldTextBox, _textBox);
             _privateObject.SetFieldOrProperty(FieldDataSource, _privateObject.GetFieldOrProperty(PropertyDataSource));
             _privateObject.SetFieldOrProperty(FieldSelectedValueIndex, -1);
             _responseWriter = new StringWriter();
@@ -393,7 +399,7 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => textBox.Text.ShouldBeNullOrEmpty(),
+                () => _textBox.Text.ShouldBeNullOrEmpty(),
                 () => registeredField.ShouldBe("0"));
         }
 
@@ -401,13 +407,13 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
         public void UpdateFieldValueInItem_Invoke_SetsItem()
         {
             // Arrange
-            var dropdown = new DropDownList();
-            dropdown.DataSource = _privateObject.GetFieldOrProperty(PropertyDataSource);
-            dropdown.DataValueField = "ValueField";
-            dropdown.DataTextField = "TextField";
-            dropdown.DataBind();
-            dropdown.SelectedIndex = 0;
-            _privateObject.SetFieldOrProperty(FieldDropList, dropdown);
+            _dropDownList = new DropDownList();
+            _dropDownList.DataSource = _privateObject.GetFieldOrProperty(PropertyDataSource);
+            _dropDownList.DataValueField = "ValueField";
+            _dropDownList.DataTextField = "TextField";
+            _dropDownList.DataBind();
+            _dropDownList.SelectedIndex = 0;
+            _privateObject.SetFieldOrProperty(FieldDropList, _dropDownList);
             _privateObject.SetFieldOrProperty(FieldSelectedValueIndex, 0);
 
             // Act
@@ -421,8 +427,8 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
         public void UpdateFieldValueInItem_NoDataSource_DoesNotSetsItem()
         {
             // Arrange
-            var dropdown = new DropDownList();
-            _privateObject.SetFieldOrProperty(FieldDropList, dropdown);
+            _dropDownList = new DropDownList();
+            _privateObject.SetFieldOrProperty(FieldDropList, _dropDownList);
             _privateObject.SetFieldOrProperty(FieldSelectedValueIndex, 0);
 
             // Act
@@ -430,6 +436,24 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
 
             // Assert
             _item.ShouldBeNull();
+        }
+
+        [TestMethod]
+        public void Dispose_Invoke_DisposesAllObjects()
+        {
+            // Arrange
+            var disposedControls = false;
+            ShimControl.AllInstances.Dispose = control =>
+            {
+                disposedControls = true;
+                ShimsContext.ExecuteWithoutShims(() => control.Dispose());
+            };
+
+            // Act
+            _testObject.Dispose();
+
+            // Assert
+            disposedControls.ShouldBeTrue();
         }
 
         private void ShimSharePointContext()
