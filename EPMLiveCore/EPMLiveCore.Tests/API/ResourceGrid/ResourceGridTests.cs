@@ -27,6 +27,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         private IDisposable _shimObject;
         private ResourceGridClass _testObj;
         private PrivateObject _privateObj;
+        private PrivateType _privateType;
         private ShimSPWeb _web;
         private ShimSPSite _site;
         private bool _itemDeleted;
@@ -36,7 +37,9 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         private bool _gridViewAdded;
         private bool _gridViewUpdated;
 
-        private const int DummyInt = 1;
+        private const int DummyIntOne = 1;
+        private const int DummyIntTwo = 2;
+        private const int DummyIntThree = 3;
         private const int CultureEnUS = 1033;
         private const string DummyString = "DummyString";
         private const string DummyUrl = "http://xyz.com";
@@ -60,6 +63,9 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         private const string ViewsTag = "<Views>";
         private const string RootTags = "<Root></Root>";
 
+        private const string BuildDepartmentHierarchyMethod = "BuildDepartmentHierarchy";
+        private const string Children = "Children";
+
         [TestInitialize]
         public void TestInitialize()
         {
@@ -73,6 +79,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
 
             _testObj = new ResourceGridClass();
             _privateObj = new PrivateObject(_testObj);
+            _privateType = new PrivateType(typeof(ResourceGridClass));
 
             SetupShims();
         }
@@ -89,7 +96,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             {
                 GetItemByIdInt32 = _ => new ShimSPListItem
                 {
-                    ItemGetString = __ => $"{DummyInt};#{DummyString}"
+                    ItemGetString = __ => $"{DummyIntOne};#{DummyString}"
                 },
                 FieldsGet = () => new ShimSPFieldCollection
                 {
@@ -107,7 +114,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 {
                     new ShimSPListItem
                     {
-                        IDGet = () => DummyInt,
+                        IDGet = () => DummyIntOne,
                         FieldsGet = () => new ShimSPFieldCollection().Bind(new SPField[]
                         {
                             new ShimSPField
@@ -128,7 +135,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 IDGet = () => Guid.NewGuid(),
                 CurrentUserGet = () => new ShimSPUser
                 {
-                    IDGet = () => DummyInt,
+                    IDGet = () => DummyIntOne,
                     NameGet = () => DummyString,
                     RegionalSettingsGet = () => new ShimSPRegionalSettings
                     {
@@ -169,7 +176,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             ShimSPListItemManager.AllInstances.ItemExistsInt32 = (_, __) => true;
             ShimSPListItemManager.AllInstances.GetCurrentResourceInt32 = (_, __) => new ShimSPListItem
             {
-                ItemGetString = item => DummyInt.ToString(),
+                ItemGetString = item => DummyIntOne.ToString(),
                 UniqueIdGet = () => Guid.NewGuid()
             };
             ShimSPListItemManager.AllInstances.DeleteInt32 = (_, __) => _itemDeleted = true;
@@ -258,7 +265,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         {
             var xmlString = $@"
                 <Root>
-                    <Resource Id='{DummyInt}' ConfirmDelete='{TrueString}'></Resource>
+                    <Resource Id='{DummyIntOne}' ConfirmDelete='{TrueString}'></Resource>
                 </Root>";
 
             return xmlString;
@@ -314,17 +321,17 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         {
             // Arrange
             var xmlString = $@"
-                <Root WebId='{WebId}' ListId='{ListId}' ItemId='{DummyInt}'>
-                    <Resource ID='{DummyInt}'>
-                        <Data Field='ID' HtmlValue='{DummyInt}' Type='Number'>{DummyInt}</Data>
+                <Root WebId='{WebId}' ListId='{ListId}' ItemId='{DummyIntOne}'>
+                    <Resource ID='{DummyIntOne}'>
+                        <Data Field='ID' HtmlValue='{DummyIntOne}' Type='Number'>{DummyIntOne}</Data>
                     </Resource>
                     <IncludeHidden>{true}</IncludeHidden>
                     <IncludeReadOnly>{true}</IncludeReadOnly>
                     <Department ID='{DummyString}'>
                         <Fields Field='Title' />
                         <Fields Field='RBS'>{DummyString}</Fields>
-                        <Fields Field='Managers'>{DummyInt};#{DummyString}</Fields>
-                        <Fields Field='Executives'>{DummyInt};#{DummyString}</Fields>
+                        <Fields Field='Managers'>{DummyIntOne};#{DummyString}</Fields>
+                        <Fields Field='Executives'>{DummyIntOne};#{DummyString}</Fields>
                     </Department>
                 </Root>";
             var count = 0;
@@ -349,7 +356,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
 
             ShimAPITeam.GetTeamStringSPWeb = (_, __) => $@"
                 <Root>
-                    <Member ID ='{DummyInt}' />
+                    <Member ID ='{DummyIntOne}' />
                 </Root>";
 
             // Act
@@ -471,6 +478,70 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 () => jobEnqueued.ShouldBeTrue(),
                 () => result.ShouldNotBeNullOrEmpty(),
                 () => result.ShouldBe(RefreshResourcesSucess));
+        }
+
+        [TestMethod]
+        public void BuildDepartmentHierarchy_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            DataTable dataTable;
+            List<DataRow> rowList;
+            CreateDataTable(out dataTable, out rowList);
+
+            // Act
+            _privateType.InvokeStatic(BuildDepartmentHierarchyMethod, rowList, dataTable);
+
+            // Assert
+            var children = (List<string>)dataTable.Rows[0][Children];
+            this.ShouldSatisfyAllConditions(
+                () => children.Count.ShouldBe(2));
+        }
+
+        private static void CreateDataTable(out DataTable dataTable, out List<DataRow> rowList)
+        {
+            const string Id = "Id";
+            const string IdClean = "IdClean";
+            const string ParentId = "ParentId";
+            const string ParentIdClean = "ParentIdClean";
+            const string ParentChild = "ParentChild";
+
+            var dataSet = new DataSet();
+            dataTable = new DataTable();
+            dataSet.Tables.Add(dataTable);
+            dataTable.Columns.Add(Id, typeof(string));
+            dataTable.Columns.Add(IdClean, typeof(string));
+            dataTable.Columns.Add(Children, typeof(List<string>));
+            dataTable.Columns.Add(ParentId, typeof(string));
+            dataTable.Columns.Add(ParentIdClean, typeof(string));
+            dataTable.PrimaryKey = new DataColumn[] { dataTable.Columns[Id] };
+
+            var row = dataTable.NewRow();
+            row[Id] = DummyIntOne.ToString();
+            row[IdClean] = DummyIntOne.ToString();
+            row[Children] = new List<string>();
+            dataTable.Rows.Add(row);
+
+            var row2 = dataTable.NewRow();
+            row2[Id] = DummyIntTwo.ToString();
+            row2[IdClean] = DummyIntTwo.ToString();
+            row2[ParentId] = DummyIntOne.ToString();
+            row2[ParentIdClean] = DummyIntOne.ToString();
+            row2[Children] = new List<string>();
+            dataTable.Rows.Add(row2);
+
+            var row3 = dataTable.NewRow();
+            row3[Id] = DummyIntThree.ToString();
+            row3[IdClean] = DummyIntThree.ToString(); ;
+            row3[ParentId] = DummyIntTwo.ToString();
+            row3[ParentIdClean] = DummyIntTwo.ToString();
+            row3[Children] = new List<string>();
+            dataTable.Rows.Add(row3);
+
+            var dataRelation = new DataRelation(ParentChild, dataTable.Columns[Id], dataTable.Columns[ParentId]);
+            dataSet.Relations.Add(dataRelation);
+
+            rowList = new List<DataRow>();
+            rowList.Add(dataTable.Rows[0]);
         }
     }
 }
