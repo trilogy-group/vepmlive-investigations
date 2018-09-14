@@ -342,11 +342,8 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         [TestMethod]
         public void DeleteResourcePoolResource_WhenRootIsNull_ThrowException()
         {
-            // Arrange
-            var xmlString = "";
-
-            // Act
-            Action action = () => ResourceGridClass.DeleteResourcePoolResource(xmlString);
+            // Arrange, Act
+            Action action = () => ResourceGridClass.DeleteResourcePoolResource(string.Empty);
 
             // Assert
             var exception = Should.Throw<APIException>(action);
@@ -410,13 +407,13 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             var xmlString = CreateXMLString();
 
             ShimManagementUtilities.PerformDeleteResourceCheckInt32GuidSPWebStringOutStringOut = 
-            (int _1, Guid _2, SPWeb _3, out string _4, out string _5) =>
-            {
-                _4 = NoValueString;
-                _5 = DummyError;
+                (int _1, Guid _2, SPWeb _3, out string _4, out string _5) =>
+                {
+                    _4 = NoValueString;
+                    _5 = DummyError;
 
-                return false;
-            };
+                    return false;
+                };
 
             // Act
             var result = ResourceGridClass.DeleteResourcePoolResource(xmlString);
@@ -607,7 +604,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         public void GetResourcePoolDataGridChanges_WhenDeleted_ConfirmResult()
         {
             // Arrange
-            string xmlString = CreateXMLForGetResourcePoolDataGridChanges("Deleted", DummyIntOne);
+            var xmlString = CreateXMLForGetResourcePoolDataGridChanges("Deleted", DummyIntOne);
 
             // Act
             var result = ResourceGridClass.GetResourcePoolDataGridChanges(xmlString, _web);
@@ -622,7 +619,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         public void GetResourcePoolDataGridChanges_WhenOtherOption_ConfirmResult()
         {
             // Arrange
-            string xmlString = CreateXMLForGetResourcePoolDataGridChanges("Other", DummyIntTwo);
+            var xmlString = CreateXMLForGetResourcePoolDataGridChanges("Other", DummyIntTwo);
             ShimUtils.GetGridEnumSPSiteSPFieldStringOutInt32OutStringOut = (SPSite site, SPField field, out string enumValues, out int enumRange, out string enumKeys) =>
             {
                 enumValues = DummyString;
@@ -644,7 +641,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         public void GetResourcePoolDataGridChanges_OnError_ThrowException()
         {
             // Arrange
-            string xmlString = CreateXMLForGetResourcePoolDataGridChanges(string.Empty, DummyIntOne);
+            var xmlString = CreateXMLForGetResourcePoolDataGridChanges(string.Empty, DummyIntOne);
 
             ShimGridGanttSettings.ConstructorSPList = (_, __) =>
             {
@@ -929,7 +926,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
 
             var row3 = dataTable.NewRow();
             row3[Id] = DummyIntThree.ToString();
-            row3[IdClean] = DummyIntThree.ToString(); ;
+            row3[IdClean] = DummyIntThree.ToString();
             row3[ParentId] = DummyIntTwo.ToString();
             row3[ParentIdClean] = DummyIntTwo.ToString();
             row3[Children] = new List<string>();
