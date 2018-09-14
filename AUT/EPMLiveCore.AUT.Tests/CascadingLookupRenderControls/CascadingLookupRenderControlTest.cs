@@ -44,13 +44,13 @@ namespace EPMLiveCore
         private const string MethodUpdateFieldValueInItem = "UpdateFieldValueInItem";
         private const string FieldpropBag = "propBag";
         private const string Fieldparent = "parent";
-        private const string Fieldm_dataSource = "m_dataSource";
+        private const string Fieldm_dataSource = "_dataSource";
         private const string Field_lookupList = "_lookupList";
         private const string Field_parentLookupList = "_parentLookupList";
         private const string Fieldm_throttled = "m_throttled";
-        private const string Fieldm_dropList = "m_dropList";
-        private const string Fieldm_tbx = "m_tbx";
-        private const string Fieldm_dropImage = "m_dropImage";
+        private const string Fieldm_dropList = "_dropList";
+        private const string Fieldm_tbx = "_textBox";
+        private const string Fieldm_dropImage = "_dropImage";
         private const string Fieldm_ids = "m_ids";
         private const string Fieldm_value = "m_value";
         private const string Fieldm_selectedValueIndex = "m_selectedValueIndex";

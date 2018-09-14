@@ -9,7 +9,7 @@ using TimeSheets.Fakes;
 namespace TimeSheets.Tests
 {
     [TestClass]
-    public class TimesheetAPICheckApproveStatusTests : SheetTestBase
+    public class TimesheetAPICheckSaveStatusTests : SheetTestBase
     {
         private const string XmlSample = "<root ID=\"10\" List=\"100\"><a></a></root>";
         private const int UserId = 23;
@@ -22,22 +22,22 @@ namespace TimeSheets.Tests
         private const int ResultTextFieldIndex = 3;
 
         [TestMethod]
-        public void CheckApproveStatus_Called_SqlDisposed()
+        public void CheckSaveStatus_Called_SqlDisposed()
         {
             // Arrange
             SetupShims();
 
             // Act
-            var message = TimesheetAPI.CheckApproveStatus(XmlSample, _sharepointShims.WebShim);
+            var message = TimesheetAPI.CheckSaveStatus(XmlSample, _sharepointShims.WebShim);
 
             // Assert
             Assert.AreEqual(
-                "<ApproveStatus Result=\"0\" Status=\"5\" PercentComplete=\"7\" ErrorResult=\"result-sample\" " +
-                "ResultText=\"result-text-sample\" ApprovalStatus=\"9\"></ApproveStatus>",
+                "<SaveStatus Result=\"0\" Status=\"5\" PercentComplete=\"7\" ErrorResult=\"result-sample\"" +
+                " ResultText=\"result-text-sample\"></SaveStatus>",
                 message);
             Assert.IsTrue(_adoShims.ConnectionsDisposed.Any());
-            Assert.AreEqual(2, _adoShims.CommandsDisposed.Count);
-            Assert.AreEqual(2, _adoShims.DataReadersDisposed.Count);
+            Assert.AreEqual(1, _adoShims.CommandsDisposed.Count);
+            Assert.AreEqual(1, _adoShims.DataReadersDisposed.Count);
         }
 
         private void SetupShims()

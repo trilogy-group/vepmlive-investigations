@@ -46,15 +46,19 @@ namespace EPMLiveCore
                         {
                             try
                             {
-                                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(properties.Site.WebApplication.Id));
-                                cn.Open();
+                                using (var connection = new SqlConnection(CoreFunctions.getConnectionString(properties.Site.WebApplication.Id)))
+                                {
+                                    connection.Open();
 
-                                SqlCommand cmd = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), @message, 30)", cn);
-                                cmd.Parameters.AddWithValue("@intid", id);
-                                cmd.Parameters.AddWithValue("@message", ret);
-                                cmd.ExecuteNonQuery();
-
-                                cn.Close();
+                                    using (var command = new SqlCommand(
+                                        "INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), @message, 30)",
+                                        connection))
+                                    {
+                                        command.Parameters.AddWithValue("@intid", id);
+                                        command.Parameters.AddWithValue("@message", ret);
+                                        command.ExecuteNonQuery();
+                                    }
+                                }
                             }
                             catch { }
                         });
@@ -66,15 +70,19 @@ namespace EPMLiveCore
                     {
                         try
                         {
-                            SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(properties.Site.WebApplication.Id));
-                            cn.Open();
+                            using (var connection = new SqlConnection(CoreFunctions.getConnectionString(properties.Site.WebApplication.Id)))
+                            {
+                                connection.Open();
 
-                            SqlCommand cmd = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), @message, 30)", cn);
-                            cmd.Parameters.AddWithValue("@intid", id);
-                            cmd.Parameters.AddWithValue("@message", ex.Message);
-                            cmd.ExecuteNonQuery();
-
-                            cn.Close();
+                                using (var command = new SqlCommand(
+                                    "INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), @message, 30)",
+                                    connection))
+                                {
+                                    command.Parameters.AddWithValue("@intid", id);
+                                    command.Parameters.AddWithValue("@message", ex.Message);
+                                    command.ExecuteNonQuery();
+                                }
+                            }
                         }
                         catch { }
                     });
@@ -111,15 +119,19 @@ namespace EPMLiveCore
                         {
                             try
                             {
-                                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(properties.Site.WebApplication.Id));
-                                cn.Open();
+                                using (var connection = new SqlConnection(CoreFunctions.getConnectionString(properties.Site.WebApplication.Id)))
+                                {
+                                    connection.Open();
 
-                                SqlCommand cmd = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), @message, 30)", cn);
-                                cmd.Parameters.AddWithValue("@intid", id);
-                                cmd.Parameters.AddWithValue("@message", ret);
-                                cmd.ExecuteNonQuery();
-
-                                cn.Close();
+                                    using (var command = new SqlCommand(
+                                        "INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), @message, 30)",
+                                        connection))
+                                    {
+                                        command.Parameters.AddWithValue("@intid", id);
+                                        command.Parameters.AddWithValue("@message", ret);
+                                        command.ExecuteNonQuery();
+                                    }
+                                }
                             }
                             catch { }
                         });
@@ -131,20 +143,23 @@ namespace EPMLiveCore
                     {
                         try
                         {
-                            SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(properties.Site.WebApplication.Id));
-                            cn.Open();
+                            using (var connection = new SqlConnection(CoreFunctions.getConnectionString(properties.Site.WebApplication.Id)))
+                            {
+                                connection.Open();
 
-                            SqlCommand cmd = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), @message, 30)", cn);
-                            cmd.Parameters.AddWithValue("@intid", id);
-                            cmd.Parameters.AddWithValue("@message", ex.Message);
-                            cmd.ExecuteNonQuery();
-
-                            cn.Close();
+                                using (var command = new SqlCommand(
+                                    "INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), @message, 30)",
+                                    connection))
+                                {
+                                    command.Parameters.AddWithValue("@intid", id);
+                                    command.Parameters.AddWithValue("@message", ex.Message);
+                                    command.ExecuteNonQuery();
+                                }
+                            }
                         }
                         catch { }
                     });
                 }
-
             }
         }
 
@@ -154,23 +169,28 @@ namespace EPMLiveCore
             {
                 try
                 {
-                    SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(properties.Site.WebApplication.Id));
-                    cn.Open();
-
-                    SqlCommand cmd = new SqlCommand("select IntegrationUrl, IntegrationKey, PlatformIntegrationId from PLATFORMINTEGRATIONS where ListId=@ListId", cn);
-                    cmd.Parameters.AddWithValue("@ListId", properties.ListId);
-                    cmd.ExecuteNonQuery();
-
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    if (dr.Read())
+                    using (var connection = new SqlConnection(CoreFunctions.getConnectionString(properties.Site.WebApplication.Id)))
                     {
-                        url = dr.GetString(0);
-                        key = dr.GetString(1);
-                        id = dr.GetGuid(2);
-                    }
-                    dr.Close();
+                        connection.Open();
 
-                    cn.Close();
+                        using (var command = new SqlCommand(
+                            "select IntegrationUrl, IntegrationKey, PlatformIntegrationId from PLATFORMINTEGRATIONS where ListId=@ListId",
+                            connection))
+                        {
+                            command.Parameters.AddWithValue("@ListId", properties.ListId);
+                            command.ExecuteNonQuery();
+
+                            using (var dataReader = command.ExecuteReader())
+                            {
+                                if (dataReader.Read())
+                                {
+                                    url = dataReader.GetString(0);
+                                    key = dataReader.GetString(1);
+                                    id = dataReader.GetGuid(2);
+                                }
+                            }
+                        }
+                    }
                 }
                 catch { }
             });
