@@ -61,7 +61,7 @@ namespace EPMLiveCore
                 webappid = webApp.Id.ToString();
                 string sConn = CoreFunctions.getConnectionString(webApp.Id);
 
-                if (sConn != "")
+                if (!string.IsNullOrWhiteSpace(sConn))
                 {
                     txtConnString.Text = sConn;
                     lblStatusDyn.Text = "Active";
