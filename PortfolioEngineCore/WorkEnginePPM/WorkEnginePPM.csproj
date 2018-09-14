@@ -1565,6 +1565,10 @@ iisreset</PostDeploymentCommand>
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
       <Name>EPMLiveCore</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\WE_WSSAdmin\WE_WSSAdmin.vbproj">
+      <Project>{B5E62B20-0CF9-44AD-A42F-296460BF9730}</Project>
+      <Name>WE_WSSAdmin</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PortfolioEngineCore\PortfolioEngineCore.csproj">
       <Project>{bb86b09c-cb35-4888-8639-c047a40a9c0c}</Project>
       <Name>PortfolioEngineCore</Name>

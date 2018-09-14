@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using WE_QueueMgr.MsmqIntegration;
+using WE_WSSAdmin;
 
 namespace WE_QueueMgr
 {
@@ -312,7 +313,7 @@ namespace WE_QueueMgr
         object longRunQueueLock = new object();
         List<QMSite> longRunQueue = new List<QMSite>();
         List<Guid> longRunJobIds = new List<Guid>();
-        
+
         void EnqueueSite(QMSite site, Guid jobId)
         {
             lock (longRunQueueLock)
@@ -610,14 +611,8 @@ namespace WE_QueueMgr
             object comObject = null;
             try
             {
-                var comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
-                comObject = Activator.CreateInstance(comObjectType);
-                var myparams = new object[] { "ManageQueue", site.basePath, jobId.ToString() };
-                return (string)comObjectType.InvokeMember("RSVPRequest",
-                                                        BindingFlags.InvokeMethod,
-                                                        null,
-                                                        comObject,
-                                                        myparams);
+                WSSAdmin wssadmin = new WSSAdmin();
+                return wssadmin.RSVPRequest("ManageQueue", site.basePath, jobId.ToString());
             }
             finally
             {

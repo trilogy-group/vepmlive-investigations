@@ -159,6 +159,10 @@
       <Project>{bb86b09c-cb35-4888-8639-c047a40a9c0c}</Project>
       <Name>PortfolioEngineCore</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\WE_WSSAdmin\WE_WSSAdmin.vbproj">
+      <Project>{b5e62b20-0cf9-44ad-a42f-296460bf9730}</Project>
+      <Name>WE_WSSAdmin</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

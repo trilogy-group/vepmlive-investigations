@@ -231,6 +231,12 @@
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\ND\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\WE_WSSAdmin\WE_WSSAdmin.vbproj">
+      <Project>{b5e62b20-0cf9-44ad-a42f-296460bf9730}</Project>
+      <Name>WE_WSSAdmin</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\gacutil.exe" /u "$(TargetName)"</PreBuildEvent>
