@@ -67,6 +67,7 @@
     <Add FullName="EPMLiveCore.API.Reporting!"/>
     <Add FullName="EPMLiveCore.Infrastructure.CacheStoreCategory!"/>
     <Add FullName="EPMLiveCore.ReportAuth!"/>
+    <Add FullName="EPMLiveCore.CascadingLookupRenderControl!"/>
     <Add FullName="EPMLiveCore.Infrastructure.EPMLiveFileStore!"/>
     <Add FullName="EPMLiveCore.API.ResourceExporter!"/>
     <Add FullName="EPMLiveCore.DisabledItemEventScope!"/>

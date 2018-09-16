@@ -150,6 +150,7 @@
     <Compile Include="API\Publish\APIPublishTests.cs" />
     <Compile Include="API\ResourceGrid\ResourceExporterTests.cs" />
     <Compile Include="API\TimerTests.cs" />
+    <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControlTests.cs" />
     <Compile Include="CheckOpenCloseConnections.cs" />
     <Compile Include="ControlDataBuilderTest.cs" />
     <Compile Include="CoreFunctions.GetPlannerList.Tests.cs" />
