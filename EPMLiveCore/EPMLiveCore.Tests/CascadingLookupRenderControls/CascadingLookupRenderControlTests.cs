@@ -42,10 +42,10 @@ namespace EPMLiveCore.Tests.CascadingLookupRenderControls
         private const string ParamElement = "Param";
         private const string DataElement = "Data";
         private const string KeyAttribute = "key";
-        private const string FieldWebForeign = "m_webForeign";
-        private const string FieldDropList = "_dropList";
-        private const string FieldSelectedValueIndex = "m_selectedValueIndex";
-        private const string FieldTextBox = "_textBox";
+        private const string FieldWebForeign = "WebForeign";
+        private const string FieldDropList = "DropList";
+        private const string FieldSelectedValueIndex = "SelectedValueIndex";
+        private const string FieldTextBox = "TextField";
         private const string FieldDataSource = "_dataSource";
         private const string MethodCreateChildControls = "CreateChildControls";
         private const string MethodOnPreRender = "OnPreRender";
