@@ -92,20 +92,9 @@ namespace EPMLiveCore
                     foreach (SPListItem item in items)
                     {
                         object fieldValue = null;
-                        var fieldValueInString = string.Empty;
-
                         try
                         {
                             fieldValue = item[LookupField.LookupField];
-                        }
-                        catch (Exception ex)
-                        {
-                            Trace.WriteLine(ex.ToString());
-                        }
-
-                        try
-                        {
-                            fieldValueInString = fieldValue.ToString();
                         }
                         catch (Exception ex)
                         {
