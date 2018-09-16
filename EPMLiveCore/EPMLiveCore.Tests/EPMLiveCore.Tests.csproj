@@ -79,7 +79,8 @@
       <HintPath>..\..\packages\Moq.4.8.3\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="mscorlib.4.0.0.0.Fakes">
+    <Reference Include="mscorlib.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="Shouldly, Version=3.0.0.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
