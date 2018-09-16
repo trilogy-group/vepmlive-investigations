@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 using System.Resources.Fakes;
+using System.Text;
+using System.Threading.Tasks;
 using EPMLiveCore.Fakes;
+using EPMLiveCore.Infrastructure.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Navigation;
@@ -63,6 +68,9 @@ namespace EPMLiveCore.Tests
         private const string AddAppQuickLaunchMethodName = "AddAppQuickLaunch";
         private const string DeleteAppQuickLaunchMethodName = "DeleteAppQuickLaunch";
         private const string GetCurrentAppTitleMethodName = "GetCurrentAppTitle";
+        private const string GetRealIndexMethodName = "GetRealIndex";
+        private const string CreateChildNodeMethodName = "CreateChildNode";
+        private const string CreateParentNodeMethodName = "CreateParentNode";
 
         [TestInitialize]
         public void Setup()
@@ -87,6 +95,7 @@ namespace EPMLiveCore.Tests
             ShimSqlConnection.AllInstances.Close = _ => { };
             ShimSqlCommand.AllInstances.ExecuteReader = _ => sqlDataReader;
             ShimCoreFunctions.getConnectionStringGuid = _ => ConnectionString;
+            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPContext.CurrentGet = () => new ShimSPContext()
             {
                 SiteGet = () => spSite,
@@ -186,7 +195,6 @@ namespace EPMLiveCore.Tests
         public void AppListExists_WhenCalled_ReturnsTrue()
         {
             // Arrange
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
 
             // Act
             var actual = (bool)privateObj.Invoke(AppListExistsMethodName, BindingFlags.Instance | BindingFlags.Public);
@@ -199,7 +207,6 @@ namespace EPMLiveCore.Tests
         public void AppIdExists_WhenCalled_ReturnsTrue()
         {
             // Arrange
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
 
             // Act
             var actual = (bool)privateObj.Invoke(AppIdExistsMethodName, BindingFlags.Instance | BindingFlags.Public, new object[] { 1 });
@@ -411,7 +418,6 @@ namespace EPMLiveCore.Tests
                 TopNavigationBarGet = () => new ShimSPNavigationNodeCollection(),
                 QuickLaunchGet = () => new ShimSPNavigationNodeCollection()
             };
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPNavigationNode>()
             {
                 new ShimSPNavigationNode()
@@ -480,7 +486,6 @@ namespace EPMLiveCore.Tests
                     ParentIdGet = () => expected
                 },
             };
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPNavigationNode>()
             {
                 new ShimSPNavigationNode()
@@ -511,7 +516,6 @@ namespace EPMLiveCore.Tests
             TopNav = $"{expected}:text,{expected}:text";
 
             spWeb.NavigationGet = () => new ShimSPNavigation();
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
 
             // Act
             var actual = (List<int>)privateObj.Invoke(
@@ -535,7 +539,6 @@ namespace EPMLiveCore.Tests
             TopNav = $"{expected}:text,{expected}:text";
 
             spWeb.NavigationGet = () => new ShimSPNavigation();
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
 
             // Act
             var actual = (List<int>)privateObj.Invoke(TryGetMyAppTopNavIdsMethodName, BindingFlags.Instance | BindingFlags.Public);
@@ -562,7 +565,6 @@ namespace EPMLiveCore.Tests
                     ParentIdGet = () => 1025
                 },
             };
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPNavigationNode>()
             {
                 new ShimSPNavigationNode()
@@ -593,7 +595,6 @@ namespace EPMLiveCore.Tests
             QuickLaunch = $"{expected}:text,{expected}:text";
 
             spWeb.NavigationGet = () => new ShimSPNavigation();
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
 
             // Act
             var actual = (List<int>)privateObj.Invoke(
@@ -617,7 +618,6 @@ namespace EPMLiveCore.Tests
             QuickLaunch = $"{expected}:text,{expected}:text";
 
             spWeb.NavigationGet = () => new ShimSPNavigation();
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
 
             // Act
             var actual = (List<int>)privateObj.Invoke(TryGetMyAppQuickLaunchIdsMethodName, BindingFlags.Instance | BindingFlags.Public);
@@ -862,7 +862,6 @@ namespace EPMLiveCore.Tests
                     ParentIdGet = () => expected
                 },
             };
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPNavigationNode>()
             {
                 new ShimSPNavigationNode()
@@ -893,7 +892,6 @@ namespace EPMLiveCore.Tests
             TopNav = $"{expected + 1}:text,{expected - 1}:text,{expected}:text";
 
             spWeb.NavigationGet = () => new ShimSPNavigation();
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPNavigationNode>()
             {
                 new ShimSPNavigationNode()
@@ -934,7 +932,6 @@ namespace EPMLiveCore.Tests
             TopNav = $"{expected + 1}:text,{expected - 1}:text,{expected}:text";
 
             spWeb.NavigationGet = () => new ShimSPNavigation();
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPNavigationNode>()
             {
                 new ShimSPNavigationNode()
@@ -975,7 +972,6 @@ namespace EPMLiveCore.Tests
             TopNav = $"{expected},{expected + 1},{expected - 1}";
 
             spWeb.NavigationGet = () => new ShimSPNavigation();
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPNavigationNode>()
             {
                 new ShimSPNavigationNode()
@@ -1016,7 +1012,6 @@ namespace EPMLiveCore.Tests
             TopNav = $"{expected + 1},{expected - 1},{expected}";
 
             spWeb.NavigationGet = () => new ShimSPNavigation();
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPNavigationNode>()
             {
                 new ShimSPNavigationNode()
@@ -1060,7 +1055,6 @@ namespace EPMLiveCore.Tests
                     ParentIdGet = () => 1025
                 },
             };
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPNavigationNode>()
             {
                 new ShimSPNavigationNode()
@@ -1091,7 +1085,6 @@ namespace EPMLiveCore.Tests
             QuickLaunch = $"{expected + 1}:text,{expected - 1}:text,{expected}:text";
 
             spWeb.NavigationGet = () => new ShimSPNavigation();
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPNavigationNode>()
             {
                 new ShimSPNavigationNode()
@@ -1132,7 +1125,6 @@ namespace EPMLiveCore.Tests
             QuickLaunch = $"{expected + 1}:text,{expected - 1}:text,{expected}:text";
 
             spWeb.NavigationGet = () => new ShimSPNavigation();
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPNavigationNode>()
             {
                 new ShimSPNavigationNode()
@@ -1173,7 +1165,6 @@ namespace EPMLiveCore.Tests
             QuickLaunch = $"{expected},{expected + 1},{expected - 1}";
 
             spWeb.NavigationGet = () => new ShimSPNavigation();
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPNavigationNode>()
             {
                 new ShimSPNavigationNode()
@@ -1214,7 +1205,6 @@ namespace EPMLiveCore.Tests
             QuickLaunch = $"{expected + 1},{expected - 1},{expected}";
 
             spWeb.NavigationGet = () => new ShimSPNavigation();
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPNavigationNode>()
             {
                 new ShimSPNavigationNode()
@@ -1249,7 +1239,6 @@ namespace EPMLiveCore.Tests
             // Arrange
             const string title = "Title";
 
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPListItem.AllInstances.TitleGet = _ => title;
 
             privateObj.SetFieldOrProperty(CurrentAppIdPropertyName, BindingFlags.Instance | BindingFlags.Public, -1);
@@ -1267,7 +1256,6 @@ namespace EPMLiveCore.Tests
             // Arrange
             const string title = "Title";
 
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPListItem.AllInstances.TitleGet = _ => title;
 
             privateObj.SetFieldOrProperty(CurrentAppIdPropertyName, BindingFlags.Instance | BindingFlags.Public, 111);
@@ -1286,7 +1274,6 @@ namespace EPMLiveCore.Tests
             const string title = "Title";
 
             visible = true;
-            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => DummyString;
             ShimSPListItem.AllInstances.TitleGet = _ => title;
 
             privateObj.SetFieldOrProperty(CurrentAppIdPropertyName, BindingFlags.Instance | BindingFlags.Public, 111);
@@ -1296,6 +1283,549 @@ namespace EPMLiveCore.Tests
 
             // Assert
             actual.ShouldBe(title);
+        }
+
+        [TestMethod]
+        public void GetRealIndex_TopNav_ReturnsInt()
+        {
+            // Arrange
+            const int expected = 111;
+            const int position = 0;
+            const string navType = "topnav";
+
+            TopNav = $"{expected}:text,{expected + 1}:text";
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                GetNodeByIdInt32 = id => new ShimSPNavigationNode()
+                {
+                    IdGet = () => id,
+                    ParentIdGet = () => expected,
+                    ChildrenGet = () => new ShimSPNavigationNodeCollection()
+                },
+            };
+            ShimSPNavigationNodeCollection.AllInstances.CountGet = _ => 1;
+            ShimSPNavigationNodeCollection.AllInstances.ItemGetInt32 = (_, __) => new ShimSPNavigationNode()
+            {
+                IdGet = () => expected
+            };
+
+            // Act
+            var actual = (int)privateObj.Invoke(
+                GetRealIndexMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { expected, position, expected, navType });
+
+            // Assert
+            actual.ShouldBe(position);
+        }
+
+        [TestMethod]
+        public void GetRealIndex_QuickLaunch_ReturnsInt()
+        {
+            // Arrange
+            const int expected = 111;
+            const int position = 0;
+            const string navType = "quiklnch";
+
+            QuickLaunch = $"{expected}:text,{expected + 1}:text";
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                GetNodeByIdInt32 = id => new ShimSPNavigationNode()
+                {
+                    IdGet = () => id,
+                    ParentIdGet = () => expected,
+                    ChildrenGet = () => new ShimSPNavigationNodeCollection()
+                },
+            };
+            ShimSPNavigationNodeCollection.AllInstances.CountGet = _ => 1;
+            ShimSPNavigationNodeCollection.AllInstances.ItemGetInt32 = (_, __) => new ShimSPNavigationNode()
+            {
+                IdGet = () => expected
+            };
+
+            // Act
+            var actual = (int)privateObj.Invoke(
+                GetRealIndexMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { expected, position, expected, navType });
+
+            // Assert
+            actual.ShouldBe(position);
+        }
+
+        [TestMethod]
+        public void CreateChildNode_TopNavNodeType_CreatesChildNode()
+        {
+            // Arrange
+            const int appId = 1;
+            const string nodeType = "topnav";
+            const int headingNodeId = 111;
+            const string title = "title";
+            const string url = "url";
+            const bool isExternal = true;
+            const int expectedId = 1111;
+
+            var spUser = new ShimSPUser().Instance;
+            var methodHit = false;
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                GetNodeByIdInt32 = id => new ShimSPNavigationNode()
+                {
+                    IdGet = () => id,
+                    ChildrenGet = () => new ShimSPNavigationNodeCollection()
+                    {
+                        AddAsLastSPNavigationNode = _ => new ShimSPNavigationNode()
+                        {
+                            IdGet = () => expectedId
+                        }
+                    }
+                },
+            };
+            ShimAppSettingsHelper.AllInstances.GetCleanUrlString = (_, input) => input;
+            ShimAppSettingsHelper.AllInstances.AddAppTopNavInt32Int32 = (_, _1, id) =>
+            {
+                if (id == expectedId)
+                {
+                    methodHit = true;
+                }
+            };
+            spWeb.Update = () =>
+            {
+                methodHit = methodHit && true;
+            };
+            ShimCacheStore.CurrentGet = () => new ShimCacheStore()
+            {
+                RemoveCategoryString = _ => { }
+            };
+
+            // Act
+            privateObj.Invoke(
+                CreateChildNodeMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { appId, nodeType, title, url, headingNodeId, isExternal, spUser });
+
+            // Assert
+            methodHit.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void CreateChildNode_QuickLaunchNodeType_CreatesChildNode()
+        {
+            // Arrange
+            const int appId = 1;
+            const string nodeType = "quiklnch";
+            const int headingNodeId = 111;
+            const string title = "title";
+            const string url = "url";
+            const bool isExternal = true;
+            const int expectedId = 1111;
+
+            var spUser = new ShimSPUser().Instance;
+            var methodHit = false;
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                GetNodeByIdInt32 = id => new ShimSPNavigationNode()
+                {
+                    IdGet = () => id,
+                    ChildrenGet = () => new ShimSPNavigationNodeCollection()
+                    {
+                        AddAsLastSPNavigationNode = _ => new ShimSPNavigationNode()
+                        {
+                            IdGet = () => expectedId
+                        }
+                    }
+                },
+            };
+            ShimAppSettingsHelper.AllInstances.GetCleanUrlString = (_, input) => input;
+            ShimAppSettingsHelper.AllInstances.AddAppQuickLaunchInt32Int32 = (_, _1, id) =>
+            {
+                if (id == expectedId)
+                {
+                    methodHit = true;
+                }
+            };
+            spWeb.Update = () =>
+            {
+                methodHit = methodHit && true;
+            };
+            ShimCacheStore.CurrentGet = () => new ShimCacheStore()
+            {
+                RemoveCategoryString = _ => { }
+            };
+
+            // Act
+            privateObj.Invoke(
+                CreateChildNodeMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { appId, nodeType, title, url, headingNodeId, isExternal, spUser });
+
+            // Assert
+            methodHit.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void CreateParentNode_TopNavNodeTypeAppIdPositiveNavIDPositive_CreatesParentNode()
+        {
+            // Arrange
+            const int appId = 1;
+            const string nodeType = "topnav";
+            const string title = "title";
+            const string url = "url";
+            const bool isExternal = true;
+            const int expectedId = 1111;
+
+            var spUser = new ShimSPUser().Instance;
+            var methodHit = 0;
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                TopNavigationBarGet = () => new ShimSPNavigationNodeCollection()
+                {
+                    AddSPNavigationNodeSPNavigationNode = (_, __) => new ShimSPNavigationNode()
+                    {
+                        IdGet = () => expectedId,
+                        Update = () =>
+                        {
+                            methodHit = methodHit + 1;
+                        }
+                    }
+                },
+                GetNodeByIdInt32 = id => new ShimSPNavigationNode()
+                {
+                    IdGet = () => id
+                },
+            };
+            ShimAppSettingsHelper.AllInstances.GetCleanUrlString = (_, input) => input;
+            ShimAppSettingsHelper.AllInstances.AddAppTopNavInt32Int32 = (_, _1, id) =>
+            {
+                if (id == expectedId)
+                {
+                    methodHit = methodHit + 1;
+                }
+            };
+            ShimAppSettingsHelper.AllInstances.GetAppTopNavLastNodeIdInt32 = (_, __) => 1;
+            ShimCacheStore.CurrentGet = () => new ShimCacheStore()
+            {
+                RemoveSafelyStringStringString = (_, _1, _2) =>
+                {
+                    methodHit = methodHit + 1;
+                }
+            };
+            spWeb.Update = () =>
+            {
+                methodHit = methodHit + 1;
+            };
+
+            // Act
+            privateObj.Invoke(
+                CreateParentNodeMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { appId, nodeType, title, url, isExternal, spUser });
+
+            // Assert
+            methodHit.ShouldBe(4);
+        }
+
+        [TestMethod]
+        public void CreateParentNode_TopNavNodeTypeAppIdPositiveNavIDNegative_CreatesParentNode()
+        {
+            // Arrange
+            const int appId = 1;
+            const string nodeType = "topnav";
+            const string title = "title";
+            const string url = "url";
+            const bool isExternal = true;
+            const int expectedId = 1111;
+
+            var spUser = new ShimSPUser().Instance;
+            var methodHit = 0;
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                TopNavigationBarGet = () => new ShimSPNavigationNodeCollection()
+                {
+                    AddAsLastSPNavigationNode = _ => new ShimSPNavigationNode()
+                    {
+                        IdGet = () => expectedId,
+                        Update = () =>
+                        {
+                            methodHit = methodHit + 1;
+                        }
+                    }
+                },
+                GetNodeByIdInt32 = id => new ShimSPNavigationNode()
+                {
+                    IdGet = () => id
+                },
+            };
+            ShimAppSettingsHelper.AllInstances.GetCleanUrlString = (_, input) => input;
+            ShimAppSettingsHelper.AllInstances.AddAppTopNavInt32Int32 = (_, _1, id) =>
+            {
+                if (id == expectedId)
+                {
+                    methodHit = methodHit + 1;
+                }
+            };
+            ShimAppSettingsHelper.AllInstances.GetAppTopNavLastNodeIdInt32 = (_, __) => -1;
+            ShimCacheStore.CurrentGet = () => new ShimCacheStore()
+            {
+                RemoveSafelyStringStringString = (_, _1, _2) =>
+                {
+                    methodHit = methodHit + 1;
+                }
+            };
+            spWeb.Update = () =>
+            {
+                methodHit = methodHit + 1;
+            };
+
+            // Act
+            privateObj.Invoke(
+                CreateParentNodeMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { appId, nodeType, title, url, isExternal, spUser });
+
+            // Assert
+            methodHit.ShouldBe(4);
+        }
+
+        [TestMethod]
+        public void CreateParentNode_TopNavNodeTypeAppIdNegativeNavIDNegative_CreatesParentNode()
+        {
+            // Arrange
+            const int appId = -1;
+            const string nodeType = "topnav";
+            const string title = "title";
+            const string url = "url";
+            const bool isExternal = true;
+            const int expectedId = 1111;
+
+            var spUser = new ShimSPUser().Instance;
+            var methodHit = 0;
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                TopNavigationBarGet = () => new ShimSPNavigationNodeCollection()
+                {
+                    AddAsLastSPNavigationNode = _ => new ShimSPNavigationNode()
+                    {
+                        IdGet = () => expectedId,
+                        Update = () =>
+                        {
+                            methodHit = methodHit + 1;
+                        }
+                    }
+                },
+                GetNodeByIdInt32 = id => new ShimSPNavigationNode()
+                {
+                    IdGet = () => id
+                },
+            };
+            ShimAppSettingsHelper.AllInstances.GetCleanUrlString = (_, input) => input;
+            ShimAppSettingsHelper.AllInstances.GetAppTopNavLastNodeIdInt32 = (_, __) => -1;
+            ShimCacheStore.CurrentGet = () => new ShimCacheStore()
+            {
+                RemoveSafelyStringStringString = (_, _1, _2) =>
+                {
+                    methodHit = methodHit + 1;
+                }
+            };
+            spWeb.Update = () =>
+            {
+                methodHit = methodHit + 1;
+            };
+
+            // Act
+            privateObj.Invoke(
+                CreateParentNodeMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { appId, nodeType, title, url, isExternal, spUser });
+
+            // Assert
+            methodHit.ShouldBe(3);
+        }
+
+        [TestMethod]
+        public void CreateParentNode_QuickLaunchNodeTypeAppIdPositiveNavIDPositive_CreatesParentNode()
+        {
+            // Arrange
+            const int appId = 1;
+            const string nodeType = "quiklnch";
+            const string title = "title";
+            const string url = "url";
+            const bool isExternal = true;
+            const int expectedId = 1111;
+
+            var spUser = new ShimSPUser().Instance;
+            var methodHit = 0;
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                QuickLaunchGet = () => new ShimSPNavigationNodeCollection()
+                {
+                    AddSPNavigationNodeSPNavigationNode = (_, __) => new ShimSPNavigationNode()
+                    {
+                        IdGet = () => expectedId,
+                        Update = () => { }
+                    }
+                },
+                GetNodeByIdInt32 = id => new ShimSPNavigationNode()
+                {
+                    IdGet = () => id
+                },
+            };
+            ShimAppSettingsHelper.AllInstances.GetCleanUrlString = (_, input) => input;
+            ShimAppSettingsHelper.AllInstances.AddAppQuickLaunchInt32Int32 = (_, _1, id) =>
+            {
+                if (id == expectedId)
+                {
+                    methodHit = methodHit + 1;
+                }
+            };
+            ShimAppSettingsHelper.AllInstances.GetAppTopNavLastNodeIdInt32 = (_, __) => 1;
+            ShimCacheStore.CurrentGet = () => new ShimCacheStore()
+            {
+                RemoveSafelyStringStringString = (_, _1, _2) =>
+                {
+                    methodHit = methodHit + 1;
+                }
+            };
+            spWeb.Update = () =>
+            {
+                methodHit = methodHit + 1;
+            };
+
+            // Act
+            privateObj.Invoke(
+                CreateParentNodeMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { appId, nodeType, title, url, isExternal, spUser });
+
+            // Assert
+            methodHit.ShouldBe(3);
+        }
+
+        [TestMethod]
+        public void CreateParentNode_QuickLaunchNodeTypeAppIdPositiveNavIDNegative_CreatesParentNode()
+        {
+            // Arrange
+            const int appId = 1;
+            const string nodeType = "quiklnch";
+            const string title = "title";
+            const string url = "url";
+            const bool isExternal = true;
+            const int expectedId = 1111;
+
+            var spUser = new ShimSPUser().Instance;
+            var methodHit = 0;
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                QuickLaunchGet = () => new ShimSPNavigationNodeCollection()
+                {
+                    AddAsLastSPNavigationNode = _ => new ShimSPNavigationNode()
+                    {
+                        IdGet = () => expectedId,
+                        Update = () =>
+                        {
+                            methodHit = methodHit + 1;
+                        }
+                    }
+                },
+                GetNodeByIdInt32 = id => new ShimSPNavigationNode()
+                {
+                    IdGet = () => id
+                },
+            };
+            ShimAppSettingsHelper.AllInstances.GetCleanUrlString = (_, input) => input;
+            ShimAppSettingsHelper.AllInstances.AddAppQuickLaunchInt32Int32 = (_, _1, id) =>
+            {
+                if (id == expectedId)
+                {
+                    methodHit = methodHit + 1;
+                }
+            };
+            ShimAppSettingsHelper.AllInstances.GetAppTopNavLastNodeIdInt32 = (_, __) => -1;
+            ShimCacheStore.CurrentGet = () => new ShimCacheStore()
+            {
+                RemoveSafelyStringStringString = (_, _1, _2) =>
+                {
+                    methodHit = methodHit + 1;
+                }
+            };
+            spWeb.Update = () =>
+            {
+                methodHit = methodHit + 1;
+            };
+
+            // Act
+            privateObj.Invoke(
+                CreateParentNodeMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { appId, nodeType, title, url, isExternal, spUser });
+
+            // Assert
+            methodHit.ShouldBe(4);
+        }
+
+        [TestMethod]
+        public void CreateParentNode_QuickLaunchTypeAppIdNegativeNavIDNegative_CreatesParentNode()
+        {
+            // Arrange
+            const int appId = -1;
+            const string nodeType = "quiklnch";
+            const string title = "title";
+            const string url = "url";
+            const bool isExternal = true;
+            const int expectedId = 1111;
+
+            var spUser = new ShimSPUser().Instance;
+            var methodHit = 0;
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                QuickLaunchGet = () => new ShimSPNavigationNodeCollection()
+                {
+                    AddAsLastSPNavigationNode = _ => new ShimSPNavigationNode()
+                    {
+                        IdGet = () => expectedId,
+                        Update = () =>
+                        {
+                            methodHit = methodHit + 1;
+                        }
+                    }
+                },
+                GetNodeByIdInt32 = id => new ShimSPNavigationNode()
+                {
+                    IdGet = () => id
+                },
+            };
+            ShimAppSettingsHelper.AllInstances.GetCleanUrlString = (_, input) => input;
+            ShimAppSettingsHelper.AllInstances.GetAppTopNavLastNodeIdInt32 = (_, __) => -1;
+            ShimCacheStore.CurrentGet = () => new ShimCacheStore()
+            {
+                RemoveSafelyStringStringString = (_, _1, _2) =>
+                {
+                    methodHit = methodHit + 1;
+                }
+            };
+            spWeb.Update = () =>
+            {
+                methodHit = methodHit + 1;
+            };
+
+            // Act
+            privateObj.Invoke(
+                CreateParentNodeMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { appId, nodeType, title, url, isExternal, spUser });
+
+            // Assert
+            methodHit.ShouldBe(3);
         }
     }
 }
