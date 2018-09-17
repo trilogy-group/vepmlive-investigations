@@ -127,6 +127,13 @@ namespace EPMLiveCore
         [TestCase(PropertyDataSource)]
         [TestCase(PropertyChoices)]
         [TestCase(PropertyHiddenFieldName)]
+        [TestCase(Fieldm_dropList)]
+        [TestCase(Fieldm_tbx)]
+        [TestCase(Fieldm_dropImage)]
+        [TestCase(Fieldm_value)]
+        [TestCase(Fieldm_selectedValueIndex)]
+        [TestCase(Fieldm_webForeign)]
+        [TestCase(Fieldm_hasValueSet)]
         public void AUT_CascadingLookupRenderControl_All_Properties_Explore_Verify_By_Name_Test(string name)
         {
             // Arrange
@@ -156,13 +163,6 @@ namespace EPMLiveCore
         [TestCase(Fieldm_dataSource)]
         [TestCase(Field_lookupList)]
         [TestCase(Fieldm_throttled)]
-        [TestCase(Fieldm_dropList)]
-        [TestCase(Fieldm_tbx)]
-        [TestCase(Fieldm_dropImage)]
-        [TestCase(Fieldm_value)]
-        [TestCase(Fieldm_selectedValueIndex)]
-        [TestCase(Fieldm_webForeign)]
-        [TestCase(Fieldm_hasValueSet)]
         public void AUT_CascadingLookupRenderControl_All_Fields_Explore_Verify_By_Name_Test(string name)
         {
             // Arrange
