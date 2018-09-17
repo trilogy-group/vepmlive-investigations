@@ -50,6 +50,10 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         private const string ColumnSharePointType = "SharePointType";
         private const string ColumnTitle = "Title";
         private const string BubbleAxisColumn = "BubbleAxis";
+        private const string MethodOnInit = "OnInit";
+        private const string Sum = "Sum";
+        private const string Avg = "Avg";
+        private const string CategorySqlColumn = "CategorySql";
         private readonly Guid DummyGuid = Guid.NewGuid();
         private RC.ReportingChart _testObject;
         private PrivateObject _privateObject;
@@ -85,7 +89,7 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             _htmlWriter = new HtmlTextWriter(_stringWriter);
             _webClosed = false;
 
-            _privateObject.Invoke("OnInit", new object[] { EventArgs.Empty });
+            _privateObject.Invoke(MethodOnInit, new object[] { EventArgs.Empty });
         }
 
         [TestCleanup]
@@ -224,202 +228,520 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         }
 
         [TestMethod]
-        public void BuildSeries_Area_()
+        public void BuildSeries_Area_SetsAreaSeries()
         {
             // Arrange
-            var chart = new RadHtmlChart();
-            _privateObject.SetFieldOrProperty(FieldRadChart, chart);
-            _testObject.PropChartSelectedListTitle = DummyString;
-            _testObject.PropChartSelectedViewTitle = DummyString;
-            _testObject.PropChartAggregationType = Count;
-            _testObject.PropChartType = ChartType.Area;
-            _testObject.PropChartXaxisField = DummyString;
-            _testObject.PropChartSelectedPaletteName = ColorBlue;
-            _testObject.PropYaxisFormat = FormatPercentage;
-            ShimReportBiz.AllInstances.SiteExists = _ => true;
-            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
-                (a, b, c, d, e) => GetDataTable();
+            var chart = SetPropertiesForSeriesType(ChartType.Area);
 
             // Act
             _testObject.BuildSeries();
 
             // Assert
-            var serie = chart.PlotArea.Series[0];
             this.ShouldSatisfyAllConditions(
                 () => chart.PlotArea.Series.Count.ShouldBe(1),
                 () => AssertAreaSeries(chart.PlotArea.Series[0]));
         }
 
         [TestMethod]
-        public void BuildSeries_Bar_()
+        public void BuildSeries_AreaSum_SetsAreaSeriesWithCategoryColumnName()
         {
             // Arrange
-            var chart = new RadHtmlChart();
-            _privateObject.SetFieldOrProperty(FieldRadChart, chart);
-            _testObject.PropChartSelectedListTitle = DummyString;
-            _testObject.PropChartSelectedViewTitle = DummyString;
-            _testObject.PropChartAggregationType = Count;
-            _testObject.PropChartType = ChartType.Bar;
-            _testObject.PropChartXaxisField = DummyString;
-            _testObject.PropChartSelectedPaletteName = ColorBlue;
-            _testObject.PropYaxisFormat = FormatPercentage;
-            ShimReportBiz.AllInstances.SiteExists = _ => true;
-            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
-                (a, b, c, d, e) => GetDataTable();
+            var chart = SetPropertiesForSeriesType(ChartType.Area);
+            _testObject.PropChartAggregationType = Sum;
 
             // Act
             _testObject.BuildSeries();
 
             // Assert
-            var serie = chart.PlotArea.Series[0];
             this.ShouldSatisfyAllConditions(
-                () => chart.PlotArea.Series.Count.ShouldBe(1)
-                );
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertAreaSeries(chart.PlotArea.Series[0], CategorySqlColumn));
         }
 
         [TestMethod]
-        public void BuildSeries_Bubble_()
+        public void BuildSeries_AreaAvg_SetsAreaSeriesWithCategoryColumnName()
         {
             // Arrange
-            var chart = new RadHtmlChart();
-            _privateObject.SetFieldOrProperty(FieldRadChart, chart);
-            _testObject.PropChartSelectedListTitle = DummyString;
-            _testObject.PropChartSelectedViewTitle = DummyString;
-            _testObject.PropChartAggregationType = Count;
-            _testObject.PropChartType = ChartType.Bubble;
-            _testObject.PropChartSelectedPaletteName = ColorBlue;
-            _testObject.PropYaxisFormat = FormatPercentage;
-            _testObject.PropChartXaxisField = BubbleAxisColumn;
-            _testObject.PropChartYaxisField = BubbleAxisColumn;
-            _testObject.PropChartZaxisField = BubbleAxisColumn;
-            _testObject.PropBubbleChartGroupBy = DummyString;
-            ShimReportBiz.AllInstances.SiteExists = _ => true;
-            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
-                (a, b, c, d, e) => GetDataTable();
+            var chart = SetPropertiesForSeriesType(ChartType.Area);
+            _testObject.PropChartAggregationType = Avg;
 
             // Act
             _testObject.BuildSeries();
 
             // Assert
-            var serie = chart.PlotArea.Series[0];
             this.ShouldSatisfyAllConditions(
-                () => chart.PlotArea.Series.Count.ShouldBe(1)
-                );
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertAreaSeries(chart.PlotArea.Series[0], CategorySqlColumn));
         }
 
         [TestMethod]
-        public void BuildSeries_Column_()
+        public void BuildSeries_AreaClustered_SetsAreaSeriesWithCategoryValue()
         {
             // Arrange
-            var chart = new RadHtmlChart();
-            _privateObject.SetFieldOrProperty(FieldRadChart, chart);
-            _testObject.PropChartSelectedListTitle = DummyString;
-            _testObject.PropChartSelectedViewTitle = DummyString;
-            _testObject.PropChartAggregationType = Count;
-            _testObject.PropChartType = ChartType.Column;
-            _testObject.PropChartXaxisField = DummyString;
-            _testObject.PropChartSelectedPaletteName = ColorBlue;
-            _testObject.PropYaxisFormat = FormatPercentage;
-            ShimReportBiz.AllInstances.SiteExists = _ => true;
-            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
-                (a, b, c, d, e) => GetDataTable();
+            var chart = SetPropertiesForSeriesType(ChartType.Area_Clustered);
 
             // Act
             _testObject.BuildSeries();
 
             // Assert
-            var serie = chart.PlotArea.Series[0];
             this.ShouldSatisfyAllConditions(
-                () => chart.PlotArea.Series.Count.ShouldBe(1)
-                );
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertAreaSeries(chart.PlotArea.Series[0], One));
         }
 
         [TestMethod]
-        public void BuildSeries_Donut_()
+        public void BuildSeries_AreaClusteredSum_SetsAreaSeriesWithCategoryColumnName()
         {
             // Arrange
-            var chart = new RadHtmlChart();
-            _privateObject.SetFieldOrProperty(FieldRadChart, chart);
-            _testObject.PropChartSelectedListTitle = DummyString;
-            _testObject.PropChartSelectedViewTitle = DummyString;
-            _testObject.PropChartAggregationType = Count;
-            _testObject.PropChartType = ChartType.Donut;
-            _testObject.PropChartXaxisField = DummyString;
-            _testObject.PropChartSelectedPaletteName = ColorBlue;
-            _testObject.PropYaxisFormat = FormatPercentage;
-            ShimReportBiz.AllInstances.SiteExists = _ => true;
-            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
-                (a, b, c, d, e) => GetDataTable();
+            var chart = SetPropertiesForSeriesType(ChartType.Area_Clustered);
+            _testObject.PropChartAggregationType = Sum;
 
             // Act
             _testObject.BuildSeries();
 
             // Assert
-            var serie = chart.PlotArea.Series[0];
             this.ShouldSatisfyAllConditions(
-                () => chart.PlotArea.Series.Count.ShouldBe(1)
-                );
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertAreaSeries(chart.PlotArea.Series[0], CategorySqlColumn));
         }
 
         [TestMethod]
-        public void BuildSeries_Line_()
+        public void BuildSeries_AreaClusteredAvg_SetsAreaSeriesWithCategoryColumnName()
         {
             // Arrange
-            var chart = new RadHtmlChart();
-            _privateObject.SetFieldOrProperty(FieldRadChart, chart);
-            _testObject.PropChartSelectedListTitle = DummyString;
-            _testObject.PropChartSelectedViewTitle = DummyString;
-            _testObject.PropChartAggregationType = Count;
-            _testObject.PropChartType = ChartType.Line;
-            _testObject.PropChartXaxisField = DummyString;
-            _testObject.PropChartSelectedPaletteName = ColorBlue;
-            _testObject.PropYaxisFormat = FormatPercentage;
-            ShimReportBiz.AllInstances.SiteExists = _ => true;
-            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
-                (a, b, c, d, e) => GetDataTable();
+            var chart = SetPropertiesForSeriesType(ChartType.Area_Clustered);
+            _testObject.PropChartAggregationType = Avg;
 
             // Act
             _testObject.BuildSeries();
 
             // Assert
-            var serie = chart.PlotArea.Series[0];
             this.ShouldSatisfyAllConditions(
-                () => chart.PlotArea.Series.Count.ShouldBe(1)
-                );
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertAreaSeries(chart.PlotArea.Series[0], CategorySqlColumn));
         }
 
         [TestMethod]
-        public void BuildSeries_Pie_()
+        public void BuildSeries_Bar_SetsBarSeries()
         {
             // Arrange
-            var chart = new RadHtmlChart();
-            _privateObject.SetFieldOrProperty(FieldRadChart, chart);
-            _testObject.PropChartSelectedListTitle = DummyString;
-            _testObject.PropChartSelectedViewTitle = DummyString;
-            _testObject.PropChartAggregationType = Count;
-            _testObject.PropChartType = ChartType.Pie;
-            _testObject.PropChartXaxisField = DummyString;
-            _testObject.PropChartSelectedPaletteName = ColorBlue;
-            _testObject.PropYaxisFormat = FormatPercentage;
-            ShimReportBiz.AllInstances.SiteExists = _ => true;
-            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
-                (a, b, c, d, e) => GetDataTable();
+            var chart = SetPropertiesForSeriesType(ChartType.Bar);
 
             // Act
             _testObject.BuildSeries();
 
             // Assert
-            var serie = chart.PlotArea.Series[0];
             this.ShouldSatisfyAllConditions(
-                () => chart.PlotArea.Series.Count.ShouldBe(1)
-                );
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBarSeries(chart.PlotArea.Series[0]));
         }
 
-        private void AssertAreaSeries(SeriesBase series)
+        [TestMethod]
+        public void BuildSeries_BarClustered_SetsStackedBarSeriesWithCategoryValue()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bar_Clustered);
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBarSeries(chart.PlotArea.Series[0], false, One));
+        }
+
+        [TestMethod]
+        public void BuildSeries_BarStacked_SetsStackedBarSeriesWithCategoryValue()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bar_Stacked);
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBarSeries(chart.PlotArea.Series[0], true, One));
+        }
+
+        [TestMethod]
+        public void BuildSeries_Bar100Percent_SetsStackedBarSeriesWithCategoryValue()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bar_100Percent);
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBarSeries(chart.PlotArea.Series[0], true, One));
+        }
+
+        [TestMethod]
+        public void BuildSeries_Bar100PercentSum_SetsStackedBarSeriesWithCategoryColumnName()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bar_100Percent);
+            _testObject.PropChartAggregationType = Sum;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBarSeries(chart.PlotArea.Series[0], true, CategorySqlColumn));
+        }
+
+        [TestMethod]
+        public void BuildSeries_Bar100PercentAvg_SetsStackedBarSeriesWithCategoryColumnName()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bar_100Percent);
+            _testObject.PropChartAggregationType = Avg;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBarSeries(chart.PlotArea.Series[0], true, CategorySqlColumn));
+        }
+
+        [TestMethod]
+        public void BuildSeries_BubbleNoFormat_SetsBubbleSeriesWithNoFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bubble);
+            _testObject.PropYaxisFormat = string.Empty;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBubbleSeries(chart.PlotArea.Series[0], string.Empty));
+        }
+
+        [TestMethod]
+        public void BuildSeries_BubbleDummyFormat_SetsBubbleSeriesWithDefaultFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bubble);
+            _testObject.PropYaxisFormat = DummyString;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            var format = $"{DummyString} = {{0}} <br/>{DummyString} = {{1}} <br/>{DummyString} = {{2}} <br/>Title = {{3}}";
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBubbleSeries(chart.PlotArea.Series[0], format));
+        }
+
+        [TestMethod]
+        public void BuildSeries_BubblePercentage_SetsBubbleSeriesWithPercentageFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bubble);
+            _testObject.PropYaxisFormat = FormatPercentage;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            var format = $"{DummyString} = {{0:p}} <br/>{DummyString} = {{1:p}} <br/>{DummyString} = {{2:p}} <br/>Title = {{3}}";
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBubbleSeries(chart.PlotArea.Series[0], format));
+        }
+
+        [TestMethod]
+        public void BuildSeries_BubbleCurrency_SetsBubbleSeriesWithCurrencyFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bubble);
+            _testObject.PropYaxisFormat = FormatCurrency;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            var format = $"{DummyString} = {{0:c}} <br/>{DummyString} = {{1:c}} <br/>{DummyString} = {{2:c}} <br/>Title = {{3}}";
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBubbleSeries(chart.PlotArea.Series[0], format));
+        }
+
+        [TestMethod]
+        public void BuildSeries_ColumnPercentage_SetsColumnSeriesWithPercentageFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Column);
+            _testObject.PropYaxisFormat = FormatPercentage;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertColumnSeries(chart.PlotArea.Series[0], FormatStringPercentage));
+        }
+
+        [TestMethod]
+        public void BuildSeries_ColumnCurrency_SetsColumnSeriesWithCurrencyFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Column);
+            _testObject.PropYaxisFormat = FormatCurrency;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertColumnSeries(chart.PlotArea.Series[0], FormatStringCurrency));
+        }
+
+        [TestMethod]
+        public void BuildSeries_ColumnClustered_SetsStackedColumnSeriesWithCategoryValue()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Column_Clustered);
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertStackedColumnSeries(chart.PlotArea.Series[0], One, false));
+        }
+
+        [TestMethod]
+        public void BuildSeries_ColumnStacked_SetsStackedColumnSeriesWithCategoryValue()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Column_Stacked);
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertStackedColumnSeries(chart.PlotArea.Series[0], One));
+        }
+
+        [TestMethod]
+        public void BuildSeries_Column100Percent_SetsStackedColumnSeriesWithCategoryValue()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Column_100Percent);
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertStackedColumnSeries(chart.PlotArea.Series[0], One));
+        }
+
+        [TestMethod]
+        public void BuildSeries_DonutPercentage_SetsDonutSeriesWithPercentageFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Donut);
+            _testObject.PropYaxisFormat = FormatPercentage;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertDonutSeries(chart.PlotArea.Series[0], FormatStringPercentage));
+        }
+
+        [TestMethod]
+        public void BuildSeries_DonutCurrency_SetsDonutSeriesWithCurrencyFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Donut);
+            _testObject.PropYaxisFormat = FormatCurrency;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertDonutSeries(chart.PlotArea.Series[0], FormatStringCurrency),
+                () => chart.PlotArea.XAxis.MajorGridLines.Visible.ShouldBeFalse(),
+                () => chart.PlotArea.XAxis.MinorGridLines.Visible.ShouldBeFalse(),
+                () => chart.PlotArea.YAxis.MajorGridLines.Visible.ShouldBeFalse(),
+                () => chart.PlotArea.YAxis.MinorGridLines.Visible.ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void BuildSeries_DonutSum_SetsDonutSeriesWithCategoryColumnName()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Donut);
+            _testObject.PropChartAggregationType = Sum;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertDonutSeries(chart.PlotArea.Series[0], seriesName: CategorySqlColumn));
+        }
+
+        [TestMethod]
+        public void BuildSeries_DonutAvg_SetsDonutSeriesWithCategoryColumnName()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Donut);
+            _testObject.PropChartAggregationType = Avg;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertDonutSeries(chart.PlotArea.Series[0], seriesName: CategorySqlColumn));
+        }
+
+        [TestMethod]
+        public void BuildSeries_LinePercentage_SetsLineSeriesWithPercentageFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Line);
+            _testObject.PropYaxisFormat = FormatPercentage;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertLineSeries(chart.PlotArea.Series[0]));
+        }
+
+        [TestMethod]
+        public void BuildSeries_LineCurrency_SetsLineSeriesWithCurrencyFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Line);
+            _testObject.PropYaxisFormat = FormatCurrency;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertLineSeries(chart.PlotArea.Series[0], FormatStringCurrency));
+        }
+
+        [TestMethod]
+        public void BuildSeries_LineClustered_SetsLineSeriesWithCategoryValue()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Line_Clustered);
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertLineSeries(chart.PlotArea.Series[0], seriesName: One));
+        }
+
+        [TestMethod]
+        public void BuildSeries_Pie_SetsPieSeriesWithPercentageFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Pie);
+            _testObject.PropYaxisFormat = FormatPercentage;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertPieSeries(chart.PlotArea.Series[0]));
+        }
+
+        [TestMethod]
+        public void BuildSeries_Pie_SetsPieSeriesWithCurrencyFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Pie);
+            _testObject.PropYaxisFormat = FormatCurrency;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertPieSeries(chart.PlotArea.Series[0], FormatStringCurrency));
+        }
+
+        private RadHtmlChart SetPropertiesForSeriesType(ChartType type)
+        {
+            var chart = new RadHtmlChart();
+            _privateObject.SetFieldOrProperty(FieldRadChart, chart);
+            _testObject.PropChartSelectedListTitle = DummyString;
+            _testObject.PropChartSelectedViewTitle = DummyString;
+            _testObject.PropChartAggregationType = Count;
+            _testObject.PropChartSelectedPaletteName = ColorBlue;
+            _testObject.PropYaxisFormat = FormatPercentage;
+            _testObject.PropChartType = type;
+            _testObject.PropChartXaxisFieldLabel = DummyString;
+            _testObject.PropChartYaxisFieldLabel = DummyString;
+            _testObject.PropChartZaxisFieldLabel = DummyString;
+
+            if (type == ChartType.Bubble)
+            {
+                _testObject.PropChartXaxisField = BubbleAxisColumn;
+                _testObject.PropChartYaxisField = BubbleAxisColumn;
+                _testObject.PropChartZaxisField = BubbleAxisColumn;
+                _testObject.PropBubbleChartGroupBy = DummyString;
+            }
+            else
+            {
+                _testObject.PropChartXaxisField = DummyString;
+                _testObject.PropChartYaxisField = CategorySqlColumn;
+            }
+
+            ShimReportBiz.AllInstances.SiteExists = _ => true;
+            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
+                (a, b, c, d, e) => GetDataTable();
+            return chart;
+        }
+
+        private void AssertAreaSeries(SeriesBase series, string seriesName = DummyString)
         {
             var area = series as AreaSeries;
             series.ShouldSatisfyAllConditions(
-                () => series.Name.ShouldBe(DummyString),
+                () => series.Name.ShouldBe(seriesName),
                 () => series.Items.Count.ShouldBe(1),
                 () => area.ShouldNotBeNull(),
                 () => area.LabelsAppearance.DataFormatString.ShouldBe(FormatStringPercentage),
@@ -427,7 +749,92 @@ namespace EPMLiveWebParts.Tests.ReportingChart
                 () => area.TooltipsAppearance.DataFormatString.ShouldBe(FormatStringPercentage));
         }
 
-        private DataTable GetDataTable(string spType = DummyString)
+        private void AssertBarSeries(SeriesBase series, bool stacked = false, string seriesName = DummyString)
+        {
+            var position = stacked ? BarColumnLabelsPosition.Center : BarColumnLabelsPosition.OutsideEnd;
+            var area = series as BarSeries;
+            series.ShouldSatisfyAllConditions(
+                () => series.Name.ShouldBe(seriesName),
+                () => series.Items.Count.ShouldBe(1),
+                () => area.ShouldNotBeNull(),
+                () => area.LabelsAppearance.DataFormatString.ShouldBe(FormatStringPercentage),
+                () => area.TooltipsAppearance.DataFormatString.ShouldBe(FormatStringPercentage),
+                () => area.Stacked.ShouldBe(stacked),
+                () => area.LabelsAppearance.Position.ShouldBe(position));
+        }
+
+        private void AssertBubbleSeries(SeriesBase series, string format)
+        {
+            var area = series as BubbleSeries;
+            series.ShouldSatisfyAllConditions(
+                () => series.Name.ShouldBe(DummyString),
+                () => series.Items.Count.ShouldBe(1),
+                () => area.ShouldNotBeNull(),
+                () => area.TooltipsAppearance.DataFormatString.ShouldBe(format));
+        }
+
+        private void AssertColumnSeries(SeriesBase series, string format)
+        {
+            var area = series as ColumnSeries;
+            series.ShouldSatisfyAllConditions(
+                () => series.Name.ShouldBe(DummyString),
+                () => series.Items.Count.ShouldBe(1),
+                () => area.ShouldNotBeNull(),
+                () => area.LabelsAppearance.DataFormatString.ShouldBe(format),
+                () => area.TooltipsAppearance.DataFormatString.ShouldBe(format),
+                () => area.Stacked.ShouldBeFalse(),
+                () => area.LabelsAppearance.Position.ShouldBe(BarColumnLabelsPosition.OutsideEnd));
+        }
+
+        private void AssertStackedColumnSeries(SeriesBase series, string seriesName = DummyString, bool stacked = true)
+        {
+            var position = stacked ? BarColumnLabelsPosition.InsideEnd : BarColumnLabelsPosition.OutsideEnd;
+            var area = series as ColumnSeries;
+            series.ShouldSatisfyAllConditions(
+                () => series.Name.ShouldBe(seriesName),
+                () => series.Items.Count.ShouldBe(1),
+                () => area.ShouldNotBeNull(),
+                () => area.LabelsAppearance.DataFormatString.ShouldBe(FormatStringPercentage),
+                () => area.TooltipsAppearance.DataFormatString.ShouldBe(FormatStringPercentage),
+                () => area.Stacked.ShouldBe(stacked),
+                () => area.LabelsAppearance.Position.ShouldBe(position));
+        }
+
+        private void AssertDonutSeries(SeriesBase series, string format = FormatStringPercentage, string seriesName = DummyString)
+        {
+            var area = series as DonutSeries;
+            series.ShouldSatisfyAllConditions(
+                () => series.Name.ShouldBe(seriesName),
+                () => series.Items.Count.ShouldBe(1),
+                () => area.ShouldNotBeNull(),
+                () => area.LabelsAppearance.Position = PieLabelsPosition.Column,
+                () => area.LabelsAppearance.DataFormatString.ShouldBe(format),
+                () => area.TooltipsAppearance.DataFormatString.ShouldBe($"{seriesName} = {{0:{format}}}"));
+        }
+
+        private void AssertLineSeries(SeriesBase series, string format = FormatStringPercentage, string seriesName = DummyString)
+        {
+            var area = series as LineSeries;
+            series.ShouldSatisfyAllConditions(
+                () => series.Name.ShouldBe(seriesName),
+                () => series.Items.Count.ShouldBe(1),
+                () => area.ShouldNotBeNull(),
+                () => area.LabelsAppearance.DataFormatString.ShouldBe(format),
+                () => area.TooltipsAppearance.DataFormatString.ShouldBe(format));
+        }
+
+        private void AssertPieSeries(SeriesBase series, string format = FormatStringPercentage, string seriesName = DummyString)
+        {
+            var area = series as PieSeries;
+            series.ShouldSatisfyAllConditions(
+                () => series.Name.ShouldBe(seriesName),
+                () => series.Items.Count.ShouldBe(1),
+                () => area.ShouldNotBeNull(),
+                () => area.LabelsAppearance.DataFormatString.ShouldBe(format),
+                () => area.TooltipsAppearance.DataFormatString.ShouldBe(format));
+        }
+
+        private DataTable GetDataTable(int numberOfRows = 1, string spType = DummyString)
         {
             var dt = new DataTable();
             dt.Columns.Add(DummyString);
@@ -437,7 +844,13 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             dt.Columns.Add(ColumnSharePointType);
             dt.Columns.Add(ColumnTitle);
             dt.Columns.Add(BubbleAxisColumn);
-            dt.Rows.Add(DummyString, DummyString, DummyString, DummyString, spType, One);
+            dt.Columns.Add(CategorySqlColumn);
+
+            for (int i = 0; i < numberOfRows; i++)
+            {
+                dt.Rows.Add(DummyString, DummyString, DummyString, DummyString, spType, DummyString, One, One);
+            }
+
             return dt;
         }
 
