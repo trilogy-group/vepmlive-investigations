@@ -237,13 +237,20 @@ function ShowPool() {
 }
 
 function ShowUserPopup(spaccount) {
-    var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('listform.aspx');
-    var urlBuilder = new SP.Utilities.UrlBuilder(layoutsUrl);
-    var url = urlBuilder.get_url() + "?PageType=4&ListId=" + sUserInfoList + "&ID=" + spaccount.split(';')[0];
-
-    var options = { url: url, width: 650, height: 600, title: "User Information" };
-
-    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+	return $.ajax({
+		url: _spPageContextInfo.siteServerRelativeUrl + "/_api/web/lists('" + sUserInfoList + "')/DefaultDisplayFormUrl",
+		type: "GET",
+		headers: {
+			"accept": "application/json;odata=verbose",
+			"content-type": "application/json;odata=verbose",
+			"X-RequestDigest'": $("#__REQUESTDIGEST").val()
+		}
+	}).done(function (data, status, xhr) {
+		var formUrl = data.d.DefaultDisplayFormUrl;
+		var url = formUrl + "?Force=True&ID=" + spaccount.split(';')[0];
+		var options = { url: url, width: 650, height: 600, title: "User Information" };
+		SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+	});
 
 }
 
