@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.Fakes;
+using System.Xml;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.ReportHelper.Fakes;
 using EPMLiveCore.ReportingProxy.Fakes;
@@ -21,10 +22,13 @@ using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.WebControls.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ReportFiltering.DomainServices;
+using ReportFiltering.DomainServices.Fakes;
 using Shouldly;
 using Telerik.Web.UI;
 using Telerik.Web.UI.HtmlChart;
 using RC = EPMLiveWebParts.ReportingChart;
+using WP = EPMLiveWebParts;
 
 namespace EPMLiveWebParts.Tests.ReportingChart
 {
@@ -38,22 +42,25 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         private const string ControlSize = "200";
         private const string MethodCreateChildControls = "CreateChildControls";
         private const string Count = "Count";
+        private const string Sum = "Sum";
+        private const string Avg = "Avg";
         private const string InternalName = "InternalName";
         private const string DisplayName = "DisplayName";
+        private const string ColorBlue = "Blue";
         private const string FormatPercentage = "Percentage";
         private const string FormatCurrency = "Currency";
-        private const string ColorBlue = "Blue";
-        private const string FieldRadChart = "_radChart";
+        private const string NoValueSpecified = "No Value Specified";
         private const string FormatStringPercentage = "p";
         private const string FormatStringCurrency = "c";
         private const string FormatStringNone = "n";
         private const string ColumnSharePointType = "SharePointType";
         private const string ColumnTitle = "Title";
         private const string BubbleAxisColumn = "BubbleAxis";
-        private const string MethodOnInit = "OnInit";
-        private const string Sum = "Sum";
-        private const string Avg = "Avg";
         private const string CategorySqlColumn = "CategorySql";
+        private const string FieldRadChart = "_radChart";
+        private const string MethodOnInit = "OnInit";
+        private const string MethodGetSeriesItems = "GetSeriesItems";
+        private const string MethodGetDataForBubbleSeries = "GetDataForBubbleSeries";
         private readonly Guid DummyGuid = Guid.NewGuid();
         private RC.ReportingChart _testObject;
         private PrivateObject _privateObject;
@@ -228,10 +235,12 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         }
 
         [TestMethod]
-        public void BuildSeries_Area_SetsAreaSeries()
+        public void BuildSeries_AreaMultipleCategory_SetsAreaSeries()
         {
             // Arrange
             var chart = SetPropertiesForSeriesType(ChartType.Area);
+            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
+                (a, b, c, d, e) => GetDataTableWithMultipleCategories();
 
             // Act
             _testObject.BuildSeries();
@@ -240,6 +249,38 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             this.ShouldSatisfyAllConditions(
                 () => chart.PlotArea.Series.Count.ShouldBe(1),
                 () => AssertAreaSeries(chart.PlotArea.Series[0]));
+        }
+
+        [TestMethod]
+        public void BuildSeries_AreaPercentage_SetsAreaSeries()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Area);
+            _testObject.PropYaxisFormat = FormatPercentage;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertAreaSeries(chart.PlotArea.Series[0]));
+        }
+
+        [TestMethod]
+        public void BuildSeries_AreaCurrency_SetsAreaSeries()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Area);
+            _testObject.PropYaxisFormat = FormatCurrency;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertAreaSeries(chart.PlotArea.Series[0], format: FormatStringCurrency));
         }
 
         [TestMethod]
@@ -290,6 +331,23 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         }
 
         [TestMethod]
+        public void BuildSeries_AreaClusteredWithNullCategory_SetsAreaSeriesWithCategoryValue()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Area_Clustered);
+            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
+                (a, b, c, d, e) => GetDataTableWithNullCategory();
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertAreaSeries(chart.PlotArea.Series[0], One));
+        }
+
+        [TestMethod]
         public void BuildSeries_AreaClusteredSum_SetsAreaSeriesWithCategoryColumnName()
         {
             // Arrange
@@ -322,7 +380,7 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         }
 
         [TestMethod]
-        public void BuildSeries_Bar_SetsBarSeries()
+        public void BuildSeries_BarPercentage_SetsBarSeries()
         {
             // Arrange
             var chart = SetPropertiesForSeriesType(ChartType.Bar);
@@ -334,6 +392,22 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             this.ShouldSatisfyAllConditions(
                 () => chart.PlotArea.Series.Count.ShouldBe(1),
                 () => AssertBarSeries(chart.PlotArea.Series[0]));
+        }
+
+        [TestMethod]
+        public void BuildSeries_BarCurrency_SetsBarSeries()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bar);
+            _testObject.PropYaxisFormat = FormatCurrency;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBarSeries(chart.PlotArea.Series[0], format: FormatStringCurrency));
         }
 
         [TestMethod]
@@ -382,6 +456,23 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         }
 
         [TestMethod]
+        public void BuildSeries_Bar100PercentWithNullCategory_SetsStackedBarSeriesWithCategoryValue()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bar_100Percent);
+            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
+                (a, b, c, d, e) => GetDataTableWithNullCategory();
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBarSeries(chart.PlotArea.Series[0], true, One));
+        }
+
+        [TestMethod]
         public void BuildSeries_Bar100PercentSum_SetsStackedBarSeriesWithCategoryColumnName()
         {
             // Arrange
@@ -398,11 +489,47 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         }
 
         [TestMethod]
+        public void BuildSeries_Bar100PercentSumWithNullCategory_SetsStackedBarSeriesWithCategoryColumnName()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bar_100Percent);
+            _testObject.PropChartAggregationType = Sum;
+            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
+                (a, b, c, d, e) => GetDataTableWithNullCategory();
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBarSeries(chart.PlotArea.Series[0], true, CategorySqlColumn));
+        }
+
+        [TestMethod]
         public void BuildSeries_Bar100PercentAvg_SetsStackedBarSeriesWithCategoryColumnName()
         {
             // Arrange
             var chart = SetPropertiesForSeriesType(ChartType.Bar_100Percent);
             _testObject.PropChartAggregationType = Avg;
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBarSeries(chart.PlotArea.Series[0], true, CategorySqlColumn));
+        }
+
+        [TestMethod]
+        public void BuildSeries_Bar100PercentAvgWithNullCategory_SetsStackedBarSeriesWithCategoryColumnName()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bar_100Percent);
+            _testObject.PropChartAggregationType = Avg;
+            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
+                (a, b, c, d, e) => GetDataTableWithNullCategory();
 
             // Act
             _testObject.BuildSeries();
@@ -461,6 +588,41 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             this.ShouldSatisfyAllConditions(
                 () => chart.PlotArea.Series.Count.ShouldBe(1),
                 () => AssertBubbleSeries(chart.PlotArea.Series[0], format));
+        }
+
+        [TestMethod]
+        public void BuildSeries_BubbleNoGroupBy_SetsBubbleSeriesWithPercentageFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bubble);
+            _testObject.PropBubbleChartGroupBy = "none";
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            var format = $"{DummyString} = {{0:p}} <br/>{DummyString} = {{1:p}} <br/>{DummyString} = {{2:p}} <br/>Title = {{3}}";
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBubbleSeries(chart.PlotArea.Series[0], format));
+        }
+
+        [TestMethod]
+        public void BuildSeries_BubbleNullCategory_SetsBubbleSeriesWithPercentageFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bubble);
+            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
+                (a, b, c, d, e) => GetDataTableWithNullCategory();
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            var format = $"{DummyString} = {{0:p}} <br/>{DummyString} = {{1:p}} <br/>{DummyString} = {{2:p}} <br/>Title = {{3}}";
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBubbleSeries(chart.PlotArea.Series[0], format, NoValueSpecified));
         }
 
         [TestMethod]
@@ -704,6 +866,66 @@ namespace EPMLiveWebParts.Tests.ReportingChart
                 () => AssertPieSeries(chart.PlotArea.Series[0], FormatStringCurrency));
         }
 
+        [TestMethod]
+        public void GetSeriesItems_NoSelectedItem_ReturnsEmpty()
+        {
+            // Arrange
+            _testObject.PropChartSelectedListTitle = null;
+            _testObject.PropChartSelectedViewTitle = null;
+
+            // Act
+            var result = _privateObject.Invoke(MethodGetSeriesItems);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBeOfType<Dictionary<string, List<SeriesItem>>>(),
+                () => ((Dictionary<string, List<SeriesItem>>)result).ShouldBeEmpty());
+        }
+
+        [TestMethod]
+        public void GetSeriesItems_Get_ReturnsSeriesDictionary()
+        {
+            // Arrange
+            var queriesMerged = false;
+            _testObject.PropChartSelectedListTitle = DummyString;
+            _testObject.PropChartSelectedViewTitle = DummyString;
+            _testObject.PropChartType = ChartType.Area;
+            _testObject.PropChartAggregationType = Sum;
+            _testObject.PropChartXaxisField = DummyString;
+            _testObject.PropChartYaxisField = CategorySqlColumn;
+            _testObject.ReportIDConsumer(new WP.ReportingFilter
+            {
+                ID = Guid.NewGuid().ToString()
+            });
+            ShimTitleFilterQueryService.AllInstances.MergeExistingQueryWithTitleQuerySPListGuidXmlDocumentRef =
+                (TitleFilterQueryService a, SPList b, Guid c, ref XmlDocument d) => { queriesMerged = true; };
+            ShimReportBiz.AllInstances.SiteExists = _ => true;
+            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
+                (a, b, c, d, e) => GetDataTable();
+
+            // Act
+            var result = _privateObject.Invoke(MethodGetSeriesItems);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => queriesMerged.ShouldBeTrue(),
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBeOfType<Dictionary<string, List<SeriesItem>>>(),
+                () => AssertSeriesDictionary((Dictionary<string, List<SeriesItem>>)result));
+        }
+
+        //[TestMethod]
+        //public void GetDataForBubbleSeries_()
+        //{
+        //    // Arrange
+
+        //    // Act
+        //    var result = _privateObject.Invoke(MethodGetDataForBubbleSeries, new object[] { GetDataTable(), DummyString, CategorySqlColumn, CategorySqlColumn, "none" });
+
+        //    // Assert
+        //}
+
         private RadHtmlChart SetPropertiesForSeriesType(ChartType type)
         {
             var chart = new RadHtmlChart();
@@ -737,19 +959,19 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             return chart;
         }
 
-        private void AssertAreaSeries(SeriesBase series, string seriesName = DummyString)
+        private void AssertAreaSeries(SeriesBase series, string seriesName = DummyString, string format = FormatStringPercentage)
         {
             var area = series as AreaSeries;
             series.ShouldSatisfyAllConditions(
                 () => series.Name.ShouldBe(seriesName),
                 () => series.Items.Count.ShouldBe(1),
                 () => area.ShouldNotBeNull(),
-                () => area.LabelsAppearance.DataFormatString.ShouldBe(FormatStringPercentage),
                 () => area.LabelsAppearance.Position.ShouldBe(LineAndScatterLabelsPosition.Above),
-                () => area.TooltipsAppearance.DataFormatString.ShouldBe(FormatStringPercentage));
+                () => area.LabelsAppearance.DataFormatString.ShouldBe(format),
+                () => area.TooltipsAppearance.DataFormatString.ShouldBe(format));
         }
 
-        private void AssertBarSeries(SeriesBase series, bool stacked = false, string seriesName = DummyString)
+        private void AssertBarSeries(SeriesBase series, bool stacked = false, string seriesName = DummyString, string format = FormatStringPercentage)
         {
             var position = stacked ? BarColumnLabelsPosition.Center : BarColumnLabelsPosition.OutsideEnd;
             var area = series as BarSeries;
@@ -757,17 +979,17 @@ namespace EPMLiveWebParts.Tests.ReportingChart
                 () => series.Name.ShouldBe(seriesName),
                 () => series.Items.Count.ShouldBe(1),
                 () => area.ShouldNotBeNull(),
-                () => area.LabelsAppearance.DataFormatString.ShouldBe(FormatStringPercentage),
-                () => area.TooltipsAppearance.DataFormatString.ShouldBe(FormatStringPercentage),
+                () => area.LabelsAppearance.DataFormatString.ShouldBe(format),
+                () => area.TooltipsAppearance.DataFormatString.ShouldBe(format),
                 () => area.Stacked.ShouldBe(stacked),
                 () => area.LabelsAppearance.Position.ShouldBe(position));
         }
 
-        private void AssertBubbleSeries(SeriesBase series, string format)
+        private void AssertBubbleSeries(SeriesBase series, string format, string seriesName = DummyString)
         {
             var area = series as BubbleSeries;
             series.ShouldSatisfyAllConditions(
-                () => series.Name.ShouldBe(DummyString),
+                () => series.Name.ShouldBe(seriesName),
                 () => series.Items.Count.ShouldBe(1),
                 () => area.ShouldNotBeNull(),
                 () => area.TooltipsAppearance.DataFormatString.ShouldBe(format));
@@ -834,24 +1056,55 @@ namespace EPMLiveWebParts.Tests.ReportingChart
                 () => area.TooltipsAppearance.DataFormatString.ShouldBe(format));
         }
 
-        private DataTable GetDataTable(int numberOfRows = 1, string spType = DummyString)
+        private void AssertSeriesDictionary(Dictionary<string, List<SeriesItem>> series)
         {
-            var dt = new DataTable();
-            dt.Columns.Add(DummyString);
-            dt.Columns.Add($"{DummyString}Text");
-            dt.Columns.Add(InternalName);
-            dt.Columns.Add(DisplayName);
-            dt.Columns.Add(ColumnSharePointType);
-            dt.Columns.Add(ColumnTitle);
-            dt.Columns.Add(BubbleAxisColumn);
-            dt.Columns.Add(CategorySqlColumn);
+            series.ShouldSatisfyAllConditions(
+                () => series.Count.ShouldBe(1),
+                () => series.Keys.First().ShouldBe(CategorySqlColumn),
+                () => series.Values.First().Count.ShouldBe(1),
+                () => AssertSeriesItem(series.Values.First().First()));
+        }
 
-            for (int i = 0; i < numberOfRows; i++)
-            {
-                dt.Rows.Add(DummyString, DummyString, DummyString, DummyString, spType, DummyString, One, One);
-            }
+        private void AssertSeriesItem(SeriesItem item)
+        {
+            item.ShouldSatisfyAllConditions(
+                () => item.Name.ShouldBeEmpty(),
+                () => item.YValue.ShouldBe(1));
+        }
 
-            return dt;
+        private DataTable CreateDataTable()
+        {
+            var dataTable = new DataTable();
+            dataTable.Columns.Add(DummyString);
+            dataTable.Columns.Add($"{DummyString}Text");
+            dataTable.Columns.Add(InternalName);
+            dataTable.Columns.Add(DisplayName);
+            dataTable.Columns.Add(ColumnSharePointType);
+            dataTable.Columns.Add(ColumnTitle);
+            dataTable.Columns.Add(BubbleAxisColumn);
+            dataTable.Columns.Add(CategorySqlColumn);
+            return dataTable;
+        }
+
+        private DataTable GetDataTable(string spType = DummyString)
+        {
+            var dataTable = CreateDataTable();
+            dataTable.Rows.Add(DummyString, DummyString, DummyString, DummyString, spType, DummyString, One, One);
+            return dataTable;
+        }
+
+        private DataTable GetDataTableWithNullCategory(string spType = DummyString)
+        {
+            var dataTable = CreateDataTable();
+            dataTable.Rows.Add(DBNull.Value, DummyString, DummyString, DummyString, spType, DummyString, One, One);
+            return dataTable;
+        }
+
+        private DataTable GetDataTableWithMultipleCategories(string spType = DummyString)
+        {
+            var dataTable = CreateDataTable();
+            dataTable.Rows.Add($"{DummyString},{DummyString}", DummyString, DummyString, DummyString, spType, DummyString, One, One);
+            return dataTable;
         }
 
         private RadHtmlChart GetRadChartFromControls()
