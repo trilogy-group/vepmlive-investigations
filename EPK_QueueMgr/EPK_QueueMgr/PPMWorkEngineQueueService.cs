@@ -279,7 +279,7 @@ namespace WE_QueueMgr
                         }
                     }
                 }
-                Task.Delay(doMonitorPeriod);
+                Thread.Sleep(doMonitorPeriod);
             }
         }
         void CheckTaskFault(Task task, ref FaultItem faultItem)
@@ -372,35 +372,35 @@ namespace WE_QueueMgr
 
                     CancellationTokenSource tokenSource = new CancellationTokenSource();
                     CancellationToken tasktoken = tokenSource.Token;
-                    using (Task task = Task.Factory.StartNew(() =>
+                    Task task = Task.Factory.StartNew(() =>
                      {
                          InvokeWSSAdminRSVPRequest(site, jobId);
-                     }, tasktoken))
-                     {
-                        DateTime jobStarted = DateTime.Now;
-                        while (((DateTime.Now - jobStarted).Minutes < jobMaxTimeout || longRunJobIds.Count <= 1) && !token.IsCancellationRequested)
+                     }, tasktoken);
+
+                    DateTime jobStarted = DateTime.Now;
+                    while (((DateTime.Now - jobStarted).Minutes < jobMaxTimeout || longRunJobIds.Count <= 1) && !token.IsCancellationRequested)
+                    {
+                        if (task.IsCompleted)
+                            break;
+                        Thread.Sleep(TimeSpan.FromSeconds(30));
+                    }
+                    if (token.IsCancellationRequested || !task.IsCompleted)
+                    {
+                        tokenSource.Cancel();
+                        string sXML = BuildProductInfoString(site);
+                        using (var qm = new QueueManager(sXML))
                         {
-                            if (task.IsCompleted)
-                                break;
-                            Task.Delay(TimeSpan.FromMinutes(1));
-                        }
-                        if (token.IsCancellationRequested || !task.IsCompleted)
-                        {
-                            tokenSource.Cancel();
-                            string sXML = BuildProductInfoString(site);
-                            using (var qm = new QueueManager(sXML))
-                            {
-                                qm.RequeueJob(jobId);
-                            }
+                            qm.RequeueJob(jobId);
                         }
                     }
+
                     lock (longRunQueueLock)
                     {
                         longRunQueue.RemoveAt(0);
                         longRunJobIds.RemoveAt(0);
                     }
                 }
-                Task.Delay(longRunPeriod);
+                Thread.Sleep(longRunPeriod);
             }
         }
 
@@ -436,7 +436,6 @@ namespace WE_QueueMgr
 
                             }
                         }
-                        sites = null;
                     }
                 }
                 catch (Exception ex)
@@ -459,7 +458,6 @@ namespace WE_QueueMgr
                                 ManageTimedJobs(site);
                             }
                         }
-                        sites = null;
                     }
 
                 }
@@ -467,7 +465,7 @@ namespace WE_QueueMgr
                 {
                     ExceptionHandler("ProcessTimerJobs", ex);
                 }
-                Task.Delay(doWorkPeriod);
+                Thread.Sleep(doWorkPeriod);
             }
         }
 

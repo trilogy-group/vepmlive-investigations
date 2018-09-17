@@ -8,12 +8,9 @@ using WE_RSVP;
 
 namespace PortfolioEngineCore.Services
 {
-    public class WSSAdmin : IDisposable
+    public class WSSAdmin
     {
-        public void Dispose()
-        {
-            this.Dispose();
-        }
+        
 
         public string RSVPRequest(string sContexts, string sBasepath, string sTargetJobGuid = "")
         {
