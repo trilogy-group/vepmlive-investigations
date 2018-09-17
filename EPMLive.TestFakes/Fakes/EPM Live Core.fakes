@@ -68,6 +68,7 @@
     <Add FullName="EPMLiveCore.API.Reporting!"/>
     <Add FullName="EPMLiveCore.Infrastructure.CacheStoreCategory!"/>
     <Add FullName="EPMLiveCore.ReportAuth!"/>
+    <Add FullName="EPMLiveCore.CascadingLookupRenderControl!"/>
     <Add FullName="EPMLiveCore.Infrastructure.ResourcePoolManager!"/>
     <Add FullName="EPMLiveCore.Infrastructure.SPListItemManager!"/>
     <Add FullName="EPMLiveCore.Infrastructure.GridViewManagerFactory!"/>
