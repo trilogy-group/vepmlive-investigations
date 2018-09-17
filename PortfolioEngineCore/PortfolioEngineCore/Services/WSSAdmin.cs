@@ -21,7 +21,7 @@ namespace PortfolioEngineCore.Services
                     break;
                 case "ManageTimerJobs":
                     int value = oRequestMgr.ManageTimedJobs(sBasepath);
-                    result = string.Format("<Reply><HRESULT>0</HRESULT><STAT ` US>{0}</STATUS></Reply>", value);
+                    result = string.Format("<Reply><HRESULT>0</HRESULT><STATUS>{0}</STATUS></Reply>", value);
                     break;
                 default:
                     break;
