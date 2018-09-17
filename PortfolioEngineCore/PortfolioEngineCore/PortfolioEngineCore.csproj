@@ -242,24 +242,6 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
-    <COMReference Include="WE_ClientRequests">
-      <Guid>{AE119285-C803-4DB1-B412-41D1F9CA443A}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="WE_ClientServices">
-      <Guid>{D58F9D80-AC70-4175-B0C1-D5E2D186B285}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
     <COMReference Include="WE_DBASvr">
       <Guid>{4F431C0A-C446-404B-BB87-8948397DFFFD}</Guid>
       <VersionMajor>1</VersionMajor>
