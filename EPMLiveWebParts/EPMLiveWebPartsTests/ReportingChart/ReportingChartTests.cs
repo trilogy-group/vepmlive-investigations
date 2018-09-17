@@ -84,6 +84,7 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             SetHttpContext();
             ShimQueryExecutor.AllInstances.ExecuteReportingDBQueryStringIDictionaryOfStringObject =
                 (a, b, c) => GetDataTable();
+            ShimQueryExecutor.ConstructorSPWeb = (_, __) => { };
 
             _testObject = new RC.ReportingChart
             {
