@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+using System.Fakes;
 using System.Reflection;
 using System.Resources.Fakes;
-using System.Text;
-using System.Threading.Tasks;
+using EPMLiveCore.Controls.Navigation.Providers.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.Infrastructure.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Navigation;
@@ -71,6 +69,12 @@ namespace EPMLiveCore.Tests
         private const string GetRealIndexMethodName = "GetRealIndex";
         private const string CreateChildNodeMethodName = "CreateChildNode";
         private const string CreateParentNodeMethodName = "CreateParentNode";
+        private const string EditNodeByIdMethodName = "EditNodeById";
+        private const string DeleteNodeMethodName = "DeleteNode";
+        private const string IsUrlInternalMethodName = "IsUrlInternal";
+        private const string UpdateNodeOrderMethodName = "UpdateNodeOrder";
+        private const string MoveNodeMethodName = "MoveNode";
+        private const string GetCleanUrlMethodName = "GetCleanUrl";
 
         [TestInitialize]
         public void Setup()
@@ -107,6 +111,7 @@ namespace EPMLiveCore.Tests
             ShimSPSite.AllInstances.WebApplicationGet = _ => new ShimSPWebApplication();
             ShimSPSite.AllInstances.OpenWebGuid = (_, __) => spWeb;
             ShimSPPersistedObject.AllInstances.IdGet = _ => guid;
+            ShimUri.UnescapeDataStringString = input => input;
         }
 
         private void SetupVariables()
@@ -153,7 +158,8 @@ namespace EPMLiveCore.Tests
                 ListsGet = () => new ShimSPListCollection()
                 {
                     TryGetListString = _ => spList
-                }
+                },
+                UrlGet = () => DummyString
             };
         }
 
@@ -1826,6 +1832,690 @@ namespace EPMLiveCore.Tests
 
             // Assert
             methodHit.ShouldBe(3);
+        }
+
+        [TestMethod]
+        public void EditNodeById_TopNavNodeType_EditsNode()
+        {
+            const int newParentNodeId = 111;
+            const int oldParentNodeId = 10;
+            const int nodeId = 11;
+            const string title = "title";
+            const string url = "url";
+            const int appId = -1;
+            const string nodeType = "TopNav";
+            const int expectedId = 1111;
+            const int expected = 111;
+
+            var spUser = new ShimSPUser()
+            {
+                LoginNameGet = () => string.Empty
+            }.Instance;
+            var validationCount = 0;
+            var actual = default(string);
+
+            TopNav = $"{nodeId}:text,{expected}:text,{expected + 1}:text,{expected + 2}";
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                GetNodeByIdInt32 = id => new ShimSPNavigationNode()
+                {
+                    IdGet = () => id,
+                    Update = () => { },
+                    ParentIdGet = () =>
+                    {
+                        if (id == nodeId)
+                        {
+                            return oldParentNodeId;
+                        }
+
+                        return 1;
+                    },
+                    ParentGet = () => new ShimSPNavigationNode()
+                    {
+                        IdGet = () =>
+                        {
+                            if (id == nodeId)
+                            {
+                                return oldParentNodeId;
+                            }
+
+                            return 1;
+                        },
+                        ChildrenGet = () => new ShimSPNavigationNodeCollection()
+                        {
+                            DeleteSPNavigationNode = node =>
+                            {
+                                if (node.Id == nodeId && id == nodeId)
+                                {
+                                    validationCount = validationCount + 1;
+                                }
+                            }
+                        },
+                    },
+                    ChildrenGet = () => new ShimSPNavigationNodeCollection()
+                    {
+                        AddAsLastSPNavigationNode = node =>
+                        {
+                            if (node.Id == nodeId && id == newParentNodeId)
+                            {
+                                validationCount = validationCount + 1;
+                            }
+                            return new ShimSPNavigationNode()
+                            {
+                                IdGet = () => expectedId
+                            };
+                        }
+                    }
+                }
+            };
+            ShimAppSettingsHelper.AllInstances.GetCleanUrlString = (_, input) => input;
+            ShimAppSettingsHelper.AllInstances.GetAppTopNavLastNodeIdInt32 = (_, __) => -1;
+            ShimAppSettingsHelper.AllInstances.IsUrlInternalString = (_, __) => true;
+            spWeb.Update = () =>
+            {
+                validationCount = validationCount + 1;
+            };
+            ShimSPListItem.AllInstances.Update = _ =>
+            {
+                validationCount = validationCount + 1;
+            };
+            ShimSPListItem.AllInstances.ItemSetStringObject = (_, key, value) =>
+            {
+                if (key == nodeType)
+                {
+                    validationCount = validationCount + 1;
+                    actual = value.ToString();
+                }
+            };
+            ShimGenericLinkProvider.ConstructorGuidGuidString = (_, _1, _2, _3) => new ShimGenericLinkProvider();
+            ShimGenericLinkProvider.AllInstances.ClearCacheBoolean = (_, _1) =>
+            {
+                validationCount = validationCount + 1;
+            };
+
+            // Act
+            privateObj.Invoke(
+                EditNodeByIdMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { newParentNodeId, nodeId, title, url, appId, nodeType, spUser });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => validationCount.ShouldBe(6),
+                () => actual.ShouldBe($"{expected}:text,{expected + 1}:text,{expected + 2}:,{expectedId}"));
+        }
+
+        [TestMethod]
+        public void EditNodeById_QuickLaunchNodeType_EditsNode()
+        {
+            const int newParentNodeId = 111;
+            const int oldParentNodeId = 10;
+            const int nodeId = 11;
+            const string title = "title";
+            const string url = "url";
+            const int appId = -1;
+            const string nodeType = "QuickLaunch";
+            const int expectedId = 1111;
+            const int expected = 111;
+
+            var spUser = new ShimSPUser()
+            {
+                LoginNameGet = () => string.Empty
+            }.Instance;
+            var validationCount = 0;
+            var actual = default(string);
+
+            QuickLaunch = $"{nodeId}:text,{expected}:text,{expected + 1}:text,{expected + 2}";
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                GetNodeByIdInt32 = id => new ShimSPNavigationNode()
+                {
+                    IdGet = () => id,
+                    Update = () => { },
+                    ParentIdGet = () =>
+                    {
+                        if (id == nodeId)
+                        {
+                            return oldParentNodeId;
+                        }
+
+                        return 1;
+                    },
+                    ParentGet = () => new ShimSPNavigationNode()
+                    {
+                        IdGet = () =>
+                        {
+                            if (id == nodeId)
+                            {
+                                return oldParentNodeId;
+                            }
+
+                            return 1;
+                        },
+                        ChildrenGet = () => new ShimSPNavigationNodeCollection()
+                        {
+                            DeleteSPNavigationNode = node =>
+                            {
+                                if (node.Id == nodeId && id == nodeId)
+                                {
+                                    validationCount = validationCount + 1;
+                                }
+                            }
+                        },
+                    },
+                    ChildrenGet = () => new ShimSPNavigationNodeCollection()
+                    {
+                        AddAsLastSPNavigationNode = node =>
+                        {
+                            if (node.Id == nodeId && id == newParentNodeId)
+                            {
+                                validationCount = validationCount + 1;
+                            }
+                            return new ShimSPNavigationNode()
+                            {
+                                IdGet = () => expectedId
+                            };
+                        }
+                    }
+                }
+            };
+            ShimAppSettingsHelper.AllInstances.GetCleanUrlString = (_, input) => input;
+            ShimAppSettingsHelper.AllInstances.GetAppTopNavLastNodeIdInt32 = (_, __) => -1;
+            ShimAppSettingsHelper.AllInstances.IsUrlInternalString = (_, __) => true;
+            spWeb.Update = () =>
+            {
+                validationCount = validationCount + 1;
+            };
+            ShimSPListItem.AllInstances.Update = _ =>
+            {
+                validationCount = validationCount + 1;
+            };
+            ShimSPListItem.AllInstances.ItemSetStringObject = (_, key, value) =>
+            {
+                if (key == nodeType)
+                {
+                    validationCount = validationCount + 1;
+                    actual = value.ToString();
+                }
+            };
+            ShimGenericLinkProvider.ConstructorGuidGuidString = (_, _1, _2, _3) => new ShimGenericLinkProvider();
+            ShimGenericLinkProvider.AllInstances.ClearCacheBoolean = (_, _1) =>
+            {
+                validationCount = validationCount + 1;
+            };
+
+            // Act
+            privateObj.Invoke(
+                EditNodeByIdMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { newParentNodeId, nodeId, title, url, appId, nodeType, spUser });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => validationCount.ShouldBe(6),
+                () => actual.ShouldBe($"{expected}:text,{expected + 1}:text,{expected + 2}:,{expectedId}"));
+        }
+
+        [TestMethod]
+        public void DeleteNode_TopNavNodeType_Deletes()
+        {
+            // Arrange
+            const int appId = 1;
+            const int nodeId = 111;
+            const string nodeType = "topnav";
+
+            var validationCount = 0;
+            var origUser = new ShimSPUser()
+            {
+                LoginNameGet = () => string.Empty
+            }.Instance;
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                GetNodeByIdInt32 = id => new ShimSPNavigationNode()
+                {
+                    IdGet = () => id,
+                    Delete = () =>
+                    {
+                        validationCount = validationCount + 1;
+                    }
+                }
+            };
+            ShimAppSettingsHelper.AllInstances.DeleteAppTopNavInt32Int32 = (_, _1, input) =>
+            {
+                if (input == nodeId)
+                {
+                    validationCount = validationCount + 1;
+                }
+            };
+            ShimGenericLinkProvider.ConstructorGuidGuidString = (_, _1, _2, _3) => new ShimGenericLinkProvider();
+            ShimGenericLinkProvider.AllInstances.ClearCacheBoolean = (_, _1) =>
+            {
+                validationCount = validationCount + 1;
+            };
+
+            // Act
+            privateObj.Invoke(
+                DeleteNodeMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { appId, nodeId, nodeType, origUser });
+
+            // Assert
+            validationCount.ShouldBe(3);
+        }
+
+        [TestMethod]
+        public void DeleteNode_QuickLaunchNodeType_Deletes()
+        {
+            // Arrange
+            const int appId = 1;
+            const int nodeId = 111;
+            const string nodeType = "quiklnch";
+
+            var validationCount = 0;
+            var origUser = new ShimSPUser()
+            {
+                LoginNameGet = () => string.Empty
+            }.Instance;
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                GetNodeByIdInt32 = id => new ShimSPNavigationNode()
+                {
+                    IdGet = () => id,
+                    Delete = () =>
+                    {
+                        validationCount = validationCount + 1;
+                    }
+                }
+            };
+            ShimAppSettingsHelper.AllInstances.DeleteAppQuickLaunchInt32Int32 = (_, _1, input) =>
+            {
+                if (input == nodeId)
+                {
+                    validationCount = validationCount + 1;
+                }
+            };
+            ShimGenericLinkProvider.ConstructorGuidGuidString = (_, _1, _2, _3) => new ShimGenericLinkProvider();
+            ShimGenericLinkProvider.AllInstances.ClearCacheBoolean = (_, _1) =>
+            {
+                validationCount = validationCount + 1;
+            };
+
+            // Act
+            privateObj.Invoke(
+                DeleteNodeMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { appId, nodeId, nodeType, origUser });
+
+            // Assert
+            validationCount.ShouldBe(3);
+        }
+
+        [TestMethod]
+        public void IsUrlInternal_HttpUrl_ReturnsBoolean()
+        {
+            // Arrange
+            const string url = "https://sampleurl.com";
+
+            // Act
+            var actual = (bool)privateObj.Invoke(
+                IsUrlInternalMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { url });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void IsUrlInternal_NotHttpUrlWithoutSPWebUrl_ReturnsBoolean()
+        {
+            // Arrange
+            const string url = "/sampleurl.com";
+
+            // Act
+            var actual = (bool)privateObj.Invoke(
+                IsUrlInternalMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { url });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void IsUrlInternal_HttpUrlWithSPWebUrl_ReturnsBoolean()
+        {
+            // Arrange
+            var url = $"https://{DummyString}.com";
+
+            // Act
+            var actual = (bool)privateObj.Invoke(
+                IsUrlInternalMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { url });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void UpdateNodeOrder_WhenCalled_UpdatesNodeOrder()
+        {
+            // Arrange
+            const int appId = -1;
+            const string nodeType = "topnav";
+            const string moveInfos = "Info1,Info2;;Info3,Info4";
+
+            var origUser = new ShimSPUser().Instance;
+            var actual = new List<string>();
+            var methodHit = 0;
+
+            ShimAppSettingsHelper.AllInstances.MoveNodeInt32StringStringArray = (_, _1, _2, input) =>
+            {
+                methodHit = methodHit + 1;
+                actual.AddRange(input);
+            };
+
+            // Act
+            privateObj.Invoke(
+                UpdateNodeOrderMethodName,
+                BindingFlags.Instance | BindingFlags.Public,
+                new object[] { appId, nodeType, moveInfos, origUser });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => methodHit.ShouldBe(2),
+                () => actual.Count.ShouldBe(4),
+                () => actual[0].ShouldBe("Info1"),
+                () => actual[1].ShouldBe("Info2"),
+                () => actual[2].ShouldBe("Info3"),
+                () => actual[3].ShouldBe("Info4"));
+        }
+
+        [TestMethod]
+        public void MoveNode_NewIndexZero_MovesNode()
+        {
+            // Arrange
+            const int appId = 1;
+            const string nodeType = "TopNav";
+
+            var movementInfo = new string[] { "10", "1", "0" };
+            var methodHit = false;
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                GetNodeByIdInt32 = _ => new ShimSPNavigationNode()
+                {
+                    ChildrenGet = () => new ShimSPNavigationNodeCollection()
+                    {
+                        CountGet = () => 5,
+                        ItemGetInt32 = index => new ShimSPNavigationNode()
+                        {
+                            MoveToFirstSPNavigationNodeCollection = _1 =>
+                            {
+                                methodHit = true;
+                            },
+                            MoveToLastSPNavigationNodeCollection = _1 => { },
+                            MoveSPNavigationNodeCollectionSPNavigationNode = (_1, _2) => { }
+                        }
+                    }
+                }
+            };
+            ShimAppSettingsHelper.AllInstances.GetRealIndexInt32Int32Int32String = (instance, _, position, _1, _2) => position;
+
+            // Act
+            privateObj.Invoke(
+                MoveNodeMethodName,
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                new object[] { appId, nodeType, movementInfo });
+
+            // Assert
+            methodHit.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void MoveNode_NewIndexIsLastIndex_MovesNode()
+        {
+            // Arrange
+            const int appId = 1;
+            const string nodeType = "TopNav";
+
+            var movementInfo = new string[] { "10", "0", "1" };
+            var methodHit = false;
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                GetNodeByIdInt32 = _ => new ShimSPNavigationNode()
+                {
+                    ChildrenGet = () => new ShimSPNavigationNodeCollection()
+                    {
+                        CountGet = () => 2,
+                        ItemGetInt32 = index => new ShimSPNavigationNode()
+                        {
+                            MoveToFirstSPNavigationNodeCollection = _1 => { },
+                            MoveToLastSPNavigationNodeCollection = _1 =>
+                            {
+                                methodHit = true;
+                            },
+                            MoveSPNavigationNodeCollectionSPNavigationNode = (_1, _2) => { }
+                        }
+                    }
+                }
+            };
+            ShimAppSettingsHelper.AllInstances.GetRealIndexInt32Int32Int32String = (instance, _, position, _1, _2) => position;
+
+            // Act
+            privateObj.Invoke(
+                MoveNodeMethodName,
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                new object[] { appId, nodeType, movementInfo });
+
+            // Assert
+            methodHit.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void MoveNode_NewIndexIsLessThanOldIndex_MovesNode()
+        {
+            // Arrange
+            const int appId = 1;
+            const string nodeType = "TopNav";
+
+            var movementInfo = new string[] { "10", "3", "2" };
+            var methodHit = false;
+            var actual = default(SPNavigationNode);
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                GetNodeByIdInt32 = _ => new ShimSPNavigationNode()
+                {
+                    ChildrenGet = () => new ShimSPNavigationNodeCollection()
+                    {
+                        CountGet = () => 5,
+                        ItemGetInt32 = index => new ShimSPNavigationNode()
+                        {
+                            IdGet = () => index,
+                            MoveToFirstSPNavigationNodeCollection = _1 => { },
+                            MoveToLastSPNavigationNodeCollection = _1 => { },
+                            MoveSPNavigationNodeCollectionSPNavigationNode = (_1, node) =>
+                            {
+                                actual = node;
+                                methodHit = true;
+                            }
+                        }
+                    }
+                }
+            };
+            ShimAppSettingsHelper.AllInstances.GetRealIndexInt32Int32Int32String = (instance, _, position, _1, _2) => position;
+
+            // Act
+            privateObj.Invoke(
+                MoveNodeMethodName,
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                new object[] { appId, nodeType, movementInfo });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Id.ShouldBe(1),
+                () => methodHit.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void MoveNode_NewIndexIsGreaterThanOldIndex_MovesNode()
+        {
+            // Arrange
+            const int appId = 1;
+            const string nodeType = "TopNav";
+
+            var movementInfo = new string[] { "10", "1", "2" };
+            var methodHit = false;
+            var actual = default(SPNavigationNode);
+
+            spWeb.NavigationGet = () => new ShimSPNavigation()
+            {
+                GetNodeByIdInt32 = _ => new ShimSPNavigationNode()
+                {
+                    ChildrenGet = () => new ShimSPNavigationNodeCollection()
+                    {
+                        CountGet = () => 5,
+                        ItemGetInt32 = index => new ShimSPNavigationNode()
+                        {
+                            IdGet = () => index,
+                            MoveToFirstSPNavigationNodeCollection = _1 => { },
+                            MoveToLastSPNavigationNodeCollection = _1 => { },
+                            MoveSPNavigationNodeCollectionSPNavigationNode = (_1, node) =>
+                            {
+                                actual = node;
+                                methodHit = true;
+                            }
+                        }
+                    }
+                }
+            };
+            ShimAppSettingsHelper.AllInstances.GetRealIndexInt32Int32Int32String = (instance, _, position, _1, _2) => position;
+
+            // Act
+            privateObj.Invoke(
+                MoveNodeMethodName,
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                new object[] { appId, nodeType, movementInfo });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Id.ShouldBe(2),
+                () => methodHit.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void GetCleanUrl_EmptyString_ReturnsString()
+        {
+            // Arrange
+            var url = string.Empty;
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                GetCleanUrlMethodName,
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                new object[] { url });
+
+            // Assert
+            actual.ShouldBe(url);
+        }
+
+        [TestMethod]
+        public void GetCleanUrl_HttpUrl_ReturnsString()
+        {
+            // Arrange
+            var url = "http://sampleurl.com";
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                GetCleanUrlMethodName,
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                new object[] { url });
+
+            // Assert
+            actual.ShouldBe(url);
+        }
+
+        [TestMethod]
+        public void GetCleanUrl_SitesUrl_ReturnsString()
+        {
+            // Arrange
+            var url = "sites";
+
+            spWeb.ServerRelativeUrlGet = () => "Not/";
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                GetCleanUrlMethodName,
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                new object[] { url });
+
+            // Assert
+            actual.ShouldBe($"/{url}");
+        }
+
+        [TestMethod]
+        public void GetCleanUrl_UrlStartsWithTitle_ReturnsString()
+        {
+            // Arrange
+            var url = "Notsites";
+
+            spWeb.ServerRelativeUrlGet = () => "Not/";
+            spWeb.TitleGet = () => url;
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                GetCleanUrlMethodName,
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                new object[] { url });
+
+            // Assert
+            actual.ShouldBe($"/sites/{url}");
+        }
+
+        [TestMethod]
+        public void GetCleanUrl_UrlNotStartsWithTitle_IsTop_ReturnsString()
+        {
+            // Arrange
+            var url = "Notsites";
+
+            spWeb.ServerRelativeUrlGet = () => "/";
+            spWeb.TitleGet = () => "NotUrl";
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                GetCleanUrlMethodName,
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                new object[] { url });
+
+            // Assert
+            actual.ShouldBe($"/{url}");
+        }
+
+        [TestMethod]
+        public void GetCleanUrl_UrlNotStartsWithTitle_IsNotTop_ReturnsString()
+        {
+            // Arrange
+            var url = "notsites";
+            const string myPath = "mypath";
+
+            spWeb.ServerRelativeUrlGet = () => myPath;
+            spWeb.TitleGet = () => "NotUrl";
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                GetCleanUrlMethodName,
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                new object[] { url });
+
+            // Assert
+            actual.ShouldBe($"{myPath}/{url}");
         }
     }
 }
