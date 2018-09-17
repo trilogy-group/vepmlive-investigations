@@ -20,8 +20,7 @@ using Shouldly;
 
 namespace EPMLiveCore.Tests
 {
-    [TestClass]
-    [ExcludeFromCodeCoverage]
+    [TestClass, ExcludeFromCodeCoverage]
     public class AppSettingsHelperTests
     {
         private AppSettingsHelper testObj;
