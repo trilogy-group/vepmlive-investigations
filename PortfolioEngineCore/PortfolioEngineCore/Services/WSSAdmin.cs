@@ -1,14 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using WE_RSVP;
 
 namespace PortfolioEngineCore.Services
 {
-    public class WSSAdmin
+    public class WSSAdmin : IDisposable
     {
+        public void Dispose()
+        {
+            this.Dispose();
+        }
+
         public string RSVPRequest(string sContexts, string sBasepath, string sTargetJobGuid = "")
         {
             RequestMgr oRequestMgr = new RequestMgr();
@@ -26,7 +32,6 @@ namespace PortfolioEngineCore.Services
                 default:
                     break;
             }
-
             return result;
 
         }
