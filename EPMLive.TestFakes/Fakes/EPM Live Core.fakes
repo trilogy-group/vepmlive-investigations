@@ -2,6 +2,7 @@
   <Assembly Name="EPM Live Core"/>
   <StubGeneration>
     <Clear/>
+    <Add FullName="EPMLiveCore.Infrastructure.IGridViewManager!"/>
   </StubGeneration>
   <ShimGeneration>
     <Clear/>
@@ -68,6 +69,11 @@
     <Add FullName="EPMLiveCore.Infrastructure.CacheStoreCategory!"/>
     <Add FullName="EPMLiveCore.ReportAuth!"/>
     <Add FullName="EPMLiveCore.CascadingLookupRenderControl!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.ResourcePoolManager!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.SPListItemManager!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.GridViewManagerFactory!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.GridViewUtils!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.DepartmentManager!"/>
     <Add FullName="EPMLiveCore.Infrastructure.EPMLiveFileStore!"/>
     <Add FullName="EPMLiveCore.API.ResourceExporter!"/>
     <Add FullName="EPMLiveCore.DisabledItemEventScope!"/>

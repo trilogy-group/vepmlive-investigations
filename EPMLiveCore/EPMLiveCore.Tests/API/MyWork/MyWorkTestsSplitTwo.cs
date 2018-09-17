@@ -833,10 +833,7 @@ namespace EPMLiveCore.Tests.API.MyWork
                     siteId = guid;
                     siteUrl = string.Empty;
                 };
-            ShimSPListCollection.AllInstances.ItemGetGuid = (_, __) => new ShimSPList()
-            {
-                DoesUserHavePermissionsSPUserSPBasePermissions = (_1, _2) => true
-            };
+            spList.DoesUserHavePermissionsSPUserSPBasePermissions = (_1, _2) => true;
 
             // Act
             var actual = XDocument.Parse((string)privateObj.Invoke(
