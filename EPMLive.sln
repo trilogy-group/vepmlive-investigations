@@ -127,8 +127,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLivePS.Tests", "EPMLiveP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveIntegrationService.Tests", "EPMLiveIntegrationService\EPMLiveIntegrationService.Tests\EPMLiveIntegrationService.Tests.csproj", "{7B333D41-BB2D-4E86-91A2-E282860973B5}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "WE_WSSAdmin", "WE_WSSAdmin\WE_WSSAdmin.vbproj", "{B5E62B20-0CF9-44AD-A42F-296460BF9730}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -546,18 +544,6 @@ Global
 		{7B333D41-BB2D-4E86-91A2-E282860973B5}.Release|x64.Build.0 = Release|Any CPU
 		{7B333D41-BB2D-4E86-91A2-E282860973B5}.Release|x86.ActiveCfg = Release|Any CPU
 		{7B333D41-BB2D-4E86-91A2-E282860973B5}.Release|x86.Build.0 = Release|Any CPU
-		{B5E62B20-0CF9-44AD-A42F-296460BF9730}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B5E62B20-0CF9-44AD-A42F-296460BF9730}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B5E62B20-0CF9-44AD-A42F-296460BF9730}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{B5E62B20-0CF9-44AD-A42F-296460BF9730}.Debug|x64.Build.0 = Debug|Any CPU
-		{B5E62B20-0CF9-44AD-A42F-296460BF9730}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{B5E62B20-0CF9-44AD-A42F-296460BF9730}.Debug|x86.Build.0 = Debug|Any CPU
-		{B5E62B20-0CF9-44AD-A42F-296460BF9730}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B5E62B20-0CF9-44AD-A42F-296460BF9730}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B5E62B20-0CF9-44AD-A42F-296460BF9730}.Release|x64.ActiveCfg = Release|Any CPU
-		{B5E62B20-0CF9-44AD-A42F-296460BF9730}.Release|x64.Build.0 = Release|Any CPU
-		{B5E62B20-0CF9-44AD-A42F-296460BF9730}.Release|x86.ActiveCfg = Release|Any CPU
-		{B5E62B20-0CF9-44AD-A42F-296460BF9730}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

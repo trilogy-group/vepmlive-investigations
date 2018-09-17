@@ -1,5 +1,6 @@
 using Microsoft.Win32;
 using PortfolioEngineCore;
+using PortfolioEngineCore.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using WE_QueueMgr.MsmqIntegration;
-using WE_WSSAdmin;
+
 
 namespace WE_QueueMgr
 {
@@ -608,7 +609,7 @@ namespace WE_QueueMgr
 
         private string InvokeWSSAdminRSVPRequest(QMSite site, Guid jobId)
         {
-            object comObject = null;
+            
             try
             {
                 WSSAdmin wssadmin = new WSSAdmin();
@@ -616,7 +617,6 @@ namespace WE_QueueMgr
             }
             finally
             {
-                comObject = null;
             }
         }
 

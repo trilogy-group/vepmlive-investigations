@@ -5,7 +5,7 @@ using System.Security.Principal;
 using PortfolioEngineCore;
 using System.Reflection;
 using System.Diagnostics;
-using WE_WSSAdmin;
+using PortfolioEngineCore.Services;
 
 namespace WorkEnginePPM
 {

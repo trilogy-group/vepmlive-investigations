@@ -176,6 +176,7 @@
     <Compile Include="Services\LMR_SQLHelper.cs" />
     <Compile Include="Services\PfE_ReportingDB.cs" />
     <Compile Include="Services\QueueManager.cs" />
+    <Compile Include="Services\WSSAdmin.cs" />
     <Compile Include="Setup\SetupSite.cs" />
     <Compile Include="WEIntegration\PfEInterface.cs" />
     <Compile Include="WEIntegration\WEIntegration.cs" />
@@ -232,10 +233,60 @@
     <WCFMetadataStorage Include="Service References\ND\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\WE_WSSAdmin\WE_WSSAdmin.vbproj">
-      <Project>{b5e62b20-0cf9-44ad-a42f-296460bf9730}</Project>
-      <Name>WE_WSSAdmin</Name>
-    </ProjectReference>
+    <COMReference Include="VBA">
+      <Guid>{000204EF-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>6</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>9</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="WE_ClientRequests">
+      <Guid>{AE119285-C803-4DB1-B412-41D1F9CA443A}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="WE_ClientServices">
+      <Guid>{D58F9D80-AC70-4175-B0C1-D5E2D186B285}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="WE_DBASvr">
+      <Guid>{4F431C0A-C446-404B-BB87-8948397DFFFD}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="WE_PDSExt">
+      <Guid>{5D724080-F798-4489-8450-34B4BCC40601}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="WE_RSVP">
+      <Guid>{2401635E-0EE6-42B4-BD19-7DE6405F5388}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
