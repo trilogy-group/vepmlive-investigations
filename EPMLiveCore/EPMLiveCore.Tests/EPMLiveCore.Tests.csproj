@@ -155,6 +155,7 @@
     <Compile Include="API\ResourceGrid\ResourceExporterTests.cs" />
     <Compile Include="API\ResourceGrid\ResourceGridTests.cs" />
     <Compile Include="API\TimerTests.cs" />
+    <Compile Include="AppSettingsHelperTests.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControlTests.cs" />
     <Compile Include="CheckOpenCloseConnections.cs" />
     <Compile Include="ControlDataBuilderTest.cs" />
@@ -185,6 +186,7 @@
     <Compile Include="ReportHelper\EPMDataTest.cs" />
     <Compile Include="ReportHelper\ReportDataTests.cs" />
     <Compile Include="Shared\AssertException.cs" />
+    <Compile Include="SocialEngine\Core\ThreadManagerTest.cs" />
     <Compile Include="SocialEngine\Modules\ListItemTests.cs" />
     <Compile Include="SPUtilities\SPListUtilityTest.cs" />
     <Compile Include="Testables\InputFormSectionTestable.cs">
@@ -220,7 +222,7 @@
       <Project>{fcf0c151-0a3f-4b9f-9327-3bbbf109d776}</Project>
       <Name>EPMLiveWorkPlanner</Name>
     </ProjectReference>
-	<ProjectReference Include="..\..\PortfolioEngineCore\WorkEnginePPM\WorkEnginePPM.csproj">
+    <ProjectReference Include="..\..\PortfolioEngineCore\WorkEnginePPM\WorkEnginePPM.csproj">
       <Project>{51caf42a-31af-4b74-853f-24b672c185c2}</Project>
       <Name>WorkEnginePPM</Name>
     </ProjectReference>
