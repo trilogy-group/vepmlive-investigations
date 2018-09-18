@@ -1,27 +1,26 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Web.UI.Fakes;
-using System.Web.Fakes;
-using Microsoft.SharePoint.Fakes;
-using System.Xml;
+﻿using System;
 using System.Collections;
-using System.Web.Script.Serialization.Fakes;
-using Microsoft.SharePoint.Utilities.Fakes;
+using System.Collections.Generic;
 using System.Collections.Specialized.Fakes;
-using Microsoft.SharePoint;
-using EPMLive.TestFakes.Utility;
-using Microsoft.QualityTools.Testing.Fakes;
-using System.Web.UI;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Threading;
+using System.Web.Fakes;
+using System.Web.Script.Serialization.Fakes;
+using System.Web.UI;
+using System.Web.UI.Fakes;
+using System.Xml;
+using EPMLive.TestFakes.Utility;
 using EPMLiveCore.Fakes;
 using EPMLiveWebParts.Fakes;
-using System.Globalization;
-using System.Threading;
-using System.Diagnostics.CodeAnalysis;
+using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Fakes;
+using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.SharePoint.WebControls.Fakes;
-using Moq;
-using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
 namespace EPMLiveWebParts.Tests
@@ -31,6 +30,7 @@ namespace EPMLiveWebParts.Tests
     public partial class GridListViewTests
     {
         private const string GoogleComUrl = "http://www.google.com";
+        private const int DummyInteger = 100;
         private IDisposable _shimsContext;
         private SharepointShims _sharepointShims;
 
@@ -616,7 +616,7 @@ namespace EPMLiveWebParts.Tests
             var shimSpWeb = _sharepointShims.WebShim;
             shimSpWeb.UrlGet = () => string.Empty;
             shimSpWeb.ServerRelativeUrlGet = () => string.Empty;
-            shimSpWeb.LocaleGet = () => new CultureInfo(100);
+            shimSpWeb.LocaleGet = () => new CultureInfo(DummyInteger);
 
             var shimSpViewFieldColl = new ShimSPViewFieldCollection();
             var shimSpBaseColl = new ShimSPBaseCollection(shimSpViewFieldColl);
