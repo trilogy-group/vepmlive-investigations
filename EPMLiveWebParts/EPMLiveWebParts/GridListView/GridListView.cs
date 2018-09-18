@@ -1,10 +1,4 @@
-﻿using EPMLiveCore;
-using EPMLiveCore.Infrastructure;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
-using Microsoft.SharePoint.WebPartPages;
-using Microsoft.Web.CommandUI;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,6 +16,12 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Xml;
 using System.Xml.Serialization;
+using EPMLiveCore;
+using EPMLiveCore.Infrastructure;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.WebControls;
+using Microsoft.SharePoint.WebPartPages;
+using Microsoft.Web.CommandUI;
 
 namespace EPMLiveWebParts
 {
