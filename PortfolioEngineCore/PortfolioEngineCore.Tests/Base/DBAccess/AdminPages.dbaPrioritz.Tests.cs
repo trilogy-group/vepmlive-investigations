@@ -12,7 +12,7 @@ namespace PortfolioEngineCore.Tests.Base
     using PortfolioEngineCore;
 
     [TestClass]
-    public class AdminPagesTests
+    public class AdminPagesDbaPrioritzTests
     {
         private IDisposable shimContext;
         private DBAccess dbAccess;
@@ -437,7 +437,7 @@ namespace PortfolioEngineCore.Tests.Base
             // Arrange
             const int LFit = 1;
             const int LFat = 202;
-            var expectedValue = "IsNull(cast(Left(PT_" + LFit.ToString("000") + 
+            var expectedValue = "IsNull(cast(Left(PT_" + LFit.ToString("000") +
                 ", PatIndex('%[^0-9]%', PT_" + LFit.ToString("000") + "+'x' ) - 1 ) as int),0)";
 
             // Act

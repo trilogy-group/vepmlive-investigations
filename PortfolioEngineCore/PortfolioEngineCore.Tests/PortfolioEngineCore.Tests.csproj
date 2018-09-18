@@ -108,7 +108,7 @@
     <Compile Include="Admininfos\AdmininfosTests.cs" />
     <Compile Include="Admininfos\AllWorkhoursTests.cs" />
     <Compile Include="Base\DBAccessTests.cs" />
-    <Compile Include="Base\DBAccess\AdminPagesTests.cs" />
+    <Compile Include="Base\DBAccess\AdminPages.dbaPrioritz.Tests.cs" />
     <Compile Include="Base\DBAccess\CostsTests.cs" />
     <Compile Include="Base\DBAccess\CostValuesTests.cs" />
     <Compile Include="Base\DBAccess\CostTypesTests.cs" />
