@@ -259,8 +259,6 @@ Log-SubSection "Building '$projName'..."
     
 # Run MSBuild
 & $MSBuildExec $projAbsPath `
-    /p:PreBuildEvent= `
-    /p:PostBuildEvent= `
     /p:Configuration="$ConfigurationToBuild" `
     /p:Platform="$PlatformToBuild" `
 	/p:langversion="$langversion" `
