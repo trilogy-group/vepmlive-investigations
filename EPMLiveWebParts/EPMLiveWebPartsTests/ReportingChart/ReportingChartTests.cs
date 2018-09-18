@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -21,6 +22,7 @@ using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.WebControls.Fakes;
+using Microsoft.SharePoint.WebPartPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ReportFiltering.DomainServices;
 using ReportFiltering.DomainServices.Fakes;
@@ -47,9 +49,17 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         private const string InternalName = "InternalName";
         private const string DisplayName = "DisplayName";
         private const string ColorBlue = "Blue";
+        private const string ColorGreen = "Green";
+        private const string ColorRed = "Red";
+        private const string ColorYellow = "Yellow";
+        private const string ColorGray = "Gray";
+        private const string ColorViolet = "Violet";
+        private const string Color1 = "Color1";
+        private const string Color2 = "Color2";
+        private const string NoValueSpecified = "No Value Specified";
         private const string FormatPercentage = "Percentage";
         private const string FormatCurrency = "Currency";
-        private const string NoValueSpecified = "No Value Specified";
+        private const string FormatDollar = "Dollar";
         private const string FormatStringPercentage = "p";
         private const string FormatStringCurrency = "c";
         private const string FormatStringNone = "n";
@@ -61,6 +71,13 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         private const string MethodOnInit = "OnInit";
         private const string MethodGetSeriesItems = "GetSeriesItems";
         private const string MethodGetDataForBubbleSeries = "GetDataForBubbleSeries";
+        private const string MethodBuildScatterSeries = "BuildScatterSeries";
+        private const string MethodBuildScatterLineSeries = "BuildScatterLineSeries";
+        private const string MethodGetSelectedListData = "GetSelectedListData";
+        private const string MethodUpdatePanelLoad = "updatePanel_Load";
+        private const string MethodConfigureDisplayFormat = "ConfigureDisplayFormat";
+        private const string MethodGetColors = "GetColors";
+        private const string MethodOnLoad = "OnLoad";
         private readonly Guid DummyGuid = Guid.NewGuid();
         private RC.ReportingChart _testObject;
         private PrivateObject _privateObject;
@@ -106,6 +123,26 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             _shimsContext?.Dispose();
             _stringWriter?.Dispose();
             _htmlWriter?.Dispose();
+        }
+
+        [TestMethod]
+        public void OnLoad_Invoke_RegisterScriptsOnPage()
+        {
+            // Arrange
+            var scriptManager = new ScriptManager();
+            ShimScriptManager.GetCurrentPage = _ => scriptManager;
+            var scriptRegistered = false;
+            ShimClientScriptManager.AllInstances.RegisterStartupScriptTypeStringStringBoolean =
+                (a, b, c, d, e) => scriptRegistered = true;
+
+            // Act
+            _privateObject.Invoke(MethodOnLoad, new object[] { EventArgs.Empty });
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => scriptManager.Scripts.ShouldNotBeEmpty(),
+                () => scriptManager.Scripts.First().Path.ShouldBe($"{ExampleUrl}/_layouts/epmlive/javascripts/libraries/Kendo/cultures/kendo.culture.{CultureInfo.InvariantCulture.ToString()}.min.js"),
+                () => scriptRegistered.ShouldBeTrue());
         }
 
         [TestMethod]
@@ -233,6 +270,92 @@ namespace EPMLiveWebParts.Tests.ReportingChart
                 () => chart.PlotArea.XAxis.MinorGridLines.Visible.ShouldBeFalse(),
                 () => chart.PlotArea.YAxis.MajorGridLines.Visible.ShouldBeFalse(),
                 () => chart.PlotArea.YAxis.MinorGridLines.Visible.ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void UpdatePanelLoad_AreaSeries_ShouldSetAreaAndAxis()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Area);
+            _testObject.PropYaxisFormat = FormatCurrency;
+
+            // Act
+            _privateObject.Invoke(MethodUpdatePanelLoad, new object[] { _testObject, EventArgs.Empty });
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertAreaSeries(chart.PlotArea.Series[0], format: FormatStringCurrency),
+                () => chart.PlotArea.XAxis.Items.Count.ShouldBeGreaterThan(0),
+                () => chart.PlotArea.XAxis.LabelsAppearance.Visible.ShouldBe(_testObject.PropChartShowSeriesLabels),
+                () => chart.PlotArea.XAxis.LabelsAppearance.RotationAngle.ShouldBe(315),
+                () => chart.PlotArea.YAxis.TitleAppearance.Text.ShouldBe(DummyString),
+                () => chart.PlotArea.YAxis.LabelsAppearance.DataFormatString.ShouldBe(FormatStringCurrency),
+                () => chart.PlotArea.YAxis.LabelsAppearance.RotationAngle.ShouldBe(0));
+        }
+
+        [TestMethod]
+        public void UpdatePanelLoad_BarSeries_ShouldSetBarAndAxis()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Bar);
+            _testObject.PropYaxisFormat = FormatPercentage;
+
+            // Act
+            _privateObject.Invoke(MethodUpdatePanelLoad, new object[] { _testObject, EventArgs.Empty });
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertBarSeries(chart.PlotArea.Series[0]),
+                () => chart.PlotArea.XAxis.Items.Count.ShouldBeGreaterThan(0),
+                () => chart.PlotArea.XAxis.LabelsAppearance.Visible.ShouldBe(_testObject.PropChartShowSeriesLabels),
+                () => chart.PlotArea.XAxis.LabelsAppearance.RotationAngle.ShouldBe(0),
+                () => chart.PlotArea.YAxis.TitleAppearance.Text.ShouldBe(DummyString),
+                () => chart.PlotArea.YAxis.LabelsAppearance.DataFormatString.ShouldBe(FormatStringPercentage),
+                () => chart.PlotArea.YAxis.LabelsAppearance.RotationAngle.ShouldBe(315));
+        }
+
+        [TestMethod]
+        public void ConfigureDisplayFormat_Dollar_SetCurrencyFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Area);
+            _testObject.PropYaxisFormat = FormatDollar;
+
+            // Act
+            _privateObject.Invoke(MethodConfigureDisplayFormat);
+
+            // Assert
+            chart.PlotArea.YAxis.LabelsAppearance.DataFormatString.ShouldBe(FormatStringCurrency);
+        }
+
+        [TestMethod]
+        public void ConfigureDisplayFormat_Percentage_SetPercentageFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Area);
+            _testObject.PropYaxisFormat = FormatPercentage;
+
+            // Act
+            _privateObject.Invoke(MethodConfigureDisplayFormat);
+
+            // Assert
+            chart.PlotArea.YAxis.LabelsAppearance.DataFormatString.ShouldBe(FormatStringPercentage);
+        }
+
+        [TestMethod]
+        public void ConfigureDisplayFormat_Currency_SetNoneFormat()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Area);
+            _testObject.PropYaxisFormat = FormatCurrency;
+
+            // Act
+            _privateObject.Invoke(MethodConfigureDisplayFormat);
+
+            // Assert
+            chart.PlotArea.YAxis.LabelsAppearance.DataFormatString.ShouldBe(FormatStringNone);
         }
 
         [TestMethod]
@@ -836,7 +959,7 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         }
 
         [TestMethod]
-        public void BuildSeries_Pie_SetsPieSeriesWithPercentageFormat()
+        public void BuildSeries_PiePercentage_SetsPieSeriesWithPercentageFormat()
         {
             // Arrange
             var chart = SetPropertiesForSeriesType(ChartType.Pie);
@@ -852,7 +975,24 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         }
 
         [TestMethod]
-        public void BuildSeries_Pie_SetsPieSeriesWithCurrencyFormat()
+        public void BuildSeries_PieMultipleCategories_SetsPieSeries()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Pie);
+            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
+                (a, b, c, d, e) => GetDataTableWithMultipleCategories();
+
+            // Act
+            _testObject.BuildSeries();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertPieSeries(chart.PlotArea.Series[0]));
+        }
+
+        [TestMethod]
+        public void BuildSeries_PieCurrency_SetsPieSeriesWithCurrencyFormat()
         {
             // Arrange
             var chart = SetPropertiesForSeriesType(ChartType.Pie);
@@ -865,6 +1005,162 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             this.ShouldSatisfyAllConditions(
                 () => chart.PlotArea.Series.Count.ShouldBe(1),
                 () => AssertPieSeries(chart.PlotArea.Series[0], FormatStringCurrency));
+        }
+
+        [TestMethod]
+        public void BuildScatterSeries_Invoke_SetsScatterSeriesToChart()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Area);
+
+            // Act
+            _privateObject.Invoke(MethodBuildScatterSeries);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertScatterSeries(chart.PlotArea.Series[0]));
+        }
+
+        [TestMethod]
+        public void BuildScatterLineSeries_Invoke_SetsScatterSeriesToChart()
+        {
+            // Arrange
+            var chart = SetPropertiesForSeriesType(ChartType.Area);
+
+            // Act
+            _privateObject.Invoke(MethodBuildScatterLineSeries);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => chart.PlotArea.Series.Count.ShouldBe(1),
+                () => AssertScatterLineSeries(chart.PlotArea.Series[0]));
+        }
+
+        [TestMethod]
+        public void GetColors_Blue_ReturnsBluePalette()
+        {
+            // Arrange, Act
+            var result = _privateObject.Invoke(MethodGetColors, new object[] { ColorBlue });
+
+            // Assert
+            var colors = result as Color[];
+            this.ShouldSatisfyAllConditions(
+                () => colors.ShouldNotBeNull(),
+                () => colors.Length.ShouldBe(5),
+                () => colors.ShouldBe(ColorPalettes.BluePalette));
+        }
+
+        [TestMethod]
+        public void GetColors_Green_ReturnsGreenPalette()
+        {
+            // Arrange, Act
+            var result = _privateObject.Invoke(MethodGetColors, new object[] { ColorGreen });
+
+            // Assert
+            var colors = result as Color[];
+            this.ShouldSatisfyAllConditions(
+                () => colors.ShouldNotBeNull(),
+                () => colors.Length.ShouldBe(5),
+                () => colors.ShouldBe(ColorPalettes.GreenPalette));
+        }
+
+        [TestMethod]
+        public void GetColors_Red_ReturnsRedPalette()
+        {
+            // Arrange, Act
+            var result = _privateObject.Invoke(MethodGetColors, new object[] { ColorRed });
+
+            // Assert
+            var colors = result as Color[];
+            this.ShouldSatisfyAllConditions(
+                () => colors.ShouldNotBeNull(),
+                () => colors.Length.ShouldBe(5),
+                () => colors.ShouldBe(ColorPalettes.RedPalette));
+        }
+
+        [TestMethod]
+        public void GetColors_Yellow_ReturnsYellowPalette()
+        {
+            // Arrange, Act
+            var result = _privateObject.Invoke(MethodGetColors, new object[] { ColorYellow });
+
+            // Assert
+            var colors = result as Color[];
+            this.ShouldSatisfyAllConditions(
+                () => colors.ShouldNotBeNull(),
+                () => colors.Length.ShouldBe(5),
+                () => colors.ShouldBe(ColorPalettes.YellowPalette));
+        }
+
+        [TestMethod]
+        public void GetColors_Gray_ReturnsGrayPalette()
+        {
+            // Arrange, Act
+            var result = _privateObject.Invoke(MethodGetColors, new object[] { ColorGray });
+
+            // Assert
+            var colors = result as Color[];
+            this.ShouldSatisfyAllConditions(
+                () => colors.ShouldNotBeNull(),
+                () => colors.Length.ShouldBe(5),
+                () => colors.ShouldBe(ColorPalettes.GrayPalette));
+        }
+
+        [TestMethod]
+        public void GetColors_Violet_ReturnsVioletPalette()
+        {
+            // Arrange, Act
+            var result = _privateObject.Invoke(MethodGetColors, new object[] { ColorViolet });
+
+            // Assert
+            var colors = result as Color[];
+            this.ShouldSatisfyAllConditions(
+                () => colors.ShouldNotBeNull(),
+                () => colors.Length.ShouldBe(5),
+                () => colors.ShouldBe(ColorPalettes.Violet));
+        }
+
+        [TestMethod]
+        public void GetColors_Color1_ReturnsColor1Palette()
+        {
+            // Arrange, Act
+            var result = _privateObject.Invoke(MethodGetColors, new object[] { Color1 });
+
+            // Assert
+            var colors = result as Color[];
+            this.ShouldSatisfyAllConditions(
+                () => colors.ShouldNotBeNull(),
+                () => colors.Length.ShouldBe(15),
+                () => colors.ShouldBe(ColorPalettes.Color1));
+        }
+
+        [TestMethod]
+        public void GetColors_Color2_ReturnsColor2Palette()
+        {
+            // Arrange, Act
+            var result = _privateObject.Invoke(MethodGetColors, new object[] { Color2 });
+
+            // Assert
+            var colors = result as Color[];
+            this.ShouldSatisfyAllConditions(
+                () => colors.ShouldNotBeNull(),
+                () => colors.Length.ShouldBe(24),
+                () => colors.ShouldBe(ColorPalettes.Color2));
+        }
+
+        [TestMethod]
+        public void GetColors_DummyColor_ReturnsGrayPalette()
+        {
+            // Arrange, Act
+            var result = _privateObject.Invoke(MethodGetColors, new object[] { DummyString });
+
+            // Assert
+            var colors = result as Color[];
+            this.ShouldSatisfyAllConditions(
+                () => colors.ShouldNotBeNull(),
+                () => colors.Length.ShouldBe(5),
+                () => colors.ShouldBe(ColorPalettes.GrayPalette));
         }
 
         [TestMethod]
@@ -916,16 +1212,209 @@ namespace EPMLiveWebParts.Tests.ReportingChart
                 () => AssertSeriesDictionary((Dictionary<string, List<SeriesItem>>)result));
         }
 
-        //[TestMethod]
-        //public void GetDataForBubbleSeries_()
-        //{
-        //    // Arrange
+        [TestMethod]
+        public void GetSelectedListData_NoSelectedList_ReturnsEmpty()
+        {
+            // Arrange
+            _testObject.PropChartSelectedListTitle = null;
 
-        //    // Act
-        //    var result = _privateObject.Invoke(MethodGetDataForBubbleSeries, new object[] { GetDataTable(), DummyString, CategorySqlColumn, CategorySqlColumn, "none" });
+            // Act
+            var result = _privateObject.Invoke(MethodGetSelectedListData, new object[] { DummyString });
 
-        //    // Assert
-        //}
+            // Assert
+            var dataTable = result as DataTable;
+            this.ShouldSatisfyAllConditions(
+                () => dataTable.ShouldNotBeNull(),
+                () => dataTable.Rows.Count.ShouldBe(0),
+                () => dataTable.Columns.Count.ShouldBe(0));
+        }
+
+        [TestMethod]
+        public void GetSelectedListData_NoSelectedView_ReturnsEmpty()
+        {
+            // Arrange
+            _testObject.PropChartSelectedListTitle = DummyString;
+            _shimViews.ItemGetString = v =>
+            {
+                if (string.IsNullOrEmpty(v))
+                {
+                    throw new ArgumentNullException();
+                }
+
+                return new ShimSPView();
+            };
+
+            // Act
+            var result = _privateObject.Invoke(MethodGetSelectedListData, new object[] { DummyString });
+
+            // Assert
+            var dataTable = result as DataTable;
+            this.ShouldSatisfyAllConditions(
+                () => dataTable.ShouldNotBeNull(),
+                () => dataTable.Rows.Count.ShouldBe(0),
+                () => dataTable.Columns.Count.ShouldBe(0));
+        }
+
+        [TestMethod]
+        public void GetSelectedListData_SelectedListAndView_ReturnsDataTable()
+        {
+            // Arrange
+            var returnDataTable = GetDataTable();
+            _testObject.PropChartSelectedListTitle = DummyString;
+            _testObject.PropChartSelectedViewTitle = DummyString;
+            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
+                (a, b, c, d, e) => returnDataTable;
+
+            // Act
+            var result = _privateObject.Invoke(MethodGetSelectedListData, new object[] { DummyString });
+
+            // Assert
+            var dataTable = result as DataTable;
+            this.ShouldSatisfyAllConditions(
+                () => dataTable.ShouldNotBeNull(),
+                () => dataTable.ShouldBeSameAs(returnDataTable));
+        }
+
+        [TestMethod]
+        public void GetToolParts_Invoke_ReturnsToolPartArray()
+        {
+            // Arrange, Act
+            var result = _testObject.GetToolParts();
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Length.ShouldBe(3),
+                () => result[0].ShouldBeOfType<ReportingChartToolPart>(),
+                () => result[1].ShouldBeOfType<WebPartToolPart>(),
+                () => result[2].ShouldBeOfType<CustomPropertyToolPart>());
+        }
+
+        [TestMethod]
+        public void SetXFieldValue_SetNull_SetsEmptyProperty()
+        {
+            // Arrange, Act
+            _testObject.SetXFieldValue(null);
+
+            // Assert
+            AssertEmpty(_testObject.PropChartXaxisField);
+        }
+
+        [TestMethod]
+        public void SetXFieldValue_SetValue_SetsProperty()
+        {
+            // Arrange, Act
+            _testObject.SetXFieldValue(DummyString);
+
+            // Assert
+            AssertNotEmpty(_testObject.PropChartXaxisField, DummyString);
+        }
+
+        [TestMethod]
+        public void SetXFieldLabel_SetNull_SetsEmptyProperty()
+        {
+            // Arrange, Act
+            _testObject.SetXFieldLabel(null);
+
+            // Assert
+            AssertEmpty(_testObject.PropChartXaxisFieldLabel);
+        }
+
+        [TestMethod]
+        public void SetXFieldLabel_SetValue_SetsProperty()
+        {
+            // Arrange, Act
+            _testObject.SetXFieldLabel(DummyString);
+
+            // Assert
+            AssertNotEmpty(_testObject.PropChartXaxisFieldLabel, DummyString);
+        }
+
+        [TestMethod]
+        public void SetYFieldsValues_SetNull_SetsEmptyProperty()
+        {
+            // Arrange, Act
+            _testObject.SetYFieldsValues(null);
+
+            // Assert
+            var result = _testObject.GetYFieldsValues();
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBeEmpty());
+        }
+
+        [TestMethod]
+        public void SetYFieldsValues_SetValue_SetsProperty()
+        {
+            // Arrange, Act
+            _testObject.SetYFieldsValues(new string[] { DummyString });
+
+            // Assert
+            var result = _testObject.GetYFieldsValues();
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Length.ShouldBe(1),
+                () => result[0].ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void SetYFieldsValues_SetMultipleValues_SetsProperty()
+        {
+            // Arrange, Act
+            _testObject.SetYFieldsValues(new string[] { DummyString, DummyString });
+
+            // Assert
+            var result = _testObject.GetYFieldsValues();
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Length.ShouldBe(2),
+                () => result[0].ShouldBe(DummyString),
+                () => result[1].ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void SetYFieldsLabels_SetNull_SetsEmptyProperty()
+        {
+            // Arrange, Act
+            _testObject.SetYFieldsLabels(null);
+
+            // Assert
+            AssertEmpty(_testObject.GetYFieldsLabel());
+        }
+
+        [TestMethod]
+        public void SetYFieldsLabels_SetValue_SetsProperty()
+        {
+            // Arrange, Act
+            _testObject.SetYFieldsLabels(new string[] { DummyString });
+
+            // Assert
+            AssertNotEmpty(_testObject.GetYFieldsLabel(), DummyString);
+        }
+
+        [TestMethod]
+        public void SetYFieldsLabels_SetMultipleValues_SetsProperty()
+        {
+            // Arrange, Act
+            _testObject.SetYFieldsLabels(new string[] { DummyString, DummyString });
+
+            // Assert
+            AssertNotEmpty(_testObject.GetYFieldsLabel(), $"{DummyString}, {DummyString}");
+        }
+
+        private void AssertEmpty(string value)
+        {
+            this.ShouldSatisfyAllConditions(
+                () => value.ShouldNotBeNull(),
+                () => value.ShouldBeEmpty());
+        }
+
+        private void AssertNotEmpty(string value, string expectedValue)
+        {
+            this.ShouldSatisfyAllConditions(
+                () => value.ShouldNotBeNull(),
+                () => value.ShouldBe(expectedValue));
+        }
 
         private RadHtmlChart SetPropertiesForSeriesType(ChartType type)
         {
@@ -975,86 +1464,104 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         private void AssertBarSeries(SeriesBase series, bool stacked = false, string seriesName = DummyString, string format = FormatStringPercentage)
         {
             var position = stacked ? BarColumnLabelsPosition.Center : BarColumnLabelsPosition.OutsideEnd;
-            var area = series as BarSeries;
+            var bar = series as BarSeries;
             series.ShouldSatisfyAllConditions(
                 () => series.Name.ShouldBe(seriesName),
                 () => series.Items.Count.ShouldBe(1),
-                () => area.ShouldNotBeNull(),
-                () => area.LabelsAppearance.DataFormatString.ShouldBe(format),
-                () => area.TooltipsAppearance.DataFormatString.ShouldBe(format),
-                () => area.Stacked.ShouldBe(stacked),
-                () => area.LabelsAppearance.Position.ShouldBe(position));
+                () => bar.ShouldNotBeNull(),
+                () => bar.LabelsAppearance.DataFormatString.ShouldBe(format),
+                () => bar.TooltipsAppearance.DataFormatString.ShouldBe(format),
+                () => bar.Stacked.ShouldBe(stacked),
+                () => bar.LabelsAppearance.Position.ShouldBe(position));
         }
 
         private void AssertBubbleSeries(SeriesBase series, string format, string seriesName = DummyString)
         {
-            var area = series as BubbleSeries;
+            var bubble = series as BubbleSeries;
             series.ShouldSatisfyAllConditions(
                 () => series.Name.ShouldBe(seriesName),
                 () => series.Items.Count.ShouldBe(1),
-                () => area.ShouldNotBeNull(),
-                () => area.TooltipsAppearance.DataFormatString.ShouldBe(format));
+                () => bubble.ShouldNotBeNull(),
+                () => bubble.TooltipsAppearance.DataFormatString.ShouldBe(format));
         }
 
         private void AssertColumnSeries(SeriesBase series, string format)
         {
-            var area = series as ColumnSeries;
+            var column = series as ColumnSeries;
             series.ShouldSatisfyAllConditions(
                 () => series.Name.ShouldBe(DummyString),
                 () => series.Items.Count.ShouldBe(1),
-                () => area.ShouldNotBeNull(),
-                () => area.LabelsAppearance.DataFormatString.ShouldBe(format),
-                () => area.TooltipsAppearance.DataFormatString.ShouldBe(format),
-                () => area.Stacked.ShouldBeFalse(),
-                () => area.LabelsAppearance.Position.ShouldBe(BarColumnLabelsPosition.OutsideEnd));
+                () => column.ShouldNotBeNull(),
+                () => column.LabelsAppearance.DataFormatString.ShouldBe(format),
+                () => column.TooltipsAppearance.DataFormatString.ShouldBe(format),
+                () => column.Stacked.ShouldBeFalse(),
+                () => column.LabelsAppearance.Position.ShouldBe(BarColumnLabelsPosition.OutsideEnd));
         }
 
         private void AssertStackedColumnSeries(SeriesBase series, string seriesName = DummyString, bool stacked = true)
         {
             var position = stacked ? BarColumnLabelsPosition.InsideEnd : BarColumnLabelsPosition.OutsideEnd;
-            var area = series as ColumnSeries;
+            var column = series as ColumnSeries;
             series.ShouldSatisfyAllConditions(
                 () => series.Name.ShouldBe(seriesName),
                 () => series.Items.Count.ShouldBe(1),
-                () => area.ShouldNotBeNull(),
-                () => area.LabelsAppearance.DataFormatString.ShouldBe(FormatStringPercentage),
-                () => area.TooltipsAppearance.DataFormatString.ShouldBe(FormatStringPercentage),
-                () => area.Stacked.ShouldBe(stacked),
-                () => area.LabelsAppearance.Position.ShouldBe(position));
+                () => column.ShouldNotBeNull(),
+                () => column.LabelsAppearance.DataFormatString.ShouldBe(FormatStringPercentage),
+                () => column.TooltipsAppearance.DataFormatString.ShouldBe(FormatStringPercentage),
+                () => column.Stacked.ShouldBe(stacked),
+                () => column.LabelsAppearance.Position.ShouldBe(position));
         }
 
         private void AssertDonutSeries(SeriesBase series, string format = FormatStringPercentage, string seriesName = DummyString)
         {
-            var area = series as DonutSeries;
+            var donut = series as DonutSeries;
             series.ShouldSatisfyAllConditions(
                 () => series.Name.ShouldBe(seriesName),
                 () => series.Items.Count.ShouldBe(1),
-                () => area.ShouldNotBeNull(),
-                () => area.LabelsAppearance.Position = PieLabelsPosition.Column,
-                () => area.LabelsAppearance.DataFormatString.ShouldBe(format),
-                () => area.TooltipsAppearance.DataFormatString.ShouldBe($"{seriesName} = {{0:{format}}}"));
+                () => donut.ShouldNotBeNull(),
+                () => donut.LabelsAppearance.Position = PieLabelsPosition.Column,
+                () => donut.LabelsAppearance.DataFormatString.ShouldBe(format),
+                () => donut.TooltipsAppearance.DataFormatString.ShouldBe($"{seriesName} = {{0:{format}}}"));
         }
 
         private void AssertLineSeries(SeriesBase series, string format = FormatStringPercentage, string seriesName = DummyString)
         {
-            var area = series as LineSeries;
+            var line = series as LineSeries;
             series.ShouldSatisfyAllConditions(
                 () => series.Name.ShouldBe(seriesName),
                 () => series.Items.Count.ShouldBe(1),
-                () => area.ShouldNotBeNull(),
-                () => area.LabelsAppearance.DataFormatString.ShouldBe(format),
-                () => area.TooltipsAppearance.DataFormatString.ShouldBe(format));
+                () => line.ShouldNotBeNull(),
+                () => line.LabelsAppearance.DataFormatString.ShouldBe(format),
+                () => line.TooltipsAppearance.DataFormatString.ShouldBe(format));
         }
 
         private void AssertPieSeries(SeriesBase series, string format = FormatStringPercentage, string seriesName = DummyString)
         {
-            var area = series as PieSeries;
+            var pie = series as PieSeries;
             series.ShouldSatisfyAllConditions(
                 () => series.Name.ShouldBe(seriesName),
                 () => series.Items.Count.ShouldBe(1),
-                () => area.ShouldNotBeNull(),
-                () => area.LabelsAppearance.DataFormatString.ShouldBe(format),
-                () => area.TooltipsAppearance.DataFormatString.ShouldBe(format));
+                () => pie.ShouldNotBeNull(),
+                () => pie.LabelsAppearance.DataFormatString.ShouldBe(format),
+                () => pie.TooltipsAppearance.DataFormatString.ShouldBe(format));
+        }
+
+        private void AssertScatterSeries(SeriesBase series, string format = FormatStringPercentage, string seriesName = DummyString)
+        {
+            var scatter = series as ScatterSeries;
+            series.ShouldSatisfyAllConditions(
+                () => series.Name.ShouldBe(seriesName),
+                () => series.Items.Count.ShouldBe(1),
+                () => scatter.ShouldNotBeNull());
+        }
+
+        private void AssertScatterLineSeries(SeriesBase series, string format = FormatStringPercentage, string seriesName = DummyString)
+        {
+            var scatter = series as ScatterLineSeries;
+            series.ShouldSatisfyAllConditions(
+                () => series.Name.ShouldBe(seriesName),
+                () => series.Items.Count.ShouldBe(1),
+                () => scatter.ShouldNotBeNull());
         }
 
         private void AssertSeriesDictionary(Dictionary<string, List<SeriesItem>> series)
