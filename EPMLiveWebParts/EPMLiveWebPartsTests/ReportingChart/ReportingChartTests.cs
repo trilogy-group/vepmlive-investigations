@@ -1669,12 +1669,11 @@ namespace EPMLiveWebParts.Tests.ReportingChart
                             </OrderBy>";
             var _shimView = new ShimSPView
             {
-                QueryGet = () => query//.Replace("\r\n", string.Empty).Replace("  ", string.Empty)
+                QueryGet = () => query
             };
             _shimViews = new ShimSPViewCollection
             {
                 ItemGetString = _ => _shimView,
-                
             };
         }
 
