@@ -279,9 +279,9 @@
 regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_RSVP.dll"
 regsvr32 /s "$(ProjectDir)\VBBinaries\WE_RSVP.dll"
 regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_PDSExt.dll"
-regsvr32 /s "$(ProjectDir)VBBinaries\WE_PDSExt.dll"
-regsvr32 /u /s "$(ProjectDir)VBBinaries\WE_DBASvr.dll"
-regsvr32 /s "$(ProjectDir)VBBinaries\WE_DBASvr.dll"
+regsvr32 /s "$(ProjectDir)\VBBinaries\WE_PDSExt.dll"
+regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_DBASvr.dll"
+regsvr32 /s "$(ProjectDir)\VBBinaries\WE_DBASvr.dll"
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
