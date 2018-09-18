@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,7 +15,7 @@ using Shouldly;
 
 namespace EPMLiveWebParts.Tests.ReportingChart
 {
-    [TestClass]
+    [TestClass, ExcludeFromCodeCoverage]
     public class ReportingChartToolPartTests
     {
         private const int Id = 1;
