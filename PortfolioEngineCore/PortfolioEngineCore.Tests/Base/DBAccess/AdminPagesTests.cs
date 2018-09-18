@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Data.Fakes;
+using System.Data.SqlClient.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortfolioEngineCore.Fakes;
 
 namespace PortfolioEngineCore.Tests.Base
 {
-    using System.Data.Fakes;
-    using System.Data.SqlClient;
-    using System.Data.SqlClient.Fakes;
     using PortfolioEngineCore;
 
     [TestClass]
@@ -22,6 +18,9 @@ namespace PortfolioEngineCore.Tests.Base
         private DBAccess dbAccess;
         private PrivateType privateType;
         private string UpdateCalcsMethodName = "UpdateCalcs";
+        private string GetCustFieldValMethodName = "GetCustFieldVal";
+        private string PerformCustomFieldsCalculateMethodName = "PerformCustomFieldsCalculate";
+        private const string DummyString = "DummyString";
 
         [TestInitialize]
         public void Initialize()
@@ -40,17 +39,13 @@ namespace PortfolioEngineCore.Tests.Base
 
         private void SetupShims()
         {
-            ShimSqlDb.ReadIntValueObject = valueObject => 1;
+            ShimSqlDb.ReadIntValueObject = _ => 1;
+            ShimSqlDb.ReadStringValueObject = _ => DummyString;
             ShimSqlDb.AllInstances.BeginTransaction = _ => { };
             ShimSqlDb.AllInstances.CommitTransaction = _ => { };
             ShimSqlDb.AllInstances.HandleStatusErrorSeverityEnumStringStatusEnumStringBoolean =
                 (_, severity, function, status, text, skipDbLog) => StatusEnum.rsServerError;
-
-
-
         }
-
-  
 
         [TestMethod]
         public void SelectFields_OnSuccess_ReturnStatusEnumSuccess()
@@ -226,7 +221,6 @@ namespace PortfolioEngineCore.Tests.Base
             ShimSqlDb.AllInstances.StatusGet = _ => StatusEnum.rsSuccess;
             ShimdbaPrioritz.PerformCustomFieldsCalculateDBAccess = _ => StatusEnum.rsSuccess;
 
-
             // Act
             var result = dbaPrioritz.UpdateWeights(dbAccess, formulas, out rowsAffected);
 
@@ -350,8 +344,13 @@ namespace PortfolioEngineCore.Tests.Base
             {
                 RowsGet = () => new ShimDataRowCollection
                 {
+                    CountGet = () => 1,
                     GetEnumerator = () => new List<DataRow>
                     {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => 1
+                        },
                         new ShimDataRow
                         {
                             ItemGetString = name => 1
@@ -367,23 +366,146 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual(StatusEnum.rsSuccess, result);
         }
 
+        [TestMethod]
+        public void UpdateFormulas_OnException_ReturnsStatusEnumError()
+        {
+            // Arrange
+            var rollBackWasCalled = false;
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () => true,
+                Close = () => { }
+            };
+            ShimdbaPrioritz.SelectComponentsDBAccessDataTableOut = SelectComponentsSuccess;
+            ShimdbaPrioritz.SelectFormulasDBAccessDataTableOut = SelectFormulasSuccess;
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                GetEnumerator = () => new List<DataRow>
+                {
+                    new ShimDataRow
+                    {
+                        ItemGetString = name => 1
+                    }
+                }.GetEnumerator()
+            };
+            var rowsAffected = 0;
+            var dataTable = new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    CountGet = () => 0,
+                    GetEnumerator = () => new List<DataRow>().GetEnumerator()
+                }
+            };
+            ShimSqlDb.AllInstances.CommitTransaction = _ =>
+            {
+                throw new Exception();
+            };
+            ShimSqlDb.AllInstances.RollbackTransaction = _ =>
+            {
+                rollBackWasCalled = true;
+            };
+
+            // Act
+            var result = dbaPrioritz.UpdateFormulas(dbAccess, dataTable, out rowsAffected);
+
+            // Assert
+            Assert.AreEqual(StatusEnum.rsServerError, result);
+            Assert.IsTrue(rollBackWasCalled);
+        }
+
+        [TestMethod]
+        public void GetCustFieldVal_LFat203_ReturnsExpectedValue()
+        {
+            // Arrange
+            const int LFit = 1;
+            const int LFat = 203;
+            var expectedValue = $"PC_{LFit.ToString("000")}";
+
+            // Act
+            var result = privateType.InvokeStatic(GetCustFieldValMethodName, LFit, LFat) as string;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(expectedValue, result);
+        }
+
+        [TestMethod]
+        public void GetCustFieldVal_LFat202_ReturnsExpectedValue()
+        {
+            // Arrange
+            const int LFit = 1;
+            const int LFat = 202;
+            var expectedValue = "IsNull(cast(Left(PT_" + LFit.ToString("000") + 
+                ", PatIndex('%[^0-9]%', PT_" + LFit.ToString("000") + "+'x' ) - 1 ) as int),0)";
+
+            // Act
+            var result = privateType.InvokeStatic(GetCustFieldValMethodName, LFit, LFat) as string;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(expectedValue, result);
+        }
+
+        [TestMethod]
+        public void PerformCustomFieldsCalculate_OnSuccess_ReturnsStatusEnumSuccess()
+        {
+            // Arrange
+            var count = 0;
+            ShimdbaPrioritz.PerformCustomFieldsCalculateDBAccess = null;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () =>
+                {
+                    if (count++ <= 4)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        count = 0;
+                        return false;
+                    }
+                },
+                ItemGetString = name => 1
+            };
+            ShimSqlDb.ReadIntValueObject = _ => count;
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
+            ShimSqlDataReader.AllInstances.Close = _ => { };
+
+            // Act
+            var result = privateType.InvokeStatic(PerformCustomFieldsCalculateMethodName, dbAccess);
+
+            // Assert
+            Assert.AreEqual(StatusEnum.rsSuccess, result);
+        }
+
+        /// <summary> 
+        /// This method is fake and these parameters are required, even though not all of them are used 
+        /// </summary> 
         private StatusEnum SelectFormulasSuccess(DBAccess dbAccess, out DataTable dataTable)
         {
             dataTable = new DataTable();
             return StatusEnum.rsSuccess;
         }
 
+        /// <summary>
+        /// This method is fake and these parameters are required, even though not all of them are used 
+        /// </summary>
         private StatusEnum SelectComponentsSuccess(DBAccess dbAccess, out DataTable dataTable)
         {
             dataTable = new DataTable();
             return StatusEnum.rsSuccess;
         }
 
+        /// <summary>
+        /// This method is fake and these parameters are required, even though not all of them are used 
+        /// </summary>
         private StatusEnum SelectDataSuccess(SqlDb sqlDb, string command, StatusEnum statusEnum, out DataTable dataTable)
         {
             dataTable = new DataTable();
             return StatusEnum.rsSuccess;
         }
-
     }
 }
