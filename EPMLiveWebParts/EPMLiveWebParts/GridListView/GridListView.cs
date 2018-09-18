@@ -1,39 +1,27 @@
 ﻿using EPMLiveCore;
 using EPMLiveCore.Infrastructure;
-using System;
-using System.Runtime.InteropServices;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Xml.Serialization;
-
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.WebPartPages;
-
-using System.ComponentModel;
-using System.Text;
-using System.Collections;
-using System.Xml;
-
 using Microsoft.Web.CommandUI;
-
-using System.Text.RegularExpressions;
-
-using System.Data;
-
-using Microsoft.SharePoint.JsonUtilities;
-
-using System.Reflection;
-using ReportFiltering;
-
-using System.Data.SqlClient;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Web;
 using System.Web.Script.Serialization;
-
-
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace EPMLiveWebParts
 {
