@@ -1,5 +1,6 @@
 using Microsoft.Win32;
 using PortfolioEngineCore;
+using PortfolioEngineCore.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using WE_QueueMgr.MsmqIntegration;
+
 
 namespace WE_QueueMgr
 {
@@ -81,31 +83,30 @@ namespace WE_QueueMgr
                                         rk.Close();
                                         if (site != null)
                                         {
-                                            var m_oConnection = new SqlConnection();
-                                            m_oConnection.ConnectionString = site.connection + ";Application Name=PfEQueueManager";
-                                            m_oConnection.Open();
-
-                                            SqlCommand cmd = new SqlCommand("SELECT WRES_ID,RES_NAME,WRES_TRACE FROM EPG_RESOURCES WHERE WRES_CAN_LOGIN = 1 AND WRES_USE_NT_LOGON = 1 AND WRES_NT_ACCOUNT=@WRES_NT_ACCOUNT", m_oConnection);
-                                            cmd.CommandType = CommandType.Text;
-                                            cmd.Parameters.AddWithValue("@WRES_NT_ACCOUNT", sNTUserName.ToLower());
-                                            SqlDataReader reader = cmd.ExecuteReader();
-                                            if (reader != null)
+                                            using (var m_oConnection = new SqlConnection())
                                             {
-                                                if (reader.Read())
+                                                m_oConnection.ConnectionString = site.connection + ";Application Name=PfEQueueManager";
+                                                m_oConnection.Open();
+
+                                                using (SqlCommand cmd = new SqlCommand("SELECT WRES_ID,RES_NAME,WRES_TRACE FROM EPG_RESOURCES WHERE WRES_CAN_LOGIN = 1 AND WRES_USE_NT_LOGON = 1 AND WRES_NT_ACCOUNT=@WRES_NT_ACCOUNT", m_oConnection))
                                                 {
-                                                    site.WRES_ID = reader["WRES_ID"].ToString();
-                                                    site.userName = reader["RES_NAME"].ToString();
-                                                    site.NTAccount = sNTUserName.ToLower();
-                                                    site.SessionInfo = Guid.NewGuid().ToString().ToUpper();
+                                                    cmd.CommandType = CommandType.Text;
+                                                    cmd.Parameters.AddWithValue("@WRES_NT_ACCOUNT", sNTUserName.ToLower());
+                                                    using (SqlDataReader reader = cmd.ExecuteReader())
+                                                    {
+                                                        if (reader != null)
+                                                        {
+                                                            if (reader.Read())
+                                                            {
+                                                                site.WRES_ID = reader["WRES_ID"].ToString();
+                                                                site.userName = reader["RES_NAME"].ToString();
+                                                                site.NTAccount = sNTUserName.ToLower();
+                                                                site.SessionInfo = Guid.NewGuid().ToString().ToUpper();
+                                                            }
+                                                        }
+                                                    }
                                                 }
-                                                reader.Close();
-                                                reader.Dispose();
                                             }
-
-                                            if (m_oConnection.State != System.Data.ConnectionState.Closed)
-                                                m_oConnection.Close();
-                                            m_oConnection.Dispose();
-
                                             m_sites.Add(site);
                                             if (!string.IsNullOrEmpty(basepaths))
                                                 basepaths += ",";
@@ -278,7 +279,7 @@ namespace WE_QueueMgr
                         }
                     }
                 }
-                Task.Delay(doMonitorPeriod);
+                Thread.Sleep(doMonitorPeriod);
             }
         }
         void CheckTaskFault(Task task, ref FaultItem faultItem)
@@ -312,7 +313,7 @@ namespace WE_QueueMgr
         object longRunQueueLock = new object();
         List<QMSite> longRunQueue = new List<QMSite>();
         List<Guid> longRunJobIds = new List<Guid>();
-        
+
         void EnqueueSite(QMSite site, Guid jobId)
         {
             lock (longRunQueueLock)
@@ -372,18 +373,16 @@ namespace WE_QueueMgr
                     CancellationTokenSource tokenSource = new CancellationTokenSource();
                     CancellationToken tasktoken = tokenSource.Token;
                     Task task = Task.Factory.StartNew(() =>
-                    {
-                        InvokeWSSAdminRSVPRequest(site, jobId);
-                    },
-                    tasktoken);
-
+                     {
+                         InvokeWSSAdminRSVPRequest(site, jobId);
+                     }, tasktoken);
 
                     DateTime jobStarted = DateTime.Now;
                     while (((DateTime.Now - jobStarted).Minutes < jobMaxTimeout || longRunJobIds.Count <= 1) && !token.IsCancellationRequested)
                     {
                         if (task.IsCompleted)
                             break;
-                        Task.Delay(TimeSpan.FromMinutes(1));
+                        Thread.Sleep(TimeSpan.FromSeconds(30));
                     }
                     if (token.IsCancellationRequested || !task.IsCompleted)
                     {
@@ -394,13 +393,14 @@ namespace WE_QueueMgr
                             qm.RequeueJob(jobId);
                         }
                     }
+
                     lock (longRunQueueLock)
                     {
                         longRunQueue.RemoveAt(0);
                         longRunJobIds.RemoveAt(0);
                     }
                 }
-                Task.Delay(longRunPeriod);
+                Thread.Sleep(longRunPeriod);
             }
         }
 
@@ -465,7 +465,7 @@ namespace WE_QueueMgr
                 {
                     ExceptionHandler("ProcessTimerJobs", ex);
                 }
-                Task.Delay(doWorkPeriod);
+                Thread.Sleep(doWorkPeriod);
             }
         }
 
@@ -607,21 +607,18 @@ namespace WE_QueueMgr
 
         private string InvokeWSSAdminRSVPRequest(QMSite site, Guid jobId)
         {
-            object comObject = null;
+
             try
             {
-                var comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
-                comObject = Activator.CreateInstance(comObjectType);
-                var myparams = new object[] { "ManageQueue", site.basePath, jobId.ToString() };
-                return (string)comObjectType.InvokeMember("RSVPRequest",
-                                                        BindingFlags.InvokeMethod,
-                                                        null,
-                                                        comObject,
-                                                        myparams);
+                WSSAdmin wssadmin = new WSSAdmin();
+                return wssadmin.RSVPRequest("ManageQueue", site.basePath, jobId.ToString());
+            }
+            catch (Exception ex)
+            {
+                return "<Reply><HRESULT>0</HRESULT><STATUS>0</STATUS></Reply>";
             }
             finally
             {
-                comObject = null;
             }
         }
 

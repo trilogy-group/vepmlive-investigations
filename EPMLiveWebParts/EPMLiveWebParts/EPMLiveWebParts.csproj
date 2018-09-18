@@ -1910,7 +1910,7 @@
     </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>del "$(TargetDir)$(TargetName).XmlSerializers.dll"
-del "$(ProjectDir)$(TargetName).XmlSerializers.dll"</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
 </Project>
