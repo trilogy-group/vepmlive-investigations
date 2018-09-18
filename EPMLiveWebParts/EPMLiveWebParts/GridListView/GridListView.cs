@@ -916,190 +916,6 @@ namespace EPMLiveWebParts
             }
         }
 
-        private string getPjList(SPWeb web)
-        {
-            string planner = "";
-            try
-            {
-                Guid lWeb = EPMLiveCore.CoreFunctions.getLockedWeb(web);
-                string projectcenter = "";
-
-                if (lWeb != web.ID)
-                {
-                    using (SPWeb tweb = web.Site.OpenWeb(lWeb))
-                    {
-                        projectcenter = EPMLiveCore.CoreFunctions.getConfigSetting(tweb, "EPMLiveWPProjectCenter");
-                    }
-                }
-                else
-                {
-                    projectcenter = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveWPProjectCenter");
-                }
-
-                if (projectcenter.ToLower() == list.Title.ToLower())
-                {
-                    foreach (SPListItem li in list.Items)
-                    {
-                        if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null)
-                            planner += "<Button Id=\"Ribbon.ListItem.EPMLive.LEditInProject\" Sequence=\"20\" Command=\"LEditInProject\" CommandValueId=\"" + list.ID + "." + li.ID + "\" LabelText=\"" + HttpUtility.HtmlEncode(li.Title) + "\" TemplateAlias=\"o1\" Image32by32=\"_layouts/images/epmlivelogo.gif\"/>";
-                        else
-                            planner += "<Button Id=\"Ribbon.ListItem.EPMLive.EditInPSProject\" Sequence=\"10\" Command=\"LEditInPSProject\"  LabelText=\"" + HttpUtility.HtmlEncode(li.Title) + "\" CommandValueId=\"" + list.ID + "." + li.ID + "\" TemplateAlias=\"o1\" Image32by32=\"_layouts/images/project2007logo.gif\"/>";
-                    }
-                }
-                else
-                {
-                    SPList pList = web.Lists[projectcenter];
-                    foreach (SPListItem li in pList.Items)
-                    {
-                        if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null)
-                            planner += "<Button Id=\"Ribbon.ListItem.EPMLive.LEditInProject\" Sequence=\"20\" Command=\"LEditInProject\" CommandValueId=\"" + pList.ID + "." + li.ID + "\" LabelText=\"" + HttpUtility.HtmlEncode(li.Title) + "\" TemplateAlias=\"o1\" Image32by32=\"_layouts/images/epmlivelogo.gif\"/>";
-                        else
-                            planner += "<Button Id=\"Ribbon.ListItem.EPMLive.EditInPSProject\" Sequence=\"10\" Command=\"LEditInPSProject\"  LabelText=\"" + HttpUtility.HtmlEncode(li.Title) + "\" CommandValueId=\"" + pList.ID + "." + li.ID + "\" TemplateAlias=\"o1\" Image32by32=\"_layouts/images/project2007logo.gif\"/>";
-                    }
-                }
-            }
-            catch { }
-            return planner;
-        }
-
-        private string getPlannerList(string plannerName, SPWeb web, string pDisplay)
-        {
-            string planner = "";
-            try
-            {
-                Guid lWeb = EPMLiveCore.CoreFunctions.getLockedWeb(web);
-                string projectcenter = "";
-                string taskcenter = "";
-                bool enableWP = false;
-                if (lWeb != web.ID)
-                {
-                    using (SPWeb tweb = web.Site.OpenWeb(lWeb))
-                    {
-                        projectcenter = EPMLiveCore.CoreFunctions.getConfigSetting(tweb, "EPMLive" + plannerName + "ProjectCenter");
-                        taskcenter = EPMLiveCore.CoreFunctions.getConfigSetting(tweb, "EPMLive" + plannerName + "TaskCenter");
-                        try
-                        {
-                            enableWP = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(tweb, "EPMLive" + plannerName + "Enable"));
-                        }
-                        catch { }
-                    }
-                }
-                else
-                {
-                    projectcenter = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLive" + plannerName + "ProjectCenter");
-                    taskcenter = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLive" + plannerName + "TaskCenter");
-                    try
-                    {
-                        enableWP = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLive" + plannerName + "Enable"));
-                    }
-                    catch { }
-
-                }
-
-                string preid = "";
-
-                if (projectcenter.ToLower() == list.Title.ToLower() && enableWP)
-                {
-                    if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] != null)
-                        preid = list.ID + ".";
-
-                    foreach (SPListItem li in list.Items)
-                    {
-                        planner += "<Button Id=\"Ribbon.ListItem.EPMLive.Planner" + plannerName + "\" Sequence=\"20\" Command=\"LPlanner" + plannerName + "\" CommandValueId=\"" + preid + li.ID + "\" LabelText=\"" + HttpUtility.HtmlEncode(li.Title) + "\" TemplateAlias=\"o1\" Image32by32=\"_layouts/images/epmlivelogo.gif\"/>";
-                    }
-                }
-                if (taskcenter.ToLower() == list.Title.ToLower() && enableWP)
-                {
-                    SPList pList = web.Lists[projectcenter];
-
-                    if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] != null)
-                        preid = pList.ID + ".";
-
-                    foreach (SPListItem li in pList.Items)
-                    {
-                        planner += "<Button Id=\"Ribbon.ListItem.EPMLive.Planner" + plannerName + "\" Sequence=\"20\" Command=\"LPlanner" + plannerName + "\" CommandValueId=\"" + preid + li.ID + "\" LabelText=\"" + HttpUtility.HtmlEncode(li.Title) + "\" TemplateAlias=\"o1\" Image32by32=\"_layouts/images/epmlivelogo.gif\"/>";
-                    }
-                }
-            }
-            catch { }
-            return planner;
-        }
-
-        private string getEPKPlannerList(SPWeb web)
-        {
-            string planner = "";
-            try
-            {
-
-                string taskcenter = EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPKTaskCenter");
-
-                if (taskcenter.ToLower() == list.Title.ToLower())
-                {
-                    SPField pField = list.Fields[EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb, "epktaskcenterprojectfield")];
-
-                    XmlDocument doc = new XmlDocument();
-                    doc.LoadXml(pField.SchemaXml);
-
-                    SPList pList = web.Lists[new Guid(doc.FirstChild.Attributes["List"].Value)];
-
-                    foreach (SPListItem li in pList.Items)
-                    {
-                        planner += "<Button Id=\"Ribbon.ListItem.EPMLive.PlannerEPK\" Sequence=\"20\" Command=\"LPlannerPE\" CommandValueId=\"" + web.ID + "." + pList.ID + "." + li.ID + "\" LabelText=\"" + HttpUtility.HtmlEncode(li.Title) + "\" TemplateAlias=\"o1\" Image32by32=\"_layouts/images/epmlivelogo.gif\"/>";
-                    }
-                }
-            }
-            catch { }
-            return planner;
-        }
-
-        private string getPlanner(string plannerName, SPWeb web, string pDisplay, string image)
-        {
-            string planner = "";
-            try
-            {
-                Guid lWeb = EPMLiveCore.CoreFunctions.getLockedWeb(web);
-                string projectcenter = "";
-                string taskcenter = "";
-                bool enableWP = false;
-                if (lWeb != web.ID)
-                {
-                    using (SPWeb tweb = web.Site.OpenWeb(lWeb))
-                    {
-                        projectcenter = EPMLiveCore.CoreFunctions.getConfigSetting(tweb, "EPMLive" + plannerName + "ProjectCenter");
-                        taskcenter = EPMLiveCore.CoreFunctions.getConfigSetting(tweb, "EPMLive" + plannerName + "TaskCenter");
-                        try
-                        {
-                            enableWP = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(tweb, "EPMLive" + plannerName + "Enable"));
-                        }
-                        catch { }
-                    }
-                }
-                else
-                {
-                    projectcenter = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLive" + plannerName + "ProjectCenter");
-                    taskcenter = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLive" + plannerName + "TaskCenter");
-                    try
-                    {
-                        enableWP = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLive" + plannerName + "Enable"));
-                    }
-                    catch { }
-
-                }
-
-                if ((projectcenter.ToLower() == list.Title.ToLower()) && enableWP)
-                {
-                    planner = "<Button Id=\"Ribbon.ListItem.EPMLive.Planner" + plannerName + "\" Sequence=\"95\" Command=\"Planner" + plannerName + "\" LabelText=\"" + pDisplay + "\" TemplateAlias=\"o2\" Image16by16=\"" + image + "\"/>";
-                }
-            }
-            catch { }
-            return planner;
-        }
-
-        private string getPlanner(string plannerName, SPWeb web, string pDisplay)
-        {
-            return getPlanner(plannerName, web, pDisplay, "_layouts/images/epmlivelogosmall.gif");
-        }
-
         private string getEPKButtons(EPMLiveCore.API.RibbonProperties rp, Ribbon ribbon1, string language)
         {
             StringBuilder sb = new StringBuilder();
@@ -3379,10 +3195,19 @@ namespace EPMLiveWebParts
             }}";
         }
 
-        private string RenderFunctionDoSearch()
+        private string RenderFunctionDoSearch(bool renderForGrid = false)
         {
+            var actionMethod = renderForGrid
+                ? $"loadX{sFullGridId}(searcher.options[searcher.selectedIndex].value, searchvalue, searchtype);"
+                : $"GridSearch('{sFullGridId}', searcher.options[searcher.selectedIndex].value, searchvalue, searchtype);";
+
             var queryStringParameterPrefix = list.ID.ToString("N");
-            return $@"function doSearch{sFullGridId}(){{
+            return $@"function doSearch{sFullGridId}(){{{(renderForGrid
+                ? $@"var gri = document.getElementById('grid{ID}');
+                     gri.style.display = 'none';
+                     var loader = document.getElementById('loadinggrid{ID}');
+                     loader.style.display = '';"
+                : string.Empty)}
                 var searcher = document.getElementById('search{sFullGridId}');
                 var unsearch = document.getElementById('unsearch{sFullGridId}');
                 unsearch.style.display=""table-cell"";
@@ -3397,9 +3222,14 @@ namespace EPMLiveWebParts
                     searchvalue = searchchoice.options[searchchoice.selectedIndex].value;
                 }} else {{ 
                     searchvalue = searchtext.value;
-                }}
+                }}{(renderForGrid 
+                    ? $@"curPage{sFullGridId} = {Convert.ToInt32(gSettings.EnableContentReporting)};
+                         sf{sFullGridId} = searchfield;
+                         sv{sFullGridId} = searchvalue;
+                         st{sFullGridId} = searchtype;"
+                    : string.Empty)}
                 
-                {(bLockSearch 
+                {(bLockSearch
                     ? $@"var url = '{GenerateSearchRequestUrl()}';
                         if(url.indexOf('?') > 0) {{
                             url = url + '&';
@@ -3409,7 +3239,7 @@ namespace EPMLiveWebParts
                         url = url + '{queryStringParameterPrefix}_searchfield=' + searchfield + '&{queryStringParameterPrefix}_searchvalue=' + searchvalue + '&{queryStringParameterPrefix}_searchtype=' + searchtype;
                         location.href= url;"
 
-                    : $"GridSearch('{sFullGridId}', searcher.options[searcher.selectedIndex].value, searchvalue, searchtype);")}
+                    : actionMethod)}
                 
             }}";
         }
@@ -4247,28 +4077,8 @@ namespace EPMLiveWebParts
 
                 output.WriteLine("<script language=\"javascript\">");
                 output.WriteLine("var searchfields" + sFullGridId + " = {" + jsonfields.TrimEnd(',') + "};");
-                output.WriteLine("function switchsearch" + sFullGridId + "()");
-                output.WriteLine("{");
-                output.WriteLine("var searcher = document.getElementById('search" + sFullGridId + "');");
-                output.WriteLine("var searchtext = document.getElementById('searchtext" + sFullGridId + "');");
-                output.WriteLine("var searchchoice = document.getElementById('searchchoice" + sFullGridId + "');");
-                output.WriteLine("var searchtypechoice = document.getElementById('searchtype" + sFullGridId + "');");
-                output.WriteLine("var searchfield = searcher.options[searcher.selectedIndex].value;");
-                output.WriteLine("var sList = searchfields" + sFullGridId + "[searchfield];");
-                output.WriteLine("if(sList){");
-                output.WriteLine("searchtext.style.display='none';");
-                output.WriteLine("searchchoice.style.display='';");
-                output.WriteLine("searchchoice.options.length = 0;");
-                output.WriteLine("searchtypechoice.options[2].selected = true;");
-                output.WriteLine("searchtypechoice.disabled = true;");
-                output.WriteLine("for(var i=0; i < sList.length; i++) {     var d = sList[i];     searchchoice.options.add(new Option(d, d)); if(d=='" + sSearchValue + "'){searchchoice.options[searchchoice.options.length-1].selected = true;} } ");
 
-                output.WriteLine("}else{");
-                output.WriteLine("searchtext.style.display='';");
-                output.WriteLine("searchchoice.style.display='none';");
-                output.WriteLine("searchtypechoice.disabled = false;");
-                output.WriteLine("}");
-                output.WriteLine("}");
+                output.WriteLine(RenderFunctionSwitchToSearch());
 
                 output.WriteLine("function unSearch" + sFullGridId + "(){");
                 output.WriteLine("var gri = document.getElementById('grid" + this.ID + "');");
@@ -4292,81 +4102,7 @@ namespace EPMLiveWebParts
 
                 output.WriteLine("}");
 
-                output.WriteLine("function doSearch" + sFullGridId + "(){");
-                output.WriteLine("var gri = document.getElementById('grid" + this.ID + "');");
-                output.WriteLine("gri.style.display = 'none';");
-                output.WriteLine("var loader = document.getElementById('loadinggrid" + this.ID + "');");
-                output.WriteLine("loader.style.display = '';");
-                //output.WriteLine("var searchbut = document.getElementById('searchbutton" + sFullGridId + "');");
-                //output.WriteLine("searchbut.disabled = true;");
-                output.WriteLine("var searcher = document.getElementById('search" + sFullGridId + "');");
-
-                output.WriteLine("var unsearch = document.getElementById('unsearch" + sFullGridId + "');");
-                output.WriteLine("unsearch.style.display=\"table-cell\";");
-                output.WriteLine("var searchchoice = document.getElementById('searchchoice" + sFullGridId + "');");
-                output.WriteLine("var searchtext = document.getElementById('searchtext" + sFullGridId + "');");
-                output.WriteLine("var searchtypechoice = document.getElementById('searchtype" + sFullGridId + "');");
-                output.WriteLine("var searchfield = searcher.options[searcher.selectedIndex].value;");
-                output.WriteLine("var searchtype = searchtypechoice.options[searchtypechoice.selectedIndex].value;");
-                output.WriteLine("var sList = searchfields" + sFullGridId + "[searchfield];");
-                output.WriteLine("var searchvalue = \"\";");
-                output.WriteLine("if(sList){");
-                output.WriteLine("searchvalue = searchchoice.options[searchchoice.selectedIndex].value;");
-                output.WriteLine("}else{");
-                output.WriteLine("searchvalue = searchtext.value;");
-                output.WriteLine("}");
-                if (gSettings.EnableContentReporting)
-                    output.WriteLine("curPage" + sFullGridId + " = 1;");
-                else
-                    output.WriteLine("curPage" + sFullGridId + " = 0;");
-
-                output.WriteLine("sf" + sFullGridId + " = searchfield;");
-                output.WriteLine("sv" + sFullGridId + " = searchvalue;");
-                output.WriteLine("st" + sFullGridId + " = searchtype;");
-
-                if (bLockSearch)
-                {
-                    System.Collections.Specialized.NameValueCollection nv = Page.Request.QueryString;
-                    StringBuilder sbUrl = new StringBuilder();
-
-                    string fListId = list.ID.ToString("N");
-
-                    foreach (string key in nv.AllKeys)
-                    {
-                        if (key != fListId + "_searchvalue" && key != fListId + "_searchfield" && key != fListId + "_searchtype")
-                        {
-                            sbUrl.Append("&");
-                            sbUrl.Append(key);
-                            sbUrl.Append("=");
-                            sbUrl.Append(HttpUtility.UrlEncode(nv[key]));
-                        }
-                    }
-
-                    string urlParams = sbUrl.ToString().TrimStart('&');
-                    if (!String.IsNullOrEmpty(urlParams))
-                        urlParams = "?" + urlParams;
-
-                    string curUrl = Page.Request.Url.ToString();
-
-                    try
-                    {
-                        curUrl = curUrl.Remove(curUrl.IndexOf("?"));
-                    }
-                    catch { }
-
-                    output.WriteLine("var url = '" + curUrl + urlParams + "';");
-                    output.WriteLine("if(url.indexOf('?') > 0){url = url + '&';}else{url = url + '?';}");
-                    output.WriteLine("url = url + '" + fListId + "_searchfield=' + searchfield + '&" + fListId + "_searchvalue=' + searchvalue + '&" + fListId + "_searchtype=' + searchtype;");
-                    output.WriteLine("location.href= url;");
-
-                }
-                else
-                {
-
-                    output.WriteLine("loadX" + sFullGridId + "(searcher.options[searcher.selectedIndex].value, searchvalue, searchtype);");
-                }
-
-                output.WriteLine("}");
+                output.WriteLine(RenderFunctionDoSearch(true));
 
                 output.WriteLine("function enablesearcher" + sFullGridId + "(){");
                 //output.WriteLine("var searchbut = document.getElementById('searchbutton" + sFullGridId + "');");
