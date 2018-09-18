@@ -4403,8 +4403,8 @@
   <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
   <ProjectExtensions />
   <PropertyGroup>
-    <PreBuildEvent>del "$(TargetDir)$(TargetName).XmlSerializers.dll"
-del "$(ProjectDir)$(TargetName).XmlSerializers.dll"</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
 </Project>

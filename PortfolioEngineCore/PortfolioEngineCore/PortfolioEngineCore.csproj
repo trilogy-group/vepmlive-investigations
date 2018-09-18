@@ -275,19 +275,18 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\gacutil.exe" /u "$(TargetName)"
-regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_RSVP.dll"
-regsvr32 /s "$(ProjectDir)\VBBinaries\WE_RSVP.dll"
+    <PreBuildEvent>regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_RSVP.dll"
 regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_PDSExt.dll"
-regsvr32 /s "$(ProjectDir)\VBBinaries\WE_PDSExt.dll"
 regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_DBASvr.dll"
+regsvr32 /s "$(ProjectDir)\VBBinaries\WE_RSVP.dll"
+regsvr32 /s "$(ProjectDir)\VBBinaries\WE_PDSExt.dll"
 regsvr32 /s "$(ProjectDir)\VBBinaries\WE_DBASvr.dll"
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\gacutil.exe" /i "$(TargetPath)"
-
-
+    <PostBuildEvent>regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_RSVP.dll"
+regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_PDSExt.dll"
+regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_DBASvr.dll"
 
 </PostBuildEvent>
   </PropertyGroup>
