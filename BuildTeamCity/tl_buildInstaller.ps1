@@ -275,8 +275,6 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
    & $MSBuildExec $projectPath `
    /t:build `
    /p:OutputPath="$BinariesDirectory" `
-   /p:PreBuildEvent= `
-   /p:PostBuildEvent= `
    /p:Configuration="$ConfigurationToBuild" `
    /p:Platform="$PlatformToBuild" `
    /p:langversion="$langversion" `
