@@ -189,25 +189,25 @@
 			"files": ["WE_WSIF.dll"],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
 		},
-    {
-      "name": "WE_WSIF.tlb",
-      "files": ["WE_WSIF.tlb"],
-      "destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
-    },
-    {
+		{
+		  "name": "WE_WSIF.tlb",
+		  "files": ["WE_WSIF.tlb"],
+		  "destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
+		},
+		{
 			"name": "WE_WSSAdmin.dll", 
 			"files": ["WE_WSSAdmin.dll"],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
 		},
-		//{
-		//	"name": "WE_WSSAdmin.dll", 
-		//	"files": ["WE_WSSAdmin.dll"],
-		//	"destination": "[ProgramFilesFolder]COMPlus Applications\\{9E3ABD82-916F-4B55-BC80-581D307471E0}",
-		//	"registerCOMplus": {
-		//		"ID": "{9E3ABD82-916F-4B55-BC80-581D307471E0}",
-		//		"Name": "WssAdmin"
-		//		}
-		//},
+		{
+			"name": "WE_WSSAdmin.dll", 
+			"files": ["WE_WSSAdmin.dll"],
+			"destination": "[ProgramFilesFolder]COMPlus Applications\\{9E3ABD82-916F-4B55-BC80-581D307471E0}",
+			"registerCOMplus": {
+				"ID": "{9E3ABD82-916F-4B55-BC80-581D307471E0}",
+				"Name": "WssAdmin"
+				}
+		},
 		{
 			"name": "workenginesetup.exe", 
 			"files": ["workenginesetup.exe"],
