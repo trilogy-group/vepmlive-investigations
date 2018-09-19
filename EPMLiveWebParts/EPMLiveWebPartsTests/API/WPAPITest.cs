@@ -87,7 +87,25 @@ namespace EPMLiveWebParts.Tests.API
                 },
                 FieldsGet = () => new ShimSPFieldCollection
                 {
-                    GetFieldByInternalNameString = _ => new ShimSPFieldNumber().Instance,
+                    GetFieldByInternalNameString = name =>
+                    {
+                        if (name == "State")
+                        {
+                            return new ShimSPField
+                            {
+                                TypeGet = () => SPFieldType.Text
+                            };
+                        }
+                        if (name == "DateField")
+                        {
+                            return new ShimSPField
+                            {
+                                TypeGet = () => SPFieldType.DateTime
+                            };
+                        }
+
+                        return new ShimSPFieldNumber().Instance;
+                    },
                     ContainsFieldWithStaticNameString = _ => true
                 }
             };
@@ -139,6 +157,10 @@ namespace EPMLiveWebParts.Tests.API
 
             ShimCoreFunctions.getListSettingStringSPList = (_, __) =>
                 $"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ntrue";
+
+            ShimListDisplayUtils.ConvertFromStringString = _ => new Dictionary<string, Dictionary<string, string>>();
+
+            ShimEditableFieldDisplay.isEditableSPListItemSPFieldDictionaryOfStringDictionaryOfStringString = (_, __, ___) => true;
         }
 
         [TestMethod]
@@ -213,6 +235,8 @@ namespace EPMLiveWebParts.Tests.API
             return $@"
                 <Root id='{DummyInt}' webid='{WebId}' siteid='{SiteId}' listid='{ListId}' itemid='{DummyInt}' Cols='{DummyString}'>
                     <Field Name='{DummyString}'>{DummyString}</Field>
+                    <Field Name='FState'>{DummyString}</Field>
+                    <Field Name='DateField'>{DummyInt}</Field>
                 </Root>";
         }
 
@@ -271,6 +295,60 @@ namespace EPMLiveWebParts.Tests.API
                 () => result.ShouldNotBeNullOrEmpty(),
                 () => result.ShouldBe(ResultForGetGridRow),
                 () => _listItemUpdated.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void GetGridRowEdit_WhenDifferentSiteId_ConfirmResult()
+        {
+            // Arrange
+            var xmlString = CreateXml();
+
+            // Act
+            var result = WPAPI.GetGridRowEdit(xmlString, _web);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _siteCreated.ShouldBeTrue(),
+                () => _webOpened.ShouldBeTrue(),
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe("<Result Status=\"0\"><![CDATA[<Grid><Changes><I id=\"1\" DummyStringCanEdit=\"1\" DummyStringType=\"Float\" DummyStringFormat=\",#0\" DummyString=\"1\" /></Changes></Grid>]]></Result>"));
+        }
+
+        [TestMethod]
+        public void GetGridRowEdit_WhenDifferentWebId_ConfirmResult()
+        {
+            // Arrange
+            var xmlString = CreateXml();
+            _siteId = SiteId;
+
+            // Act
+            var result = WPAPI.GetGridRowEdit(xmlString, _web);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _siteCreated.ShouldBeFalse(),
+                () => _webOpened.ShouldBeTrue(),
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe("<Result Status=\"0\"><![CDATA[<Grid><Changes><I id=\"1\" DummyStringCanEdit=\"1\" DummyStringType=\"Float\" DummyStringFormat=\",#0\" DummyString=\"1\" /></Changes></Grid>]]></Result>"));
+        }
+
+        [TestMethod]
+        public void GetGridRowEdit_WhenSiteIdAndWebIdAreEqual_ConfirmResult()
+        {
+            // Arrange
+            var xmlString = CreateXml();
+            _siteId = SiteId;
+            _webId = WebId;
+
+            // Act
+            var result = WPAPI.GetGridRowEdit(xmlString, _web);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _siteCreated.ShouldBeFalse(),
+                () => _webOpened.ShouldBeFalse(),
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe("<Result Status=\"0\"><![CDATA[<Grid><Changes><I id=\"1\" DummyStringCanEdit=\"1\" DummyStringType=\"Float\" DummyStringFormat=\",#0\" DummyString=\"1\" /></Changes></Grid>]]></Result>"));
         }
     }
 }
