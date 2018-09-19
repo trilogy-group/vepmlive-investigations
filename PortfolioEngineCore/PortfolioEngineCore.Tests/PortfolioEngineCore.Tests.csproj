@@ -126,6 +126,7 @@
     <Compile Include="Analyzers\BaseDetailRowDataTest.cs" />
     <Compile Include="PfeJobTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\RPEditorDataTests.cs" />
     <Compile Include="Testables\BaseDetailRowDataTestable.cs" />
   </ItemGroup>
   <ItemGroup>
