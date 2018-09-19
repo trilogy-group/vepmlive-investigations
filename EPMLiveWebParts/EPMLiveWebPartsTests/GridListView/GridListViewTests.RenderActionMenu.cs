@@ -1,19 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Globalization;
-using System.Text;
-using System.Web.Fakes;
-using System.Web.UI;
-using System.Web.UI.Fakes;
-using EPMLiveCore;
+﻿using System.Web.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveWebParts.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
-using Microsoft.SharePoint.WebPartPages.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
-using WorkEnginePPM.Fakes;
 
 namespace EPMLiveWebParts.Tests
 {
