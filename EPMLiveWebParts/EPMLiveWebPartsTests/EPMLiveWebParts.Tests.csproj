@@ -97,6 +97,9 @@
     <Reference Include="System.XML.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="WorkEnginePPM.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -115,6 +118,7 @@
   <ItemGroup>
     <Compile Include="ChatControl\VfChartTests.cs" />
     <Compile Include="GridListView\GridListViewTests.AddContextualTab.cs" />
+    <Compile Include="GridListView\GridListViewTests.RenderActionMenu.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderGantt.cs" />
     <Compile Include="Layouts\epmlive\TlwizardTests.cs" />
     <Compile Include="ReportingChart\ReportingChartToolPartTests.cs" />
