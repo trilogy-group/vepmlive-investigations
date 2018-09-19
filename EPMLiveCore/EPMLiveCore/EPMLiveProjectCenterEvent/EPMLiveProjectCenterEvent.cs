@@ -225,7 +225,10 @@ namespace EPMLiveCore
             {
                 var propertyValue = GetPropertyValue("ProjectUpdate", properties);
 
-                if (propertyValue != null && !propertyValue.ToString().Equals("Schedule Driven")) return;
+                //SKYVERA-455: if project update is schedule driven but project is closed, we should avoid automatic updates for project fields
+                if (propertyValue != null && (!propertyValue.ToString().Equals("Schedule Driven")
+                    || (properties.List.Fields.ContainsFieldWithInternalName("State") &&
+                        properties.AfterProperties["State"].ToString().ToLower().EndsWith("closed")))) return;
 
                 foreach (SPField spField in properties.List.Fields)
                 {
