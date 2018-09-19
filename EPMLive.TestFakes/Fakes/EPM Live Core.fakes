@@ -24,6 +24,7 @@
     <Add FullName="EPMLiveCore.API.APITeam!"/>
     <Add FullName="EPMLiveCore.Utilities!"/>
     <Add FullName="EPMLiveCore.Jobs.ResourceImportJob!"/>
+    <Add FullName="EPMLiveCore.Jobs.ResourceImportResult!"/>
     <Add FullName="EPMLiveCore.API.ResourceImporter!"/>
     <Add FullName="EPMLiveCore.API.ListCommands!"/>
     <Add FullName="EPMLiveCore.GridGanttSettings!"/>
