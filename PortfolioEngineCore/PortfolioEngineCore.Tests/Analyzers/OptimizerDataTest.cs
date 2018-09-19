@@ -63,10 +63,13 @@ namespace PortfolioEngineCore.Tests.Analyzers
             ShimUtilities.ResolveNTNameintoWResIDSqlConnectionString = (sqlConnection, userName) => 1;
         }
 
-        private string MyFormatDummyMethod(OptimizerData instance, object obj, int alirg3, ref string sCodes, ref string sRes)
+        /// <summary>
+        /// This method is fake and these parameters are required, even though not all of them are used
+        /// </summary>
+        private string MyFormatDummyMethod(OptimizerData instance, object obj, int type, ref string codes, ref string resource)
         {
-            sCodes = DummyString;
-            sRes = DummyString;
+            codes = DummyString;
+            resource = DummyString;
             return DummyString;
         }
 
