@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections;
+using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Text;
 using System.Xml;
 using Microsoft.SharePoint;
-using System.Data;
-using System.Data.SqlClient;
-using System.Collections;
 
 namespace EPMLiveCore
 {
@@ -15,49 +14,74 @@ namespace EPMLiveCore
         public static DataSet GetReportingData(SPWeb web, string list, bool bRollup, string query, string orderby, int page, int pagesize)
         {
 
-            var rb = new ReportHelper.ReportBiz(web.Site.ID);
+            var reportBiz = new ReportHelper.ReportBiz(web.Site.ID);
 
-            if (rb.SiteExists())
+            if (reportBiz.SiteExists())
             {
-                SPList oList = web.Lists[list];
+                var oList = web.Lists[list];
+                var data = new ReportHelper.EPMData(web.Site.ID);
+                var clientReportingConnection = data.GetClientReportingConnection;
 
-                ReportHelper.EPMData data = new ReportHelper.EPMData(web.Site.ID);
+                SqlCommand sqlCommand = null;
 
-                SqlConnection cn = data.GetClientReportingConnection;
+                try
+                {
+                    sqlCommand = new SqlCommand(
+                        "select * from information_schema.parameters where specific_name='spGetReportListData' and parameter_name='@orderby'",
+                        clientReportingConnection);
 
-                SqlCommand cmd = new SqlCommand("select * from information_schema.parameters where specific_name='spGetReportListData' and parameter_name='@orderby'", cn);
-                bool borderby = false;
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
-                    borderby = true;
-                dr.Close();
+                    var borderby = false;
+                    var dr = sqlCommand.ExecuteReader();
+                    if (dr.Read())
+                    {
+                        borderby = true;
+                    }
+                    dr.Close();
+                    sqlCommand.Dispose();
 
-                cmd = new SqlCommand("spGetReportListData", cn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                cmd.Parameters.AddWithValue("@webid", web.ID);
-                cmd.Parameters.AddWithValue("@weburl", web.ServerRelativeUrl);
-                cmd.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
-                cmd.Parameters.AddWithValue("@rollup", bRollup);
-                cmd.Parameters.AddWithValue("@list", list);
-                cmd.Parameters.AddWithValue("@query", query);
-                cmd.Parameters.AddWithValue("@pagesize", pagesize);
-                cmd.Parameters.AddWithValue("@page", page);
-                cmd.Parameters.AddWithValue("@listid", oList.ID);
+                    sqlCommand = new SqlCommand("spGetReportListData", clientReportingConnection);
+                    sqlCommand.CommandType = CommandType.StoredProcedure;
+                    sqlCommand.Parameters.AddWithValue("@siteid", web.Site.ID);
+                    sqlCommand.Parameters.AddWithValue("@webid", web.ID);
+                    sqlCommand.Parameters.AddWithValue("@weburl", web.ServerRelativeUrl);
+                    sqlCommand.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
+                    sqlCommand.Parameters.AddWithValue("@rollup", bRollup);
+                    sqlCommand.Parameters.AddWithValue("@list", list);
+                    sqlCommand.Parameters.AddWithValue("@query", query);
+                    sqlCommand.Parameters.AddWithValue("@pagesize", pagesize);
+                    sqlCommand.Parameters.AddWithValue("@page", page);
+                    sqlCommand.Parameters.AddWithValue("@listid", oList.ID);
 
-                if (borderby)
-                    cmd.Parameters.AddWithValue("@orderby", orderby);
+                    if (borderby)
+                    {
+                        sqlCommand.Parameters.AddWithValue("@orderby", orderby);
+                    }
 
-                DataSet ds = new DataSet();
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(ds);
-
-                cn.Close();
-
-                return ds;
+                    var dataSet = new DataSet();
+                    using (var dataAdapter = new SqlDataAdapter(sqlCommand))
+                    {
+                        dataAdapter.Fill(dataSet);
+                    }
+                    clientReportingConnection.Close();
+                    return dataSet;
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.ToString());
+                    throw;
+                }
+                finally
+                {
+                    if (sqlCommand != null)
+                    {
+                        sqlCommand.Dispose();
+                    }
+                }
             }
             else
+            {
                 throw new Exception("Reporting Not Setup.");
+            }
         }
 
         public static DataTable GetReportingData(SPWeb web, string list, bool bRollup, string query, string orderby)
@@ -359,26 +383,44 @@ namespace EPMLiveCore
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
+                SqlConnection connection = null;
+                SqlCommand command = null;
+
                 try
                 {
-                    SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                    cn.Open();
+                    connection = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+                    connection.Open();
 
-                    SqlCommand cmd = new SqlCommand("SELECT VALUE,listid FROM PERSONALIZATIONS where userid=@userid and [key]=@key and FK=@FK", cn);
-                    cmd.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
-                    cmd.Parameters.AddWithValue("@key", "ReportFilterWebPartSelections");
-                    cmd.Parameters.AddWithValue("@FK", filterWpId);
-                    cmd.ExecuteNonQuery();
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    if (dr.Read())
+                    command = new SqlCommand(
+                        "SELECT VALUE,listid FROM PERSONALIZATIONS where userid=@userid and [key]=@key and FK=@FK",
+                        connection);
+                    command.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
+                    command.Parameters.AddWithValue("@key", "ReportFilterWebPartSelections");
+                    command.Parameters.AddWithValue("@FK", filterWpId);
+                    command.ExecuteNonQuery();
+                    var dataReader = command.ExecuteReader();
+                    if (dataReader.Read())
                     {
-                        reportFilterIDs = new ArrayList(dr.GetString(0).Split('|')[0].Split(','));
-                        listid = dr.GetGuid(1);
+                        reportFilterIDs = new ArrayList(dataReader.GetString(0).Split('|')[0].Split(','));
+                        listid = dataReader.GetGuid(1);
                     }
-                    dr.Close();
-                    cn.Close();
+                    dataReader.Close();
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.ToString());
+                }
+                finally
+                {
+                    if (connection != null)
+                    {
+                        connection.Dispose();
+                    }
+                    if (command != null)
+                    {
+                        command.Dispose();
+                    }
+                }
             });
 
             if (listid == list.ID)
