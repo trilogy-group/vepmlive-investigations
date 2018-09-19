@@ -416,6 +416,7 @@ namespace EPMLiveCore
                 catch (Exception ex)
                 {
                     Trace.WriteLine(ex.ToString());
+                    throw;
                 }
                 finally
                 {
