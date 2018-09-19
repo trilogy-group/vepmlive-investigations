@@ -809,22 +809,22 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         private void SetChartTypeDropDownList(string type)
         {
             var aggregateSelect = _privateObject.GetFieldOrProperty(FieldChartTypeDropDownList);
-            var select = aggregateSelect as DropDownList;
-            if (select != null)
+            var dropDownList = aggregateSelect as DropDownList;
+            if (dropDownList != null)
             {
-                select.Items.Add(type);
-                select.SelectedValue = type;
+                dropDownList.Items.Add(type);
+                dropDownList.SelectedValue = type;
             }
         }
 
         private void SetAggregateTypeHtmlSelectValue(string type)
         {
             var aggregateSelect = _privateObject.GetFieldOrProperty(FieldAggregateTypeHtmlSelect);
-            var select = aggregateSelect as HtmlSelect;
-            if (select != null)
+            var htmlSelect = aggregateSelect as HtmlSelect;
+            if (htmlSelect != null)
             {
-                select.Items.Add(type);
-                select.Value = type;
+                htmlSelect.Items.Add(type);
+                htmlSelect.Value = type;
             }
         }
 
