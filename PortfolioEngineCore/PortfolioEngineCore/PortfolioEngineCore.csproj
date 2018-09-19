@@ -275,19 +275,18 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_RSVP.dll"
-regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_PDSExt.dll"
-regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_DBASvr.dll"
-regsvr32 /s "$(ProjectDir)\VBBinaries\WE_RSVP.dll"
-regsvr32 /s "$(ProjectDir)\VBBinaries\WE_PDSExt.dll"
-regsvr32 /s "$(ProjectDir)\VBBinaries\WE_DBASvr.dll"
+    <PreBuildEvent>regsvr32 /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_RSVP.dll"
+regsvr32 /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_PDSExt.dll"
+regsvr32 /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_DBASvr.dll"
+regsvr32 /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_RSVP.dll"
+regsvr32 /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_PDSExt.dll"
+regsvr32 /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_DBASvr.dll"
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_RSVP.dll"
-regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_PDSExt.dll"
-regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_DBASvr.dll"
-
+    <PostBuildEvent>regsvr32 /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_RSVP.dll"
+regsvr32 /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_PDSExt.dll"
+regsvr32 /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_DBASvr.dll"
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
