@@ -1,17 +1,27 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Data;
-using System.Collections;
 using EPMLiveIntegration;
-using System.Data.SqlClient;
-
 
 namespace EPMLiveCore.API.Integration
 {
     public class SQL : EPMLiveIntegration.IIntegrator
     {
+        private const string ColNameId = "ID";
+        private const string ColNameSpid = "SPID";
+        private const string PropKeyTable = "Table";
+        private const string PropKeyIdColumn = "IDColumn";
+        private const string PropKeyWhere = "Where";
+        private const string PropKeyUserMapType = "UserMapType";
+        private const string Apostrophe = "'";
+        private const string DoubleApostrophe = "''";
+        private const string PropKeyAvailableSyncOpts = "AvailableSynchOptions";
+
         public bool InstallIntegration(WebProperties WebProps, IntegrationLog Log, out string Message, string IntegrationKey, string APIUrl)
         {
             Message = "";
@@ -27,25 +37,37 @@ namespace EPMLiveCore.API.Integration
 
         public TransactionTable DeleteItems(WebProperties WebProps, DataTable Items, IntegrationLog Log)
         {
-            TransactionTable table = new TransactionTable();
+            CheckArgumentForNull(WebProps, nameof(WebProps));
+            CheckArgumentForNull(Items, nameof(Items));
 
-            SqlConnection cn = GetConnection(WebProps.Properties);
-            cn.Open();
+            const string deleteCommandTemplate = "DELETE FROM {0} WHERE {1}=@id";
+            var tableName = WebProps.Properties[PropKeyTable];
+            var idColumn = WebProps.Properties[PropKeyIdColumn];
 
-            foreach(DataRow dr in Items.Rows)
+            var table = new TransactionTable();
+
+            using (var connection = GetConnection(WebProps.Properties))
             {
-                try
+                connection.Open();
+
+                foreach (DataRow dataRow in Items.Rows)
                 {
-                    SqlCommand cmd = new SqlCommand("DELETE FROM " + WebProps.Properties["Table"] + " WHERE " + WebProps.Properties["IDColumn"] + "=@id", cn);
-                    cmd.Parameters.AddWithValue("@id", dr["ID"].ToString());
-                    cmd.ExecuteNonQuery();
+                    try
+                    {
+                        using (var command = new SqlCommand(string.Format(deleteCommandTemplate, tableName, idColumn), connection))
+                        {
+                            command.Parameters.AddWithValue("@id", dataRow[ColNameId].ToString());
+                            command.ExecuteNonQuery();
+                        }
 
-                    table.AddRow(dr["SPID"].ToString(), dr["ID"].ToString(), TransactionType.DELETE);
+                        table.AddRow(dataRow[ColNameSpid].ToString(), dataRow[ColNameId].ToString(), TransactionType.DELETE);
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError(ex.ToString());
+                        table.AddRow(dataRow[ColNameSpid].ToString(), dataRow[ColNameId].ToString(), TransactionType.FAILED);
+                    }
                 }
-                catch {
-                    table.AddRow(dr["SPID"].ToString(), dr["ID"].ToString(), TransactionType.FAILED);
-                }
-
             }
 
             return table;
@@ -53,189 +75,235 @@ namespace EPMLiveCore.API.Integration
 
         public TransactionTable UpdateItems(WebProperties WebProps, DataTable Items, IntegrationLog Log)
         {
-            TransactionTable trans = new TransactionTable();
+            CheckArgumentForNull(WebProps, nameof(WebProps));
+            CheckArgumentForNull(Items, nameof(Items));
+            CheckArgumentForNull(Log, nameof(Log));
 
-            SqlConnection cn = GetConnection(WebProps.Properties);
-            cn.Open();
+            const string queryTemplate = "SELECT * FROM {0} WHERE {1}=@id";
+            var tableName = WebProps.Properties[PropKeyTable];
+            var idColumn = WebProps.Properties[PropKeyIdColumn];
+            var trans = new TransactionTable();
 
-            foreach(DataRow drItem in Items.Rows)
+            using (var connection = GetConnection(WebProps.Properties))
             {
-                string curID = drItem["ID"].ToString();
-                string SPPID = drItem["SPID"].ToString();
+                connection.Open();
 
-                try
+                foreach (DataRow drItem in Items.Rows)
                 {
-                    if(curID == "")
-                    {
-                        trans.AddRow(SPPID, InsertRow(WebProps, drItem, Log, cn), TransactionType.INSERT);
-                    }
-                    else
-                    {
-                        
-                        SqlCommand cmd = new SqlCommand("SELECT * FROM " + WebProps.Properties["Table"] + " WHERE " + WebProps.Properties["IDColumn"] + "=@id", cn);
-                        cmd.Parameters.AddWithValue("@id", curID);
-                        DataSet ds = new DataSet();
-                        SqlDataAdapter da = new SqlDataAdapter(cmd);
-                        da.Fill(ds);
+                    var currentId = drItem[ColNameId].ToString();
+                    var spId = drItem[ColNameSpid].ToString();
 
-                        if(ds.Tables[0].Rows.Count > 0)
+                    try
+                    {
+                        if (currentId == string.Empty)
                         {
-                            trans.AddRow(SPPID, UpdateRow(WebProps, drItem, Log, cn), TransactionType.UPDATE);
+                            trans.AddRow(spId, InsertRow(WebProps, drItem, Log, connection), TransactionType.INSERT);
                         }
                         else
                         {
-                            trans.AddRow(SPPID, InsertRow(WebProps, drItem, Log, cn), TransactionType.INSERT);
+                            var dataSet = new DataSet();
+                            using (var command = new SqlCommand(string.Format(queryTemplate, tableName, idColumn), connection))
+                            {
+                                command.Parameters.AddWithValue("@id", currentId);
+
+                                using (var dataAdapter = new SqlDataAdapter(command))
+                                {
+                                    dataAdapter.Fill(dataSet);
+                                }
+                            }
+
+                            if (dataSet.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                            {
+                                trans.AddRow(spId, UpdateRow(WebProps, drItem, Log, connection), TransactionType.UPDATE);
+                            }
+                            else
+                            {
+                                trans.AddRow(spId, InsertRow(WebProps, drItem, Log, connection), TransactionType.INSERT);
+                            }
                         }
                     }
-                }
-                catch(Exception ex)
-                {
-                    Log.LogMessage(ex.Message, IntegrationLogType.Error);
-                    trans.AddRow(SPPID, curID, TransactionType.FAILED);
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError(ex.ToString());
+                        Log.LogMessage(ex.Message, IntegrationLogType.Error);
+                        trans.AddRow(spId, currentId, TransactionType.FAILED);
+                    }
                 }
             }
-            cn.Close();
+
             return trans;
         }
 
-
         public List<ColumnProperty> GetColumns(WebProperties WebProps, IntegrationLog Log, string ListName)
         {
-            List<ColumnProperty> lstCols = new List<ColumnProperty>();
+            CheckArgumentForNull(WebProps, nameof(WebProps));
+            CheckArgumentForNull(ListName, nameof(ListName));
+
+            const string queryTemplate = "select name from sys.columns where object_id = object_id('{0}')";
+            var tableName = WebProps.Properties[PropKeyTable].ToString().Replace(Apostrophe, DoubleApostrophe);
+
+            var columnsList = new List<ColumnProperty>();
 
 
-            SqlConnection cn = GetConnection(WebProps.Properties);
-            cn.Open();
-            SqlCommand cmd = new SqlCommand("select name from sys.columns where object_id = object_id('" + WebProps.Properties["Table"].ToString().Replace("'", "''") + "')", cn);
-
-            SqlDataReader dr = cmd.ExecuteReader();
-            while(dr.Read())
+            using (var connection = GetConnection(WebProps.Properties))
             {
-                ColumnProperty prop = new ColumnProperty();
-                prop.ColumnName = dr.GetString(0);
-                prop.DiplayName = dr.GetString(0);
-                prop.DefaultListColumn = GetDefaultColumn(ListName, dr.GetString(0));
-                lstCols.Add(prop);
+                connection.Open();
+
+                using (var command = new SqlCommand(string.Format(queryTemplate, tableName), connection))
+                using (var dataReader = command.ExecuteReader())
+                {
+                    while (dataReader.Read())
+                    {
+                        var colProperty = new ColumnProperty();
+                        colProperty.ColumnName = dataReader.GetString(0);
+                        colProperty.DiplayName = dataReader.GetString(0);
+                        colProperty.DefaultListColumn = GetDefaultColumn(ListName, dataReader.GetString(0));
+                        columnsList.Add(colProperty);
+                    }
+                }
             }
-            dr.Close();
-            
-            cn.Close();
-           
 
-            return lstCols;
-
+            return columnsList;
         }
 
         public DataTable PullData(WebProperties WebProps, IntegrationLog Log, DataTable Items, DateTime LastSynch)
         {
-            SqlConnection cn = GetConnection(WebProps.Properties);
-            cn.Open();
+            CheckArgumentForNull(WebProps, nameof(WebProps));
+            CheckArgumentForNull(Items, nameof(Items));
 
-            string cols = WebProps.Properties["IDColumn"].ToString();
+            var dataSet = new DataSet();
 
-            string where = "";
-            try
+            using (var connection = GetConnection(WebProps.Properties))
             {
-                where = WebProps.Properties["Where"].ToString();
-            }
-            catch { }
+                connection.Open();
 
-            foreach(DataColumn dc in Items.Columns)
-            {
-                if(dc.ColumnName != "ID")
+                var colsBuilder = new StringBuilder(WebProps.Properties[PropKeyIdColumn].ToString());
+
+                var where = WebProps.Properties.ContainsKey(PropKeyWhere)
+                    ? WebProps.Properties[PropKeyWhere].ToString()
+                    : string.Empty;
+
+                foreach (DataColumn dataColumn in Items.Columns)
                 {
-                    cols += "," + dc.ColumnName;
+                    if (dataColumn.ColumnName != ColNameId)
+                    {
+                        colsBuilder.Append($",{dataColumn.ColumnName}");
+                    }
+                }
+
+                var query = $"SELECT {colsBuilder} FROM {WebProps.Properties[PropKeyTable]}";
+                if (where != string.Empty)
+                {
+                    query = $"{query} Where {where.Replace(Apostrophe, DoubleApostrophe)}";
+                }
+
+                using (var command = new SqlCommand(query, connection))
+                using (var dataAdapter = new SqlDataAdapter(command))
+                {
+                    dataAdapter.Fill(dataSet);
                 }
             }
 
-            string sql = "SELECT " + cols + " FROM " + WebProps.Properties["Table"];
-            if(where != "")
+            if (dataSet.Tables.Count == 0)
             {
-                sql += " Where " + where.Replace("'", "''");
+                throw new InvalidOperationException("No tables returned from query");
             }
 
-            SqlCommand cmd = new SqlCommand(sql, cn);
-            DataSet ds = new DataSet();
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            da.Fill(ds);
+            var idColumn = WebProps.Properties[PropKeyIdColumn].ToString();
+            dataSet.Tables[0].Columns[idColumn].ColumnName = ColNameId;
 
-            cn.Close();
-
-            ds.Tables[0].Columns[WebProps.Properties["IDColumn"].ToString()].ColumnName = "ID";
-
-            return ds.Tables[0];
+            return dataSet.Tables[0];
         }
 
         public DataTable GetItem(WebProperties WebProps, IntegrationLog Log, string ItemID, DataTable Items)
         {
+            CheckArgumentForNull(WebProps, nameof(WebProps));
+            CheckArgumentForNull(ItemID, nameof(ItemID));
+            CheckArgumentForNull(Items, nameof(Items));
 
-            SqlConnection cn = GetConnection(WebProps.Properties);
-            cn.Open();
+            var tableName = WebProps.Properties["Table"];
+            var idColumn = WebProps.Properties["IDColumn"];
 
-            SqlCommand cmd = new SqlCommand("SELECT * FROM " + WebProps.Properties["Table"] + " WHERE " + WebProps.Properties["IDColumn"] + " = '" + ItemID + "'", cn);
-            DataSet ds = new DataSet();
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            da.Fill(ds);
+            const string queryTemplate = "SELECT * FROM {0} WHERE {1} = '{2}'";
 
-            if(ds.Tables[0].Rows.Count > 0)
+            using (var connection = GetConnection(WebProps.Properties))
             {
+                connection.Open();
 
-                DataRow dr = ds.Tables[0].Rows[0];
+                var dataSet = new DataSet();
 
-                ArrayList arrRow = new ArrayList();
-                arrRow.Add(ItemID);
-
-                foreach(DataColumn dc in Items.Columns)
+                using (var command = new SqlCommand(string.Format(queryTemplate, tableName, idColumn, ItemID), connection))
+                using (var dataAdapter = new SqlDataAdapter(command))
                 {
-
-                    if(dc.ColumnName != "ID")
-                    {
-                        try
-                        {
-                            arrRow.Add(dr[dc.ColumnName].ToString());
-                        }catch{arrRow.Add("");}
-                    }
-
+                    dataAdapter.Fill(dataSet);
                 }
 
-                Items.Rows.Add((string[])arrRow.ToArray(typeof(string)));
+                if (dataSet.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                {
+                    var dataRow = dataSet.Tables[0].Rows[0];
 
+                    var valuesArray = new ArrayList();
+                    valuesArray.Add(ItemID);
+
+                    foreach (DataColumn dataColumn in Items.Columns)
+                    {
+                        if (dataColumn.ColumnName != ColNameId)
+                        {
+                            if (dataRow[dataColumn.ColumnName] != null)
+                            {
+                                valuesArray.Add(dataRow[dataColumn.ColumnName].ToString());
+                            }
+                            else
+                            {
+                                valuesArray.Add(string.Empty);
+                            }
+                        }
+                    }
+
+                    Items.Rows.Add(valuesArray.OfType<string>().ToArray());
+                }
             }
-
-            cn.Close();
 
             return Items;
         }
 
         public Dictionary<String, String> GetDropDownValues(WebProperties WebProps, IntegrationLog log, string Property, string ParentPropertyValue)
         {
-            Dictionary<string, string> props = new Dictionary<string, string>();
+            CheckArgumentForNull(WebProps, nameof(WebProps));
+            CheckArgumentForNull(Property, nameof(Property));
 
-            SqlConnection cn = GetConnection(WebProps.Properties);
-            cn.Open();
-            
-            switch(Property)
+            var properties = new Dictionary<string, string>();
+
+            using (var connection = GetConnection(WebProps.Properties))
             {
-                case "Table":
-                    SqlCommand cmd = new SqlCommand("select name from sys.tables", cn);
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    while(dr.Read())
-                        props.Add(dr.GetString(0), dr.GetString(0));
-                    dr.Close();
-                    break;
-                case "UserMapType":
-                    props.Add("Email", "Email Address");
-                    break;
-                case "AvailableSynchOptions":
-                    props.Add("LI", "LI");
-                    props.Add("TI", "TI");
-                    props.Add("TO", "TO");
-                    break;
-            }
-            
-            cn.Close();
+                connection.Open();
 
-            return props;
+                switch (Property)
+                {
+                    case PropKeyTable:
+                        using (var command = new SqlCommand("select name from sys.tables", connection))
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            while (dataReader.Read())
+                            {
+                                properties.Add(dataReader.GetString(0), dataReader.GetString(0));
+                            }
+                        }
+                        break;
+                    case PropKeyUserMapType:
+                        properties.Add("Email", "Email Address");
+                        break;
+                    case PropKeyAvailableSyncOpts:
+                        properties.Add("LI", "LI");
+                        properties.Add("TI", "TI");
+                        properties.Add("TO", "TO");
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(Property), "Unexpected value from Property argument");
+                }
+            }
+
+            return properties;
         }
 
         public bool TestConnection(WebProperties WebProps, IntegrationLog Log, out string Message)
@@ -319,11 +387,14 @@ namespace EPMLiveCore.API.Integration
 
             string sql = "INSERT INTO " + WebProps.Properties["Table"] + "(" + paramnames.Trim(',') + ") OUTPUT Inserted." + WebProps.Properties["IDColumn"] + " VALUES (" + paramvalues.Trim(',') + ")";
 
-            SqlCommand cmd = new SqlCommand(sql, cn);
-            cmd.Parameters.AddRange(arrparams.ToArray(typeof(SqlParameter)));
-            object o = cmd.ExecuteScalar();
+            object result;
+            using (var command = new SqlCommand(sql, cn))
+            {
+                command.Parameters.AddRange(arrparams.ToArray(typeof(SqlParameter)));
+                result = command.ExecuteScalar();
+            }
 
-            return o.ToString();
+            return result.ToString();
         }
 
         private string UpdateRow(WebProperties WebProps, DataRow Item, IntegrationLog Log, SqlConnection cn)
@@ -357,12 +428,22 @@ namespace EPMLiveCore.API.Integration
 
             string sql = "UPDATE " + WebProps.Properties["Table"] + " Set " + paramnames.Trim(',') + " WHERE " + WebProps.Properties["IDColumn"] + " =@id";
 
-            SqlCommand cmd = new SqlCommand(sql, cn);
-            cmd.Parameters.AddRange(arrparams.ToArray(typeof(SqlParameter)));
-            cmd.Parameters.AddWithValue("@id", Item["ID"].ToString());
-            object o = cmd.ExecuteScalar();
+            using (var command = new SqlCommand(sql, cn))
+            {
+                command.Parameters.AddRange(arrparams.ToArray(typeof(SqlParameter)));
+                command.Parameters.AddWithValue("@id", Item[ColNameId].ToString());
+                command.ExecuteScalar();
+            }
 
-            return Item["ID"].ToString();
+            return Item[ColNameId].ToString();
+        }
+
+        private void CheckArgumentForNull(object argument, string argumentName)
+        {
+            if (argument == null)
+            {
+                throw new ArgumentNullException(argumentName);
+            }
         }
     }
 }
