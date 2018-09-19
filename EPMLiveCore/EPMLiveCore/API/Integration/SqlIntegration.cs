@@ -221,8 +221,8 @@ namespace EPMLiveCore.API.Integration
             CheckArgumentForNull(ItemID, nameof(ItemID));
             CheckArgumentForNull(Items, nameof(Items));
 
-            var tableName = WebProps.Properties["Table"];
-            var idColumn = WebProps.Properties["IDColumn"];
+            var tableName = WebProps.Properties[PropKeyTable];
+            var idColumn = WebProps.Properties[PropKeyIdColumn];
 
             const string queryTemplate = "SELECT * FROM {0} WHERE {1} = '{2}'";
 
@@ -394,7 +394,7 @@ namespace EPMLiveCore.API.Integration
                 result = command.ExecuteScalar();
             }
 
-            return result.ToString();
+            return result?.ToString();
         }
 
         private string UpdateRow(WebProperties WebProps, DataRow Item, IntegrationLog Log, SqlConnection cn)
