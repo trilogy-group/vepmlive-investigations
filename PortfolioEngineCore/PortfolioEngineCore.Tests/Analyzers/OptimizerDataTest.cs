@@ -1,35 +1,37 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Data.SqlClient.Fakes;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Shouldly;
 
 namespace PortfolioEngineCore.Tests.Analyzers
 {
-    using System.Data;
-    using System.Data.SqlClient;
-    using System.Data.SqlClient.Fakes;
     using Fakes;
     using PortfolioEngineCore;
-    using Shouldly;
 
     [TestClass]
     public class OptimizerDataTest
     {
         private static readonly Guid DummyGuid = Guid.NewGuid();
         private const string DummyString = "DummyString";
+        private const string ReadCurrencySettingsMethodName = "ReadCurrencySettings";
+        private const string ReadStagesMethodName = "ReadStages";
+        private const string ReadExtraPifieldsMethodName = "ReadExtraPifields";
+        private const string MyFormatMethodName = "MyFormat";
+        private const string FormatSQLDateTimeMethodName = "FormatSQLDateTime";
+        private const string StripNumMethodName = "StripNum";
+        private const string OptimizeThisTypeMethodName = "OptimizeThisType";
+        private const string FormatExportExtraDataMethodName = "FormatExportExtraData";
+        private const int FieldId = 10;
         private IDisposable shimContext;
         private OptimizerData optimizerData;
         private PrivateObject privateObject;
-        private PrivateType privateType;
-        private string ReadCurrencySettingsMethodName = "ReadCurrencySettings";
-        private string ReadStagesMethodName = "ReadStages";
-        private string ReadExtraPifieldsMethodName = "ReadExtraPifields";
-        private const int FieldId = 10;
-        private string MyFormatMethodName = "MyFormat";
-        private string FormatSQLDateTimeMethodName = "FormatSQLDateTime";
+        private string ReadPILevelDataMethodName = "ReadPILevelData";
 
         [TestInitialize]
         public void Initialize()
@@ -38,38 +40,34 @@ namespace PortfolioEngineCore.Tests.Analyzers
             SetupShims();
             optimizerData = new OptimizerData(DummyString, DummyString, DummyString, DummyString, DummyString, SecurityLevels.Base);
             privateObject = new PrivateObject(optimizerData);
-            privateType = new PrivateType(typeof(OptimizerData));
-        }
-
-        private void SetupShims()
-        {
-
-            //ShimPFEBase.ConstructorStringSecurityLevelsBoolean = (_, baseInfo, securityLevel, debug) => { };
-            //ShimPFEBase.ConstructorStringStringStringStringStringSecurityLevelsBoolean =
-            //    (_, basePath, username, pid, company, connString, securityLevel, debug) => { };
-            ShimSqlConnection.AllInstances.Open = _ => { };
-            ShimSqlConnection.AllInstances.Close = _ => { };
-            ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
-
-            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader();
-
-            ShimSqlDataReader.AllInstances.Read = _ => false;
-            ShimSqlDataReader.AllInstances.ItemGetString = (_, name) => 1;
-
-            ShimSqlDb.ReadIntValueObject = _ => 1;
-            ShimSqlDb.ReadStringValueObject = _ => DummyString;
-
-            ShimCStruct.AllInstances.LoadXMLString = (_, xml) => true;
-
-
-            ShimUtilities.ResolveNTNameintoWResIDSqlConnectionString = (sqlConnection, userName) => 1;
-
         }
 
         [TestCleanup]
         public void Cleanup()
         {
             shimContext?.Dispose();
+            optimizerData?.Dispose();
+        }
+
+        private void SetupShims()
+        {
+            ShimSqlConnection.AllInstances.Open = _ => { };
+            ShimSqlConnection.AllInstances.Close = _ => { };
+            ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader();
+            ShimSqlDataReader.AllInstances.Read = _ => false;
+            ShimSqlDataReader.AllInstances.ItemGetString = (_, name) => 1;
+            ShimSqlDb.ReadIntValueObject = _ => 1;
+            ShimSqlDb.ReadStringValueObject = _ => DummyString;
+            ShimCStruct.AllInstances.LoadXMLString = (_, xml) => true;
+            ShimUtilities.ResolveNTNameintoWResIDSqlConnectionString = (sqlConnection, userName) => 1;
+        }
+
+        private string MyFormatDummyMethod(OptimizerData instance, object obj, int alirg3, ref string sCodes, ref string sRes)
+        {
+            sCodes = DummyString;
+            sRes = DummyString;
+            return DummyString;
         }
 
         [TestMethod]
@@ -285,7 +283,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
 
             // Act
             var result = optimizerData.DeleteOptimizerStratagyXML(DummyGuid);
-            
+
             // Assert
             result.ShouldBeTrue();
         }
@@ -335,7 +333,6 @@ namespace PortfolioEngineCore.Tests.Analyzers
             result.ShouldBeTrue();
         }
 
-
         [TestMethod]
         public void CommitOptimizerStratagy_Should_ExecuteCorrectly()
         {
@@ -353,7 +350,6 @@ namespace PortfolioEngineCore.Tests.Analyzers
             // Assert
             nonQueryExecuted.ShouldBeGreaterThan(0);
         }
-
 
         [TestMethod]
         public void ReadCurrencySettings_Should_ExecuteCorrectly()
@@ -436,19 +432,46 @@ namespace PortfolioEngineCore.Tests.Analyzers
                 () => extraFieldTypes.Any(p => p == 1).ShouldBeTrue());
         }
 
-
         [TestMethod]
-        public void ReadPILevelData()
+        public void ReadPILevelData_Should_ExecuteCorrectly()
         {
             // Arrange
+            var count = 0;
+            var fiExtra = new int[513];
+            fiExtra[1] = 9911;
+            ShimSqlDb.ReadDateValueObject = _ => DateTime.Now;
+            ShimSqlDataReader.AllInstances.ItemGetInt32 = (_, index) => DBNull.Value;
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (++count <= 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
+            };
+            privateObject.SetFieldOrProperty("m_Use_extra", 3);
+            privateObject.SetFieldOrProperty("m_fidextra", fiExtra);
+            ShimOptimizerData.AllInstances.MyFormatObjectInt32StringRefStringRef = MyFormatDummyMethod;
 
             // Act
+            privateObject.Invoke(ReadPILevelDataMethodName, new ShimSqlConnection().Instance, DummyString);
+            var codesCollection = privateObject.GetFieldOrProperty("m_codes") as ICollection;
+            var resCollection = privateObject.GetFieldOrProperty("m_reses") as ICollection;
+            var piList = privateObject.GetFieldOrProperty("m_PIs") as IList;
 
             // Assert
-            Assert.Fail("Not Implemented");
-
+            optimizerData.ShouldSatisfyAllConditions(
+                () => codesCollection.ShouldNotBeNull(),
+                () => codesCollection.Count.ShouldBeGreaterThan(0),
+                () => resCollection.ShouldNotBeNull(),
+                () => resCollection.Count.ShouldBeGreaterThan(0),
+                () => piList.ShouldNotBeNull(),
+                () => piList.Count.ShouldBeGreaterThan(0));
         }
-
 
         [TestMethod]
         public void GetCFFieldName_TableID101_ShouldExecuteCorrectly()
@@ -594,7 +617,6 @@ namespace PortfolioEngineCore.Tests.Analyzers
                 () => fieldName.ShouldBe(expectedFieldName));
         }
 
-
         [TestMethod]
         public void GetCFFieldName_TableID802_ShouldExecuteCorrectly()
         {
@@ -612,7 +634,6 @@ namespace PortfolioEngineCore.Tests.Analyzers
                 () => tableName.ShouldBe(ExpectedTableName),
                 () => fieldName.ShouldBe(expectedFieldName));
         }
-
 
         [TestMethod]
         public void GetCFFieldName_TableID803_ShouldExecuteCorrectly()
@@ -811,7 +832,6 @@ namespace PortfolioEngineCore.Tests.Analyzers
                 () => fieldName.ShouldBe(expectedFieldName));
         }
 
-
         [TestMethod]
         public void GetCFFieldName_TableID304_ShouldExecuteCorrectly()
         {
@@ -829,7 +849,6 @@ namespace PortfolioEngineCore.Tests.Analyzers
                 () => tableName.ShouldBe(ExpectedTableName),
                 () => fieldName.ShouldBe(expectedFieldName));
         }
-
 
         [TestMethod]
         public void GetCFFieldName_TableID305_ShouldExecuteCorrectly()
@@ -849,9 +868,8 @@ namespace PortfolioEngineCore.Tests.Analyzers
                 () => fieldName.ShouldBe(expectedFieldName));
         }
 
-
         [TestMethod]
-        public void MyFormat_EPK_FTYPE_DATEAndDateMinValue_ReturnsEmptyValue()
+        public void MyFormat_TypeDateAndDateMinValue_ReturnsEmptyValue()
         {
             // Arrange
             ShimSqlDb.ReadDateValueObject = _ => DateTime.MinValue;
@@ -865,9 +883,8 @@ namespace PortfolioEngineCore.Tests.Analyzers
                 () => result.ShouldBeEmpty());
         }
 
-
         [TestMethod]
-        public void MyFormat_EPK_FTYPE_DATEAndDateMinValu_ReturnsValue()
+        public void MyFormat_TypeDateAndDateMinValue_ReturnsValue()
         {
             // Arrange
             ShimSqlDb.ReadDateValueObject = _ => DateTime.Now;
@@ -880,12 +897,11 @@ namespace PortfolioEngineCore.Tests.Analyzers
                 () => result.ShouldNotBeNullOrEmpty());
         }
 
-
         [TestMethod]
-        public void MyFormat_EPK_FTYPE_DURATION_ReturnsValue()
+        public void MyFormat_TypeDuration_ReturnsValue()
         {
             // Arrange
-            const decimal ExpectedValue = 1.0M;
+            const long ExpectedValue = 1;
             ShimSqlDb.ReadDecimalValueObject = _ => ExpectedValue;
 
             // Act
@@ -898,7 +914,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
         }
 
         [TestMethod]
-        public void MyFormat_EPK_FTYPE_RTF_ReturnsValue()
+        public void MyFormat_TypeRTF_ReturnsValue()
         {
             // Arrange
             ShimSqlDb.ReadStringValueObject = _ => DummyString;
@@ -912,9 +928,8 @@ namespace PortfolioEngineCore.Tests.Analyzers
                 () => result.ShouldBe(DummyString));
         }
 
-
         [TestMethod]
-        public void MyFormat_EPKFTYPECODE_ReturnsValue()
+        public void MyFormat_TypeCode_ReturnsValue()
         {
             // Arrange
             const int ExpectedValue = 2;
@@ -934,7 +949,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
         }
 
         [TestMethod]
-        public void MyFormat_EPKFTYPECODEAndCodesEmpty_ReturnsValue()
+        public void MyFormat_TypeCodeAndCodesEmpty_ReturnsValue()
         {
             // Arrange
             const int ExpectedValue = 2;
@@ -954,7 +969,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
         }
 
         [TestMethod]
-        public void MyFormat_EPKFTYPERES_ReturnsValue()
+        public void MyFormat_TypeRes_ReturnsValue()
         {
             // Arrange
             const int ExpectedValue = 7;
@@ -974,7 +989,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
         }
 
         [TestMethod]
-        public void MyFormat_EPKFTYPERESAndResEmpty_ReturnsValue()
+        public void MyFormat_TypeResAndResEmpty_ReturnsValue()
         {
             // Arrange
             const int ExpectedValue = 7;
@@ -994,43 +1009,236 @@ namespace PortfolioEngineCore.Tests.Analyzers
         }
 
         [TestMethod]
-        public void FormatExportExtraData()
+        public void FormatExportExtraData_FieldTypeYesNoInput1_ReturnsExpectedResult()
         {
             // Arrange
+            var expectedResult = "Yes";
+            var input = "1";
+            var type = 13;
 
             // Act
+            var result = privateObject.Invoke(FormatExportExtraDataMethodName, input, type) as string;
 
             // Assert
-            Assert.Fail("Not Implemented");
-
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBe(expectedResult));
         }
-
 
         [TestMethod]
-        public void OptimizeThisType()
+        public void FormatExportExtraData_FieldTypeYesNoInput0_ReturnsExpectedResult()
         {
             // Arrange
+            var expectedResult = "No";
+            var input = "0";
+            var type = 13;
 
             // Act
+            var result = privateObject.Invoke(FormatExportExtraDataMethodName, input, type) as string;
 
             // Assert
-            Assert.Fail("Not Implemented");
-
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBe(expectedResult));
         }
-
 
         [TestMethod]
-        public void StripNum()
+        public void FormatExportExtraData_FieldTypeText_ReturnsExpectedResult()
         {
             // Arrange
+            var input = DummyString;
+            var type = 9;
 
             // Act
+            var result = privateObject.Invoke(FormatExportExtraDataMethodName, input, type) as string;
 
             // Assert
-            Assert.Fail("Not Implemented");
-
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBe(DummyString));
         }
 
+        [TestMethod]
+        public void FormatExportExtraData_FieldTypeCode_ReturnsExpectedResult()
+        {
+            // Arrange
+            var input = "1";
+            var type = 4;
+
+            // Act
+            var result = privateObject.Invoke(FormatExportExtraDataMethodName, input, type) as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBeEmpty());
+        }
+
+        [TestMethod]
+        public void FormatExportExtraData_FieldTypeCodeOnException_ReturnsExpectedResult()
+        {
+            // Arrange
+            var input = "1";
+            var type = 4;
+            privateObject.SetFieldOrProperty("m_codes", null);
+
+            // Act
+            var result = privateObject.Invoke(FormatExportExtraDataMethodName, input, type) as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBeEmpty());
+        }
+
+        [TestMethod]
+        public void FormatExportExtraData_FieldTypeRes_ReturnsExpectedResult()
+        {
+            // Arrange
+            var input = "1";
+            var type = 7;
+            privateObject.SetFieldOrProperty("m_reses", new Dictionary<int, string>
+            {
+                [1] = DummyString
+            });
+
+            // Act
+            var result = privateObject.Invoke(FormatExportExtraDataMethodName, input, type) as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void FormatExportExtraData_FieldTypeResOnException_ReturnsExpectedResult()
+        {
+            // Arrange
+            var input = "1";
+            var type = 7;
+            privateObject.SetFieldOrProperty("m_reses", null);
+
+            // Act
+            var result = privateObject.Invoke(FormatExportExtraDataMethodName, input, type) as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBeEmpty());
+        }
+
+        [TestMethod]
+        public void FormatExportExtraData_FieldTypeUnknown_ReturnsExpectedResult()
+        {
+            // Arrange
+            var input = "1";
+            var type = 999;
+
+            // Act
+            var result = privateObject.Invoke(FormatExportExtraDataMethodName, input, type) as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBeEmpty());
+        }
+
+        [TestMethod]
+        public void OptimizeThisType_FieldTypeDate_ReturnsFalse()
+        {
+            // Arrange
+            const int FieldType = 1;
+
+            // Act
+            var result = privateObject.Invoke(OptimizeThisTypeMethodName, FieldType) as bool?;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Value.ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void OptimizeThisType_FieldTypeInteger_ReturnsTrue()
+        {
+            // Arrange
+            const int FieldType = 2;
+
+            // Act
+            var result = privateObject.Invoke(OptimizeThisTypeMethodName, FieldType) as bool?;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Value.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void OptimizeThisType_FieldTypeRes_ReturnsFalse()
+        {
+            // Arrange
+            const int FieldType = 7;
+
+            // Act
+            var result = privateObject.Invoke(OptimizeThisTypeMethodName, FieldType) as bool?;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Value.ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void OptimizeThisType_FieldTypeUnknown_ReturnsFalse()
+        {
+            // Arrange
+            const int FieldType = 987;
+
+            // Act
+            var result = privateObject.Invoke(OptimizeThisTypeMethodName, FieldType) as bool?;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Value.ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void StripNum_ValueWithSpace_ShouldExecuteCorrectly()
+        {
+            // Arrange
+            var args = new object[] { "1 2" };
+
+            // Act
+            var result = privateObject.Invoke(StripNumMethodName, args) as int?;
+            var original = args[0] as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Value.ShouldBe(1),
+                () => original.ShouldNotBeNullOrEmpty(),
+                () => original.ShouldBe("2"));
+        }
+
+        [TestMethod]
+        public void StripNum_ValueWithoutSpace_ShouldExecuteCorrectly()
+        {
+            // Arrange
+            var args = new object[] { "12" };
+
+            // Act
+            var result = privateObject.Invoke(StripNumMethodName, args) as int?;
+            var original = args[0] as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Value.ShouldBe(12),
+                () => original.ShouldNotBeNull(),
+                () => original.ShouldBeEmpty());
+        }
 
         [TestMethod]
         public void FormatSQLDateTime_Should_ReturnExpectedValue()
@@ -1049,29 +1257,65 @@ namespace PortfolioEngineCore.Tests.Analyzers
         }
 
         [TestMethod]
-        public void OptimizerLoadData()
+        public void OptimizerLoadData_Should_ReturnContent()
         {
             // Arrange
+            var count = 0;
+            ShimOptimizerData.AllInstances.OptimizerLoadDataString = null;
+            ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
+            ShimSqlDb.ReadDateValueObject = _ => DateTime.Now;
+            ShimSqlDataReader.AllInstances.ItemGetInt32 = (_, index) => DBNull.Value;
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (++count <= 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
+            };
+            privateObject.SetFieldOrProperty("m_Use_extra", 3);
+            ShimOptimizerData.AllInstances.MyFormatObjectInt32StringRefStringRef = MyFormatDummyMethod;
 
             // Act
+            var result = optimizerData.OptimizerLoadData(DummyString);
 
             // Assert
-            Assert.Fail("Not Implemented");
-
+            result.ShouldNotBeNullOrEmpty();
         }
 
         [TestMethod]
-        public void GrabPidsFromTicket()
+        public void GrabPidsFromTicket_Should_ReturnExpectedValue()
         {
             // Arrange
+            const string ExpectedValue = "1,1";
+            var count = 0;
+            ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
+            ShimSqlDataReader.AllInstances.Read = _ =>
+            {
+                if (++count <= 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    count = 0;
+                    return false;
+                }
+            };
+            ShimSqlDb.ReadStringValueObject = _ => $"{DummyGuid},{DummyGuid}";
+            ShimSqlDb.ReadIntValueObject = _ => 1;
 
             // Act
+            var result = optimizerData.GrabPidsFromTicket(DummyString);
 
             // Assert
-            Assert.Fail("Not Implemented");
-
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe(ExpectedValue));
         }
-
- 
     }
 }
