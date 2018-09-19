@@ -34,17 +34,20 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         private PrivateObject _privateObj;
         private ShimSPWeb _web;
         private bool _fileDeleted;
+        private bool _itemUpdated;
 
         private const int DummyInt = 1;
         private const string DummyString = "DummyString";
         private const string NeedToBeSiteAdminErrorMessage = "You need to be a Site Collection Administrator in order to import resources.";
         private const string DSMResultProperty = "_dSMResult";
         private const string DtResourcesProperty = "_dtResources";
+        private const string TotalRecordsProperty = "_totalRecords";
 
         [TestInitialize]
         public void TestInitializer()
         {
             _fileDeleted = false;
+            _itemUpdated = false;
             _shimObject = ShimsContext.Create();
         }
 
@@ -88,9 +91,29 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                                         LookupFieldGet = () => DummyString
                                     };
                                 }
-
+                                if (name == "Generic")
+                                {
+                                    return new ShimSPField
+                                    {
+                                        TypeGet = () => SPFieldType.Boolean
+                                    };
+                                }
+                                
                                 return new ShimSPField();
                             }
+                        },
+                        GetItemsSPQuery = __ => new ShimSPListItemCollection
+                        {
+                            CountGet = () => DummyInt,
+                            ItemGetInt32 = ___ => new ShimSPListItem
+                            {
+                                IDGet = () => DummyInt
+                            }
+                        },
+                        GetItemByIdInt32 = __ => new ShimSPListItem
+                        {
+                            ItemGetString = ___ => DummyString,
+                            Update = () => _itemUpdated = true
                         }
                     },
                     ItemGetGuid = _ => new ShimSPList
@@ -131,6 +154,8 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
 
                 return SPFieldType.Text;
             };
+
+            ShimSPFieldLookupValue.ConstructorInt32String = (_, __, ___) => { };
 
             ShimAct.ConstructorSPWeb = (_, __) => { };
             ShimAct.AllInstances.IsOnlineGet = _ => true;
@@ -180,6 +205,11 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 {
                     new ShimCell(),
                     new ShimCell(),
+                    new ShimCell(),
+                    new ShimCell(),
+                    new ShimCell(),
+                    new ShimCell(),
+                    new ShimCell(),
                     new ShimCell()
                 }),
                 new ShimRow(),
@@ -187,6 +217,11 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             });
             ShimOpenXmlElement.AllInstances.DescendantsOf1(_ => new List<Cell>
             {
+                new ShimCell(),
+                new ShimCell(),
+                new ShimCell(),
+                new ShimCell(),
+                new ShimCell(),
                 new ShimCell(),
                 new ShimCell(),
                 new ShimCell()
@@ -200,12 +235,22 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 switch (count1)
                 {
                     case 1:
-                        return $"ResourceLevel";
+                        return "ID";
                     case 2:
+                        return "Title";
+                    case 3:
+                        return "ResourceLevel";
+                    case 4:
                         return "Permissions";
+                    case 5:
+                        return $"Generic{DummyInt}";
+                    case 6:
+                        return "Email";
+                    case 7:
+                        return "SharePointAccount";
                     default:
                         count1 = 0;
-                        return $"{DummyString}{DummyInt}";
+                        return DummyString;
                 }
             };
 
@@ -216,10 +261,21 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 switch (count2)
                 {
                     case 1:
-                        return "ResourceLevel";
+                        return "ID";
                     case 2:
+                        return "Title";
+                    case 3:
+                        return "ResourceLevel";
+                    case 4:
                         return "Permissions";
+                    case 5:
+                        return "Generic";
                     case 6:
+                        return "Email";
+                    case 7:
+                        return "SharePointAccount";
+                    case 9:
+                    case 13:
                         return DummyInt.ToString();
                     default:
                         return DummyString;
@@ -230,6 +286,8 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             {
                 WorksheetGet = () => new ShimWorksheet()
             };
+
+            ShimSPQuery.Constructor = _ => { };
         }
 
         private void CreateTestObject(string data, bool isImportCancelled)
@@ -326,10 +384,29 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             // Assert
             var dSMResult = (ResourceImportResult)_privateObj.GetFieldOrProperty(DSMResultProperty);
             var dtResources = (DataTable)_privateObj.GetFieldOrProperty(DtResourcesProperty);
+            var totalRecords = (int)_privateObj.GetFieldOrProperty(TotalRecordsProperty);
             this.ShouldSatisfyAllConditions(
-                () => dSMResult.Log.InfoCount.ShouldBe(1),
+                () => dSMResult.Log.InfoCount.ShouldBe(3),
+                () => dSMResult.Log.ErrorCount.ShouldBe(0),
+                () => dSMResult.Log.WarningCount.ShouldBe(0),
                 () => dSMResult.Log.Messages[0].Message.ShouldBe("Loading Spreadsheet"),
+                () => dSMResult.Log.Messages[1].Message.ShouldBe("Importing Resources"),
+                () => dSMResult.Log.Messages[2].Message.ShouldBe("Import completed successfully!"),
+                () => dSMResult.CurrentProcess.ShouldBe("Import Completed. Check the log for more details."),
+                () => dSMResult.FailedRecords.ShouldBe(0),
+                () => dSMResult.ProcessedRecords.ShouldBe(1),
+                () => dSMResult.SuccessRecords.ShouldBe(1),
+                () => dSMResult.TotalRecords.ShouldBe(1),
+                () => dSMResult.PercentComplete.ShouldBe(100),
                 () => _fileDeleted.ShouldBeTrue(),
+                () => _itemUpdated.ShouldBeTrue(),
+                () => dtResources.Columns.Contains("ID").ShouldBeTrue(),
+                () => dtResources.Columns.Contains("Title").ShouldBeTrue(),
+                () => dtResources.Columns.Contains("ResourceLevel").ShouldBeTrue(),
+                () => dtResources.Columns.Contains("Permissions").ShouldBeTrue(),
+                () => dtResources.Columns.Contains("Generic").ShouldBeTrue(),
+                () => dtResources.Columns.Contains("Email").ShouldBeTrue(),
+                () => dtResources.Columns.Contains("SharePointAccount").ShouldBeTrue(),
                 () => dtResources.Columns.Contains(DummyString).ShouldBeTrue(),
                 () => dtResources.Rows.Count.ShouldBe(1));
         }
