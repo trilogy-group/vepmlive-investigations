@@ -14,13 +14,13 @@ namespace PortfolioEngineCore.Tests.Base
     [TestClass]
     public class AdminPagesDbaPrioritzTests
     {
+        private const string UpdateCalcsMethodName = "UpdateCalcs";
+        private const string GetCustFieldValMethodName = "GetCustFieldVal";
+        private const string PerformCustomFieldsCalculateMethodName = "PerformCustomFieldsCalculate";
+        private const string DummyString = "DummyString";
         private IDisposable shimContext;
         private DBAccess dbAccess;
         private PrivateType privateType;
-        private string UpdateCalcsMethodName = "UpdateCalcs";
-        private string GetCustFieldValMethodName = "GetCustFieldVal";
-        private string PerformCustomFieldsCalculateMethodName = "PerformCustomFieldsCalculate";
-        private const string DummyString = "DummyString";
 
         [TestInitialize]
         public void Initialize()
