@@ -32,7 +32,7 @@ namespace PPM
             else
             {
                 string s = "";
-                string sBaseInfo = WebAdmin.BuildBaseInfo(context);
+                string sBaseInfo = WebAdmin.BuildBaseInfo(context);      
                 PortfolioEngineCore.PfEInterface pfeif = new PortfolioEngineCore.PfEInterface(sBaseInfo);
                 try
                 {

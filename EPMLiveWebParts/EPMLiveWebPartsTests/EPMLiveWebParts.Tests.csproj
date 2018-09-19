@@ -120,6 +120,7 @@
     <Compile Include="GridListView\GridListViewTests.RenderGantt.cs" />
     <Compile Include="Layouts\epmlive\TlwizardTests.cs" />
     <Compile Include="ReportingChart\ReportingChartTests.cs" />
+    <Compile Include="ReportingChart\ReportingChartToolPartTests.cs" />
     <Compile Include="ResourcePlanningTest.cs" />
     <Compile Include="ReportingFilter\ReportingFilterTests.cs" />
     <Compile Include="UserProfileDisplay\DisplayProfilePicturesTests.cs" />

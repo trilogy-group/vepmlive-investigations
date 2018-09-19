@@ -59,7 +59,7 @@ namespace EPMLiveCore
         ///     Class (<see cref="MyWorkGridAction" />) explore and verify fields for coverage gain.
         /// </summary>
         [Test]
-        [Timeout(TestsTimeOut)]
+        [Timeout(TestContants.TimeOutTenSeconds)]
         [Category("AUT Initializer")]
         [TestCase(MethodPage_Load, 0)]
         public void AUT_MyWorkGridAction_All_Methods_Explore_Verify_Test(string methodName, int overloadingIndex = 0)
