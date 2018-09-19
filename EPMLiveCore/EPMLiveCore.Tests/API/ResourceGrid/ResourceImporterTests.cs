@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.Fakes;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Fakes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Fakes;
 using DocumentFormat.OpenXml.Packaging.Fakes;
 using DocumentFormat.OpenXml.Spreadsheet;
@@ -17,7 +13,6 @@ using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.Infrastructure.Fakes;
 using EPMLiveCore.Jobs;
-using EPMLiveCore.Jobs.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
@@ -35,13 +30,33 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         private ShimSPWeb _web;
         private bool _fileDeleted;
         private bool _itemUpdated;
+        private int? _itemValue;
 
         private const int DummyInt = 1;
         private const string DummyString = "DummyString";
+        private const string DummyDateField = "DummyDate";
         private const string NeedToBeSiteAdminErrorMessage = "You need to be a Site Collection Administrator in order to import resources.";
         private const string DSMResultProperty = "_dSMResult";
         private const string DtResourcesProperty = "_dtResources";
         private const string TotalRecordsProperty = "_totalRecords";
+
+        private const string IdField = "ID";
+        private const string GenericField = "Generic";
+        private const string SharePointAccountField = "SharePointAccount";
+        private const string TitleField = "Title";
+        private const string ResourceLevelField = "ResourceLevel";
+        private const string PermissionsField = "Permissions";
+        private const string EmailField = "Email";
+
+        private const string ImportCancelledMessage = "Import cancelled!";
+        private const string ImportCompletedErrorMessage = "Import completed with errors!";
+        private const string LoadingSpreadsheetMessage = "Loading Spreadsheet";
+        private const string ImportingResourcesMessage = "Importing Resources";
+        private const string ImportCompletedSuccessfullyMessage = "Import completed successfully!";
+        private const string ImportCompletedCheckLogMessage = "Import Completed. Check the log for more details.";
+
+        private const string AddNewResourceMethod = "AddNewResource";
+        private const string GetUserValueMethod = "GetUserValue";
 
         [TestInitialize]
         public void TestInitializer()
@@ -61,6 +76,12 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         {
             _web = new ShimSPWeb
             {
+                EnsureUserString = _ => new ShimSPUser
+                {
+                    LoginNameGet = () => DummyString,
+                    IDGet = () => DummyInt,
+                    NameGet = () => DummyString
+                },
                 CurrentUserGet = () => new ShimSPUser
                 {
                     IsSiteAdminGet = () => isSiteAdmin
@@ -71,7 +92,15 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                     {
                         new ShimSPListItem
                         {
-                            ItemGetString = __ => DummyString
+                            ItemGetString = item =>
+                            {
+                                if (item == IdField)
+                                {
+                                    return DummyInt;
+                                }
+
+                                return DummyString;
+                            }
                         }
                     })
                 },
@@ -79,6 +108,11 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 {
                     ItemGetString = _ => new ShimSPList
                     {
+                        AddItem = () => new ShimSPListItem
+                        {
+                            ItemGetString = __ => DummyString,
+                            Update = () => _itemUpdated = true
+                        },
                         FieldsGet = () => new ShimSPFieldCollection
                         {
                             GetFieldByInternalNameString = name =>
@@ -91,11 +125,22 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                                         LookupFieldGet = () => DummyString
                                     };
                                 }
-                                if (name == "Generic")
+                                if (name == GenericField)
                                 {
                                     return new ShimSPField
                                     {
                                         TypeGet = () => SPFieldType.Boolean
+                                    };
+                                }
+                                if (name == SharePointAccountField)
+                                {
+                                    return new ShimSPFieldUser();
+                                }
+                                if (name == DummyDateField)
+                                {
+                                    return new ShimSPField
+                                    {
+                                        TypeGet = () => SPFieldType.DateTime
                                     };
                                 }
                                 
@@ -107,7 +152,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                             CountGet = () => DummyInt,
                             ItemGetInt32 = ___ => new ShimSPListItem
                             {
-                                IDGet = () => DummyInt
+                                IDGet = () => _itemValue.HasValue ? _itemValue.Value : DummyInt
                             }
                         },
                         GetItemByIdInt32 = __ => new ShimSPListItem
@@ -124,7 +169,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                             {
                                 ItemGetString = item =>
                                 {
-                                    if (item == "ID")
+                                    if (item == IdField)
                                     {
                                         return DummyInt;
                                     }
@@ -147,6 +192,10 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
 
             ShimSPField.AllInstances.TypeGet = instance =>
             {
+                if (instance is SPFieldUser)
+                {
+                    return SPFieldType.User;
+                }
                 if (instance is SPFieldLookup)
                 {
                     return SPFieldType.Lookup;
@@ -210,6 +259,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                     new ShimCell(),
                     new ShimCell(),
                     new ShimCell(),
+                    new ShimCell(),
                     new ShimCell()
                 }),
                 new ShimRow(),
@@ -217,6 +267,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             });
             ShimOpenXmlElement.AllInstances.DescendantsOf1(_ => new List<Cell>
             {
+                new ShimCell(),
                 new ShimCell(),
                 new ShimCell(),
                 new ShimCell(),
@@ -235,19 +286,21 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 switch (count1)
                 {
                     case 1:
-                        return "ID";
+                        return IdField;
                     case 2:
-                        return "Title";
+                        return TitleField;
                     case 3:
-                        return "ResourceLevel";
+                        return ResourceLevelField;
                     case 4:
-                        return "Permissions";
+                        return PermissionsField;
                     case 5:
-                        return $"Generic{DummyInt}";
+                        return $"{GenericField}{DummyInt}";
                     case 6:
-                        return "Email";
+                        return EmailField;
                     case 7:
-                        return "SharePointAccount";
+                        return SharePointAccountField;
+                    case 8:
+                        return DummyDateField;
                     default:
                         count1 = 0;
                         return DummyString;
@@ -261,21 +314,24 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 switch (count2)
                 {
                     case 1:
-                        return "ID";
+                        return IdField;
                     case 2:
-                        return "Title";
+                        return TitleField;
                     case 3:
-                        return "ResourceLevel";
+                        return ResourceLevelField;
                     case 4:
-                        return "Permissions";
+                        return PermissionsField;
                     case 5:
-                        return "Generic";
+                        return GenericField;
                     case 6:
-                        return "Email";
+                        return EmailField;
                     case 7:
-                        return "SharePointAccount";
-                    case 9:
-                    case 13:
+                        return SharePointAccountField;
+                    case 8:
+                        return DummyDateField;
+                    case 10:
+                    case 14:
+                    case 17:
                         return DummyInt.ToString();
                     default:
                         return DummyString;
@@ -340,7 +396,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 () => dSMResult.Log.WarningCount.ShouldBe(0),
                 () => dSMResult.Log.ErrorCount.ShouldBe(0),
                 () => dSMResult.Log.Messages.Count.ShouldBe(1),
-                () => dSMResult.Log.Messages[0].Message.ShouldBe("Import cancelled!"));
+                () => dSMResult.Log.Messages[0].Message.ShouldBe(ImportCancelledMessage));
         }
 
         [TestMethod]
@@ -368,7 +424,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 () => dSMResult.Log.ErrorCount.ShouldBe(1),
                 () => dSMResult.Log.Messages.Count.ShouldBe(2),
                 () => dSMResult.Log.Messages[0].Message.ShouldBe(DummyErrorMessage),
-                () => dSMResult.Log.Messages[1].Message.ShouldBe("Import completed with errors!"));
+                () => dSMResult.Log.Messages[1].Message.ShouldBe(ImportCompletedErrorMessage));
         }
 
         [TestMethod]
@@ -384,15 +440,14 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             // Assert
             var dSMResult = (ResourceImportResult)_privateObj.GetFieldOrProperty(DSMResultProperty);
             var dtResources = (DataTable)_privateObj.GetFieldOrProperty(DtResourcesProperty);
-            var totalRecords = (int)_privateObj.GetFieldOrProperty(TotalRecordsProperty);
             this.ShouldSatisfyAllConditions(
                 () => dSMResult.Log.InfoCount.ShouldBe(3),
                 () => dSMResult.Log.ErrorCount.ShouldBe(0),
                 () => dSMResult.Log.WarningCount.ShouldBe(0),
-                () => dSMResult.Log.Messages[0].Message.ShouldBe("Loading Spreadsheet"),
-                () => dSMResult.Log.Messages[1].Message.ShouldBe("Importing Resources"),
-                () => dSMResult.Log.Messages[2].Message.ShouldBe("Import completed successfully!"),
-                () => dSMResult.CurrentProcess.ShouldBe("Import Completed. Check the log for more details."),
+                () => dSMResult.Log.Messages[0].Message.ShouldBe(LoadingSpreadsheetMessage),
+                () => dSMResult.Log.Messages[1].Message.ShouldBe(ImportingResourcesMessage),
+                () => dSMResult.Log.Messages[2].Message.ShouldBe(ImportCompletedSuccessfullyMessage),
+                () => dSMResult.CurrentProcess.ShouldBe(ImportCompletedCheckLogMessage),
                 () => dSMResult.FailedRecords.ShouldBe(0),
                 () => dSMResult.ProcessedRecords.ShouldBe(1),
                 () => dSMResult.SuccessRecords.ShouldBe(1),
@@ -400,15 +455,98 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 () => dSMResult.PercentComplete.ShouldBe(100),
                 () => _fileDeleted.ShouldBeTrue(),
                 () => _itemUpdated.ShouldBeTrue(),
-                () => dtResources.Columns.Contains("ID").ShouldBeTrue(),
-                () => dtResources.Columns.Contains("Title").ShouldBeTrue(),
-                () => dtResources.Columns.Contains("ResourceLevel").ShouldBeTrue(),
-                () => dtResources.Columns.Contains("Permissions").ShouldBeTrue(),
-                () => dtResources.Columns.Contains("Generic").ShouldBeTrue(),
-                () => dtResources.Columns.Contains("Email").ShouldBeTrue(),
-                () => dtResources.Columns.Contains("SharePointAccount").ShouldBeTrue(),
+                () => dtResources.Columns.Contains(IdField).ShouldBeTrue(),
+                () => dtResources.Columns.Contains(TitleField).ShouldBeTrue(),
+                () => dtResources.Columns.Contains(ResourceLevelField).ShouldBeTrue(),
+                () => dtResources.Columns.Contains(PermissionsField).ShouldBeTrue(),
+                () => dtResources.Columns.Contains(GenericField).ShouldBeTrue(),
+                () => dtResources.Columns.Contains(EmailField).ShouldBeTrue(),
+                () => dtResources.Columns.Contains(SharePointAccountField).ShouldBeTrue(),
                 () => dtResources.Columns.Contains(DummyString).ShouldBeTrue(),
+                () => dtResources.Columns.Contains(DummyDateField).ShouldBeTrue(),
                 () => dtResources.Rows.Count.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void AddNewResource_WhenIsGeneric_ConfirmResult()
+        {
+            // Arrange
+            var dataRow = SetupForAddNewResource();
+
+            // Act
+            _privateObj.Invoke(AddNewResourceMethod, dataRow, true);
+
+            // Assert
+            _itemUpdated.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void AddNewResource_WhenIsNotGeneric_ConfirmResult()
+        {
+            // Arrange
+            var dataRow = SetupForAddNewResource();
+
+            // Act
+            _privateObj.Invoke(AddNewResourceMethod, dataRow, false);
+
+            // Assert
+            _itemUpdated.ShouldBeTrue();
+        }
+
+        private DataRow SetupForAddNewResource()
+        {
+            _itemValue = -1;
+            SetupShims(true);
+            CreateTestObject(DummyString, false);
+
+            var dataTable = new DataTable();
+            dataTable.Columns.Add(IdField);
+            dataTable.Columns.Add(TitleField);
+            dataTable.Columns.Add(EmailField);
+            dataTable.Columns.Add(SharePointAccountField);
+
+            var dataRow = dataTable.NewRow();
+            dataRow[IdField] = DummyInt;
+            dataRow[TitleField] = DummyString;
+            dataRow[EmailField] = DummyString;
+            dataRow[SharePointAccountField] = DummyString;
+
+            dataTable.Rows.Add(dataRow);
+            return dataRow;
+        }
+
+        [TestMethod]
+        public void GetUserValue_WhenNotFound_ConfirmResult()
+        {
+            // Arrange
+            var usersDict = new Dictionary<string, object[]>();
+
+            SetupShims(true);
+            CreateTestObject(DummyString, false);
+
+            // Act
+            var result = _privateObj.Invoke(GetUserValueMethod, usersDict, DummyString);
+
+            // Assert
+            result.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void GetUserValue_WhenFoundAtSecondPosition_ConfirmResult()
+        {
+            // Arrange
+            var usersDict = new Dictionary<string, object[]>();
+            usersDict.Add(DummyString, new[] { DummyString, string.Empty });
+            usersDict.Add($"{DummyString}2", new[] { (object)DummyInt, DummyString });
+
+            SetupShims(true);
+            CreateTestObject(DummyString, false);
+
+            // Act
+            var result = _privateObj.Invoke(GetUserValueMethod, usersDict, DummyString);
+
+            // Assert
+            result.ShouldNotBeNull();
         }
     }
 }
