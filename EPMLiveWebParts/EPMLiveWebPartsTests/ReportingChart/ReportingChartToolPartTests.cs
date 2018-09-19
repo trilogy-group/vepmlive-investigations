@@ -1031,131 +1031,22 @@ namespace EPMLiveWebParts.Tests.ReportingChart
 
         private void ShimSharePointContext()
         {
-            //ShimSPFieldCollectionMethods();
-            //ShimSPViewCollectionMethods();
-            //ShimSPListMethods();
-            //ShimSPListCollectionMethods();
             ShimSPWebMethods();
-            //var site = ShimSPSiteMethods();
 
             ShimSPContext.CurrentGet = () => new ShimSPContext
             {
-                WebGet = () => _shimWeb.Instance,
-                //SiteGet = () => site.Instance
+                WebGet = () => _shimWeb.Instance
             }.Instance;
 
             ShimSPSite.ConstructorGuid = (_, __) => { };
-            //ShimSPSite.AllInstances.OpenWebGuid = (_, __) => _shimWeb;
-            //ShimTemplateBasedControl.AllInstances.WebGet = _ => _shimWeb;
         }
-
-        //private void ShimSPViewCollectionMethods()
-        //{
-        //    var query = $@"<Where><Child>
-        //                        <FieldRef Name=""{DummyString}""/>
-        //                        <Values>
-        //                            <Value>{DummyString}</Value>
-        //                        </Values>
-        //                    </Child></Where>
-        //                    <OrderBy>
-        //                        <FieldRef Name=""{DummyString}"" Ascending=""false""/>
-        //                    </OrderBy>";
-        //    var _shimView = new ShimSPView
-        //    {
-        //        QueryGet = () => query
-        //    };
-        //    _shimViews = new ShimSPViewCollection
-        //    {
-        //        ItemGetString = _ => _shimView,
-        //    };
-        //}
-
-        //private ShimSPSite ShimSPSiteMethods()
-        //{
-        //    var site = new ShimSPSite
-        //    {
-        //        IDGet = () => DummyGuid,
-        //        RootWebGet = () => _shimWeb.Instance,
-        //        WebApplicationGet = () => new ShimSPWebApplication
-        //        {
-        //            ApplicationPoolGet = () => new SPApplicationPool()
-        //        }.Instance
-        //    };
-        //    _shimWeb.SiteGet = () => site.Instance;
-        //    return site;
-        //}
-
-        //private void ShimSPFieldCollectionMethods()
-        //{
-        //    _shimFields = new ShimSPFieldCollection
-        //    {
-        //        GetFieldByInternalNameString = _ => new ShimSPField()
-        //        {
-        //            TitleGet = () => DummyString,
-        //            InternalNameGet = () => DummyString,
-        //            TypeGet = () => SPFieldType.User
-        //        }.Instance
-        //    };
-
-        //    ShimSPField.AllInstances.TitleGet = _ => DummyString;
-        //    ShimSPField.AllInstances.InternalNameGet = _ => DummyString;
-        //}
 
         private void ShimSPWebMethods()
         {
-            //var user = new ShimSPUser
-            //{
-            //    IDGet = () => Id
-            //};
-
             _shimWeb = new ShimSPWeb
             {
-                //IDGet = () => DummyGuid,
-                //CurrentUserGet = () => user,
-                //EnsureUserString = _ => user,
-                //SiteUserInfoListGet = () => _shimList.Instance,
-                //ListsGet = () => _shimListCollection.Instance,
-                //Close = () => { _webClosed = true; },
-                //UrlGet = () => ExampleUrl,
                 LocaleGet = () => CultureInfo.InvariantCulture
             };
         }
-
-        //private void ShimSPListCollectionMethods()
-        //{
-        //    _shimListCollection = new ShimSPListCollection
-        //    {
-        //        ItemGetString = _ => _shimList,
-        //        ItemGetGuid = _ => _shimList,
-        //        GetListGuidBoolean = (_, __) => _shimList,
-        //        TryGetListString = list => _shimList.Instance
-        //    };
-        //}
-
-        //private void ShimSPListMethods()
-        //{
-        //    _shimList = new ShimSPList
-        //    {
-        //        IDGet = () => DummyGuid,
-        //        ItemsGet = () => new ShimSPListItemCollection
-        //        {
-        //            GetEnumerator = () => new List<SPListItem> { GetListItem() }.GetEnumerator(),
-        //            GetDataTable = () => new DataTable()
-        //        },
-        //        FieldsGet = () => _shimFields.Instance,
-        //        ParentWebGet = () => _shimWeb,
-        //        ViewsGet = () => _shimViews
-        //    };
-        //}
-
-        //private ShimSPListItem GetListItem()
-        //{
-        //    return new ShimSPListItem()
-        //    {
-        //        IDGet = () => Id,
-        //        ItemGetGuid = _ => DummyString,
-        //        ItemGetString = _ => DummyString
-        //    };
-        //}
     }
 }
