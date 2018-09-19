@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Text;
 using System.Xml;
+using EPMLiveCore.ReportHelper;
 using Microsoft.SharePoint;
 
 namespace EPMLiveCore
@@ -14,31 +15,32 @@ namespace EPMLiveCore
         public static DataSet GetReportingData(SPWeb web, string list, bool bRollup, string query, string orderby, int page, int pagesize)
         {
 
-            var reportBiz = new ReportHelper.ReportBiz(web.Site.ID);
+            var reportBiz = new ReportBiz(web.Site.ID);
 
             if (reportBiz.SiteExists())
             {
                 var oList = web.Lists[list];
-                var data = new ReportHelper.EPMData(web.Site.ID);
-                var clientReportingConnection = data.GetClientReportingConnection;
-
+                EPMData data = null;
                 SqlCommand sqlCommand = null;
 
                 try
                 {
+                    data = new EPMData(web.Site.ID);
+                    var clientReportingConnection = data.GetClientReportingConnection;
                     sqlCommand = new SqlCommand(
                         "select * from information_schema.parameters where specific_name='spGetReportListData' and parameter_name='@orderby'",
                         clientReportingConnection);
 
                     var borderby = false;
-                    var dr = sqlCommand.ExecuteReader();
-                    if (dr.Read())
+                    using (var dr = sqlCommand.ExecuteReader())
                     {
-                        borderby = true;
+                        if (dr.Read())
+                        {
+                            borderby = true;
+                        }
                     }
-                    dr.Close();
-                    sqlCommand.Dispose();
 
+                    sqlCommand.Dispose();
                     sqlCommand = new SqlCommand("spGetReportListData", clientReportingConnection);
                     sqlCommand.CommandType = CommandType.StoredProcedure;
                     sqlCommand.Parameters.AddWithValue("@siteid", web.Site.ID);
@@ -62,7 +64,7 @@ namespace EPMLiveCore
                     {
                         dataAdapter.Fill(dataSet);
                     }
-                    clientReportingConnection.Close();
+
                     return dataSet;
                 }
                 catch (Exception ex)
@@ -75,6 +77,10 @@ namespace EPMLiveCore
                     if (sqlCommand != null)
                     {
                         sqlCommand.Dispose();
+                    }
+                    if (data != null)
+                    {
+                        data.Dispose();
                     }
                 }
             }
@@ -398,13 +404,14 @@ namespace EPMLiveCore
                     command.Parameters.AddWithValue("@key", "ReportFilterWebPartSelections");
                     command.Parameters.AddWithValue("@FK", filterWpId);
                     command.ExecuteNonQuery();
-                    var dataReader = command.ExecuteReader();
-                    if (dataReader.Read())
+                    using (var dataReader = command.ExecuteReader())
                     {
-                        reportFilterIDs = new ArrayList(dataReader.GetString(0).Split('|')[0].Split(','));
-                        listid = dataReader.GetGuid(1);
+                        if (dataReader.Read())
+                        {
+                            reportFilterIDs = new ArrayList(dataReader.GetString(0).Split('|')[0].Split(','));
+                            listid = dataReader.GetGuid(1);
+                        }
                     }
-                    dataReader.Close();
                 }
                 catch (Exception ex)
                 {
