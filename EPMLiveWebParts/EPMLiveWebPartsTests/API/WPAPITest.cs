@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using EPMLiveCore.API.Fakes;
+using EPMLiveCore.Fakes;
 using EPMLiveWebParts.API.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
-using EPMLiveCore.Fakes;
-using EPMLiveCore.API.Fakes;
-using System.Data;
-using System.Collections.Specialized;
 
 namespace EPMLiveWebParts.Tests.API
 {
@@ -164,12 +164,12 @@ namespace EPMLiveWebParts.Tests.API
 
             _site = new ShimSPSite
             {
-                IDGet = () => string.IsNullOrEmpty(_siteId) ? Guid.NewGuid() : new Guid(_siteId)
+                IDGet = () => string.IsNullOrWhiteSpace(_siteId) ? Guid.NewGuid() : new Guid(_siteId)
             };
 
             _web = new ShimSPWeb
             {
-                IDGet = () => string.IsNullOrEmpty(_webId) ? Guid.NewGuid() : new Guid(_webId),
+                IDGet = () => string.IsNullOrWhiteSpace(_webId) ? Guid.NewGuid() : new Guid(_webId),
                 SiteGet = () => _site.Instance,
                 ListsGet = () => new ShimSPListCollection
                 {
