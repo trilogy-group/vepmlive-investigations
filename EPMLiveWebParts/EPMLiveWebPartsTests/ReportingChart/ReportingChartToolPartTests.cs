@@ -130,7 +130,6 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             }
         }
 
-
         [TestInitialize]
         public void TestInitialize()
         {
