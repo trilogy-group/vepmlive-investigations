@@ -458,11 +458,6 @@ namespace EPMLiveCore.API
                                         throw new APIException(4019, "Item Already Queued");
                                     }                                    
                                 }
-                                catch (Exception ex)
-                                {
-                                    Trace.WriteLine(ex.ToString());
-                                    throw;
-                                }
                                 finally
                                 {
                                     if (command != null)
@@ -567,11 +562,6 @@ namespace EPMLiveCore.API
                                             message = "<PublishStatus/>";
                                         }
                                     }
-                                }
-                                catch(Exception ex)
-                                {
-                                    Trace.WriteLine(ex.ToString());
-                                    throw;
                                 }
                                 finally
                                 {
