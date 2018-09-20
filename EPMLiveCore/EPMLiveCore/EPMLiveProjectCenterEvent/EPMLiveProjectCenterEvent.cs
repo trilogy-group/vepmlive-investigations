@@ -29,7 +29,6 @@ namespace EPMLiveCore
         static string sEventLogName = "EPM Live";
         static string sEvent = "";
 
-        // Consider refactoring with meaningful names
         private const string TypeScheduleDriven = "Schedule Driven";
         private const string StateFieldName = "State";
         private const string ClosedState = "closed";
