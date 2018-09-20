@@ -18,6 +18,7 @@ namespace EPMLiveWebParts.Tests.IntegrationModuleDisplay
     {
         private static readonly Guid DummyGuid = Guid.NewGuid();
         private const string DummyUrl = "https://duymy.org/";
+        private const string RenderWebPartMethodName = "RenderWebPart";
         private static int Count;
         private IntegrationModuleDisplay integrationModuleDisplay;
         private IDisposable shimContext;
@@ -70,7 +71,7 @@ namespace EPMLiveWebParts.Tests.IntegrationModuleDisplay
         public void RenderWebPart_OnSuccess_ShouldWriteContent()
         {
             // Arrange, Act
-            privateObject.Invoke("RenderWebPart", textWriter);
+            privateObject.Invoke(RenderWebPartMethodName, textWriter);
             var outputContent = stringBuilder.ToString();
 
             // Assert
@@ -90,7 +91,7 @@ namespace EPMLiveWebParts.Tests.IntegrationModuleDisplay
             };
 
             // Act
-            privateObject.Invoke("RenderWebPart", textWriter);
+            privateObject.Invoke(RenderWebPartMethodName, textWriter);
             var outputContent = stringBuilder.ToString();
 
             // Assert
@@ -106,7 +107,7 @@ namespace EPMLiveWebParts.Tests.IntegrationModuleDisplay
             ShimSPContext.AllInstances.ItemGet = _ => null;
 
             // Act
-            privateObject.Invoke("RenderWebPart", textWriter);
+            privateObject.Invoke(RenderWebPartMethodName, textWriter);
             var outputContent = stringBuilder.ToString();
 
             // Assert
