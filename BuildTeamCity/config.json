@@ -190,9 +190,9 @@
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
 		},
 		{
-		  "name": "WE_WSIF.tlb",
-		  "files": ["WE_WSIF.tlb"],
-		  "destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
+			"name": "WE_WSIF.tlb", 
+			"files": ["WE_WSIF.tlb"],
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
 		},
 		{
 			"name": "WE_WSSAdmin.dll", 
@@ -208,6 +208,7 @@
 				"Name": "WssAdmin"
 				}
 		},
+
 		{
 			"name": "workenginesetup.exe", 
 			"files": ["workenginesetup.exe"],

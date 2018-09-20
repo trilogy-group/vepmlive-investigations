@@ -117,6 +117,7 @@
   <ItemGroup>
     <Compile Include="ChartControl\VfChartTests.cs" />
     <Compile Include="GridListView\GridListViewTests.AddContextualTab.cs" />
+    <Compile Include="GridListView\GridListViewTests.RenderActionMenu.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderGantt.cs" />
     <Compile Include="Layouts\epmlive\TlwizardTests.cs" />
     <Compile Include="ReportingChart\ReportingChartTests.cs" />
