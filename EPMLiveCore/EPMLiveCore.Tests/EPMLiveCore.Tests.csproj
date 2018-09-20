@@ -48,6 +48,10 @@
       <HintPath>..\..\packages\Castle.Core.4.3.0\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="DocumentFormat.OpenXml.2.5.5631.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\DocumentFormat.OpenXml.2.5.5631.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="EPM Live Core.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
@@ -154,6 +158,7 @@
     <Compile Include="API\Publish\APIPublishTests.cs" />
     <Compile Include="API\ResourceGrid\ResourceExporterTests.cs" />
     <Compile Include="API\ResourceGrid\ResourceGridTests.cs" />
+    <Compile Include="API\ResourceGrid\ResourceImporterTests.cs" />
     <Compile Include="API\TimerTests.cs" />
     <Compile Include="AppSettingsHelperTests.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControlTests.cs" />
