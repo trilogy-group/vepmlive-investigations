@@ -26,7 +26,7 @@ using RC = EPMLiveWebParts.ReportingChart;
 namespace EPMLiveWebParts.Tests.ReportingChart
 {
     [TestClass, ExcludeFromCodeCoverage]
-    public partial class ReportingChartToolPartTests
+    public class ReportingChartToolPartTests
     {
         private const int Id = 1;
         private const string DummyString = "DummyString";
