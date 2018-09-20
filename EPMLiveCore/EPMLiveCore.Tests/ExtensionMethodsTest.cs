@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO.Compression.Fakes;
 using System.IO.Fakes;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using EPMLiveCore.ListDefinitions;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
@@ -21,6 +24,7 @@ namespace EPMLiveCore.Tests
         private IDisposable _shimObj;
         private ShimSPWeb _web;
         private ShimSPSite _site;
+        private CultureInfo _currentCulture;
 
         private const int DummyInt = 1;
         private const string DummyString = "DummyString";
@@ -31,12 +35,16 @@ namespace EPMLiveCore.Tests
         public void TestInitialize()
         {
             _shimObj = ShimsContext.Create();
+
+            _currentCulture = Thread.CurrentThread.CurrentCulture;
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
             _shimObj?.Dispose();
+            Thread.CurrentThread.CurrentCulture = _currentCulture;
         }
 
         private void SetupShims()
@@ -55,6 +63,14 @@ namespace EPMLiveCore.Tests
                             {
                                 TitleGet = () => DummyString
                             }
+                        },
+                        GetItemsSPQuery = __ => new ShimSPListItemCollection
+                        {
+                            CountGet = () => DummyInt,
+                            ItemGetInt32 = index => new ShimSPListItem
+                            {
+                                ItemGetString = name => DummyInt
+                            }
                         }
                     }
                 }.Bind(new SPList[]
@@ -70,8 +86,9 @@ namespace EPMLiveCore.Tests
             };
 
             ShimSPSite.ConstructorString = (_, __) => { };
+            ShimSPSite.ConstructorGuid = (_, __) => { };
             ShimSPSite.AllInstances.Dispose = _ => { };
-            ShimSPSite.AllInstances.OpenWebGuid = (_, __) => new ShimSPWeb().Instance;
+            ShimSPSite.AllInstances.OpenWebGuid = (_, __) => _web;
 
             ShimSPWeb.AllInstances.Dispose = _ => { };
         }
@@ -394,6 +411,202 @@ namespace EPMLiveCore.Tests
 
             // Assert
             result.Count.ShouldBe(2);
+        }
+
+        [TestMethod]
+        public void Sort_WithListBox_ConfirmResult()
+        {
+            // Arrange
+            var listBox = new ListBox();
+            listBox.Items.Add("B");
+            listBox.Items.Add("A");
+
+            // Act
+            ExtensionMethods.Sort(listBox);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => listBox.Items[0].Text.ShouldBe("A"),
+                () => listBox.Items[1].Text.ShouldBe("B"));
+        }
+
+        [TestMethod]
+        public void Sort_WithListControl_ConfirmResult()
+        {
+            // Arrange
+            var listControl = new DropDownList();
+            listControl.Items.Add("B");
+            listControl.Items.Add("A");
+
+            // Act
+            ExtensionMethods.Sort(listControl);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => listControl.Items[0].Text.ShouldBe("A"),
+                () => listControl.Items[1].Text.ShouldBe("B"));
+        }
+
+        [TestMethod]
+        public void StartOfWeek_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            var date = DateTime.Today;
+
+            // Act
+            var result = ExtensionMethods.StartOfWeek(date);
+
+            // Assert
+            result.DayOfWeek.ShouldBe(DayOfWeek.Sunday);
+        }
+
+        [TestMethod]
+        public void ToFriendlyDate_WhenToday_ConfirmResult()
+        {
+            // Arrange
+            var date = DateTime.Today;
+
+            // Act
+            var result = ExtensionMethods.ToFriendlyDate(date);
+
+            // Assert
+            result.ShouldBe("Today");
+        }
+
+        [TestMethod]
+        public void ToFriendlyDate_WhenYesterday_ConfirmResult()
+        {
+            // Arrange
+            var date = DateTime.Today.AddDays(-1);
+
+            // Act
+            var result = ExtensionMethods.ToFriendlyDate(date);
+
+            // Assert
+            result.ShouldBe("Yesterday");
+        }
+
+        [TestMethod]
+        public void ToFriendlyDate_WhenTomorrow_ConfirmResult()
+        {
+            // Arrange
+            var date = DateTime.Today.AddDays(1);
+
+            // Act
+            var result = ExtensionMethods.ToFriendlyDate(date);
+
+            // Assert
+            result.ShouldBe("Tomorrow");
+        }
+
+        [TestMethod]
+        public void ToFriendlyDate_WhensTomorrow_ConfirmResult()
+        {
+            // Arrange
+            var date = DateTime.Today.AddDays(-2);
+
+            // Act
+            var result = ExtensionMethods.ToFriendlyDate(date);
+
+            // Assert
+            result.ShouldBe(date.DayOfWeek.ToString());
+            // TODO
+        }
+        
+        [TestMethod]
+        public void SpDecompress_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            var bytes = Encoding.UTF8.GetBytes(CompressedDummyString);
+
+            // Act
+            //var result = ExtensionMethods.SpDecompress(bytes);
+
+            // Assert
+            //TODO
+        }
+
+        [TestMethod]
+        public void GetExtId_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            SetupShims();
+
+            // Act
+            var result = ExtensionMethods.GetExtId(new ShimSPUser().Instance, _web);
+
+            // Assert
+            result.ShouldBe(DummyInt);
+        }
+
+        [TestMethod]
+        public void GetExtId_WhenListIsNull_ConfirmResult()
+        {
+            // Arrange
+            var web = new ShimSPWeb
+            {
+                ListsGet = () => new ShimSPListCollection()
+            };
+
+            // Act
+            var result = ExtensionMethods.GetExtId(new ShimSPUser().Instance, web);
+
+            // Assert
+            result.ShouldBe(-1);
+        }
+
+        [TestMethod]
+        public void GetExtId_WhenListItemCountIsZero_ConfirmResult()
+        {
+            // Arrange
+            var web = new ShimSPWeb
+            {
+                ListsGet = () => new ShimSPListCollection
+                {
+                    TryGetListString = _ => new ShimSPList
+                    {
+                        GetItemsSPQuery = query => new ShimSPListItemCollection
+                        {
+                            CountGet = () => 0
+                        }
+                    }
+                }
+            };
+
+            // Act
+            var result = ExtensionMethods.GetExtId(new ShimSPUser().Instance, web);
+
+            // Assert
+            result.ShouldBe(-2);
+        }
+
+        [TestMethod]
+        public void GetExtId_WhenListItemValueIsInvalid_ConfirmResult()
+        {
+            // Arrange
+            var web = new ShimSPWeb
+            {
+                ListsGet = () => new ShimSPListCollection
+                {
+                    TryGetListString = _ => new ShimSPList
+                    {
+                        GetItemsSPQuery = query => new ShimSPListItemCollection
+                        {
+                            CountGet = () => 1,
+                            ItemGetInt32 = index => new ShimSPListItem
+                            {
+                                ItemGetString = item => DummyString
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Act
+            var result = ExtensionMethods.GetExtId(new ShimSPUser().Instance, web);
+
+            // Assert
+            result.ShouldBe(-3);
         }
     }
 }
