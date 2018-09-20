@@ -33,14 +33,13 @@ namespace PortfolioEngineCore.Tests.Resources
             shimContext?.Dispose();
         }
 
-        private static Type RPEditorDataType
+        private static Type RPEditorDataType { get; } = GetRpEditorDataType();
+
+        private static Type GetRpEditorDataType()
         {
-            get
-            {
-                var assembly = Assembly.LoadFrom(PortfolioEngineCoreDllPath);
-                var type = assembly.GetTypes().FirstOrDefault(p => p.FullName == RPEditorDataFullName);
-                return type;
-            }
+            var assembly = Assembly.LoadFrom(PortfolioEngineCoreDllPath);
+            var type = assembly.GetTypes().FirstOrDefault(p => p.FullName == RPEditorDataFullName);
+            return type;
         }
 
         private MethodInfo GetPublicStaticMethod(string methodName)
@@ -101,7 +100,6 @@ namespace PortfolioEngineCore.Tests.Resources
                     GetIntString = _ => 9020
                 }
             };
-
             var periodList = new List<CStruct>
             {
                 new ShimCStruct
@@ -388,6 +386,5 @@ namespace PortfolioEngineCore.Tests.Resources
 
             return cStructs.ToList();
         }
-
     }
 }
