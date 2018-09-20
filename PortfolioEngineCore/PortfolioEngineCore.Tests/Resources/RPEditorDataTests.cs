@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortfolioEngineCore.Fakes;
@@ -17,6 +15,10 @@ namespace PortfolioEngineCore.Tests.Resources
         private const string DummyString = "DummyString";
         private const string RPEditorDataFullName = "PortfolioEngineCore.RPEditorData";
         private const string PortfolioEngineCoreDllPath = "PortfolioEngineCore.dll";
+        private const string Field = "Field";
+        private const string RPCategory = "RPCategory";
+        private const string Period = "Period";
+        private const string PlanRow = "PlanRow";
         private IDisposable shimContext;
 
         [TestInitialize]
@@ -46,15 +48,24 @@ namespace PortfolioEngineCore.Tests.Resources
             return RPEditorDataType?.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public);
         }
 
-        private MethodInfo GetPrivateStaticMethod(string methodName)
+        private MethodInfo GetPrivateStaticMethod(string methodName, Type[] parameters = null)
         {
-            return RPEditorDataType?.GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic);
+            if (parameters != null)
+            {
+                return RPEditorDataType?.GetMethod(methodName, parameters);
+            }
+            else
+            {
+                return RPEditorDataType?.GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic);
+            }
         }
 
         [TestMethod]
-        public void BuildResourcePlanGridXML()
+        public void BuildResourcePlanGridXML_Should_ExecuteCorrectly()
         {
             // Arrange
+            var methodInfo = GetPublicStaticMethod("BuildResourcePlanGridXML");
+            var grid = new CStruct();
             var dbAcces = new ShimDBAccess().Instance;
             var planData = new ShimCStruct
             {
@@ -75,8 +86,6 @@ namespace PortfolioEngineCore.Tests.Resources
                     }
                 }.Instance
             }.Instance;
-            var grid = new CStruct();
-            var methodInfo = GetPublicStaticMethod("BuildResourcePlanGridXML");
             ShimCStruct.AllInstances.GetSubStructString = (_, name) => new CStruct();
             ShimCStruct.AllInstances.GetStringString = (_, name) => "1,2,3";
             ShimCStruct.AllInstances.GetStringAttrStringString = (_, name, defaultValue) => "1,2";
@@ -84,10 +93,7 @@ namespace PortfolioEngineCore.Tests.Resources
             {
                 new ShimCStruct
                 {
-                    GetSubStructString = _ => new ShimCStruct
-                    {
-
-                    },
+                    GetSubStructString = _ => new ShimCStruct(),
                     GetIntString = _ => 9007
                 },
                 new ShimCStruct
@@ -117,19 +123,17 @@ namespace PortfolioEngineCore.Tests.Resources
                     GetStringAttrString = _ => DummyString
                 }
             };
-            
-
             ShimCStruct.AllInstances.GetListString = (_, name) =>
             {
                 switch (name)
                 {
-                    case "Field":
+                    case Field:
                         return GetFieldsList();
-                    case "RPCategory":
+                    case RPCategory:
                         return rpCategoryList;
-                    case "Period":
+                    case Period:
                         return periodList;
-                    case "PlanRow":
+                    case PlanRow:
                         return planRowList;
                     default:
                         return new List<CStruct>();
@@ -139,12 +143,9 @@ namespace PortfolioEngineCore.Tests.Resources
             // Act
             var result = methodInfo?.Invoke(null, new object[] { dbAcces, planData, grid }) as StatusEnum?;
 
-
             // Assert
             result.ShouldNotBeNull();
             result.Value.ShouldBe(StatusEnum.rsSuccess);
-
-
         }
 
         [TestMethod]
@@ -160,10 +161,7 @@ namespace PortfolioEngineCore.Tests.Resources
             {
                 ["1"] = new CStruct() { Value = DummyString }
             };
-
-            var listRoles = new SortedList<string, CStruct>
-            {
-            };
+            var listRoles = new SortedList<string, CStruct>();
 
             // Act
             var result = method?.Invoke(null, new object[] { planRow, listCCRoles, listRoles }) as CStruct;
@@ -181,10 +179,7 @@ namespace PortfolioEngineCore.Tests.Resources
             {
                 GetIntString = _ => 1
             }.Instance;
-            var listCCRoles = new SortedList<string, CStruct>
-            {
-            };
-
+            var listCCRoles = new SortedList<string, CStruct>();
             var listRoles = new SortedList<string, CStruct>
             {
                 ["1"] = new CStruct() { Value = DummyString, InnerText = DummyString }
@@ -351,109 +346,47 @@ namespace PortfolioEngineCore.Tests.Resources
                 () => result.ShouldBe(expectedValue));
         }
 
-        private List<CStruct> GetFieldsList()
+        [TestMethod]
+        public void BuildJSONLookup_Should_ReturnContent()
         {
-            var list = new List<CStruct>
+            // Arrange
+            var method = RPEditorDataType?.GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
+                .Where(p => p.Name == "BuildJSONLookup")
+                .LastOrDefault();
+            var lookupItems = new CStruct[]
             {
                 new ShimCStruct
                 {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 9020,
-                    GetStringAttrString = _ => DummyString
+                    GetIntAttrString = name => 1,
+                    GetBooleanAttrStringBoolean = (name, defaultValue) => true,
+                    GetStringAttrString = name => DummyString
                 },
                 new ShimCStruct
                 {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 9000,
-                    GetStringAttrString = _ => DummyString
-                },
-                new ShimCStruct
-                {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 9014,
-                    GetStringAttrString = _ => DummyString
-                },
-                new ShimCStruct
-                {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 9020,
-                    GetStringAttrString = _ => DummyString
-                },
-                new ShimCStruct
-                {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 9009,
-                    GetStringAttrString = _ => DummyString
-                },
-                new ShimCStruct
-                {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 9008,
-                    GetStringAttrString = _ => DummyString
-                },
-                new ShimCStruct
-                {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 9007,
-                    GetStringAttrString = _ => DummyString
-                },
-                new ShimCStruct
-                {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 9006,
-                    GetStringAttrString = _ => DummyString
-                },
-                new ShimCStruct
-                {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 9015,
-                    GetStringAttrString = _ => DummyString
-                },
-                new ShimCStruct
-                {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 9004,
-                    GetStringAttrString = _ => DummyString
-                },
-                new ShimCStruct
-                {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 9012,
-                    GetStringAttrString = _ => DummyString
-                },
-                new ShimCStruct
-                {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 9013,
-                    GetStringAttrString = _ => DummyString
-                },
-                new ShimCStruct
-                {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 9017,
-                    GetStringAttrString = _ => DummyString
-                },
-                new ShimCStruct
-                {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 9018,
-                    GetStringAttrString = _ => DummyString
-                },
-                new ShimCStruct
-                {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 0,
-                    GetStringAttrString = _ => DummyString
-                },
-                new ShimCStruct
-                {
-                    GetBooleanAttrString = _ => true,
-                    GetIntAttrString = _ => 999,
-                    GetStringAttrString = _ => DummyString
+                    GetIntAttrString = name => 1,
+                    GetBooleanAttrStringBoolean = (name, defaultValue) => false,
+                    GetStringAttrString = name => DummyString
                 }
             };
 
-            return list;
+            // Act
+            var result = method?.Invoke(null, new object[] { lookupItems, 0, true, true }) as string;
+
+            // Assert
+            result.ShouldNotBeNullOrEmpty();
+        }
+
+        private List<CStruct> GetFieldsList()
+        {
+            var idAttributes = new int[] { 9020, 9000, 9014, 9009, 9008, 9007, 9006, 9004, 9015, 9012, 9013, 9017, 9018, 0, 999 };
+            var cStructs = idAttributes.Select(id => new ShimCStruct
+            {
+                GetBooleanAttrString = _ => true,
+                GetIntAttrString = _ => id,
+                GetStringAttrString = _ => DummyString
+            }.Instance);
+
+            return cStructs.ToList();
         }
 
     }
