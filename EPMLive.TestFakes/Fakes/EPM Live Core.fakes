@@ -25,6 +25,7 @@
     <Add FullName="EPMLiveCore.API.APITeam!"/>
     <Add FullName="EPMLiveCore.Utilities!"/>
     <Add FullName="EPMLiveCore.Jobs.ResourceImportJob!"/>
+    <Add FullName="EPMLiveCore.Jobs.ResourceImportResult!"/>
     <Add FullName="EPMLiveCore.API.ResourceImporter!"/>
     <Add FullName="EPMLiveCore.API.ListCommands!"/>
     <Add FullName="EPMLiveCore.GridGanttSettings!"/>
@@ -81,5 +82,6 @@
     <Add FullName="EPMLiveCore.DisabledItemEventScope!"/>
     <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.Step!"/>
     <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps.UpdateResourcePool!"/>
+    <Add FullName="EPMLiveCore.ReportingData!"/>
   </ShimGeneration>
 </Fakes>
