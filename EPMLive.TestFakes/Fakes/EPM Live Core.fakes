@@ -51,6 +51,7 @@
     <Add FullName="EPMLiveCore.API.NavigationService!"/>
     <Add FullName="EPMLiveCore.Controls.Navigation.Providers.ApplicationsLinkProvider!"/>
     <Add FullName="EPMLiveCore.Controls.Navigation.Providers.GenericLinkProvider!"/>
+    <Add FullName="EPMLiveCore.Controls.Navigation.EPMLiveQuickLaunchProvider!"/>
     <Add FullName="EPMLiveCore.Infrastructure.Navigation.NavLink!"/>
     <Add FullName="EPMLiveCore.Act!"/>
     <Add FullName="EPMLiveCore.API.PropertyHash!"/>
