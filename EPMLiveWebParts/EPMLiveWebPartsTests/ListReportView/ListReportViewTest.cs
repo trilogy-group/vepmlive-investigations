@@ -144,8 +144,7 @@ namespace EPMLiveWebParts.Tests.ListReportView
             var result = privateObject.Invoke(BuildGridPostParametersMethodName, true) as string;
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.IsFalse(string.IsNullOrEmpty(result));
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result));
         }
 
         [TestMethod]
@@ -159,8 +158,7 @@ namespace EPMLiveWebParts.Tests.ListReportView
             var result = privateObject.Invoke(BuildGridPostParametersMethodName, true) as string;
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.IsFalse(string.IsNullOrEmpty(result));
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result));
         }
 
         [TestMethod]
@@ -217,8 +215,8 @@ namespace EPMLiveWebParts.Tests.ListReportView
 
             // Assert
             Assert.IsNull(result);
-            Assert.IsTrue(string.IsNullOrEmpty(listReportView.DisplayListNames));
-            Assert.IsTrue(string.IsNullOrEmpty(listReportView.SelectedListNames));
+            Assert.IsTrue(string.IsNullOrWhiteSpace(listReportView.DisplayListNames));
+            Assert.IsTrue(string.IsNullOrWhiteSpace(listReportView.SelectedListNames));
         }
 
         [TestMethod]
