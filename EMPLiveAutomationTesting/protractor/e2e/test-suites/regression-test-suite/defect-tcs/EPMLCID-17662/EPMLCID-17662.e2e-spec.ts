@@ -16,7 +16,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await new LoginPage().goToAndLogin();
     });
 
-    fit('Part-1 Disable one resource - [15377923]', async () => {
+    it('Part-1 Disable one resource - [15377923]', async () => {
         stepLogger.caseId = 15377923;
         stepLogger.stepId(1);
         await ResourcesPageHelper.navigateToResourcesPage(stepLogger);
@@ -41,7 +41,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await ResourcesPageHelper.verifyResourceSaved(displayName, stepLogger);
     });
 
-    fit('Part-2 Check disabled resource in resource Planner - [15377921]', async () => {
+    it('Part-2 Check disabled resource in resource Planner - [15377921]', async () => {
         stepLogger.caseId = 15377921;
         // precondition
         await CommonPageHelper.navigateToProjectCenter(stepLogger);
