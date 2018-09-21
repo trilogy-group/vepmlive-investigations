@@ -153,6 +153,7 @@
     <Compile Include="API\MyWork\MyWorkTestsSplitOne.cs" />
     <Compile Include="API\MyWork\MyWorkTestsSplitThree.cs" />
     <Compile Include="API\MyWork\MyWorkTestsSplitTwo.cs" />
+    <Compile Include="API\MyWork\UtilsTests.cs" />
     <Compile Include="API\NavigationServiceTests.cs" />
     <Compile Include="API\Notification\APIEmailTests.cs" />
     <Compile Include="API\Publish\APIPublishTests.cs" />
