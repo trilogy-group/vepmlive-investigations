@@ -46,6 +46,11 @@ namespace EPMLiveCore.Tests
         private const bool DummyBool = true;
         private const int DummyUnixTime = 1514764800;
         private const int LocaleId = 1033;
+        private const string InternalName = "InternalName";
+        private const string BString = "B";
+        private const string AString = "A";
+        private const string TimeFormat = "hh:mm:ss tt";
+        private const string DateFormat = "M/dd/yyyy";
 
         [TestInitialize]
         public void TestInitialize()
@@ -214,12 +219,10 @@ namespace EPMLiveCore.Tests
         public void ToPrettierName_WithSPWeb_ConfirmResult()
         {
             // Arrange
-            const string internalName = "InternalName";
-
             SetupShims();
 
             // Act
-            var result = ExtensionMethods.ToPrettierName(internalName, _web.Instance);
+            var result = ExtensionMethods.ToPrettierName(InternalName, _web.Instance);
 
             // Assert
             result.ShouldBe(DummyString);
@@ -229,13 +232,12 @@ namespace EPMLiveCore.Tests
         public void ToPrettierName_WithListAndSPWeb_ConfirmResult()
         {
             // Arrange
-            const string internalName = "InternalName";
             var list = new List<string> { DummyString };
 
             SetupShims();
 
             // Act
-            var result = ExtensionMethods.ToPrettierName(internalName, list, _web.Instance);
+            var result = ExtensionMethods.ToPrettierName(InternalName, list, _web.Instance);
 
             // Assert
             result.ShouldBe(DummyString);
@@ -245,13 +247,12 @@ namespace EPMLiveCore.Tests
         public void ToPrettierName_WithListName_ConfirmResult()
         {
             // Arrange
-            const string internalName = "InternalName";
             const string listName = "ListName";
 
             SetupShims();
 
             // Act
-            var result = ExtensionMethods.ToPrettierName(internalName, listName, _web.Instance);
+            var result = ExtensionMethods.ToPrettierName(InternalName, listName, _web.Instance);
 
             // Assert
             result.ShouldBe(DummyString);
@@ -446,16 +447,16 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             var listBox = new ListBox();
-            listBox.Items.Add("B");
-            listBox.Items.Add("A");
+            listBox.Items.Add(BString);
+            listBox.Items.Add(AString);
 
             // Act
             ExtensionMethods.Sort(listBox);
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => listBox.Items[0].Text.ShouldBe("A"),
-                () => listBox.Items[1].Text.ShouldBe("B"));
+                () => listBox.Items[0].Text.ShouldBe(AString),
+                () => listBox.Items[1].Text.ShouldBe(BString));
         }
 
         [TestMethod]
@@ -463,16 +464,16 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             var listControl = new DropDownList();
-            listControl.Items.Add("B");
-            listControl.Items.Add("A");
+            listControl.Items.Add(BString);
+            listControl.Items.Add(AString);
 
             // Act
             ExtensionMethods.Sort(listControl);
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => listControl.Items[0].Text.ShouldBe("A"),
-                () => listControl.Items[1].Text.ShouldBe("B"));
+                () => listControl.Items[0].Text.ShouldBe(AString),
+                () => listControl.Items[1].Text.ShouldBe(BString));
         }
 
         [TestMethod]
@@ -610,7 +611,7 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             var date = DateTime.Now;
-            var time = new DateTime(date.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+            var time = new DateTime(date.TimeOfDay.Ticks).ToString(TimeFormat);
 
             // Act
             var result = ExtensionMethods.ToFriendlyDateAndTime(date);
@@ -624,7 +625,7 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             var date = DateTime.Now.AddDays(-1);
-            var time = new DateTime(date.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+            var time = new DateTime(date.TimeOfDay.Ticks).ToString(TimeFormat);
 
             // Act
             var result = ExtensionMethods.ToFriendlyDateAndTime(date);
@@ -638,7 +639,7 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             var date = DateTime.Now.AddDays(1);
-            var time = new DateTime(date.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+            var time = new DateTime(date.TimeOfDay.Ticks).ToString(TimeFormat);
 
             // Act
             var result = ExtensionMethods.ToFriendlyDateAndTime(date);
@@ -652,8 +653,8 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             var date = DateTime.Now.AddDays(-25);
-            var time = new DateTime(date.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
-            var dateToString = date.ToString("M/dd/yyyy");
+            var time = new DateTime(date.TimeOfDay.Ticks).ToString(TimeFormat);
+            var dateToString = date.ToString(DateFormat);
 
             // Act
             var result = ExtensionMethods.ToFriendlyDateAndTime(date);
@@ -667,7 +668,7 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             var date = new DateTime(2018, 9, 13, 10, 10, 10);
-            var time = new DateTime(date.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+            var time = new DateTime(date.TimeOfDay.Ticks).ToString(TimeFormat);
             var dayOfWeek = date.DayOfWeek;
 
             ShimDateTime.TodayGet = () => new DateTime(2018, 9, 20);
@@ -684,7 +685,7 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             var date = new DateTime(2018, 9, 17, 10, 10, 10);
-            var time = new DateTime(date.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+            var time = new DateTime(date.TimeOfDay.Ticks).ToString(TimeFormat);
             var dayOfWeek = date.DayOfWeek;
 
             ShimDateTime.TodayGet = () => new DateTime(2018, 9, 20);
@@ -701,7 +702,7 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             var date = new DateTime(2018, 9, 22, 10, 10, 10);
-            var time = new DateTime(date.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+            var time = new DateTime(date.TimeOfDay.Ticks).ToString(TimeFormat);
             var dayOfWeek = date.DayOfWeek;
 
             ShimDateTime.TodayGet = () => new DateTime(2018, 9, 20);
@@ -718,7 +719,7 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             var date = new DateTime(2018, 9, 28, 10, 10, 10);
-            var time = new DateTime(date.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+            var time = new DateTime(date.TimeOfDay.Ticks).ToString(TimeFormat);
             var dayOfWeek = date.DayOfWeek;
 
             ShimDateTime.TodayGet = () => new DateTime(2018, 9, 20);
@@ -735,8 +736,8 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             var date = new DateTime(2018, 10, 2, 10, 10, 10);
-            var time = new DateTime(date.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
-            var dateToString = date.ToString("M/dd/yyyy");
+            var time = new DateTime(date.TimeOfDay.Ticks).ToString(TimeFormat);
+            var dateToString = date.ToString(DateFormat);
 
             ShimDateTime.TodayGet = () => new DateTime(2018, 9, 20);
 
@@ -1150,7 +1151,7 @@ namespace EPMLiveCore.Tests
         public void GetWebPartByTypeName_OnValidCall_ConfirmResult()
         {
             // Arrange
-            var webPartType = "XsltListViewWebPart";
+            const string WebPartType = "XsltListViewWebPart";
             var webPartManager = new ShimSPLimitedWebPartManager
             {
                 WebPartsGet = () => new ShimSPLimitedWebPartCollection().Bind(new XsltListViewWebPart[] 
@@ -1160,7 +1161,7 @@ namespace EPMLiveCore.Tests
             }.Instance;
 
             // Act
-            var result = ExtensionMethods.GetWebPartByTypeName(webPartManager, webPartType);
+            var result = ExtensionMethods.GetWebPartByTypeName(webPartManager, WebPartType);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -1192,16 +1193,16 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             var treeView = new TreeView();
-            treeView.Nodes.Add(new TreeNode("B"));
-            treeView.Nodes.Add(new TreeNode("A"));
+            treeView.Nodes.Add(new TreeNode(BString));
+            treeView.Nodes.Add(new TreeNode(AString));
 
             // Act
             ExtensionMethods.Sort(treeView);
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => treeView.Nodes[0].Text.ShouldBe("A"),
-                () => treeView.Nodes[1].Text.ShouldBe("B"));
+                () => treeView.Nodes[0].Text.ShouldBe(AString),
+                () => treeView.Nodes[1].Text.ShouldBe(BString));
         }
 
         [TestMethod]
