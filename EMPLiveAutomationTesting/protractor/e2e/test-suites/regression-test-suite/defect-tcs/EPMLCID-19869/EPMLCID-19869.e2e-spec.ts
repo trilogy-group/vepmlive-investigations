@@ -13,7 +13,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await new LoginPage().goToAndLogin();
     });
 
-    fit('Create a new department - [15438965]', async () => {
+    it('Create a new department - [15438965]', async () => {
         stepLogger.caseId = 15438965;
         stepLogger.stepId(1);
         await DepartmentsPageHelper.navigateToDepartments(stepLogger);
@@ -40,7 +40,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await DepartmentsPageHelper.verifyDepartmentCreated(title, stepLogger);
     });
 
-    fit('Create an enabled resource and a disabled resource - [15438973]', async () => {
+    it('Create an enabled resource and a disabled resource - [15438973]', async () => {
         stepLogger.caseId = 15438973;
         // Step 1 is in precondition
         stepLogger.stepId(2);
