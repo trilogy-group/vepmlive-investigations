@@ -155,7 +155,6 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             _stringWriter = new StringWriter(_htmlBuilder);
             _htmlWriter = new HtmlTextWriter(_stringWriter);
             _htmlResult = string.Empty;
-
             _page = new Page();
             _testObject.Page = _page;
 
