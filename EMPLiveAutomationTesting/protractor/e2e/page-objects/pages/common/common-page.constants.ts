@@ -26,6 +26,8 @@ export class CommonPageConstants {
     static readonly column = 'Column Popup';
     static readonly dropDown: string = 'dropdown-toggle';
     static readonly linkDisable = 'This control is currently disabled.';
+    static readonly ellipsisLabel = 'Ellipsis';
+    static readonly contextMenuLabel = 'Context menu';
 
     static get viewDropDownLabels() {
         return {
@@ -318,6 +320,7 @@ export class CommonPageConstants {
             holidaySchedule: 'HolidaySchedule_ddlShowAll',
             workHours: 'WorkHours_ddlShowAll',
             portfolio: 'Portfolio_ddlShowAll',
+            department: 'Department_ddlShowAll',
         };
     }
 

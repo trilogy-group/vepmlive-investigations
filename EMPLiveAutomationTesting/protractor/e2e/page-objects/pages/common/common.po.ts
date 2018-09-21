@@ -582,4 +582,9 @@ export class CommonPage extends BasePage {
             scroll: element(By.css(`.${gridLabels.scroll}`)),
         };
     }
+
+    static getOptionsUnderUserManagement(option: string) {
+        const selector = `//ul[@id='epm-nav-sub-settings-user-management-links']//span[text()='${option}']`;
+        return element(By.xpath(selector));
+    }
 }

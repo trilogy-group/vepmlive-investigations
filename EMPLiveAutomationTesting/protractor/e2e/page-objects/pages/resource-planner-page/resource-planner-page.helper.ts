@@ -6,6 +6,7 @@ import {ResourcePlannerConstants} from './resource-planner-page.constants';
 import {CommonPageHelper} from '../common/common-page.helper';
 import {ResourcePlannerPage} from './resource-planner-page.po';
 import {ElementHelper} from '../../../components/html/element-helper';
+import {ExpectationHelper} from '../../../components/misc-utils/expectation-helper';
 
 export class ResourcePlannerPageHelper  {
 
@@ -197,4 +198,20 @@ export class ResourcePlannerPageHelper  {
         await ElementHelper.openLinkInNewTab(ResourcePlannerPage.editResourceLink);
     }
 
+    static async verifyResourcePlanDisplayed(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyText(
+            CommonPage.dialogTitle,
+            ResourcePlannerConstants.title,
+            ResourcePlannerConstants.title,
+            stepLogger
+        );
+    }
+
+    static async verifyDisabledResourceNotDisplayed(displayName: string, stepLogger: StepLogger) {
+        await ExpectationHelper.verifyNotDisplayedStatus(
+            ResourcePlannerPage.getButtomGridItemsByText(displayName),
+            displayName,
+            stepLogger
+        );
+    }
 }

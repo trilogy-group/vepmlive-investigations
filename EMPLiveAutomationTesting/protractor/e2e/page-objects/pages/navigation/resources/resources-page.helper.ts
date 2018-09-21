@@ -8,6 +8,12 @@ import {ValidationsHelper} from '../../../../components/misc-utils/validation-he
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {WaitHelper} from '../../../../components/html/wait-helper';
+import {HomePage} from '../../homepage/home.po';
+import {CommonPageConstants} from '../../common/common-page.constants';
+import {ExpectationHelper} from '../../../../components/misc-utils/expectation-helper';
+import {browser} from 'protractor';
+import {ElementHelper} from '../../../../components/html/element-helper';
+import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 
 export class ResourcesPageHelper {
 
@@ -79,5 +85,139 @@ export class ResourcesPageHelper {
         stepLogger.verification('Newly created Resource [Ex: Display Name 1] displayed in "Resources" page');
         await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(displayName), displayName );
 
+    }
+
+    static async navigateToResourcesPage(stepLogger: StepLogger) {
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.resources,
+            CommonPage.pageHeaders.projects.resources,
+            CommonPageConstants.pageHeaders.projects.resources,
+            stepLogger);
+    }
+
+    static async verifyResourcesPageDisplayed(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(
+            ResourcesPage.newInviteLink,
+            ResourcesPageConstants.pagePrefix,
+            stepLogger
+        );
+    }
+
+    static async verifyCreateUserPageDisplayed(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(
+            ResourcesPage.inputs.generic,
+            ResourcesPageConstants.createUserPage,
+            stepLogger
+        );
+    }
+
+    static async fillCreateUserForm(stepLogger: StepLogger) {
+        const uniqueId = PageHelper.getUniqueId();
+        const displayName = `${ResourcesPageConstants.inputLabels.displayName} ${uniqueId}`;
+        const createUserlabels = ResourcesPage.inputs;
+        await this.selectGenericBox(stepLogger);
+
+        stepLogger.step(`enter display Name *: ${displayName}`);
+        await TextboxHelper.sendKeys(createUserlabels.displayName, displayName);
+
+        stepLogger.step(`Enter standard rate *: ${displayName}`);
+        await TextboxHelper.sendKeys(createUserlabels.standardRate, ResourcesPageConstants.standardRate);
+
+        stepLogger.step(`Select department *: ${displayName}`);
+        await PageHelper.click(createUserlabels.department);
+        await PageHelper.click(createUserlabels.departmentInput);
+
+        stepLogger.step(`Select value for Role *: ${displayName}`);
+        await PageHelper.click(createUserlabels.role);
+        await PageHelper.click(createUserlabels.roleInput);
+
+        stepLogger.step(`Select value for Holiday Schedule *: ${displayName}`);
+        await PageHelper.click(createUserlabels.holidaySchedule);
+        await PageHelper.click(createUserlabels.holidayScheduleInput);
+
+        stepLogger.step(`Select value for Working Hours *: ${displayName}`);
+        await PageHelper.click(createUserlabels.workingHours);
+        await PageHelper.click(createUserlabels.workingHoursInput);
+        return displayName;
+    }
+
+    static async clickSave(stepLogger: StepLogger) {
+        stepLogger.step('Click on save');
+        await PageHelper.click(CommonPage.formButtons.save);
+    }
+
+    static async verifyResourceSaved(displayName: string, stepLogger: StepLogger) {
+        await browser.sleep(PageHelper.timeout.s);
+        await this.clickSearchIcon(stepLogger);
+        stepLogger.step('Enter newly created resource name');
+        await TextboxHelper.sendKeys(ResourcesPage.searchTextbox, displayName, true);
+        await ExpectationHelper.verifyDisplayedStatus(
+            ResourcesPage.getUserByDisplayName(displayName),
+            displayName,
+            stepLogger
+        );
+    }
+
+    static async hoverOnResource(stepLogger: StepLogger) {
+        stepLogger.step('Hover over Resource');
+        const ellipses = ResourcesPage.gridDetails.ellipses.get(1);
+        await browser.sleep(PageHelper.timeout.s);
+        await ElementHelper.actionHoverOver(ellipses);
+    }
+
+    static async verifyEllipsisDisplayed(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(
+            ResourcesPage.gridDetails.ellipses.get(1),
+            CommonPageConstants.ellipsisLabel,
+            stepLogger
+        );
+    }
+
+    static async clickOnEllipsis(stepLogger: StepLogger) {
+        stepLogger.step('Click on Ellipsis');
+        await PageHelper.click(ResourcesPage.gridDetails.ellipses.get(1));
+    }
+
+    static async verifyMenuItemDisplayed(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(
+            ResourcesPage.ellipsesDropdownForItem.editItem,
+            ResourcesPageConstants.ellipsesDropdownLabel,
+            stepLogger
+        );
+    }
+
+    static async clickOnEditItem(stepLogger: StepLogger) {
+        stepLogger.step('Click on Edit Item');
+        await PageHelper.click(ResourcesPage.ellipsesDropdownForItem.editItem);
+    }
+
+    static async editResourcePageDisplayed(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(
+            ResourcesPage.inputs.displayName,
+            ResourcesPageConstants.editPageName,
+            stepLogger
+        );
+    }
+
+    static async selectDisabled(stepLogger: StepLogger) {
+        stepLogger.step('Scroll down and check the checkbox for "Disabled"');
+        const isDisabled = await PageHelper.isElementSelected(ResourcesPage.inputs.disabled);
+        if ( ! isDisabled) {
+            await PageHelper.click(ResourcesPage.inputs.disabled);
+        }
+    }
+
+    static async verifyDisabledChecked(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyCheckboxIsChecked(
+            ResourcesPage.inputs.disabled,
+            ResourcesPageConstants.inputLabels.disabled,
+            stepLogger
+        );
+    }
+
+    static async getDisplayNameInEditResourcePage(stepLogger: StepLogger) {
+        stepLogger.step('Returns title of resource name');
+        const displayName = await PageHelper.getAttributeValue(ResourcesPage.inputs.displayName, HtmlHelper.attributes.value);
+        return displayName;
     }
 }

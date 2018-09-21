@@ -4,6 +4,7 @@ import {CommonPageHelper} from '../../common/common-page.helper';
 import {ResourcesPageConstants} from './resources-page.constants';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import {CommonPageConstants} from '../../common/common-page.constants';
+import {AnchorHelper} from '../../../../components/html/anchor-helper';
 
 export class ResourcesPage extends BasePage {
 
@@ -23,7 +24,11 @@ export class ResourcesPage extends BasePage {
             holidaySchedule: this.getDropdownValue(dropdownLabel.holidaySchedule),
             holidayScheduleInput: this.selectDropdownOption(dropdownValueLabel.usHolidays),
             workingHours: this.getDropdownValue(dropdownLabel.workHours),
-            workingHoursInput: this.selectDropdownOption(dropdownValueLabel.usWorkHours)
+            workingHoursInput: this.selectDropdownOption(dropdownValueLabel.usWorkHours),
+            standardRate: CommonPageHelper.getElementByTitle(inputLabel.standardRate),
+            department: this.getDropdownValue(dropdownLabel.department),
+            departmentInput: element(By.css('.autoText:last-child')),
+            disabled: CommonPageHelper.getElementByTitle(inputLabel.disabled),
         };
     }
 
@@ -41,5 +46,24 @@ export class ResourcesPage extends BasePage {
 
     static get searchTextbox() {
         return element(By.id('toolBarResGridSelector'));
+    }
+
+    static getUserByDisplayName(displayName: string) {
+        return AnchorHelper.getElementByTextInsideGrid(displayName);
+    }
+
+    static get gridDetails() {
+        return {
+            ellipses: element.all(By.css('.GMCell.GMAlignRight.HideCol0Title')),
+        };
+    }
+
+    static get ellipsesDropdownForItem() {
+        const ellipsesDropdownForItemLabels = CommonPageConstants.contextMenuOptions;
+        return {
+            viewItem: CommonPageHelper.getContextMenuItemByText(ellipsesDropdownForItemLabels.viewItem),
+            deleteItem: CommonPageHelper.getContextMenuItemByText(ellipsesDropdownForItemLabels.deleteItem),
+            editItem: CommonPageHelper.getContextMenuItemByText(ellipsesDropdownForItemLabels.editItem),
+        };
     }
 }

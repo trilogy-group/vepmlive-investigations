@@ -20,6 +20,7 @@ import {ResourceAnalyzerPageHelper} from '../resource-analyzer-page/resource-ana
 import {ResourceAnalyzerPage} from '../resource-analyzer-page/resource-analyzer-page.po';
 import {IssueItemPageHelper} from '../items-page/issue-item/issue-item-page.helper';
 import {ExpectationHelper} from '../../../components/misc-utils/expectation-helper';
+import {HomePage} from '../homepage/home.po';
 
 const fs = require('fs');
 
@@ -908,5 +909,27 @@ export class CommonPageHelper {
         // Takes time to enable input field
         await browser.sleep(PageHelper.timeout.xs);
         await TextboxHelper.sendKeys(CommonPage.gridDetails.editField, textToSearch, true);
+    }
+
+    static async navigateToProjectCenter(stepLogger: StepLogger) {
+        await this.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger
+        );
+    }
+
+    static async verifyContextMenuDisplayed(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(
+            CommonPage.contextMenuOptions.editPlan,
+            CommonPageConstants.contextMenuLabel,
+            stepLogger
+        );
+    }
+
+    static async clickEditResourcePlan(stepLogger: StepLogger) {
+        stepLogger.step('Click on Edit Resource Plan');
+        await CommonPageHelper.getContextMenuItemByText(CommonPageConstants.contextMenuOptions.editResource);
     }
 }
