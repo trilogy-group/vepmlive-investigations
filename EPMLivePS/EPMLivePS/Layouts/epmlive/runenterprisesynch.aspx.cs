@@ -1,23 +1,33 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using Microsoft.SharePoint;
-using System.ComponentModel;
-using System.Threading;
 using System.Data.SqlClient;
 using System.Text;
+using System.Threading;
+using EPMLiveCore;
+using Microsoft.SharePoint;
+using SysTrace = System.Diagnostics.Trace;
 
 namespace EPMLiveEnterprise
 {
     public partial class runenterprisesynch : System.Web.UI.Page
     {
+        private const string QueryTimerLog = "select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=9";
+        private const string QueryGetStatus = "select status from queue where timerjobuid=@timerjobuid";
+        private const string QueryReadConfigValue = "select config_value from econfig where config_name='ConnectedURLs'";
+        private const string CmdTextInsertTimerJobs = "INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 9, 'Project Server Field Synch', 5, @webguid)";
+        private const string CmdTextDeleteEpmLiveLog = "delete from epmlive_log where timerjobuid=@timerjobuid";
+        private const string CmdTextDeleteQueue = "DELETE FROM QUEUE where timerjobuid = @timerjobuid ";
+        private const string CmdTextInsertQueue = "INSERT INTO QUEUE (timerjobuid, status, percentcomplete, dtstarted) VALUES (@timerjobuid, @status, 0, getdate()) ";
+        private const string CmdTextInsertLogTemplate = "insert into epmlive_log (timerjobuid,result,resulttext) VALUES (@timerjobuid,'{0}',@resulttext)";
+        private const string CmdTextUpdateQueue = "UPDATE queue set percentComplete=0,status=2,dtfinished=GETDATE() where timerjobuid=@timerjobuid";
+        private const string CmdTextUpdatePercentageTemplate = "UPDATE queue set percentComplete={0} where timerjobuid='{1}'";
+        private const string SqlParamSiteGuid = "@siteguid";
+        private const string SqlParamWebGuid = "@webguid";
+        private const string SqlParamTimerJobUid = "@timerjobuid";
+        private const string SqlParamResultText = "@resulttext";
+        private const string SqlParamStatus = "@status";
+        private const int DefaultStatus = 2;
+        private const char CarriageReturn = '\r';
+        private const char NewLine = '\n';
         protected string data;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -46,208 +56,263 @@ namespace EPMLiveEnterprise
             });
         }
 
-        void RunThread(object o)
+        void RunThread(object args)
         {
-            //string[] sParam = (string[])o;
-
-            string sFullParam = (string)o;
-
-            string sSite = sFullParam.Split('|')[0];
-            string sWebApp = sFullParam.Split('|')[1];
-            string sWeb = sFullParam.Split('|')[2];
-            string username = sFullParam.Split('|')[3];
-
-            string sCon = EPMLiveCore.CoreFunctions.getConnectionString(new Guid(sWebApp));
-
-            SqlConnection cn = new SqlConnection(sCon);
-            cn.Open();
-
-            SqlCommand cmd = new SqlCommand("select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=9", cn);
-            cmd.Parameters.AddWithValue("@siteguid", sSite);
-            SqlDataReader dr = cmd.ExecuteReader();
-
-            Guid tjGuid = Guid.Empty;
-            bool processing = false;
-            if (dr.Read())
+            if (args == null || !(args is string))
             {
-                tjGuid = dr.GetGuid(0);
-                if (!dr.IsDBNull(3))
-                    if (dr.GetInt32(3) != 2)
-                        processing = true;
-                dr.Close();
-            }
-            else
-            {
-                dr.Close();
-
-                tjGuid = Guid.NewGuid();
-
-                cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 9, 'Project Server Field Synch', 5, @webguid)", cn);
-                cmd.Parameters.AddWithValue("@siteguid", sSite);
-                cmd.Parameters.AddWithValue("@webguid", sWeb);
-                cmd.Parameters.AddWithValue("@timerjobuid", tjGuid);
-                cmd.ExecuteNonQuery();
+                throw new ArgumentException($"{args} argument is not a valid string value", nameof(args));
             }
 
-            if (processing)
+            var argsArray = ((string)args).Split('|');
+
+            if (argsArray.Length < 4)
             {
-                cn.Close();
-                return;
+                throw new ArgumentException(
+                    $"{args} argument must contain 4 values seperated with | char (Pattern: siteGuid|webAppGuid|web|username)",
+                    nameof(args));
             }
 
-            cmd = new SqlCommand("delete from epmlive_log where timerjobuid=@timerjobuid", cn);
-            cmd.Parameters.AddWithValue("@timerjobuid", tjGuid);
-            cmd.ExecuteNonQuery();
+            var siteGuidValue = argsArray[0];
+            var webAppGuidValue = argsArray[1];
+            var webGuidValue = argsArray[2];
+            var username = argsArray[3];
 
-            cmd = new SqlCommand("select status from queue where timerjobuid=@timerjobuid", cn);
-            cmd.Parameters.AddWithValue("@timerjobuid", tjGuid);
-            dr = cmd.ExecuteReader();
+            var connectionString = CoreFunctions.getConnectionString(new Guid(webAppGuidValue));
 
-            int status = 2;
-
-            if (dr.Read())
+            using (var connection = new SqlConnection(connectionString))
             {
-                status = dr.GetInt32(0);
-            }
+                connection.Open();
 
-            dr.Close();
+                Guid timerJobGuid;
 
-            if (status == 2)
-            {
-                cmd = new SqlCommand("DELETE FROM QUEUE where timerjobuid = @timerjobuid ", cn);
-                cmd.Parameters.AddWithValue("@timerjobuid", tjGuid);
-                cmd.ExecuteNonQuery();
-
-                cmd = new SqlCommand("INSERT INTO QUEUE (timerjobuid, status, percentcomplete, dtstarted) VALUES (@timerjobuid, @status, 0, getdate()) ", cn);
-                cmd.Parameters.AddWithValue("@timerjobuid", tjGuid);
-                cmd.Parameters.AddWithValue("@status", 1);
-                cmd.ExecuteNonQuery();
-            }
-
-
-            //SqlCommand cmd = new SqlCommand("select * from epmlive_log where source='" + sSite + "' and action='esynch'", cn);
-            //SqlDataReader dr = cmd.ExecuteReader();
-            //if (!dr.Read())
-            //{
-            //    dr.Close();
-            //    cmd = new SqlCommand("INSERT INTO epmlive_log (source,action,percentComplete,result, dtlogged) VALUES ('" + sSite + "','esynch',0,'Processing',GETDATE())", cn);
-            //    cmd.ExecuteNonQuery();
-            //}
-            //else
-            //{
-            //    dr.Close();
-            //    cmd = new SqlCommand("UPDATE epmlive_log set percentComplete=0, result='Processing' where source='" + sSite + "' and action = 'esynch'", cn);
-            //    cmd.ExecuteNonQuery();
-            //}
-
-            ////////////////////////////////////////////////////////////////////
-            StringBuilder sbOut = new StringBuilder();
-
-            try
-            {
-                cmd = new SqlCommand("select config_value from econfig where config_name='ConnectedURLs'", cn);
-                dr = cmd.ExecuteReader();
-
-                string sSites = "";
-                int siteCount = 1;
-                string[] strSites = null;
-
-                if (dr.Read())
+                if (!TryGetTimerJobGuid(connection, siteGuidValue, webGuidValue, out timerJobGuid))
                 {
-                    sSites = dr.GetString(0);
+                    return;
                 }
-                dr.Close();
 
-                if (sSites != "")
+                DeleteEpmLiveLog(connection, timerJobGuid);
+
+                var status = GetStatus(connection, timerJobGuid);
+                if (status == DefaultStatus)
                 {
-                    strSites = sSites.Replace("\r\n", "\n").Split('\n');
-                    siteCount += strSites.Length;
+                    ReCreateQueueData(connection, timerJobGuid);
                 }
-                ////////////////////////////////////////////////////////////////////
 
+                ProcessSites(connection, siteGuidValue, username, timerJobGuid);
+                UpdateQueue(connection, timerJobGuid);
+            }
+        }
 
+        private bool TryGetTimerJobGuid(SqlConnection connection, string siteGuidValue, string webGuidValue, out Guid timerJobGuid)
+        {
+            var timerJobGuidBuffer = default(Guid?);
 
-                using (SPSite site = new SPSite(new Guid(sSite)))
+            using (var command = new SqlCommand(QueryTimerLog, connection))
+            {
+                command.Parameters.AddWithValue(SqlParamSiteGuid, siteGuidValue);
+
+                using (var dataReader = command.ExecuteReader())
                 {
-                    sbOut.Append("Site: " + site.RootWeb.Title + " (" + site.Url + ")<br>");
-                    SPWebCollection webc = site.AllWebs;
-                    double counter = 0;
-                    double percent = 0;
-                    double totalWebs = webc.Count;
-
-                    foreach (SPWeb w in webc)
+                    if (dataReader.Read())
                     {
-                        sbOut.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Web: " + w.Title + " (" + w.Url + ")<br>");
-                        ProjectWorkspaceSynch pws = new ProjectWorkspaceSynch(new Guid(sSite), w.Url, new Guid(), username);
-                        pws.processProjectCenter();
-                        pws.processTaskCenter();
-                        counter++;
-
-                        double newPercent = counter / totalWebs / siteCount * 100;
-                        if (newPercent >= percent + 5)
+                        if (!dataReader.IsDBNull(3) && dataReader.GetInt32(3) != DefaultStatus)
                         {
-                            percent = newPercent;
-                            cmd = new SqlCommand("UPDATE queue set percentComplete=" + newPercent + " where timerjobuid='" + tjGuid + "'", cn);
-                            cmd.ExecuteNonQuery();
+                            timerJobGuid = Guid.Empty;
+                            return false;
                         }
+
+                        timerJobGuidBuffer = dataReader.GetGuid(0);
                     }
                 }
 
-                double siteCounter = 1;
-
-                if (strSites != null)
+                if (!timerJobGuidBuffer.HasValue)
                 {
-                    foreach (string strSite in strSites)
+                    timerJobGuidBuffer = Guid.NewGuid();
+
+                    using (var insertCommand = new SqlCommand(CmdTextInsertTimerJobs, connection))
                     {
-                        using (SPSite site = new SPSite(strSite))
+                        insertCommand.Parameters.AddWithValue(SqlParamSiteGuid, siteGuidValue);
+                        insertCommand.Parameters.AddWithValue(SqlParamWebGuid, webGuidValue);
+                        insertCommand.Parameters.AddWithValue(SqlParamTimerJobUid, timerJobGuidBuffer.Value);
+                        insertCommand.ExecuteNonQuery();
+                    }
+                }
+
+                timerJobGuid = timerJobGuidBuffer.Value;
+                return true;
+            }
+        }
+
+        private void DeleteEpmLiveLog(SqlConnection connection, Guid tjGuid)
+        {
+            using (var command = new SqlCommand(CmdTextDeleteEpmLiveLog, connection))
+            {
+                command.Parameters.AddWithValue(SqlParamTimerJobUid, tjGuid);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private int GetStatus(SqlConnection connection, Guid timerJobGuid)
+        {
+            using (var command = new SqlCommand(QueryGetStatus, connection))
+            {
+                command.Parameters.AddWithValue(SqlParamTimerJobUid, timerJobGuid);
+
+                using (var dataReader = command.ExecuteReader())
+                {
+                    return dataReader.Read()
+                        ? dataReader.GetInt32(0)
+                        : DefaultStatus;
+                }
+            }
+        }
+
+        private void ReCreateQueueData(SqlConnection connection, Guid timerJobGuid)
+        {
+            using (var command = new SqlCommand(CmdTextDeleteQueue, connection))
+            {
+                command.Parameters.AddWithValue(SqlParamTimerJobUid, timerJobGuid);
+                command.ExecuteNonQuery();
+            }
+
+            using (var command = new SqlCommand(CmdTextInsertQueue, connection))
+            {
+                command.Parameters.AddWithValue(SqlParamTimerJobUid, timerJobGuid);
+                command.Parameters.AddWithValue(SqlParamStatus, 1);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private void ProcessSites(SqlConnection connection, string siteGuidValue, string username, Guid timerJobGuid)
+        {
+            var outputBuilder = new StringBuilder();
+
+            try
+            {
+                var siteCount = 1;
+                var sitesArray = GetSitesArray(connection);
+
+                if (sitesArray?.Length > 0)
+                {
+                    siteCount += sitesArray.Length;
+                }
+
+                using (var site = new SPSite(new Guid(siteGuidValue)))
+                {
+                    var result = ProcessSite(site, siteCount, connection, timerJobGuid, siteGuidValue, username, 0);
+                    outputBuilder.Append(result);
+                }
+
+                if (sitesArray != null)
+                {
+                    var siteCounter = 1;
+
+                    foreach (var siteUrl in sitesArray)
+                    {
+                        using (SPSite site = new SPSite(siteUrl))
                         {
-                            sbOut.Append("Site: " + site.RootWeb.Title + " (" + site.Url + ")<br>");
-                            SPWebCollection webc = site.AllWebs;
-                            double counter = 0;
-                            double percent = 0;
-                            double totalWebs = webc.Count;
-
-                            foreach (SPWeb w in webc)
-                            {
-                                sbOut.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Web: " + w.Title + " (" + w.Url + ")<br>");
-                                ProjectWorkspaceSynch pws = new ProjectWorkspaceSynch(new Guid(sSite), w.Url, new Guid(), username);
-                                pws.processProjectCenter();
-                                pws.processTaskCenter();
-                                counter++;
-
-                                double newPercent = (counter / totalWebs / siteCount + siteCounter / siteCount) * 100;
-                                if (newPercent >= percent + 5)
-                                {
-                                    percent = newPercent;
-                                    cmd = new SqlCommand("UPDATE queue set percentComplete=" + newPercent + " where timerjobuid='" + tjGuid + "'", cn);
-                                    cmd.ExecuteNonQuery();
-                                }
-                            }
+                            var pctFactor = (double)siteCounter / siteCount;
+                            var result = ProcessSite(site, siteCount, connection, timerJobGuid, siteGuidValue, username, pctFactor);
+                            outputBuilder.Append(result);
                         }
                         siteCounter++;
                     }
                 }
 
-                cmd = new SqlCommand("insert into epmlive_log (timerjobuid,result,resulttext) VALUES (@timerjobuid,'No Errors',@resulttext)", cn);
-                cmd.Parameters.AddWithValue("@timerjobuid", tjGuid);
-                cmd.Parameters.AddWithValue("@resulttext", sbOut.ToString());
-                cmd.ExecuteNonQuery();
-                
+                SaveLog(connection, true, timerJobGuid, outputBuilder.ToString());
             }
             catch (Exception ex)
             {
-                cmd = new SqlCommand("insert into epmlive_log (timerjobuid,result,resulttext) VALUES (@timerjobuid,'Errors',@resulttext)", cn);
-                cmd.Parameters.AddWithValue("@timerjobuid", tjGuid);
-                cmd.Parameters.AddWithValue("@resulttext", sbOut + "<br><br>Error: " + ex.Message);
-                cmd.ExecuteNonQuery();
+                SysTrace.TraceError(ex.ToString());
+                SaveLog(connection, false, timerJobGuid, $"{outputBuilder}<br><br>Error: {ex.Message}");
             }
-            
-            cmd = new SqlCommand("UPDATE queue set percentComplete=0,status=2,dtfinished=GETDATE() where timerjobuid=@timerjobuid", cn);
-            cmd.Parameters.AddWithValue("@timerjobuid", tjGuid);
-            cmd.ExecuteNonQuery();
-
-            cn.Close();
         }
 
+        private string[] GetSitesArray(SqlConnection connection)
+        {
+            var sitesArray = default(string[]);
+
+            using (var command = new SqlCommand(QueryReadConfigValue, connection))
+            using (var dataReader = command.ExecuteReader())
+            {
+                var sites = string.Empty;
+
+                if (dataReader.Read())
+                {
+                    sites = dataReader.GetString(0);
+                }
+
+                if (sites != string.Empty)
+                {
+                    sitesArray = sites.Replace(string.Concat(CarriageReturn, NewLine), NewLine.ToString())
+                                      .Split(NewLine);
+                }
+            }
+
+            return sitesArray;
+        }
+
+        private string ProcessSite(
+            SPSite site,
+            int siteCount,
+            SqlConnection connection,
+            Guid timerJobGuid,
+            string siteGuidValue,
+            string username,
+            double percentageFactor)
+        {
+            var resultBuilder = new StringBuilder();
+            resultBuilder.Append($"Site: {site.RootWeb.Title} ({site.Url})<br>");
+
+            var counter = 0d;
+            var percent = 0d;
+            var totalWebs = (double)site.AllWebs.Count;
+
+            foreach (SPWeb web in site.AllWebs)
+            {
+                resultBuilder.Append($"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Web: {web.Title} ({web.Url})<br>");
+
+                var projWorkspaceSync = new ProjectWorkspaceSynch(new Guid(siteGuidValue), web.Url, Guid.Empty, username);
+                projWorkspaceSync.processProjectCenter();
+                projWorkspaceSync.processTaskCenter();
+                counter++;
+
+                var newPercent = (counter / totalWebs / siteCount + percentageFactor) * 100;
+                if (newPercent >= percent + 5)
+                {
+                    percent = newPercent;
+
+                    var commandText = string.Format(CmdTextUpdatePercentageTemplate, newPercent, timerJobGuid);
+                    using (var command = new SqlCommand(commandText, connection))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+
+            return resultBuilder.ToString();
+        }
+
+        private void SaveLog(SqlConnection connection, bool isSuccess, Guid tjGuid, string message)
+        {
+            var errorStatus = isSuccess ? "No Errors" : "Errors";
+            var commandText = string.Format(CmdTextInsertLogTemplate, errorStatus);
+
+            using (var command = new SqlCommand(commandText, connection))
+            {
+                command.Parameters.AddWithValue(SqlParamTimerJobUid, tjGuid);
+                command.Parameters.AddWithValue(SqlParamResultText, message);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private void UpdateQueue(SqlConnection connection, Guid tjGuid)
+        {
+            using (var command = new SqlCommand(CmdTextUpdateQueue, connection))
+            {
+                command.Parameters.AddWithValue(SqlParamTimerJobUid, tjGuid);
+                command.ExecuteNonQuery();
+            }
+        }
     }
 }
