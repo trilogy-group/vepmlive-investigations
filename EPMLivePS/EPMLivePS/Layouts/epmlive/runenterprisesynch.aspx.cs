@@ -143,11 +143,11 @@ namespace EPMLiveEnterprise
             }
         }
 
-        private void DeleteEpmLiveLog(SqlConnection connection, Guid tjGuid)
+        private void DeleteEpmLiveLog(SqlConnection connection, Guid timerJobGuid)
         {
             using (var command = new SqlCommand(CmdTextDeleteEpmLiveLog, connection))
             {
-                command.Parameters.AddWithValue(SqlParamTimerJobUid, tjGuid);
+                command.Parameters.AddWithValue(SqlParamTimerJobUid, timerJobGuid);
                 command.ExecuteNonQuery();
             }
         }
@@ -293,24 +293,24 @@ namespace EPMLiveEnterprise
             return resultBuilder.ToString();
         }
 
-        private void SaveLog(SqlConnection connection, bool isSuccess, Guid tjGuid, string message)
+        private void SaveLog(SqlConnection connection, bool isSuccess, Guid timerJobGuid, string message)
         {
             var errorStatus = isSuccess ? "No Errors" : "Errors";
             var commandText = string.Format(CmdTextInsertLogTemplate, errorStatus);
 
             using (var command = new SqlCommand(commandText, connection))
             {
-                command.Parameters.AddWithValue(SqlParamTimerJobUid, tjGuid);
+                command.Parameters.AddWithValue(SqlParamTimerJobUid, timerJobGuid);
                 command.Parameters.AddWithValue(SqlParamResultText, message);
                 command.ExecuteNonQuery();
             }
         }
 
-        private void UpdateQueue(SqlConnection connection, Guid tjGuid)
+        private void UpdateQueue(SqlConnection connection, Guid timerJobGuid)
         {
             using (var command = new SqlCommand(CmdTextUpdateQueue, connection))
             {
-                command.Parameters.AddWithValue(SqlParamTimerJobUid, tjGuid);
+                command.Parameters.AddWithValue(SqlParamTimerJobUid, timerJobGuid);
                 command.ExecuteNonQuery();
             }
         }
