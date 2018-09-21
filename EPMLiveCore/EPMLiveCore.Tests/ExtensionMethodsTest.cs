@@ -20,7 +20,8 @@ using Shouldly;
 
 namespace EPMLiveCore.Tests
 {
-    [TestClass, ExcludeFromCodeCoverage]
+    [TestClass]
+    [ExcludeFromCodeCoverage]
     public class ExtensionMethodsTest
     {
         private IDisposable _shimObj;
