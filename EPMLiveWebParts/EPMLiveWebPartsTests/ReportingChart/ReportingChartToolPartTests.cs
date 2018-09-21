@@ -8,6 +8,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
+using System.Web.Fakes;
 using System.Web.UI;
 using System.Web.UI.Fakes;
 using System.Web.UI.HtmlControls;
@@ -26,7 +28,7 @@ using RC = EPMLiveWebParts.ReportingChart;
 namespace EPMLiveWebParts.Tests.ReportingChart
 {
     [TestClass, ExcludeFromCodeCoverage]
-    public class ReportingChartToolPartTests
+    public partial class ReportingChartToolPartTests
     {
         private const int Id = 1;
         private const string DummyString = "DummyString";
@@ -34,11 +36,17 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         private const string ExampleUrl = "http://example.com";
         private const string SelectListOption = "<Select List>";
         private const string ChartTypeArea = "Area";
+        private const string ChartTypeAreaClustered = "Area_Clustered";
         private const string ChartTypeBar = "Bar";
-        private const string ChartTypeColumn = "Column";
-        private const string ChartTypeLine = "Line";
         private const string ChartTypeBarClustered = "Bar_Clustered";
+        private const string ChartTypeBarStacked = "Bar_Stacked";
         private const string ChartTypeBar100Percent = "Bar_100Percent";
+        private const string ChartTypeColumn = "Column";
+        private const string ChartTypeColumnClustered = "Column_Clustered";
+        private const string ChartTypeColumnStacked = "Column_Stacked";
+        private const string ChartTypeColumn100Percent = "Column_100Percent";
+        private const string ChartTypeLine = "Line";
+        private const string ChartTypeLineClustered = "Line_Clustered";
         private const string ChartTypePie = "Pie";
         private const string ChartTypeDonut = "Donut";
         private const string ChartTypeScatter = "Scatter";
@@ -46,6 +54,14 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         private const string AggregationCount = "Count";
         private const string AggregationSum = "Sum";
         private const string AggregationAverage = "Avg";
+        private const string Calculated = "Calculated";
+        private const string Integer = "Integer";
+        private const string Int = "Int";
+        private const string SharePointType = "SharePointType";
+        private const string DisplayName = "DisplayName";
+        private const string InternalName = "InternalName";
+        private const string ColumnType = "ColumnType";
+        private const string ListName = "ListName";
         private const string MethodWriteJavascript = "WriteJavascript";
         private const string MethodOnInit = "OnInit";
         private const string MethodWriteConfigSectionHtml = "WriteConfigSectionHtml";
@@ -89,13 +105,6 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         private const string DivZaxisSectionHidden = "</select></div></td></tr><tr><td><div id='ZaxisSection' style='display:none'>Size Value (Z Axis)<br/><select>";
         private const string DivGroupBy = "</select><br/>Group By<br/><select>";
         private const string CloseDivAndTable = "</select><br/></div></td></tr></table></div>";
-        private const string Calculated = "Calculated";
-        private const string Integer = "Integer";
-        private const string Int = "Int";
-        private const string SharePointType = "SharePointType";
-        private const string DisplayName = "DisplayName";
-        private const string InternalName = "InternalName";
-        private const string ColumnType = "ColumnType";
         private const string FormatNone = "None";
         private const string FormatCurrency = "Currency";
         private const string FormatPercentage = "Percentage";
@@ -115,6 +124,9 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         private ShimSPWeb _shimWeb;
         private ShimSPListCollection _shimListCollection;
         private ShimSPList _shimList;
+        private Page _page;
+        HttpCacheability _pageCacheability;
+        int _responseExpiration;
 
         private string _htmlResult;
         public string HtmlResult
@@ -144,9 +156,12 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             _htmlWriter = new HtmlTextWriter(_stringWriter);
             _htmlResult = string.Empty;
 
-            ShimSharePointContext();
-            _reportingChart = new RC.ReportingChart();
+            _page = new Page();
+            _testObject.Page = _page;
 
+            ShimSharePointContext();
+
+            _reportingChart = new RC.ReportingChart();
             ShimToolPart.AllInstances.ParentToolPaneGet = _ => new ShimToolPane
             {
                 SelectedWebPartGet = () => _reportingChart
@@ -168,6 +183,19 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             ShimQueryExecutor.AllInstances.ExecuteReportingDBQueryStringIDictionaryOfStringObject =
                 (a, b, c) => GetDataTable();
             ShimQueryExecutor.ConstructorSPWeb = (_, __) => { };
+            ShimSPSite.AllInstances.OpenWebGuid = (_, __) => _shimWeb;
+        }
+
+        private void ShimPageResponse()
+        {
+            ShimPage.AllInstances.ResponseGet = _ => new ShimHttpResponse()
+            {
+                CacheGet = () => new ShimHttpCachePolicy
+                {
+                    SetCacheabilityHttpCacheability = cacheability => { _pageCacheability = cacheability; }
+                },
+                ExpiresSetInt32 = expiration => { _responseExpiration = expiration; }
+            }.Instance;
         }
 
         [TestCleanup]
@@ -1031,8 +1059,7 @@ namespace EPMLiveWebParts.Tests.ReportingChart
 
         private void SetAggregateTypeHtmlSelectValue(string type)
         {
-            var aggregateSelect = _privateObject.GetFieldOrProperty(FieldAggregateTypeHtmlSelect);
-            var htmlSelect = aggregateSelect as HtmlSelect;
+            var htmlSelect = GetHtmlSelect(FieldAggregateTypeHtmlSelect);
             if (htmlSelect != null)
             {
                 htmlSelect.Items.Add(type);
@@ -1283,13 +1310,7 @@ namespace EPMLiveWebParts.Tests.ReportingChart
 
         private void SetListsDropDownList(string value)
         {
-            var dropdown = _privateObject.GetFieldOrProperty(FieldListsDropDownList);
-            var select = dropdown as DropDownList;
-            if (select != null && value != null)
-            {
-                select.Items.Add(value);
-                select.SelectedValue = value;
-            }
+            SetDropDownListValue(FieldListsDropDownList, value);
         }
 
         private void FillReportingChartProperties()
@@ -1309,6 +1330,12 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             return dropDown as DropDownList;
         }
 
+        private HtmlSelect GetHtmlSelect(string name)
+        {
+            var htmlSelect = _privateObject.GetFieldOrProperty(name);
+            return htmlSelect as HtmlSelect;
+        }
+
         private CheckBoxList GetCheckBoxList(string name)
         {
             var checkBoxList = _privateObject.GetFieldOrProperty(name);
@@ -1317,24 +1344,33 @@ namespace EPMLiveWebParts.Tests.ReportingChart
 
         private void ShimSharePointContext()
         {
+            ShimSPSite.ConstructorString = (_, __) => { };
+
             ShimSPListMethods();
             ShimSPListCollectionMethods();
             ShimSPWebMethods();
 
             ShimSPContext.CurrentGet = () => new ShimSPContext
             {
-                WebGet = () => _shimWeb.Instance
+                WebGet = () => _shimWeb.Instance,
+                SiteGet = () => new ShimSPSite { UrlGet = () => ExampleUrl }
             }.Instance;
-
-            ShimSPSite.ConstructorGuid = (_, __) => { };
         }
-        
-        private void ShimSPWebMethods()
+
+        ShimSPView _view;
+        private void ShimSPListMethods()
         {
-            _shimWeb = new ShimSPWeb
+            _view = new ShimSPView
             {
-                ListsGet = () => _shimListCollection.Instance,
-                LocaleGet = () => CultureInfo.InvariantCulture
+                IDGet = () => DummyGuid,
+                TitleGet = () => DummyString
+            };
+            var views = new ShimSPViewCollection();
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new SPView[] { _view.Instance }.GetEnumerator();
+            _shimList = new ShimSPList
+            {
+                IDGet = () => DummyGuid,
+                ViewsGet = () => views
             };
         }
 
@@ -1346,11 +1382,12 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             };
         }
 
-        private void ShimSPListMethods()
+        private void ShimSPWebMethods()
         {
-            _shimList = new ShimSPList
+            _shimWeb = new ShimSPWeb
             {
-                IDGet = () => DummyGuid
+                ListsGet = () => _shimListCollection.Instance,
+                LocaleGet = () => CultureInfo.InvariantCulture
             };
         }
 
@@ -1361,8 +1398,9 @@ namespace EPMLiveWebParts.Tests.ReportingChart
             dataTable.Columns.Add(DisplayName);
             dataTable.Columns.Add(InternalName);
             dataTable.Columns.Add(ColumnType);
+            dataTable.Columns.Add(ListName);
 
-            dataTable.Rows.Add(sharePointType, DummyString, DummyString, columnType);
+            dataTable.Rows.Add(sharePointType, DummyString, DummyString, columnType, DummyString);
             return dataTable;
         }
     }
