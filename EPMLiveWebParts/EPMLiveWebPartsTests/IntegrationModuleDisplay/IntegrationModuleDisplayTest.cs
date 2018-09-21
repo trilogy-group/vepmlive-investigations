@@ -100,7 +100,7 @@ namespace EPMLiveWebParts.Tests.IntegrationModuleDisplay
         }
 
         [TestMethod]
-        public void RenderWebPart_CurrentSPContextItemNUll_ShouldWriteContenttMethod()
+        public void RenderWebPart_CurrentSPContextItemNull_ShouldWriteContentMethod()
         {
             // Arrange
             const string ExpectedContent = "This web part must be used on a display form";
