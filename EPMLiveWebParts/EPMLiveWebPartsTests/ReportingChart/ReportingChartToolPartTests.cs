@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -11,8 +12,10 @@ using System.Web.UI;
 using System.Web.UI.Fakes;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
+using EPMLiveCore.ReportingProxy.Fakes;
 using EPMLiveWebParts.ReportingChart;
 using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.WebPartPages;
 using Microsoft.SharePoint.WebPartPages.Fakes;
@@ -29,6 +32,7 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         private const string DummyString = "DummyString";
         private const string One = "1";
         private const string ExampleUrl = "http://example.com";
+        private const string SelectListOption = "<Select List>";
         private const string ChartTypeArea = "Area";
         private const string ChartTypeBar = "Bar";
         private const string ChartTypeColumn = "Column";
@@ -45,8 +49,22 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         private const string MethodWriteJavascript = "WriteJavascript";
         private const string MethodOnInit = "OnInit";
         private const string MethodWriteConfigSectionHtml = "WriteConfigSectionHtml";
+        private const string MethodFillDropDowns = "FillDropDowns";
         private const string FieldChartTypeDropDownList = "ChartTypeDropDownList";
+        private const string FieldListsDropDownList = "ListsDropDownList";
         private const string FieldAggregateTypeHtmlSelect = "AggregateTypeHtmlSelect";
+        private const string FieldXaxisFieldDropDownList = "XaxisFieldDropDownList";
+        private const string FieldYaxisFormatDropDownList = "YaxisFormatDropDownList";
+        private const string FieldLegendPositionDropDownList = "LegendPositionDropDownList";
+        private const string FieldDdlXaxisFieldNum = "ddlXaxisFieldNum";
+        private const string FieldDdlXaxisFieldNonNum = "ddlXaxisFieldNonNum";
+        private const string FieldCblYaxisFieldNum = "cblYaxisFieldNum";
+        private const string FieldDdlYaxisFieldNum = "ddlYaxisFieldNum";
+        private const string FieldZaxisFieldDropDownList = "ZaxisFieldDropDownList";
+        private const string FieldCblYaxisFieldNonNum = "cblYaxisFieldNonNum";
+        private const string FieldDdlYaxisFieldNonNum = "ddlYaxisFieldNonNum";
+        private const string FieldBubbleGroupByDropDownList = "BubbleGroupByDropDownList";
+        private const string FieldChartPaletteStyleDropDownList = "ChartPaletteStyleDropDownList";
         private const string DivXaxisSectionFull = "<div id='XaxisSection_full'>Category (X axis)<br><select>";
         private const string DivXaxisSectionFullHidden = "<div id='XaxisSection_full' style='display:none'>Category (X axis)<br><select>";
         private const string DivXaxisSectionDdlNum = "</div><div id='XaxisSection_ddl_num'>Value (X axis)<br><select>";
@@ -71,14 +89,32 @@ namespace EPMLiveWebParts.Tests.ReportingChart
         private const string DivZaxisSectionHidden = "</select></div></td></tr><tr><td><div id='ZaxisSection' style='display:none'>Size Value (Z Axis)<br/><select>";
         private const string DivGroupBy = "</select><br/>Group By<br/><select>";
         private const string CloseDivAndTable = "</select><br/></div></td></tr></table></div>";
+        private const string Calculated = "Calculated";
+        private const string Integer = "Integer";
+        private const string Int = "Int";
+        private const string SharePointType = "SharePointType";
+        private const string DisplayName = "DisplayName";
+        private const string InternalName = "InternalName";
+        private const string ColumnType = "ColumnType";
+        private const string FormatNone = "None";
+        private const string FormatCurrency = "Currency";
+        private const string FormatPercentage = "Percentage";
+        private const string PositionLeft = "Left";
+        private const string PositionTop = "Top";
+        private const string PositionRight = "Right";
+        private const string PositionBottom = "Bottom";
+        private const string ColorBlue = "Blue";
+        private readonly Guid DummyGuid = Guid.NewGuid();
         private ReportingChartToolPart _testObject;
         private PrivateObject _privateObject;
         private IDisposable _shimsContext;
         private StringBuilder _htmlBuilder;
         private StringWriter _stringWriter;
         private HtmlTextWriter _htmlWriter;
-        private ShimSPWeb _shimWeb;
         private RC.ReportingChart _reportingChart;
+        private ShimSPWeb _shimWeb;
+        private ShimSPListCollection _shimListCollection;
+        private ShimSPList _shimList;
 
         private string _htmlResult;
         public string HtmlResult
@@ -93,7 +129,6 @@ namespace EPMLiveWebParts.Tests.ReportingChart
                 return _htmlResult;
             }
         }
-
 
         [TestInitialize]
         public void TestInitialize()
@@ -129,6 +164,10 @@ namespace EPMLiveWebParts.Tests.ReportingChart
 
                 return DummyString;
             };
+
+            ShimQueryExecutor.AllInstances.ExecuteReportingDBQueryStringIDictionaryOfStringObject =
+                (a, b, c) => GetDataTable();
+            ShimQueryExecutor.ConstructorSPWeb = (_, __) => { };
         }
 
         [TestCleanup]
@@ -806,6 +845,179 @@ namespace EPMLiveWebParts.Tests.ReportingChart
                 () => result.ShouldContain("document.getElementById(\"YAxisFormatSection\").style.display = \"\";"));
         }
 
+        [TestMethod]
+        public void FillDropDowns_EmptyLists_DoesNotFillDropDowns()
+        {
+            // Arrange
+            SetListsDropDownList(string.Empty);
+
+            // Act
+            _privateObject.Invoke(MethodFillDropDowns);
+
+            // Assert
+            AssertEmptyLists();
+        }
+
+        [TestMethod]
+        public void FillDropDowns_NoListSelected_DoesNotFillDropDowns()
+        {
+            // Arrange
+            SetListsDropDownList(SelectListOption);
+
+            // Act
+            _privateObject.Invoke(MethodFillDropDowns);
+
+            // Assert
+            AssertEmptyLists();
+        }
+
+        [TestMethod]
+        public void FillDropDowns_GetNullList_DoesNotFillDropDowns()
+        {
+            // Arrange
+            SetListsDropDownList(DummyString);
+            _shimListCollection.TryGetListString = _ => null;
+
+            // Act
+            _privateObject.Invoke(MethodFillDropDowns);
+
+            // Assert
+            AssertEmptyLists();
+        }
+
+        [TestMethod]
+        public void FillDropDowns_SelectedList_SetsColorsList()
+        {
+            // Arrange
+            SetListsDropDownList(DummyString);
+
+            // Act
+            _privateObject.Invoke(MethodFillDropDowns);
+
+            // Assert
+            var result = GetDropDown(FieldChartPaletteStyleDropDownList);
+            result.ShouldSatisfyAllConditions(
+                () => result.Items.Count.ShouldBe(8),
+                () => result.Items[0].Value.ShouldBe(ColorBlue),
+                () => result.Items[1].Value.ShouldBe("Color1"),
+                () => result.Items[2].Value.ShouldBe("Color2"),
+                () => result.Items[3].Value.ShouldBe("Gray"),
+                () => result.Items[4].Value.ShouldBe("Green"),
+                () => result.Items[5].Value.ShouldBe("Red"),
+                () => result.Items[6].Value.ShouldBe("Violet"),
+                () => result.Items[7].Value.ShouldBe("Yellow"));
+        }
+
+        [TestMethod]
+        public void FillDropDowns_Numeric_FillsDropDowns()
+        {
+            // Arrange
+            SetListsDropDownList(DummyString);
+            FillReportingChartProperties();
+            var dummyList = new ListItem(DummyString, DummyString);
+
+            // Act
+            _privateObject.Invoke(MethodFillDropDowns);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => GetDropDown(FieldXaxisFieldDropDownList).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetDropDown(FieldDdlXaxisFieldNum).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetDropDown(FieldDdlXaxisFieldNonNum).Items.Count.ShouldBe(0),
+                () => GetCheckBoxList(FieldCblYaxisFieldNum).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetCheckBoxList(FieldCblYaxisFieldNonNum).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldDdlYaxisFieldNum).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetDropDown(FieldDdlYaxisFieldNonNum).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldZaxisFieldDropDownList).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetDropDown(FieldBubbleGroupByDropDownList).Items.Count.ShouldBe(0),
+                () => AssertYaxisFormatDropDownList(),
+                () => AssertLegendPositionDropDownList());
+        }
+
+        [TestMethod]
+        public void FillDropDowns_NumericMultipleYaxisField_FillsDropDowns()
+        {
+            // Arrange
+            SetListsDropDownList(DummyString);
+            FillReportingChartProperties();
+            _reportingChart.PropChartYaxisField = $"{DummyString}|{DummyString}";
+            var dummyList = new ListItem(DummyString, DummyString);
+
+            // Act
+            _privateObject.Invoke(MethodFillDropDowns);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => GetDropDown(FieldXaxisFieldDropDownList).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetDropDown(FieldDdlXaxisFieldNum).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetDropDown(FieldDdlXaxisFieldNonNum).Items.Count.ShouldBe(0),
+                () => GetCheckBoxList(FieldCblYaxisFieldNum).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetCheckBoxList(FieldCblYaxisFieldNonNum).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldDdlYaxisFieldNum).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetDropDown(FieldDdlYaxisFieldNonNum).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldZaxisFieldDropDownList).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetDropDown(FieldBubbleGroupByDropDownList).Items.Count.ShouldBe(0),
+                () => AssertYaxisFormatDropDownList(),
+                () => AssertLegendPositionDropDownList());
+        }
+
+        [TestMethod]
+        public void FillDropDowns_NonNumeric_FillsDropDowns()
+        {
+            // Arrange
+            SetListsDropDownList(DummyString);
+            FillReportingChartProperties();
+            var dummyList = new ListItem(DummyString, DummyString);
+            ShimQueryExecutor.AllInstances.ExecuteReportingDBQueryStringIDictionaryOfStringObject =
+                (a, b, c) => GetDataTable(Calculated, DummyString);
+
+            // Act
+            _privateObject.Invoke(MethodFillDropDowns);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => GetDropDown(FieldXaxisFieldDropDownList).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetDropDown(FieldDdlXaxisFieldNum).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldDdlXaxisFieldNonNum).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetCheckBoxList(FieldCblYaxisFieldNum).Items.Count.ShouldBe(0),
+                () => GetCheckBoxList(FieldCblYaxisFieldNonNum).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetDropDown(FieldDdlYaxisFieldNum).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldDdlYaxisFieldNonNum).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetDropDown(FieldZaxisFieldDropDownList).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldBubbleGroupByDropDownList).Items.Contains(dummyList).ShouldBeTrue(),
+                () => AssertYaxisFormatDropDownList(),
+                () => AssertLegendPositionDropDownList());
+        }
+
+        [TestMethod]
+        public void FillDropDowns_NonNumericMultipleYaxisField_FillsDropDowns()
+        {
+            // Arrange
+            SetListsDropDownList(DummyString);
+            FillReportingChartProperties();
+            _reportingChart.PropChartYaxisField = $"{DummyString}|{DummyString}";
+            var dummyList = new ListItem(DummyString, DummyString);
+            ShimQueryExecutor.AllInstances.ExecuteReportingDBQueryStringIDictionaryOfStringObject =
+                (a, b, c) => GetDataTable(Calculated, DummyString);
+
+            // Act
+            _privateObject.Invoke(MethodFillDropDowns);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => GetDropDown(FieldXaxisFieldDropDownList).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetDropDown(FieldDdlXaxisFieldNum).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldDdlXaxisFieldNonNum).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetCheckBoxList(FieldCblYaxisFieldNum).Items.Count.ShouldBe(0),
+                () => GetCheckBoxList(FieldCblYaxisFieldNonNum).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetDropDown(FieldDdlYaxisFieldNum).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldDdlYaxisFieldNonNum).Items.Contains(dummyList).ShouldBeTrue(),
+                () => GetDropDown(FieldZaxisFieldDropDownList).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldBubbleGroupByDropDownList).Items.Contains(dummyList).ShouldBeTrue(),
+                () => AssertYaxisFormatDropDownList(),
+                () => AssertLegendPositionDropDownList());
+        }
+
         private void SetChartTypeDropDownList(string type)
         {
             var aggregateSelect = _privateObject.GetFieldOrProperty(FieldChartTypeDropDownList);
@@ -1029,8 +1241,84 @@ namespace EPMLiveWebParts.Tests.ReportingChart
                 () => HtmlResult.ShouldContain(CloseDivAndTable));
         }
 
+        private void AssertEmptyLists()
+        {
+            this.ShouldSatisfyAllConditions(
+                () => GetDropDown(FieldXaxisFieldDropDownList).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldYaxisFormatDropDownList).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldLegendPositionDropDownList).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldDdlXaxisFieldNum).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldDdlXaxisFieldNonNum).Items.Count.ShouldBe(0),
+                () => GetCheckBoxList(FieldCblYaxisFieldNum).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldDdlYaxisFieldNum).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldZaxisFieldDropDownList).Items.Count.ShouldBe(0),
+                () => GetCheckBoxList(FieldCblYaxisFieldNonNum).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldDdlYaxisFieldNonNum).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldBubbleGroupByDropDownList).Items.Count.ShouldBe(0),
+                () => GetDropDown(FieldChartPaletteStyleDropDownList).Items.Count.ShouldBe(0));
+        }
+
+        private void AssertYaxisFormatDropDownList()
+        {
+            var list = GetDropDown(FieldYaxisFormatDropDownList);
+            list.ShouldSatisfyAllConditions(
+                () => list.Items.Count.ShouldBe(3),
+                () => list.Items[0].Value.ShouldBe(FormatNone),
+                () => list.Items[1].Value.ShouldBe(FormatCurrency),
+                () => list.Items[1].Selected.ShouldBeTrue(),
+                () => list.Items[2].Value.ShouldBe(FormatPercentage));
+        }
+
+        private void AssertLegendPositionDropDownList()
+        {
+            var list = GetDropDown(FieldLegendPositionDropDownList);
+            list.ShouldSatisfyAllConditions(
+                () => list.Items.Count.ShouldBe(4),
+                () => list.Items[0].Value.ShouldBe(PositionLeft),
+                () => list.Items[0].Selected.ShouldBeTrue(),
+                () => list.Items[1].Value.ShouldBe(PositionTop),
+                () => list.Items[2].Value.ShouldBe(PositionRight),
+                () => list.Items[3].Value.ShouldBe(PositionBottom));
+        }
+
+        private void SetListsDropDownList(string value)
+        {
+            var dropdown = _privateObject.GetFieldOrProperty(FieldListsDropDownList);
+            var select = dropdown as DropDownList;
+            if (select != null && value != null)
+            {
+                select.Items.Add(value);
+                select.SelectedValue = value;
+            }
+        }
+
+        private void FillReportingChartProperties()
+        {
+            _reportingChart.PropChartLegendPosition = PositionLeft;
+            _reportingChart.PropChartXaxisField = DummyString;
+            _reportingChart.PropChartYaxisField = DummyString;
+            _reportingChart.PropChartZaxisField = DummyString;
+            _reportingChart.PropYaxisFormat = FormatCurrency;
+            _reportingChart.PropChartSelectedPaletteName = ColorBlue;
+            _reportingChart.PropBubbleChartGroupBy = DummyString;
+        }
+
+        private DropDownList GetDropDown(string name)
+        {
+            var dropDown = _privateObject.GetFieldOrProperty(name);
+            return dropDown as DropDownList;
+        }
+
+        private CheckBoxList GetCheckBoxList(string name)
+        {
+            var checkBoxList = _privateObject.GetFieldOrProperty(name);
+            return checkBoxList as CheckBoxList;
+        }
+
         private void ShimSharePointContext()
         {
+            ShimSPListMethods();
+            ShimSPListCollectionMethods();
             ShimSPWebMethods();
 
             ShimSPContext.CurrentGet = () => new ShimSPContext
@@ -1040,13 +1328,42 @@ namespace EPMLiveWebParts.Tests.ReportingChart
 
             ShimSPSite.ConstructorGuid = (_, __) => { };
         }
-
+        
         private void ShimSPWebMethods()
         {
             _shimWeb = new ShimSPWeb
             {
+                ListsGet = () => _shimListCollection.Instance,
                 LocaleGet = () => CultureInfo.InvariantCulture
             };
+        }
+
+        private void ShimSPListCollectionMethods()
+        {
+            _shimListCollection = new ShimSPListCollection
+            {
+                TryGetListString = list => _shimList.Instance
+            };
+        }
+
+        private void ShimSPListMethods()
+        {
+            _shimList = new ShimSPList
+            {
+                IDGet = () => DummyGuid
+            };
+        }
+
+        private DataTable GetDataTable(string sharePointType = Integer, string columnType = Int)
+        {
+            var dataTable = new DataTable();
+            dataTable.Columns.Add(SharePointType);
+            dataTable.Columns.Add(DisplayName);
+            dataTable.Columns.Add(InternalName);
+            dataTable.Columns.Add(ColumnType);
+
+            dataTable.Rows.Add(sharePointType, DummyString, DummyString, columnType);
+            return dataTable;
         }
     }
 }
