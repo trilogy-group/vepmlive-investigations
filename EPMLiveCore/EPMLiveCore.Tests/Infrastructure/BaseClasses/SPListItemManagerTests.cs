@@ -559,7 +559,14 @@ namespace EPMLiveCore.Tests.Infrastructure.BaseClasses
         /// <summary>
         /// This method is fake and these parameters are required, even though not all of them are used
         /// </summary>
-        private void GetFieldSpecialValues(SPListItemManager listItemManager, SPField spField, string stringValue, object value, out string fieldEditValue, out string fieldTextValue, out string fieldHtmlValue)
+        private void GetFieldSpecialValues(
+            SPListItemManager listItemManager, 
+            SPField spField, 
+            string stringValue, 
+            object value, 
+            out string fieldEditValue, 
+            out string fieldTextValue, 
+            out string fieldHtmlValue)
         {
             fieldEditValue = DummyString;
             fieldTextValue = DummyString;
@@ -569,7 +576,14 @@ namespace EPMLiveCore.Tests.Infrastructure.BaseClasses
         /// <summary>
         /// This method is fake and these parameters are required, even though not all of them are used
         /// </summary>
-        private void GetFieldSpecialValuesThrowsException(SPListItemManager listItemManager, SPField spField, string stringValue, object value, out string fieldEditValue, out string fieldTextValue, out string fieldHtmlValue)
+        private void GetFieldSpecialValuesThrowsException(
+            SPListItemManager listItemManager, 
+            SPField spField, 
+            string stringValue, 
+            object value, 
+            out string fieldEditValue,
+            out string fieldTextValue, 
+            out string fieldHtmlValue)
         {
             throw new Exception("Dummy Exception");
         }
