@@ -14,6 +14,7 @@ namespace EPMLiveCore.Tests.API.MyWork
     using EPMLiveCore.API;
     using EPMLiveCore.API.Fakes;
     using Fakes;
+    using Shouldly;
 
     [TestClass]
     public class UtilsTests
@@ -984,6 +985,33 @@ namespace EPMLiveCore.Tests.API.MyWork
         }
 
         [TestMethod]
+        public void ValidateItemListWebAndSite_WithValidElement_NotThrowException()
+        {
+            // Arrange
+            var element = new ShimXElement();
+            ShimXContainer.AllInstances.Descendants = _ => GetXElementList();
+            ShimXContainer.AllInstances.ElementXName = GetDummyXElement("Site");
+            ShimXContainer.AllInstances.ElementXName = (_, name) =>
+            {
+                return new ShimXElement
+                {
+                    Attributes = () => new List<XAttribute>
+                    {
+                        new XAttribute("ID", 1),
+                        new XAttribute("URL", DummyString),
+                    }
+                };
+            };
+
+            // Act
+            Action action = () => Utils.ValidateItemListWebAndSite(element);
+
+            // Assert
+            action.ShouldNotThrow();
+        }
+
+
+        [TestMethod]
         [ExpectedException(typeof(Exception))]
         public void ValidateItemListWebAndSite_SiteUrlAttributeDoesNotExist_ThrowsException()
         {
@@ -1153,6 +1181,31 @@ namespace EPMLiveCore.Tests.API.MyWork
 
             // Assert
             // Expect an exception
+        }
+
+        [TestMethod]
+        public void ValidateListWebAndSite_ValidElement_NotThrowException()
+        {
+            // Arrange
+            var element = new ShimXElement();
+            ShimXContainer.AllInstances.Descendants = _ => GetXElementList();
+            ShimXContainer.AllInstances.ElementXName = (_, name) =>
+            {
+                return new ShimXElement
+                {
+                    Attributes = () => new List<XAttribute>
+                    {
+                        new XAttribute("ID", 1),
+                        new XAttribute("URL", DummyString)
+                    }
+                };
+            };
+
+            // Act
+            Action action = () => Utils.ValidateListWebAndSite(element);
+
+            // Assert
+            action.ShouldNotThrow();
         }
 
 
@@ -1332,6 +1385,24 @@ namespace EPMLiveCore.Tests.API.MyWork
         }
 
         [TestMethod]
+        public void GetRelatedGridTypeForReadOnly_FieldTypeInvalid_ReturnsExpectedValue()
+        {
+            // Arrange
+            const string ExpectedValue = "Html";
+            var field = new ShimSPField
+            {
+                TypeGet = () => SPFieldType.Invalid,
+            };
+
+            // Act
+            var result = Utils.GetRelatedGridTypeForReadOnly(field);
+
+            // Assert
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result));
+            Assert.AreEqual(ExpectedValue, result);
+        }
+
+        [TestMethod]
         public void GetRelatedGridTypeForReadOnly_FieldTypeDefaultValue_ReturnsExpectedValue()
         {
             // Arrange
@@ -1438,6 +1509,237 @@ namespace EPMLiveCore.Tests.API.MyWork
             Assert.IsFalse(string.IsNullOrWhiteSpace(values));
             Assert.IsFalse(string.IsNullOrWhiteSpace(keys));
             Assert.AreEqual(1, range);
+        }
+
+
+        [TestMethod]
+        public void GetFormat_FieldTypeDateTime_ReturnsExpectedValue()
+        {
+            // Arrange
+            var expectedValue = SPDateTimeFieldFormatType.DateTime.ToString();
+            var field = new ShimSPFieldDateTime
+            {
+                DisplayFormatGet = () => SPDateTimeFieldFormatType.DateTime
+            };
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.DateTime;
+
+            // Act
+            var result = Utils.GetFormat(field);
+
+            // Assert
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result));
+            Assert.AreEqual(expectedValue, result);
+        }
+
+        [TestMethod]
+        public void GetFormat_FieldTypeCurrency_ReturnsExpectedValue()
+        {
+            // Arrange
+            var expectedValue = "Currency";
+            var field = new ShimSPField
+            {
+                TypeGet = () => SPFieldType.Currency
+            };
+
+            // Act
+            var result = Utils.GetFormat(field);
+
+            // Assert
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result));
+            Assert.AreEqual(expectedValue, result);
+        }
+
+        [TestMethod]
+        public void GetFormat_FieldTypeCalculated_ReturnsExpectedValue()
+        {
+            // Arrange
+            var expectedValue = "Indicator";
+            var field = new ShimSPField
+            {
+                TypeGet = () => SPFieldType.Calculated,
+                DescriptionGet = () => expectedValue
+            };
+
+            // Act
+            var result = Utils.GetFormat(field);
+
+            // Assert
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result));
+            Assert.AreEqual(expectedValue, result);
+        }
+
+        [TestMethod]
+        public void GetFormat_FieldTypeDefaultValue_ReturnsExpectedValue()
+        {
+            // Arrange
+            var field = new ShimSPField
+            {
+                TypeGet = () => SPFieldType.Attachments
+            };
+
+            // Act
+            var result = Utils.GetFormat(field);
+
+            // Assert
+            Assert.IsTrue(string.IsNullOrWhiteSpace(result));
+        }
+
+        [TestMethod]
+        public void GetFormat_FieldTypeNumberAndDisplayFormatAutomatic_ReturnsExpectedValue()
+        {
+            // Arrange
+            var expectedValue = ",#0.##########";
+            var field = new ShimSPFieldNumber
+            {
+                DisplayFormatGet = () => SPNumberFormatTypes.Automatic,
+                ShowAsPercentageGet = () => true
+            };
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Number;
+
+            // Act
+            var result = Utils.GetFormat(field);
+
+            // Assert
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result));
+            Assert.IsTrue(result.Contains(expectedValue));
+        }
+
+        [TestMethod]
+        public void GetFormat_FieldTypeNumberAndDisplayFormatNoDecimal_ReturnsExpectedValue()
+        {
+            // Arrange
+            var expectedValue = ",#0";
+            var field = new ShimSPFieldNumber
+            {
+                DisplayFormatGet = () => SPNumberFormatTypes.NoDecimal,
+                ShowAsPercentageGet = () => true
+            };
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Number;
+
+            // Act
+            var result = Utils.GetFormat(field);
+
+            // Assert
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result));
+            Assert.IsTrue(result.Contains(expectedValue));
+        }
+
+        [TestMethod]
+        public void GetFormat_FieldTypeNumberAndDisplayFormatOneDecimal_ReturnsExpectedValue()
+        {
+            // Arrange
+            var expectedValue = ",#0.0";
+            var field = new ShimSPFieldNumber
+            {
+                DisplayFormatGet = () => SPNumberFormatTypes.OneDecimal,
+                ShowAsPercentageGet = () => true
+            };
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Number;
+
+            // Act
+            var result = Utils.GetFormat(field);
+
+            // Assert
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result));
+            Assert.IsTrue(result.Contains(expectedValue));
+        }
+
+        [TestMethod]
+        public void GetFormat_FieldTypeNumberAndDisplayFormatTwoDecimals_ReturnsExpectedValue()
+        {
+            // Arrange
+            var expectedValue = ",#0.00";
+            var field = new ShimSPFieldNumber
+            {
+                DisplayFormatGet = () => SPNumberFormatTypes.TwoDecimals,
+                ShowAsPercentageGet = () => true
+            };
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Number;
+
+            // Act
+            var result = Utils.GetFormat(field);
+
+            // Assert
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result));
+            Assert.IsTrue(result.Contains(expectedValue));
+        }
+
+        [TestMethod]
+        public void GetFormat_FieldTypeNumberAndDisplayFormatThreeDecimals_ReturnsExpectedValue()
+        {
+            // Arrange
+            var expectedValue = ",#0.000";
+            var field = new ShimSPFieldNumber
+            {
+                DisplayFormatGet = () => SPNumberFormatTypes.ThreeDecimals,
+                ShowAsPercentageGet = () => true
+            };
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Number;
+
+            // Act
+            var result = Utils.GetFormat(field);
+
+            // Assert
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result));
+            Assert.IsTrue(result.Contains(expectedValue));
+        }
+
+        [TestMethod]
+        public void GetFormat_FieldTypeNumberAndDisplayFormatFourDecimals_ReturnsExpectedValue()
+        {
+            // Arrange
+            var expectedValue = ",#0.0000";
+            var field = new ShimSPFieldNumber
+            {
+                DisplayFormatGet = () => SPNumberFormatTypes.FourDecimals,
+                ShowAsPercentageGet = () => true
+            };
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Number;
+
+            // Act
+            var result = Utils.GetFormat(field);
+
+            // Assert
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result));
+            Assert.IsTrue(result.Contains(expectedValue));
+        }
+
+        [TestMethod]
+        public void GetFormat_FieldTypeNumberAndDisplayFormatFiveDecimals_ReturnsExpectedValue()
+        {
+            // Arrange
+            var expectedValue = ",#0.00000";
+            var field = new ShimSPFieldNumber
+            {
+                DisplayFormatGet = () => SPNumberFormatTypes.FiveDecimals,
+                ShowAsPercentageGet = () => true
+            };
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Number;
+
+            // Act
+            var result = Utils.GetFormat(field);
+
+            // Assert
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result));
+            Assert.IsTrue(result.Contains(expectedValue));
+        }
+
+        [TestMethod]
+        public void GetFormat_FieldTypeNumberAndDisplayFormatUnknownValue_ReturnsExpectedValue()
+        {
+            // Arrange
+            var field = new ShimSPFieldNumber
+            {
+                DisplayFormatGet = () => (SPNumberFormatTypes)10,
+                ShowAsPercentageGet = () => true
+            };
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Number;
+
+            // Act
+            var result = Utils.GetFormat(field);
+
+            // Assert
+            Assert.IsTrue(string.IsNullOrEmpty(result));
         }
     }
 }
