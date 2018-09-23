@@ -147,10 +147,12 @@ namespace EPMLiveCore.Tests.AssignmentPlanner
             var validationCount = 0;
             var mockObject = new Mock<IGridViewManager>();
 
-            mockObject.Setup(x => x.Remove(It.IsAny<GridView>())).Callback(() =>
-            {
-                validationCount = validationCount + 1;
-            });
+            mockObject
+                .Setup(x => x.Remove(It.IsAny<GridView>()))
+                .Callback(() =>
+                {
+                    validationCount = validationCount + 1;
+                });
 
             ShimGridViewManagerFactory.AllInstances.MakeGridViewManagerStringGridView = (_, _1, _2) => mockObject.Object;
 
@@ -264,11 +266,15 @@ namespace EPMLiveCore.Tests.AssignmentPlanner
                 }
             };
 
-            mockObject.Setup(x => x.Initialize()).Callback(() =>
-            {
-                validationCount = validationCount + 1;
-            });
-            mockObject.SetupGet(x => x.List).Returns(grids);
+            mockObject
+                .Setup(x => x.Initialize())
+                .Callback(() =>
+                {
+                    validationCount = validationCount + 1;
+                });
+            mockObject
+                .SetupGet(x => x.List)
+                .Returns(grids);
 
             ShimGridViewManagerFactory.AllInstances.MakeGridViewManagerStringGridViewManagerKind = (_, _1, _2) => mockObject.Object;
 
@@ -338,10 +344,12 @@ namespace EPMLiveCore.Tests.AssignmentPlanner
             var validationCount = 0;
             var mockObject = new Mock<IGridViewManager>();
 
-            mockObject.Setup(x => x.Add(It.IsAny<GridView>())).Callback(() =>
-            {
-                validationCount = validationCount + 1;
-            });
+            mockObject
+                .Setup(x => x.Add(It.IsAny<GridView>()))
+                .Callback(() =>
+                {
+                    validationCount = validationCount + 1;
+                });
 
             ShimGridViewManagerFactory.AllInstances.MakeGridViewManagerStringGridView = (_, _1, _2) => mockObject.Object;
 
@@ -370,10 +378,12 @@ namespace EPMLiveCore.Tests.AssignmentPlanner
             var mockObject = new Mock<IGridViewManager>();
             var validationCount = 0;
 
-            mockObject.Setup(x => x.Update(It.IsAny<GridView>())).Callback(() =>
-            {
-                validationCount = validationCount + 1;
-            });
+            mockObject
+                .Setup(x => x.Update(It.IsAny<GridView>()))
+                .Callback(() =>
+                {
+                    validationCount = validationCount + 1;
+                });
 
             ShimGridViewManagerFactory.AllInstances.MakeGridViewManagerStringGridView = (_, _1, _2) =>
             {
