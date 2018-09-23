@@ -241,7 +241,7 @@ namespace EPMLiveCore.Tests.API.MyWork
         }
 
         [TestMethod]
-        public void GetConfigWebGuid_Should_ReturnsSPWeb()
+        public void GetConfigWeb_ValidConfiguration_ReturnSPWeb()
         {
             // Arrange
             var web = new ShimSPWeb
@@ -354,7 +354,6 @@ namespace EPMLiveCore.Tests.API.MyWork
 
             // Assert
             // Expect an exception
-
         }
 
         [TestMethod]
