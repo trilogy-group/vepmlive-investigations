@@ -354,7 +354,6 @@ namespace EPMLiveCore.Tests.API.MyWork
             Assert.AreEqual(1, range);
         }
 
-
         [TestMethod]
         public void GetFormat_FieldTypeDateTime_ReturnsExpectedValue()
         {
@@ -378,7 +377,7 @@ namespace EPMLiveCore.Tests.API.MyWork
         public void GetFormat_FieldTypeCurrency_ReturnsExpectedValue()
         {
             // Arrange
-            var expectedValue = "Currency";
+            const string ExpectedValue = "Currency";
             var field = new ShimSPField
             {
                 TypeGet = () => SPFieldType.Currency
@@ -389,18 +388,18 @@ namespace EPMLiveCore.Tests.API.MyWork
 
             // Assert
             Assert.IsFalse(string.IsNullOrWhiteSpace(result));
-            Assert.AreEqual(expectedValue, result);
+            Assert.AreEqual(ExpectedValue, result);
         }
 
         [TestMethod]
         public void GetFormat_FieldTypeCalculated_ReturnsExpectedValue()
         {
             // Arrange
-            var expectedValue = "Indicator";
+            const string ExpectedValue = "Indicator";
             var field = new ShimSPField
             {
                 TypeGet = () => SPFieldType.Calculated,
-                DescriptionGet = () => expectedValue
+                DescriptionGet = () => ExpectedValue
             };
 
             // Act
@@ -408,7 +407,7 @@ namespace EPMLiveCore.Tests.API.MyWork
 
             // Assert
             Assert.IsFalse(string.IsNullOrWhiteSpace(result));
-            Assert.AreEqual(expectedValue, result);
+            Assert.AreEqual(ExpectedValue, result);
         }
 
         [TestMethod]
@@ -431,7 +430,7 @@ namespace EPMLiveCore.Tests.API.MyWork
         public void GetFormat_FieldTypeNumberAndDisplayFormatAutomatic_ReturnsExpectedValue()
         {
             // Arrange
-            var expectedValue = ",#0.##########";
+            const string ExpectedValue = ",#0.##########";
             var field = new ShimSPFieldNumber
             {
                 DisplayFormatGet = () => SPNumberFormatTypes.Automatic,
@@ -444,14 +443,14 @@ namespace EPMLiveCore.Tests.API.MyWork
 
             // Assert
             Assert.IsFalse(string.IsNullOrWhiteSpace(result));
-            Assert.IsTrue(result.Contains(expectedValue));
+            Assert.IsTrue(result.Contains(ExpectedValue));
         }
 
         [TestMethod]
         public void GetFormat_FieldTypeNumberAndDisplayFormatNoDecimal_ReturnsExpectedValue()
         {
             // Arrange
-            var expectedValue = ",#0";
+            const string ExpectedValue = ",#0";
             var field = new ShimSPFieldNumber
             {
                 DisplayFormatGet = () => SPNumberFormatTypes.NoDecimal,
@@ -464,14 +463,14 @@ namespace EPMLiveCore.Tests.API.MyWork
 
             // Assert
             Assert.IsFalse(string.IsNullOrWhiteSpace(result));
-            Assert.IsTrue(result.Contains(expectedValue));
+            Assert.IsTrue(result.Contains(ExpectedValue));
         }
 
         [TestMethod]
         public void GetFormat_FieldTypeNumberAndDisplayFormatOneDecimal_ReturnsExpectedValue()
         {
             // Arrange
-            var expectedValue = ",#0.0";
+            const string ExpectedValue = ",#0.0";
             var field = new ShimSPFieldNumber
             {
                 DisplayFormatGet = () => SPNumberFormatTypes.OneDecimal,
@@ -484,14 +483,14 @@ namespace EPMLiveCore.Tests.API.MyWork
 
             // Assert
             Assert.IsFalse(string.IsNullOrWhiteSpace(result));
-            Assert.IsTrue(result.Contains(expectedValue));
+            Assert.IsTrue(result.Contains(ExpectedValue));
         }
 
         [TestMethod]
         public void GetFormat_FieldTypeNumberAndDisplayFormatTwoDecimals_ReturnsExpectedValue()
         {
             // Arrange
-            var expectedValue = ",#0.00";
+            const string ExpectedValue = ",#0.00";
             var field = new ShimSPFieldNumber
             {
                 DisplayFormatGet = () => SPNumberFormatTypes.TwoDecimals,
@@ -504,14 +503,14 @@ namespace EPMLiveCore.Tests.API.MyWork
 
             // Assert
             Assert.IsFalse(string.IsNullOrWhiteSpace(result));
-            Assert.IsTrue(result.Contains(expectedValue));
+            Assert.IsTrue(result.Contains(ExpectedValue));
         }
 
         [TestMethod]
         public void GetFormat_FieldTypeNumberAndDisplayFormatThreeDecimals_ReturnsExpectedValue()
         {
             // Arrange
-            var expectedValue = ",#0.000";
+            const string ExpectedValue = ",#0.000";
             var field = new ShimSPFieldNumber
             {
                 DisplayFormatGet = () => SPNumberFormatTypes.ThreeDecimals,
@@ -524,14 +523,14 @@ namespace EPMLiveCore.Tests.API.MyWork
 
             // Assert
             Assert.IsFalse(string.IsNullOrWhiteSpace(result));
-            Assert.IsTrue(result.Contains(expectedValue));
+            Assert.IsTrue(result.Contains(ExpectedValue));
         }
 
         [TestMethod]
         public void GetFormat_FieldTypeNumberAndDisplayFormatFourDecimals_ReturnsExpectedValue()
         {
             // Arrange
-            var expectedValue = ",#0.0000";
+            const string ExpectedValue = ",#0.0000";
             var field = new ShimSPFieldNumber
             {
                 DisplayFormatGet = () => SPNumberFormatTypes.FourDecimals,
@@ -544,14 +543,14 @@ namespace EPMLiveCore.Tests.API.MyWork
 
             // Assert
             Assert.IsFalse(string.IsNullOrWhiteSpace(result));
-            Assert.IsTrue(result.Contains(expectedValue));
+            Assert.IsTrue(result.Contains(ExpectedValue));
         }
 
         [TestMethod]
         public void GetFormat_FieldTypeNumberAndDisplayFormatFiveDecimals_ReturnsExpectedValue()
         {
             // Arrange
-            var expectedValue = ",#0.00000";
+            const string ExpectedValue = ",#0.00000";
             var field = new ShimSPFieldNumber
             {
                 DisplayFormatGet = () => SPNumberFormatTypes.FiveDecimals,
@@ -564,7 +563,7 @@ namespace EPMLiveCore.Tests.API.MyWork
 
             // Assert
             Assert.IsFalse(string.IsNullOrWhiteSpace(result));
-            Assert.IsTrue(result.Contains(expectedValue));
+            Assert.IsTrue(result.Contains(ExpectedValue));
         }
 
         [TestMethod]
