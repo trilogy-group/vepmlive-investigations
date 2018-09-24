@@ -18,6 +18,31 @@ export class MyWorkPageConstants {
     static readonly editItemLabel = 'Edit Item';
     static readonly commentsLabel = 'Comments';
     static readonly editCommentsLabel = 'Edit Comments';
+    static readonly viewsRibbonLabel = 'Views Ribbon menu';
+    static readonly saveViewPopupLabel = 'Save view popup';
+    static readonly viewNameOtherThanDefault = 'Working On It';
+    static readonly renameViewPopupLabel = 'Rename View Popup';
+    static readonly noNameMessage = 'Please enter view name - view names cannot be blank.';
+    static readonly ellipsesDropdownLabel = 'Ellipses Dropdown';
+    static readonly workingOnItLabel = 'Working On It';
+    static readonly radioCheckedLabel = 'radio-checked';
+    static readonly workTypeSubMenuLabel = 'Work Type Sub Menu';
+    static readonly searchResultsLabel = 'Search Results';
+    static readonly editTitleLabel = 'Editable title Textbox';
+    static readonly deleteItemMessage = 'Are you sure you want to send the item(s) to the Recycle Bin?';
+    static readonly defaultViewLabel = 'Default View';
+    static readonly deleteDefaultViewMessage = 'You cannot delete the Default View';
+    static readonly renameDefaultViewMessage = 'The default view cannot be renamed. If you want to create a new view that' +
+        ' will act as the default for all users, select the Default View and click "Save View" - this will let you create ' +
+        'a new view from the Default View schema.';
+    static readonly alertLabel = 'Alert for Default View';
+    static readonly filterRowLabel = 'Filter Row';
+    static readonly sortedColumnsLabel = 'Sorted Column';
+    static readonly workSummaryLabel = 'Work Summary';
+    static readonly newlyCreatedViewLabel = 'Newly Created view';
+    static readonly selectColumnsPopupLabel = 'Select Columns Popup';
+    static readonly selectedCheckboxLabel = 'Selected Checkbox';
+    static readonly unSelectedCheckboxLabel = 'Unselected Checkbox';
 
     static get pageName() {
         return {
@@ -81,10 +106,17 @@ export class MyWorkPageConstants {
     }
 
     static get viewRibbonOptions() {
+        const viewSection = 'Ribbon.MyWork.Views';
         return{
-          saveView: 'Ribbon.MyWork.Views.SaveView-Medium',
-          renameView: 'Ribbon.MyWork.Views.RenameView-Medium',
-          deleteView: 'Ribbon.MyWork.Views.DeleteView-Medium'
+            saveView: `${viewSection}.SaveView-Medium`,
+            renameView: `${viewSection}.RenameView-Medium`,
+            deleteView: `${viewSection}.DeleteView-Medium`,
+            currentViewDropdown: `${viewSection}.CurrentViewDropDown`,
+            selectColumns: `Ribbon.MyWork.Actions.SelectColoumns-Medium`,
+            currentView: 'Current View:',
+            showFilters: `${viewSection}.ShowHideFilters-Medium`,
+            removeSorting: `${viewSection}.ClearSort-Medium`,
+            manageCurrentViewDropdown: 'Ribbon.MyWork.ViewsM.CurrentViewDropDown'
         };
     }
 
@@ -136,6 +168,30 @@ export class MyWorkPageConstants {
             editCommentTextArea: 'socialCommentInputBox',
             editPost: 'Post',
             editCancel: 'Cancel',
+        };
+    }
+
+    static get headerOptions() {
+        return {
+            active: 'MWG_Pivot_Active',
+            completed: 'MWG_Pivot_Completed',
+            ellipses: 'MWG_Pivot_Selector',
+        };
+    }
+
+    static get ellipsesDropdown() {
+        return {
+            dropDownSection: 'MWG_PivotMenu',
+            workTypes: 'Work Types',
+            close: 'MWG_PivotClose',
+            workTypeSubmenu: 'MWG_WorkType_Menu',
+        };
+    }
+
+    static get ellipsesDropdownForItem() {
+        return {
+            viewItem: 'View Item',
+            deleteItem: 'Delete Item'
         };
     }
 }

@@ -35,7 +35,7 @@ export class HomePageConstants {
     }
 
     static get addADocumentWindow() {
-        return{
+        return {
             addADocumentTitle: 'Add a document',
             chooseFiles: 'Choose Files',
             overwriteExistingFilesLabel: 'Overwrite existing files',

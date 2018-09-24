@@ -376,6 +376,10 @@ export class PageHelper {
         return await browser.switchTo().alert().accept();
     }
 
+    static async dismissAlert() {
+        return await browser.switchTo().alert().dismiss();
+    }
+
     static async closeAlertIfPresent() {
         try {
             await browser.sleep(PageHelper.timeout.xs);
@@ -483,5 +487,9 @@ export class PageHelper {
     static async clickAndEnter(elem: ElementFinder) {
         await this.click(elem);
         await this.enterPressForBrowser();
+    }
+
+    static async isAlertPresent() {
+        return await browser.wait(this.EC.alertIsPresent(), 1000).then(() => true).catch(() => false);
     }
 }

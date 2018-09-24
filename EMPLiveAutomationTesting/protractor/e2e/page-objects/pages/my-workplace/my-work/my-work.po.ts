@@ -5,6 +5,7 @@ import {ComponentHelpers} from '../../../../components/devfactory/component-help
 import {CommonPageConstants} from '../../common/common-page.constants';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
+import {ElementHelper} from '../../../../components/html/element-helper';
 
 export class MyWorkPage {
 
@@ -117,7 +118,13 @@ export class MyWorkPage {
         return{
             saveView: AnchorHelper.getAnchorById(viewRibbonlabel.saveView),
             renameView: AnchorHelper.getAnchorById(viewRibbonlabel.renameView),
-            deleteView: AnchorHelper.getAnchorById(viewRibbonlabel.deleteView)
+            deleteView: AnchorHelper.getAnchorById(viewRibbonlabel.deleteView),
+            currentViewDropdown: AnchorHelper.getAnchorById(viewRibbonlabel.currentViewDropdown),
+            selectColumns: AnchorHelper.getAnchorById(viewRibbonlabel.selectColumns),
+            currentView: ElementHelper.getElementByText(viewRibbonlabel.currentView),
+            showFilters: AnchorHelper.getAnchorById(viewRibbonlabel.showFilters),
+            removeSorting: AnchorHelper.getAnchorById(viewRibbonlabel.removeSorting),
+            manageCurrentViewDropdown: AnchorHelper.getAnchorById(viewRibbonlabel.manageCurrentViewDropdown),
         };
     }
 
@@ -201,5 +208,91 @@ export class MyWorkPage {
 
     static getCommentByName(commentName: string) {
         return element(By.xpath(`//div[@class="socialcomment-contents-TRC"  and text()="${commentName}"]`));
+    }
+
+    static getCurrentViewByName(viewName: string) {
+        return element(By.xpath(`//a[@role="button"] //span[text()="${viewName}"]`));
+    }
+
+    static get selectViewNameOtherThanDefault() {
+        return element(By.xpath('//div[text()="Personal Views"]/following-sibling::ul[1]'));
+    }
+
+    static getColumnSelectedOnSelectColumnsPopup(column: string) {
+        const columnChecked = CommonPageConstants.selectColumnsPopup.columnChecked;
+        return element(By.xpath(`//div[contains(@class, "${columnChecked}")]/div[text()='${column}']`));
+    }
+
+    static columnDisplayed(column: string) {
+        return element(By.xpath(`//td[contains(@class,"GMHeaderText") and (text()='${column}')]`));
+    }
+
+    static get headerOptions() {
+        const headerOptionLabels = MyWorkPageConstants.headerOptions;
+        return {
+            active: element(By.id(headerOptionLabels.active)),
+            completed: element(By.id(headerOptionLabels.completed)),
+            ellipses: element(By.id(headerOptionLabels.ellipses)),
+        };
+    }
+
+    static get ellipsesDropdownForItem() {
+        const ellipsesDropdownForItemLabels = MyWorkPageConstants.ellipsesDropdownForItem;
+        return {
+            viewItem: ElementHelper.getElementByText(ellipsesDropdownForItemLabels.viewItem),
+            deleteItem: ElementHelper.getElementByText(ellipsesDropdownForItemLabels.deleteItem),
+        };
+    }
+
+    static get selectColumnsPopup() {
+        const selectColumnsPopupLabel = CommonPageConstants.selectColumnsPopup;
+        return {
+            ok: ElementHelper.getElementByText(selectColumnsPopupLabel.ok),
+            hideAll: ElementHelper.getElementByText(selectColumnsPopupLabel.hideAll),
+            cancel: ElementHelper.getElementByText(selectColumnsPopupLabel.cancel),
+            column: element.all(By.css(`.${selectColumnsPopupLabel.column}`)),
+            columnChecked: element(By.css(`.${selectColumnsPopupLabel.columnChecked}`)),
+            eachSelectedColumn: element(By.css(`.${selectColumnsPopupLabel.columnChecked}>div`)),
+            showAll: ElementHelper.getElementByText(selectColumnsPopupLabel.showAll),
+            columnUnchecked: element(By.css(`.${selectColumnsPopupLabel.columnUnchecked}`)),
+            columnNameWithImages: element.all(By.css(`.${selectColumnsPopupLabel.column}>img`)),
+            allSelectedColumn: element.all(By.css(`.${selectColumnsPopupLabel.columnChecked}>div`)),
+        };
+    }
+
+    static get ellipsesDropdown() {
+        const ellipsesDropdown = MyWorkPageConstants.ellipsesDropdown;
+        return {
+            dropDownSection: element(By.id(ellipsesDropdown.dropDownSection)),
+            workTypes: element(By.xpath(`//div[@id='MWG_PivotMenu']//span[text()="${ellipsesDropdown.workTypes}"]`)),
+            close: element(By.id(ellipsesDropdown.close)),
+            workTypeSubmenuItem: element(By.css(`#${ellipsesDropdown.workTypeSubmenu}>li:first-child`)),
+        };
+    }
+
+    static get gridDetails() {
+        const gridLabels = CommonPageConstants.gridDetails;
+        return {
+            title: element.all(By.css(`.${gridLabels.title} a`)),
+            workingOn: element.all(By.css(`.${gridLabels.workingOn}`)),
+            workType: element.all(By.css(`.${gridLabels.workType}>div`)),
+            editTitle: element(By.css(`.${gridLabels.editTitle}`)),
+            toEdit: element.all(By.css(`.${gridLabels.title}.GMCell.GMRightHtml.HideCol0Title`)),
+            filter: element(By.css(`.${gridLabels.filter}`)),
+            workTypeFilter: element(By.css(`.${gridLabels.workType}.${gridLabels.filter}`)),
+            workTypeHeader: element(By.css(`.${gridLabels.workType}.${gridLabels.header}`)),
+            sorted: element(By.css(`.${gridLabels.workType} + td > u.${gridLabels.sorted}`)),
+            scroll: element(By.css(`.${gridLabels.scroll}`)),
+            workTypeValues: element.all(By.css(`.${gridLabels.workType}.${gridLabels.cell}>div`)),
+        };
+    }
+
+    static get newlyCreatedView() {
+        const workSummary = MyWorkPageConstants.workSummaryLabel;
+        return element(By.xpath(`//span[text()="${workSummary}"]/ancestor::li[1]/following-sibling::li[1]//span[@class="ms-cui-ctl-mediumlabel"]`));
+    }
+
+    static getColumnByNameOnSelectColumnsPopup(columnName: string) {
+        return element(By.xpath(`//div[contains(@class,'GMColumnsMenuItemText') and text()='${columnName}']`));
     }
 }

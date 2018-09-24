@@ -26,6 +26,8 @@ export class CommonPageConstants {
     static readonly column = 'Column Popup';
     static readonly dropDown: string = 'dropdown-toggle';
     static readonly linkDisable = 'This control is currently disabled.';
+    static readonly ellipsisLabel = 'Ellipsis';
+    static readonly contextMenuLabel = 'Context menu';
 
     static get viewDropDownLabels() {
         return {
@@ -318,6 +320,7 @@ export class CommonPageConstants {
             holidaySchedule: 'HolidaySchedule_ddlShowAll',
             workHours: 'WorkHours_ddlShowAll',
             portfolio: 'Portfolio_ddlShowAll',
+            department: 'Department_ddlShowAll',
         };
     }
 
@@ -391,6 +394,32 @@ export class CommonPageConstants {
             predecessors1: '1',
             predecessorsNull: ' ',
             predecessors2: '2',
+        };
+    }
+
+    static get gridDetails() {
+        return {
+            title: 'EPMLiveMyWorkTitle',
+            workingOn: 'epmlive-toggle-switch',
+            workType: 'HideCol0Work0000Type',
+            editTitle: 'GMEditInput',
+            filter: 'GMCellFilter',
+            header: 'GMHeaderText',
+            sorted: 'GMImage',
+            scroll: 'GMHScrollMid',
+            cell: 'GMCell'
+        };
+    }
+
+    static get selectColumnsPopup() {
+        return {
+            ok: 'OK',
+            hideAll: 'Hide all',
+            cancel: 'Cancel',
+            column: 'GMColumnsMenuItemText',
+            columnChecked: 'GMMenuCheckedIconRight',
+            showAll: 'Show all',
+            columnUnchecked: 'GMColumnsMenuUncheckedIconRight'
         };
     }
 }
