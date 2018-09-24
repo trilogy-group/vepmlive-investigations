@@ -192,7 +192,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.newItem,
             MyWorkPageConstants.manage,
-
         );
     }
 
@@ -214,7 +213,6 @@ export class MyWorkPageHelper {
             MyWorkPage.inputs.heading,
             changesItemLabel,
             MyWorkPageConstants.pageName.changes,
-
         );
     }
 
@@ -259,7 +257,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.getItemByName(itemTitle),
             itemTitle,
-
         );
     }
 
@@ -275,7 +272,6 @@ export class MyWorkPageHelper {
             MyWorkPage.inputs.heading,
             toDoPopup,
             MyWorkPageConstants.pageName.toDo,
-
         );
     }
 
@@ -284,7 +280,6 @@ export class MyWorkPageHelper {
             MyWorkPage.validationMessage,
             MyWorkPageConstants.validationMessageLabel,
             MyWorkPageConstants.blankValidationMessage,
-
         );
     }
 
@@ -298,7 +293,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyNotDisplayedStatus(
             MyWorkPage.inputs.title,
             toDoPopup,
-
         );
     }
 
@@ -311,7 +305,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.newItemMenu.changesItem,
             MyWorkPageConstants.newItemListLabel,
-
         );
     }
 
@@ -326,7 +319,6 @@ export class MyWorkPageHelper {
             MyWorkPage.inputs.heading,
             issueItemLabel,
             MyWorkPageConstants.pageName.issues,
-
         );
     }
 
@@ -336,7 +328,6 @@ export class MyWorkPageHelper {
             MyWorkPage.inputs.heading,
             riskItemLabel,
             MyWorkPageConstants.pageName.risks,
-
         );
     }
 
@@ -354,7 +345,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyEnabledStatus(
             MyWorkPage.manageTabRibbonItems.editItem,
             MyWorkPageConstants.editItemLabel,
-
         );
     }
 
@@ -376,7 +366,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyNotDisplayedStatus(
             MyWorkPage.getItemByName(editedItemTitleForCancel),
             editedItemTitleForCancel,
-
         );
     }
 
@@ -389,7 +378,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyEnabledStatus(
             MyWorkPage.manageTabRibbonItems.comments,
             MyWorkPageConstants.commentsLabel,
-
         );
     }
 
@@ -419,7 +407,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.getCommentByName(commentText),
             commentText,
-
         );
     }
 
@@ -450,7 +437,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyNotDisplayedStatus(
             MyWorkPage.getCommentByName(commentText),
             commentText,
-
         );
     }
 
@@ -470,7 +456,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.getViewRibbonOptions.saveView,
             MyWorkPageConstants.viewsRibbonLabel,
-
         );
     }
 
@@ -484,7 +469,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.viewsPopup.name,
             MyWorkPageConstants.saveViewPopupLabel,
-
         );
     }
 
@@ -511,7 +495,6 @@ export class MyWorkPageHelper {
             MyWorkPage.getCurrentView,
             MyWorkPageConstants.currentView,
             currentView,
-
         );
     }
 
@@ -538,7 +521,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.viewsPopup.newName,
             MyWorkPageConstants.renameViewPopupLabel,
-
         );
     }
 
@@ -603,7 +585,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyNotDisplayedStatus(
             MyWorkPage.getCurrentViewByName(currentViewName),
             currentViewName,
-
         );
     }
 
@@ -619,17 +600,14 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             selectPopupItems.ok,
             selectPopupLabels.ok,
-
         );
         await ExpectationHelper.verifyDisplayedStatus(
             selectPopupItems.cancel,
             selectPopupLabels.cancel,
-
         );
         await ExpectationHelper.verifyDisplayedStatus(
             selectPopupItems.hideAll,
             selectPopupLabels.hideAll,
-
         );
     }
 
@@ -649,7 +627,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.columnDisplayed(selectedColumn),
             selectedColumn,
-
         );
     }
 
@@ -666,7 +643,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyStringEqualTo(
             alertMessageExpected,
             MyWorkPageConstants.noNameMessage,
-
         );
     }
 
@@ -686,7 +662,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.ellipsesDropdown.workTypes,
             MyWorkPageConstants.ellipsesDropdownLabel,
-
         );
     }
 
@@ -699,7 +674,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyHiddenStatus(
             MyWorkPage.ellipsesDropdown.workTypes,
             MyWorkPageConstants.ellipsesDropdownLabel,
-
         );
     }
 
@@ -731,7 +705,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             CommonPage.getGridRowByTitle(itemTitle),
             `${MyWorkPageConstants.workingOnItLabel} item`,
-
         );
     }
 
@@ -741,7 +714,6 @@ export class MyWorkPageHelper {
             gridItems.workingOn.get(0),
             HtmlHelper.attributes.class,
             MyWorkPageConstants.radioCheckedLabel,
-
         );
     }
 
@@ -754,7 +726,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.ellipsesDropdown.workTypeSubmenuItem,
             MyWorkPageConstants.workTypeSubMenuLabel,
-
         );
     }
 
@@ -774,7 +745,6 @@ export class MyWorkPageHelper {
                 MyWorkPage.gridDetails.workType.get(i),
                 MyWorkPageConstants.searchResultsLabel,
                 workType,
-
             );
         }
     }
@@ -790,7 +760,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.gridDetails.editTitle,
             MyWorkPageConstants.editTitleLabel,
-
         );
     }
 
@@ -811,7 +780,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             CommonPage.getGridRowByTitle(editedTitle),
             editedTitle,
-
         );
     }
 

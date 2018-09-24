@@ -100,13 +100,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         // After save It need static wait(5 sec) and no element found which get change after save.
         await browser.sleep(PageHelper.timeout.m);
         await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.two, ProjectItemPageConstants.newTaskFields.start).click();
-        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.
-            predecessors1, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
+        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.predecessors1, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
             CommonPageConstants.predecessorsData.predecessors1));
         await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.three,
             ProjectItemPageConstants.newTaskFields.start).click();
-        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.
-            predecessors2, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
+        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.predecessors2, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
             CommonPageConstants.predecessorsData.predecessors2));
         await PageHelper.click(ProjectItemPage.selectTaskName);
         await expect(await ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
@@ -133,7 +131,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('The "Build Team" window closes and the selected resource is now added and its' +
             ' availability can be verified in the "Assigned To" column.');
         await expect(await CommonPage.dialogTitle.isPresent()).toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+            ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
         await PageHelper.click(ProjectItemPage.selectTaskName);
         await PageHelper.click(ProjectItemPage.assignToDropDown);
 

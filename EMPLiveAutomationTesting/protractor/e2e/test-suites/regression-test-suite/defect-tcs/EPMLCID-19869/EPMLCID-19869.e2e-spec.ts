@@ -25,19 +25,19 @@ describe(SuiteNames.regressionTestSuite, () => {
 
         StepLogger.stepId(3);
         const title = await DepartmentsPageHelper.enterNewTitle();
-        await DepartmentsPageHelper.verifyTitleEntered(title, );
+        await DepartmentsPageHelper.verifyTitleEntered(title,);
 
         StepLogger.stepId(4);
         const selectedManagerUser = await DepartmentsPageHelper.selectManagersField();
-        await DepartmentsPageHelper.verifySelectedManagersField(selectedManagerUser, );
+        await DepartmentsPageHelper.verifySelectedManagersField(selectedManagerUser,);
 
         StepLogger.stepId(5);
         const selectedExecutivesUser = await DepartmentsPageHelper.selectExecutivesField();
-        await DepartmentsPageHelper.verifySelectedExecutivesField(selectedExecutivesUser, );
+        await DepartmentsPageHelper.verifySelectedExecutivesField(selectedExecutivesUser,);
 
         StepLogger.stepId(6);
         await DepartmentsPageHelper.clickSave();
-        await DepartmentsPageHelper.verifyDepartmentCreated(title, );
+        await DepartmentsPageHelper.verifyDepartmentCreated(title,);
     });
 
     it('Create an enabled resource and a disabled resource - [15438973]', async () => {
@@ -56,6 +56,6 @@ describe(SuiteNames.regressionTestSuite, () => {
 
         StepLogger.stepId(5);
         await ResourcesPageHelper.clickSave();
-        await ResourcesPageHelper.verifyResourceSaved(displayName, );
+        await ResourcesPageHelper.verifyResourceSaved(displayName,);
     });
 });

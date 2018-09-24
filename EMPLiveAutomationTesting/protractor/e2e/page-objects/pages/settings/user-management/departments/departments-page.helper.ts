@@ -26,7 +26,6 @@ export class DepartmentsPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             DepartmentsPage.addNewItem,
             DepartmentsPageConstants.pageTitle,
-
         );
     }
 
@@ -39,7 +38,6 @@ export class DepartmentsPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             DepartmentsPage.addNewItemOptions.title,
             DepartmentsPageConstants.addNewItemPageLabel,
-
         );
     }
 
@@ -57,7 +55,6 @@ export class DepartmentsPageHelper {
             DepartmentsPage.addNewItemOptions.titlePlaceholder,
             HtmlHelper.attributes.value,
             title,
-
         );
     }
 
@@ -74,7 +71,6 @@ export class DepartmentsPageHelper {
             DepartmentsPage.addNewItemOptions.managerSelectedValueOption,
             DepartmentsPageConstants.managerSelectedLabel,
             selectedUser,
-
         );
     }
 

@@ -119,7 +119,7 @@ export class ModelerPageConstants {
     }
 
     static get collapseAndExpandRibbons() {
-        return{
+        return {
             collapseViewTopRibbon: 'idRibbonDiv_ulCollapsed',
             expandViewTopRibbon: 'idRibbonDiv_ul',
             collapseViewBottomRibbon: 'idBottomRibbonDiv_ulCollapsed',

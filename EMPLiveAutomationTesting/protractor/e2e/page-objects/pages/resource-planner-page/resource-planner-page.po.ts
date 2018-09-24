@@ -15,26 +15,28 @@ export class ResourcePlannerPage extends BasePage {
         // tslint:disable-next-line:max-line-length
         return element(By.xpath(`//*[normalize-space(text())="${ResourcePlannerConstants.user}"]//following-sibling::td[text()="${ResourcePlannerConstants.department}"]`));
     }
+
     static get editResourceLink() {
         return CommonPage.ribbonItems.editResource;
     }
-    static  get editResourceLinkViaEllipse() {
+
+    static get editResourceLinkViaEllipse() {
         return CommonPage.contextMenuOptions.editResource;
     }
-    static getHoursHeader() {
-        // selecting User which have department Test department 1
-        return element.all(By.css('#g_RPE .GMHeadRight td.GMHeaderText'));
-    }
+
     static get addedUser() {
         // selecting User which have department Test department 1
         return ElementHelper.getElementByText(ResourcePlannerConstants.user);
     }
+
     static get selectMonth() {
         return element(By.css('#g_RPE .GMBodyRight .GMDataRow td.GMClassEdit'));
     }
+
     static get inputHours() {
         return element(By.css('input.GMEditInput'));
     }
+
     static get yesButton() {
         return element(By.css('[value="Yes"]'));
     }
@@ -42,21 +44,9 @@ export class ResourcePlannerPage extends BasePage {
     static get greenCheckImg() {
         return element(By.css('[class*="rp-commitment"]'));
     }
+
     static get privateCheckImg() {
         return element(By.css('[class*="rp-pm-private"]'));
-    }
-    static getTopSectionButtonById(id: string) {
-    return element(By.css(`#idEditorTabDiv_ul #${id}`));
-    }
-
-    static getbuttonSectionButtonById(id: string) {
-        return element(By.css(`#idResourcesTabDiv_ul #${id}`));
-    }
-    static getTopGridItemsByText(title: string) {
-        return element(By.xpath(`//*[@id="gridDiv_RPE"]//td[contains(text(),"${title}")]`));
-    }
-    static getButtomGridItemsByText(title: string) {
-        return element(By.xpath(`//*[@id="g_Res"]//td[contains(text(),"${title}")]`));
     }
 
     static get topSection() {
@@ -85,6 +75,7 @@ export class ResourcePlannerPage extends BasePage {
             role: ResourcePlannerPage.getTopGridItemsByText(labels.role),
         };
     }
+
     static get buttomGrid() {
         const labels = ResourcePlannerConstants.topGrid;
         return {
@@ -93,6 +84,7 @@ export class ResourcePlannerPage extends BasePage {
             role: ResourcePlannerPage.getButtomGridItemsByText(labels.role),
         };
     }
+
     static get buttonSection() {
         const labels = ResourcePlannerConstants.buttonSection;
         return {
@@ -105,5 +97,26 @@ export class ResourcePlannerPage extends BasePage {
             filter: ResourcePlannerPage.getbuttonSectionButtonById(labels.showFilter),
             showGrouping: ResourcePlannerPage.getbuttonSectionButtonById(labels.showGrouping),
         };
+    }
+
+    static getHoursHeader() {
+        // selecting User which have department Test department 1
+        return element.all(By.css('#g_RPE .GMHeadRight td.GMHeaderText'));
+    }
+
+    static getTopSectionButtonById(id: string) {
+        return element(By.css(`#idEditorTabDiv_ul #${id}`));
+    }
+
+    static getbuttonSectionButtonById(id: string) {
+        return element(By.css(`#idResourcesTabDiv_ul #${id}`));
+    }
+
+    static getTopGridItemsByText(title: string) {
+        return element(By.xpath(`//*[@id="gridDiv_RPE"]//td[contains(text(),"${title}")]`));
+    }
+
+    static getButtomGridItemsByText(title: string) {
+        return element(By.xpath(`//*[@id="g_Res"]//td[contains(text(),"${title}")]`));
     }
 }

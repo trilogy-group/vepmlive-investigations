@@ -25,19 +25,19 @@ export class ResourceCapacityHeatMapPageHelper {
     }
 
     static async selectPeriodStartDate(optionValue: Number) {
-        await  PageHelper.click(ResourceCapacityHeatMapPage.periodStart);
+        await PageHelper.click(ResourceCapacityHeatMapPage.periodStart);
         StepLogger.step('Select Period start Date ');
 
         await DropDownHelper.selectOptionByVal(ResourceCapacityHeatMapPage.periodStart, optionValue.toString());
 
-        await  CommonPageHelper.waitForApplyButtontoDisplayed();
+        await CommonPageHelper.waitForApplyButtontoDisplayed();
     }
 
     static async selectLastValuePeriodEndDate() {
         StepLogger.step('Select Period End Date ');
-        await  PageHelper.click(ResourceCapacityHeatMapPage.periodEnd);
+        await PageHelper.click(ResourceCapacityHeatMapPage.periodEnd);
         await PageHelper.click(ResourceCapacityHeatMapPage.periodEndOptionValue);
-        await  CommonPageHelper.waitForApplyButtontoDisplayed();
+        await CommonPageHelper.waitForApplyButtontoDisplayed();
     }
 
     static async selectDepartment() {
@@ -47,7 +47,7 @@ export class ResourceCapacityHeatMapPageHelper {
         await DropDownHelper.selectOptionByVal(
             ResourceCapacityHeatMapPage.department, ResourceCapacityHeatMapPageConstants.departmentValue);
 
-        await  CommonPageHelper.waitForApplyButtontoDisplayed();
+        await CommonPageHelper.waitForApplyButtontoDisplayed();
     }
 
 }

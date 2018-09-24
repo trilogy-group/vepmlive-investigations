@@ -45,7 +45,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
 
         StepLogger.stepId(1);
-        await  WaitHelper.waitForElementToBeDisplayed(ResourcePlannerPage.delete);
+        await WaitHelper.waitForElementToBeDisplayed(ResourcePlannerPage.delete);
         await PageHelper.switchToDefaultContent();
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 

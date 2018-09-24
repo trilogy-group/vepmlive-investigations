@@ -26,12 +26,12 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     it('Set Cost Plan for Project - [785226]', async () => {
         StepLogger.caseId = 785226;
-        const cost =  4;
+        const cost = 4;
         StepLogger.preCondition('Creating a project');
 
         const uniqueId = PageHelper.getUniqueId();
 
-        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, );
+        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId,);
 
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,

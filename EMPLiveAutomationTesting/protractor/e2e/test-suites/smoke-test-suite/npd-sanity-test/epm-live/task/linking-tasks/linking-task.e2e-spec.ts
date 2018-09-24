@@ -117,7 +117,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('Required values Entered/Selected in Add Link pop up');
         await expect(await ElementHelper.getText(ProjectItemPage.linkDropDownValue)).toBe
         (ProjectItemPageConstants.linkDropDownValues.finishToStart, ValidationsHelper.getFieldShouldHaveValueValidation
-            (ProjectItemPageConstants.addLinkPopup.linkType, CommonPageConstants.buttonName.addButton));
+        (ProjectItemPageConstants.addLinkPopup.linkType, CommonPageConstants.buttonName.addButton));
 
         StepLogger.stepId(4);
         StepLogger.step('Click on Cancel button in Add Link pop up');
@@ -129,13 +129,11 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.verification('Selected Tasks are NOT linked [NO change in column values Work and Predecessors]');
         await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.two, ProjectItemPageConstants.newTaskFields.start).click();
-        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.
-            predecessorsNull, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
+        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.predecessorsNull, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
             CommonPageConstants.predecessorsData.predecessorsNull));
         await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.three,
             ProjectItemPageConstants.newTaskFields.start).click();
-        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.
-            predecessorsNull, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
+        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.predecessorsNull, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
             CommonPageConstants.predecessorsData.predecessorsNull));
     });
 });

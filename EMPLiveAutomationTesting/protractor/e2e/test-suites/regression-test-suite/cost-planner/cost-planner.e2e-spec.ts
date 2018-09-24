@@ -62,4 +62,4 @@ describe(SuiteNames.regressionTestSuite, () => {
 
         await EditCostHelper.validateEditCostWebElements();
     });
-   });
+});

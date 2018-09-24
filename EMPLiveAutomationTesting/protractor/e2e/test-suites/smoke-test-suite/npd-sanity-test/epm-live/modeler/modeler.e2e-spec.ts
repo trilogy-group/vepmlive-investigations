@@ -23,7 +23,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     it('Validate Edit Cost Functionality in Cost Planner - [783206]', async () => {
         StepLogger.caseId = 783206;
-        const cost =  4;
+        const cost = 4;
 
         const uniqueId = PageHelper.getUniqueId();
 

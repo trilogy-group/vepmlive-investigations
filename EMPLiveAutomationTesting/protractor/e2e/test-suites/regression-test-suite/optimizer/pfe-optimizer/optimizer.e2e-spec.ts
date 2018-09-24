@@ -108,7 +108,7 @@ describe(SuiteNames.regressionTestSuite, () => {
             StepLogger.stepId(3);
             await OptimizerPageHelper.gotoConfigureSection();
             await OptimizerPageHelper.verifyFilterSectionLabels();
-     });
+        });
 
     it('Verify that Strategy should be Deleted.  - [744370]', async () => {
         StepLogger.caseId = 744370;

@@ -12,26 +12,13 @@ export class SocialStreamPage {
         return {
             editPage: ElementHelper.getElementByText(menuTitlesAndIds.editPage),
             page: ElementHelper.getElementByText(menuTitlesAndIds.page),
-            epmLive:  SocialStreamPageHelper.title(menuTitlesAndIds.epmLive),
-            socialStream:  SocialStreamPageHelper.title(menuTitlesAndIds.socialStream),
-            gridGantt:  SocialStreamPageHelper.title(menuTitlesAndIds.gridGantt),
+            epmLive: SocialStreamPageHelper.title(menuTitlesAndIds.epmLive),
+            socialStream: SocialStreamPageHelper.title(menuTitlesAndIds.socialStream),
+            gridGantt: SocialStreamPageHelper.title(menuTitlesAndIds.gridGantt),
             delete: ElementHelper.getElementByText(menuTitlesAndIds.delete),
         };
     }
 
-    static async deleteSocialStream() {
-        if (await SocialStreamPage.menueLink.first().isPresent() === true) {
-            await PageHelper.click(SocialStreamPage.menueLink.first());
-            await PageHelper.click(SocialStreamPage.delete);
-            await browser.switchTo().alert().accept();
-            // After save It need static wait(5 sec) and no element found which get change after save.
-            await browser.sleep(PageHelper.timeout.m);
-
-            if (await SocialStreamPage.menueLink.first().isPresent() === true) {
-                await this.deleteSocialStream();
-            }
-        }
-    }
     static get addAWebpart() {
         return element(By.css(`[class*='WPAddButton']`));
     }
@@ -93,20 +80,34 @@ export class SocialStreamPage {
         return element.all(By.css(`${this.statusBox}>button`));
     }
 
-    static async logout() {
-        await browser.get(SocialStreamPageConstants.logoutURL);
-    }
-
     static get nextButton() {
         return element(By.css(`[alt="Next"]`));
     }
 
     static get addButton() {
-            return element(By.css(`[class*='buttonArea'] > button:first-child`));
+        return element(By.css(`[class*='buttonArea'] > button:first-child`));
     }
 
-    static get stopEditing  () {
+    static get stopEditing() {
         return element(By.css(`[id*="SelectedItem"]`));
+    }
+
+    static async deleteSocialStream() {
+        if (await SocialStreamPage.menueLink.first().isPresent() === true) {
+            await PageHelper.click(SocialStreamPage.menueLink.first());
+            await PageHelper.click(SocialStreamPage.delete);
+            await browser.switchTo().alert().accept();
+            // After save It need static wait(5 sec) and no element found which get change after save.
+            await browser.sleep(PageHelper.timeout.m);
+
+            if (await SocialStreamPage.menueLink.first().isPresent() === true) {
+                await this.deleteSocialStream();
+            }
+        }
+    }
+
+    static async logout() {
+        await browser.get(SocialStreamPageConstants.logoutURL);
     }
 
 }

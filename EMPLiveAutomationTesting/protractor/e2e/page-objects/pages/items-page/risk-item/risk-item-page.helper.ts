@@ -106,13 +106,13 @@ export class RiskItemPageHelper {
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.scheduledStatusCheckBox))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.scheduleStatus));
-        await  CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.scheduledStatusCheckBox, false);
+        await CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.scheduledStatusCheckBox, false);
 
         StepLogger.step('Deselect non required and default selected column "Exposure"');
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.exposureCheckBox))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.exposure));
-        await  CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.exposureCheckBox, false);
+        await CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.exposureCheckBox, false);
 
         StepLogger.step('Deselect non required and default selected column Schedule "Due"');
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.dueCheckBox))

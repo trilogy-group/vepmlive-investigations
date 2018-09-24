@@ -38,7 +38,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification(`Notification 'Your Workspace <Name of Workspace entered in step# 3> is now ready!'
         displayed in the pop down`);
         await expect(await CommonPage.latestNotification.getText())
-        .toContain(title.replace('* ', ''), ValidationsHelper.getLabelDisplayedValidation(title));
+            .toContain(title.replace('* ', ''), ValidationsHelper.getLabelDisplayedValidation(title));
 
     });
 

@@ -242,30 +242,30 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(2);
         StepLogger.step('Click on public view drop down');
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.defaultDropDownViewByText))
-                    .toBe(true,
-                        ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.defaultViewName));
+            .toBe(true,
+                ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.defaultViewName));
         await PageHelper.click(CommonPage.viewPageActions.defaultDropDownViewByText);
 
         StepLogger.stepId(3);
         StepLogger.step('Click on create public view');
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.createNewPublicView))
-                    .toBe(true,
-                        ValidationsHelper.getDisplayedValidation(CommonPageConstants.viewDropDownLabels.createPublicView));
+            .toBe(true,
+                ValidationsHelper.getDisplayedValidation(CommonPageConstants.viewDropDownLabels.createPublicView));
         await PageHelper.click(CommonPage.viewPageActions.createNewPublicView);
 
         StepLogger.stepId(4);
         StepLogger.step('Fill view name');
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.fillCreatePublicViewPageTitle))
-                    .toBe(true,
-                        ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.title));
+            .toBe(true,
+                ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.title));
         const uniqueId = PageHelper.getUniqueId();
         const titleNewView = `NewAutomatedPublicView${uniqueId}`;
         await TextboxHelper.sendKeys(CommonPage.viewNewPageActions.fillCreatePublicViewPageTitle, titleNewView);
 
         StepLogger.step('Click "Create a Public View" radio button');
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.publicViewRadioButton))
-        .toBe(true,
-            ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.publicView));
+            .toBe(true,
+                ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.publicView));
         await PageHelper.click(CommonPage.viewNewPageActions.publicViewRadioButton);
 
         StepLogger.step('Deselect non required columns');
@@ -274,8 +274,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(5);
         StepLogger.step('Submit new view by clicking ok available at top');
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.submitCreatePublicViewPage))
-        .toBe(true,
-            ValidationsHelper.getDisplayedValidation(CommonPageConstants.formLabels.topSave));
+            .toBe(true,
+                ValidationsHelper.getDisplayedValidation(CommonPageConstants.formLabels.topSave));
         await PageHelper.click(CommonPage.viewNewPageActions.submitCreatePublicViewPage);
 
         StepLogger.stepId(6);
@@ -300,8 +300,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.verification('The up arrow will appear against Status' +
             ' and the data in table appears sort by Status ascending from a-z');
-        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.status.descending)).
-        toBe(true, ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.sortingOrder.descending));
+        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.status.descending)).toBe(true, ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.sortingOrder.descending));
 
         StepLogger.stepId(4);
         StepLogger.step('Click on same column header again');
@@ -309,7 +308,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.verification('The down arrow will appear against Status' +
             ' and the data in table appears sort by Status ascending from z-a');
-        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.status.ascending)).
-        toBe(true, ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.sortingOrder.ascending));
+        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.status.ascending)).toBe(true, ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.sortingOrder.ascending));
     });
 });

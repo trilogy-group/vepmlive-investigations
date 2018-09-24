@@ -223,7 +223,7 @@ export class CommonPageHelper {
     ) {
         StepLogger.step('Select "Navigation" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.navigation);
-        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, );
+        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader,);
     }
 
     static async searchByTitle(linkOfThePage: ElementFinder,
@@ -235,7 +235,7 @@ export class CommonPageHelper {
             pageHeader,
             pageName,
         );
-        await this.searchItemByTitle(titleValue, columnName, );
+        await this.searchItemByTitle(titleValue, columnName,);
     }
 
     static async navigateToItemPageUnderMyWorkplace(linkOfThePage: ElementFinder,
@@ -245,7 +245,7 @@ export class CommonPageHelper {
         StepLogger.step('Select "My Workplace" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.myWorkplace);
         StepLogger.stepId(2);
-        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, );
+        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader,);
     }
 
     static async navigateToSubPage(pageName: string, linkOfThePage: ElementFinder, pageHeader: ElementFinder) {
@@ -860,7 +860,7 @@ export class CommonPageHelper {
     }
 
     static async verifyItemDisabled(targetElement: ElementFinder) {
-        await ExpectationHelper.verifyAttributeValue(targetElement, 'aria-disabled', 'true', );
+        await ExpectationHelper.verifyAttributeValue(targetElement, 'aria-disabled', 'true',);
     }
 
     static async clickIconEllipsisHorizontal() {
@@ -915,7 +915,6 @@ export class CommonPageHelper {
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-
         );
     }
 

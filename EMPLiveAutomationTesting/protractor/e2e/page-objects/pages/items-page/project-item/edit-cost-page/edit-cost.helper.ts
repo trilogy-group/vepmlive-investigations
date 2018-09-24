@@ -20,12 +20,12 @@ export class EditCostHelper {
 
     static async verifyValueInBenefitCost(cost: number) {
         StepLogger.verification('Verify  Value in Benefit Cost');
-        await CommonPageHelper.textPresentValidation(EditCost.inputTextBoxForBenefitsCostTab , cost.toString());
+        await CommonPageHelper.textPresentValidation(EditCost.inputTextBoxForBenefitsCostTab, cost.toString());
     }
 
     static async enterValueInActualCost(cost: number) {
         StepLogger.step('Enter Cost in Textbox ');
-        await PageHelper.sendKeysToInputFieldAndEnter(EditCost.inputTextBoxForActualCostTab , cost.toString());
+        await PageHelper.sendKeysToInputFieldAndEnter(EditCost.inputTextBoxForActualCostTab, cost.toString());
 
     }
 
@@ -36,12 +36,12 @@ export class EditCostHelper {
 
     static async enterValueInBudgetCost(cost: number) {
         StepLogger.step('Enter Value in Budget Tab');
-        await PageHelper.sendKeysToInputFieldAndEnter(EditCost.inputTextBoxForBudgetTab , cost.toString());
+        await PageHelper.sendKeysToInputFieldAndEnter(EditCost.inputTextBoxForBudgetTab, cost.toString());
     }
 
     static async verifyValueInBudgetCost(cost: number) {
         StepLogger.verification('Enter Value in Benefit Tab');
-        await CommonPageHelper.textPresentValidation(EditCost.inputTextBoxForBudgetTab  , cost.toString());
+        await CommonPageHelper.textPresentValidation(EditCost.inputTextBoxForBudgetTab, cost.toString());
     }
 
     static async clickActualCostsTab() {
@@ -182,10 +182,10 @@ export class EditCostHelper {
 
     static async enterValueInVariousCategories(cost: number) {
         StepLogger.step('Enter Value in Cell1');
-        await PageHelper.sendKeysToInputField(CommonPage.getCostCell.cell1 , cost.toString());
+        await PageHelper.sendKeysToInputField(CommonPage.getCostCell.cell1, cost.toString());
 
         StepLogger.step('Enter Value in Cell2');
-        await PageHelper.sendKeysToInputField(CommonPage.getCostCell.cell2 , cost.toString());
+        await PageHelper.sendKeysToInputField(CommonPage.getCostCell.cell2, cost.toString());
 
         await this.enterValueInBudgetCost(cost);
     }
@@ -194,10 +194,10 @@ export class EditCostHelper {
         await this.verifyValueInBudgetCost(cost);
 
         StepLogger.verification('Verify  Value in Benefit Cell1');
-        await CommonPageHelper.textPresentValidation(CommonPage.getCostCell.cell1 , cost.toString());
+        await CommonPageHelper.textPresentValidation(CommonPage.getCostCell.cell1, cost.toString());
 
         StepLogger.verification('Verify  Value in Benefit Cell2');
-        await CommonPageHelper.textPresentValidation(CommonPage.getCostCell.cell2 , cost.toString());
+        await CommonPageHelper.textPresentValidation(CommonPage.getCostCell.cell2, cost.toString());
     }
 
     static async clickEditCostFromContextMenu() {

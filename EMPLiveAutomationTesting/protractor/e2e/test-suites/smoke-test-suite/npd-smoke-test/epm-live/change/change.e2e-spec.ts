@@ -72,7 +72,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         StepLogger.verification('Notification about New Changes created [Ex: New Change Item 1]' +
-                ' displayed on the Home Page');
+            ' displayed on the Home Page');
 
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getNotificationByText(titleValue)))
             .toBe(true,

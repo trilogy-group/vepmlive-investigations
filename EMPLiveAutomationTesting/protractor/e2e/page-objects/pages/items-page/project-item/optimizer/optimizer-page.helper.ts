@@ -68,7 +68,7 @@ export class OptimizerPageHelper {
 
     static async enterStrategyName(strategyName: string) {
         StepLogger.step('Enter strategy Name' + strategyName);
-        await PageHelper.sendKeysToInputField(OptimizerPage.strategyName, strategyName );
+        await PageHelper.sendKeysToInputField(OptimizerPage.strategyName, strategyName);
     }
 
     static async saveStrategyValidateIt(strategyName: string) {
@@ -110,7 +110,7 @@ export class OptimizerPageHelper {
         StepLogger.verification('Optimizer Configuration Popup closed');
         await CommonPageHelper.labelDisplayedValidation
         (CommonPage.pageHeaders.projects.optimizerConfiguration, CommonPageConstants.pageHeaders.projects.projectDetails, false);
-      }
+    }
 
     static async verifyConfigrationPopUPDisplayed() {
         StepLogger.verification('Optimizer Configuration Page is  opened ');

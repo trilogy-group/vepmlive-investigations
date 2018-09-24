@@ -293,7 +293,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             ' Generic Resource 1]');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects, CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter, );
+            CommonPageConstants.pageHeaders.projects.projectCenter,);
         await PageHelper.click(CommonPage.projectCheckbox);
         await PageHelper.click(CommonPage.ribbonTitles.items);
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
@@ -361,7 +361,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonItems.addTask);
 
         StepLogger.step('Enter details for Task (Name, Hours)');
-        await PageHelper.actionSendKeys( uniqueId);
+        await PageHelper.actionSendKeys(uniqueId);
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.work);
         await PageHelper.actionSendKeys(CommonPageConstants.costData.firstData);
         await ElementHelper.clickUsingJs(ProjectItemPage.save);
@@ -388,7 +388,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(selectedResourcePoolResourceName)))
             .toBe(true, ProjectItemPageValidations.getResourceAddedValidation
-                  (ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            (ProjectItemPageConstants.teamSectionlabels.currentTeam));
     });
 
     it('Verify functionality of "Always follow Web-Settings" check-box.. - [778281]', async () => {
@@ -464,7 +464,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.verification('Options in Time Zone and Region gets enabled');
         await expect(await CommonPage.timeZone.isPresent()).toBe(false,
-                ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.timeZone));
+            ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.timeZone));
     });
 
 });

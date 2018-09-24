@@ -75,7 +75,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification(`To Do page is displayed`);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.toDo))
             .toBe(true,
-        ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
         const label = AnchorHelper.getElementsByTextInsideGrid(labels.title);
         StepLogger.step(`Newly created ToDo [Ex: Title 1] displayed in "ToDo" page`);
         await CommonPageHelper.checkItemCreated(title, label);
@@ -266,7 +266,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.verification('Grid/ Gantt web part should be applied in To Do page');
         await expect(await PageHelper.isElementDisplayed(ToDoPage.gridGantt)).toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.gridGantt));
+            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.gridGantt));
 
         StepLogger.stepId(6);
         StepLogger.step(`Click on Page tab >> 'Stop Editing'`);
@@ -276,6 +276,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('User should be on To Do list page and all item should be displayed in grid.');
         await browser.sleep(PageHelper.timeout.m);
         await expect(await PageHelper.isElementDisplayed(ToDoPage.gridGantt)).toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
+            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
     });
 });

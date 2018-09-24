@@ -210,7 +210,6 @@ export class ResourcePlannerPageHelper {
             CommonPage.dialogTitle,
             ResourcePlannerConstants.title,
             ResourcePlannerConstants.title,
-
         );
     }
 

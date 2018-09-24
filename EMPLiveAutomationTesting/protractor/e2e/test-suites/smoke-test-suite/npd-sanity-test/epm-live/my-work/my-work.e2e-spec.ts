@@ -176,18 +176,18 @@ describe(SuiteNames.smokeTestSuite, () => {
         const inputLabels = MyWorkPageConstants.inputLabels;
         const titleValue = `${inputLabels.title} ${uniqueId}`;
         // step#5 is inside this function
-        await MyWorkPageHelper.fillTimeOffFormAndSave(titleValue, );
+        await MyWorkPageHelper.fillTimeOffFormAndSave(titleValue,);
 
         StepLogger.stepId(6);
         StepLogger.verification('"Navigate to My Time Off page');
-        await PageHelper.click( MyWorkplacePage.navigation.myTimeOff);
+        await PageHelper.click(MyWorkplacePage.navigation.myTimeOff);
 
         StepLogger.verification('search for newly created projects');
         await CommonPageHelper.searchItemByTitle(titleValue, MyTimeOffPageConstants.columnNames.title, true);
 
         StepLogger.verification('searched projects should get displayed');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
-                .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
 
     it('Create New To Do item - [855560]', async () => {
@@ -368,15 +368,15 @@ describe(SuiteNames.smokeTestSuite, () => {
             StepLogger.step('Select Projects -> Projects from the options displayed');
 
             await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
+                HomePage.navigation.projects.projects,
+                CommonPage.pageHeaders.projects.projectsCenter,
+                CommonPageConstants.pageHeaders.projects.projectCenter,
             );
 
             StepLogger.verification('Project Center page is displayed');
             await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
-            .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+                .toBe(true,
+                    ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
             StepLogger.stepId(2);
             StepLogger.step('Select on any of the project created as per pre requisites [Ex: Smoke Test Project 2]');
@@ -388,7 +388,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
             StepLogger.verification('Select Planner pop-up displays with different planner options to select');
             await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle)).toBe(true,
-            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.selectPlanner));
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.selectPlanner));
 
             StepLogger.stepId(3);
             StepLogger.step('click on Project Planner');
@@ -396,16 +396,16 @@ describe(SuiteNames.smokeTestSuite, () => {
 
             StepLogger.verification('"Project Planner" window is displayed');
             await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))
-            .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
+                .toBe(true,
+                    ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
             StepLogger.verification('NO Tasks displayed in Project Planner');
-        // After select project Planner wait required, not element found which can use with waitHelper.
+            // After select project Planner wait required, not element found which can use with waitHelper.
             await browser.sleep(PageHelper.timeout.m);
             await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
             await CommonPageHelper.deleteTask();
             await expect(await ProjectItemPage.selectTaskName.isPresent()).toBe(false,
-            ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
+                ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
 
             StepLogger.stepId(4);
             StepLogger.step('Click on + Task button');
@@ -428,24 +428,24 @@ describe(SuiteNames.smokeTestSuite, () => {
 
             StepLogger.verification('List of users drop down is closed');
             await expect(await ProjectItemPageHelper.selectLastAssign().isPresent()).toBe(false,
-            ValidationsHelper.getNotDisplayedValidation(ProjectItemPageConstants.newTaskFields.assignedList));
+                ValidationsHelper.getNotDisplayedValidation(ProjectItemPageConstants.newTaskFields.assignedList));
 
             StepLogger.verification('Selected user name is displayed in "Assigned To" column [Ex: User1 User1] in' +
-            ' "Project Planner" window');
+                ' "Project Planner" window');
             await expect(await ElementHelper.getElementByText(user).isPresent()).toBe(true,
-            ValidationsHelper.getDisplayedValidation(user));
+                ValidationsHelper.getDisplayedValidation(user));
 
             StepLogger.stepId(6);
             StepLogger.step('Click on Save button from ribbon panel');
             await ElementHelper.clickUsingJs(ProjectItemPage.save);
 
             StepLogger.verification('Changes done in "Project Planner" window are saved');
-        // After save It need static wait(5 sec) and no element found which get change after save.
+            // After save It need static wait(5 sec) and no element found which get change after save.
             await browser.sleep(PageHelper.timeout.s);
             await expect(await ElementHelper.getText(ProjectItemPageHelper.newTasksFields.title)).toBe(uniqueId,
-            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title, uniqueId));
+                ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title, uniqueId));
             await expect(await ElementHelper.getElementByText(user).isPresent()).toBe(true,
-            ValidationsHelper.getDisplayedValidation(user));
+                ValidationsHelper.getDisplayedValidation(user));
 
             StepLogger.stepId(7);
             StepLogger.step('Click on Publish button in Project Planner window');
@@ -453,10 +453,10 @@ describe(SuiteNames.smokeTestSuite, () => {
 
             StepLogger.step('Wait till the Publishing is completed [Publish Status will show the status]');
             StepLogger.verification('Project Planner details are published successfully');
-        // Wait required to let it publish
+            // Wait required to let it publish
             await browser.sleep(PageHelper.timeout.s);
             await expect(await PageHelper.isElementPresent(ProjectItemPage.publishstatus)).toBe(true,
-            ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.itemOptions.publish));
+                ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.itemOptions.publish));
 
             StepLogger.stepId(8);
             StepLogger.step('Click "Close" button in "Project Planner" window');
@@ -465,24 +465,24 @@ describe(SuiteNames.smokeTestSuite, () => {
             StepLogger.verification('Project Planner window is closed');
             await WaitHelper.waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);
             await expect(await CommonPage.pageHeaders.projects.projectPlanner.isPresent()).toBe(false,
-            ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
+                ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
             StepLogger.verification('Project Center page is displayed');
             await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter)).toBe(true,
-            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
             StepLogger.stepId(9);
             StepLogger.step('Login into application with the user credential to whom task is assigned in above steps [Ex: User1 User1]');
             await SocialStreamPage.logout();
             await loginPage.goToAndLoginAsTeamMember();
             await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
-            MyWorkplacePage.navigation.myWork,
-            CommonPage.pageHeaders.myWorkplace.myWork,
-            CommonPageConstants.pageHeaders.myWorkplace.myWork,
+                MyWorkplacePage.navigation.myWork,
+                CommonPage.pageHeaders.myWorkplace.myWork,
+                CommonPageConstants.pageHeaders.myWorkplace.myWork,
             );
 
             await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId))).toBe(true,
-            ValidationsHelper.getDisplayedValidation(uniqueId));
+                ValidationsHelper.getDisplayedValidation(uniqueId));
 
         });
 

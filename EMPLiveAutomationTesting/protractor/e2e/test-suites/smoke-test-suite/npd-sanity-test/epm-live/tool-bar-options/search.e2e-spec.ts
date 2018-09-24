@@ -27,7 +27,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.caseId = 1035924;
         StepLogger.stepId(1);
         StepLogger.verification('Navigate To Projects Page');
-        await CommonPageHelper.navigateToItemPageUnderNavigation (
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
@@ -41,7 +41,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.verification('searched projects should get displayed');
         await expect(await PageHelper.isElementPresent(CommonPageHelper.searchedItemList(firstProjectName)))
-                .toBe(true, ValidationsHelper.getLabelDisplayedValidation(firstProjectName));
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(firstProjectName));
 
         StepLogger.stepId(5);
         StepLogger.step('Select column name as State');

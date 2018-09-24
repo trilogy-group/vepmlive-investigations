@@ -24,7 +24,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         const uniqueId = PageHelper.getUniqueId();
 
         StepLogger.step('Create a new project and navigate to build team page');
-        await ProjectItemPageHelper.createProjectAndNavigateToBuildTeamPage(uniqueId, );
+        await ProjectItemPageHelper.createProjectAndNavigateToBuildTeamPage(uniqueId,);
 
         StepLogger.verification('Verify Save and Close button is disabled by default');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.saveAndClose);
@@ -34,7 +34,7 @@ describe(SuiteNames.regressionTestSuite, () => {
                 ProjectItemPageConstants.messageText.saveAndCloseDisabled);
 
         StepLogger.step('Add resource to Current team and verify');
-        await ProjectItemPageHelper.addResourceAndVerifyUserMovedUnderCurrentTeam(uniqueId, );
+        await ProjectItemPageHelper.addResourceAndVerifyUserMovedUnderCurrentTeam(uniqueId,);
     });
 
 });

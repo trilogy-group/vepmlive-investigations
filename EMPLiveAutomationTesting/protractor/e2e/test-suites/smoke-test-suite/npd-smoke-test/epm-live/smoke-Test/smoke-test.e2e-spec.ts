@@ -52,7 +52,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.step('Select the ellipses button (...) displayed on right side of the project created as per pre requisites');
         StepLogger.step('Select "Edit Plan" from the menu items displayed');
         await CommonPageHelper.actionTakenViaContextMenu(CommonPage.project,
-            CommonPage.contextMenuOptions.editPlan, );
+            CommonPage.contextMenuOptions.editPlan,);
 
         StepLogger.step('Select "Project Planner" in "Select Planner" window (if displayed)');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);

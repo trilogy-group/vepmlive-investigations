@@ -1,7 +1,8 @@
 export class ResourceAnalyzerPageConstants {
-    static  readonly display = 'DisplayButton';
-    static  readonly cancel = 'CancelButton';
-    static  readonly fiscalCalendarDropDown = 'Fiscal Calendar DropDown';
+    static readonly display = 'DisplayButton';
+    static readonly cancel = 'CancelButton';
+    static readonly fiscalCalendarDropDown = 'Fiscal Calendar DropDown';
+
     static get topPannelAnalyzerTab() {
         return {
             publish: 'SaveBtn',
@@ -16,6 +17,7 @@ export class ResourceAnalyzerPageConstants {
             print: 'idPrintTop',
         };
     }
+
     static get topPannelViewTab() {
         return {
             publish: 'SaveBtn',
@@ -37,6 +39,7 @@ export class ResourceAnalyzerPageConstants {
             toPeriod: 'idAnalyzerTab_ToPeriodLabel',
         };
     }
+
     static get bottomPannel() {
         return {
             totalColumn: 'Total',

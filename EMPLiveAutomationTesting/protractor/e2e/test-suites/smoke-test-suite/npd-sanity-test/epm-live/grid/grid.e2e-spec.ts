@@ -83,7 +83,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('Work column updated according to the number of assigned resources. (Billing hours ' +
             'of the resource multiplied with the duration and the result displayed in Work column) [In this case 2 X 8 X 10 = 160]');
         await expect(await ProjectItemPageHelper.newTasksFields.work.getText()).toBe(CommonPageConstants.hours.updatedEffortHours,
-            ValidationsHelper.getFieldShouldHaveValueValidation( ProjectItemPageConstants.newTaskFields.work,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.work,
                 CommonPageConstants.hours.updatedEffortHours));
 
         StepLogger.stepId(3);
@@ -94,7 +94,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         // After save It need static wait(5 sec) and no element found which get change after save.
         await browser.sleep(PageHelper.timeout.s);
         await expect(await ProjectItemPageHelper.newTasksFields.work.getText()).toBe(CommonPageConstants.hours.updatedEffortHours,
-            ValidationsHelper.getFieldShouldHaveValueValidation( ProjectItemPageConstants.newTaskFields.work,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.work,
                 CommonPageConstants.hours.updatedEffortHours));
 
         await PageHelper.click(ProjectItemPage.selectTaskName);
@@ -117,8 +117,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(5);
         StepLogger.step('Select the project in which task details updated in step# 2 [Ex: Smoke Test Project 2]' +
-        'Click on the ITEMS tab above the grid From the ITEMS ribbon menu, click on Edit Plan' +
-        'Click on Project Planner in the list of planners displayed');
+            'Click on the ITEMS tab above the grid From the ITEMS ribbon menu, click on Edit Plan' +
+            'Click on Project Planner in the list of planners displayed');
         await PageHelper.click(CommonPage.projectCheckbox);
         await PageHelper.click(CommonPage.ribbonTitles.items);
         // 5 second wait required Wait helper is not working.
@@ -141,7 +141,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('Changes done to task in step# 3 are saved and displayed in Project Planner page');
         await PageHelper.click(ProjectItemPage.selectTaskName);
         await expect(await ProjectItemPageHelper.newTasksFields.work.getText()).toBe(CommonPageConstants.hours.updatedEffortHours,
-            ValidationsHelper.getFieldShouldHaveValueValidation( ProjectItemPageConstants.newTaskFields.work,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.work,
                 CommonPageConstants.hours.updatedEffortHours));
 
         await PageHelper.click(ProjectItemPage.selectTaskName);

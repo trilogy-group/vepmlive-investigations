@@ -67,7 +67,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.step('Provide values in required fields');
         const uniqueId = PageHelper.getUniqueId();
         const displayName = `${ResourcesPageConstants.inputLabels.displayName} ${uniqueId}`;
-        await ResourcesPageHelper.fillFormAndSave(displayName, );
+        await ResourcesPageHelper.fillFormAndSave(displayName,);
 
         StepLogger.stepId(4);
         StepLogger.step('Click on search');
@@ -76,6 +76,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await TextboxHelper.sendKeys(ResourcesPage.searchTextbox, displayName, true);
         StepLogger.verification('Newly created Resource [Ex: Display Name 1] displayed in "Resources" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(displayName)))
-                .toBe(true, ValidationsHelper.getLabelDisplayedValidation(displayName));
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(displayName));
     });
 });

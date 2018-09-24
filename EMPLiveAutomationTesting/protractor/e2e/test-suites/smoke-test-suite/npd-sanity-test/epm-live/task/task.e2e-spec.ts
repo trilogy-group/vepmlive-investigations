@@ -50,7 +50,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.verification('Project Center page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
-    .toBe(true,
+            .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
         StepLogger.stepId(2);

@@ -19,25 +19,25 @@ export class ResourceAvailablePageHelper {
         await this.selectDepartment();
 
         await CommonPageHelper.clickApplyButton();
-         }
+    }
 
     static async selectPeriodStartDate(optionValue: Number) {
-        await  PageHelper.click(ResourceAvailablePage.periodStartOption);
+        await PageHelper.click(ResourceAvailablePage.periodStartOption);
         StepLogger.step('Select Period start Date ');
 
         await DropDownHelper.selectOptionByVal(
-            ResourceAvailablePage.periodStartOption , optionValue.toString());
+            ResourceAvailablePage.periodStartOption, optionValue.toString());
 
-        await  CommonPageHelper.waitForApplyButtontoDisplayed();
+        await CommonPageHelper.waitForApplyButtontoDisplayed();
     }
 
     static async selectLastValuePeriodEndDate() {
         StepLogger.step('Select Period End Date ');
-        await  PageHelper.click(ResourceAvailablePage.periodEndOption);
+        await PageHelper.click(ResourceAvailablePage.periodEndOption);
 
         await PageHelper.click(ResourceAvailablePage.periodEndOptionValue);
 
-        await  CommonPageHelper.waitForApplyButtontoDisplayed();
+        await CommonPageHelper.waitForApplyButtontoDisplayed();
     }
 
     static async selectDepartment() {
@@ -47,7 +47,7 @@ export class ResourceAvailablePageHelper {
         await DropDownHelper.selectOptionByVal
         (ResourceAvailablePage.department, ResourceAvailablePageConstants.departmentValue);
 
-        await  CommonPageHelper.waitForApplyButtontoDisplayed();
+        await CommonPageHelper.waitForApplyButtontoDisplayed();
     }
 
 }

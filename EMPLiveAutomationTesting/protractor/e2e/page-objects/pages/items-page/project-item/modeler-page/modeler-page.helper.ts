@@ -103,7 +103,7 @@ export class ModelerPageHelper {
             ModelerPageConstants.defaultSelectedOption,
         );
         let i: number;
-        for (i = 0; i < 4 ; i++) {
+        for (i = 0; i < 4; i++) {
             await ExpectationHelper.verifyText(
                 ModelerPage.getSelectVersionOptionText(i + 1),
                 ModelerPageConstants.selectVersionsOptionsText,

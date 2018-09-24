@@ -167,7 +167,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const requestor = input.requestorValue;
         const startDate = input.startDate;
         const finishDate = input.finishDate;
-        await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate, );
+        await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate,);
 
         await PageHelper.switchToDefaultContent();
 

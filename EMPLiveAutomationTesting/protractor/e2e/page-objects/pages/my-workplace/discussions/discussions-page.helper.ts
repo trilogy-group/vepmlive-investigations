@@ -39,7 +39,6 @@ export class DiscussionsPageHelper {
             MyWorkplacePage.navigation.discussions,
             CommonPage.pageHeaders.myWorkplace.discussions,
             CommonPageConstants.pageHeaders.myWorkplace.discussions,
-
         );
         StepLogger.stepId(1);
         StepLogger.step('Click on "+ new discussion" link displayed on top of "Discussions" page');

@@ -83,7 +83,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.verification('Version column displays value "0.2" [A new version should be created ' +
             'successfully of the already existing document]');
-        await expect(await CommonPageHelper.getVersionNumberByRowText(newFile.file, CommonPageConstants.versionComment.second ).getText())
+        await expect(await CommonPageHelper.getVersionNumberByRowText(newFile.file, CommonPageConstants.versionComment.second).getText())
             .toBe(CommonPageConstants.versionComment.second, ValidationsHelper.getDisplayedValidation
             (CommonPageConstants.versionComment.second));
 

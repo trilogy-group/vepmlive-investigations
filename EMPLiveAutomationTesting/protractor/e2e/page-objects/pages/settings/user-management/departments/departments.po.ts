@@ -14,7 +14,7 @@ export class DepartmentsPage extends BasePage {
         const addNewItemLabels = DepartmentsPageConstants.addNewItemOptions;
         const managerTable = 'table[id*="Managers"]';
         const executiveTable = 'table[id*="Executives"]';
-        return{
+        return {
             title: CommonPageHelper.getElementByTitle(addNewItemLabels.title),
             titlePlaceholder: element(By.css('div#WPQ2ClientFormPlaceholder>input:first-child')),
             parentDepartmentDropdown: CommonPageHelper.getElementByTitle(addNewItemLabels.parentDepartment),

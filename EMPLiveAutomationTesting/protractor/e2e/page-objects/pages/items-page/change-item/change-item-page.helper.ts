@@ -91,7 +91,7 @@ export class ChangeItemPageHelper {
         //  await CommonPageHelper.windowShouldNotBeDisplayedValidation(ChangeItemPageConstants.pageName);
 
         StepLogger.verification('Notification about New Changes created [Ex: New Change Item 1]' +
-                ' displayed on the Home Page');
+            ' displayed on the Home Page');
         await CommonPageHelper.notificationDisplayedValidation
         (CommonPageHelper.getNotificationByText(titleValue), ChangeItemPageConstants.pageName);
 

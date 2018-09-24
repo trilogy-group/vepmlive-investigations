@@ -206,7 +206,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     it('Validate Edit Cost Functionality in Cost Planner - [743932]', async () => {
         StepLogger.caseId = 743932;
-        const cost =  4;
+        const cost = 4;
         const uniqueId = PageHelper.getUniqueId();
 
         StepLogger.preCondition('Creating New Project');

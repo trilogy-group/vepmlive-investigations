@@ -44,6 +44,6 @@ export class SocialStreamPageHelper {
         await PageHelper.switchToDefaultContent();
 
         StepLogger.verification('Newly created Project displayed in "Project" page');
-        await CommonPageHelper.labelDisplayedValidation(ElementHelper.getElementByText(projectNameValue), projectNameValue );
+        await CommonPageHelper.labelDisplayedValidation(ElementHelper.getElementByText(projectNameValue), projectNameValue);
     }
 }

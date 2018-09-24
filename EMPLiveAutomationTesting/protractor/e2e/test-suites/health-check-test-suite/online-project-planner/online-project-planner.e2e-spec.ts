@@ -30,7 +30,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         // Step #1 Inside this function
         const uniqueId = PageHelper.getUniqueId();
 
-        let projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, );
+        let projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId,);
 
         projectNameValue = await ProjectItemPageHelper.editProjectAndValidateIt(projectNameValue);
 
@@ -43,7 +43,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         const uniqueId = PageHelper.getUniqueId();
 
         StepLogger.preCondition('Creating New Project');
-        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, );
+        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId,);
 
         StepLogger.stepId(1);
 

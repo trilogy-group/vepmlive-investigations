@@ -63,7 +63,7 @@ export class OptimizerPageConstants {
     }
 
     static get optimizerConfiguration() {
-        return{
+        return {
             heading: 'Optimizer Configuration',
             enterValueLabel: '1) Which field will be totaled and used to compare to the manually entered value?',
             titleComparisonLabel: '2) Enter a title for the comparison field.',
@@ -85,7 +85,7 @@ export class OptimizerPageConstants {
     }
 
     static get optimizerStrategyActions() {
-        return{
+        return {
             saveStrategy: 'idptSaveScen',
             renameStrategy: 'idrenamestrat',
             deleteStrategy: 'idptDelScen',
@@ -96,7 +96,7 @@ export class OptimizerPageConstants {
     }
 
     static get optimierSaveStrategyPopup() {
-        return{
+        return {
             strategyName: 'idSaveStratName',
             personalStrategyCheckBox: 'idStratPer',
             ok: 'OK',
@@ -105,7 +105,7 @@ export class OptimizerPageConstants {
     }
 
     static get deleteStrategyPopup() {
-        return{
+        return {
             message: 'Are you sure you want to delete this Strategy?',
             ok: 'OK',
             cancel: 'Cancel'
@@ -113,9 +113,9 @@ export class OptimizerPageConstants {
     }
 
     static get optimizerRibbon() {
-        return{
+        return {
             collapseView: 'idOptimizerTabDiv_ulCollapsed',
-                expandView: 'idOptimizerTabDiv_ul',
+            expandView: 'idOptimizerTabDiv_ul',
         };
     }
 
@@ -130,7 +130,7 @@ export class OptimizerPageConstants {
     }
 
     static get renameStrategyPopup() {
-        return{
+        return {
             strategyName: 'idRenameStrat',
             ok: 'OK',
             cancel: 'Cancel'

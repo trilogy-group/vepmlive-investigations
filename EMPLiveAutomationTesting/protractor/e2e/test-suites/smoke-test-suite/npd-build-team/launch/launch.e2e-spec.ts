@@ -100,9 +100,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.step('Select Projects -> Projects from the options displayed');
         // Step #1 and #2 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
-                HomePage.navigation.projects.projects,
-                CommonPage.pageHeaders.projects.projectsCenter,
-                CommonPageConstants.pageHeaders.projects.projectCenter,
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
         );
         StepLogger.stepId(3);
         StepLogger.step('Mouse over on any Project created as per pre requisites');
@@ -118,7 +118,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
-        .toBe(CommonPageConstants.ribbonLabels.editTeam,
+            .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         StepLogger.step('Switch to content frame');
@@ -128,7 +128,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('"Build Team" tab is selected by default');
         await expect(await PageHelper.isElementDisplayed(CommonPage.ribbonItems.close))
             .toBe(true,
-                    ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.ribbonLabels.close));
+                ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.ribbonLabels.close));
 
         StepLogger.verification('"Current Team" Section is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.currentTeam));
@@ -136,7 +136,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('"Resource Pool" Section is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.resourcePool))
             .toBe(true,
-                    ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.resourcePool));
+                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.resourcePool));
 
         StepLogger.stepId(4);
         StepLogger.step('Click "Close" button in "Edit Team" window');
@@ -148,18 +148,18 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('"Edit Team" window is closed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
             .toBe(false,
-                    ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         StepLogger.verification('"Project Center" page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
             .toBe(true,
-                    ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
         StepLogger.verification('All previously created Projects are displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.record))
             .toBe(true,
-                    ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
-        });
+                ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
+    });
 
     it('Navigate to Edit Costs page - [966345]', async () => {
         StepLogger.caseId = 966345;

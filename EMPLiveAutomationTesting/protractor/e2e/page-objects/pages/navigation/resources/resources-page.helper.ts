@@ -103,7 +103,6 @@ export class ResourcesPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             ResourcesPage.newInviteLink,
             ResourcesPageConstants.pagePrefix,
-
         );
     }
 
@@ -111,7 +110,6 @@ export class ResourcesPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             ResourcesPage.inputs.generic,
             ResourcesPageConstants.createUserPage,
-
         );
     }
 
@@ -158,7 +156,6 @@ export class ResourcesPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             ResourcesPage.getUserByDisplayName(displayName),
             displayName,
-
         );
     }
 
@@ -173,7 +170,6 @@ export class ResourcesPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             ResourcesPage.gridDetails.ellipses.get(1),
             CommonPageConstants.ellipsisLabel,
-
         );
     }
 
@@ -186,7 +182,6 @@ export class ResourcesPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(
             ResourcesPage.ellipsesDropdownForItem.editItem,
             ResourcesPageConstants.ellipsesDropdownLabel,
-
         );
     }
 

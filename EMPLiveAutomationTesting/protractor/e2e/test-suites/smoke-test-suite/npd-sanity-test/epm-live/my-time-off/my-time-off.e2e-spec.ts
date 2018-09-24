@@ -70,7 +70,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('Newly created TimeOff [Ex: Title 1] displayed in "My TimeOff" page');
         await CommonPageHelper.searchItemByTitle(title, MyTimeOffPageConstants.columnNames.title, true);
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(title)))
-                .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
 
     it('View Time Off - [785496]', async () => {

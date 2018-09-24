@@ -19,7 +19,7 @@ export class ResourceCommitmentsHelper {
         await CommonPageHelper.fieldDisplayedValidation
         (ResourceCommitments.specifyParameterValues, ResourceCommitmentsConstansts.specifyParameterValues);
 
-        await  PageHelper.click(CommonPage.getDropDownByParameterName(ResourceCommitmentsConstansts.resource, 1));
+        await PageHelper.click(CommonPage.getDropDownByParameterName(ResourceCommitmentsConstansts.resource, 1));
 
         await this.selectResource();
 
@@ -27,7 +27,7 @@ export class ResourceCommitmentsHelper {
     }
 
     static async selectResource() {
-        await  PageHelper.click(ResourceCommitments.getDropDownByParameterName);
+        await PageHelper.click(ResourceCommitments.getDropDownByParameterName);
         StepLogger.step('Select Resource ');
 
         await DropDownHelper.selectOptionByVal
