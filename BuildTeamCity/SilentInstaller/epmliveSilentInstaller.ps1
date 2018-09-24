@@ -117,7 +117,7 @@ foreach ($component in $config.Components)
 
 		if (![string]::IsNullOrEmpty($component.registerCOMplus))
 		{
-			Register-COMPlus (Join-Path $destination $file) $component.registerCOMplus.ID $component.registerCOMplus.Name $comUserName $inPassword
+			##Register-COMPlus (Join-Path $destination $file) $component.registerCOMplus.ID $component.registerCOMplus.Name $comUserName $inPassword
 		}
 		
 		

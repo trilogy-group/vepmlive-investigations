@@ -39,6 +39,24 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>EPMLiveLists.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -218,9 +236,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\06_PE_DATA.txt" />
-    <Content Include="VBBinaries\WE_DBASvr.dll" />
-    <Content Include="VBBinaries\WE_PDSExt.dll" />
-    <Content Include="VBBinaries\WE_RSVP.dll" />
     <None Include="Service References\ND\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
@@ -275,20 +290,17 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_RSVP.dll"
-regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_PDSExt.dll"
-regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_DBASvr.dll"
-regsvr32 /s "$(ProjectDir)\VBBinaries\WE_RSVP.dll"
-regsvr32 /s "$(ProjectDir)\VBBinaries\WE_PDSExt.dll"
-regsvr32 /s "$(ProjectDir)\VBBinaries\WE_DBASvr.dll"
+    <PreBuildEvent>regsvr32 /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_RSVP.dll"
+regsvr32 /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_PDSExt.dll"
+regsvr32 /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_DBASvr.dll"
+regsvr32 /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_RSVP.dll"
+regsvr32 /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_PDSExt.dll"
+regsvr32 /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_DBASvr.dll"
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_RSVP.dll"
-regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_PDSExt.dll"
-regsvr32 /u /s "$(ProjectDir)\VBBinaries\WE_DBASvr.dll"
-
-</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
