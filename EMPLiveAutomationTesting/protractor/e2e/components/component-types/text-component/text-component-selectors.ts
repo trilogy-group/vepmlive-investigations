@@ -2,21 +2,21 @@ import {TextBoxComponentSelectorsFactory} from '@aurea/protractor-automation-hel
 import {ModelComponentSelectors} from '../modal-component/model-component-selectors';
 import {HtmlHelper} from '../../misc-utils/html-helper';
 import {ComponentHelpers} from '../../devfactory/component-helpers/component-helpers';
-import {element, By} from 'protractor';
+import {By, element} from 'protractor';
 
 export class TextComponentSelectors extends TextBoxComponentSelectorsFactory {
     public static getDivForTextXpath(
         text: string,
         isContains = false,
         insidePopup = false
-      ) {
+    ) {
         return `${ModelComponentSelectors.getModelPopupXpath(insidePopup)}` +
             `${ComponentHelpers.getElementByTagXpath(
                 HtmlHelper.tags.div,
                 text,
                 isContains,
             )}`;
-      }
+    }
 
     public static getListForClassXpath(
         classValue: string,
@@ -50,7 +50,7 @@ export class TextComponentSelectors extends TextBoxComponentSelectorsFactory {
 
     static getItemByText(text: string, isContains = false, tag = '*') {
         const xpath = `//${tag}[${ComponentHelpers.getXPathFunctionForText(
-          text, isContains)}]`;
+            text, isContains)}]`;
         return element(By.xpath(xpath));
     }
 
