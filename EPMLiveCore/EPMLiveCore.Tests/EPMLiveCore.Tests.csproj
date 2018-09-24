@@ -183,6 +183,7 @@
     <Compile Include="Infrastructure\BaseClasses\SPListItemManagerTests.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
     <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
+    <Compile Include="Jobs\NotificationsTests.cs" />
     <Compile Include="Jobs\ResourceImportJobTests.cs" />
     <Compile Include="Jobs\ResourcePlanTest.cs" />
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
