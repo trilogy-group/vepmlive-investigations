@@ -149,6 +149,7 @@
     <Compile Include="API\CreateWorkspace\WorkspaceFactoryTests.cs" />
     <Compile Include="API\Integration\IntegrationAdminTests.cs" />
     <Compile Include="API\Integration\IntegrationCoreTest.cs" />
+    <Compile Include="API\Integration\SqlIntegrationTest.cs" />
     <Compile Include="API\MyWork\MyWorkTests.cs" />
     <Compile Include="API\MyWork\MyWorkTestsSplitOne.cs" />
     <Compile Include="API\MyWork\MyWorkTestsSplitThree.cs" />
