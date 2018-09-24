@@ -181,12 +181,16 @@ namespace EPMLiveCore.Tests.API.Applications
                 new ShimSPFeatureDefinition
                 {
                     IdGet = () => new Guid(Feature1Guid),
-                    CompatibilityLevelGet = () => 14
+                    DisplayNameGet = () => DummyString,
+                    CompatibilityLevelGet = () => 14,
+                    ScopeGet = () => SPFeatureScope.Site
                 },
                 new ShimSPFeatureDefinition
                 {
                     IdGet = () => new Guid(Feature2Guid),
-                    CompatibilityLevelGet = () => 15
+                    DisplayNameGet = () => DummyString,
+                    CompatibilityLevelGet = () => 15,
+                    ScopeGet = () => SPFeatureScope.Site
                 }
             });
             ShimSPSite.AllInstances.Dispose = _ => { };
@@ -200,12 +204,16 @@ namespace EPMLiveCore.Tests.API.Applications
                     new ShimSPFeatureDefinition
                     {
                         IdGet = () => new Guid(Feature3Guid),
-                        CompatibilityLevelGet = () => 14
+                        DisplayNameGet = () => DummyString,
+                        CompatibilityLevelGet = () => 14,
+                        ScopeGet = () => SPFeatureScope.Farm
                     },
                     new ShimSPFeatureDefinition
                     {
                         IdGet = () => new Guid(Feature4Guid),
-                        CompatibilityLevelGet = () => 15
+                        DisplayNameGet = () => DummyString,
+                        CompatibilityLevelGet = () => 15,
+                        ScopeGet = () => SPFeatureScope.Farm
                     }
                 })
             };
@@ -250,6 +258,11 @@ namespace EPMLiveCore.Tests.API.Applications
                         <Feature ID='{Feature3Guid}' Name='{DummyString}' NoDelete='false'></Feature>
                         <Feature ID='{Feature4Guid}' Name='{DummyString}' NoDelete='false'></Feature>
                     </Features>
+                    <Web>
+                        <Properties>
+                            <Property Name='{DummyString}' Value='{DummyString}' Append='true' Overwrite='true' LockWebProperty='true'></Property>
+                        </Properties>
+                    </Web>
                 </Root>";
 
             var xmlDocument = new XmlDocument();
