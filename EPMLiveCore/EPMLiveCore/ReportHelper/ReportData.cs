@@ -1305,10 +1305,12 @@ namespace EPMLiveCore.ReportHelper
             return (bool)_DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
         }
 
-        public void Dispose()
-        {
-            _DAO.Dispose();
-        }
+		public void Dispose()
+		{
+			_DAO.Dispose();
+			if (_cmdWithParams != null)
+				_cmdWithParams.Dispose();
+		}
 
         public bool BulkInsert(DataSet dsLists, Guid timerjobguid)
         {

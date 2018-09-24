@@ -218,8 +218,6 @@ foreach($projectToBePackaged in $projectsToBePackaged){
    & $MSBuildExec $projectPath `
    /t:Package `
    /p:OutputPath="$BinariesDirectory" `
-   /p:PreBuildEvent= `
-   /p:PostBuildEvent= `
    /p:WarningLevel=0 `
    /p:Configuration="$ConfigurationToBuild" `
    /p:Platform="$PlatformToBuild" `
@@ -247,8 +245,6 @@ foreach($projectToBeBuildAsEXE in $projectsToBeBuildAsEXE){
    & $MSBuildExec $projectPath `
    /t:build `
    /p:OutputPath="$BinariesDirectory" `
-   /p:PreBuildEvent= `
-   /p:PostBuildEvent= `
    /p:Configuration="$ConfigurationToBuild" `
    /p:Platform="x64" `
     /p:langversion="$langversion" `
@@ -275,8 +271,6 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
    & $MSBuildExec $projectPath `
    /t:build `
    /p:OutputPath="$BinariesDirectory" `
-   /p:PreBuildEvent= `
-   /p:PostBuildEvent= `
    /p:Configuration="$ConfigurationToBuild" `
    /p:Platform="$PlatformToBuild" `
    /p:langversion="$langversion" `

@@ -222,6 +222,7 @@
     <Compile Include="BtnCommonActions.cs" />
     <Compile Include="BtnCreateNew.cs" />
     <Compile Include="CascadingLookupFieldValueCollection.cs" />
+    <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControl.CreateChildControls.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControl.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingMultiLookupRenderControl.cs" />
     <Compile Include="CascadingLookup\CascadingLookup.Field.cs" />
@@ -4403,8 +4404,8 @@
   <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
   <ProjectExtensions />
   <PropertyGroup>
-    <PreBuildEvent>del "$(TargetDir)$(TargetName).XmlSerializers.dll"
-del "$(ProjectDir)$(TargetName).XmlSerializers.dll"</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
 </Project>

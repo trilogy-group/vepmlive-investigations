@@ -62,13 +62,6 @@ namespace EPMLiveWebParts.Tests
             
         }
 
-        private ShimSPViewFieldCollection GetSPViewFieldCollectionShim()
-        {
-            var result = new ShimSPViewFieldCollection();
-            result.Bind(new[] { "test-field-1", "test-field-2" });
-            return result;
-        }
-
         [TestMethod]
         public void RenderGantt_GivenArguments_SetBigHeight_ConfirmOutput()
         {
