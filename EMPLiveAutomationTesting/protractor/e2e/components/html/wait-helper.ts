@@ -7,6 +7,7 @@ export class WaitHelper {
     static async staticWait(ms: number) {
         await browser.sleep(ms);
     }
+
     /**
      * Default timeout for promises
      * @type {number}

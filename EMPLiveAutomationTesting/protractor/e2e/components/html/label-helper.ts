@@ -9,7 +9,7 @@ export class LabelHelper {
         return element.all(By.xpath(TextComponentSelectors.getDivForTextXpath(text, textIsContains, insidePopup)));
     }
 
-    static getDivByText (text: string) {
+    static getDivByText(text: string) {
         return this.getAllDivForText(text, false).first();
     }
 
@@ -24,7 +24,7 @@ export class LabelHelper {
         return element.all(By.xpath(TextComponentSelectors.getListForClassXpath(classValue, textIsContains, insidePopup)));
     }
 
-    static getListByClass (classValue: string) {
+    static getListByClass(classValue: string) {
         return this.getAllListsForClass(classValue, false).first();
     }
 
@@ -39,7 +39,7 @@ export class LabelHelper {
         return element.all(By.xpath(TextComponentSelectors.getSpanForTextXpath(classValue, textIsContains, insidePopup)));
     }
 
-    static getSpanByText (classValue: string) {
+    static getSpanByText(classValue: string) {
         return this.getAllSpansForText(classValue, false).first();
     }
 
