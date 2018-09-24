@@ -76,10 +76,14 @@ iisreset</PostDeploymentCommand>
     <TokenReplacementFileExtensions>ashx</TokenReplacementFileExtensions>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.SharePoint.Security, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.SharePoint.Security, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Security.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.Web.CommandUI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -97,10 +101,8 @@ iisreset</PostDeploymentCommand>
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.SharePoint.Client.ServerRuntime, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint" />
+    <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\CommonAssemblyInfo.cs">
@@ -290,7 +292,6 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\CustomFieldForm.aspx.designer.cs">
       <DependentUpon>CustomFieldForm.aspx.cs</DependentUpon>
     </Compile>
-    <Compile Include="Layouts\ppm\CustomFieldHelper.cs" />
     <Compile Include="Layouts\ppm\Customfields.ashx.cs">
       <DependentUpon>Customfields.ashx</DependentUpon>
     </Compile>
@@ -391,7 +392,6 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\EditList.aspx.designer.cs">
       <DependentUpon>EditList.aspx.cs</DependentUpon>
     </Compile>
-    <Compile Include="Layouts\ppm\EPKClass01.cs" />
     <Compile Include="Layouts\ppm\EPKCSRequest.ashx.cs">
       <DependentUpon>EPKCSRequest.ashx</DependentUpon>
     </Compile>
@@ -793,7 +793,6 @@ iisreset</PostDeploymentCommand>
       <DependentUpon>workitems.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\XEPKadmin1.cs" />
-    <Compile Include="Layouts\ppm\XmlHelper.cs" />
     <Compile Include="ListDisplayUtils.cs" />
     <Compile Include="MyTasks\MyTasks.cs" />
     <Compile Include="PersonalPlanner\PersonalPlanner.cs" />
@@ -810,13 +809,9 @@ iisreset</PostDeploymentCommand>
     <Compile Include="SPFields\PFEResourcePermissionsField.cs" />
     <Compile Include="SPFields\PFEResourcePermissionsFieldControl.cs" />
     <Compile Include="WebAdminFunctions.cs" />
-    <Compile Include="WebServices\ADataCacheGridBase.cs" />
     <Compile Include="WebServices\CADataCache.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="WebServices\CADataCache\CABottomGrid.cs" />
-    <Compile Include="WebServices\CADataCache\CADataCacheGridBase.cs" />
-    <Compile Include="WebServices\CADataCache\CATopGrid.cs" />
     <Compile Include="WebServices\CAGrids.cs" />
     <Compile Include="WebServices\ClientPrioritization.asmx.cs">
       <DependentUpon>ClientPrioritization.asmx</DependentUpon>
@@ -834,7 +829,6 @@ iisreset</PostDeploymentCommand>
       <DependentUpon>CostAnalyzer.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="WebServices\DataCacheBase.cs" />
     <Compile Include="WebServices\EditCalendar.asmx.cs">
       <DependentUpon>EditCalendar.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -843,7 +837,6 @@ iisreset</PostDeploymentCommand>
       <DependentUpon>EditCosts.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="WebServices\GridRenderingTypes.cs" />
     <Compile Include="WebServices\Integration.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -852,46 +845,7 @@ iisreset</PostDeploymentCommand>
       <DependentUpon>Model.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="WebServices\ModelDataCache\BarMoved.cs" />
-    <Compile Include="WebServices\ModelDataCache\BottomGrid.cs" />
-    <Compile Include="WebServices\ModelDataCache\CatItemData.cs" />
-    <Compile Include="WebServices\ModelDataCache\CSCategoryEntry.cs" />
-    <Compile Include="WebServices\ModelDataCache\CSNamedRate.cs" />
-    <Compile Include="WebServices\ModelDataCache\CSRatesAndCategory.cs" />
-    <Compile Include="WebServices\ModelDataCache\CSTargetData.cs" />
-    <Compile Include="WebServices\ModelDataCache\CustomFieldData.cs" />
-    <Compile Include="WebServices\ModelDataCache\CustomFieldDbTable.cs" />
-    <Compile Include="WebServices\ModelDataCache\CustomFieldsDefn.cs" />
-    <Compile Include="WebServices\ModelDataCache\DataItem.cs" />
-    <Compile Include="WebServices\DetailRowData.cs" />
-    <Compile Include="WebServices\ModelDataCache\FieldIDs.cs" />
-    <Compile Include="WebServices\ModelDataCache\FilterGridCostsLayout.cs" />
-    <Compile Include="WebServices\ModelDataCache\FilterGridCostsData.cs" />
-    <Compile Include="WebServices\GridBase.cs" />
-    <Compile Include="WebServices\ModelDataCache\ItemDefn.cs" />
-    <Compile Include="WebServices\ModelDataCache\ListItemData.cs" />
-    <Compile Include="WebServices\ModelDataCache\ModelBarsChanged.cs" />
-    <Compile Include="WebServices\ModelDataCache\ModelCache.cs" />
-    <Compile Include="WebServices\ModelDataCache\ModelDataCacheGridBase.cs" />
-    <Compile Include="WebServices\ModelDataCache\ModelErrorHandling.cs" />
-    <Compile Include="WebServices\PeriodData.cs" />
-    <Compile Include="WebServices\ModelDataCache\PeriodsAndOptions.cs" />
-    <Compile Include="WebServices\ModelDataCache\PIData.cs" />
-    <Compile Include="WebServices\ModelDataCache\PortFieldData.cs" />
-    <Compile Include="WebServices\ModelDataCache\RateFteCache.cs" />
-    <Compile Include="WebServices\ModelDataCache\RateTable.cs" />
-    <Compile Include="WebServices\ModelDataCache\SecItemData.cs" />
-    <Compile Include="WebServices\ModelDataCache\SortFieldDefn.cs" />
-    <Compile Include="WebServices\ModelDataCache\SortGroupDefn.cs" />
-    <Compile Include="WebServices\ModelDataCache\SortRowDefn.cs" />
-    <Compile Include="WebServices\ModelDataCache\TargetColours.cs" />
-    <Compile Include="WebServices\ModelDataCache\TargetGridLayout.cs" />
-    <Compile Include="WebServices\ModelDataCache\TargetGridsData.cs" />
-    <Compile Include="WebServices\ModelDataCache\TargetLegendGridData.cs" />
-    <Compile Include="WebServices\ModelDataCache\TargetLegendGridLayout.cs" />
-    <Compile Include="WebServices\RPADataCache\RPABottomGrid.cs" />
-    <Compile Include="WebServices\TargetRowData.cs" />
-    <Compile Include="WebServices\ModelDataCache\TopGrid.cs" />
+    <Compile Include="WebServices\ModelCache.cs" />
     <Compile Include="WebServices\OptGrids.cs" />
     <Compile Include="WebServices\Optimizer.asmx.cs">
       <DependentUpon>Optimizer.asmx</DependentUpon>
@@ -908,8 +862,6 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="WebServices\Response.cs" />
     <Compile Include="WebServices\RPADataCache.cs" />
-    <Compile Include="WebServices\RPADataCache\RPADataCacheGridBase.cs" />
-    <Compile Include="WebServices\RPADataCache\RPATopGrid.cs" />
     <Compile Include="WebServices\RPAGrids.cs" />
     <Compile Include="WebServices\RPEditor.asmx.cs">
       <DependentUpon>RPEditor.asmx</DependentUpon>
