@@ -9,7 +9,9 @@
     <Add FullName="EPMLiveCore.AppSettingsHelper!"/>
     <Add FullName="EPMLiveCore.EditableFieldDisplay!"/>
     <Add FullName="EPMLiveCore.ActLicensing.Licensing!"/>
+    <Add FullName="EPMLiveCore.JSONUtil"/>
     <Add FullName="EPMLiveCore.UserLevels"/>
+    <Add FullName="EPMLiveCore.ListDisplayUtils!"/>
     <Add FullName="EPMLiveCore.ReportingProxy.QueryExecutor!"/>
     <Add FullName="EPMLiveCore.CoreFunctions!"/>
     <Add FullName="EPMLiveCore.Infrastructure.Logging.LoggingService!"/>
@@ -24,6 +26,7 @@
     <Add FullName="EPMLiveCore.API.APITeam!"/>
     <Add FullName="EPMLiveCore.Utilities!"/>
     <Add FullName="EPMLiveCore.Jobs.ResourceImportJob!"/>
+    <Add FullName="EPMLiveCore.Jobs.ResourceImportResult!"/>
     <Add FullName="EPMLiveCore.API.ResourceImporter!"/>
     <Add FullName="EPMLiveCore.API.ListCommands!"/>
     <Add FullName="EPMLiveCore.GridGanttSettings!"/>
@@ -50,6 +53,7 @@
     <Add FullName="EPMLiveCore.API.NavigationService!"/>
     <Add FullName="EPMLiveCore.Controls.Navigation.Providers.ApplicationsLinkProvider!"/>
     <Add FullName="EPMLiveCore.Controls.Navigation.Providers.GenericLinkProvider!"/>
+    <Add FullName="EPMLiveCore.Controls.Navigation.EPMLiveQuickLaunchProvider!"/>
     <Add FullName="EPMLiveCore.Infrastructure.Navigation.NavLink!"/>
     <Add FullName="EPMLiveCore.Act!"/>
     <Add FullName="EPMLiveCore.API.PropertyHash!"/>
@@ -80,5 +84,6 @@
     <Add FullName="EPMLiveCore.DisabledItemEventScope!"/>
     <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.Step!"/>
     <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps.UpdateResourcePool!"/>
+    <Add FullName="EPMLiveCore.ReportingData!"/>
   </ShimGeneration>
 </Fakes>
