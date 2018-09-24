@@ -50,6 +50,7 @@ namespace EPMLiveCore.Tests.API.Applications
         private bool _listDeleted;
         private bool _configSettingSet;
         private bool _folderDeleted;
+        private bool _fileDeleted;
         private bool _solutionDeleted;
         private bool _listFileDeleted;
         private bool _fieldUpdated;
@@ -83,6 +84,7 @@ namespace EPMLiveCore.Tests.API.Applications
             _listDeleted = false;
             _configSettingSet = false;
             _folderDeleted = false;
+            _fileDeleted = false;
             _solutionDeleted = false;
             _listFileDeleted = false;
             _fieldUpdated = false;
@@ -132,7 +134,14 @@ namespace EPMLiveCore.Tests.API.Applications
                         case "TopNav":
                             return DummyInt;
                         case "InstalledFiles":
-                            return $"<Files><File Type='' FullFile='{DummyString}' Name='{DummyString}' /></Files>";
+                            return @"<Files>
+                                       <Folder Type='Folder' FullFile='Folder1/' Name='Folder1'></Folder>
+                                       <Folder Type='Folder' FullFile='Folder2' Name='Folder2'>
+                                           <File Type='File' FullFile='File1' Name='File1'></File>
+                                       </Folder>
+                                       <Folder Type='Folder' FullFile='Folder3/File' Name='Folder3'></Folder>
+                                       <Folder Type='Folder' FullFile='Folder4' Name='Folder4' NoDelete='true'></Folder>
+                                     </Files>";
                         default:
                             return DummyString;
                     }
@@ -194,7 +203,18 @@ namespace EPMLiveCore.Tests.API.Applications
                 {
                     GetByIDInt32 = _ => spUser
                 },
-                ListsGet = () => new ShimSPListCollection(),
+                ListsGet = () => new ShimSPListCollection
+                {
+                    TryGetListString = item =>
+                    {
+                        if (item == "File1")
+                        {
+                            return null;
+                        }
+
+                        return _list;
+                    }
+                },
                 FilesGet = () => new ShimSPFileCollection
                 {
                     DeleteString = _ => _webFileDeleted = true
@@ -248,9 +268,14 @@ namespace EPMLiveCore.Tests.API.Applications
                 FeaturesGet = () => new ShimSPFeatureCollection
                 {
                     RemoveGuid = _ => _webFeatureRemoved = true
+                },
+                GetFileString = _ => new ShimSPFile
+                {
+                    ExistsGet = () => true,
+                    Delete = () => _fileDeleted = true
                 }
             };
-
+            
             _site = new ShimSPSite
             {
                 IDGet = () => Guid.NewGuid(),
@@ -359,6 +384,15 @@ namespace EPMLiveCore.Tests.API.Applications
             ShimGridGanttSettings.AllInstances.SaveSettingsSPList = (_, __) => _gridGanttSettingsSaved = true;
 
             ShimPath.GetDirectoryNameString = _ => DummyString;
+            ShimPath.GetExtensionString = fileName =>
+            {
+                if (fileName == "Folder1")
+                {
+                    return DummyString;
+                }
+
+                return string.Empty;
+            };
         }
 
         private XmlDocument CreateXmlDocument(string solutions)
@@ -432,16 +466,17 @@ namespace EPMLiveCore.Tests.API.Applications
         }
 
         [TestMethod]
-        public void UninstallApp_FirstSituation_ConfirmResult()
+        public void UninstallApp_Situation1_ConfirmResult()
         {
             // Arrange
             var guid = Guid.NewGuid().ToString();
-            SetupForUnninstallApp(_list, guid, true, true, string.Empty, false);
+            SetupForUnninstallApp(guid, true, true, false);
 
             // Act
             _testObj.UninstallApp(false, _web.Instance);
 
             // Assert
+            var messages = _testObj.XmlMessages.OuterXml;
             this.ShouldSatisfyAllConditions(
                 () => _webFileDeleted.ShouldBeTrue(),
                 () => _listItemUpdated.ShouldBeTrue(),
@@ -462,20 +497,42 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _listDeleted.ShouldBeTrue(),
                 () => _configSettingSet.ShouldBeTrue(),
                 () => _solutionDeleted.ShouldBeFalse(),
-                () => _listFileDeleted.ShouldBeFalse());
-            //() => _folderDeleted.ShouldBeTrue());
+                () => _listFileDeleted.ShouldBeFalse(),
+                () => _folderDeleted.ShouldBeTrue(),
+                () => _fileDeleted.ShouldBeTrue(),
+                () => messages.ShouldContain("Application is installed somewhere else and will remove from this site only."),
+                () => messages.ShouldContain("Permissions Check"),
+                () => messages.ShouldContain("Removing App from Communities"),
+                () => messages.ShouldContain("Deleting Community"),
+                () => messages.ShouldContain("Uninstalling Navigation"),
+                () => messages.ShouldContain("Checking QuickLaunch"),
+                () => messages.ShouldContain("Checking Top Navigation"),
+                () => messages.ShouldContain("Uninstalling Lists"),
+                () => messages.ShouldContain("Uninstalling Fields"),
+                () => messages.ShouldContain("Uninstalling Lookups"),
+                () => messages.ShouldContain("Uninstalling Views"),
+                () => messages.ShouldContain("Uninstalling Workflows"),
+                () => messages.ShouldContain("Uninstalling Event Handlers"),
+                () => messages.ShouldContain("Uninstalling Items"),
+                () => messages.ShouldContain("Remove (DummyString) From Reporting Database"),
+                () => messages.ShouldContain("Uninstalling Features"),
+                () => messages.ShouldContain("Application currently installed on another site"),
+                () => messages.ShouldContain("Uninstalling Properties"),
+                () => messages.ShouldContain("Uninstalling Files"),
+                () => messages.ShouldContain("Folder is a list"));
         }
 
         [TestMethod]
-        public void UninstallApp_SecondSituation_ConfirmResult()
+        public void UninstallApp_Situation2_ConfirmResult()
         {
             // Arrange
-            SetupForUnninstallApp(_list, WebId, false, true, string.Empty, true);
+            SetupForUnninstallApp(WebId, false, true, true);
 
             // Act
             _testObj.UninstallApp(false, _web.Instance);
 
             // Assert
+            var messages = _testObj.XmlMessages.OuterXml;
             this.ShouldSatisfyAllConditions(
                 () => _webFileDeleted.ShouldBeTrue(),
                 () => _listItemUpdated.ShouldBeTrue(),
@@ -496,20 +553,22 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _listDeleted.ShouldBeTrue(),
                 () => _configSettingSet.ShouldBeTrue(),
                 () => _solutionDeleted.ShouldBeTrue(),
-                () => _listFileDeleted.ShouldBeTrue());
-            //() => _folderDeleted.ShouldBeTrue());
+                () => _listFileDeleted.ShouldBeTrue(),
+                () => _folderDeleted.ShouldBeTrue(),
+                () => _fileDeleted.ShouldBeTrue());
         }
 
         [TestMethod]
-        public void UninstallApp_ThirdSituation_ConfirmResult()
+        public void UninstallApp_Situation3_ConfirmResult()
         {
             // Arrange
-            SetupForUnninstallApp(_list, WebId, false, true, string.Empty, false);
+            SetupForUnninstallApp(WebId, false, true, false);
 
             // Act
             _testObj.UninstallApp(false, _web.Instance);
 
             // Assert
+            var messages = _testObj.XmlMessages.OuterXml;
             this.ShouldSatisfyAllConditions(
                 () => _webFileDeleted.ShouldBeTrue(),
                 () => _listItemUpdated.ShouldBeTrue(),
@@ -530,8 +589,9 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _listDeleted.ShouldBeTrue(),
                 () => _configSettingSet.ShouldBeTrue(),
                 () => _solutionDeleted.ShouldBeFalse(),
-                () => _listFileDeleted.ShouldBeFalse());
-            //() => _folderDeleted.ShouldBeTrue());
+                () => _listFileDeleted.ShouldBeFalse(),
+                () => _folderDeleted.ShouldBeTrue(),
+                () => _fileDeleted.ShouldBeTrue());
         }
 
         [TestMethod]
@@ -539,12 +599,13 @@ namespace EPMLiveCore.Tests.API.Applications
         {
             // Arrange
             var guid = Guid.NewGuid().ToString();
-            SetupForUnninstallApp(_list, guid, true, true, string.Empty, false);
+            SetupForUnninstallApp(guid, true, true, false);
 
             // Act
             _testObj.UninstallApp(true, _web.Instance);
 
             // Assert
+            var messages = _testObj.XmlMessages.OuterXml;
             this.ShouldSatisfyAllConditions(
                 () => _webFileDeleted.ShouldBeFalse(),
                 () => _listItemUpdated.ShouldBeTrue(),
@@ -565,20 +626,22 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _listDeleted.ShouldBeFalse(),
                 () => _configSettingSet.ShouldBeFalse(),
                 () => _solutionDeleted.ShouldBeFalse(),
-                () => _listFileDeleted.ShouldBeFalse());
-            //() => _folderDeleted.ShouldBeTrue());
+                () => _listFileDeleted.ShouldBeFalse(),
+                () => _folderDeleted.ShouldBeFalse(),
+                () => _fileDeleted.ShouldBeFalse());
         }
 
         [TestMethod]
         public void UninstallApp_Situation5_ConfirmResult()
         {
             // Arrange
-            SetupForUnninstallApp(_list, WebId, false, true, string.Empty, true);
+            SetupForUnninstallApp(WebId, false, true, true);
 
             // Act
             _testObj.UninstallApp(true, _web.Instance);
 
             // Assert
+            var messages = _testObj.XmlMessages.OuterXml;
             this.ShouldSatisfyAllConditions(
                 () => _webFileDeleted.ShouldBeFalse(),
                 () => _listItemUpdated.ShouldBeTrue(),
@@ -597,11 +660,49 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _listDeleted.ShouldBeFalse(),
                 () => _configSettingSet.ShouldBeFalse(),
                 () => _solutionDeleted.ShouldBeFalse(),
-                () => _listFileDeleted.ShouldBeFalse());
-            //() => _folderDeleted.ShouldBeTrue());
+                () => _listFileDeleted.ShouldBeFalse(),
+                () => _folderDeleted.ShouldBeFalse(),
+                () => _fileDeleted.ShouldBeFalse());
         }
 
-        private void SetupForUnninstallApp(SPList list, string webId, bool isRootWeb, bool userHavePermissions, string getExtension, bool hasSolutions)
+        [TestMethod]
+        public void UninstallApp_Situation6_ConfirmResult()
+        {
+            // Arrange
+            var guid = Guid.NewGuid().ToString();
+            SetupForUnninstallApp(guid, true, false, false);
+
+            // Act
+            _testObj.UninstallApp(false, _web.Instance);
+
+            // Assert
+            var messages = _testObj.XmlMessages.OuterXml;
+            this.ShouldSatisfyAllConditions(
+                () => _webFileDeleted.ShouldBeFalse(),
+                () => _listItemUpdated.ShouldBeFalse(),
+                () => _listItemDeleted.ShouldBeFalse(),
+                () => _listItemRecycled.ShouldBeFalse(),
+                () => _fieldUpdated.ShouldBeFalse(),
+                () => _fieldDeleted.ShouldBeFalse(),
+                () => _gridGanttSettingsSaved.ShouldBeFalse(),
+                () => _viewDeleted.ShouldBeFalse(),
+                () => _eventHandlerDeleted.ShouldBeFalse(),
+                () => _siteFeatureRemoved.ShouldBeFalse(),
+                () => _webFeatureRemoved.ShouldBeFalse(),
+                () => _appRemovedFromCommunity.ShouldBeFalse(),
+                () => _communityDeleted.ShouldBeFalse(),
+                () => _quickLaunchDeleted.ShouldBeFalse(),
+                () => _topNavigationBarDeleted.ShouldBeFalse(),
+                () => _listBizDeleted.ShouldBeFalse(),
+                () => _listDeleted.ShouldBeFalse(),
+                () => _configSettingSet.ShouldBeFalse(),
+                () => _solutionDeleted.ShouldBeFalse(),
+                () => _listFileDeleted.ShouldBeFalse(),
+                () => _folderDeleted.ShouldBeFalse(),
+                () => _fileDeleted.ShouldBeFalse());
+        }
+
+        private void SetupForUnninstallApp(string webId, bool isRootWeb, bool userHavePermissions, bool hasSolutions)
         {
             var solutionsXml = string.Empty;
 
@@ -611,14 +712,10 @@ namespace EPMLiveCore.Tests.API.Applications
                                   <ListTemplate FileName='{DummyString}'></ListTemplate>";
             }
 
-            ShimSPListCollection.AllInstances.TryGetListString = (_, __) => list;
-
             ShimSPWeb.AllInstances.GetSiteDataSPSiteDataQuery = (_, __) => CreateSiteDataTable(webId);
             ShimSPWeb.AllInstances.IsRootWebGet = _ => isRootWeb;
 
             ShimSPSecurableObject.AllInstances.DoesUserHavePermissionsSPBasePermissions = (_, __) => userHavePermissions;
-
-            ShimPath.GetExtensionString = _ => getExtension;
 
             ShimApplications.GetApplicationInfoFromListSPWebString = (_, __) => new ApplicationDef
             {
