@@ -93,6 +93,15 @@ namespace EPMLiveWebParts.Tests
             _outputBuilder = new StringBuilder();
             _outputWriterString = new StringWriter(_outputBuilder);
             _outputWriterHtml = new HtmlTextWriter(_outputWriterString);
+            ShimSPList.AllInstances.ViewsGet = _ => new ShimSPViewCollection().Bind(
+               new SPView[]
+               {
+                    new ShimSPView
+                    {
+                        ServerRelativeUrlGet = () => DummyUrl
+                    }
+               });
+            ShimHttpRequest.AllInstances.UrlGet = (_) => new Uri(DummyUrl);
         }
 
         private void SetUpDefaultValues()

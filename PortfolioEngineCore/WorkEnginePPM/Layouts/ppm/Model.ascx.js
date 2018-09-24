@@ -5587,7 +5587,7 @@
            var arows = grid.Rows;
 
 
-           for (i = 1; i <= grid.RowCount; i++) {
+           for (i = 0; i < grid.RowCount; i++) {
                var xr = arows[i];
 
                if (xr.Level >= dstl) {
