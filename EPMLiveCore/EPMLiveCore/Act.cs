@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.SharePoint;
 using System.Collections;
-using Microsoft.SharePoint.Administration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveCore
 {
@@ -25,6 +24,17 @@ namespace EPMLiveCore
 
     public class Act
     {
+        private const int AccessLicense = 0;
+        private const int OldPurchaseMethod = 1;
+        private const int Trial = 2;
+        private const int NewPurchaseMethod = 3;
+        private const int PurchasedLicense = 6;
+        private const string LevelColumn = "Level";
+        private const string SharepointSystemUser = "sharepoint\\system";
+        private const string EPMLiveAccountManagementAssembly = "EPMLiveAccountManagement, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+        private const string FeaturesColumn = "Features";
+        private const string UserCountColumn = "UserCount";
+        private const string QuantityColumn = "quantity";
         private SPWeb _web;
         private bool _bIsOnline = false;
         public string OwnerUsername = "";
@@ -104,147 +114,191 @@ namespace EPMLiveCore
             };
         }
 
-
-
         private int CheckOnlineFeatureLicense(ActFeature feature, string username, SPSite site)
         {
+            var assemblyInstance = Assembly.Load(EPMLiveAccountManagementAssembly);
+            var thisClass = assemblyInstance.GetType("EPMLiveAccountManagement.AccountManagement", true, true);
 
-            MethodInfo m;
+            var methodInfo = thisClass.GetMethod("GetActivationInfo");
+            var dsInfo = (DataSet)methodInfo.Invoke(
+                null, 
+                new object[]
+                {
+                    _web.Site.ID,
+                    CoreFunctions.GetRealUserName(username, site)
+                });
 
-            Assembly assemblyInstance = Assembly.Load("EPMLiveAccountManagement, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
-            Type thisClass = assemblyInstance.GetType("EPMLiveAccountManagement.AccountManagement", true, true);
+            if (dsInfo.Tables.Count == 0 || dsInfo.Tables[0].Rows.Count == 0 || dsInfo.Tables[0].Columns.Count == 0)
+            {
+                throw new InvalidOperationException("dsInfo.Tables[0].Rows[0][0] should not be null.");
+            }
 
-            m = thisClass.GetMethod("GetActivationInfo");
-            DataSet dsInfo = (DataSet)m.Invoke(null, new object[] { _web.Site.ID, CoreFunctions.GetRealUserName(username, site) });
+            int activationType;
+            if (!int.TryParse(dsInfo.Tables[0].Rows[0][0]?.ToString(), out activationType))
+            {
+                activationType = 0;
+            }
 
-            int ActivationType = 0;
+            switch (activationType)
+            {
+                case AccessLicense:
+                    return 7;
+                case OldPurchaseMethod:
+                    return CheckOldPurchaseMethod(feature, username, dsInfo);
+                case Trial:
+                    return HasAccess(username, dsInfo)
+                        ? AccessLicense
+                        : PurchasedLicense;
+                case NewPurchaseMethod:
+                    return CheckNewPurchaseMethod(feature, username, dsInfo);
+                default:
+                    Trace.WriteLine("Unexpected activationType: " + activationType);
+                    break;
+            }
 
+            return -1;
+        }
+
+        private int CheckNewPurchaseMethod(ActFeature feature, string username, DataSet dsInfo)
+        {
+            if (dsInfo.Tables.Count < 3)
+            {
+                throw new ArgumentException("dsInfo.Tables should have at least 3 tables.", nameof(dsInfo));
+            }
+            var hasPurchased = false;
+            var hasAccess = false;
+            var userLevel = 0;
+
+            foreach (DataRow dataRow in dsInfo.Tables[1].Rows)
+            {
+                var arrFeatures = new ArrayList(dataRow[FeaturesColumn]?.ToString().Split(','));
+                if (arrFeatures.Contains(((int)feature).ToString()))
+                {
+                    hasPurchased = true;
+                    if (SharepointSystemUser.Equals(username, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return AccessLicense;
+                    }
+                    break;
+                }
+            }
+
+            if (!int.TryParse(dsInfo.Tables[2].Rows[0][0].ToString(), out userLevel))
+            {
+                Trace.WriteLine("Unable to parse dsInfo.Tables[2].Rows[0][0]");
+            }
+
+            if (userLevel == 9999)
+            {
+                return AccessLicense;
+            }
+            else
+            {
+                var dataRows = dsInfo.Tables[1].Select($"ResLevel='{userLevel}'");
+                if (dataRows.Any())
+                {
+                    int usercount;
+                    int maxusers;
+                    if (!int.TryParse(dataRows[0][UserCountColumn]?.ToString(), out usercount))
+                    {
+                        usercount = 0;
+                    }
+                    if (!int.TryParse(dataRows[0][QuantityColumn]?.ToString(), out maxusers))
+                    {
+                        maxusers = 0;
+                    }
+
+                    if (maxusers >= usercount)
+                    {
+                        var arrFeatures = new ArrayList(dataRows[0][FeaturesColumn]?.ToString().Split(','));
+                        if (arrFeatures.Contains(((int)feature).ToString()))
+                        {
+                            hasAccess = true;
+                        }
+                    }
+                    else
+                    {
+                        return Trial;
+                    }
+                }
+            }
+
+            return GetLicenseValue(hasPurchased, hasAccess);
+        }
+
+        private static int GetLicenseValue(bool hasPurchased, bool hasAccess)
+        {
+            if (hasAccess)
+            {
+                return AccessLicense;
+            }
+            else if (hasPurchased)
+            {
+                return PurchasedLicense;
+            }
+
+            return 5;
+        }
+
+        private static int CheckOldPurchaseMethod(ActFeature feature, string username, DataSet dsInfo)
+        {
+            if (dsInfo.Tables.Count < 2 || dsInfo.Tables[1].Rows.Count == 0 || !dsInfo.Tables[1].Columns.Contains(LevelColumn))
+            {
+                throw new InvalidOperationException($"dsInfo.Tables[1].Rows[0][{LevelColumn}] should not be null");
+            }
+
+            int contractlevel;
+            if (!int.TryParse(dsInfo.Tables[1].Rows[0][LevelColumn]?.ToString(), out contractlevel))
+            {
+                contractlevel = 2;
+            }
+
+            var userLevels = new UserLevels();
+            var userLevel = userLevels.GetById(1);
+            if (contractlevel == 2)
+            {
+                userLevel = userLevels.GetById(2);
+            }
+            else if (contractlevel == 4)
+            {
+                userLevel = userLevels.GetById(3);
+            }
+
+            if (userLevel == null || userLevel.levels == null)
+            {
+                throw new InvalidOperationException("userLevel.levels should not be null.");
+            }
+            if (userLevel.levels.Contains((int)feature))
+            {
+                if (HasAccess(username, dsInfo))
+                {
+                    return AccessLicense;
+                }
+                return 6;
+            }
+
+            return 5;
+        }
+
+        private static bool HasAccess(string username, DataSet dsInfo)
+        {
+            if (SharepointSystemUser.Equals(username, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
             try
             {
-                ActivationType = int.Parse(dsInfo.Tables[0].Rows[0][0].ToString());
+                if (dsInfo.Tables[2].Rows[0][0].ToString() == "1")
+                {
+                    return true;
+                }
             }
-            catch { }
-            
-            UserLevels uls = new UserLevels();
-
-            switch(ActivationType)
+            catch (Exception ex)
             {
-                case 0:
-                    return 7;
-                case 1: //old purchase method
-                    {
-                        int contractlevel = 2;
-
-                        try
-                        {
-                            contractlevel = int.Parse(dsInfo.Tables[1].Rows[0]["Level"].ToString());
-                        }
-                        catch { }
-
-                        UserLevel userlevel = uls.GetById(1);
-                        if(contractlevel == 2)
-                            userlevel = uls.GetById(2);
-                        else if(contractlevel == 4)
-                            userlevel = uls.GetById(3);
-
-                        if(userlevel.levels.Contains((int)feature))
-                        {
-
-                            if(username.ToLower() == "sharepoint\\system")
-                                return 0;
-                            try
-                            {
-                                if(dsInfo.Tables[2].Rows[0][0].ToString() == "1")
-                                {
-                                    return 0;
-                                }
-                            }
-                            catch { }
-                            return 6;
-                        }
-                        return 5;
-                    }
-                case 2: //Trial
-                    if(username.ToLower() == "sharepoint\\system")
-                        return 0;
-
-                    if(dsInfo.Tables[2].Rows[0][0].ToString() == "1")
-                    {
-                        return 0;
-                    }
-                    return 6;
-
-                case 3: //New purchase method
-                    {
-                        bool HasPurchased = false;
-                        bool HasAccess = false;
-
-                        int userLevel = 0;
-
-                        foreach(DataRow dr in dsInfo.Tables[1].Rows)
-                        {
-                            ArrayList arrFeatures = new ArrayList(dr["Features"].ToString().Split(','));
-                            if(arrFeatures.Contains(((int)feature).ToString()))
-                            {
-                                HasPurchased = true;
-                                if(username.ToLower() == "sharepoint\\system")
-                                    return 0;
-                                break;
-                            }
-                        }
-
-                        try
-                        {
-                            userLevel = int.Parse(dsInfo.Tables[2].Rows[0][0].ToString());
-                        }
-                        catch { }
-                        if(userLevel == 9999)
-                        {
-                            return 0;
-                        }
-                        else
-                        {
-                            DataRow[] drs = dsInfo.Tables[1].Select("ResLevel='" + userLevel + "'");
-                            if(drs.Length > 0)
-                            {
-
-                                int usercount = 0;
-                                int maxusers = 0;
-                                try
-                                {
-                                    usercount = int.Parse(drs[0]["UserCount"].ToString());
-                                }
-                                catch { }
-                                try
-                                {
-                                    maxusers = int.Parse(drs[0]["quantity"].ToString());
-                                }
-                                catch { }
-
-                                if(maxusers >= usercount)
-                                {
-
-                                    ArrayList arrFeatures = new ArrayList(drs[0]["Features"].ToString().Split(','));
-                                    if(arrFeatures.Contains(((int)feature).ToString()))
-                                    {
-                                        HasAccess = true;
-                                    }
-                                }
-                                else
-                                    return 2;
-                            }
-                        }
-
-                        if(HasAccess)
-                            return 0;
-                        else if(HasPurchased)
-                            return 6;
-                        else
-                            return 5;
-                    }
-
+                Trace.WriteLine(ex.ToString());
             }
-            return -1;
+
+            return false;
         }
 
         private int SetUserActivation(int feature, string username, SPSite site)

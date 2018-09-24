@@ -112,7 +112,7 @@ namespace ModelDataCache
 
         protected override void AddDetailRow(DetailRowData detailRowData, int rowId)
         {
-            var target = ApplyTarget
+            var target = ApplyTarget && rowId < TargetsSorted.Count
                 ? TargetsSorted.ElementAt(rowId)
                 : null;
 

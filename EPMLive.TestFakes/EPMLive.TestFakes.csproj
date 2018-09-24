@@ -41,6 +41,10 @@
     <AssemblyOriginatorKeyFile>EPMLive.TestFakes.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="DocumentFormat.OpenXml.2.5.5631.0.Fakes">
+      <HintPath>FakesAssemblies\DocumentFormat.OpenXml.2.5.5631.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
     </Reference>
@@ -49,6 +53,9 @@
     </Reference>
     <Reference Include="EPMLiveIntegrationService.Fakes">
       <HintPath>FakesAssemblies\EPMLiveIntegrationService.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="EPMLiveReportsAdmin.Fakes">
+      <HintPath>FakesAssemblies\EPMLiveReportsAdmin.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="EPMLiveTimerService.Fakes">
       <HintPath>FakesAssemblies\EPMLiveTimerService.Fakes.dll</HintPath>
@@ -162,6 +169,10 @@
       <Project>{1121d2ff-7eaa-4532-a1ce-473de551dd70}</Project>
       <Name>EPMLivePS</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EPMLiveReporting\EPMLiveReporting\EPMLiveReporting.csproj">
+      <Project>{b56160fe-490c-462a-bc9a-feffd2f1487c}</Project>
+      <Name>EPMLiveReporting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveTimerService\EPMLiveTimerService\EPMLiveTimerService.csproj">
       <Project>{6c2be0de-af49-4f4d-bab8-ae256f1cbdd7}</Project>
       <Name>EPMLiveTimerService</Name>
@@ -222,6 +233,8 @@
     <Fakes Include="Fakes\System.Data.DataSetExtensions.fakes" />
     <Fakes Include="Fakes\Microsoft.Web.CommandUI.fakes" />
     <Fakes Include="Fakes\EPMLiveWorkPlanner.fakes" />
+    <Fakes Include="Fakes\EPMLiveReportsAdmin.fakes" />
+    <Fakes Include="Fakes\DocumentFormat.OpenXml.fakes" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

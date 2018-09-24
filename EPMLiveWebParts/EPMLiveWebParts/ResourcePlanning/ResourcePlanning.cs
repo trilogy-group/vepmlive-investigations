@@ -814,35 +814,8 @@ namespace EPMLiveWebParts
 
         private void renderGrid(HtmlTextWriter output)
         {
-            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid.css\"/>");
-            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid_skins.css\"/>");
-            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/calendar/dhtmlxcalendar.css\"/>");
-            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xmenu/dhtmlxmenu.css\">");
-            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xmenu/context.css\">");
-            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xcombo/dhtmlxcombo.css\">");
-
-            output.Write("<script>_css_prefix=\"/_layouts/epmlive/DHTML/xgrid/\"; _js_prefix=\"/_layouts/epmlive/DHTML/xgrid/\"; </script>");
-
-            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/dhtmlxcommon.js\"></script>");
-            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/dhtmlxgrid.js\"></script>");
-            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/dhtmlxgridcell.js\"></script>");
-            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/dhtmlxgrid_post.js\"></script>");
-
-            output.Write("<script src=\"/_layouts/epmlive/DHTML/xtreegrid/dhtmlxtreegrid.js\"></script>");
-            output.Write("<script src=\"/_layouts/epmlive/DHTML/xtreegrid/ext/dhtmlxtreegrid_filter.js\"></script>");
-
-            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_nxml.js\"></script>");
-            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_filter.js\"></script>");
-            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_math.js\"></script>");
-            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_srnd.js\"></script>");
-
-            output.Write("<script src=\"/_layouts/epmlive/DHTML/xcombo/dhtmlxcombo.js\"></script>");
-
-            output.Write("<script language=\"JavaScript\" src=\"/_layouts/epmlive/dhtml/xmenu/dhtmlxprotobar.js\"></script>");
-            output.Write("<script language=\"JavaScript\" src=\"/_layouts/epmlive/dhtml/xmenu/dhtmlxmenubar.js\"></script>");
-            output.Write("<script language=\"JavaScript\" src=\"/_layouts/epmlive/dhtml/xmenu/dhtmlxmenubar_cp.js\"></script>");
-
-            output.Write("<script src=\"/_layouts/epmlive/resPlanning.js\"></script>");
+            AppendCssLibraries(output);
+            AppendJsLibraries(output);
 
             output.Write("<div id=\"grid" + this.ID + "\" style=\"width:100%;display:none;\" ></div>\r\n\r\n");
 
@@ -850,44 +823,7 @@ namespace EPMLiveWebParts
             output.Write("<img src=\"/_layouts/images/GEARS_ANv4.GIF\" style=\"vertical-align: middle;\"/> Loading Resources...");
             output.Write("</div>");
 
-            output.Write("<script language=\"javascript\">");
-
-            output.Write("function gridfilter" + this.ZoneIndex + this.ZoneID + "(value){");
-            output.Write("var vals = value.split('|');");
-            output.Write("mygrid" + this.ZoneIndex + this.ZoneID + ".filterBy(vals[0],vals[1]);");
-            output.Write("}");
-
-            output.Write(Properties.Resources.txtResourcePlannerJavascript1.Replace("#gridid#", this.ZoneIndex + this.ZoneID));
-
-            output.Write("function changeview" + this.ZoneIndex + this.ZoneID + "(){");
-            output.Write("try{");
-            output.Write("var view = document.getElementById('viewselector" + this.ZoneIndex + this.ZoneID + "').value;");
-            output.Write("document.getElementById(\"grid" + this.ID + "\").style.display = \"none\";");
-            output.Write("document.getElementById(\"loadinggrid" + this.ID + "\").style.display = \"\";");
-            output.Write("mygrid" + this.ZoneIndex + this.ZoneID + ".detachHeader(1);");
-            output.Write("mygrid" + this.ZoneIndex + this.ZoneID + ".clearAll(true);");
-            output.Write("mygrid" + this.ZoneIndex + this.ZoneID + ".loadXML(\"" + resWeb.Url + "/_layouts/epmlive/getresourcepool.aspx?view=\" + view + \"&gridname=" + this.ZoneIndex + this.ZoneID + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "\");");
-            output.Write("}catch(e){alert(e);}");
-            output.Write("}");
-
-            output.Write("function setSize" + this.ZoneIndex + this.ZoneID + "(){mygrid" + this.ZoneIndex + this.ZoneID + "._askRealRows();}");
-
-            output.Write("function printgrid" + this.ZoneIndex + this.ZoneID + "() {var temp = mygrid" + this.ZoneIndex + this.ZoneID + ".hdr.rows[2];var parent = temp.parentNode;parent.removeChild(temp,true);mygrid" + this.ZoneIndex + this.ZoneID + ".printView();parent.appendChild(temp);}");
-            output.Write("function switchFilter" + this.ZoneIndex + this.ZoneID + "(hlink){");
-            output.Write("var input1 = mygrid" + this.ZoneIndex + this.ZoneID + ".hdr.rows[2];");
-            output.Write("if(mygrid" + this.ZoneIndex + this.ZoneID + "Hidden == false){");
-            output.Write("input1.style.display = \"none\";");
-            output.Write("mygrid" + this.ZoneIndex + this.ZoneID + "Hidden = true;");
-            output.Write("if(hlink != null){document.getElementById(hlink).innerHTML=\"&nbsp;Show Filters\";}");
-            output.Write("}else{");
-            output.Write("input1.style.display = \"\";");
-            output.Write("mygrid" + this.ZoneIndex + this.ZoneID + "Hidden = false;");
-            output.Write("if(hlink != null){document.getElementById(hlink).innerHTML=\"&nbsp;Hide Filters\";}");
-            output.Write("}");
-            output.Write("mygrid" + this.ZoneIndex + this.ZoneID + ".setSizes();");
-            output.Write("}");
-            output.Write("function switchFilterLoad" + this.ZoneIndex + this.ZoneID + "(){switchFilter" + this.ZoneIndex + this.ZoneID + "(null);}");
-            output.Write("</script>");
+            AppendFilteringScripts(output);
 
             output.Write("<script>");
             output.Write("var mygrid" + this.ZoneIndex + this.ZoneID + "Hidden = false;");
@@ -926,10 +862,6 @@ namespace EPMLiveWebParts
             output.Write("mygrid" + this.ZoneIndex + this.ZoneID + ".setDateFormat(\"%m/%d/%Y\");");
             output.Write("mygrid" + this.ZoneIndex + this.ZoneID + ".attachEvent(\"onXLE\",clearLoader);");
             output.Write("mygrid" + this.ZoneIndex + this.ZoneID + ".attachEvent(\"onCheck\", doOnCheck" + this.ZoneIndex + this.ZoneID + ");");
-
-            //output.Write("mygrid" + this.ZoneIndex + this.ZoneID + ".attachEvent(\"onXLE\",switchFilterLoad" + this.ZoneIndex + this.ZoneID + ");");
-            //output.Write("mygrid" + this.ZoneIndex + this.ZoneID + ".attachEvent(\"onBeforeContextMenu\",onShowMenu);");
-
             output.Write("mygrid" + this.ZoneIndex + this.ZoneID + ".init();");
 
             output.Write("try{");
@@ -942,5 +874,81 @@ namespace EPMLiveWebParts
             output.Write("<input type=\"hidden\" name=\"resourceList\" id=\"resourceList\" value=\"\">");
         }
 
+        private void AppendFilteringScripts(HtmlTextWriter output)
+        {
+            var zoneIdentifier = string.Concat(ZoneIndex, ZoneID);
+            var requestUrl = HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString());
+
+            output.Write("<script language=\"javascript\">");
+
+            output.Write($"function gridfilter{zoneIdentifier}(value){{");
+            output.Write("var vals = value.split('|');");
+            output.Write($"mygrid{zoneIdentifier}.filterBy(vals[0],vals[1]);");
+            output.Write("}");
+
+            output.Write(Properties.Resources.txtResourcePlannerJavascript1.Replace("#gridid#", zoneIdentifier));
+
+            output.Write($"function changeview{zoneIdentifier}(){{");
+            output.Write("try{");
+            output.Write($"var view = document.getElementById('viewselector{zoneIdentifier}').value;");
+            output.Write($"document.getElementById(\"grid{ID}\").style.display = \"none\";");
+            output.Write($"document.getElementById(\"loadinggrid{ID}\").style.display = \"\";");
+            output.Write($"mygrid{zoneIdentifier}.detachHeader(1);");
+            output.Write($"mygrid{zoneIdentifier}.clearAll(true);");
+            output.Write($"mygrid{zoneIdentifier}.loadXML(\"{resWeb.Url}/_layouts/epmlive/getresourcepool.aspx");
+            output.Write($"?view=\" + view + \"&gridname={zoneIdentifier}&source={requestUrl}\");");
+            output.Write("}catch(e){alert(e);}");
+            output.Write("}");
+
+            output.Write($"function setSize{zoneIdentifier}(){{mygrid{zoneIdentifier}._askRealRows();}}");
+
+            output.Write($"function printgrid{zoneIdentifier}() {{var temp = mygrid{zoneIdentifier}.hdr.rows[2];");
+            output.Write($"var parent = temp.parentNode;parent.removeChild(temp,true);mygrid{zoneIdentifier}.printView();parent.appendChild(temp);}}");
+            output.Write($"function switchFilter{zoneIdentifier}(hlink){{");
+            output.Write($"var input1 = mygrid{zoneIdentifier}.hdr.rows[2];");
+            output.Write($"if(mygrid{zoneIdentifier}Hidden == false){{");
+            output.Write("input1.style.display = \"none\";");
+            output.Write($"mygrid{zoneIdentifier}Hidden = true;");
+            output.Write("if(hlink != null){document.getElementById(hlink).innerHTML=\"&nbsp;Show Filters\";}");
+            output.Write("}else{");
+            output.Write("input1.style.display = \"\";");
+            output.Write($"mygrid{zoneIdentifier}Hidden = false;");
+            output.Write("if(hlink != null){document.getElementById(hlink).innerHTML=\"&nbsp;Hide Filters\";}");
+            output.Write("}");
+            output.Write($"mygrid{zoneIdentifier}.setSizes();");
+            output.Write("}");
+            output.Write($"function switchFilterLoad{zoneIdentifier}(){{switchFilter{zoneIdentifier}(null);}}");
+            output.Write("</script>");
+        }
+
+        private void AppendJsLibraries(HtmlTextWriter output)
+        {
+            output.Write("<script>_css_prefix=\"/_layouts/epmlive/DHTML/xgrid/\"; _js_prefix=\"/_layouts/epmlive/DHTML/xgrid/\"; </script>");
+            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/dhtmlxcommon.js\"></script>");
+            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/dhtmlxgrid.js\"></script>");
+            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/dhtmlxgridcell.js\"></script>");
+            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/dhtmlxgrid_post.js\"></script>");
+            output.Write("<script src=\"/_layouts/epmlive/DHTML/xtreegrid/dhtmlxtreegrid.js\"></script>");
+            output.Write("<script src=\"/_layouts/epmlive/DHTML/xtreegrid/ext/dhtmlxtreegrid_filter.js\"></script>");
+            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_nxml.js\"></script>");
+            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_filter.js\"></script>");
+            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_math.js\"></script>");
+            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_srnd.js\"></script>");
+            output.Write("<script src=\"/_layouts/epmlive/DHTML/xcombo/dhtmlxcombo.js\"></script>");
+            output.Write("<script language=\"JavaScript\" src=\"/_layouts/epmlive/dhtml/xmenu/dhtmlxprotobar.js\"></script>");
+            output.Write("<script language=\"JavaScript\" src=\"/_layouts/epmlive/dhtml/xmenu/dhtmlxmenubar.js\"></script>");
+            output.Write("<script language=\"JavaScript\" src=\"/_layouts/epmlive/dhtml/xmenu/dhtmlxmenubar_cp.js\"></script>");
+            output.Write("<script src=\"/_layouts/epmlive/resPlanning.js\"></script>");
+        }
+
+        private void AppendCssLibraries(HtmlTextWriter output)
+        {
+            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid.css\"/>");
+            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid_skins.css\"/>");
+            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/calendar/dhtmlxcalendar.css\"/>");
+            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xmenu/dhtmlxmenu.css\">");
+            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xmenu/context.css\">");
+            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xcombo/dhtmlxcombo.css\">");
+        }
     }
 }

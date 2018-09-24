@@ -148,6 +148,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Layouts\EPMLive\AllSnapshots.aspx.designer.cs">
       <DependentUpon>AllSnapshots.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\EPMLive\EventAudit.AddEventHandler.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Layouts\EPMLive\cleanupwarning.aspx.cs">
       <DependentUpon>cleanupwarning.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -240,6 +243,9 @@ net start "WETimer"</PostDeploymentCommand>
       <FeatureId>{e399d077-9e80-4787-9d1a-3e07d65a59a1}</FeatureId>
     </None>
     <None Include="key.snk" />
+    <Compile Include="Layouts\EPMLive\EventAudit.AuditWebs.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <None Include="Layouts\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{805e2070-4cdf-4f20-9a9a-296da0e466a4}</SharePointProjectItemId>
     </None>
