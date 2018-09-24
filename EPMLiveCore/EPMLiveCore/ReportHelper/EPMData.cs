@@ -1180,7 +1180,7 @@ namespace EPMLiveCore.ReportHelper
             CheckArgumentForNull(li, nameof(li));
             CheckArgumentForNull(field, nameof(field));
 
-            string resultType = field.GetProperty("ResultType").ToLower();
+            var resultType = field.GetProperty("ResultType").ToLower();
 
             var cultureInfo = CultureInfo.GetCultureInfo(field.CurrencyLocaleId).NumberFormat;
             var fieldRawValue = li[field.InternalName].ToString();
