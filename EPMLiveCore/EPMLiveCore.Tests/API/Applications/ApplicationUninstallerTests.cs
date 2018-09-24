@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
+using System.IO.Fakes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using EPMLiveCore.API;
 using EPMLiveCore.API.Fakes;
+using EPMLiveCore.Fakes;
 using EPMLiveCore.Jobs.Applications;
 using EPMLiveCore.Jobs.Applications.Fakes;
 using EPMLiveCore.ReportHelper.Fakes;
@@ -19,6 +21,7 @@ using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Navigation;
 using Microsoft.SharePoint.Navigation.Fakes;
+using Microsoft.SharePoint.Workflow.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
@@ -35,15 +38,27 @@ namespace EPMLiveCore.Tests.API.Applications
         private Uninstall _configJob;
         private PrivateObject _privateConfigJob;
 
-        private bool _fileDeleted;
+        private bool _webFileDeleted;
         private bool _listItemUpdated;
         private bool _listItemDeleted;
+        private bool _listItemRecycled;
         private bool _appRemovedFromCommunity;
         private bool _communityDeleted;
         private bool _quickLaunchDeleted;
         private bool _topNavigationBarDeleted;
         private bool _listBizDeleted;
         private bool _listDeleted;
+        private bool _configSettingSet;
+        private bool _folderDeleted;
+        private bool _solutionDeleted;
+        private bool _listFileDeleted;
+        private bool _fieldUpdated;
+        private bool _fieldDeleted;
+        private bool _gridGanttSettingsSaved;
+        private bool _viewDeleted;
+        private bool _eventHandlerDeleted;
+        private bool _siteFeatureRemoved;
+        private bool _webFeatureRemoved;
 
         private const int DummyInt = 1;
         private const string DummyString = "DummyString";
@@ -56,15 +71,27 @@ namespace EPMLiveCore.Tests.API.Applications
         [TestInitialize]
         public void TestInitialize()
         {
-            _fileDeleted = false;
+            _webFileDeleted = false;
             _listItemUpdated = false;
             _listItemDeleted = false;
+            _listItemRecycled = false;
             _appRemovedFromCommunity = false;
             _communityDeleted = false;
             _quickLaunchDeleted = false;
             _topNavigationBarDeleted = false;
             _listBizDeleted = false;
             _listDeleted = false;
+            _configSettingSet = false;
+            _folderDeleted = false;
+            _solutionDeleted = false;
+            _listFileDeleted = false;
+            _fieldUpdated = false;
+            _fieldDeleted = false;
+            _gridGanttSettingsSaved = false;
+            _viewDeleted = false;
+            _eventHandlerDeleted = false;
+            _siteFeatureRemoved = false;
+            _webFeatureRemoved = false;
 
             _shimsObject = ShimsContext.Create();
 
@@ -87,7 +114,8 @@ namespace EPMLiveCore.Tests.API.Applications
 
             var spUser = new ShimSPUser
             {
-                UserTokenGet = () => new ShimSPUserToken()
+                UserTokenGet = () => new ShimSPUserToken(),
+                IsSiteAdminGet = () => true
             };
 
             var spListItem = new ShimSPListItem
@@ -103,12 +131,19 @@ namespace EPMLiveCore.Tests.API.Applications
                         case "QuickLaunch":
                         case "TopNav":
                             return DummyInt;
+                        case "InstalledFiles":
+                            return $"<Files><File Type='' FullFile='{DummyString}' Name='{DummyString}' /></Files>";
                         default:
                             return DummyString;
                     }
                 },
                 Update = () => _listItemUpdated = true,
-                Delete = () => _listItemDeleted = true
+                Delete = () => _listItemDeleted = true,
+                Recycle = () =>
+                {
+                    _listItemRecycled = true;
+                    return Guid.NewGuid();
+                }
             };
 
             _list = new ShimSPList
@@ -123,7 +158,31 @@ namespace EPMLiveCore.Tests.API.Applications
                     spListItem
                 }),
                 ParentWebGet = () => _web,
-                Delete = () => _listDeleted = true
+                Delete = () => _listDeleted = true,
+                FieldsGet = () => new ShimSPFieldCollection
+                {
+                    GetFieldByInternalNameString = _ => new ShimSPField
+                    {
+                        SealedGet = () => true,
+                        Update = () => _fieldUpdated = true,
+                        Delete = () => _fieldDeleted = true
+                    }
+                },
+                ViewsGet = () => new ShimSPViewCollection
+                {
+                    ItemGetString = _ => new ShimSPView(),
+                    DeleteGuid = _ => _viewDeleted = true
+                },
+                EventReceiversGet = () => new ShimSPEventReceiverDefinitionCollection().Bind(new SPEventReceiverDefinition[]
+                {
+                    new ShimSPEventReceiverDefinition
+                    {
+                        TypeGet = () => SPEventReceiverType.AppInstalled,
+                        AssemblyGet = () => DummyString,
+                        ClassGet = () => DummyString,
+                        Delete = () => _eventHandlerDeleted = true
+                    }
+                })
             };
 
             _web = new ShimSPWeb
@@ -135,40 +194,93 @@ namespace EPMLiveCore.Tests.API.Applications
                 {
                     GetByIDInt32 = _ => spUser
                 },
-                ListsGet = () => new ShimSPListCollection
-                {
-                    TryGetListString = _ => _list
-                },
+                ListsGet = () => new ShimSPListCollection(),
                 FilesGet = () => new ShimSPFileCollection
                 {
-                    DeleteString = _ => _fileDeleted = true
+                    DeleteString = _ => _webFileDeleted = true
                 },
                 NavigationGet = () => new ShimSPNavigation
                 {
-                    QuickLaunchGet = () => new ShimSPNavigationNodeCollection().Bind(new SPNavigationNode[]
+                    QuickLaunchGet = () => new ShimSPNavigationNodeCollection
+                    {
+                        DeleteSPNavigationNode = _ => _quickLaunchDeleted = true
+                    }.Bind(new SPNavigationNode[]
                     {
                         new ShimSPNavigationNode
                         {
                             IdGet = () => DummyInt,
-                            TitleGet = () => DummyString,
-                            Delete = () => _quickLaunchDeleted = true
+                            TitleGet = () => DummyString
                         }
                     }),
-                    TopNavigationBarGet = () => new ShimSPNavigationNodeCollection().Bind(new SPNavigationNode[]
+                    TopNavigationBarGet = () => new ShimSPNavigationNodeCollection
+                    {
+                        DeleteSPNavigationNode = _ => _topNavigationBarDeleted = true
+                    }.Bind(new SPNavigationNode[]
                     {
                         new ShimSPNavigationNode
                         {
                             IdGet = () => DummyInt,
-                            TitleGet = () => DummyString,
-                            Delete = () => _topNavigationBarDeleted = true
+                            TitleGet = () => DummyString
+                        },
+                        new ShimSPNavigationNode
+                        {
+                            IdGet = () => DummyInt + 1,
+                            TitleGet = () => $"{DummyString}1",
+                            ChildrenGet = () => new ShimSPNavigationNodeCollection
+                            {
+                                DeleteSPNavigationNode = _ => { }
+                            }.Bind(new SPNavigationNode[]
+                            {
+                                new ShimSPNavigationNode
+                                {
+                                    IdGet = () => DummyInt,
+                                    TitleGet = () => DummyString
+                                }
+                            })
                         }
                     })
+                },
+                GetFolderString = _ => new ShimSPFolder
+                {
+                    ExistsGet = () => true,
+                    Delete = () => _folderDeleted = true
+                },
+                FeaturesGet = () => new ShimSPFeatureCollection
+                {
+                    RemoveGuid = _ => _webFeatureRemoved = true
                 }
             };
 
             _site = new ShimSPSite
             {
-                IDGet = () => Guid.NewGuid()
+                IDGet = () => Guid.NewGuid(),
+                GetCatalogSPListTemplateType = _ => new ShimSPDocumentLibrary(),
+                SolutionsGet = () => new ShimSPUserSolutionCollection
+                {
+                    RemoveSPUserSolution = _ => _solutionDeleted = true
+                }.Bind(new SPUserSolution[]
+                {
+                    new ShimSPUserSolution
+                    {
+                        NameGet = () => DummyString
+                    }
+                }),
+                FeaturesGet = () => new ShimSPFeatureCollection
+                {
+                    RemoveGuid = _ => _siteFeatureRemoved = true
+                }
+            };
+
+            ShimSPList.AllInstances.RootFolderGet = _ => new ShimSPFolder
+            {
+                FilesGet = () => new ShimSPFileCollection().Bind(new SPFile[]
+                {
+                    new ShimSPFile
+                    {
+                        NameGet = () => DummyString,
+                        Delete = () => _listFileDeleted = true
+                    }
+                })
             };
 
             ShimSPSite.ConstructorGuid = (_, __) => { };
@@ -206,14 +318,14 @@ namespace EPMLiveCore.Tests.API.Applications
                         IdGet = () => new Guid(Feature3Guid),
                         DisplayNameGet = () => DummyString,
                         CompatibilityLevelGet = () => 14,
-                        ScopeGet = () => SPFeatureScope.Farm
+                        ScopeGet = () => SPFeatureScope.Web
                     },
                     new ShimSPFeatureDefinition
                     {
                         IdGet = () => new Guid(Feature4Guid),
                         DisplayNameGet = () => DummyString,
                         CompatibilityLevelGet = () => 15,
-                        ScopeGet = () => SPFeatureScope.Farm
+                        ScopeGet = () => SPFeatureScope.Web
                     }
                 })
             };
@@ -222,11 +334,6 @@ namespace EPMLiveCore.Tests.API.Applications
 
             ShimSPQuery.Constructor = _ => { };
 
-            ShimApplications.GetApplicationInfoFromListSPWebString = (_, __) => new ApplicationDef
-            {
-                Id = DummyInt,
-                ApplicationXml = CreateXmlDocument()
-            };
             ShimApplications.RemoveAppFromCommunitySPListItemInt32 = (_, __) => _appRemovedFromCommunity = true;
             ShimApplications.DeleteCommunityInt32SPWeb = (_, __) => _communityDeleted = true;
 
@@ -242,15 +349,50 @@ namespace EPMLiveCore.Tests.API.Applications
             ShimEPMData.ConstructorGuid = (_, __) => { };
             ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, __) => DummyString;
             ShimEPMData.AllInstances.AddParamStringObject = (_, __, ___) => { };
+
+            ShimCoreFunctions.getLockConfigSettingSPWebStringBoolean = (_, __, ___) => DummyString;
+            ShimCoreFunctions.getLockedWebSPWeb = _ => Guid.NewGuid();
+            ShimCoreFunctions.setConfigSettingSPWebStringString = (_, __, ___) => _configSettingSet = true;
+            ShimCoreFunctions.getListSettingStringSPList = (_, __) => $"{DummyString}1";
+            ShimCoreFunctions.iGetListEventTypeString = _ => SPEventReceiverType.AppInstalled;
+
+            ShimGridGanttSettings.AllInstances.SaveSettingsSPList = (_, __) => _gridGanttSettingsSaved = true;
+
+            ShimPath.GetDirectoryNameString = _ => DummyString;
         }
 
-        private XmlDocument CreateXmlDocument()
+        private XmlDocument CreateXmlDocument(string solutions)
         {
             var xmlString = $@"
                 <Root>
                     <Application></Application>
+                    <Solutions>
+                        {solutions}
+                    </Solutions>
                     <Lists>
                         <List Name='{DummyString}' Reporting='true' NoDelete='false'></List>
+                        <List Name='{DummyString}' Reporting='true' NoDelete='true'>
+                            <Fields>
+                                <Field InternalName='{DummyString}' Total='{DummyInt}'></Field>
+                            </Fields>
+                            <Lookups>
+                                <Lookup InternalName='{DummyString}'></Lookup>
+                            </Lookups>
+                            <Views>
+                                <View Name='{DummyString}'></View>
+                            </Views>
+                            <Workflows>
+                                <Workflow Name='{DummyString}'></Workflow>
+                            </Workflows>
+                            <EventHandlers>
+                                <EventHandler Type='{DummyString}' Assembly='{DummyString}' Class='{DummyString}'></EventHandler>
+                            </EventHandlers>
+                            <Items>
+                                <Item>
+                                    <Field Name='Title'>{DummyString}</Field>
+                                </Item>
+                            </Items>
+                        </List>
                     </Lists>
                     <Features>
                         <Feature ID='{Feature1Guid}' Name='{DummyString}' NoDelete='false'></Feature>
@@ -260,7 +402,12 @@ namespace EPMLiveCore.Tests.API.Applications
                     </Features>
                     <Web>
                         <Properties>
-                            <Property Name='{DummyString}' Value='{DummyString}' Append='true' Overwrite='true' LockWebProperty='true'></Property>
+                            <Property Name='{DummyString}' 
+                                      Value='{DummyString}' 
+                                      Append='true' 
+                                      Overwrite='true' 
+                                      LockWebProperty='true'
+                                      Seperator='\n'></Property>
                         </Properties>
                     </Web>
                 </Root>";
@@ -285,27 +432,199 @@ namespace EPMLiveCore.Tests.API.Applications
         }
 
         [TestMethod]
-        public void UninstallApp_WhenIsInstalledElsewhereAndUserHasPermissionAndRootWeb_ConfirmResult()
+        public void UninstallApp_FirstSituation_ConfirmResult()
         {
             // Arrange
             var guid = Guid.NewGuid().ToString();
-            ShimSPWeb.AllInstances.GetSiteDataSPSiteDataQuery = (_, __) => CreateSiteDataTable(guid);
-            ShimSPSecurableObject.AllInstances.DoesUserHavePermissionsSPBasePermissions = (_, __) => true;
-            ShimSPWeb.AllInstances.IsRootWebGet = _ => true;
+            SetupForUnninstallApp(_list, guid, true, true, string.Empty, false);
 
             // Act
             _testObj.UninstallApp(false, _web.Instance);
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => _fileDeleted.ShouldBeTrue(),
+                () => _webFileDeleted.ShouldBeTrue(),
                 () => _listItemUpdated.ShouldBeTrue(),
+                () => _listItemDeleted.ShouldBeFalse(),
+                () => _listItemRecycled.ShouldBeTrue(),
+                () => _fieldUpdated.ShouldBeTrue(),
+                () => _fieldDeleted.ShouldBeTrue(),
+                () => _gridGanttSettingsSaved.ShouldBeTrue(),
+                () => _viewDeleted.ShouldBeTrue(),
+                () => _eventHandlerDeleted.ShouldBeTrue(),
+                () => _siteFeatureRemoved.ShouldBeFalse(),
+                () => _webFeatureRemoved.ShouldBeTrue(),
                 () => _appRemovedFromCommunity.ShouldBeTrue(),
                 () => _communityDeleted.ShouldBeTrue(),
                 () => _quickLaunchDeleted.ShouldBeTrue(),
                 () => _topNavigationBarDeleted.ShouldBeTrue(),
                 () => _listBizDeleted.ShouldBeTrue(),
-                () => _listDeleted.ShouldBeTrue());
+                () => _listDeleted.ShouldBeTrue(),
+                () => _configSettingSet.ShouldBeTrue(),
+                () => _solutionDeleted.ShouldBeFalse(),
+                () => _listFileDeleted.ShouldBeFalse());
+            //() => _folderDeleted.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void UninstallApp_SecondSituation_ConfirmResult()
+        {
+            // Arrange
+            SetupForUnninstallApp(_list, WebId, false, true, string.Empty, true);
+
+            // Act
+            _testObj.UninstallApp(false, _web.Instance);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _webFileDeleted.ShouldBeTrue(),
+                () => _listItemUpdated.ShouldBeTrue(),
+                () => _listItemDeleted.ShouldBeTrue(),
+                () => _listItemRecycled.ShouldBeTrue(),
+                () => _fieldUpdated.ShouldBeTrue(),
+                () => _fieldDeleted.ShouldBeTrue(),
+                () => _gridGanttSettingsSaved.ShouldBeTrue(),
+                () => _viewDeleted.ShouldBeTrue(),
+                () => _eventHandlerDeleted.ShouldBeTrue(),
+                () => _siteFeatureRemoved.ShouldBeTrue(),
+                () => _webFeatureRemoved.ShouldBeTrue(),
+                () => _appRemovedFromCommunity.ShouldBeTrue(),
+                () => _communityDeleted.ShouldBeTrue(),
+                () => _quickLaunchDeleted.ShouldBeTrue(),
+                () => _topNavigationBarDeleted.ShouldBeTrue(),
+                () => _listBizDeleted.ShouldBeTrue(),
+                () => _listDeleted.ShouldBeTrue(),
+                () => _configSettingSet.ShouldBeTrue(),
+                () => _solutionDeleted.ShouldBeTrue(),
+                () => _listFileDeleted.ShouldBeTrue());
+            //() => _folderDeleted.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void UninstallApp_ThirdSituation_ConfirmResult()
+        {
+            // Arrange
+            SetupForUnninstallApp(_list, WebId, false, true, string.Empty, false);
+
+            // Act
+            _testObj.UninstallApp(false, _web.Instance);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _webFileDeleted.ShouldBeTrue(),
+                () => _listItemUpdated.ShouldBeTrue(),
+                () => _listItemDeleted.ShouldBeTrue(),
+                () => _listItemRecycled.ShouldBeTrue(),
+                () => _fieldUpdated.ShouldBeTrue(),
+                () => _fieldDeleted.ShouldBeTrue(),
+                () => _gridGanttSettingsSaved.ShouldBeTrue(),
+                () => _viewDeleted.ShouldBeTrue(),
+                () => _eventHandlerDeleted.ShouldBeTrue(),
+                () => _siteFeatureRemoved.ShouldBeTrue(),
+                () => _webFeatureRemoved.ShouldBeTrue(),
+                () => _appRemovedFromCommunity.ShouldBeTrue(),
+                () => _communityDeleted.ShouldBeTrue(),
+                () => _quickLaunchDeleted.ShouldBeTrue(),
+                () => _topNavigationBarDeleted.ShouldBeTrue(),
+                () => _listBizDeleted.ShouldBeTrue(),
+                () => _listDeleted.ShouldBeTrue(),
+                () => _configSettingSet.ShouldBeTrue(),
+                () => _solutionDeleted.ShouldBeFalse(),
+                () => _listFileDeleted.ShouldBeFalse());
+            //() => _folderDeleted.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void UninstallApp_Situation4_ConfirmResult()
+        {
+            // Arrange
+            var guid = Guid.NewGuid().ToString();
+            SetupForUnninstallApp(_list, guid, true, true, string.Empty, false);
+
+            // Act
+            _testObj.UninstallApp(true, _web.Instance);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _webFileDeleted.ShouldBeFalse(),
+                () => _listItemUpdated.ShouldBeTrue(),
+                () => _listItemDeleted.ShouldBeFalse(),
+                () => _listItemRecycled.ShouldBeFalse(),
+                () => _fieldUpdated.ShouldBeFalse(),
+                () => _fieldDeleted.ShouldBeFalse(),
+                () => _gridGanttSettingsSaved.ShouldBeFalse(),
+                () => _viewDeleted.ShouldBeFalse(),
+                () => _eventHandlerDeleted.ShouldBeFalse(),
+                () => _siteFeatureRemoved.ShouldBeFalse(),
+                () => _webFeatureRemoved.ShouldBeFalse(),
+                () => _appRemovedFromCommunity.ShouldBeFalse(),
+                () => _communityDeleted.ShouldBeFalse(),
+                () => _quickLaunchDeleted.ShouldBeFalse(),
+                () => _topNavigationBarDeleted.ShouldBeFalse(),
+                () => _listBizDeleted.ShouldBeFalse(),
+                () => _listDeleted.ShouldBeFalse(),
+                () => _configSettingSet.ShouldBeFalse(),
+                () => _solutionDeleted.ShouldBeFalse(),
+                () => _listFileDeleted.ShouldBeFalse());
+            //() => _folderDeleted.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void UninstallApp_Situation5_ConfirmResult()
+        {
+            // Arrange
+            SetupForUnninstallApp(_list, WebId, false, true, string.Empty, true);
+
+            // Act
+            _testObj.UninstallApp(true, _web.Instance);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _webFileDeleted.ShouldBeFalse(),
+                () => _listItemUpdated.ShouldBeTrue(),
+                () => _listItemDeleted.ShouldBeFalse(),
+                () => _listItemRecycled.ShouldBeFalse(),
+                () => _gridGanttSettingsSaved.ShouldBeFalse(),
+                () => _viewDeleted.ShouldBeFalse(),
+                () => _eventHandlerDeleted.ShouldBeFalse(),
+                () => _siteFeatureRemoved.ShouldBeFalse(),
+                () => _webFeatureRemoved.ShouldBeFalse(),
+                () => _appRemovedFromCommunity.ShouldBeFalse(),
+                () => _communityDeleted.ShouldBeFalse(),
+                () => _quickLaunchDeleted.ShouldBeFalse(),
+                () => _topNavigationBarDeleted.ShouldBeFalse(),
+                () => _listBizDeleted.ShouldBeFalse(),
+                () => _listDeleted.ShouldBeFalse(),
+                () => _configSettingSet.ShouldBeFalse(),
+                () => _solutionDeleted.ShouldBeFalse(),
+                () => _listFileDeleted.ShouldBeFalse());
+            //() => _folderDeleted.ShouldBeTrue());
+        }
+
+        private void SetupForUnninstallApp(SPList list, string webId, bool isRootWeb, bool userHavePermissions, string getExtension, bool hasSolutions)
+        {
+            var solutionsXml = string.Empty;
+
+            if (hasSolutions)
+            {
+                solutionsXml = $@"<Solution FileName='{DummyString}'></Solution>
+                                  <ListTemplate FileName='{DummyString}'></ListTemplate>";
+            }
+
+            ShimSPListCollection.AllInstances.TryGetListString = (_, __) => list;
+
+            ShimSPWeb.AllInstances.GetSiteDataSPSiteDataQuery = (_, __) => CreateSiteDataTable(webId);
+            ShimSPWeb.AllInstances.IsRootWebGet = _ => isRootWeb;
+
+            ShimSPSecurableObject.AllInstances.DoesUserHavePermissionsSPBasePermissions = (_, __) => userHavePermissions;
+
+            ShimPath.GetExtensionString = _ => getExtension;
+
+            ShimApplications.GetApplicationInfoFromListSPWebString = (_, __) => new ApplicationDef
+            {
+                Id = DummyInt,
+                ApplicationXml = CreateXmlDocument(solutionsXml)
+            };
         }
     }
 }
