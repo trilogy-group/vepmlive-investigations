@@ -77,7 +77,6 @@ namespace EPMLiveCore.Tests.API.Integration
         public void TestInitialize()
         {
             _shimsContext = ShimsContext.Create();
-            //_adoShims = AdoShims.ShimAdoNetCalls();
 
             FakesForSpSecurity();
             FakesForConstructor();
