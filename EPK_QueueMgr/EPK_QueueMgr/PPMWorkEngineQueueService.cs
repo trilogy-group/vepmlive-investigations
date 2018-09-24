@@ -473,7 +473,7 @@ namespace WE_QueueMgr
 
         private void ManageQueueJobs(QMSite site)
         {
-            if (site != null)
+			if (site != null)
             {
                 lock (_locks.GetOrAdd(site.basePath.ToLower(), s => new object()))
                 {
@@ -607,19 +607,8 @@ namespace WE_QueueMgr
 
         private string InvokeWSSAdminRSVPRequest(QMSite site, Guid jobId)
         {
-
-            try
-            {
-                WSSAdmin wssadmin = new WSSAdmin();
-                return wssadmin.RSVPRequest("ManageQueue", site.basePath, jobId.ToString());
-            }
-            catch (Exception ex)
-            {
-                return "<Reply><HRESULT>0</HRESULT><STATUS>0</STATUS></Reply>";
-            }
-            finally
-            {
-            }
+            WSSAdmin wssadmin = new WSSAdmin();
+            return wssadmin.RSVPRequest("ManageQueue", site.basePath, jobId.ToString());
         }
 
     }
