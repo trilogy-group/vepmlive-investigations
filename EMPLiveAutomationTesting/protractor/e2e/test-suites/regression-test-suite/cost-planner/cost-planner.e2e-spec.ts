@@ -11,55 +11,55 @@ import {ProjectItemPageHelper} from '../../../page-objects/pages/items-page/proj
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Launch Cost Planner from Project center.(Ellipsis icon) - [743216]', async () => {
-        stepLogger.caseId = 743216;
+        StepLogger.caseId = 743216;
 
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.stepId(1);
-        await CommonPageHelper.selectProjectAndClickEllipsisButton(stepLogger);
+        StepLogger.stepId(1);
+        await CommonPageHelper.selectProjectAndClickEllipsisButton();
 
-        await CommonPageHelper.verifyVariousOptionsOnContextMenu(stepLogger);
+        await CommonPageHelper.verifyVariousOptionsOnContextMenu();
 
-        stepLogger.stepId(2);
-        await EditCostHelper.clickEditCostFromContextMenu(stepLogger);
+        StepLogger.stepId(2);
+        await EditCostHelper.clickEditCostFromContextMenu();
 
         await CommonPageHelper.switchToFirstContentFrame();
 
-        await EditCostHelper.validateEditCostWebElements(stepLogger);
+        await EditCostHelper.validateEditCostWebElements();
     });
     it('Launch Cost Planner from "View Item" page for Project. - [743217]', async () => {
-        stepLogger.caseId = 743217;
-        stepLogger.stepId(1);
+        StepLogger.caseId = 743217;
+        StepLogger.stepId(1);
 
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.stepId(2);
-        await CommonPageHelper.viewOptionViaRibbon(stepLogger);
+        StepLogger.stepId(2);
+        await CommonPageHelper.viewOptionViaRibbon();
 
-        await ProjectItemPageHelper.verifyProjectDetailsDisplayed(stepLogger);
+        await ProjectItemPageHelper.verifyProjectDetailsDisplayed();
 
-        stepLogger.stepId(3);
-        await CommonPageHelper.clickEditCost(stepLogger);
+        StepLogger.stepId(3);
+        await CommonPageHelper.clickEditCost();
 
         await CommonPageHelper.switchToFirstContentFrame();
 
-        await EditCostHelper.validateEditCostWebElements(stepLogger);
+        await EditCostHelper.validateEditCostWebElements();
     });
    });

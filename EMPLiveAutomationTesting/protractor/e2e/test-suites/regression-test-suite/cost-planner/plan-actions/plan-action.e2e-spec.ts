@@ -11,35 +11,35 @@ import {IssueItemPageHelper} from '../../../../page-objects/pages/items-page/iss
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Verify the "Save" button when no changes made - [743219]', async () => {
-        stepLogger.caseId = 743219;
-        stepLogger.stepId(1);
+        StepLogger.caseId = 743219;
+        StepLogger.stepId(1);
         // verification for step 1 is inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.stepId(2);
+        StepLogger.stepId(2);
 
-        await CommonPageHelper.selectRecordAndClickItem(stepLogger);
+        await CommonPageHelper.selectRecordAndClickItem();
 
-        await IssueItemPageHelper.validateContentOfItemTab(stepLogger);
+        await IssueItemPageHelper.validateContentOfItemTab();
 
-        stepLogger.stepId(3);
-        await CommonPageHelper.clickEditCost(stepLogger);
+        StepLogger.stepId(3);
+        await CommonPageHelper.clickEditCost();
 
         await CommonPageHelper.switchToFirstContentFrame();
 
-        await EditCostHelper.validateSaveButtonDisabled(stepLogger);
+        await EditCostHelper.validateSaveButtonDisabled();
     });
 });

@@ -18,72 +18,72 @@ import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 
 export class MyWorkPageHelper {
 
-    static async fillFormAndSave(stepLogger: StepLogger) {
+    static async fillFormAndSave() {
         const inputLabels = MyWorkPageConstants.inputLabels;
         const uniqueId = PageHelper.getUniqueId();
         const titleValue = `${inputLabels.title} ${uniqueId}`;
 
-        stepLogger.step(`Title *: New Item`);
+        StepLogger.step(`Title *: New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.title, titleValue);
 
-        stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
+        StepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
         await PageHelper.click(MyWorkPage.dropdownAll.project);
         await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.inputs.project);
         const projectName = await MyWorkPage.inputs.project.getText();
         await PageHelper.click(MyWorkPage.inputs.project);
 
-        stepLogger.verification('Required values entered/selected in Project Field');
+        StepLogger.verification('Required values entered/selected in Project Field');
         await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
             .toBe(true, ValidationsHelper.getFieldShouldHaveValueValidation(inputLabels.project, projectName));
 
-        stepLogger.step(`Assigned To: New Item`);
+        StepLogger.step(`Assigned To: New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.assignedTo, LoginPageHelper.adminEmailId);
-        stepLogger.step(`select assignedTo value`);
+        StepLogger.step(`select assignedTo value`);
         await PageHelper.click(MyWorkPage.selectValueFromSuggestions(LoginPageHelper.adminEmailId));
 
-        stepLogger.stepId(5);
-        stepLogger.step('Click on save');
+        StepLogger.stepId(5);
+        StepLogger.step('Click on save');
         await PageHelper.click(CommonPage.formButtons.save);
         await PageHelper.switchToDefaultContent();
 
-        stepLogger.verification('"New Item" page is closed');
+        StepLogger.verification('"New Item" page is closed');
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyWorkPageConstants.editPageName));
         // Wait for the page to close after clicking on save. This is to reduce window close synchronization issues
         await WaitHelper.staticWait(PageHelper.timeout.m);
 
-        stepLogger.verification('Newly created Item [Ex: Title 1] displayed in "My Work" page');
+        StepLogger.verification('Newly created Item [Ex: Title 1] displayed in "My Work" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
     }
 
-    static async fillTimeOffFormAndSave(titleValue: string, stepLogger: StepLogger) {
+    static async fillTimeOffFormAndSave(titleValue: string) {
 
-        stepLogger.step(`Title *: New Item`);
+        StepLogger.step(`Title *: New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.title, titleValue);
 
-        stepLogger.step('Time Off Type *: Select any type from the drop down [Ex: Holiday])');
+        StepLogger.step('Time Off Type *: Select any type from the drop down [Ex: Holiday])');
         await PageHelper.click(MyWorkPage.dropdownAll.timeOffType);
         await PageHelper.click(MyWorkPage.dropdownAll.timeOffInput);
 
-        stepLogger.step(`Requestor* : New Item`);
+        StepLogger.step(`Requestor* : New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.requestor, LoginPageHelper.adminEmailId);
-        stepLogger.step(`select Requester* value`);
+        StepLogger.step(`select Requester* value`);
         await PageHelper.click(MyWorkPage.selectValueFromSuggestions(LoginPageHelper.adminEmailId));
 
-        stepLogger.step(`Enter Start Date: New Item`);
+        StepLogger.step(`Enter Start Date: New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.start, CommonPageHelper.getTodayInMMDDYYYY);
 
-        stepLogger.step(`Enter Finish Date: New Item`);
+        StepLogger.step(`Enter Finish Date: New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.finish, CommonPageHelper.getYesterdayInMMDDYYYY);
 
-        stepLogger.stepId(5);
-        stepLogger.step('Click on save');
+        StepLogger.stepId(5);
+        StepLogger.step('Click on save');
         await PageHelper.click(CommonPage.formButtons.save);
         await PageHelper.switchToDefaultContent();
 
-        stepLogger.verification('"New Item" page is closed');
+        StepLogger.verification('"New Item" page is closed');
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyWorkPageConstants.editPageName));
@@ -91,54 +91,54 @@ export class MyWorkPageHelper {
         await WaitHelper.staticWait(PageHelper.timeout.m);
     }
 
-    static async clickOnPageTab(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Page" tab');
+    static async clickOnPageTab() {
+        StepLogger.step('Click on "Page" tab');
         await browser.sleep(PageHelper.timeout.s);
         await PageHelper.click(CommonPage.ribbonTitles.page);
     }
 
-    static async verifyMyWorkPageDisplayed(stepLogger: StepLogger) {
-        stepLogger.verification(`verify "My Work"  page is displayed`);
+    static async verifyMyWorkPageDisplayed() {
+        StepLogger.verification(`verify "My Work"  page is displayed`);
         const panelHeadingDisplayed = await PageHelper.isElementDisplayed(
             CommonPage.pageHeaders.myWorkplace.myWork);
         await expect(panelHeadingDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             CommonPageConstants.pageHeaders.myWorkplace.myWork));
     }
 
-    static async expandEditPageDropdown(stepLogger: StepLogger) {
-        stepLogger.step(`click on "Edit Page" dropdown`);
+    static async expandEditPageDropdown() {
+        StepLogger.step(`click on "Edit Page" dropdown`);
         await PageHelper.click(MyWorkPage.editPageDropdown);
     }
 
-    static async verifyEditPageDropdownOptions(stepLogger: StepLogger) {
-        stepLogger.verification(`verify "Edit Page" option is shown`);
+    static async verifyEditPageDropdownOptions() {
+        StepLogger.verification(`verify "Edit Page" option is shown`);
         const editPageDisplayed = await PageHelper.isElementDisplayed(
             MyWorkPage.editPageMenuOption);
         await expect(editPageDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             MyWorkPageConstants.editPageActions.editPage));
 
-        stepLogger.verification(`verify "Stop Editing" option is shown as disabled`);
+        StepLogger.verification(`verify "Stop Editing" option is shown as disabled`);
         const stopEditingDisplayed = await PageHelper.isElementDisplayed(
             MyWorkPage.disabledStopEditingOption);
         await expect(stopEditingDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             MyWorkPageConstants.editPageActions.stopEditing));
     }
 
-    static async clickOnEditPageMenuOption(stepLogger: StepLogger) {
-        stepLogger.step(`click on "Edit Page" option from dropdown`);
+    static async clickOnEditPageMenuOption() {
+        StepLogger.step(`click on "Edit Page" option from dropdown`);
         await PageHelper.click(MyWorkPage.editPageMenuOption);
     }
 
-    static async verifyEditPageOpened(stepLogger: StepLogger) {
-        stepLogger.verification(`verify "Edit Page" opens`);
+    static async verifyEditPageOpened() {
+        StepLogger.verification(`verify "Edit Page" opens`);
         const editPageDisplayed = await PageHelper.isElementDisplayed(
             MyWorkPage.editPage);
         await expect(editPageDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             MyWorkPageConstants.editPageActions.editPage));
     }
 
-    static  async verifyPageTabIsSelected(stepLogger: StepLogger) {
-        stepLogger.verification(`verify "PageTab" is shown as selected`);
+    static async verifyPageTabIsSelected() {
+        StepLogger.verification(`verify "PageTab" is shown as selected`);
         const tabDisplayed = await PageHelper.isElementDisplayed(MyWorkPage.selectedPageTab);
         await expect(tabDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             CommonPageConstants.ribbonMenuTitles.page));
@@ -167,70 +167,71 @@ export class MyWorkPageHelper {
         await PageHelper.click(MyWorkPage.viewsPopup.ok);
         return viewNewName;
     }
-    static async verifyAndAcceptRenameConfirmationPopup(viewName: string, stepLogger: StepLogger) {
+
+    static async verifyAndAcceptRenameConfirmationPopup(viewName: string) {
         const renamePopUpText = await PageHelper.getAlertText();
         const expectedPopUpText = `Would you like to rename the "${viewName}" view?`;
-        await ExpectationHelper.verifyStringEqualTo(renamePopUpText, expectedPopUpText, stepLogger);
+        await ExpectationHelper.verifyStringEqualTo(renamePopUpText, expectedPopUpText);
         await PageHelper.acceptAlert();
     }
 
-    static async navigateToMyWork(stepLogger: StepLogger) {
+    static async navigateToMyWork() {
         const pageHeader = CommonPage.pageHeaders;
         const pageHeaderName = CommonPageConstants.pageHeaders.myWorkplace;
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(MyWorkplacePage.navigation.myWork,
-            pageHeader.myWorkplace.myWork, pageHeaderName.myWork, stepLogger);
+            pageHeader.myWorkplace.myWork, pageHeaderName.myWork);
     }
 
-    static async clickStopEditing(stepLogger: StepLogger) {
-        stepLogger.step('Click on Stop Editing button available');
-        await this.clickOnPageTab(stepLogger);
+    static async clickStopEditing() {
+        StepLogger.step('Click on Stop Editing button available');
+        await this.clickOnPageTab();
         await PageHelper.click(MyWorkPage.stopEditing);
     }
 
-    static async verifyManageTabDisplayed(stepLogger: StepLogger) {
+    static async verifyManageTabDisplayed() {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.newItem,
             MyWorkPageConstants.manage,
-            stepLogger
+
         );
     }
 
-    static async clickOnManageTab(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Manage" tab.');
+    static async clickOnManageTab() {
+        StepLogger.step('Click on "Manage" tab.');
         await browser.sleep(PageHelper.timeout.s);
         await PageHelper.click(MyWorkPage.selectRibbonTabs.manage);
     }
 
-    static async goToNewChangesItem(stepLogger: StepLogger) {
-        await this.expandNewItem(stepLogger);
-        stepLogger.step('click on "Changes Item" drop-down.');
+    static async goToNewChangesItem() {
+        await this.expandNewItem();
+        StepLogger.step('click on "Changes Item" drop-down.');
         await PageHelper.click(MyWorkPage.newItemMenu.changesItem);
     }
 
-    static async verifyChangesNewItemPopupDisplayed(stepLogger: StepLogger) {
+    static async verifyChangesNewItemPopupDisplayed() {
         const changesItemLabel = `${MyWorkPageConstants.newItemTypeLabels.changes} ${MyWorkPageConstants.newItemPopupLabel}`;
         await ExpectationHelper.verifyText(
             MyWorkPage.inputs.heading,
             changesItemLabel,
             MyWorkPageConstants.pageName.changes,
-            stepLogger
+
         );
     }
 
-    static async fillNewItemFormForChanges(stepLogger: StepLogger) {
-        return await MyWorkPageHelper.fillNewItemForm(MyWorkPageConstants.newItemTypeLabels.changes, stepLogger);
+    static async fillNewItemFormForChanges() {
+        return await MyWorkPageHelper.fillNewItemForm(MyWorkPageConstants.newItemTypeLabels.changes);
     }
 
-    static async fillNewItemFormForRisks(stepLogger: StepLogger) {
-        return await MyWorkPageHelper.fillNewItemForm(MyWorkPageConstants.newItemTypeLabels.risks, stepLogger);
+    static async fillNewItemFormForRisks() {
+        return await MyWorkPageHelper.fillNewItemForm(MyWorkPageConstants.newItemTypeLabels.risks);
     }
 
-    static async fillNewItemFormForIssues(stepLogger: StepLogger) {
-        return await MyWorkPageHelper.fillNewItemForm(MyWorkPageConstants.newItemTypeLabels.issues, stepLogger);
+    static async fillNewItemFormForIssues() {
+        return await MyWorkPageHelper.fillNewItemForm(MyWorkPageConstants.newItemTypeLabels.issues);
     }
 
-    static async fillNewItemForm(itemType: string, stepLogger: StepLogger) {
-        stepLogger.step('Populate the necessary fields. Enter resource name in "Assigned To"' +
+    static async fillNewItemForm(itemType: string) {
+        StepLogger.step('Populate the necessary fields. Enter resource name in "Assigned To"' +
             ' field(for e.g. Administrator.) Click on "Save" button.');
         const uniqueId = PageHelper.getUniqueId();
         const itemTitle = `${itemType} ${uniqueId}`;
@@ -241,129 +242,129 @@ export class MyWorkPageHelper {
         const assignedTo = `${MyWorkPageConstants.adMembersLabel}${LoginPageHelper.adminEmailId}`;
         await TextboxHelper.sendKeys(MyWorkPage.inputs.assignedTo, assignedTo);
         await PageHelper.click(MyWorkPage.assignedToSuggestions);
-        await this.clickSaveButton(stepLogger);
+        await this.clickSaveButton();
         return itemTitle;
     }
 
-    static async clickSaveButton(stepLogger: StepLogger, switchToFrame = false) {
-        stepLogger.step('Click on save');
-        if ( switchToFrame ) {
+    static async clickSaveButton(switchToFrame = false) {
+        StepLogger.step('Click on save');
+        if (switchToFrame) {
             await CommonPageHelper.switchToFirstContentFrame();
         }
         await PageHelper.click(MyWorkPage.buttonsOnPopup.save);
     }
 
-    static async verifyCreateItem(itemTitle: string, stepLogger: StepLogger) {
+    static async verifyCreateItem(itemTitle: string) {
         await browser.sleep(PageHelper.timeout.s);
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.getItemByName(itemTitle),
             itemTitle,
-            stepLogger
+
         );
     }
 
-    static async goToDoNewItem(stepLogger: StepLogger) {
-        stepLogger.step('Expand the "New Item < ToDo Item" drop-down.');
+    static async goToDoNewItem() {
+        StepLogger.step('Expand the "New Item < ToDo Item" drop-down.');
         await PageHelper.click(MyWorkPage.newItem);
         await PageHelper.click(MyWorkPage.newItemMenu.toDoItem);
     }
 
-    static async verifyToDoNewItemPopupDisplayed(stepLogger: StepLogger) {
+    static async verifyToDoNewItemPopupDisplayed() {
         const toDoPopup = `${MyWorkPageConstants.newItemTypeLabels.toDo} ${MyWorkPageConstants.newItemPopupLabel}`;
         await ExpectationHelper.verifyText(
             MyWorkPage.inputs.heading,
             toDoPopup,
             MyWorkPageConstants.pageName.toDo,
-            stepLogger
+
         );
     }
 
-    static async verifyTitleValidationMessage(stepLogger: StepLogger) {
+    static async verifyTitleValidationMessage() {
         await ExpectationHelper.verifyText(
             MyWorkPage.validationMessage,
             MyWorkPageConstants.validationMessageLabel,
             MyWorkPageConstants.blankValidationMessage,
-            stepLogger
-        );
-}
 
-    static async clickCancelButton(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Cancel" button');
+        );
+    }
+
+    static async clickCancelButton() {
+        StepLogger.step('Click on "Cancel" button');
         await PageHelper.click(MyWorkPage.buttonsOnPopup.cancel);
     }
 
-    static async verifyPopupClosed(stepLogger: StepLogger) {
+    static async verifyPopupClosed() {
         const toDoPopup = `${MyWorkPageConstants.newItemTypeLabels.toDo} ${MyWorkPageConstants.newItemPopupLabel}`;
         await ExpectationHelper.verifyNotDisplayedStatus(
             MyWorkPage.inputs.title,
             toDoPopup,
-            stepLogger
+
         );
     }
 
-    static async expandNewItem(stepLogger: StepLogger) {
-        stepLogger.step('Expand the "New Item" drop-down.');
+    static async expandNewItem() {
+        StepLogger.step('Expand the "New Item" drop-down.');
         await PageHelper.click(MyWorkPage.newItem);
     }
 
-    static async newItemsDropdownDisplayed(stepLogger: StepLogger) {
+    static async newItemsDropdownDisplayed() {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.newItemMenu.changesItem,
             MyWorkPageConstants.newItemListLabel,
-            stepLogger
+
         );
     }
 
-    static async clickIssuesItem(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Issues Item"');
-        await PageHelper.click( MyWorkPage.newItemMenu.issuesItem);
+    static async clickIssuesItem() {
+        StepLogger.step('Click on "Issues Item"');
+        await PageHelper.click(MyWorkPage.newItemMenu.issuesItem);
     }
 
-    static async verifyIssuesNewItemPopupDisplayed(stepLogger: StepLogger) {
+    static async verifyIssuesNewItemPopupDisplayed() {
         const issueItemLabel = `${MyWorkPageConstants.newItemTypeLabels.issues} ${MyWorkPageConstants.newItemPopupLabel}`;
         await ExpectationHelper.verifyText(
             MyWorkPage.inputs.heading,
             issueItemLabel,
             MyWorkPageConstants.pageName.issues,
-            stepLogger
+
         );
     }
 
-    static async verifyRisksNewItemPopupDisplayed(stepLogger: StepLogger) {
+    static async verifyRisksNewItemPopupDisplayed() {
         const riskItemLabel = `${MyWorkPageConstants.newItemTypeLabels.risks} ${MyWorkPageConstants.newItemPopupLabel}`;
         await ExpectationHelper.verifyText(
             MyWorkPage.inputs.heading,
             riskItemLabel,
             MyWorkPageConstants.pageName.risks,
-            stepLogger
+
         );
     }
 
-    static async clickRisksItem(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Risks Item"');
-        await PageHelper.click( MyWorkPage.newItemMenu.risksItem);
+    static async clickRisksItem() {
+        StepLogger.step('Click on "Risks Item"');
+        await PageHelper.click(MyWorkPage.newItemMenu.risksItem);
     }
 
-    static async clickOnAnyCreatedItem(stepLogger: StepLogger) {
-        stepLogger.step('Click on newly created item in the grid.');
+    static async clickOnAnyCreatedItem() {
+        StepLogger.step('Click on newly created item in the grid.');
         await PageHelper.click(CommonPage.recordWithoutGreenTicket);
     }
 
-    static async verifyEditItemButtonEnabled(stepLogger: StepLogger) {
+    static async verifyEditItemButtonEnabled() {
         await ExpectationHelper.verifyEnabledStatus(
             MyWorkPage.manageTabRibbonItems.editItem,
             MyWorkPageConstants.editItemLabel,
-            stepLogger
+
         );
     }
 
-    static async clickOnEditItem(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Edit Item" button.');
+    static async clickOnEditItem() {
+        StepLogger.step('Click on "Edit Item" button.');
         await PageHelper.click(MyWorkPage.manageTabRibbonItems.editItem);
     }
 
-    static async editTitle(stepLogger: StepLogger) {
-        stepLogger.step('Edit field.');
+    static async editTitle() {
+        StepLogger.step('Edit field.');
         const uniqueId = PageHelper.getUniqueId();
         const itemEditedTitle = `${MyWorkPageConstants.editItemLabel} ${uniqueId}`;
         await CommonPageHelper.switchToFirstContentFrame();
@@ -371,124 +372,124 @@ export class MyWorkPageHelper {
         return itemEditedTitle;
     }
 
-    static async verifyChangesNotReflected(editedItemTitleForCancel: string, stepLogger: StepLogger) {
+    static async verifyChangesNotReflected(editedItemTitleForCancel: string) {
         await ExpectationHelper.verifyNotDisplayedStatus(
             MyWorkPage.getItemByName(editedItemTitleForCancel),
             editedItemTitleForCancel,
-            stepLogger
+
         );
     }
 
-    static async clickCancelIcon(stepLogger: StepLogger) {
-        stepLogger.step('Click on cancel icon');
+    static async clickCancelIcon() {
+        StepLogger.step('Click on cancel icon');
         await PageHelper.click(MyWorkPage.closeIconOnPopup);
     }
 
-    static async verifyCommentButtonEnabled(stepLogger: StepLogger) {
+    static async verifyCommentButtonEnabled() {
         await ExpectationHelper.verifyEnabledStatus(
             MyWorkPage.manageTabRibbonItems.comments,
             MyWorkPageConstants.commentsLabel,
-            stepLogger
+
         );
     }
 
-    static async clickOnComment(stepLogger: StepLogger) {
-        await stepLogger.step('Click on "Comment" button from ribbon panel.');
+    static async clickOnComment() {
+        await StepLogger.step('Click on "Comment" button from ribbon panel.');
         await PageHelper.click(MyWorkPage.manageTabRibbonItems.comments);
         await browser.sleep(PageHelper.timeout.s);
         await CommonPageHelper.switchToFirstContentFrame();
     }
 
-    static async addComment(stepLogger: StepLogger) {
-        stepLogger.step('Add a comment');
+    static async addComment() {
+        StepLogger.step('Add a comment');
         const uniqueId = PageHelper.getUniqueId();
         const commentText = `${MyWorkPageConstants.commentsLabel} ${uniqueId}`;
         await TextboxHelper.sendKeys(MyWorkPage.commentsPopupDetails.commentTextArea, commentText);
         return commentText;
     }
 
-    static async clickOnPost(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Post" button.');
+    static async clickOnPost() {
+        StepLogger.step('Click on "Post" button.');
         await PageHelper.click(MyWorkPage.commentsPopupDetails.post);
     }
 
-    static async verifyCommentedPost(commentText: string, stepLogger: StepLogger) {
+    static async verifyCommentedPost(commentText: string) {
         // Dynamic wait didn't help
         await browser.sleep(PageHelper.timeout.s);
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.getCommentByName(commentText),
             commentText,
-            stepLogger
+
         );
     }
 
-    static async clickEditOnAnyComment(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Edit" button.');
+    static async clickEditOnAnyComment() {
+        StepLogger.step('Click on "Edit" button.');
         await PageHelper.click(MyWorkPage.commentsPopupDetails.edit);
     }
 
-    static async editComment(stepLogger: StepLogger) {
-        stepLogger.step('Edit the comment');
+    static async editComment() {
+        StepLogger.step('Edit the comment');
         const uniqueId = PageHelper.getUniqueId();
         const commentText = `${MyWorkPageConstants.editCommentsLabel} ${uniqueId}`;
         await TextboxHelper.sendKeys(MyWorkPage.commentsPopupDetails.editCommentTextArea, commentText);
         return commentText;
     }
 
-    static async clickOnPostForEditComment(stepLogger: StepLogger) {
-        stepLogger.step('Click post button on edit comment section');
+    static async clickOnPostForEditComment() {
+        StepLogger.step('Click post button on edit comment section');
         await PageHelper.click(MyWorkPage.commentsPopupDetails.editPost);
     }
 
-    static async clickOnDelete(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Delete" button.');
+    static async clickOnDelete() {
+        StepLogger.step('Click on "Delete" button.');
         await ElementHelper.clickUsingJsNoWait(MyWorkPage.commentsPopupDetails.delete);
     }
 
-    static async verifyCommentDeleted(commentText: string, stepLogger: StepLogger) {
+    static async verifyCommentDeleted(commentText: string) {
         await ExpectationHelper.verifyNotDisplayedStatus(
             MyWorkPage.getCommentByName(commentText),
             commentText,
-            stepLogger
+
         );
     }
 
-    static async clickViewsTab(stepLogger: StepLogger) {
-        stepLogger.step('Click on View tab.');
+    static async clickViewsTab() {
+        StepLogger.step('Click on View tab.');
         await browser.sleep(PageHelper.timeout.s);
         const isViewTabDisplayed = await PageHelper.isElementPresent(MyWorkPage.selectRibbonTabs.views);
-        if (! isViewTabDisplayed) {
-            await this.clickOnAnyCreatedItem(stepLogger);
+        if (!isViewTabDisplayed) {
+            await this.clickOnAnyCreatedItem();
         }
         await PageHelper.click(MyWorkPage.selectRibbonTabs.views);
         // Scripts are failing - page takes time to load
         await browser.sleep(PageHelper.timeout.s);
     }
 
-    static async verifyViewRibbonDisplayed(stepLogger: StepLogger) {
+    static async verifyViewRibbonDisplayed() {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.getViewRibbonOptions.saveView,
             MyWorkPageConstants.viewsRibbonLabel,
-            stepLogger
+
         );
     }
 
-    static async clickSaveView(stepLogger: StepLogger) {
-        stepLogger.step('Click on Save View');
-        await this.clickOnAnyCreatedItem(stepLogger);
+    static async clickSaveView() {
+        StepLogger.step('Click on Save View');
+        await this.clickOnAnyCreatedItem();
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.saveView);
     }
 
-    static async verifySaveViewPopupDisplayed(stepLogger: StepLogger) {
+    static async verifySaveViewPopupDisplayed() {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.viewsPopup.name,
             MyWorkPageConstants.saveViewPopupLabel,
-            stepLogger
+
         );
     }
 
-    static async enterTextOnSaveViewTitle(stepLogger: StepLogger) {
-        stepLogger.step('Enter text - save view name');
+    static async enterTextOnSaveViewTitle() {
+        StepLogger.step('Enter text - save view name');
         const currentViewName = await PageHelper.getText(MyWorkPage.getCurrentView);
         const viewsPopupItems = MyWorkPage.viewsPopup;
         const uniqueId = PageHelper.getUniqueId();
@@ -498,78 +499,78 @@ export class MyWorkPageHelper {
         return currentViewName;
     }
 
-    static async clickCancelOnViewsPopup(stepLogger: StepLogger) {
-        stepLogger.step('Click on Cancel button');
+    static async clickCancelOnViewsPopup() {
+        StepLogger.step('Click on Cancel button');
         await PageHelper.click(MyWorkPage.viewsPopup.cancel);
     }
 
-    static async verifyViewName(currentView: string, stepLogger: StepLogger) {
+    static async verifyViewName(currentView: string) {
         await browser.sleep(PageHelper.timeout.s);
-        await this.clickOnAnyCreatedItem(stepLogger);
+        await this.clickOnAnyCreatedItem();
         await ExpectationHelper.verifyText(
             MyWorkPage.getCurrentView,
             MyWorkPageConstants.currentView,
             currentView,
-            stepLogger
+
         );
     }
 
-    static async selectViewFromCurrentView(stepLogger: StepLogger) {
-        stepLogger.step('Select some other view apart from Default view ');
+    static async selectViewFromCurrentView() {
+        StepLogger.step('Select some other view apart from Default view ');
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
         await browser.sleep(PageHelper.timeout.xs);
         await PageHelper.click(MyWorkPage.selectViewNameOtherThanDefault);
         // sometimes - stale exception
         await browser.sleep(PageHelper.timeout.s);
-        await this.clickViewsTab(stepLogger);
+        await this.clickViewsTab();
         const viewName = PageHelper.getText(MyWorkPage.getCurrentView);
         return viewName;
     }
 
-    static async clickRenameView(stepLogger: StepLogger) {
-        await this.clickOnAnyCreatedItem(stepLogger);
-        stepLogger.step('click on Rename view');
+    static async clickRenameView() {
+        await this.clickOnAnyCreatedItem();
+        StepLogger.step('click on Rename view');
         await ElementHelper.clickUsingJsNoWait(MyWorkPage.getViewRibbonOptions.renameView);
     }
 
-    static async verifyRenameViewDisplayed(stepLogger: StepLogger) {
+    static async verifyRenameViewDisplayed() {
         await browser.sleep(PageHelper.timeout.s);
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.viewsPopup.newName,
             MyWorkPageConstants.renameViewPopupLabel,
-            stepLogger
+
         );
     }
 
-    static async enterNewName(stepLogger: StepLogger) {
-        stepLogger.step('Enter text - rename view new name');
+    static async enterNewName() {
+        StepLogger.step('Enter text - rename view new name');
         const uniqueId = PageHelper.getUniqueId();
         const viewName = `${MyWorkPageConstants.viewName}${uniqueId}`;
         await TextboxHelper.sendKeys(MyWorkPage.viewsPopup.newName, viewName);
     }
 
-    static async clickCancelButtonViewsPopup(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Cancel" button');
+    static async clickCancelButtonViewsPopup() {
+        StepLogger.step('Click on "Cancel" button');
         await PageHelper.click(MyWorkPage.viewsPopup.cancel);
     }
 
-    static async clickDeleteView(stepLogger: StepLogger) {
-        stepLogger.step('Click on Delete View button.');
+    static async clickDeleteView() {
+        StepLogger.step('Click on Delete View button.');
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.deleteView);
     }
 
-    static async dismissDeletePopup(stepLogger: StepLogger) {
-        stepLogger.step('Click on Cancel button.');
+    static async dismissDeletePopup() {
+        StepLogger.step('Click on Cancel button.');
         await PageHelper.dismissAlert();
     }
 
-    static async goToSaveView(stepLogger: StepLogger) {
-        await this.clickViewsTab(stepLogger);
-        await this.clickSaveView(stepLogger);
+    static async goToSaveView() {
+        await this.clickViewsTab();
+        await this.clickSaveView();
     }
 
-    static async fillNameAndSubmitSaveView(stepLogger: StepLogger) {
-        stepLogger.step('Enter some valid text in it and do not check default view check box.Click on "Ok" button');
+    static async fillNameAndSubmitSaveView() {
+        StepLogger.step('Enter some valid text in it and do not check default view check box.Click on "Ok" button');
         const uniqueId = PageHelper.getUniqueId();
         const viewName = `${MyWorkPageConstants.viewName}${uniqueId}`;
         const viewsPopupItems = MyWorkPage.viewsPopup;
@@ -585,180 +586,180 @@ export class MyWorkPageHelper {
         return viewName;
     }
 
-    static async verifyDeleteViewPopup(viewName: string, stepLogger: StepLogger) {
+    static async verifyDeleteViewPopup(viewName: string) {
         const deletePopUpText = await PageHelper.getAlertText();
         const expectedPopUpText = `Would you like to delete the "${viewName}" view?`;
-        await ExpectationHelper.verifyStringEqualTo(deletePopUpText, expectedPopUpText, stepLogger);
+        await ExpectationHelper.verifyStringEqualTo(deletePopUpText, expectedPopUpText);
     }
 
-    static async clickOKonDeleteViewPopup(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Ok" button.');
+    static async clickOKonDeleteViewPopup() {
+        StepLogger.step('Click on "Ok" button.');
         await PageHelper.acceptAlert();
     }
 
-    static async verifyViewDeleted(currentViewName: string, stepLogger: StepLogger) {
+    static async verifyViewDeleted(currentViewName: string) {
         await browser.sleep(PageHelper.timeout.s);
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
         await ExpectationHelper.verifyNotDisplayedStatus(
             MyWorkPage.getCurrentViewByName(currentViewName),
             currentViewName,
-            stepLogger
+
         );
     }
 
-    static async clickSelectColumns(stepLogger: StepLogger) {
-        await this.clickOnAnyCreatedItem(stepLogger);
-        stepLogger.step('Click on "Select Columns".');
+    static async clickSelectColumns() {
+        await this.clickOnAnyCreatedItem();
+        StepLogger.step('Click on "Select Columns".');
         await ElementHelper.clickUsingJsNoWait(MyWorkPage.getViewRibbonOptions.selectColumns);
     }
 
-    static async verifyButtonsOnSelectColumns(stepLogger: StepLogger) {
+    static async verifyButtonsOnSelectColumns() {
         const selectPopupItems = MyWorkPage.selectColumnsPopup;
         const selectPopupLabels = CommonPageConstants.selectColumnsPopup;
         await ExpectationHelper.verifyDisplayedStatus(
             selectPopupItems.ok,
             selectPopupLabels.ok,
-            stepLogger
+
         );
         await ExpectationHelper.verifyDisplayedStatus(
             selectPopupItems.cancel,
             selectPopupLabels.cancel,
-            stepLogger
+
         );
         await ExpectationHelper.verifyDisplayedStatus(
             selectPopupItems.hideAll,
             selectPopupLabels.hideAll,
-            stepLogger
+
         );
     }
 
-    static async selectColumn(stepLogger: StepLogger) {
-        stepLogger.step('Select the check-box for any column, Click on "Ok" button');
+    static async selectColumn() {
+        StepLogger.step('Select the check-box for any column, Click on "Ok" button');
         const selectPopupItems = MyWorkPage.selectColumnsPopup;
         const columnName = await PageHelper.getText(selectPopupItems.column.get(0));
         const isColumnSelected = await PageHelper.isElementPresent(MyWorkPage.getColumnSelectedOnSelectColumnsPopup(columnName));
-        if (! isColumnSelected) {
+        if (!isColumnSelected) {
             await PageHelper.click(selectPopupItems.column.get(0));
         }
         await PageHelper.click(selectPopupItems.ok);
         return columnName;
     }
 
-    static async verifySelectedColumnDisplayed(selectedColumn: string, stepLogger: StepLogger) {
-        await ExpectationHelper.verifyDisplayedStatus (
+    static async verifySelectedColumnDisplayed(selectedColumn: string) {
+        await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.columnDisplayed(selectedColumn),
             selectedColumn,
-            stepLogger
+
         );
     }
 
-    static async deleteNameInSaveViewSubmit(stepLogger: StepLogger) {
-        stepLogger.step('Delete the text from the text-box. Click on "Ok" button.');
+    static async deleteNameInSaveViewSubmit() {
+        StepLogger.step('Delete the text from the text-box. Click on "Ok" button.');
         const saveViewPopupItems = await MyWorkPage.viewsPopup;
         await PageHelper.click(saveViewPopupItems.name);
         await TextboxHelper.clearText(saveViewPopupItems.name);
         await PageHelper.click(saveViewPopupItems.ok);
     }
 
-    static async verifyEmptyNameMessage(stepLogger: StepLogger) {
+    static async verifyEmptyNameMessage() {
         const alertMessageExpected = await PageHelper.getAlertText();
         await ExpectationHelper.verifyStringEqualTo(
             alertMessageExpected,
             MyWorkPageConstants.noNameMessage,
-            stepLogger
+
         );
     }
 
-    static async clickOKAlert(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Ok" button.');
+    static async clickOKAlert() {
+        StepLogger.step('Click on "Ok" button.');
         await PageHelper.acceptAlert();
     }
 
-    static async clickEllipsesIcon(stepLogger: StepLogger) {
-        stepLogger.step('Click on ellipses icon.');
+    static async clickEllipsesIcon() {
+        StepLogger.step('Click on ellipses icon.');
         await browser.sleep(PageHelper.timeout.s);
         await ElementHelper.clickUsingJsNoWait(MyWorkPage.headerOptions.ellipses);
     }
 
-    static async verifyEllipsesDropdownDisplayed(stepLogger: StepLogger) {
+    static async verifyEllipsesDropdownDisplayed() {
         await browser.sleep(PageHelper.timeout.s);
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.ellipsesDropdown.workTypes,
             MyWorkPageConstants.ellipsesDropdownLabel,
-            stepLogger
+
         );
     }
 
-    static async clickCloseOnEllipsesDropdown(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Close" button.');
+    static async clickCloseOnEllipsesDropdown() {
+        StepLogger.step('Click on "Close" button.');
         await PageHelper.click(MyWorkPage.ellipsesDropdown.close);
     }
 
-    static async verifyEllipsesDropdownClosed(stepLogger: StepLogger) {
+    static async verifyEllipsesDropdownClosed() {
         await ExpectationHelper.verifyHiddenStatus(
             MyWorkPage.ellipsesDropdown.workTypes,
             MyWorkPageConstants.ellipsesDropdownLabel,
-            stepLogger
+
         );
     }
 
-    static async clickOnWorkingOnForAnyItem(stepLogger: StepLogger) {
-        stepLogger.step('Click on the "Working on" column for any of the items');
+    static async clickOnWorkingOnForAnyItem() {
+        StepLogger.step('Click on the "Working on" column for any of the items');
         const gridItems = MyWorkPage.gridDetails;
         const radioButtonClassAttribute = await PageHelper.getAttributeValue(
             gridItems.workingOn.get(0), HtmlHelper.attributes.class);
         const isChecked = radioButtonClassAttribute.includes(MyWorkPageConstants.radioCheckedLabel);
-        if ( ! isChecked) {
+        if (!isChecked) {
             await PageHelper.click(gridItems.workingOn.get(0));
         }
-        await this.clickOnAnyCreatedItem(stepLogger);
+        await this.clickOnAnyCreatedItem();
         const selectedItemTitle = await PageHelper.getText(gridItems.title.get(0));
         return selectedItemTitle;
     }
 
-    static async selectWorkingOnView(stepLogger: StepLogger) {
-        stepLogger.step('Expand the "Current View" drop-down and click on Click on "Working on it"');
+    static async selectWorkingOnView() {
+        StepLogger.step('Expand the "Current View" drop-down and click on Click on "Working on it"');
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
         await browser.sleep(PageHelper.timeout.xs);
         await ElementHelper.clickUsingJsNoWait(MyWorkPage.getCurrentViewByName(MyWorkPageConstants.workingOnItLabel));
         // sometimes - stale exception
         await browser.sleep(PageHelper.timeout.s);
-        await this.clickViewsTab(stepLogger);
+        await this.clickViewsTab();
     }
 
-    static async verifyWorkingOnItemDisplayed(itemTitle: any, stepLogger: StepLogger) {
+    static async verifyWorkingOnItemDisplayed(itemTitle: any) {
         await ExpectationHelper.verifyDisplayedStatus(
             CommonPage.getGridRowByTitle(itemTitle),
             `${MyWorkPageConstants.workingOnItLabel} item`,
-            stepLogger
+
         );
     }
 
-    static async verifyRadioButtonSelected(stepLogger: StepLogger) {
+    static async verifyRadioButtonSelected() {
         const gridItems = MyWorkPage.gridDetails;
         await ExpectationHelper.verifyAttributeContains(
             gridItems.workingOn.get(0),
             HtmlHelper.attributes.class,
             MyWorkPageConstants.radioCheckedLabel,
-            stepLogger
+
         );
     }
 
-    static async hoverOnAnyOption(stepLogger: StepLogger) {
-        stepLogger.step('Hover the mouse for any of the options.');
+    static async hoverOnAnyOption() {
+        StepLogger.step('Hover the mouse for any of the options.');
         await ElementHelper.actionHoverOver(MyWorkPage.ellipsesDropdown.workTypes);
     }
 
-    static async verifySubmenuDisplayed(stepLogger: StepLogger) {
+    static async verifySubmenuDisplayed() {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.ellipsesDropdown.workTypeSubmenuItem,
             MyWorkPageConstants.workTypeSubMenuLabel,
-            stepLogger
+
         );
     }
 
-    static async clickWorkTypeOption(stepLogger: StepLogger) {
-        stepLogger.step('Click on any option');
+    static async clickWorkTypeOption() {
+        StepLogger.step('Click on any option');
         const ellipseMyWorkPageItems = MyWorkPage.ellipsesDropdown;
         await ElementHelper.actionHoverOver(ellipseMyWorkPageItems.workTypes);
         const workType = await PageHelper.getText(ellipseMyWorkPageItems.workTypeSubmenuItem);
@@ -766,253 +767,239 @@ export class MyWorkPageHelper {
         return workType;
     }
 
-    static async verifySearchResults(workType: string, stepLogger: StepLogger) {
+    static async verifySearchResults(workType: string) {
         const rowCount = await MyWorkPage.gridDetails.workType.count();
-        for (let i = 0 ; i < rowCount; i++) {
+        for (let i = 0; i < rowCount; i++) {
             await ExpectationHelper.verifyText(
                 MyWorkPage.gridDetails.workType.get(i),
                 MyWorkPageConstants.searchResultsLabel,
                 workType,
-                stepLogger
+
             );
         }
     }
 
-    static async doubleClickOnTitle(stepLogger: StepLogger) {
-        stepLogger.step('Wait for elements to be greater than 0');
-        await browser.wait(async() => await MyWorkPage.gridDetails.title.count() > 0);
-        stepLogger.step('Double Click on the right side of item name.');
+    static async doubleClickOnTitle() {
+        StepLogger.step('Wait for elements to be greater than 0');
+        await browser.wait(async () => await MyWorkPage.gridDetails.title.count() > 0);
+        StepLogger.step('Double Click on the right side of item name.');
         await browser.actions().click(MyWorkPage.gridDetails.title.get(0)).perform();
     }
 
-    static async verifyTitleInEditableMode(stepLogger: StepLogger) {
+    static async verifyTitleInEditableMode() {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.gridDetails.editTitle,
             MyWorkPageConstants.editTitleLabel,
-            stepLogger
+
         );
     }
 
-    static async editTitleInGrid(stepLogger: StepLogger) {
-        stepLogger.step('Make the necessary changes. - edit title');
+    static async editTitleInGrid() {
+        StepLogger.step('Make the necessary changes. - edit title');
         const uniqueId = PageHelper.getUniqueId();
         const title = `${MyWorkPageConstants.editItemLabel}${uniqueId}`;
         await TextboxHelper.sendKeys(MyWorkPage.gridDetails.editTitle, title);
         return title;
     }
 
-    static async clickAnyWhereElseOnPage(stepLogger: StepLogger) {
-        stepLogger.step('Click on anywhere else on the page.');
+    static async clickAnyWhereElseOnPage() {
+        StepLogger.step('Click on anywhere else on the page.');
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentView);
     }
 
-    static async verifyTitleEdited(editedTitle: string, stepLogger: StepLogger) {
+    static async verifyTitleEdited(editedTitle: string) {
         await ExpectationHelper.verifyDisplayedStatus(
             CommonPage.getGridRowByTitle(editedTitle),
             editedTitle,
-            stepLogger
+
         );
     }
 
-    static async clickOnEllipsesForAnyItem(stepLogger: StepLogger) {
-        stepLogger.step('Expand the ellipsis icon for a grid item.');
+    static async clickOnEllipsesForAnyItem() {
+        StepLogger.step('Expand the ellipsis icon for a grid item.');
         const gridItems = MyWorkPage.gridDetails;
         const title = await PageHelper.getText(gridItems.title.get(0));
         await PageHelper.click(gridItems.toEdit.get(0));
         return title;
     }
 
-    static async verifyEllipsesDropdownForItemDisplayed(stepLogger: StepLogger) {
+    static async verifyEllipsesDropdownForItemDisplayed() {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.ellipsesDropdownForItem.deleteItem,
             MyWorkPageConstants.ellipsesDropdownLabel,
-            stepLogger
         );
     }
 
-    static async clickOnDeleteItem(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Delete Item" option.');
+    static async clickOnDeleteItem() {
+        StepLogger.step('Click on "Delete Item" option.');
         await PageHelper.click(MyWorkPage.ellipsesDropdownForItem.deleteItem);
     }
 
-    static async verifyDeleteItemPopup(stepLogger: StepLogger) {
+    static async verifyDeleteItemPopup() {
         const actualMessage = await PageHelper.getAlertText();
         await ExpectationHelper.verifyStringEqualTo(
             actualMessage,
             MyWorkPageConstants.deleteItemMessage,
-            stepLogger
         );
     }
 
-    static async verifyItemDeleted(itemTitle: any, stepLogger: StepLogger) {
+    static async verifyItemDeleted(itemTitle: any) {
         await PageHelper.refreshPage();
         await browser.sleep(PageHelper.timeout.s);
         await ExpectationHelper.verifyNotDisplayedStatus(
             CommonPage.getGridRowByTitle(itemTitle),
             itemTitle,
-            stepLogger
         );
     }
 
-    static async selectDefaultView(stepLogger: StepLogger) {
-        stepLogger.step('Select Default View');
+    static async selectDefaultView() {
+        StepLogger.step('Select Default View');
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
         await browser.sleep(PageHelper.timeout.xs);
         await ElementHelper.clickUsingJsNoWait(MyWorkPage.getCurrentViewByName(MyWorkPageConstants.defaultViewLabel));
     }
 
-    static async verifyDeleletViewMessageForDefaultView(stepLogger: StepLogger) {
+    static async verifyDeleletViewMessageForDefaultView() {
         const actualMessage = await PageHelper.getAlertText();
         await ExpectationHelper.verifyStringEqualTo(
             actualMessage,
             MyWorkPageConstants.deleteDefaultViewMessage,
-            stepLogger
         );
     }
 
-    static async verifyAlertClosed(stepLogger: StepLogger) {
+    static async verifyAlertClosed() {
         await browser.sleep(PageHelper.timeout.s);
         await ExpectationHelper.verifyAlertNotDisplayed(
             MyWorkPageConstants.alertLabel,
-            stepLogger
         );
     }
 
-    static async verifyRenameViewMessageForDefaultView(stepLogger: StepLogger) {
+    static async verifyRenameViewMessageForDefaultView() {
         await browser.sleep(PageHelper.timeout.s);
         const actualMessage = await PageHelper.getAlertText();
         await ExpectationHelper.verifyStringEqualTo(
             actualMessage,
             MyWorkPageConstants.renameDefaultViewMessage,
-            stepLogger
         );
     }
 
-    static async verifyDefaultViewName(stepLogger: StepLogger) {
-        await this.verifyViewName(MyWorkPageConstants.defaultViewLabel, stepLogger);
+    static async verifyDefaultViewName() {
+        await this.verifyViewName(MyWorkPageConstants.defaultViewLabel);
     }
 
-    static async clickOnShowFilters(stepLogger: StepLogger) {
-        stepLogger.step('Click on Show Filters button.');
+    static async clickOnShowFilters() {
+        StepLogger.step('Click on Show Filters button.');
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.showFilters);
     }
 
-    static async verifyExtraRowAdded(stepLogger: StepLogger) {
+    static async verifyExtraRowAdded() {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.gridDetails.filter,
             MyWorkPageConstants.filterRowLabel,
-            stepLogger
         );
     }
 
-    static async getFirstWorkType(stepLogger: StepLogger) {
-        stepLogger.step('Get first work type');
+    static async getFirstWorkType() {
+        StepLogger.step('Get first work type');
         return await PageHelper.getText(MyWorkPage.gridDetails.workTypeValues.get(0));
     }
 
-    static async enterTextOnFilterFields(filterText: string, stepLogger: StepLogger) {
-        stepLogger.step('Enter some valid text under any of the column names and hit enter.');
+    static async enterTextOnFilterFields(filterText: string) {
+        StepLogger.step('Enter some valid text under any of the column names and hit enter.');
         await browser.sleep(PageHelper.timeout.s);
         const workTypeFilter = MyWorkPage.gridDetails.workTypeFilter;
-        await CommonPageHelper.filterColumnByText(workTypeFilter, filterText, stepLogger);
+        await CommonPageHelper.filterColumnByText(workTypeFilter, filterText);
         return filterText;
     }
 
-    static async clickOnAnyColumnHeader(stepLogger: StepLogger) {
-        stepLogger.step('Click on any of the column header.');
+    static async clickOnAnyColumnHeader() {
+        StepLogger.step('Click on any of the column header.');
         await PageHelper.click(MyWorkPage.gridDetails.workTypeHeader);
     }
 
-    static async verifyColumnSortedDisplayed(stepLogger: StepLogger) {
+    static async verifyColumnSortedDisplayed() {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.gridDetails.sorted,
             MyWorkPageConstants.sortedColumnsLabel,
-            stepLogger
         );
     }
 
-    static async clickOnRemoveSorting(stepLogger: StepLogger) {
-        stepLogger.step('Click on remove sorting button');
+    static async clickOnRemoveSorting() {
+        StepLogger.step('Click on remove sorting button');
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.removeSorting);
     }
 
-    static async verifySortedRemoved(stepLogger: StepLogger) {
+    static async verifySortedRemoved() {
         await ExpectationHelper.verifyNotDisplayedStatus(
             MyWorkPage.gridDetails.sorted,
             MyWorkPageConstants.sortedColumnsLabel,
-            stepLogger
         );
     }
 
-    static async expandCurrentView(stepLogger: StepLogger) {
-        stepLogger.step('Expand the Current View drop down by clicking on it.');
+    static async expandCurrentView() {
+        StepLogger.step('Expand the Current View drop down by clicking on it.');
         await ElementHelper.clickUsingJsNoWait(MyWorkPage.getViewRibbonOptions.manageCurrentViewDropdown);
     }
 
-    static async verifySavedViewDisplayed(stepLogger: StepLogger) {
+    static async verifySavedViewDisplayed() {
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.newlyCreatedView,
             MyWorkPageConstants.newlyCreatedViewLabel,
-            stepLogger
         );
         return await PageHelper.getText(MyWorkPage.newlyCreatedView);
     }
 
-    static async clickOnNewlyCreatedView(viewName: string, stepLogger: StepLogger) {
-        stepLogger.step('Click on any of the options.');
+    static async clickOnNewlyCreatedView(viewName: string) {
+        StepLogger.step('Click on any of the options.');
         await ElementHelper.clickUsingJsNoWait(MyWorkPage.getCurrentViewByName(viewName));
     }
 
-    static async clickCancelOnSelectColumnsPopup(stepLogger: StepLogger) {
-        stepLogger.step('Click on any of the options.');
+    static async clickCancelOnSelectColumnsPopup() {
+        StepLogger.step('Click on any of the options.');
         await PageHelper.click(MyWorkPage.selectColumnsPopup.cancel);
     }
 
-    static async verifySelectColumnPopupClosed(stepLogger: StepLogger) {
+    static async verifySelectColumnPopupClosed() {
         await ExpectationHelper.verifyNotDisplayedStatus(
             MyWorkPage.selectColumnsPopup.hideAll,
             MyWorkPageConstants.selectColumnsPopupLabel,
-            stepLogger
         );
     }
 
-    static async clickOnHideAllButton(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Hide All" button');
+    static async clickOnHideAllButton() {
+        StepLogger.step('Click on "Hide All" button');
         await PageHelper.click(MyWorkPage.selectColumnsPopup.hideAll);
     }
 
-    static async verifyHideAllFunctionality(stepLogger: StepLogger) {
+    static async verifyHideAllFunctionality() {
         const selectColumnsPopupItems = MyWorkPage.selectColumnsPopup;
         await ExpectationHelper.verifyDisplayedStatus(
             selectColumnsPopupItems.showAll,
             CommonPageConstants.selectColumnsPopup.showAll,
-            stepLogger
         );
         await ExpectationHelper.verifyNotDisplayedStatus(
             selectColumnsPopupItems.eachSelectedColumn,
             MyWorkPageConstants.selectedCheckboxLabel,
-            stepLogger
         );
     }
 
-    static async clickOnShowAllButton(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Show All" button');
+    static async clickOnShowAllButton() {
+        StepLogger.step('Click on "Show All" button');
         await PageHelper.click(MyWorkPage.selectColumnsPopup.showAll);
     }
 
-    static async verifyShowAllFunctionality(stepLogger: StepLogger) {
+    static async verifyShowAllFunctionality() {
         await ExpectationHelper.verifyNotDisplayedStatus(
             MyWorkPage.selectColumnsPopup.columnUnchecked,
             MyWorkPageConstants.unSelectedCheckboxLabel,
-            stepLogger
         );
     }
 
-    static async selectAllColumnsAndSubmit(stepLogger: StepLogger) {
+    static async selectAllColumnsAndSubmit() {
         const selectColumnPopupItems = MyWorkPage.selectColumnsPopup;
         // unselecting the columns which has images
         let i, j: number;
-        for ( i = 0; i < 2; i++) {
+        for (i = 0; i < 2; i++) {
             await PageHelper.click(selectColumnPopupItems.columnNameWithImages.get(i));
         }
         await PageHelper.click(MyWorkPage.getColumnByNameOnSelectColumnsPopup('CommentCount'));
@@ -1023,19 +1010,18 @@ export class MyWorkPageHelper {
             const eachColumnName = await PageHelper.getText(selectColumnPopupItems.allSelectedColumn.get(j));
             allSelectedColumns.push(eachColumnName);
         }
-        stepLogger.step('Click on "Ok" button');
+        StepLogger.step('Click on "Ok" button');
         await PageHelper.click(selectColumnPopupItems.ok);
         return allSelectedColumns;
     }
 
-    static async verifySelectedColumnsDisplayed(selectedColNames: string[], stepLogger: StepLogger) {
+    static async verifySelectedColumnsDisplayed(selectedColNames: string[]) {
         await browser.sleep(PageHelper.timeout.s);
         for (let i = 0; i < selectedColNames.length - 1; i++) {
             await ElementHelper.scrollToElement(MyWorkPage.columnDisplayed(selectedColNames[i]));
             await ExpectationHelper.verifyDisplayedStatus(
                 MyWorkPage.columnDisplayed(selectedColNames[i]),
                 selectedColNames[i],
-                stepLogger
             );
         }
     }

@@ -220,39 +220,39 @@ export class CommonPageHelper {
     static async navigateToItemPageUnderNavigation(linkOfThePage: ElementFinder,
                                                    pageHeader: ElementFinder,
                                                    pageName: string,
-                                                   stepLogger: StepLogger) {
-        stepLogger.step('Select "Navigation" icon  from left side menu');
+    ) {
+        StepLogger.step('Select "Navigation" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.navigation);
-        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, stepLogger);
+        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, );
     }
 
     static async searchByTitle(linkOfThePage: ElementFinder,
                                pageHeader: ElementFinder,
                                pageName: string,
-                               stepLogger: StepLogger, titleValue: string, columnName: string) {
+                               titleValue: string, columnName: string) {
         await this.navigateToItemPageUnderNavigation(
             linkOfThePage,
             pageHeader,
             pageName,
-            stepLogger);
-        await this.searchItemByTitle(titleValue, columnName, stepLogger);
+        );
+        await this.searchItemByTitle(titleValue, columnName, );
     }
 
     static async navigateToItemPageUnderMyWorkplace(linkOfThePage: ElementFinder,
                                                     pageHeader: ElementFinder,
                                                     pageName: string,
-                                                    stepLogger: StepLogger) {
-        stepLogger.step('Select "My Workplace" icon  from left side menu');
+    ) {
+        StepLogger.step('Select "My Workplace" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.myWorkplace);
-        stepLogger.stepId(2);
-        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, stepLogger);
+        StepLogger.stepId(2);
+        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, );
     }
 
-    static async navigateToSubPage(pageName: string, linkOfThePage: ElementFinder, pageHeader: ElementFinder, stepLogger: StepLogger) {
-        stepLogger.step(`Select Project -> ${pageName} from the left side menu options displayed`);
+    static async navigateToSubPage(pageName: string, linkOfThePage: ElementFinder, pageHeader: ElementFinder) {
+        StepLogger.step(`Select Project -> ${pageName} from the left side menu options displayed`);
         await PageHelper.click(linkOfThePage);
 
-        stepLogger.verification(`${pageName} page is displayed`);
+        StepLogger.verification(`${pageName} page is displayed`);
         await expect(await PageHelper.isElementDisplayed(pageHeader))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(pageName));
@@ -262,30 +262,30 @@ export class CommonPageHelper {
         return element(By.xpath(`//td[contains(@class,'GMHeaderText') and ${ComponentHelpers.getXPathFunctionForDot(text)}]`));
     }
 
-    static async searchItemByTitle(titleValue: string, columnName: string, stepLogger: StepLogger, verifySearchControl = false) {
+    static async searchItemByTitle(titleValue: string, columnName: string, verifySearchControl = false) {
 
         // Give it sometime to create, Created Item is not reflecting immediately. requires time in processing
         // and search option also requires some time to settle down
         await browser.sleep(PageHelper.timeout.m);
 
-        stepLogger.step('Click on search');
+        StepLogger.step('Click on search');
         await PageHelper.click(CommonPage.actionMenuIcons.search);
 
         if (verifySearchControl === true) {
-            stepLogger.verification('Search Component dropdown is available');
+            StepLogger.verification('Search Component dropdown is available');
             await expect(await PageHelper.isElementDisplayed(CommonPage.searchControls.column))
                 .toBe(true, ValidationsHelper.getDisplayedValidation(CommonPageConstants.searchControl.searchComponentDropdown));
-            stepLogger.verification('Search Operator dropdown is available');
+            StepLogger.verification('Search Operator dropdown is available');
             await expect(await PageHelper.isElementDisplayed(CommonPage.searchControls.type))
                 .toBe(true, ValidationsHelper.getDisplayedValidation(CommonPageConstants.searchControl.searchOperatorDropdown));
-            stepLogger.verification('Search field is available');
+            StepLogger.verification('Search field is available');
             await expect(await PageHelper.isElementDisplayed(CommonPage.searchControls.text))
                 .toBe(true, ValidationsHelper.getDisplayedValidation(CommonPageConstants.searchControl.searchField));
         }
-        stepLogger.step('Select column name as Title');
+        StepLogger.step('Select column name as Title');
         await PageHelper.sendKeysToInputField(CommonPage.searchControls.column, columnName);
 
-        stepLogger.step('Enter search title');
+        StepLogger.step('Enter search title');
         await TextboxHelper.sendKeys(CommonPage.searchControls.text, titleValue, true);
     }
 
@@ -323,84 +323,84 @@ export class CommonPageHelper {
         return element(By.css(`#RibbonContainer li[title="${title}"]`));
     }
 
-    static async refreshPageIfRibbonElementIsDisable(stepLogger: StepLogger, targetElement: ElementFinder, item = CommonPage.record) {
+    static async refreshPageIfRibbonElementIsDisable(targetElement: ElementFinder, item = CommonPage.record) {
         let maxAttempts = 0;
         await browser.sleep(PageHelper.timeout.s);
 
         while ((await CommonPageHelper.getRibbonIsDisable(targetElement, 'aria-disabled') === 'true') && maxAttempts++ < 10) {
             await browser.refresh();
-            await this.selectRecordFromGrid(stepLogger, item);
+            await this.selectRecordFromGrid(item);
         }
     }
 
-    static async editOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
-        await this.selectRecordFromGrid(stepLogger, item);
+    static async editOptionViaRibbon(item = CommonPage.record) {
+        await this.selectRecordFromGrid(item);
 
-        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editItem);
+        await this.refreshPageIfRibbonElementIsDisable(CommonPage.ribbonItems.editItem);
 
-        stepLogger.step('Select "Edit Item" from the options displayed');
+        StepLogger.step('Select "Edit Item" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editItem);
 
     }
 
-    static async editCostViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
-        await this.selectRecordFromGrid(stepLogger, item);
+    static async editCostViaRibbon(item = CommonPage.record) {
+        await this.selectRecordFromGrid(item);
 
-        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editCost);
+        await this.refreshPageIfRibbonElementIsDisable(CommonPage.ribbonItems.editCost);
 
-        await IssueItemPageHelper.validateContentOfItemTab(stepLogger);
+        await IssueItemPageHelper.validateContentOfItemTab();
 
-        stepLogger.step('Select "Edit Cost" from the options displayed');
+        StepLogger.step('Select "Edit Cost" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editCost);
 
     }
 
-    static async selectRecordAndClickItem(stepLogger: StepLogger, item = CommonPage.record) {
-        await this.selectRecordFromGrid(stepLogger, item);
+    static async selectRecordAndClickItem(item = CommonPage.record) {
+        await this.selectRecordFromGrid(item);
 
-        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editCost);
+        await this.refreshPageIfRibbonElementIsDisable(CommonPage.ribbonItems.editCost);
 
     }
 
-    static async clickEditCost(stepLogger: StepLogger) {
-        stepLogger.step('Select "Edit Cost" from the options displayed');
+    static async clickEditCost() {
+        StepLogger.step('Select "Edit Cost" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editCost);
     }
 
-    static async clickEditResourcePlanViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
-        await this.selectRecordFromGrid(stepLogger, item);
-        stepLogger.step('Select "Edit Resource Plan" from the options displayed');
+    static async clickEditResourcePlanViaRibbon(item = CommonPage.record) {
+        await this.selectRecordFromGrid(item);
+        StepLogger.step('Select "Edit Resource Plan" from the options displayed');
 
-        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editResource);
+        await this.refreshPageIfRibbonElementIsDisable(CommonPage.ribbonItems.editResource);
 
         await PageHelper.click(CommonPage.ribbonItems.editResource);
-        stepLogger.step('Select "Edit Resource Plan" from the options displayed');
+        StepLogger.step('Select "Edit Resource Plan" from the options displayed');
     }
 
-    static async resourceAnalyzerViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
-        await this.selectRecordFromGrid(stepLogger, item);
-        stepLogger.step('Select "Edit Resource Analyzer" from the options displayed');
+    static async resourceAnalyzerViaRibbon(item = CommonPage.record) {
+        await this.selectRecordFromGrid(item);
+        StepLogger.step('Select "Edit Resource Analyzer" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.resourceAnalyzer);
         await WaitHelper.waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
         await PageHelper.switchToDefaultContent();
         await PageHelper.switchToFrame(CommonPage.contentFrame);
         await WaitHelper.staticWait(PageHelper.timeout.xs);
-        await ResourceAnalyzerPageHelper.clickDisplayButton(stepLogger);
+        await ResourceAnalyzerPageHelper.clickDisplayButton();
         await PageHelper.acceptAlert();
-        stepLogger.step('Resource Analyzer Page is displayed');
+        StepLogger.step('Resource Analyzer Page is displayed');
         await expect(await PageHelper.isElementDisplayed(ResourceAnalyzerPage.analyzerTab))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.resourceAnalyzer));
     }
 
-    static async editTeam(stepLogger: StepLogger, item = CommonPage.record) {
-        await this.selectRecordFromGrid(stepLogger, item);
-        stepLogger.step('Select "Edit Resource Plan" from the options displayed');
+    static async editTeam(item = CommonPage.record) {
+        await this.selectRecordFromGrid(item);
+        StepLogger.step('Select "Edit Resource Plan" from the options displayed');
 
-        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editTeam);
+        await this.refreshPageIfRibbonElementIsDisable(CommonPage.ribbonItems.editTeam);
 
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
-        stepLogger.verification('"Edit Team" window is displayed');
+        StepLogger.verification('"Edit Team" window is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
@@ -437,10 +437,10 @@ export class CommonPageHelper {
         }
     }
 
-    static async viewOptionViaRibbon(stepLogger: StepLogger) {
-        await this.selectRecordFromGrid(stepLogger);
+    static async viewOptionViaRibbon() {
+        await this.selectRecordFromGrid();
 
-        stepLogger.step('Select "View Item" from the options displayed');
+        StepLogger.step('Select "View Item" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.viewItem);
     }
 
@@ -450,45 +450,45 @@ export class CommonPageHelper {
         return element.all(By.xpath(xpath)).first();
     }
 
-    static async selectRecordFromGrid(stepLogger: StepLogger, item = CommonPage.record) {
-        stepLogger.stepId(2);
-        stepLogger.step('Select the check box for record');
+    static async selectRecordFromGrid(item = CommonPage.record) {
+        StepLogger.stepId(2);
+        StepLogger.step('Select the check box for record');
         await WaitHelper.waitForElementToBeDisplayed(item);
         await PageHelper.click(item);
 
-        stepLogger.step('Click on ITEMS on ribbon');
+        StepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
 
-    static async selectTwoRecordFromGrid(stepLogger: StepLogger) {
-        stepLogger.stepId(2);
-        stepLogger.step('Select the check box for record');
+    static async selectTwoRecordFromGrid() {
+        StepLogger.stepId(2);
+        StepLogger.step('Select the check box for record');
         await PageHelper.click(CommonPage.getNthRecord());
 
         await PageHelper.click(CommonPage.getNthRecord(2));
 
-        stepLogger.step('Click on ITEMS on ribbon');
+        StepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
 
-    static async clickItemTab(stepLogger: StepLogger) {
+    static async clickItemTab() {
 
-        stepLogger.step('Click on ITEMS on ribbon');
+        StepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
 
-    static async selectTwoRecordsFromGrid(stepLogger: StepLogger, item = CommonPage.record) {
-        stepLogger.stepId(2);
-        stepLogger.step('Select the check box for two record');
+    static async selectTwoRecordsFromGrid(item = CommonPage.record) {
+        StepLogger.stepId(2);
+        StepLogger.step('Select the check box for two record');
         await WaitHelper.waitForElementToBeDisplayed(item);
         await PageHelper.click(item);
         await browser.sleep(PageHelper.timeout.xs);
         await PageHelper.click(CommonPage.secondRecord);
-        await this.clickItemTab(stepLogger);
+        await this.clickItemTab();
     }
 
-    static async verifyProjectCenterDisplayed(stepLogger: StepLogger) {
-        stepLogger.verification('Project Center opened ');
+    static async verifyProjectCenterDisplayed() {
+        StepLogger.verification('Project Center opened ');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
     }
@@ -551,43 +551,43 @@ export class CommonPageHelper {
         await PageHelper.actionSendKeys(hours);
     }
 
-    static async actionTakenViaContextMenu(item: ElementFinder, actionItem: ElementFinder, stepLogger: StepLogger) {
-        stepLogger.stepId(3);
-        stepLogger.step('Mouse over the item created as per pre requisites that need to be viewed');
+    static async actionTakenViaContextMenu(item: ElementFinder, actionItem: ElementFinder) {
+        StepLogger.stepId(3);
+        StepLogger.step('Mouse over the item created as per pre requisites that need to be viewed');
         await WaitHelper.waitForElementToBeDisplayed(item);
         await ElementHelper.actionHoverOver(item);
 
-        stepLogger.step('Click on the Ellipses button (...)');
+        StepLogger.step('Click on the Ellipses button (...)');
         await PageHelper.click(CommonPage.ellipse);
 
-        stepLogger.step('Select "View Item" from the options displayed');
+        StepLogger.step('Select "View Item" from the options displayed');
         await PageHelper.click(actionItem);
     }
 
     static async attachFile(attachmentFileButton: ElementFinder,
                             browseFileControl: ElementFinder,
-                            stepLogger: StepLogger) {
-        stepLogger.stepId(6);
-        stepLogger.step('Click on button to attach files');
+    ) {
+        StepLogger.stepId(6);
+        StepLogger.step('Click on button to attach files');
         await PageHelper.click(attachmentFileButton);
 
-        stepLogger.verification('The popup appears with Choose Files option');
+        StepLogger.verification('The popup appears with Choose Files option');
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.attachFilePopupTitle,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
-        stepLogger.stepId(7);
+        StepLogger.stepId(7);
         await PageHelper.switchToFrame(CommonPage.contentFrame);
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
-        stepLogger.step('Click on "Choose Files" and select the file that needs to be attached');
+        StepLogger.step('Click on "Choose Files" and select the file that needs to be attached');
         await PageHelper.uploadFile(browseFileControl, newFile.fullFilePath);
 
-        stepLogger.verification('The File name appears under "Choose Files"');
+        StepLogger.verification('The File name appears under "Choose Files"');
         await expect(await ElementHelper.getValue(browseFileControl))
             .toContain(newFile.newFileName,
                 ValidationsHelper.getFieldShouldHaveValueValidation(CommonPageConstants.attachFilePopupTitle, newFile.newFileName));
 
-        stepLogger.step('Click on OK');
+        StepLogger.step('Click on OK');
         await PageHelper.click(CommonPage.formButtons.okWithSmallK);
 
         await PageHelper.switchToDefaultContent();
@@ -598,38 +598,37 @@ export class CommonPageHelper {
     static async uploadDocument(page: ElementFinder,
                                 addWindowTitle: string,
                                 pageName: string,
-                                stepLogger: StepLogger,
                                 newFile = CommonPageHelper.uniqueImageFilePath) {
-        stepLogger.stepId(3);
-        stepLogger.step(`Click on the "+ New" button link displayed on top of "${pageName}" page`);
+        StepLogger.stepId(3);
+        StepLogger.step(`Click on the "+ New" button link displayed on top of "${pageName}" page`);
         await PageHelper.click(CommonPage.uploadButton);
 
-        stepLogger.step('Waiting for page to open');
+        StepLogger.step('Waiting for page to open');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(addWindowTitle,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(addWindowTitle));
 
-        stepLogger.step('Switch to frame');
+        StepLogger.step('Switch to frame');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
-        stepLogger.stepId(4);
-        stepLogger.step(`Click on "Choose Files" button in "${addWindowTitle}" pop up`);
-        stepLogger.step(`Browse and select the file that need to be added as a ${pageName}`);
+        StepLogger.stepId(4);
+        StepLogger.step(`Click on "Choose Files" button in "${addWindowTitle}" pop up`);
+        StepLogger.step(`Browse and select the file that need to be added as a ${pageName}`);
         await PageHelper.uploadFile(CommonPage.browseButton, newFile.fullFilePath);
 
-        stepLogger.step('Click "OK" button');
+        StepLogger.step('Click "OK" button');
         await PageHelper.click(CommonPage.formButtons.ok);
 
         await PageHelper.switchToDefaultContent();
 
-        stepLogger.verification(`"${addWindowTitle}" window is closed`);
+        StepLogger.verification(`"${addWindowTitle}" window is closed`);
         await expect(await CommonPage.dialogTitle.isDisplayed())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(addWindowTitle));
 
-        stepLogger.verification(`${pageName} page is displayed`);
+        StepLogger.verification(`${pageName} page is displayed`);
         await expect(await PageHelper.isElementDisplayed(page))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(pageName));
@@ -660,8 +659,8 @@ export class CommonPageHelper {
         return itemFound;
     }
 
-    static async switchToContentFrame(stepLogger: StepLogger) {
-        stepLogger.step('Switch to content frame');
+    static async switchToContentFrame() {
+        StepLogger.step('Switch to content frame');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
         // Avoiding - Element is not able to click at point (-9553, -9859)
@@ -676,13 +675,13 @@ export class CommonPageHelper {
         return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)));
     }
 
-    static async clickLhsSideBarMenuIcon(icon: ElementFinder, stepLogger: StepLogger) {
-        stepLogger.step('Click on icon from the left navigation panel');
+    static async clickLhsSideBarMenuIcon(icon: ElementFinder) {
+        StepLogger.step('Click on icon from the left navigation panel');
         await PageHelper.click(icon);
     }
 
-    static async verifyPanelHeaderDisplayed(item: ElementFinder, itemName: string, stepLogger: StepLogger) {
-        stepLogger.verification(`verify "${itemName}" header is displayed`);
+    static async verifyPanelHeaderDisplayed(item: ElementFinder, itemName: string) {
+        StepLogger.verification(`verify "${itemName}" header is displayed`);
         const panelHeadingDisplayed = await PageHelper.isElementDisplayed(item);
         await expect(panelHeadingDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             itemName));
@@ -799,8 +798,8 @@ export class CommonPageHelper {
                 ValidationsHelper.getImageDisplayedValidation(text));
     }
 
-    static async clickNewLink(stepLogger: StepLogger) {
-        stepLogger.step('click on add new link ');
+    static async clickNewLink() {
+        StepLogger.step('click on add new link ');
         await PageHelper.click(CommonPage.addNewLink);
     }
 
@@ -808,8 +807,8 @@ export class CommonPageHelper {
         return element(By.css(`[value="${CommonPageConstants.ribbonLabels.apply}"]`));
     }
 
-    static async clickApplyButton(stepLogger: StepLogger) {
-        stepLogger.step('Click on Apply Button ');
+    static async clickApplyButton() {
+        StepLogger.step('Click on Apply Button ');
         await ElementHelper.actionMouseMove(this.getApplyLink());
         await PageHelper.click(this.getApplyLink());
     }
@@ -818,9 +817,9 @@ export class CommonPageHelper {
         await WaitHelper.waitForElementToBeClickable(this.getApplyLink());
     }
 
-    static async resourceAnalyzerPopUp(stepLogger: StepLogger, item = CommonPage.record) {
-        await this.selectRecordFromGrid(stepLogger, item);
-        stepLogger.step('Select "Edit Resource Analyzer" from the options displayed');
+    static async resourceAnalyzerPopUp(item = CommonPage.record) {
+        await this.selectRecordFromGrid(item);
+        StepLogger.step('Select "Edit Resource Analyzer" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.resourceAnalyzer);
         await WaitHelper.waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
         await PageHelper.switchToDefaultContent();
@@ -836,73 +835,73 @@ export class CommonPageHelper {
         return CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer);
     }
 
-    static async goToOptimizer(stepLogger: StepLogger) {
-        stepLogger.step('Click on Optimizer button from the items tab.');
+    static async goToOptimizer() {
+        StepLogger.step('Click on Optimizer button from the items tab.');
         await PageHelper.click(this.getOptimizerButton());
         // Takes time to load the iframe
         await browser.sleep(PageHelper.timeout.m);
         await CommonPageHelper.switchToFirstContentFrame();
     }
 
-    static async gotoModeler(stepLogger: StepLogger) {
-        stepLogger.step('Click on Modeler button from the items tab.');
+    static async gotoModeler() {
+        StepLogger.step('Click on Modeler button from the items tab.');
         await PageHelper.click(CommonPage.modelerButton);
         // Takes time to load the iframe
         await browser.sleep(PageHelper.timeout.s);
         await CommonPageHelper.switchToFirstContentFrame();
     }
 
-    static async selectProjectAndClickEllipsisButton(stepLogger: StepLogger, item = CommonPage.record) {
-        await CommonPageHelper.selectRecordFromGrid(stepLogger, item);
+    static async selectProjectAndClickEllipsisButton(item = CommonPage.record) {
+        await CommonPageHelper.selectRecordFromGrid(item);
 
         await ElementHelper.actionMouseMove(item);
 
-        await CommonPageHelper.clickIconEllipsisHorizontal(stepLogger);
+        await CommonPageHelper.clickIconEllipsisHorizontal();
     }
 
-    static async verifyItemDisabled(targetElement: ElementFinder, stepLogger: StepLogger) {
-        await ExpectationHelper.verifyAttributeValue(targetElement, 'aria-disabled', 'true', stepLogger);
+    static async verifyItemDisabled(targetElement: ElementFinder) {
+        await ExpectationHelper.verifyAttributeValue(targetElement, 'aria-disabled', 'true', );
     }
 
-    static async clickIconEllipsisHorizontal(stepLogger: StepLogger) {
-        stepLogger.step('Click on Ellipsis Horizontal');
+    static async clickIconEllipsisHorizontal() {
+        StepLogger.step('Click on Ellipsis Horizontal');
         await PageHelper.click(CommonPage.iconEllipsisHorizontal);
     }
 
-    static async optimizerViaRibbon(stepLogger: StepLogger) {
-        await this.selectTwoRecordFromGrid(stepLogger);
+    static async optimizerViaRibbon() {
+        await this.selectTwoRecordFromGrid();
 
-        stepLogger.step('Select "Optimizer" from the options displayed');
+        StepLogger.step('Select "Optimizer" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.optimizer);
     }
 
-    static async verifyNavigation(stepLogger: StepLogger) {
-        stepLogger.verification('Optimizer page is displayed');
+    static async verifyNavigation() {
+        StepLogger.verification('Optimizer page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.optimizer)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.optimizer));
 
     }
 
-    static async verifyVariousOptionsOnContextMenu(stepLogger: StepLogger) {
-        stepLogger.verification('On Context Menu Edit Cost is present');
+    static async verifyVariousOptionsOnContextMenu() {
+        StepLogger.verification('On Context Menu Edit Cost is present');
         await CommonPageHelper.fieldDisplayedValidation
         (CommonPage.contextMenuOptions.editCosts, CommonPageConstants.contextMenuOptions.editCosts);
 
-        stepLogger.verification('On Context Menu comments is present');
+        StepLogger.verification('On Context Menu comments is present');
         await CommonPageHelper.fieldDisplayedValidation
         (CommonPage.contextMenuOptions.comments, CommonPageConstants.contextMenuOptions.comments);
 
-        stepLogger.verification('On Context Menu deleteItem is present');
+        StepLogger.verification('On Context Menu deleteItem is present');
         await CommonPageHelper.fieldDisplayedValidation
         (CommonPage.contextMenuOptions.deleteItem, CommonPageConstants.contextMenuOptions.deleteItem);
 
-        stepLogger.verification('On Context Menu editPlan is present');
+        StepLogger.verification('On Context Menu editPlan is present');
         await CommonPageHelper.fieldDisplayedValidation
         (CommonPage.contextMenuOptions.editPlan, CommonPageConstants.contextMenuOptions.editPlan);
     }
 
-    static async filterColumnByText(elem: ElementFinder, textToSearch: string , stepLogger: StepLogger) {
-        stepLogger.step('Enter text to filter in column');
+    static async filterColumnByText(elem: ElementFinder, textToSearch: string) {
+        StepLogger.step('Enter text to filter in column');
         await browser.actions().mouseMove(elem, {x: -5, y: -5}).perform();
         await browser.actions().click(elem).perform();
         await browser.actions().doubleClick(elem).perform();
@@ -911,25 +910,24 @@ export class CommonPageHelper {
         await TextboxHelper.sendKeys(CommonPage.gridDetails.editField, textToSearch, true);
     }
 
-    static async navigateToProjectCenter(stepLogger: StepLogger) {
+    static async navigateToProjectCenter() {
         await this.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger
+
         );
     }
 
-    static async verifyContextMenuDisplayed(stepLogger: StepLogger) {
+    static async verifyContextMenuDisplayed() {
         await ExpectationHelper.verifyDisplayedStatus(
             CommonPage.contextMenuOptions.editPlan,
             CommonPageConstants.contextMenuLabel,
-            stepLogger
         );
     }
 
-    static async clickEditResourcePlan(stepLogger: StepLogger) {
-        stepLogger.step('Click on Edit Resource Plan');
+    static async clickEditResourcePlan() {
+        StepLogger.step('Click on Edit Resource Plan');
         await CommonPageHelper.getContextMenuItemByText(CommonPageConstants.contextMenuOptions.editResource);
     }
 }

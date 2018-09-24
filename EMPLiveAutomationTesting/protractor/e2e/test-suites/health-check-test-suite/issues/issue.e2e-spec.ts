@@ -7,24 +7,28 @@ import {IssueItemPageHelper} from '../../../page-objects/pages/items-page/issue-
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Add, Edit and Delete Issue - [829740]', async () => {
-        stepLogger.caseId = 829740;
-        stepLogger.stepId(1);
-        let titleValue = await IssueItemPageHelper.createIssueAndValidateIt(stepLogger);
+        StepLogger.caseId = 829740;
+        StepLogger.stepId(1);
+        let titleValue = await IssueItemPageHelper.createIssueAndValidateIt();
 
-        stepLogger.stepId(2);
-        titleValue = await IssueItemPageHelper.editItemAndValidateIt(stepLogger, titleValue);
+        StepLogger.stepId(2);
+        titleValue = await IssueItemPageHelper.editItemAndValidateIt(titleValue);
 
-        stepLogger.stepId(3);
-        await IssueItemPageHelper.deleteItemAndValidateIt(stepLogger, titleValue);
+        StepLogger.stepId(3);
+        await IssueItemPageHelper.deleteItemAndValidateIt(titleValue);
     });
 
 });

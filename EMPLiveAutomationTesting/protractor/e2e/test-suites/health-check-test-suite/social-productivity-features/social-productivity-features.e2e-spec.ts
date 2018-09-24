@@ -6,16 +6,21 @@ import {SocialStreamPageHelper} from '../../../page-objects/pages/settings/socia
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
+
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Add an item from Social Stream - [829790]', async () => {
-        stepLogger.caseId = 829790;
-        await SocialStreamPageHelper.addStreamAndValidateIt(stepLogger);
+        StepLogger.caseId = 829790;
+        await SocialStreamPageHelper.addStreamAndValidateIt();
     });
 
 });

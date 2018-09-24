@@ -50,25 +50,25 @@ export class ProjectItemPageHelper {
                           benefits: string,
                           overallHealth: string,
                           projectUpdateManual: string,
-                          stepLogger: StepLogger) {
+    ) {
         const labels = ProjectItemPageConstants.inputLabels;
         const inputs = ProjectItemPage.inputs;
 
         // Add project name
-        stepLogger.step('Title *: Random New Issue Item');
+        StepLogger.step('Title *: Random New Issue Item');
         await TextboxHelper.sendKeys(inputs.projectName, projectNameValue);
 
-        stepLogger.verification('Required values entered/selected in name Field');
+        StepLogger.verification('Required values entered/selected in name Field');
         await expect(await TextboxHelper.hasValue(inputs.projectName, projectNameValue))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.projectName, projectNameValue));
 
         /* // Add portfolio name
-         stepLogger.step('Select any Portfolio from the drop down [Ex: Test Portfolio1]');
+         StepLogger.step('Select any Portfolio from the drop down [Ex: Test Portfolio1]');
          await PageHelper.click(ProjectItemPage.portfolioShowAllButton);
          await WaitHelper.waitForElementToBeDisplayed(inputs.portfolio);
          const portfolioName = await inputs.portfolio.getText();
-         stepLogger.verification('Required values selected in Portfolio Field');
+         StepLogger.verification('Required values selected in Portfolio Field');
 
          await PageHelper.click(inputs.portfolio);
          await expect(await CommonPageHelper.getAutoCompleteItemByDescription(portfolioName).isPresent())
@@ -76,101 +76,101 @@ export class ProjectItemPageHelper {
                  ValidationsHelper.getFieldShouldHaveValueValidation(labels.portfolio, portfolioName));
  */
         // Add Project Description
-        stepLogger.step('Enter some text [Ex: Description for Smoke Test Project 1]');
+        StepLogger.step('Enter some text [Ex: Description for Smoke Test Project 1]');
         await TextboxHelper.sendKeys(inputs.projectDescription, projectDescription);
 
-        stepLogger.verification('Required values entered in Description Field');
+        StepLogger.verification('Required values entered in Description Field');
         await expect(await TextboxHelper.hasValue(inputs.projectDescription, projectDescription))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.projectDescription, projectDescription));
 
         // Add Benefits
-        stepLogger.step('Benefits: Test Smoke');
+        StepLogger.step('Benefits: Test Smoke');
         await TextboxHelper.sendKeys(inputs.benefits, benefits);
 
-        stepLogger.verification('Required values entered in "Benefits" Field');
+        StepLogger.verification('Required values entered in "Benefits" Field');
         await expect(await TextboxHelper.hasValue(inputs.benefits, benefits))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.benefits, benefits));
 
         // Add Overall Health
-        stepLogger.step(`Overall Health: Select the value ${overallHealth}`);
+        StepLogger.step(`Overall Health: Select the value ${overallHealth}`);
         await PageHelper.sendKeysToInputField(inputs.overallHealth, overallHealth);
 
-        stepLogger.verification(`Verify - Overall Health: Select the value ${overallHealth}`);
+        StepLogger.verification(`Verify - Overall Health: Select the value ${overallHealth}`);
         await expect(await ElementHelper.hasSelectedOption(inputs.overallHealth, overallHealth))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.overallHealth, overallHealth));
         await browser.sleep(10000);
         // Add Project Update
-        stepLogger.step(`Project Update: Select the value "${projectUpdateManual}"`);
+        StepLogger.step(`Project Update: Select the value "${projectUpdateManual}"`);
         await PageHelper.sendKeysToInputField(inputs.projectUpdate, projectUpdateManual);
 
-        stepLogger.verification(`Verify - Project Update : Select the value "${projectUpdateManual}"`);
+        StepLogger.verification(`Verify - Project Update : Select the value "${projectUpdateManual}"`);
         await expect(await ElementHelper.hasSelectedOption(inputs.projectUpdate, projectUpdateManual))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.projectUpdate, projectUpdateManual));
 
-        stepLogger.stepId(4);
-        stepLogger.step('Click on "Save" button in "Project - New Item" window');
+        StepLogger.stepId(4);
+        StepLogger.step('Click on "Save" button in "Project - New Item" window');
         await PageHelper.click(CommonPage.formButtons.save);
 
-        stepLogger.verification('"Project - New Item" window is closed');
+        StepLogger.verification('"Project - New Item" window is closed');
         await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName));
     }
 
-    static async navigateAndOpenProjectPage(projectNameValue: string, stepLogger: StepLogger) {
-        stepLogger.verification('Navigate to page');
+    static async navigateAndOpenProjectPage(projectNameValue: string) {
+        StepLogger.verification('Navigate to page');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.verification('Search item by title');
+        StepLogger.verification('Search item by title');
         await CommonPageHelper.searchItemByTitle(projectNameValue,
             ProjectItemPageConstants.columnNames.title,
-            stepLogger);
+        );
 
-        stepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
+        StepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(projectNameValue)))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
 
-        stepLogger.step('Click on searched record');
+        StepLogger.step('Click on searched record');
         await PageHelper.click(CommonPage.record);
 
-        stepLogger.verification('Verify record by title');
+        StepLogger.verification('Verify record by title');
         const firstTableColumns = [projectNameValue];
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(firstTableColumns)))
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
-        stepLogger.step('Click on Project record');
+        StepLogger.step('Click on Project record');
         await PageHelper.click(CommonPageHelper.getRowForTableData(firstTableColumns));
     }
 
-    static async createNewProject(uniqueId: string, stepLogger: StepLogger) {
+    static async createNewProject(uniqueId: string) {
 
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.step('Click on "+ New item" link displayed on top of "Project Center" Page');
+        StepLogger.step('Click on "+ New item" link displayed on top of "Project Center" Page');
         await PageHelper.click(CommonPage.addNewLink);
 
         // Note - little mismatch, It doesn't open a popup window
-        stepLogger.verification('"Project Center - New Item" window is displayed');
+        StepLogger.verification('"Project Center - New Item" window is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(ProjectItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
 
-        stepLogger.step('Enter/Select required details in "Project Center - New Item" window as described below');
+        StepLogger.step('Enter/Select required details in "Project Center - New Item" window as described below');
         const labels = ProjectItemPageConstants.inputLabels;
         const projectNameValue = `${labels.projectName} ${uniqueId}`;
         const projectDescription = `${labels.projectDescription} ${uniqueId}`;
@@ -184,101 +184,101 @@ export class ProjectItemPageHelper {
             benefits,
             overallHealthOnTrack,
             projectUpdateManual,
-            stepLogger);
+        );
 
         return projectNameValue;
     }
 
-    static async waitForBuildTeamPageToOpenAndSwitchToPage(stepLogger: StepLogger) {
-        stepLogger.step('Waiting for page to open');
+    static async waitForBuildTeamPageToOpenAndSwitchToPage() {
+        StepLogger.step('Waiting for page to open');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(ProjectItemPageConstants.buildTeamPage,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.buildTeamPage));
 
-        stepLogger.step('Switch to frame');
+        StepLogger.step('Switch to frame');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
     }
 
-    static async createTask(uniqueId: string, stepLogger: StepLogger, finishDate: string) {
+    static async createTask(uniqueId: string, finishDate: string) {
 
         await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
         await CommonPageHelper.deleteTask();
-        stepLogger.step('Click on Add Task');
+        StepLogger.step('Click on Add Task');
         await PageHelper.click(CommonPage.ribbonItems.addTask);
-        stepLogger.step('Enter Task name');
+        StepLogger.step('Enter Task name');
         await PageHelper.actionSendKeys(uniqueId);
-        stepLogger.step('Enter finish date');
+        StepLogger.step('Enter finish date');
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.date);
         await ElementHelper.actionDoubleClick(ProjectItemPageHelper.newTasksFields.date);
         await TextboxHelper.sendKeys(MyTimeOffPage.dateEditBox, finishDate);
-        stepLogger.step('Enter duration');
+        StepLogger.step('Enter duration');
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
         await PageHelper.actionSendKeys(CommonPageConstants.hours.durationHours1);
-        stepLogger.step('Enter effort hours');
+        StepLogger.step('Enter effort hours');
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.work);
         await PageHelper.actionSendKeys(CommonPageConstants.hours.effortHours);
-        stepLogger.step('Select assignee');
+        StepLogger.step('Select assignee');
         await PageHelper.click(ProjectItemPage.assignToDropDown);
         await PageHelper.click(ProjectItemPageHelper.selectFirstAssign());
-        stepLogger.step('Click OK');
+        StepLogger.step('Click OK');
         await PageHelper.click(ProjectItemPageHelper.button.ok);
     }
 
-    static async createProjectAndNavigateToBuildTeamPage(uniqueId: string, stepLogger: StepLogger) {
-        stepLogger.step('Create a new project');
-        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
+    static async createProjectAndNavigateToBuildTeamPage(uniqueId: string) {
+        StepLogger.step('Create a new project');
+        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId);
 
-        stepLogger.step('Navigate and open specific project page');
-        await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue, stepLogger);
+        StepLogger.step('Navigate and open specific project page');
+        await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue);
 
-        stepLogger.step('Select "Edit Team" from the options displayed');
+        StepLogger.step('Select "Edit Team" from the options displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
-        stepLogger.step('Wait for Build Team Page to open');
-        await ProjectItemPageHelper.waitForBuildTeamPageToOpenAndSwitchToPage(stepLogger);
+        StepLogger.step('Wait for Build Team Page to open');
+        await ProjectItemPageHelper.waitForBuildTeamPageToOpenAndSwitchToPage();
     }
 
-    static async addResourceAndVerifyUserMovedUnderCurrentTeam(uniqueId: string, stepLogger: StepLogger) {
+    static async addResourceAndVerifyUserMovedUnderCurrentTeam(uniqueId: string) {
         const labels = ProjectItemPageConstants.inputLabels;
         const projectNameValue = `${labels.projectName} ${uniqueId}`;
 
-        stepLogger.step('Select a user from resource pool and add');
+        StepLogger.step('Select a user from resource pool and add');
         const userCheckBoxForResourcePool = await ProjectItemPage.getUserCheckBoxForTeamType(
             ProjectItemPageConstants.buildTeamContentIDs.resourcePool, ProjectItemPageConstants.nonAdminUser);
         await CheckboxHelper.markCheckbox(userCheckBoxForResourcePool, true);
 
-        stepLogger.step('Click on Add resource');
+        StepLogger.step('Click on Add resource');
         await PageHelper.click(CommonPage.formButtons.add);
 
-        stepLogger.verification('Verify Save and Close button is enabled after addition of resource');
+        StepLogger.verification('Verify Save and Close button is enabled after addition of resource');
         await expect(await ElementHelper.hasClass(ProjectItemPage.saveAndClose,
             ProjectItemPageConstants.buildTeamContentClass.saveAndCloseDisabled))
             .toBe(false, ProjectItemPageConstants.messageText.saveAndCloseEnabled);
 
-        stepLogger.step('Click on Save & Close button');
+        StepLogger.step('Click on Save & Close button');
         await PageHelper.click(CommonPage.ribbonItems.saveAndClose);
 
         await PageHelper.switchToDefaultContent();
 
-        stepLogger.verification('Verify Project page is displayed');
+        StepLogger.verification('Verify Project page is displayed');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(projectNameValue)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
 
-        stepLogger.step('Navigate and open specific project page');
-        await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue, stepLogger);
+        StepLogger.step('Navigate and open specific project page');
+        await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue);
 
-        stepLogger.step('Select "Edit Team" from the options displayed');
+        StepLogger.step('Select "Edit Team" from the options displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
-        stepLogger.step('Wait for Build Team Page to open');
-        await ProjectItemPageHelper.waitForBuildTeamPageToOpenAndSwitchToPage(stepLogger);
+        StepLogger.step('Wait for Build Team Page to open');
+        await ProjectItemPageHelper.waitForBuildTeamPageToOpenAndSwitchToPage();
 
-        stepLogger.verification('Verify User is moved under Current team');
+        StepLogger.verification('Verify User is moved under Current team');
         const userCheckBoxForCurrentTeam = await ProjectItemPage.getUserCheckBoxForTeamType(
             ProjectItemPageConstants.buildTeamContentIDs.currentTeam, ProjectItemPageConstants.nonAdminUser);
         await expect(await PageHelper.isElementDisplayed(userCheckBoxForCurrentTeam))
@@ -405,13 +405,13 @@ export class ProjectItemPageHelper {
         await browser.sleep(PageHelper.timeout.xs);
     }
 
-    static async createProject(uniqueId: string, stepLogger: StepLogger) {
-        stepLogger.step('Create a new project');
-        await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
+    static async createProject(uniqueId: string) {
+        StepLogger.step('Create a new project');
+        await ProjectItemPageHelper.createNewProject(uniqueId);
     }
 
-    static async removeAssignedUserIfPresent(stepLogger: StepLogger) {
-        stepLogger.step('Removed assigned user from current team');
+    static async removeAssignedUserIfPresent() {
+        StepLogger.step('Removed assigned user from current team');
         if (await ProjectItemPage.selectTeamMemberCheckBox.isPresent() === true) {
             await PageHelper.click(ProjectItemPage.selectTeamMemberCheckBox);
             await PageHelper.click(ProjectItemPage.teamChangeButtons.remove);
@@ -437,16 +437,16 @@ export class ProjectItemPageHelper {
         return element(By.css(`[class*="MenuBody"] > div > div:nth-child(${index})`));
     }
 
-    static async editProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string) {
+    static async editProjectAndValidateIt(projectNameValue: string) {
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger,
+
             projectNameValue,
             ProjectItemPageConstants.columnNames.title);
-        await CommonPageHelper.editOptionViaRibbon(stepLogger);
+        await CommonPageHelper.editOptionViaRibbon();
         projectNameValue = projectNameValue + 'Edited';
-        stepLogger.verification('"Edit Project" page is displayed');
+        StepLogger.verification('"Edit Project" page is displayed');
         await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
 
         await TextboxHelper.sendKeys(ProjectItemPage.inputs.projectName, projectNameValue);
@@ -456,59 +456,60 @@ export class ProjectItemPageHelper {
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger,
+
             projectNameValue,
             ProjectItemPageConstants.columnNames.title);
 
-        stepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
+        StepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
         await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(projectNameValue), projectNameValue);
         return projectNameValue;
 
     }
 
-    static async deleteOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
-        await CommonPageHelper.selectRecordFromGrid(stepLogger, item);
+    static async deleteOptionViaRibbon(item = CommonPage.record) {
+        await CommonPageHelper.selectRecordFromGrid(item);
 
-        stepLogger.step('Select "Delete" from the options displayed');
+        StepLogger.step('Select "Delete" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.delete);
 
         await PageHelper.acceptAlert();
     }
 
-    static async deleteProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string) {
-        await this.deleteOptionViaRibbon(stepLogger);
+    static async deleteProjectAndValidateIt(projectNameValue: string) {
+        await this.deleteOptionViaRibbon();
 
-        stepLogger.verification('Navigate to page');
+        StepLogger.verification('Navigate to page');
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger,
+
             projectNameValue,
             ProjectItemPageConstants.columnNames.title);
 
-        stepLogger.step('Validating deleted Project  is not  Present');
+        StepLogger.step('Validating deleted Project  is not  Present');
         await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg, ProjectItemPageConstants.noDataFound);
     }
 
-    static async verifyProjectDetailsDisplayed(stepLogger: StepLogger) {
-        stepLogger.verification('Project Details opened ');
+    static async verifyProjectDetailsDisplayed() {
+        StepLogger.verification('Project Details opened ');
         await CommonPageHelper.labelDisplayedValidation
         (CommonPage.pageHeaders.projects.projectDetails, CommonPageConstants.pageHeaders.projects.projectDetails);
     }
 
-    static  async validateProjectOpenInNewTab(stepLogger: StepLogger) {
-        stepLogger.verification('Switch To new Tab  ');
+    static async validateProjectOpenInNewTab() {
+        StepLogger.verification('Switch To new Tab  ');
         await PageHelper.switchToNewTabIfAvailable(1);
         await PageHelper.switchToNewTabIfAvailable(0);
         await PageHelper.switchToNewTabIfAvailable(1);
 
-        stepLogger.step('Validating Top Grid Item Name is Present');
-        await CommonPageHelper.fieldDisplayedValidation(EditCost.editCostLink , ResourcePlannerConstants.topGrid.itemName );
+        StepLogger.step('Validating Top Grid Item Name is Present');
+        await CommonPageHelper.fieldDisplayedValidation(EditCost.editCostLink, ResourcePlannerConstants.topGrid.itemName);
     }
-    static  async validateProjectOpenViaRightClickInNewTab (stepLogger: StepLogger) {
-        stepLogger.verification('Open project  In New Tab');
+
+    static async validateProjectOpenViaRightClickInNewTab() {
+        StepLogger.verification('Open project  In New Tab');
         await ElementHelper.openLinkInNewTab(ProjectItemPage.clickProjectLink);
 
-        await this.validateProjectOpenInNewTab(stepLogger);
+        await this.validateProjectOpenInNewTab();
     }
 }

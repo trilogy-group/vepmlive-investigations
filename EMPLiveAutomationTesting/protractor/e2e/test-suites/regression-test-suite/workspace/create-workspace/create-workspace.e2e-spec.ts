@@ -9,22 +9,22 @@ import {WorkspacePageHelper} from '../../../../page-objects/pages/workspaces/wor
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Verify workspace button. - [744303]', async () => {
-        stepLogger.caseId = 744303;
-        stepLogger.stepId(1);
-        await CommonPageHelper.clickLhsSideBarMenuIcon(CommonPage.sidebarMenus.workspaces, stepLogger);
+        StepLogger.caseId = 744303;
+        StepLogger.stepId(1);
+        await CommonPageHelper.clickLhsSideBarMenuIcon(CommonPage.sidebarMenus.workspaces);
         await CommonPageHelper.verifyPanelHeaderDisplayed(CommonPage.sidebarMenuPanelHeader.workspaces,
-            CommonPageConstants.sidebarMenuPanelHeader.workspaces, stepLogger);
+            CommonPageConstants.sidebarMenuPanelHeader.workspaces);
 
-        stepLogger.stepId(2);
-        await WorkspacePageHelper.verifyWorkpaceMenuPanelOptions(stepLogger);
+        StepLogger.stepId(2);
+        await WorkspacePageHelper.verifyWorkpaceMenuPanelOptions();
     });
 });

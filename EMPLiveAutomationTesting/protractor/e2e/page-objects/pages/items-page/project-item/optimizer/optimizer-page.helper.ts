@@ -10,98 +10,110 @@ import {CommonPageConstants} from '../../../common/common-page.constants';
 import {CommonPage} from '../../../common/common.po';
 
 export class OptimizerPageHelper {
-    static async clickConfigrationButton(stepLogger: StepLogger) {
+    static async clickConfigrationButton() {
         // this is work around without it not able to work on new tab
         await WaitHelper.waitForElementToBeDisplayed(OptimizerPage.saveStrategy);
 
         await CommonPageHelper.switchToFirstContentFrame();
 
-        stepLogger.step('Click Configration Button');
+        StepLogger.step('Click Configration Button');
         await PageHelper.click(OptimizerPage.configure);
     }
-    static async selectAvailableFiled(stepLogger: StepLogger) {
-        stepLogger.step('Click select Available Filed Button');
+
+    static async selectAvailableFiled() {
+        StepLogger.step('Click select Available Filed Button');
         await PageHelper.click(OptimizerPage.optionAvailable);
     }
-    static async clickAddOption(stepLogger: StepLogger) {
-        stepLogger.step('Click Add Button');
+
+    static async clickAddOption() {
+        StepLogger.step('Click Add Button');
         await PageHelper.click(OptimizerPage.addOption);
     }
-    static async clickOkOption(stepLogger: StepLogger) {
-        stepLogger.step('Click Ok  Button');
+
+    static async clickOkOption() {
+        StepLogger.step('Click Ok  Button');
         await PageHelper.click(OptimizerPage.okOption);
     }
-    static async clickSaveStrategy(stepLogger: StepLogger) {
-        stepLogger.step('Click save Strategy Button');
+
+    static async clickSaveStrategy() {
+        StepLogger.step('Click save Strategy Button');
         await PageHelper.click(OptimizerPage.saveStrategy);
     }
-    static async verifySaveStrategyPopUpOpen(stepLogger: StepLogger) {
-        stepLogger.verification('verify Save Strategy PopUp Open');
+
+    static async verifySaveStrategyPopUpOpen() {
+        StepLogger.verification('verify Save Strategy PopUp Open');
         await CommonPageHelper.fieldDisplayedValidation(OptimizerPage.strategyName, OptimizerPageConstants.saveStrategy);
     }
-    static async saveNewStratedyName(stepLogger: StepLogger) {
-        stepLogger.step('Click save Strategy Button');
+
+    static async saveNewStratedyName() {
+        StepLogger.step('Click save Strategy Button');
         await PageHelper.click(OptimizerPage.saveNewStratedyName);
     }
-    static async clickShowAllStrategyArrowDown(stepLogger: StepLogger) {
+
+    static async clickShowAllStrategyArrowDown() {
         await WaitHelper.staticWait(PageHelper.timeout.s);
 
-        stepLogger.step('Click Show All save Strategy Arrow Down Button');
+        StepLogger.step('Click Show All save Strategy Arrow Down Button');
         await PageHelper.click(OptimizerPage.arrowDown);
     }
-    static async addAvilabelFiled(stepLogger: StepLogger) {
 
-        await this.selectAvailableFiled(stepLogger);
+    static async addAvilabelFiled() {
 
-        await this.clickAddOption(stepLogger);
+        await this.selectAvailableFiled();
 
-        await this.clickOkOption(stepLogger);
+        await this.clickAddOption();
+
+        await this.clickOkOption();
     }
-    static  async enterStrategyName(stepLogger: StepLogger,  strategyName: string) {
-        stepLogger.step('Enter strategy Name' + strategyName);
+
+    static async enterStrategyName(strategyName: string) {
+        StepLogger.step('Enter strategy Name' + strategyName);
         await PageHelper.sendKeysToInputField(OptimizerPage.strategyName, strategyName );
     }
 
-    static  async saveStrategyValidateIt(stepLogger: StepLogger , strategyName: string) {
+    static async saveStrategyValidateIt(strategyName: string) {
 
-        await this.enterStrategyName(stepLogger, strategyName);
+        await this.enterStrategyName(strategyName);
 
-        await this.saveNewStratedyName(stepLogger);
+        await this.saveNewStratedyName();
 
-        await this.clickShowAllStrategyArrowDown(stepLogger);
+        await this.clickShowAllStrategyArrowDown();
 
         await expect(await ElementHelper.getText(OptimizerPage.currectstrategy))
             .toContain(strategyName, ValidationsHelper.getLabelDisplayedValidation(strategyName));
     }
-    static  async optimizerPageElementCheck(stepLogger: StepLogger ) {
 
-        stepLogger.verification('Available option is displayed');
+    static async optimizerPageElementCheck() {
+
+        StepLogger.verification('Available option is displayed');
         await CommonPageHelper.buttonDisplayedValidation(OptimizerPage.optionAvailable, OptimizerPageConstants.avaliableOption);
 
-        stepLogger.verification('Optimizer Text is displayed');
+        StepLogger.verification('Optimizer Text is displayed');
 
         await CommonPageHelper.fieldDisplayedValidation(OptimizerPage.optimizerText, OptimizerPageConstants.optimizerText);
 
-        stepLogger.verification('Total Field Drop Down is displayed');
+        StepLogger.verification('Total Field Drop Down is displayed');
         await CommonPageHelper.buttonDisplayedValidation(OptimizerPage.totalFieldDropDown, OptimizerPageConstants.totalFieldDropDown);
 
-        stepLogger.verification('Budget is selected bu default  is displayed');
+        StepLogger.verification('Budget is selected bu default  is displayed');
         await CommonPageHelper.textPresentValidation(OptimizerPage.totalFieldDropDownOption, OptimizerPageConstants.budget);
 
-        stepLogger.verification('Total Field Drop Down is displayed');
+        StepLogger.verification('Total Field Drop Down is displayed');
         await CommonPageHelper.buttonDisplayedValidation(OptimizerPage.addOption, OptimizerPageConstants.menuConfigure.add);
 
-        stepLogger.verification('Total Field Drop Down is displayed');
+        StepLogger.verification('Total Field Drop Down is displayed');
         await CommonPageHelper.buttonDisplayedValidation(OptimizerPage.okOption, OptimizerPageConstants.menuConfigure.ok);
 
     }
-    static async verifyConfigrationPopUpClosed(stepLogger: StepLogger) {
-        stepLogger.verification('Optimizer Configuration Popup closed');
+
+    static async verifyConfigrationPopUpClosed() {
+        StepLogger.verification('Optimizer Configuration Popup closed');
         await CommonPageHelper.labelDisplayedValidation
         (CommonPage.pageHeaders.projects.optimizerConfiguration, CommonPageConstants.pageHeaders.projects.projectDetails, false);
       }
-    static async verifyConfigrationPopUPDisplayed(stepLogger: StepLogger) {
-        stepLogger.verification('Optimizer Configuration Page is  opened ');
+
+    static async verifyConfigrationPopUPDisplayed() {
+        StepLogger.verification('Optimizer Configuration Page is  opened ');
         await CommonPageHelper.fieldDisplayedValidation
         (CommonPage.pageHeaders.projects.optimizerConfiguration,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectDetails));

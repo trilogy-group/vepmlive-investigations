@@ -14,201 +14,205 @@ import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Launch "Assignment Planner" - [743177]', async () => {
-        stepLogger.caseId = 743177;
-        stepLogger.stepId(1);
-        stepLogger.step('Select "Navigation" icon  from left side menu');
-        stepLogger.step('Select Projects -> Projects from the options displayed');
+        StepLogger.caseId = 743177;
+        StepLogger.stepId(1);
+        StepLogger.step('Select "Navigation" icon  from left side menu');
+        StepLogger.step('Select Projects -> Projects from the options displayed');
         // Step #1 and #2 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.stepId(3);
-        stepLogger.step('Select check-box for any Project');
+        StepLogger.stepId(3);
+        StepLogger.step('Select check-box for any Project');
         await PageHelper.click(CommonPage.record);
 
-        stepLogger.step('Click on "Items" tab');
+        StepLogger.step('Click on "Items" tab');
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
-        stepLogger.step('Click on "Edit Team" icon from ribbon panel');
+        StepLogger.step('Click on "Edit Team" icon from ribbon panel');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
-        stepLogger.verification('"Edit Team" window is displayed');
+        StepLogger.verification('"Edit Team" window is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        await CommonPageHelper.switchToContentFrame(stepLogger);
+        await CommonPageHelper.switchToContentFrame();
 
-        stepLogger.verification('"Current Team" Section is displayed');
+        StepLogger.verification('"Current Team" Section is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.currentTeam))
             .toBe(true,
                 ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
-        stepLogger.verification('"Resource Pool" Section is displayed');
+        StepLogger.verification('"Resource Pool" Section is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.resourcePool))
             .toBe(true,
                 ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.resourcePool));
 
-        stepLogger.stepId(4);
-        stepLogger.step('Select few resources from "Current Team" using check boxes');
+        StepLogger.stepId(4);
+        StepLogger.step('Select few resources from "Current Team" using check boxes');
         await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.get(0));
         await PageHelper.click(ProjectItemPage.teamRecords.currentTeam.get(0));
         await PageHelper.click(ProjectItemPage.teamRecords.currentTeam.get(1));
 
-        stepLogger.step('Click on "Assignment Planner" displayed on top of "Edit Team" window');
+        StepLogger.step('Click on "Assignment Planner" displayed on top of "Edit Team" window');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.assignmentPlanner);
         await PageHelper.click(CommonPage.ribbonItems.assignmentPlanner);
 
         // Assignment planner takes around 10 seconds to Loading view and Randering data
         await WaitHelper.staticWait(10000);
 
-        stepLogger.step('switch to default context');
+        StepLogger.step('switch to default context');
         await PageHelper.switchToDefaultContent();
 
-        stepLogger.verification('"Assignment Planner" is displayed in new window');
+        StepLogger.verification('"Assignment Planner" is displayed in new window');
         // It needs 2nd element from list of webElements else it always picking up Edit team as title and assertion is getting failed
         await expect(await CommonPage.dialogTitles.get(1).getText())
             .toBe(CommonPageConstants.ribbonLabels.assignmentPlanner,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.assignmentPlanner));
 
-        stepLogger.step('Switch to Assignment Planner frame');
+        StepLogger.step('Switch to Assignment Planner frame');
         await PageHelper.switchToFrame(ProjectItemPage.assignmentPlannerFrame);
 
-        stepLogger.stepId(5);
-        stepLogger.step('Click "Close" button in "Assignment Planner" window');
+        StepLogger.stepId(5);
+        StepLogger.step('Click "Close" button in "Assignment Planner" window');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.close);
         await PageHelper.click(CommonPage.ribbonItems.close);
 
-        stepLogger.step('switch to default content');
+        StepLogger.step('switch to default content');
         await PageHelper.switchToDefaultContent();
 
-        stepLogger.verification('"Assignment Planner" window is closed');
+        StepLogger.verification('"Assignment Planner" window is closed');
         // It needs 2nd element from list of webElements else it always picking up Edit team as title and assertion is getting failed
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitles.get(1)))
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.assignmentPlanner));
 
-        stepLogger.verification('"Edit Team" window is displayed');
+        StepLogger.verification('"Edit Team" window is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        await CommonPageHelper.switchToContentFrame(stepLogger);
-        stepLogger.stepId(6);
-        stepLogger.step('Click "Close" button in "Edit Team" window');
+        await CommonPageHelper.switchToContentFrame();
+        StepLogger.stepId(6);
+        StepLogger.step('Click "Close" button in "Edit Team" window');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.close);
         await PageHelper.click(CommonPage.ribbonItems.close);
 
-        stepLogger.step('switch to default content');
+        StepLogger.step('switch to default content');
         await PageHelper.switchToDefaultContent();
 
-        stepLogger.verification('"Edit Team" window is closed');
+        StepLogger.verification('"Edit Team" window is closed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        stepLogger.verification('"Project Center" page is displayed');
+        StepLogger.verification('"Project Center" page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
     });
 
     it('View the options under "Reports" drop-down" - [743178]', async () => {
-        stepLogger.caseId = 743178;
-        stepLogger.stepId(1);
-        stepLogger.step('Select "Navigation" icon  from left side menu');
-        stepLogger.step('Select Projects -> Projects from the options displayed');
+        StepLogger.caseId = 743178;
+        StepLogger.stepId(1);
+        StepLogger.step('Select "Navigation" icon  from left side menu');
+        StepLogger.step('Select Projects -> Projects from the options displayed');
         // Step #1 and #2 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.stepId(3);
-        stepLogger.step('Select check-box for any Project');
+        StepLogger.stepId(3);
+        StepLogger.step('Select check-box for any Project');
         await PageHelper.click(CommonPage.record);
 
-        stepLogger.step('Click on "Items" tab');
+        StepLogger.step('Click on "Items" tab');
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
-        stepLogger.step('Click on "Edit Team" icon from ribbon panel');
+        StepLogger.step('Click on "Edit Team" icon from ribbon panel');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
-        stepLogger.verification('"Edit Team" window is displayed');
+        StepLogger.verification('"Edit Team" window is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        await CommonPageHelper.switchToContentFrame(stepLogger);
+        await CommonPageHelper.switchToContentFrame();
 
-        stepLogger.verification('"Current Team" Section is displayed');
+        StepLogger.verification('"Current Team" Section is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.currentTeam))
             .toBe(true,
                 ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
-        stepLogger.verification('"Resource Pool" Section is displayed');
+        StepLogger.verification('"Resource Pool" Section is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.resourcePool))
             .toBe(true,
                 ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.resourcePool));
 
-        stepLogger.stepId(4);
-        stepLogger.step('Select few resources from "Current Team" using check boxes');
+        StepLogger.stepId(4);
+        StepLogger.step('Select few resources from "Current Team" using check boxes');
         await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.get(0));
         await PageHelper.click(ProjectItemPage.teamRecords.currentTeam.get(0));
         await PageHelper.click(ProjectItemPage.teamRecords.currentTeam.get(1));
 
-        stepLogger.step('Click on "view Reports" drop down displayed on top of "Edit Team" window');
+        StepLogger.step('Click on "view Reports" drop down displayed on top of "Edit Team" window');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.viewReports);
         await PageHelper.click(CommonPage.ribbonItems.viewReports);
 
-        stepLogger.verification('Following options are displayed');
-        stepLogger.verification('Resource Available vs. Planned by Dept');
+        StepLogger.verification('Following options are displayed');
+        StepLogger.verification('Resource Available vs. Planned by Dept');
         await expect(await PageHelper.isElementDisplayed(CommonPage.ribbonItems.resourceAvailableVsPlannedByDept))
             .toBe(true,
                 ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.ribbonLabels.resourceAvailableVsPlannedByDept));
 
-        stepLogger.verification('Resource Capacity Heat Map');
+        StepLogger.verification('Resource Capacity Heat Map');
         await expect(await PageHelper.isElementDisplayed(CommonPage.ribbonItems.resourceCapacityHeatMap))
             .toBe(true,
                 ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.ribbonLabels.resourceCapacityHeatMap));
 
-        stepLogger.verification('Resource Commitments');
+        StepLogger.verification('Resource Commitments');
         await expect(await PageHelper.isElementDisplayed(CommonPage.ribbonItems.resourceCommitments))
             .toBe(true,
                 ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.ribbonLabels.resourceCommitments));
 
-        stepLogger.verification('Resource Requirements');
+        StepLogger.verification('Resource Requirements');
         await expect(await PageHelper.isElementDisplayed(CommonPage.ribbonItems.resourceRequirements))
             .toBe(true,
                 ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.ribbonLabels.resourceRequirements));
 
-        stepLogger.verification('Resource Work vs. Capacity');
+        StepLogger.verification('Resource Work vs. Capacity');
         await expect(await PageHelper.isElementDisplayed(CommonPage.ribbonItems.resourceWorkVsCapacity))
             .toBe(true,
                 ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.ribbonLabels.resourceWorkVsCapacity));
 
-        stepLogger.stepId(5);
-        stepLogger.step('Click "Close" button in "Edit Team" window');
+        StepLogger.stepId(5);
+        StepLogger.step('Click "Close" button in "Edit Team" window');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.viewReports);
         await ElementHelper.actionClick(CommonPage.ribbonItems.viewReports);
 
@@ -218,15 +222,15 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.close);
         await PageHelper.click(CommonPage.ribbonItems.close);
 
-        stepLogger.step('switch to default content');
+        StepLogger.step('switch to default content');
         await PageHelper.switchToDefaultContent();
 
-        stepLogger.verification('"Edit Team" window is closed');
+        StepLogger.verification('"Edit Team" window is closed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        stepLogger.verification('"Project Center" page is displayed');
+        StepLogger.verification('"Project Center" page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));

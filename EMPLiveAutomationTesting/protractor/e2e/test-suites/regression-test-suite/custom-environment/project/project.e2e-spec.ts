@@ -15,107 +15,107 @@ import {EditCost} from '../../../../page-objects/pages/items-page/project-item/e
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Validate right click for Projects > Edit Cost tab - [14119619]', async () => {
-        stepLogger.caseId = 14119619;
-        stepLogger.stepId(1);
+        StepLogger.caseId = 14119619;
+        StepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.stepId(2);
-        await CommonPageHelper.selectRecordFromGrid(stepLogger);
+        StepLogger.stepId(2);
+        await CommonPageHelper.selectRecordFromGrid();
 
-        await EditCostHelper.verifiyEditCostIsPresent(stepLogger);
+        await EditCostHelper.verifiyEditCostIsPresent();
 
-        stepLogger.stepId(3);
-        await EditCostHelper.editCostOpenViaRibbonInNewTab(stepLogger);
+        StepLogger.stepId(3);
+        await EditCostHelper.editCostOpenViaRibbonInNewTab();
 
-        stepLogger.stepId(4);
-        await EditCostHelper.validateEditCostOpenInNewTab(stepLogger);
+        StepLogger.stepId(4);
+        await EditCostHelper.validateEditCostOpenInNewTab();
     });
 
     it('Validate right click for Projects > Edit resource tab - [14119617]', async () => {
-        stepLogger.caseId = 14119617;
-        stepLogger.stepId(1);
+        StepLogger.caseId = 14119617;
+        StepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.stepId(2);
-        await CommonPageHelper.selectRecordFromGrid(stepLogger);
+        StepLogger.stepId(2);
+        await CommonPageHelper.selectRecordFromGrid();
 
-        await EditCostHelper.verifiyEditCostIsPresent(stepLogger);
+        await EditCostHelper.verifiyEditCostIsPresent();
 
-        stepLogger.stepId(3);
-        await ResourcePlannerPageHelper.openEditResourceViaRibbonInNewTab(stepLogger);
+        StepLogger.stepId(3);
+        await ResourcePlannerPageHelper.openEditResourceViaRibbonInNewTab();
 
-        stepLogger.stepId(4);
-        await ResourcePlannerPageHelper.validateEditResourceOpenInNewTab(stepLogger);
+        StepLogger.stepId(4);
+        await ResourcePlannerPageHelper.validateEditResourceOpenInNewTab();
     });
     it('Validate right click for Projects > Edit Cost tab through Ellipse link - [14119634]', async () => {
-        stepLogger.caseId = 14119634;
-        stepLogger.stepId(1);
+        StepLogger.caseId = 14119634;
+        StepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.stepId(2);
-        await CommonPageHelper.selectProjectAndClickEllipsisButton(stepLogger);
+        StepLogger.stepId(2);
+        await CommonPageHelper.selectProjectAndClickEllipsisButton();
 
-        await CommonPageHelper.verifyVariousOptionsOnContextMenu(stepLogger);
+        await CommonPageHelper.verifyVariousOptionsOnContextMenu();
 
-        stepLogger.stepId(3);
-        stepLogger.stepId(4);
+        StepLogger.stepId(3);
+        StepLogger.stepId(4);
         await ElementHelper.openLinkInNewTab(EditCost.editCostLinkViaEllipse);
 
-        await EditCostHelper.validateEditCostOpenInNewTab(stepLogger);
+        await EditCostHelper.validateEditCostOpenInNewTab();
     });
     it('Validate right click for Projects > Edit resource tab through ellipse link - [14119625]', async () => {
-        stepLogger.caseId = 14119625;
-        stepLogger.stepId(1);
+        StepLogger.caseId = 14119625;
+        StepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.stepId(2);
-        await CommonPageHelper.selectProjectAndClickEllipsisButton(stepLogger);
+        StepLogger.stepId(2);
+        await CommonPageHelper.selectProjectAndClickEllipsisButton();
 
-        await CommonPageHelper.verifyVariousOptionsOnContextMenu(stepLogger);
+        await CommonPageHelper.verifyVariousOptionsOnContextMenu();
 
-        stepLogger.stepId(3);
-        stepLogger.stepId(4);
+        StepLogger.stepId(3);
+        StepLogger.stepId(4);
         await ElementHelper.openLinkInNewTab(ResourcePlannerPage.editResourceLinkViaEllipse);
 
-        await ResourcePlannerPageHelper.validateEditResourceOpenInNewTab(stepLogger);
+        await ResourcePlannerPageHelper.validateEditResourceOpenInNewTab();
 
     });
     it('Validate right click for Projects > Project name. - [14119624]', async () => {
-        stepLogger.caseId = 14119624;
-        stepLogger.stepId(1);
+        StepLogger.caseId = 14119624;
+        StepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.stepId(2);
-        stepLogger.stepId(3);
-        await ProjectItemPageHelper.validateProjectOpenViaRightClickInNewTab(stepLogger);
+        StepLogger.stepId(2);
+        StepLogger.stepId(3);
+        await ProjectItemPageHelper.validateProjectOpenViaRightClickInNewTab();
     });
 });

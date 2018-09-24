@@ -9,29 +9,33 @@ import {ValidationsHelper} from '../../../../../components/misc-utils/validation
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Create Workspace Functionality - [1124282]', async () => {
-        stepLogger.caseId = 1124282;
-        await WorkspacePageHelper.createWorkspace(stepLogger);
+        StepLogger.caseId = 1124282;
+        await WorkspacePageHelper.createWorkspace();
     });
 
     it('To Verify User is able to view notification after Creating Workspace Using a Project Template - [1175091]', async () => {
-        stepLogger.caseId = 1175091;
-        const title = await WorkspacePageHelper.createWorkspace(stepLogger);
+        StepLogger.caseId = 1175091;
+        const title = await WorkspacePageHelper.createWorkspace();
 
-        stepLogger.stepId(5);
+        StepLogger.stepId(5);
         await browser.sleep(PageHelper.timeout.s);
-        stepLogger.step(`Click on 'Person' button displayed on left side of user name on top right side of page`);
+        StepLogger.step(`Click on 'Person' button displayed on left side of user name on top right side of page`);
         await PageHelper.click(CommonPage.personIcon);
 
-        stepLogger.verification(`Notification 'Your Workspace <Name of Workspace entered in step# 3> is now ready!'
+        StepLogger.verification(`Notification 'Your Workspace <Name of Workspace entered in step# 3> is now ready!'
         displayed in the pop down`);
         await expect(await CommonPage.latestNotification.getText())
         .toContain(title.replace('* ', ''), ValidationsHelper.getLabelDisplayedValidation(title));

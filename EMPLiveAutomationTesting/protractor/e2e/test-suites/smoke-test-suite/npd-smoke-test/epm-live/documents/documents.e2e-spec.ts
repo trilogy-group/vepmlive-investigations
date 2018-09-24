@@ -15,30 +15,34 @@ import {ElementHelper} from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Add Documents Functionality-Project Document - [1124284]', async () => {
-        stepLogger.caseId = 1124284;
+        StepLogger.caseId = 1124284;
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
 
         // Step #1 and #2 Inside this function
-        await DocumentPageHelper.navigateTOAddADocumentPage(stepLogger);
+        await DocumentPageHelper.navigateTOAddADocumentPage();
 
         // Step #3 and #4 Inside this function
-        await DocumentPageHelper.uploadDocument(newFile.fullFilePath, stepLogger, false);
+        await DocumentPageHelper.uploadDocument(newFile.fullFilePath, false);
 
         // Notification is not visible after save.
 
         // Step #5 and #6 Inside this function
-        await DocumentPageHelper.verifyCreatedDocument(stepLogger);
+        await DocumentPageHelper.verifyCreatedDocument();
 
-        stepLogger.verification('Newly uploaded Project document [Ex: testfile.txt] is displayed under the expanded ' +
+        StepLogger.verification('Newly uploaded Project document [Ex: testfile.txt] is displayed under the expanded ' +
             'Project node');
 
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.file)))
@@ -46,9 +50,9 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add Project Documents Functionality-New version of existing document-[1175281]', async () => {
-        stepLogger.caseId = 1175281;
+        StepLogger.caseId = 1175281;
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
-        stepLogger.preCondition('Execute test case C1124284 and add a Project Document [Ex: testfile.txt]');
+        StepLogger.preCondition('Execute test case C1124284 and add a Project Document [Ex: testfile.txt]');
         await PageHelper.click(HomePage.navigateMenu);
         await PageHelper.click(HomePage.navigateToHome);
         await expect(await browser.getTitle())
@@ -59,25 +63,25 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(HomePage.toolBarMenuItems.projectDocument);
         await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
             ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
-        await DocumentPageHelper.uploadDocument(newFile.fullFilePath, stepLogger, true);
+        await DocumentPageHelper.uploadDocument(newFile.fullFilePath, true);
 
         // Step #1 and #2 Inside this function
-        await DocumentPageHelper.navigateTOAddADocumentPage(stepLogger);
+        await DocumentPageHelper.navigateTOAddADocumentPage();
 
         // Step #3 and #4 Inside this function
-        await DocumentPageHelper.uploadDocument(newFile.fullFilePath, stepLogger, true);
+        await DocumentPageHelper.uploadDocument(newFile.fullFilePath, true);
 
         // Notification is not visible after save.
 
         // Step #5 and #6 Inside this function
-        await DocumentPageHelper.verifyCreatedDocument(stepLogger);
+        await DocumentPageHelper.verifyCreatedDocument();
 
-        stepLogger.verification('Newly uploaded Project document [Ex: testfile.txt] is displayed under the expanded ' +
+        StepLogger.verification('Newly uploaded Project document [Ex: testfile.txt] is displayed under the expanded ' +
             'Project node');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.file)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
 
-        stepLogger.verification('Version column displays value "0.2" [A new version should be created ' +
+        StepLogger.verification('Version column displays value "0.2" [A new version should be created ' +
             'successfully of the already existing document]');
         await expect(await CommonPageHelper.getVersionNumberByRowText(newFile.file, CommonPageConstants.versionComment.second ).getText())
             .toBe(CommonPageConstants.versionComment.second, ValidationsHelper.getDisplayedValidation
@@ -86,29 +90,29 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Add Project Document - [907962]', async () => {
-        stepLogger.caseId = 907962;
+        StepLogger.caseId = 907962;
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
         const project = CreateNewPageConstants.navigationLabels.libraryApps.projectDocument;
 
         // Step #1 and #6 Inside this function
-        await DocumentPageHelper.addDocument(newFile.fullFilePath, stepLogger, project);
+        await DocumentPageHelper.addDocument(newFile.fullFilePath, project);
 
-        stepLogger.verification('Project Document uploaded [Ex: Testwordfile.docx] is displayed in "Social Stream"');
+        StepLogger.verification('Project Document uploaded [Ex: Testwordfile.docx] is displayed in "Social Stream"');
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementAllByText(newFile.file, true)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
 
-        stepLogger.stepId(7);
-        stepLogger.step('Select Navigation icon  from left side menu');
+        StepLogger.stepId(7);
+        StepLogger.step('Select Navigation icon  from left side menu');
         await PageHelper.click(HomePage.navigateMenu);
         await PageHelper.click(HomePage.navigation.projects.documents);
-        stepLogger.step('Click on the Project node to expand it');
+        StepLogger.step('Click on the Project node to expand it');
         await PageHelper.click(CommonPage.projectsList);
 
-        stepLogger.verification('Project Documents page is displayed');
+        StepLogger.verification('Project Documents page is displayed');
         await expect(await browser.getTitle()).toBe(HomePageConstants.documentPage,
             ValidationsHelper.getPageDisplayedValidation(HomePageConstants.navigationLabels.projects.documents));
 
-        stepLogger.verification('Project Document uploaded [Ex: Testwordfile.docx] is displayed under the Project Node');
+        StepLogger.verification('Project Document uploaded [Ex: Testwordfile.docx] is displayed under the Project Node');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.file)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
     });

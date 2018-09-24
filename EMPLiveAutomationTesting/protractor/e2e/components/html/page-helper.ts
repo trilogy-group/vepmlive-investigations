@@ -186,13 +186,11 @@ export class PageHelper {
      * @returns {any}
      */
     static async click(targetElement: ElementFinder) {
-
-        await WaitHelper.waitForElementToBeClickable(targetElement);
-        return targetElement.click();
+        await ElementHelper.clickUsingJs(targetElement);
     }
 
-    static async fixHeader(stepLogger: StepLogger) {
-        stepLogger.step('Fix the header');
+    static async fixHeader() {
+        StepLogger.step('Fix the header');
         await this.executeScript(`try{
         if(location.href.indexOf('kitty')){
         document.getElementById('stickyHeader').className

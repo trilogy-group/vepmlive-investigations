@@ -10,205 +10,205 @@ import {OptimizerPageHelper} from '../../../../page-objects/pages/items-page/pro
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Verify the Optimizer and View Option of the Optimizer page.  - [744404]', async () => {
-        stepLogger.caseId = 744404;
+        StepLogger.caseId = 744404;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerTabOptions(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerTabOptions();
     });
 
     it('Verify the Content of Optimizer Option Tab.  - [744405]', async () => {
-        stepLogger.caseId = 744405;
+        StepLogger.caseId = 744405;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.verifyOptimizerTabContents(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.verifyOptimizerTabContents();
     });
 
     it('Verify the content of Optimizer configuration screen. - [744407]', async () => {
-        stepLogger.caseId = 744407;
+        StepLogger.caseId = 744407;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.clickConfigure(stepLogger);
-        await OptimizerPageHelper.verifyConfigureScreen(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.clickConfigure();
+        await OptimizerPageHelper.verifyConfigureScreen();
     });
 
     it('Verify the Add button of the Optimizer configuration screen. - [744408]', async () => {
-        stepLogger.caseId = 744408;
+        StepLogger.caseId = 744408;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.clickConfigure(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerConfigurationPopupOpened(stepLogger);
-        stepLogger.stepId(5);
-        const fieldName = await OptimizerPageHelper.selectAvailableFieldAndAdd(stepLogger);
-        await OptimizerPageHelper.verifyAddedFieldInSelectedFields(fieldName, stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.clickConfigure();
+        await OptimizerPageHelper.verifyOptimizerConfigurationPopupOpened();
+        StepLogger.stepId(5);
+        const fieldName = await OptimizerPageHelper.selectAvailableFieldAndAdd();
+        await OptimizerPageHelper.verifyAddedFieldInSelectedFields(fieldName);
     });
 
     it('Verify the Remove button of the Optimizer configuration screen. - [744409]', async () => {
-        stepLogger.caseId = 744409;
+        StepLogger.caseId = 744409;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.clickConfigure(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerConfigurationPopupOpened(stepLogger);
-        stepLogger.stepId(5);
-        const fieldName = await OptimizerPageHelper.selectSelectedFieldAndRemove(stepLogger);
-        await OptimizerPageHelper.verifyRemovedFieldInAvailableFields(fieldName, stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.clickConfigure();
+        await OptimizerPageHelper.verifyOptimizerConfigurationPopupOpened();
+        StepLogger.stepId(5);
+        const fieldName = await OptimizerPageHelper.selectSelectedFieldAndRemove();
+        await OptimizerPageHelper.verifyRemovedFieldInAvailableFields(fieldName);
     });
 
     it('Verify the content of Save Strategy button. - [744410]', async () => {
-        stepLogger.caseId = 744410;
+        StepLogger.caseId = 744410;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.openSaveStrategyPopup(stepLogger);
-        await OptimizerPageHelper.verifySaveStrategyPopup(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.openSaveStrategyPopup();
+        await OptimizerPageHelper.verifySaveStrategyPopup();
     });
 
     it('Verify the Rename Strategy button. - [744411]', async () => {
-        stepLogger.caseId = 744411;
+        StepLogger.caseId = 744411;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.selectStrategyFromCurrentStrategy(stepLogger);
-        await OptimizerPageHelper.clickRenameStrategy(stepLogger);
-        await OptimizerPageHelper.verifyRenameStrategyPopup(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.selectStrategyFromCurrentStrategy();
+        await OptimizerPageHelper.clickRenameStrategy();
+        await OptimizerPageHelper.verifyRenameStrategyPopup();
     });
 
     it('Verify the content of View Tab of optimizer. - [744413]', async () => {
-        stepLogger.caseId = 744413;
+        StepLogger.caseId = 744413;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.clickViewTab(stepLogger);
-        await OptimizerPageHelper.verifyViewTabContent(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.clickViewTab();
+        await OptimizerPageHelper.verifyViewTabContent();
     });
 
     it('Verify the on Delete View button. - [744414]', async () => {
-        stepLogger.caseId = 744414;
+        StepLogger.caseId = 744414;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.clickViewTab(stepLogger);
-        await OptimizerPageHelper.clickDeleteView(stepLogger);
-        await OptimizerPageHelper.verifyDeleteViewPopup(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.clickViewTab();
+        await OptimizerPageHelper.clickDeleteView();
+        await OptimizerPageHelper.verifyDeleteViewPopup();
     });
 
     it('Verify the Current View drop down - [744415]', async () => {
-        stepLogger.caseId = 744415;
+        StepLogger.caseId = 744415;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.clickViewTab(stepLogger);
-        await OptimizerPageHelper.verifyCurrentViewDropdown(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.clickViewTab();
+        await OptimizerPageHelper.verifyCurrentViewDropdown();
     });
 });

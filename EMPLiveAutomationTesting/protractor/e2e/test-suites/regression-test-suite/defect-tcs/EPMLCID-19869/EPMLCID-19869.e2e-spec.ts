@@ -6,56 +6,56 @@ import {ResourcesPageHelper} from '../../../../page-objects/pages/navigation/res
 import {DepartmentsPageHelper} from '../../../../page-objects/pages/settings/user-management/departments/departments-page.helper';
 
 describe(SuiteNames.regressionTestSuite, () => {
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         await new LoginPage().goToAndLogin();
     });
 
     it('Create a new department - [15438965]', async () => {
-        stepLogger.caseId = 15438965;
-        stepLogger.stepId(1);
-        await DepartmentsPageHelper.navigateToDepartments(stepLogger);
-        await DepartmentsPageHelper.verifyDepartmentsPageDisplayed(stepLogger);
+        StepLogger.caseId = 15438965;
+        StepLogger.stepId(1);
+        await DepartmentsPageHelper.navigateToDepartments();
+        await DepartmentsPageHelper.verifyDepartmentsPageDisplayed();
 
-        stepLogger.stepId(2);
-        await DepartmentsPageHelper.clickAddNewItem(stepLogger);
-        await DepartmentsPageHelper.verifyAddPageDisplayed(stepLogger);
+        StepLogger.stepId(2);
+        await DepartmentsPageHelper.clickAddNewItem();
+        await DepartmentsPageHelper.verifyAddPageDisplayed();
 
-        stepLogger.stepId(3);
-        const title = await DepartmentsPageHelper.enterNewTitle(stepLogger);
-        await DepartmentsPageHelper.verifyTitleEntered(title, stepLogger);
+        StepLogger.stepId(3);
+        const title = await DepartmentsPageHelper.enterNewTitle();
+        await DepartmentsPageHelper.verifyTitleEntered(title, );
 
-        stepLogger.stepId(4);
-        const selectedManagerUser = await DepartmentsPageHelper.selectManagersField(stepLogger);
-        await DepartmentsPageHelper.verifySelectedManagersField(selectedManagerUser, stepLogger);
+        StepLogger.stepId(4);
+        const selectedManagerUser = await DepartmentsPageHelper.selectManagersField();
+        await DepartmentsPageHelper.verifySelectedManagersField(selectedManagerUser, );
 
-        stepLogger.stepId(5);
-        const selectedExecutivesUser = await DepartmentsPageHelper.selectExecutivesField(stepLogger);
-        await DepartmentsPageHelper.verifySelectedExecutivesField(selectedExecutivesUser, stepLogger);
+        StepLogger.stepId(5);
+        const selectedExecutivesUser = await DepartmentsPageHelper.selectExecutivesField();
+        await DepartmentsPageHelper.verifySelectedExecutivesField(selectedExecutivesUser, );
 
-        stepLogger.stepId(6);
-        await DepartmentsPageHelper.clickSave(stepLogger);
-        await DepartmentsPageHelper.verifyDepartmentCreated(title, stepLogger);
+        StepLogger.stepId(6);
+        await DepartmentsPageHelper.clickSave();
+        await DepartmentsPageHelper.verifyDepartmentCreated(title, );
     });
 
     it('Create an enabled resource and a disabled resource - [15438973]', async () => {
-        stepLogger.caseId = 15438973;
+        StepLogger.caseId = 15438973;
         // Step 1 is in precondition
-        stepLogger.stepId(2);
-        await ResourcesPageHelper.navigateToResourcesPage(stepLogger);
-        await ResourcesPageHelper.verifyResourcesPageDisplayed(stepLogger);
+        StepLogger.stepId(2);
+        await ResourcesPageHelper.navigateToResourcesPage();
+        await ResourcesPageHelper.verifyResourcesPageDisplayed();
 
-        stepLogger.stepId(3);
-        await ResourcesPageHelper.clickNewInviteLink(stepLogger);
-        await ResourcesPageHelper.verifyCreateUserPageDisplayed(stepLogger);
+        StepLogger.stepId(3);
+        await ResourcesPageHelper.clickNewInviteLink();
+        await ResourcesPageHelper.verifyCreateUserPageDisplayed();
 
-        stepLogger.stepId(4);
-        const displayName = await ResourcesPageHelper.fillCreateUserForm(stepLogger);
+        StepLogger.stepId(4);
+        const displayName = await ResourcesPageHelper.fillCreateUserForm();
 
-        stepLogger.stepId(5);
-        await ResourcesPageHelper.clickSave(stepLogger);
-        await ResourcesPageHelper.verifyResourceSaved(displayName, stepLogger);
+        StepLogger.stepId(5);
+        await ResourcesPageHelper.clickSave();
+        await ResourcesPageHelper.verifyResourceSaved(displayName, );
     });
 });

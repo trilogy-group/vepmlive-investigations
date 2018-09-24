@@ -11,45 +11,49 @@ import {ValidationsHelper} from '../../../../../components/misc-utils/validation
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Check Search feature - [1035924]', async () => {
-        stepLogger.caseId = 1035924;
-        stepLogger.stepId(1);
-        stepLogger.verification('Navigate To Projects Page');
+        StepLogger.caseId = 1035924;
+        StepLogger.stepId(1);
+        StepLogger.verification('Navigate To Projects Page');
         await CommonPageHelper.navigateToItemPageUnderNavigation (
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.stepId(1);
+        StepLogger.stepId(1);
         // step#3, step#4 are inside this function
-        stepLogger.verification('Search item by Project Name');
+        StepLogger.verification('Search item by Project Name');
         const firstProjectName = await CommonPage.itemsListing.getText();
-        await CommonPageHelper.searchItemByTitle(firstProjectName, ProjectItemPageConstants.columnNames.title, stepLogger, true);
+        await CommonPageHelper.searchItemByTitle(firstProjectName, ProjectItemPageConstants.columnNames.title, true);
 
-        stepLogger.verification('searched projects should get displayed');
+        StepLogger.verification('searched projects should get displayed');
         await expect(await PageHelper.isElementPresent(CommonPageHelper.searchedItemList(firstProjectName)))
                 .toBe(true, ValidationsHelper.getLabelDisplayedValidation(firstProjectName));
 
-        stepLogger.stepId(5);
-        stepLogger.step('Select column name as State');
+        StepLogger.stepId(5);
+        StepLogger.step('Select column name as State');
         await PageHelper.sendKeysToInputField(CommonPage.searchControls.column, ProjectItemPageConstants.columnNames.state);
-        stepLogger.step('Select search choice as "Closed"');
+        StepLogger.step('Select search choice as "Closed"');
         await PageHelper.click(CommonPage.searchControls.textChoice);
         await PageHelper.click(CommonPage.searchChoiceOption.closed);
-        stepLogger.step('Click on perform search button');
+        StepLogger.step('Click on perform search button');
 
-        stepLogger.stepId(6);
+        StepLogger.stepId(6);
         await PageHelper.click(CommonPage.searchIcon);
-        stepLogger.verification('"No data found" message should be shown');
+        StepLogger.verification('"No data found" message should be shown');
         await expect(await PageHelper.isElementDisplayed(CommonPage.noDataFound))
             .toBe(true, ValidationsHelper.getDisplayedValidation(CommonPageConstants.messages.noDataFound));
     });

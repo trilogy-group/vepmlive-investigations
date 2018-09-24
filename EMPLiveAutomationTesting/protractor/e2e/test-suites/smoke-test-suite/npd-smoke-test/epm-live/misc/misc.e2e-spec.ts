@@ -10,48 +10,52 @@ import {OptimizerPageHelper} from '../../../../../page-objects/pages/items-page/
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Create New Strategy in Optimizer Functionality - [1124301]', async () => {
-        stepLogger.caseId = 1124301;
+        StepLogger.caseId = 1124301;
         const uniqueId = PageHelper.getUniqueId();
 
-        stepLogger.stepId(1);
+        StepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.stepId(2);
-        stepLogger.stepId(3);
-        await CommonPageHelper.optimizerViaRibbon(stepLogger);
+        StepLogger.stepId(2);
+        StepLogger.stepId(3);
+        await CommonPageHelper.optimizerViaRibbon();
 
-        await CommonPageHelper.verifyNavigation(stepLogger);
+        await CommonPageHelper.verifyNavigation();
 
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.clickConfigrationButton(stepLogger);
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.clickConfigrationButton();
 
-        await OptimizerPageHelper.verifyConfigrationPopUPDisplayed(stepLogger);
+        await OptimizerPageHelper.verifyConfigrationPopUPDisplayed();
 
-        stepLogger.stepId(5);
-        await OptimizerPageHelper.addAvilabelFiled(stepLogger);
+        StepLogger.stepId(5);
+        await OptimizerPageHelper.addAvilabelFiled();
 
-        await OptimizerPageHelper.verifyConfigrationPopUpClosed(stepLogger);
+        await OptimizerPageHelper.verifyConfigrationPopUpClosed();
 
-        stepLogger.stepId(6);
-        await OptimizerPageHelper.clickSaveStrategy(stepLogger);
+        StepLogger.stepId(6);
+        await OptimizerPageHelper.clickSaveStrategy();
 
-        await OptimizerPageHelper.verifySaveStrategyPopUpOpen(stepLogger);
+        await OptimizerPageHelper.verifySaveStrategyPopUpOpen();
 
-        stepLogger.stepId(7);
-        stepLogger.stepId(8);
-        await OptimizerPageHelper.saveStrategyValidateIt(stepLogger , uniqueId);
+        StepLogger.stepId(7);
+        StepLogger.stepId(8);
+        await OptimizerPageHelper.saveStrategyValidateIt(uniqueId);
     });
 });

@@ -8,27 +8,27 @@ import {CommonPageHelper} from '../../../../common/common-page.helper';
 import {CommonPage} from '../../../../common/common.po';
 
 export class ResourceCommitmentsHelper {
-    static async selectResourceAndApply(stepLogger: StepLogger) {
+    static async selectResourceAndApply() {
         // this is work around without it not able to work on new tab
         await WaitHelper.staticWait(PageHelper.timeout.s);
 
         await PageHelper.switchToNewTabIfAvailable(0);
         await PageHelper.switchToNewTabIfAvailable(1);
 
-        stepLogger.verification('Specific Parameter Values is displayed ');
+        StepLogger.verification('Specific Parameter Values is displayed ');
         await CommonPageHelper.fieldDisplayedValidation
         (ResourceCommitments.specifyParameterValues, ResourceCommitmentsConstansts.specifyParameterValues);
 
         await  PageHelper.click(CommonPage.getDropDownByParameterName(ResourceCommitmentsConstansts.resource, 1));
 
-        await this.selectResource(stepLogger);
+        await this.selectResource();
 
-        await CommonPageHelper.clickApplyButton(stepLogger);
+        await CommonPageHelper.clickApplyButton();
     }
 
-    static async selectResource(stepLogger: StepLogger) {
+    static async selectResource() {
         await  PageHelper.click(ResourceCommitments.getDropDownByParameterName);
-        stepLogger.step('Select Resource ');
+        StepLogger.step('Select Resource ');
 
         await DropDownHelper.selectOptionByVal
         (ResourceCommitments.getDropDownByParameterName, '10001');

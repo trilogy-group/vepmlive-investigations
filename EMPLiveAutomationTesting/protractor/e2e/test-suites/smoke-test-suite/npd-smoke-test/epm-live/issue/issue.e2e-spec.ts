@@ -19,192 +19,196 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Add Issues Functionality - [1124274]', async () => {
-        stepLogger.caseId = 1124274;
+        StepLogger.caseId = 1124274;
 
-        stepLogger.stepId(1);
+        StepLogger.stepId(1);
 
-        stepLogger.step('Select "Create New" icon  from left side menu');
+        StepLogger.step('Select "Create New" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.createNew);
 
-        stepLogger.step('Various Create New options are displayed');
+        StepLogger.step('Various Create New options are displayed');
         await expect(await PageHelper.isElementDisplayed(CreateNewPage.navigation.listApps.issue))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(CreateNewPageConstants.navigationLabels.listApps.issue));
 
-        stepLogger.stepId(2);
-        stepLogger.step('Click on "Issue" link from the options displayed');
+        StepLogger.stepId(2);
+        StepLogger.step('Click on "Issue" link from the options displayed');
         await PageHelper.click(CreateNewPage.navigation.listApps.issue);
 
-        stepLogger.verification('"Issues - New Item" window is displayed');
+        StepLogger.verification('"Issues - New Item" window is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(IssueItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(IssueItemPageConstants.pageName));
 
-        stepLogger.stepId(3);
-        stepLogger.step('Enter/Select required details in "Issues - New Item" window as described below');
+        StepLogger.stepId(3);
+        StepLogger.step('Enter/Select required details in "Issues - New Item" window as described below');
         const uniqueId = PageHelper.getUniqueId();
         const labels = IssueItemPageConstants.inputLabels;
 
-        stepLogger.step('Switch to frame');
+        StepLogger.step('Switch to frame');
         await CommonPageHelper.switchToFirstContentFrame();
-        stepLogger.step('Title *: Random New Issue Item');
+        StepLogger.step('Title *: Random New Issue Item');
         const titleValue = `${labels.title} ${uniqueId}`;
         await TextboxHelper.sendKeys(IssueItemPage.inputs.title, titleValue);
 
-        stepLogger.verification('Required values entered/selected in title Field');
+        StepLogger.verification('Required values entered/selected in title Field');
         await expect(await TextboxHelper.hasValue(IssueItemPage.inputs.title, titleValue))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.title, titleValue));
 
-        stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
+        StepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
 
         await PageHelper.click(CommonPage.projectShowAllButton);
         await WaitHelper.waitForElementToBeDisplayed(IssueItemPage.inputs.project);
         const projectName = await IssueItemPage.inputs.project.getText();
         await PageHelper.click(IssueItemPage.inputs.project);
 
-        stepLogger.verification('Required values entered/selected in Project Field');
+        StepLogger.verification('Required values entered/selected in Project Field');
         await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.project, projectName));
 
-        stepLogger.stepId(4);
-        stepLogger.step('Click on "Save" button in "Issues - New Item" window');
+        StepLogger.stepId(4);
+        StepLogger.step('Click on "Save" button in "Issues - New Item" window');
         await PageHelper.click(CommonPage.formButtons.save);
 
-        stepLogger.verification('"Issues - New Item" window is closed');
+        StepLogger.verification('"Issues - New Item" window is closed');
         await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(IssueItemPageConstants.pageName));
 
         await PageHelper.switchToDefaultContent();
-        stepLogger
-            .verification('Notification about New Issues created [Ex: New Issue Item 1] displayed on the Home Page');
+
+        StepLogger.verification('Notification about New Issues created [Ex: New Issue Item 1] displayed on the Home Page');
 
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getNotificationByText(titleValue)))
             .toBe(true,
                 ValidationsHelper.getNotificationDisplayedValidation(IssueItemPageConstants.pageName));
 
-        stepLogger.stepId(5);
+        StepLogger.stepId(5);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.issues,
             CommonPage.pageHeaders.projects.issues,
             CommonPageConstants.pageHeaders.projects.issues,
-            stepLogger);
+        );
 
         await CommonPageHelper.searchItemByTitle(titleValue,
             IssueItemPageConstants.columnNames.title,
-            stepLogger);
+        );
 
-        stepLogger.verification('Newly created Issue [Ex: New Issue Item 1] displayed in "Issues" page');
+        StepLogger.verification('Newly created Issue [Ex: New Issue Item 1] displayed in "Issues" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
 
     it('Edit Issues Functionality - [1124275]', async () => {
-        stepLogger.caseId = 1124275;
-        stepLogger.stepId(1);
+        StepLogger.caseId = 1124275;
+        StepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.issues,
             CommonPage.pageHeaders.projects.issues,
             CommonPageConstants.pageHeaders.projects.issues,
-            stepLogger);
+        );
 
-        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.record, CommonPage.contextMenuOptions.editItem, stepLogger);
+        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.record, CommonPage.contextMenuOptions.editItem);
 
-        stepLogger.verification('"Edit Issue" page is displayed');
+        StepLogger.verification('"Edit Issue" page is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(IssueItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
 
-        stepLogger.verification('Values selected/entered while creating the Issue are pre populated in respective fields');
+        StepLogger.verification('Values selected/entered while creating the Issue are pre populated in respective fields');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(IssueItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
 
-        stepLogger.stepId(4);
-        stepLogger.step('Enter/Select required details in "Edit Issue" page as described below');
+        StepLogger.stepId(4);
+        StepLogger.step('Enter/Select required details in "Edit Issue" page as described below');
 
         const labels = IssueItemPageConstants.inputLabels;
-        stepLogger.step('Title *: Random New Issue Item');
+        StepLogger.step('Title *: Random New Issue Item');
         const uniqueId = PageHelper.getUniqueId();
         const titleValue = `${labels.title} ${uniqueId}`;
         await TextboxHelper.sendKeys(IssueItemPage.inputs.title, titleValue);
 
-        stepLogger.step('Status: Select the value "In Progress"');
+        StepLogger.step('Status: Select the value "In Progress"');
         const status = CommonPageConstants.statuses.inProgress;
         await PageHelper.sendKeysToInputField(IssueItemPage.inputs.status, status);
 
         const priority = CommonPageConstants.priorities.high;
-        stepLogger.step('Priority: Select the value "(1) High"');
+        StepLogger.step('Priority: Select the value "(1) High"');
         await PageHelper.sendKeysToInputField(IssueItemPage.inputs.priority, priority);
 
-        stepLogger.verification('Required values Entered/Selected in "Edit Issue" Page');
-        stepLogger.verification('Verify - Title *: Random New Issue Item');
+        StepLogger.verification('Required values Entered/Selected in "Edit Issue" Page');
+        StepLogger.verification('Verify - Title *: Random New Issue Item');
         await expect(await TextboxHelper.hasValue(IssueItemPage.inputs.title, titleValue))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.title, titleValue));
 
-        stepLogger.verification('Verify - Status: Select the value "In Progress"');
+        StepLogger.verification('Verify - Status: Select the value "In Progress"');
         await expect(await ElementHelper.hasSelectedOption(IssueItemPage.inputs.status, status))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.status, status));
 
-        stepLogger.verification('Verify - Priority: Select the value "(1) High"');
+        StepLogger.verification('Verify - Priority: Select the value "(1) High"');
         await expect(await ElementHelper.hasSelectedOption(IssueItemPage.inputs.priority, priority))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.priority, priority));
 
-        stepLogger.stepId(5);
-        stepLogger.step('Click "Save" button in "Edit Issue" page');
+        StepLogger.stepId(5);
+        StepLogger.step('Click "Save" button in "Edit Issue" page');
         await PageHelper.click(CommonPage.formButtons.save);
 
-        stepLogger.verification('"Issues" page is displayed');
+        StepLogger.verification('"Issues" page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.issues))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.issues));
 
-        stepLogger.verification('"Edit Issue" page is closed');
+        StepLogger.verification('"Edit Issue" page is closed');
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(IssueItemPageConstants.editPageName));
 
-        stepLogger.verification('Updated Issue details (Title, Status, Priority) displayed in "Issues" page');
-        stepLogger.verification('Show columns whatever is required');
+        StepLogger.verification('Updated Issue details (Title, Status, Priority) displayed in "Issues" page');
+        StepLogger.verification('Show columns whatever is required');
         await CommonPageHelper.showColumns([
             IssueItemPageConstants.columnNames.title,
             IssueItemPageConstants.columnNames.status,
             IssueItemPageConstants.columnNames.priority]);
 
-        stepLogger.verification('Search item by title');
-        await CommonPageHelper.searchItemByTitle(titleValue, IssueItemPageConstants.columnNames.title, stepLogger);
+        StepLogger.verification('Search item by title');
+        await CommonPageHelper.searchItemByTitle(titleValue, IssueItemPageConstants.columnNames.title);
 
-        stepLogger.verification('Click on searched record');
+        StepLogger.verification('Click on searched record');
         await PageHelper.click(CommonPage.record);
 
-        stepLogger.verification('Verify record by title');
+        StepLogger.verification('Verify record by title');
         const firstTableColumns = [titleValue];
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(firstTableColumns)))
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
-        stepLogger.verification('Verify by other properties');
+        StepLogger.verification('Verify by other properties');
         const secondTableColumns = [status, priority];
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
             .toBe(true,

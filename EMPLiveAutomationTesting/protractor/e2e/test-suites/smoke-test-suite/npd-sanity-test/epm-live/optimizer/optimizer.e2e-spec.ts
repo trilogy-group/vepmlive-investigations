@@ -12,49 +12,54 @@ import {CommonPageConstants} from '../../../../../page-objects/pages/common/comm
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
+
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Set Cost Plan for Project - [785226]', async () => {
-        stepLogger.caseId = 785226;
+        StepLogger.caseId = 785226;
         const cost =  4;
-        stepLogger.preCondition('Creating a project');
+        StepLogger.preCondition('Creating a project');
 
         const uniqueId = PageHelper.getUniqueId();
 
-        const  projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
+        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, );
 
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger,
+
             projectNameValue,
             ProjectItemPageConstants.columnNames.title);
 
-        stepLogger.stepId(1);
-        await CommonPageHelper.selectProjectAndClickEllipsisButton(stepLogger);
+        StepLogger.stepId(1);
+        await CommonPageHelper.selectProjectAndClickEllipsisButton();
 
-        await CommonPageHelper.verifyVariousOptionsOnContextMenu(stepLogger);
+        await CommonPageHelper.verifyVariousOptionsOnContextMenu();
 
-        stepLogger.stepId(2);
-        await CommonPageHelper.clickEditCost(stepLogger);
+        StepLogger.stepId(2);
+        await CommonPageHelper.clickEditCost();
 
         await CommonPageHelper.switchToFirstContentFrame();
 
-        await EditCostHelper.validateEditCostWebElements(stepLogger);
+        await EditCostHelper.validateEditCostWebElements();
 
-        stepLogger.stepId(3);
-        await EditCostHelper.enterValueInVariousCategories(stepLogger, cost);
+        StepLogger.stepId(3);
+        await EditCostHelper.enterValueInVariousCategories(cost);
 
-        await EditCostHelper.verifyValueInVariousCategories(stepLogger, cost);
+        await EditCostHelper.verifyValueInVariousCategories(cost);
 
-        stepLogger.stepId(4);
-        await EditCostHelper.clickSaveCostPlanner(stepLogger);
+        StepLogger.stepId(4);
+        await EditCostHelper.clickSaveCostPlanner();
 
-        await EditCostHelper.verifyValueInVariousCategories(stepLogger, cost);
+        await EditCostHelper.verifyValueInVariousCategories(cost);
     });
 });

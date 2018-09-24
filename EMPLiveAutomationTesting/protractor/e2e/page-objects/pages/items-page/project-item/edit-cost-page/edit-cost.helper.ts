@@ -13,215 +13,215 @@ import {ElementHelper} from '../../../../../components/html/element-helper';
 
 export class EditCostHelper {
 
-    static async enterValueInBenefitTab(stepLogger: StepLogger, cost: number) {
-        stepLogger.step('Enter Value in Benefit Tab');
+    static async enterValueInBenefitTab(cost: number) {
+        StepLogger.step('Enter Value in Benefit Tab');
         await PageHelper.sendKeysToInputFieldAndEnter(EditCost.inputTextBoxForBenefitsCostTab, cost.toString());
     }
 
-    static async verifyValueInBenefitCost(stepLogger: StepLogger, cost: number) {
-        stepLogger.verification('Verify  Value in Benefit Cost');
+    static async verifyValueInBenefitCost(cost: number) {
+        StepLogger.verification('Verify  Value in Benefit Cost');
         await CommonPageHelper.textPresentValidation(EditCost.inputTextBoxForBenefitsCostTab , cost.toString());
     }
 
-    static async enterValueInActualCost(stepLogger: StepLogger , cost: number ) {
-        stepLogger.step('Enter Cost in Textbox ');
+    static async enterValueInActualCost(cost: number) {
+        StepLogger.step('Enter Cost in Textbox ');
         await PageHelper.sendKeysToInputFieldAndEnter(EditCost.inputTextBoxForActualCostTab , cost.toString());
 
     }
 
-    static async verifyValueInActualCost(stepLogger: StepLogger, cost: number) {
-        stepLogger.verification('Verify  Value in Actual Cost');
+    static async verifyValueInActualCost(cost: number) {
+        StepLogger.verification('Verify  Value in Actual Cost');
         await CommonPageHelper.textPresentValidation(EditCost.inputTextBoxForActualCostTab, cost.toString());
     }
 
-    static async enterValueInBudgetCost(stepLogger: StepLogger, cost: number) {
-        stepLogger.step('Enter Value in Budget Tab');
+    static async enterValueInBudgetCost(cost: number) {
+        StepLogger.step('Enter Value in Budget Tab');
         await PageHelper.sendKeysToInputFieldAndEnter(EditCost.inputTextBoxForBudgetTab , cost.toString());
     }
 
-    static async verifyValueInBudgetCost(stepLogger: StepLogger, cost: number) {
-        stepLogger.verification('Enter Value in Benefit Tab');
+    static async verifyValueInBudgetCost(cost: number) {
+        StepLogger.verification('Enter Value in Benefit Tab');
         await CommonPageHelper.textPresentValidation(EditCost.inputTextBoxForBudgetTab  , cost.toString());
     }
 
-    static async clickActualCostsTab(stepLogger: StepLogger) {
-        stepLogger.step('Click Actual Cost Tab');
+    static async clickActualCostsTab() {
+        StepLogger.step('Click Actual Cost Tab');
         await PageHelper.clickAndEnter(EditCost.costTab.actualCostsTab);
     }
 
-    static async clickBudgetTabCostsTab(stepLogger: StepLogger) {
-        stepLogger.step('Click budgetTab Cost Tab');
+    static async clickBudgetTabCostsTab() {
+        StepLogger.step('Click budgetTab Cost Tab');
         await PageHelper.clickAndEnter(EditCost.costTab.budgetTab);
     }
 
-    static async clickBenefitsTab(stepLogger: StepLogger) {
-        stepLogger.step('Click Benefits Tab');
+    static async clickBenefitsTab() {
+        StepLogger.step('Click Benefits Tab');
         await PageHelper.clickAndEnter(EditCost.costTab.benefitsTab);
     }
 
-    static async clickResourcePlanTab(stepLogger: StepLogger) {
-        stepLogger.step('Click resourcePlan Tab');
+    static async clickResourcePlanTab() {
+        StepLogger.step('Click resourcePlan Tab');
         await PageHelper.clickAndEnter(EditCost.costTab.resourcePlan);
     }
 
-    static async clickTimeSheetActualsTab(stepLogger: StepLogger) {
-        stepLogger.step('Click timeSheet Actuals Tab');
+    static async clickTimeSheetActualsTab() {
+        StepLogger.step('Click timeSheet Actuals Tab');
         await PageHelper.clickAndEnter(EditCost.costTab.timeSheetActuals);
     }
 
-    static  async clickSaveCostPlanner(stepLogger: StepLogger) {
-        stepLogger.step('Click Save Button ');
+    static async clickSaveCostPlanner() {
+        StepLogger.step('Click Save Button ');
         await PageHelper.click(CommonPage.ribbonItems.save);
     }
 
-    static  async clickCloseCostPlanner(stepLogger: StepLogger) {
-        stepLogger.step('Click Close Button ');
+    static async clickCloseCostPlanner() {
+        StepLogger.step('Click Close Button ');
         await WaitHelper.staticWait(PageHelper.timeout.s);
 
         await PageHelper.click(CommonPage.ribbonItems.close);
     }
 
-    static  async validateEditCostIsDisabled(stepLogger: StepLogger) {
-        stepLogger.verification('Validate Edit Cost Is Disabled ');
-        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.editCost, stepLogger);
+    static async validateEditCostIsDisabled() {
+        StepLogger.verification('Validate Edit Cost Is Disabled ');
+        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.editCost);
     }
 
-    static  async validateEditCostIsEnable(stepLogger: StepLogger) {
-        stepLogger.verification('Validate Edit Cost Is Enabled');
-        await ExpectationHelper.verifyAttributeValue(CommonPage.ribbonItems.editCost,  'aria-disabled', '', stepLogger);
+    static async validateEditCostIsEnable() {
+        StepLogger.verification('Validate Edit Cost Is Enabled');
+        await ExpectationHelper.verifyAttributeValue(CommonPage.ribbonItems.editCost, 'aria-disabled', '');
     }
 
-    static  async validateSaveButtonDisabled(stepLogger: StepLogger) {
-        stepLogger.verification('Validate SaveButton Is Disabled ');
+    static async validateSaveButtonDisabled() {
+        StepLogger.verification('Validate SaveButton Is Disabled ');
         const expectedValue = 'ms-cui-ctl-large ms-cui-disabled';
 
-        await ExpectationHelper.verifyAttributeValue(CommonPage.ribbonItems.save,  'class', expectedValue, stepLogger);
+        await ExpectationHelper.verifyAttributeValue(CommonPage.ribbonItems.save, 'class', expectedValue);
     }
 
-    static  async validateEditCostFunctionality(stepLogger: StepLogger, value: number) {
-        await this.clickActualCostsTab(stepLogger);
+    static async validateEditCostFunctionality(value: number) {
+        await this.clickActualCostsTab();
 
-        stepLogger.verification('Validate Edit Cost Functionality ');
-        await this.clickSaveCostPlanner(stepLogger);
+        StepLogger.verification('Validate Edit Cost Functionality ');
+        await this.clickSaveCostPlanner();
 
-        stepLogger.verification('Validate that Benefits Cost is save ');
-        await this.verifyValueInActualCost(stepLogger, value);
+        StepLogger.verification('Validate that Benefits Cost is save ');
+        await this.verifyValueInActualCost(value);
 
-        stepLogger.verification('Validate that Benefits Cost is save ');
-        await this.verifyValueInActualCost(stepLogger, value);
+        StepLogger.verification('Validate that Benefits Cost is save ');
+        await this.verifyValueInActualCost(value);
 
-        await this.validateSaveButtonDisabled(stepLogger);
+        await this.validateSaveButtonDisabled();
 
-        await this.clickCloseCostPlanner(stepLogger);
+        await this.clickCloseCostPlanner();
 
-        stepLogger.verification('Validate that Project center page is displayed');
+        StepLogger.verification('Validate that Project center page is displayed');
         await CommonPageHelper.fieldDisplayedValidation
         (HomePage.navigation.projects.projects, HomePageConstants.navigationLabels.projects.projects);
 
-        await CommonPageHelper.clickEditCost(stepLogger);
+        await CommonPageHelper.clickEditCost();
 
         await CommonPageHelper.switchToFirstContentFrame();
 
-        stepLogger.verification('Validate that Budget  Cost is save ');
+        StepLogger.verification('Validate that Budget  Cost is save ');
 
-        await this.verifyValueInBudgetCost(stepLogger, value);
+        await this.verifyValueInBudgetCost(value);
 
-        await this.clickActualCostsTab(stepLogger);
+        await this.clickActualCostsTab();
 
-        stepLogger.verification('Validate that Actual  Cost is save ');
-        await this.verifyValueInActualCost(stepLogger, value);
+        StepLogger.verification('Validate that Actual  Cost is save ');
+        await this.verifyValueInActualCost(value);
 
-        await this.clickBenefitsTab(stepLogger);
+        await this.clickBenefitsTab();
 
-        await this.verifyValueInBenefitCost(stepLogger, value);
+        await this.verifyValueInBenefitCost(value);
     }
 
-    static  async validateEditCostWebElements(stepLogger: StepLogger) {
+    static async validateEditCostWebElements() {
 
-        stepLogger.verification('Validate that Actual  Cost is Present ');
+        StepLogger.verification('Validate that Actual  Cost is Present ');
         await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.actualCostsTab, EditCostConstants.costTabs.actualCostsTab);
 
-        stepLogger.verification('Validate that budget  Cost is Present ');
+        StepLogger.verification('Validate that budget  Cost is Present ');
         await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.budgetTab, EditCostConstants.costTabs.budgetTab);
 
-        stepLogger.verification('Validate that timeSheetActuals  Cost is Present ');
+        StepLogger.verification('Validate that timeSheetActuals  Cost is Present ');
         await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.timeSheetActuals, EditCostConstants.costTabs.timeSheetActuals);
 
-        stepLogger.verification('Validate that benefitsTab  Cost is Present ');
+        StepLogger.verification('Validate that benefitsTab  Cost is Present ');
         await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.benefitsTab, EditCostConstants.costTabs.benefitsTab);
 
-        stepLogger.verification('category is present for benefitsTab  Cost ');
+        StepLogger.verification('category is present for benefitsTab  Cost ');
 
         await CommonPageHelper.fieldDisplayedValidation(EditCost.category(), EditCostConstants.category);
     }
 
-    static  async validateCostCategoriesInEachTab(stepLogger: StepLogger) {
-        stepLogger.verification('Validate that  cost Categories is present in Budget Tab ');
+    static async validateCostCategoriesInEachTab() {
+        StepLogger.verification('Validate that  cost Categories is present in Budget Tab ');
         await CommonPageHelper.fieldDisplayedValidation(EditCost.category(), EditCostConstants.category);
 
-        await this.clickActualCostsTab(stepLogger);
+        await this.clickActualCostsTab();
 
-        stepLogger.verification('Validate that  cost Categories is present in Actual Tab ');
+        StepLogger.verification('Validate that  cost Categories is present in Actual Tab ');
         await CommonPageHelper.fieldDisplayedValidation(EditCost.category(1), EditCostConstants.category);
 
-        await this.clickBenefitsTab(stepLogger);
+        await this.clickBenefitsTab();
 
-        stepLogger.verification('Validate that  cost Categories is present in Benefit Tab ');
+        StepLogger.verification('Validate that  cost Categories is present in Benefit Tab ');
         await CommonPageHelper.fieldDisplayedValidation(EditCost.category(2), EditCostConstants.category);
 
-        await this.clickResourcePlanTab(stepLogger);
+        await this.clickResourcePlanTab();
 
-        stepLogger.verification('Validate that  cost Categories is present in Resource plan Tab ');
+        StepLogger.verification('Validate that  cost Categories is present in Resource plan Tab ');
         await CommonPageHelper.fieldDisplayedValidation(EditCost.category(3), EditCostConstants.category);
 
-        await this.clickTimeSheetActualsTab(stepLogger);
+        await this.clickTimeSheetActualsTab();
 
-        stepLogger.verification('Validate that  cost Categories is present in time sheet tab  ');
+        StepLogger.verification('Validate that  cost Categories is present in time sheet tab  ');
         await CommonPageHelper.fieldDisplayedValidation(EditCost.category(4), EditCostConstants.category);
     }
 
-    static  async enterValueInVariousCategories(stepLogger: StepLogger , cost: number ) {
-        stepLogger.step('Enter Value in Cell1');
+    static async enterValueInVariousCategories(cost: number) {
+        StepLogger.step('Enter Value in Cell1');
         await PageHelper.sendKeysToInputField(CommonPage.getCostCell.cell1 , cost.toString());
 
-        stepLogger.step('Enter Value in Cell2');
+        StepLogger.step('Enter Value in Cell2');
         await PageHelper.sendKeysToInputField(CommonPage.getCostCell.cell2 , cost.toString());
 
-        await this.enterValueInBudgetCost(stepLogger, cost);
+        await this.enterValueInBudgetCost(cost);
     }
 
-    static  async verifyValueInVariousCategories(stepLogger: StepLogger , cost: number ) {
-        await this.verifyValueInBudgetCost(stepLogger, cost);
+    static async verifyValueInVariousCategories(cost: number) {
+        await this.verifyValueInBudgetCost(cost);
 
-        stepLogger.verification('Verify  Value in Benefit Cell1');
+        StepLogger.verification('Verify  Value in Benefit Cell1');
         await CommonPageHelper.textPresentValidation(CommonPage.getCostCell.cell1 , cost.toString());
 
-        stepLogger.verification('Verify  Value in Benefit Cell2');
+        StepLogger.verification('Verify  Value in Benefit Cell2');
         await CommonPageHelper.textPresentValidation(CommonPage.getCostCell.cell2 , cost.toString());
     }
 
-    static async clickEditCostFromContextMenu(stepLogger: StepLogger) {
-        stepLogger.step('Select "Edit Cost" from Context Menu options displayed');
+    static async clickEditCostFromContextMenu() {
+        StepLogger.step('Select "Edit Cost" from Context Menu options displayed');
         await PageHelper.click(CommonPage.contextMenuOptions.editCosts);
     }
 
-    static async verifiyEditCostIsPresent(stepLogger: StepLogger) {
-        stepLogger.verification('Verifiy Edit cost is present');
+    static async verifiyEditCostIsPresent() {
+        StepLogger.verification('Verifiy Edit cost is present');
         await CommonPageHelper.fieldDisplayedValidation(CommonPage.ribbonItems.editCost, CommonPageConstants.ribbonLabels.editCost);
     }
 
-    static  async editCostOpenViaRibbonInNewTab (stepLogger: StepLogger) {
-        stepLogger.step('Open Cost In New Tab');
+    static async editCostOpenViaRibbonInNewTab() {
+        StepLogger.step('Open Cost In New Tab');
         await ElementHelper.openLinkInNewTab(EditCost.editCostLink);
     }
 
-    static  async validateEditCostOpenInNewTab(stepLogger: StepLogger) {
-        stepLogger.verification('Switch To new Tab  ');
+    static async validateEditCostOpenInNewTab() {
+        StepLogger.verification('Switch To new Tab  ');
         await PageHelper.switchToNewTabIfAvailable(1);
         await PageHelper.switchToNewTabIfAvailable(0);
         await PageHelper.switchToNewTabIfAvailable(1);
 
-        stepLogger.verification('Validate that Actual  Cost is Present ');
+        StepLogger.verification('Validate that Actual  Cost is Present ');
         await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.actualCostsTab, EditCostConstants.costTabs.actualCostsTab);
     }
 }
