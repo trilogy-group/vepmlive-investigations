@@ -507,7 +507,7 @@ namespace EPMLiveCore.Tests.API.Applications
         }
 
         [TestMethod]
-        public void UninstallApp_Situation1_ConfirmResult()
+        public void UninstallApp_WhenIsRootWebAndUserHasPermissionsAndHasNotSolutionsAndIsNotVerifyOnly_ConfirmResult()
         {
             // Arrange
             var guid = Guid.NewGuid().ToString();
@@ -568,7 +568,7 @@ namespace EPMLiveCore.Tests.API.Applications
         }
 
         [TestMethod]
-        public void UninstallApp_Situation2_ConfirmResult()
+        public void UninstallApp_WhenIsNotRootWebAndUserHasPermissionsAndHasSolutionsAndIsNotVerifyOnly_ConfirmResult()
         {
             // Arrange
             SetupForUnninstallApp(WebId, false, true, true);
@@ -628,7 +628,7 @@ namespace EPMLiveCore.Tests.API.Applications
         }
 
         [TestMethod]
-        public void UninstallApp_Situation3_ConfirmResult()
+        public void UninstallApp_WhenIsNotRootWebAndUserHasPermissionsAndHasNotSolutionsAndIsNotVerifyOnly_ConfirmResult()
         {
             // Arrange
             SetupForUnninstallApp(WebId, false, true, false);
@@ -688,7 +688,7 @@ namespace EPMLiveCore.Tests.API.Applications
         }
 
         [TestMethod]
-        public void UninstallApp_Situation4_ConfirmResult()
+        public void UninstallApp_WhenIsRootWebAndUserHasPermissionsAndHasNotSolutionsAndIsVerifyOnly_ConfirmResult()
         {
             // Arrange
             var guid = Guid.NewGuid().ToString();
@@ -760,7 +760,7 @@ namespace EPMLiveCore.Tests.API.Applications
         }
 
         [TestMethod]
-        public void UninstallApp_Situation5_ConfirmResult()
+        public void UninstallApp_WhenIsNotRootWebAndUserHasPermissionsAndHasSolutionsAndIsVerifyOnly_ConfirmResult()
         {
             // Arrange
             SetupForUnninstallApp(WebId, false, true, true);
@@ -830,7 +830,7 @@ namespace EPMLiveCore.Tests.API.Applications
         }
 
         [TestMethod]
-        public void UninstallApp_Situation6_ConfirmResult()
+        public void UninstallApp_WhenIsRootWebAndUserHasNotPermissionsAndHasNotSolutionsAndIsNotVerifyOnly_ConfirmResult()
         {
             // Arrange
             var guid = Guid.NewGuid().ToString();
