@@ -121,6 +121,7 @@
     <Compile Include="API\TimesheetAPI.GetOtherHours.Tests.cs" />
     <Compile Include="API\TimesheetAPI.SaveTimesheet.Tests.cs" />
     <Compile Include="API\TimesheetAPI.GetTimesheetUpdates.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.StopStopWatch.Tests.cs" />
     <Compile Include="API\TimesheetAPI.StartStopWatch.Tests.cs" />
     <Compile Include="API\TimesheetAPI.SubmitTimesheet.Tests.cs" />
     <Compile Include="API\TimesheetAPI.UnSubmitTimesheet.Tests.cs" />

@@ -77,5 +77,14 @@ namespace EPMLiveTimesheets.Tests {
                 return ResourceManager.GetString("GetWork_Called_SqlDisposed_ExpectedResult", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;StopWatch Status=&quot;0&quot;&gt;&lt;StopWatchValue Date=&quot;Tuesday, January 9, 2018 12:00:00 AM&quot; DateTicks=&quot;636510528000000000&quot; Minutes=&quot;0&quot;/&gt;&lt;/StopWatch&gt;.
+        /// </summary>
+        internal static string StopStopWatch_Called_SqlDisposed_ExpectedResult {
+            get {
+                return ResourceManager.GetString("StopStopWatch_Called_SqlDisposed_ExpectedResult", resourceCulture);
+            }
+        }
     }
 }

@@ -1500,34 +1500,34 @@ namespace TimeSheets
                 }
                 catch { }
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                var dtStart = DateTime.MinValue;
+                using (var connection =
+                    GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
+                    var user = GetUser(oWeb, userid);
 
+                    using (var command =
+                        new SqlCommand("Select STARTED FROM TSSW where TSITEMUID = @id and USER_ID=@userid", connection))
+                    {
+                        command.Parameters.AddWithValue("@id", tsuid);
+                        command.Parameters.AddWithValue("@userid", user.ID);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                dtStart = reader.GetDateTime(0);
+                            }
+                        }
+                    }
 
-                SPUser user = GetUser(oWeb, userid);
-
-                DateTime dtStart = DateTime.MinValue;
-
-                SqlCommand cmd = new SqlCommand("Select STARTED FROM TSSW where TSITEMUID = @id and USER_ID=@userid", cn);
-                cmd.Parameters.AddWithValue("@id", tsuid);
-                cmd.Parameters.AddWithValue("@userid", user.ID);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
-                {
-                    dtStart = dr.GetDateTime(0);
+                    using (var cmd =
+                        new SqlCommand("DELETE FROM TSSW where TSITEMUID = @id and USER_ID=@userid", connection))
+                    {
+                        cmd.Parameters.AddWithValue("@id", tsuid);
+                        cmd.Parameters.AddWithValue("@userid", user.ID);
+                        cmd.ExecuteNonQuery();
+                    }
                 }
-                dr.Close();
-
-                cmd = new SqlCommand("DELETE FROM TSSW where TSITEMUID = @id and USER_ID=@userid", cn);
-                cmd.Parameters.AddWithValue("@id", tsuid);
-                cmd.Parameters.AddWithValue("@userid", user.ID);
-                cmd.ExecuteNonQuery();
-
-                cn.Close();
 
                 if (dtStart != DateTime.MinValue)
                 {
