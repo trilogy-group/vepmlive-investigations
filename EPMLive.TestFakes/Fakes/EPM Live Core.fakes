@@ -10,7 +10,9 @@
     <Add FullName="EPMLiveCore.AppSettingsHelper!"/>
     <Add FullName="EPMLiveCore.EditableFieldDisplay!"/>
     <Add FullName="EPMLiveCore.ActLicensing.Licensing!"/>
+    <Add FullName="EPMLiveCore.JSONUtil"/>
     <Add FullName="EPMLiveCore.UserLevels"/>
+    <Add FullName="EPMLiveCore.ListDisplayUtils!"/>
     <Add FullName="EPMLiveCore.ReportingProxy.QueryExecutor!"/>
     <Add FullName="EPMLiveCore.CoreFunctions!"/>
     <Add FullName="EPMLiveCore.Infrastructure.Logging.LoggingService!"/>
@@ -52,6 +54,7 @@
     <Add FullName="EPMLiveCore.API.NavigationService!"/>
     <Add FullName="EPMLiveCore.Controls.Navigation.Providers.ApplicationsLinkProvider!"/>
     <Add FullName="EPMLiveCore.Controls.Navigation.Providers.GenericLinkProvider!"/>
+    <Add FullName="EPMLiveCore.Controls.Navigation.EPMLiveQuickLaunchProvider!"/>
     <Add FullName="EPMLiveCore.Infrastructure.Navigation.NavLink!"/>
     <Add FullName="EPMLiveCore.Act!"/>
     <Add FullName="EPMLiveCore.API.PropertyHash!"/>

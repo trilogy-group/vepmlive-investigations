@@ -153,11 +153,13 @@
     <Compile Include="API\MyWork\MyWorkTestsSplitOne.cs" />
     <Compile Include="API\MyWork\MyWorkTestsSplitThree.cs" />
     <Compile Include="API\MyWork\MyWorkTestsSplitTwo.cs" />
+    <Compile Include="API\MyWork\UtilsTests.cs" />
     <Compile Include="API\NavigationServiceTests.cs" />
     <Compile Include="API\Notification\APIEmailTests.cs" />
     <Compile Include="API\Publish\APIPublishTests.cs" />
     <Compile Include="API\ResourceGrid\ResourceExporterTests.cs" />
     <Compile Include="API\ResourceGrid\ResourceGridTests.cs" />
+    <Compile Include="API\SolGalTemplatesManagerTests.cs" />
     <Compile Include="API\ResourceGrid\ResourceImporterTests.cs" />
     <Compile Include="API\TimerTests.cs" />
     <Compile Include="AppSettingsHelperTests.cs" />
@@ -168,6 +170,8 @@
     <Compile Include="CoreFunctions.GetPlannerList.Tests.cs" />
     <Compile Include="CoreFunctionsTest.cs" />
     <Compile Include="EditableFieldDisplayTests.cs" />
+    <Compile Include="ExtensionMethodsTest.cs" />
+    <Compile Include="Infrastructure\BaseClasses\SPListItemManagerTests.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
     <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
     <Compile Include="Jobs\ResourceImportJobTests.cs" />

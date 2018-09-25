@@ -34,6 +34,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>EPMLiveWebParts.Tests.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Castle.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
@@ -115,13 +121,17 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="API\WPAPITest.cs" />
     <Compile Include="ChartControl\VfChartTests.cs" />
     <Compile Include="GridListView\GridListViewTests.AddContextualTab.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderActionMenu.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderGantt.cs" />
+    <Compile Include="IntegrationModuleDisplay\IntegrationModuleDisplayTest.cs" />
     <Compile Include="Layouts\epmlive\TlwizardTests.cs" />
+    <Compile Include="ListReportView\ListReportViewTest.cs" />
     <Compile Include="ReportingChart\ReportingChartTests.cs" />
     <Compile Include="ReportingChart\ReportingChartToolPartTests.cs" />
+    <Compile Include="ReportingChart\ReportingChartToolPartTests.Part2.cs" />
     <Compile Include="ResourcePlanningTest.cs" />
     <Compile Include="ReportingFilter\ReportingFilterTests.cs" />
     <Compile Include="UserProfileDisplay\DisplayProfilePicturesTests.cs" />
@@ -150,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="EPMLiveWebParts.Tests.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

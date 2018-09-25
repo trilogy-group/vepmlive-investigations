@@ -368,7 +368,7 @@ namespace TimeSheets
                                                     using (SqlCommand cmd = new SqlCommand("UPDATE TSITEM set Title = @title, project=@project, project_id=@projectid where ts_item_uid=@uid", cn))
                                                     {
                                                         cmd.Parameters.AddWithValue("@uid", id);
-                                                        cmd.Parameters.AddWithValue("@title", li["Title"].ToString());
+                                                        cmd.Parameters.AddWithValue("@title", li["Title"] == null ? string.Empty : li["Title"].ToString());
                                                         if (projectid == 0)
                                                         {
                                                             cmd.Parameters.AddWithValue("@project", DBNull.Value);
@@ -407,7 +407,7 @@ namespace TimeSheets
                                                         itemInsertCmd.Parameters.AddWithValue("@webid", web.ID);
                                                         itemInsertCmd.Parameters.AddWithValue("@listid", list.ID);
                                                         itemInsertCmd.Parameters.AddWithValue("@itemid", li.ID);
-                                                        itemInsertCmd.Parameters.AddWithValue("@title", li["Title"].ToString());
+                                                        itemInsertCmd.Parameters.AddWithValue("@title", li["Title"] == null? string.Empty : li["Title"].ToString());
                                                         itemInsertCmd.Parameters.AddWithValue("@list", list.Title);
                                                         itemInsertCmd.Parameters.AddWithValue("@itemtype", itemtypeid);
                                                         itemInsertCmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
