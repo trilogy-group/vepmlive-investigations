@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Fakes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using EPMLiveCore.API;
 using EPMLiveCore.API.Fakes;
@@ -21,7 +17,6 @@ using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Navigation;
 using Microsoft.SharePoint.Navigation.Fakes;
-using Microsoft.SharePoint.Workflow.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
@@ -68,6 +63,50 @@ namespace EPMLiveCore.Tests.API.Applications
         private const string Feature2Guid = "d56a106c-f833-4437-be12-129ea71dfd45";
         private const string Feature3Guid = "005aed9a-7b82-46b5-b3fd-8e8d85240487";
         private const string Feature4Guid = "54f10d47-074e-4895-b205-43b477f613e6";
+        private const string Folder1 = "Folder1";
+        private const string Folder2 = "Folder2";
+        private const string Folder3 = "Folder3";
+        private const string Folder4 = "Folder4";
+        private const string File1 = "File1";
+        private const string UserIdField = "userid";
+
+        private const string ApplicationUninstall = "Application Uninstall";
+        private const string ApplicationInstalledSomewhereElse = "Application is installed somewhere else and will remove from this site only.";
+        private const string PermissionsCheck = "Permissions Check";
+        private const string YouDoNotHavePermissions = "You do not have Manage Web permissions";
+        private const string RemovingAppFromCommunities = "Removing App from Communities";
+        private const string DeletingCommunity = "Deleting Community";
+        private const string UninstallingNavigation = "Uninstalling Navigation";
+        private const string CheckingQuickLaunch = "Checking QuickLaunch";
+        private const string CheckingTopNavigation = "Checking Top Navigation";
+        private const string UninstallingLists = "Uninstalling Lists";
+        private const string ListWillNotDelete = "List will not delete";
+        private const string UninstallingFields = "Uninstalling Fields";
+        private const string UninstallingLookups = "Uninstalling Lookups";
+        private const string UninstallingViews = "Uninstalling Views";
+        private const string UninstallingWorkflows = "Uninstalling Workflows";
+        private const string UninstallingEventHandlers = "Uninstalling Event Handlers";
+        private const string UninstallingItems = "Uninstalling Items";
+        private const string RemoveDummyStringFromReportingDatabase = "Remove (DummyString) From Reporting Database";
+        private const string UninstallingFeatures = "Uninstalling Features";
+        private const string ApplicationInstalledOnAnotherSite = "Application currently installed on another site";
+        private const string UninstallingProperties = "Uninstalling Properties";
+        private const string UninstallingFiles = "Uninstalling Files";
+        private const string FolderIsAList = "Folder is a list";
+        private const string UninstallingSolutionsAndLists = "Uninstalling Solutions and Lists";
+        private const string CheckingNavigation = "Checking Navigation";
+        private const string CheckingLists = "Checking Lists";
+        private const string CheckingFields = "Checking Fields";
+        private const string CheckingLookups = "Checking Lookups";
+        private const string CheckingViews = "Checking Views";
+        private const string CheckingWorkflows = "Checking Workflows";
+        private const string CheckingEventHandlers = "Checking Event Handlers";
+        private const string CheckingItems = "Checking Items";
+        private const string RemoveFromReportingDatabase = "Remove From Reporting Database";
+        private const string CheckingFeatures = "Checking Features";
+        private const string CheckingProperties = "Checking Properties";
+        private const string CheckingFiles = "Checking Files";
+        private const string CheckingSolutionsAndLists = "Checking Solutions and Lists";
 
         [TestInitialize]
         public void TestInitialize()
@@ -112,7 +151,7 @@ namespace EPMLiveCore.Tests.API.Applications
         {
             _configJob = new ShimUninstall().Instance;
             _privateConfigJob = new PrivateObject(_configJob);
-            _privateConfigJob.SetFieldOrProperty("userid", DummyInt);
+            _privateConfigJob.SetFieldOrProperty(UserIdField, DummyInt);
 
             var spUser = new ShimSPUser
             {
@@ -134,14 +173,14 @@ namespace EPMLiveCore.Tests.API.Applications
                         case "TopNav":
                             return DummyInt;
                         case "InstalledFiles":
-                            return @"<Files>
-                                       <Folder Type='Folder' FullFile='Folder1/' Name='Folder1'></Folder>
-                                       <Folder Type='Folder' FullFile='Folder2' Name='Folder2'>
-                                           <File Type='File' FullFile='File1' Name='File1'></File>
-                                       </Folder>
-                                       <Folder Type='Folder' FullFile='Folder3/File' Name='Folder3'></Folder>
-                                       <Folder Type='Folder' FullFile='Folder4' Name='Folder4' NoDelete='true'></Folder>
-                                     </Files>";
+                            return $@"<Files>
+                                        <Folder Type='Folder' FullFile='{Folder1}/' Name='{Folder1}'></Folder>
+                                        <Folder Type='Folder' FullFile='{Folder2}' Name='{Folder2}'>
+                                            <File Type='File' FullFile='{File1}' Name='{File1}'></File>
+                                        </Folder>
+                                        <Folder Type='Folder' FullFile='{Folder3}/File' Name='{Folder3}'></Folder>
+                                        <Folder Type='Folder' FullFile='{Folder4}' Name='{Folder4}' NoDelete='true'></Folder>
+                                      </Files>";
                         default:
                             return DummyString;
                     }
@@ -207,7 +246,7 @@ namespace EPMLiveCore.Tests.API.Applications
                 {
                     TryGetListString = item =>
                     {
-                        if (item == "File1")
+                        if (item == File1)
                         {
                             return null;
                         }
@@ -386,7 +425,7 @@ namespace EPMLiveCore.Tests.API.Applications
             ShimPath.GetDirectoryNameString = _ => DummyString;
             ShimPath.GetExtensionString = fileName =>
             {
-                if (fileName == "Folder1")
+                if (fileName == Folder1)
                 {
                     return DummyString;
                 }
@@ -404,7 +443,7 @@ namespace EPMLiveCore.Tests.API.Applications
                         {solutions}
                     </Solutions>
                     <Lists>
-                        <List Name='{DummyString}' Reporting='true' NoDelete='false'></List>
+                        <List Name='{DummyString}' Reporting='true'></List>
                         <List Name='{DummyString}' Reporting='true' NoDelete='true'>
                             <Fields>
                                 <Field InternalName='{DummyString}' Total='{DummyInt}'></Field>
@@ -429,10 +468,10 @@ namespace EPMLiveCore.Tests.API.Applications
                         </List>
                     </Lists>
                     <Features>
-                        <Feature ID='{Feature1Guid}' Name='{DummyString}' NoDelete='false'></Feature>
-                        <Feature ID='{Feature2Guid}' Name='{DummyString}' NoDelete='false'></Feature>
-                        <Feature ID='{Feature3Guid}' Name='{DummyString}' NoDelete='false'></Feature>
-                        <Feature ID='{Feature4Guid}' Name='{DummyString}' NoDelete='false'></Feature>
+                        <Feature ID='{Feature1Guid}' Name='{DummyString}'></Feature>
+                        <Feature ID='{Feature2Guid}' Name='{DummyString}'></Feature>
+                        <Feature ID='{Feature3Guid}' Name='{DummyString}'></Feature>
+                        <Feature ID='{Feature4Guid}' Name='{DummyString}'></Feature>
                     </Features>
                     <Web>
                         <Properties>
@@ -454,11 +493,13 @@ namespace EPMLiveCore.Tests.API.Applications
 
         private DataTable CreateSiteDataTable(string webId)
         {
+            const string WebIdColumn = "WebId";
+
             var dataTable = new DataTable();
-            dataTable.Columns.Add("WebId");
+            dataTable.Columns.Add(WebIdColumn);
 
             var dataRow = dataTable.NewRow();
-            dataRow["WebId"] = new Guid(webId);
+            dataRow[WebIdColumn] = new Guid(webId);
 
             dataTable.Rows.Add(dataRow);
 
@@ -500,26 +541,30 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _listFileDeleted.ShouldBeFalse(),
                 () => _folderDeleted.ShouldBeTrue(),
                 () => _fileDeleted.ShouldBeTrue(),
-                () => messages.ShouldContain("Application is installed somewhere else and will remove from this site only."),
-                () => messages.ShouldContain("Permissions Check"),
-                () => messages.ShouldContain("Removing App from Communities"),
-                () => messages.ShouldContain("Deleting Community"),
-                () => messages.ShouldContain("Uninstalling Navigation"),
-                () => messages.ShouldContain("Checking QuickLaunch"),
-                () => messages.ShouldContain("Checking Top Navigation"),
-                () => messages.ShouldContain("Uninstalling Lists"),
-                () => messages.ShouldContain("Uninstalling Fields"),
-                () => messages.ShouldContain("Uninstalling Lookups"),
-                () => messages.ShouldContain("Uninstalling Views"),
-                () => messages.ShouldContain("Uninstalling Workflows"),
-                () => messages.ShouldContain("Uninstalling Event Handlers"),
-                () => messages.ShouldContain("Uninstalling Items"),
-                () => messages.ShouldContain("Remove (DummyString) From Reporting Database"),
-                () => messages.ShouldContain("Uninstalling Features"),
-                () => messages.ShouldContain("Application currently installed on another site"),
-                () => messages.ShouldContain("Uninstalling Properties"),
-                () => messages.ShouldContain("Uninstalling Files"),
-                () => messages.ShouldContain("Folder is a list"));
+                () => messages.ShouldContain(ApplicationUninstall),
+                () => messages.ShouldContain(ApplicationInstalledSomewhereElse),
+                () => messages.ShouldContain(PermissionsCheck),
+                () => messages.ShouldNotContain(YouDoNotHavePermissions),
+                () => messages.ShouldContain(RemovingAppFromCommunities),
+                () => messages.ShouldContain(DeletingCommunity),
+                () => messages.ShouldContain(UninstallingNavigation),
+                () => messages.ShouldContain(CheckingQuickLaunch),
+                () => messages.ShouldContain(CheckingTopNavigation),
+                () => messages.ShouldContain(UninstallingLists),
+                () => messages.ShouldContain(ListWillNotDelete),
+                () => messages.ShouldContain(UninstallingFields),
+                () => messages.ShouldContain(UninstallingLookups),
+                () => messages.ShouldContain(UninstallingViews),
+                () => messages.ShouldContain(UninstallingWorkflows),
+                () => messages.ShouldContain(UninstallingEventHandlers),
+                () => messages.ShouldContain(UninstallingItems),
+                () => messages.ShouldContain(RemoveDummyStringFromReportingDatabase),
+                () => messages.ShouldContain(UninstallingFeatures),
+                () => messages.ShouldContain(ApplicationInstalledOnAnotherSite),
+                () => messages.ShouldContain(UninstallingProperties),
+                () => messages.ShouldContain(UninstallingFiles),
+                () => messages.ShouldContain(FolderIsAList),
+                () => messages.ShouldNotContain(UninstallingSolutionsAndLists));
         }
 
         [TestMethod]
@@ -555,7 +600,31 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _solutionDeleted.ShouldBeTrue(),
                 () => _listFileDeleted.ShouldBeTrue(),
                 () => _folderDeleted.ShouldBeTrue(),
-                () => _fileDeleted.ShouldBeTrue());
+                () => _fileDeleted.ShouldBeTrue(),
+                () => messages.ShouldNotContain(ApplicationUninstall),
+                () => messages.ShouldNotContain(ApplicationInstalledSomewhereElse),
+                () => messages.ShouldContain(PermissionsCheck),
+                () => messages.ShouldNotContain(YouDoNotHavePermissions),
+                () => messages.ShouldContain(RemovingAppFromCommunities),
+                () => messages.ShouldContain(DeletingCommunity),
+                () => messages.ShouldContain(UninstallingNavigation),
+                () => messages.ShouldContain(CheckingQuickLaunch),
+                () => messages.ShouldContain(CheckingTopNavigation),
+                () => messages.ShouldContain(UninstallingLists),
+                () => messages.ShouldContain(ListWillNotDelete),
+                () => messages.ShouldContain(UninstallingFields),
+                () => messages.ShouldContain(UninstallingLookups),
+                () => messages.ShouldContain(UninstallingViews),
+                () => messages.ShouldContain(UninstallingWorkflows),
+                () => messages.ShouldContain(UninstallingEventHandlers),
+                () => messages.ShouldContain(UninstallingItems),
+                () => messages.ShouldContain(RemoveDummyStringFromReportingDatabase),
+                () => messages.ShouldContain(UninstallingFeatures),
+                () => messages.ShouldNotContain(ApplicationInstalledOnAnotherSite),
+                () => messages.ShouldContain(UninstallingProperties),
+                () => messages.ShouldContain(UninstallingFiles),
+                () => messages.ShouldContain(FolderIsAList),
+                () => messages.ShouldContain(UninstallingSolutionsAndLists));
         }
 
         [TestMethod]
@@ -591,7 +660,31 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _solutionDeleted.ShouldBeFalse(),
                 () => _listFileDeleted.ShouldBeFalse(),
                 () => _folderDeleted.ShouldBeTrue(),
-                () => _fileDeleted.ShouldBeTrue());
+                () => _fileDeleted.ShouldBeTrue(),
+                () => messages.ShouldNotContain(ApplicationUninstall),
+                () => messages.ShouldNotContain(ApplicationInstalledSomewhereElse),
+                () => messages.ShouldContain(PermissionsCheck),
+                () => messages.ShouldNotContain(YouDoNotHavePermissions),
+                () => messages.ShouldContain(RemovingAppFromCommunities),
+                () => messages.ShouldContain(DeletingCommunity),
+                () => messages.ShouldContain(UninstallingNavigation),
+                () => messages.ShouldContain(CheckingQuickLaunch),
+                () => messages.ShouldContain(CheckingTopNavigation),
+                () => messages.ShouldContain(UninstallingLists),
+                () => messages.ShouldContain(ListWillNotDelete),
+                () => messages.ShouldContain(UninstallingFields),
+                () => messages.ShouldContain(UninstallingLookups),
+                () => messages.ShouldContain(UninstallingViews),
+                () => messages.ShouldContain(UninstallingWorkflows),
+                () => messages.ShouldContain(UninstallingEventHandlers),
+                () => messages.ShouldContain(UninstallingItems),
+                () => messages.ShouldContain(RemoveDummyStringFromReportingDatabase),
+                () => messages.ShouldContain(UninstallingFeatures),
+                () => messages.ShouldNotContain(ApplicationInstalledOnAnotherSite),
+                () => messages.ShouldContain(UninstallingProperties),
+                () => messages.ShouldContain(UninstallingFiles),
+                () => messages.ShouldContain(FolderIsAList),
+                () => messages.ShouldContain(UninstallingSolutionsAndLists));
         }
 
         [TestMethod]
@@ -628,7 +721,42 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _solutionDeleted.ShouldBeFalse(),
                 () => _listFileDeleted.ShouldBeFalse(),
                 () => _folderDeleted.ShouldBeFalse(),
-                () => _fileDeleted.ShouldBeFalse());
+                () => _fileDeleted.ShouldBeFalse(),
+                () => messages.ShouldContain(ApplicationUninstall),
+                () => messages.ShouldContain(ApplicationInstalledSomewhereElse),
+                () => messages.ShouldContain(PermissionsCheck),
+                () => messages.ShouldNotContain(YouDoNotHavePermissions),
+                () => messages.ShouldNotContain(RemovingAppFromCommunities),
+                () => messages.ShouldNotContain(DeletingCommunity),
+                () => messages.ShouldNotContain(UninstallingNavigation),
+                () => messages.ShouldContain(CheckingNavigation),
+                () => messages.ShouldContain(CheckingQuickLaunch),
+                () => messages.ShouldContain(CheckingTopNavigation),
+                () => messages.ShouldNotContain(UninstallingLists),
+                () => messages.ShouldContain(CheckingLists),
+                () => messages.ShouldContain(ListWillNotDelete),
+                () => messages.ShouldNotContain(UninstallingFields),
+                () => messages.ShouldContain(CheckingFields),
+                () => messages.ShouldNotContain(UninstallingLookups),
+                () => messages.ShouldContain(CheckingLookups),
+                () => messages.ShouldNotContain(UninstallingViews),
+                () => messages.ShouldContain(CheckingViews),
+                () => messages.ShouldNotContain(UninstallingWorkflows),
+                () => messages.ShouldContain(CheckingWorkflows),
+                () => messages.ShouldNotContain(UninstallingEventHandlers),
+                () => messages.ShouldContain(CheckingEventHandlers),
+                () => messages.ShouldNotContain(UninstallingItems),
+                () => messages.ShouldContain(CheckingItems),
+                () => messages.ShouldContain(RemoveFromReportingDatabase),
+                () => messages.ShouldNotContain(UninstallingFeatures),
+                () => messages.ShouldContain(CheckingFeatures),
+                () => messages.ShouldContain(ApplicationInstalledOnAnotherSite),
+                () => messages.ShouldNotContain(UninstallingProperties),
+                () => messages.ShouldContain(CheckingProperties),
+                () => messages.ShouldNotContain(UninstallingFiles),
+                () => messages.ShouldContain(CheckingFiles),
+                () => messages.ShouldContain(FolderIsAList),
+                () => messages.ShouldNotContain(UninstallingSolutionsAndLists));
         }
 
         [TestMethod]
@@ -662,7 +790,43 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _solutionDeleted.ShouldBeFalse(),
                 () => _listFileDeleted.ShouldBeFalse(),
                 () => _folderDeleted.ShouldBeFalse(),
-                () => _fileDeleted.ShouldBeFalse());
+                () => _fileDeleted.ShouldBeFalse(),
+                () => messages.ShouldNotContain(ApplicationUninstall),
+                () => messages.ShouldNotContain(ApplicationInstalledSomewhereElse),
+                () => messages.ShouldContain(PermissionsCheck),
+                () => messages.ShouldNotContain(YouDoNotHavePermissions),
+                () => messages.ShouldNotContain(RemovingAppFromCommunities),
+                () => messages.ShouldNotContain(DeletingCommunity),
+                () => messages.ShouldNotContain(UninstallingNavigation),
+                () => messages.ShouldContain(CheckingNavigation),
+                () => messages.ShouldContain(CheckingQuickLaunch),
+                () => messages.ShouldContain(CheckingTopNavigation),
+                () => messages.ShouldNotContain(UninstallingLists),
+                () => messages.ShouldContain(CheckingLists),
+                () => messages.ShouldContain(ListWillNotDelete),
+                () => messages.ShouldNotContain(UninstallingFields),
+                () => messages.ShouldContain(CheckingFields),
+                () => messages.ShouldNotContain(UninstallingLookups),
+                () => messages.ShouldContain(CheckingLookups),
+                () => messages.ShouldNotContain(UninstallingViews),
+                () => messages.ShouldContain(CheckingViews),
+                () => messages.ShouldNotContain(UninstallingWorkflows),
+                () => messages.ShouldContain(CheckingWorkflows),
+                () => messages.ShouldNotContain(UninstallingEventHandlers),
+                () => messages.ShouldContain(CheckingEventHandlers),
+                () => messages.ShouldNotContain(UninstallingItems),
+                () => messages.ShouldContain(CheckingItems),
+                () => messages.ShouldContain(RemoveFromReportingDatabase),
+                () => messages.ShouldNotContain(UninstallingFeatures),
+                () => messages.ShouldContain(CheckingFeatures),
+                () => messages.ShouldNotContain(ApplicationInstalledOnAnotherSite),
+                () => messages.ShouldNotContain(UninstallingProperties),
+                () => messages.ShouldContain(CheckingProperties),
+                () => messages.ShouldNotContain(UninstallingFiles),
+                () => messages.ShouldContain(CheckingFiles),
+                () => messages.ShouldContain(FolderIsAList),
+                () => messages.ShouldNotContain(UninstallingSolutionsAndLists),
+                () => messages.ShouldContain(CheckingSolutionsAndLists));
         }
 
         [TestMethod]
@@ -699,7 +863,31 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _solutionDeleted.ShouldBeFalse(),
                 () => _listFileDeleted.ShouldBeFalse(),
                 () => _folderDeleted.ShouldBeFalse(),
-                () => _fileDeleted.ShouldBeFalse());
+                () => _fileDeleted.ShouldBeFalse(),
+                () => messages.ShouldContain(ApplicationUninstall),
+                () => messages.ShouldContain(ApplicationInstalledSomewhereElse),
+                () => messages.ShouldContain(PermissionsCheck),
+                () => messages.ShouldContain(YouDoNotHavePermissions),
+                () => messages.ShouldNotContain(RemovingAppFromCommunities),
+                () => messages.ShouldNotContain(DeletingCommunity),
+                () => messages.ShouldNotContain(UninstallingNavigation),
+                () => messages.ShouldNotContain(CheckingQuickLaunch),
+                () => messages.ShouldNotContain(CheckingTopNavigation),
+                () => messages.ShouldNotContain(UninstallingLists),
+                () => messages.ShouldNotContain(ListWillNotDelete),
+                () => messages.ShouldNotContain(UninstallingFields),
+                () => messages.ShouldNotContain(UninstallingLookups),
+                () => messages.ShouldNotContain(UninstallingViews),
+                () => messages.ShouldNotContain(UninstallingWorkflows),
+                () => messages.ShouldNotContain(UninstallingEventHandlers),
+                () => messages.ShouldNotContain(UninstallingItems),
+                () => messages.ShouldNotContain(RemoveDummyStringFromReportingDatabase),
+                () => messages.ShouldNotContain(UninstallingFeatures),
+                () => messages.ShouldNotContain(ApplicationInstalledOnAnotherSite),
+                () => messages.ShouldNotContain(UninstallingProperties),
+                () => messages.ShouldNotContain(UninstallingFiles),
+                () => messages.ShouldNotContain(FolderIsAList),
+                () => messages.ShouldNotContain(UninstallingSolutionsAndLists));
         }
 
         private void SetupForUnninstallApp(string webId, bool isRootWeb, bool userHavePermissions, bool hasSolutions)
