@@ -131,6 +131,7 @@
     <Compile Include="ListReportView\ListReportViewTest.cs" />
     <Compile Include="ReportingChart\ReportingChartTests.cs" />
     <Compile Include="ReportingChart\ReportingChartToolPartTests.cs" />
+    <Compile Include="ReportingChart\ReportingChartToolPartTests.Part2.cs" />
     <Compile Include="ResourcePlanningTest.cs" />
     <Compile Include="ReportingFilter\ReportingFilterTests.cs" />
     <Compile Include="UserProfileDisplay\DisplayProfilePicturesTests.cs" />

@@ -3161,7 +3161,116 @@ namespace EPMLiveWebParts
                 ndSiteUrl.InnerText = "yes";
                 ndNewItem.AppendChild(ndSiteUrl);
             }
+            //============Comments===================
+            {
+                try
+                {
+                    string HasComments = "";
 
+                    string scomments = li["CommentCount"].ToString();
+                    double comments = 0;
+                    double.TryParse(scomments, out comments);
+                    if (comments > 0)
+                    {
+                        if (list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
+                        {
+                            ArrayList commenters = new ArrayList();
+                            int authorid = 0;
+                            try
+                            {
+                                commenters = new ArrayList(li["Commenters"].ToString().Split(','));
+                            }
+                            catch { }
+                            try
+                            {
+                                SPFieldUserValue uv = new SPFieldUserValue(list.ParentWeb, li["Author"].ToString());
+                                authorid = uv.LookupId;
+                            }
+                            catch { }
+                            bool isAssigned = false;
+                            try
+                            {
+                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(list.ParentWeb, li["AssignedTo"].ToString());
+                                foreach (SPFieldUserValue uv in uvc)
+                                {
+                                    if (uv.LookupId == list.ParentWeb.CurrentUser.ID)
+                                    {
+                                        isAssigned = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            catch { }
+                            if (commenters.Contains(list.ParentWeb.CurrentUser.ID.ToString()) || authorid == list.ParentWeb.CurrentUser.ID || isAssigned)
+                            {
+                                ArrayList commentersread = new ArrayList();
+                                try
+                                {
+                                    commentersread = new ArrayList(li["CommentersRead"].ToString().Split(','));
+                                }
+                                catch { }
+                                if (commentersread.Contains(list.ParentWeb.CurrentUser.ID.ToString()))
+                                {
+                                    HasComments += "1";
+                                }
+                                else
+                                {
+                                    HasComments += "2";
+                                }
+                            }
+                            else
+                                HasComments += "1";
+                        }
+                    }
+
+
+                    XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
+                    XmlAttribute attrName = docXml.CreateAttribute("name");
+                    attrName.Value = "HasComments";
+                    ndSiteUrl.Attributes.Append(attrName);
+                    ndSiteUrl.InnerText = HasComments;
+                    ndNewItem.AppendChild(ndSiteUrl);
+                }
+                catch { }
+            }
+            //===========
+            //============Plan===================
+            {
+                try
+                {
+                    string HasPlan = "";
+                    if (list.Title.Contains(TitleProjectCenter))
+                    {
+                        var plannerExists = false;
+                        SPFile file = GetTaskFile(list.ParentWeb, li.ID.ToString(), sPlannerID);
+                        if (file != null)
+                        {
+                            plannerExists = file.Exists;
+                        }
+                        if (!plannerExists)
+                        {
+                            file = list.ParentWeb.GetFile("Project Schedules/MSProject/" + li["Title"].ToString() + ".mpp");
+                            if (file != null)
+                            {
+                                plannerExists = file.Exists;
+                            }
+                        }
+                        if (plannerExists)
+                        {
+                            HasPlan = "1";
+                        }
+                    }
+
+
+                    XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
+                    XmlAttribute attrName = docXml.CreateAttribute("name");
+                    attrName.Value = "HasPlan";
+                    ndSiteUrl.Attributes.Append(attrName);
+                    ndSiteUrl.InnerText = HasPlan;
+                    ndNewItem.AppendChild(ndSiteUrl);
+                }
+                catch { }
+            }
             int counter = 1;
 
             foreach (string group in groups)
