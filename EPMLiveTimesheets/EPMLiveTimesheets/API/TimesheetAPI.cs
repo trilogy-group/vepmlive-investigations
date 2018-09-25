@@ -1616,43 +1616,41 @@ namespace TimeSheets
 
                 if (dtUserID != null && dtUserID.Rows.Count > 0)
                 {
-                    SqlConnection cn = null;
                     StringBuilder sharePointAccountIDs = new StringBuilder();
                     String userIDs;
                     bIsTimeSheetManager = "True";
 
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    using (var connection =
+                        GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                     {
-                        cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                        cn.Open();
-                    });
-
-                    foreach (DataRow row in dtUserID.Rows)
-                    {
-                        sharePointAccountIDs.Append(string.Format("{0},", row["SharePointAccountID"]));
-                    }
-
-                    if (sharePointAccountIDs.Length > 0)
-                    {
-                        userIDs = sharePointAccountIDs.ToString().Substring(0, sharePointAccountIDs.ToString().Length - 1);
-
-                        sql_getApprovalCount = "select count(*) as ApprovalCount from TSTIMESHEET where SITE_UID = @siteID and TSUSER_UID in (select TSUSERUID from TSUSER where USER_ID in (" + @userIDs + ") and SUBMITTED = @submitted and APPROVAL_STATUS = @approvalStatus and PERIOD_ID <= @periodId)";
-
-                        using (SqlCommand cmd = new SqlCommand(sql_getApprovalCount, cn))
+                        foreach (DataRow row in dtUserID.Rows)
                         {
-                            cmd.Parameters.AddWithValue("@siteID", oWeb.Site.ID);
-                            cmd.Parameters.AddWithValue("@userIDs", userIDs);
-                            cmd.Parameters.AddWithValue("@submitted", 1);
-                            cmd.Parameters.AddWithValue("@approvalStatus", 0);
-                            cmd.Parameters.AddWithValue("@periodId", periodId);
-                            var obj = cmd.ExecuteScalar();
-                            approvalCount = Convert.ToInt32(obj);
+                            sharePointAccountIDs.Append(string.Format("{0},", row["SharePointAccountID"]));
                         }
 
-                        cn.Close();
+                        if (sharePointAccountIDs.Length > 0)
+                        {
+                            userIDs = sharePointAccountIDs.ToString().Substring(0, sharePointAccountIDs.ToString().Length - 1);
 
+                            sql_getApprovalCount = string.Format(
+                                "select count(*) as ApprovalCount from TSTIMESHEET where SITE_UID = @siteID " +
+                                "and TSUSER_UID in (select TSUSERUID from TSUSER where USER_ID in ({0}) " +
+                                "and SUBMITTED = @submitted " +
+                                "and APPROVAL_STATUS = @approvalStatus and PERIOD_ID <= @periodId)",
+                                userIDs);
+
+                            using (var command = new SqlCommand(sql_getApprovalCount, connection))
+                            {
+                                command.Parameters.AddWithValue("@siteID", oWeb.Site.ID);
+                                command.Parameters.AddWithValue("@userIDs", userIDs);
+                                command.Parameters.AddWithValue("@submitted", 1);
+                                command.Parameters.AddWithValue("@approvalStatus", 0);
+                                command.Parameters.AddWithValue("@periodId", periodId);
+                                var obj = command.ExecuteScalar();
+                                approvalCount = Convert.ToInt32(obj);
+                            }
+                        }
                     }
-
                 }
                 else
                 {
@@ -2926,6 +2924,7 @@ namespace TimeSheets
                 {
                     Filter = doc.FirstChild.Attributes["Filter"].Value;
                 }
+
                 XmlDocument docData = new XmlDocument();
                 docData.LoadXml("<Grid><Cfg TimesheetUID=\"\"/><Body><B></B></Body></Grid>");
 
@@ -2935,7 +2934,9 @@ namespace TimeSheets
 
                 EPMLiveCore.ReportHelper.MyWorkReportData rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(web.Site.ID);
 
-                string sql = string.Format(@"SELECT * FROM dbo.LSTResourcePool WHERE (',' + TimesheetManagerID + ',' LIKE '%,{0},%') and Generic=0 ANd (Disabled=0 or Disabled is NULL)", web.CurrentUser.ID);
+                string sql = string.Format(
+                    @"SELECT * FROM dbo.LSTResourcePool WHERE (',' + TimesheetManagerID + ',' LIKE '%,{0},%') and Generic=0 ANd (Disabled=0 or Disabled is NULL)",
+                    web.CurrentUser.ID);
                 DataTable dtMyResources = rptData.ExecuteSql(sql);
 
                 string sResList = "";
@@ -2944,30 +2945,28 @@ namespace TimeSheets
                 {
                     sResList += ";#" + dr["SharePointAccountID"].ToString();
                 }
+
                 sResList = sResList.Trim(';').Trim('#');
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                var ds = new DataSet();
+                ArrayList arrPeriods;
+                using (var connection =
+                    GetOpenedConnection(EpmCoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                    cn.Open();
-                });
+                    using (var command = new SqlCommand("spTSGetMyApprovals", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@siteid", web.Site.ID);
+                        command.Parameters.AddWithValue("@periodid", sPeriod);
+                        command.Parameters.AddWithValue("@resources", sResList);
+                        using (var dataAdapter = new SqlDataAdapter(command))
+                        {
+                            dataAdapter.Fill(ds);
+                        }
+                    }
 
-                DataSet ds = new DataSet();
-                SqlCommand cmd = new SqlCommand("spTSGetMyApprovals", cn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                cmd.Parameters.AddWithValue("@periodid", sPeriod);
-                cmd.Parameters.AddWithValue("@resources", sResList);
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(ds);
-
-                ArrayList arrPeriods = GetPeriodDaysArray(cn, settings, web, sPeriod);
-
-                cn.Close();
-
-
-
+                    arrPeriods = GetPeriodDaysArray(connection, settings, web, sPeriod);
+                }
 
                 foreach (DataRow dr in dtMyResources.Rows)
                 {
@@ -3175,23 +3174,14 @@ namespace TimeSheets
 
             try
             {
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                DataSet dsTS;
+                ArrayList arrPeriods;
+                using (var connection =
+                    GetOpenedConnection(EpmCoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                    cn.Open();
-                });
-
-
-                DataSet dsTS = GetTSDataSet(cn, web, user, sPeriod);
-
-                ArrayList arrPeriods = GetPeriodDaysArray(cn, settings, web, sPeriod);
-
-                try
-                {
-                    cn.Close();
+                    dsTS = GetTSDataSet(connection, web, user, sPeriod);
+                    arrPeriods = GetPeriodDaysArray(connection, settings, web, sPeriod);
                 }
-                catch { }
 
                 bool bCanEdit = true;
 
@@ -3806,26 +3796,15 @@ namespace TimeSheets
             }
             catch { }
             SPUser user = GetUser(web, sUserId);
-            sUserId = user.ID.ToString();
 
-            SqlConnection cn = null;
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            DataSet dataSet;
+            using (var connection =
+                GetOpenedConnection(EpmCoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
             {
-                cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                cn.Open();
-            });
-
-
-            DataSet ds = GetTSDataSet(cn, web, user, sPeriod);
-
-
-            try
-            {
-                cn.Close();
+                dataSet = GetTSDataSet(connection, web, user, sPeriod);
             }
-            catch { }
 
-            return ds.GetXml();
+            return dataSet.GetXml();
         }
 
         private static DataSet GetTSDataSet(SqlConnection connection, SPWeb web, SPUser user, string period)
@@ -4631,32 +4610,28 @@ namespace TimeSheets
 
                 Guid id = Guid.NewGuid();
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                using (var connection =
+                    GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
+                    var rptData = new EpmWorkReportData(oWeb.Site.ID);
+                    var sItems = docTimesheet.FirstChild.InnerText.Split(',');
 
-                EPMLiveCore.ReportHelper.MyWorkReportData rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(oWeb.Site.ID);
-
-                string[] sItems = docTimesheet.FirstChild.InnerText.Split(',');
-
-
-                foreach (string sItem in sItems)
-                {
-                    string[] ItemInfo = sItem.Split('.');
-
-                    string sql = string.Format(@"SELECT top 1 * from dbo.LSTMyWork WHERE itemid={0} and listid='{1}'", ItemInfo[1], ItemInfo[0]);
-
-                    DataTable dtWork = rptData.ExecuteSql(sql);
-
-                    if (dtWork.Rows.Count > 0)
+                    foreach (var sItem in sItems)
                     {
-                        AddWorkItem(dtWork.Rows[0], oWeb.Site, tsuid, id, cn);
+                        var itemInfo = sItem.Split('.');
+                        var sql = string.Format(
+                            @"SELECT top 1 * from dbo.LSTMyWork WHERE itemid={0} and listid='{1}'",
+                            itemInfo[1],
+                            itemInfo[0]);
+
+                        var dtWork = rptData.ExecuteSql(sql);
+
+                        if (dtWork.Rows.Count > 0)
+                        {
+                            AddWorkItem(dtWork.Rows[0], oWeb.Site, tsuid, id, connection);
+                        }
                     }
                 }
-                cn.Close();
 
                 return "<AddWork Status=\"0\"></AddWork>";
 

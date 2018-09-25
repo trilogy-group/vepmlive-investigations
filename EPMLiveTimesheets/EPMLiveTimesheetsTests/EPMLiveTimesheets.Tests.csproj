@@ -110,10 +110,14 @@
   </Choose>
   <ItemGroup>
     <Compile Include="API\TimesheetAPI.CheckSaveStatus.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetTimesheetGrid.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetTimesheetApprovalsGrid.Tests.cs" />
     <Compile Include="API\TimesheetAPI.GetTimesheetGridLayout.Tests.cs" />
     <Compile Include="API\TimesheetAPI.AutoAddWork.Tests.cs" />
     <Compile Include="API\TimesheetAPI.GenerateTSFromPast.Tests.cs" />
     <Compile Include="API\TimesheetAPI.ApproveTimesheetsCore.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetTSData.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.AddWork.Tests.cs" />
     <Compile Include="API\TimesheetAPI.GetWork.Tests.cs" />
     <Compile Include="API\TimesheetAPI.GetTSDataSet.Tests.cs" />
     <Compile Include="API\TimesheetAPI.FillTimesheetItemsDataset.Tests.cs" />
