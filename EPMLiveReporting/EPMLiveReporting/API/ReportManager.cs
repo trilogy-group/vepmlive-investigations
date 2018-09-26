@@ -62,14 +62,21 @@ namespace EPMLiveReportsAdmin.API
 
                 SPDocumentLibrary spDocumentLibrary;
 
-                try
-                {
-                    spDocumentLibrary = (SPDocumentLibrary)Web.Lists["Report Library"];
-                }
-                catch (Exception)
-                {
-                    throw new Exception("Document Library 'Report Library' does not exist.");
-                }
+				try
+				{
+					spDocumentLibrary = (SPDocumentLibrary)Web.Lists["Report Library"];
+				}
+				catch
+				{
+					try
+					{
+						spDocumentLibrary = (SPDocumentLibrary)Web.Site.RootWeb.Lists["Report Library"];
+					}
+					catch (Exception)
+					{
+						throw new Exception("Document Library 'Report Library' does not exist.");
+					}
+				}
 
                 List<SPFolder> spFolders =
                     (from SPListItem spListItem in spDocumentLibrary.Folders select spListItem.Folder).ToList();
