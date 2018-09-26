@@ -919,10 +919,10 @@ namespace EPMLiveCore.Tests
             SetupShims();
 
             // Act
-            var result = ExtensionMethods.ToRegionalDateTime(DateTime.Today, _web);
+            var result = ExtensionMethods.ToRegionalDateTime(timeToTest, _web);
 
             // Assert
-            result.ShouldBe("9/21/2018 12:00:00 AM");
+            result.ShouldBe("9/20/2018 10:00:00 AM");
         }
 
         [TestMethod]
