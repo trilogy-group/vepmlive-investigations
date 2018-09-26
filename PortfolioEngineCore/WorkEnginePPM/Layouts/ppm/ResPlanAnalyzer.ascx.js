@@ -6841,8 +6841,11 @@
                 case "AnalyzerTab_RemoveSorting_Click":
                     grid = Grids["g_1"];
 
-
                     grid.ChangeSort("PortfolioItem");
+                    grid.SortRows();
+                    grid.Render();
+
+                    grid.ChangeSort("rowid");
                     grid.SortRows();
                     grid.Render();
 
