@@ -7,12 +7,15 @@ using System.DirectoryServices.Fakes;
 using System.Fakes;
 using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using EPMLiveCore.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
+using Microsoft.SharePoint.Navigation.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
@@ -56,6 +59,7 @@ namespace EPMLiveCore.Tests
         public void Setup()
         {
             SetupShims();
+            SetupShimsSplitTwo();
 
             testObject = new CoreFunctions();
             privateObject = new PrivateObject(testObject);
@@ -117,7 +121,25 @@ namespace EPMLiveCore.Tests
                 {
                     GetByIDInt32 = _ => spUser
                 },
-                IDGet = () => guid
+                IDGet = () => guid,
+                WebsGet = () => new ShimSPWebCollection()
+                {
+                    AddStringStringStringUInt32StringBooleanBoolean = (_, _1, _2, _3, _4, _5, _6) => spWeb
+                },
+                NavigationGet = () => new ShimSPNavigation()
+                {
+                    TopNavigationBarGet = () => new ShimSPNavigationNodeCollection()
+                    {
+                        NavigationGet = () => new ShimSPNavigation()
+                    }
+                },
+                SiteGroupsGet = () => new ShimSPGroupCollection()
+                {
+                    GetByIDInt32 = _ => new ShimSPGroup()
+                },
+                UrlGet = () => DummyString,
+                ServerRelativeUrlGet = () => DummyString,
+                TitleGet = () => DummyString
             };
         }
 
