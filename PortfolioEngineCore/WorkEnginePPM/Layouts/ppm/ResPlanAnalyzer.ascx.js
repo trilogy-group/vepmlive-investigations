@@ -6842,7 +6842,7 @@
                     grid = Grids["g_1"];
 
 
-                    grid.ChangeSort("rowid");
+                    grid.ChangeSort("PortfolioItem");
                     grid.SortRows();
                     grid.Render();
 
