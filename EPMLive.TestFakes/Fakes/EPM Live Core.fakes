@@ -25,6 +25,7 @@
     <Add Namespace="EPMLiveCore.API"/>
     <Add FullName="EPMLiveCore.API.APITeam!"/>
     <Add FullName="EPMLiveCore.Utilities!"/>
+    <Add FullName="EPMLiveCore.WorkEngineSolutionStoreListSvc.Lists!"/>
     <Add FullName="EPMLiveCore.Jobs.ResourceImportJob!"/>
     <Add FullName="EPMLiveCore.Jobs.ResourceImportResult!"/>
     <Add FullName="EPMLiveCore.Jobs.Applications.Uninstall!"/>
