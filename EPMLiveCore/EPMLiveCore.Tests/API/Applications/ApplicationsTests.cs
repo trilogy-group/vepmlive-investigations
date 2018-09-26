@@ -1080,12 +1080,13 @@ namespace EPMLiveCore.Tests.API.Applications
             }.Instance;
 
             // Act
-            _privateType.InvokeStatic(AddAppNavMethod,
-                                      listItem,
-                                      DummyInt,
-                                      CreateNavsXmlNode(),
-                                      new ShimSPNavigationNodeCollection().Instance,
-                                      new ShimSPField().Instance);
+            _privateType.InvokeStatic(
+                AddAppNavMethod,
+                listItem,
+                DummyInt,
+                CreateNavsXmlNode(),
+                new ShimSPNavigationNodeCollection().Instance,
+                new ShimSPField().Instance);
 
             // Assert
             this.ShouldSatisfyAllConditions(
