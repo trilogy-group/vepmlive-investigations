@@ -24,7 +24,7 @@ namespace TimeSheets.Tests
         [TestMethod]
         public void AddWork_Called_SqlDisposed()
         {
-            // Arrange
+            // Arrange 
             SetupShims();
 
             // Act
