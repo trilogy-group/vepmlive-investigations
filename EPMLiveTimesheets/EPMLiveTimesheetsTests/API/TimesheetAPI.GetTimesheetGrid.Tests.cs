@@ -80,16 +80,14 @@ namespace TimeSheets.Tests
             ShimTimesheetAPI.GetTSDataSetSqlConnectionSPWebSPUserString = (connection, web, user, period) => dataSet;
 
             ShimTimesheetAPI.CreateTSRowXmlDocumentRefDataSetDataRowArrayListArrayListTimesheetSettingsBooleanSPWeb = 
-                (
-                    ref XmlDocument docData,
-                    DataSet set,
-                    DataRow dataRow,
-                    ArrayList lookups,
-                    ArrayList periods,
-                    TimesheetSettings settings,
-                    bool edit,
-                    SPWeb web
-                ) =>
+                (ref XmlDocument docData,
+                DataSet set,
+                DataRow dataRow,
+                ArrayList lookups,
+                ArrayList periods,
+                TimesheetSettings settings,
+                bool edit,
+                SPWeb web) =>
             {
                 var node = docData.FirstChild.FirstChild;
                 return node;

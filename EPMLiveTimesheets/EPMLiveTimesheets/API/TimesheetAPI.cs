@@ -2934,7 +2934,7 @@ namespace TimeSheets
 
                 EPMLiveCore.ReportHelper.MyWorkReportData rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(web.Site.ID);
 
-                string sql = string.Format(
+                var sql = string.Format(
                     @"SELECT * FROM dbo.LSTResourcePool WHERE (',' + TimesheetManagerID + ',' LIKE '%,{0},%') and Generic=0 ANd (Disabled=0 or Disabled is NULL)",
                     web.CurrentUser.ID);
                 DataTable dtMyResources = rptData.ExecuteSql(sql);
@@ -2948,7 +2948,7 @@ namespace TimeSheets
 
                 sResList = sResList.Trim(';').Trim('#');
 
-                var ds = new DataSet();
+                var dataSet = new DataSet();
                 ArrayList arrPeriods;
                 using (var connection =
                     GetOpenedConnection(EpmCoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
@@ -2961,7 +2961,7 @@ namespace TimeSheets
                         command.Parameters.AddWithValue("@resources", sResList);
                         using (var dataAdapter = new SqlDataAdapter(command))
                         {
-                            dataAdapter.Fill(ds);
+                            dataAdapter.Fill(dataSet);
                         }
                     }
 
@@ -2970,7 +2970,7 @@ namespace TimeSheets
 
                 foreach (DataRow dr in dtMyResources.Rows)
                 {
-                    DataRow[] drTimesheets = ds.Tables[0].Select("USER_ID='" + dr["SharePointAccountId"].ToString() + "'");
+                    DataRow[] drTimesheets = dataSet.Tables[0].Select("USER_ID='" + dr["SharePointAccountId"].ToString() + "'");
                     DataRow drTimesheet = null;
                     string tsuid = "";
 
@@ -2983,7 +2983,7 @@ namespace TimeSheets
                     {
                         if (drTimesheet == null || drTimesheet["SUBMITTED"].ToString().ToLower() == "false")
                         {
-                            iGetApprovalRow(dr, drTimesheet, ds.Tables[1], ref docData, ndB, arrPeriods, tsuid);
+                            iGetApprovalRow(dr, drTimesheet, dataSet.Tables[1], ref docData, ndB, arrPeriods, tsuid);
                         }
                     }
                     else if (Filter == "3")
@@ -2992,13 +2992,13 @@ namespace TimeSheets
                         {
                             if (drTimesheet["SUBMITTED"].ToString().ToLower() == "true" && drTimesheet["APPROVAL_STATUS"].ToString() == "0")
                             {
-                                iGetApprovalRow(dr, drTimesheet, ds.Tables[1], ref docData, ndB, arrPeriods, tsuid);
+                                iGetApprovalRow(dr, drTimesheet, dataSet.Tables[1], ref docData, ndB, arrPeriods, tsuid);
                             }
                         }
                     }
                     else
                     {
-                        iGetApprovalRow(dr, drTimesheet, ds.Tables[1], ref docData, ndB, arrPeriods, tsuid);
+                        iGetApprovalRow(dr, drTimesheet, dataSet.Tables[1], ref docData, ndB, arrPeriods, tsuid);
                     }
                 }
 
