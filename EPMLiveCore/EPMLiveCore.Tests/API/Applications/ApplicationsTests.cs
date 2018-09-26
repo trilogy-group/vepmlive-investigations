@@ -21,7 +21,8 @@ using ApplicationsClass = EPMLiveCore.API.Applications;
 
 namespace EPMLiveCore.Tests.API.Applications
 {
-    [TestClass, ExcludeFromCodeCoverage]
+    [TestClass]
+    [ExcludeFromCodeCoverage]
     public class ApplicationsTests
     {
         private IDisposable _shimsObject;
