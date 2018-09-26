@@ -75,6 +75,7 @@ namespace EPMLiveCore.Tests
             {
                 ListItemVersionGet = () => new ShimSPListItemVersion()
             };
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
         }
 
         private void SetupVariables()
