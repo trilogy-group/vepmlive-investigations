@@ -240,7 +240,6 @@ namespace EPMLiveCore.ReportHelper
         [TestCase(MethodTableExists, 0)]
         [TestCase(MethodGetSafeTableName, 0)]
         [TestCase(MethodGetTableCount, 0)]
-        [TestCase(MethodUpdateListName, 0)]
         [TestCase(MethodGetListId, 0)]
         [TestCase(MethodGetListId, 1)]
         [TestCase(MethodGetTableName, 0)]
@@ -9058,70 +9057,6 @@ namespace EPMLiveCore.ReportHelper
 
         #endregion
 
-        #region Method Call : (UpdateListName) (Return Type : bool) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_EPMData_UpdateListName_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var RPTListID = CreateType<Guid>();
-            var sListName = CreateType<string>();
-            var methodUpdateListNamePrametersTypes = new Type[] { typeof(Guid), typeof(string) };
-            object[] parametersOfUpdateListName = { RPTListID, sListName };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodUpdateListName, methodUpdateListNamePrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<EPMData, bool>(_ePMDataInstanceFixture, out exception1, parametersOfUpdateListName);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<EPMData, bool>(_ePMDataInstance, MethodUpdateListName, parametersOfUpdateListName, methodUpdateListNamePrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfUpdateListName.ShouldNotBeNull();
-            parametersOfUpdateListName.Length.ShouldBe(2);
-            methodUpdateListNamePrametersTypes.Length.ShouldBe(2);
-        }
-
-        #endregion
-
-        #region Method Call : (UpdateListName) (Return Type : bool) Results Not Null and no exception thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_EPMData_UpdateListName_Method_Call_With_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            var RPTListID = CreateType<Guid>();
-            var sListName = CreateType<string>();
-            var methodUpdateListNamePrametersTypes = new Type[] { typeof(Guid), typeof(string) };
-            object[] parametersOfUpdateListName = { RPTListID, sListName };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodUpdateListName, methodUpdateListNamePrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<EPMData, bool>(_ePMDataInstanceFixture, out exception1, parametersOfUpdateListName);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<EPMData, bool>(_ePMDataInstance, MethodUpdateListName, parametersOfUpdateListName, methodUpdateListNamePrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfUpdateListName.ShouldNotBeNull();
-            parametersOfUpdateListName.Length.ShouldBe(2);
-            methodUpdateListNamePrametersTypes.Length.ShouldBe(2);
-        }
-
-        #endregion
-
         #region Method Call : (UpdateListName) (Return Type : bool) No Exception with encapsulation Thrown
 
         [Test]
@@ -9164,47 +9099,6 @@ namespace EPMLiveCore.ReportHelper
             // Assert
             Should.NotThrow(currentAction);
             methodUpdateListNamePrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (UpdateListName) (Return Type : bool) without parameters value verify result should be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_EPMData_UpdateListName_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodUpdateListName, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_ePMDataInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (UpdateListName) (Return Type : bool) Parameters Count verify
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_EPMData_UpdateListName_Method_Call_Parameters_Count_Verification_Test()
-        {
-            // Arrange
-            var methodInfo = GetMethodInfo(MethodUpdateListName, 0);
-            const int parametersCount = 2;
-
-            // Act
-            var parameters = methodInfo.GetParameters();
-
-            // Assert
-            parameters.Length.ShouldBe(parametersCount);
         }
 
         #endregion

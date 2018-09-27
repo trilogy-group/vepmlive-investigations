@@ -77,21 +77,22 @@ namespace CADataCache
         }
     }
     [Serializable()]
-    public class CostAnalyzerDataCache : DataCacheBase<clsDataItem, clsCustomFieldData, clsListItemData>
+    public class CostAnalyzerDataCache
     {
         private const string HideRowsWithAllZerosXmlNode = "HideRowsWithAllZeros";
         private const string HideRowsWithAllZerosXmlValueAttribute = "Value";
 
         clsCostData m_clsda = null;
-        private IList<clsColDisp> m_topgridcln = null;
-        private IList<clsColDisp> m_bottomgridcln = null;
+        private List<clsColDisp> m_topgridcln = null;
+        private List<clsColDisp> m_bottomgridcln = null;
         private bool[] m_cust_Defn = null;
         private int[] m_cust_full = null;
         private clsCustomFieldData[] m_cust_ocf = null;
         private IDictionary<int, clsListItemData>[] m_cust_lk = null;
-        private IList<CATGRow> TGStandard = null;
-        private IList<CATGRow> BGStandard = null;
-        private IList<clsDetailRowData> m_clnsort = null;
+        private List<CATGRow> TGStandard = null;
+        private List<CATGRow> BGStandard = null;
+
+        private List<clsDetailRowData> m_clnsort = null;
 
         private int m_DispMode = 1;
 
@@ -720,62 +721,133 @@ namespace CADataCache
 
         public string GetTopGrid()
         {
-            var grid = new CATopGrid(
-                _hideRowsWithAllZeros,
-                bShowFTEs,
-                bUseQTY,
-                bUseCosts,
-                m_show_rhs_dec_costs,
-                0,
-                TGStandard,
-                m_topgridcln);
 
-            grid.AddPeriodsData(m_clsda.m_Periods.Values);
+            CATopGrid oGrid = new CATopGrid();
+            string s;
+            oGrid.InitializeGridLayout(m_topgridcln, 0);
+            int i = 0;
 
-            var i = 0;
-            grid.AddDetailRowsData(m_clnsort.Select(oDet =>
+            foreach (clsPeriodData oPer in m_clsda.m_Periods.Values)
             {
-                oDet.rowid = i++;
-                return oDet;
-            }));
+                i++;
+                oGrid.AddPeriodColumn(oPer.PeriodID.ToString(), oPer.PeriodName, bShowFTEs, TGStandard, 0, bUseQTY, bUseCosts);
+            }
 
-            return grid.RenderToXml(GridRenderingTypes.Combined);
+            oGrid.FinalizeGridLayout();
+            oGrid.InitializeGridData();
+            
+            i = 0;
+            foreach (clsDetailRowData oDet in m_clnsort)
+            {
+                oDet.rowid = ++i;
+                if (IsRowVisible(oDet, bShowFTEs, bUseQTY, bUseCosts, m_show_rhs_dec_costs, _hideRowsWithAllZeros))
+                {
+                    oGrid.AddDetailRow(oDet, i, bShowFTEs, m_topgridcln, TGStandard, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
+                }
+            }
+
+            s = oGrid.GetString();
+            return s;
+        }
+
+        private bool IsRowVisible(clsDetailRowData details, bool showFte, bool showQuantityColumn, bool showCostColumn, bool showCostDecimals, bool hideRowsWithAllZeros)
+        {
+            if (!hideRowsWithAllZeros)
+            {
+                return true;
+            }
+
+            var quantityValue = 0.0;
+            var costValue = 0.0;
+            var fteValue = 0.0;
+
+            var totalPeriods = details.zFTE.Length - 1;
+            for (var i = 1; i <= totalPeriods; i++)
+            {
+                costValue = 0;
+                quantityValue = 0;
+                fteValue = 0;
+
+                if (showQuantityColumn && details.zValue[i] != double.MinValue)
+                {
+                    quantityValue = details.zValue[i];
+                }
+
+                if (showFte && details.zFTE[i] != double.MinValue)
+                {
+                    fteValue = details.zFTE[i];
+                }
+
+                if (showCostColumn)
+                {
+                    costValue = showCostDecimals ? details.zCost[i] : Math.Round(details.zCost[i]);
+                }
+
+                if (costValue != 0 || quantityValue != 0 || fteValue != 0)
+                {
+                    break;
+                }
+            }
+
+            return costValue + quantityValue + fteValue > 0;
         }
 
         public string GetBottomGrid()
         {
-            var bsrem = m_showremaining;
+
+            CABottomGrid oGrid = new CABottomGrid();
+            string s;
+            oGrid.InitializeGridLayout(m_bottomgridcln, 0);
+            int i = 0;
+
+
+            foreach (clsPeriodData oPer in m_clsda.m_Periods.Values)
+            {
+                i++;
+                oGrid.AddPeriodColumn(oPer.PeriodID.ToString(), oPer.PeriodName, bShowFTEs, TotSelectedOrder, 0, bUseQTY, bUseCosts, m_use_heatmap);
+            }
+
+            oGrid.FinalizeGridLayout();
+            oGrid.InitializeGridData();
+            //clsPIData oPIData;
+
+
+            bool bsrem = m_showremaining;
 
             if (m_apply_target == 0)
                 bsrem = false;
 
-            var grid = new CABottomGrid(
-                m_use_heatmap, 
-                m_heatmapcol, 
-                m_use_heatmapColour,
-                m_clsda.m_clsTargetColours,
-                bsrem,
-                true,
-                bShowFTEs,
-                bUseQTY,
-                bUseCosts,
-                m_show_rhs_dec_costs,
-                0,
-                TotSelectedOrder,
-                m_bottomgridcln);
-
-            grid.AddPeriodsData(m_clsda.m_Periods.Values);
-
-            var i = 0;
-            grid.AddDetailRowsData(m_total_rows.Values.Select(totalRow =>
+            //displist = TGStandard;
+            try
             {
-                var oDet = totalRow.m_totals[0];
+                i = 0;
+                foreach (CATotRow xTot in m_total_rows.Values)
+                {
+                    clsDetailRowData oDet = xTot.m_totals[0];
+                    clsDetailRowData otDet = m_target_dets.ElementAt(i).Value;
 
-                oDet.rowid = i++;
-                return totalRow;
-            }));
+                    oDet.rowid = i;
 
-            return grid.RenderToXml(GridRenderingTypes.Combined);
+
+
+                    oGrid.AddDetailRow(oDet, otDet, m_clsda.m_clsTargetColours, ++i, bShowFTEs, m_bottomgridcln, TotSelectedOrder, bUseQTY, bUseCosts,
+                                       m_show_rhs_dec_costs, bsrem, xTot, m_use_heatmap, m_heatmapcol, m_use_heatmapColour, true);
+
+                    //    m_cln_pis.TryGetValue(oDet.ProjectID, out oPIData);
+                    //    oGrid.AddDetailRow(oDet, m_detdispcln, m_cResVals, m_maj_Cat_lookup, oPIData, ++i, m_DispMode, displist, m_cResVals.TargetColors);
+                }
+            }
+            catch (Exception ex)
+            {
+                string sx = ex.Message;
+            }
+
+            s = oGrid.GetString();
+
+            return s;
+
+
+
         }
 
         public void SetCTStateData(CStruct xData)
@@ -946,12 +1018,206 @@ namespace CADataCache
 
         private string FormatExtraDisplay(string sIn, int lt)
         {
-            return FormatExtraDisplay(
-                sIn, 
-                lt, 
-                m_clsda.m_codes, 
-                m_clsda.m_reses,
-                m_clsda.m_stages);
+            DateTime dt;
+            int l;
+            double d;
+            clsDataItem oi;
+
+
+            switch (lt)
+            {
+                case 1:
+                    dt = DateTime.MinValue;
+
+                    try
+                    {
+                        dt = DateTime.ParseExact(sIn, "yyyyMMdd", null);
+                    }
+
+                    catch
+                    {
+                    }
+
+                    try
+                    {
+                        if (dt == DateTime.MinValue)
+                            dt = DateTime.ParseExact(sIn, "yyyyMMddHHmm", null);
+                    }
+
+                    catch
+                    {
+                    }
+
+                    if (dt > DateTime.MinValue)
+                        return dt.ToString("MM/dd/yyyy");
+
+                    return "";
+
+                case 2:
+                    try
+                    {
+                        l = int.Parse(sIn);
+                    }
+
+                    catch
+                    {
+                        l = 0;
+                    }
+
+
+
+                    if (l != 0)
+                        return l.ToString();
+
+                    return "";
+
+
+                case 3:
+
+                    try
+                    {
+                        d = Double.Parse(sIn);
+                    }
+
+                    catch
+                    {
+                        d = 0;
+                    }
+
+
+                    if (d != 0)
+                        return d.ToString();
+
+                    return "";
+
+                case 11:
+                    try
+                    {
+                        l = int.Parse(sIn);
+                    }
+
+                    catch
+                    {
+                        l = 0;
+                    }
+
+                    if (l != 0)
+                        return l.ToString("0%");
+
+                    return "";
+
+                case 13:
+                    try
+                    {
+                        l = int.Parse(sIn);
+                    }
+
+                    catch
+                    {
+                        l = 0;
+                    }
+
+                    return (l == 0 ? "No" : "Yes");
+
+                case 6:
+                case 9:
+                case 19:
+                    return sIn;
+
+
+                case 8:
+                    try
+                    {
+                        d = Double.Parse(sIn);
+                    }
+
+                    catch
+                    {
+                        d = 0;
+                    }
+
+                    if (d != 0)
+                        return d.ToString("$#,##0.00");
+
+                    return "";
+
+                case 20:
+                    try
+                    {
+                        d = Double.Parse(sIn);
+                    }
+
+                    catch
+                    {
+                        d = 0;
+                    }
+
+
+                    return FormatWork(d);
+
+                case 23:
+                    try
+                    {
+                        d = Double.Parse(sIn);
+                    }
+
+                    catch
+                    {
+                        d = 0;
+                    }
+
+                    return FormatDuration(d);
+
+                case 4:
+                    try
+                    {
+                        l = int.Parse(sIn);
+                    }
+
+                    catch
+                    {
+                        l = 0;
+                    }
+
+                    if (m_clsda.m_codes.TryGetValue(l, out oi))
+                        return oi.Name;
+
+                    return "";
+
+                case 7:
+                    try
+                    {
+                        l = int.Parse(sIn);
+                    }
+
+                    catch
+                    {
+                        l = 0;
+                    }
+
+                    if (m_clsda.m_reses.TryGetValue(l, out oi))
+                        return oi.Name;
+
+                    return "";
+
+                case 9911:
+                    try
+                    {
+                        l = int.Parse(sIn);
+                    }
+
+                    catch
+                    {
+                        l = 0;
+                    }
+
+                    if (m_clsda.m_stages.TryGetValue(l, out oi))
+                        return oi.Name;
+
+                    return "";
+            }
+
+            return "";
         }
 
         private string FormatWork(double Hours)
@@ -1893,6 +2159,55 @@ namespace CADataCache
             return sRet;
 
         }
+
+        private string BuildCustFieldJSon(clsCustomFieldData oc, int index, int max)
+        {
+            clsListItemData ce, ne, initial;
+            string sRet = "";
+
+            if (max < 0)
+                return "";
+
+            initial = oc.ListItems.ElementAt(index).Value;
+
+            for (int i = index; i <= max; i++)
+            {
+
+                ce = oc.ListItems.ElementAt(i).Value;
+
+                if (initial.Level == ce.Level)
+                {
+
+                    if (sRet != "")
+                        sRet = sRet + ",";
+
+                    if (oc.UseFullName == 1)
+                        sRet += "{Name:'" + ce.ID.ToString() + "',Text:'" + ce.FullName + "',Value:'" + ce.UID.ToString() + "'}";
+                    else
+                        sRet += "{Name:'" + ce.ID.ToString() + "',Text:'" + ce.Name + "',Value:'" + ce.UID.ToString() + "'}";
+
+
+                    if (i != max)
+                    {
+                        ne = oc.ListItems.ElementAt(i + 1).Value;
+
+                        if (ne.Level > ce.Level)
+                        {
+                            sRet += ",{Name:'Level" + ce.ID.ToString() + "',Expanded:-1,Level:" + ce.Level.ToString() + ", Items:[ " + BuildCustFieldJSon(oc, i + 1, max) + "]}";
+                        }
+                        else if (ne.Level < ce.Level)
+                            return sRet;
+
+                    }
+                }
+
+            }
+
+
+            return sRet;
+
+        }
+
 
         public string RatesAndCategory()
         {
