@@ -25,8 +25,7 @@ using Shouldly;
 
 namespace EPMLiveCore.Tests.AssignmentPlanner
 {
-    [TestClass]
-    [ExcludeFromCodeCoverage]
+    [TestClass, ExcludeFromCodeCoverage]    
     public class GridManagerTests
     {
         private GridManager testObject;
