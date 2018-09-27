@@ -1958,8 +1958,8 @@ namespace EPMLiveCore.Tests.API.Integration
                     cmd => cmd.CommandText.Equals(CmdTextDeleteIntControls) &&
                            cmd.Parameters.Count == 1 &&
                            cmd.Parameters.OfType<SqlParameter>().Any(param => param.ParameterName == "@intlistid")),
-                () => _adoShims.IsCommandExecuted(CmdTextDeleteIntControls),
-                () => _adoShims.IsCommandDisposed(CmdTextDeleteIntControls));
+                () => _adoShims.IsCommandExecuted(CmdTextDeleteIntControls).ShouldBeTrue(),
+                () => _adoShims.IsCommandDisposed(CmdTextDeleteIntControls).ShouldBeTrue());
         }
 
         [TestMethod]
@@ -2033,8 +2033,8 @@ namespace EPMLiveCore.Tests.API.Integration
                            cmd.Parameters.Count == 1 &&
                            cmd.Parameters.OfType<SqlParameter>()
                                          .Any(param => param.ParameterName.Equals("@inteventid"))),
-                () => _adoShims.IsCommandExecuted(QueryReadtDataFromIntEvents),
-                () => _adoShims.IsCommandDisposed(QueryReadtDataFromIntEvents));
+                () => _adoShims.IsCommandExecuted(QueryReadtDataFromIntEvents).ShouldBeTrue(),
+                () => _adoShims.IsCommandDisposed(QueryReadtDataFromIntEvents).ShouldBeTrue());
         }
 
         [TestMethod]
@@ -2058,8 +2058,8 @@ namespace EPMLiveCore.Tests.API.Integration
                            cmd.Parameters.Count == 1 &&
                            cmd.Parameters.OfType<SqlParameter>()
                                          .Any(param => param.ParameterName.Equals("@intlistid"))),
-                () => _adoShims.IsCommandExecuted(QueryReadValueFromIntProps),
-                () => _adoShims.IsCommandDisposed(QueryReadValueFromIntProps));
+                () => _adoShims.IsCommandExecuted(QueryReadValueFromIntProps).ShouldBeTrue(),
+                () => _adoShims.IsCommandDisposed(QueryReadValueFromIntProps).ShouldBeTrue());
         }
 
         [TestMethod]
@@ -2087,8 +2087,8 @@ namespace EPMLiveCore.Tests.API.Integration
                            cmd.Parameters.Count == 1 &&
                            cmd.Parameters.OfType<SqlParameter>()
                                          .Any(param => param.ParameterName.Equals("@intlistid"))),
-                () => _adoShims.IsCommandExecuted(QueryReadModuleIdFromIntLists),
-                () => _adoShims.IsCommandDisposed(QueryReadModuleIdFromIntLists));
+                () => _adoShims.IsCommandExecuted(QueryReadModuleIdFromIntLists).ShouldBeTrue(),
+                () => _adoShims.IsCommandDisposed(QueryReadModuleIdFromIntLists).ShouldBeTrue());
         }
 
         [TestMethod]
@@ -2119,8 +2119,8 @@ namespace EPMLiveCore.Tests.API.Integration
                                          .Any(param => param.ParameterName.Equals("@listid")) &&
                            cmd.Parameters.OfType<SqlParameter>()
                                          .Any(param => param.ParameterName.Equals("@moduleid"))),
-                () => _adoShims.IsCommandExecuted(QueryReadColIdFromIntLists),
-                () => _adoShims.IsCommandDisposed(QueryReadColIdFromIntLists));
+                () => _adoShims.IsCommandExecuted(QueryReadColIdFromIntLists).ShouldBeTrue(),
+                () => _adoShims.IsCommandDisposed(QueryReadColIdFromIntLists).ShouldBeTrue());
         }
 
         [TestMethod]
@@ -2141,8 +2141,8 @@ namespace EPMLiveCore.Tests.API.Integration
                     cmd => cmd.CommandText.Equals(QueryReadListIdAndKeyFromIntLists) &&
                            cmd.Parameters.OfType<SqlParameter>()
                                          .Any(param => param.ParameterName.Equals("@intlistid"))),
-                () => _adoShims.IsCommandExecuted(QueryReadListIdAndKeyFromIntLists),
-                () => _adoShims.IsCommandDisposed(QueryReadListIdAndKeyFromIntLists));
+                () => _adoShims.IsCommandExecuted(QueryReadListIdAndKeyFromIntLists).ShouldBeTrue(),
+                () => _adoShims.IsCommandDisposed(QueryReadListIdAndKeyFromIntLists).ShouldBeTrue());
         }
 
         private static void FakesForSpSecurity()
