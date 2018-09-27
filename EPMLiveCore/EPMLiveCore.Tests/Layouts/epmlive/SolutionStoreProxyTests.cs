@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Net.Fakes;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Fakes;
 using System.Web.UI.Fakes;
 using System.Xml;
@@ -33,9 +29,19 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         private const int DummyInt = 1;
         private const string DummyString = "DummyString";
         private const string DummyUrl = "http://xyz.com/";
+        private const string DummyError = "Dummy Error";
+        private const string DummyVersion = "1.0.0";
         private const string WebId = "f41736f9-4ec8-4790-b5f8-668e74cddac5";
+        private const string DisplayName = "Template Type";
 
         private const string PageLoadMethod = "Page_Load";
+        private const string SvcNameList = "List";
+        private const string SvcMethodGetListItems = "GetListItems";
+        private const string SvcMethodGetList = "GetList";
+        private const string SvcMethodGetListItemsInXML = "GetListItemsInXML";
+        private const string SvcNameCopy = "Copy";
+        private const string SvcMethodCopyItem = "CopyItem";
+        private const string SvcNameCustom = "Custom";
 
         [TestInitialize]
         public void TestInitialize()
@@ -78,6 +84,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             ShimNetworkCredential.ConstructorStringStringString = (_, _1, _2, _3) => { };
 
             ShimCoreFunctions.getFarmSettingString = _ => DummyUrl;
+            ShimCoreFunctions.GetAssemblyVersion = () => DummyVersion;
 
             _web = new ShimSPWeb
             {
@@ -114,7 +121,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                                    <s:Schema id=""RowsetSchema"" />
                                    <rs:data>
                                        <z:row ows_MetaInfo=""SiteTemplates|{DummyString}{separator}Description|{DummyString}{separator}TemplateCategory|{DummyString}{separator}SalesInfo|{DummyString}"" ows_SiteTemplates=""{DummyString}""
-                                              ows_ID=""{DummyInt}"" ows_Visible=""true"" ows_LinkFilename=""{DummyString}"" ows_Level=""{DummyString}"" ows_TemplateType=""{DummyString}"" ows_Icon=""{DummyString}""/>
+                                              ows_ID=""{DummyInt}"" ows_Visible=""{true}"" ows_LinkFilename=""{DummyString}"" ows_Level=""{DummyString}"" ows_TemplateType=""{DummyString}"" ows_Icon=""{DummyString}""/>
                                    </rs:data>
                                </xml>";
 
@@ -127,18 +134,27 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         private XmlNode CreateSvcListNode()
         {
             var xmlString = $@"<Root>
-                                   <Data DisplayName=""Template Type"" StaticName=""{DummyString}"" />
+                                   <Data>
+                                       <Row DisplayName=""{DisplayName}"" StaticName=""{DummyString}"">
+                                           <Choices>
+                                               <Choice>{DummyString}</Choice>
+                                           </Choices>
+                                       </Row>
+                                   </Data>
                                </Root>";
 
-            return null;
+            var xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml(xmlString);
+
+            return xmlDocument.SelectSingleNode("/Root");
         }
 
         [TestMethod]
         public void PageLoad_WhenSvcNameListAndMethodGetListItems_ConfirmResult()
         {
             // Arrange
-            _webSvcName = "List";
-            _webSvcMethod = "GetListItems";
+            _webSvcName = SvcNameList;
+            _webSvcMethod = SvcMethodGetListItems;
 
             // Act
             _privateObj.Invoke(PageLoadMethod, this, EventArgs.Empty);
@@ -146,15 +162,25 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => _responseWritten.ShouldBeTrue(),
-                () => _responseText.ShouldBe("{Templates:{Template:{Id:&quot;1&quot;,Active:&quot;true&quot;,IncludeContent:&quot;false&quot;,Title:&quot;DummyString&quot;,Description:&quot;DummyString&quot;,Levels:&quot;DummyString&quot;,SalesInfo:&quot;DummyString&quot;,TemplateType:&quot;DummyString&quot;,TemplateCategory:&quot;DummyString&quot;,ImageUrl:&quot;DummyString&quot;}}}"));
+                () => _responseText.ShouldContain("{Templates:{Template:"),
+                () => _responseText.ShouldContain($"Id:&quot;{DummyInt}&quot;"),
+                () => _responseText.ShouldContain($"Active:&quot;{true}&quot;"),
+                () => _responseText.ShouldContain($"IncludeContent:&quot;{false}&quot;"),
+                () => _responseText.ShouldContain($"Title:&quot;{DummyString}&quot;"),
+                () => _responseText.ShouldContain($"Description:&quot;{DummyString}&quot;"),
+                () => _responseText.ShouldContain($"Levels:&quot;{DummyString}&quot;"),
+                () => _responseText.ShouldContain($"SalesInfo:&quot;{DummyString}&quot;"),
+                () => _responseText.ShouldContain($"TemplateType:&quot;{DummyString}&quot;"),
+                () => _responseText.ShouldContain($"TemplateCategory:&quot;{DummyString}&quot;"),
+                () => _responseText.ShouldContain($"ImageUrl:&quot;{DummyString}&quot;"));
         }
 
         [TestMethod]
         public void PageLoad_WhenSvcNameListAndMethodGetList_ConfirmResult()
         {
             // Arrange
-            _webSvcName = "List";
-            _webSvcMethod = "GetList";
+            _webSvcName = SvcNameList;
+            _webSvcMethod = SvcMethodGetList;
 
             // Act
             _privateObj.Invoke(PageLoadMethod, this, EventArgs.Empty);
@@ -162,7 +188,116 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => _responseWritten.ShouldBeTrue(),
-                () => _responseText.ShouldBe("{Templates:{Template:{Id:&quot;1&quot;,Active:&quot;true&quot;,IncludeContent:&quot;false&quot;,Title:&quot;DummyString&quot;,Description:&quot;DummyString&quot;,Levels:&quot;DummyString&quot;,SalesInfo:&quot;DummyString&quot;,TemplateType:&quot;DummyString&quot;,TemplateCategory:&quot;DummyString&quot;,ImageUrl:&quot;DummyString&quot;}}}"));
+                () => _responseText.ShouldContain("{FilterFields:{Filter:"),
+                () => _responseText.ShouldContain($"DisplayName:&quot;{DisplayName}&quot;"),
+                () => _responseText.ShouldContain($"StaticName:&quot;{DummyString}&quot;"),
+                () => _responseText.ShouldContain($"Choices:&quot;{DummyString};#&quot;"));
+        }
+
+        [TestMethod]
+        public void PageLoad_WhenSvcNameListAndMethodGetListItemsInXML_ConfirmResult()
+        {
+            // Arrange
+            _webSvcName = SvcNameList;
+            _webSvcMethod = SvcMethodGetListItemsInXML;
+
+            // Act
+            _privateObj.Invoke(PageLoadMethod, this, EventArgs.Empty);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _responseWritten.ShouldBeTrue(),
+                () => _responseText.ShouldContain("<Templates>"),
+                () => _responseText.ShouldContain($"Id=\"{DummyInt}\""),
+                () => _responseText.ShouldContain($"Active=\"{true}\""),
+                () => _responseText.ShouldContain($"IncludeContent=\"{false}\""),
+                () => _responseText.ShouldContain($"<Title><![CDATA[{DummyString}]]></Title>"),
+                () => _responseText.ShouldContain($"<Description><![CDATA[{DummyString}]]></Description>"),
+                () => _responseText.ShouldContain($"<Levels><![CDATA[{DummyString}]]></Levels>"),
+                () => _responseText.ShouldContain($"<SalesInfo><![CDATA[{DummyString}]]></SalesInfo>"),
+                () => _responseText.ShouldContain($"<TemplateType><![CDATA[{DummyString}]]></TemplateType>"),
+                () => _responseText.ShouldContain($"<TemplateCategory><![CDATA[{DummyString}]]></TemplateCategory>"),
+                () => _responseText.ShouldContain($"<ImageUrl><![CDATA[{DummyString}]]></ImageUrl>"));
+        }
+
+        [TestMethod]
+        public void PageLoad_WhenSvcNameListAndMethodInvalid_ConfirmResult()
+        {
+            // Arrange
+            _webSvcName = SvcNameList;
+            _webSvcMethod = DummyString;
+
+            // Act
+            _privateObj.Invoke(PageLoadMethod, this, EventArgs.Empty);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _responseWritten.ShouldBeFalse(),
+                () => _responseText.ShouldBeNullOrWhiteSpace());
+        }
+
+        [TestMethod]
+        public void PageLoad_WhenSvcNameCopyAndMethodCopyItem_ConfirmResult()
+        {
+            // Arrange
+            _webSvcName = SvcNameCopy;
+            _webSvcMethod = SvcMethodCopyItem;
+
+            // Act
+            _privateObj.Invoke(PageLoadMethod, this, EventArgs.Empty);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _responseWritten.ShouldBeFalse(),
+                () => _responseText.ShouldBeNullOrWhiteSpace());
+        }
+
+        [TestMethod]
+        public void PageLoad_WhenSvcNameCopyAndMethodInvalid_ConfirmResult()
+        {
+            // Arrange
+            _webSvcName = SvcNameCopy;
+            _webSvcMethod = DummyString;
+
+            // Act
+            _privateObj.Invoke(PageLoadMethod, this, EventArgs.Empty);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _responseWritten.ShouldBeFalse(),
+                () => _responseText.ShouldBeNullOrWhiteSpace());
+        }
+
+        [TestMethod]
+        public void PageLoad_WhenSvcNameCustom_ConfirmResult()
+        {
+            // Arrange
+            _webSvcName = SvcNameCustom;
+            _webSvcMethod = DummyString;
+
+            // Act
+            _privateObj.Invoke(PageLoadMethod, this, EventArgs.Empty);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _responseWritten.ShouldBeFalse(),
+                () => _responseText.ShouldBeNullOrWhiteSpace());
+        }
+
+        [TestMethod]
+        public void PageLoad_WhenSvcNameIsInvalid_ConfirmResult()
+        {
+            // Arrange
+            _webSvcName = DummyString;
+            _webSvcMethod = DummyString;
+
+            // Act
+            _privateObj.Invoke(PageLoadMethod, this, EventArgs.Empty);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _responseWritten.ShouldBeFalse(),
+                () => _responseText.ShouldBeNullOrWhiteSpace());
         }
     }
 }
