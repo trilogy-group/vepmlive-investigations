@@ -91,7 +91,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     }
                     catch (Exception exception)
                     {
-                        LogMessage(string.Empty, $"Error: {exception.Message}", 3);
+                        LogMessage(string.Empty, $"Error: {exception}", 3);
                     }
                 }
                 else
