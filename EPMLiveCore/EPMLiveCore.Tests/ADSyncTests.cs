@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Fakes;
-using System.Collections.Generic;
 using System.Data;
-using System.DirectoryServices;
 using System.DirectoryServices.Fakes;
 using System.Linq;
 using System.Security.Principal.Fakes;
-using System.Text;
-using System.Threading.Tasks;
 using EPMLive.TestFakes.Utility;
 using EPMLiveCore.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
@@ -27,8 +23,6 @@ namespace EPMLiveCore.Tests
         private IDisposable _shims;
         private ADSync _adSync;
         private PrivateObject _adSyncObject;
-        //protected AdoShims _adoShims;
-        //protected SharepointShims _sharepointShims;
 
         private bool _directoryDisposed;
 
@@ -39,8 +33,6 @@ namespace EPMLiveCore.Tests
             _adSync = new ADSync();
             _adSyncObject = new PrivateObject(_adSync);
             SetupShims();
-            //_adoShims = AdoShims.ShimAdoNetCalls();
-            //_sharepointShims = SharepointShims.ShimSharepointCalls();
         }
 
         [TestCleanup]
