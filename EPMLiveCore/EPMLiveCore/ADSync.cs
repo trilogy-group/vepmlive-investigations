@@ -701,8 +701,12 @@ namespace EPMLiveCore
             {
                 DataRow dr = _adUsers.NewRow();
                 DirectoryEntry de = new DirectoryEntry(userPath);
-                DirectorySearcher ds = new DirectorySearcher(de, "(objectClass=user)");
-                SearchResult sr = ds.FindOne();
+                SearchResult searchResult;
+                using (var searcher = new DirectorySearcher(de, "(objectClass=user)"))
+                {
+                    searchResult = searcher.FindOne();
+                }
+
                 string spFieldName = string.Empty;
                 string adFieldName = string.Empty;
 
@@ -712,7 +716,7 @@ namespace EPMLiveCore
                     {
                         spFieldName = _adFieldMappingValues[field].ToString(); //For testing only...remove
                         adFieldName = field; //For testing only...remove
-                        dr[spFieldName] = sr.Properties[field][0].ToString();
+                        dr[spFieldName] = searchResult.Properties[field][0].ToString();
                     }
                     catch (Exception ex)
                     {

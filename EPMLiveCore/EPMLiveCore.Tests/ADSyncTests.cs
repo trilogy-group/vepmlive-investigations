@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.DirectoryServices;
 using System.DirectoryServices.Fakes;
 using System.Linq;
 using System.Security.Principal.Fakes;
 using System.Text;
 using System.Threading.Tasks;
+using EPMLive.TestFakes.Utility;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -14,15 +16,15 @@ namespace EPMLiveCore.Tests
     [TestClass]
     public class ADSyncTests
     {
+        private const string SampleSid = "SampleSID";
+        private const string ColumnSid = "SID";
+
         private IDisposable _shims;
-
         private ADSync _adSync;
-
         private PrivateObject _adSyncObject;
         //protected AdoShims _adoShims;
         //protected SharepointShims _sharepointShims;
 
-        private const string SampleSid = "SampleSID";
         private bool _directoryDisposed;
 
         [TestInitialize]
@@ -62,6 +64,30 @@ namespace EPMLiveCore.Tests
             // Assert
             Assert.AreEqual(SampleSid.ToUpper(), result);
             Assert.IsTrue(_directoryDisposed);
+        }
+
+        [TestMethod]
+        public void AddResourceToDataTable_Called_DirectoryDisposed()
+        {
+            // Arrange
+            var directoryShims = DirectoryShims.ShimDirectoryCalls();
+            ShimDirectorySearcher.ConstructorDirectoryEntryString = (instance, _, __) =>
+            {
+                new ShimDirectorySearcher(instance)
+                {
+                    FindOne = () => directoryShims.SearchResultShim
+                };
+            };
+            var table = new DataTable();
+            table.Columns.Add(ColumnSid);
+            _adSyncObject.SetField("_adUsers", table);
+
+            // Act
+            _adSyncObject.Invoke("AddResourceToDataTable", string.Empty);
+
+            // Assert
+            Assert.AreEqual(SampleSid, table.Rows[0][ColumnSid]);
+            Assert.IsTrue(directoryShims.DirectorySearchersDisposed.Any());
         }
 
         private void SetupShims()
