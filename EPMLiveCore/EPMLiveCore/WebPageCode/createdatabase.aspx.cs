@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Configuration;
 using System.Collections.Generic;
+using SysTrace = System.Diagnostics.Trace;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
@@ -18,91 +19,142 @@ namespace EPMLiveCore
 {
     public partial class createdatabase : System.Web.UI.Page
     {
+        private const string KeyServer = "Server";
+        private const string KeyDatabase = "DB";
+        private const string KeyUsername = "Username";
+        private const string KeyPassword = "Password";
+        private const string KeyWebApp = "WEBAPP";
         protected string output;
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
             Server.ScriptTimeout = 300;
 
-            string sSqlServer = Request["Server"];
-            string sDatabase = Request["DB"];
-            string sUsername = Request["Username"];
-            string sPassword = Request["Password"];
+            var webapp = SPWebService.ContentService.WebApplications[new Guid(Request[KeyWebApp])];
 
-            SPWebApplication webapp = SPWebService.ContentService.WebApplications[new Guid(Request["WEBAPP"])];
+            var server = Request[KeyServer];
+            var database = Request[KeyDatabase];
+            var username = Request[KeyUsername];
+            var password = Request[KeyPassword];
 
-            string sSql = "";
-            if(sUsername == "")
-                sSql = "Trusted_Connection=True";
-            else
-                sSql = "User Id=" + sUsername + ";Password=" + sPassword;
+            var credentials = string.IsNullOrWhiteSpace(username)
+                ? "Trusted_Connection=True"
+                : $"User Id={username};Password={password}";
+
+            string connectionString;
+
+            SqlConnection sqlConnection = null;
 
             try
             {
-                SqlConnection cn = new SqlConnection("Server=" + sSqlServer + ";Database=master;" + sSql);
+                connectionString = $"Server={server};Database=master;{credentials}";
+                CreateDatabase(database, connectionString);
 
-                cn.Open();
+                connectionString = $"Server={server};Database={database};{credentials}";
+                sqlConnection = new SqlConnection(connectionString);
 
-                SqlCommand cmd = new SqlCommand("CREATE DATABASE " + sDatabase, cn);
-                cmd.ExecuteNonQuery();
+                sqlConnection.Open();
 
-                cn.Close();
+                CreateUser(webapp.ApplicationPool.Username, sqlConnection);
+                AddRoles(webapp.ApplicationPool.Username, sqlConnection);
 
-                cn = new SqlConnection("Server=" + sSqlServer + ";Database=" + sDatabase + ";" + sSql);
+                ExecuteCommand(Properties.Resources._0Tables01, sqlConnection);
+                ExecuteCommand(Properties.Resources._0Tables02, sqlConnection);
+                ExecuteCommand(Properties.Resources._1Views01, sqlConnection);
+                ExecuteCommand(Properties.Resources._2SPs01, sqlConnection);
+                ExecuteCommand(Properties.Resources._9Data01, sqlConnection);
+                ExecuteCommand(Properties.Resources._9Data02, sqlConnection);
+                InsertVersions(sqlConnection);
 
-                cn.Open();
-
-                try
-                {
-                    cmd = new SqlCommand("create user [" + webapp.ApplicationPool.Username + "] from login [" + webapp.ApplicationPool.Username + "]", cn);
-                    cmd.ExecuteNonQuery();
-                }
-                catch { }
-
-                try
-                {
-                    cmd = new SqlCommand("sp_addrolemember", cn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@rolename", "db_owner");
-                    cmd.Parameters.AddWithValue("@membername", webapp.ApplicationPool.Username);
-                    cmd.ExecuteNonQuery();
-                }
-                catch { }
-
-                cmd = new SqlCommand(Properties.Resources._0Tables01, cn);
-                cmd.ExecuteNonQuery();
-                cmd = new SqlCommand(Properties.Resources._0Tables02, cn);
-                cmd.ExecuteNonQuery();
-                cmd = new SqlCommand(Properties.Resources._1Views01, cn);
-                cmd.ExecuteNonQuery();
-                cmd = new SqlCommand(Properties.Resources._2SPs01, cn);
-                cmd.ExecuteNonQuery();
-                cmd = new SqlCommand(Properties.Resources._9Data01, cn);
-                cmd.ExecuteNonQuery();
-                cmd = new SqlCommand(Properties.Resources._9Data02, cn);
-                cmd.ExecuteNonQuery();
-                cmd = new SqlCommand("INSERT INTO VERSIONS (VERSION, DTINSTALLED) VALUES (@version, GETDATE())", cn);
-                cmd.Parameters.AddWithValue("@version", CoreFunctions.GetFullAssemblyVersion());
-                cmd.ExecuteNonQuery();
-
-                cn.Close();
-
-                string sError = "";
-                string sqlString = "Server=" + sSqlServer + ";Database=" + sDatabase + ";" + sSql;
+                string error;
                 SPContext.Current.Web.AllowUnsafeUpdates = true;
                 SPContext.Current.Site.AllowUnsafeUpdates = true;
-                EPMLiveCore.CoreFunctions.setConnectionString(webapp.Id, sqlString, out sError);
+                CoreFunctions.setConnectionString(webapp.Id, connectionString, out error);
 
-                if(sError != "")
+                if (!string.IsNullOrWhiteSpace(error))
                 {
-                    output = "Error Setting String: " + sError;
+                    output = $"Error Setting String: {error}";
                     return;
                 }
             }
-            catch(Exception ex) { output = "Failed: " + ex.Message; return; }
+            catch (Exception ex)
+            {
+                SysTrace.TraceError(ex.ToString());
+                output = $"Failed: {ex.Message}";
+                return;
+            }
+            finally
+            {
+                sqlConnection?.Dispose();
+            }
+
             output = "Success";
         }
 
+        private void InsertVersions(SqlConnection sqlConnection)
+        {
+            using (var command = new SqlCommand("INSERT INTO VERSIONS (VERSION, DTINSTALLED) VALUES (@version, GETDATE())", sqlConnection))
+            {
+                command.Parameters.AddWithValue("@version", CoreFunctions.GetFullAssemblyVersion());
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private void CreateDatabase(string databaseName, string connectionString)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            using (var command = new SqlCommand($"CREATE DATABASE {databaseName}", connection))
+            {
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private void AddRoles(string username, SqlConnection sqlConnection)
+        {
+            var command = default(SqlCommand);
+            try
+            {
+                command = new SqlCommand("sp_addrolemember", sqlConnection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@rolename", "db_owner");
+                command.Parameters.AddWithValue("@membername", username);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                SysTrace.TraceError($"Error while adding roles to the user. Details: {ex}");
+            }
+            finally
+            {
+                command?.Dispose();
+            }
+        }
+
+        private void CreateUser(string username, SqlConnection sqlConnection)
+        {
+            var createUserCommand = default(SqlCommand);
+            try
+            {
+                createUserCommand = new SqlCommand($"create user [{username}] from login [{username}]", sqlConnection);
+                createUserCommand.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                SysTrace.TraceError($"Error while creating new user. Details: {ex}");
+            }
+            finally
+            {
+                createUserCommand?.Dispose();
+            }
+        }
+
+        private void ExecuteCommand(string commandText, SqlConnection sqlConnection)
+        {
+            using (var command = new SqlCommand(commandText, sqlConnection))
+            {
+                command.ExecuteNonQuery();
+            }
+        }
     }
 }
