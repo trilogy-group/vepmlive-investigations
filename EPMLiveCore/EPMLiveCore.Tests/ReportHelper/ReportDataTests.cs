@@ -10,12 +10,31 @@ using Microsoft.SharePoint.Fakes;
 using System.Data;
 using EPMLiveCore.ReportHelper.Fakes;
 using System.Data.SqlClient;
+using Microsoft.QualityTools.Testing.Fakes;
+using System.Collections;
 
 namespace EPMLiveCore.ReportHelper.Tests
 {
     [TestClass()]
     public class ReportDataTests
     {
+        private IDisposable shimsContext;
+        private static readonly Guid DummyGuid = Guid.NewGuid();
+        private const string DummyString = "DummyString";
+             
+
+        [TestInitialize]
+        public void Initialize()
+        {
+            shimsContext = ShimsContext.Create();
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            shimsContext?.Dispose();
+        }
+
         [TestMethod()]
         public void CreateTableTest()
         {
@@ -93,5 +112,28 @@ namespace EPMLiveCore.ReportHelper.Tests
                 Assert.IsTrue(result);
             }
         }
+
+        [TestMethod]
+        public void MyWorkListItemsDataTable()
+        {
+            // Arrange
+            var web = new ShimSPWeb();
+            var list = new ArrayList();
+            var error = false;
+            var errorMessage = string.Empty;
+            ShimEPMData.ConstructorGuidStringStringBooleanStringString = (_, siteId, dbName, serverName, useSAccount, username, password) => { };
+            ShimReportData.AllInstances.GetListColumnsString = (_, name) => new DataTable();
+
+            // Act
+            ReportData report = new ReportData(DummyGuid, DummyString, DummyString, true, DummyString, DummyString);
+            var result = report.MyWorkListItemsDataTable(DummyGuid, DummyString, web, DummyString, list, DummyGuid, out error, out errorMessage);
+
+            // Assert
+
+
+
+
+        }
+
     }
 }
