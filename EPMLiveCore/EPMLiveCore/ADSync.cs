@@ -845,8 +845,10 @@ namespace EPMLiveCore
             string sid = string.Empty;
             try
             {
-                DirectoryEntry root = new DirectoryEntry(path, null, null, AuthenticationTypes.Secure);
-                sid = new SecurityIdentifier((byte[])root.Properties["objectSid"][0], 0).Value;
+                using (var root = new DirectoryEntry(path, null, null, AuthenticationTypes.Secure))
+                {
+                    sid = new SecurityIdentifier((byte[])root.Properties["objectSid"][0], 0).Value;
+                }
             }
             catch (Exception ex)
             {
