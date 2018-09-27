@@ -700,11 +700,13 @@ namespace EPMLiveCore
             try
             {
                 DataRow dr = _adUsers.NewRow();
-                DirectoryEntry de = new DirectoryEntry(userPath);
                 SearchResult searchResult;
-                using (var searcher = new DirectorySearcher(de, "(objectClass=user)"))
+                using (var directoryEntry = new DirectoryEntry(userPath))
                 {
-                    searchResult = searcher.FindOne();
+                    using (var searcher = new DirectorySearcher(directoryEntry, "(objectClass=user)"))
+                    {
+                        searchResult = searcher.FindOne();
+                    }
                 }
 
                 string spFieldName = string.Empty;

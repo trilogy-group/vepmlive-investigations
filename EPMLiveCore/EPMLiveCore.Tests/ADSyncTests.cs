@@ -88,6 +88,7 @@ namespace EPMLiveCore.Tests
             // Assert
             Assert.AreEqual(SampleSid, table.Rows[0][ColumnSid]);
             Assert.IsTrue(directoryShims.DirectorySearchersDisposed.Any());
+            Assert.IsTrue(directoryShims.DirectoryEntriesDisposed.Any());
         }
 
         private void SetupShims()
@@ -103,7 +104,10 @@ namespace EPMLiveCore.Tests
                             ItemGetInt32 = index => new byte[] { }
                         }
                     },
-                    DisposeBoolean = _ => { _directoryDisposed = true; }
+                    DisposeBoolean = _ =>
+                    {
+                        _directoryDisposed = true;
+                    }
                 };
             };
 
