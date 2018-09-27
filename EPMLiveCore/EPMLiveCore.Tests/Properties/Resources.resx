@@ -1,0 +1,1243 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AddEntityPickersToLookups_With_isEnhance_Type1_Expected" xml:space="preserve">
+    <value>&lt;Data&gt;&lt;Param key="SPFieldType"&gt;SPFieldUser&lt;/Param&gt;&lt;Param key="ParentWebID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="LookupWebID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="LookupListID"&gt;lookUpList&lt;/Param&gt;&lt;Param key="LookupFieldInternalName"&gt;lookUpField&lt;/Param&gt;&lt;Param key="LookupFieldID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="IsMultiSelect"&gt;False&lt;/Param&gt;&lt;Param key="ListID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="ItemID"&gt;123&lt;/Param&gt;&lt;Param key="Required"&gt;True&lt;/Param&gt;param&lt;/Data&gt;</value>
+  </data>
+  <data name="AddEntityPickersToLookups_With_isEnhance_Type1_Not_AllowMultipleValues_Expected" xml:space="preserve">
+    <value>&lt;Data&gt;&lt;Param key="SPFieldType"&gt;SPFieldUser&lt;/Param&gt;&lt;Param key="ParentWebID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="LookupWebID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="LookupListID"&gt;lookUpList&lt;/Param&gt;&lt;Param key="LookupFieldInternalName"&gt;lookUpField&lt;/Param&gt;&lt;Param key="LookupFieldID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="IsMultiSelect"&gt;True&lt;/Param&gt;&lt;Param key="ListID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="ItemID"&gt;123&lt;/Param&gt;&lt;Param key="Required"&gt;True&lt;/Param&gt;param&lt;/Data&gt;</value>
+  </data>
+  <data name="AddEntityPickersToLookups_With_isEnhance_Type2_Expected" xml:space="preserve">
+    <value>&lt;Data&gt;&lt;Param key="SPFieldType"&gt;SPFieldUser&lt;/Param&gt;&lt;Param key="ParentWebID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="LookupWebID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="LookupListID"&gt;lookUpList&lt;/Param&gt;&lt;Param key="LookupFieldInternalName"&gt;lookUpField&lt;/Param&gt;&lt;Param key="LookupFieldID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="IsMultiSelect"&gt;False&lt;/Param&gt;&lt;Param key="ListID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="ItemID"&gt;123&lt;/Param&gt;param&lt;Param key="Field"&gt;&lt;/Param&gt;&lt;Param key="ControlType"&gt;2&lt;/Param&gt;&lt;Param key="Parent"&gt;&lt;/Param&gt;&lt;Param key="ParentListField"&gt;&lt;/Param&gt;&lt;Param key="Required"&gt;True&lt;/Param&gt;&lt;/Data&gt;</value>
+  </data>
+  <data name="AddEntityPickersToLookups_With_isParent_Expected" xml:space="preserve">
+    <value>&lt;Data&gt;&lt;Param key="SPFieldType"&gt;SPFieldUser&lt;/Param&gt;&lt;Param key="ParentWebID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="LookupWebID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="LookupListID"&gt;lookUpList&lt;/Param&gt;&lt;Param key="LookupFieldInternalName"&gt;lookUpField&lt;/Param&gt;&lt;Param key="LookupFieldID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="IsMultiSelect"&gt;False&lt;/Param&gt;&lt;Param key="ListID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="ItemID"&gt;123&lt;/Param&gt;&lt;Param key="Required"&gt;True&lt;/Param&gt;param&lt;/Data&gt;</value>
+  </data>
+  <data name="AddEntityPickersToLookups_With_isParent_isEnhance_Type1_Expected" xml:space="preserve">
+    <value>&lt;Data&gt;&lt;Param key="SPFieldType"&gt;SPFieldUser&lt;/Param&gt;&lt;Param key="ParentWebID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="LookupWebID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="LookupListID"&gt;lookUpList&lt;/Param&gt;&lt;Param key="LookupFieldInternalName"&gt;lookUpField&lt;/Param&gt;&lt;Param key="LookupFieldID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="IsMultiSelect"&gt;False&lt;/Param&gt;&lt;Param key="ListID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="ItemID"&gt;123&lt;/Param&gt;&lt;Param key="Required"&gt;True&lt;/Param&gt;param&lt;/Data&gt;</value>
+  </data>
+  <data name="AddEntityPickersToLookups_With_isParent_isEnhance_Type1_Not_AllowMultipleValues_Expected" xml:space="preserve">
+    <value>&lt;Data&gt;&lt;Param key="SPFieldType"&gt;SPFieldUser&lt;/Param&gt;&lt;Param key="ParentWebID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="LookupWebID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="LookupListID"&gt;lookUpList&lt;/Param&gt;&lt;Param key="LookupFieldInternalName"&gt;lookUpField&lt;/Param&gt;&lt;Param key="LookupFieldID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="IsMultiSelect"&gt;False&lt;/Param&gt;&lt;Param key="ListID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="ItemID"&gt;123&lt;/Param&gt;&lt;Param key="Required"&gt;True&lt;/Param&gt;param&lt;/Data&gt;</value>
+  </data>
+  <data name="AddEntityPickersToLookups_With_isParent_isEnhance_Type2_Expected" xml:space="preserve">
+    <value>&lt;Data&gt;&lt;Param key="SPFieldType"&gt;&lt;/Param&gt;&lt;Param key="ParentWebID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="LookupWebID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="LookupListID"&gt;lookUpList&lt;/Param&gt;&lt;Param key="LookupFieldInternalName"&gt;lookUpField&lt;/Param&gt;&lt;Param key="LookupFieldID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="IsMultiSelect"&gt;False&lt;/Param&gt;&lt;Param key="ListID"&gt;00000000-0000-0000-0000-000000000000&lt;/Param&gt;&lt;Param key="ItemID"&gt;123&lt;/Param&gt;param&lt;Param key="Field"&gt;&lt;/Param&gt;&lt;Param key="ControlType"&gt;2&lt;/Param&gt;&lt;Param key="Parent"&gt;&lt;/Param&gt;&lt;Param key="ParentListField"&gt;&lt;/Param&gt;&lt;Param key="Required"&gt;True&lt;/Param&gt;&lt;/Data&gt;</value>
+  </data>
+  <data name="Permissions" xml:space="preserve">
+    <value>&lt;tr&gt;&lt;td colspan="2"&gt;&lt;div class="upcontainer"&gt;&lt;div class="upheader"&gt;&lt;img src="/_layouts/15/epmlive/images/navigation/collapse.png" class="image_margin imgDownArrow" alt="downArrow" /&gt;&lt;img src="/_layouts/15/epmlive/images/navigation/expand.png" class="image_margin imgArrow" alt="arrow" /&gt;&lt;span&gt;Permissions&lt;/span&gt;&lt;/div&gt;&lt;div class="upcontent"&gt;&lt;table&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>&lt;tr&gt;&lt;td colspan="2"&gt;&lt;div class="upcontainer"&gt;&lt;div class="upheader"&gt;&lt;img src="/_layouts/15/epmlive/images/navigation/collapse.png" class="image_margin imgDownArrow" alt="downArrow" /&gt;&lt;img src="/_layouts/15/epmlive/images/navigation/expand.png" class="image_margin imgArrow" alt="arrow" /&gt;&lt;span&gt;Profile&lt;/span&gt;&lt;/div&gt;&lt;div class="upcontent"&gt;&lt;table&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;</value>
+  </data>
+  <data name="RenderControl_With_Display_And_arrwpFields" xml:space="preserve">
+    <value>&lt;script&gt;$(document).ready(function () {$(".imgArrow").addClass("hideImage"); $(".upheader").click(function () {$header = $(this);$arrowImage = $header.find(".imgArrow");$downArrowImage = $header.find(".imgDownArrow");$content = $header.next();
+$content.slideToggle(100,function (){  if ($arrowImage.hasClass("hideImage")) {$downArrowImage.addClass("hideImage");$arrowImage.removeClass("hideImage");$("#onetIDListForm").attr("style","width:95%");}else {$arrowImage.addClass("hideImage");$downArrowImage.removeClass("hideImage");}});});});&lt;/script&gt;&lt;script language="javascript"&gt;
+WETitle = "title";
+WEWebUrl = 'url';
+WEWebId = '00000000-0000-0000-0000-000000000000';
+WEEditForm = 'url/url';
+WEExtraParams = 'isDlg=1';
+WEListId = '00000000-0000-0000-0000-000000000000';
+WEItemId = '123';
+WESource = 'http%3a%2f%2fsite.com%2f';
+WEUseTeam = false;
+WEDLG = '1';
+&lt;/script&gt;
+&lt;tr&gt;&lt;td colspan='2'&gt;
+                        &lt;table cellpadding="5" id="divuCount" cellspacing="0" class="tblResourceWarningMessages"&gt;
+                        &lt;tr&gt;
+                        &lt;td&gt;Once you fill out this form the resource will be requested and must be approved by an administrator before the user can login.&lt;/td&gt;
+                        &lt;/tr&gt;
+                        &lt;/table&gt;&lt;br&gt;
+                        &lt;/td&gt;&lt;/tr&gt; &lt;font color="#007C17"&gt;*&lt;/font&gt; &lt;font class="ms-formvalidation"&gt;*&lt;/font&gt;&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', '')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function checkSpecialCharacters(objectName,object){
+var checkPattern = /[\|\\"'\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \' / [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function checkSpecialCharactersForNonGeneric(objectName,object){
+var checkPattern = /[\|\\"\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \/ [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function setLicenseType(){
+}
+function cleanupfields(){
+}
+function InitFields(){
+cleanupfields();
+try { setLicenseType(); }catch(e){}
+$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
+}_spBodyOnLoadFunctionNames.push("InitFields");
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '/url?Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+
+                               if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         &lt;/script&gt;</value>
+  </data>
+  <data name="RenderControl_With_Display_And_Count_Less_Than_Max" xml:space="preserve">
+    <value>&lt;script&gt;$(document).ready(function () {$(".imgArrow").addClass("hideImage"); $(".upheader").click(function () {$header = $(this);$arrowImage = $header.find(".imgArrow");$downArrowImage = $header.find(".imgDownArrow");$content = $header.next();
+$content.slideToggle(100,function (){  if ($arrowImage.hasClass("hideImage")) {$downArrowImage.addClass("hideImage");$arrowImage.removeClass("hideImage");$("#onetIDListForm").attr("style","width:95%");}else {$arrowImage.addClass("hideImage");$downArrowImage.removeClass("hideImage");}});});});&lt;/script&gt;&lt;script language="javascript"&gt;
+WETitle = "title";
+WEWebUrl = 'url';
+WEWebId = '00000000-0000-0000-0000-000000000000';
+WEEditForm = 'url/url';
+WEExtraParams = 'isDlg=1';
+WEListId = '00000000-0000-0000-0000-000000000000';
+WEItemId = '123';
+WESource = 'http%3a%2f%2fsite.com%2f';
+WEUseTeam = false;
+WEDLG = '1';
+&lt;/script&gt;
+&lt;tr&gt;&lt;td colspan='2'&gt;&lt;div id="divuCount"&gt;User usage: 1 of 2&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', '')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function checkSpecialCharacters(objectName,object){
+var checkPattern = /[\|\\"'\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \' / [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function checkSpecialCharactersForNonGeneric(objectName,object){
+var checkPattern = /[\|\\"\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \/ [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function setLicenseType(){
+}
+function cleanupfields(){
+}
+function InitFields(){
+cleanupfields();
+try { setLicenseType(); }catch(e){}
+$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
+}_spBodyOnLoadFunctionNames.push("InitFields");
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '/url?Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+
+                               if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         &lt;/script&gt;</value>
+  </data>
+  <data name="RenderControl_With_Display_Expected" xml:space="preserve">
+    <value>&lt;script&gt;$(document).ready(function () {$(".imgArrow").addClass("hideImage"); $(".upheader").click(function () {$header = $(this);$arrowImage = $header.find(".imgArrow");$downArrowImage = $header.find(".imgDownArrow");$content = $header.next();
+$content.slideToggle(100,function (){  if ($arrowImage.hasClass("hideImage")) {$downArrowImage.addClass("hideImage");$arrowImage.removeClass("hideImage");$("#onetIDListForm").attr("style","width:95%");}else {$arrowImage.addClass("hideImage");$downArrowImage.removeClass("hideImage");}});});});&lt;/script&gt;&lt;script language="javascript"&gt;
+WETitle = "title";
+WEWebUrl = 'url';
+WEWebId = '00000000-0000-0000-0000-000000000000';
+WEEditForm = 'url/url';
+WEExtraParams = 'isDlg=1';
+WEListId = '00000000-0000-0000-0000-000000000000';
+WEItemId = '123';
+WESource = 'http%3a%2f%2fsite.com%2f';
+WEUseTeam = false;
+WEDLG = '1';
+&lt;/script&gt;
+&lt;tr&gt;&lt;td colspan='2'&gt;
+                        &lt;table cellpadding="5" id="divuCount" cellspacing="0" class="tblResourceWarningMessages"&gt;
+                        &lt;tr&gt;
+                        &lt;td&gt;Once you fill out this form the resource will be requested and must be approved by an administrator before the user can login.&lt;/td&gt;
+                        &lt;/tr&gt;
+                        &lt;/table&gt;&lt;br&gt;
+                        &lt;/td&gt;&lt;/tr&gt;&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('CompleteId', 'PercentCompleteId', 'StatusId')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function checkSpecialCharacters(objectName,object){
+var checkPattern = /[\|\\"'\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \' / [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function checkSpecialCharactersForNonGeneric(objectName,object){
+var checkPattern = /[\|\\"\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \/ [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function setLicenseType(){
+var id = '';
+if(document.getElementById('ResourceLevel') !== null){
+var tbl = document.getElementById('ResourceLevel');
+for (var rIdx = 0; rIdx &lt; tbl.rows.length; rIdx++) {
+var row = tbl.rows[rIdx];
+for (var cIdx = 0; cIdx &lt; row.cells.length; cIdx++) {
+var cell = row.cells[cIdx];
+for (var idx = 0; idx &lt; cell.childNodes.length; idx++) {
+var child = cell.childNodes[idx];
+if (child.nodeName != null &amp;&amp; child.nodeName != undefined &amp;&amp; child.nodeName.toUpperCase() == 'INPUT') {
+if(child.nextSibling != null &amp;&amp; child.nextSibling != undefined &amp;&amp; child.nextSibling.innerHTML.toUpperCase()  == 'NO ACCESS') {
+id = child.id;
+}
+if(child.checked){
+defaultLicenseTypeId = child.id;
+}
+}
+}
+}
+}
+document.getElementById(id).checked = true;
+}
+}
+function cleanupfields(){
+  try{
+      if(document.getElementById('CanLoginId').checked){
+          try{document.getElementById('Generic').parentNode.parentNode.parentNode.style.display='none';}catch(e){}
+          try{document.getElementById('Generic').checked = false;}catch(e){}
+          try{document.getElementById('PermissionsId').parentNode.parentNode.parentNode.style.display='';}catch(e){}
+          try{document.getElementById('ResourceLevel').parentNode.parentNode.parentNode.style.display='';}catch(e){}
+      try{document.getElementById('divRequest').parentNode.parentNode.style.display='';}catch(e){}
+      try{document.getElementById('divuCount').parentNode.parentNode.style.display='';}catch(e){}
+      }else{
+          try{document.getElementById('Generic').parentNode.parentNode.parentNode.style.display='';}catch(e){}
+          try{document.getElementById('PermissionsId').parentNode.parentNode.parentNode.style.display='none';}catch(e){}
+          try{document.getElementById('ResourceLevel').parentNode.parentNode.parentNode.style.display='none';}catch(e){}
+      try{document.getElementById('divRequest').parentNode.parentNode.style.display='none';}catch(e){}
+      }
+  }catch(e){}
+  if(document.getElementById('Generic').checked){
+      try{document.getElementById('FirstNameId').parentNode.parentNode.parentNode.style.display='none';}catch(e){}
+      try{document.getElementById('LastNameId').parentNode.parentNode.parentNode.style.display='none';}catch(e){}
+      try{document.getElementById('EmailId').parentNode.parentNode.parentNode.style.display='none';}catch(e){}
+      try{document.getElementById('TimesheetAdministratorId').parentNode.parentNode.parentNode.style.display='none';}catch(e){}
+      try{document.getElementById('SharePointAccountId').parentNode.parentNode.parentNode.style.display='none';}catch(e){}
+      try{document.getElementById('TitleId').parentNode.parentNode.parentNode.style.display='';document.getElementById('TitleId').onblur = function() { checkSpecialCharacters('Display Name',document.getElementById('TitleId')); }}catch(e){}
+ try{document.getElementById('PermissionsId').parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.display='none';}catch(e){}
+          try{document.getElementById('ResourceLevel').parentNode.parentNode.parentNode.style.display='none';}catch(e){}
+          try{document.getElementById('CanLoginId').parentNode.parentNode.parentNode.style.display='none';}catch(e){}
+  }else{
+try{document.getElementById(defaultLicenseTypeId).checked = true;}catch(e){}
+      try{document.getElementById('FirstNameId').parentNode.parentNode.parentNode.style.display='';document.getElementById('FirstNameId').onblur = function() { checkSpecialCharactersForNonGeneric('First Name',document.getElementById('FirstNameId')); }}catch(e){}
+      try{document.getElementById('LastNameId').parentNode.parentNode.parentNode.style.display='';document.getElementById('LastNameId').onblur = function() { checkSpecialCharactersForNonGeneric('Last Name',document.getElementById('LastNameId')); }}catch(e){}
+      try{document.getElementById('EmailId').parentNode.parentNode.parentNode.style.display='';}catch(e){}
+      try{document.getElementById('TimesheetAdministratorId').parentNode.parentNode.parentNode.style.display='';}catch(e){}
+      try{document.getElementById('TitleId').parentNode.parentNode.parentNode.style.display='none';}catch(e){}
+      try{document.getElementById('SharePointAccountId').parentNode.parentNode.parentNode.style.display='';}catch(e){}
+try{document.getElementById('PermissionsId').parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.display='';}catch(e){}
+          try{document.getElementById('ResourceLevel').parentNode.parentNode.parentNode.style.display='';}catch(e){}
+          try{document.getElementById('CanLoginId').parentNode.parentNode.parentNode.style.display='';}catch(e){}
+  }
+}
+function InitFields(){
+document.getElementById('Generic').onclick = function() {cleanupfields();};
+document.getElementById('CanLoginId').onclick = function() {cleanupfields();};
+cleanupfields();
+try { setLicenseType(); }catch(e){}
+$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
+}_spBodyOnLoadFunctionNames.push("InitFields");
+function CustomPreSaveAction(){
+  if(!document.getElementById('Generic').checked){
+      var f = document.getElementById('FirstNameId').value;
+      var l = document.getElementById('LastNameId').value;
+      var e = document.getElementById('EmailId').value;
+      if(f == "" || l == "" || e == ""){
+          alert('You must enter a First Name, Last Name, and Email');return false;
+      }else{return true;}
+  }else{
+      var f = document.getElementById('TitleId').value;
+      if(f == ""){
+          alert('You must enter a Display Name');return false;
+      }else{return true;}
+  }
+}
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '/url?Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+
+                               if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         &lt;/script&gt;</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>&lt;tr&gt;&lt;td colspan="2"&gt;&lt;div class="upcontainer"&gt;&lt;div class="upheader"&gt;&lt;img src="/_layouts/15/epmlive/images/navigation/collapse.png" class="image_margin imgDownArrow" alt="downArrow" /&gt;&lt;img src="/_layouts/15/epmlive/images/navigation/expand.png" class="image_margin imgArrow" alt="arrow" /&gt;&lt;span&gt;User&lt;/span&gt;&lt;/div&gt;&lt;div class="upcontent"&gt;&lt;table&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;</value>
+  </data>
+  <data name="RenderControl_With_Display_And_InternalName_CanLogin" xml:space="preserve">
+    <value>&lt;script&gt;$(document).ready(function () {$(".imgArrow").addClass("hideImage"); $(".upheader").click(function () {$header = $(this);$arrowImage = $header.find(".imgArrow");$downArrowImage = $header.find(".imgDownArrow");$content = $header.next();
+$content.slideToggle(100,function (){  if ($arrowImage.hasClass("hideImage")) {$downArrowImage.addClass("hideImage");$arrowImage.removeClass("hideImage");$("#onetIDListForm").attr("style","width:95%");}else {$arrowImage.addClass("hideImage");$downArrowImage.removeClass("hideImage");}});});});&lt;/script&gt;&lt;script language="javascript"&gt;
+WETitle = "title";
+WEWebUrl = 'url';
+WEWebId = '00000000-0000-0000-0000-000000000000';
+WEEditForm = 'url/url';
+WEExtraParams = 'isDlg=1';
+WEListId = '00000000-0000-0000-0000-000000000000';
+WEItemId = '123';
+WESource = 'http%3a%2f%2fsite.com%2f';
+WEUseTeam = false;
+WEDLG = '1';
+&lt;/script&gt;
+&lt;tr&gt;&lt;td colspan='2'&gt;
+                        &lt;table cellpadding="5" id="divuCount" cellspacing="0" class="tblResourceWarningMessages"&gt;
+                        &lt;tr&gt;
+                        &lt;td&gt;Once you fill out this form the resource will be requested and must be approved by an administrator before the user can login.&lt;/td&gt;
+                        &lt;/tr&gt;
+                        &lt;/table&gt;&lt;br&gt;
+                        &lt;/td&gt;&lt;/tr&gt;&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', '')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function checkSpecialCharacters(objectName,object){
+var checkPattern = /[\|\\"'\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \' / [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function checkSpecialCharactersForNonGeneric(objectName,object){
+var checkPattern = /[\|\\"\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \/ [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function setLicenseType(){
+}
+function cleanupfields(){
+  try{
+      if(document.getElementById('CanLogin_00000000-0000-0000-0000-000000000000_$Field').checked){
+      try{document.getElementById('divRequest').parentNode.parentNode.style.display='';}catch(e){}
+      try{document.getElementById('divuCount').parentNode.parentNode.style.display='';}catch(e){}
+      }else{
+      try{document.getElementById('divRequest').parentNode.parentNode.style.display='none';}catch(e){}
+      }
+  }catch(e){}
+}
+function InitFields(){
+document.getElementById('CanLogin_00000000-0000-0000-0000-000000000000_$Field').onclick = function() {cleanupfields();};
+cleanupfields();
+try { setLicenseType(); }catch(e){}
+$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
+}_spBodyOnLoadFunctionNames.push("InitFields");
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '/url?Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+
+                               if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         &lt;/script&gt;</value>
+  </data>
+  <data name="RenderControl_With_Display_And_InternalName_DaysOverdue" xml:space="preserve">
+    <value>&lt;script&gt;$(document).ready(function () {$(".imgArrow").addClass("hideImage"); $(".upheader").click(function () {$header = $(this);$arrowImage = $header.find(".imgArrow");$downArrowImage = $header.find(".imgDownArrow");$content = $header.next();
+$content.slideToggle(100,function (){  if ($arrowImage.hasClass("hideImage")) {$downArrowImage.addClass("hideImage");$arrowImage.removeClass("hideImage");$("#onetIDListForm").attr("style","width:95%");}else {$arrowImage.addClass("hideImage");$downArrowImage.removeClass("hideImage");}});});});&lt;/script&gt;&lt;script language="javascript"&gt;
+WETitle = "title";
+WEWebUrl = 'url';
+WEWebId = '00000000-0000-0000-0000-000000000000';
+WEEditForm = 'url/url';
+WEExtraParams = 'isDlg=1';
+WEListId = '00000000-0000-0000-0000-000000000000';
+WEItemId = '123';
+WESource = 'http%3a%2f%2fsite.com%2f';
+WEUseTeam = false;
+WEDLG = '1';
+&lt;/script&gt;
+&lt;tr&gt;&lt;td colspan='2'&gt;
+                        &lt;table cellpadding="5" id="divuCount" cellspacing="0" class="tblResourceWarningMessages"&gt;
+                        &lt;tr&gt;
+                        &lt;td&gt;Once you fill out this form the resource will be requested and must be approved by an administrator before the user can login.&lt;/td&gt;
+                        &lt;/tr&gt;
+                        &lt;/table&gt;&lt;br&gt;
+                        &lt;/td&gt;&lt;/tr&gt;0&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', '')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function checkSpecialCharacters(objectName,object){
+var checkPattern = /[\|\\"'\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \' / [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function checkSpecialCharactersForNonGeneric(objectName,object){
+var checkPattern = /[\|\\"\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \/ [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function setLicenseType(){
+}
+function cleanupfields(){
+}
+function InitFields(){
+cleanupfields();
+try { setLicenseType(); }catch(e){}
+$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
+}_spBodyOnLoadFunctionNames.push("InitFields");
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '/url?Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+
+                               if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         &lt;/script&gt;</value>
+  </data>
+  <data name="RenderControl_With_Display_And_InternalName_Due" xml:space="preserve">
+    <value>&lt;script&gt;$(document).ready(function () {$(".imgArrow").addClass("hideImage"); $(".upheader").click(function () {$header = $(this);$arrowImage = $header.find(".imgArrow");$downArrowImage = $header.find(".imgDownArrow");$content = $header.next();
+$content.slideToggle(100,function (){  if ($arrowImage.hasClass("hideImage")) {$downArrowImage.addClass("hideImage");$arrowImage.removeClass("hideImage");$("#onetIDListForm").attr("style","width:95%");}else {$arrowImage.addClass("hideImage");$downArrowImage.removeClass("hideImage");}});});});&lt;/script&gt;&lt;script language="javascript"&gt;
+WETitle = "title";
+WEWebUrl = 'url';
+WEWebId = '00000000-0000-0000-0000-000000000000';
+WEEditForm = 'url/url';
+WEExtraParams = 'isDlg=1';
+WEListId = '00000000-0000-0000-0000-000000000000';
+WEItemId = '123';
+WESource = 'http%3a%2f%2fsite.com%2f';
+WEUseTeam = false;
+WEDLG = '1';
+&lt;/script&gt;
+&lt;tr&gt;&lt;td colspan='2'&gt;
+                        &lt;table cellpadding="5" id="divuCount" cellspacing="0" class="tblResourceWarningMessages"&gt;
+                        &lt;tr&gt;
+                        &lt;td&gt;Once you fill out this form the resource will be requested and must be approved by an administrator before the user can login.&lt;/td&gt;
+                        &lt;/tr&gt;
+                        &lt;/table&gt;&lt;br&gt;
+                        &lt;/td&gt;&lt;/tr&gt;&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', '')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function checkSpecialCharacters(objectName,object){
+var checkPattern = /[\|\\"'\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \' / [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function checkSpecialCharactersForNonGeneric(objectName,object){
+var checkPattern = /[\|\\"\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \/ [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function setLicenseType(){
+}
+function cleanupfields(){
+}
+function InitFields(){
+cleanupfields();
+try { setLicenseType(); }catch(e){}
+$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
+}_spBodyOnLoadFunctionNames.push("InitFields");
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '/url?Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+
+                               if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         &lt;/script&gt;</value>
+  </data>
+  <data name="RenderControl_With_Display_And_InternalName_FirstName" xml:space="preserve">
+    <value>&lt;script&gt;$(document).ready(function () {$(".imgArrow").addClass("hideImage"); $(".upheader").click(function () {$header = $(this);$arrowImage = $header.find(".imgArrow");$downArrowImage = $header.find(".imgDownArrow");$content = $header.next();
+$content.slideToggle(100,function (){  if ($arrowImage.hasClass("hideImage")) {$downArrowImage.addClass("hideImage");$arrowImage.removeClass("hideImage");$("#onetIDListForm").attr("style","width:95%");}else {$arrowImage.addClass("hideImage");$downArrowImage.removeClass("hideImage");}});});});&lt;/script&gt;&lt;script language="javascript"&gt;
+WETitle = "title";
+WEWebUrl = 'url';
+WEWebId = '00000000-0000-0000-0000-000000000000';
+WEEditForm = 'url/url';
+WEExtraParams = 'isDlg=1';
+WEListId = '00000000-0000-0000-0000-000000000000';
+WEItemId = '123';
+WESource = 'http%3a%2f%2fsite.com%2f';
+WEUseTeam = false;
+WEDLG = '1';
+&lt;/script&gt;
+&lt;tr&gt;&lt;td colspan='2'&gt;
+                        &lt;table cellpadding="5" id="divuCount" cellspacing="0" class="tblResourceWarningMessages"&gt;
+                        &lt;tr&gt;
+                        &lt;td&gt;Once you fill out this form the resource will be requested and must be approved by an administrator before the user can login.&lt;/td&gt;
+                        &lt;/tr&gt;
+                        &lt;/table&gt;&lt;br&gt;
+                        &lt;/td&gt;&lt;/tr&gt;&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', '')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function checkSpecialCharacters(objectName,object){
+var checkPattern = /[\|\\"'\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \' / [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function checkSpecialCharactersForNonGeneric(objectName,object){
+var checkPattern = /[\|\\"\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \/ [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function setLicenseType(){
+}
+function cleanupfields(){
+      try{document.getElementById('FirstNameId').parentNode.parentNode.parentNode.style.display='';document.getElementById('FirstNameId').onblur = function() { checkSpecialCharactersForNonGeneric('First Name',document.getElementById('FirstNameId')); }}catch(e){}
+      try{document.getElementById('LastNameId').parentNode.parentNode.parentNode.style.display='';document.getElementById('LastNameId').onblur = function() { checkSpecialCharactersForNonGeneric('Last Name',document.getElementById('LastNameId')); }}catch(e){}
+}
+function InitFields(){
+cleanupfields();
+try { setLicenseType(); }catch(e){}
+$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 0 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
+}_spBodyOnLoadFunctionNames.push("InitFields");
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '/url?Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+
+                               if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         &lt;/script&gt;</value>
+  </data>
+  <data name="RenderControl_With_Display_And_InternalName_ResourceLevel" xml:space="preserve">
+    <value>&lt;script&gt;$(document).ready(function () {$(".imgArrow").addClass("hideImage"); $(".upheader").click(function () {$header = $(this);$arrowImage = $header.find(".imgArrow");$downArrowImage = $header.find(".imgDownArrow");$content = $header.next();
+$content.slideToggle(100,function (){  if ($arrowImage.hasClass("hideImage")) {$downArrowImage.addClass("hideImage");$arrowImage.removeClass("hideImage");$("#onetIDListForm").attr("style","width:95%");}else {$arrowImage.addClass("hideImage");$downArrowImage.removeClass("hideImage");}});});});&lt;/script&gt;&lt;script language="javascript"&gt;
+WETitle = "title";
+WEWebUrl = 'url';
+WEWebId = '00000000-0000-0000-0000-000000000000';
+WEEditForm = 'url/url';
+WEExtraParams = 'isDlg=1';
+WEListId = '00000000-0000-0000-0000-000000000000';
+WEItemId = '123';
+WESource = 'http%3a%2f%2fsite.com%2f';
+WEUseTeam = false;
+WEDLG = '1';
+&lt;/script&gt;
+&lt;tr&gt;&lt;td colspan='2'&gt;
+                        &lt;table cellpadding="5" id="divuCount" cellspacing="0" class="tblResourceWarningMessages"&gt;
+                        &lt;tr&gt;
+                        &lt;td&gt;Once you fill out this form the resource will be requested and must be approved by an administrator before the user can login.&lt;/td&gt;
+                        &lt;/tr&gt;
+                        &lt;/table&gt;&lt;br&gt;
+                        &lt;/td&gt;&lt;/tr&gt;&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', '')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function checkSpecialCharacters(objectName,object){
+var checkPattern = /[\|\\"'\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \' / [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function checkSpecialCharactersForNonGeneric(objectName,object){
+var checkPattern = /[\|\\"\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \/ [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function setLicenseType(){
+var id = '';
+if(document.getElementById('ResourceLevel_00000000-0000-0000-0000-000000000000_$Field') !== null){
+var tbl = document.getElementById('ResourceLevel_00000000-0000-0000-0000-000000000000_$Field');
+for (var rIdx = 0; rIdx &lt; tbl.rows.length; rIdx++) {
+var row = tbl.rows[rIdx];
+for (var cIdx = 0; cIdx &lt; row.cells.length; cIdx++) {
+var cell = row.cells[cIdx];
+for (var idx = 0; idx &lt; cell.childNodes.length; idx++) {
+var child = cell.childNodes[idx];
+if (child.nodeName != null &amp;&amp; child.nodeName != undefined &amp;&amp; child.nodeName.toUpperCase() == 'INPUT') {
+if(child.nextSibling != null &amp;&amp; child.nextSibling != undefined &amp;&amp; child.nextSibling.innerHTML.toUpperCase()  == 'NO ACCESS') {
+id = child.id;
+}
+if(child.checked){
+defaultLicenseTypeId = child.id;
+}
+}
+}
+}
+}
+document.getElementById(id).checked = true;
+}
+}
+function cleanupfields(){
+}
+function InitFields(){
+cleanupfields();
+try { setLicenseType(); }catch(e){}
+$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 1 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 0 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
+}_spBodyOnLoadFunctionNames.push("InitFields");
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '/url?Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+
+                               if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         &lt;/script&gt;</value>
+  </data>
+  <data name="RenderControl_With_Display_And_InternalName_ScheduleStatus" xml:space="preserve">
+    <value>&lt;script&gt;$(document).ready(function () {$(".imgArrow").addClass("hideImage"); $(".upheader").click(function () {$header = $(this);$arrowImage = $header.find(".imgArrow");$downArrowImage = $header.find(".imgDownArrow");$content = $header.next();
+$content.slideToggle(100,function (){  if ($arrowImage.hasClass("hideImage")) {$downArrowImage.addClass("hideImage");$arrowImage.removeClass("hideImage");$("#onetIDListForm").attr("style","width:95%");}else {$arrowImage.addClass("hideImage");$downArrowImage.removeClass("hideImage");}});});});&lt;/script&gt;&lt;script language="javascript"&gt;
+WETitle = "title";
+WEWebUrl = 'url';
+WEWebId = '00000000-0000-0000-0000-000000000000';
+WEEditForm = 'url/url';
+WEExtraParams = 'isDlg=1';
+WEListId = '00000000-0000-0000-0000-000000000000';
+WEItemId = '123';
+WESource = 'http%3a%2f%2fsite.com%2f';
+WEUseTeam = false;
+WEDLG = '1';
+&lt;/script&gt;
+&lt;tr&gt;&lt;td colspan='2'&gt;
+                        &lt;table cellpadding="5" id="divuCount" cellspacing="0" class="tblResourceWarningMessages"&gt;
+                        &lt;tr&gt;
+                        &lt;td&gt;Once you fill out this form the resource will be requested and must be approved by an administrator before the user can login.&lt;/td&gt;
+                        &lt;/tr&gt;
+                        &lt;/table&gt;&lt;br&gt;
+                        &lt;/td&gt;&lt;/tr&gt;&lt;img src="/_layouts/images/picture.jpg"&gt;&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', '')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function checkSpecialCharacters(objectName,object){
+var checkPattern = /[\|\\"'\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \' / [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function checkSpecialCharactersForNonGeneric(objectName,object){
+var checkPattern = /[\|\\"\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \/ [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function setLicenseType(){
+}
+function cleanupfields(){
+}
+function InitFields(){
+cleanupfields();
+try { setLicenseType(); }catch(e){}
+$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
+}_spBodyOnLoadFunctionNames.push("InitFields");
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '/url?Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+
+                               if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         &lt;/script&gt;</value>
+  </data>
+  <data name="RenderControl_With_Display_And_InternalName_Status" xml:space="preserve">
+    <value>&lt;script&gt;$(document).ready(function () {$(".imgArrow").addClass("hideImage"); $(".upheader").click(function () {$header = $(this);$arrowImage = $header.find(".imgArrow");$downArrowImage = $header.find(".imgDownArrow");$content = $header.next();
+$content.slideToggle(100,function (){  if ($arrowImage.hasClass("hideImage")) {$downArrowImage.addClass("hideImage");$arrowImage.removeClass("hideImage");$("#onetIDListForm").attr("style","width:95%");}else {$arrowImage.addClass("hideImage");$downArrowImage.removeClass("hideImage");}});});});&lt;/script&gt;&lt;script language="javascript"&gt;
+WETitle = "title";
+WEWebUrl = 'url';
+WEWebId = '00000000-0000-0000-0000-000000000000';
+WEEditForm = 'url/url';
+WEExtraParams = 'isDlg=1';
+WEListId = '00000000-0000-0000-0000-000000000000';
+WEItemId = '123';
+WESource = 'http%3a%2f%2fsite.com%2f';
+WEUseTeam = false;
+WEDLG = '1';
+&lt;/script&gt;
+&lt;tr&gt;&lt;td colspan='2'&gt;
+                        &lt;table cellpadding="5" id="divuCount" cellspacing="0" class="tblResourceWarningMessages"&gt;
+                        &lt;tr&gt;
+                        &lt;td&gt;Once you fill out this form the resource will be requested and must be approved by an administrator before the user can login.&lt;/td&gt;
+                        &lt;/tr&gt;
+                        &lt;/table&gt;&lt;br&gt;
+                        &lt;/td&gt;&lt;/tr&gt;&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', 'Status_00000000-0000-0000-0000-000000000000_$DropDownChoice')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function checkSpecialCharacters(objectName,object){
+var checkPattern = /[\|\\"'\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \' / [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function checkSpecialCharactersForNonGeneric(objectName,object){
+var checkPattern = /[\|\\"\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \/ [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function setLicenseType(){
+}
+function cleanupfields(){
+}
+function InitFields(){
+cleanupfields();
+try { setLicenseType(); }catch(e){}
+$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
+}_spBodyOnLoadFunctionNames.push("InitFields");
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '/url?Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+
+                               if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         &lt;/script&gt;</value>
+  </data>
+  <data name="RenderControl_With_Display_And_InternalName_Title" xml:space="preserve">
+    <value>&lt;script&gt;$(document).ready(function () {$(".imgArrow").addClass("hideImage"); $(".upheader").click(function () {$header = $(this);$arrowImage = $header.find(".imgArrow");$downArrowImage = $header.find(".imgDownArrow");$content = $header.next();
+$content.slideToggle(100,function (){  if ($arrowImage.hasClass("hideImage")) {$downArrowImage.addClass("hideImage");$arrowImage.removeClass("hideImage");$("#onetIDListForm").attr("style","width:95%");}else {$arrowImage.addClass("hideImage");$downArrowImage.removeClass("hideImage");}});});});&lt;/script&gt;&lt;script language="javascript"&gt;
+WETitle = "title";
+WEWebUrl = 'url';
+WEWebId = '00000000-0000-0000-0000-000000000000';
+WEEditForm = 'url/url';
+WEExtraParams = 'isDlg=1';
+WEListId = '00000000-0000-0000-0000-000000000000';
+WEItemId = '123';
+WESource = 'http%3a%2f%2fsite.com%2f';
+WEUseTeam = false;
+WEDLG = '1';
+&lt;/script&gt;
+&lt;tr&gt;&lt;td colspan='2'&gt;
+                        &lt;table cellpadding="5" id="divuCount" cellspacing="0" class="tblResourceWarningMessages"&gt;
+                        &lt;tr&gt;
+                        &lt;td&gt;Once you fill out this form the resource will be requested and must be approved by an administrator before the user can login.&lt;/td&gt;
+                        &lt;/tr&gt;
+                        &lt;/table&gt;&lt;br&gt;
+                        &lt;/td&gt;&lt;/tr&gt;&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', '')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function checkSpecialCharacters(objectName,object){
+var checkPattern = /[\|\\"'\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \' / [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function checkSpecialCharactersForNonGeneric(objectName,object){
+var checkPattern = /[\|\\"\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \/ [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function setLicenseType(){
+}
+function cleanupfields(){
+}
+function InitFields(){
+cleanupfields();
+try { setLicenseType(); }catch(e){}
+$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
+}_spBodyOnLoadFunctionNames.push("InitFields");
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '/url?Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+
+                               if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         &lt;/script&gt;</value>
+  </data>
+  <data name="RenderControl_With_Display_And_IsSiteAdmin" xml:space="preserve">
+    <value>&lt;script&gt;$(document).ready(function () {$(".imgArrow").addClass("hideImage"); $(".upheader").click(function () {$header = $(this);$arrowImage = $header.find(".imgArrow");$downArrowImage = $header.find(".imgDownArrow");$content = $header.next();
+$content.slideToggle(100,function (){  if ($arrowImage.hasClass("hideImage")) {$downArrowImage.addClass("hideImage");$arrowImage.removeClass("hideImage");$("#onetIDListForm").attr("style","width:95%");}else {$arrowImage.addClass("hideImage");$downArrowImage.removeClass("hideImage");}});});});&lt;/script&gt;&lt;script language="javascript"&gt;
+WETitle = "title";
+WEWebUrl = 'url';
+WEWebId = '00000000-0000-0000-0000-000000000000';
+WEEditForm = 'url/url';
+WEExtraParams = 'isDlg=1';
+WEListId = '00000000-0000-0000-0000-000000000000';
+WEItemId = '123';
+WESource = 'http%3a%2f%2fsite.com%2f';
+WEUseTeam = false;
+WEDLG = '1';
+&lt;/script&gt;
+&lt;tr&gt;&lt;td colspan='2'&gt;
+                                    &lt;table cellpadding="5" id="divuCount" cellspacing="0" class="tblResourceWarningMessages"&gt;
+                                    &lt;tr&gt;
+                                    &lt;td&gt;The account limit of 0 has been reached.  Until the Account Owner ()
+                                    purchases additional accounts, creating user accounts with login access
+                                    will be in the form of "requests", which you can approve once the owner purchases additional accounts.&lt;/td&gt;
+                                    &lt;/tr&gt;
+                                    &lt;/table&gt;&lt;br&gt;
+                                    &lt;/td&gt;&lt;/tr&gt;&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', '')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function checkSpecialCharacters(objectName,object){
+var checkPattern = /[\|\\"'\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \' / [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function checkSpecialCharactersForNonGeneric(objectName,object){
+var checkPattern = /[\|\\"\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \/ [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function setLicenseType(){
+}
+function cleanupfields(){
+}
+function InitFields(){
+cleanupfields();
+try { setLicenseType(); }catch(e){}
+$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
+}_spBodyOnLoadFunctionNames.push("InitFields");
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '/url?Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+
+                               if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         &lt;/script&gt;</value>
+  </data>
+  <data name="RenderControl_With_Display_And_OwnerUserName" xml:space="preserve">
+    <value>&lt;script&gt;$(document).ready(function () {$(".imgArrow").addClass("hideImage"); $(".upheader").click(function () {$header = $(this);$arrowImage = $header.find(".imgArrow");$downArrowImage = $header.find(".imgDownArrow");$content = $header.next();
+$content.slideToggle(100,function (){  if ($arrowImage.hasClass("hideImage")) {$downArrowImage.addClass("hideImage");$arrowImage.removeClass("hideImage");$("#onetIDListForm").attr("style","width:95%");}else {$arrowImage.addClass("hideImage");$downArrowImage.removeClass("hideImage");}});});});&lt;/script&gt;&lt;script language="javascript"&gt;
+WETitle = "title";
+WEWebUrl = 'url';
+WEWebId = '00000000-0000-0000-0000-000000000000';
+WEEditForm = 'url/url';
+WEExtraParams = 'isDlg=1';
+WEListId = '00000000-0000-0000-0000-000000000000';
+WEItemId = '123';
+WESource = 'http%3a%2f%2fsite.com%2f';
+WEUseTeam = false;
+WEDLG = '1';
+&lt;/script&gt;
+&lt;tr&gt;&lt;td colspan='2'&gt;&lt;table cellpadding="5" id="divuCount" cellspacing="0" class="tblResourceWarningMessages"&gt;
+                                    &lt;tr&gt;
+                                    &lt;td&gt;You cannot create a new user that has login access because your account limit of 0 has been reached.  Purchasing additional accounts is easy, just click &lt;a href="url/_layouts/epmlive/purchase.aspx?accountid=00000000-0000-0000-0000-000000000000"&gt;Purchase Accounts&lt;/a&gt;.&lt;/tr&gt;
+                                    &lt;/table&gt;&lt;br&gt;&lt;/td&gt;&lt;/tr&gt;&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', '')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function checkSpecialCharacters(objectName,object){
+var checkPattern = /[\|\\"'\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \' / [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function checkSpecialCharactersForNonGeneric(objectName,object){
+var checkPattern = /[\|\\"\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \/ [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function setLicenseType(){
+}
+function cleanupfields(){
+}
+function InitFields(){
+cleanupfields();
+try { setLicenseType(); }catch(e){}
+$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
+}_spBodyOnLoadFunctionNames.push("InitFields");
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '/url?Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+
+                               if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         &lt;/script&gt;</value>
+  </data>
+  <data name="RenderControl_With_Display_And_Type_Calculated" xml:space="preserve">
+    <value>&lt;script&gt;$(document).ready(function () {$(".imgArrow").addClass("hideImage"); $(".upheader").click(function () {$header = $(this);$arrowImage = $header.find(".imgArrow");$downArrowImage = $header.find(".imgDownArrow");$content = $header.next();
+$content.slideToggle(100,function (){  if ($arrowImage.hasClass("hideImage")) {$downArrowImage.addClass("hideImage");$arrowImage.removeClass("hideImage");$("#onetIDListForm").attr("style","width:95%");}else {$arrowImage.addClass("hideImage");$downArrowImage.removeClass("hideImage");}});});});&lt;/script&gt;&lt;script language="javascript"&gt;
+WETitle = "title";
+WEWebUrl = 'url';
+WEWebId = '00000000-0000-0000-0000-000000000000';
+WEEditForm = 'url/url';
+WEExtraParams = 'isDlg=1';
+WEListId = '00000000-0000-0000-0000-000000000000';
+WEItemId = '123';
+WESource = 'http%3a%2f%2fsite.com%2f';
+WEUseTeam = false;
+WEDLG = '1';
+&lt;/script&gt;
+&lt;tr&gt;&lt;td colspan='2'&gt;
+                        &lt;table cellpadding="5" id="divuCount" cellspacing="0" class="tblResourceWarningMessages"&gt;
+                        &lt;tr&gt;
+                        &lt;td&gt;Once you fill out this form the resource will be requested and must be approved by an administrator before the user can login.&lt;/td&gt;
+                        &lt;/tr&gt;
+                        &lt;/table&gt;&lt;br&gt;
+                        &lt;/td&gt;&lt;/tr&gt;&lt;img src="/_layouts/images/picture.jpg"&gt;&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', '')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function checkSpecialCharacters(objectName,object){
+var checkPattern = /[\|\\"'\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \' / [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function checkSpecialCharactersForNonGeneric(objectName,object){
+var checkPattern = /[\|\\"\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \/ [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function setLicenseType(){
+}
+function cleanupfields(){
+}
+function InitFields(){
+cleanupfields();
+try { setLicenseType(); }catch(e){}
+$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
+}_spBodyOnLoadFunctionNames.push("InitFields");
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '/url?Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+
+                               if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         &lt;/script&gt;</value>
+  </data>
+  <data name="RenderControl_With_Display_And_Type_Lookup" xml:space="preserve">
+    <value>&lt;script&gt;$(document).ready(function () {$(".imgArrow").addClass("hideImage"); $(".upheader").click(function () {$header = $(this);$arrowImage = $header.find(".imgArrow");$downArrowImage = $header.find(".imgDownArrow");$content = $header.next();
+$content.slideToggle(100,function (){  if ($arrowImage.hasClass("hideImage")) {$downArrowImage.addClass("hideImage");$arrowImage.removeClass("hideImage");$("#onetIDListForm").attr("style","width:95%");}else {$arrowImage.addClass("hideImage");$downArrowImage.removeClass("hideImage");}});});});&lt;/script&gt;&lt;script language="javascript"&gt;
+WETitle = "title";
+WEWebUrl = 'url';
+WEWebId = '00000000-0000-0000-0000-000000000000';
+WEEditForm = 'url/url';
+WEExtraParams = 'isDlg=1';
+WEListId = '00000000-0000-0000-0000-000000000000';
+WEItemId = '123';
+WESource = 'http%3a%2f%2fsite.com%2f';
+WEUseTeam = false;
+WEDLG = '1';
+&lt;/script&gt;
+&lt;tr&gt;&lt;td colspan='2'&gt;
+                        &lt;table cellpadding="5" id="divuCount" cellspacing="0" class="tblResourceWarningMessages"&gt;
+                        &lt;tr&gt;
+                        &lt;td&gt;Once you fill out this form the resource will be requested and must be approved by an administrator before the user can login.&lt;/td&gt;
+                        &lt;/tr&gt;
+                        &lt;/table&gt;&lt;br&gt;
+                        &lt;/td&gt;&lt;/tr&gt;&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', '')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function checkSpecialCharacters(objectName,object){
+var checkPattern = /[\|\\"'\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \' / [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function checkSpecialCharactersForNonGeneric(objectName,object){
+var checkPattern = /[\|\\"\/\[\]\:\&lt;\&gt;\+\=\,\;\?\*\@]/
+if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ " \/ [ ] : &lt; &gt; + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }
+}
+function setLicenseType(){
+}
+function cleanupfields(){
+}
+function InitFields(){
+cleanupfields();
+try { setLicenseType(); }catch(e){}
+$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
+}_spBodyOnLoadFunctionNames.push("InitFields");
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '/url?Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+
+                               if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         &lt;/script&gt;</value>
+  </data>
+  <data name="RenderControl_With_Edit" xml:space="preserve">
+    <value>&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', '')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function CustomPreSaveAction(){
+var tags = document.getElementsByTagName('input');
+for (var i = 0; i &lt; tags.length; i++) {
+var tagIdStr = tags[i].id;
+ if (tagIdStr.indexOf("Title_") == 0 &amp;&amp; tagIdStr.lastIndexOf("_$TextField" == tagIdStr.length - "_$TextField".length)) {
+var col = tags[i];
+if (col != null &amp;&amp; col.value != null &amp;&amp; col.value != "") {
+var title = col.value.replace(/[^a-zA-Z0-9 ]/g, "");
+ if (title.length == 0) {
+alert("At least one alpha-numeric character is required for " + col.title);
+ return false;
+}
+ }
+}
+}
+ return true;
+  }
+&lt;/script&gt;
+&lt;script&gt;
+                    
+                                            $(document).ready(function() {
+                                                var button = $('input[id$=SaveItem]');
+                                                button.removeAttr('onclick');
+                                                button.click(function() {
+                                                    var elementName = $(this).attr('name');
+                                                    var aspForm = $('#aspnetForm');
+                    
+                                                    var editPostbackUrl = '/url?id=0&amp;Source=%2f_layouts%2f15%2fepmlive%2fgetlastid.aspx%3fBackTo%3dclose%26listid%3d00000000-0000-0000-0000-000000000000%26isdlg%3d1';
+                    
+                                                    if (!PreSaveItem()) return false;
+                                                    if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+                    
+                                                    WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', editPostbackUrl, false, true));
+                                                });
+                                            });
+                                             &lt;/script&gt;</value>
+  </data>
+  <data name="RenderControl_With_New" xml:space="preserve">
+    <value>&lt;script language="javascript"&gt;
+_spBodyOnLoadFunctionNames.push("InitStatusingControls('', '', '')");
+&lt;/script&gt;
+&lt;script language="javascript"&gt;
+function CustomPreSaveAction(){
+var tags = document.getElementsByTagName('input');
+for (var i = 0; i &lt; tags.length; i++) {
+var tagIdStr = tags[i].id;
+ if (tagIdStr.indexOf("Title_") == 0 &amp;&amp; tagIdStr.lastIndexOf("_$TextField" == tagIdStr.length - "_$TextField".length)) {
+var col = tags[i];
+if (col != null &amp;&amp; col.value != null &amp;&amp; col.value != "") {
+var title = col.value.replace(/[^a-zA-Z0-9 ]/g, "");
+ if (title.length == 0) {
+alert("At least one alpha-numeric character is required for " + col.title);
+ return false;
+}
+ }
+}
+}
+ return true;
+  }
+&lt;/script&gt;
+&lt;script&gt;
+
+                        $(document).ready(function() {
+                           if($('input[id$=SaveItem]').length &gt; 1){                        
+                                $('.ms-formline').hide();
+                                $('input[id$=SaveItem]').last().hide();
+                                $('input[id$=GoBack]').last().hide();
+                            }
+                         });
+                         &lt;/script&gt;</value>
+  </data>
+</root>
