@@ -169,6 +169,7 @@
     <Compile Include="API\ResourceGrid\ResourceImporterTests.cs" />
     <Compile Include="API\TimerTests.cs" />
     <Compile Include="AppSettingsHelperTests.cs" />
+    <Compile Include="AssignmentPlanner\GridManagerTests.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControlTests.cs" />
     <Compile Include="CheckOpenCloseConnections.cs" />
     <Compile Include="ControlDataBuilderTest.cs" />
