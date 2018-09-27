@@ -169,7 +169,6 @@
     <Compile Include="API\ResourceGrid\ResourceImporterTests.cs" />
     <Compile Include="API\TimerTests.cs" />
     <Compile Include="AppSettingsHelperTests.cs" />
-    <Compile Include="AssignmentPlanner\GridManagerTests.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControlTests.cs" />
     <Compile Include="CheckOpenCloseConnections.cs" />
     <Compile Include="ControlDataBuilderTest.cs" />
@@ -192,8 +191,14 @@
     <Compile Include="Layouts\epmlive\GridGanttSettingsTest.cs" />
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.AddEntityPickersToLookups.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.IsFieldExcluded.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.OnInit.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.RenderControl.cs" />
     <Compile Include="NewAppTest.cs" />
     <Compile Include="PlatformIntegrationEventTest.cs" />
+    <Compile Include="Properties\Resources.Designer.cs" />
     <Compile Include="ReportHelper\EPMDataTest.Part3.cs" />
     <Compile Include="ReportHelper\EPMDataTest.Part2.cs" />
     <Compile Include="ReportHelper\ListBizTest.cs" />
@@ -261,6 +266,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Fakes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
