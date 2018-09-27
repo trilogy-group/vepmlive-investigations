@@ -44,7 +44,7 @@
     </Reference>
     <Reference Include="Microsoft.Office.Project.Server.Library, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files\Microsoft Office Servers\16.0\Bin\Microsoft.Office.Project.Server.Library.dll</HintPath>
+      <HintPath>C:\Program Files\Microsoft Office Servers\16.0\Bin\Microsoft.Office.Project.Server.Library.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Office.Project.Server.Library.16.0.0.0.Fakes">
       <HintPath>..\EPMLive.TestFakes\FakesAssemblies\Microsoft.Office.Project.Server.Library.16.0.0.0.Fakes.dll</HintPath>
