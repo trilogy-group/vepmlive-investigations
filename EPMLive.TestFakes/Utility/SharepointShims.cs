@@ -226,7 +226,8 @@ namespace EPMLive.TestFakes.Utility
             return new ShimSPSite
             {
                 WebApplicationGet = () => ApplicationShim,
-                ContentDatabaseGet = () => ContentDatabaseShim
+                ContentDatabaseGet = () => ContentDatabaseShim,
+                RootWebGet = () => WebShim
             };
         }
 
