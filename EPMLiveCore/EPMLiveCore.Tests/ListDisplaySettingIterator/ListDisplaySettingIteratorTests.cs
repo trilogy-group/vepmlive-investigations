@@ -64,9 +64,11 @@ namespace EPMLiveCore.Tests
             ShimSPContext.CurrentGet = () => new ShimSPContext();
             ShimSPContext.AllInstances.WebGet = _ => new ShimSPWeb();
 
-            ShimGridGanttSettings.ConstructorSPList = (a,b) => { };
-            ShimGridGanttSettings.AllInstances.DisplaySettingsGet = _ => "boo";
-            ShimGridGanttSettings.AllInstances.EnableWorkListGet = _ => true;
+            ShimGridGanttSettings.ConstructorSPList = (settings, b) => 
+            {
+                settings.DisplaySettings = "boo";
+                settings.EnableWorkList = true;
+            };
 
             ShimSPSite.ConstructorGuid = (a, b) => { };
             ShimSPSite.AllInstances.Dispose = _ => { };

@@ -85,8 +85,14 @@ namespace EPMLiveCore.Tests
                 ? new ShimSPFeature()
                 : null;
 
-            ShimGridGanttSettings.AllInstances.DisplayFormRedirectGet = _ => true;
-            ShimFormComponent.AllInstances.ControlModeGet = _ => SPControlMode.New;
+            ShimGridGanttSettings.ConstructorSPList = (settings, b) =>
+            {
+                settings.DisplaySettings = "boo";
+                settings.EnableWorkList = true;
+                settings.DisplayFormRedirect = true;
+            };
+
+            ShimSPFormContext.AllInstances.FormModeGet = _ => SPControlMode.New;
             ShimPage.AllInstances.RequestGet = page => new HttpRequest(string.Empty, "http://site.com", "IsDlg=0");
             ShimDataRow.AllInstances.ItemGetInt32 = (a, b) => "3";
             ShimSqlDataReader.AllInstances.GetStringInt32 = (a, index) =>
