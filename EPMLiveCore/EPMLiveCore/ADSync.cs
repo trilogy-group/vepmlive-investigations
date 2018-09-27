@@ -600,25 +600,33 @@ namespace EPMLiveCore
 
             try
             {
-                DirectoryEntry de = new DirectoryEntry("LDAP://" + domain);
-                DirectorySearcher ds = new DirectorySearcher(de, "(objectClass=person)");
-                //ds.Filter = "(CN=User,CN=Schema,CN=Configuration,DC=dev2008,DC=com)";
-                SearchResult sr = ds.FindOne();
-                //System.DirectoryServices.ResultPropertyCollection prop = sr.Properties;
-                //ICollection coll = prop.PropertyNames;
-                //IEnumerator enu = coll.GetEnumerator();
-
-                DirectoryEntry de2 = new DirectoryEntry(sr.Path);
-                de2.RefreshCache(new string[] { "allowedAttributes" });
-
-                SortedList lstProps = new SortedList();
-
-                foreach (string sprop in de2.Properties["allowedAttributes"])
+                SearchResult searchResult;
+                using (var directoryEntry = new DirectoryEntry($"LDAP://{domain}"))
                 {
-                    lstProps.Add(sprop, "");
+                    using (var directorySearcher = new DirectorySearcher(directoryEntry, "(objectClass=person)"))
+                    {
+                        searchResult = directorySearcher.FindOne();
+                    }
                 }
 
-                foreach(DictionaryEntry deProp in lstProps)
+                SortedList properties;
+                if (searchResult == null)
+                {
+                    throw new InvalidOperationException($"{nameof(searchResult)} couldn't be null.");
+                }
+                using (var directoryEntry = new DirectoryEntry(searchResult.Path))
+                {
+                    directoryEntry.RefreshCache(new[] { "allowedAttributes" });
+
+                    properties = new SortedList();
+
+                    foreach (string attribute in directoryEntry.Properties["allowedAttributes"])
+                    {
+                        properties.Add(attribute, string.Empty);
+                    }
+                }
+
+                foreach(DictionaryEntry deProp in properties)
                 {
                     if (!userAttributes.Contains(deProp.Key.ToString().ToLower()))
                     {

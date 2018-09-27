@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Fakes;
 using System.Collections.Generic;
 using System.Data;
 using System.DirectoryServices;
@@ -17,6 +18,7 @@ namespace EPMLiveCore.Tests
     public class ADSyncTests
     {
         private const string SampleSid = "SampleSID";
+        private const string SamplePropertyValue = "SamplePropertyValue";
         private const string ColumnSid = "SID";
 
         private IDisposable _shims;
@@ -91,25 +93,59 @@ namespace EPMLiveCore.Tests
             Assert.IsTrue(directoryShims.DirectoryEntriesDisposed.Any());
         }
 
+        [TestMethod]
+        public void GetADGroupUserAttributes_Called_DirectoryDisposed()
+        {
+            // Arrange
+            var directoryShims = DirectoryShims.ShimDirectoryCalls();
+            ShimDirectorySearcher.ConstructorDirectoryEntryString = (instance, _, __) =>
+            {
+                new ShimDirectorySearcher(instance)
+                {
+                    FindOne = () => directoryShims.SearchResultShim
+                };
+            };
+            var table = new DataTable();
+            table.Columns.Add(ColumnSid);
+            _adSyncObject.SetField("_adUsers", table);
+
+            // Act
+            var result = _adSync.GetADGroupUserAttributes(string.Empty, string.Empty);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(SamplePropertyValue.ToLower(), result.FirstOrDefault());
+            Assert.IsTrue(directoryShims.DirectorySearchersDisposed.Any());
+            Assert.AreEqual(2, directoryShims.DirectoryEntriesDisposed.Count);
+        }
+
         private void SetupShims()
         {
             ShimDirectoryEntry.ConstructorStringStringStringAuthenticationTypes = (instance, __, ___, ____, _____) =>
             {
                 new ShimDirectoryEntry(instance)
                 {
-                    PropertiesGet = () => new ShimPropertyCollection
-                    {
-                        ItemGetString = key => new ShimPropertyValueCollection
-                        {
-                            ItemGetInt32 = index => new byte[] { }
-                        }
-                    },
                     DisposeBoolean = _ =>
                     {
                         _directoryDisposed = true;
                     }
                 };
             };
+
+            var shimPropertyValueCollection = new ShimPropertyValueCollection
+            {
+                ItemGetInt32 = index => new byte[] { }
+            };
+            new ShimCollectionBase(shimPropertyValueCollection)
+            {
+                GetEnumerator = () => new [] { SamplePropertyValue }.GetEnumerator()
+            };
+            var shimPropertyCollection = new ShimPropertyCollection
+            {
+                ItemGetString = key => shimPropertyValueCollection,
+            };
+            ShimDirectoryEntry.AllInstances.PropertiesGet = (_) => shimPropertyCollection;
+            ShimDirectoryEntry.AllInstances.RefreshCacheStringArray = (entry, strings) => {};
 
             ShimSecurityIdentifier.ConstructorByteArrayInt32 = (instance, __, ___) =>
             {
