@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.DirectoryServices;
 using System.Collections;
-using Microsoft.SharePoint;
 using System.Security.Principal;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Linq;
+using Microsoft.SharePoint;
 using EPMLiveCore.ReportHelper;
 
 namespace EPMLiveCore
@@ -522,41 +524,48 @@ namespace EPMLiveCore
 
         private bool PopulateAllGroupUserAttributes()
         {
-            string sid = string.Empty;
+            string sId = string.Empty;
             string cn = string.Empty;
             try
             {
-                DirectoryEntry de = new DirectoryEntry("LDAP://" + _fullDomain);
-                de.AuthenticationType = AuthenticationTypes.Secure;
-                var ds = new DirectorySearcher(de, "(objectClass=person)") { PageSize = GetSizeLimit() };
-
-                if (_adGroupNameAndPath.ContainsKey(_groupName))
+                using (var directoryEntry = new DirectoryEntry($"LDAP://{_fullDomain}"))
                 {
-                    ds.Filter = "(memberOf=" + _adGroupNameAndPath[_groupName].ToString().Replace("(", "").Replace("LDAP://", "") + ")";
-                    AddProperties(ds);
-                    foreach (SearchResult sr in ds.FindAll())
+                    directoryEntry.AuthenticationType = AuthenticationTypes.Secure;
+                    using (var searcher =
+                        new DirectorySearcher(directoryEntry, "(objectClass=person)") { PageSize = GetSizeLimit() } )
                     {
-                        try
+                        if (_adGroupNameAndPath.ContainsKey(_groupName))
                         {
-                            // don't update disabled users
-                            sid = GetUserSID(sr.Path).ToUpper();
-                            //Array exclusions = _adExclusions.ToArray();                           
-                            if (!_adExclusions.Contains(sid)) //Skip exclusions
+                            searcher.Filter =
+                                $"(memberOf={_adGroupNameAndPath[_groupName].ToString().Replace("(", "").Replace("LDAP://", "")})";
+                            AddProperties(searcher);
+                            foreach (SearchResult searchResult in searcher.FindAll())
                             {
-                                if (!userDisabled(sid))
+                                try
                                 {
-                                    AddResourceToDataTable(sr.Path);
+                                    sId = GetUserSID(searchResult.Path).ToUpper();
+                                    var exclusions = from string exclusion in _adExclusions select exclusion;
+                                    if (!exclusions.Any(e => string.Equals(e, sId, StringComparison.CurrentCultureIgnoreCase)))
+                                    {
+                                        if (!userDisabled(sId))
+                                        {
+                                            AddResourceToDataTable(searchResult.Path);
+                                        }
+                                        else
+                                        {
+                                            _disableUsers.Add(sId);
+                                        }
+                                    }
                                 }
-                                else
+                                catch (Exception exception)
                                 {
-                                    _disableUsers.Add(sid);
+                                    Trace.TraceError(exception.ToString());
+                                    _ExecutionLogs.Add(
+                                        $"     ERROR -- Location: PopulateAllGroupUserAttributes() " +
+                                        $"resource level -- SID: {sId} -- Message: {exception.Message}");
+                                    _hasErrors = true;
                                 }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            _ExecutionLogs.Add("     ERROR -- Location: PopulateAllGroupUserAttributes() resource level -- SID: " + sid + " -- Message: " + ex.Message);
-                            _hasErrors = true;
                         }
                     }
                 }

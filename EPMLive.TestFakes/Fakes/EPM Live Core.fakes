@@ -87,5 +87,6 @@
     <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.Step!"/>
     <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps.UpdateResourcePool!"/>
     <Add FullName="EPMLiveCore.ReportingData!"/>
+    <Add FullName="EPMLiveCore.ADSync!"/>
   </ShimGeneration>
 </Fakes>

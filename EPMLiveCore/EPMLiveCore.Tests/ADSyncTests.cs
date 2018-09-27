@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Fakes;
 using System.Collections.Generic;
 using System.Data;
@@ -9,6 +10,7 @@ using System.Security.Principal.Fakes;
 using System.Text;
 using System.Threading.Tasks;
 using EPMLive.TestFakes.Utility;
+using EPMLiveCore.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -20,6 +22,7 @@ namespace EPMLiveCore.Tests
         private const string SampleSid = "SampleSID";
         private const string SamplePropertyValue = "SamplePropertyValue";
         private const string ColumnSid = "SID";
+        private const string SampleGroup = "SampleGroup";
 
         private IDisposable _shims;
         private ADSync _adSync;
@@ -117,6 +120,44 @@ namespace EPMLiveCore.Tests
             Assert.AreEqual(SamplePropertyValue.ToLower(), result.FirstOrDefault());
             Assert.IsTrue(directoryShims.DirectorySearchersDisposed.Any());
             Assert.AreEqual(2, directoryShims.DirectoryEntriesDisposed.Count);
+        }
+
+        [TestMethod]
+        public void PopulateAllGroupUserAttributes_Called_DirectoryDisposed()
+        {
+            // Arrange
+            var directoryShims = DirectoryShims.ShimDirectoryCalls();
+            ShimDirectorySearcher.ConstructorDirectoryEntryString = (instance, _, __) =>
+            {
+                new ShimDirectorySearcher(instance)
+                {
+                    FindOne = () => directoryShims.SearchResultShim
+                };
+            };
+            var table = new Hashtable
+            {
+                { SampleGroup, SampleGroup }
+            };
+            _adSyncObject.SetField("_adGroupNameAndPath", table);
+            _adSyncObject.SetField("_groupName", SampleGroup);
+            _adSyncObject.SetField("_adExclusions", new ArrayList());
+
+            ShimADSync.GetSizeLimit = () => 1;
+            ShimADSync.AllInstances.GetUserSIDString = (_, __) => SampleSid;
+            ShimADSync.AllInstances.userDisabledString = (_, __) => false;
+            ShimADSync.AllInstances.AddResourceToDataTableString = (_, __) => { };
+
+            // Act
+            var result = _adSyncObject.Invoke("PopulateAllGroupUserAttributes");
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(bool));
+            Assert.IsTrue((bool)result);
+            var hasErrors = _adSyncObject.GetField("_hasErrors");
+            Assert.IsInstanceOfType(hasErrors, typeof(bool));
+            Assert.IsFalse((bool)hasErrors);
+            Assert.IsTrue(directoryShims.DirectorySearchersDisposed.Any());
+            Assert.IsTrue(directoryShims.DirectoryEntriesDisposed.Any());
         }
 
         private void SetupShims()
