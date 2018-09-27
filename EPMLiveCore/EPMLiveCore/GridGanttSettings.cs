@@ -59,6 +59,7 @@ namespace EPMLiveCore
         public bool EnableContentReporting = false;
         public bool DisableThumbnails = false;
 
+
         public bool SaveSettings(SPList _list)
         {
             try
