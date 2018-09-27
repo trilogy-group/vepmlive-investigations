@@ -174,7 +174,6 @@
     <Compile Include="ControlDataBuilderTest.cs" />
     <Compile Include="CoreFunctions.GetPlannerList.Tests.cs" />
     <Compile Include="CoreFunctionsRemTestsSplitOne.cs" />
-    <Compile Include="CoreFunctionsRemTestsSplitThree.cs" />
     <Compile Include="CoreFunctionsTest.cs" />
     <Compile Include="EditableFieldDisplayTests.cs" />
     <Compile Include="ExtensionMethodsTest.cs" />
@@ -228,6 +227,7 @@
     </Compile>
     <Compile Include="TestCheck.cs" />
     <Compile Include="WebPageCode\AdminConnsTest.cs" />
+    <Compile Include="WebPageCode\CreateDatabaseTest.cs" />
     <Compile Include="WebPageCode\ListDisplayPageTests.cs" />
   </ItemGroup>
   <ItemGroup>
