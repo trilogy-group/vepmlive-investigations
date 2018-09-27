@@ -107,8 +107,7 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             const string jobName = "WorkEngineActivation";
-
-            var userlist = "Empty";
+            const string userlist = "Empty";
             var arrayList = new ArrayList()
             {
                 $"Not{DummyString}"
@@ -126,9 +125,6 @@ namespace EPMLiveCore.Tests
                 {
                     Name = jobName
                 }
-                //{
-                //    NameGet = () => jobName
-                //}.Instance
             }.GetEnumerator();
 
             // Act
@@ -176,7 +172,6 @@ namespace EPMLiveCore.Tests
             // Arrange
             const string keyString = "EPMLiveKeys";
             var keyValue = $"{DummyString}\t{DummyString}";
-
             var hashTable = new Hashtable()
             {
                 [keyString] = keyValue
