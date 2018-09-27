@@ -19,6 +19,11 @@ using EPMLiveWebParts.Fakes;
 using System.Globalization;
 using System.Threading;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.SharePoint.WebControls;
+using Microsoft.SharePoint.WebControls.Fakes;
+using System.Collections.Generic;
+using Microsoft.SharePoint.WebPartPages.Fakes;
+using Microsoft.SharePoint.Utilities;
 
 namespace EPMLiveWebParts.Tests
 {
@@ -52,6 +57,7 @@ namespace EPMLiveWebParts.Tests
         private bool _hasSearchResults;
         private string _searchField;
         private string _searchString;
+        private StringBuilder _controlOutputString;
 
         [TestInitialize]
         public void SetUp()
@@ -96,6 +102,40 @@ namespace EPMLiveWebParts.Tests
                     }
                });
             ShimHttpRequest.AllInstances.UrlGet = (_) => new Uri(DummyUrl);
+            _testablePrivate.SetFieldOrProperty("peMulti", new PeopleEditor());
+            _testablePrivate.SetFieldOrProperty("peSingle", new PeopleEditor());
+            _controlOutputString = new StringBuilder();
+            ShimControl.AllInstances.RenderControlHtmlTextWriter = (_, __) => { };
+            ShimSPField.AllInstances.ReorderableGet = (_) => true;
+            ShimSPField.AllInstances.HiddenGet = (_) => false;
+            ShimSPField.AllInstances.TitleGet = (field) => field.InternalName;
+            ShimSPField.AllInstances.TypeGet = (_) => SPFieldType.Boolean;
+            ShimSPField.AllInstances.SchemaXmlGet = (_) => $"<Element List=\"{DummyString}\" WebId=\"{DummyString}\" Min=\"1\" Max=\"1\"/>";
+            ShimCoreFunctions.getListSettingStringSPList = (_, __) => DummyString;
+            ShimGridGanttSettings.ConstructorSPList = (_, __) => { };
+            ShimListDisplayUtils.ConvertFromStringString = (_) => new Dictionary<string, Dictionary<string, string>>()
+            {
+                {
+                    DummyString,
+                    new Dictionary<string, string>()
+                }
+            };
+            ShimHttpContext.CurrentGet = () => new ShimHttpContext()
+            {
+                RequestGet = () => new ShimHttpRequest()
+                {
+                    UrlGet = () => new Uri("http://fake.url")
+                },
+            };
+            ShimWebPart.AllInstances.QualifierGet = (_) => DummyString;
+            ShimSPList.AllInstances.ParentWebGet = (_) => new ShimSPWeb()
+            {
+                PropertiesGet = () => new ShimSPPropertyBag()
+                {
+                }.Instance
+            }.Instance;
+            ShimStringDictionary.AllInstances.ItemGetString = (_, __) => "1";
+            ShimSPUser.AllInstances.GroupsGet = (_) => _sharepointShims.GroupsShim;
         }
 
         private void SetUpDefaultValues()
