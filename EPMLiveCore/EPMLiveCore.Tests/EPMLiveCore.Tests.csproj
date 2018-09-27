@@ -98,10 +98,6 @@
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Configuration.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Configuration.4.0.0.0.Fakes.dll</HintPath>
-    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -152,6 +148,7 @@
     <Compile Include="API\Analytics\FRFQueryFactoryTests.cs" />
     <Compile Include="API\Analytics\RecentItemsTests.cs" />
     <Compile Include="API\APITeamTests.cs" />
+    <Compile Include="API\Applications\ApplicationsTests.cs" />
     <Compile Include="API\Comments\CommentManagerTests.cs" />
     <Compile Include="API\CreateWorkspace\DALTests.cs" />
     <Compile Include="API\CreateWorkspace\WorkspaceFactoryTests.cs" />
