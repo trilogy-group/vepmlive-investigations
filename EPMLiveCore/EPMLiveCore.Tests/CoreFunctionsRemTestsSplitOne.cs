@@ -59,8 +59,6 @@ namespace EPMLiveCore.Tests
         public void Setup()
         {
             SetupShims();
-            //SetupShimsSplitTwo();
-            //SetupShimsSplitThree();
 
             testObject = new CoreFunctions();
             privateObject = new PrivateObject(testObject);
@@ -77,7 +75,8 @@ namespace EPMLiveCore.Tests
             ShimSPContext.CurrentGet = () => new ShimSPContext()
             {
                 ListItemVersionGet = () => new ShimSPListItemVersion(),
-                WebGet = () => spWeb
+                WebGet = () => spWeb,
+                SiteGet = () => spSite
             };
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
             ShimSPWebService.ContentServiceGet = () => new ShimSPWebService()
@@ -95,6 +94,12 @@ namespace EPMLiveCore.Tests
             ShimSPSite.AllInstances.AllowUnsafeUpdatesSetBoolean = (_, __) => { };
             ShimSPWebApplication.AllInstances.JobDefinitionsGet = _ => new ShimSPJobDefinitionCollection();
             ShimSPPersistedObject.AllInstances.FarmGet = _ => spFarm;
+            ShimSPQuery.Constructor = _ => new ShimSPQuery();
+            ShimSPFieldUserValue.ConstructorSPWebString = (_, _1, _2) => new ShimSPFieldUserValue()
+            {
+                UserGet = () => null,
+                LookupValueGet = () => DummyString
+            };
         }
 
         private void SetupVariables()
@@ -125,7 +130,9 @@ namespace EPMLiveCore.Tests
             };
             spUser = new ShimSPUser()
             {
-                LoginNameGet = () => DummyString
+                LoginNameGet = () => DummyString,
+                EmailGet = () => DummyString,
+                IDGet = () => 1
             };
             spWeb = new ShimSPWeb()
             {
@@ -158,7 +165,13 @@ namespace EPMLiveCore.Tests
                 UrlGet = () => DummyString,
                 ServerRelativeUrlGet = () => DummyString,
                 TitleGet = () => DummyString,
-                AllowUnsafeUpdatesSetBoolean = _ => { }
+                AllowUnsafeUpdatesSetBoolean = _ => { },
+                SiteUserInfoListGet = () => spList,
+                SiteUsersGet = () => new ShimSPUserCollection()
+                {
+                    GetByIDInt32 = _ => spUser
+                },
+                EnsureUserString = _ => spUser
             };
         }
 

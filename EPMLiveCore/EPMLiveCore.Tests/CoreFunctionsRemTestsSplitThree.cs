@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Collections.Specialized.Fakes;
-using System.Configuration.Fakes;
-using System.Globalization;
-using System.Linq;
-using System.Net.Fakes;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using EPMLiveCore.Fakes;
-using EPMLiveCore.SPUtilities.Fakes;
+using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
@@ -27,17 +20,9 @@ namespace EPMLiveCore.Tests
         private const string GetUserCountMethodName = "getUserCount";
         private const string DeleteKeyMethodName = "deleteKey";
         private const string FeatureListMethodName = "featureList";
-
-        private void SetupShimsSplitThree()
-        {
-            ShimUserManager.ConstructorStringSPPersistedObjectGuid = (_, _1, _2, _3) => new ShimUserManager();
-            ShimSPSite.ConstructorString = (_, __) => new ShimSPSite();
-            ShimSPSite.AllInstances.OpenWeb = _ => spWeb;
-            ShimSPSite.AllInstances.RootWebGet = _ => spWeb;
-            ShimSPSite.AllInstances.WebApplicationGet = _ => new ShimSPWebApplication();
-            ShimSPSite.AllInstances.AllowUnsafeUpdatesSetBoolean = (_, __) => { };
-            ShimSPWebApplication.AllInstances.JobDefinitionsGet = _ => new ShimSPJobDefinitionCollection();
-        }
+        private const string EnqueueMethodName = "enqueue";
+        private const string EnsureNoDuplicatesMethodName = "EnsureNoDuplicates";
+        private const string GetResourceWithDuplicateEmailMethodName = "GetResourceWithDuplicateEmail";
 
         [TestMethod]
         public void GetFeatureUsers_WhenCalled_ReturnsArrayList()
@@ -210,6 +195,197 @@ namespace EPMLiveCore.Tests
             actual.ShouldSatisfyAllConditions(
                 () => actual.Length.ShouldBe(1),
                 () => actual[0].ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void Enqueue_WhenCalled_Enques()
+        {
+            // Arrange
+            var validation = true;
+
+            ShimCoreFunctions.enqueueGuidInt32SPSite = (actualGuid, actualInt, actualSite) =>
+            {
+                validation = validation && actualGuid.Equals(guid);
+                validation = validation && actualInt.Equals(1);
+            };
+
+            // Act
+            privateObject.Invoke(
+                EnqueueMethodName,
+                BindingFlags.Static | BindingFlags.Public,
+                new object[] { guid, 1 });
+
+            // Assert
+            validation.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void EnsureNoDuplicates_WhenCalled_EnsuresNoDuplicates()
+        {
+            // Arrange
+            var validation = false;
+            var properties = new ShimSPItemEventProperties()
+            {
+                AfterPropertiesGet = () => new ShimSPItemEventDataCollection()
+                {
+                    ItemGetString = input =>
+                    {
+                        throw new Exception();
+                    }
+                },
+                ListItemGet = () => new ShimSPListItem()
+                {
+                    ItemGetString = input =>
+                    {
+                        if (input.Equals("Generic"))
+                        {
+                            throw new Exception();
+                        }
+
+                        return DummyString;
+                    }
+                }
+            };
+
+            ShimCoreFunctions.GetResourceWithDuplicateEmailSPItemEventPropertiesBooleanBooleanStringSPUserOut =
+                (SPItemEventProperties propertiesParam, Boolean isAdd, Boolean isOnline, string sharePointAccount, out SPUser u) =>
+                {
+                    validation = true;
+                    u = null;
+                    return new ShimSPListItemCollection()
+                    {
+                        CountGet = () => 0
+                    };
+                };
+
+            // Act
+            privateObject.Invoke(
+                EnsureNoDuplicatesMethodName,
+                BindingFlags.Static | BindingFlags.Public,
+                new object[] { properties.Instance, true, true });
+
+            // Assert
+            validation.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void GetResourceWithDuplicateEmail_IsAddTrueisOnlineTrue_ReturnsListItemCollection()
+        {
+            // Arrange
+            const bool isAdd = true;
+            const bool isOnline = true;
+
+            var properties = new ShimSPItemEventProperties()
+            {
+                WebGet = () => spWeb,
+                ListGet = () => spList,
+                ListItemGet = () => spListItem
+            };
+
+            spList.GetItemsSPQuery = _ => new ShimSPListItemCollection()
+            {
+                CountGet = () => 10,
+                ItemGetInt32 = __ => spListItem
+            };
+
+            // Act
+            var actual = (SPListItemCollection)privateObject.Invoke(
+                GetResourceWithDuplicateEmailMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { properties.Instance, isAdd, isOnline, string.Empty, spUser.Instance });
+
+            // Assert
+            actual.Count.ShouldBe(10);
+        }
+
+        [TestMethod]
+        public void GetResourceWithDuplicateEmail_IsAddTrueisOnlineFalse_ReturnsListItemCollection()
+        {
+            // Arrange
+            const bool isAdd = true;
+            const bool isOnline = false;
+
+            var properties = new ShimSPItemEventProperties()
+            {
+                WebGet = () => spWeb,
+                ListGet = () => spList,
+                ListItemGet = () => spListItem
+            };
+
+            spList.GetItemsSPQuery = _ => new ShimSPListItemCollection()
+            {
+                CountGet = () => 10,
+                ItemGetInt32 = __ => spListItem
+            };
+
+            // Act
+            var actual = (SPListItemCollection)privateObject.Invoke(
+                GetResourceWithDuplicateEmailMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { properties.Instance, isAdd, isOnline, string.Empty, spUser.Instance });
+
+            // Assert
+            actual.Count.ShouldBe(10);
+        }
+
+        [TestMethod]
+        public void GetResourceWithDuplicateEmail_IsAddFalseisOnlineTrue_ReturnsListItemCollection()
+        {
+            // Arrange
+            const bool isAdd = false;
+            const bool isOnline = true;
+
+            var properties = new ShimSPItemEventProperties()
+            {
+                WebGet = () => spWeb,
+                ListGet = () => spList,
+                ListItemGet = () => spListItem
+            };
+
+            spList.GetItemsSPQuery = _ => new ShimSPListItemCollection()
+            {
+                CountGet = () => 10,
+                ItemGetInt32 = __ => spListItem
+            };
+
+            // Act
+            var actual = (SPListItemCollection)privateObject.Invoke(
+                GetResourceWithDuplicateEmailMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { properties.Instance, isAdd, isOnline, string.Empty, spUser.Instance });
+
+            // Assert
+            actual.Count.ShouldBe(10);
+        }
+
+        [TestMethod]
+        public void GetResourceWithDuplicateEmail_IsAddFalseisOnlineFalse_ReturnsListItemCollection()
+        {
+            // Arrange
+            const bool isAdd = false;
+            const bool isOnline = false;
+
+            var properties = new ShimSPItemEventProperties()
+            {
+                WebGet = () => spWeb,
+                ListGet = () => spList,
+                ListItemGet = () => spListItem
+            };
+
+            spList.GetItemsSPQuery = _ => new ShimSPListItemCollection()
+            {
+                CountGet = () => 10,
+                ItemGetInt32 = __ => spListItem
+            };
+
+            // Act
+            var actual = (SPListItemCollection)privateObject.Invoke(
+                GetResourceWithDuplicateEmailMethodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                new object[] { properties.Instance, isAdd, isOnline, string.Empty, spUser.Instance });
+
+            // Assert
+            actual.Count.ShouldBe(10);
         }
     }
 }
