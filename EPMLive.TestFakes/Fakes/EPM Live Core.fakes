@@ -12,6 +12,7 @@
     <Add FullName="EPMLiveCore.ActLicensing.Licensing!"/>
     <Add FullName="EPMLiveCore.JSONUtil"/>
     <Add FullName="EPMLiveCore.UserLevels"/>
+    <Add FullName="EPMLiveCore.UserManager"/>
     <Add FullName="EPMLiveCore.ListDisplayUtils!"/>
     <Add FullName="EPMLiveCore.ReportingProxy.QueryExecutor!"/>
     <Add FullName="EPMLiveCore.CoreFunctions!"/>
