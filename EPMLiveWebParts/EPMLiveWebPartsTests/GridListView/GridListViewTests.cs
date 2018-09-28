@@ -24,6 +24,8 @@ using Microsoft.SharePoint.WebControls.Fakes;
 using System.Collections.Generic;
 using Microsoft.SharePoint.WebPartPages.Fakes;
 using Microsoft.SharePoint.Utilities;
+using Microsoft.SharePoint.Administration.Fakes;
+using System.Data.SqlClient.Fakes;
 
 namespace EPMLiveWebParts.Tests
 {
@@ -136,6 +138,13 @@ namespace EPMLiveWebParts.Tests
             }.Instance;
             ShimStringDictionary.AllInstances.ItemGetString = (_, __) => "1";
             ShimSPUser.AllInstances.GroupsGet = (_) => _sharepointShims.GroupsShim;
+            ShimCoreFunctions.getConnectionStringGuid = (_) => DummyString;
+            ShimSqlConnection.ConstructorString = (_,__) => { };
+            ShimSqlConnection.AllInstances.Open = (_) => { };
+            ShimSqlConnection.AllInstances.Close = (_) => { };
+            ShimSqlCommand.ConstructorString = (_, __) => { };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = (_) => 0;
+            ShimSqlCommand.AllInstances.ExecuteReader = (_) => new ShimSqlDataReader().Instance;
         }
 
         private void SetUpDefaultValues()
