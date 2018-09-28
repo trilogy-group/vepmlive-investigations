@@ -181,6 +181,7 @@
     <Compile Include="EditableFieldDisplayTests.cs" />
     <Compile Include="ExtensionMethodsTest.cs" />
     <Compile Include="Infrastructure\BaseClasses\SPListItemManagerTests.cs" />
+    <Compile Include="Infrastructure\ResourceManagment\ResourcePoolManagerTests.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
     <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
     <Compile Include="Jobs\ResourceImportJobTests.cs" />
