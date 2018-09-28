@@ -297,7 +297,7 @@ namespace TimeSheets
 
         }
 
-        private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, string period, bool liveHours, bool bSkipSP)
+        private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, string period,string username, bool liveHours, bool bSkipSP)
         {
             string id = iGetAttribute(ndRow, "UID");
 
@@ -365,7 +365,8 @@ namespace TimeSheets
 
                                                 if (drItem.Length > 0)
                                                 {
-                                                    using (SqlCommand cmd = new SqlCommand("UPDATE TSITEM set Title = @title, project=@project, project_id=@projectid where ts_item_uid=@uid", cn))
+                                                    string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username, webid + "."+ list + Convert.ToString(projectid));
+                                                    using (SqlCommand cmd = new SqlCommand("UPDATE TSITEM set Title = @title, project=@project, project_id=@projectid,rate=@rate where ts_item_uid=@uid", cn))
                                                     {
                                                         cmd.Parameters.AddWithValue("@uid", id);
                                                         cmd.Parameters.AddWithValue("@title", li["Title"] == null ? string.Empty : li["Title"].ToString());
@@ -373,11 +374,13 @@ namespace TimeSheets
                                                         {
                                                             cmd.Parameters.AddWithValue("@project", DBNull.Value);
                                                             cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
+                                                            cmd.Parameters.AddWithValue("@rate", DBNull.Value);
                                                         }
                                                         else
                                                         {
                                                             cmd.Parameters.AddWithValue("@project", project);
                                                             cmd.Parameters.AddWithValue("@projectid", projectid);
+                                                            cmd.Parameters.AddWithValue("@rate", rate);
                                                         }
                                                         cmd.ExecuteNonQuery();
                                                     }
@@ -407,7 +410,7 @@ namespace TimeSheets
                                                         itemInsertCmd.Parameters.AddWithValue("@webid", web.ID);
                                                         itemInsertCmd.Parameters.AddWithValue("@listid", list.ID);
                                                         itemInsertCmd.Parameters.AddWithValue("@itemid", li.ID);
-                                                        itemInsertCmd.Parameters.AddWithValue("@title", li["Title"] == null? string.Empty : li["Title"].ToString());
+                                                        itemInsertCmd.Parameters.AddWithValue("@title", li["Title"] == null ? string.Empty : li["Title"].ToString());
                                                         itemInsertCmd.Parameters.AddWithValue("@list", list.Title);
                                                         itemInsertCmd.Parameters.AddWithValue("@itemtype", itemtypeid);
                                                         itemInsertCmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
@@ -656,16 +659,17 @@ namespace TimeSheets
                     try
                     {
                         cn.Open();
-                        using (SqlCommand cmd = new SqlCommand("SELECT     dbo.TSUSER.USER_ID FROM         dbo.TSUSER INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn))
+                        using (SqlCommand cmd = new SqlCommand("SELECT   dbo.TSUSER.USER_ID,dbo.TSUSER.USERNAME FROM         dbo.TSUSER INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn))
                         {
                             cmd.Parameters.AddWithValue("@tsuid", base.TSUID);
-
+                            string username = string.Empty;
                             int userid = 0;
                             using (SqlDataReader dr = cmd.ExecuteReader())
                             {
                                 if (dr.Read())
                                 {
                                     userid = dr.GetInt32(0);
+                                    username = dr.GetString(1);
                                 }
 
                             }
@@ -736,7 +740,7 @@ namespace TimeSheets
                                                 float percent = 0;
                                                 float count = 0;
                                                 float total = ndItems.Count;
-
+                                                
                                                 foreach (XmlNode ndItem in ndItems)
                                                 {
                                                     string worktype = "";
@@ -747,7 +751,7 @@ namespace TimeSheets
                                                     }
                                                     catch { }
 
-                                                    ProcessItemRow(ndItem, ref dtItems, cn, site, settings, period, liveHours, worktype == settings.NonWorkList);
+                                                    ProcessItemRow(ndItem, ref dtItems, cn, site, settings, period,username, liveHours, worktype == settings.NonWorkList);
 
                                                     count++;
                                                     float pct = count / total * 98;
