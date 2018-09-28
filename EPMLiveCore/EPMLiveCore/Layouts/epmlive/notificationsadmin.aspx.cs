@@ -144,52 +144,52 @@ namespace EPMLiveCore.Layouts.epmlive
                                         txtEmailSubject.Text = "EPM Live: Task Status Report";
                                     }
 
-
-                                    SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(currWeb.Site.WebApplication.Id));
-
-                                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                                    using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(currWeb.Site.WebApplication.Id)))
                                     {
-                                        cn.Open();
-                                    });
+                                        SPSecurity.RunWithElevatedPrivileges(delegate { sqlConnection.Open(); });
 
-
-                                    SqlCommand cmd = new SqlCommand("select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=3", cn);
-                                    cmd.Parameters.AddWithValue("@siteguid", currWeb.Site.ID);
-                                    SqlDataReader dr = cmd.ExecuteReader();
-
-                                    if (dr.Read())
-                                    {
-                                        ddlRunTime.SelectedValue = dr.GetInt32(1).ToString();
-
-                                        if (!dr.IsDBNull(3))
+                                        using (var sqlCommand = new SqlCommand(
+                                            "select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=3",
+                                            sqlConnection))
                                         {
-                                            if (dr.GetInt32(3) == 0)
+                                            sqlCommand.Parameters.AddWithValue("@siteguid", currWeb.Site.ID);
+
+                                            using (var dataReader = sqlCommand.ExecuteReader())
                                             {
-                                                lblStatus.Text = "Queued";
-                                                btnTest.Enabled = false;
-                                            }
-                                            else if (dr.GetInt32(3) == 1)
-                                            {
-                                                lblStatus.Text = "Processing (" + dr.GetInt32(2).ToString("##0") + "%)";
-                                                btnTest.Enabled = false;
-                                            }
-                                            else if (!dr.IsDBNull(5))
-                                            {
-                                                lblStatus.Text = dr.GetString(5);
-                                            }
-                                            else
-                                            {
-                                                lblStatus.Text = "No Results";
+                                                if (dataReader.Read())
+                                                {
+                                                    ddlRunTime.SelectedValue = dataReader.GetInt32(1).ToString();
+
+                                                    if (!dataReader.IsDBNull(3))
+                                                    {
+                                                        if (dataReader.GetInt32(3) == 0)
+                                                        {
+                                                            lblStatus.Text = "Queued";
+                                                            btnTest.Enabled = false;
+                                                        }
+                                                        else if (dataReader.GetInt32(3) == 1)
+                                                        {
+                                                            lblStatus.Text = $"Processing ({dataReader.GetInt32(2):##0}%)";
+                                                            btnTest.Enabled = false;
+                                                        }
+                                                        else if (!dataReader.IsDBNull(5))
+                                                        {
+                                                            lblStatus.Text = dataReader.GetString(5);
+                                                        }
+                                                        else
+                                                        {
+                                                            lblStatus.Text = "No Results";
+                                                        }
+                                                    }
+
+                                                    if (!dataReader.IsDBNull(4))
+                                                    {
+                                                        lblLastRun.Text = dataReader.GetDateTime(4).ToString();
+                                                    }
+                                                }
                                             }
                                         }
-
-                                        if (!dr.IsDBNull(4))
-                                            lblLastRun.Text = dr.GetDateTime(4).ToString();
                                     }
-
-                                    dr.Close();
-
-                                    cn.Close();
 
                                     if (currWeb.Properties.ContainsKey("EPMLiveNotificationNote"))
                                     {
@@ -298,27 +298,30 @@ namespace EPMLiveCore.Layouts.epmlive
 
                 SPSite site = SPContext.Current.Site;
                 {
-                    SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id));
-
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
                     {
-                        cn.Open();
-                    });
+                        SPSecurity.RunWithElevatedPrivileges(delegate { sqlConnection.Open(); });
 
-                    Guid jobguid = Guid.Empty;
+                        var jobGuid = Guid.Empty;
 
-                    SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=3", cn);
-                    cmd.Parameters.AddWithValue("@siteguid", site.ID.ToString());
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    if (dr.Read())
-                    {
-                        jobguid = dr.GetGuid(0);
-                    }
-                    dr.Close();
+                        using (var sqlCommand = new SqlCommand(
+                            "select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=3",
+                            sqlConnection))
+                        {
+                            sqlCommand.Parameters.AddWithValue("@siteguid", site.ID.ToString());
+                            using (var dataReader = sqlCommand.ExecuteReader())
+                            {
+                                if (dataReader.Read())
+                                {
+                                    jobGuid = dataReader.GetGuid(0);
+                                }
 
-                    if (jobguid != Guid.Empty)
-                    {
-                        CoreFunctions.enqueue(jobguid, 0);
+                                if (jobGuid != Guid.Empty)
+                                {
+                                    CoreFunctions.enqueue(jobGuid, 0);
+                                }
+                            }
+                        }
                     }
                 }
                 Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/notificationsadmin.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
@@ -712,45 +715,43 @@ namespace EPMLiveCore.Layouts.epmlive
 
                             string sTime = ddlRunTime.SelectedValue;
 
-                            SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(currWeb.Site.WebApplication.Id));
-
-                            SPSecurity.RunWithElevatedPrivileges(delegate()
+                            using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(currWeb.Site.WebApplication.Id)))
                             {
-                                cn.Open();
-                            });
+                                SPSecurity.RunWithElevatedPrivileges(delegate { sqlConnection.Open(); });
 
-                            SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=3", cn);
-                            cmd.Parameters.AddWithValue("@siteguid", currWeb.Site.ID.ToString());
-                            SqlDataReader dr = cmd.ExecuteReader();
-                            if(dr.Read())
-                            {
-                                dr.Close();
-                                cmd = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and jobtype=3", cn);
-                                cmd.Parameters.AddWithValue("@siteguid", currWeb.Site.ID.ToString());
-                                cmd.Parameters.AddWithValue("@runtime", ddlRunTime.SelectedValue);
-                                cmd.ExecuteNonQuery();
+                                using (var selectCommand = new SqlCommand(
+                                    "select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=3",
+                                    sqlConnection))
+                                {
+                                    selectCommand.Parameters.AddWithValue("@siteguid", currWeb.Site.ID.ToString());
+                                    using (var dataReader = selectCommand.ExecuteReader())
+                                    {
+                                        if (dataReader.Read())
+                                        {
+                                            using (var updateCommand = new SqlCommand(
+                                                "UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and jobtype=3",
+                                                sqlConnection))
+                                            {
+                                                updateCommand.Parameters.AddWithValue("@siteguid", currWeb.Site.ID.ToString());
+                                                updateCommand.Parameters.AddWithValue("@runtime", ddlRunTime.SelectedValue);
+                                                updateCommand.ExecuteNonQuery();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (var insertCommand = new SqlCommand(
+                                                "INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, runtime, scheduletype, webguid) VALUES (@siteguid, 3, 'Notifications', @runtime, 2, @webguid)",
+                                                sqlConnection))
+                                            {
+                                                insertCommand.Parameters.AddWithValue("@siteguid", currWeb.Site.ID.ToString());
+                                                insertCommand.Parameters.AddWithValue("@webguid", currWeb.ID.ToString());
+                                                insertCommand.Parameters.AddWithValue("@runtime", ddlRunTime.SelectedValue);
+                                                insertCommand.ExecuteNonQuery();
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                            else
-                            {
-                                dr.Close();
-                                cmd = new SqlCommand("INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, runtime, scheduletype, webguid) VALUES (@siteguid, 3, 'Notifications', @runtime, 2, @webguid)", cn);
-                                cmd.Parameters.AddWithValue("@siteguid", currWeb.Site.ID.ToString());
-                                cmd.Parameters.AddWithValue("@webguid", currWeb.ID.ToString());
-                                cmd.Parameters.AddWithValue("@runtime", ddlRunTime.SelectedValue);
-                                cmd.ExecuteNonQuery();
-                            }
-
-                            cn.Close();
-                            //if (currWeb.Properties.ContainsKey("EPMLiveNotificationTime"))
-                            //{
-                            //    // property exists already -> update it
-                            //    currWeb.Properties["EPMLiveNotificationTime"] = sTime;
-                            //}
-                            //else
-                            //{
-                            //    // property doesn't exist -> add it if there is value to set
-                            //    currWeb.Properties.Add("EPMLiveNotificationTime", sTime);
-                            //}
 
                             string sNotes = txtNotes.Text;
                             if(currWeb.Properties.ContainsKey("EPMLiveNotificationNote"))
