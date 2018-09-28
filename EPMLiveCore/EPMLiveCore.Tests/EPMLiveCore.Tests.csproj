@@ -154,6 +154,7 @@
     <Compile Include="API\CreateWorkspace\WorkspaceFactoryTests.cs" />
     <Compile Include="API\Integration\IntegrationAdminTests.cs" />
     <Compile Include="API\Integration\IntegrationCoreTest.cs" />
+    <Compile Include="API\Integration\SqlIntegrationTest.cs" />
     <Compile Include="API\MyWork\MyWorkTests.cs" />
     <Compile Include="API\MyWork\MyWorkTestsSplitOne.cs" />
     <Compile Include="API\MyWork\MyWorkTestsSplitThree.cs" />
@@ -190,6 +191,7 @@
     <Compile Include="Layouts\epmlive\GenericQueryControlTests.cs" />
     <Compile Include="Layouts\epmlive\GridGanttSettingsTest.cs" />
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
+    <Compile Include="Layouts\epmlive\SolutionStoreProxyTests.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.AddEntityPickersToLookups.cs" />
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.cs" />
