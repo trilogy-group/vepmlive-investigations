@@ -11,6 +11,7 @@ using System.Xml.Linq;
 using EPMLiveCore.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Navigation.Fakes;
@@ -74,7 +75,31 @@ namespace EPMLiveCore.Tests
             ShimSPProcessIdentity.AllInstances.UsernameGet = _ => Username;
             ShimSPContext.CurrentGet = () => new ShimSPContext()
             {
-                ListItemVersionGet = () => new ShimSPListItemVersion()
+                ListItemVersionGet = () => new ShimSPListItemVersion(),
+                WebGet = () => spWeb,
+                SiteGet = () => spSite
+            };
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
+            ShimSPWebService.ContentServiceGet = () => new ShimSPWebService()
+            {
+                WebApplicationsGet = () => new ShimSPWebApplicationCollection()
+            };
+            ShimSPPersistedObjectCollection<SPWebApplication>.AllInstances.ItemGetGuid = (_, _1) => new ShimSPWebApplication();
+            ShimSPRoleAssignment.ConstructorSPPrincipal = (_, __) => new ShimSPRoleAssignment();
+            ShimSPRoleAssignment.AllInstances.RoleDefinitionBindingsGet = _ => new ShimSPRoleDefinitionBindingCollection();
+            ShimUserManager.ConstructorStringSPPersistedObjectGuid = (_, _1, _2, _3) => new ShimUserManager();
+            ShimSPSite.ConstructorString = (_, __) => new ShimSPSite();
+            ShimSPSite.AllInstances.OpenWeb = _ => spWeb;
+            ShimSPSite.AllInstances.RootWebGet = _ => spWeb;
+            ShimSPSite.AllInstances.WebApplicationGet = _ => new ShimSPWebApplication();
+            ShimSPSite.AllInstances.AllowUnsafeUpdatesSetBoolean = (_, __) => { };
+            ShimSPWebApplication.AllInstances.JobDefinitionsGet = _ => new ShimSPJobDefinitionCollection();
+            ShimSPPersistedObject.AllInstances.FarmGet = _ => spFarm;
+            ShimSPQuery.Constructor = _ => new ShimSPQuery();
+            ShimSPFieldUserValue.ConstructorSPWebString = (_, _1, _2) => new ShimSPFieldUserValue()
+            {
+                UserGet = () => null,
+                LookupValueGet = () => DummyString
             };
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
         }
@@ -107,7 +132,9 @@ namespace EPMLiveCore.Tests
             };
             spUser = new ShimSPUser()
             {
-                LoginNameGet = () => DummyString
+                LoginNameGet = () => DummyString,
+                EmailGet = () => DummyString,
+                IDGet = () => 1
             };
             spWeb = new ShimSPWeb()
             {
@@ -139,7 +166,14 @@ namespace EPMLiveCore.Tests
                 },
                 UrlGet = () => DummyString,
                 ServerRelativeUrlGet = () => DummyString,
-                TitleGet = () => DummyString
+                TitleGet = () => DummyString,
+                AllowUnsafeUpdatesSetBoolean = _ => { },
+                SiteUserInfoListGet = () => spList,
+                SiteUsersGet = () => new ShimSPUserCollection()
+                {
+                    GetByIDInt32 = _ => spUser
+                },
+                EnsureUserString = _ => spUser
             };
         }
 
