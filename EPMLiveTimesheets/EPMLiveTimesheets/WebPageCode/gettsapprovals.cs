@@ -527,7 +527,8 @@ namespace TimeSheets
 
                     if (ndListId != null && ndItemId != null)
                     {
-                        AddCells(
+                    var sql = "select ts_item_uid,submitted,approval_status from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id";
+                    AddCells(
                             nd, 
                             site, 
                             ndListId, 
@@ -543,7 +544,8 @@ namespace TimeSheets
                             timeeditor,
                             strworktypes,
                             timenotes, 
-                            cn);
+                            cn,
+                            sql);
                     }
                     else
                     {

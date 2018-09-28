@@ -150,6 +150,7 @@
     <Compile Include="Testables\TestableCryptoTransform.cs" />
     <Compile Include="TestClassInitializer.cs" />
     <Compile Include="Utility\AdoShims.cs" />
+    <Compile Include="Utility\HtmlTextWriterShims.cs" />
     <Compile Include="Utility\DirectoryShims.cs" />
     <Compile Include="Utility\CryptographyShims.cs" />
     <Compile Include="Utility\IOShims.cs" />
@@ -215,8 +216,12 @@
   </ItemGroup>
   <ItemGroup>
     <Fakes Include="Fakes\System.Data.fakes" />
-    <Fakes Include="Fakes\Microsoft.SharePoint.fakes" />
-    <Fakes Include="Fakes\System.Web.fakes" />
+    <Fakes Include="Fakes\Microsoft.SharePoint.fakes">
+      <SubType>Designer</SubType>
+    </Fakes>
+    <Fakes Include="Fakes\System.Web.fakes">
+      <SubType>Designer</SubType>
+    </Fakes>
     <Fakes Include="Fakes\System.fakes" />
     <Fakes Include="Fakes\EPMLiveTimerService.fakes" />
     <Fakes Include="Fakes\PortfolioEngineCore.fakes" />
@@ -235,7 +240,9 @@
     <Fakes Include="Fakes\EPMLiveWorkPlanner.fakes" />
     <Fakes Include="Fakes\EPMLiveReportsAdmin.fakes" />
     <Fakes Include="Fakes\DocumentFormat.OpenXml.fakes" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

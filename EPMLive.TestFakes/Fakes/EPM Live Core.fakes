@@ -87,6 +87,16 @@
     <Add FullName="EPMLiveCore.DisabledItemEventScope!"/>
     <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.Step!"/>
     <Add FullName="EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps.UpdateResourcePool!"/>
+    <Add FullName="EPMLiveCore.ListDisplayUtils!"/>
+    <Add FullName="EPMLiveCore.ListDisplaySettingIterator!"/>
+    <Add FullName="EPMLiveCore.ListFieldIteratorExtensions!"/>
+    <Add FullName="EPMLiveCore.CascadingLookupRenderControl!"/>
+    <Add FullName="EPMLiveCore.CascadingMultiLookupRenderControl!"/>
+    <Add FullName="EPMLiveCore.GenericEntityEditor!"/>
+    <Add FullName="EPMLiveCore.Act!"/>
+    <Add FullName="EPMLiveCore.EditableFieldDisplay!"/>
+    <Add FullName="EPMLiveCore.ListDisplaySettingIteratorHelpers!"/>
+    <Add FullName="EPMLiveCore.ListDisplaySettingIteratorRenderHelpers!"/>
     <Add FullName="EPMLiveCore.ReportingData!"/>
   </ShimGeneration>
 </Fakes>
