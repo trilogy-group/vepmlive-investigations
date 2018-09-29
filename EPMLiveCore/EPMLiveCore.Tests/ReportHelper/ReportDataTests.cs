@@ -15,6 +15,7 @@ using System.Collections;
 using System.Data.Fakes;
 using Shouldly;
 using EPMLiveCore.Fakes;
+using WorkEnginePPM;
 
 namespace EPMLiveCore.ReportHelper.Tests
 {
@@ -199,6 +200,10 @@ namespace EPMLiveCore.ReportHelper.Tests
         public void MyWorkListItemsDataTable_Should_()
         {
             // Arrange
+            const string SharepointType = "SharepointType";
+            const string ColumnName = "ColumnName";
+            const string InternalName = "internalname";
+
             var web = new ShimSPWeb
             {
                 ListsGet = () => new ShimSPListCollection
@@ -215,7 +220,20 @@ namespace EPMLiveCore.ReportHelper.Tests
                 {
                     new ShimDataRow
                     {
-                        ItemGetString = name => SPFieldType.Lookup.ToString()
+                        ItemGetString = name =>
+                        {
+                            switch (name)
+                            {
+                                case ColumnName:
+                                    return "AssignedToText";
+                                case InternalName:
+                                    return SPFieldType.Lookup.ToString();
+                                case SharepointType:
+                                    return SPFieldType.Lookup.ToString();
+                                default:
+                                    return string.Empty;
+                            }
+                        }
                     }
                     //new ShimDataRow
                     //{
@@ -240,10 +258,27 @@ namespace EPMLiveCore.ReportHelper.Tests
                 }.GetEnumerator()
             };
             ShimSPList.AllInstances.FieldsGet = _ => new ShimSPFieldCollection();
-            ShimSPFieldCollection.AllInstances.ContainsFieldString = (_, name) => true;
-            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, name) => new ShimSPField
+            ShimSPFieldCollection.AllInstances.ContainsFieldString = (_, name) =>
             {
-                TypeGet = () => SPFieldType.AllDayEvent
+                return true;
+            };
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, name) =>
+            {
+                return new ShimSPField
+                {
+                    TypeGet = () =>
+                    {
+                        SPFieldType type;
+                        if (Enum.TryParse<SPFieldType>(name, out type))
+                        {
+                            return type;
+                        }
+                        else
+                        {
+                            return SPFieldType.AllDayEvent;
+                        }
+                    }
+                };
             };
 
 
