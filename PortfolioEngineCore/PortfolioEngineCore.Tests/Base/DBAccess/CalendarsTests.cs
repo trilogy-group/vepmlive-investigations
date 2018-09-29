@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Data;
+using System.Data.Fakes;
+using System.Data.SqlClient.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Shouldly;
 
 namespace PortfolioEngineCore.Tests.Base
 {
-    using System.Data;
-    using System.Data.Fakes;
-    using System.Data.SqlClient.Fakes;
     using Fakes;
     using PortfolioEngineCore;
-    using Shouldly;
 
     [TestClass]
     public class CalendarsTests
@@ -22,6 +19,9 @@ namespace PortfolioEngineCore.Tests.Base
         private DBAccess dbAccess;
         private static string CommandText = string.Empty;
         private const string DummyString = "DummyString";
+        private const string PeriodName = "PRD_NAME";
+        private const string PeriodStartDate = "PRD_START_DATE";
+        private const string PeriodFinishDate = "PRD_FINISH_DATE";
         private const int DummyInt = 1;
 
         [TestInitialize]
@@ -48,8 +48,6 @@ namespace PortfolioEngineCore.Tests.Base
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => DummyInt;
             ShimSqlDb.AllInstances.HandleStatusErrorSeverityEnumStringStatusEnumStringBoolean = 
                 (_, severity, function, code, exceptionMessage, skipLog) => StatusEnum.rsServerError;
-
-
         }
 
         [TestMethod]
@@ -497,6 +495,221 @@ namespace PortfolioEngineCore.Tests.Base
                () => result.ShouldBe(StatusEnum.rsSuccess),
                () => reply.ShouldNotBeNullOrEmpty(),
                () => reply.ShouldContainWithoutWhitespace(ExpectedErrorMessage));
+        }
+
+        [TestMethod]
+        public void CheckPeriods_PeriodNameEmpty_ReturnStatusRequestCannotBeCompleted()
+        {
+            // Arrange
+            const string ExpectedErrorMessage = "All Periods must have a name";
+            var reply = string.Empty;
+            var dataTable = new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    CountGet = () => 1,
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name =>
+                            {
+                                switch (name)
+                                {
+                                    case PeriodName:
+                                        return string.Empty;
+                                    default:
+                                        return DateTime.Now;
+                                }
+                            }
+                        }
+                    }.GetEnumerator()
+                }
+            };
+
+            // Act
+            var result = dbaCalendars.CheckPeriods(dataTable, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsRequestCannotBeCompleted),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContainWithoutWhitespace(ExpectedErrorMessage));
+        }
+
+        [TestMethod]
+        public void CheckPeriods_StartDateGreaterThanFinishDate_ReturnStatusRequestCannotBeCompleted()
+        {
+            // Arrange
+            const string ExpectedErrorMessage = "Period finish must be later than period start";
+            var reply = string.Empty;
+            var dataTable = new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    CountGet = () => 1,
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name =>
+                            {
+                                switch (name)
+                                {
+                                    case PeriodName:
+                                        return DummyString;
+                                    case PeriodStartDate:
+                                        return DateTime.Now.AddDays(1);
+                                    case PeriodFinishDate:
+                                        return DateTime.Now.AddDays(-1);
+                                    default:
+                                        return string.Empty;
+                                }
+                            }
+                        }
+                    }.GetEnumerator()
+                }
+            };
+
+            // Act
+            var result = dbaCalendars.CheckPeriods(dataTable, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsRequestCannotBeCompleted),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContainWithoutWhitespace(ExpectedErrorMessage));
+        }
+
+        [TestMethod]
+        public void CheckPeriods_StartDateNotContigousWithPreviousFinishDate_ReturnStatusRequestCannotBeCompleted()
+        {
+            // Arrange
+            const string ExpectedErrorMessage = "Period start date must be contiguous with previous period finish date";
+            var reply = string.Empty;
+            var dataTable = new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    CountGet = () => 1,
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name =>
+                            {
+                                switch (name)
+                                {
+                                    case PeriodName:
+                                        return DummyString;
+                                    case PeriodStartDate:
+                                        return DateTime.Now.AddDays(-1);
+                                    case PeriodFinishDate:
+                                        return DateTime.Now.AddDays(1);
+                                    default:
+                                        return string.Empty;
+                                }
+                            }
+                        },
+                        new ShimDataRow
+                        {
+                            ItemGetString = name =>
+                            {
+                                switch (name)
+                                {
+                                    case PeriodName:
+                                        return DummyString;
+                                    case PeriodStartDate:
+                                        return DateTime.Now.AddDays(-1);
+                                    case PeriodFinishDate:
+                                        return DateTime.Now.AddDays(1);
+                                    default:
+                                        return string.Empty;
+                                }
+                            }
+                        }
+                    }.GetEnumerator()
+                }
+            };
+
+            // Act
+            var result = dbaCalendars.CheckPeriods(dataTable, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsRequestCannotBeCompleted),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContainWithoutWhitespace(ExpectedErrorMessage));
+        }
+
+        [TestMethod]
+        public void CheckPeriods_OnSuccess_ReturnsStatusSuccess()
+        {
+            // Arrange
+            var reply = string.Empty;
+            var dataTable = new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    CountGet = () => 1,
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name =>
+                            {
+                                switch (name)
+                                {
+                                    case PeriodName:
+                                        return DummyString;
+                                    case PeriodStartDate:
+                                        return DateTime.Now.AddDays(-1);
+                                    case PeriodFinishDate:
+                                        return DateTime.Now.AddDays(1);
+                                    default:
+                                        return string.Empty;
+                                }
+                            }
+                        }
+                    }.GetEnumerator()
+                }
+            };
+
+            // Act
+            var result = dbaCalendars.CheckPeriods(dataTable, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsSuccess),
+                () => reply.ShouldBeEmpty());
+        }
+
+        [TestMethod]
+        public void CheckPeriods_OnException_ReturnsStatusRequestCannotBeCompleted()
+        {
+            // Arrange
+            const string ExpectedErrorMessage = "Dummy Message";
+            var reply = string.Empty;
+            var dataTable = new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    CountGet = () => 1,
+                    GetEnumerator = () =>
+                    {
+                        throw new Exception(ExpectedErrorMessage);
+                    }
+                }
+            };
+
+            // Act
+            var result = dbaCalendars.CheckPeriods(dataTable, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsRequestCannotBeCompleted),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContain(ExpectedErrorMessage));
         }
 
         /// <summary>
