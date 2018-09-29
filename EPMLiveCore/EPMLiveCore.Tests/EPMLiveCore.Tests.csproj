@@ -152,6 +152,7 @@
     <Compile Include="API\Comments\CommentManagerTests.cs" />
     <Compile Include="API\CreateWorkspace\DALTests.cs" />
     <Compile Include="API\CreateWorkspace\WorkspaceFactoryTests.cs" />
+    <Compile Include="API\CreateWorkspace\WorkspaceTimerJobAgentTest.cs" />
     <Compile Include="API\Integration\IntegrationAdminTests.cs" />
     <Compile Include="API\Integration\IntegrationCoreTest.cs" />
     <Compile Include="API\Integration\SqlIntegrationTest.cs" />
