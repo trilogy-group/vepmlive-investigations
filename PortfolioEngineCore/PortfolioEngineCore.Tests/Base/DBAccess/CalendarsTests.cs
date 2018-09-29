@@ -303,7 +303,6 @@ namespace PortfolioEngineCore.Tests.Base
                 () => reply.ShouldContainWithoutWhitespace(ExpectedErrorMessage));
         }
 
-
         [TestMethod]
         public void DeleteCalendar_MessageNotEmpty_ReturnsRequestCannotBeCompleted()
         {
@@ -390,6 +389,119 @@ namespace PortfolioEngineCore.Tests.Base
                 () => reply.ShouldBeEmpty());
         }
 
+        [TestMethod]
+        public void UpdateCalendar_CalendarNameEmpty_ReturnsStautsRequestCannotBeCompleted()
+        {
+            // Arrange
+            const string ExpectedErrorMessage = "Please enter a Calendar Name";
+            var reply = string.Empty;
+            var calendarId = 0;
+
+            // Act
+            var result = dbaCalendars.UpdateCalendar(dbAccess, ref calendarId, string.Empty, DummyString, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+               () => result.ShouldBe(StatusEnum.rsRequestCannotBeCompleted),
+               () => reply.ShouldNotBeNullOrEmpty(),
+               () => reply.ShouldContainWithoutWhitespace(ExpectedErrorMessage));
+        }
+
+        [TestMethod]
+        public void UpdateCalendar_CalendarNameAlreadyExists_ReturnsStautsRequestCannotBeCompleted()
+        {
+            // Arrange
+            var ExpectedErrorMessage = $"Can't save Calendar.\nA field with name '{DummyString}' already exists";
+            var reply = string.Empty;
+            var calendarId = 3;
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                CountGet = () => 1,
+                ItemGetInt32 = i => new ShimDataRow
+                {
+                    ItemGetString = name => 1
+                }
+            };
+
+            // Act
+            var result = dbaCalendars.UpdateCalendar(dbAccess, ref calendarId, DummyString, DummyString, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+               () => result.ShouldBe(StatusEnum.rsRequestCannotBeCompleted),
+               () => reply.ShouldNotBeNullOrEmpty(),
+               () => reply.ShouldContainWithoutWhitespace(ExpectedErrorMessage));
+        }
+
+        [TestMethod]
+        public void UpdateCalendar_CalendarIDGreaterThan0_ReturnsStatusSuccess()
+        {
+            // Arrange
+            var reply = string.Empty;
+            var calendarId = 1;
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                CountGet = () => 0,
+            };
+
+            // Act
+            var result = dbaCalendars.UpdateCalendar(dbAccess, ref calendarId, DummyString, DummyString, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+               () => result.ShouldBe(StatusEnum.rsSuccess),
+               () => reply.ShouldBeEmpty());
+        }
+
+        [TestMethod]
+        public void UpdateCalendar_CalendarIDLessThan0_ReturnsStatusSuccess()
+        {
+            // Arrange
+            var reply = string.Empty;
+            var calendarId = -1;
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                CountGet = () => 0,
+            };
+
+            // Act
+            var result = dbaCalendars.UpdateCalendar(dbAccess, ref calendarId, DummyString, DummyString, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+               () => result.ShouldBe(StatusEnum.rsSuccess),
+               () => reply.ShouldBeEmpty());
+        }
+
+        [TestMethod]
+        public void UpdateCalendar_OnException_ReturnsStatusServerError()
+        {
+            // Arrange
+            const string ExpectedErrorMessage = "Dummy MEssage";
+            var reply = string.Empty;
+            var calendarId = -1;
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                CountGet = () => 0,
+            };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            {
+                throw new Exception(ExpectedErrorMessage);
+            };
+
+            // Act
+            var result = dbaCalendars.UpdateCalendar(dbAccess, ref calendarId, DummyString, DummyString, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+               () => result.ShouldBe(StatusEnum.rsSuccess),
+               () => reply.ShouldNotBeNullOrEmpty(),
+               () => reply.ShouldContainWithoutWhitespace(ExpectedErrorMessage));
+        }
+
+        /// <summary>
+        /// This method is fake. All the parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum DeleteDataByIdSuccess(SqlDb db, string commandText, int id, StatusEnum statusEnumError, out int rowsAffected)
         {
             CommandText = commandText;
@@ -397,6 +509,9 @@ namespace PortfolioEngineCore.Tests.Base
             return StatusEnum.rsSuccess;
         }
 
+        /// <summary>
+        /// This method is fake. All the parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum SelectDataByNameSuccess(SqlDb db, string commandText, string name, StatusEnum statusEnumError, out DataTable dataTable)
         {
             CommandText = commandText;
@@ -404,6 +519,9 @@ namespace PortfolioEngineCore.Tests.Base
             return StatusEnum.rsSuccess;
         }
 
+        /// <summary>
+        /// This method is fake. All the parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum SelectDataByIdSuccess(SqlDb db, string commandText, int id, StatusEnum statusEnumError, out DataTable dataTable)
         {
             CommandText = commandText;
@@ -411,6 +529,9 @@ namespace PortfolioEngineCore.Tests.Base
             return StatusEnum.rsSuccess;
         }
 
+        /// <summary>
+        /// This method is fake. All the parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum SelectDataSuccess(SqlDb db, string commandText, StatusEnum statusEnumError, out DataTable dataTable)
         {
             CommandText = commandText;
