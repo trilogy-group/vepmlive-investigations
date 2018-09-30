@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using System.Data.SqlClient;
+using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using SystemTrace = System.Diagnostics.Trace;
 
 namespace EPMLiveEnterprise.Layouts.epmlive
 {
@@ -64,57 +58,62 @@ namespace EPMLiveEnterprise.Layouts.epmlive
             Guid siteGuid = SPContext.Current.Site.ID;
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
-                cn.Open();
-
-                using (var command = new SqlCommand("select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=9", cn))
+                using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
                 {
-                    command.Parameters.AddWithValue("@siteguid", siteGuid);
+                    connection.Open();
 
-                    using (var dataReader = command.ExecuteReader())
+                    using (var command = new SqlCommand("select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=9", connection))
                     {
-                        if (dataReader.Read())
+                        command.Parameters.AddWithValue("@siteguid", siteGuid);
+
+                        using (var dataReader = command.ExecuteReader())
                         {
-                            if (!dataReader.IsDBNull(3))
+                            if (dataReader.Read())
                             {
-                                if (dataReader.GetInt32(3) == 0)
+                                if (!dataReader.IsDBNull(3))
                                 {
-                                    lblLastSyncResults.Text = "Queued";
-                                    inpSynch.Visible = false;
+                                    if (dataReader.GetInt32(3) == 0)
+                                    {
+                                        lblLastSyncResults.Text = "Queued";
+                                        inpSynch.Visible = false;
+                                    }
+                                    else if (dataReader.GetInt32(3) == 1)
+                                    {
+                                        lblLastSyncResults.Text = "Processing (" + dataReader.GetInt32(2).ToString("##0") + "%)";
+                                        inpSynch.Visible = false;
+                                    }
+                                    else if (!dataReader.IsDBNull(5))
+                                    {
+                                        lblLastSyncResults.Text = dataReader.GetString(5);
+                                    }
+                                    else
+                                    {
+                                        lblLastSyncResults.Text = "No Results";
+                                    }
                                 }
-                                else if (dataReader.GetInt32(3) == 1)
+
+                                if (!dataReader.IsDBNull(4))
                                 {
-                                    lblLastSyncResults.Text = "Processing (" + dataReader.GetInt32(2).ToString("##0") + "%)";
-                                    inpSynch.Visible = false;
-                                }
-                                else if (!dataReader.IsDBNull(5))
-                                {
-                                    lblLastSyncResults.Text = dataReader.GetString(5);
-                                }
-                                else
-                                {
-                                    lblLastSyncResults.Text = "No Results";
+                                    lblLastSyncTime.Text = dataReader.GetDateTime(4).ToString();
                                 }
                             }
-
-                            if (!dataReader.IsDBNull(4))
-                                lblLastSyncTime.Text = dataReader.GetDateTime(4).ToString();
                         }
                     }
-                }
 
 
-                if (Request["d"] != null)
-                {
-                    string isPj = "0";
-                    try
+                    if (Request["d"] != null)
                     {
-                        isPj = Request["pj"].ToString();
-                    }
-                    catch { }
+                        string isPj = "0";
+                        try
+                        {
+                            isPj = Request["pj"].ToString();
+                        }
+                        catch (Exception ex)
+                        {
+                            SystemTrace.WriteLine(ex.ToString());
+                        }
 
-                    {
-                        using (var command = new SqlCommand("spHideField", cn))
+                        using (var command = new SqlCommand("spHideField", connection))
                         {
                             command.CommandType = CommandType.StoredProcedure;
                             command.Parameters.AddWithValue("@fieldname", Request["d"]);
@@ -122,135 +121,69 @@ namespace EPMLiveEnterprise.Layouts.epmlive
                             command.Parameters.AddWithValue("@type", Request["type"]);
                             command.ExecuteNonQuery();
                         }
+
+                        Response.Redirect(serverUrl + "/_layouts/epmlive/enterprisefields.aspx?" + Guid.NewGuid());
                     }
 
-                    Response.Redirect(serverUrl + "/_layouts/epmlive/enterprisefields.aspx?" + Guid.NewGuid());
-                }
-
-                //cmd = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=1 and visible=1 order by displayname", cn);
-                //SqlDataReader dr = cmd.ExecuteReader();
-
-                //while (dr.Read())
-                //{
-                //    standardFields = standardFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
-                //    standardFields = standardFields + dr.GetString(2);
-                //    standardFields = standardFields + "</td><td align=\"center\" class=\"cell\">";
-                //    standardFields = standardFields + "<input type=\"hidden\" name=\"fields\" value=\"" + dr.GetString(0) + "\">";
-
-                //    standardFields = standardFields + "<input class=\"checkbox\" type=\"checkbox\" name=\"" + dr.GetString(0) + "\" ";
-
-                //    if (!dr.IsDBNull(10))
-                //    {
-                //        if (dr.GetBoolean(1))
-                //            standardFields = standardFields + "checked";
-                //        standardFields = standardFields + ">";
-                //    }
-                //    else
-                //    {
-                //        if (dr.GetBoolean(1))
-                //            standardFields = standardFields + "checked";
-                //        standardFields = standardFields + " disabled>";
-                //    }
-                //    standardFields = standardFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
-
-                //    if (!dr.GetBoolean(6))
-                //        standardFields = standardFields + "<a href=enterprisefields.aspx?d=" + dr.GetString(0) + "&type=1>delete</a>";
-                //    else
-                //        standardFields = standardFields + "&nbsp;";
-
-                //    standardFields = standardFields + "</font></td></tr>";
-                //}
-
-                //dr.Close();
-                //====================Custom Fields================
-                using (var command = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=2 and visible=1 order by displayname", cn))
-                {
-                    using (var dataReader = command.ExecuteReader())
+                    //====================Custom Fields================
+                    using (var command = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=2 and visible=1 order by displayname", connection))
                     {
-                        while (dataReader.Read())
+                        using (var dataReader = command.ExecuteReader())
                         {
-                            customFields = customFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
-                            customFields = customFields + dataReader.GetString(2);
-                            //customFields = customFields + "</td><td align=\"center\" class=\"cell\">";
-                            //customFields = customFields + "<input type=\"hidden\" name=\"fields\" value=\"" + dr.GetString(0) + "\">";
-                            //customFields = customFields + "<input class=\"checkbox\" type=\"checkbox\" name=\"" + dr.GetString(0) + "\" ";
-                            //if (dr.GetBoolean(1))
-                            //    customFields = customFields + "checked";
+                            while (dataReader.Read())
+                            {
+                                customFields = customFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
+                                customFields = customFields + dataReader.GetString(2);
+                                customFields = customFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
 
-                            //customFields = customFields + ">";
-                            customFields = customFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
+                                if (!dataReader.GetBoolean(6))
+                                {
+                                    customFields = customFields + "<a href=enterprisefields.aspx?d=" + dataReader.GetString(0) + "&type=2>delete</a>";
+                                }
+                                else
+                                {
+                                    customFields = customFields + "&nbsp;";
+                                }
 
-                            if (!dataReader.GetBoolean(6))
-                                customFields = customFields + "<a href=enterprisefields.aspx?d=" + dataReader.GetString(0) + "&type=2>delete</a>";
-                            else
-                                customFields = customFields + "&nbsp;";
-
-                            customFields = customFields + "</font></td></tr>";
+                                customFields = customFields + "</font></td></tr>";
+                            }
                         }
                     }
-                }
-                //====================Enterprise===================
+                    //====================Enterprise===================
 
-                using (var command = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=3 and visible=1 order by displayname", cn))
-                {
-                    using (var dataReader = command.ExecuteReader())
+                    using (var command = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=3 and visible=1 order by displayname", connection))
                     {
-                        while (dataReader.Read())
+                        using (var dataReader = command.ExecuteReader())
                         {
-                            enterpriseFields = enterpriseFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
-                            enterpriseFields = enterpriseFields + dataReader.GetString(2);
-                            //enterpriseFields = enterpriseFields + "</td><td align=\"center\" class=\"cell\">";
-                            //enterpriseFields = enterpriseFields + "<input type=\"hidden\" name=\"fields\" value=\"" + dr.GetString(0) + "\">";
-                            //enterpriseFields = enterpriseFields + "<input class=\"checkbox\" type=\"checkbox\" name=\"" + dr.GetString(0) + "\" ";
-                            //if (dr.GetBoolean(1))
-                            //    enterpriseFields = enterpriseFields + "checked";
+                            while (dataReader.Read())
+                            {
+                                enterpriseFields = enterpriseFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
+                                enterpriseFields = enterpriseFields + dataReader.GetString(2);
+                                enterpriseFields = enterpriseFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
 
-                            //if (dr.IsDBNull(10))
-                            //    enterpriseFields = enterpriseFields + " disabled=\"disabled\"";
+                                if (!dataReader.GetBoolean(6))
+                                {
+                                    enterpriseFields = enterpriseFields + "<a href=enterprisefields.aspx?d=" + dataReader.GetString(0) + "&type=3>delete</a>";
+                                }
+                                else
+                                {
+                                    enterpriseFields = enterpriseFields + "&nbsp;";
+                                }
 
-                            //enterpriseFields = enterpriseFields + "/>";
-                            enterpriseFields = enterpriseFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
-
-                            if (!dataReader.GetBoolean(6))
-                                enterpriseFields = enterpriseFields + "<a href=enterprisefields.aspx?d=" + dataReader.GetString(0) + "&type=3>delete</a>";
-                            else
-                                enterpriseFields = enterpriseFields + "&nbsp;";
-
-                            enterpriseFields = enterpriseFields + "</font></td></tr>";
+                                enterpriseFields = enterpriseFields + "</font></td></tr>";
+                            }
                         }
                     }
+
+                    loadPjFields(connection);
                 }
-
-                loadPjFields(cn);
-
-                cn.Close();
             });
         }
 
-
-
-        private void loadPjFields(SqlConnection cn)
+        private void loadPjFields(SqlConnection connection)
         {
-            //SqlCommand cmd = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=1 and pjvisible=1 order by displayname", cn);
-            //SqlDataReader dr = cmd.ExecuteReader();
-
-            //while (dr.Read())
-            //{
-            //    pjstandardFields = pjstandardFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
-            //    pjstandardFields = pjstandardFields + dr.GetString(2);
-            //    pjstandardFields = pjstandardFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
-
-            //    if (!dr.GetBoolean(6))
-            //        pjstandardFields = pjstandardFields + "<a href=enterprisefields.aspx?d=" + dr.GetString(0) + "&type=1&pj=1>delete</a>";
-            //    else
-            //        pjstandardFields = pjstandardFields + "&nbsp;";
-
-            //    pjstandardFields = pjstandardFields + "</font></td></tr>";
-            //}
-
-            //dr.Close();
             //====================Custom Fields================
-            using (var command = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=2 and pjvisible=1 order by displayname", cn))
+            using (var command = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=2 and pjvisible=1 order by displayname", connection))
             {
                 using (var dataReader = command.ExecuteReader())
                 {
@@ -266,7 +199,7 @@ namespace EPMLiveEnterprise.Layouts.epmlive
             }
             ////====================Enterprise===================
 
-            using (var command = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=3 and pjvisible=1", cn))
+            using (var command = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=3 and pjvisible=1", connection))
             {
                 using (var dataReader = command.ExecuteReader())
                 {
@@ -282,7 +215,7 @@ namespace EPMLiveEnterprise.Layouts.epmlive
             }
             ////====================pjEnterprise===================
 
-            using (var command = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=4 and pjvisible=1", cn))
+            using (var command = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=4 and pjvisible=1", connection))
             {
                 using (var dataReader = command.ExecuteReader())
                 {
