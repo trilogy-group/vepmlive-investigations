@@ -32,24 +32,12 @@ export class ResourcesPage extends BasePage {
         };
     }
 
-    static selectDropdownOption(option: string) {
-        return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(option)}]`));
-    }
-
-    static getDropdownValue(id: string) {
-        return element(By.id(`${id}`));
-    }
-
     static get searchIcon() {
         return element(By.id('toolbar-search-icon'));
     }
 
     static get searchTextbox() {
         return element(By.id('toolBarResGridSelector'));
-    }
-
-    static getUserByDisplayName(displayName: string) {
-        return AnchorHelper.getElementByTextInsideGrid(displayName);
     }
 
     static get gridDetails() {
@@ -65,5 +53,17 @@ export class ResourcesPage extends BasePage {
             deleteItem: CommonPageHelper.getContextMenuItemByText(ellipsesDropdownForItemLabels.deleteItem),
             editItem: CommonPageHelper.getContextMenuItemByText(ellipsesDropdownForItemLabels.editItem),
         };
+    }
+
+    static selectDropdownOption(option: string) {
+        return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(option)}]`));
+    }
+
+    static getDropdownValue(id: string) {
+        return element(By.id(`${id}`));
+    }
+
+    static getUserByDisplayName(displayName: string) {
+        return AnchorHelper.getElementByTextInsideGrid(displayName);
     }
 }

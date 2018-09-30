@@ -13,18 +13,18 @@ import {ProjectItemPageConstants} from '../../items-page/project-item/project-it
 
 export class TaskPageHelper {
 
-    static async increaseAndDecreaseTaskDuration(stepLogger: StepLogger, uniqueId: string, updatedHours: string, operation: string) {
+    static async increaseAndDecreaseTaskDuration(uniqueId: string, updatedHours: string, operation: string) {
 
-        stepLogger.stepId(1);
-        stepLogger.step('Click on "Task" button');
-        stepLogger.step('Enter details for Task (Name, Hours)');
+        StepLogger.stepId(1);
+        StepLogger.step('Click on "Task" button');
+        StepLogger.step('Enter details for Task (Name, Hours)');
         await CommonPageHelper.enterTaskNameAndData(CommonPageConstants.hours.durationHours1, uniqueId);
         await CommonPageHelper.enterTaskNameAndData(CommonPageConstants.hours.durationHours2, uniqueId);
         await CommonPageHelper.enterTaskNameAndData(CommonPageConstants.hours.durationHours3, uniqueId);
         await ElementHelper.clickUsingJs(ProjectItemPage.save);
 
-        stepLogger.verification('Third Task is created and required details entered [Ex: New Task 3]');
-        stepLogger.verification('Changes done in "Project Planner" page are saved');
+        StepLogger.verification('Third Task is created and required details entered [Ex: New Task 3]');
+        StepLogger.verification('Changes done in "Project Planner" page are saved');
         // After save It need static wait(5 sec) and no element found which get change after save.
         await browser.sleep(PageHelper.timeout.s);
         await WaitHelper.waitForElementToBeDisplayed(ProjectItemPageHelper.newTasksFields.title);
@@ -35,26 +35,26 @@ export class TaskPageHelper {
         await ProjectItemPageHelper.getselectTask(3, ProjectItemPageConstants.newTaskFields.start).click();
         await ProjectItemPageHelper.verifyTitleAndDuration(uniqueId, CommonPageConstants.hours.durationHours3);
 
-        stepLogger.stepId(2);
-        stepLogger.step('Select All three tasks using Shift or Ctrl buttons');
+        StepLogger.stepId(2);
+        StepLogger.step('Select All three tasks using Shift or Ctrl buttons');
         await ProjectItemPageHelper.selectCreatedTask();
         await PageHelper.click(CommonPage.linkDownbutton);
 
-        stepLogger.verification('Add Link pop up is displayed');
+        StepLogger.verification('Add Link pop up is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.addButton)).toBe(true,
             ValidationsHelper.getButtonDisplayedValidation(CommonPageConstants.buttonName.addButton));
 
-        stepLogger.stepId(3);
-        stepLogger.step('Leave the default value "0" in "Lag Time (Days)" text box\n' +
+        StepLogger.stepId(3);
+        StepLogger.step('Leave the default value "0" in "Lag Time (Days)" text box\n' +
             'Click on "Add Link" button');
         await PageHelper.click(CommonPage.addButton);
 
-        stepLogger.verification('Add Link pop up is closed');
+        StepLogger.verification('Add Link pop up is closed');
         await WaitHelper.waitForElementToBeHidden(CommonPage.addButton);
         await expect(await CommonPage.addButton.isPresent()).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.buttonName.addButton));
 
-        stepLogger.verification('Selected tasks are linked');
+        StepLogger.verification('Selected tasks are linked');
         await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.two, ProjectItemPageConstants.newTaskFields.start).click();
         await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText())
             .toBe(CommonPageConstants.predecessorsData.predecessors1,
@@ -67,9 +67,9 @@ export class TaskPageHelper {
                 ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
                     CommonPageConstants.predecessorsData.predecessors2));
 
-        stepLogger.stepId(4);
-        stepLogger.step('Click on Project tab');
-        stepLogger.step('Ensure Respect Links option is enabled (If NOT enable click on it to Enable)');
+        StepLogger.stepId(4);
+        StepLogger.step('Click on Project tab');
+        StepLogger.step('Ensure Respect Links option is enabled (If NOT enable click on it to Enable)');
         await PageHelper.click(CommonPage.projectTab);
         // Ensure Respect Links option is enabled (If NOT enable click on it to Enable and Respect Links' option is enabled
         // is not possible by automation.
@@ -85,12 +85,12 @@ export class TaskPageHelper {
         const startDate2 = await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.three,
             ProjectItemPageConstants.newTaskFields.start).getText();
 
-        stepLogger.stepId(5);
-        stepLogger.step(`${operation} the Duration for task1 from, say, 5 to 3 days`);
+        StepLogger.stepId(5);
+        StepLogger.step(`${operation} the Duration for task1 from, say, 5 to 3 days`);
         await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.one, ProjectItemPageConstants.newTaskFields.start).click();
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
         await PageHelper.actionSendKeys(updatedHours);
-        stepLogger.step('Click anywhere in the page/tab out of the Duration column');
+        StepLogger.step('Click anywhere in the page/tab out of the Duration column');
         await PageHelper.click(ProjectItemPage.selectTaskName);
 
         await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.one, ProjectItemPageConstants.newTaskFields.start).click();
@@ -105,8 +105,8 @@ export class TaskPageHelper {
         const updatedStartDate2 = ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.three,
             ProjectItemPageConstants.newTaskFields.start).getText();
 
-        stepLogger.verification('Task1\'s Finish Date gets shifted forward');
-        stepLogger.verification('Start and Finish dates for Task 2 and Task 3 get shifted forward');
+        StepLogger.verification('Task1\'s Finish Date gets shifted forward');
+        StepLogger.verification('Start and Finish dates for Task 2 and Task 3 get shifted forward');
         await expect(updatedFinishDate).not.toBe(finishDate, ValidationsHelper.getNotDisplayedValidation(finishDate));
         await expect(updatedStartDate1).not.toBe(startDate1, ValidationsHelper.getNotDisplayedValidation(startDate1));
         await expect(updatedStartDate2).not.toBe(startDate2, ValidationsHelper.getNotDisplayedValidation(startDate2));

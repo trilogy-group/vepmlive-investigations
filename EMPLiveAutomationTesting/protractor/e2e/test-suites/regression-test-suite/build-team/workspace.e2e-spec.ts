@@ -9,28 +9,28 @@ import {WorkspacePageHelper} from '../../../page-objects/pages/workspaces/worksp
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Hide the panel via "Hide" button. - [743197]', async () => {
-        stepLogger.caseId = 743197;
-        stepLogger.stepId(1);
-        await CommonPageHelper.clickLhsSideBarMenuIcon(CommonPage.sidebarMenus.workspaces, stepLogger);
+        StepLogger.caseId = 743197;
+        StepLogger.stepId(1);
+        await CommonPageHelper.clickLhsSideBarMenuIcon(CommonPage.sidebarMenus.workspaces);
         await CommonPageHelper.verifyPanelHeaderDisplayed(CommonPage.sidebarMenuPanelHeader.workspaces,
-            CommonPageConstants.sidebarMenuPanelHeader.workspaces, stepLogger);
-        await WorkspacePageHelper.verifyWorkpaceListingInMenuPanel(stepLogger);
+            CommonPageConstants.sidebarMenuPanelHeader.workspaces);
+        await WorkspacePageHelper.verifyWorkpaceListingInMenuPanel();
 
-        stepLogger.stepId(2);
-        await WorkspacePageHelper.expandEllipsisAndSelectEditTeamOption(stepLogger);
-        await WorkspacePageHelper.verifyEditTeamWindowOpened(stepLogger);
+        StepLogger.stepId(2);
+        await WorkspacePageHelper.expandEllipsisAndSelectEditTeamOption();
+        await WorkspacePageHelper.verifyEditTeamWindowOpened();
 
-        stepLogger.stepId(3);
-        await WorkspacePageHelper.clickOnCloseButton(stepLogger);
-        await WorkspacePageHelper.verifyEditTeamWindowClosed(stepLogger);
+        StepLogger.stepId(3);
+        await WorkspacePageHelper.clickOnCloseButton();
+        await WorkspacePageHelper.verifyEditTeamWindowClosed();
     });
 });

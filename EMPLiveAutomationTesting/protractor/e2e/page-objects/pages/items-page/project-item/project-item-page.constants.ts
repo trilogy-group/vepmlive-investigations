@@ -12,17 +12,18 @@ export class ProjectItemPageConstants {
     static readonly changeWindow = 'Changes - All Changes';
     static readonly issueWindow = 'Issues - All Issues by Status';
     static readonly nonAdminUser = 'Non Admin User';
-    static readonly region  = 'Region';
-    static readonly ganttChart  = 'Gantt Chart';
-    static readonly views  = 'Views';
-    static readonly actualCost  = 'Actual Cost';
-    static readonly saveView  = 'Save View';
-    static readonly createColumn  = 'Create Column';
+    static readonly region = 'Region';
+    static readonly ganttChart = 'Gantt Chart';
+    static readonly views = 'Views';
+    static readonly actualCost = 'Actual Cost';
+    static readonly saveView = 'Save View';
+    static readonly createColumn = 'Create Column';
     static readonly actionsDropdown = 'Actions Dropdown';
     static readonly applyButton = 'Apply Button';
     static readonly resourcePlanner = 'Resource Planner - Project Mode';
     static readonly resourceAnalyzer = 'Resource Analyzer';
-    static  readonly noDataFound = 'No data found';
+    static readonly noDataFound = 'No data found';
+
     static get inputLabels() {
         return {
             projectName: 'Project Name *',
@@ -237,6 +238,7 @@ export class ProjectItemPageConstants {
             manage: 'Manage Fragments',
         };
     }
+
     static get itemOptions() {
         return {
             resourceAnalyzer: 'Resource Analyzer',
@@ -309,6 +311,7 @@ export class ProjectItemPageConstants {
             projectPlanner: 'Project Planner'
         };
     }
+
     static get users() {
         return {
             adminUser: 'Admin User'

@@ -12,77 +12,81 @@ import {HomePage} from '../../../page-objects/pages/homepage/home.po';
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Add, Edit and Delete Project - [829527]', async () => {
-        stepLogger.caseId = 829527;
-        stepLogger.stepId(1);
+        StepLogger.caseId = 829527;
+        StepLogger.stepId(1);
         // Step #1 Inside this function
         const uniqueId = PageHelper.getUniqueId();
 
-        let projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
+        let projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId,);
 
-        projectNameValue = await ProjectItemPageHelper.editProjectAndValidateIt(stepLogger, projectNameValue);
+        projectNameValue = await ProjectItemPageHelper.editProjectAndValidateIt(projectNameValue);
 
-        await ProjectItemPageHelper.deleteProjectAndValidateIt(stepLogger, projectNameValue);
+        await ProjectItemPageHelper.deleteProjectAndValidateIt(projectNameValue);
     });
 
     it('Edit Project Cost - [829775]', async () => {
-        stepLogger.caseId = 829775;
-        const cost =  4;
+        StepLogger.caseId = 829775;
+        const cost = 4;
         const uniqueId = PageHelper.getUniqueId();
 
-        stepLogger.preCondition('Creating New Project');
-        const  projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
+        StepLogger.preCondition('Creating New Project');
+        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId,);
 
-        stepLogger.stepId(1);
+        StepLogger.stepId(1);
 
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger,
+
             projectNameValue,
             ProjectItemPageConstants.columnNames.title);
 
-        stepLogger.stepId(1);
-        await CommonPageHelper.selectProjectAndClickEllipsisButton(stepLogger);
+        StepLogger.stepId(1);
+        await CommonPageHelper.selectProjectAndClickEllipsisButton();
 
-        await CommonPageHelper.verifyVariousOptionsOnContextMenu(stepLogger);
+        await CommonPageHelper.verifyVariousOptionsOnContextMenu();
 
-        stepLogger.stepId(2);
-        await CommonPageHelper.clickEditCost(stepLogger);
+        StepLogger.stepId(2);
+        await CommonPageHelper.clickEditCost();
 
         await CommonPageHelper.switchToFirstContentFrame();
 
-        await EditCostHelper.validateEditCostWebElements(stepLogger);
+        await EditCostHelper.validateEditCostWebElements();
 
-        stepLogger.stepId(3);
-        await EditCostHelper.enterValueInBudgetCost(stepLogger, cost);
+        StepLogger.stepId(3);
+        await EditCostHelper.enterValueInBudgetCost(cost);
 
-        await EditCostHelper.verifyValueInBudgetCost(stepLogger, cost);
+        await EditCostHelper.verifyValueInBudgetCost(cost);
 
-        stepLogger.stepId(4);
-        await EditCostHelper.clickActualCostsTab(stepLogger);
+        StepLogger.stepId(4);
+        await EditCostHelper.clickActualCostsTab();
 
-        await EditCostHelper.enterValueInActualCost(stepLogger , cost);
+        await EditCostHelper.enterValueInActualCost(cost);
 
-        await EditCostHelper.verifyValueInActualCost(stepLogger, cost);
+        await EditCostHelper.verifyValueInActualCost(cost);
 
-        stepLogger.stepId(5);
-        await EditCostHelper.clickBenefitsTab(stepLogger);
+        StepLogger.stepId(5);
+        await EditCostHelper.clickBenefitsTab();
 
-        await EditCostHelper.enterValueInBenefitTab(stepLogger, cost);
+        await EditCostHelper.enterValueInBenefitTab(cost);
 
-        await EditCostHelper.verifyValueInBenefitCost(stepLogger, cost);
+        await EditCostHelper.verifyValueInBenefitCost(cost);
 
-        stepLogger.stepId(6);
-        stepLogger.stepId(7);
-        await EditCostHelper.validateEditCostFunctionality(stepLogger, cost);
+        StepLogger.stepId(6);
+        StepLogger.stepId(7);
+        await EditCostHelper.validateEditCostFunctionality(cost);
     });
 });

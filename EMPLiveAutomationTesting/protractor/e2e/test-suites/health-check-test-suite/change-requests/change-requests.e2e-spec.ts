@@ -6,24 +6,28 @@ import {ChangeItemPageHelper} from '../../../page-objects/pages/items-page/chang
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Add, Edit and Delete Change - [829742]', async () => {
-        stepLogger.caseId = 829742;
-        stepLogger.stepId(1);
-        let titleValue = await ChangeItemPageHelper.createNewChangeAndValidateIt(stepLogger);
+        StepLogger.caseId = 829742;
+        StepLogger.stepId(1);
+        let titleValue = await ChangeItemPageHelper.createNewChangeAndValidateIt();
 
-        stepLogger.stepId(2);
-        titleValue = await ChangeItemPageHelper.editChangeAndValidateIt(stepLogger, titleValue);
+        StepLogger.stepId(2);
+        titleValue = await ChangeItemPageHelper.editChangeAndValidateIt(titleValue);
 
-        stepLogger.stepId(3);
-        await ChangeItemPageHelper.deleteChangeAndValidateIt(stepLogger, titleValue);
+        StepLogger.stepId(3);
+        await ChangeItemPageHelper.deleteChangeAndValidateIt(titleValue);
 
     });
 });

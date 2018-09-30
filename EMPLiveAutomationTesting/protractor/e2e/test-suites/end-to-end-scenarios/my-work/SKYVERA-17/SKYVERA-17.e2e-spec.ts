@@ -5,107 +5,111 @@ import {StepLogger} from '../../../../../core/logger/step-logger';
 import {MyWorkPageHelper} from '../../../../page-objects/pages/my-workplace/my-work/my-work-page.helper';
 
 describe(SuiteNames.endToEndSuite, () => {
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         await new LoginPage().goToAndLogin();
-        stepLogger.preCondition('User should be on "My Work" page.');
-        await MyWorkPageHelper.navigateToMyWork(stepLogger);
-        await MyWorkPageHelper.verifyMyWorkPageDisplayed(stepLogger);
+        StepLogger.preCondition('User should be on "My Work" page.');
+        await MyWorkPageHelper.navigateToMyWork();
+        await MyWorkPageHelper.verifyMyWorkPageDisplayed();
+    });
+
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
     });
 
     it('User should not be able to delete/rename default View. - [745111]', async () => {
-        stepLogger.caseId = 745111;
+        StepLogger.caseId = 745111;
 
-        stepLogger.stepId(1);
-        await MyWorkPageHelper.clickViewsTab(stepLogger);
-        await MyWorkPageHelper.selectDefaultView(stepLogger);
-        await MyWorkPageHelper.verifyDefaultViewName(stepLogger);
+        StepLogger.stepId(1);
+        await MyWorkPageHelper.clickViewsTab();
+        await MyWorkPageHelper.selectDefaultView();
+        await MyWorkPageHelper.verifyDefaultViewName();
 
-        stepLogger.stepId(2);
-        await MyWorkPageHelper.clickDeleteView(stepLogger);
-        await MyWorkPageHelper.verifyDeleletViewMessageForDefaultView(stepLogger);
+        StepLogger.stepId(2);
+        await MyWorkPageHelper.clickDeleteView();
+        await MyWorkPageHelper.verifyDeleletViewMessageForDefaultView();
 
-        stepLogger.stepId(3);
-        await MyWorkPageHelper.clickOKAlert(stepLogger);
-        await MyWorkPageHelper.verifyAlertClosed(stepLogger);
+        StepLogger.stepId(3);
+        await MyWorkPageHelper.clickOKAlert();
+        await MyWorkPageHelper.verifyAlertClosed();
 
-        stepLogger.stepId(4);
-        await MyWorkPageHelper.clickRenameView(stepLogger);
-        await MyWorkPageHelper.verifyRenameViewMessageForDefaultView(stepLogger);
+        StepLogger.stepId(4);
+        await MyWorkPageHelper.clickRenameView();
+        await MyWorkPageHelper.verifyRenameViewMessageForDefaultView();
 
-        stepLogger.stepId(5);
-        await MyWorkPageHelper.clickOKAlert(stepLogger);
-        await MyWorkPageHelper.verifyAlertClosed(stepLogger);
+        StepLogger.stepId(5);
+        await MyWorkPageHelper.clickOKAlert();
+        await MyWorkPageHelper.verifyAlertClosed();
     });
 
     it('Filter grid via Show Filters button. - [745116]', async () => {
-        stepLogger.caseId = 745116;
+        StepLogger.caseId = 745116;
 
-        stepLogger.stepId(1);
-        await MyWorkPageHelper.clickViewsTab(stepLogger);
-        await MyWorkPageHelper.clickOnShowFilters(stepLogger);
-        await MyWorkPageHelper.verifyExtraRowAdded(stepLogger);
+        StepLogger.stepId(1);
+        await MyWorkPageHelper.clickViewsTab();
+        await MyWorkPageHelper.clickOnShowFilters();
+        await MyWorkPageHelper.verifyExtraRowAdded();
 
-        stepLogger.stepId(2);
-        const filterText = await MyWorkPageHelper.getFirstWorkType(stepLogger);
-        await MyWorkPageHelper.enterTextOnFilterFields(filterText, stepLogger);
-        await MyWorkPageHelper.verifySearchResults(filterText, stepLogger);
+        StepLogger.stepId(2);
+        const filterText = await MyWorkPageHelper.getFirstWorkType();
+        await MyWorkPageHelper.enterTextOnFilterFields(filterText);
+        await MyWorkPageHelper.verifySearchResults(filterText);
     });
 
     it('Clear sorting via Clear Sorting button. - [745115]', async () => {
-        stepLogger.caseId = 745115;
+        StepLogger.caseId = 745115;
 
-        stepLogger.stepId(1);
-        await MyWorkPageHelper.clickViewsTab(stepLogger);
-        await MyWorkPageHelper.clickOnAnyColumnHeader(stepLogger);
-        await MyWorkPageHelper.verifyColumnSortedDisplayed(stepLogger);
+        StepLogger.stepId(1);
+        await MyWorkPageHelper.clickViewsTab();
+        await MyWorkPageHelper.clickOnAnyColumnHeader();
+        await MyWorkPageHelper.verifyColumnSortedDisplayed();
 
-        stepLogger.stepId(2);
-        await MyWorkPageHelper.clickOnRemoveSorting(stepLogger);
-        await MyWorkPageHelper.verifySortedRemoved(stepLogger);
+        StepLogger.stepId(2);
+        await MyWorkPageHelper.clickOnRemoveSorting();
+        await MyWorkPageHelper.verifySortedRemoved();
     });
 
     it('Change current view. - [745101]', async () => {
-        stepLogger.caseId = 745101;
+        StepLogger.caseId = 745101;
 
-        stepLogger.stepId(1);
-        await MyWorkPageHelper.clickOnManageTab(stepLogger);
-        await MyWorkPageHelper.expandCurrentView(stepLogger);
+        StepLogger.stepId(1);
+        await MyWorkPageHelper.clickOnManageTab();
+        await MyWorkPageHelper.expandCurrentView();
 
-        stepLogger.stepId(2);
-        const viewName = await MyWorkPageHelper.verifySavedViewDisplayed(stepLogger);
+        StepLogger.stepId(2);
+        const viewName = await MyWorkPageHelper.verifySavedViewDisplayed();
 
-        stepLogger.stepId(3);
-        await MyWorkPageHelper.clickOnNewlyCreatedView(viewName, stepLogger);
-        await MyWorkPageHelper.verifyViewName(viewName, stepLogger);
+        StepLogger.stepId(3);
+        await MyWorkPageHelper.clickOnNewlyCreatedView(viewName);
+        await MyWorkPageHelper.verifyViewName(viewName);
     });
 
     it('Verify the Select Columns Feature. - [745114]', async () => {
-        stepLogger.caseId = 745114;
+        StepLogger.caseId = 745114;
 
-        stepLogger.stepId(1);
-        await MyWorkPageHelper.clickViewsTab(stepLogger);
-        await MyWorkPageHelper.clickSelectColumns(stepLogger);
-        await MyWorkPageHelper.verifyButtonsOnSelectColumns(stepLogger);
+        StepLogger.stepId(1);
+        await MyWorkPageHelper.clickViewsTab();
+        await MyWorkPageHelper.clickSelectColumns();
+        await MyWorkPageHelper.verifyButtonsOnSelectColumns();
 
-        stepLogger.stepId(2);
-        await MyWorkPageHelper.clickCancelOnSelectColumnsPopup(stepLogger);
-        await MyWorkPageHelper.verifySelectColumnPopupClosed(stepLogger);
+        StepLogger.stepId(2);
+        await MyWorkPageHelper.clickCancelOnSelectColumnsPopup();
+        await MyWorkPageHelper.verifySelectColumnPopupClosed();
 
-        stepLogger.stepId(3);
-        await MyWorkPageHelper.clickSelectColumns(stepLogger);
-        await MyWorkPageHelper.clickOnHideAllButton(stepLogger);
-        await MyWorkPageHelper.verifyHideAllFunctionality(stepLogger);
+        StepLogger.stepId(3);
+        await MyWorkPageHelper.clickSelectColumns();
+        await MyWorkPageHelper.clickOnHideAllButton();
+        await MyWorkPageHelper.verifyHideAllFunctionality();
 
-        stepLogger.stepId(4);
-        await MyWorkPageHelper.clickOnShowAllButton(stepLogger);
-        await MyWorkPageHelper.verifyShowAllFunctionality(stepLogger);
+        StepLogger.stepId(4);
+        await MyWorkPageHelper.clickOnShowAllButton();
+        await MyWorkPageHelper.verifyShowAllFunctionality();
 
-        stepLogger.stepId(5);
-        const selectedColNames = await MyWorkPageHelper.selectAllColumnsAndSubmit(stepLogger);
-        await MyWorkPageHelper.verifySelectedColumnsDisplayed(selectedColNames, stepLogger);
+        StepLogger.stepId(5);
+        const selectedColNames = await MyWorkPageHelper.selectAllColumnsAndSubmit();
+        await MyWorkPageHelper.verifySelectedColumnsDisplayed(selectedColNames);
     });
 
 });

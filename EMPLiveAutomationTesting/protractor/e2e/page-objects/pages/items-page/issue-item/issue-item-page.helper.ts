@@ -18,114 +18,114 @@ import {ProjectItemPage} from '../project-item/project-item.po';
 
 export class IssueItemPageHelper {
 
-    static async clickCreateNewIssue(stepLogger: StepLogger) {
-        stepLogger.step('Select "Create New" icon  from left side menu');
+    static async clickCreateNewIssue() {
+        StepLogger.step('Select "Create New" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.createNew);
     }
 
-    static async newIconFromLeftSideMenu(stepLogger: StepLogger) {
-        stepLogger.step('Select "Create New" icon  from left side menu');
+    static async newIconFromLeftSideMenu() {
+        StepLogger.step('Select "Create New" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.createNew);
 
     }
 
-    static async clickIssueLink(stepLogger: StepLogger) {
-        stepLogger.step('Click on "Issue" link from the options displayed');
+    static async clickIssueLink() {
+        StepLogger.step('Click on "Issue" link from the options displayed');
         await PageHelper.click(CreateNewPage.navigation.listApps.issue);
     }
 
-    static async clickProject(stepLogger: StepLogger, projectName: string, labels: string) {
+    static async clickProject(projectName: string, labels: string) {
         await PageHelper.click(IssueItemPage.inputs.project);
-        stepLogger.verification('Required values entered/selected in Project Field');
+        StepLogger.verification('Required values entered/selected in Project Field');
         await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels, projectName));
-        stepLogger.stepId(4);
+        StepLogger.stepId(4);
 
     }
 
-    static async enterIssueTitle(stepLogger: StepLogger, titleValue: string) {
-        stepLogger.step('Title *: Random New Issue Item');
+    static async enterIssueTitle(titleValue: string) {
+        StepLogger.step('Title *: Random New Issue Item');
         await TextboxHelper.sendKeys(IssueItemPage.inputs.title, titleValue);
 
     }
 
-    static async createIssueAndValidateIt(stepLogger: StepLogger) {
-        stepLogger.stepId(1);
-        await this.clickCreateNewIssue(stepLogger);
+    static async createIssueAndValidateIt() {
+        StepLogger.stepId(1);
+        await this.clickCreateNewIssue();
 
-        stepLogger.step('Various Create New options are displayed');
+        StepLogger.step('Various Create New options are displayed');
         await CommonPageHelper.labelDisplayedValidation
         (CreateNewPage.navigation.listApps.issue, CreateNewPageConstants.navigationLabels.listApps.issue);
 
-        stepLogger.stepId(2);
-        await this.newIconFromLeftSideMenu(stepLogger);
+        StepLogger.stepId(2);
+        await this.newIconFromLeftSideMenu();
 
-        stepLogger.step('Various Create New options are displayed');
+        StepLogger.step('Various Create New options are displayed');
         await CommonPageHelper.labelDisplayedValidation
         (CreateNewPage.navigation.listApps.issue, CreateNewPageConstants.navigationLabels.listApps.issue);
 
-        stepLogger.stepId(3);
-        await this.clickIssueLink(stepLogger);
+        StepLogger.stepId(3);
+        await this.clickIssueLink();
 
-        stepLogger.stepId(4);
-        stepLogger.step('Enter/Select required details in "Issues - New Item" window as described below');
+        StepLogger.stepId(4);
+        StepLogger.step('Enter/Select required details in "Issues - New Item" window as described below');
         const uniqueId = PageHelper.getUniqueId();
         const labels = IssueItemPageConstants.inputLabels;
 
-        stepLogger.step('Switch to frame');
+        StepLogger.step('Switch to frame');
         await CommonPageHelper.switchToFirstContentFrame();
 
-        stepLogger.step('Title *: Random New Issue Item');
+        StepLogger.step('Title *: Random New Issue Item');
         const titleValue = `${labels.title} ${uniqueId}`;
-        await this.enterIssueTitle(stepLogger, titleValue);
+        await this.enterIssueTitle(titleValue);
 
-        stepLogger.verification('Required values entered/selected in title Field');
+        StepLogger.verification('Required values entered/selected in title Field');
         await expect(await TextboxHelper.hasValue(IssueItemPage.inputs.title, titleValue))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.title, titleValue));
 
-        stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
+        StepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
         await PageHelper.click(CommonPage.projectShowAllButton);
 
         await WaitHelper.waitForElementToBeDisplayed(IssueItemPage.inputs.project);
         const projectName = await IssueItemPage.inputs.project.getText();
 
-        await this.clickProject(stepLogger, projectName, labels.project);
+        await this.clickProject(projectName, labels.project);
 
-        stepLogger.stepId(4);
-        stepLogger.step('Click on "Save" button in "Issues - New Item" window');
+        StepLogger.stepId(4);
+        StepLogger.step('Click on "Save" button in "Issues - New Item" window');
         await PageHelper.click(CommonPage.formButtons.save);
 
         await PageHelper.switchToDefaultContent();
-        stepLogger
-            .verification('Notification about New Issues created [Ex: New Issue Item 1] displayed on the Home Page');
+
+        StepLogger.verification('Notification about New Issues created [Ex: New Issue Item 1] displayed on the Home Page');
         await CommonPageHelper.notificationDisplayedValidation
         (CommonPageHelper.getNotificationByText(titleValue), IssueItemPageConstants.pageName);
 
-        stepLogger.stepId(5);
+        StepLogger.stepId(5);
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.issues,
             CommonPage.pageHeaders.projects.issues,
             CommonPageConstants.pageHeaders.projects.issues,
-            stepLogger,
+
             titleValue,
             IssueItemPageConstants.columnNames.title);
 
-        stepLogger.verification('Newly created Issue [Ex: New Issue Item 1] displayed in "Issues" page');
+        StepLogger.verification('Newly created Issue [Ex: New Issue Item 1] displayed in "Issues" page');
         await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(titleValue), titleValue);
         return titleValue;
     }
 
-    static async editItemAndValidateIt(stepLogger: StepLogger, titleValue: string) {
+    static async editItemAndValidateIt(titleValue: string) {
         titleValue = titleValue + 'Edited';
 
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.issues,
             CommonPage.pageHeaders.projects.issues,
             CommonPageConstants.pageHeaders.projects.issues,
-            stepLogger);
+        );
 
-        await CommonPageHelper.editOptionViaRibbon(stepLogger);
+        await CommonPageHelper.editOptionViaRibbon();
 
         await TextboxHelper.sendKeys(IssueItemPage.inputs.title, titleValue);
 
@@ -134,50 +134,51 @@ export class IssueItemPageHelper {
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.issues,
             CommonPage.pageHeaders.projects.issues,
             CommonPageConstants.pageHeaders.projects.issues,
-            stepLogger,
+
             titleValue,
             IssueItemPageConstants.columnNames.title);
         return titleValue;
     }
 
-    static async deleteItemAndValidateIt(stepLogger: StepLogger, titleValue: string) {
-        await RiskItemPageHelper.deleteOptionViaRibbon(stepLogger);
+    static async deleteItemAndValidateIt(titleValue: string) {
+        await RiskItemPageHelper.deleteOptionViaRibbon();
 
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.issues,
             CommonPage.pageHeaders.projects.issues,
             CommonPageConstants.pageHeaders.projects.issues,
-            stepLogger,
+
             titleValue,
             IssueItemPageConstants.columnNames.title);
 
-        stepLogger.step('Validating deleted Risk  is not  Present');
+        StepLogger.step('Validating deleted Risk  is not  Present');
         await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg, ProjectItemPageConstants.noDataFound);
     }
 
-    static  async validateContentOfItemTab(stepLogger: StepLogger) {
-        stepLogger.step('Validate Edit Cost Is Present');
+    static async validateContentOfItemTab() {
+        StepLogger.step('Validate Edit Cost Is Present');
         await CommonPageHelper.fieldDisplayedValidation(CommonPage.ribbonItems.editCost, CommonPageConstants.ribbonLabels.editCost);
 
-        stepLogger.step('Validate viewItem Is Present');
+        StepLogger.step('Validate viewItem Is Present');
         await CommonPageHelper.fieldDisplayedValidation(CommonPage.ribbonItems.viewItem, CommonPageConstants.ribbonLabels.viewItem);
 
-        stepLogger.step('Validate editItem Is Present');
+        StepLogger.step('Validate editItem Is Present');
         await CommonPageHelper.fieldDisplayedValidation(CommonPage.ribbonItems.editItem, CommonPageConstants.ribbonLabels.editItem);
 
-        stepLogger.step('Validate editResource Is Present');
+        StepLogger.step('Validate editResource Is Present');
         await CommonPageHelper.fieldDisplayedValidation(CommonPage.ribbonItems.editResource, CommonPageConstants.ribbonLabels.editResource);
     }
-    static  async validateContentOfItemTabIsDisabled(stepLogger: StepLogger) {
-        stepLogger.step('Validate Edit Cost Is Disabled ');
-        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.editCost, stepLogger);
 
-        stepLogger.step('Validate viewItem Is Disabled ');
-        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.viewItem, stepLogger);
+    static async validateContentOfItemTabIsDisabled() {
+        StepLogger.step('Validate Edit Cost Is Disabled ');
+        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.editCost);
 
-        stepLogger.step('Validate editItem Is Disabled ');
-        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.editItem, stepLogger);
+        StepLogger.step('Validate viewItem Is Disabled ');
+        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.viewItem);
 
-        stepLogger.step('Validate editResource Is Disabled ');
-        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.editResource, stepLogger);
+        StepLogger.step('Validate editItem Is Disabled ');
+        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.editItem);
+
+        StepLogger.step('Validate editResource Is Disabled ');
+        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.editResource);
     }
 }

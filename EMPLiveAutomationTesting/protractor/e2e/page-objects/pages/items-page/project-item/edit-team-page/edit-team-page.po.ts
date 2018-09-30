@@ -10,7 +10,8 @@ export class EditTeamPage extends BasePage {
             resourceWorkVsCapacity: element(By.xpath('//span[text() ="Resource Work vs. Capacity"]//parent::a'))
         };
     }
+
     static get viewReport() {
         return element(By.id('Ribbon.BuildTeam.ToolsGroup.Reports-Medium'));
     }
-   }
+}

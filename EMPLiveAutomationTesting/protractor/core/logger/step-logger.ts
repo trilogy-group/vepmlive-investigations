@@ -1,22 +1,18 @@
 import * as log4js from 'log4js';
 import {Logger} from 'log4js';
+import {browser} from 'protractor';
 
 declare var allure: any;
 
 export class StepLogger {
-    existingStep: any;
-    logger: Logger;
-    stepIdVar = '';
-    id: number;
-    testCaseId: number;
-    logMessages = '';
-    subStepIdentifier = 'Sub-Step';
+    static logger: Logger;
+    static stepIdVar = '';
+    static id: number;
+    static testCaseId: number;
+    static logMessages = '';
+    static debug = process.env.DEBUG || true;
 
-    constructor(private debug = process.env.DEBUG || true) {
-        this.id = 0;
-    }
-
-    set caseId(theCaseId: number) {
+    static set caseId(theCaseId: number) {
         this.testCaseId = theCaseId;
         this.logger = log4js.getLogger(`C${theCaseId}`);
         this.logger.debug(this.logMessages);
@@ -24,7 +20,7 @@ export class StepLogger {
         this.logMessages = '';
     }
 
-    step(stepName: string) {
+    static step(stepName: string) {
         let operation = 'Pre-Condition';
         if (this.testCaseId) {
             // this.stepId();
@@ -33,26 +29,20 @@ export class StepLogger {
         this.commonLogger(operation, stepName);
     }
 
-    stepId(optionalId = 0) {
+    static stepId(optionalId = 0) {
         this.id = optionalId > 0 ? optionalId : this.id + 1;
         this.commonLogger('Step Id', this.id.toString());
     }
 
-    commonLogger(operation: string, step: string) {
+    static commonLogger(operation: string, step: string) {
         const message = `${this.stepIdVar}- *${operation}* - ${step}`;
         if (this.debug) {
             console.log(`${this.testCaseId || ''}${message}`);
         }
         if (!process.env.NO_ALLURE) {
-            if (step === this.subStepIdentifier) {
-                // tslint:disable-next-line:no-empty
-                this.existingStep.createStep(message, () => {
-                })();
-            } else {
-                // tslint:disable-next-line:no-empty
-                this.existingStep = allure.createStep(message, () => {
-                })();
-            }
+            // tslint:disable-next-line:no-empty
+            allure.createStep(message, () => {
+            })();
         }
         if (this.logger) {
             this.logger.debug(message);
@@ -61,19 +51,28 @@ export class StepLogger {
         }
     }
 
-    verification(verificationDescription: string) {
+    static verification(verificationDescription: string) {
         this.commonLogger('Verification', verificationDescription);
+    }
+
+    static async takeScreenShot() {
+        const png = await browser.takeScreenshot();
+        if (!process.env.NO_ALLURE) {
+            allure.createAttachment('Screenshot', function () {
+                return new Buffer(png, 'base64');
+            }, 'image/png')();
+        }
     }
 
     /**
      * Called for any precondition related step-log shown towrds Spec file, never used anywhere else such as validation/helper
      * @param {string} preConditionDescription
      */
-    preCondition(preConditionDescription: string) {
+    static preCondition(preConditionDescription: string) {
         this.commonLogger('Pre-Condition', preConditionDescription);
     }
 
-    postCondition(postConditionDescription: string) {
+    static postCondition(postConditionDescription: string) {
         this.commonLogger('Post-Condition', postConditionDescription);
     }
 
@@ -81,7 +80,7 @@ export class StepLogger {
      * Called wherever a helper/validation method need to have a step/action step significant enough to log
      * @param {string} stepName
      */
-    subStep(stepName: string) {
+    static subStep(stepName: string) {
         this.commonLogger('Sub-Step', stepName);
     }
 
@@ -89,7 +88,7 @@ export class StepLogger {
      * Called wherever a helper/validation method need to have a verification step significant enough to log
      * @param {string} verificationDescription
      */
-    subVerification(verificationDescription: string) {
+    static subVerification(verificationDescription: string) {
         this.commonLogger('Sub-Verification', verificationDescription);
     }
 }

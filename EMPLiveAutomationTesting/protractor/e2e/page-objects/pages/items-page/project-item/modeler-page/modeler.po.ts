@@ -17,11 +17,6 @@ export class ModelerPage extends BasePage {
         };
     }
 
-    static getButtonOnPopup(buttonName: string) {
-        const activeWindow = 'div.dhtmlx_window_active';
-        return element(By.css(`${activeWindow} input[value="${buttonName}"]`));
-    }
-
     static get activeTab() {
         return element(By.css('.dhx_tab_element_active>span'));
     }
@@ -72,10 +67,6 @@ export class ModelerPage extends BasePage {
         };
     }
 
-    static getSelectVersionOptionText(index: number) {
-        return element(By.css(`select#idVersionList>option:nth-child(${index})`));
-    }
-
     static get copyVersionPopup() {
         const copyVersionLabel = ModelerPageConstants.copyVersionPopup;
         return {
@@ -90,7 +81,7 @@ export class ModelerPage extends BasePage {
 
     static get collapseAndExpandRibbons() {
         const ribbonItems = ModelerPageConstants.collapseAndExpandRibbons;
-        return{
+        return {
             collapseViewTopRibbon: element(By.id(ribbonItems.collapseViewTopRibbon)),
             expandViewTopRibbon: element(By.id(ribbonItems.expandViewTopRibbon)),
             minusSignTopRibbon: element(By.css(`#${ribbonItems.expandViewTopRibbon}>span>img`)),
@@ -116,5 +107,14 @@ export class ModelerPage extends BasePage {
             ganttZoom: element(By.id(viewTabLabels.ganttZoom)),
             currentView: element(By.id(viewTabLabels.currentView))
         };
+    }
+
+    static getButtonOnPopup(buttonName: string) {
+        const activeWindow = 'div.dhtmlx_window_active';
+        return element(By.css(`${activeWindow} input[value="${buttonName}"]`));
+    }
+
+    static getSelectVersionOptionText(index: number) {
+        return element(By.css(`select#idVersionList>option:nth-child(${index})`));
     }
 }

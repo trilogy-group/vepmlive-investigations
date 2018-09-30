@@ -6,15 +6,20 @@ import {WorkspacePageHelper} from '../../../page-objects/pages/workspaces/worksp
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
+
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('To Verify User is Able to Create Workspace - [2488594]', async () => {
-        stepLogger.caseId = 2488594;
-        await WorkspacePageHelper.createWorkspace(stepLogger);
+        StepLogger.caseId = 2488594;
+        await WorkspacePageHelper.createWorkspace();
     });
 });

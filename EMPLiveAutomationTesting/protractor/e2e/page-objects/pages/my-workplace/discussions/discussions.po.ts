@@ -16,7 +16,7 @@ export class DiscussionsPage {
     }
 
     static get subjectTextField() {
-         return CommonPageHelper.getElementByTitle(DiscussionsPageConstants.subjectInputTitle);
+        return CommonPageHelper.getElementByTitle(DiscussionsPageConstants.subjectInputTitle);
     }
 
     static get bodyTextBox() {

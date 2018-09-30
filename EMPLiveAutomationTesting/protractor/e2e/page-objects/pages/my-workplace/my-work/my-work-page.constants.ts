@@ -97,7 +97,7 @@ export class MyWorkPageConstants {
     }
 
     static get ribbonTabs() {
-        return{
+        return {
             page: 'Page',
             hide: 'Hide',
             manage: 'Manage Work',
@@ -107,7 +107,7 @@ export class MyWorkPageConstants {
 
     static get viewRibbonOptions() {
         const viewSection = 'Ribbon.MyWork.Views';
-        return{
+        return {
             saveView: `${viewSection}.SaveView-Medium`,
             renameView: `${viewSection}.RenameView-Medium`,
             deleteView: `${viewSection}.DeleteView-Medium`,
@@ -121,7 +121,7 @@ export class MyWorkPageConstants {
     }
 
     static get viewsPopUp() {
-        return{
+        return {
             title: 'dialogTitleSpan',
             name: 'MWG_ViewName',
             defaultView: 'MWG_DefaultView',
@@ -159,9 +159,9 @@ export class MyWorkPageConstants {
     }
 
     static get commentsPopupDetails() {
-        return{
+        return {
             cc: 'upLevelDiv',
-            commentTextArea : 'tbCommentInput',
+            commentTextArea: 'tbCommentInput',
             post: 'postBtn',
             edit: 'Edit',
             delete: 'Delete',

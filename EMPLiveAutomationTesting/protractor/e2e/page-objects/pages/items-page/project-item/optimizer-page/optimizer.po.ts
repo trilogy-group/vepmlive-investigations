@@ -21,7 +21,7 @@ export class OptimizerPage extends BasePage {
 
     static get saveViewPopup() {
         const label = OptimizerPageConstants.saveViewPopup;
-        return{
+        return {
             viewName: element(By.id(label.viewName)),
             defaultView: element(By.id(label.defaultView)),
             personalView: element(By.id(label.personalView)),
@@ -32,7 +32,7 @@ export class OptimizerPage extends BasePage {
 
     static get getSelectColumnsPopup() {
         const label = OptimizerPageConstants.selectColumnsPopup;
-        return{
+        return {
             ok: ElementHelper.getElementByText(label.ok),
             cancel: ElementHelper.getElementByText(label.cancel),
             hideAll: ElementHelper.getElementByText(label.hideAll),
@@ -59,26 +59,13 @@ export class OptimizerPage extends BasePage {
         return element(By.css('div#idOptimizerTabDiv_ribbon img[src*="close"]'));
     }
 
-    static getDisplyedColumns(columnNumber: number) {
-        return element(By.xpath(`//td[text()="Selection"]/following-sibling::td[${columnNumber}]`));
-    }
-
-    static getCurrentViewDropdownValue(viewName: string) {
-        return element(By.xpath(`//*[@id='idAnalyzerTab_SelView_viewinternal']//span[text()="${viewName}"]/following-sibling::span[1]`));
-    }
-
-    static getButtonOnPopup(buttonName: string) {
-        const activeWindow = 'div.dhtmlx_window_active';
-        return element(By.css(`${activeWindow} input[value="${buttonName}"]`));
-    }
-
     static get getConfigure() {
         return element(By.css('ul#idOptimizerTabDiv_ul img[src*="configure"]'));
     }
 
     static get getOptimizerConfiguration() {
         const label = OptimizerPageConstants.optimizerConfiguration;
-        return{
+        return {
             heading: CommonPageHelper.getElementByText(label.heading),
             enterValueLabel: CommonPageHelper.getElementByText(label.enterValueLabel, true),
             titleComparisonLabel: CommonPageHelper.getElementByText(label.titleComparisonLabel, true),
@@ -93,7 +80,7 @@ export class OptimizerPage extends BasePage {
             downArrow: AnchorHelper.getItemById(label.downArrow),
             ok: this.getButtonOnPopup(label.ok),
             cancel: this.getButtonOnPopup(label.cancel),
-            message : element(By.css('#idOptDlg>div>div:last-child')),
+            message: element(By.css('#idOptDlg>div>div:last-child')),
             firstAvailableField: element(By.css('select#idOptConfAvailfields>option:first-child')),
             firstSelectedField: element(By.css('select#idOptConfSelfields>option:first-child'))
         };
@@ -101,7 +88,7 @@ export class OptimizerPage extends BasePage {
 
     static get getOptimizerStrategyActions() {
         const label = OptimizerPageConstants.optimizerStrategyActions;
-        return{
+        return {
             saveStrategy: AnchorHelper.getAnchorById(label.saveStrategy),
             renameStrategy: AnchorHelper.getAnchorById(label.renameStrategy),
             deleteStrategy: AnchorHelper.getAnchorById(label.deleteStrategy),
@@ -114,7 +101,7 @@ export class OptimizerPage extends BasePage {
 
     static get getOptimierSaveStrategyPopup() {
         const label = OptimizerPageConstants.optimierSaveStrategyPopup;
-        return{
+        return {
             strategyName: element(By.id(label.strategyName)),
             personalStrategyCheckBox: element(By.id(label.personalStrategyCheckBox)),
             ok: this.getButtonOnPopup(label.ok),
@@ -124,20 +111,16 @@ export class OptimizerPage extends BasePage {
 
     static get getDeleteStrategyPopup() {
         const label = OptimizerPageConstants.optimierSaveStrategyPopup;
-        return{
+        return {
             message: element(By.xpath('//div[@id="idDeleteStratagy"]/div/div[1]')),
             ok: this.getButtonOnPopup(label.ok),
             cancel: this.getButtonOnPopup(label.cancel)
         };
     }
 
-    static getCurrentStrategyByName(strategyName: string) {
-        return element(By.xpath(`//li[@id="idOptTab_SelView_viewinternal"]//span[normalize-space(text())="${strategyName}"]`));
-    }
-
     static get getOptimizerRibbon() {
         const label = OptimizerPageConstants.optimizerRibbon;
-        return{
+        return {
             collapseView: element(By.id(label.collapseView)),
             expandView: element(By.id(label.expandView)),
             minusSign: element(By.css(`#${label.expandView}>span>img`)),
@@ -159,6 +142,32 @@ export class OptimizerPage extends BasePage {
         };
     }
 
+    static get getRenameStrategyPopup() {
+        const label = OptimizerPageConstants.renameStrategyPopup;
+        return {
+            strategyName: element(By.id(label.strategyName)),
+            ok: this.getButtonOnPopup(label.ok),
+            cancel: this.getButtonOnPopup(label.cancel)
+        };
+    }
+
+    static getDisplyedColumns(columnNumber: number) {
+        return element(By.xpath(`//td[text()="Selection"]/following-sibling::td[${columnNumber}]`));
+    }
+
+    static getCurrentViewDropdownValue(viewName: string) {
+        return element(By.xpath(`//*[@id='idAnalyzerTab_SelView_viewinternal']//span[text()="${viewName}"]/following-sibling::span[1]`));
+    }
+
+    static getButtonOnPopup(buttonName: string) {
+        const activeWindow = 'div.dhtmlx_window_active';
+        return element(By.css(`${activeWindow} input[value="${buttonName}"]`));
+    }
+
+    static getCurrentStrategyByName(strategyName: string) {
+        return element(By.xpath(`//li[@id="idOptTab_SelView_viewinternal"]//span[normalize-space(text())="${strategyName}"]`));
+    }
+
     static getCurrentViewByName(viewName: string) {
         return element(By.xpath(`//li[@id="idAnalyzerTab_SelView_viewinternal"]//span[normalize-space(text())="${viewName}"]`));
     }
@@ -166,15 +175,6 @@ export class OptimizerPage extends BasePage {
     static getAvailableFieldByName(fieldName: string) {
         const label = OptimizerPageConstants.optimizerConfiguration;
         return element(By.xpath(`//select[@id="${label.selectedFieldsSelect}"]//option[text()="${fieldName}"]`));
-    }
-
-    static get getRenameStrategyPopup() {
-        const label = OptimizerPageConstants.renameStrategyPopup;
-        return{
-            strategyName: element(By.id(label.strategyName)),
-            ok: this.getButtonOnPopup(label.ok),
-            cancel: this.getButtonOnPopup(label.cancel)
-        };
     }
 
 }

@@ -1,5 +1,6 @@
 export class ReportingSettingsPageConstants {
     static readonly pageName = 'Mapped Lists';
+
     static get topMenus() {
         return {
             settings: {

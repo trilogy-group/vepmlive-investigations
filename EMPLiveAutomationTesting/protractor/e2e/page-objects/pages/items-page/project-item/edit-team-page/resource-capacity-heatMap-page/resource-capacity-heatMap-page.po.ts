@@ -9,9 +9,11 @@ export class ResourceCapacityHeatMapPage {
     static get periodEnd() {
         return CommonPage.getDropDownByParameterName(ResourceCapacityHeatMapPageConstants.periodEnd);
     }
+
     static get periodEndOptionValue() {
         return CommonPage.periodEndOptionValue(ResourceCapacityHeatMapPageConstants.periodEnd);
     }
+
     static get department() {
         return CommonPage.getDropDownByParameterName(ResourceCapacityHeatMapPageConstants.department);
     }

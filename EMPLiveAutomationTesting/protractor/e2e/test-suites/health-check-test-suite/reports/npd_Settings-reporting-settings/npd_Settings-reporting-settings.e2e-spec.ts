@@ -11,26 +11,30 @@ import {ReportingSettingsPageHelper} from '../../../../page-objects/pages/settin
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Run Refresh Schedule - [829793]', async () => {
-        stepLogger.caseId = 829793;
-        stepLogger.stepId(1);
+        StepLogger.caseId = 829793;
+        StepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await ReportingSettingsPageHelper.navigateTo(stepLogger);
-        stepLogger.stepId(2);
+        );
+        await ReportingSettingsPageHelper.navigateTo();
+        StepLogger.stepId(2);
         // Run Schedule
-        await ReportingSettingsPageHelper.runSchedule(stepLogger);
+        await ReportingSettingsPageHelper.runSchedule();
     });
 
 });

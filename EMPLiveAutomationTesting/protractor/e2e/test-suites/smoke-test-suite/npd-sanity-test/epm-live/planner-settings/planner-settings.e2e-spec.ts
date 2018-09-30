@@ -15,36 +15,40 @@ import {PlannerSettingPage} from '../../../../../page-objects/pages/settings/pla
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Add new planner - [1032747]', async () => {
-        stepLogger.caseId = 1032747;
-        stepLogger.stepId(1);
+        StepLogger.caseId = 1032747;
+        StepLogger.stepId(1);
         const uniqueId = PageHelper.getUniqueId();
         const plannerName = `${PlannerSettingsPageConstants.newPlannerDetails.name}${uniqueId}`;
-        stepLogger.step('Click on "Main Gear Settings" icon  displayed in left bottom corner');
+        StepLogger.step('Click on "Main Gear Settings" icon  displayed in left bottom corner');
         await PageHelper.click(CommonPage.sidebarMenus.settings);
 
         const plannerReportingMenus = SettingsPage.menuItems.plannerSettings;
 
-        stepLogger.verification('Various Settings Options displayed');
+        StepLogger.verification('Various Settings Options displayed');
         await expect(await PageHelper.isElementDisplayed(plannerReportingMenus.rootMenu))
             .toBe(true, ValidationsHelper.getDisplayedValidation(PlannerSettingsPageConstants.validation.settings));
 
-        stepLogger.stepId(2);
-        stepLogger.step('Expand "Planner Settings" node');
+        StepLogger.stepId(2);
+        StepLogger.step('Expand "Planner Settings" node');
         await PlannerSettingsPageHelper.expandPlannerSettingsNode();
 
-        stepLogger.step('Click on "Planners" sub node');
+        StepLogger.step('Click on "Planners" sub node');
         await PageHelper.click(PlannerSettingsPageHelper.menu.buttonLabel.planner);
 
-        stepLogger.verification('Various Settings Options displayed');
+        StepLogger.verification('Various Settings Options displayed');
         await expect(await PageHelper.isElementDisplayed(PlannerSettingsPageHelper.menu.menuTitles.planName))
             .toBe(true, ValidationsHelper.getDisplayedValidation(PlannerSettingsPageConstants.validation.planName));
         await expect(await PageHelper.isElementDisplayed(PlannerSettingsPageHelper.menu.menuTitles.souceList))
@@ -56,84 +60,84 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(PlannerSettingsPageHelper.menu.menuTitles.newPlanner))
             .toBe(true, ValidationsHelper.getDisplayedValidation(PlannerSettingsPageConstants.validation.addANewPlanner));
 
-        stepLogger.stepId(3);
-        stepLogger.step('Click on + Add New Planner button link');
+        StepLogger.stepId(3);
+        StepLogger.step('Click on + Add New Planner button link');
         await PageHelper.click(PlannerSettingsPageHelper.menu.menuTitles.newPlanner);
 
-        stepLogger.verification('Planner Settings page is displayed');
+        StepLogger.verification('Planner Settings page is displayed');
         await expect(await browser.getTitle()).toBe(PlannerSettingsPageConstants.plannerPage,
             ValidationsHelper.getPageDisplayedValidation(PlannerSettingsPageConstants.plannerPage));
 
-        stepLogger.stepId(4);
-        stepLogger.step('Enter/Select below value in Planner Settings page "General Settings"');
-        stepLogger.step('Planner Name: Enter a Name for Planner [Ex: Smoke Test Planner 1]');
+        StepLogger.stepId(4);
+        StepLogger.step('Enter/Select below value in Planner Settings page "General Settings"');
+        StepLogger.step('Planner Name: Enter a Name for Planner [Ex: Smoke Test Planner 1]');
         await TextboxHelper.sendKeys(PlannerSettingPage.planNameField, plannerName);
 
-        stepLogger.step('Planner Description: Enter Description for Planner [Ex: New Planner created as part of smoke test]');
+        StepLogger.step('Planner Description: Enter Description for Planner [Ex: New Planner created as part of smoke test]');
         await TextboxHelper.sendKeys(PlannerSettingPage.planDiscriptionField,
             PlannerSettingsPageConstants.newPlannerDetails.description);
 
-        stepLogger.step('Scroll down till the section Additional Settings is displayed');
+        StepLogger.step('Scroll down till the section Additional Settings is displayed');
         await ElementHelper.scrollToElement(PlannerSettingPage.startSoonCheckBox);
 
-        stepLogger.step('Enforce Start as Soon as Possible: Check/Select the check box Enable Start as Soon as Possible');
+        StepLogger.step('Enforce Start as Soon as Possible: Check/Select the check box Enable Start as Soon as Possible');
         await CheckboxHelper.markCheckbox(PlannerSettingPage.startSoonCheckBox, true);
 
         // To Verify "Required values Entered/Selected in 'Planner Settings' page" is not posible
-        await PlannerSettingsPageHelper.saveAndVerifyCreatePlanner(plannerName, stepLogger, true);
+        await PlannerSettingsPageHelper.saveAndVerifyCreatePlanner(plannerName, true);
     });
 
     it('Edit Planner name - [1032780]', async () => {
-        stepLogger.caseId = 1032780;
+        StepLogger.caseId = 1032780;
         const uniqueId = PageHelper.getUniqueId();
-        stepLogger.preCondition('Add new planner');
+        StepLogger.preCondition('Add new planner');
         const plannerName = `${PlannerSettingsPageConstants.newPlannerDetails.name}${uniqueId}`;
         const plannerUpdatedName = PlannerSettingsPageConstants.newPlannerDetails.updatedName + uniqueId;
         await PlannerSettingsPageHelper.createPlanner(plannerName);
 
-        stepLogger.stepId(1);
-        stepLogger.step('Click on "Main Gear Settings" icon  displayed in left bottom corner');
+        StepLogger.stepId(1);
+        StepLogger.step('Click on "Main Gear Settings" icon  displayed in left bottom corner');
         await PageHelper.click(CommonPage.sidebarMenus.settings);
 
-        stepLogger.step('Expand "Planner Settings" node');
+        StepLogger.step('Expand "Planner Settings" node');
         await PlannerSettingsPageHelper.expandPlannerSettingsNode();
 
-        stepLogger.step('Click on "Planners" sub node');
+        StepLogger.step('Click on "Planners" sub node');
         await PageHelper.click(PlannerSettingsPageHelper.menu.buttonLabel.planner);
 
-        stepLogger.verification('Planner Administration page is displayed');
+        StepLogger.verification('Planner Administration page is displayed');
         await expect(await browser.getTitle()).toBe(PlannerSettingsPageConstants.administration,
             ValidationsHelper.getPageDisplayedValidation(PlannerSettingsPageConstants.administration));
 
-        stepLogger.verification('All existing Planners are displayed in the list along with the new planner created' +
+        StepLogger.verification('All existing Planners are displayed in the list along with the new planner created' +
             ' as per pre requisites [Ex: Smoke Test Planner 1]');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(plannerName)))
             .toBe(true, ValidationsHelper.getRecordCreatedValidation([plannerName]));
 
-        stepLogger.stepId(2);
-        stepLogger.step('Mouse over the name of the newly created planner [Ex: Smoke Test Planner 1]\n' +
+        StepLogger.stepId(2);
+        StepLogger.step('Mouse over the name of the newly created planner [Ex: Smoke Test Planner 1]\n' +
             'Click on drop down seen on the right side of the planner name');
         await PageHelper.click(ElementHelper.getElementByText(plannerName));
 
-        stepLogger.step('Select Edit Planner from the options displayed');
+        StepLogger.step('Select Edit Planner from the options displayed');
         await PageHelper.click(PlannerSettingsPageHelper.menu.menuTitles.editPlanner);
 
         // Values selected for the Planner while creating are pre populated in respective fields verify is not posible
-        stepLogger.verification('Planner Settings page is displayed');
+        StepLogger.verification('Planner Settings page is displayed');
         await expect(await browser.getTitle()).toBe(PlannerSettingsPageConstants.plannerPage,
             ValidationsHelper.getPageDisplayedValidation(PlannerSettingsPageConstants.plannerPage));
 
-        stepLogger.stepId(3);
-        stepLogger.step('Planner Name: Enter a Name for Planner [Ex: Smoke Test Planner 1]');
+        StepLogger.stepId(3);
+        StepLogger.step('Planner Name: Enter a Name for Planner [Ex: Smoke Test Planner 1]');
         await TextboxHelper.sendKeys(PlannerSettingPage.planNameField, plannerUpdatedName);
 
-        stepLogger.step('Planner Description: Enter Description for Planner [Ex: New Planner created as part of smoke test]');
+        StepLogger.step('Planner Description: Enter Description for Planner [Ex: New Planner created as part of smoke test]');
         await TextboxHelper.sendKeys(PlannerSettingPage.planDiscriptionField,
             PlannerSettingsPageConstants.newPlannerDetails.updatedDescription);
 
         // Required changes done in 'Planner Settings' page verify is not posible
         // Step from 4 Inside the function
-        await PlannerSettingsPageHelper.saveAndVerifyCreatePlanner(plannerUpdatedName, stepLogger, true);
+        await PlannerSettingsPageHelper.saveAndVerifyCreatePlanner(plannerUpdatedName, true);
 
     });
 

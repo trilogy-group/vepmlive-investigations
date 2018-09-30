@@ -10,291 +10,291 @@ import {OptimizerPageHelper} from '../../../../page-objects/pages/items-page/pro
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Verify the Close button of the Optimizer page  - [744351]', async () => {
-        stepLogger.caseId = 744351;
+        StepLogger.caseId = 744351;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.closeOptimizerWindowFromOptimizerTab(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerWindowClosed(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.closeOptimizerWindowFromOptimizerTab();
+        await OptimizerPageHelper.verifyOptimizerWindowClosed();
     });
 
     it('Verify that when user select only single project  - [744353]', async () => {
-        stepLogger.caseId = 744353;
+        StepLogger.caseId = 744353;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectRecordFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await OptimizerPageHelper.gotoConfigureSection(stepLogger);
-        await OptimizerPageHelper.verifyAlertMessageForSingleProjectSelection(stepLogger);
+        await CommonPageHelper.selectRecordFromGrid();
+        StepLogger.stepId(3);
+        await OptimizerPageHelper.gotoConfigureSection();
+        await OptimizerPageHelper.verifyAlertMessageForSingleProjectSelection();
     });
 
     it('Verify that Saved Strategy name displayed in the Current Strategy drop down box  - [744366]', async () => {
-        stepLogger.caseId = 744366;
+        StepLogger.caseId = 744366;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.openSaveStrategyPopup(stepLogger);
-        await OptimizerPageHelper.verifySaveStrtegyPopupDisplayed(stepLogger);
-        stepLogger.stepId(4);
-        const strategyName = await OptimizerPageHelper.enterNewStrategyNameAndSubmit(stepLogger);
-        stepLogger.stepId(5);
-        await OptimizerPageHelper.verifyCurrentStrategyName(strategyName, stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.openSaveStrategyPopup();
+        await OptimizerPageHelper.verifySaveStrtegyPopupDisplayed();
+        StepLogger.stepId(4);
+        const strategyName = await OptimizerPageHelper.enterNewStrategyNameAndSubmit();
+        StepLogger.stepId(5);
+        await OptimizerPageHelper.verifyCurrentStrategyName(strategyName);
     });
 
     it('Verify the Delete Strategy button  - [744369]', async () => {
-        stepLogger.caseId = 744369;
+        StepLogger.caseId = 744369;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.openDeleteStrategyPopup(stepLogger);
-        await OptimizerPageHelper.verifyDeleteStrategyPopup(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.openDeleteStrategyPopup();
+        await OptimizerPageHelper.verifyDeleteStrategyPopup();
     });
 
     it('Verify the content of label name "Which fields will be used as filters? of Optimizer configuration screen. - [744356]',
         async () => {
-            stepLogger.caseId = 744356;
+            StepLogger.caseId = 744356;
             // Step 1 is inside the below function
             await CommonPageHelper.navigateToItemPageUnderNavigation(
                 HomePage.navigation.projects.projects,
                 CommonPage.pageHeaders.projects.projectsCenter,
                 CommonPageConstants.pageHeaders.projects.projectCenter,
-                stepLogger);
-            await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+            );
+            await CommonPageHelper.verifyProjectCenterDisplayed();
             // Step 2 is inside the below function
-            await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-            stepLogger.stepId(3);
-            await OptimizerPageHelper.gotoConfigureSection(stepLogger);
-            await OptimizerPageHelper.verifyFilterSectionLabels(stepLogger);
-     });
+            await CommonPageHelper.selectTwoRecordsFromGrid();
+            StepLogger.stepId(3);
+            await OptimizerPageHelper.gotoConfigureSection();
+            await OptimizerPageHelper.verifyFilterSectionLabels();
+        });
 
     it('Verify that Strategy should be Deleted.  - [744370]', async () => {
-        stepLogger.caseId = 744370;
+        StepLogger.caseId = 744370;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        const strategyNameToDel = await OptimizerPageHelper.deleteStrategy(stepLogger);
-        stepLogger.stepId(5);
-        await OptimizerPageHelper.clickOKonDeleteStrategyPopup(stepLogger);
-        await OptimizerPageHelper.verifyDeletedStrategy(stepLogger, strategyNameToDel);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerPageOpened();
+        StepLogger.stepId(4);
+        const strategyNameToDel = await OptimizerPageHelper.deleteStrategy();
+        StepLogger.stepId(5);
+        await OptimizerPageHelper.clickOKonDeleteStrategyPopup();
+        await OptimizerPageHelper.verifyDeletedStrategy(strategyNameToDel);
     });
 
     it('Verify the Minus Sign  - [744373]', async () => {
-        stepLogger.caseId = 744373;
+        StepLogger.caseId = 744373;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.clickMinusSign(stepLogger);
-        await OptimizerPageHelper.verifyRibbonCollapsed(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.clickMinusSign();
+        await OptimizerPageHelper.verifyRibbonCollapsed();
     });
 
     it('Verify the close button of the View Tab.  - [744376]', async () => {
-        stepLogger.caseId = 744376;
+        StepLogger.caseId = 744376;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.clickViewTab(stepLogger);
-        await OptimizerPageHelper.verifyViewPageOpened(stepLogger);
-        stepLogger.stepId(5);
-        await OptimizerPageHelper.closeOptimizerWindowFromViewTab(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerWindowClosed(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.clickViewTab();
+        await OptimizerPageHelper.verifyViewPageOpened();
+        StepLogger.stepId(5);
+        await OptimizerPageHelper.closeOptimizerWindowFromViewTab();
+        await OptimizerPageHelper.verifyOptimizerWindowClosed();
     });
 
     it('Verify that View should be Deleted.  - [744382]', async () => {
-        stepLogger.caseId = 744382;
+        StepLogger.caseId = 744382;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.clickViewTab(stepLogger);
-        await OptimizerPageHelper.verifyViewPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        const viewNameToDel = await OptimizerPageHelper.clickDeleteView(stepLogger);
-        await OptimizerPageHelper.verifyDeleteViewPopup(stepLogger);
-        stepLogger.stepId(5);
-        await OptimizerPageHelper.clickOKonDeleteViewPopup(stepLogger);
-        await OptimizerPageHelper.verifyDeletedView(stepLogger, viewNameToDel);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.clickViewTab();
+        await OptimizerPageHelper.verifyViewPageOpened();
+        StepLogger.stepId(4);
+        const viewNameToDel = await OptimizerPageHelper.clickDeleteView();
+        await OptimizerPageHelper.verifyDeleteViewPopup();
+        StepLogger.stepId(5);
+        await OptimizerPageHelper.clickOKonDeleteViewPopup();
+        await OptimizerPageHelper.verifyDeletedView(viewNameToDel);
     });
 
     it('Verify the message display on the bottom of the Optimizer configuration page. - [744360]', async () => {
-        stepLogger.caseId = 744360;
+        StepLogger.caseId = 744360;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
         // Step 3 and 4 are inside this function
-        stepLogger.stepId(3);
-        await OptimizerPageHelper.gotoConfigureSection(stepLogger);
-        await OptimizerPageHelper.verifyMessageOnConfiguration(stepLogger);
+        StepLogger.stepId(3);
+        await OptimizerPageHelper.gotoConfigureSection();
+        await OptimizerPageHelper.verifyMessageOnConfiguration();
     });
 
     it('Verify that Current strategy drop down. - [744372]', async () => {
-        stepLogger.caseId = 744372;
+        StepLogger.caseId = 744372;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.verfyCurrentStrategyDropdown(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.verifyOptimizerPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.verfyCurrentStrategyDropdown();
     });
 
     it('Verify the Select column button. - [744384]', async () => {
-        stepLogger.caseId = 744384;
+        StepLogger.caseId = 744384;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.clickViewTab(stepLogger);
-        await OptimizerPageHelper.verifyViewPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.clickSelectColumns(stepLogger);
-        await OptimizerPageHelper.verifySelectColumnsPopup(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.clickViewTab();
+        await OptimizerPageHelper.verifyViewPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.clickSelectColumns();
+        await OptimizerPageHelper.verifySelectColumnsPopup();
     });
 
     it('Verify the Hide all button of the Select column to display page should be displayed - [744385]', async () => {
-        stepLogger.caseId = 744385;
+        StepLogger.caseId = 744385;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.clickViewTab(stepLogger);
-        await OptimizerPageHelper.verifyViewPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.clickSelectColumns(stepLogger);
-        stepLogger.stepId(5);
-        await OptimizerPageHelper.clickHideAll(stepLogger);
-        await OptimizerPageHelper.verifyNoColumnSelected(stepLogger);
-        stepLogger.stepId(6);
-        await OptimizerPageHelper.clickShowAll(stepLogger);
-        await OptimizerPageHelper.verifyAllColumnSelected(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.clickViewTab();
+        await OptimizerPageHelper.verifyViewPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.clickSelectColumns();
+        StepLogger.stepId(5);
+        await OptimizerPageHelper.clickHideAll();
+        await OptimizerPageHelper.verifyNoColumnSelected();
+        StepLogger.stepId(6);
+        await OptimizerPageHelper.clickShowAll();
+        await OptimizerPageHelper.verifyAllColumnSelected();
     });
 
     it('Verify that selected column should be displayed on View Management grid. - [744386]', async () => {
-        stepLogger.caseId = 744386;
+        StepLogger.caseId = 744386;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
-        stepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer(stepLogger);
-        await OptimizerPageHelper.clickViewTab(stepLogger);
-        await OptimizerPageHelper.verifyViewPageOpened(stepLogger);
-        stepLogger.stepId(4);
-        await OptimizerPageHelper.clickSelectColumns(stepLogger);
-        const selectedColNames = await OptimizerPageHelper.selectColumns(stepLogger);
-        stepLogger.stepId(5);
-        await OptimizerPageHelper.clickOKonSelectColumnPopup(stepLogger);
-        await OptimizerPageHelper.verifyColumnNamesInGrid(selectedColNames, stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        await CommonPageHelper.goToOptimizer();
+        await OptimizerPageHelper.clickViewTab();
+        await OptimizerPageHelper.verifyViewPageOpened();
+        StepLogger.stepId(4);
+        await OptimizerPageHelper.clickSelectColumns();
+        const selectedColNames = await OptimizerPageHelper.selectColumns();
+        StepLogger.stepId(5);
+        await OptimizerPageHelper.clickOKonSelectColumnPopup();
+        await OptimizerPageHelper.verifyColumnNamesInGrid(selectedColNames);
     });
 });
