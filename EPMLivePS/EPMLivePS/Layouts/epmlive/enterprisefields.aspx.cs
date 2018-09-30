@@ -112,12 +112,14 @@ namespace EPMLiveEnterprise.Layouts.epmlive
                     catch { }
 
                     {
-                        cmd = new SqlCommand("spHideField", cn);
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddWithValue("@fieldname", Request["d"]);
-                        cmd.Parameters.AddWithValue("@isPj", isPj);
-                        cmd.Parameters.AddWithValue("@type", Request["type"]);
-                        cmd.ExecuteNonQuery();
+                        using (cmd = new SqlCommand("spHideField", cn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.AddWithValue("@fieldname", Request["d"]);
+                            cmd.Parameters.AddWithValue("@isPj", isPj);
+                            cmd.Parameters.AddWithValue("@type", Request["type"]);
+                            cmd.ExecuteNonQuery();
+                        }
                     }
 
                     Response.Redirect(serverUrl + "/_layouts/epmlive/enterprisefields.aspx?" + Guid.NewGuid());
