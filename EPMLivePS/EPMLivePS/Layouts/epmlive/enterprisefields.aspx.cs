@@ -259,18 +259,20 @@ namespace EPMLiveEnterprise.Layouts.epmlive
             dr.Close();
             ////====================Enterprise===================
 
-            cmd = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=3 and pjvisible=1", cn);
-            dr = cmd.ExecuteReader();
-
-            while (dr.Read())
+            using (cmd = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=3 and pjvisible=1", cn))
             {
-                pjenterpriseFields = pjenterpriseFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
-                pjenterpriseFields = pjenterpriseFields + dr.GetString(2);
-                pjenterpriseFields = pjenterpriseFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
-                pjenterpriseFields = pjenterpriseFields + "<a href=enterprisefields.aspx?d=" + dr.GetString(0) + "&type=3&pj=1>delete</a>";
-                pjenterpriseFields = pjenterpriseFields + "</font></td></tr>";
+                using (dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        pjenterpriseFields = pjenterpriseFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
+                        pjenterpriseFields = pjenterpriseFields + dr.GetString(2);
+                        pjenterpriseFields = pjenterpriseFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
+                        pjenterpriseFields = pjenterpriseFields + "<a href=enterprisefields.aspx?d=" + dr.GetString(0) + "&type=3&pj=1>delete</a>";
+                        pjenterpriseFields = pjenterpriseFields + "</font></td></tr>";
+                    }
+                }
             }
-            dr.Close();
             ////====================pjEnterprise===================
 
             using (cmd = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=4 and pjvisible=1", cn))
