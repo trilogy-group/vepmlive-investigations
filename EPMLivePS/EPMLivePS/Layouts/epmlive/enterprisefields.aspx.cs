@@ -159,31 +159,32 @@ namespace EPMLiveEnterprise.Layouts.epmlive
 
                 //dr.Close();
                 //====================Custom Fields================
-                cmd = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=2 and visible=1 order by displayname", cn);
-                dr = cmd.ExecuteReader();
-
-                while (dr.Read())
+                using (cmd = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=2 and visible=1 order by displayname", cn))
                 {
-                    customFields = customFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
-                    customFields = customFields + dr.GetString(2);
-                    //customFields = customFields + "</td><td align=\"center\" class=\"cell\">";
-                    //customFields = customFields + "<input type=\"hidden\" name=\"fields\" value=\"" + dr.GetString(0) + "\">";
-                    //customFields = customFields + "<input class=\"checkbox\" type=\"checkbox\" name=\"" + dr.GetString(0) + "\" ";
-                    //if (dr.GetBoolean(1))
-                    //    customFields = customFields + "checked";
+                    using (dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            customFields = customFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
+                            customFields = customFields + dr.GetString(2);
+                            //customFields = customFields + "</td><td align=\"center\" class=\"cell\">";
+                            //customFields = customFields + "<input type=\"hidden\" name=\"fields\" value=\"" + dr.GetString(0) + "\">";
+                            //customFields = customFields + "<input class=\"checkbox\" type=\"checkbox\" name=\"" + dr.GetString(0) + "\" ";
+                            //if (dr.GetBoolean(1))
+                            //    customFields = customFields + "checked";
 
-                    //customFields = customFields + ">";
-                    customFields = customFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
+                            //customFields = customFields + ">";
+                            customFields = customFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
 
-                    if (!dr.GetBoolean(6))
-                        customFields = customFields + "<a href=enterprisefields.aspx?d=" + dr.GetString(0) + "&type=2>delete</a>";
-                    else
-                        customFields = customFields + "&nbsp;";
+                            if (!dr.GetBoolean(6))
+                                customFields = customFields + "<a href=enterprisefields.aspx?d=" + dr.GetString(0) + "&type=2>delete</a>";
+                            else
+                                customFields = customFields + "&nbsp;";
 
-                    customFields = customFields + "</font></td></tr>";
+                            customFields = customFields + "</font></td></tr>";
+                        }
+                    }
                 }
-
-                dr.Close();
                 //====================Enterprise===================
 
                 using (cmd = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=3 and visible=1 order by displayname", cn))
