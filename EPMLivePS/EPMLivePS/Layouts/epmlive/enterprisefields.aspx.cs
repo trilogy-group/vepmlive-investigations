@@ -67,39 +67,41 @@ namespace EPMLiveEnterprise.Layouts.epmlive
                 SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
                 cn.Open();
 
-                SqlCommand cmd = new SqlCommand("select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=9", cn);
-                cmd.Parameters.AddWithValue("@siteguid", siteGuid);
-                SqlDataReader dr = cmd.ExecuteReader();
-
-                if (dr.Read())
+                using (var command = new SqlCommand("select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=9", cn))
                 {
-                    if (!dr.IsDBNull(3))
+                    command.Parameters.AddWithValue("@siteguid", siteGuid);
+
+                    using (var dataReader = command.ExecuteReader())
                     {
-                        if (dr.GetInt32(3) == 0)
+                        if (dataReader.Read())
                         {
-                            lblLastSyncResults.Text = "Queued";
-                            inpSynch.Visible = false;
-                        }
-                        else if (dr.GetInt32(3) == 1)
-                        {
-                            lblLastSyncResults.Text = "Processing (" + dr.GetInt32(2).ToString("##0") + "%)";
-                            inpSynch.Visible = false;
-                        }
-                        else if (!dr.IsDBNull(5))
-                        {
-                            lblLastSyncResults.Text = dr.GetString(5);
-                        }
-                        else
-                        {
-                            lblLastSyncResults.Text = "No Results";
+                            if (!dataReader.IsDBNull(3))
+                            {
+                                if (dataReader.GetInt32(3) == 0)
+                                {
+                                    lblLastSyncResults.Text = "Queued";
+                                    inpSynch.Visible = false;
+                                }
+                                else if (dataReader.GetInt32(3) == 1)
+                                {
+                                    lblLastSyncResults.Text = "Processing (" + dataReader.GetInt32(2).ToString("##0") + "%)";
+                                    inpSynch.Visible = false;
+                                }
+                                else if (!dataReader.IsDBNull(5))
+                                {
+                                    lblLastSyncResults.Text = dataReader.GetString(5);
+                                }
+                                else
+                                {
+                                    lblLastSyncResults.Text = "No Results";
+                                }
+                            }
+
+                            if (!dataReader.IsDBNull(4))
+                                lblLastSyncTime.Text = dataReader.GetDateTime(4).ToString();
                         }
                     }
-
-                    if (!dr.IsDBNull(4))
-                        lblLastSyncTime.Text = dr.GetDateTime(4).ToString();
                 }
-
-                dr.Close();
 
 
                 if (Request["d"] != null)
@@ -112,13 +114,13 @@ namespace EPMLiveEnterprise.Layouts.epmlive
                     catch { }
 
                     {
-                        using (cmd = new SqlCommand("spHideField", cn))
+                        using (var command = new SqlCommand("spHideField", cn))
                         {
-                            cmd.CommandType = CommandType.StoredProcedure;
-                            cmd.Parameters.AddWithValue("@fieldname", Request["d"]);
-                            cmd.Parameters.AddWithValue("@isPj", isPj);
-                            cmd.Parameters.AddWithValue("@type", Request["type"]);
-                            cmd.ExecuteNonQuery();
+                            command.CommandType = CommandType.StoredProcedure;
+                            command.Parameters.AddWithValue("@fieldname", Request["d"]);
+                            command.Parameters.AddWithValue("@isPj", isPj);
+                            command.Parameters.AddWithValue("@type", Request["type"]);
+                            command.ExecuteNonQuery();
                         }
                     }
 
@@ -161,14 +163,14 @@ namespace EPMLiveEnterprise.Layouts.epmlive
 
                 //dr.Close();
                 //====================Custom Fields================
-                using (cmd = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=2 and visible=1 order by displayname", cn))
+                using (var command = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=2 and visible=1 order by displayname", cn))
                 {
-                    using (dr = cmd.ExecuteReader())
+                    using (var dataReader = command.ExecuteReader())
                     {
-                        while (dr.Read())
+                        while (dataReader.Read())
                         {
                             customFields = customFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
-                            customFields = customFields + dr.GetString(2);
+                            customFields = customFields + dataReader.GetString(2);
                             //customFields = customFields + "</td><td align=\"center\" class=\"cell\">";
                             //customFields = customFields + "<input type=\"hidden\" name=\"fields\" value=\"" + dr.GetString(0) + "\">";
                             //customFields = customFields + "<input class=\"checkbox\" type=\"checkbox\" name=\"" + dr.GetString(0) + "\" ";
@@ -178,8 +180,8 @@ namespace EPMLiveEnterprise.Layouts.epmlive
                             //customFields = customFields + ">";
                             customFields = customFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
 
-                            if (!dr.GetBoolean(6))
-                                customFields = customFields + "<a href=enterprisefields.aspx?d=" + dr.GetString(0) + "&type=2>delete</a>";
+                            if (!dataReader.GetBoolean(6))
+                                customFields = customFields + "<a href=enterprisefields.aspx?d=" + dataReader.GetString(0) + "&type=2>delete</a>";
                             else
                                 customFields = customFields + "&nbsp;";
 
@@ -189,14 +191,14 @@ namespace EPMLiveEnterprise.Layouts.epmlive
                 }
                 //====================Enterprise===================
 
-                using (cmd = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=3 and visible=1 order by displayname", cn))
+                using (var command = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=3 and visible=1 order by displayname", cn))
                 {
-                    using (dr = cmd.ExecuteReader())
+                    using (var dataReader = command.ExecuteReader())
                     {
-                        while (dr.Read())
+                        while (dataReader.Read())
                         {
                             enterpriseFields = enterpriseFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
-                            enterpriseFields = enterpriseFields + dr.GetString(2);
+                            enterpriseFields = enterpriseFields + dataReader.GetString(2);
                             //enterpriseFields = enterpriseFields + "</td><td align=\"center\" class=\"cell\">";
                             //enterpriseFields = enterpriseFields + "<input type=\"hidden\" name=\"fields\" value=\"" + dr.GetString(0) + "\">";
                             //enterpriseFields = enterpriseFields + "<input class=\"checkbox\" type=\"checkbox\" name=\"" + dr.GetString(0) + "\" ";
@@ -209,8 +211,8 @@ namespace EPMLiveEnterprise.Layouts.epmlive
                             //enterpriseFields = enterpriseFields + "/>";
                             enterpriseFields = enterpriseFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
 
-                            if (!dr.GetBoolean(6))
-                                enterpriseFields = enterpriseFields + "<a href=enterprisefields.aspx?d=" + dr.GetString(0) + "&type=3>delete</a>";
+                            if (!dataReader.GetBoolean(6))
+                                enterpriseFields = enterpriseFields + "<a href=enterprisefields.aspx?d=" + dataReader.GetString(0) + "&type=3>delete</a>";
                             else
                                 enterpriseFields = enterpriseFields + "&nbsp;";
 
