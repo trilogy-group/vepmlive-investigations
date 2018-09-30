@@ -188,31 +188,31 @@ namespace EPMLiveCore
 
         #region Method Call : (Page_Load) (Return Type : void) No Exception Thrown
 
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_MyWorkGridAction_Page_Load_Method_Call_Void_With_2_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sender = CreateType<object>();
-            var e = CreateType<EventArgs>();
-            var methodPage_LoadPrametersTypes = new Type[] { typeof(object), typeof(EventArgs) };
-            object[] parametersOfPage_Load = { sender, e };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodPage_Load, methodPage_LoadPrametersTypes, out exception);
+        //[Test]
+        //[Timeout(TestsTimeOut)]
+        //[Category("AUT MethodCallTest")]
+        //public void AUT_MyWorkGridAction_Page_Load_Method_Call_Void_With_2_Parameters_No_Exception_Thrown_Test()
+        //{
+        //    // Arrange
+        //    var sender = CreateType<object>();
+        //    var e = CreateType<EventArgs>();
+        //    var methodPage_LoadPrametersTypes = new Type[] { typeof(object), typeof(EventArgs) };
+        //    object[] parametersOfPage_Load = { sender, e };
+        //    Exception exception = null;
+        //    var methodInfo = GetMethodInfo(MethodPage_Load, methodPage_LoadPrametersTypes, out exception);
 
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_myWorkGridActionInstanceFixture, parametersOfPage_Load);
+        //    // Act
+        //    Action currentAction = () => methodInfo.Invoke(_myWorkGridActionInstanceFixture, parametersOfPage_Load);
 
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfPage_Load.ShouldNotBeNull();
-            parametersOfPage_Load.Length.ShouldBe(2);
-            methodPage_LoadPrametersTypes.Length.ShouldBe(2);
-            methodPage_LoadPrametersTypes.Length.ShouldBe(parametersOfPage_Load.Length);
-            Should.NotThrow(currentAction);
-        }
+        //    // Assert
+        //    methodInfo.ShouldNotBeNull();
+        //    exception.ShouldBeNull();
+        //    parametersOfPage_Load.ShouldNotBeNull();
+        //    parametersOfPage_Load.Length.ShouldBe(2);
+        //    methodPage_LoadPrametersTypes.Length.ShouldBe(2);
+        //    methodPage_LoadPrametersTypes.Length.ShouldBe(parametersOfPage_Load.Length);
+        //    Should.NotThrow(currentAction);
+        //}
 
         #endregion
 
