@@ -31,6 +31,7 @@ namespace TimeSheets
         private const string TsItemNotes = "ts_item_notes";
         private const string Zero = "0";
         private const string Dot = ".";
+        private const string Two = "2";
         XmlDocument docXml = new XmlDocument();
         XmlNode ndMainParent;
         protected string data = "";
@@ -594,15 +595,16 @@ namespace TimeSheets
 
             AppendChild(newNode, Name, "tsuid", dataRows[0][TsUid].ToString());
 
-            if (dataRows[0]["approval_status"].ToString().ToLower() == One)
+            var approvalStatus = dataRows[0]["approval_status"].ToString();
+            if (approvalStatus.Equals(One, StringComparison.OrdinalIgnoreCase))
             {
                 newCell.InnerXml = "<![CDATA[<img src=\"images/tsflaggreen.gif\" alt=\"Approved\">]]>";
             }
-            else if (dataRows[0]["approval_status"].ToString().ToLower() == "2")
+            else if (approvalStatus.Equals(Two, StringComparison.OrdinalIgnoreCase))
             {
                 newCell.InnerXml = "<![CDATA[<img src=\"images/tsflagred.gif\" alt=\"Rejected\">]]>";
             }
-            else if (dataRows[0]["submitted"].ToString().ToLower() == "true")
+            else if (dataRows[0]["submitted"].ToString().Equals(True, StringComparison.OrdinalIgnoreCase))
             {
                 newCell.InnerXml = "<![CDATA[<img src=\"images/tsflagyellow.gif\" alt=\"Submitted\">]]>";
             }
@@ -660,7 +662,7 @@ namespace TimeSheets
                 case One:
                     newCell.InnerXml = "<![CDATA[<img src=\"images/tsflaggreen.gif\" alt=\"Approved\">]]>";
                     break;
-                case "2":
+                case Two:
                     newCell.InnerXml = "<![CDATA[<img src=\"images/tsflagred.gif\" alt=\"Rejected\">]]>";
                     break;
             };
@@ -831,15 +833,11 @@ namespace TimeSheets
                 ? drTaskTimes[0][Hours].ToString() 
                 : Zero;
 
-            try
+            if (!double.TryParse(hours, out total))
             {
-                total += double.Parse(hours);
+                SystemTrace.WriteLine($"Unable to parse double from string '{hours}'");
             }
-            catch (Exception ex)
-            {
-                SystemTrace.WriteLine(ex.ToString());
-            }
-
+            
             if (drTaskNotes.Length > 0)
             {
                 AppendAttribute(newCell, TypeConst, TimeEditor);

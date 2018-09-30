@@ -72,55 +72,55 @@ namespace TimeSheets.Tests
         }
 
         [TestMethod]
-        public void addGroups_When_Pending_And_RowCount()
+        public void AddGroups_When_Pending_And_RowCount()
         {
             CommonTestData(Pending, 1, EPMLiveTimesheets.Tests.Properties.Resources.addGroups_When_Pending_And_RowCount);
         }
 
         [TestMethod]
-        public void addGroups_When_Approved_And_RowCount()
+        public void AddGroups_When_Approved_And_RowCount()
         {
             CommonTestData(Approved, 1, EPMLiveTimesheets.Tests.Properties.Resources.addGroups_When_Approved_And_RowCount);
         }
 
         [TestMethod]
-        public void addGroups_When_Rejected_And_RowCount()
+        public void AddGroups_When_Rejected_And_RowCount()
         {
             CommonTestData(Rejected, 1, EPMLiveTimesheets.Tests.Properties.Resources.addGroups_When_Rejected_And_RowCount);
         }
 
         [TestMethod]
-        public void addGroups_When_Pending()
+        public void AddGroups_When_Pending()
         {
             CommonTestData(Pending, 0, EPMLiveTimesheets.Tests.Properties.Resources.addGroups_When_Pending_1);
         }
 
         [TestMethod]
-        public void addGroups_When_Approved()
+        public void AddGroups_When_Approved()
         {
             CommonTestData(Approved, 0, EPMLiveTimesheets.Tests.Properties.Resources.addGroups_When_Approved_1);
         }
 
         [TestMethod]
-        public void addGroups_When_Rejected_2()
+        public void AddGroups_When_Rejected_2()
         {
             CommonTestData(Rejected, 0, EPMLiveTimesheets.Tests.Properties.Resources.addGroups_When_Rejected_2, "2");
         }
 
         [TestMethod]
-        public void addGroups_When_Pending_And_Submitted()
+        public void AddGroups_When_Pending_And_Submitted()
         {
             CommonTestData(Pending, 0, EPMLiveTimesheets.Tests.Properties.Resources.addGroups_When_Pending_2, string.Empty, "true");
         }
 
         [TestMethod]
-        public void addGroups_When_Approved_2()
+        public void AddGroups_When_Approved_2()
         {
             CommonTestData(Approved, 0, EPMLiveTimesheets.Tests.Properties.Resources.addGroups_When_Approved_2, "1");
         }
 
         [TestMethod]
-        public void addGroups_When_Rejected()
+        public void AddGroups_When_Rejected()
         {
             CommonTestData(Rejected, 0, EPMLiveTimesheets.Tests.Properties.Resources.addGroups_When_Rejected_1);
         }
