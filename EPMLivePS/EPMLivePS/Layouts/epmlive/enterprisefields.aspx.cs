@@ -186,34 +186,35 @@ namespace EPMLiveEnterprise.Layouts.epmlive
                 dr.Close();
                 //====================Enterprise===================
 
-                cmd = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=3 and visible=1 order by displayname", cn);
-                dr = cmd.ExecuteReader();
-
-                while (dr.Read())
+                using (cmd = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=3 and visible=1 order by displayname", cn))
                 {
-                    enterpriseFields = enterpriseFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
-                    enterpriseFields = enterpriseFields + dr.GetString(2);
-                    //enterpriseFields = enterpriseFields + "</td><td align=\"center\" class=\"cell\">";
-                    //enterpriseFields = enterpriseFields + "<input type=\"hidden\" name=\"fields\" value=\"" + dr.GetString(0) + "\">";
-                    //enterpriseFields = enterpriseFields + "<input class=\"checkbox\" type=\"checkbox\" name=\"" + dr.GetString(0) + "\" ";
-                    //if (dr.GetBoolean(1))
-                    //    enterpriseFields = enterpriseFields + "checked";
+                    using (dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            enterpriseFields = enterpriseFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
+                            enterpriseFields = enterpriseFields + dr.GetString(2);
+                            //enterpriseFields = enterpriseFields + "</td><td align=\"center\" class=\"cell\">";
+                            //enterpriseFields = enterpriseFields + "<input type=\"hidden\" name=\"fields\" value=\"" + dr.GetString(0) + "\">";
+                            //enterpriseFields = enterpriseFields + "<input class=\"checkbox\" type=\"checkbox\" name=\"" + dr.GetString(0) + "\" ";
+                            //if (dr.GetBoolean(1))
+                            //    enterpriseFields = enterpriseFields + "checked";
 
-                    //if (dr.IsDBNull(10))
-                    //    enterpriseFields = enterpriseFields + " disabled=\"disabled\"";
+                            //if (dr.IsDBNull(10))
+                            //    enterpriseFields = enterpriseFields + " disabled=\"disabled\"";
 
-                    //enterpriseFields = enterpriseFields + "/>";
-                    enterpriseFields = enterpriseFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
+                            //enterpriseFields = enterpriseFields + "/>";
+                            enterpriseFields = enterpriseFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
 
-                    if (!dr.GetBoolean(6))
-                        enterpriseFields = enterpriseFields + "<a href=enterprisefields.aspx?d=" + dr.GetString(0) + "&type=3>delete</a>";
-                    else
-                        enterpriseFields = enterpriseFields + "&nbsp;";
+                            if (!dr.GetBoolean(6))
+                                enterpriseFields = enterpriseFields + "<a href=enterprisefields.aspx?d=" + dr.GetString(0) + "&type=3>delete</a>";
+                            else
+                                enterpriseFields = enterpriseFields + "&nbsp;";
 
-                    enterpriseFields = enterpriseFields + "</font></td></tr>";
+                            enterpriseFields = enterpriseFields + "</font></td></tr>";
+                        }
+                    }
                 }
-
-                dr.Close();
 
                 loadPjFields(cn);
 
