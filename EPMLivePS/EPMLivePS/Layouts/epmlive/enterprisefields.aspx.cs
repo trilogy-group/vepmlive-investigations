@@ -244,47 +244,48 @@ namespace EPMLiveEnterprise.Layouts.epmlive
 
             //dr.Close();
             //====================Custom Fields================
-            SqlCommand cmd = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=2 and pjvisible=1 order by displayname", cn);
-            SqlDataReader dr = cmd.ExecuteReader();
-
-            while (dr.Read())
+            using (var command = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=2 and pjvisible=1 order by displayname", cn))
             {
-                pjcustomFields = pjcustomFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
-                pjcustomFields = pjcustomFields + dr.GetString(2);
-                pjcustomFields = pjcustomFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
-                pjcustomFields = pjcustomFields + "<a href=enterprisefields.aspx?d=" + dr.GetString(0) + "&type=2&pj=1>delete</a>";
-                pjcustomFields = pjcustomFields + "</font></td></tr>";
+                using (var dataReader = command.ExecuteReader())
+                {
+                    while (dataReader.Read())
+                    {
+                        pjcustomFields = pjcustomFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
+                        pjcustomFields = pjcustomFields + dataReader.GetString(2);
+                        pjcustomFields = pjcustomFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
+                        pjcustomFields = pjcustomFields + "<a href=enterprisefields.aspx?d=" + dataReader.GetString(0) + "&type=2&pj=1>delete</a>";
+                        pjcustomFields = pjcustomFields + "</font></td></tr>";
+                    }
+                }
             }
-
-            dr.Close();
             ////====================Enterprise===================
 
-            using (cmd = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=3 and pjvisible=1", cn))
+            using (var command = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=3 and pjvisible=1", cn))
             {
-                using (dr = cmd.ExecuteReader())
+                using (var dataReader = command.ExecuteReader())
                 {
-                    while (dr.Read())
+                    while (dataReader.Read())
                     {
                         pjenterpriseFields = pjenterpriseFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
-                        pjenterpriseFields = pjenterpriseFields + dr.GetString(2);
+                        pjenterpriseFields = pjenterpriseFields + dataReader.GetString(2);
                         pjenterpriseFields = pjenterpriseFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
-                        pjenterpriseFields = pjenterpriseFields + "<a href=enterprisefields.aspx?d=" + dr.GetString(0) + "&type=3&pj=1>delete</a>";
+                        pjenterpriseFields = pjenterpriseFields + "<a href=enterprisefields.aspx?d=" + dataReader.GetString(0) + "&type=3&pj=1>delete</a>";
                         pjenterpriseFields = pjenterpriseFields + "</font></td></tr>";
                     }
                 }
             }
             ////====================pjEnterprise===================
 
-            using (cmd = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=4 and pjvisible=1", cn))
+            using (var command = new SqlCommand("Select * from CUSTOMFIELDS where fieldcategory=4 and pjvisible=1", cn))
             {
-                using (dr = cmd.ExecuteReader())
+                using (var dataReader = command.ExecuteReader())
                 {
-                    while (dr.Read())
+                    while (dataReader.Read())
                     {
                         pjpjenterpriseFields = pjpjenterpriseFields + "<tr><td class=\"ms-descriptiontext cell\" style=\"padding-left: 20px\">";
-                        pjpjenterpriseFields = pjpjenterpriseFields + dr.GetString(2);
+                        pjpjenterpriseFields = pjpjenterpriseFields + dataReader.GetString(2);
                         pjpjenterpriseFields = pjpjenterpriseFields + "</td><td align=\"center\" class=\"cell\"><font class=\"ms-descriptiontext\">";
-                        pjpjenterpriseFields = pjpjenterpriseFields + "<a href=enterprisefields.aspx?d=" + dr.GetString(0) + "&type=3&pj=1>delete</a>";
+                        pjpjenterpriseFields = pjpjenterpriseFields + "<a href=enterprisefields.aspx?d=" + dataReader.GetString(0) + "&type=3&pj=1>delete</a>";
                         pjpjenterpriseFields = pjpjenterpriseFields + "</font></td></tr>";
                     }
                 }
