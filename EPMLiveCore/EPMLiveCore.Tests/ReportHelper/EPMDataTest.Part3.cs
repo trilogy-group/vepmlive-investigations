@@ -757,21 +757,6 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void UpdateListName_OnSuccess_ReturnsTrue()
-        {
-            // Arrange
-            ShimEPMData.AllInstances.ExecuteNonQuerySqlConnection = (_, connection) => true;
-
-            // Act
-            var result = _privateObject.Invoke(UpdateListNameMethodName, DummyGuid, DummyString) as bool?;
-
-            // Assert
-            result.ShouldSatisfyAllConditions(
-                () => result.ShouldNotBeNull(),
-                () => result.Value.ShouldBeTrue());
-        }
-
-        [TestMethod]
         public void GetListId_OnSuccess_ReturnsGuid()
         {
             // Arrange
