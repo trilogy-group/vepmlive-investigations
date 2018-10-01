@@ -130,9 +130,15 @@
     <Compile Include="API\TimesheetAPI.SubmitTimesheet.Tests.cs" />
     <Compile Include="API\TimesheetAPI.UnSubmitTimesheet.Tests.cs" />
     <Compile Include="API\TimesheetAPITests.cs" />
+    <Compile Include="GetTsTests.addGroups.cs" />
     <Compile Include="GetTsTests.cs" />
     <Compile Include="MyTimesheetTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Resource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -169,6 +175,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resource.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
