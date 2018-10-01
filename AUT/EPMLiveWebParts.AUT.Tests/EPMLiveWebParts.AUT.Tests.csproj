@@ -157,7 +157,6 @@
     <Compile Include="Layouts\epmlive\ChartWizardTest.cs" />
     <Compile Include="Layouts\epmlive\ExtensionMethodsTest.cs" />
     <Compile Include="Layouts\epmlive\GetreportfiltertitlesTest.cs" />
-    <Compile Include="Layouts\epmlive\MyWorkGridActionTest.cs" />
     <Compile Include="Layouts\epmlive\MyWorkRichTextEditorTest.cs" />
     <Compile Include="Layouts\epmlive\MyWorkTest.cs" />
     <Compile Include="Layouts\epmlive\RedirectionProxyTest.cs" />
