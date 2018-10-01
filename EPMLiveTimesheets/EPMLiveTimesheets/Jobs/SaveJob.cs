@@ -342,11 +342,11 @@ namespace TimeSheets
                                             }
                                             catch { }
                                             // Checking if any customer is using custom projectcenter
-                                            string projectlistname = string.Empty;
-                                            projectlistname = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveCustomProjectList");
-                                            if (!string.IsNullOrEmpty(projectlistname))
+                                            string projectListName = string.Empty;
+                                            projectListName = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveCustomProjectList");
+                                            if (!string.IsNullOrEmpty(projectListName))
                                             {
-                                                ListProjectCenter = projectlistname;
+                                                ListProjectCenter = projectListName;
                                             }
 
                                             if (li != null)
@@ -373,7 +373,7 @@ namespace TimeSheets
 
                                                 if (drItem.Length > 0)
                                                 {
-                                                    string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username, webid + "." + web.Lists[ListProjectCenter].ID + "." + Convert.ToString(projectid));
+                                                    string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username, $"{webid}.{web.Lists[ListProjectCenter].ID}.{projectid}");
                                                     using (SqlCommand cmd = new SqlCommand("UPDATE TSITEM set Title = @title, project=@project, project_id=@projectid,rate=@rate where ts_item_uid=@uid", cn))
                                                     {
                                                         cmd.Parameters.AddWithValue("@uid", id);
@@ -421,7 +421,7 @@ namespace TimeSheets
                                                         itemInsertCmd.Parameters.AddWithValue("@list", list.Title);
                                                         itemInsertCmd.Parameters.AddWithValue("@itemtype", itemtypeid);
                                                         itemInsertCmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
-                                                        string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username, webid + "." + web.Lists[ListProjectCenter].ID + "." + Convert.ToString(projectid));
+                                                        string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username, $"{webid}.{web.Lists[ListProjectCenter].ID}.{projectid}");
                                                         itemInsertCmd.Parameters.AddWithValue("@rate", rate);
                                                         if (projectlist == "")
                                                             itemInsertCmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);

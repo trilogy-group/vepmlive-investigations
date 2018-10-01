@@ -8,7 +8,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
-using Microsoft.SharePoint; 
+using Microsoft.SharePoint;
 using System.Text.RegularExpressions;
 using System.Data.SqlClient;
 
@@ -56,7 +56,7 @@ namespace TimeSheets
 
                 output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><data>";
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
                     cn.Open();
@@ -175,9 +175,9 @@ namespace TimeSheets
 
                                         processItem(id, iWeb, iList, pList);
 
-                                        if(liveHours)
+                                        if (liveHours)
                                         {
-                                            
+
                                             processLiveHours(id, listGuid, iList);
                                         }
 
@@ -235,7 +235,7 @@ namespace TimeSheets
                             hours = dr1.GetDouble(0);
                     dr1.Close();
 
-                    if(li.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                    if (li.DoesUserHavePermissions(SPBasePermissions.EditListItems))
                     {
                         li["TimesheetHours"] = hours;
 
@@ -245,11 +245,11 @@ namespace TimeSheets
                     }
                     else
                     {
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
-                            using(SPSite s = new SPSite(list.ParentWeb.Site.ID))
+                            using (SPSite s = new SPSite(list.ParentWeb.Site.ID))
                             {
-                                using(SPWeb w = s.OpenWeb(list.ParentWeb.ID))
+                                using (SPWeb w = s.OpenWeb(list.ParentWeb.ID))
                                 {
                                     SPList l = w.Lists[listGuid];
                                     SPListItem i = l.GetItemById(li.ID);
@@ -524,7 +524,7 @@ namespace TimeSheets
             string siteid = "";
             string title = "";
 
-            if(tsuid == "")
+            if (tsuid == "")
                 tsuid = Request["tsuid"];
 
             try
@@ -614,7 +614,7 @@ namespace TimeSheets
                             cmd = new SqlCommand("UPDATE tsitem set title = @title, approval_status = 0,project_list_uid=@projectlistuid where ts_item_uid=@itemuid", cn);
                             cmd.Parameters.AddWithValue("@itemuid", tsitemuid);
                             cmd.Parameters.AddWithValue("@title", li.Title);
-                            if(pList!=null)
+                            if (pList != null)
                                 cmd.Parameters.AddWithValue("@projectlistuid", pList.ID);
                             else
                                 cmd.Parameters.AddWithValue("@projectlistuid", DBNull.Value);
@@ -751,14 +751,14 @@ namespace TimeSheets
                                 itemtype = 2;
 
                             // Checking if any customer is using custom projectcenter
-                            string projectlistname = string.Empty;
-                            projectlistname = EPMLiveCore.CoreFunctions.getConfigSetting(iWeb, "EPMLiveCustomProjectList");
-                            if (!string.IsNullOrEmpty(projectlistname))
+                            string projectListName = string.Empty;
+                            projectListName = EPMLiveCore.CoreFunctions.getConfigSetting(iWeb, "EPMLiveCustomProjectList");
+                            if (!string.IsNullOrEmpty(projectListName))
                             {
-                                ListProjectCenter = projectlistname;
+                                ListProjectCenter = projectListName;
                             }
 
-                            string rate = SharedFunctions.GetStandardRates(cn, tsuid.ToString(), iWeb, username, webid + "." + iWeb.Lists[ListProjectCenter].ID + "." + Convert.ToString(project_id));
+                            string rate = SharedFunctions.GetStandardRates(cn, tsuid.ToString(), iWeb, username, $"{webid}.{iWeb.Lists[ListProjectCenter].ID}.{project_id}");
                             SqlCommand cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID,TS_ITEM_UID,WEB_UID,LIST_UID,ITEM_TYPE,ITEM_ID,TITLE,PROJECT,PROJECT_ID,LIST,PROJECT_LIST_UID,Rate) VALUES (@TS_UID,@TS_ITEM_UID,@WEB_UID,@LIST_UID,@ITEM_TYPE,@ITEM_ID,@TITLE,@PROJECT,@PROJECT_ID,@LIST,@projectlistuid,@rate)", cn);
                             cmd.Parameters.AddWithValue("@TS_UID", tsuid);
                             cmd.Parameters.AddWithValue("@TS_ITEM_UID", newTS);
@@ -777,7 +777,7 @@ namespace TimeSheets
                                 cmd.Parameters.AddWithValue("@projectlistuid", DBNull.Value);
                             cmd.ExecuteNonQuery();
 
-                            if(pField != null)
+                            if (pField != null)
                                 SharedFunctions.processMeta(iWeb, iList, li, newTS, project, cn, pList);
                             int daycounter = 0;
                             for (int i = 0; i < intDateCount; i++)
@@ -847,6 +847,6 @@ namespace TimeSheets
                 }
             }
         }
-        
+
     }
 }
