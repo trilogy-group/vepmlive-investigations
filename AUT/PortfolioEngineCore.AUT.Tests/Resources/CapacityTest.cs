@@ -9,7 +9,7 @@ using AUT.ConfigureTestProjects.Extensions;
 using AUT.ConfigureTestProjects.StaticTypes;
 using NUnit.Framework;
 using Should = Shouldly.Should;
-using Shouldly;
+using Shouldly; 
 
 namespace PortfolioEngineCore
 {
@@ -1569,33 +1569,33 @@ namespace PortfolioEngineCore
 
         #region Method Call : (AddCustomField) (Return Type : void) No Exception Thrown
 
-        //[Test]
-        //[Timeout(TestsTimeOut)]
-        //[Category("AUT MethodCallTest")]
-        //public void AUT_Capacity_AddCustomField_Static_Method_Call_Void_With_5_Parameters_No_Exception_Thrown_Test()
-        //{
-        //    // Arrange
-        //    var customfields = CreateType<List<string>>();
-        //    var lFieldID = CreateType<int>();
-        //    var lFieldType = CreateType<int>();
-        //    var reader = CreateType<SqlDataReader>();
-        //    var sFieldName = CreateType<string>();
-        //    var methodAddCustomFieldPrametersTypes = new Type[] { typeof(List<string>), typeof(int), typeof(int), typeof(SqlDataReader), typeof(string) };
-        //    object[] parametersOfAddCustomField = { customfields, lFieldID, lFieldType, reader, sFieldName };
-        //    Exception exception = null;
-        //    var methodInfo = GetMethodInfo(MethodAddCustomField, methodAddCustomFieldPrametersTypes, out exception);
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_Capacity_AddCustomField_Static_Method_Call_Void_With_5_Parameters_No_Exception_Thrown_Test()
+        {
+            // Arrange
+            var customfields = CreateType<List<string>>();
+            var lFieldID = CreateType<int>();
+            var lFieldType = CreateType<int>();
+            var reader = CreateType<SqlDataReader>();
+            var sFieldName = CreateType<string>();
+            var methodAddCustomFieldPrametersTypes = new Type[] { typeof(List<string>), typeof(int), typeof(int), typeof(SqlDataReader), typeof(string) };
+            object[] parametersOfAddCustomField = { customfields, lFieldID, lFieldType, reader, sFieldName };
+            Exception exception = null;
+            var methodInfo = GetMethodInfo(MethodAddCustomField, methodAddCustomFieldPrametersTypes, out exception);
 
-        //    // Act
-        //    Action currentAction = () => methodInfo.Invoke(_capacityInstanceFixture, parametersOfAddCustomField);
+            // Act
+            Action currentAction = () => methodInfo.Invoke(_capacityInstanceFixture, parametersOfAddCustomField);
 
-        //    // Assert
-        //    methodInfo.ShouldNotBeNull();
-        //    exception.ShouldBeNull();
-        //    parametersOfAddCustomField.ShouldNotBeNull();
-        //    parametersOfAddCustomField.Length.ShouldBe(5);
-        //    methodAddCustomFieldPrametersTypes.Length.ShouldBe(5);
-        //    Should.NotThrow(currentAction);
-        //}
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            parametersOfAddCustomField.ShouldNotBeNull();
+            parametersOfAddCustomField.Length.ShouldBe(5);
+            methodAddCustomFieldPrametersTypes.Length.ShouldBe(5);
+            Should.NotThrow(currentAction);
+        }
 
         #endregion
 
