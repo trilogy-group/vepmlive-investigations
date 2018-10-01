@@ -38,6 +38,7 @@ namespace EPMLiveCore.Tests
         private bool _deRefreshCacheCalled;
         private bool _nonQueryExecuted;
         private bool _daoDisposed;
+        private string _sqlString;
 
         private const int DummyInt = 1;
         private const string DummyString = "DummyString";
@@ -54,6 +55,7 @@ namespace EPMLiveCore.Tests
             _deRefreshCacheCalled = false;
             _nonQueryExecuted = false;
             _daoDisposed = false;
+            _sqlString = string.Empty;
 
             _shimObject = ShimsContext.Create();
             _testObj = new ADSync();
@@ -123,16 +125,19 @@ namespace EPMLiveCore.Tests
                 AllWebsGet = () => new ShimSPWebCollection
                 {
                     ItemGetString = _ => _web
-                }
+                },
+                RootWebGet = () => _web
             };
 
             _web = new ShimSPWeb
             {
+                IDGet = () => Guid.NewGuid(),
                 SiteGet = () => _site,
                 ListsGet = () => new ShimSPListCollection
                 {
                     ItemGetString = _ => spList
-                }
+                },
+                UrlGet = () => DummyString
             };
 
             ShimSPSite.AllInstances.OpenWeb = _ => _web;
@@ -144,9 +149,18 @@ namespace EPMLiveCore.Tests
 
             ShimSPQuery.Constructor = _ => { };
 
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = action => action();
+
             ShimEPMData.ConstructorGuid = (_, __) => { };
             ShimEPMData.AllInstances.GetEPMLiveConnectionGet = _ => new ShimSqlConnection();
-            ShimEPMData.AllInstances.ExecuteNonQuerySqlConnection = (_, __) => _nonQueryExecuted = true;
+            ShimEPMData.AllInstances.ExecuteNonQuerySqlConnection = (instance, __) =>
+            {
+                _nonQueryExecuted = true;
+                _sqlString = instance.Command;
+
+                return true;
+            };
+            ShimEPMData.AllInstances.AddParamStringObject = (_, __, ___) => { };
             ShimEPMData.AllInstances.Dispose = _ => _daoDisposed = true;
 
             ShimCoreFunctions.getConfigSettingSPWebStringBooleanBoolean = (_1, _2, _3, _4) => DummyString;
@@ -282,6 +296,66 @@ namespace EPMLiveCore.Tests
             this.ShouldSatisfyAllConditions(
                 () => _deRefreshCacheCalled.ShouldBeTrue(),
                 () => result.ShouldNotBeNull());
+        }
+
+        [TestMethod]
+        public void AddTimerJob_WhenExecuteScalarReturnsGuidAndRunNowIsTrue_ConfirmResult()
+        {
+            // Arrange
+            var jobEnqueued = false;
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, __) => Guid.NewGuid();
+            ShimCoreFunctions.enqueueGuidInt32 = (_, __) => jobEnqueued = true;
+
+            // Act
+            var result = _testObj.AddTimerJob(_web, DummyInt, DummyInt, DummyString, true);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _sqlString.ShouldContain("UPDATE TIMERJOBS"),
+                () => _nonQueryExecuted.ShouldBeTrue(),
+                () => jobEnqueued.ShouldBeTrue(),
+                () => _daoDisposed.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void AddTimerJob_WhenExecuteScalarReturnsNullAndRunNowIsFalse_ConfirmResult()
+        {
+            // Arrange
+            var jobEnqueued = false;
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, __) => null;
+            ShimCoreFunctions.enqueueGuidInt32 = (_, __) => jobEnqueued = true;
+
+            // Act
+            var result = _testObj.AddTimerJob(_web, DummyInt, DummyInt, DummyString, false);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _sqlString.ShouldContain("INSERT INTO TIMERJOBS"),
+                () => _nonQueryExecuted.ShouldBeTrue(),
+                () => jobEnqueued.ShouldBeFalse(),
+                () => _daoDisposed.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void AddTimerJob_OnError_LogError()
+        {
+            // Arrange
+            var jobEnqueued = false;
+            ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, __) =>
+            {
+                throw new Exception(DummyError);
+            };
+            ShimCoreFunctions.enqueueGuidInt32 = (_, __) => jobEnqueued = true;
+
+            // Act
+            var result = _testObj.AddTimerJob(_web, DummyInt, DummyInt, DummyString, false);
+
+            // Assert
+            var executionLogs = (List<string>)_privateObj.GetFieldOrProperty("_ExecutionLogs");
+            var hasError = (List<string>)_privateObj.GetFieldOrProperty("_ExecutionLogs");
+            this.ShouldSatisfyAllConditions(
+                () => _nonQueryExecuted.ShouldBeFalse(),
+                () => jobEnqueued.ShouldBeFalse());
         }
     }
 }
