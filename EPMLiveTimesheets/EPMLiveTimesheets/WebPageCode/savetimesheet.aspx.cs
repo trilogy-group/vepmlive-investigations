@@ -32,7 +32,7 @@ namespace TimeSheets
         string[] dayDefs;
 
         bool liveHours = false;
-
+        private const string ListProjectCenter = "Project Center";
         protected void Page_Load(object sender, EventArgs e)
         {
             Guid webGuid = new Guid();
@@ -749,8 +749,8 @@ namespace TimeSheets
                             int itemtype = 1;
                             if (nonworklist == iList.ID)
                                 itemtype = 2;
-
-                            SqlCommand cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID,TS_ITEM_UID,WEB_UID,LIST_UID,ITEM_TYPE,ITEM_ID,TITLE,PROJECT,PROJECT_ID,LIST,PROJECT_LIST_UID) VALUES (@TS_UID,@TS_ITEM_UID,@WEB_UID,@LIST_UID,@ITEM_TYPE,@ITEM_ID,@TITLE,@PROJECT,@PROJECT_ID,@LIST,@projectlistuid)", cn);
+                            string rate = SharedFunctions.GetStandardRates(cn, tsuid.ToString(), iWeb, username, webid + "." + iWeb.Lists[ListProjectCenter].ID + "." + Convert.ToString(project_id));
+                            SqlCommand cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID,TS_ITEM_UID,WEB_UID,LIST_UID,ITEM_TYPE,ITEM_ID,TITLE,PROJECT,PROJECT_ID,LIST,PROJECT_LIST_UID,Rate) VALUES (@TS_UID,@TS_ITEM_UID,@WEB_UID,@LIST_UID,@ITEM_TYPE,@ITEM_ID,@TITLE,@PROJECT,@PROJECT_ID,@LIST,@projectlistuid,@rate)", cn);
                             cmd.Parameters.AddWithValue("@TS_UID", tsuid);
                             cmd.Parameters.AddWithValue("@TS_ITEM_UID", newTS);
                             cmd.Parameters.AddWithValue("@WEB_UID", webid);
@@ -761,6 +761,7 @@ namespace TimeSheets
                             cmd.Parameters.AddWithValue("@PROJECT", project);
                             cmd.Parameters.AddWithValue("@PROJECT_ID", project_id);
                             cmd.Parameters.AddWithValue("@LIST", li.ParentList.Title);
+                            cmd.Parameters.AddWithValue("@rate", rate);
                             if (pList != null)
                                 cmd.Parameters.AddWithValue("@projectlistuid", pList.ID);
                             else

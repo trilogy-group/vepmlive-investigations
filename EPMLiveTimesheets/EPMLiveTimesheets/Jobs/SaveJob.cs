@@ -18,6 +18,7 @@ namespace TimeSheets
         SPList WorkList;
         private bool Editable = false;
         private string NonUpdatingColumns = "Project,AssignedTo";
+        private const string ListProjectCenter = "Project Center";
         StringBuilder sbErrors = null;
         private static string iGetAttribute(XmlNode nd, string attribute)
         {
@@ -365,7 +366,7 @@ namespace TimeSheets
 
                                                 if (drItem.Length > 0)
                                                 {
-                                                    string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username, webid + "."+ list + Convert.ToString(projectid));
+                                                    string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username, webid + "."+ web.Lists[ListProjectCenter].ID + "." + Convert.ToString(projectid));
                                                     using (SqlCommand cmd = new SqlCommand("UPDATE TSITEM set Title = @title, project=@project, project_id=@projectid,rate=@rate where ts_item_uid=@uid", cn))
                                                     {
                                                         cmd.Parameters.AddWithValue("@uid", id);
@@ -394,9 +395,8 @@ namespace TimeSheets
                                                         projectlist = fieldlookup.LookupList;
                                                     }
                                                     catch { }
-
                                                     using (SqlCommand itemInsertCmd = new SqlCommand(@"INSERT INTO TSITEM SELECT DISTINCT TS_UID, case when TS_UID=@currenttsuid then @uidcurrent else NEWID() end,
-                                                            @webid,@listid,@itemtype,@itemid,@title,@project,@projectid,@list,0,@projectlistid,@assignedtoid 
+                                                            @webid,@listid,@itemtype,@itemid,@title,@project,@projectid,@list,0,@projectlistid,@assignedtoid,@rate 
                                                             FROM TSTIMESHEET INNER JOIN TSUSER ON TSTIMESHEET.TSUSER_UID = TSUSER.TSUSERUID 
                                                             WHERE TS_UID=@currenttsuid OR (TS_UID NOT IN (SELECT TS_UID FROM TSITEM WHERE ITEM_ID=@itemid AND ITEM_TYPE = @worktype) 
                                                             AND PERIOD_ID > @currentperiodid AND SUBMITTED = 0 AND TSTIMESHEET.SITE_UID=@siteid AND TSUSEr.USER_ID=@userid)", cn))
@@ -414,7 +414,8 @@ namespace TimeSheets
                                                         itemInsertCmd.Parameters.AddWithValue("@list", list.Title);
                                                         itemInsertCmd.Parameters.AddWithValue("@itemtype", itemtypeid);
                                                         itemInsertCmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
-
+                                                        string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username, webid + "." + web.Lists[ListProjectCenter].ID + "." + Convert.ToString(projectid));
+                                                        itemInsertCmd.Parameters.AddWithValue("@rate", rate);
                                                         if (projectlist == "")
                                                             itemInsertCmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);
                                                         else

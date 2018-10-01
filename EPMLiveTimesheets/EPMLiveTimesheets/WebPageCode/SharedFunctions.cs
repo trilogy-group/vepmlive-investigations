@@ -6,15 +6,17 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Data;
 using System.Xml;
+using System.Linq;
 using EPMLiveCore;
 using EPMLiveCore.PfeData;
+using System.Data.Common;
 
 namespace TimeSheets
 {
     public class SharedFunctions
     {
         private const string DefaultDateFormat = "yyyy-MM-dd";
-        private const string PfeProjectSQL= "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE PROJECT_EXT_UID = @projectID";
+        private const string PfeProjectSQL = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE PROJECT_EXT_UID = @projectID";
         private const string ResourceSQL = "Select EXTID from LSTResourcepool where SharePointAccountID = @UID";
         private const string PeriodSQL = "Select TP.PERIOD_START, TP.PERIOD_END from TSTIMESHEET TS left join TSPERIOD TP on TS.PERIOD_ID= TP.PERIOD_ID where TS.TS_UID= @TS_UID";
         public static bool canUserImpersonate(string curuser, string iuser, SPWeb web, out string resName)
@@ -407,10 +409,16 @@ namespace TimeSheets
             try
             {
                 projectextid = 0;
-                using (SqlConnection cn = new SqlConnection(Utilities.GetPFEDBConnectionString(basepath)))
+                var connectionString = Utilities.GetPFEDBConnectionString(basepath);
+                // convert sql connection string to proper format
+                var connectionStringBuilder = new DbConnectionStringBuilder { ConnectionString = connectionString };
+                connectionStringBuilder.Remove("Provider");
+                connectionStringBuilder.Add("Application Name", "EPMLiveCore TimeSheet");
+                connectionString = connectionStringBuilder.ToString();
+                using (SqlConnection cn = new SqlConnection(connectionString))
                 {
                     cn.Open();
-                    
+
                     using (SqlCommand cmd = new SqlCommand(PfeProjectSQL, cn))
                     {
                         cmd.Parameters.AddWithValue("@projectID", projectid);
@@ -423,6 +431,8 @@ namespace TimeSheets
                         }
                     }
                 }
+
+
             }
             catch
             {
@@ -449,7 +459,7 @@ namespace TimeSheets
                 {
                     GetProjectEXTID(basePath, web, projectid, out projectextid);
                     ProjectResourceRateRepository repo = new ProjectResourceRateRepository();
-                    var pferates = repo.GetRate(web, DateTime.Today, projectextid, Convert.ToInt32(extid));
+                    var pferates = repo.GetRates(web, projectextid, Convert.ToInt32(extid)).FirstOrDefault();
                     if (pferates != null && pferates.Rate > 0)
                     {
                         rate = web.Locale.NumberFormat.CurrencySymbol + Convert.ToString(pferates.Rate);
@@ -458,7 +468,7 @@ namespace TimeSheets
                 if (string.IsNullOrEmpty(rate))
                 {
                     GetPeriodDates(cn, tsuid, out prdStart, out prdEnd);
-                   
+
 
                     if (!string.IsNullOrEmpty(prdStart) && !string.IsNullOrEmpty(prdEnd) && !string.IsNullOrEmpty(extid))
                     {
