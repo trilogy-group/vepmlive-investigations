@@ -516,7 +516,6 @@ namespace EPMLivePS.Tests
                 validation = validation + 1;
             };
 
-
             // Act
             InvokeMethod(AssignGroupsToTasksMethodName, nonPublicInstance, new object[] { 1, 1, projectDataSet.Instance });
 
