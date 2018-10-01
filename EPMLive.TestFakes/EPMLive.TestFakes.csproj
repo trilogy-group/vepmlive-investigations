@@ -129,6 +129,10 @@
     <Reference Include="System.Web.Extensions.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.Web.Extensions.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Web.Services.4.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\System.Web.Services.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System.XML" />
     <Reference Include="System.XML.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
@@ -252,6 +256,7 @@
     <Fakes Include="Fakes\EPMLiveReportsAdmin.fakes" />
     <Fakes Include="Fakes\DocumentFormat.OpenXml.fakes" />
     <Fakes Include="Fakes\Microsoft.Office.Project.Server.Library.fakes" />
+    <Fakes Include="Fakes\System.Web.Services.fakes" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>
