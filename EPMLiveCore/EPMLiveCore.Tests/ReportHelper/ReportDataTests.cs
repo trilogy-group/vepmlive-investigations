@@ -16,6 +16,7 @@ using System.Data.Fakes;
 using Shouldly;
 using EPMLiveCore.Fakes;
 using WorkEnginePPM;
+using System.Collections.Generic.Fakes;
 
 namespace EPMLiveCore.ReportHelper.Tests
 {
@@ -32,6 +33,10 @@ namespace EPMLiveCore.ReportHelper.Tests
         private const string ColumnDataTime = "ColumnDateTime";
         private const string ColumnFloat = "ColumnFloat";
         private ReportData reportData;
+
+        const string SharepointType = "SharepointType";
+        //const string ColumnName = "ColumnName";
+        const string InternalName = "internalname";
 
         [TestInitialize]
         public void Initialize()
@@ -56,6 +61,9 @@ namespace EPMLiveCore.ReportHelper.Tests
             ShimReportData.AllInstances.VerifyListColumnsDataTableString = (_, dataTable, tableName) => { };
             ShimReportData.AllInstances.ListReportsWorkString = (_, name) => true;
             ShimEPMData.AllInstances.SaveWorkSPListItem = (_, list) => true;
+            ShimReportData.AddLookUpFieldValuesStringString = (value, valueType) => DummyString;
+            ShimDataTable.AllInstances.NewRow = _ => new ShimDataRow();
+
 
         }
 
@@ -200,10 +208,11 @@ namespace EPMLiveCore.ReportHelper.Tests
         public void MyWorkListItemsDataTable_Should_()
         {
             // Arrange
-            const string SharepointType = "SharepointType";
-            const string ColumnName = "ColumnName";
-            const string InternalName = "internalname";
-
+            const string AssignedToText = "AssignedToText";
+            const string DummyText = "dummyText";
+            const string DummyIdColumn = "dummyId";
+            const string DummyColumnGrid = "DummyColumnGrid";
+            const string DummyColumnGuid = "DummyColumnGuid";
             var web = new ShimSPWeb
             {
                 ListsGet = () => new ShimSPListCollection
@@ -220,68 +229,54 @@ namespace EPMLiveCore.ReportHelper.Tests
                 {
                     new ShimDataRow
                     {
-                        ItemGetString = name =>
-                        {
-                            switch (name)
-                            {
-                                case ColumnName:
-                                    return "AssignedToText";
-                                case InternalName:
-                                    return SPFieldType.Lookup.ToString();
-                                case SharepointType:
-                                    return SPFieldType.Lookup.ToString();
-                                default:
-                                    return string.Empty;
-                            }
-                        }
-                    }
-                    //new ShimDataRow
-                    //{
-                    //    ItemGetString = GetColumnValues("uniqueidentifier", "column-guid")
-                    //},
-                    //new ShimDataRow
-                    //{
-                    //    ItemGetString = GetColumnValues("int", "column-int")
-                    //},
-                    //new ShimDataRow
-                    //{
-                    //    ItemGetString = GetColumnValues("datetime", "column-datetime")
-                    //},
-                    //new ShimDataRow
-                    //{
-                    //    ItemGetString = GetColumnValues("float", "column-float")
-                    //},
-                    //new ShimDataRow
-                    //{
-                    //    ItemGetString = GetColumnValues("defaultValue", DummyString)
-                    //}
+                        ItemGetString = GetItemValues(AssignedToText, SPFieldType.Lookup.ToString(), SPFieldType.Lookup.ToString())
+                    },
+                    new ShimDataRow
+                    {
+                        ItemGetString = GetItemValues(DummyText, SPFieldType.Lookup.ToString(), SPFieldType.Lookup.ToString())
+                    },
+                    new ShimDataRow
+                    {
+                        ItemGetString = GetItemValues(DummyIdColumn, SPFieldType.Lookup.ToString(), SPFieldType.Lookup.ToString())
+                    },
+                    new ShimDataRow
+                    {
+                        ItemGetString = GetItemValues(DummyColumnGrid, SPFieldType.GridChoice.ToString(), SPFieldType.GridChoice.ToString())
+                    },
+                    new ShimDataRow
+                    {
+                        ItemGetString = GetItemValues(DummyColumnGuid, SPFieldType.GridChoice.ToString(), SPFieldType.Guid.ToString())
+                    },
                 }.GetEnumerator()
             };
             ShimSPList.AllInstances.FieldsGet = _ => new ShimSPFieldCollection();
-            ShimSPFieldCollection.AllInstances.ContainsFieldString = (_, name) =>
+            ShimSPFieldCollection.AllInstances.ContainsFieldString = (_, name) => true;
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, name) => new ShimSPField
             {
-                return true;
-            };
-            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, name) =>
-            {
-                return new ShimSPField
+                TypeGet = () =>
                 {
-                    TypeGet = () =>
+                    SPFieldType type;
+                    if (Enum.TryParse<SPFieldType>(name, out type))
                     {
-                        SPFieldType type;
-                        if (Enum.TryParse<SPFieldType>(name, out type))
-                        {
-                            return type;
-                        }
-                        else
-                        {
-                            return SPFieldType.AllDayEvent;
-                        }
+                        return type;
                     }
-                };
+                    else
+                    {
+                        return SPFieldType.AllDayEvent;
+                    }
+                }
             };
-
-
+            var spFieldUserEnumerator = new List<SPFieldUserValue>
+            {
+                new ShimSPFieldUserValue
+                {
+                    UserGet = () => new ShimSPUser
+                    {
+                        NameGet = () => DummyString
+                    }
+                }
+            }.GetEnumerator();
+            ShimList<SPFieldUserValue>.AllInstances.GetEnumerator = _ => spFieldUserEnumerator;
             ShimSPList.AllInstances.ItemsGet = _ => new ShimSPListItemCollection
             {
                 GetEnumerator = () => new List<SPListItem>
@@ -295,22 +290,58 @@ namespace EPMLiveCore.ReportHelper.Tests
                             FieldsGet = () => new ShimSPFieldCollection()
                         },
                         ItemGetString = name => DummyString,
-                        ItemSetStringObject = (name, valueObject) => { }
+                        ItemSetStringObject = (name, valueObject) => { },
+                        FieldsGet = () => new ShimSPFieldCollection
+                        {
+                            GetFieldByInternalNameString = name => new ShimSPField()
+                        }
                     },
                 }.GetEnumerator()
             };
             ShimExtensionMethods.ContainsFieldWithInternalNameSPFieldCollectionString = (_, name) => true;
-            //ShimDataRow.AllInstances.ItemGetString = (_, name) => new object();
-            //ShimDataRow.AllInstances.ItemSetStringObject = (_, name, objectValue) => { };
-            ShimDataTable.AllInstances.NewRow = _ => new ShimDataRow();
+
+            var teste = new List<Tuple<string, object>>();
+
+            ShimDataRow.AllInstances.ItemSetStringObject = (_, columnName, objectValue) =>
+            {
+                teste.Add(new Tuple<string, object>(columnName, objectValue));
+            };
+
             // Act
             var result = reportData.MyWorkListItemsDataTable(DummyGuid, DummyString, web, DummyString, list, DummyGuid, out error, out errorMessage);
+
+            var assignetToTextValue = teste.FirstOrDefault(p => p.Item1 == AssignedToText)?.Item2.ToString();
+            var dummyTextValue = teste.FirstOrDefault(p => p.Item1 == DummyText)?.Item2.ToString();
+            var dummyIdColumn = teste.FirstOrDefault(p => p.Item1 == DummyIdColumn)?.Item2.ToString();
+            var dummyColumnGrid = teste.FirstOrDefault(p => p.Item1 == DummyColumnGrid)?.Item2.ToString();
+            var dummyColumnGuid = teste.FirstOrDefault(p => p.Item1 == DummyColumnGuid)?.Item2.ToString();
 
             // Assert
             result.ShouldSatisfyAllConditions(
                 () => error.ShouldBeFalse(),
                 () => errorMessage.ShouldBeEmpty(),
-                () => result.ShouldNotBeNull());
+                () => result.ShouldNotBeNull(),
+                () => assignetToTextValue.ShouldNotBeNullOrEmpty(),
+                () => assignetToTextValue.ShouldBe(DummyString),
+                () => );
+        }
+
+        private FakesDelegates.Func<string, object> GetItemValues(string columnName, string internalName, string sharepointType)
+        {
+            return name =>
+            {
+                switch (name)
+                {
+                    case ColumnName:
+                        return columnName;
+                    case InternalName:
+                        return internalName;
+                    case SharepointType:
+                        return sharepointType;
+                    default:
+                        return string.Empty;
+                }
+            };
         }
 
         private FakesDelegates.Func<string, object> GetColumnValues(string colType, string colName)
