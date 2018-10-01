@@ -106,5 +106,9 @@
     <Add FullName="EPMLiveCore.ADSync!"/>
     <Add FullName="EPMLiveCore.FilteredLookupField!"/>
     <Add FullName="EPMLiveCore.FilteredLookupFieldEditor!"/>
+    <Add FullName="EPMLiveCore.Jobs.Applications.InstallAndConfigure!"/>
+    <Add FullName="EPMLiveCore.API.ApplicationDef!"/>
+    <Add FullName="EPMLiveCore.API.ApplicationInstaller!"/>
+    <Add FullName="EPMLiveCore.ApplicationStore.AppStore!"/>
   </ShimGeneration>
 </Fakes>
