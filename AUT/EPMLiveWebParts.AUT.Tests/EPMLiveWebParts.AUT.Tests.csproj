@@ -109,6 +109,7 @@
     <Compile Include="API\WPAPITest.cs" />
     <Compile Include="BackButton\BackButtonTest.cs" />
     <Compile Include="BuyNow\BuyNowTest.cs" />
+    <Compile Include="ChartControl\ChartControlTest.cs" />
     <Compile Include="ChartControl\ChartControlToolpartBaseTest.cs" />
     <Compile Include="ChartControl\EpmChartTest.cs" />
     <Compile Include="ChartControl\ExtensionsTest.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="Layouts\epmlive\ChartWizardTest.cs" />
     <Compile Include="Layouts\epmlive\ExtensionMethodsTest.cs" />
     <Compile Include="Layouts\epmlive\GetreportfiltertitlesTest.cs" />
+    <Compile Include="Layouts\epmlive\MyWorkGridActionTest.cs" />
     <Compile Include="Layouts\epmlive\MyWorkRichTextEditorTest.cs" />
     <Compile Include="Layouts\epmlive\MyWorkTest.cs" />
     <Compile Include="Layouts\epmlive\RedirectionProxyTest.cs" />
