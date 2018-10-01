@@ -25,7 +25,8 @@ Remove-Item $xmlCoverageFile -ErrorAction SilentlyContinue
 #$f = $a.GetFile($vsConsolePath)
 #$vsConsolePath = $f.ShortPath
 #& $vsConsolePath  $targetFiles /InIsolation /Platform:X64 /EnableCodeCoverage
-$coverageFile = $(get-ChildItem -Path "$ScriptDir\TestResults" -Recurse -Include *coverage)[0]
+$coverageFiles = $(get-ChildItem -Path "$ScriptDir\TestResults" -Recurse -Include *coverage) 
+$coverageFile = $coverageFiles -join ' '
 & $covConsolePath  analyze  /output:$xmlCoverageFile $coverageFile 
 
 Write-Host "=> Ended Test Coverage" -ForegroundColor DarkCyan   
