@@ -37,8 +37,7 @@ using static EPMLiveEnterprise.WebSvcWssInterop.Fakes.ShimWssSettingsDataSet;
 
 namespace EPMLivePS.Tests
 {
-    [TestClass]
-    [ExcludeFromCodeCoverage]
+    [TestClass, ExcludeFromCodeCoverage]
     public class PublisherTests
     {
         private object reflectionObject;
