@@ -1,22 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.SharePoint.WebPartPages;
-using System.Web.UI;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using System.Collections;
-using Microsoft.SharePoint;
-using System.Web;
-using Telerik.Web.UI;
-using System.Drawing;
-using EPMLiveWebParts.EpmCharting.DomainServices;
-using EPMLiveWebParts;
 using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
 using EPMLiveCore.ReportingProxy;
-
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.WebPartPages;
 
 namespace EPMLiveWebParts.ReportingChart
 {
@@ -732,116 +724,138 @@ namespace EPMLiveWebParts.ReportingChart
             output.Write(" var aggVal = aggreDdl.options[aggreDdl.selectedIndex].value; ");
             output.Write(" var aggSec = document.getElementById(\"aggTypeSec\"); ");
             output.Write(" aggSec.style.display = (cType != 'Bubble') ? '' : 'none'; ");
-            // SHOW Z ONLY WHEN CONFIGURATING BUBBLE CHARTS
-            output.Write(" document.getElementById(\"ZaxisSection\").style.display = (cType == 'Bubble') ? '' : 'none'; ");
-            output.Write(" if (cType == \"Area\" || cType == \"Bar\" || cType == \"Column\" || cType == \"Line\") { ");
-            output.Write("     if (aggVal == \"Count\") { ");
-            // NO Y VALUE
-            output.Write("      try{ ");
-            output.Write("         document.getElementById(\"XaxisSection_full\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"XaxisSection_ddl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"XaxisSection_ddl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YAxisFormatSection\").style.display = \"none\"; ");
-            output.Write("      } catch (e) {} ");
-            output.Write("     } else if (aggVal == \"Sum\" || aggVal == \"Avg\"){ ");
-            // 1 Y VALUE (NUMERICAL)
-            output.Write("      try{ ");
-            output.Write("         document.getElementById(\"XaxisSection_full\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"XaxisSection_ddl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"XaxisSection_ddl_nonnum\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl_num\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YAxisFormatSection\").style.display = \"\"; ");
-            output.Write("      } catch (e) {} ");
-            output.Write("     } ");
-            output.Write(" } else if (cType.indexOf(\"_Clustered\") != -1 || cType.indexOf(\"_Stacked\") != -1 || cType.indexOf(\"_100Percent\") != -1) { ");
-            output.Write("     if (aggVal == \"Count\") { ");
-            // 1 Y VALUE (NON NUMERICAL)
-            output.Write("      try{ ");
-            output.Write("         document.getElementById(\"XaxisSection_full\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"XaxisSection_ddl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"XaxisSection_ddl_nonnum\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl_nonnum\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"YAxisFormatSection\").style.display = \"\"; ");
-            output.Write("      } catch (e) {} ");
-            output.Write("     } else if (aggVal == \"Sum\" || aggVal == \"Avg\"){ ");
-            // MORE THAN 1 Y VALUE (Numerical)
-            output.Write("      try{ ");
-            output.Write("         document.getElementById(\"XaxisSection_full\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"XaxisSection_ddl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"XaxisSection_ddl_nonnum\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl_num\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YAxisFormatSection\").style.display = \"\"; ");
-            output.Write("      } catch (e) {} ");
-            output.Write("     } ");
-            output.Write(" } else if (cType == \"Pie\" || cType == \"Donut\" ) { ");
-            output.Write("     if (aggVal == \"Count\") { ");
-            // NO Y VALUE
-            output.Write("      try{ ");
-            output.Write("         document.getElementById(\"XaxisSection_full\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"XaxisSection_ddl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"XaxisSection_ddl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YAxisFormatSection\").style.display = \"none\"; ");
-            output.Write("      } catch (e) {} ");
-            output.Write("     } else if (aggVal == \"Sum\" || aggVal == \"Avg\"){ ");
-            // 1 Y VALUE (Numerical)
-            output.Write("      try{ ");
-            output.Write("         document.getElementById(\"XaxisSection_full\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"XaxisSection_ddl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"XaxisSection_ddl_nonnum\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl_num\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"YAxisFormatSection\").style.display = \"\"; ");
-            output.Write("      } catch (e) {} ");
-            output.Write("     } ");
-            output.Write(" } else if (cType == \"Bubble\" ) { ");
-            // 1 Y VALUE (NUMERICAL)
-            output.Write("      try{ ");
-            output.Write("         document.getElementById(\"XaxisSection_full\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"XaxisSection_ddl_num\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"XaxisSection_ddl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl_num\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl_num\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_cbl_nonnum\").style.display = \"none\"; ");
-            output.Write("         document.getElementById(\"YaxisSection_ddl\").style.display = \"\"; ");
-            output.Write("         document.getElementById(\"YAxisFormatSection\").style.display = \"\"; ");
-            output.Write("      } catch (e) {} ");
-            output.Write(" } ");
+            SetZFlagWhenBubbleChart(output);
+            WriteAreaBarColumnLineChartTypes(output);
+            WriteClusteredOrStackedCharType(output);
+            WritePieOrDonutChartType(output);
+            WriteBubbleCharType(output);
             output.Write("}");
             output.Write("</script>");
 
+        }
+
+        private static void SetZFlagWhenBubbleChart(HtmlTextWriter output)
+        {
+            output.Write(" document.getElementById(\"ZaxisSection\").style.display = (cType == 'Bubble') ? '' : 'none'; ");
+        }
+
+        private void WriteAreaBarColumnLineChartTypes(HtmlTextWriter output)
+        {
+            output.Write(" if (cType == \"Area\" || cType == \"Bar\" || cType == \"Column\" || cType == \"Line\") { ");
+            WriteAggValEqualsCountCase1(output);
+            WriteAggValEqualsSumOrAvgCase1(output);
+            output.Write("     } ");
+        }
+
+        private void WriteClusteredOrStackedCharType(HtmlTextWriter output)
+        {
+            output.Write(" } else if (cType.indexOf(\"_Clustered\") != -1 || cType.indexOf(\"_Stacked\") != -1 || cType.indexOf(\"_100Percent\") != -1) { ");
+            WriteAggValEqualsCountCase2(output);
+            WriteAggValEqualsSumOrAvgCase2(output);
+            output.Write("     } ");
+        }
+
+        private void WritePieOrDonutChartType(HtmlTextWriter output)
+        {
+            output.Write(" } else if (cType == \"Pie\" || cType == \"Donut\" ) { ");
+            WriteAggValEqualsCountCase1(output);
+            WriteAggValEqualsSumOrAvgCase1(output);
+            output.Write("     } ");
+        }
+
+        private void WriteBubbleCharType(HtmlTextWriter output)
+        {
+            output.Write(" } else if (cType == \"Bubble\" ) { ");
+            WriteTryCatchBlock(
+                output,
+                new Tuple<string, string>("XaxisSection_full", "none"),
+                new Tuple<string, string>("XaxisSection_ddl_num", ""),
+                new Tuple<string, string>("XaxisSection_ddl_nonnum", "none"),
+                new Tuple<string, string>("YaxisSection_ddl_num", ""),
+                new Tuple<string, string>("YaxisSection_ddl_nonnum", "none"),
+                new Tuple<string, string>("YaxisSection_cbl", "none"),
+                new Tuple<string, string>("YaxisSection_cbl_num", "none"),
+                new Tuple<string, string>("YaxisSection_cbl_nonnum", "none"),
+                new Tuple<string, string>("YaxisSection_ddl", ""),
+                new Tuple<string, string>("YAxisFormatSection", ""));
+        }
+
+        private void WriteAggValEqualsSumOrAvgCase2(HtmlTextWriter output)
+        {
+            output.Write("     } else if (aggVal == \"Sum\" || aggVal == \"Avg\"){ ");
+            WriteTryCatchBlock(
+                output,
+                new Tuple<string, string>("XaxisSection_full", "none"),
+                new Tuple<string, string>("XaxisSection_ddl_num", "none"),
+                new Tuple<string, string>("XaxisSection_ddl_nonnum", ""),
+                new Tuple<string, string>("YaxisSection_cbl_num", ""),
+                new Tuple<string, string>("YaxisSection_cbl_nonnum", "none"),
+                new Tuple<string, string>("YaxisSection_cbl", ""),
+                new Tuple<string, string>("YaxisSection_ddl", "none"),
+                new Tuple<string, string>("YaxisSection_ddl_num", "none"),
+                new Tuple<string, string>("YaxisSection_ddl_nonnum", "none"),
+                new Tuple<string, string>("YAxisFormatSection", ""));
+        }
+
+        private void WriteAggValEqualsCountCase2(HtmlTextWriter output)
+        {
+            output.Write("     if (aggVal == \"Count\") { ");
+            WriteTryCatchBlock(
+                output,
+                new Tuple<string, string>("XaxisSection_full", "none"),
+                new Tuple<string, string>("XaxisSection_ddl_num", "none"),
+                new Tuple<string, string>("XaxisSection_ddl_nonnum", ""),
+                new Tuple<string, string>("YaxisSection_ddl_num", "none"),
+                new Tuple<string, string>("YaxisSection_ddl_nonnum", ""),
+                new Tuple<string, string>("YaxisSection_cbl", "none"),
+                new Tuple<string, string>("YaxisSection_cbl_num", "none"),
+                new Tuple<string, string>("YaxisSection_cbl_nonnum", "none"),
+                new Tuple<string, string>("YaxisSection_ddl", ""),
+                new Tuple<string, string>("YAxisFormatSection", ""));
+        }
+
+        private void WriteAggValEqualsSumOrAvgCase1(HtmlTextWriter output)
+        {
+            output.Write("     } else if (aggVal == \"Sum\" || aggVal == \"Avg\"){ ");
+            WriteTryCatchBlock(
+                output,
+                new Tuple<string, string>("XaxisSection_full", "none"),
+                new Tuple<string, string>("XaxisSection_ddl_num", "none"),
+                new Tuple<string, string>("XaxisSection_ddl_nonnum", ""),
+                new Tuple<string, string>("YaxisSection_ddl", ""),
+                new Tuple<string, string>("YaxisSection_ddl_num", ""),
+                new Tuple<string, string>("YaxisSection_ddl_nonnum", "none"),
+                new Tuple<string, string>("YaxisSection_cbl", "none"),
+                new Tuple<string, string>("YaxisSection_cbl_num", "none"),
+                new Tuple<string, string>("YaxisSection_cbl_nonnum", "none"),
+                new Tuple<string, string>("YAxisFormatSection", ""));
+        }
+
+        private void WriteAggValEqualsCountCase1(HtmlTextWriter output)
+        {
+            output.Write("     if (aggVal == \"Count\") { ");
+            WriteTryCatchBlock(
+                output,
+                new Tuple<string, string>("XaxisSection_full", string.Empty),
+                new Tuple<string, string>("XaxisSection_ddl_num", "none"),
+                new Tuple<string, string>("XaxisSection_ddl_nonnum", "none"),
+                new Tuple<string, string>("YaxisSection_ddl", "none"),
+                new Tuple<string, string>("YaxisSection_ddl_num", "none"),
+                new Tuple<string, string>("YaxisSection_ddl_nonnum", "none"),
+                new Tuple<string, string>("YaxisSection_cbl", "none"),
+                new Tuple<string, string>("YaxisSection_cbl_num", "none"),
+                new Tuple<string, string>("YaxisSection_cbl_nonnum", "none"),
+                new Tuple<string, string>("YAxisFormatSection", "none"));
+        }
+
+        private void WriteTryCatchBlock(HtmlTextWriter output, params Tuple<string, string>[] argsToWrite)
+        {
+            output.Write("      try{ ");
+            foreach (var tuple in argsToWrite)
+            {
+                output.Write($"         document.getElementById(\"{tuple.Item1}\").style.display = \"{tuple.Item2}\"; ");
+            }
+            output.Write("      } catch (e) {} ");
         }
 
         #endregion
@@ -1551,8 +1565,8 @@ namespace EPMLiveWebParts.ReportingChart
             {
                 ListControl lc = (ListControl)o;
                 var sorted = (from ListItem i in lc.Items
-                              orderby i.Text ascending
-                              select i).ToArray();
+                              orderby i.Text
+                    select i).ToArray();
                 ListItemCollection liCol = new ListItemCollection();
                 liCol.AddRange(sorted);
                 lc.DataSource = liCol;
