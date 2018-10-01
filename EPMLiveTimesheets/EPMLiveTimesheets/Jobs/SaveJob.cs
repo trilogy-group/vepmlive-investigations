@@ -18,7 +18,7 @@ namespace TimeSheets
         SPList WorkList;
         private bool Editable = false;
         private string NonUpdatingColumns = "Project,AssignedTo";
-        private const string ListProjectCenter = "Project Center";
+        private string ListProjectCenter = "Project Center";
         StringBuilder sbErrors = null;
         private static string iGetAttribute(XmlNode nd, string attribute)
         {
@@ -298,7 +298,7 @@ namespace TimeSheets
 
         }
 
-        private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, string period,string username, bool liveHours, bool bSkipSP)
+        private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, string period, string username, bool liveHours, bool bSkipSP)
         {
             string id = iGetAttribute(ndRow, "UID");
 
@@ -341,6 +341,13 @@ namespace TimeSheets
                                                 li = list.GetItemById(int.Parse(itemid));
                                             }
                                             catch { }
+                                            // Checking if any customer is using custom projectcenter
+                                            string projectlistname = string.Empty;
+                                            projectlistname = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveCustomProjectList");
+                                            if (!string.IsNullOrEmpty(projectlistname))
+                                            {
+                                                ListProjectCenter = projectlistname;
+                                            }
 
                                             if (li != null)
                                             {
@@ -366,7 +373,7 @@ namespace TimeSheets
 
                                                 if (drItem.Length > 0)
                                                 {
-                                                    string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username, webid + "."+ web.Lists[ListProjectCenter].ID + "." + Convert.ToString(projectid));
+                                                    string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username, webid + "." + web.Lists[ListProjectCenter].ID + "." + Convert.ToString(projectid));
                                                     using (SqlCommand cmd = new SqlCommand("UPDATE TSITEM set Title = @title, project=@project, project_id=@projectid,rate=@rate where ts_item_uid=@uid", cn))
                                                     {
                                                         cmd.Parameters.AddWithValue("@uid", id);
@@ -741,7 +748,7 @@ namespace TimeSheets
                                                 float percent = 0;
                                                 float count = 0;
                                                 float total = ndItems.Count;
-                                                
+
                                                 foreach (XmlNode ndItem in ndItems)
                                                 {
                                                     string worktype = "";
@@ -752,7 +759,7 @@ namespace TimeSheets
                                                     }
                                                     catch { }
 
-                                                    ProcessItemRow(ndItem, ref dtItems, cn, site, settings, period,username, liveHours, worktype == settings.NonWorkList);
+                                                    ProcessItemRow(ndItem, ref dtItems, cn, site, settings, period, username, liveHours, worktype == settings.NonWorkList);
 
                                                     count++;
                                                     float pct = count / total * 98;
