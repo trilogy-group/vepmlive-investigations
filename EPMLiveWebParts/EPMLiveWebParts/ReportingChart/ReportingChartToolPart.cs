@@ -409,29 +409,15 @@ namespace EPMLiveWebParts.ReportingChart
 
         private void WriteConfigSectionHtml(HtmlTextWriter output)
         {
-            string sChartTypeVal = ChartTypeDropDownList.SelectedValue;
-            string sAggType = AggregateTypeHtmlSelect.Value;
+            var sChartTypeVal = ChartTypeDropDownList.SelectedValue;
+            var sAggType = AggregateTypeHtmlSelect.Value;
 
 
-            output.Write("<div class=\"UserSectionHead\">");
-            output.Write("<b>Chart Configuration</b>");
-            output.Write("<br />");
-            output.Write("<table cellpadding=1 style=\"padding-left: 5px\">");
+            RenderChartConfiguration(output);
+            RenderListsDropDown(output);
+            RenderViewsDropDown(output);
 
-            #region RENDER LISTS DROP DOWN
-            output.Write("<tr><td>");
-            output.Write("List<br>");
-            ListsDropDownList.RenderControl(output);
-            output.Write("</td></tr>");
-            #endregion
-
-            #region RENDER VIEWS DROP DOWN
-            output.Write("<tr><td>");
-            output.Write("View<br>");
-            ViewsDropDownList.RenderControl(output);
-            output.Write("</td></tr>");
-            #endregion
-
+            //CC-76549 I'm leaving this commented out if statement because there's no indication on to why this block was commented ot if this if should even be kept or removed
             if (IsBubbleChart())
             {
                 //output.Write("<tr><td>");
@@ -439,55 +425,78 @@ namespace EPMLiveWebParts.ReportingChart
                 //output.Write("Allow User To Select X, Y, Z Values<br></td></tr>");
             }
 
-            #region RENDER CHART TYPES DROPDOWN
+            RenderChartTypesDropDown(output);
+            RenderAggregateTypeDropDown(output);
+            RenderXAxis(output, sChartTypeVal, sAggType);
+            RenderYAxis(output, sChartTypeVal, sAggType);
+            RenderZAxis(output, sChartTypeVal);
+
+            output.Write("</table>");
+            output.Write("</div>");
+        }
+
+        private static void RenderChartConfiguration(HtmlTextWriter output)
+        {
+            output.Write("<div class=\"UserSectionHead\">");
+            output.Write("<b>Chart Configuration</b>");
+            output.Write("<br />");
+            output.Write("<table cellpadding=1 style=\"padding-left: 5px\">");
+        }
+
+        private void RenderListsDropDown(HtmlTextWriter output)
+        {
+            output.Write("<tr><td>");
+            output.Write("List<br>");
+            ListsDropDownList.RenderControl(output);
+            output.Write("</td></tr>");
+        }
+
+        private void RenderViewsDropDown(HtmlTextWriter output)
+        {
+            output.Write("<tr><td>");
+            output.Write("View<br>");
+            ViewsDropDownList.RenderControl(output);
+            output.Write("</td></tr>");
+        }
+
+        private void RenderChartTypesDropDown(HtmlTextWriter output)
+        {
             output.Write("<tr><td>");
             output.Write("Chart Type<br>");
             ChartTypeDropDownList.RenderControl(output);
             output.Write("</td></tr>");
-            #endregion
+        }
 
-            #region RENDER AGGREGATE TYPE DROPDOWN
-
+        private void RenderAggregateTypeDropDown(HtmlTextWriter output)
+        {
             output.Write("<tr><td>");
-            if (sChartTypeVal.Contains("Bubble"))
-            {
-                output.Write("<div id=\"aggTypeSec\" display='none'>");
-            }
-            else
-            {
-                output.Write("<div id=\"aggTypeSec\" display='none'>");
-            }
+            output.Write("<div id=\"aggTypeSec\" display='none'>");
             output.Write("Aggregation Type<br>");
             AggregateTypeHtmlSelect.RenderControl(output);
             output.Write("<br>");
             output.Write("</div>");
             output.Write("</td></tr>");
+        }
 
-            #endregion
-
-            #region RENDER X AXIS
+        private void RenderXAxis(HtmlTextWriter output, string sChartTypeVal, string sAggType)
+        {
             output.Write("<tr><td>");
 
-            if (sChartTypeVal == "Area" || sChartTypeVal == "Bar" || sChartTypeVal == "Column" || sChartTypeVal == "Line")
+            if (sChartTypeVal == "Area"
+                || sChartTypeVal == "Bar"
+                || sChartTypeVal == "Column"
+                || sChartTypeVal == "Line")
             {
-                if (sAggType == "Count")
-                {
-                    output.Write("<div id='XaxisSection_full'>");
-                    output.Write("Category (X axis)<br>");
-                    XaxisFieldDropDownList.RenderControl(output);
-                    output.Write("</div>");
+                RenderAggTypeEqualsCountOrSum(output, sAggType);
+            }
 
-                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
-                    output.Write("Value (X axis)<br>");
-                    ddlXaxisFieldNum.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_nonnum' style='display:none'>");
-                    output.Write("Category (X axis)<br>");
-                    ddlXaxisFieldNonNum.RenderControl(output);
-                    output.Write("</div>");
-                }
-                else if (sAggType == "Sum" || sAggType == "Avg")
+            else if (sChartTypeVal.Contains("_Clustered")
+                     || sChartTypeVal.Contains("_Stacked")
+                     || sChartTypeVal.Contains("_100Percent"))
+            {
+                if (sAggType == "Count"
+                    || sAggType == "Sum"
+                    || sAggType == "Avg")
                 {
                     output.Write("<div id='XaxisSection_full' style='display:none'>");
                     output.Write("Category (X axis)<br>");
@@ -505,80 +514,10 @@ namespace EPMLiveWebParts.ReportingChart
                     output.Write("</div>");
                 }
             }
-            // MULTI SERIES
-            else if (sChartTypeVal.Contains("_Clustered") || sChartTypeVal.Contains("_Stacked") || sChartTypeVal.Contains("_100Percent"))
+            else if (sChartTypeVal.Contains("Pie")
+                     || sChartTypeVal.Contains("Donut"))
             {
-                if (sAggType == "Count")
-                {
-                    output.Write("<div id='XaxisSection_full' style='display:none'>");
-                    output.Write("Category (X axis)<br>");
-                    XaxisFieldDropDownList.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
-                    output.Write("Value (X axis)<br>");
-                    ddlXaxisFieldNum.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_nonnum'>");
-                    output.Write("Category (X axis)<br>");
-                    ddlXaxisFieldNonNum.RenderControl(output);
-                    output.Write("</div>");
-                }
-                else if (sAggType == "Sum" || sAggType == "Avg")
-                {
-                    output.Write("<div id='XaxisSection_full' style='display:none'>");
-                    output.Write("Category (X axis)<br>");
-                    XaxisFieldDropDownList.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
-                    output.Write("Value (X axis)<br>");
-                    ddlXaxisFieldNum.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_nonnum'>");
-                    output.Write("Category (X axis)<br>");
-                    ddlXaxisFieldNonNum.RenderControl(output);
-                    output.Write("</div>");
-                }
-            }
-            else if (sChartTypeVal.Contains("Pie") || sChartTypeVal.Contains("Donut"))
-            {
-                if (sAggType == "Count")
-                {
-                    output.Write("<div id='XaxisSection_full'>");
-                    output.Write("Category (X axis)<br>");
-                    XaxisFieldDropDownList.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
-                    output.Write("Value (X axis)<br>");
-                    ddlXaxisFieldNum.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_nonnum' style='display:none'>");
-                    output.Write("Category (X axis)<br>");
-                    ddlXaxisFieldNonNum.RenderControl(output);
-                    output.Write("</div>");
-                }
-                else if (sAggType == "Sum" || sAggType == "Avg")
-                {
-                    output.Write("<div id='XaxisSection_full' style='display:none'>");
-                    output.Write("Category (X axis)<br>");
-                    XaxisFieldDropDownList.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
-                    output.Write("Value (X axis)<br>");
-                    ddlXaxisFieldNum.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_nonnum'>");
-                    output.Write("Category (X axis)<br>");
-                    ddlXaxisFieldNonNum.RenderControl(output);
-                    output.Write("</div>");
-                }
+                RenderAggTypeEqualsCountOrSum(output, sAggType);
             }
             else if (sChartTypeVal.Contains("Bubble"))
             {
@@ -599,118 +538,137 @@ namespace EPMLiveWebParts.ReportingChart
             }
 
             output.Write("</td></tr>");
-            #endregion
+        }
 
-            #region RENDER Y AXIS
-            bool bRenderY = false;
-            // SINGLE SERIES
-            if (sChartTypeVal == "Area" || sChartTypeVal == "Bar" || sChartTypeVal == "Column" || sChartTypeVal == "Line")
+        private void RenderAggTypeEqualsCountOrSum(HtmlTextWriter output, string sAggType)
+        {
+            if (sAggType == "Count")
+            {
+                output.Write("<div id='XaxisSection_full'>");
+                output.Write("Category (X axis)<br>");
+                XaxisFieldDropDownList.RenderControl(output);
+                output.Write("</div>");
+
+                output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
+                output.Write("Value (X axis)<br>");
+                ddlXaxisFieldNum.RenderControl(output);
+                output.Write("</div>");
+
+                output.Write("<div id='XaxisSection_ddl_nonnum' style='display:none'>");
+                output.Write("Category (X axis)<br>");
+                ddlXaxisFieldNonNum.RenderControl(output);
+                output.Write("</div>");
+            }
+            else if (sAggType == "Sum"
+                     || sAggType == "Avg")
+            {
+                output.Write("<div id='XaxisSection_full' style='display:none'>");
+                output.Write("Category (X axis)<br>");
+                XaxisFieldDropDownList.RenderControl(output);
+                output.Write("</div>");
+
+                output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
+                output.Write("Value (X axis)<br>");
+                ddlXaxisFieldNum.RenderControl(output);
+                output.Write("</div>");
+
+                output.Write("<div id='XaxisSection_ddl_nonnum'>");
+                output.Write("Category (X axis)<br>");
+                ddlXaxisFieldNonNum.RenderControl(output);
+                output.Write("</div>");
+            }
+        }
+
+        private void RenderYAxis(HtmlTextWriter output, string sChartTypeVal, string sAggType)
+        {
+            var bRenderY = false;
+
+            if (sChartTypeVal == "Area"
+                || sChartTypeVal == "Bar"
+                || sChartTypeVal == "Column"
+                || sChartTypeVal == "Line")
             {
                 if (sAggType == "Count")
                 {
-                    // NO Y VALUE
                     RenderOneYField(output, false, true);
                     RenderMultipleYField(output, false, true);
                 }
-                else if (sAggType == "Sum" || sAggType == "Avg")
+                else if (sAggType == "Sum"
+                         || sAggType == "Avg")
                 {
-                    // 1 Y VALUE                   
                     RenderOneYField(output, true, false);
                     RenderMultipleYField(output, true, true);
                     bRenderY = true;
                 }
             }
-            // MULTI SERIES
-            else if (sChartTypeVal.Contains("_Clustered") || sChartTypeVal.Contains("_Stacked") || sChartTypeVal.Contains("_100Percent"))
+            else if (sChartTypeVal.Contains("_Clustered")
+                     || sChartTypeVal.Contains("_Stacked")
+                     || sChartTypeVal.Contains("_100Percent"))
             {
                 if (sAggType == "Count")
                 {
-                    // 1 Y VALUE
                     RenderOneYField(output, false, false);
                     RenderMultipleYField(output, false, true);
                     bRenderY = true;
                 }
-                else if (sAggType == "Sum" || sAggType == "Avg")
+                else if (sAggType == "Sum"
+                         || sAggType == "Avg")
                 {
-                    // MORE THAN 1 Y VALUE
                     RenderMultipleYField(output, true, false);
                     RenderOneYField(output, false, true);
                     bRenderY = true;
                 }
             }
-            else if (sChartTypeVal.Contains("Pie") || sChartTypeVal.Contains("Donut"))
+            else if (sChartTypeVal.Contains("Pie")
+                     || sChartTypeVal.Contains("Donut"))
             {
                 if (sAggType == "Count")
                 {
-                    // NO Y VALUE 
                     RenderOneYField(output, false, true);
                     RenderMultipleYField(output, false, true);
                 }
-                else if (sAggType == "Sum" || sAggType == "Avg")
+                else if (sAggType == "Sum"
+                         || sAggType == "Avg")
                 {
-                    // 1 Y VALUE
                     RenderOneYField(output, true, false);
                     RenderMultipleYField(output, false, true);
                     bRenderY = true;
                 }
             }
-            // FOR SCATTER AND SCATTER LINE
-            else if (sChartTypeVal.Contains("Scatter"))
+            else if (sChartTypeVal.Contains("Scatter")
+                     || sChartTypeVal.Contains("Bubble"))
             {
-                // 1 Y VALUE
-                RenderOneYField(output, true, false);
-                RenderMultipleYField(output, false, true);
-                bRenderY = true;
-            }
-            else if (sChartTypeVal.Contains("Bubble"))
-            {
-                // 1 Y VALUE
                 RenderOneYField(output, true, false);
                 RenderMultipleYField(output, false, true);
                 bRenderY = true;
             }
 
-            // render y axis formatting controls
             output.Write("<tr><td>");
-            if (bRenderY)
-            {
-                output.Write("<div id='YAxisFormatSection'>");
-            }
-            else
-            {
-                output.Write("<div id='YAxisFormatSection' style='display:none'>");
-            }
+            output.Write(
+                bRenderY
+                    ? "<div id='YAxisFormatSection'>"
+                    : "<div id='YAxisFormatSection' style='display:none'>");
             output.Write("Y Axis Formatting<br>");
             YaxisFormatDropDownList.RenderControl(output);
             output.Write("</div>");
             output.Write("</td></tr>");
+        }
 
-            #endregion
-
-            #region RENDER Z AXIS
+        private void RenderZAxis(HtmlTextWriter output, string sChartTypeVal)
+        {
             output.Write("<tr><td>");
-            if (sChartTypeVal.Contains("Bubble"))
-            {
-                output.Write("<div id='ZaxisSection'>");
-            }
-            else
-            {
-                output.Write("<div id='ZaxisSection' style='display:none'>");
-            }
+            output.Write(
+                sChartTypeVal.Contains("Bubble")
+                    ? "<div id='ZaxisSection'>"
+                    : "<div id='ZaxisSection' style='display:none'>");
             output.Write("Size Value (Z Axis)<br/>");
             ZaxisFieldDropDownList.RenderControl(output);
             output.Write("<br/>");
-            //output.Write("<b>Z Axis Color Field</b><br>");
-            //BubbleChartColorFieldDropDownList.RenderControl(output);
             output.Write("Group By<br/>");
             BubbleGroupByDropDownList.RenderControl(output);
             output.Write("<br/>");
             output.Write("</div>");
             output.Write("</td></tr>");
-            #endregion
-
-            output.Write("</table>");
-            output.Write("</div>");
         }
 
         private void WriteDisplaySectionHtml(HtmlTextWriter output)
