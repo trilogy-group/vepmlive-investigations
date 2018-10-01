@@ -1245,216 +1245,320 @@ namespace EPMLiveWebParts.ReportingChart
 
         private void FillDropDowns()
         {
-            string sListTitle = ListsDropDownList.SelectedValue;
-            if (string.IsNullOrEmpty(sListTitle) || sListTitle == "<Select List>")
-                return;
-
-            SPList oList = SPContext.Current.Web.Lists.TryGetList(sListTitle);
-            if (oList == null)
-                return;
-
-            XaxisFieldDropDownList.Items.Clear();
-            ddlXaxisFieldNum.Items.Clear();
-            ddlXaxisFieldNonNum.Items.Clear();
-            cblYaxisFieldNum.Items.Clear();
-            ddlYaxisFieldNum.Items.Clear();
-            ZaxisFieldDropDownList.Items.Clear();
-            cblYaxisFieldNonNum.Items.Clear();
-            ddlYaxisFieldNonNum.Items.Clear();
-            BubbleGroupByDropDownList.Items.Clear();
-            ChartPaletteStyleDropDownList.Items.Clear();
-
-            ReportingChart rc = (ReportingChart)ParentToolPane.SelectedWebPart;
-
-            // fill color paletWte ddl
-            ChartPaletteStyleDropDownList.Items.AddRange(new ListItem[] {
-                new ListItem("Color 1", "Color1"),
-                new ListItem("Color 2", "Color2"),
-                new ListItem("Gray", "Gray"),
-                new ListItem("Blue", "Blue"),
-                new ListItem("Red", "Red"),
-                new ListItem("Green", "Green"),
-                new ListItem("Yellow", "Yellow"),
-                new ListItem("Violet", "Violet")
-            });
-
-            DataTable dt = GetListColumns(oList.ID);
-            foreach (DataRow fld in dt.Rows)
+            var sListTitle = ListsDropDownList.SelectedValue;
+            if (string.IsNullOrWhiteSpace(sListTitle)
+                || sListTitle == "<Select List>")
             {
-                string sFldSharePointType = fld["SharePointType"].ToString();
-                string sFldDisplayName = fld["DisplayName"].ToString();
-                string sFldInternalName = fld["InternalName"].ToString();
-                string sFldColType = fld["ColumnType"].ToString();
+                return;
+            }
 
-                if (sFldSharePointType == "Attachments" || sFldInternalName == "Order" ||
-                    sFldSharePointType == "File" || sFldInternalName == "Metainfo" ||
-                    sFldSharePointType == "Computed" || sFldSharePointType == "Guid" ||
-                    sFldSharePointType == "Counter" || sFldSharePointType == "Note")
-                    continue;
+            var oList = SPContext.Current.Web.Lists.TryGetList(sListTitle);
+            if (oList == null)
+            {
+                return;
+            }
 
-                var liX = new ListItem(sFldDisplayName, sFldInternalName);
-                if (!XaxisFieldDropDownList.Items.Contains(liX))
-                    XaxisFieldDropDownList.Items.Add(liX);
+            ClearControls();
 
-                // numeric
-                if ((sFldSharePointType == "Calculated" && sFldColType == "Float") ||
-                    (sFldSharePointType == "Calculated" && sFldColType == "Int") ||
-                    sFldSharePointType == "Currency" ||
-                    sFldSharePointType == "Integer" ||
-                    sFldSharePointType == "Number")
+            var reportingChart = (ReportingChart)ParentToolPane.SelectedWebPart;
+
+            FillColorPalette();
+            FillChartLines(oList);
+
+            FillYAxisFormatDropdown();
+            FillLegendPositionDropDown();
+            SelectChartLegendPosition(reportingChart);
+
+            SortListControls();
+
+            ProcessXAxisFields(reportingChart);
+            ProcessYAxisFields(reportingChart);
+
+            SelectChartZAxisField(reportingChart);
+            SelectBubbleChartGroupBy(reportingChart);
+            SelectChartSelectedPaletteName(reportingChart);
+        }
+
+        private void FillColorPalette()
+        {
+            ChartPaletteStyleDropDownList.Items.AddRange(
+                new[]
                 {
-                    var liNum = new ListItem(sFldDisplayName, sFldInternalName);
+                    new ListItem("Color 1", "Color1"),
+                    new ListItem("Color 2", "Color2"),
+                    new ListItem("Gray", "Gray"),
+                    new ListItem("Blue", "Blue"),
+                    new ListItem("Red", "Red"),
+                    new ListItem("Green", "Green"),
+                    new ListItem("Yellow", "Yellow"),
+                    new ListItem("Violet", "Violet")
+                });
+        }
 
-                    if (!ddlXaxisFieldNum.Items.Contains(liNum))
-                        ddlXaxisFieldNum.Items.Add(liNum);
+        private void FillChartLines(SPList oList)
+        {
+            var listColumns = GetListColumns(oList.ID);
+            foreach (DataRow dataRow in listColumns.Rows)
+            {
+                var sharePointType = dataRow["SharePointType"]
+                    .ToString();
+                var displayName = dataRow["DisplayName"]
+                    .ToString();
+                var internalName = dataRow["InternalName"]
+                    .ToString();
+                var columnType = dataRow["ColumnType"]
+                    .ToString();
 
-                    if (!cblYaxisFieldNum.Items.Contains(liNum))
-                        cblYaxisFieldNum.Items.Add(liNum);
-
-                    if (!ddlYaxisFieldNum.Items.Contains(liNum))
-                        ddlYaxisFieldNum.Items.Add(liNum);
-
-                    if (!ZaxisFieldDropDownList.Items.Contains(liNum))
-                        ZaxisFieldDropDownList.Items.Add(liNum);
+                if (sharePointType == "Attachments"
+                    || internalName == "Order"
+                    || sharePointType == "File"
+                    || internalName == "Metainfo"
+                    || sharePointType == "Computed"
+                    || sharePointType == "Guid"
+                    || sharePointType == "Counter"
+                    || sharePointType == "Note")
+                {
+                    continue;
                 }
-                // non-numeric
+
+                var liX = new ListItem(displayName, internalName);
+                if (!XaxisFieldDropDownList.Items.Contains(liX))
+                {
+                    XaxisFieldDropDownList.Items.Add(liX);
+                }
+
+                if (sharePointType == "Calculated" && columnType == "Float"
+                    || sharePointType == "Calculated" && columnType == "Int"
+                    || sharePointType == "Currency"
+                    || sharePointType == "Integer"
+                    || sharePointType == "Number")
+                {
+                    FillNumericChart(displayName, internalName);
+                }
                 else
                 {
-                    var liNonNum = new ListItem(sFldDisplayName, sFldInternalName);
-
-                    if (!ddlXaxisFieldNonNum.Items.Contains(liNonNum))
-                        ddlXaxisFieldNonNum.Items.Add(liNonNum);
-
-                    if (!cblYaxisFieldNonNum.Items.Contains(liNonNum))
-                        cblYaxisFieldNonNum.Items.Add(liNonNum);
-
-                    if (!ddlYaxisFieldNonNum.Items.Contains(liNonNum))
-                        ddlYaxisFieldNonNum.Items.Add(liNonNum);
-
-                    if (!BubbleGroupByDropDownList.Items.Contains(liNonNum))
-                        BubbleGroupByDropDownList.Items.Add(liNonNum);
+                    FillNonNumericChart(displayName, internalName);
                 }
             }
+        }
 
-            YaxisFormatDropDownList.Items.Clear();
-            // fill y axis format ddl
-            YaxisFormatDropDownList.Items.AddRange(new ListItem[] {
-                new ListItem("None", "None"),
-                new ListItem("Currency", "Currency"),
-                new ListItem("Percentage", "Percentage")
-            });
+        private void FillNumericChart(string displayName, string internalName)
+        {
+            var numericLine = new ListItem(displayName, internalName);
 
-            LegendPositionDropDownList.Items.Clear();
-            LegendPositionDropDownList.Items.AddRange(new ListItem[] {
-                new ListItem("Left", "Left"),
-                new ListItem("Top", "Top"),
-                new ListItem("Right", "Right"),
-                new ListItem("Bottom", "Bottom")
-            });
-
-            if (LegendPositionDropDownList.Items.FindByText(rc.PropChartLegendPosition) != null)
+            if (!ddlXaxisFieldNum.Items.Contains(numericLine))
             {
-                LegendPositionDropDownList.Items.FindByText(rc.PropChartLegendPosition).Selected = true;
+                ddlXaxisFieldNum.Items.Add(numericLine);
             }
 
+            if (!cblYaxisFieldNum.Items.Contains(numericLine))
+            {
+                cblYaxisFieldNum.Items.Add(numericLine);
+            }
+
+            if (!ddlYaxisFieldNum.Items.Contains(numericLine))
+            {
+                ddlYaxisFieldNum.Items.Add(numericLine);
+            }
+
+            if (!ZaxisFieldDropDownList.Items.Contains(numericLine))
+            {
+                ZaxisFieldDropDownList.Items.Add(numericLine);
+            }
+        }
+
+        private void FillNonNumericChart(string displayName, string internalName)
+        {
+            var nonNumericLine = new ListItem(displayName, internalName);
+
+            if (!ddlXaxisFieldNonNum.Items.Contains(nonNumericLine))
+            {
+                ddlXaxisFieldNonNum.Items.Add(nonNumericLine);
+            }
+
+            if (!cblYaxisFieldNonNum.Items.Contains(nonNumericLine))
+            {
+                cblYaxisFieldNonNum.Items.Add(nonNumericLine);
+            }
+
+            if (!ddlYaxisFieldNonNum.Items.Contains(nonNumericLine))
+            {
+                ddlYaxisFieldNonNum.Items.Add(nonNumericLine);
+            }
+
+            if (!BubbleGroupByDropDownList.Items.Contains(nonNumericLine))
+            {
+                BubbleGroupByDropDownList.Items.Add(nonNumericLine);
+            }
+        }
+
+        private void FillYAxisFormatDropdown()
+        {
+            YaxisFormatDropDownList.Items.Clear();
+            YaxisFormatDropDownList.Items.AddRange(
+                new[]
+                {
+                    new ListItem("None", "None"),
+                    new ListItem("Currency", "Currency"),
+                    new ListItem("Percentage", "Percentage")
+                });
+        }
+
+        private void FillLegendPositionDropDown()
+        {
+            LegendPositionDropDownList.Items.Clear();
+            LegendPositionDropDownList.Items.AddRange(
+                new[]
+                {
+                    new ListItem("Left", "Left"),
+                    new ListItem("Top", "Top"),
+                    new ListItem("Right", "Right"),
+                    new ListItem("Bottom", "Bottom")
+                });
+        }
+
+        private void SelectChartLegendPosition(ReportingChart reportingChart)
+        {
+            if (LegendPositionDropDownList.Items.FindByText(reportingChart.PropChartLegendPosition) != null)
+            {
+                LegendPositionDropDownList.Items.FindByText(reportingChart.PropChartLegendPosition)
+                                          .Selected = true;
+            }
+        }
+
+        private void ProcessXAxisFields(ReportingChart reportingChart)
+        {
+            if (!string.IsNullOrWhiteSpace(reportingChart.PropChartXaxisField))
+            {
+                if (XaxisFieldDropDownList.Items.FindByValue(reportingChart.PropChartXaxisField) != null)
+                {
+                    XaxisFieldDropDownList.Items.FindByValue(reportingChart.PropChartXaxisField)
+                                          .Selected = true;
+                }
+
+                if (ddlXaxisFieldNum.Items.FindByValue(reportingChart.PropChartXaxisField) != null)
+                {
+                    ddlXaxisFieldNum.Items.FindByValue(reportingChart.PropChartXaxisField)
+                                    .Selected = true;
+                }
+
+                if (ddlXaxisFieldNonNum.Items.FindByValue(reportingChart.PropChartXaxisField) != null)
+                {
+                    ddlXaxisFieldNonNum.Items.FindByValue(reportingChart.PropChartXaxisField)
+                                       .Selected = true;
+                }
+            }
+        }
+
+        private void ProcessYAxisFields(ReportingChart reportingChart)
+        {
+            if (!string.IsNullOrWhiteSpace(reportingChart.PropChartYaxisField))
+            {
+                var yFields = reportingChart.PropChartYaxisField.Split('|');
+                if (yFields.Length > 1)
+                {
+                    foreach (var yField in yFields)
+                    {
+                        if (cblYaxisFieldNum.Items.FindByValue(yField) != null)
+                        {
+                            cblYaxisFieldNum.Items.FindByValue(yField)
+                                            .Selected = true;
+                        }
+
+                        if (cblYaxisFieldNonNum.Items.FindByValue(yField) != null)
+                        {
+                            cblYaxisFieldNonNum.Items.FindByValue(yField)
+                                               .Selected = true;
+                        }
+                    }
+                }
+                else
+                {
+                    var yValue = yFields[0];
+                    if (ddlYaxisFieldNum.Items.FindByValue(yValue) != null)
+                    {
+                        ddlYaxisFieldNum.Items.FindByValue(yValue)
+                                        .Selected = true;
+                    }
+
+                    if (ddlYaxisFieldNonNum.Items.FindByValue(yValue) != null)
+                    {
+                        ddlYaxisFieldNonNum.Items.FindByValue(yValue)
+                                           .Selected = true;
+                    }
+                }
+
+                SelectAxisFormat(reportingChart);
+            }
+        }
+
+        private void SelectAxisFormat(ReportingChart reportingChart)
+        {
+            if (!string.IsNullOrWhiteSpace(reportingChart.PropYaxisFormat)
+                && YaxisFormatDropDownList.Items.FindByValue(reportingChart.PropYaxisFormat) != null)
+            {
+                YaxisFormatDropDownList.Items.FindByValue(reportingChart.PropYaxisFormat)
+                                       .Selected = true;
+            }
+        }
+
+        private void SelectChartZAxisField(ReportingChart reportingChart)
+        {
+            if (!string.IsNullOrWhiteSpace(reportingChart.PropChartZaxisField)
+                && ZaxisFieldDropDownList.Items.FindByValue(reportingChart.PropChartZaxisField) != null)
+            {
+                ZaxisFieldDropDownList.Items.FindByValue(reportingChart.PropChartZaxisField)
+                                      .Selected = true;
+            }
+        }
+
+        private void SelectBubbleChartGroupBy(ReportingChart reportingChart)
+        {
+            if (!string.IsNullOrWhiteSpace(reportingChart.PropBubbleChartGroupBy)
+                && BubbleGroupByDropDownList.Items.FindByValue(reportingChart.PropBubbleChartGroupBy) != null)
+            {
+                BubbleGroupByDropDownList.Items.FindByValue(reportingChart.PropBubbleChartGroupBy)
+                                         .Selected = true;
+            }
+        }
+
+        private void SelectChartSelectedPaletteName(ReportingChart reportingChart)
+        {
+            if (!string.IsNullOrWhiteSpace(reportingChart.PropChartSelectedPaletteName)
+                && ChartPaletteStyleDropDownList.Items.FindByValue(reportingChart.PropChartSelectedPaletteName) != null)
+            {
+                ChartPaletteStyleDropDownList.Items.FindByValue(reportingChart.PropChartSelectedPaletteName)
+                                             .Selected = true;
+            }
+        }
+
+        private void SortListControls()
+        {
             SortListControlItems(XaxisFieldDropDownList);
             SortListControlItems(ddlXaxisFieldNum);
             SortListControlItems(ddlXaxisFieldNonNum);
-            // sort numeric fields
             SortListControlItems(cblYaxisFieldNum);
             SortListControlItems(ddlYaxisFieldNum);
             SortListControlItems(ZaxisFieldDropDownList);
-            // sort non-numeric fields
             SortListControlItems(cblYaxisFieldNonNum);
             SortListControlItems(ddlYaxisFieldNonNum);
             SortListControlItems(BubbleGroupByDropDownList);
             SortListControlItems(BubbleChartColorFieldDropDownList);
             SortListControlItems(ChartPaletteStyleDropDownList);
+        }
 
-
-            if (!string.IsNullOrEmpty(rc.PropChartXaxisField))
-            {
-                if (XaxisFieldDropDownList.Items.FindByValue(rc.PropChartXaxisField) != null)
-                {
-                    XaxisFieldDropDownList.Items.FindByValue(rc.PropChartXaxisField).Selected = true;
-                }
-
-                if (ddlXaxisFieldNum.Items.FindByValue(rc.PropChartXaxisField) != null)
-                {
-                    ddlXaxisFieldNum.Items.FindByValue(rc.PropChartXaxisField).Selected = true;
-                }
-
-                if (ddlXaxisFieldNonNum.Items.FindByValue(rc.PropChartXaxisField) != null)
-                {
-                    ddlXaxisFieldNonNum.Items.FindByValue(rc.PropChartXaxisField).Selected = true;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(rc.PropChartYaxisField))
-            {
-                string[] yFlds = rc.PropChartYaxisField.Split('|');
-                if (yFlds.Count() > 1)
-                {
-                    foreach (string yFld in yFlds)
-                    {
-                        if (cblYaxisFieldNum.Items.FindByValue(yFld) != null)
-                        {
-                            cblYaxisFieldNum.Items.FindByValue(yFld).Selected = true;
-                        }
-
-                        if (cblYaxisFieldNonNum.Items.FindByValue(yFld) != null)
-                        {
-                            cblYaxisFieldNonNum.Items.FindByValue(yFld).Selected = true;
-                        }
-                    }
-                }
-                else
-                {
-                    string yVal = yFlds[0];
-                    if (ddlYaxisFieldNum.Items.FindByValue(yVal) != null)
-                    {
-                        ddlYaxisFieldNum.Items.FindByValue(yVal).Selected = true;
-                    }
-
-                    if (ddlYaxisFieldNonNum.Items.FindByValue(yVal) != null)
-                    {
-                        ddlYaxisFieldNonNum.Items.FindByValue(yVal).Selected = true;
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(rc.PropYaxisFormat))
-                {
-                    if (YaxisFormatDropDownList.Items.FindByValue(rc.PropYaxisFormat) != null)
-                    {
-                        YaxisFormatDropDownList.Items.FindByValue(rc.PropYaxisFormat).Selected = true;
-                    }
-                }
-            }
-
-            if (!string.IsNullOrEmpty(rc.PropChartZaxisField))
-            {
-                if (ZaxisFieldDropDownList.Items.FindByValue(rc.PropChartZaxisField) != null)
-                {
-                    ZaxisFieldDropDownList.Items.FindByValue(rc.PropChartZaxisField).Selected = true;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(rc.PropBubbleChartGroupBy))
-            {
-                if (BubbleGroupByDropDownList.Items.FindByValue(rc.PropBubbleChartGroupBy) != null)
-                {
-                    BubbleGroupByDropDownList.Items.FindByValue(rc.PropBubbleChartGroupBy).Selected = true;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(rc.PropChartSelectedPaletteName))
-            {
-                if (ChartPaletteStyleDropDownList.Items.FindByValue(rc.PropChartSelectedPaletteName) != null)
-                {
-                    ChartPaletteStyleDropDownList.Items.FindByValue(rc.PropChartSelectedPaletteName).Selected = true;
-                }
-            }
-
+        private void ClearControls()
+        {
+            XaxisFieldDropDownList?.Items.Clear();
+            ddlXaxisFieldNum?.Items.Clear();
+            ddlXaxisFieldNonNum?.Items.Clear();
+            cblYaxisFieldNum?.Items.Clear();
+            ddlYaxisFieldNum?.Items.Clear();
+            ZaxisFieldDropDownList?.Items.Clear();
+            cblYaxisFieldNonNum?.Items.Clear();
+            ddlYaxisFieldNonNum?.Items.Clear();
+            BubbleGroupByDropDownList?.Items.Clear();
+            ChartPaletteStyleDropDownList?.Items.Clear();
         }
 
         private DataTable GetListColumns(Guid id)
