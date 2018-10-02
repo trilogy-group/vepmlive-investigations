@@ -43,7 +43,6 @@ namespace EPMLiveCore.ReportHelper.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            reportData?.Dispose();
             shimsContext?.Dispose();
         }
 
