@@ -1960,6 +1960,9 @@
                     var selectView = document.getElementById("idAnalyzerTab_SelView");
                     if (selectView.selectedIndex >= 0) {
                         var selectedItem = selectView.options[selectView.selectedIndex];
+
+
+
                         var deleteViewGuid = selectedItem.value;
                         var sbd = new StringBuilder();
                         sbd.append('<Execute Function="DeleteOptimizerView">');
