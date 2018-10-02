@@ -189,28 +189,7 @@ namespace EPMLiveCore
 		}
 
 		#endregion
-
-		#region Method Call : (Page_Load) (Return Type : void) Invoke without parameter types and should not throw
-
-		[Test]
-		[Timeout(TestsTimeOut)]
-		[Category("AUT MethodCallTest")]
-		public void AUT_MyWorkGridAction_Page_Load_Method_Call_With_2_Parameters_Dynamic_Invoking_Without_Parameters_Should_Not_Throw_Test()
-		{
-			// Arrange
-			Exception exception;
-			var methodInfo = GetMethodInfo(MethodPage_Load, 0);
-
-			// Act
-			Action currentAction = () => methodInfo.InvokeStaticMethodWithDynamicParamters(_myWorkGridActionInstanceFixture, Fixture, out exception);
-
-			// Assert
-			methodInfo.ShouldNotBeNull();
-			Should.NotThrow(currentAction);
-		}
-
-		#endregion
-
+        
 		#endregion
 
 		#endregion

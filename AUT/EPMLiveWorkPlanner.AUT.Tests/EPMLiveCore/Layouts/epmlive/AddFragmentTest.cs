@@ -1089,37 +1089,7 @@ namespace EPMLiveCore.Layouts.epmlive
         }
 
         #endregion
-
-        #region Method Call : (AddResourceToTeam) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_AddFragment_AddResourceToTeam_Method_Call_Void_With_No_Parameters_Call_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            this.ValidateExecuteCondition(MethodAddResourceToTeam);
-            var resources = this.CreateType<List<string>>();
-            var methodAddResourceToTeamPrametersTypes = new Type[] { typeof(List<string>) };
-            object[] parametersOfAddResourceToTeam = { resources };
-            Exception exception = null;
-            var methodInfo = this.GetMethodInfo(MethodAddResourceToTeam, methodAddResourceToTeamPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_addFragmentInstanceFixture, parametersOfAddResourceToTeam);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfAddResourceToTeam.ShouldNotBeNull();
-            parametersOfAddResourceToTeam.Length.ShouldBe(1);
-            methodAddResourceToTeamPrametersTypes.Length.ShouldBe(1);
-            methodAddResourceToTeamPrametersTypes.Length.ShouldBe(parametersOfAddResourceToTeam.Length);
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (AddResourceToTeam) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
