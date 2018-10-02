@@ -42,6 +42,7 @@ namespace EPMLivePS.Tests.HelperClasses
         public void TestCleanup()
         {
             _shimsContext?.Dispose();
+            _testEntity?.Dispose();
         }
 
         [TestMethod]
@@ -53,7 +54,8 @@ namespace EPMLivePS.Tests.HelperClasses
             // Assert
             _adoShims.ShouldSatisfyAllConditions(
                 () => _adoShims.IsCommandCreated(QuerySelectCustomFields01).ShouldBeTrue(),
-                () => _adoShims.IsCommandExecuted(QuerySelectCustomFields01).ShouldBeTrue());
+                () => _adoShims.IsCommandExecuted(QuerySelectCustomFields01).ShouldBeTrue(),
+                () => _adoShims.IsCommandDisposed(QuerySelectCustomFields01).ShouldBeTrue());
         }
 
         [TestMethod]
@@ -90,8 +92,10 @@ namespace EPMLivePS.Tests.HelperClasses
             _adoShims.ShouldSatisfyAllConditions(
                 () => _adoShims.IsCommandCreated(QuerySelectCustomFields02).ShouldBeTrue(),
                 () => _adoShims.IsCommandExecuted(QuerySelectCustomFields02).ShouldBeTrue(),
+                () => _adoShims.IsCommandDisposed(QuerySelectCustomFields02).ShouldBeTrue(),
                 () => _adoShims.IsCommandCreated(QuerySelectCustomFields03).ShouldBeTrue(),
-                () => _adoShims.IsCommandExecuted(QuerySelectCustomFields03).ShouldBeTrue());
+                () => _adoShims.IsCommandExecuted(QuerySelectCustomFields03).ShouldBeTrue(),
+                () => _adoShims.IsCommandDisposed(QuerySelectCustomFields03).ShouldBeTrue());
         }
 
         private void ShimQuerySelectCustomFields03Reader(SqlDataReader dataReader)
