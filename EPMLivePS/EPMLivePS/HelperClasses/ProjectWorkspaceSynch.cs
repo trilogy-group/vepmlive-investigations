@@ -10,8 +10,9 @@ using System.Diagnostics;
 
 namespace EPMLiveEnterprise
 {
-    public class ProjectWorkspaceSynch
+    public class ProjectWorkspaceSynch : IDisposable
     {
+        private bool _disposed = false;
         private SqlConnection cn;
 
         private SPSite mySite;
@@ -70,6 +71,8 @@ namespace EPMLiveEnterprise
 
         ~ProjectWorkspaceSynch()
         {
+            Dispose(false);
+
             try
             {
                 cn.Close();
@@ -169,18 +172,17 @@ namespace EPMLiveEnterprise
                     myWebToPublish.Features.Add(new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055"), true);
                 }
 
-                Hashtable newFields = new Hashtable();
-                Hashtable delFields = new Hashtable();
-                Hashtable updFields = new Hashtable();
+                var newFields = new Hashtable();
+                var updFields = new Hashtable();
 
-                SqlCommand cmd = new SqlCommand("select wssfieldname,editable from customfields where visible = 1 and fieldcategory in (3,4)", cn);
-                //SqlCommand cmd = new SqlCommand("select wssfieldname,editable from customfields where visible = 1 and fieldcategory != 1", cn);
-                SqlDataReader dr = cmd.ExecuteReader();
-                while (dr.Read())
+                using (var command = new SqlCommand("select wssfieldname,editable from customfields where visible = 1 and fieldcategory in (3,4)", cn))
+                using (var dataReader = command.ExecuteReader())
                 {
-                    newFields.Add(dr.GetString(0), dr.GetBoolean(1));
+                    while (dataReader.Read())
+                    {
+                        newFields.Add(dataReader.GetString(0), dataReader.GetBoolean(1));
+                    }
                 }
-                dr.Close();
 
                 SPList list = null;
                 try
@@ -333,87 +335,59 @@ namespace EPMLiveEnterprise
                     }
                     foreach (DictionaryEntry de in newFields)
                     {
-                        cmd = new SqlCommand("select * from customfields where wssfieldname=@fieldname", cn);
-                        cmd.Parameters.AddWithValue("@fieldname", de.Key.ToString());
-                        dr = cmd.ExecuteReader();
-                        if (dr.Read())
+                        try
                         {
-                            try
+                            var field = default(SPField);
+                            using (var command = new SqlCommand("select * from customfields where wssfieldname=@fieldname", cn))
                             {
-                                SPFieldType fType = SPFieldType.Text;
-                                switch (dr.GetString(7))
+                                command.Parameters.AddWithValue("@fieldname", de.Key.ToString());
+
+                                using (var dataReader = command.ExecuteReader())
                                 {
-                                    case "DATETIME":
-                                        fType = SPFieldType.DateTime;
-                                        break;
-                                    case "DURATION":
-                                        fType = SPFieldType.Number;
-                                        break;
-                                    case "NUMBER":
-                                        fType = SPFieldType.Number;
-                                        break;
-                                    case "CURRENCY":
-                                        fType = SPFieldType.Currency;
-                                        break;
-                                    case "BOOLEAN":
-                                        fType = SPFieldType.Boolean;
-                                        break;
-                                    case "CHOICE":
-                                        fType = SPFieldType.Choice;
-                                        break;
-                                }
-
-                                list.Fields.Add(de.Key.ToString().Trim(), fType, false);
-
-                                SPField f = list.Fields[de.Key.ToString()];
-                                f.Title = dr.GetString(2);
-                                //if (de.Value.ToString() == "True")
-                                //{
-                                //    f.ShowInNewForm = true;
-                                //    f.ShowInEditForm = true;
-                                //}
-                                //else
-                                //{
-                                //    f.ShowInNewForm = false;
-                                //    f.ShowInEditForm = false;
-                                //}
-                                dr.Close();
-                                if (f.Type == SPFieldType.Choice)
-                                {
-                                    cmd = new SqlCommand("select * from customfields where wssfieldname=@fieldname and fieldcategory=3", cn);
-                                    cmd.Parameters.AddWithValue("@fieldname", f.InternalName);
-                                    dr = cmd.ExecuteReader();
-
-                                    if (dr.Read())
+                                    if (dataReader.Read())
                                     {
-                                        f.SchemaXml = getSchemaXml(f, dr.GetString(0));
+                                        var fieldTypeName = dataReader.GetString(7);
+                                        var fieldType = _fieldTypes.ContainsKey(fieldTypeName)
+                                            ? _fieldTypes[fieldTypeName]
+                                            : SPFieldType.Text;
+
+                                        list.Fields.Add(de.Key.ToString().Trim(), fieldType, false);
+
+                                        field = list.Fields[de.Key.ToString()];
+                                        field.Title = dataReader.GetString(2);
                                     }
-                                    dr.Close();
+                                }
+                            }
+
+                            if (field != null)
+                            {
+                                if (field.Type == SPFieldType.Choice)
+                                {
+                                    using (var command = new SqlCommand("select * from customfields where wssfieldname=@fieldname and fieldcategory=3", cn))
+                                    {
+                                        command.Parameters.AddWithValue("@fieldname", field.InternalName);
+                                        using (var dataReader = command.ExecuteReader())
+                                        {
+                                            if (dataReader.Read())
+                                            {
+                                                field.SchemaXml = getSchemaXml(field, dataReader.GetString(0));
+                                            }
+                                        }
+                                    }
                                 }
                                 if (isCalculated(cfDs, de.Key.ToString().Substring(3)))
                                 {
-                                    f.ShowInEditForm = false;
-                                    f.ShowInNewForm = false;
+                                    field.ShowInEditForm = false;
+                                    field.ShowInNewForm = false;
                                 }
-                                f.Update();
-
+                                field.Update();
                             }
-                            catch (Exception ex)
-                            {
-                                myLog.WriteEntry("Error Adding Field: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 331);
-                            }
-                            try
-                            {
-                                dr.Close();
-                            }
-                            catch { }
                         }
-                        dr.Close();
+                        catch (Exception ex)
+                        {
+                            myLog.WriteEntry("Error Adding Field: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 331);
+                        }
                     }
-                }
-                else
-                {
-                    //myLog.WriteEntry("Task Center was not found at site: " + myWebToPublish.Url, EventLogEntryType.Warning, 331);
                 }
             }
             catch (Exception ex)
@@ -421,6 +395,16 @@ namespace EPMLiveEnterprise
                 myLog.WriteEntry("Error Processing Task Center: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 330);
             }
         }
+
+        private readonly IDictionary<string, SPFieldType> _fieldTypes = new Dictionary<string, SPFieldType>
+        {
+            ["DATETIME"] = SPFieldType.DateTime,
+            ["DURATION"] = SPFieldType.Number,
+            ["NUMBER"] = SPFieldType.Number,
+            ["CURRENCY"] = SPFieldType.Currency,
+            ["BOOLEAN"] = SPFieldType.Boolean,
+            ["CHOICE"] = SPFieldType.Choice
+        };
 
         public bool isCalculated(WebSvcCustomFields.CustomFieldDataSet cfDs, string fieldName)
         {
@@ -1018,6 +1002,24 @@ namespace EPMLiveEnterprise
                 myLog.WriteEntry("Error in getResourceWssId(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 330);
             }
             return 0;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    myLog?.Dispose();
+                }
+
+                _disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
         }
     }
 }
