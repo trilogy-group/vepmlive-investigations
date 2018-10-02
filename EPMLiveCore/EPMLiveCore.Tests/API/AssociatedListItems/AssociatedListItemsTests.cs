@@ -37,6 +37,7 @@ namespace EPMLiveCore.Tests.API.AssociatedListItems
         private const string WebID = "06676109-36f8-4957-a41a-9464d4e52fc5";
         private const string ProjectListID = "f42cdfdd-f66d-4588-8d2b-0dcd5fab4bc1";
         private const string ProjectID = "69490876-7284-4f10-9d1f-508230a8f76e";
+        private const string FancyFormListID = "bef35162-aa84-4670-8758-d653af039b4f";
 
         [TestInitialize]
         public void TestInitialize()
@@ -66,7 +67,7 @@ namespace EPMLiveCore.Tests.API.AssociatedListItems
 
             _site = new ShimSPSite
             {
-
+                IDGet = () => new Guid(SiteID)
             };
 
             var count = 0;
@@ -102,19 +103,33 @@ namespace EPMLiveCore.Tests.API.AssociatedListItems
                         new ShimSPListItem().Instance,
                         new ShimSPListItem().Instance
                     });
+                },
+                GetItemByIdInt32 = _ => new ShimSPListItem
+                {
+                    IDGet = () => DummyInt,
+                    TitleGet = () => DummyString,
+                    AttachmentsGet = () => new ShimSPAttachmentCollection().Bind(new string[] { DummyString })
+                },
+                RootFolderGet = () => new ShimSPFolder
+                {
+                    UrlGet = () => DummyString
                 }
             };
 
             _web = new ShimSPWeb
             {
+                IDGet = () => new Guid(WebID),
                 ListsGet = () => new ShimSPListCollection
                 {
                     ItemGetGuid = _ => list,
                     ItemGetString = _ => list
-                }
+                },
+                SiteGet = () => _site,
+                UrlGet = () => DummyUrl
             };
 
             ShimSPSite.ConstructorString = (_, __) => { };
+            ShimSPSite.ConstructorGuid = (_, __) => { };
             ShimSPSite.AllInstances.OpenWebGuid = (_, __) => _web;
             ShimSPSite.AllInstances.Dispose = _ => { };
 
@@ -224,7 +239,40 @@ namespace EPMLiveCore.Tests.API.AssociatedListItems
                         <ProjectListID>{ProjectListID}</ProjectListID>
                         <ProjectID>{ProjectID}</ProjectID>
                         <ProjectTitle>{DummyString}</ProjectTitle>
+                        <FancyFormListID>{FancyFormListID}</FancyFormListID>
+                        <FancyFormItemID>{DummyInt}</FancyFormItemID>
                       </Root>";
+        }
+
+        [TestMethod]
+        public void GetFancyFormAssociatedItems_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            var xmlData = CreateXmlData();
+
+            // Act
+            var result = AssociatedListItemsClass.GetFancyFormAssociatedItems(xmlData, _web);
+
+            // Assert
+        }
+
+        [TestMethod]
+        public void GetFancyFormAssociatedItemAttachments_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            var xmlData = CreateXmlData();
+
+            // Act
+            var result = AssociatedListItemsClass.GetFancyFormAssociatedItemAttachments(xmlData, _web);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldContain("<div id='attach-wrapper'>"),
+                () => result.ShouldContain("<div id='attach-text-wrapper'>"),
+                () => result.ShouldContain("<div class='attach-text'>"),
+                () => result.ShouldContain("<span class='icon-file'  style='margin-right:5px;color:#999999;'></span>"),
+                () => result.ShouldContain($"<a href='{DummyUrl}/{DummyString}/attachments/{DummyInt}/{DummyString}' target='_blank' ID='{DummyString}' class='fancybox'>"),
+                () => result.ShouldContain($"<span>{DummyString}</span>"));
         }
     }
 }
