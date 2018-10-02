@@ -43,13 +43,14 @@ namespace EPMLiveCore.ReportHelper.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            shimsContext?.Dispose();
             reportData?.Dispose();
+            shimsContext?.Dispose();
         }
 
         private void SetupShims()
         {
             ShimEPMData.ConstructorGuidStringStringBooleanStringString = (_, siteId, dbName, serverName, useSAccount, username, password) => { };
+            ShimEPMData.AllInstances.Dispose = _ => { };
             ShimReportData.AllInstances.GetListColumnsString = (_, name) => new DataTable();
             ShimReportData.AllInstances.AddMetaInfoColsDataTable = (_, dt) => new DataTable();
             ShimReportData.AllInstances.VerifyListColumnsDataTableString = (_, dataTable, tableName) => { };
