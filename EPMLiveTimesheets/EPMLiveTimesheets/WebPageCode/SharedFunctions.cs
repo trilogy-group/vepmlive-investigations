@@ -6,19 +6,13 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Data;
 using System.Xml;
-using System.Linq;
 using EPMLiveCore;
-using EPMLiveCore.PfeData;
-using System.Data.Common;
 
 namespace TimeSheets
 {
     public class SharedFunctions
     {
         private const string DefaultDateFormat = "yyyy-MM-dd";
-        private const string PfeProjectSQL = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE PROJECT_EXT_UID = @projectID";
-        private const string ResourceSQL = "Select EXTID from LSTResourcepool where SharePointAccountID = @UID";
-        private const string PeriodSQL = "Select TP.PERIOD_START, TP.PERIOD_END from TSTIMESHEET TS left join TSPERIOD TP on TS.PERIOD_ID= TP.PERIOD_ID where TS.TS_UID= @TS_UID";
         public static bool canUserImpersonate(string curuser, string iuser, SPWeb web, out string resName)
         {
             resName = "";
@@ -347,7 +341,7 @@ namespace TimeSheets
             {
                 prdStart = "";
                 prdEnd = "";
-                using (SqlCommand cmd = new SqlCommand(PeriodSQL, cn))
+                using (SqlCommand cmd = new SqlCommand("Select TP.PERIOD_START,TP.PERIOD_END from TSTIMESHEET TS left join TSPERIOD TP on TS.PERIOD_ID=TP.PERIOD_ID where TS.TS_UID= @TS_UID", cn))
                 {
                     cmd.Parameters.AddWithValue("@TS_UID", tsuid);
                     using (SqlDataReader dr = cmd.ExecuteReader())
@@ -385,7 +379,7 @@ namespace TimeSheets
                 {
                     cn.Open();
                     var user = web.AllUsers[username];
-                    using (SqlCommand cmd = new SqlCommand(ResourceSQL, cn))
+                    using (SqlCommand cmd = new SqlCommand("Select EXTID from LSTResourcepool where SharePointAccountID = @UID", cn))
                     {
                         cmd.Parameters.AddWithValue("@UID", user.ID);
                         using (SqlDataReader dr = cmd.ExecuteReader())
@@ -404,81 +398,29 @@ namespace TimeSheets
             }
 
         }
-        static void GetProjectEXTID(string basepath, SPWeb web, string projectid, out int projectextid)
-        {
-            try
-            {
-                projectextid = 0;
-                var connectionString = Utilities.GetPFEDBConnectionString(basepath);
-                // convert sql connection string to proper format
-                var connectionStringBuilder = new DbConnectionStringBuilder { ConnectionString = connectionString };
-                connectionStringBuilder.Remove("Provider");
-                connectionStringBuilder.Add("Application Name", "EPMLiveCore TimeSheet");
-                connectionString = connectionStringBuilder.ToString();
-                using (SqlConnection cn = new SqlConnection(connectionString))
-                {
-                    cn.Open();
 
-                    using (SqlCommand cmd = new SqlCommand(PfeProjectSQL, cn))
-                    {
-                        cmd.Parameters.AddWithValue("@projectID", projectid);
-                        using (SqlDataReader dr = cmd.ExecuteReader())
-                        {
-                            if (dr.Read())
-                            {
-                                projectextid = dr.GetInt32(0);
-                            }
-                        }
-                    }
-                }
-
-
-            }
-            catch
-            {
-                projectextid = 0;
-            }
-
-        }
-        public static string GetStandardRates(SqlConnection cn, string tsuid, SPWeb web, string username, string projectid = null)
+        static string GetStandardRates(SqlConnection cn, string tsuid, SPWeb web, string username)
         {
             string rate = string.Empty;
             try
             {
-
-
                 string prdStart = string.Empty;
                 string prdEnd = string.Empty;
                 string extid = string.Empty;
-                int projectextid = 0;
-                string basePath = CoreFunctions.getConfigSetting(web, "epkbasepath");
+                GetPeriodDates(cn, tsuid, out prdStart, out prdEnd);
                 string rptConnectionstring = CoreFunctions.getReportingConnectionString(web.Site.WebApplication.Id, web.Site.ID);
                 GetResourcesEXTID(rptConnectionstring, web, username, out extid);
+                string basePath = CoreFunctions.getConfigSetting(web, "epkbasepath");
 
-                if (!string.IsNullOrEmpty(projectid))
+                if (!string.IsNullOrEmpty(prdStart) && !string.IsNullOrEmpty(prdEnd) && !string.IsNullOrEmpty(extid))
                 {
-                    GetProjectEXTID(basePath, web, projectid, out projectextid);
-                    ProjectResourceRateRepository repo = new ProjectResourceRateRepository();
-                    var pferates = repo.GetRates(web, projectextid, Convert.ToInt32(extid)).FirstOrDefault();
-                    if (pferates != null && pferates.Rate > 0)
+                    DataSet dsrates = Utilities.GetRoleRates(basePath, username, prdStart, prdEnd, extid);
+                    if (dsrates.Tables[0].Rows.Count > 0)
                     {
-                        rate = web.Locale.NumberFormat.CurrencySymbol + Convert.ToString(pferates.Rate);
+                        rate = web.Locale.NumberFormat.CurrencySymbol + Convert.ToString(dsrates.Tables[0].Rows[0]["BC_RATE"]);
                     }
                 }
-                if (string.IsNullOrEmpty(rate))
-                {
-                    GetPeriodDates(cn, tsuid, out prdStart, out prdEnd);
 
-
-                    if (!string.IsNullOrEmpty(prdStart) && !string.IsNullOrEmpty(prdEnd) && !string.IsNullOrEmpty(extid))
-                    {
-                        DataSet dsrates = Utilities.GetRoleRates(basePath, username, prdStart, prdEnd, extid);
-                        if (dsrates.Tables[0].Rows.Count > 0)
-                        {
-                            rate = web.Locale.NumberFormat.CurrencySymbol + Convert.ToString(dsrates.Tables[0].Rows[0]["BC_RATE"]);
-                        }
-                    }
-                }
                 if (string.IsNullOrEmpty(rate))
                 {
                     DataSet dsResMeta = new DataSet();
