@@ -40,7 +40,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             _readFirstCall = true;
             _shimAdoNetCalls = AdoShims.ShimAdoNetCalls();
             _shimSharepointCalls = SharepointShims.ShimSharepointCalls();
-            ArrangeShims();            
+            ArrangeShims();
             _readCallCnt = 0;
             _readTimeEditorCall = true;
         }
@@ -52,15 +52,80 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
         }
 
         [TestMethod]
-        public void outputXml()
+        public void outputXml_When_Table_DataRow_Not_Empty()
         {
-            // Arrange
-            ArrangeShims();
+            // Arrange            
             var docXml = new XmlDocument();
             docXml.LoadXml(@"<root>
 <head>
     <settings></settings>
     <column width='0' type=''></column>
+    <beforeInit>
+        <call command='attachHeader'>
+            <dummy><![CDATA["" gridfilterSomeText('1 ""]]></dummy>
+        </call>
+    </beforeInit>
+</head>
+<rows>
+    <row id='                                                                           . .'>
+        <userdata name='listid'></userdata>
+        <userdata name='itemid'></userdata>
+        <userdata name='Work'></userdata>
+    </row>
+</rows>
+</root>");
+            var expected = "<root><head><column type=\"ch\" width=\"25\" align=\"center\" color=\"#F0F0F0\"><![CDATA[#master_checkbox]]></column><column type=\"tsnotes\" width=\"50\" align=\"center\" color=\"#F0F0F0\"><![CDATA[Notes]]></column><column type=\"ro\" width=\"35\" align=\"center\" color=\"#F0F0F0\"><![CDATA[TM]]></column><column type=\"ro\" width=\"35\" align=\"center\" color=\"#F0F0F0\"><![CDATA[PM]]></column><column width=\"50\" type=\"ro\"></column><beforeInit><call command=\"attachHeader\"><dummy><![CDATA[&nbsp;,&nbsp;,&nbsp;,&nbsp;,\" gridfilterSomeText('2 \",&nbsp;,&nbsp;]]></dummy></call></beforeInit><column type=\"ro[=sum]\" width=\"40\" align=\"right\" id=\"_TsDate_1_1_0001\"><![CDATA[Mon<br>1]]></column><column type=\"ro[=sum]\" width=\"50\" align=\"right\" id=\"_TsTotal_\">Total</column><column type=\"percentwork\" width=\"125\" align=\"left\" color=\"#F0F0F0\" id=\"_PercentWork_\"><![CDATA[% Work Spent]]></column></head><rows><row id=\"1\"><userdata name=\"listid\"></userdata><userdata name=\"itemid\"></userdata><userdata name=\"Work\"></userdata><cell type=\"ro\" style=\"background: #EFEFEF\"></cell><cell type=\"ro\" style=\"background: #EFEFEF\"></cell><cell type=\"ro\" style=\"background: #EFEFEF\"></cell><cell style=\"background: #EFEFEF\"><![CDATA[<img src=\"_layouts/images/yellow.gif\" alt=\"Pending\">]]></cell><cell type=\"timeeditor\">0|6|N|</cell><cell style=\"background: #EFEFEF; font-weight: bold\">6</cell><cell style=\"background: #EFEFEF; font-weight: bold\">|1</cell></row></rows></root>";
+            var approval = new GetTsApprovals();
+            SetFieldValue(approval, "docXml", docXml);
+            SetFieldValue(approval, "cn", new ShimSqlConnection().Instance);
+            SetFieldValue(approval, "gridname", "SomeText");
+
+            ShimDataTable.AllInstances.SelectString = (table, s) => new[] { new ShimDataRow().Instance };
+            ShimDataRowCollection.AllInstances.CountGet = _ => 1;
+            ShimDataRowCollection.AllInstances.ItemGetInt32 = (a, b) => new ShimDataRow();
+
+            ShimDataRow.AllInstances.ItemGetString = (a, key) => key == "TS_ITEM_HOURS" ? "6" : string.Empty;
+            ShimDataRow.AllInstances.ItemGetInt32 = (a, b) => 1;
+
+            // Act
+            InvokeMethod(approval, "outputXml", new object[] { });
+            var actual = GetFieldValue<string>(approval, "data");
+
+            // Assert            
+            Assert.AreEqual(expected, actual);
+
+            var list = _shimAdoNetCalls.CommandsCreated;
+            Assert.AreEqual(5, list.Count);
+            Assert.AreEqual("select TSTYPE_ID from TSTYPE where site_uid=@siteid", list[0].CommandText);
+            Assert.AreEqual("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", list[1].CommandText);
+            Assert.AreEqual("spTSgetTSHours", list[2].CommandText);
+            Assert.AreEqual("spTSGetTotalHoursForItem", list[3].CommandText);
+            Assert.AreEqual("select ts_item_uid,submitted,approval_status,project from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id", list[4].CommandText);
+
+            list = _shimAdoNetCalls.CommandsExecuted;
+            Assert.AreEqual(3, list.Count);
+            Assert.AreEqual("select TSTYPE_ID from TSTYPE where site_uid=@siteid", list[0].CommandText);
+            Assert.AreEqual("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", list[1].CommandText);
+            Assert.AreEqual("select ts_item_uid,submitted,approval_status,project from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id", list[2].CommandText);
+
+            Assert.AreEqual(_shimAdoNetCalls.CommandsCreated.Count, _shimAdoNetCalls.CommandsDisposed.Count);
+        }
+
+        [TestMethod]
+        public void outputXml_When_Project_And_Table_DataRow_Not_Empty()
+        {
+            // Arrange            
+            var docXml = new XmlDocument();
+            docXml.LoadXml(@"<root>
+<head>
+    <settings></settings>
+    <column width='0' type=''></column>
+    <column width='0' type='' id='Project'></column>
+    <beforeInit>
+        <call command='attachHeader'>
+            <dummy><![CDATA["" gridfilterSomeText('1 ""]]></dummy>
+        </call>
+    </beforeInit>
 </head>
 <rows>
     <row id='                                                                           . .'>
@@ -71,18 +136,324 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
 </rows>
 </root>");
 
+            var expected = "<root><head><column type=\"ch\" width=\"25\" align=\"center\" color=\"#F0F0F0\"><![CDATA[#master_checkbox]]></column><column type=\"tsnotes\" width=\"50\" align=\"center\" color=\"#F0F0F0\"><![CDATA[Notes]]></column><column type=\"ro\" width=\"35\" align=\"center\" color=\"#F0F0F0\"><![CDATA[TM]]></column><column type=\"ro\" width=\"35\" align=\"center\" color=\"#F0F0F0\"><![CDATA[PM]]></column><column width=\"50\" type=\"ro\"></column><column width=\"50\" type=\"ro\" id=\"Project\"></column><beforeInit><call command=\"attachHeader\"><dummy><![CDATA[&nbsp;,&nbsp;,&nbsp;,&nbsp;,\" gridfilterSomeText('2 \",&nbsp;,&nbsp;]]></dummy></call></beforeInit><column type=\"ro[=sum]\" width=\"40\" align=\"right\" id=\"_TsDate_1_1_0001\"><![CDATA[Mon<br>1]]></column><column type=\"ro[=sum]\" width=\"50\" align=\"right\" id=\"_TsTotal_\">Total</column><column type=\"percentwork\" width=\"125\" align=\"left\" color=\"#F0F0F0\" id=\"_PercentWork_\"><![CDATA[% Work Spent]]></column></head><rows><row id=\"1\"><userdata name=\"listid\"></userdata><userdata name=\"itemid\"></userdata><userdata name=\"Work\"></userdata><cell type=\"ro\" style=\"background: #EFEFEF\"></cell><cell type=\"ro\" style=\"background: #EFEFEF\"></cell><cell type=\"ro\" style=\"background: #EFEFEF\"></cell><cell style=\"background: #EFEFEF\"><![CDATA[<img src=\"_layouts/images/yellow.gif\" alt=\"Pending\">]]></cell><cell type=\"timeeditor\">0|6|N|</cell><cell style=\"background: #EFEFEF; font-weight: bold\">6</cell><cell style=\"background: #EFEFEF; font-weight: bold\">|1</cell></row></rows></root>";
+
             var approval = new GetTsApprovals();
             SetFieldValue(approval, "docXml", docXml);
             SetFieldValue(approval, "cn", new ShimSqlConnection().Instance);
+            SetFieldValue(approval, "gridname", "SomeText");
 
-            ShimDataRow.AllInstances.ItemGetString = (a, key) => key == "TS_ITEM_HOURS" ? "6" : string.Empty;
-            
+            ShimDataTable.AllInstances.SelectString = (table, s) => new[] { new ShimDataRow().Instance };
+            ShimDataRowCollection.AllInstances.CountGet = _ => 1;
+            ShimDataRowCollection.AllInstances.ItemGetInt32 = (a, b) => new ShimDataRow();
+            ShimDataRow.AllInstances.ItemGetString = (a, b) =>
+            {
+                switch (b)
+                {
+                    case "TS_ITEM_HOURS":
+                        return "6";
+                    default:
+                        return string.Empty;
+                }
+            };
+
+            ShimDataRow.AllInstances.ItemGetInt32 = (a, b) => 1;
+
             // Act
-            InvokeMethod(approval, "outputXml", new object[] {});
+            InvokeMethod(approval, "outputXml", new object[] { });
             var actual = GetFieldValue<string>(approval, "data");
 
-            // Assert
-            Assert.IsFalse(string.IsNullOrWhiteSpace(actual));
+            // Assert            
+            actual.ShouldBe(expected);
+
+            var list = _shimAdoNetCalls.CommandsCreated;
+            Assert.AreEqual(5, list.Count);
+            Assert.AreEqual("select TSTYPE_ID from TSTYPE where site_uid=@siteid", list[0].CommandText);
+            Assert.AreEqual("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", list[1].CommandText);
+            Assert.AreEqual("spTSgetTSHours", list[2].CommandText);
+            Assert.AreEqual("spTSGetTotalHoursForItem", list[3].CommandText);
+            Assert.AreEqual("select ts_item_uid,submitted,approval_status,project from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id", list[4].CommandText);
+
+            list = _shimAdoNetCalls.CommandsExecuted;
+            Assert.AreEqual(3, list.Count);
+            Assert.AreEqual("select TSTYPE_ID from TSTYPE where site_uid=@siteid", list[0].CommandText);
+            Assert.AreEqual("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", list[1].CommandText);
+            Assert.AreEqual("select ts_item_uid,submitted,approval_status,project from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id", list[2].CommandText);
+
+            Assert.AreEqual(_shimAdoNetCalls.CommandsCreated.Count, _shimAdoNetCalls.CommandsDisposed.Count);
+        }
+
+        [TestMethod]
+        public void outputXml_When_Table_DataRow_Not_Empty_And_TimeEditor_False()
+        {
+            // Arrange            
+            var docXml = new XmlDocument();
+            docXml.LoadXml(@"<root>
+<head>
+    <settings></settings>
+    <column width='0' type=''></column>
+    <beforeInit>
+        <call command='attachHeader'>
+            <dummy><![CDATA["" gridfilterSomeText('1 ""]]></dummy>
+        </call>
+    </beforeInit>
+</head>
+<rows>
+    <row id='                                                                           . .'>
+        <userdata name='listid'></userdata>
+        <userdata name='itemid'></userdata>
+        <userdata name='Work'></userdata>
+    </row>
+</rows>
+</root>");
+            var expected = "<root><head><column type=\"ch\" width=\"25\" align=\"center\" color=\"#F0F0F0\"><![CDATA[#master_checkbox]]></column><column type=\"tsnotes\" width=\"50\" align=\"center\" color=\"#F0F0F0\"><![CDATA[Notes]]></column><column type=\"ro\" width=\"35\" align=\"center\" color=\"#F0F0F0\"><![CDATA[TM]]></column><column type=\"ro\" width=\"35\" align=\"center\" color=\"#F0F0F0\"><![CDATA[PM]]></column><column width=\"50\" type=\"ro\"></column><beforeInit><call command=\"attachHeader\"><dummy><![CDATA[&nbsp;,&nbsp;,&nbsp;,&nbsp;,\" gridfilterSomeText('2 \",&nbsp;,&nbsp;]]></dummy></call></beforeInit><column type=\"ro[=sum]\" width=\"40\" align=\"right\" id=\"_TsDate_1_1_0001\"><![CDATA[Mon<br>1]]></column><column type=\"ro[=sum]\" width=\"50\" align=\"right\" id=\"_TsTotal_\">Total</column><column type=\"percentwork\" width=\"125\" align=\"left\" color=\"#F0F0F0\" id=\"_PercentWork_\"><![CDATA[% Work Spent]]></column></head><rows><row id=\"1\"><userdata name=\"listid\"></userdata><userdata name=\"itemid\"></userdata><userdata name=\"Work\"></userdata><cell type=\"ro\" style=\"background: #EFEFEF\"></cell><cell type=\"ro\" style=\"background: #EFEFEF\"></cell><cell type=\"ro\" style=\"background: #EFEFEF\"></cell><cell style=\"background: #EFEFEF\"><![CDATA[<img src=\"_layouts/images/yellow.gif\" alt=\"Pending\">]]></cell><cell type=\"ro\">6</cell><cell style=\"background: #EFEFEF; font-weight: bold\">6</cell><cell style=\"background: #EFEFEF; font-weight: bold\">|1</cell></row></rows></root>";
+            var approval = new GetTsApprovals();
+            SetFieldValue(approval, "docXml", docXml);
+            SetFieldValue(approval, "cn", new ShimSqlConnection().Instance);
+            SetFieldValue(approval, "gridname", "SomeText");
+
+            ShimDataTable.AllInstances.SelectString = (table, s) => new[] { new ShimDataRow().Instance };
+            ShimDataRowCollection.AllInstances.CountGet = _ => 1;
+            ShimDataRowCollection.AllInstances.ItemGetInt32 = (a, b) => new ShimDataRow();
+            ShimDataRow.AllInstances.ItemGetString = (a, b) =>
+            {
+                switch (b)
+                {
+                    case "TS_ITEM_HOURS":
+                        return "6";
+                    default:
+                        return string.Empty;
+                }
+            };
+
+            ShimCoreFunctions.getConfigSettingSPWebString = (a, b) =>
+            {
+                switch (b)
+                {
+                    case "EPMLiveDaySettings":
+                        return "True|True|True|True";
+
+                    default:
+                        return false.ToString();
+                }
+            };
+
+            ShimDataRow.AllInstances.ItemGetInt32 = (a, b) => 1;
+
+            _readTimeEditorCall = false;
+
+            // Act
+            InvokeMethod(approval, "outputXml", new object[] { });
+            var actual = GetFieldValue<string>(approval, "data");
+
+            // Assert            
+            actual.ShouldBe(expected);
+
+            var list = _shimAdoNetCalls.CommandsCreated;
+            Assert.AreEqual(5, list.Count);
+            Assert.AreEqual("select TSTYPE_ID from TSTYPE where site_uid=@siteid", list[0].CommandText);
+            Assert.AreEqual("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", list[1].CommandText);
+            Assert.AreEqual("spTSgetTSHours", list[2].CommandText);
+            Assert.AreEqual("spTSGetTotalHoursForItem", list[3].CommandText);
+            Assert.AreEqual("select ts_item_uid,submitted,approval_status,project from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id", list[4].CommandText);
+
+            list = _shimAdoNetCalls.CommandsExecuted;
+            Assert.AreEqual(3, list.Count);
+            Assert.AreEqual("select TSTYPE_ID from TSTYPE where site_uid=@siteid", list[0].CommandText);
+            Assert.AreEqual("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", list[1].CommandText);
+            Assert.AreEqual("select ts_item_uid,submitted,approval_status,project from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id", list[2].CommandText);
+
+            Assert.AreEqual(_shimAdoNetCalls.CommandsCreated.Count, _shimAdoNetCalls.CommandsDisposed.Count);
+        }
+
+        [TestMethod]
+        public void outputXml_When_Table_DataRow_Empty()
+        {
+            // Arrange            
+            var docXml = new XmlDocument();
+            docXml.LoadXml(@"<root>
+<head>
+    <settings></settings>
+    <column width='0' type=''></column>
+    <beforeInit>
+        <call command='attachHeader'>
+            <dummy><![CDATA["" gridfilterSomeText('1 ""]]></dummy>
+        </call>
+    </beforeInit>
+</head>
+<rows>
+    <row id='                                                                           . .'>
+        <userdata name='listid'></userdata>
+        <userdata name='itemid'></userdata>
+        <userdata name='Work'></userdata>
+    </row>
+</rows>
+</root>");
+            var expected = "<root><head><column type=\"ch\" width=\"25\" align=\"center\" color=\"#F0F0F0\"><![CDATA[#master_checkbox]]></column><column type=\"tsnotes\" width=\"50\" align=\"center\" color=\"#F0F0F0\"><![CDATA[Notes]]></column><column type=\"ro\" width=\"35\" align=\"center\" color=\"#F0F0F0\"><![CDATA[TM]]></column><column type=\"ro\" width=\"35\" align=\"center\" color=\"#F0F0F0\"><![CDATA[PM]]></column><column width=\"50\" type=\"ro\"></column><beforeInit><call command=\"attachHeader\"><dummy><![CDATA[&nbsp;,&nbsp;,&nbsp;,&nbsp;,\" gridfilterSomeText('2 \",&nbsp;,&nbsp;]]></dummy></call></beforeInit><column type=\"ro[=sum]\" width=\"40\" align=\"right\" id=\"_TsDate_1_1_0001\"><![CDATA[Mon<br>1]]></column><column type=\"ro[=sum]\" width=\"50\" align=\"right\" id=\"_TsTotal_\">Total</column><column type=\"percentwork\" width=\"125\" align=\"left\" color=\"#F0F0F0\" id=\"_PercentWork_\"><![CDATA[% Work Spent]]></column></head><rows><row id=\"1\"><userdata name=\"listid\"></userdata><userdata name=\"itemid\"></userdata><userdata name=\"Work\"></userdata><cell type=\"ro\" style=\"background: #EFEFEF\"></cell><cell type=\"ro\" style=\"background: #EFEFEF\"></cell><cell type=\"ro\" style=\"background: #EFEFEF\"></cell><cell style=\"background: #EFEFEF\"><![CDATA[<img src=\"_layouts/images/yellow.gif\" alt=\"Pending\">]]></cell><cell type=\"timeeditor\">0|0|N|</cell><cell style=\"background: #EFEFEF; font-weight: bold\">0</cell><cell style=\"background: #EFEFEF; font-weight: bold\">|0</cell></row></rows></root>";
+
+            var approval = new GetTsApprovals();
+            SetFieldValue(approval, "docXml", docXml);
+            SetFieldValue(approval, "cn", new ShimSqlConnection().Instance);
+            SetFieldValue(approval, "gridname", "SomeText");
+
+            ShimDataTable.AllInstances.SelectString = (table, s) => new DataRow[0];
+            ShimInternalDataCollectionBase.AllInstances.CountGet = _ => 0;
+            ShimDataRowCollection.AllInstances.CountGet = _ => 0;
+
+            // Act
+            InvokeMethod(approval, "outputXml", new object[] { });
+            var actual = GetFieldValue<string>(approval, "data");
+
+            // Assert            
+            actual.ShouldBe(expected);
+
+            var list = _shimAdoNetCalls.CommandsCreated;
+            Assert.AreEqual(5, list.Count);
+            Assert.AreEqual("select TSTYPE_ID from TSTYPE where site_uid=@siteid", list[0].CommandText);
+            Assert.AreEqual("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", list[1].CommandText);
+            Assert.AreEqual("spTSgetTSHours", list[2].CommandText);
+            Assert.AreEqual("spTSGetTotalHoursForItem", list[3].CommandText);
+            Assert.AreEqual("select ts_item_uid,submitted,approval_status,project from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id", list[4].CommandText);
+
+            list = _shimAdoNetCalls.CommandsExecuted;
+            Assert.AreEqual(3, list.Count);
+            Assert.AreEqual("select TSTYPE_ID from TSTYPE where site_uid=@siteid", list[0].CommandText);
+            Assert.AreEqual("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", list[1].CommandText);
+            Assert.AreEqual("select ts_item_uid,submitted,approval_status,project from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id", list[2].CommandText);
+
+            Assert.AreEqual(_shimAdoNetCalls.CommandsCreated.Count, _shimAdoNetCalls.CommandsDisposed.Count);
+        }
+
+        [TestMethod]
+        public void outputXml_When_Table_DataRow_Empty_And_TimeEditor_False()
+        {
+            // Arrange            
+            var docXml = new XmlDocument();
+            docXml.LoadXml(@"<root>
+<head>
+    <settings></settings>
+    <column width='0' type=''></column>
+    <beforeInit>
+        <call command='attachHeader'>
+            <dummy><![CDATA["" gridfilterSomeText('1 ""]]></dummy>
+        </call>
+    </beforeInit>
+</head>
+<rows>
+    <row id='                                                                           . .'>
+        <userdata name='listid'></userdata>
+        <userdata name='itemid'></userdata>
+        <userdata name='Work'></userdata>
+    </row>
+</rows>
+</root>");
+            var expected = "<root><head><column type=\"ch\" width=\"25\" align=\"center\" color=\"#F0F0F0\"><![CDATA[#master_checkbox]]></column><column type=\"tsnotes\" width=\"50\" align=\"center\" color=\"#F0F0F0\"><![CDATA[Notes]]></column><column type=\"ro\" width=\"35\" align=\"center\" color=\"#F0F0F0\"><![CDATA[TM]]></column><column type=\"ro\" width=\"35\" align=\"center\" color=\"#F0F0F0\"><![CDATA[PM]]></column><column width=\"50\" type=\"ro\"></column><beforeInit><call command=\"attachHeader\"><dummy><![CDATA[&nbsp;,&nbsp;,&nbsp;,&nbsp;,\" gridfilterSomeText('2 \",&nbsp;,&nbsp;]]></dummy></call></beforeInit><column type=\"ro[=sum]\" width=\"40\" align=\"right\" id=\"_TsDate_1_1_0001\"><![CDATA[Mon<br>1]]></column><column type=\"ro[=sum]\" width=\"50\" align=\"right\" id=\"_TsTotal_\">Total</column><column type=\"percentwork\" width=\"125\" align=\"left\" color=\"#F0F0F0\" id=\"_PercentWork_\"><![CDATA[% Work Spent]]></column></head><rows><row id=\"1\"><userdata name=\"listid\"></userdata><userdata name=\"itemid\"></userdata><userdata name=\"Work\"></userdata><cell type=\"ro\" style=\"background: #EFEFEF\"></cell><cell type=\"ro\" style=\"background: #EFEFEF\"></cell><cell type=\"ro\" style=\"background: #EFEFEF\"></cell><cell style=\"background: #EFEFEF\"><![CDATA[<img src=\"_layouts/images/yellow.gif\" alt=\"Pending\">]]></cell><cell type=\"ro\">0</cell><cell style=\"background: #EFEFEF; font-weight: bold\">0</cell><cell style=\"background: #EFEFEF; font-weight: bold\">|0</cell></row></rows></root>";
+            var approval = new GetTsApprovals();
+            SetFieldValue(approval, "docXml", docXml);
+            SetFieldValue(approval, "cn", new ShimSqlConnection().Instance);
+            SetFieldValue(approval, "gridname", "SomeText");
+
+            ShimCoreFunctions.getConfigSettingSPWebString = (a, b) =>
+            {
+                switch (b)
+                {
+                    case "EPMLiveDaySettings":
+                        return "True|True|True|True";
+
+                    default:
+                        return false.ToString();
+                }
+            };
+
+            ShimDataTable.AllInstances.SelectString = (table, s) => new DataRow[0];
+            ShimDataRowCollection.AllInstances.CountGet = _ => 0;
+            _readTimeEditorCall = false;
+
+            // Act
+            InvokeMethod(approval, "outputXml", new object[] { });
+            var actual = GetFieldValue<string>(approval, "data");
+
+            // Assert            
+            actual.ShouldBe(expected);
+
+            var list = _shimAdoNetCalls.CommandsCreated;
+            Assert.AreEqual(5, list.Count);
+            Assert.AreEqual("select TSTYPE_ID from TSTYPE where site_uid=@siteid", list[0].CommandText);
+            Assert.AreEqual("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", list[1].CommandText);
+            Assert.AreEqual("spTSgetTSHours", list[2].CommandText);
+            Assert.AreEqual("spTSGetTotalHoursForItem", list[3].CommandText);
+            Assert.AreEqual("select ts_item_uid,submitted,approval_status,project from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id", list[4].CommandText);
+
+            list = _shimAdoNetCalls.CommandsExecuted;
+            Assert.AreEqual(3, list.Count);
+            Assert.AreEqual("select TSTYPE_ID from TSTYPE where site_uid=@siteid", list[0].CommandText);
+            Assert.AreEqual("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", list[1].CommandText);
+            Assert.AreEqual("select ts_item_uid,submitted,approval_status,project from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id", list[2].CommandText);
+
+            Assert.AreEqual(_shimAdoNetCalls.CommandsCreated.Count, _shimAdoNetCalls.CommandsDisposed.Count);
+        }
+
+        [TestMethod]
+        public void outputXml_When_No_ListId_Item_And_Table_DataRow_Not_Empty()
+        {
+            // Arrange            
+            var docXml = new XmlDocument();
+            docXml.LoadXml(@"<root>
+<head>
+    <settings></settings>
+    <column width='0' type=''></column>
+    <beforeInit>
+        <call command='attachHeader'>
+            <dummy><![CDATA["" gridfilterSomeText('1 ""]]></dummy>
+        </call>
+    </beforeInit>
+</head>
+<rows>
+    <row id='                                                                           . .'>        
+        <userdata name='Work'></userdata>
+    </row>
+</rows>
+</root>");
+            var expected = "<root><head><column type=\"ch\" width=\"25\" align=\"center\" color=\"#F0F0F0\"><![CDATA[#master_checkbox]]></column><column type=\"tsnotes\" width=\"50\" align=\"center\" color=\"#F0F0F0\"><![CDATA[Notes]]></column><column type=\"ro\" width=\"35\" align=\"center\" color=\"#F0F0F0\"><![CDATA[TM]]></column><column type=\"ro\" width=\"35\" align=\"center\" color=\"#F0F0F0\"><![CDATA[PM]]></column><column width=\"50\" type=\"ro\"></column><beforeInit><call command=\"attachHeader\"><dummy><![CDATA[&nbsp;,&nbsp;,&nbsp;,&nbsp;,\" gridfilterSomeText('2 \",&nbsp;,&nbsp;]]></dummy></call></beforeInit><column type=\"ro[=sum]\" width=\"40\" align=\"right\" id=\"_TsDate_1_1_0001\"><![CDATA[Mon<br>1]]></column><column type=\"ro[=sum]\" width=\"50\" align=\"right\" id=\"_TsTotal_\">Total</column><column type=\"percentwork\" width=\"125\" align=\"left\" color=\"#F0F0F0\" id=\"_PercentWork_\"><![CDATA[% Work Spent]]></column></head><rows><row id=\"1\"><userdata name=\"Work\"></userdata><cell type=\"ro\" style=\"background: #EFEFEF; font-weight: bold;\"></cell><cell type=\"ro\" style=\"background: #EFEFEF; font-weight: bold;\"></cell><cell type=\"ro\" style=\"background: #EFEFEF; font-weight: bold;\"></cell><cell type=\"ro\" style=\"background: #EFEFEF; font-weight: bold;\"></cell><cell style=\"background: #EFEFEF\"></cell><cell style=\"background: #EFEFEF;font-weight: bold;\"></cell><cell style=\"background: #EFEFEF;font-weight: bold;\" type=\"ro\"></cell></row></rows></root>";
+            var approval = new GetTsApprovals();
+            SetFieldValue(approval, "docXml", docXml);
+            SetFieldValue(approval, "cn", new ShimSqlConnection().Instance);
+            SetFieldValue(approval, "gridname", "SomeText");
+
+            ShimDataTable.AllInstances.SelectString = (table, s) => new[] { new ShimDataRow().Instance };
+            ShimDataRowCollection.AllInstances.CountGet = _ => 1;
+            ShimDataRowCollection.AllInstances.ItemGetInt32 = (a, b) => new ShimDataRow();
+            ShimDataRow.AllInstances.ItemGetString = (a, b) =>
+            {
+                switch (b)
+                {
+                    case "TS_ITEM_HOURS":
+                        return "6";
+                    default:
+                        return string.Empty;
+                }
+            };
+
+            ShimDataRow.AllInstances.ItemGetInt32 = (a, b) => 1;
+
+            // Act
+            InvokeMethod(approval, "outputXml", new object[] { });
+            var actual = GetFieldValue<string>(approval, "data");
+
+            // Assert            
+            actual.ShouldBe(expected);
+
+            var list = _shimAdoNetCalls.CommandsCreated;
+            Assert.AreEqual(2, list.Count);
+            Assert.AreEqual("select TSTYPE_ID from TSTYPE where site_uid=@siteid", list[0].CommandText);
+            Assert.AreEqual("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", list[1].CommandText);
+
+            list = _shimAdoNetCalls.CommandsExecuted;
+            Assert.AreEqual(2, list.Count);
+            Assert.AreEqual("select TSTYPE_ID from TSTYPE where site_uid=@siteid", list[0].CommandText);
+            Assert.AreEqual("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", list[1].CommandText);
+
+            Assert.AreEqual(_shimAdoNetCalls.CommandsCreated.Count, _shimAdoNetCalls.CommandsDisposed.Count);
         }
 
         [TestMethod]
@@ -91,12 +462,12 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             // Arrange
             ArrangeShims();
             var approval = new GetTsApprovals();
-            SetFieldValue(approval, "arrGroupFields", new[] {"field"});
+            SetFieldValue(approval, "arrGroupFields", new[] { "field" });
             SetFieldValue(approval, "list", new ShimSPList().Instance);
             SetFieldValue(approval, "view", new ShimSPView().Instance);
 
             // Act
-            InvokeMethod(approval, "addTSItem", new object[] {new ShimSPListItem().Instance, new SortedList(), "userName", "resource"});
+            InvokeMethod(approval, "addTSItem", new object[] { new ShimSPListItem().Instance, new SortedList(), "userName", "resource" });
             var actual = GetFieldValue<Queue>(approval, "queueAllItems");
 
             // Assert
@@ -148,7 +519,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             // Act
             approval.populateGroups(string.Empty, arrGTemp, new ShimSPWeb().Instance);
             var actual = docXml.OuterXml;
-            
+
             // Assert
             actual.ShouldBe(expected);
         }
@@ -164,7 +535,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             docXml.LoadXml("<rows></rows>");
             var ndMainParent = docXml.ChildNodes[0];
 
-            ShimDataRow.AllInstances.ItemGetString = (a, key) => key == "jobstatus" ? "1" : string.Empty;            
+            ShimDataRow.AllInstances.ItemGetString = (a, key) => key == "jobstatus" ? "1" : string.Empty;
 
             ShimDataRow.AllInstances.ItemGetInt32 = (a, index) =>
             {
@@ -189,7 +560,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             // Act
             approval.populateGroups(string.Empty, arrGTemp, new ShimSPWeb().Instance);
             var actual = docXml.OuterXml;
-            
+
             // Assert
             actual.ShouldBe(expected);
         }
@@ -240,7 +611,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             // Act
             approval.populateGroups(string.Empty, arrGTemp, new ShimSPWeb().Instance);
             var actual = docXml.OuterXml;
-            
+
             // Assert
             actual.ShouldBe(expected);
         }
@@ -281,7 +652,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             // Act
             approval.populateGroups(string.Empty, arrGTemp, new ShimSPWeb().Instance);
             var actual = docXml.OuterXml;
-            
+
             // Assert
             actual.ShouldBe(expected);
         }
@@ -322,7 +693,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             // Act
             approval.populateGroups(string.Empty, arrGTemp, new ShimSPWeb().Instance);
             var actual = docXml.OuterXml;
-            
+
             // Assert
             actual.ShouldBe(expected);
         }
@@ -363,7 +734,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             // Act
             approval.populateGroups(string.Empty, arrGTemp, new ShimSPWeb().Instance);
             var actual = docXml.OuterXml;
-            
+
             // Assert
             actual.ShouldBe(expected);
         }
@@ -404,7 +775,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             // Act
             approval.populateGroups(string.Empty, arrGTemp, new ShimSPWeb().Instance);
             var actual = docXml.OuterXml;
-            
+
             // Assert
             actual.ShouldBe(expected);
         }
@@ -421,7 +792,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             var ndMainParent = docXml.ChildNodes[0];
 
             ShimDataTable.AllInstances.SelectString = (a, b) => new DataRow[0];
-            
+
             SetFieldValue(approval, "resWeb", new ShimSPWeb().Instance);
             SetFieldValue(approval, "dsTimesheetTasks", new ShimDataSet().Instance);
             SetFieldValue(approval, "dsTimesheets", new ShimDataSet().Instance);
@@ -499,7 +870,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             ShimSPList.AllInstances.GetItemByIdInt32 = (a, b) => new ShimSPListItem();
 
             ShimSPWeb.AllInstances.IDGet = web => Guid.Empty;
-            
+
             ShimDbDataAdapter.AllInstances.FillDataSet = (adapter, set) => 0;
 
             ShimDataSet.AllInstances.TablesGet = _ => new ShimDataTableCollection();
@@ -510,7 +881,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection();
 
             ShimSPView.AllInstances.ViewFieldsGet = view => new ShimSPViewFieldCollection();
-            ShimSPViewFieldCollection.AllInstances.CountGet = collection => 0;            
+            ShimSPViewFieldCollection.AllInstances.CountGet = collection => 0;
 
             ShimSPList.AllInstances.GetItemsSPQuery = (a, b) => new ShimSPListItemCollection();
             ShimSPListItemCollection.AllInstances.GetEnumerator = _ =>
