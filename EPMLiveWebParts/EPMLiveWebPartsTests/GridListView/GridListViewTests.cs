@@ -134,7 +134,8 @@ namespace EPMLiveWebParts.Tests
             {
                 PropertiesGet = () => new ShimSPPropertyBag()
                 {
-                }.Instance
+                }.Instance,
+                SiteGet = () => _sharepointShims.SiteShim.Instance,
             }.Instance;
             ShimStringDictionary.AllInstances.ItemGetString = (_, __) => "1";
             ShimSPUser.AllInstances.GroupsGet = (_) => _sharepointShims.GroupsShim;
@@ -145,11 +146,14 @@ namespace EPMLiveWebParts.Tests
             ShimSqlCommand.ConstructorString = (_, __) => { };
             ShimSqlCommand.AllInstances.ExecuteNonQuery = (_) => 0;
             ShimSqlCommand.AllInstances.ExecuteReader = (_) => new ShimSqlDataReader().Instance;
+            ShimSqlDataReader.AllInstances.Read = (_) => true;
             ShimSPSite.AllInstances.OpenWeb = (_) => _sharepointShims.WebShim.Instance;
             ShimSPWeb.AllInstances.WebsGet = (_) => new ShimSPWebCollection();
             ShimSPSite.AllInstances.RootWebGet = (_) => _sharepointShims.WebShim.Instance;
             ShimSPSite.AllInstances.FeaturesGet = (_) => new ShimSPFeatureCollection().Instance;
             ShimSPWeb.AllInstances.PropertiesGet = (_) => new ShimSPPropertyBag().Instance;
+            ShimSPSite.AllInstances.Dispose = (_) => { };
+            ShimSPContext.AllInstances.ListItemGet = (_) => _sharepointShims.ListItemShim.Instance;
         }
 
         private void SetUpDefaultValues()
