@@ -1,30 +1,27 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EPMLiveCore.ReportHelper;
-using System;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Generic.Fakes;
+using System.Data;
+using System.Data.Fakes;
+using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using EPMLiveCore.Fakes;
+using EPMLiveCore.ReportHelper.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
-using System.Data;
-using EPMLiveCore.ReportHelper.Fakes;
-using System.Data.SqlClient;
-using Microsoft.QualityTools.Testing.Fakes;
-using System.Collections;
-using System.Data.Fakes;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
-using EPMLiveCore.Fakes;
-using WorkEnginePPM;
-using System.Collections.Generic.Fakes;
 
 namespace EPMLiveCore.ReportHelper.Tests
 {
     [TestClass()]
     public class ReportDataTests
     {
-        private IDisposable shimsContext;
         private static readonly Guid DummyGuid = Guid.NewGuid();
+        private const string SharepointType = "SharepointType";
+        private const string InternalName = "internalname";
         private const string DummyString = "DummyString";
         private const string ColumnName = "ColumnName";
         private const string ColumnType = "ColumnType";
@@ -33,10 +30,7 @@ namespace EPMLiveCore.ReportHelper.Tests
         private const string ColumnDataTime = "ColumnDateTime";
         private const string ColumnFloat = "ColumnFloat";
         private ReportData reportData;
-
-        const string SharepointType = "SharepointType";
-        //const string ColumnName = "ColumnName";
-        const string InternalName = "internalname";
+        private IDisposable shimsContext;
 
         [TestInitialize]
         public void Initialize()
@@ -63,8 +57,6 @@ namespace EPMLiveCore.ReportHelper.Tests
             ShimEPMData.AllInstances.SaveWorkSPListItem = (_, list) => true;
             ShimReportData.AddLookUpFieldValuesStringString = (value, valueType) => DummyString;
             ShimDataTable.AllInstances.NewRow = _ => new ShimDataRow();
-
-
         }
 
         [TestMethod()]
@@ -145,9 +137,6 @@ namespace EPMLiveCore.ReportHelper.Tests
             }
         }
 
-       
-
-
         [TestMethod]
         public void MyWorkListItemsDataTable_Should_ReturnExpectedDataTableColumns()
         {
@@ -205,7 +194,7 @@ namespace EPMLiveCore.ReportHelper.Tests
         }
 
         [TestMethod]
-        public void MyWorkListItemsDataTable_Should_()
+        public void MyWorkListItemsDataTable_OnSuccess_ReturnsDataTable()
         {
             // Arrange
             const string AssignedToText = "AssignedToText";
@@ -213,6 +202,7 @@ namespace EPMLiveCore.ReportHelper.Tests
             const string DummyIdColumn = "dummyId";
             const string DummyColumnGrid = "DummyColumnGrid";
             const string DummyColumnGuid = "DummyColumnGuid";
+            var columnsTuple = new List<Tuple<string, object>>();
             var web = new ShimSPWeb
             {
                 ListsGet = () => new ShimSPListCollection
@@ -299,22 +289,15 @@ namespace EPMLiveCore.ReportHelper.Tests
                 }.GetEnumerator()
             };
             ShimExtensionMethods.ContainsFieldWithInternalNameSPFieldCollectionString = (_, name) => true;
-
-            var teste = new List<Tuple<string, object>>();
-
             ShimDataRow.AllInstances.ItemSetStringObject = (_, columnName, objectValue) =>
             {
-                teste.Add(new Tuple<string, object>(columnName, objectValue));
+                columnsTuple.Add(new Tuple<string, object>(columnName, objectValue));
             };
 
             // Act
             var result = reportData.MyWorkListItemsDataTable(DummyGuid, DummyString, web, DummyString, list, DummyGuid, out error, out errorMessage);
-
-            var assignetToTextValue = teste.FirstOrDefault(p => p.Item1 == AssignedToText)?.Item2.ToString();
-            var dummyTextValue = teste.FirstOrDefault(p => p.Item1 == DummyText)?.Item2.ToString();
-            var dummyIdColumn = teste.FirstOrDefault(p => p.Item1 == DummyIdColumn)?.Item2.ToString();
-            var dummyColumnGrid = teste.FirstOrDefault(p => p.Item1 == DummyColumnGrid)?.Item2.ToString();
-            var dummyColumnGuid = teste.FirstOrDefault(p => p.Item1 == DummyColumnGuid)?.Item2.ToString();
+            var assignetToTextValue = columnsTuple.FirstOrDefault(p => p.Item1 == AssignedToText)?.Item2.ToString();
+            var dummyTextValue = columnsTuple.FirstOrDefault(p => p.Item1 == DummyText)?.Item2.ToString();
 
             // Assert
             result.ShouldSatisfyAllConditions(
@@ -323,7 +306,33 @@ namespace EPMLiveCore.ReportHelper.Tests
                 () => result.ShouldNotBeNull(),
                 () => assignetToTextValue.ShouldNotBeNullOrEmpty(),
                 () => assignetToTextValue.ShouldBe(DummyString),
-                () => );
+                () => dummyTextValue.ShouldNotBeNullOrEmpty(),
+                () => dummyTextValue.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void MyWorkListItemsDataTable_OnException_ReturnError()
+        {
+            // Arrange
+            var web = new ShimSPWeb();
+            var list = new ArrayList();
+            var error = false;
+            var errorMessage = string.Empty;
+            ShimReportData.AllInstances.VerifyListColumnsDataTableString = (_, dataTable, tableName) =>
+            {
+                throw new Exception(DummyString);
+            };
+
+            // Act
+            ReportData report = new ReportData(DummyGuid, DummyString, DummyString, true, DummyString, DummyString);
+            var result = report.MyWorkListItemsDataTable(DummyGuid, DummyString, web, DummyString, list, DummyGuid, out error, out errorMessage);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => error.ShouldBeTrue(),
+                () => errorMessage.ShouldNotBeNullOrEmpty(),
+                () => errorMessage.ShouldContain(DummyString));
         }
 
         private FakesDelegates.Func<string, object> GetItemValues(string columnName, string internalName, string sharepointType)
@@ -371,31 +380,5 @@ namespace EPMLiveCore.ReportHelper.Tests
             dataTable.Columns[ColumnFloat].ShouldNotBeNull();
             dataTable.Columns[ColumnFloat].DataType.ShouldBe(typeof(decimal));
         }
-
-        [TestMethod]
-        public void MyWorkListItemsDataTable_OnException_ReturnError()
-        {
-            // Arrange
-            var web = new ShimSPWeb();
-            var list = new ArrayList();
-            var error = false;
-            var errorMessage = string.Empty;
-            ShimReportData.AllInstances.VerifyListColumnsDataTableString = (_, dataTable, tableName) => 
-            {
-                throw new Exception(DummyString);
-            };
-
-            // Act
-            ReportData report = new ReportData(DummyGuid, DummyString, DummyString, true, DummyString, DummyString);
-            var result = report.MyWorkListItemsDataTable(DummyGuid, DummyString, web, DummyString, list, DummyGuid, out error, out errorMessage);
-
-            // Assert
-            result.ShouldSatisfyAllConditions(
-                () => result.ShouldNotBeNull(),
-                () => error.ShouldBeTrue(),
-                () => errorMessage.ShouldNotBeNullOrEmpty(),
-                () => errorMessage.ShouldContain(DummyString));
-        }
-
     }
 }
