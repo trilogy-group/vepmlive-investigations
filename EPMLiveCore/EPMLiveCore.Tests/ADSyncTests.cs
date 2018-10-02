@@ -177,7 +177,7 @@ namespace EPMLiveCore.Tests
             {
                 ItemGetString = key => shimPropertyValueCollection,
             };
-            ShimDirectoryEntry.AllInstances.PropertiesGet = (_) => shimPropertyCollection;
+            ShimDirectoryEntry.AllInstances.PropertiesGet = _ => shimPropertyCollection;
             ShimDirectoryEntry.AllInstances.RefreshCacheStringArray = (entry, strings) => {};
 
             ShimSecurityIdentifier.ConstructorByteArrayInt32 = (instance, __, ___) =>
