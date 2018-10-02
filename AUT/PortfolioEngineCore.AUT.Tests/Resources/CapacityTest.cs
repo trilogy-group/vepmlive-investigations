@@ -9,7 +9,7 @@ using AUT.ConfigureTestProjects.Extensions;
 using AUT.ConfigureTestProjects.StaticTypes;
 using NUnit.Framework;
 using Should = Shouldly.Should;
-using Shouldly;
+using Shouldly; 
 
 namespace PortfolioEngineCore
 {
