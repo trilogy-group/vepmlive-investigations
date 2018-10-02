@@ -131,7 +131,6 @@ namespace EPMLiveCore
         [TestCase(MethodInitSavedFieldMappings, 0)]
         [TestCase(MethodInitResourceField, 0)]
         [TestCase(MethodADFields, 0)]
-        [TestCase(MethodInitGroups, 0)]
         [TestCase(MethodDropDownListScheduleType_SelectedIndexChanged, 0)]
         [TestCase(MethodSubmit_Click, 0)]
         [TestCase(MethodPage_LoadComplete, 0)]
