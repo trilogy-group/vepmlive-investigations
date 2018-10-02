@@ -13,7 +13,7 @@ using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveCore.API.Integration
 {
-    internal class IntegrationAdmin
+    internal class IntegrationAdmin : IDisposable
     {
         API.Integration.IntegrationCore _core;
         public Guid intlistid;
@@ -565,5 +565,25 @@ namespace EPMLiveCore.API.Integration
             return sb.ToString();
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            for (var i = 0; i < ControlCollection.Count; i++)
+            {
+                var control = ControlCollection[i] as Control;
+                control?.Dispose();
+            }
+
+        }
     }
 }
