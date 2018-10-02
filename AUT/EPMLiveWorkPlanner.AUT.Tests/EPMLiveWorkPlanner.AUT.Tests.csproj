@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props')" />
+  <Import Project="..\packages\NUnit.3.10.1\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FC639724-3E8B-4282-9156-B0377723BDC3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>EPMLiveWorkPlanner.AUT.Tests</RootNamespace>
+    <AssemblyName>EPMLiveWorkPlanner.AUT.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AUT.ConfigureTestProjects, Version=5.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AUT.ConfigureTestProjects.5.4.0\lib\net462\AUT.ConfigureTestProjects.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AutoFixture, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.4.5.0\lib\net452\AutoFixture.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AutoFixture.AutoMoq, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.AutoMoq.4.5.0\lib\net452\AutoFixture.AutoMoq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AutoFixture.NUnit3, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.NUnit3.4.5.0\lib\net452\AutoFixture.NUnit3.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Castle.Core.4.3.1\lib\net45\Castle.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Fare, Version=2.1.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fare.2.1.1\lib\net35\Fare.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Moq, Version=4.9.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.9.0\lib\net45\Moq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=3.10.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.10.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Shouldly, Version=3.0.0.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
+      <HintPath>..\packages\Shouldly.3.0.0\lib\net451\Shouldly.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.1\lib\netstandard1.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.1\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="EPMLiveCore\Layouts\epmlive\AddFragmentTest.cs" />
+    <Compile Include="EPMLiveCore\Layouts\epmlive\ManageFragmentTest.cs" />
+    <Compile Include="EPMLiveCore\Layouts\epmlive\SaveFragmentTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\CsvImportJobTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\EdititemTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\EditplannerTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\GetmenuTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\GettasksTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\KanBanPlannerTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\EPMLiveWorkPlanner\NoteEditorTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\ImportCsvTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\ImportExcelFinishTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\ImportExcelTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\ImportListTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\OpenmppTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\PlannerAdminTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\PlannerUpdatesTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\PublishLogTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\SaveAgilePlannerTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\SaveWorkPlannerTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\SelectDateTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\WorkPlanLinkTaskTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\WorkPlannerActionTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\WorkPlannerLocationTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\WorkPlannerTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\Layouts\epmlive\WorkPlannerWizardTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\ListImportJobTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\PlannerCoreTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\PublishJobTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\ResourceInformationTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\ShowerrorTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\ShowganttTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\TasksTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\UpdatetaskTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\WorkPlannerAPITest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\WorkplannerconfigTest.cs" />
+    <Compile Include="EPMLiveWorkPlanner\XLSImportJobTest.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
+      <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
+      <Name>EPMLiveCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EPMLiveWorkPlanner\EPMLiveWorkPlanner\EPMLiveWorkPlanner.csproj">
+      <Project>{fcf0c151-0a3f-4b9f-9327-3bbbf109d776}</Project>
+      <Name>EPMLiveWorkPlanner</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.10.1\build\NUnit.props'))" />
+    <Error Condition="!Exists('..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
