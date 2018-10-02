@@ -183,7 +183,15 @@ namespace EPMLiveCore.ReportHelper.Tests
             };
 
             // Act
-            var result = reportData.MyWorkListItemsDataTable(DummyGuid, DummyString, web, DummyString, list, DummyGuid, out error, out errorMessage);
+            var result = reportData.MyWorkListItemsDataTable(
+                DummyGuid, 
+                DummyString, 
+                web, 
+                DummyString, 
+                list, 
+                DummyGuid, 
+                out error,
+                out errorMessage);
 
             // Assert
             result.ShouldSatisfyAllConditions(
@@ -295,7 +303,15 @@ namespace EPMLiveCore.ReportHelper.Tests
             };
 
             // Act
-            var result = reportData.MyWorkListItemsDataTable(DummyGuid, DummyString, web, DummyString, list, DummyGuid, out error, out errorMessage);
+            var result = reportData.MyWorkListItemsDataTable(
+                DummyGuid, 
+                DummyString, 
+                web, 
+                DummyString, 
+                list, 
+                DummyGuid, 
+                out error,
+                out errorMessage);
             var assignetToTextValue = columnsTuple.FirstOrDefault(p => p.Item1 == AssignedToText)?.Item2.ToString();
             var dummyTextValue = columnsTuple.FirstOrDefault(p => p.Item1 == DummyText)?.Item2.ToString();
 
@@ -324,8 +340,15 @@ namespace EPMLiveCore.ReportHelper.Tests
             };
 
             // Act
-            ReportData report = new ReportData(DummyGuid, DummyString, DummyString, true, DummyString, DummyString);
-            var result = report.MyWorkListItemsDataTable(DummyGuid, DummyString, web, DummyString, list, DummyGuid, out error, out errorMessage);
+            var result = reportData.MyWorkListItemsDataTable(
+                DummyGuid, 
+                DummyString, 
+                web, 
+                DummyString, 
+                list, 
+                DummyGuid, 
+                out error,
+                out errorMessage);
 
             // Assert
             result.ShouldSatisfyAllConditions(
