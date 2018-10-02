@@ -39,6 +39,16 @@ namespace TimeSheets
         private DataSet dsTimesheetNotes;
         private DataSet dsTimesheetMeta;
 
+        private const string Width = "width";
+        private const string TypeAttribute = "type";
+        private const string TreeId = "tree";
+        private const string Align = "align";
+        private const string Color = "color";
+        private const string Id = "id";
+        private const string Column = "column";
+        private const string UserData = "userdata[@name='{0}']";
+        private const int ColumnStartIndex = 4;
+
         SPWeb resWeb = null;
 
         bool usecurrent = true;
@@ -50,8 +60,9 @@ namespace TimeSheets
                 if (resWeb.ID != SPContext.Current.Web.ID)
                 {
                     resWeb.Close();
-                }}
-            
+                }
+            }
+
             base.Dispose();
         }
 
@@ -65,7 +76,7 @@ namespace TimeSheets
             base.inEditMode = false;
             string resUrl = string.Empty;
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 try
                 {
@@ -76,7 +87,7 @@ namespace TimeSheets
                 {
                     Debug.WriteLine(ex);
                 }
-                resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(curWeb, "EPMLiveResourceURL", true, false); 
+                resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(curWeb, "EPMLiveResourceURL", true, false);
             });
 
             try
@@ -434,17 +445,17 @@ namespace TimeSheets
 
         protected override void outputXml()
         {
-            ArrayList arr = new ArrayList();
-            string worktypes = string.Empty;
-            bool timeeditor = false;
-            bool timenotes = false;
-            string filterHead = string.Empty;
-            XmlNodeList ndCols = docXml.SelectNodes("//head/column");
+            var arrayList = new ArrayList();
+            var workTypes = string.Empty;
+            var timeEditor = false;
+            var timeNotes = false;
+            var filterHead = string.Empty;
+            var ndCols = docXml.SelectNodes("//head/column");
 
-            int columnCount = ndCols.Count;
-            string strColumns = string.Empty;
+            var columnCount = ndCols.Count;
+            var strColumns = string.Empty;
 
-            SPWeb web = site.RootWeb;
+            var web = site.RootWeb;
             {
                 usecurrent = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveTSUseCurrent"));
             }
@@ -459,157 +470,185 @@ namespace TimeSheets
                     "tsnotes",
                     "50",
                     period,
-                    arr,
+                    arrayList,
                     ref filterHead,
-                    ref worktypes,
-                    ref timeeditor,
-                    ref timenotes);
+                    ref workTypes,
+                    ref timeEditor,
+                    ref timeNotes);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
             }
 
+            var ndHead = docXml.SelectSingleNode("//head");
+            if (!usecurrent)
+            {
+                strColumns = GetColumns(ndHead);
+            }
 
-                XmlNode ndHead = docXml.SelectSingleNode("//head");
+            AddColumnWork(ndHead);
+            ndHead.RemoveChild(ndHead.SelectSingleNode("settings"));
 
-                if (!usecurrent)
+            var strWorktypes = workTypes.Split('|');
+            var rowCounter = 1;
+
+            foreach (XmlNode rowNode in docXml.SelectNodes("//row"))
+            {
+                var ndListId = rowNode.SelectSingleNode(string.Format(UserData, "listid"));
+                var ndItemId = rowNode.SelectSingleNode(string.Format(UserData, "itemid"));
+                var ndTsuid = rowNode.SelectSingleNode(string.Format(UserData, "tsuid"));
+
+                if (ndListId != null && ndItemId != null)
                 {
-                    foreach (XmlNode nd in ndHead.SelectNodes("column"))
-                    {
-                        string id = string.Empty;
-                        try
-                        {
-                            id = nd.Attributes["id"].Value;
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine(ex);
-                        }
-                        strColumns += "," + id;
-                    }
-                    strColumns = strColumns.Substring(1);
-                }
-
-                XmlNode newColWork = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-                newColWork.InnerXml = "<![CDATA[% Work Spent]]>";
-                XmlAttribute attrTypeWork = docXml.CreateAttribute("type");
-                attrTypeWork.Value = "percentwork";
-                XmlAttribute attrWidthWork = docXml.CreateAttribute("width");
-                attrWidthWork.Value = "125";
-                XmlAttribute attrAlignWork = docXml.CreateAttribute("align");
-                attrAlignWork.Value = "left";
-                XmlAttribute attrColorWork = docXml.CreateAttribute("color");
-                attrColorWork.Value = "#F0F0F0";
-                XmlAttribute attrIdWork = docXml.CreateAttribute("id");
-                attrIdWork.Value = "_PercentWork_";
-
-                newColWork.Attributes.Append(attrTypeWork);
-                newColWork.Attributes.Append(attrWidthWork);
-                newColWork.Attributes.Append(attrAlignWork);
-                newColWork.Attributes.Append(attrColorWork);
-                newColWork.Attributes.Append(attrIdWork);
-
-                ndHead.AppendChild(newColWork);
-
-                ndHead.RemoveChild(ndHead.SelectSingleNode("settings"));
-
-                string[] strworktypes = worktypes.Split('|');
-
-                int rowCounter = 1;
-
-                foreach (XmlNode nd in docXml.SelectNodes("//row"))
-                {
-                    double hours = 0;
-                    XmlNode ndListId = nd.SelectSingleNode("userdata[@name='listid']");
-                    XmlNode ndItemId = nd.SelectSingleNode("userdata[@name='itemid']");
-                    XmlNode ndTsuid = nd.SelectSingleNode("userdata[@name='tsuid']");
-
-                    if (ndListId != null && ndItemId != null)
-                    {
-                    var sql = "select ts_item_uid,submitted,approval_status from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id";
+                    var sql = "select ts_item_uid,submitted,approval_status,project from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id";
                     AddCells(
-                            nd, 
-                            site, 
-                            ndListId, 
-                            ndItemId, 
-                            period, 
-                            dsTSHours, 
-                            arr, 
-                            bgcolor, 
-                            usecurrent, 
-                            strColumns, 
-                            dsTimesheetTasks, 
-                            dsTimesheetMeta,
-                            timeeditor,
-                            strworktypes,
-                            timenotes, 
-                            cn,
-                            sql);
-                    }
-                    else
-                    {
-                        AddCells(nd, bgcolor, arr);
-                    }
-                    nd.Attributes["id"].Value = rowCounter.ToString();
-                    rowCounter++;
+                        rowNode,
+                        site,
+                        ndListId,
+                        ndItemId,
+                        period,
+                        dsTSHours,
+                        arrayList,
+                        bgcolor,
+                        usecurrent,
+                        strColumns,
+                        dsTimesheetTasks,
+                        dsTimesheetMeta,
+                        timeEditor,
+                        strWorktypes,
+                        timeNotes,
+                        cn,
+                        sql);
                 }
-
-                XmlNode ndFilter = docXml.SelectSingleNode("//head/beforeInit/call[@command='attachHeader']");
-                if (ndFilter != null)
+                else
                 {
-                    string xml = ndFilter.FirstChild.InnerXml;
-                    xml = xml.Replace("<![CDATA[", "<![CDATA[&nbsp;,&nbsp;,&nbsp;,&nbsp;,").Replace("gridfilter" + gridname + "('1", "gridfilter" + gridname + "('2").Replace("]]>", filterHead + ",&nbsp;]]>");
-                    ndFilter.FirstChild.InnerXml = xml;
+                    AddCells(rowNode, bgcolor, arrayList);
                 }
+                rowNode.Attributes[Id].Value = rowCounter.ToString();
+                rowCounter++;
+            }
 
-                double fullWidth = double.Parse(Request["width"]);
-                double reservedWidth = 0;
+            var ndFilter = docXml.SelectSingleNode("//head/beforeInit/call[@command='attachHeader']");
+            if (ndFilter != null)
+            {
+                var xml = ndFilter.FirstChild.InnerXml;
+                xml = xml.Replace("<![CDATA[", "<![CDATA[&nbsp;,&nbsp;,&nbsp;,&nbsp;,")
+                        .Replace($"gridfilter{gridname}('1", $"gridfilter{gridname}('2")
+                        .Replace("]]>", $"{filterHead},&nbsp;]]>");
+                ndFilter.FirstChild.InnerXml = xml;
+            }
 
-                XmlNodeList ndNewCols = docXml.SelectNodes("//head/column");
-                for (int i = columnCount + 4; i < ndNewCols.Count; i++)
-                {
-                    try
-                    {
-                        string w = ndNewCols[i].Attributes["width"].Value;
-                        reservedWidth += double.Parse(w);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex);
-                    }
-                }
-                reservedWidth += 125;
-
-                fullWidth -= reservedWidth;
-                fullWidth = fullWidth / (columnCount + 1);
-
-                if (fullWidth < 50)
-                    fullWidth = 50;
-
-                for (int i = 4; i <= columnCount+3; i++)
-                {
-                    string id = string.Empty;
-                    try
-                    {
-                        id = ndNewCols[i].Attributes["type"].Value;
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex);
-                    }
-                    if (id == "tree")
-                        ndNewCols[i].Attributes["width"].Value = (fullWidth * 2 - 10).ToString();
-                    else
-                    {
-                        ndNewCols[i].Attributes["width"].Value = fullWidth.ToString();
-                        ndNewCols[i].Attributes["type"].Value = "ro";
-                    }
-                }
+            UpdateHeadColumns(columnCount);
 
             cn.Close();
 
             data = docXml.OuterXml;
+        }
+
+        private void UpdateHeadColumns(int columnCount)
+        {
+            var fullWidth = double.Parse(Request[Width]);
+            double reservedWidth = 0;
+
+            var ndNewCols = docXml.SelectNodes("//head/column");
+            for (var i = columnCount + 4; i < ndNewCols.Count; i++)
+            {
+                try
+                {
+                    var witdth = ndNewCols[i].Attributes[Width].Value;
+                    reservedWidth += double.Parse(witdth);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+            }
+            reservedWidth += 125;
+
+            fullWidth -= reservedWidth;
+            fullWidth = fullWidth / (columnCount + 1);
+
+            if (fullWidth < 50)
+            {
+                fullWidth = 50;
+            }
+
+            for (var i = ColumnStartIndex; i <= columnCount + 3; i++)
+            {
+                var id = string.Empty;
+                try
+                {
+                    id = ndNewCols[i].Attributes[TypeAttribute].Value;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+                if (id == TreeId)
+                {
+                    ndNewCols[i].Attributes[Width].Value = (fullWidth * 2 - 10).ToString();
+                }
+                else
+                {
+                    ndNewCols[i].Attributes[Width].Value = fullWidth.ToString();
+                    ndNewCols[i].Attributes[TypeAttribute].Value = "ro";
+                }
+            }
+        }
+
+        private void AddColumnWork(XmlNode ndHead)
+        {
+            if (ndHead == null)
+            {
+                throw new ArgumentNullException(nameof(ndHead));
+            }
+
+            var newColWork = docXml.CreateNode(XmlNodeType.Element, Column, docXml.NamespaceURI);
+            newColWork.InnerXml = "<![CDATA[% Work Spent]]>";
+            var attrTypeWork = docXml.CreateAttribute(TypeAttribute);
+            attrTypeWork.Value = "percentwork";
+            var attrWidthWork = docXml.CreateAttribute(Width);
+            attrWidthWork.Value = "125";
+            var attrAlignWork = docXml.CreateAttribute(Align);
+            attrAlignWork.Value = "left";
+            var attrColorWork = docXml.CreateAttribute(Color);
+            attrColorWork.Value = "#F0F0F0";
+            var attrIdWork = docXml.CreateAttribute(Id);
+            attrIdWork.Value = "_PercentWork_";
+
+            newColWork.Attributes.Append(attrTypeWork);
+            newColWork.Attributes.Append(attrWidthWork);
+            newColWork.Attributes.Append(attrAlignWork);
+            newColWork.Attributes.Append(attrColorWork);
+            newColWork.Attributes.Append(attrIdWork);
+
+            ndHead.AppendChild(newColWork);
+        }
+
+        private static string GetColumns(XmlNode ndHead)
+        {
+            if (ndHead == null)
+            {
+                throw new ArgumentNullException(nameof(ndHead));
+            }
+
+            var stringBuilder = new StringBuilder();
+            foreach (XmlNode nd in ndHead.SelectNodes(Column))
+            {
+                string id = string.Empty;
+                try
+                {
+                    id = nd.Attributes[Id].Value;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+                stringBuilder.AppendFormat(",{0}", id);
+            }
+            var strColumns = stringBuilder.ToString().Substring(1);
+            return strColumns;
         }
 
         private void addTSItem(SPListItem li, SortedList arrGTemp, string username, string resource)
