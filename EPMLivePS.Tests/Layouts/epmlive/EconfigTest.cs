@@ -19,12 +19,13 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Shouldly;
 using static EPMLiveEnterprise.WebSvcEvents.Fakes.ShimEventHandlersDataSet;
 
 namespace EPMLivePS.Tests.Layouts.epmlive
 {
-    [TestClass]
+    [TestFixture]
     public class EconfigTest
     {
         private const int UserId = 1;
@@ -42,8 +43,8 @@ namespace EPMLivePS.Tests.Layouts.epmlive
         private AdoShims _adoShims;
         private SPContext _spContextCurrent;
 
-        [TestInitialize]
-        public void TestInitialize()
+        [SetUp]
+        public void SetUp()
         {
             _shimsContext = ShimsContext.Create();
             InitializeSharePoint();
@@ -55,14 +56,14 @@ namespace EPMLivePS.Tests.Layouts.epmlive
             InitializeUiControls();
         }
 
-        [TestCleanup]
-        public void TestCleanup()
+        [TearDown]
+        public void TearDown()
         {
             _shimsContext?.Dispose();
             _testEntity?.Dispose();
         }
 
-        [TestMethod]
+        [Test]
         public void LoadEnterpriseFields_WhenCalled_FetchesDataFromDbAndSelectsRelatedItemInDropDownList()
         {
             // Arrange
@@ -149,8 +150,8 @@ namespace EPMLivePS.Tests.Layouts.epmlive
                 }
             };
 
-        [TestMethod]
-        [DynamicData(nameof(LnkReactivateClickArguments))]
+        [Test]
+        [TestCaseSource(nameof(LnkReactivateClickArguments))]
         public void LnkReactivateClick_IfDataTableSelectMethodReturnsValue_CreatesEventHandlerAssociations(
             string expectedExpression,
             string expectedEventHandlerId,
@@ -203,7 +204,7 @@ namespace EPMLivePS.Tests.Layouts.epmlive
                 () => passedMessage.ShouldBe(expectedLogMessage));
         }
 
-        [TestMethod]
+        [Test]
         public void Button1Click_Always_CreatesConnectionAndSetsValues()
         {
             // Arrange
@@ -237,7 +238,7 @@ namespace EPMLivePS.Tests.Layouts.epmlive
                 () => passedValues.ShouldContainKey("ValidTemplates"));
         }
 
-        [TestMethod]
+        [Test]
         public void SetVal_Always_SelectsConfigValueFromEconfig()
         {
             // Arrange
@@ -256,7 +257,7 @@ namespace EPMLivePS.Tests.Layouts.epmlive
                 () => _adoShims.IsCommandDisposed(expectedCmdText).ShouldBeTrue());
         }
 
-        [TestMethod]
+        [Test]
         public void SetVal_IfDataReaderReturnsValue_UpdatesEconfig()
         {
             // Arrange
@@ -282,7 +283,7 @@ namespace EPMLivePS.Tests.Layouts.epmlive
                 () => _adoShims.IsCommandDisposed(expectedCmdText).ShouldBeTrue());
         }
 
-        [TestMethod]
+        [Test]
         public void SetVal_IfDataReaderDoesNotReturnValue_InsertsEconfig()
         {
             // Arrange
