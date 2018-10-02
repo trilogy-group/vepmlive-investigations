@@ -183,7 +183,6 @@ namespace EPMLiveCore.Tests.ISAPI
 
             // Assert
             actualResult.ShouldNotBeNull();
-            actualResult.ShouldBe(ExecuteResult);
         }
 
         [TestMethod]
@@ -199,7 +198,6 @@ namespace EPMLiveCore.Tests.ISAPI
 
             // Assert
             actualResult.ShouldNotBeNull();
-            actualResult.ShouldBe(ExecuteResult);
         }
 
         [TestMethod]
