@@ -96,7 +96,6 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 		[APPROVAL_STATUS] [int] NOT NULL CONSTRAINT [DF_TSITEM_APPROVAL_STATUS]  DEFAULT ((0)),
 		PROJECT_LIST_UID uniqueidentifier NULL,
 		ASSIGNEDTOID int NULL,
-		RATE [varchar](50) NULL,
 		CONSTRAINT [PK_TSITEM] PRIMARY KEY CLUSTERED 
 		(
 		[TS_ITEM_UID] ASC
