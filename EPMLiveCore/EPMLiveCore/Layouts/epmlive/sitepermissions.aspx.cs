@@ -382,5 +382,25 @@ namespace EPMLiveCore
 
             Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/sitepermissions.aspx?", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
         }
+
+        public override void Dispose()
+        {
+            DisposePanelGroupsChilds();
+
+            base.Dispose();
+        }
+
+        private void DisposePanelGroupsChilds()
+        {
+            if (pnlGroups == null)
+            {
+                return;
+            }
+
+            foreach (Control control in pnlGroups.Controls)
+            {
+                control?.Dispose();
+            }
+        }
     }
 }
