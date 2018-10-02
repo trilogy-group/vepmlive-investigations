@@ -16,31 +16,36 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id));
-                    cn.Open();
-
-                    SqlCommand cmd = new SqlCommand("SELECT Xml FROM IzendaAdHocReports where TenantID=@siteid and name=@name", cn);
-                    cmd.Parameters.AddWithValue("@siteid", Web.ID);
-                    cmd.Parameters.AddWithValue("@name", hdnFullName.Value);
-
-                    SqlDataReader dr = cmd.ExecuteReader();
-
-                    if (dr.Read())
+                    using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id)))
                     {
-                        if (hdnFullName.Value.Contains("\\"))
-                        {
-                            string[] sName = hdnFullName.Value.Split('\\');
-                            txtName.Text = sName[1];
-                            txtCategory.Text = sName[0];
-                        }
-                        else
-                        {
-                            txtName.Text = hdnFullName.Value;
-                        }
-                        txtXml.Text = dr.GetString(0);
-                    }
+                        sqlConnection.Open();
 
-                    cn.Close();
+                        using (var sqlCommand = new SqlCommand(
+                            "SELECT Xml FROM IzendaAdHocReports where TenantID=@siteid and name=@name",
+                            sqlConnection))
+                        {
+                            sqlCommand.Parameters.AddWithValue("@siteid", Web.ID);
+                            sqlCommand.Parameters.AddWithValue("@name", hdnFullName.Value);
+
+                            using (var dataReader = sqlCommand.ExecuteReader())
+                            {
+                                if (dataReader.Read())
+                                {
+                                    if (hdnFullName.Value.Contains("\\"))
+                                    {
+                                        var sName = hdnFullName.Value.Split('\\');
+                                        txtName.Text = sName[1];
+                                        txtCategory.Text = sName[0];
+                                    }
+                                    else
+                                    {
+                                        txtName.Text = hdnFullName.Value;
+                                    }
+                                    txtXml.Text = dataReader.GetString(0);
+                                }
+                            }
+                        }
+                    }
                 });
             }
         }
@@ -49,21 +54,25 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
         {
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id));
-                cn.Open();
-                string newname = txtName.Text;
-                if (txtCategory.Text != "")
-                    newname = txtCategory.Text + "\\" + newname;
+                using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id)))
+                {
+                    sqlConnection.Open();
+                    var newName = txtName.Text;
+                    if (txtCategory.Text != "")
+                    {
+                        newName = string.Format("{0}\\{1}", txtCategory.Text, newName);
+                    }
 
-                SqlCommand cmd = new SqlCommand("UPDATE IzendaAdHocReports set Name=@newname, xml=@xml,ModifiedDate=GETDATE() where TenantID=@siteid and name=@name", cn);
-                cmd.Parameters.AddWithValue("@siteid", Web.ID);
-                cmd.Parameters.AddWithValue("@name", hdnFullName.Value);
-                cmd.Parameters.AddWithValue("@xml", txtXml.Text);
-                cmd.Parameters.AddWithValue("@newname", newname);
+                    var sqlCommand = new SqlCommand(
+                        "UPDATE IzendaAdHocReports set Name=@newname, xml=@xml,ModifiedDate=GETDATE() where TenantID=@siteid and name=@name",
+                        sqlConnection);
+                    sqlCommand.Parameters.AddWithValue("@siteid", Web.ID);
+                    sqlCommand.Parameters.AddWithValue("@name", hdnFullName.Value);
+                    sqlCommand.Parameters.AddWithValue("@xml", txtXml.Text);
+                    sqlCommand.Parameters.AddWithValue("@newname", newName);
 
-                cmd.ExecuteNonQuery();
-
-                cn.Close();
+                    sqlCommand.ExecuteNonQuery();
+                }
             });
             Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/reporting/izenda/manage.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
 

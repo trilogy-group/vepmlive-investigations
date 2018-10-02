@@ -219,6 +219,7 @@
     <Compile Include="Layouts\epmlive\SolutionStoreProxyTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsTests.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
+    <Compile Include="Layouts\Reporting\EditTests.cs" />
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.AddEntityPickersToLookups.cs" />
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.cs" />
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.IsFieldExcluded.cs" />
