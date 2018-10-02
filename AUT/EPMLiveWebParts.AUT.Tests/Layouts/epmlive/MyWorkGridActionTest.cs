@@ -53,31 +53,6 @@ namespace EPMLiveCore
 
 		#region Explore Class for Coverage Gain : Class (MyWorkGridAction)
 
-		#region General Initializer : Class (MyWorkGridAction) All Methods Explore Verification.
-
-		/// <summary>
-		///     Class (<see cref="MyWorkGridAction" />) explore and verify fields for coverage gain.
-		/// </summary>
-		[Test]
-		[Timeout(TestContants.TimeOutTenSeconds)]
-		[Category("AUT Initializer")]
-		[TestCase(MethodPage_Load, 0)]
-		public void AUT_MyWorkGridAction_All_Methods_Explore_Verify_Test(string methodName, int overloadingIndex = 0)
-		{
-			// Arrange
-			var currentMethodInfo = GetMethodInfo(methodName, overloadingIndex);
-
-			// Act
-			ShouldlyExtension.ExploreMethodWithOrWithoutInstance(_myWorkGridActionInstanceFixture,
-																 Fixture,
-																 currentMethodInfo);
-
-			// Assert
-			currentMethodInfo.ShouldNotBeNull();
-		}
-
-		#endregion
-
 		#region General Initializer : Class (MyWorkGridAction) All Fields Explore By Name
 
 		/// <summary>
@@ -157,24 +132,7 @@ namespace EPMLiveCore
 		#endregion
 
 		#region Category : MethodCallTest
-
-		#region Method Call : NonStatic methods call tests
-
-		/// <summary>
-		///      Class (<see cref="MyWorkGridAction" />) public, non-public non-static methods exploration for coverage gain.
-		/// </summary>
-		[Test]
-		[Timeout(TestsTimeOut)]
-		[Category("AUT MethodCallTest")]
-		[TestCase(MethodPage_Load)]
-		public void AUT_MyWorkGridAction_NonStatic_Methods_Explore_Verify_Test(string methodName)
-		{
-			// AAA: Arrange, Act, Assert
-			ShouldlyExtension.ExploreVerifyMethods<MyWorkGridAction>(Fixture, methodName);
-		}
-
-		#endregion
-
+        
 		#region Method Call : (Page_Load) (Return Type : void) private call definition
 
 		[ExcludeFromCodeCoverage]
@@ -258,26 +216,6 @@ namespace EPMLiveCore
 
 			// Assert
 			parameters.Length.ShouldBe(parametersCount);
-		}
-
-		#endregion
-
-		#region Method Call : (Page_Load) (Return Type : void) Invoke Should Not Throw
-
-		[Test]
-		[Timeout(TestsTimeOut)]
-		[Category("AUT MethodCallTest")]
-		public void AUT_MyWorkGridAction_Page_Load_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
-		{
-			// Arrange
-			var methodPage_LoadPrametersTypes = new Type[] { typeof(object), typeof(EventArgs) };
-
-			// Act
-			Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_myWorkGridActionInstance, MethodPage_Load, Fixture, methodPage_LoadPrametersTypes);
-
-			// Assert
-			methodPage_LoadPrametersTypes.Length.ShouldBe(2);
-			Should.NotThrow(currentAction);
 		}
 
 		#endregion

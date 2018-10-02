@@ -732,57 +732,6 @@ namespace PortfolioEngineCore
 
         #endregion
 
-        #region Method Call : (Initialize) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CStruct_Initialize_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sStructName = CreateType<string>();
-            var xCompatibleStruct = CreateType<CStruct>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _cStructInstance.Initialize(sStructName, xCompatibleStruct);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (Initialize) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CStruct_Initialize_Method_Call_Void_With_2_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sStructName = CreateType<string>();
-            var xCompatibleStruct = CreateType<CStruct>();
-            var methodInitializePrametersTypes = new Type[] { typeof(string), typeof(CStruct) };
-            object[] parametersOfInitialize = { sStructName, xCompatibleStruct };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodInitialize, methodInitializePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_cStructInstanceFixture, parametersOfInitialize);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfInitialize.ShouldNotBeNull();
-            parametersOfInitialize.Length.ShouldBe(2);
-            methodInitializePrametersTypes.Length.ShouldBe(2);
-            methodInitializePrametersTypes.Length.ShouldBe(parametersOfInitialize.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (Initialize) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -881,57 +830,6 @@ namespace PortfolioEngineCore
 
         #endregion
 
-        #region Method Call : (Initialize) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CStruct_Initialize_Method_DirectCall_Overloading_Of_1_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sStructName = CreateType<string>();
-            var oXMLDocument = CreateType<XmlDocument>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _cStructInstance.Initialize(sStructName, oXMLDocument);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (Initialize) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CStruct_Initialize_Method_Call_Void_Overloading_Of_1_With_2_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sStructName = CreateType<string>();
-            var oXMLDocument = CreateType<XmlDocument>();
-            var methodInitializePrametersTypes = new Type[] { typeof(string), typeof(XmlDocument) };
-            object[] parametersOfInitialize = { sStructName, oXMLDocument };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodInitialize, methodInitializePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_cStructInstanceFixture, parametersOfInitialize);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfInitialize.ShouldNotBeNull();
-            parametersOfInitialize.Length.ShouldBe(2);
-            methodInitializePrametersTypes.Length.ShouldBe(2);
-            methodInitializePrametersTypes.Length.ShouldBe(parametersOfInitialize.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (Initialize) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -1026,55 +924,6 @@ namespace PortfolioEngineCore
         {
             var methodInitializePrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_cStructInstance, MethodInitialize, Fixture, methodInitializePrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (Initialize) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CStruct_Initialize_Method_DirectCall_Overloading_Of_2_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sStructName = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _cStructInstance.Initialize(sStructName);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (Initialize) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CStruct_Initialize_Method_Call_Void_Overloading_Of_2_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sStructName = CreateType<string>();
-            var methodInitializePrametersTypes = new Type[] { typeof(string) };
-            object[] parametersOfInitialize = { sStructName };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodInitialize, methodInitializePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_cStructInstanceFixture, parametersOfInitialize);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfInitialize.ShouldNotBeNull();
-            parametersOfInitialize.Length.ShouldBe(1);
-            methodInitializePrametersTypes.Length.ShouldBe(1);
-            methodInitializePrametersTypes.Length.ShouldBe(parametersOfInitialize.Length);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -11822,59 +11671,6 @@ namespace PortfolioEngineCore
 
         #endregion
 
-        #region Method Call : (SetBooleanAttr) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CStruct_SetBooleanAttr_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sItemName = CreateType<string>();
-            var bValue = CreateType<bool>();
-            var bCreateIfFalse = CreateType<bool>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _cStructInstance.SetBooleanAttr(sItemName, bValue, bCreateIfFalse);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (SetBooleanAttr) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CStruct_SetBooleanAttr_Method_Call_Void_With_3_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sItemName = CreateType<string>();
-            var bValue = CreateType<bool>();
-            var bCreateIfFalse = CreateType<bool>();
-            var methodSetBooleanAttrPrametersTypes = new Type[] { typeof(string), typeof(bool), typeof(bool) };
-            object[] parametersOfSetBooleanAttr = { sItemName, bValue, bCreateIfFalse };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetBooleanAttr, methodSetBooleanAttrPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_cStructInstanceFixture, parametersOfSetBooleanAttr);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetBooleanAttr.ShouldNotBeNull();
-            parametersOfSetBooleanAttr.Length.ShouldBe(3);
-            methodSetBooleanAttrPrametersTypes.Length.ShouldBe(3);
-            methodSetBooleanAttrPrametersTypes.Length.ShouldBe(parametersOfSetBooleanAttr.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (SetBooleanAttr) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -11974,59 +11770,6 @@ namespace PortfolioEngineCore
 
         #endregion
 
-        #region Method Call : (SetStringAttr) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CStruct_SetStringAttr_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sItemName = CreateType<string>();
-            var sValue = CreateType<string>();
-            var bCreateIfFalse = CreateType<bool>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _cStructInstance.SetStringAttr(sItemName, sValue, bCreateIfFalse);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (SetStringAttr) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CStruct_SetStringAttr_Method_Call_Void_With_3_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sItemName = CreateType<string>();
-            var sValue = CreateType<string>();
-            var bCreateIfFalse = CreateType<bool>();
-            var methodSetStringAttrPrametersTypes = new Type[] { typeof(string), typeof(string), typeof(bool) };
-            object[] parametersOfSetStringAttr = { sItemName, sValue, bCreateIfFalse };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetStringAttr, methodSetStringAttrPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_cStructInstanceFixture, parametersOfSetStringAttr);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetStringAttr.ShouldNotBeNull();
-            parametersOfSetStringAttr.Length.ShouldBe(3);
-            methodSetStringAttrPrametersTypes.Length.ShouldBe(3);
-            methodSetStringAttrPrametersTypes.Length.ShouldBe(parametersOfSetStringAttr.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (SetStringAttr) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -12122,59 +11865,6 @@ namespace PortfolioEngineCore
         {
             var methodSetIntAttrPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_cStructInstance, MethodSetIntAttr, Fixture, methodSetIntAttrPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (SetIntAttr) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CStruct_SetIntAttr_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sItemName = CreateType<string>();
-            var nValue = CreateType<int>();
-            var bCreateIfFalse = CreateType<bool>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _cStructInstance.SetIntAttr(sItemName, nValue, bCreateIfFalse);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (SetIntAttr) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CStruct_SetIntAttr_Method_Call_Void_With_3_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sItemName = CreateType<string>();
-            var nValue = CreateType<int>();
-            var bCreateIfFalse = CreateType<bool>();
-            var methodSetIntAttrPrametersTypes = new Type[] { typeof(string), typeof(int), typeof(bool) };
-            object[] parametersOfSetIntAttr = { sItemName, nValue, bCreateIfFalse };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetIntAttr, methodSetIntAttrPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_cStructInstanceFixture, parametersOfSetIntAttr);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetIntAttr.ShouldNotBeNull();
-            parametersOfSetIntAttr.Length.ShouldBe(3);
-            methodSetIntAttrPrametersTypes.Length.ShouldBe(3);
-            methodSetIntAttrPrametersTypes.Length.ShouldBe(parametersOfSetIntAttr.Length);
-            Should.NotThrow(currentAction);
         }
 
         #endregion

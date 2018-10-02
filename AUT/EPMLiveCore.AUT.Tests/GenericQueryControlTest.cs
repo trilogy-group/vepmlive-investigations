@@ -116,7 +116,6 @@ namespace EPMLiveCore
         [TestCase(MethodGenerateContextScript, 0)]
         [TestCase(MethodGetCallbackResult, 0)]
         [TestCase(MethodRaiseCallbackEvent, 0)]
-        [TestCase(MethodDispose, 0)]
         public void AUT_GenericQueryControl_All_Methods_Explore_Verify_Test(string methodName, int overloadingIndex = 0)
         {
             // Arrange
@@ -1956,32 +1955,6 @@ namespace EPMLiveCore
 
         #endregion
 
-        #region Method Call : (Dispose) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_GenericQueryControl_Dispose_Method_Call_Void_With_No_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodDisposePrametersTypes = null;
-            object[] parametersOfDispose = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodDispose, methodDisposePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_genericQueryControlInstanceFixture, parametersOfDispose);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfDispose.ShouldBeNull();
-            methodDisposePrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (Dispose) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -2019,27 +1992,6 @@ namespace EPMLiveCore
 
             // Assert
             methodDisposePrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
-        #region Method Call : (Dispose) (Return Type : void) Invoke without parameter types and should not throw
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_GenericQueryControl_Dispose_Method_Call_With_No_Parameters_Dynamic_Invoking_Without_Parameters_Should_Not_Throw_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodDispose, 0);
-
-            // Act
-            Action currentAction = () => methodInfo.InvokeStaticMethodWithDynamicParamters(_genericQueryControlInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
             Should.NotThrow(currentAction);
         }
 

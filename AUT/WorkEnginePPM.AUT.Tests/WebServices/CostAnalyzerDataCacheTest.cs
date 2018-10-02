@@ -1302,32 +1302,6 @@ namespace CADataCache
 
         #endregion
 
-        #region Method Call : (PrepareTotalsCollection) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CostAnalyzerDataCache_PrepareTotalsCollection_Method_Call_Void_With_No_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodPrepareTotalsCollectionPrametersTypes = null;
-            object[] parametersOfPrepareTotalsCollection = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodPrepareTotalsCollection, methodPrepareTotalsCollectionPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_costAnalyzerDataCacheInstanceFixture, parametersOfPrepareTotalsCollection);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfPrepareTotalsCollection.ShouldBeNull();
-            methodPrepareTotalsCollectionPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (PrepareTotalsCollection) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -2410,55 +2384,6 @@ namespace CADataCache
 
         #endregion
 
-        #region Method Call : (SetFilteredForRows) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CostAnalyzerDataCache_SetFilteredForRows_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var xData = CreateType<CStruct>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _costAnalyzerDataCacheInstance.SetFilteredForRows(xData);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (SetFilteredForRows) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CostAnalyzerDataCache_SetFilteredForRows_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var xData = CreateType<CStruct>();
-            var methodSetFilteredForRowsPrametersTypes = new Type[] { typeof(CStruct) };
-            object[] parametersOfSetFilteredForRows = { xData };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetFilteredForRows, methodSetFilteredForRowsPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_costAnalyzerDataCacheInstanceFixture, parametersOfSetFilteredForRows);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetFilteredForRows.ShouldNotBeNull();
-            parametersOfSetFilteredForRows.Length.ShouldBe(1);
-            methodSetFilteredForRowsPrametersTypes.Length.ShouldBe(1);
-            methodSetFilteredForRowsPrametersTypes.Length.ShouldBe(parametersOfSetFilteredForRows.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (SetFilteredForRows) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -3348,38 +3273,6 @@ namespace CADataCache
 
         #endregion
 
-        #region Method Call : (SetTotalDetFieldValue) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CostAnalyzerDataCache_SetTotalDetFieldValue_Method_Call_Void_With_4_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var odet = CreateType<clsDetailRowData>();
-            var fid = CreateType<int>();
-            var lVal = CreateType<int>();
-            var sVal = CreateType<string>();
-            var methodSetTotalDetFieldValuePrametersTypes = new Type[] { typeof(clsDetailRowData), typeof(int), typeof(int), typeof(string) };
-            object[] parametersOfSetTotalDetFieldValue = { odet, fid, lVal, sVal };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetTotalDetFieldValue, methodSetTotalDetFieldValuePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_costAnalyzerDataCacheInstanceFixture, parametersOfSetTotalDetFieldValue);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetTotalDetFieldValue.ShouldNotBeNull();
-            parametersOfSetTotalDetFieldValue.Length.ShouldBe(4);
-            methodSetTotalDetFieldValuePrametersTypes.Length.ShouldBe(4);
-            methodSetTotalDetFieldValuePrametersTypes.Length.ShouldBe(parametersOfSetTotalDetFieldValue.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (SetTotalDetFieldValue) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -3606,32 +3499,6 @@ namespace CADataCache
         {
             var methodProcessTotalsPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_costAnalyzerDataCacheInstance, MethodProcessTotals, Fixture, methodProcessTotalsPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (ProcessTotals) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CostAnalyzerDataCache_ProcessTotals_Method_Call_Void_With_No_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodProcessTotalsPrametersTypes = null;
-            object[] parametersOfProcessTotals = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodProcessTotals, methodProcessTotalsPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_costAnalyzerDataCacheInstanceFixture, parametersOfProcessTotals);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfProcessTotals.ShouldBeNull();
-            methodProcessTotalsPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
         }
 
         #endregion

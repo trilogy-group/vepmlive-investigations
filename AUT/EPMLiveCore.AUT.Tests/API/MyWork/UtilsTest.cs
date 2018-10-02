@@ -1110,39 +1110,6 @@ namespace EPMLiveCore.API
 
         #endregion
 
-        #region Method Call : (AddItemListWebSiteToXElement) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Utils_AddItemListWebSiteToXElement_Static_Method_Call_Void_With_6_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var itemId = CreateType<int>();
-            var listId = CreateType<Guid>();
-            var webId = CreateType<Guid>();
-            var siteId = CreateType<Guid>();
-            var siteUrl = CreateType<string>();
-            var xElement = CreateType<XElement>();
-            var methodAddItemListWebSiteToXElementPrametersTypes = new Type[] { typeof(int), typeof(Guid), typeof(Guid), typeof(Guid), typeof(string), typeof(XElement) };
-            object[] parametersOfAddItemListWebSiteToXElement = { itemId, listId, webId, siteId, siteUrl, xElement };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodAddItemListWebSiteToXElement, methodAddItemListWebSiteToXElementPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(null, parametersOfAddItemListWebSiteToXElement);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfAddItemListWebSiteToXElement.ShouldNotBeNull();
-            parametersOfAddItemListWebSiteToXElement.Length.ShouldBe(6);
-            methodAddItemListWebSiteToXElementPrametersTypes.Length.ShouldBe(6);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (AddItemListWebSiteToXElement) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
