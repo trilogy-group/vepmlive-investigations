@@ -1,37 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Fakes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using System.Xml.Linq;
-using DocumentFormat.OpenXml.Drawing.Charts;
+using System.Xml.Linq.Fakes;
+using EPMLiveCore.API;
 using EPMLiveCore.API.SPAdmin;
+using EPMLiveCore.API.SPAdmin.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
-using EPMLiveCore.API.SPAdmin.Fakes;
-using System.Data;
-using EPMLiveCore.API;
 
 namespace EPMLiveCore.Tests.API.SPAdmin
 {
+    using System.Data;
+
     [TestClass]
     public class EventReceiverManagerTests
     {
-        private IDisposable shimsContext;
-        private EventReceiverManager eventReceiverManager;
-        private PrivateObject privateObject;
         private const string DummyString = "DummyString";
         private const string ListEventReceiversMethodName = "ListEventReceivers";
         private const string AddEventReceiverMethodName = "AddEventReceiver";
         private const string RemoveEventReceiverMethodName = "RemoveEventReceiver";
+        private const string TypeNameOperation = "Operation";
+        private const string TypeNameEventType = "EventType";
+        private const string TypeNameType = "Type";
+        private const string TypeNameAssembly = "Assembly";
+        private const string TypeNameClassName = "ClassName";
+        private const string ParseRequestDataMethodName = "ParseRequestData";
         private static bool RemoveEventReceiverWasCalled = false;
         private static bool AddEventReceiverWasCalled = false;
         private static bool ListEventReceiversWasCalled = false;
         private static readonly Guid DummyGuid = Guid.NewGuid();
+        private IDisposable shimsContext;
+        private EventReceiverManager eventReceiverManager;
+        private PrivateObject privateObject;
+        private PrivateType privateType;
 
         [TestInitialize]
         public void Initialize()
@@ -40,6 +46,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             SetupShims();
             eventReceiverManager = new EventReceiverManager(new ShimSPWeb());
             privateObject = new PrivateObject(eventReceiverManager);
+            privateType = new PrivateType(typeof(EventReceiverManager));
         }
 
         [TestCleanup]
@@ -54,7 +61,8 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             ShimSPSite.AllInstances.OpenWebGuid = (_, guid) => new ShimSPWeb();
             ShimSPWeb.AllInstances.ListsGet = _ => new ShimSPListCollection();
             ShimSPListCollection.AllInstances.GetListGuidBoolean = (_, id, fetchMetadata) => new ShimSPList();
-
+            ShimXContainer.AllInstances.ElementXName = (_, name) => new ShimXElement();
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>();
         }
 
         [TestMethod]
@@ -119,6 +127,8 @@ namespace EPMLiveCore.Tests.API.SPAdmin
         public void AddEventReceiver_ReceiverAlreadyExists_ExecutesCorrectly()
         {
             // Arrange
+            ShimEventReceiverManager.AllInstances.AddEventReceiverSPListStringStringSPEventReceiverTypeXElementRef = null;
+            ShimXContainer.AllInstances.ElementXName = null;
             const string ExpectedMessage = "Operation not performed. Event receiver already exists.";
             var receiverType = SPEventReceiverType.GroupUserDeleted;
             var receiverElement = new XElement(DummyString);
@@ -171,6 +181,8 @@ namespace EPMLiveCore.Tests.API.SPAdmin
         public void AddEventReceiver_ReceiverDoesNotExist_ExecutesCorrectly()
         {
             // Arrange
+            ShimEventReceiverManager.AllInstances.AddEventReceiverSPListStringStringSPEventReceiverTypeXElementRef = null;
+            ShimXContainer.AllInstances.ElementXName = null;
             const string ExpectedMessage = "Event receiver successfully installed.";
             var receiverType = SPEventReceiverType.GroupUserDeleted;
             var receiverElement = new XElement(DummyString);
@@ -215,6 +227,8 @@ namespace EPMLiveCore.Tests.API.SPAdmin
         public void RemoveEventReceiver_ReceiverExists_ExecutesCorrectly()
         {
             // Arrange
+            ShimEventReceiverManager.AllInstances.RemoveEventReceiverSPListStringStringSPEventReceiverTypeXElementRef = null;
+            ShimXContainer.AllInstances.ElementXName = null;
             const string ExpectedMessage = "Event receiver successfully uninstalled.";
             var receiverType = SPEventReceiverType.GroupUserDeleted;
             var receiverElement = new XElement(DummyString);
@@ -267,6 +281,8 @@ namespace EPMLiveCore.Tests.API.SPAdmin
         public void RemoveEventReceiver_ReceiverNotFound_ExecutesCorrectly()
         {
             // Arrange
+            ShimEventReceiverManager.AllInstances.RemoveEventReceiverSPListStringStringSPEventReceiverTypeXElementRef = null;
+            ShimXContainer.AllInstances.ElementXName = null;
             const string ExpectedMessage = "Operation not performed. Event receiver was not found.";
             var receiverType = SPEventReceiverType.GroupUserDeleted;
             var receiverElement = new XElement(DummyString);
@@ -363,8 +379,10 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             // Assert
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNullOrEmpty(),
-                () => result.ShouldContain(ExpectedValue));
-
+                () => result.ShouldContain(ExpectedValue),
+                () => AddEventReceiverWasCalled.ShouldBeTrue(),
+                () => RemoveEventReceiverWasCalled.ShouldBeTrue(),
+                () => ListEventReceiversWasCalled.ShouldBeTrue());
         }
 
         [TestMethod]
@@ -507,20 +525,471 @@ namespace EPMLiveCore.Tests.API.SPAdmin
                 () => result.ShouldContainWithoutWhitespace(expectedValue));
         }
 
+        [TestMethod]
+        public void ParseRequestData_RootElementNull_ThrowsException()
+        {
+            // Arrange
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => null
+            };
 
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
 
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
 
+        [TestMethod]
+        public void ParseRequestData_DataElementNull_ThrowsException()
+        {
+            // Arrange
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementXName = (_, name) => null;
 
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
 
-        private FakesDelegates.Func<string, object> GetDataRowItemValue(object eventType, string operation, object defaultValue)
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        [TestMethod]
+        public void ParseRequestData_EventReceiverElementsListEmpty_ThrowsException()
+        {
+            // Arrange
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
+
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        [TestMethod]
+        public void ParseRequestData_EventReceiverElementDataIdNull_ThrowsException()
+        {
+            // Arrange
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>
+            {
+                new ShimXElement()
+                {
+                    AttributeXName = attributeName => null
+                }
+            };
+
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
+
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        [TestMethod]
+        public void ParseRequestData_EventReceiverElementSiteIdNull_ThrowsException()
+        {
+            // Arrange
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>
+            {
+                new ShimXElement()
+                {
+                    AttributeXName = attributeName => attributeName == "SiteId" ? null : new XAttribute(attributeName, DummyGuid)
+                }
+            };
+
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
+
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        [TestMethod]
+        public void ParseRequestData_EventReceiverElementWebIdNull_ThrowsException()
+        {
+            // Arrange
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>
+            {
+                new ShimXElement()
+                {
+                    AttributeXName = attributeName => attributeName == "WebId" ? null : new XAttribute(attributeName, DummyGuid)
+                }
+            };
+
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
+
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        [TestMethod]
+        public void ParseRequestData_EventReceiverElementListIdNull_ThrowsException()
+        {
+            // Arrange
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>
+            {
+                new ShimXElement()
+                {
+                    AttributeXName = attributeName => attributeName == "ListId" ? null : new XAttribute(attributeName, DummyGuid)
+                }
+            };
+
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
+
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        [TestMethod]
+        public void ParseRequestData_EventReceiverElementTypeNull_ThrowsException()
+        {
+            // Arrange
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>
+            {
+                new ShimXElement()
+                {
+                    AttributeXName = attributeName => attributeName == "Type" ? null : new XAttribute(attributeName, DummyGuid)
+                }
+            };
+
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
+
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        [TestMethod]
+        public void ParseRequestData_InvalidEventReceiverType_ThrowsException()
+        {
+            // Arrange
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>
+            {
+                new ShimXElement()
+                {
+                    AttributeXName = attributeName => new XAttribute(attributeName, DummyGuid)
+                }
+            };
+
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
+
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        [TestMethod]
+        public void ParseRequestData_EventReceiverElementOperationNull_ThrowsException()
+        {
+            // Arrange
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>
+            {
+                new ShimXElement()
+                {
+                    AttributeXName = attributeName =>
+                    {
+                        if (attributeName == "Operation")
+                        {
+                            return null;
+                        }
+                        else if (attributeName == "Type")
+                        {
+                            return new XAttribute(attributeName, SPEventReceiverType.AppInstalled);
+                        }
+                        else
+                        {
+                            return new XAttribute(attributeName, DummyGuid);
+                        }
+                    }
+                }
+            };
+
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
+
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        [TestMethod]
+        public void ParseRequestData_EventReceiverElementOperationInvalid_ThrowsException()
+        {
+            // Arrange
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>
+            {
+                new ShimXElement()
+                {
+                    AttributeXName = GetItemAttribute(DummyString, SPEventReceiverType.AppInstalled, DummyGuid)
+                }
+            };
+
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
+
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        [TestMethod]
+        public void ParseRequestData_EventReceiverElementAssemblyNull_ThrowsException()
+        {
+            // Arrange
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>
+            {
+                new ShimXElement()
+                {
+                    AttributeXName = GetItemAttribute("ADD", SPEventReceiverType.AppInstalled, DummyGuid, null)
+                }
+            };
+
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
+
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        [TestMethod]
+        public void ParseRequestData_EventReceiverElementAssemblyInvalid_ThrowsException()
+        {
+            // Arrange
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>
+            {
+                new ShimXElement()
+                {
+                    AttributeXName = GetItemAttribute("ADD", SPEventReceiverType.AppInstalled, DummyGuid, DummyString)
+                }
+            };
+
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
+
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        [TestMethod]
+        public void ParseRequestData_EventReceiverElementClassName_ThrowsException()
+        {
+            // Arrange
+            var assemblyName = GetAssemblyFullName();
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>
+            {
+                new ShimXElement()
+                {
+                    AttributeXName = GetItemAttribute("ADD", SPEventReceiverType.AppInstalled, DummyGuid, assemblyName, null)
+                }
+            };
+
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
+
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        [TestMethod]
+        public void ParseRequestData_EventReceiverAssemblyClassNull_ThrowsException()
+        {
+            // Arrange
+            var assemblyName = GetAssemblyFullName();
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>
+            {
+                new ShimXElement()
+                {
+                    AttributeXName = GetItemAttribute("ADD", SPEventReceiverType.AppInstalled, DummyGuid, assemblyName, DummyString)
+                }
+            };
+
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
+
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        [TestMethod]
+        public void ParseRequestData_EventReceiverAssemblyClassNotValid_ThrowsException()
+        {
+            // Arrange
+            var assemblyName = GetAssemblyFullName();
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>
+            {
+                new ShimXElement()
+                {
+                    AttributeXName = GetItemAttribute("ADD", SPEventReceiverType.AppInstalled, DummyGuid, assemblyName, "EPMLiveCore.Act")
+                }
+            };
+
+            // Act
+            Action action = () => privateType.InvokeStatic(ParseRequestDataMethodName, DummyString);
+
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        [TestMethod]
+        public void ParseRequestData_OnSucces_ShouldReturnDataTable()
+        {
+            // Arrange
+            var assemblyName = GetAssemblyFullName();
+            const string ExpectedOperation = "ADD";
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>
+            {
+                new ShimXElement()
+                {
+                    AttributeXName = GetItemAttribute(ExpectedOperation, SPEventReceiverType.AppInstalled, DummyGuid, assemblyName, "EPMLiveCore.ChildParentSync")
+                }
+            };
+
+            // Act
+            var result = privateType.InvokeStatic(ParseRequestDataMethodName, DummyString) as DataTable;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Rows.Count.ShouldBeGreaterThan(0),
+                () => result.Rows[0][0].ShouldBe(DummyGuid),
+                () => result.Rows[0][3].ShouldBe(ExpectedOperation));
+        }
+
+        [TestMethod]
+        public void ParseRequestData_OpenWebException_ThrowsAPIException()
+        {
+            // Arrange
+            var assemblyName = GetAssemblyFullName();
+            ShimXDocument.ParseString = content => new ShimXDocument
+            {
+                RootGet = () => new ShimXElement()
+            };
+            ShimXContainer.AllInstances.ElementsXName = (_, name) => new List<XElement>
+            {
+                new ShimXElement()
+                {
+                    AttributeXName = GetItemAttribute("LIST", SPEventReceiverType.AppInstalled, DummyGuid, assemblyName, "EPMLiveCore.ChildParentSync")
+                }
+            };
+            ShimSPSite.AllInstances.OpenWebGuid = (_, guid) =>
+            {
+                throw new Exception();
+            };
+
+            // Act
+            Action action = () => new PrivateType(typeof(EventReceiverManager)).InvokeStatic(ParseRequestDataMethodName, DummyString);
+
+            // Assert
+            action.ShouldThrow<APIException>();
+        }
+
+        private string GetAssemblyFullName()
+        {
+            var assembly = Assembly.LoadFrom("EPM Live Core.dll");
+            return assembly?.FullName;
+        }
+
+        private FakesDelegates.Func<XName, XAttribute> GetItemAttribute(
+            object operationValue = null,
+            object typeValue = null,
+            object defaultValue = null,
+            object assemblyValue = null,
+            object classNameValue = null)
+        {
+            return name =>
+            {
+                switch (name.LocalName)
+                {
+                    case TypeNameOperation:
+                        return operationValue == null ? null : new XAttribute(name, operationValue);
+                    case TypeNameType:
+                        return typeValue == null ? null : new XAttribute(name, typeValue);
+                    case TypeNameAssembly:
+                        return assemblyValue == null ? null : new XAttribute(name, assemblyValue);
+                    case TypeNameClassName:
+                        return classNameValue == null ? null : new XAttribute(name, classNameValue);
+                    default:
+                        return new XAttribute(name, defaultValue);
+                }
+            };
+        }
+
+        private FakesDelegates.Func<string, object> GetDataRowItemValue(
+            object eventType, 
+            string operation, 
+            object defaultValue)
         {
             return name =>
             {
                 switch (name)
                 {
-                    case "EventType":
+                    case TypeNameEventType:
                         return eventType;
-                    case "Operation":
+                    case TypeNameOperation:
                         return operation;
                     default:
                         return defaultValue;
@@ -541,11 +1010,11 @@ namespace EPMLiveCore.Tests.API.SPAdmin
         /// This method is fake. All the parameters are required, even though not all of them are used
         /// </summary>
         private void RemoveEventReceiver(
-            EventReceiverManager eventReceiver, 
-            SPList list, 
-            string assembly, 
-            string className, 
-            SPEventReceiverType type, 
+            EventReceiverManager eventReceiver,
+            SPList list,
+            string assembly,
+            string className,
+            SPEventReceiverType type,
             ref XElement element)
         {
             RemoveEventReceiverWasCalled = true;
@@ -556,11 +1025,11 @@ namespace EPMLiveCore.Tests.API.SPAdmin
         /// This method is fake. All the parameters are required, even though not all of them are used
         /// </summary>
         private void AddEventReceiver(
-            EventReceiverManager eventReceiver, 
-            SPList list, 
-            string assembly, 
-            string className, 
-            SPEventReceiverType type, 
+            EventReceiverManager eventReceiver,
+            SPList list,
+            string assembly,
+            string className,
+            SPEventReceiverType type,
             ref XElement element)
         {
             element.Add(DummyString);
