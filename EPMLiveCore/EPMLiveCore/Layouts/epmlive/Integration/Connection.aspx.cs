@@ -133,5 +133,15 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
             });
 
         }
+
+        public override void Dispose()
+        {
+            for (var i = 0; i < lblMain.Controls.Count; i++)
+            {
+                var control = lblMain.Controls[i];
+                control?.Dispose();
+            }
+            base.Dispose();
+        }
     }
 }
