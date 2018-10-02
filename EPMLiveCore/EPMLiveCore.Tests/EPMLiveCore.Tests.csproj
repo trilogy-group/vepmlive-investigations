@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -148,11 +148,14 @@
     <Compile Include="API\Analytics\FRFQueryFactoryTests.cs" />
     <Compile Include="API\Analytics\RecentItemsTests.cs" />
     <Compile Include="API\APITeamTests.cs" />
+    <Compile Include="API\Applications\ApplicationsTests.cs" />
     <Compile Include="API\Comments\CommentManagerTests.cs" />
     <Compile Include="API\CreateWorkspace\DALTests.cs" />
     <Compile Include="API\CreateWorkspace\WorkspaceFactoryTests.cs" />
+    <Compile Include="API\CreateWorkspace\WorkspaceTimerJobAgentTest.cs" />
     <Compile Include="API\Integration\IntegrationAdminTests.cs" />
     <Compile Include="API\Integration\IntegrationCoreTest.cs" />
+    <Compile Include="API\Integration\SqlIntegrationTest.cs" />
     <Compile Include="API\MyWork\MyWorkTests.cs" />
     <Compile Include="API\MyWork\MyWorkTestsSplitOne.cs" />
     <Compile Include="API\MyWork\MyWorkTestsSplitThree.cs" />
@@ -168,17 +171,21 @@
     <Compile Include="API\ResourceGrid\ResourceImporterTests.cs" />
     <Compile Include="API\TimerTests.cs" />
     <Compile Include="AppSettingsHelperTests.cs" />
+    <Compile Include="AssignmentPlanner\GridManagerTests.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControlTests.cs" />
     <Compile Include="CheckOpenCloseConnections.cs" />
     <Compile Include="ControlDataBuilderTest.cs" />
     <Compile Include="CoreFunctions.GetPlannerList.Tests.cs" />
     <Compile Include="CoreFunctionsRemTestsSplitOne.cs" />
+    <Compile Include="CoreFunctionsRemTestsSplitThree.cs" />
     <Compile Include="CoreFunctionsTest.cs" />
     <Compile Include="EditableFieldDisplayTests.cs" />
     <Compile Include="ExtensionMethodsTest.cs" />
     <Compile Include="Infrastructure\BaseClasses\SPListItemManagerTests.cs" />
+    <Compile Include="Infrastructure\ResourceManagment\ResourcePoolManagerTests.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
     <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
+    <Compile Include="Jobs\NotificationsTests.cs" />
     <Compile Include="Jobs\ResourceImportJobTests.cs" />
     <Compile Include="Jobs\ResourcePlanTest.cs" />
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
@@ -189,9 +196,16 @@
     <Compile Include="Layouts\epmlive\GenericQueryControlTests.cs" />
     <Compile Include="Layouts\epmlive\GridGanttSettingsTest.cs" />
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
+    <Compile Include="Layouts\epmlive\SolutionStoreProxyTests.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.AddEntityPickersToLookups.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.IsFieldExcluded.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.OnInit.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.RenderControl.cs" />
     <Compile Include="NewAppTest.cs" />
     <Compile Include="PlatformIntegrationEventTest.cs" />
+    <Compile Include="Properties\Resources.Designer.cs" />
     <Compile Include="ReportHelper\EPMDataTest.Part3.cs" />
     <Compile Include="ReportHelper\EPMDataTest.Part2.cs" />
     <Compile Include="ReportHelper\ListBizTest.cs" />
@@ -220,6 +234,7 @@
     </Compile>
     <Compile Include="TestCheck.cs" />
     <Compile Include="WebPageCode\AdminConnsTest.cs" />
+    <Compile Include="WebPageCode\CreateDatabaseTest.cs" />
     <Compile Include="WebPageCode\ListDisplayPageTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -259,6 +274,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Fakes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

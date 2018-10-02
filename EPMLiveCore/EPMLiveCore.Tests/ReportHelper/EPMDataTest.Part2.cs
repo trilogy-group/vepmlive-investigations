@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Fakes;
 using System.Data;
 using System.Data.Common.Fakes;
 using System.Data.Fakes;
@@ -386,13 +387,13 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
-        public void Dispose_WithOpenConnections_ShouldCloseConnection()
+        public void Dispose_WithOpenConnections_ShouldDisposeConnection()
         {
             // Arrange
-            var closed = false;
-            ShimSqlConnection.AllInstances.Close = _ =>
+            var disposed = false;
+            ShimComponent.AllInstances.Dispose = _ =>
             {
-                closed = true;
+                disposed = true;
             };
             ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
             _privateObject.SetFieldOrProperty("_conEPMLive", new ShimSqlConnection().Instance);
@@ -403,7 +404,7 @@ namespace EPMLiveCore.Tests.ReportHelper
             _EPMData.Dispose();
 
             // Assert
-            closed.ShouldBeTrue();
+            disposed.ShouldBeTrue();
         }
 
         [TestMethod]

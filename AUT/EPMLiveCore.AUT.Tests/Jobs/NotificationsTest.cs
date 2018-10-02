@@ -50,8 +50,6 @@ namespace EPMLiveCore.Jobs
         private const string MethodisDate = "isDate";
         private const string MethodlogException = "logException";
         private const string Fieldlist = "list";
-        private const string FieldstringWriter = "stringWriter";
-        private const string FieldhtmlWriter = "htmlWriter";
         private const string FieldgvSection = "gvSection";
         private const string FielddsSectionTables = "dsSectionTables";
         private const string FieldsEvent = "sEvent";
@@ -170,8 +168,6 @@ namespace EPMLiveCore.Jobs
         [Timeout(TestsTimeOut)]
         [Category("AUT Initializer")]
         [TestCase(Fieldlist)]
-        [TestCase(FieldstringWriter)]
-        [TestCase(FieldhtmlWriter)]
         [TestCase(FieldgvSection)]
         [TestCase(FielddsSectionTables)]
         [TestCase(FieldsEvent)]
