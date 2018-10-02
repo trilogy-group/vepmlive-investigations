@@ -110,6 +110,7 @@
     <Compile Include="Analyzers\OptimizerDataTest.cs" />
     <Compile Include="Base\DBAccessTests.cs" />
     <Compile Include="Base\DBAccess\AdminPages.dbaPrioritz.Tests.cs" />
+    <Compile Include="Base\DBAccess\CalendarsTests.cs" />
     <Compile Include="Base\DBAccess\CostsTests.cs" />
     <Compile Include="Base\DBAccess\CostValuesTests.cs" />
     <Compile Include="Base\DBAccess\CostTypesTests.cs" />

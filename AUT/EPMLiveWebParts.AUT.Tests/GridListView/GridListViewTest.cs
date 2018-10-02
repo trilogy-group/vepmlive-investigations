@@ -1389,34 +1389,6 @@ namespace EPMLiveWebParts
 
         #endregion
 
-        #region Method Call : (getPjList) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_getPjList_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var web = CreateType<SPWeb>();
-            var methodgetPjListPrametersTypes = new Type[] { typeof(SPWeb) };
-            object[] parametersOfgetPjList = { web };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodgetPjList, methodgetPjListPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_gridListViewInstanceFixture, parametersOfgetPjList);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfgetPjList.ShouldNotBeNull();
-            parametersOfgetPjList.Length.ShouldBe(1);
-            methodgetPjListPrametersTypes.Length.ShouldBe(1);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (getPjList) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -1482,47 +1454,6 @@ namespace EPMLiveWebParts
 
         #endregion
 
-        #region Method Call : (getPjList) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_getPjList_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodgetPjList, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_gridListViewInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (getPjList) (Return Type : string) Parameters Count verify
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_getPjList_Method_Call_Parameters_Count_Verification_Test()
-        {
-            // Arrange
-            var methodInfo = GetMethodInfo(MethodgetPjList, 0);
-            const int parametersCount = 1;
-
-            // Act
-            var parameters = methodInfo.GetParameters();
-
-            // Assert
-            parameters.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
         #region Method Call : (getPlannerList) (Return Type : string) private call definition
 
         [ExcludeFromCodeCoverage]
@@ -1530,36 +1461,6 @@ namespace EPMLiveWebParts
         {
             var methodgetPlannerListPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_gridListViewInstance, MethodgetPlannerList, Fixture, methodgetPlannerListPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (getPlannerList) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_getPlannerList_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var plannerName = CreateType<string>();
-            var web = CreateType<SPWeb>();
-            var pDisplay = CreateType<string>();
-            var methodgetPlannerListPrametersTypes = new Type[] { typeof(string), typeof(SPWeb), typeof(string) };
-            object[] parametersOfgetPlannerList = { plannerName, web, pDisplay };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodgetPlannerList, methodgetPlannerListPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_gridListViewInstanceFixture, parametersOfgetPlannerList);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfgetPlannerList.ShouldNotBeNull();
-            parametersOfgetPlannerList.Length.ShouldBe(3);
-            methodgetPlannerListPrametersTypes.Length.ShouldBe(3);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -1631,47 +1532,6 @@ namespace EPMLiveWebParts
 
         #endregion
 
-        #region Method Call : (getPlannerList) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_getPlannerList_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodgetPlannerList, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_gridListViewInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (getPlannerList) (Return Type : string) Parameters Count verify
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_getPlannerList_Method_Call_Parameters_Count_Verification_Test()
-        {
-            // Arrange
-            var methodInfo = GetMethodInfo(MethodgetPlannerList, 0);
-            const int parametersCount = 3;
-
-            // Act
-            var parameters = methodInfo.GetParameters();
-
-            // Assert
-            parameters.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
         #region Method Call : (getEPKPlannerList) (Return Type : string) private call definition
 
         [ExcludeFromCodeCoverage]
@@ -1679,34 +1539,6 @@ namespace EPMLiveWebParts
         {
             var methodgetEPKPlannerListPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_gridListViewInstance, MethodgetEPKPlannerList, Fixture, methodgetEPKPlannerListPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (getEPKPlannerList) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_getEPKPlannerList_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var web = CreateType<SPWeb>();
-            var methodgetEPKPlannerListPrametersTypes = new Type[] { typeof(SPWeb) };
-            object[] parametersOfgetEPKPlannerList = { web };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodgetEPKPlannerList, methodgetEPKPlannerListPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_gridListViewInstanceFixture, parametersOfgetEPKPlannerList);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfgetEPKPlannerList.ShouldNotBeNull();
-            parametersOfgetEPKPlannerList.Length.ShouldBe(1);
-            methodgetEPKPlannerListPrametersTypes.Length.ShouldBe(1);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -1776,47 +1608,6 @@ namespace EPMLiveWebParts
 
         #endregion
 
-        #region Method Call : (getEPKPlannerList) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_getEPKPlannerList_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodgetEPKPlannerList, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_gridListViewInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (getEPKPlannerList) (Return Type : string) Parameters Count verify
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_getEPKPlannerList_Method_Call_Parameters_Count_Verification_Test()
-        {
-            // Arrange
-            var methodInfo = GetMethodInfo(MethodgetEPKPlannerList, 0);
-            const int parametersCount = 1;
-
-            // Act
-            var parameters = methodInfo.GetParameters();
-
-            // Assert
-            parameters.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
         #region Method Call : (getPlanner) (Return Type : string) private call definition
 
         [ExcludeFromCodeCoverage]
@@ -1824,37 +1615,6 @@ namespace EPMLiveWebParts
         {
             var methodgetPlannerPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_gridListViewInstance, MethodgetPlanner, Fixture, methodgetPlannerPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (getPlanner) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_getPlanner_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var plannerName = CreateType<string>();
-            var web = CreateType<SPWeb>();
-            var pDisplay = CreateType<string>();
-            var image = CreateType<string>();
-            var methodgetPlannerPrametersTypes = new Type[] { typeof(string), typeof(SPWeb), typeof(string), typeof(string) };
-            object[] parametersOfgetPlanner = { plannerName, web, pDisplay, image };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodgetPlanner, methodgetPlannerPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_gridListViewInstanceFixture, parametersOfgetPlanner);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfgetPlanner.ShouldNotBeNull();
-            parametersOfgetPlanner.Length.ShouldBe(4);
-            methodgetPlannerPrametersTypes.Length.ShouldBe(4);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -1927,47 +1687,6 @@ namespace EPMLiveWebParts
 
         #endregion
 
-        #region Method Call : (getPlanner) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_getPlanner_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodgetPlanner, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_gridListViewInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (getPlanner) (Return Type : string) Parameters Count verify
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_getPlanner_Method_Call_Parameters_Count_Verification_Test()
-        {
-            // Arrange
-            var methodInfo = GetMethodInfo(MethodgetPlanner, 0);
-            const int parametersCount = 4;
-
-            // Act
-            var parameters = methodInfo.GetParameters();
-
-            // Assert
-            parameters.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
         #region Method Call : (getPlanner) (Return Type : string) private call definition
 
         [ExcludeFromCodeCoverage]
@@ -1975,36 +1694,6 @@ namespace EPMLiveWebParts
         {
             var methodgetPlannerPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_gridListViewInstance, MethodgetPlanner, Fixture, methodgetPlannerPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (getPlanner) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_getPlanner_Method_Call_Overloading_Of_1_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var plannerName = CreateType<string>();
-            var web = CreateType<SPWeb>();
-            var pDisplay = CreateType<string>();
-            var methodgetPlannerPrametersTypes = new Type[] { typeof(string), typeof(SPWeb), typeof(string) };
-            object[] parametersOfgetPlanner = { plannerName, web, pDisplay };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodgetPlanner, methodgetPlannerPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_gridListViewInstanceFixture, parametersOfgetPlanner);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfgetPlanner.ShouldNotBeNull();
-            parametersOfgetPlanner.Length.ShouldBe(3);
-            methodgetPlannerPrametersTypes.Length.ShouldBe(3);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -2072,47 +1761,6 @@ namespace EPMLiveWebParts
             // Assert
             Should.NotThrow(currentAction);
             methodgetPlannerPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (getPlanner) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_getPlanner_Method_Call_Overloading_Of_1_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodgetPlanner, 1);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_gridListViewInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (getPlanner) (Return Type : string) Parameters Count verify
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_getPlanner_Method_Call_Overloading_Of_1_Parameters_Count_Verification_Test()
-        {
-            // Arrange
-            var methodInfo = GetMethodInfo(MethodgetPlanner, 1);
-            const int parametersCount = 3;
-
-            // Act
-            var parameters = methodInfo.GetParameters();
-
-            // Assert
-            parameters.Length.ShouldBe(parametersCount);
         }
 
         #endregion
