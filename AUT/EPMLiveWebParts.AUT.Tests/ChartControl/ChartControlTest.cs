@@ -150,62 +150,7 @@ namespace EPMLiveWebParts
         #endregion
 
         #region Explore Class for Coverage Gain : Class (ChartControl)
-
-        #region General Initializer : Class (ChartControl) All Methods Explore Verification.
-
-        /// <summary>
-        ///     Class (<see cref="ChartControl" />) explore and verify fields for coverage gain.
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT Initializer")]
-        [TestCase(MethodGetYaxisFields, 0)]
-        [TestCase(MethodReportIdConsumer, 0)]
-        [TestCase(MethodSetChartWidthAndHeight, 0)]
-        [TestCase(MethodOnPreRender, 0)]
-        [TestCase(MethodHandleBubbleChartInputPostBack, 0)]
-        [TestCase(MethodCreateChildControls, 0)]
-        [TestCase(MethodIsBubbleChart, 0)]
-        [TestCase(MethodRenderWebPart, 0)]
-        [TestCase(MethodGetToolParts, 0)]
-        [TestCase(MethodRenderWebPartWithElevatedPermissions, 0)]
-        [TestCase(MethodDisableBrowserCaching, 0)]
-        [TestCase(MethodInitializeBubbleChartInputs, 0)]
-        [TestCase(MethodBubbleChartApplyButtonClick, 0)]
-        [TestCase(MethodGetPersistedBubbleChartPersonalizations, 0)]
-        [TestCase(MethodPersistBubbleChartPersonalizations, 0)]
-        [TestCase(MethodGetZaxisColorFieldSelection, 0)]
-        [TestCase(MethodGetZaxisFieldSelection, 0)]
-        [TestCase(MethodGetXaxisFieldSelection, 0)]
-        [TestCase(MethodGetXaxisFieldLabel, 0)]
-        [TestCase(MethodGetYaxisFieldLabel, 0)]
-        [TestCase(MethodGetYaxisSelections, 0)]
-        [TestCase(MethodGetZaxisFieldLabel, 0)]
-        [TestCase(MethodSetBubbleChartInputSelectionsBasedOnPersonalizationSettings, 0)]
-        [TestCase(MethodSetZaxisColorFieldSelection, 0)]
-        [TestCase(MethodSetZaxisSelection, 0)]
-        [TestCase(MethodSetYaxisSelections, 0)]
-        [TestCase(MethodSetXaxisSelection, 0)]
-        [TestCase(MethodSetBubbleChartInputsBasedOnWebPartProperties, 0)]
-        [TestCase(MethodPopulateBubbleChartInputsWithInitialValues, 0)]
-        [TestCase(MethodSortBubbleChartDropDownLists, 0)]
-        [TestCase(MethodRebuildControlTree, 0)]
-        public void AUT_ChartControl_All_Methods_Explore_Verify_Test(string methodName, int overloadingIndex = 0)
-        {
-            // Arrange
-            var currentMethodInfo = GetMethodInfo(methodName, overloadingIndex);
-
-            // Act
-            ShouldlyExtension.ExploreMethodWithOrWithoutInstance(_chartControlInstanceFixture, 
-                                                                 Fixture, 
-                                                                 currentMethodInfo);
-
-            // Assert
-            currentMethodInfo.ShouldNotBeNull();
-        }
-
-        #endregion
-
+        
         #region General Initializer : Class (ChartControl) All Properties Explore By Name
 
         /// <summary>
@@ -1330,54 +1275,7 @@ namespace EPMLiveWebParts
         #endregion
 
         #region Category : MethodCallTest
-
-        #region Method Call : NonStatic methods call tests
-
-        /// <summary>
-        ///      Class (<see cref="ChartControl" />) public, non-public non-static methods exploration for coverage gain.
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        [TestCase(MethodGetYaxisFields)]
-        [TestCase(MethodReportIdConsumer)]
-        [TestCase(MethodSetChartWidthAndHeight)]
-        [TestCase(MethodOnPreRender)]
-        [TestCase(MethodHandleBubbleChartInputPostBack)]
-        [TestCase(MethodCreateChildControls)]
-        [TestCase(MethodIsBubbleChart)]
-        [TestCase(MethodRenderWebPart)]
-        [TestCase(MethodGetToolParts)]
-        [TestCase(MethodRenderWebPartWithElevatedPermissions)]
-        [TestCase(MethodDisableBrowserCaching)]
-        [TestCase(MethodInitializeBubbleChartInputs)]
-        [TestCase(MethodBubbleChartApplyButtonClick)]
-        [TestCase(MethodGetPersistedBubbleChartPersonalizations)]
-        [TestCase(MethodPersistBubbleChartPersonalizations)]
-        [TestCase(MethodGetZaxisColorFieldSelection)]
-        [TestCase(MethodGetZaxisFieldSelection)]
-        [TestCase(MethodGetXaxisFieldSelection)]
-        [TestCase(MethodGetXaxisFieldLabel)]
-        [TestCase(MethodGetYaxisFieldLabel)]
-        [TestCase(MethodGetYaxisSelections)]
-        [TestCase(MethodGetZaxisFieldLabel)]
-        [TestCase(MethodSetBubbleChartInputSelectionsBasedOnPersonalizationSettings)]
-        [TestCase(MethodSetZaxisColorFieldSelection)]
-        [TestCase(MethodSetZaxisSelection)]
-        [TestCase(MethodSetYaxisSelections)]
-        [TestCase(MethodSetXaxisSelection)]
-        [TestCase(MethodSetBubbleChartInputsBasedOnWebPartProperties)]
-        [TestCase(MethodPopulateBubbleChartInputsWithInitialValues)]
-        [TestCase(MethodSortBubbleChartDropDownLists)]
-        [TestCase(MethodRebuildControlTree)]
-        public void AUT_ChartControl_NonStatic_Methods_Explore_Verify_Test(string methodName)
-        {
-            // AAA: Arrange, Act, Assert
-            ShouldlyExtension.ExploreVerifyMethods<ChartControl>(Fixture, methodName);
-        }
-
-        #endregion
-
+        
         #region Method Call : (SetYField) (Return Type : void) private call definition
 
         [ExcludeFromCodeCoverage]
