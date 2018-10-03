@@ -115,7 +115,6 @@
     <Compile Include="ChartControl\VfChartSeriesTest.cs" />
     <Compile Include="ChartControl\VfChartTest.cs" />
     <Compile Include="ChartControl\VfPointTest.cs" />
-    <Compile Include="Comments\CommentsTest.cs" />
     <Compile Include="Comments\CommentsToolPartTest.cs" />
     <Compile Include="ContentView\ContentViewTest.cs" />
     <Compile Include="ContextualHelpSlideOut\ContextualHelpSlideOutTest.cs" />
