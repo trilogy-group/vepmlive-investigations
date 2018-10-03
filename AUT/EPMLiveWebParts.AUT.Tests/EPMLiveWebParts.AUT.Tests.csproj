@@ -109,7 +109,6 @@
     <Compile Include="API\WPAPITest.cs" />
     <Compile Include="BackButton\BackButtonTest.cs" />
     <Compile Include="BuyNow\BuyNowTest.cs" />
-    <Compile Include="ChartControl\ChartControlTest.cs" />
     <Compile Include="ChartControl\ChartControlToolpartBaseTest.cs" />
     <Compile Include="ChartControl\EpmChartTest.cs" />
     <Compile Include="ChartControl\ExtensionsTest.cs" />
