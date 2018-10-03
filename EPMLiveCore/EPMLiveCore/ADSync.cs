@@ -288,35 +288,32 @@ namespace EPMLiveCore
 
         public List<string> GetGroups(string path)
         {
-            DirectoryEntry objADAM = default(DirectoryEntry);
             DirectoryEntry objGroupEntry = default(DirectoryEntry);
-            DirectorySearcher objSearchADAM = default(DirectorySearcher);
             SearchResultCollection objSearchResults = default(SearchResultCollection);
             List<string> result = new List<string>();
 
+            var directoryAdam = default(DirectoryEntry);
             try
             {
-                objADAM = new DirectoryEntry(path);
-                objADAM.RefreshCache();
-            }
-            catch (Exception e)
-            {
-                _ExecutionLogs.Add("     WARNING -- Location: GetGroups() -- Path:" + path + " -- Message:" + e.Message);
-            }
+                directoryAdam = new DirectoryEntry(path);
+                directoryAdam.RefreshCache();
 
-            // Get search object, specify filter and scope,  
-            // perform search.  
-            try
-            {
-                objSearchADAM = new DirectorySearcher(objADAM);
-                objSearchADAM.Filter = "(&(objectClass=group))";
-                objSearchADAM.PageSize = GetSizeLimit();
-                objSearchADAM.SearchScope = SearchScope.Subtree;
-                objSearchResults = objSearchADAM.FindAll();
+                using (var searchAdam = new DirectorySearcher(directoryAdam))
+                {
+                    searchAdam.Filter = "(&(objectClass=group))";
+                    searchAdam.PageSize = GetSizeLimit();
+                    searchAdam.SearchScope = SearchScope.Subtree;
+                    objSearchResults = searchAdam.FindAll();
+                }
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                _ExecutionLogs.Add("     WARNING -- Location: GetGroups() -- Path:" + path + " -- Message:" + e.Message);
+                Trace.TraceError(exception.ToString());
+                _ExecutionLogs.Add($"     WARNING -- Location: GetGroups() -- Path:{path} -- Message:{exception.Message}");
+            }
+            finally
+            {
+                directoryAdam?.Dispose();
             }
 
             // Enumerate groups  
@@ -768,34 +765,6 @@ namespace EPMLiveCore
             sb.Append("AD Sync process finished at:" + DateTime.Now.ToString() + "<br/>");
             _processLog = sb.ToString();
         }
-
-        //private void CreateExecutionLog()
-        //{
-        //    StreamWriter SW;
-        //    if (Directory.Exists(@"C:\EPMLive"))
-        //    {
-        //        if (File.Exists(@"C:\EPMLive\EPMLiveADSyncProcessLog.txt"))
-        //        {
-        //            try
-        //            {
-        //                File.Delete(@"C:\EPMLive\EPMLiveADSyncProcessLog.txt");
-        //            }
-        //            catch (Exception ex)
-        //            {
-
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        Directory.CreateDirectory(@"C:\EPMLive");
-        //    }
-
-        //    SW = File.CreateText(@"C:\EPMLive\EPMLiveADSyncProcessLog.txt");
-        //    SW.Close();
-        //    SW.Dispose();
-        //    _ExecutionLogs.Add("EPMLive -- AD Sync process started at: " + DateTime.Now.ToString());
-        //}        
 
         private void AddProperties(DirectorySearcher ds)
         {

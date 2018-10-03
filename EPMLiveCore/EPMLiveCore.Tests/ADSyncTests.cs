@@ -19,6 +19,7 @@ namespace EPMLiveCore.Tests
         private const string SamplePropertyValue = "SamplePropertyValue";
         private const string ColumnSid = "SID";
         private const string SampleGroup = "SampleGroup";
+        private const string SampleName = "SampleName";
 
         private IDisposable _shims;
         private ADSync _adSync;
@@ -152,6 +153,24 @@ namespace EPMLiveCore.Tests
             Assert.IsTrue(directoryShims.DirectoryEntriesDisposed.Any());
         }
 
+        [TestMethod]
+        public void GetGroups_Called_DirectoryDisposed()
+        {
+            // Arrange
+            var directoryShims = DirectoryShims.ShimDirectoryCalls();
+            directoryShims.DirectoryEntryShim.NameGet = () => SampleName;
+
+            // Act
+            var result = _adSync.GetGroups(string.Empty);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(SampleName, result[0]);
+            Assert.IsTrue(directoryShims.DirectorySearchersDisposed.Any());
+            Assert.IsTrue(directoryShims.DirectoryEntriesDisposed.Any());
+        }
+
         private void SetupShims()
         {
             ShimDirectoryEntry.ConstructorStringStringStringAuthenticationTypes = (instance, __, ___, ____, _____) =>
@@ -179,6 +198,7 @@ namespace EPMLiveCore.Tests
             };
             ShimDirectoryEntry.AllInstances.PropertiesGet = _ => shimPropertyCollection;
             ShimDirectoryEntry.AllInstances.RefreshCacheStringArray = (entry, strings) => {};
+            ShimDirectoryEntry.AllInstances.RefreshCache = entry => {};
 
             ShimSecurityIdentifier.ConstructorByteArrayInt32 = (instance, __, ___) =>
             {
