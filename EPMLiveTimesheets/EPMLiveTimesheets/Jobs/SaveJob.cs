@@ -18,6 +18,7 @@ namespace TimeSheets
         SPList WorkList;
         private bool Editable = false;
         private string NonUpdatingColumns = "Project,AssignedTo";
+        private string ListProjectCenter = "Project Center";
         StringBuilder sbErrors = null;
         private static string iGetAttribute(XmlNode nd, string attribute)
         {
@@ -297,7 +298,7 @@ namespace TimeSheets
 
         }
 
-        private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, string period, bool liveHours, bool bSkipSP)
+        private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, string period, string username, bool liveHours, bool bSkipSP)
         {
             string id = iGetAttribute(ndRow, "UID");
 
@@ -340,6 +341,13 @@ namespace TimeSheets
                                                 li = list.GetItemById(int.Parse(itemid));
                                             }
                                             catch { }
+                                            // Checking if any customer is using custom projectcenter
+                                            string projectListName = string.Empty;
+                                            projectListName = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveCustomProjectList");
+                                            if (!string.IsNullOrEmpty(projectListName))
+                                            {
+                                                ListProjectCenter = projectListName;
+                                            }
 
                                             if (li != null)
                                             {
@@ -365,7 +373,8 @@ namespace TimeSheets
 
                                                 if (drItem.Length > 0)
                                                 {
-                                                    using (SqlCommand cmd = new SqlCommand("UPDATE TSITEM set Title = @title, project=@project, project_id=@projectid where ts_item_uid=@uid", cn))
+                                                    string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username, $"{webid}.{web.Lists[ListProjectCenter].ID}.{projectid}");
+                                                    using (SqlCommand cmd = new SqlCommand("UPDATE TSITEM set Title = @title, project=@project, project_id=@projectid,rate=@rate where ts_item_uid=@uid", cn))
                                                     {
                                                         cmd.Parameters.AddWithValue("@uid", id);
                                                         cmd.Parameters.AddWithValue("@title", li["Title"] == null ? string.Empty : li["Title"].ToString());
@@ -373,11 +382,13 @@ namespace TimeSheets
                                                         {
                                                             cmd.Parameters.AddWithValue("@project", DBNull.Value);
                                                             cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
+                                                            cmd.Parameters.AddWithValue("@rate", DBNull.Value);
                                                         }
                                                         else
                                                         {
                                                             cmd.Parameters.AddWithValue("@project", project);
                                                             cmd.Parameters.AddWithValue("@projectid", projectid);
+                                                            cmd.Parameters.AddWithValue("@rate", rate);
                                                         }
                                                         cmd.ExecuteNonQuery();
                                                     }
@@ -391,9 +402,8 @@ namespace TimeSheets
                                                         projectlist = fieldlookup.LookupList;
                                                     }
                                                     catch { }
-
                                                     using (SqlCommand itemInsertCmd = new SqlCommand(@"INSERT INTO TSITEM SELECT DISTINCT TS_UID, case when TS_UID=@currenttsuid then @uidcurrent else NEWID() end,
-                                                            @webid,@listid,@itemtype,@itemid,@title,@project,@projectid,@list,0,@projectlistid,@assignedtoid 
+                                                            @webid,@listid,@itemtype,@itemid,@title,@project,@projectid,@list,0,@projectlistid,@assignedtoid,@rate 
                                                             FROM TSTIMESHEET INNER JOIN TSUSER ON TSTIMESHEET.TSUSER_UID = TSUSER.TSUSERUID 
                                                             WHERE TS_UID=@currenttsuid OR (TS_UID NOT IN (SELECT TS_UID FROM TSITEM WHERE ITEM_ID=@itemid AND ITEM_TYPE = @worktype) 
                                                             AND PERIOD_ID > @currentperiodid AND SUBMITTED = 0 AND TSTIMESHEET.SITE_UID=@siteid AND TSUSEr.USER_ID=@userid)", cn))
@@ -407,11 +417,12 @@ namespace TimeSheets
                                                         itemInsertCmd.Parameters.AddWithValue("@webid", web.ID);
                                                         itemInsertCmd.Parameters.AddWithValue("@listid", list.ID);
                                                         itemInsertCmd.Parameters.AddWithValue("@itemid", li.ID);
-                                                        itemInsertCmd.Parameters.AddWithValue("@title", li["Title"] == null? string.Empty : li["Title"].ToString());
+                                                        itemInsertCmd.Parameters.AddWithValue("@title", li["Title"] == null ? string.Empty : li["Title"].ToString());
                                                         itemInsertCmd.Parameters.AddWithValue("@list", list.Title);
                                                         itemInsertCmd.Parameters.AddWithValue("@itemtype", itemtypeid);
                                                         itemInsertCmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
-
+                                                        string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username, $"{webid}.{web.Lists[ListProjectCenter].ID}.{projectid}");
+                                                        itemInsertCmd.Parameters.AddWithValue("@rate", rate);
                                                         if (projectlist == "")
                                                             itemInsertCmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);
                                                         else
@@ -656,16 +667,17 @@ namespace TimeSheets
                     try
                     {
                         cn.Open();
-                        using (SqlCommand cmd = new SqlCommand("SELECT     dbo.TSUSER.USER_ID FROM         dbo.TSUSER INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn))
+                        using (SqlCommand cmd = new SqlCommand("SELECT   dbo.TSUSER.USER_ID,dbo.TSUSER.USERNAME FROM         dbo.TSUSER INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn))
                         {
                             cmd.Parameters.AddWithValue("@tsuid", base.TSUID);
-
+                            string username = string.Empty;
                             int userid = 0;
                             using (SqlDataReader dr = cmd.ExecuteReader())
                             {
                                 if (dr.Read())
                                 {
                                     userid = dr.GetInt32(0);
+                                    username = dr.GetString(1);
                                 }
 
                             }
@@ -747,7 +759,7 @@ namespace TimeSheets
                                                     }
                                                     catch { }
 
-                                                    ProcessItemRow(ndItem, ref dtItems, cn, site, settings, period, liveHours, worktype == settings.NonWorkList);
+                                                    ProcessItemRow(ndItem, ref dtItems, cn, site, settings, period, username, liveHours, worktype == settings.NonWorkList);
 
                                                     count++;
                                                     float pct = count / total * 98;

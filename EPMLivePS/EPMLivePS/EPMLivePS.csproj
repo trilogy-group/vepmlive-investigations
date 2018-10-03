@@ -97,7 +97,7 @@
       <HintPath>C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST\Microsoft.ProjectServer.Client.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.SharePoint.Security, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      </Reference>
+    </Reference>
     <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -126,6 +126,7 @@
     <Compile Include="EPMLivePublisher.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="EventDefinition.cs" />
     <Compile Include="HelperClasses\EPMLiveHelperClasses.cs" />
     <Compile Include="HelperClasses\ProjectDerived.cs" />
     <Compile Include="HelperClasses\ProjectWorkspaceSynch.cs" />
