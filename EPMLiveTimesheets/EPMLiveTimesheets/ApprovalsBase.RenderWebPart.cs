@@ -22,8 +22,7 @@ namespace TimeSheets
             bool initMb = false)
         {
             string firstEditorBox;
-            var editEvents = "false";
-            output.Write(SharedFunctions.getTimeEditorDiv(editEvents, FullGridId, Connection, web, out firstEditorBox));
+            output.Write(SharedFunctions.getTimeEditorDiv(bool.FalseString, FullGridId, Connection, web, out firstEditorBox));
 
             AppendCssAndJsLibraries(output);
             AppendStyles(output);
