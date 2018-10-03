@@ -409,29 +409,15 @@ namespace EPMLiveWebParts.ReportingChart
 
         private void WriteConfigSectionHtml(HtmlTextWriter output)
         {
-            string sChartTypeVal = ChartTypeDropDownList.SelectedValue;
-            string sAggType = AggregateTypeHtmlSelect.Value;
+            var sChartTypeVal = ChartTypeDropDownList.SelectedValue;
+            var sAggType = AggregateTypeHtmlSelect.Value;
 
 
-            output.Write("<div class=\"UserSectionHead\">");
-            output.Write("<b>Chart Configuration</b>");
-            output.Write("<br />");
-            output.Write("<table cellpadding=1 style=\"padding-left: 5px\">");
+            RenderChartConfiguration(output);
+            RenderListsDropDown(output);
+            RenderViewsDropDown(output);
 
-            #region RENDER LISTS DROP DOWN
-            output.Write("<tr><td>");
-            output.Write("List<br>");
-            ListsDropDownList.RenderControl(output);
-            output.Write("</td></tr>");
-            #endregion
-
-            #region RENDER VIEWS DROP DOWN
-            output.Write("<tr><td>");
-            output.Write("View<br>");
-            ViewsDropDownList.RenderControl(output);
-            output.Write("</td></tr>");
-            #endregion
-
+            //CC-76549 I'm leaving this commented out if statement because there's no indication on to why this block was commented ot if this if should even be kept or removed
             if (IsBubbleChart())
             {
                 //output.Write("<tr><td>");
@@ -439,55 +425,78 @@ namespace EPMLiveWebParts.ReportingChart
                 //output.Write("Allow User To Select X, Y, Z Values<br></td></tr>");
             }
 
-            #region RENDER CHART TYPES DROPDOWN
+            RenderChartTypesDropDown(output);
+            RenderAggregateTypeDropDown(output);
+            RenderXAxis(output, sChartTypeVal, sAggType);
+            RenderYAxis(output, sChartTypeVal, sAggType);
+            RenderZAxis(output, sChartTypeVal);
+
+            output.Write("</table>");
+            output.Write("</div>");
+        }
+
+        private static void RenderChartConfiguration(HtmlTextWriter output)
+        {
+            output.Write("<div class=\"UserSectionHead\">");
+            output.Write("<b>Chart Configuration</b>");
+            output.Write("<br />");
+            output.Write("<table cellpadding=1 style=\"padding-left: 5px\">");
+        }
+
+        private void RenderListsDropDown(HtmlTextWriter output)
+        {
+            output.Write("<tr><td>");
+            output.Write("List<br>");
+            ListsDropDownList.RenderControl(output);
+            output.Write("</td></tr>");
+        }
+
+        private void RenderViewsDropDown(HtmlTextWriter output)
+        {
+            output.Write("<tr><td>");
+            output.Write("View<br>");
+            ViewsDropDownList.RenderControl(output);
+            output.Write("</td></tr>");
+        }
+
+        private void RenderChartTypesDropDown(HtmlTextWriter output)
+        {
             output.Write("<tr><td>");
             output.Write("Chart Type<br>");
             ChartTypeDropDownList.RenderControl(output);
             output.Write("</td></tr>");
-            #endregion
+        }
 
-            #region RENDER AGGREGATE TYPE DROPDOWN
-
+        private void RenderAggregateTypeDropDown(HtmlTextWriter output)
+        {
             output.Write("<tr><td>");
-            if (sChartTypeVal.Contains("Bubble"))
-            {
-                output.Write("<div id=\"aggTypeSec\" display='none'>");
-            }
-            else
-            {
-                output.Write("<div id=\"aggTypeSec\" display='none'>");
-            }
+            output.Write("<div id=\"aggTypeSec\" display='none'>");
             output.Write("Aggregation Type<br>");
             AggregateTypeHtmlSelect.RenderControl(output);
             output.Write("<br>");
             output.Write("</div>");
             output.Write("</td></tr>");
+        }
 
-            #endregion
-
-            #region RENDER X AXIS
+        private void RenderXAxis(HtmlTextWriter output, string sChartTypeVal, string sAggType)
+        {
             output.Write("<tr><td>");
 
-            if (sChartTypeVal == "Area" || sChartTypeVal == "Bar" || sChartTypeVal == "Column" || sChartTypeVal == "Line")
+            if (sChartTypeVal == "Area"
+                || sChartTypeVal == "Bar"
+                || sChartTypeVal == "Column"
+                || sChartTypeVal == "Line")
             {
-                if (sAggType == "Count")
-                {
-                    output.Write("<div id='XaxisSection_full'>");
-                    output.Write("Category (X axis)<br>");
-                    XaxisFieldDropDownList.RenderControl(output);
-                    output.Write("</div>");
+                RenderAggTypeEqualsCountOrSum(output, sAggType);
+            }
 
-                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
-                    output.Write("Value (X axis)<br>");
-                    ddlXaxisFieldNum.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_nonnum' style='display:none'>");
-                    output.Write("Category (X axis)<br>");
-                    ddlXaxisFieldNonNum.RenderControl(output);
-                    output.Write("</div>");
-                }
-                else if (sAggType == "Sum" || sAggType == "Avg")
+            else if (sChartTypeVal.Contains("_Clustered")
+                     || sChartTypeVal.Contains("_Stacked")
+                     || sChartTypeVal.Contains("_100Percent"))
+            {
+                if (sAggType == "Count"
+                    || sAggType == "Sum"
+                    || sAggType == "Avg")
                 {
                     output.Write("<div id='XaxisSection_full' style='display:none'>");
                     output.Write("Category (X axis)<br>");
@@ -505,80 +514,10 @@ namespace EPMLiveWebParts.ReportingChart
                     output.Write("</div>");
                 }
             }
-            // MULTI SERIES
-            else if (sChartTypeVal.Contains("_Clustered") || sChartTypeVal.Contains("_Stacked") || sChartTypeVal.Contains("_100Percent"))
+            else if (sChartTypeVal.Contains("Pie")
+                     || sChartTypeVal.Contains("Donut"))
             {
-                if (sAggType == "Count")
-                {
-                    output.Write("<div id='XaxisSection_full' style='display:none'>");
-                    output.Write("Category (X axis)<br>");
-                    XaxisFieldDropDownList.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
-                    output.Write("Value (X axis)<br>");
-                    ddlXaxisFieldNum.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_nonnum'>");
-                    output.Write("Category (X axis)<br>");
-                    ddlXaxisFieldNonNum.RenderControl(output);
-                    output.Write("</div>");
-                }
-                else if (sAggType == "Sum" || sAggType == "Avg")
-                {
-                    output.Write("<div id='XaxisSection_full' style='display:none'>");
-                    output.Write("Category (X axis)<br>");
-                    XaxisFieldDropDownList.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
-                    output.Write("Value (X axis)<br>");
-                    ddlXaxisFieldNum.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_nonnum'>");
-                    output.Write("Category (X axis)<br>");
-                    ddlXaxisFieldNonNum.RenderControl(output);
-                    output.Write("</div>");
-                }
-            }
-            else if (sChartTypeVal.Contains("Pie") || sChartTypeVal.Contains("Donut"))
-            {
-                if (sAggType == "Count")
-                {
-                    output.Write("<div id='XaxisSection_full'>");
-                    output.Write("Category (X axis)<br>");
-                    XaxisFieldDropDownList.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
-                    output.Write("Value (X axis)<br>");
-                    ddlXaxisFieldNum.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_nonnum' style='display:none'>");
-                    output.Write("Category (X axis)<br>");
-                    ddlXaxisFieldNonNum.RenderControl(output);
-                    output.Write("</div>");
-                }
-                else if (sAggType == "Sum" || sAggType == "Avg")
-                {
-                    output.Write("<div id='XaxisSection_full' style='display:none'>");
-                    output.Write("Category (X axis)<br>");
-                    XaxisFieldDropDownList.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
-                    output.Write("Value (X axis)<br>");
-                    ddlXaxisFieldNum.RenderControl(output);
-                    output.Write("</div>");
-
-                    output.Write("<div id='XaxisSection_ddl_nonnum'>");
-                    output.Write("Category (X axis)<br>");
-                    ddlXaxisFieldNonNum.RenderControl(output);
-                    output.Write("</div>");
-                }
+                RenderAggTypeEqualsCountOrSum(output, sAggType);
             }
             else if (sChartTypeVal.Contains("Bubble"))
             {
@@ -599,118 +538,137 @@ namespace EPMLiveWebParts.ReportingChart
             }
 
             output.Write("</td></tr>");
-            #endregion
+        }
 
-            #region RENDER Y AXIS
-            bool bRenderY = false;
-            // SINGLE SERIES
-            if (sChartTypeVal == "Area" || sChartTypeVal == "Bar" || sChartTypeVal == "Column" || sChartTypeVal == "Line")
+        private void RenderAggTypeEqualsCountOrSum(HtmlTextWriter output, string sAggType)
+        {
+            if (sAggType == "Count")
+            {
+                output.Write("<div id='XaxisSection_full'>");
+                output.Write("Category (X axis)<br>");
+                XaxisFieldDropDownList.RenderControl(output);
+                output.Write("</div>");
+
+                output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
+                output.Write("Value (X axis)<br>");
+                ddlXaxisFieldNum.RenderControl(output);
+                output.Write("</div>");
+
+                output.Write("<div id='XaxisSection_ddl_nonnum' style='display:none'>");
+                output.Write("Category (X axis)<br>");
+                ddlXaxisFieldNonNum.RenderControl(output);
+                output.Write("</div>");
+            }
+            else if (sAggType == "Sum"
+                     || sAggType == "Avg")
+            {
+                output.Write("<div id='XaxisSection_full' style='display:none'>");
+                output.Write("Category (X axis)<br>");
+                XaxisFieldDropDownList.RenderControl(output);
+                output.Write("</div>");
+
+                output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
+                output.Write("Value (X axis)<br>");
+                ddlXaxisFieldNum.RenderControl(output);
+                output.Write("</div>");
+
+                output.Write("<div id='XaxisSection_ddl_nonnum'>");
+                output.Write("Category (X axis)<br>");
+                ddlXaxisFieldNonNum.RenderControl(output);
+                output.Write("</div>");
+            }
+        }
+
+        private void RenderYAxis(HtmlTextWriter output, string sChartTypeVal, string sAggType)
+        {
+            var bRenderY = false;
+
+            if (sChartTypeVal == "Area"
+                || sChartTypeVal == "Bar"
+                || sChartTypeVal == "Column"
+                || sChartTypeVal == "Line")
             {
                 if (sAggType == "Count")
                 {
-                    // NO Y VALUE
                     RenderOneYField(output, false, true);
                     RenderMultipleYField(output, false, true);
                 }
-                else if (sAggType == "Sum" || sAggType == "Avg")
+                else if (sAggType == "Sum"
+                         || sAggType == "Avg")
                 {
-                    // 1 Y VALUE                   
                     RenderOneYField(output, true, false);
                     RenderMultipleYField(output, true, true);
                     bRenderY = true;
                 }
             }
-            // MULTI SERIES
-            else if (sChartTypeVal.Contains("_Clustered") || sChartTypeVal.Contains("_Stacked") || sChartTypeVal.Contains("_100Percent"))
+            else if (sChartTypeVal.Contains("_Clustered")
+                     || sChartTypeVal.Contains("_Stacked")
+                     || sChartTypeVal.Contains("_100Percent"))
             {
                 if (sAggType == "Count")
                 {
-                    // 1 Y VALUE
                     RenderOneYField(output, false, false);
                     RenderMultipleYField(output, false, true);
                     bRenderY = true;
                 }
-                else if (sAggType == "Sum" || sAggType == "Avg")
+                else if (sAggType == "Sum"
+                         || sAggType == "Avg")
                 {
-                    // MORE THAN 1 Y VALUE
                     RenderMultipleYField(output, true, false);
                     RenderOneYField(output, false, true);
                     bRenderY = true;
                 }
             }
-            else if (sChartTypeVal.Contains("Pie") || sChartTypeVal.Contains("Donut"))
+            else if (sChartTypeVal.Contains("Pie")
+                     || sChartTypeVal.Contains("Donut"))
             {
                 if (sAggType == "Count")
                 {
-                    // NO Y VALUE 
                     RenderOneYField(output, false, true);
                     RenderMultipleYField(output, false, true);
                 }
-                else if (sAggType == "Sum" || sAggType == "Avg")
+                else if (sAggType == "Sum"
+                         || sAggType == "Avg")
                 {
-                    // 1 Y VALUE
                     RenderOneYField(output, true, false);
                     RenderMultipleYField(output, false, true);
                     bRenderY = true;
                 }
             }
-            // FOR SCATTER AND SCATTER LINE
-            else if (sChartTypeVal.Contains("Scatter"))
+            else if (sChartTypeVal.Contains("Scatter")
+                     || sChartTypeVal.Contains("Bubble"))
             {
-                // 1 Y VALUE
-                RenderOneYField(output, true, false);
-                RenderMultipleYField(output, false, true);
-                bRenderY = true;
-            }
-            else if (sChartTypeVal.Contains("Bubble"))
-            {
-                // 1 Y VALUE
                 RenderOneYField(output, true, false);
                 RenderMultipleYField(output, false, true);
                 bRenderY = true;
             }
 
-            // render y axis formatting controls
             output.Write("<tr><td>");
-            if (bRenderY)
-            {
-                output.Write("<div id='YAxisFormatSection'>");
-            }
-            else
-            {
-                output.Write("<div id='YAxisFormatSection' style='display:none'>");
-            }
+            output.Write(
+                bRenderY
+                    ? "<div id='YAxisFormatSection'>"
+                    : "<div id='YAxisFormatSection' style='display:none'>");
             output.Write("Y Axis Formatting<br>");
             YaxisFormatDropDownList.RenderControl(output);
             output.Write("</div>");
             output.Write("</td></tr>");
+        }
 
-            #endregion
-
-            #region RENDER Z AXIS
+        private void RenderZAxis(HtmlTextWriter output, string sChartTypeVal)
+        {
             output.Write("<tr><td>");
-            if (sChartTypeVal.Contains("Bubble"))
-            {
-                output.Write("<div id='ZaxisSection'>");
-            }
-            else
-            {
-                output.Write("<div id='ZaxisSection' style='display:none'>");
-            }
+            output.Write(
+                sChartTypeVal.Contains("Bubble")
+                    ? "<div id='ZaxisSection'>"
+                    : "<div id='ZaxisSection' style='display:none'>");
             output.Write("Size Value (Z Axis)<br/>");
             ZaxisFieldDropDownList.RenderControl(output);
             output.Write("<br/>");
-            //output.Write("<b>Z Axis Color Field</b><br>");
-            //BubbleChartColorFieldDropDownList.RenderControl(output);
             output.Write("Group By<br/>");
             BubbleGroupByDropDownList.RenderControl(output);
             output.Write("<br/>");
             output.Write("</div>");
             output.Write("</td></tr>");
-            #endregion
-
-            output.Write("</table>");
-            output.Write("</div>");
         }
 
         private void WriteDisplaySectionHtml(HtmlTextWriter output)
@@ -1245,216 +1203,320 @@ namespace EPMLiveWebParts.ReportingChart
 
         private void FillDropDowns()
         {
-            string sListTitle = ListsDropDownList.SelectedValue;
-            if (string.IsNullOrEmpty(sListTitle) || sListTitle == "<Select List>")
-                return;
-
-            SPList oList = SPContext.Current.Web.Lists.TryGetList(sListTitle);
-            if (oList == null)
-                return;
-
-            XaxisFieldDropDownList.Items.Clear();
-            ddlXaxisFieldNum.Items.Clear();
-            ddlXaxisFieldNonNum.Items.Clear();
-            cblYaxisFieldNum.Items.Clear();
-            ddlYaxisFieldNum.Items.Clear();
-            ZaxisFieldDropDownList.Items.Clear();
-            cblYaxisFieldNonNum.Items.Clear();
-            ddlYaxisFieldNonNum.Items.Clear();
-            BubbleGroupByDropDownList.Items.Clear();
-            ChartPaletteStyleDropDownList.Items.Clear();
-
-            ReportingChart rc = (ReportingChart)ParentToolPane.SelectedWebPart;
-
-            // fill color paletWte ddl
-            ChartPaletteStyleDropDownList.Items.AddRange(new ListItem[] {
-                new ListItem("Color 1", "Color1"),
-                new ListItem("Color 2", "Color2"),
-                new ListItem("Gray", "Gray"),
-                new ListItem("Blue", "Blue"),
-                new ListItem("Red", "Red"),
-                new ListItem("Green", "Green"),
-                new ListItem("Yellow", "Yellow"),
-                new ListItem("Violet", "Violet")
-            });
-
-            DataTable dt = GetListColumns(oList.ID);
-            foreach (DataRow fld in dt.Rows)
+            var sListTitle = ListsDropDownList.SelectedValue;
+            if (string.IsNullOrWhiteSpace(sListTitle)
+                || sListTitle == "<Select List>")
             {
-                string sFldSharePointType = fld["SharePointType"].ToString();
-                string sFldDisplayName = fld["DisplayName"].ToString();
-                string sFldInternalName = fld["InternalName"].ToString();
-                string sFldColType = fld["ColumnType"].ToString();
+                return;
+            }
 
-                if (sFldSharePointType == "Attachments" || sFldInternalName == "Order" ||
-                    sFldSharePointType == "File" || sFldInternalName == "Metainfo" ||
-                    sFldSharePointType == "Computed" || sFldSharePointType == "Guid" ||
-                    sFldSharePointType == "Counter" || sFldSharePointType == "Note")
-                    continue;
+            var oList = SPContext.Current.Web.Lists.TryGetList(sListTitle);
+            if (oList == null)
+            {
+                return;
+            }
 
-                var liX = new ListItem(sFldDisplayName, sFldInternalName);
-                if (!XaxisFieldDropDownList.Items.Contains(liX))
-                    XaxisFieldDropDownList.Items.Add(liX);
+            ClearControls();
 
-                // numeric
-                if ((sFldSharePointType == "Calculated" && sFldColType == "Float") ||
-                    (sFldSharePointType == "Calculated" && sFldColType == "Int") ||
-                    sFldSharePointType == "Currency" ||
-                    sFldSharePointType == "Integer" ||
-                    sFldSharePointType == "Number")
+            var reportingChart = (ReportingChart)ParentToolPane.SelectedWebPart;
+
+            FillColorPalette();
+            FillChartLines(oList);
+
+            FillYAxisFormatDropdown();
+            FillLegendPositionDropDown();
+            SelectChartLegendPosition(reportingChart);
+
+            SortListControls();
+
+            ProcessXAxisFields(reportingChart);
+            ProcessYAxisFields(reportingChart);
+
+            SelectChartZAxisField(reportingChart);
+            SelectBubbleChartGroupBy(reportingChart);
+            SelectChartSelectedPaletteName(reportingChart);
+        }
+
+        private void FillColorPalette()
+        {
+            ChartPaletteStyleDropDownList.Items.AddRange(
+                new[]
                 {
-                    var liNum = new ListItem(sFldDisplayName, sFldInternalName);
+                    new ListItem("Color 1", "Color1"),
+                    new ListItem("Color 2", "Color2"),
+                    new ListItem("Gray", "Gray"),
+                    new ListItem("Blue", "Blue"),
+                    new ListItem("Red", "Red"),
+                    new ListItem("Green", "Green"),
+                    new ListItem("Yellow", "Yellow"),
+                    new ListItem("Violet", "Violet")
+                });
+        }
 
-                    if (!ddlXaxisFieldNum.Items.Contains(liNum))
-                        ddlXaxisFieldNum.Items.Add(liNum);
+        private void FillChartLines(SPList oList)
+        {
+            var listColumns = GetListColumns(oList.ID);
+            foreach (DataRow dataRow in listColumns.Rows)
+            {
+                var sharePointType = dataRow["SharePointType"]
+                    .ToString();
+                var displayName = dataRow["DisplayName"]
+                    .ToString();
+                var internalName = dataRow["InternalName"]
+                    .ToString();
+                var columnType = dataRow["ColumnType"]
+                    .ToString();
 
-                    if (!cblYaxisFieldNum.Items.Contains(liNum))
-                        cblYaxisFieldNum.Items.Add(liNum);
-
-                    if (!ddlYaxisFieldNum.Items.Contains(liNum))
-                        ddlYaxisFieldNum.Items.Add(liNum);
-
-                    if (!ZaxisFieldDropDownList.Items.Contains(liNum))
-                        ZaxisFieldDropDownList.Items.Add(liNum);
+                if (sharePointType == "Attachments"
+                    || internalName == "Order"
+                    || sharePointType == "File"
+                    || internalName == "Metainfo"
+                    || sharePointType == "Computed"
+                    || sharePointType == "Guid"
+                    || sharePointType == "Counter"
+                    || sharePointType == "Note")
+                {
+                    continue;
                 }
-                // non-numeric
+
+                var liX = new ListItem(displayName, internalName);
+                if (!XaxisFieldDropDownList.Items.Contains(liX))
+                {
+                    XaxisFieldDropDownList.Items.Add(liX);
+                }
+
+                if (sharePointType == "Calculated" && columnType == "Float"
+                    || sharePointType == "Calculated" && columnType == "Int"
+                    || sharePointType == "Currency"
+                    || sharePointType == "Integer"
+                    || sharePointType == "Number")
+                {
+                    FillNumericChart(displayName, internalName);
+                }
                 else
                 {
-                    var liNonNum = new ListItem(sFldDisplayName, sFldInternalName);
-
-                    if (!ddlXaxisFieldNonNum.Items.Contains(liNonNum))
-                        ddlXaxisFieldNonNum.Items.Add(liNonNum);
-
-                    if (!cblYaxisFieldNonNum.Items.Contains(liNonNum))
-                        cblYaxisFieldNonNum.Items.Add(liNonNum);
-
-                    if (!ddlYaxisFieldNonNum.Items.Contains(liNonNum))
-                        ddlYaxisFieldNonNum.Items.Add(liNonNum);
-
-                    if (!BubbleGroupByDropDownList.Items.Contains(liNonNum))
-                        BubbleGroupByDropDownList.Items.Add(liNonNum);
+                    FillNonNumericChart(displayName, internalName);
                 }
             }
+        }
 
-            YaxisFormatDropDownList.Items.Clear();
-            // fill y axis format ddl
-            YaxisFormatDropDownList.Items.AddRange(new ListItem[] {
-                new ListItem("None", "None"),
-                new ListItem("Currency", "Currency"),
-                new ListItem("Percentage", "Percentage")
-            });
+        private void FillNumericChart(string displayName, string internalName)
+        {
+            var numericLine = new ListItem(displayName, internalName);
 
-            LegendPositionDropDownList.Items.Clear();
-            LegendPositionDropDownList.Items.AddRange(new ListItem[] {
-                new ListItem("Left", "Left"),
-                new ListItem("Top", "Top"),
-                new ListItem("Right", "Right"),
-                new ListItem("Bottom", "Bottom")
-            });
-
-            if (LegendPositionDropDownList.Items.FindByText(rc.PropChartLegendPosition) != null)
+            if (!ddlXaxisFieldNum.Items.Contains(numericLine))
             {
-                LegendPositionDropDownList.Items.FindByText(rc.PropChartLegendPosition).Selected = true;
+                ddlXaxisFieldNum.Items.Add(numericLine);
             }
 
+            if (!cblYaxisFieldNum.Items.Contains(numericLine))
+            {
+                cblYaxisFieldNum.Items.Add(numericLine);
+            }
+
+            if (!ddlYaxisFieldNum.Items.Contains(numericLine))
+            {
+                ddlYaxisFieldNum.Items.Add(numericLine);
+            }
+
+            if (!ZaxisFieldDropDownList.Items.Contains(numericLine))
+            {
+                ZaxisFieldDropDownList.Items.Add(numericLine);
+            }
+        }
+
+        private void FillNonNumericChart(string displayName, string internalName)
+        {
+            var nonNumericLine = new ListItem(displayName, internalName);
+
+            if (!ddlXaxisFieldNonNum.Items.Contains(nonNumericLine))
+            {
+                ddlXaxisFieldNonNum.Items.Add(nonNumericLine);
+            }
+
+            if (!cblYaxisFieldNonNum.Items.Contains(nonNumericLine))
+            {
+                cblYaxisFieldNonNum.Items.Add(nonNumericLine);
+            }
+
+            if (!ddlYaxisFieldNonNum.Items.Contains(nonNumericLine))
+            {
+                ddlYaxisFieldNonNum.Items.Add(nonNumericLine);
+            }
+
+            if (!BubbleGroupByDropDownList.Items.Contains(nonNumericLine))
+            {
+                BubbleGroupByDropDownList.Items.Add(nonNumericLine);
+            }
+        }
+
+        private void FillYAxisFormatDropdown()
+        {
+            YaxisFormatDropDownList.Items.Clear();
+            YaxisFormatDropDownList.Items.AddRange(
+                new[]
+                {
+                    new ListItem("None", "None"),
+                    new ListItem("Currency", "Currency"),
+                    new ListItem("Percentage", "Percentage")
+                });
+        }
+
+        private void FillLegendPositionDropDown()
+        {
+            LegendPositionDropDownList.Items.Clear();
+            LegendPositionDropDownList.Items.AddRange(
+                new[]
+                {
+                    new ListItem("Left", "Left"),
+                    new ListItem("Top", "Top"),
+                    new ListItem("Right", "Right"),
+                    new ListItem("Bottom", "Bottom")
+                });
+        }
+
+        private void SelectChartLegendPosition(ReportingChart reportingChart)
+        {
+            if (LegendPositionDropDownList.Items.FindByText(reportingChart.PropChartLegendPosition) != null)
+            {
+                LegendPositionDropDownList.Items.FindByText(reportingChart.PropChartLegendPosition)
+                                          .Selected = true;
+            }
+        }
+
+        private void ProcessXAxisFields(ReportingChart reportingChart)
+        {
+            if (!string.IsNullOrWhiteSpace(reportingChart.PropChartXaxisField))
+            {
+                if (XaxisFieldDropDownList.Items.FindByValue(reportingChart.PropChartXaxisField) != null)
+                {
+                    XaxisFieldDropDownList.Items.FindByValue(reportingChart.PropChartXaxisField)
+                                          .Selected = true;
+                }
+
+                if (ddlXaxisFieldNum.Items.FindByValue(reportingChart.PropChartXaxisField) != null)
+                {
+                    ddlXaxisFieldNum.Items.FindByValue(reportingChart.PropChartXaxisField)
+                                    .Selected = true;
+                }
+
+                if (ddlXaxisFieldNonNum.Items.FindByValue(reportingChart.PropChartXaxisField) != null)
+                {
+                    ddlXaxisFieldNonNum.Items.FindByValue(reportingChart.PropChartXaxisField)
+                                       .Selected = true;
+                }
+            }
+        }
+
+        private void ProcessYAxisFields(ReportingChart reportingChart)
+        {
+            if (!string.IsNullOrWhiteSpace(reportingChart.PropChartYaxisField))
+            {
+                var yFields = reportingChart.PropChartYaxisField.Split('|');
+                if (yFields.Length > 1)
+                {
+                    foreach (var yField in yFields)
+                    {
+                        if (cblYaxisFieldNum.Items.FindByValue(yField) != null)
+                        {
+                            cblYaxisFieldNum.Items.FindByValue(yField)
+                                            .Selected = true;
+                        }
+
+                        if (cblYaxisFieldNonNum.Items.FindByValue(yField) != null)
+                        {
+                            cblYaxisFieldNonNum.Items.FindByValue(yField)
+                                               .Selected = true;
+                        }
+                    }
+                }
+                else
+                {
+                    var yValue = yFields[0];
+                    if (ddlYaxisFieldNum.Items.FindByValue(yValue) != null)
+                    {
+                        ddlYaxisFieldNum.Items.FindByValue(yValue)
+                                        .Selected = true;
+                    }
+
+                    if (ddlYaxisFieldNonNum.Items.FindByValue(yValue) != null)
+                    {
+                        ddlYaxisFieldNonNum.Items.FindByValue(yValue)
+                                           .Selected = true;
+                    }
+                }
+
+                SelectAxisFormat(reportingChart);
+            }
+        }
+
+        private void SelectAxisFormat(ReportingChart reportingChart)
+        {
+            if (!string.IsNullOrWhiteSpace(reportingChart.PropYaxisFormat)
+                && YaxisFormatDropDownList.Items.FindByValue(reportingChart.PropYaxisFormat) != null)
+            {
+                YaxisFormatDropDownList.Items.FindByValue(reportingChart.PropYaxisFormat)
+                                       .Selected = true;
+            }
+        }
+
+        private void SelectChartZAxisField(ReportingChart reportingChart)
+        {
+            if (!string.IsNullOrWhiteSpace(reportingChart.PropChartZaxisField)
+                && ZaxisFieldDropDownList.Items.FindByValue(reportingChart.PropChartZaxisField) != null)
+            {
+                ZaxisFieldDropDownList.Items.FindByValue(reportingChart.PropChartZaxisField)
+                                      .Selected = true;
+            }
+        }
+
+        private void SelectBubbleChartGroupBy(ReportingChart reportingChart)
+        {
+            if (!string.IsNullOrWhiteSpace(reportingChart.PropBubbleChartGroupBy)
+                && BubbleGroupByDropDownList.Items.FindByValue(reportingChart.PropBubbleChartGroupBy) != null)
+            {
+                BubbleGroupByDropDownList.Items.FindByValue(reportingChart.PropBubbleChartGroupBy)
+                                         .Selected = true;
+            }
+        }
+
+        private void SelectChartSelectedPaletteName(ReportingChart reportingChart)
+        {
+            if (!string.IsNullOrWhiteSpace(reportingChart.PropChartSelectedPaletteName)
+                && ChartPaletteStyleDropDownList.Items.FindByValue(reportingChart.PropChartSelectedPaletteName) != null)
+            {
+                ChartPaletteStyleDropDownList.Items.FindByValue(reportingChart.PropChartSelectedPaletteName)
+                                             .Selected = true;
+            }
+        }
+
+        private void SortListControls()
+        {
             SortListControlItems(XaxisFieldDropDownList);
             SortListControlItems(ddlXaxisFieldNum);
             SortListControlItems(ddlXaxisFieldNonNum);
-            // sort numeric fields
             SortListControlItems(cblYaxisFieldNum);
             SortListControlItems(ddlYaxisFieldNum);
             SortListControlItems(ZaxisFieldDropDownList);
-            // sort non-numeric fields
             SortListControlItems(cblYaxisFieldNonNum);
             SortListControlItems(ddlYaxisFieldNonNum);
             SortListControlItems(BubbleGroupByDropDownList);
             SortListControlItems(BubbleChartColorFieldDropDownList);
             SortListControlItems(ChartPaletteStyleDropDownList);
+        }
 
-
-            if (!string.IsNullOrEmpty(rc.PropChartXaxisField))
-            {
-                if (XaxisFieldDropDownList.Items.FindByValue(rc.PropChartXaxisField) != null)
-                {
-                    XaxisFieldDropDownList.Items.FindByValue(rc.PropChartXaxisField).Selected = true;
-                }
-
-                if (ddlXaxisFieldNum.Items.FindByValue(rc.PropChartXaxisField) != null)
-                {
-                    ddlXaxisFieldNum.Items.FindByValue(rc.PropChartXaxisField).Selected = true;
-                }
-
-                if (ddlXaxisFieldNonNum.Items.FindByValue(rc.PropChartXaxisField) != null)
-                {
-                    ddlXaxisFieldNonNum.Items.FindByValue(rc.PropChartXaxisField).Selected = true;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(rc.PropChartYaxisField))
-            {
-                string[] yFlds = rc.PropChartYaxisField.Split('|');
-                if (yFlds.Count() > 1)
-                {
-                    foreach (string yFld in yFlds)
-                    {
-                        if (cblYaxisFieldNum.Items.FindByValue(yFld) != null)
-                        {
-                            cblYaxisFieldNum.Items.FindByValue(yFld).Selected = true;
-                        }
-
-                        if (cblYaxisFieldNonNum.Items.FindByValue(yFld) != null)
-                        {
-                            cblYaxisFieldNonNum.Items.FindByValue(yFld).Selected = true;
-                        }
-                    }
-                }
-                else
-                {
-                    string yVal = yFlds[0];
-                    if (ddlYaxisFieldNum.Items.FindByValue(yVal) != null)
-                    {
-                        ddlYaxisFieldNum.Items.FindByValue(yVal).Selected = true;
-                    }
-
-                    if (ddlYaxisFieldNonNum.Items.FindByValue(yVal) != null)
-                    {
-                        ddlYaxisFieldNonNum.Items.FindByValue(yVal).Selected = true;
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(rc.PropYaxisFormat))
-                {
-                    if (YaxisFormatDropDownList.Items.FindByValue(rc.PropYaxisFormat) != null)
-                    {
-                        YaxisFormatDropDownList.Items.FindByValue(rc.PropYaxisFormat).Selected = true;
-                    }
-                }
-            }
-
-            if (!string.IsNullOrEmpty(rc.PropChartZaxisField))
-            {
-                if (ZaxisFieldDropDownList.Items.FindByValue(rc.PropChartZaxisField) != null)
-                {
-                    ZaxisFieldDropDownList.Items.FindByValue(rc.PropChartZaxisField).Selected = true;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(rc.PropBubbleChartGroupBy))
-            {
-                if (BubbleGroupByDropDownList.Items.FindByValue(rc.PropBubbleChartGroupBy) != null)
-                {
-                    BubbleGroupByDropDownList.Items.FindByValue(rc.PropBubbleChartGroupBy).Selected = true;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(rc.PropChartSelectedPaletteName))
-            {
-                if (ChartPaletteStyleDropDownList.Items.FindByValue(rc.PropChartSelectedPaletteName) != null)
-                {
-                    ChartPaletteStyleDropDownList.Items.FindByValue(rc.PropChartSelectedPaletteName).Selected = true;
-                }
-            }
-
+        private void ClearControls()
+        {
+            XaxisFieldDropDownList?.Items.Clear();
+            ddlXaxisFieldNum?.Items.Clear();
+            ddlXaxisFieldNonNum?.Items.Clear();
+            cblYaxisFieldNum?.Items.Clear();
+            ddlYaxisFieldNum?.Items.Clear();
+            ZaxisFieldDropDownList?.Items.Clear();
+            cblYaxisFieldNonNum?.Items.Clear();
+            ddlYaxisFieldNonNum?.Items.Clear();
+            BubbleGroupByDropDownList?.Items.Clear();
+            ChartPaletteStyleDropDownList?.Items.Clear();
         }
 
         private DataTable GetListColumns(Guid id)

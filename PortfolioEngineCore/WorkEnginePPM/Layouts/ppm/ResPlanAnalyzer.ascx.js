@@ -810,9 +810,9 @@
                         }
 
                         if (showLoading) {
-                            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); $this.HideWorkingPopup("divLoading"); $this.ApplyRowFilters(grid); }, 10);
+                            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); $this.HideWorkingPopup("divLoading"); }, 10);
                         } else {
-                            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); $this.ApplyRowFilters(grid); }, 10);
+                            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); }, 10);
                         }
                     }
 
@@ -1075,10 +1075,7 @@
 
             try {
                 if (bDoRender == true)
-                    grid.Render();
-                else {
-                    this.ApplyRowFilters(grid);
-                }
+                    grid.Render();                
             }
             catch (e) { };
 
