@@ -625,8 +625,11 @@ namespace EPMLiveCore.Tests
         public void ToFriendlyDateAndTime_WhenYesterday_ConfirmResult()
         {
             // Arrange
-            var date = DateTime.Now.AddDays(-1);
+            var today = new DateTime(2018, 9, 20);
+            var date = today.AddDays(-1);
             var time = new DateTime(date.TimeOfDay.Ticks).ToString(TimeFormat);
+
+            ShimDateTime.TodayGet = () => today;
 
             // Act
             var result = ExtensionMethods.ToFriendlyDateAndTime(date);
@@ -770,9 +773,12 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             var timeFormatPattern = CultureInfo.GetCultureInfo(Convert.ToInt32(LocaleId)).DateTimeFormat.LongTimePattern;
-            var date = DateTime.Now.AddDays(-1);
+            var today = new DateTime(2018, 9, 20);
+            var date = today.AddDays(-1);
             var time = new DateTime(date.TimeOfDay.Ticks).ToString(timeFormatPattern);
             SetupShims();
+
+            ShimDateTime.TodayGet = () => today;
 
             // Act
             var result = ExtensionMethods.ToFriendlyDateAndTime(date, _web);

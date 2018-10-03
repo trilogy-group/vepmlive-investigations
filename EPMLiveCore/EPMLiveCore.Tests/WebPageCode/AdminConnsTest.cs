@@ -96,18 +96,17 @@ namespace EPMLiveCore.Tests.WebPageCode
             // Assert
             Assert.IsTrue(_adoShims.IsConnectionCreated(TestConnectionString));
             Assert.IsTrue(_adoShims.IsConnectionDisposed(TestConnectionString));
-            Assert.IsTrue(_adoShims.IsCommandCreated(Properties.Resources._0Tables01));
-            Assert.IsTrue(_adoShims.IsCommandDisposed(Properties.Resources._0Tables01));
-            Assert.IsTrue(_adoShims.IsCommandCreated(Properties.Resources._0Tables02));
-            Assert.IsTrue(_adoShims.IsCommandDisposed(Properties.Resources._0Tables02));
-            Assert.IsTrue(_adoShims.IsCommandCreated(Properties.Resources._1Views01));
-            Assert.IsTrue(_adoShims.IsCommandDisposed(Properties.Resources._1Views01));
-            Assert.IsTrue(_adoShims.IsCommandCreated(Properties.Resources._2SPs01));
-            Assert.IsTrue(_adoShims.IsCommandDisposed(Properties.Resources._2SPs01));
-            Assert.IsTrue(_adoShims.IsCommandCreated(Properties.Resources._9Data01));
-            Assert.IsTrue(_adoShims.IsCommandDisposed(Properties.Resources._9Data01));
-            Assert.IsTrue(_adoShims.IsCommandCreated(Properties.Resources._9Data02));
-            Assert.IsTrue(_adoShims.IsCommandDisposed(Properties.Resources._9Data02));
+            Assert.IsTrue(_adoShims.IsCommandDisposed(EPMLiveCore.Properties.Resources._0Tables01));
+            Assert.IsTrue(_adoShims.IsCommandCreated(EPMLiveCore.Properties.Resources._0Tables02));
+            Assert.IsTrue(_adoShims.IsCommandDisposed(EPMLiveCore.Properties.Resources._0Tables02));
+            Assert.IsTrue(_adoShims.IsCommandCreated(EPMLiveCore.Properties.Resources._1Views01));
+            Assert.IsTrue(_adoShims.IsCommandDisposed(EPMLiveCore.Properties.Resources._1Views01));
+            Assert.IsTrue(_adoShims.IsCommandCreated(EPMLiveCore.Properties.Resources._2SPs01));
+            Assert.IsTrue(_adoShims.IsCommandDisposed(EPMLiveCore.Properties.Resources._2SPs01));
+            Assert.IsTrue(_adoShims.IsCommandCreated(EPMLiveCore.Properties.Resources._9Data01));
+            Assert.IsTrue(_adoShims.IsCommandDisposed(EPMLiveCore.Properties.Resources._9Data01));
+            Assert.IsTrue(_adoShims.IsCommandCreated(EPMLiveCore.Properties.Resources._9Data02));
+            Assert.IsTrue(_adoShims.IsCommandDisposed(EPMLiveCore.Properties.Resources._9Data02));
             Assert.IsTrue(_adoShims.IsCommandCreated(InsertVersionSql));
             Assert.IsTrue(_adoShims.IsCommandDisposed(InsertVersionSql));
         }

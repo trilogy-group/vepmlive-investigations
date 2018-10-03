@@ -819,34 +819,34 @@ namespace WorkEnginePPM
 
         #region Method Call : (DefineGroupingValue) (Return Type : void) No Exception Thrown
 
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_SortAndGroup_DefineGroupingValue_Method_Call_Void_With_5_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var group = CreateType<int>();
-            var parval = CreateType<int>();
-            var thisval = CreateType<int>();
-            var ElStr = CreateType<string>();
-            var ElDStr = CreateType<string>();
-            var methodDefineGroupingValuePrametersTypes = new Type[] { typeof(int), typeof(int), typeof(int), typeof(string), typeof(string) };
-            object[] parametersOfDefineGroupingValue = { group, parval, thisval, ElStr, ElDStr };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodDefineGroupingValue, methodDefineGroupingValuePrametersTypes, out exception);
+        //[Test]
+        //[Timeout(TestsTimeOut)]
+        //[Category("AUT MethodCallTest")]
+        //public void AUT_SortAndGroup_DefineGroupingValue_Method_Call_Void_With_5_Parameters_No_Exception_Thrown_Test()
+        //{
+        //    // Arrange
+        //    var group = CreateType<int>();
+        //    var parval = CreateType<int>();
+        //    var thisval = CreateType<int>();
+        //    var ElStr = CreateType<string>();
+        //    var ElDStr = CreateType<string>();
+        //    var methodDefineGroupingValuePrametersTypes = new Type[] { typeof(int), typeof(int), typeof(int), typeof(string), typeof(string) };
+        //    object[] parametersOfDefineGroupingValue = { group, parval, thisval, ElStr, ElDStr };
+        //    Exception exception = null;
+        //    var methodInfo = GetMethodInfo(MethodDefineGroupingValue, methodDefineGroupingValuePrametersTypes, out exception);
 
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_sortAndGroupInstanceFixture, parametersOfDefineGroupingValue);
+        //    // Act
+        //    Action currentAction = () => methodInfo.Invoke(_sortAndGroupInstanceFixture, parametersOfDefineGroupingValue);
 
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfDefineGroupingValue.ShouldNotBeNull();
-            parametersOfDefineGroupingValue.Length.ShouldBe(5);
-            methodDefineGroupingValuePrametersTypes.Length.ShouldBe(5);
-            methodDefineGroupingValuePrametersTypes.Length.ShouldBe(parametersOfDefineGroupingValue.Length);
-            Should.NotThrow(currentAction);
-        }
+        //    // Assert
+        //    methodInfo.ShouldNotBeNull();
+        //    exception.ShouldBeNull();
+        //    parametersOfDefineGroupingValue.ShouldNotBeNull();
+        //    parametersOfDefineGroupingValue.Length.ShouldBe(5);
+        //    methodDefineGroupingValuePrametersTypes.Length.ShouldBe(5);
+        //    methodDefineGroupingValuePrametersTypes.Length.ShouldBe(parametersOfDefineGroupingValue.Length);
+        //    Should.NotThrow(currentAction);
+        //}
 
         #endregion
 
