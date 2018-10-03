@@ -231,6 +231,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="ChildParentSync.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\700Steps.cs" />
     <Compile Include="ListDisplaySettingIterator.OnInit.cs" />
     <Compile Include="ListDisplaySettingIterator.RenderControl.cs" />
     <Compile Include="ListDisplaySettingIterator.IsFieldExcluded.cs" />
@@ -1386,6 +1387,7 @@
     <Compile Include="SPUtilities\SPListUtility.cs" />
     <Compile Include="SPUtilities\SPProjectUtility.cs" />
     <Compile Include="StatusingEvent.cs" />
+    <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="TagManager\API\Gateway.cs" />
     <Compile Include="TagManager\Tag.cs" />
     <Compile Include="TagManager\TagManager.cs" />
