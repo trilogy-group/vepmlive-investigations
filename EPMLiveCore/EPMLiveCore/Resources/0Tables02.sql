@@ -125,6 +125,13 @@ else
 			ADD PROJECT_LIST_UID uniqueidentifier NULL
 			
 		end
+		if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'TSITEM' and column_name = 'RATE')
+		begin
+			Print '     Add Column RATE'
+			ALTER TABLE TSITEM
+			ADD [RATE] [varchar](50) NULL
+			
+		end
 	end
 
 ------------------TABLE: TSITEMHOURS---------------------------------
