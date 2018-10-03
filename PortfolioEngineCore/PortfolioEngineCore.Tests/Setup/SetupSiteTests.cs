@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Fakes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,12 +30,21 @@ namespace PortfolioEngineCore.Tests.Setup
         private bool _runDBScriptsCalled;
         private bool _addregistryEntriesCalled;
         private bool _dbClosed;
+        private bool _readerExecuted;
+        private bool _dataReaderClosed;
 
         private const int DummyInt = 1;
         private const string DummyString = "DummyString";
         private const string DummyError = "Dummy Error";
 
         private const string RenamePFEPermissionsMethod = "RenamePFEPermissions";
+        private const string OpenMasterMethod = "OpenMaster";
+        private const string CreateDBMethod = "createDB";
+        private const string RunDBScriptsMethod = "RunDBScripts";
+        private const string OpenDBMethod = "OpenDB";
+        private const string RunDBUpgradeScriptsMethod = "RunDBUpgradeScripts";
+        private const string RunDBScriptMethod = "RunDBScript";
+        private const string GetAssemblyVersionMethod = "GetAssemblyVersion";
 
         [TestInitialize]
         public void TestInitialize()
@@ -44,6 +55,8 @@ namespace PortfolioEngineCore.Tests.Setup
             _runDBScriptsCalled = false;
             _addregistryEntriesCalled = false;
             _dbClosed = false;
+            _readerExecuted = false;
+            _dataReaderClosed = false;
 
             _shimObject = ShimsContext.Create();
             _testObj = new SetupSite();
@@ -171,7 +184,7 @@ namespace PortfolioEngineCore.Tests.Setup
             _testObj.AddRegistryEntries(DummyString, DummyString, DummyString);
 
             // Assert
-            var message = (string)_privateObj.GetFieldOrProperty("_message");
+            var message = _testObj.SetupMessage;
             this.ShouldSatisfyAllConditions(
                 () => subKeyCreated.ShouldBeTrue(),
                 () => values.Count.ShouldBe(4),
@@ -195,7 +208,7 @@ namespace PortfolioEngineCore.Tests.Setup
             _testObj.AddRegistryEntries(DummyString, DummyString, DummyString);
 
             // Assert
-            var message = (string)_privateObj.GetFieldOrProperty("_message");
+            var message = _testObj.SetupMessage;
             message.ShouldBe($"<br>Adding Registry Entries...Error: {DummyError}");
         }
 
@@ -223,8 +236,8 @@ namespace PortfolioEngineCore.Tests.Setup
             _testObj.UpgradeDB(DummyString);
 
             // Assert
-            var errors = (bool)_privateObj.GetFieldOrProperty("_errors");
-            var message = (string)_privateObj.GetFieldOrProperty("_message");
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
             this.ShouldSatisfyAllConditions(
                 () => openDBCalled.ShouldBeTrue(),
                 () => runDBUpgradeScriptsCalled.ShouldBeTrue(),
@@ -247,8 +260,8 @@ namespace PortfolioEngineCore.Tests.Setup
             _testObj.UpgradeDB(DummyString);
 
             // Assert
-            var errors = (bool)_privateObj.GetFieldOrProperty("_errors");
-            var message = (string)_privateObj.GetFieldOrProperty("_message");
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
             this.ShouldSatisfyAllConditions(
                 () => errors.ShouldBeTrue(),
                 () => message.ShouldContain("Checking BasePath"),
@@ -281,8 +294,8 @@ namespace PortfolioEngineCore.Tests.Setup
                 DummyString);
 
             // Assert
-            var errors = (bool)_privateObj.GetFieldOrProperty("_errors");
-            var message = (string)_privateObj.GetFieldOrProperty("_message");
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
             this.ShouldSatisfyAllConditions(
                 () => _checkActivation.ShouldBeTrue(),
                 () => _openMasterCalled.ShouldBeTrue(),
@@ -324,8 +337,8 @@ namespace PortfolioEngineCore.Tests.Setup
                 DummyString);
 
             // Assert
-            var errors = (bool)_privateObj.GetFieldOrProperty("_errors");
-            var message = (string)_privateObj.GetFieldOrProperty("_message");
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
             this.ShouldSatisfyAllConditions(
                 () => _checkActivation.ShouldBeFalse(),
                 () => _openMasterCalled.ShouldBeFalse(),
@@ -378,8 +391,8 @@ namespace PortfolioEngineCore.Tests.Setup
                 DummyString);
 
             // Assert
-            var errors = (bool)_privateObj.GetFieldOrProperty("_errors");
-            var message = (string)_privateObj.GetFieldOrProperty("_message");
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
             this.ShouldSatisfyAllConditions(
                 () => errors.ShouldBeTrue(),
                 () => message.ShouldContain("Checking BasePath"),
@@ -491,8 +504,8 @@ namespace PortfolioEngineCore.Tests.Setup
             _testObj.RenamePermissions(DummyString, new Dictionary<string, string>());
 
             // Assert
-            var errors = (bool)_privateObj.GetFieldOrProperty("_errors");
-            var message = (string)_privateObj.GetFieldOrProperty("_message");
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
             this.ShouldSatisfyAllConditions(
                 () => openDBCalled.ShouldBeTrue(),
                 () => renamePFEPermissionsCalled.ShouldBeTrue(),
@@ -513,8 +526,8 @@ namespace PortfolioEngineCore.Tests.Setup
             _testObj.RenamePermissions(DummyString, null);
 
             // Assert
-            var errors = (bool)_privateObj.GetFieldOrProperty("_errors");
-            var message = (string)_privateObj.GetFieldOrProperty("_message");
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
             this.ShouldSatisfyAllConditions(
                 () => errors.ShouldBeTrue(),
                 () => message.ShouldContain("Checking BasePath...Error: BasePath registry entry not found."));
@@ -550,8 +563,8 @@ namespace PortfolioEngineCore.Tests.Setup
             _privateObj.Invoke(RenamePFEPermissionsMethod, permissions);
 
             // Assert
-            var errors = (bool)_privateObj.GetFieldOrProperty("_errors");
-            var message = (string)_privateObj.GetFieldOrProperty("_message");
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
             this.ShouldSatisfyAllConditions(
                 () => nonQueryExecuted.ShouldBeTrue(),
                 () => sqlCommand.ShouldBe("UPDATE EPG_GROUPS SET GROUP_NAME = @New WHERE GROUP_NAME = @Old AND GROUP_ENTITY = 1"),
@@ -589,14 +602,467 @@ namespace PortfolioEngineCore.Tests.Setup
             _privateObj.Invoke(RenamePFEPermissionsMethod, permissions);
 
             // Assert
-            var errors = (bool)_privateObj.GetFieldOrProperty("_errors");
-            var message = (string)_privateObj.GetFieldOrProperty("_message");
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
             this.ShouldSatisfyAllConditions(
                 () => nonQueryExecuted.ShouldBeFalse(),
                 () => errors.ShouldBeTrue(),
                 () => message.ShouldContain("<br>Renaming Permissions"),
                 () => message.ShouldContain($"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Renaming {DummyString} to {DummyString}"),
                 () => message.ShouldContain($"...Error: {DummyError}"));
+        }
+
+        [TestMethod]
+        public void OpenMaster_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            var connectionOpened = false;
+
+            ShimSqlConnection.Constructor = _ => { };
+            ShimSqlConnection.AllInstances.ConnectionStringSetString = (_, __) => { };
+            ShimSqlConnection.AllInstances.Open = _ => connectionOpened = true;
+
+            // Act
+            _privateObj.Invoke(OpenMasterMethod, DummyString);
+
+            // Assert
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
+            this.ShouldSatisfyAllConditions(
+                () => errors.ShouldBeFalse(),
+                () => connectionOpened.ShouldBeTrue(),
+                () => message.ShouldContain("<br>Opening master Database...Success"));
+        }
+
+        [TestMethod]
+        public void OpenMaster_OnError_LogError()
+        {
+            // Arrange
+            var connectionOpened = false;
+
+            ShimSqlConnection.Constructor = _ => 
+            {
+                throw new Exception(DummyError);
+            };
+            ShimSqlConnection.AllInstances.Open = _ => connectionOpened = true;
+
+            // Act
+            _privateObj.Invoke(OpenMasterMethod, DummyString);
+
+            // Assert
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
+            this.ShouldSatisfyAllConditions(
+                () => errors.ShouldBeTrue(),
+                () => connectionOpened.ShouldBeFalse(),
+                () => message.ShouldContain($"<br>Opening master Database...Error: {DummyError}"));
+        }
+
+        [TestMethod]
+        public void CreateDB_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            var sqlCommands = new List<string>();
+            SetupForCreateDBMethod(sqlCommands, false, true, true, string.Empty, true);
+
+            // Act
+            _privateObj.Invoke(CreateDBMethod, DummyString, DummyString, DummyString, DummyString);
+
+            // Assert
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
+            this.ShouldSatisfyAllConditions(
+                () => _readerExecuted.ShouldBeTrue(),
+                () => _dataReaderClosed.ShouldBeTrue(),
+                () => sqlCommands.ShouldContain($"CREATE DATABASE {DummyString}"),
+                () => sqlCommands.ShouldContain($"CREATE LOGIN [{DummyString}] WITH PASSWORD = '{DummyString}', CHECK_POLICY = OFF"),
+                () => sqlCommands.ShouldContain($"CREATE USER [{DummyString}] FOR LOGIN [{DummyString}]"),
+                () => sqlCommands.ShouldContain($"sp_addrolemember"),
+                () => errors.ShouldBeFalse(),
+                () => message.ShouldContain("<br>Creating Database...Success"),
+                () => message.ShouldContain("<br>Creating Login...Success"),
+                () => message.ShouldContain("<br>Granting Permissions To Login...Success"));
+        }
+
+        [TestMethod]
+        public void CreateDB_WhenDataBaseExists_LogError()
+        {
+            // Arrange
+            var sqlCommands = new List<string>();
+            SetupForCreateDBMethod(sqlCommands, true, true, true, string.Empty, true);
+
+            // Act
+            _privateObj.Invoke(CreateDBMethod, DummyString, DummyString, DummyString, DummyString);
+
+            // Assert
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
+            this.ShouldSatisfyAllConditions(
+                () => _readerExecuted.ShouldBeTrue(),
+                () => _dataReaderClosed.ShouldBeTrue(),
+                () => sqlCommands.Count.ShouldBe(0),
+                () => errors.ShouldBeTrue(),
+                () => message.ShouldContain("<br>Creating Database...Error: Database Exists"));
+        }
+
+        [TestMethod]
+        public void CreateDB_WhenCreateDatabaseError_LogError()
+        {
+            // Arrange
+            var sqlCommands = new List<string>();
+            SetupForCreateDBMethod(sqlCommands, false, false, true, string.Empty, true);
+
+            // Act
+            _privateObj.Invoke(CreateDBMethod, DummyString, DummyString, DummyString, DummyString);
+
+            // Assert
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
+            this.ShouldSatisfyAllConditions(
+                () => _readerExecuted.ShouldBeTrue(),
+                () => _dataReaderClosed.ShouldBeTrue(),
+                () => sqlCommands.Count.ShouldBe(0),
+                () => errors.ShouldBeTrue(),
+                () => message.ShouldContain("<br>Creating Database...Error: CreateDataBaseError"));
+        }
+
+        [TestMethod]
+        public void CreateDB_WhenCreateLoginErrorUserNameExists_LogError()
+        {
+            // Arrange
+            var sqlCommands = new List<string>();
+            var loginErrorMessage = $"The server principal '{DummyString}' already exists";
+            SetupForCreateDBMethod(sqlCommands, false, true, false, loginErrorMessage, true);
+
+            // Act
+            _privateObj.Invoke(CreateDBMethod, DummyString, DummyString, DummyString, DummyString);
+
+            // Assert
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
+            this.ShouldSatisfyAllConditions(
+                () => _readerExecuted.ShouldBeTrue(),
+                () => _dataReaderClosed.ShouldBeTrue(),
+                () => sqlCommands.ShouldContain($"CREATE DATABASE {DummyString}"),
+                () => sqlCommands.ShouldNotContain($"CREATE LOGIN [{DummyString}] WITH PASSWORD = '{DummyString}', CHECK_POLICY = OFF"),
+                () => sqlCommands.ShouldContain($"CREATE USER [{DummyString}] FOR LOGIN [{DummyString}]"),
+                () => sqlCommands.ShouldContain($"sp_addrolemember"),
+                () => errors.ShouldBeFalse(),
+                () => message.ShouldContain("<br>Creating Database...Success"),
+                () => message.ShouldContain("<br>Creating Login...Skipping: Username exists"),
+                () => message.ShouldContain("<br>Granting Permissions To Login...Success"));
+        }
+
+        [TestMethod]
+        public void CreateDB_WhenCreateLoginErrorUserNameNotExists_LogError()
+        {
+            // Arrange
+            var sqlCommands = new List<string>();
+            SetupForCreateDBMethod(sqlCommands, false, true, false, DummyError, true);
+
+            // Act
+            _privateObj.Invoke(CreateDBMethod, DummyString, DummyString, DummyString, DummyString);
+
+            // Assert
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
+            this.ShouldSatisfyAllConditions(
+                () => _readerExecuted.ShouldBeTrue(),
+                () => _dataReaderClosed.ShouldBeTrue(),
+                () => sqlCommands.Count.ShouldBe(1),
+                () => sqlCommands.ShouldContain($"CREATE DATABASE {DummyString}"),
+                () => errors.ShouldBeTrue(),
+                () => message.ShouldContain("<br>Creating Database...Success"),
+                () => message.ShouldContain($"<br>Creating Login...Error: {DummyError}"));
+        }
+
+        [TestMethod]
+        public void CreateDB_WhenCreateUserError_LogError()
+        {
+            // Arrange
+            var sqlCommands = new List<string>();
+            SetupForCreateDBMethod(sqlCommands, false, true, true, string.Empty, false);
+
+            // Act
+            _privateObj.Invoke(CreateDBMethod, DummyString, DummyString, DummyString, DummyString);
+
+            // Assert
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
+            this.ShouldSatisfyAllConditions(
+                () => _readerExecuted.ShouldBeTrue(),
+                () => _dataReaderClosed.ShouldBeTrue(),
+                () => sqlCommands.Count.ShouldBe(2),
+                () => sqlCommands.ShouldContain($"CREATE DATABASE {DummyString}"),
+                () => sqlCommands.ShouldContain($"CREATE LOGIN [{DummyString}] WITH PASSWORD = '{DummyString}', CHECK_POLICY = OFF"),
+                () => errors.ShouldBeTrue(),
+                () => message.ShouldContain("<br>Creating Database...Success"),
+                () => message.ShouldContain($"<br>Creating Login...Success"),
+                () => message.ShouldContain($"<br>Granting Permissions To Login...Error: CreateUserError"));
+        }
+
+        [TestMethod]
+        public void CreateDB_WhenConnectionIsNotOpen_LogError()
+        {
+            // Arrange, Act
+            _privateObj.Invoke(CreateDBMethod, DummyString, DummyString, DummyString, DummyString);
+
+            // Assert
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
+            this.ShouldSatisfyAllConditions(
+                () => errors.ShouldBeTrue(),
+                () => message.ShouldContain("<br>Error: master Database not open"));
+        }
+
+        private void SetupForCreateDBMethod(List<string> sqlCommands, bool read, bool createDatabase, bool createLogin, string loginErrorMessage, bool createUser)
+        {
+            _privateObj.SetFieldOrProperty("_CN", new ShimSqlConnection().Instance);
+
+            ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
+            ShimSqlConnection.AllInstances.Close = _ => { };
+            ShimSqlConnection.AllInstances.Open = _ => { };
+            ShimSqlConnection.AllInstances.ConnectionStringSetString = (_, __) => { };
+
+            ShimSqlCommand.ConstructorStringSqlConnection = (instance, sqlCommand, ___) =>
+            {
+                instance.CommandText = sqlCommand;
+            };
+            ShimSqlCommand.AllInstances.ExecuteReader = _ =>
+            {
+                _readerExecuted = true;
+
+                return new ShimSqlDataReader
+                {
+                    Read = () => read,
+                    Close = () => _dataReaderClosed = true
+                };
+            };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                if (instance.CommandText.Contains("CREATE DATABASE"))
+                {
+                    if (!createDatabase)
+                    {
+                        throw new Exception("CreateDataBaseError");
+                    }
+                }
+
+                if (instance.CommandText.Contains("CREATE LOGIN"))
+                {
+                    if (!createLogin)
+                    {
+                        throw new Exception(loginErrorMessage);
+                    }
+                }
+
+                if (instance.CommandText.Contains("CREATE USER"))
+                {
+                    if (!createUser)
+                    {
+                        throw new Exception("CreateUserError");
+                    }
+                }
+
+                sqlCommands.Add(instance.CommandText);
+
+                return DummyInt;
+            };
+        }
+
+        [TestMethod]
+        public void RunDBScripts_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            var scriptList = new List<string>();
+            var script = new ShimDataScript().Instance;
+            var privateScript = new PrivateObject(script);
+
+            privateScript.SetFieldOrProperty("ScriptName", "DummyScript");
+
+            var dataScripts = new DataScript[] { script };
+            var userInformation = new UserInformation[] { new ShimUserInformation() };
+
+            ShimSetupSite.AllInstances.RunDBScriptStringString = (_, scriptName, ___) =>
+            {
+                scriptList.Add(scriptName);
+            };
+
+            // Act
+            _privateObj.Invoke(RunDBScriptsMethod, dataScripts, DummyString, userInformation, DummyString);
+
+            // Assert
+            var message = _testObj.SetupMessage;
+            this.ShouldSatisfyAllConditions(
+                () => message.ShouldContain("<br>Running Scripts"),
+                () => scriptList.ShouldContain("01_CRTTBLS"),
+                () => scriptList.ShouldContain("02_CRTINDS"),
+                () => scriptList.ShouldContain("04_CRTSPS"),
+                () => scriptList.ShouldContain("05_CRTVWS"),
+                () => scriptList.ShouldContain("07_DATA"),
+                () => scriptList.ShouldContain("DummyScript"),
+                () => scriptList.ShouldContain("99_FixSvcAcct"),
+                () => scriptList.ShouldContain("100_ADDADMIN"),
+                () => scriptList.ShouldContain("100_ADDADMINGRP"),
+                () => scriptList.ShouldContain("UPDATEURL"));
+        }
+
+        [TestMethod]
+        public void OpenDB_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            var connectionOpened = false;
+
+            ShimSqlConnection.ConstructorString = (_, __) => { };
+            ShimSqlConnection.AllInstances.Open = _ => connectionOpened = true;
+
+            // Act
+            _privateObj.Invoke(OpenDBMethod);
+
+            // Assert
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
+            this.ShouldSatisfyAllConditions(
+                () => connectionOpened.ShouldBeTrue(),
+                () => errors.ShouldBeFalse(),
+                () => message.ShouldBeNullOrWhiteSpace());
+        }
+
+        [TestMethod]
+        public void OpenDB_OnError_LogError()
+        {
+            // Arrange
+            var connectionOpened = false;
+
+            ShimSqlConnection.ConstructorString = (_, __) =>
+            {
+                throw new Exception(DummyError);
+            };
+            ShimSqlConnection.AllInstances.Open = _ => connectionOpened = true;
+
+            // Act
+            _privateObj.Invoke(OpenDBMethod);
+
+            // Assert
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
+            this.ShouldSatisfyAllConditions(
+                () => connectionOpened.ShouldBeFalse(),
+                () => errors.ShouldBeTrue(),
+                () => message.ShouldContain($"...Error: {DummyError}"));
+        }
+
+        [TestMethod]
+        public void RunDBUpgradeScripts_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            var scriptList = new List<string>();
+
+            ShimSetupSite.AllInstances.RunDBScriptStringString = (_, scriptName, ___) =>
+            {
+                scriptList.Add(scriptName);
+            };
+
+            // Act
+            _privateObj.Invoke(RunDBUpgradeScriptsMethod);
+
+            // Assert
+            var message = _testObj.SetupMessage;
+            this.ShouldSatisfyAllConditions(
+                () => message.ShouldContain("<br>Running Scripts"),
+                () => scriptList.ShouldContain("01_CRTTBLS"),
+                () => scriptList.ShouldContain("02_CRTINDS"),
+                () => scriptList.ShouldContain("04_CRTSPS"),
+                () => scriptList.ShouldContain("05_CRTVWS"),
+                () => scriptList.ShouldContain("07_DATA"));
+        }
+
+        [TestMethod]
+        public void RunDBScript_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            var nonQueryExecuted = false;
+            ShimSqlCommand.ConstructorStringSqlConnection = (_, __, ___) => { };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            {
+                nonQueryExecuted = true;
+
+                return DummyInt;
+            };
+
+            // Act
+            _privateObj.Invoke(RunDBScriptMethod, DummyString, DummyString);
+
+            // Assert
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
+            this.ShouldSatisfyAllConditions(
+                () => errors.ShouldBeFalse(),
+                () => message.ShouldBe($"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running Script: {DummyString}...Success"),
+                () => nonQueryExecuted.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void RunDBScript_OnError_LogError()
+        {
+            // Arrange
+            var nonQueryExecuted = false;
+            ShimSqlCommand.ConstructorStringSqlConnection = (_, __, ___) => 
+            {
+                throw new Exception(DummyError);
+            };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            {
+                nonQueryExecuted = true;
+
+                return DummyInt;
+            };
+
+            // Act
+            _privateObj.Invoke(RunDBScriptMethod, DummyString, DummyString);
+
+            // Assert
+            var errors = _testObj.SetupErrors;
+            var message = _testObj.SetupMessage;
+            this.ShouldSatisfyAllConditions(
+                () => errors.ShouldBeTrue(),
+                () => message.ShouldBe($"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running Script: {DummyString}...Error: {DummyError}"),
+                () => nonQueryExecuted.ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void GetAssemblyVersion_OnValidCall_ReturnAssemblyVersion()
+        {
+            // Arrange
+            ShimFileVersionInfo.GetVersionInfoString = _ => new ShimFileVersionInfo
+            {
+                ProductMajorPartGet = () => DummyInt,
+                ProductMinorPartGet = () => DummyInt,
+                ProductBuildPartGet = () => DummyInt,
+                ProductPrivatePartGet = () => DummyInt
+            };
+
+            // Act
+            var result = (string)_privateObj.Invoke(GetAssemblyVersionMethod);
+
+            // Assert
+            result.ShouldBe($"{DummyInt}.{DummyInt}.{DummyInt}.{DummyInt}");
+        }
+
+        [TestMethod]
+        public void GetAssemblyVersion_OnValidCall_ReturnEmptyString()
+        {
+            // Arrange
+            ShimFileVersionInfo.GetVersionInfoString = _ =>
+            {
+                throw new Exception();
+            };
+
+            // Act
+            var result = (string)_privateObj.Invoke(GetAssemblyVersionMethod);
+
+            // Assert
+            result.ShouldBeNullOrWhiteSpace();
         }
     }
 }
