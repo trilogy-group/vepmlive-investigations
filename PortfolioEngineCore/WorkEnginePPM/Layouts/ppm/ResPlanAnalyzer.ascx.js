@@ -810,9 +810,9 @@
                         }
 
                         if (showLoading) {
-                            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); $this.HideWorkingPopup("divLoading"); $this.ApplyRowFilters(grid); }, 10);
+                            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); $this.HideWorkingPopup("divLoading"); }, 10);
                         } else {
-                            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); $this.ApplyRowFilters(grid); }, 10);
+                            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); }, 10);
                         }
                     }
 
@@ -1075,10 +1075,7 @@
 
             try {
                 if (bDoRender == true)
-                    grid.Render();
-                else {
-                    this.ApplyRowFilters(grid);
-                }
+                    grid.Render();                
             }
             catch (e) { };
 
@@ -6841,6 +6838,9 @@
                 case "AnalyzerTab_RemoveSorting_Click":
                     grid = Grids["g_1"];
 
+                    grid.ChangeSort("PortfolioItem");
+                    grid.SortRows();
+                    grid.Render();
 
                     grid.ChangeSort("rowid");
                     grid.SortRows();

@@ -28,8 +28,6 @@ namespace EPMLiveCore.Jobs
     {
         //private SPWeb currWeb;
         private SPList list;
-        private StringWriter stringWriter;
-        private HtmlTextWriter htmlWriter;
         protected GridView gvSection;
         private DataSet dsSectionTables;
 
@@ -306,22 +304,24 @@ namespace EPMLiveCore.Jobs
                     SPAdministrationWebApplication spWebAdmin = Microsoft.SharePoint.Administration.SPAdministrationWebApplication.Local;
                     sMailSvr = spWebAdmin.OutboundMailServiceInstance.Server.Name;
 
-                    System.Net.Mail.MailMessage mailMsg = new MailMessage();
-                    mailMsg.From = new MailAddress(sFromEmail);
-                    mailMsg.To.Add(new MailAddress(sUserEmail));
-                    mailMsg.Subject = sSubject;
-                    mailMsg.Body = createMsgBody(sUserDisplayName);
-                    mailMsg.IsBodyHtml = true;
-                    mailMsg.BodyEncoding = System.Text.Encoding.UTF8;
-                    mailMsg.Priority = MailPriority.Normal;
+                    using (var mailMsg = new MailMessage())
+                    {
+                        mailMsg.From = new MailAddress(sFromEmail);
+                        mailMsg.To.Add(new MailAddress(sUserEmail));
+                        mailMsg.Subject = sSubject;
+                        mailMsg.Body = createMsgBody(sUserDisplayName);
+                        mailMsg.IsBodyHtml = true;
+                        mailMsg.BodyEncoding = Encoding.UTF8;
+                        mailMsg.Priority = MailPriority.Normal;
 
-                    // Configure the mail server
-                    SmtpClient smtpClient = new SmtpClient();
-
-                    smtpClient.Host = sMailSvr;
-                    //smtpClient.UseDefaultCredentials = true;
-                    //smtpClient.Credentials = CredentialCache.DefaultNetworkCredentials;
-                    smtpClient.Send(mailMsg);
+                        using (var smtpClient = new SmtpClient
+                        {
+                            Host = sMailSvr
+                        })
+                        {
+                            smtpClient.Send(mailMsg);
+                        }
+                    }
                 });
             }
             catch (Exception exc)
@@ -332,26 +332,33 @@ namespace EPMLiveCore.Jobs
 
         private string createMsgBody(string sUserDisplayName)
         {
+            using (var stringWriter = new StringWriter())
+            {
+                using (var htmlWriter = new HtmlTextWriter(stringWriter))
+                {
+                    // write the msg header
+                    if (bShowGreeting)
+                    {
+                        htmlWriter.Write(
+                            "><font face=\"Segoe UI,Helvetica,Arial\" color=\"#666666\" size=\"2\">Hello {0},</font><br /><br />",
+                            sUserDisplayName);
+                    }
 
-            stringWriter = new StringWriter();
-            htmlWriter = new HtmlTextWriter(stringWriter);
+                    htmlWriter.Write("<p style=\"font-family:Segoe UI,Helvetica,Arial;color:#666;font-size:16px;padding:10px;\">{0}</p>", sNote);
+                    htmlWriter.Write(
+                        "<div style=\"padding-left:10px;margin-bottom:20px;\"><p style=\"font-family:Segoe UI, Helvetica,Arial;color:#0090ca;font-size:30px;padding:0;margin:0;\">Work assigned to you</p></div>");
 
-            // write the msg header
-            if (bShowGreeting) htmlWriter.Write("><font face=\"Segoe UI,Helvetica,Arial\" color=\"#666666\" size=\"2\">Hello " + sUserDisplayName + ",</font><br /><br />");
+                    // write the tables
+                    convertDataToHTML(htmlWriter);
 
-            htmlWriter.Write("<p style=\"font-family:Segoe UI,Helvetica,Arial;color:#666;font-size:16px;padding:10px;\">" + sNote + "</p>");
-            htmlWriter.Write("<div style=\"padding-left:10px;margin-bottom:20px;\"><p style=\"font-family:Segoe UI, Helvetica,Arial;color:#0090ca;font-size:30px;padding:0;margin:0;\">Work assigned to you</p></div>");
+                    // write the msg footer
+                    htmlWriter.Write(
+                        "<div style=\"border-top:1px solid #eee;margin-top:40px;text-align:center;font-family:Segoe UI, Helvetica,Arial;color:#CBD7D7;font-size:12px;display:inline-block;width:100%;padding-bottom:40px;\"><br /><p style=\"padding:0px;margin:0px;\">You are receiving this email because this email address is assigned work within an EPM Live system. <br>Click <a href=\"{0}/_layouts/epmlive/notifications.aspx\" style=\"text-decoration:none;color:#CBD7D7;\">here</a> if you want to unsubscribe from this email.</p></div>",
+                        sMainURL);
 
-            // write the tables
-            convertDataToHTML();
-
-            //if (!bLockNotify)
-            //{
-            // write the msg footer
-            htmlWriter.Write("<div style=\"border-top:1px solid #eee;margin-top:40px;text-align:center;font-family:Segoe UI, Helvetica,Arial;color:#CBD7D7;font-size:12px;display:inline-block;width:100%;padding-bottom:40px;\"><br /><p style=\"padding:0px;margin:0px;\">You are receiving this email because this email address is assigned work within an EPM Live system. <br>Click <a href=\"" + sMainURL + "/_layouts/epmlive/notifications.aspx\" style=\"text-decoration:none;color:#CBD7D7;\">here</a> if you want to unsubscribe from this email.</p></div>");
-            //}
-
-            return System.Web.HttpUtility.HtmlDecode(stringWriter.ToString());
+                    return HttpUtility.HtmlDecode(stringWriter.ToString());
+                }
+            }
         }
 
         private void createSectionTables(string sNotificationLists)
@@ -483,7 +490,7 @@ namespace EPMLiveCore.Jobs
             catch { }
         }
 
-        private void convertDataToHTML()
+        private void convertDataToHTML(HtmlTextWriter htmlWriter)
         {
             try
             {

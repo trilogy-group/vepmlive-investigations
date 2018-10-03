@@ -8,7 +8,7 @@ using System.Xml;
 namespace TimeSheets.Tests
 {
     [TestClass()]
-    public class GetTsTests
+    public partial class GetTsTests
     {
         [TestMethod()]
         public void processListTest_Without_GroupFields()
