@@ -551,8 +551,7 @@ namespace EPMLiveCore
                                 try
                                 {
                                     sId = GetUserSID(searchResult.Path).ToUpper();
-                                    var exclusions = from string exclusion in _adExclusions select exclusion;
-                                    if (!exclusions.Any(e => string.Equals(e, sId, StringComparison.CurrentCultureIgnoreCase)))
+                                    if (!_adExclusions.Contains(sId))
                                     {
                                         if (!userDisabled(sId))
                                         {
