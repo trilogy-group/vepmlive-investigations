@@ -151,115 +151,6 @@ namespace EPMLiveWebParts
 
         #region Explore Class for Coverage Gain : Class (ChartControl)
         
-        #region General Initializer : Class (ChartControl) All Properties Explore By Name
-
-        /// <summary>
-        ///     Class (<see cref="ChartControl" />) explore and verify properties for coverage gain.
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT Initializer")]
-        [TestCase(PropertyPropChartTitle)]
-        [TestCase(PropertyPropChartTitleFontSize)]
-        [TestCase(PropertyPropChartMainStyle)]
-        [TestCase(PropertyPropChartSelectedPaletteName)]
-        [TestCase(PropertyPropChartView3D)]
-        [TestCase(PropertyPropChartXaxisField)]
-        [TestCase(PropertyPropChartXaxisFieldLabel)]
-        [TestCase(PropertyPropChartYaxisField)]
-        [TestCase(PropertyPropChartYaxisFieldLabel)]
-        [TestCase(PropertyPropChartZaxisField)]
-        [TestCase(PropertyPropChartZaxisFieldLabel)]
-        [TestCase(PropertyPropBubbleChartColorField)]
-        [TestCase(PropertyPropChartXaxisLabelRotationAngle)]
-        [TestCase(PropertyPropChartXaxisLabelFontSize)]
-        [TestCase(PropertyPropChartShowYaxisValuesAsPercentage)]
-        [TestCase(PropertyPropChartShowYaxisValuesAsCurrency)]
-        [TestCase(PropertyPropChartZaxisLabelRotationAngle)]
-        [TestCase(PropertyPropChartSeriesDataPointLabelFontSize)]
-        [TestCase(PropertyPropChartShowSeriesInZaxis)]
-        [TestCase(PropertyPropChartShowSeriesLabels)]
-        [TestCase(PropertyPropChartShowZeroValueData)]
-        [TestCase(PropertyPropChartShowSeriesNameAsLabel)]
-        [TestCase(PropertyPropChartShowSeriesValueAsLabel)]
-        [TestCase(PropertyPropChartSeriesNameLabelPosition)]
-        [TestCase(PropertyPropChartSeriesValueLabelPosition)]
-        [TestCase(PropertyPropChartYaxisNumValues)]
-        [TestCase(PropertyPropChartShowLegend)]
-        [TestCase(PropertyPropChartShowGridlines)]
-        [TestCase(PropertyPropChartLegendFontName)]
-        [TestCase(PropertyPropChartLegendFontSize)]
-        [TestCase(PropertyPropChartShowFrame)]
-        [TestCase(PropertyPropChartFrameColor)]
-        [TestCase(PropertyPropChartFrameRoundCorners)]
-        [TestCase(PropertyPropChartSelectedList)]
-        [TestCase(PropertyPropChartSelectedView)]
-        [TestCase(PropertyPropChartRollupLists)]
-        [TestCase(PropertyPropChartRollupSites)]
-        [TestCase(PropertyPropChartAggregationType)]
-        [TestCase(PropertyPropChartRollupData)]
-        [TestCase(PropertyPropChartShowBubbleChartInputsInWebPart)]
-        [TestCase(PropertyChart)]
-        public void AUT_ChartControl_All_Properties_Explore_Verify_By_Name_Test(string name)
-        {
-            // Arrange
-            var propertyInfo = GetPropertyInfo(name);
-
-            // Act
-            ShouldlyExtension.ExploreProperty(_chartControlInstanceFixture,
-                                              Fixture,
-                                              propertyInfo);
-
-            // Assert
-            propertyInfo.ShouldNotBeNull();
-        }
-
-        #endregion
-
-        #region General Initializer : Class (ChartControl) All Fields Explore By Name
-
-        /// <summary>
-        ///     Class (<see cref="ChartControl" />) explore and verify fields for coverage gain.
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT Initializer")]
-        [TestCase(FieldScriptTagHolder)]
-        [TestCase(FieldChartData)]
-        [TestCase(FieldSiteDataQueryData)]
-        [TestCase(FieldConfigureChartVerbiageLiteral)]
-        [TestCase(FieldTopList)]
-        [TestCase(FieldWebPartToolPart)]
-        [TestCase(Field_backingChart)]
-        [TestCase(Field_litVfChart)]
-        [TestCase(Field_isPostBackFromBubbleChartInputsApplyButton)]
-        [TestCase(FieldBubbleChartXaxisDropDownList)]
-        [TestCase(FieldBubbleChartYaxisAsDropDownList)]
-        [TestCase(FieldBubbleChartYaxisCheckBoxList)]
-        [TestCase(FieldBubbleChartZaxisDropDownList)]
-        [TestCase(FieldBubbleChartZcolorFieldDropDownList)]
-        [TestCase(FieldBubbleChartApplyButton)]
-        [TestCase(FieldUserSettingsTable)]
-        [TestCase(FieldMainTable)]
-        [TestCase(Field_myProvider)]
-        [TestCase(Fieldact)]
-        [TestCase(Fieldactivation)]
-        public void AUT_ChartControl_All_Fields_Explore_Verify_By_Name_Test(string name)
-        {
-            // Arrange
-            var fieldInfo = GetFieldInfo(name);
-
-            // Act
-            ShouldlyExtension.ExploreFieldWithOrWithoutInstance(_chartControlInstanceFixture, 
-                                                                Fixture, 
-                                                                fieldInfo);
-
-            // Assert
-            fieldInfo.ShouldNotBeNull();
-        }
-
-        #endregion
-
         #endregion
 
         #endregion
@@ -314,60 +205,6 @@ namespace EPMLiveWebParts
         #endregion
 
         #region Category : GetterSetter
-
-        #region General Getters/Setters : Class (ChartControl) => all properties (non-static) explore and verify type tests
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT GetterSetter")]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartTitle)]
-        [TestCaseGeneric(typeof(int) , PropertyPropChartTitleFontSize)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartMainStyle)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartSelectedPaletteName)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartView3D)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartXaxisField)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartXaxisFieldLabel)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartYaxisField)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartYaxisFieldLabel)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartZaxisField)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartZaxisFieldLabel)]
-        [TestCaseGeneric(typeof(string) , PropertyPropBubbleChartColorField)]
-        [TestCaseGeneric(typeof(int) , PropertyPropChartXaxisLabelRotationAngle)]
-        [TestCaseGeneric(typeof(int) , PropertyPropChartXaxisLabelFontSize)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartShowYaxisValuesAsPercentage)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartShowYaxisValuesAsCurrency)]
-        [TestCaseGeneric(typeof(int) , PropertyPropChartZaxisLabelRotationAngle)]
-        [TestCaseGeneric(typeof(int) , PropertyPropChartSeriesDataPointLabelFontSize)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartShowSeriesInZaxis)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartShowSeriesLabels)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartShowZeroValueData)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartShowSeriesNameAsLabel)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartShowSeriesValueAsLabel)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartSeriesNameLabelPosition)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartSeriesValueLabelPosition)]
-        [TestCaseGeneric(typeof(int) , PropertyPropChartYaxisNumValues)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartShowLegend)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartShowGridlines)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartLegendFontName)]
-        [TestCaseGeneric(typeof(int) , PropertyPropChartLegendFontSize)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartShowFrame)]
-        [TestCaseGeneric(typeof(Color) , PropertyPropChartFrameColor)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartFrameRoundCorners)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartSelectedList)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartSelectedView)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartRollupLists)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartRollupSites)]
-        [TestCaseGeneric(typeof(string) , PropertyPropChartAggregationType)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartRollupData)]
-        [TestCaseGeneric(typeof(bool) , PropertyPropChartShowBubbleChartInputsInWebPart)]
-        [TestCaseGeneric(typeof(EpmChart) , PropertyChart)]
-        public void AUT_ChartControl_Property_Type_Verify_Explore_By_Name_Test<T>(string propertyName)
-        {
-            // AAA : Arrange, Act, Assert
-            ShouldlyExtension.PropertyTypeVerify<ChartControl, T>(_chartControlInstance, propertyName, Fixture);
-        }
-
-        #endregion
 
         #region General Getters/Setters : Class (ChartControl) => Property (Chart) Property Type Test Except String
 
@@ -3387,32 +3224,6 @@ namespace EPMLiveWebParts
 
         #endregion
 
-        #region Method Call : (GetZaxisColorFieldSelection) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ChartControl_GetZaxisColorFieldSelection_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodGetZaxisColorFieldSelectionPrametersTypes = null;
-            object[] parametersOfGetZaxisColorFieldSelection = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetZaxisColorFieldSelection, methodGetZaxisColorFieldSelectionPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_chartControlInstanceFixture, parametersOfGetZaxisColorFieldSelection);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetZaxisColorFieldSelection.ShouldBeNull();
-            methodGetZaxisColorFieldSelectionPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (GetZaxisColorFieldSelection) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -3476,27 +3287,6 @@ namespace EPMLiveWebParts
 
         #endregion
 
-        #region Method Call : (GetZaxisColorFieldSelection) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ChartControl_GetZaxisColorFieldSelection_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetZaxisColorFieldSelection, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_chartControlInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (GetZaxisFieldSelection) (Return Type : string) private call definition
 
         [ExcludeFromCodeCoverage]
@@ -3504,32 +3294,6 @@ namespace EPMLiveWebParts
         {
             var methodGetZaxisFieldSelectionPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_chartControlInstance, MethodGetZaxisFieldSelection, Fixture, methodGetZaxisFieldSelectionPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (GetZaxisFieldSelection) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ChartControl_GetZaxisFieldSelection_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodGetZaxisFieldSelectionPrametersTypes = null;
-            object[] parametersOfGetZaxisFieldSelection = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetZaxisFieldSelection, methodGetZaxisFieldSelectionPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_chartControlInstanceFixture, parametersOfGetZaxisFieldSelection);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetZaxisFieldSelection.ShouldBeNull();
-            methodGetZaxisFieldSelectionPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -3597,27 +3361,6 @@ namespace EPMLiveWebParts
 
         #endregion
 
-        #region Method Call : (GetZaxisFieldSelection) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ChartControl_GetZaxisFieldSelection_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetZaxisFieldSelection, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_chartControlInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (GetXaxisFieldSelection) (Return Type : string) private call definition
 
         [ExcludeFromCodeCoverage]
@@ -3625,32 +3368,6 @@ namespace EPMLiveWebParts
         {
             var methodGetXaxisFieldSelectionPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_chartControlInstance, MethodGetXaxisFieldSelection, Fixture, methodGetXaxisFieldSelectionPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (GetXaxisFieldSelection) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ChartControl_GetXaxisFieldSelection_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodGetXaxisFieldSelectionPrametersTypes = null;
-            object[] parametersOfGetXaxisFieldSelection = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetXaxisFieldSelection, methodGetXaxisFieldSelectionPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_chartControlInstanceFixture, parametersOfGetXaxisFieldSelection);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetXaxisFieldSelection.ShouldBeNull();
-            methodGetXaxisFieldSelectionPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
         }
 
         #endregion
