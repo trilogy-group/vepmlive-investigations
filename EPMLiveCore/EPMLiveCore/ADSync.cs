@@ -163,12 +163,21 @@ namespace EPMLiveCore
         private bool userDeleted(string sid)
         {
             string path = "LDAP://<SID=" + sid + ">";
-            DirectoryEntry user = new DirectoryEntry(path);
-            if (user != null)
+            var userDirectory = default(DirectoryEntry);
+            try
             {
+                userDirectory = new DirectoryEntry(path);
                 return false;
             }
-            return true;
+            catch (Exception exception)
+            {
+                Trace.TraceError(exception.ToString());
+                return true;
+            }
+            finally
+            {
+                userDirectory?.Dispose();
+            }
         }
 
         private bool userDisabled(string sid)

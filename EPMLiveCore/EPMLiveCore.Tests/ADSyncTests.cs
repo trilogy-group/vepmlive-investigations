@@ -194,6 +194,21 @@ namespace EPMLiveCore.Tests
             Assert.IsTrue(directoryShims.DirectoryEntriesDisposed.Any());
         }
 
+        [TestMethod]
+        public void userDeleted_Called_DirectoryDisposed()
+        {
+            // Arrange
+            var directoryShims = DirectoryShims.ShimDirectoryCalls();
+
+            // Act
+            var result = _adSyncObject.Invoke("userDeleted", SampleSid);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(bool));
+            Assert.IsFalse((bool)result);
+            Assert.IsTrue(directoryShims.DirectoryEntriesDisposed.Any());
+        }
+
         private void SetupShims()
         {
             ShimDirectoryEntry.ConstructorStringStringStringAuthenticationTypes = (instance, __, ___, ____, _____) =>
