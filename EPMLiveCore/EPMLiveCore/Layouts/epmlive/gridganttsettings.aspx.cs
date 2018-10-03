@@ -1405,9 +1405,12 @@ namespace EPMLiveCore.Layouts.epmlive
                                 if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
                                     EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
 
-                                EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys");
-                                myLog.MaximumKilobytes = 32768;
-                                myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 4001);
+                                using (var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys"))
+                                {
+                                    myLog.MaximumKilobytes = 32768;
+                                    var eventId = 4001;
+                                    myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, eventId);
+                                }
                             });
                         }
                     }
