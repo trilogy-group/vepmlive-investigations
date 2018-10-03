@@ -120,7 +120,6 @@ namespace EPMLiveCore.Layouts.epmlive
         [Test]
         [Timeout(TestsTimeOut)]
         [Category("AUT Initializer")]
-        [TestCase(MethodOnPreRender, 0)]
         [TestCase(MethodPage_Load, 0)]
         [TestCase(MethodCheckForNoFragment, 0)]
         [TestCase(MethodFillMyFragmentsGrid, 0)]
