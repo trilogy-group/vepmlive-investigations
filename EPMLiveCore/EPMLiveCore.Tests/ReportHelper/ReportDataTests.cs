@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using EPMLiveCore.ReportHelper;
 using System;
 using System.Collections;
@@ -416,7 +416,7 @@ namespace EPMLiveCore.ReportHelper.Tests
         {
             // Arrange
             PrivateObject.SetField("_DAO", new ShimEPMData().Instance);
-            ShimEPMData.AllInstances.GetClientReportingConnectionGet = _ => new SqlConnection();
+            ShimEPMData.AllInstances.GetClientReportingConnectionGet  = _ => new SqlConnection();
             ShimEPMData.AllInstances.GetTableSqlConnection = (_, _2) =>
             {
                 var dataTable = new DataTable();
@@ -529,7 +529,7 @@ namespace EPMLiveCore.ReportHelper.Tests
             ShimEPMData.AllInstances.ExecuteNonQuerySqlConnection = (_, __) => true;
 
             // Act
-            var actualResult = TestEntity.AddColumns(DummyString, new List<ColumnDef> { new ColumnDef(new DataColumn()) });
+            var actualResult = TestEntity.AddColumns(DummyString, new List<ColumnDef> {new ColumnDef(new DataColumn())});
 
             // Assert
             actualResult.ShouldBeTrue();
@@ -783,7 +783,7 @@ namespace EPMLiveCore.ReportHelper.Tests
                 return new ShimSPWebCollection().Bind(list.AsEnumerable());
             };
             ShimSPListCollection.AllInstances.ItemGetGuid = (_, _2) => new ShimSPList();
-            ShimSPList.AllInstances.IDGet = _ => Guid.NewGuid();
+            ShimSPList.AllInstances.IDGet = _=> Guid.NewGuid();
 
             // Act
             var actualResult = TestEntity.InsertList(Guid.NewGuid(), DummyString, DummyString, true);
@@ -804,7 +804,7 @@ namespace EPMLiveCore.ReportHelper.Tests
             ShimEPMData.AllInstances.AddParamStringObject = (_, _2, _3) => { };
             ShimSPWeb.AllInstances.ListsGet = _ =>
             {
-                var spList = new List<SPList> { new ShimSPList() };
+                var spList = new List<SPList> {new ShimSPList()};
                 return new ShimSPListCollection().Bind(spList);
             };
             ShimSPListCollection.AllInstances.ItemGetGuid = (_, _2) => new ShimSPList();
@@ -1225,7 +1225,7 @@ namespace EPMLiveCore.ReportHelper.Tests
         public void DeleteSQL_OnValidCall_ReturnString()
         {
             // Arrange
-            Func<string> action = () => TestEntity.DeleteSQL(DummyString, Guid.NewGuid(), DummyInt);
+            Func<string> action  = () => TestEntity.DeleteSQL(DummyString, Guid.NewGuid(), DummyInt);
 
             // Act
             var actualResult = action();
@@ -2043,7 +2043,7 @@ namespace EPMLiveCore.ReportHelper.Tests
                 return true;
             };
             ShimReportData.AllInstances.UpdateSQLStringDataTableSPListItemArrayListArrayList = (_, _2, _3, _4, _5, _6) => DummyString;
-            ShimReportData.AllInstances.GetListColumnsGuid = (_, __) => new DataTable();
+            ShimReportData.AllInstances.GetListColumnsGuid  = (_, __) => new DataTable();
 
             // Act
             TestEntity.UpdateItem(Guid.NewGuid(), new ShimSPListItem(), DummyString);
@@ -2098,7 +2098,7 @@ namespace EPMLiveCore.ReportHelper.Tests
             ShimReportData.AllInstances.GetDefaultColumnValueStringSPListItemBooleanOut =
                 (ReportData data, string str, SPListItem arg3, out bool blnGuid) =>
                 {
-                    if (str.EndsWith("id")
+                    if (str.EndsWith("id") 
                         || str.Equals($"3{DummyString.ToLower()}")
                         || str.Equals("datasource"))
                     {
@@ -2352,7 +2352,7 @@ namespace EPMLiveCore.ReportHelper.Tests
             ShimSPField.AllInstances.TypeAsStringGet = _ => DummyString;
             ShimSPField.AllInstances.InternalNameGet = _ => DummyString;
             ShimSPField.AllInstances.TypeGet = _ => type;
-            ShimReportData.AllInstances.PopulateDefaultColumnValueStringSPListItem = (_, _2, _3) => new SqlParameter();
+            ShimReportData.AllInstances.PopulateDefaultColumnValueStringSPListItem = (_, _2,_3) => new SqlParameter();
             ShimReportData.AllInstances.PopulateMandatoryHiddenFldsColumnValueStringSPListItem = (_, _2, _3) => new SqlParameter();
             ShimReportData.GetParamSPFieldString = (_, _2) => new SqlParameter
             {
@@ -2366,8 +2366,8 @@ namespace EPMLiveCore.ReportHelper.Tests
             var actualResult = PrivateObject.Invoke("AddColumnValues",
                 new ShimSPListItem().Instance,
                 dataTable,
-                new ArrayList { DummyString.ToLower() },
-                new ArrayList { "test" },
+                new ArrayList{DummyString.ToLower()},
+                new ArrayList{"test"},
                 "insert") as string;
 
             // Assert
@@ -2445,8 +2445,8 @@ namespace EPMLiveCore.ReportHelper.Tests
             ShimEPMData.AllInstances.UseSqlAccountGet = _ => useSqlAccount;
             ShimEPMData.AllInstances.AddParamStringObject = (_, _2, _3) => { };
 
-            // Act
-            var actualResult = TestEntity.InsertDbEntry();
+           // Act
+           var actualResult = TestEntity.InsertDbEntry();
 
             // Assert
             actualResult.ShouldBeTrue();
@@ -2465,7 +2465,7 @@ namespace EPMLiveCore.ReportHelper.Tests
             // Act
             var actualResult = TestEntity.CreateTable(
                 name,
-                new List<ColumnDef> { new ColumnDef(new DataColumn()) },
+                new List<ColumnDef> {new ColumnDef(new DataColumn())},
                 true,
                 out message);
 

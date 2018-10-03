@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
-using Microsoft.SharePoint;
 using System.Threading;
-using System.Data.SqlClient;
+using EPMLiveCore.Helpers;
 using EPMLiveCore.ReportHelper;
-using System.Collections;
+using Microsoft.SharePoint;
 
 namespace EPMLiveCore
 {
@@ -112,30 +113,7 @@ namespace EPMLiveCore
 
         private string GetSafeGroupTitle(string grpName)
         {
-            string result = string.Empty;
-            if (!string.IsNullOrEmpty(grpName))
-            {
-                result = grpName;
-                result = result.Replace("\"", "")
-                           .Replace("/", "")
-                           .Replace("\\", "")
-                           .Replace("[", "")
-                           .Replace("]", "")
-                           .Replace(":", "")
-                           .Replace("|", "")
-                           .Replace("<", "")
-                           .Replace(">", "")
-                           .Replace("+", "")
-                           .Replace("=", "")
-                           .Replace(";", "")
-                           .Replace(",", "")
-                           .Replace("?", "")
-                           .Replace("*", "")
-                           .Replace("'", "")
-                           .Replace("@", "");
-            }
-
-            return result;
+            return StringHelper.GetSafeString(grpName);
         }
 
         public override void ItemDeleting(SPItemEventProperties properties)
