@@ -9,6 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml.Linq;
 using EPMLiveCore.Controls.Navigation.Providers;
+using EPMLiveCore.Helpers;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 
@@ -653,30 +654,7 @@ namespace EPMLiveCore.API
 
         private string GetSafeTitle(string grpName)
         {
-            string result = string.Empty;
-            if (!string.IsNullOrEmpty(grpName))
-            {
-                result = grpName;
-                result = result.Replace("\"", "")
-                    .Replace("/", "")
-                    .Replace("\\", "")
-                    .Replace("[", "")
-                    .Replace("]", "")
-                    .Replace(":", "")
-                    .Replace("|", "")
-                    .Replace("<", "")
-                    .Replace(">", "")
-                    .Replace("+", "")
-                    .Replace("=", "")
-                    .Replace(";", "")
-                    .Replace(",", "")
-                    .Replace("?", "")
-                    .Replace("*", "")
-                    .Replace("'", "")
-                    .Replace("@", "");
-            }
-
-            return result;
+            return StringHelper.GetSafeString(grpName);
         }
 
         public void BaseProvision(SPSite site, SPWeb web, SPSite cESite, SPWeb cEWeb)
