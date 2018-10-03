@@ -153,12 +153,14 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ActTests.cs" />
+    <Compile Include="ADSyncLeakTest.cs" />
     <Compile Include="ADSyncTests.cs" />
     <Compile Include="API\Analytics\AnalyticsDataTests.cs" />
     <Compile Include="API\Analytics\FRFQueryFactoryTests.cs" />
     <Compile Include="API\Analytics\RecentItemsTests.cs" />
     <Compile Include="API\APITeamTests.cs" />
     <Compile Include="API\Applications\ApplicationsTests.cs" />
+    <Compile Include="API\AssociatedListItems\AssociatedListItemsTests.cs" />
     <Compile Include="API\Comments\CommentManagerTests.cs" />
     <Compile Include="API\CreateWorkspace\DALTests.cs" />
     <Compile Include="API\CreateWorkspace\WorkspaceFactoryTests.cs" />
