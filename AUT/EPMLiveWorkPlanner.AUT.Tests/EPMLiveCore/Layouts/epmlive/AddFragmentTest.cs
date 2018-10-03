@@ -1158,28 +1158,6 @@ namespace EPMLiveCore.Layouts.epmlive
 
         #endregion
 
-        #region Method Call : (AddResourceToTeam) (Return Type : void) Invoke without parameter types and should not throw
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_AddFragment_AddResourceToTeam_Method_Call_With_1_Parameters_Dynamic_Invoking_Without_Parameters_Should_Not_Throw_Test()
-        {
-            // Arrange
-            this.ValidateExecuteCondition(MethodAddResourceToTeam);
-            Exception exception;
-            var methodInfo = this.GetMethodInfo(MethodAddResourceToTeam, 0);
-
-            // Act
-            Action currentAction = () => methodInfo.InvokeStaticMethodWithDynamicParamters(_addFragmentInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #endregion
 
         #endregion
