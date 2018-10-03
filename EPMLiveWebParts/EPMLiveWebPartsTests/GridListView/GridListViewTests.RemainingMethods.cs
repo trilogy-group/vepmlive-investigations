@@ -205,25 +205,5 @@ namespace EPMLiveWebParts.Tests
             _testablePrivate.ShouldSatisfyAllConditions(
                 () => sFullParamList.ShouldBe("TGlzdAkKVmlldwlkdW1teQpGaWx0ZXJGaWVsZAlkdW1teQpGaWx0ZXJWYWx1ZQlkdW1teQpMb29rdXBGaWVsZAlkdW1teQpMb29rdXBGaWVsZExpc3QJZHVtbXkKR3JpZE5hbWUJdGVzdC1ncmlkLWlkCkFHcm91cHMJfApFeHBhbmQJMTAKU3RhcnQJU3RhcnREYXRlCkZpbmlzaAlEdWVEYXRlClBlcmNlbnQJUGVyY2VudENvbXBsZXRlCldCUwlPdXRsaW5lTnVtYmVyCk1pbGVzdG9uZQlNaWxlc3RvbmUKRXhlY3V0aXZlCQpJbmZvCQpMVHlwZQkKUkxpc3RzCQpSU2l0ZXMJCkhpZGVOZXcJRmFsc2UKVXNlUGVyZglGYWxzZQpBbGxvd0VkaXQJRmFsc2UKRWRpdERlZmF1bHQJRmFsc2UKU2hvd0luc2VydAlGYWxzZQpVc2VQb3B1cAlGYWxzZQpVc2VOZXcJRmFsc2UKTmV3TmFtZQkKUmVxdWVzdHMJRmFsc2UKVXNlUGFyZW50CWZhbHNlClNob3dDaGVja2JveGVzCUZhbHNlCldQSUQJ"));
         }
-
-        [TestMethod]
-        public void GridListView_CreateChildControls_ViewContextView_NotNull_ConfirmToolbarAndGridMode()
-        {
-            // Arrange
-            SetupShims();
-            _testablePrivate.SetFieldOrProperty("tb", new TimeDebug(DummyString, DummyString));
-            //ShimPage.AllInstances.FindControlString = (_,__) => 
-
-            // Act
-            _testablePrivate.Invoke("CreateChildControls",
-                new object[] { });
-
-            // Assert
-            var sFullParamList = _testablePrivate.GetFieldOrProperty("sFullParamList") as String;
-            _testablePrivate.ShouldSatisfyAllConditions(
-                () => sFullParamList.ShouldBe("TGlzdAkKVmlldwlkdW1teQpGaWx0ZXJGaWVsZAlkdW1teQpGaWx0ZXJWYWx1ZQlkdW1teQpMb29rdXBGaWVsZAlkdW1teQpMb29rdXBGaWVsZExpc3QJZHVtbXkKR3JpZE5hbWUJdGVzdC1ncmlkLWlkCkFHcm91cHMJfApFeHBhbmQJMTAKU3RhcnQJU3RhcnREYXRlCkZpbmlzaAlEdWVEYXRlClBlcmNlbnQJUGVyY2VudENvbXBsZXRlCldCUwlPdXRsaW5lTnVtYmVyCk1pbGVzdG9uZQlNaWxlc3RvbmUKRXhlY3V0aXZlCQpJbmZvCQpMVHlwZQkKUkxpc3RzCQpSU2l0ZXMJCkhpZGVOZXcJRmFsc2UKVXNlUGVyZglGYWxzZQpBbGxvd0VkaXQJRmFsc2UKRWRpdERlZmF1bHQJRmFsc2UKU2hvd0luc2VydAlGYWxzZQpVc2VQb3B1cAlGYWxzZQpVc2VOZXcJRmFsc2UKTmV3TmFtZQkKUmVxdWVzdHMJRmFsc2UKVXNlUGFyZW50CWZhbHNlClNob3dDaGVja2JveGVzCUZhbHNlCldQSUQJ"));
-        }
-
-
     }
 }
