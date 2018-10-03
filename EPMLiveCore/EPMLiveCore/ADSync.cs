@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.DirectoryServices;
 using System.Collections;
-using Microsoft.SharePoint;
 using System.Security.Principal;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Linq;
+using Microsoft.SharePoint;
 using EPMLiveCore.ReportHelper;
 
 namespace EPMLiveCore
@@ -522,41 +524,47 @@ namespace EPMLiveCore
 
         private bool PopulateAllGroupUserAttributes()
         {
-            string sid = string.Empty;
+            string sId = string.Empty;
             string cn = string.Empty;
             try
             {
-                DirectoryEntry de = new DirectoryEntry("LDAP://" + _fullDomain);
-                de.AuthenticationType = AuthenticationTypes.Secure;
-                var ds = new DirectorySearcher(de, "(objectClass=person)") { PageSize = GetSizeLimit() };
-
-                if (_adGroupNameAndPath.ContainsKey(_groupName))
+                using (var directoryEntry = new DirectoryEntry($"LDAP://{_fullDomain}"))
                 {
-                    ds.Filter = "(memberOf=" + _adGroupNameAndPath[_groupName].ToString().Replace("(", "").Replace("LDAP://", "") + ")";
-                    AddProperties(ds);
-                    foreach (SearchResult sr in ds.FindAll())
+                    directoryEntry.AuthenticationType = AuthenticationTypes.Secure;
+                    using (var searcher =
+                        new DirectorySearcher(directoryEntry, "(objectClass=person)") { PageSize = GetSizeLimit() } )
                     {
-                        try
+                        if (_adGroupNameAndPath.ContainsKey(_groupName))
                         {
-                            // don't update disabled users
-                            sid = GetUserSID(sr.Path).ToUpper();
-                            //Array exclusions = _adExclusions.ToArray();                           
-                            if (!_adExclusions.Contains(sid)) //Skip exclusions
+                            searcher.Filter =
+                                $"(memberOf={_adGroupNameAndPath[_groupName].ToString().Replace("(", "").Replace("LDAP://", "")})";
+                            AddProperties(searcher);
+                            foreach (SearchResult searchResult in searcher.FindAll())
                             {
-                                if (!userDisabled(sid))
+                                try
                                 {
-                                    AddResourceToDataTable(sr.Path);
+                                    sId = GetUserSID(searchResult.Path).ToUpper();
+                                    if (!_adExclusions.Contains(sId))
+                                    {
+                                        if (!userDisabled(sId))
+                                        {
+                                            AddResourceToDataTable(searchResult.Path);
+                                        }
+                                        else
+                                        {
+                                            _disableUsers.Add(sId);
+                                        }
+                                    }
                                 }
-                                else
+                                catch (Exception exception)
                                 {
-                                    _disableUsers.Add(sid);
+                                    Trace.TraceError(exception.ToString());
+                                    _ExecutionLogs.Add(
+                                        $"     ERROR -- Location: PopulateAllGroupUserAttributes() " +
+                                        $"resource level -- SID: {sId} -- Message: {exception.Message}");
+                                    _hasErrors = true;
                                 }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            _ExecutionLogs.Add("     ERROR -- Location: PopulateAllGroupUserAttributes() resource level -- SID: " + sid + " -- Message: " + ex.Message);
-                            _hasErrors = true;
                         }
                     }
                 }
@@ -600,25 +608,33 @@ namespace EPMLiveCore
 
             try
             {
-                DirectoryEntry de = new DirectoryEntry("LDAP://" + domain);
-                DirectorySearcher ds = new DirectorySearcher(de, "(objectClass=person)");
-                //ds.Filter = "(CN=User,CN=Schema,CN=Configuration,DC=dev2008,DC=com)";
-                SearchResult sr = ds.FindOne();
-                //System.DirectoryServices.ResultPropertyCollection prop = sr.Properties;
-                //ICollection coll = prop.PropertyNames;
-                //IEnumerator enu = coll.GetEnumerator();
-
-                DirectoryEntry de2 = new DirectoryEntry(sr.Path);
-                de2.RefreshCache(new string[] { "allowedAttributes" });
-
-                SortedList lstProps = new SortedList();
-
-                foreach (string sprop in de2.Properties["allowedAttributes"])
+                SearchResult searchResult;
+                using (var directoryEntry = new DirectoryEntry($"LDAP://{domain}"))
                 {
-                    lstProps.Add(sprop, "");
+                    using (var directorySearcher = new DirectorySearcher(directoryEntry, "(objectClass=person)"))
+                    {
+                        searchResult = directorySearcher.FindOne();
+                    }
                 }
 
-                foreach(DictionaryEntry deProp in lstProps)
+                SortedList properties;
+                if (searchResult == null)
+                {
+                    throw new InvalidOperationException($"{nameof(searchResult)} couldn't be null.");
+                }
+                using (var directoryEntry = new DirectoryEntry(searchResult.Path))
+                {
+                    directoryEntry.RefreshCache(new[] { "allowedAttributes" });
+
+                    properties = new SortedList();
+
+                    foreach (string attribute in directoryEntry.Properties["allowedAttributes"])
+                    {
+                        properties.Add(attribute, string.Empty);
+                    }
+                }
+
+                foreach(DictionaryEntry deProp in properties)
                 {
                     if (!userAttributes.Contains(deProp.Key.ToString().ToLower()))
                     {
@@ -700,9 +716,15 @@ namespace EPMLiveCore
             try
             {
                 DataRow dr = _adUsers.NewRow();
-                DirectoryEntry de = new DirectoryEntry(userPath);
-                DirectorySearcher ds = new DirectorySearcher(de, "(objectClass=user)");
-                SearchResult sr = ds.FindOne();
+                SearchResult searchResult;
+                using (var directoryEntry = new DirectoryEntry(userPath))
+                {
+                    using (var searcher = new DirectorySearcher(directoryEntry, "(objectClass=user)"))
+                    {
+                        searchResult = searcher.FindOne();
+                    }
+                }
+
                 string spFieldName = string.Empty;
                 string adFieldName = string.Empty;
 
@@ -712,7 +734,7 @@ namespace EPMLiveCore
                     {
                         spFieldName = _adFieldMappingValues[field].ToString(); //For testing only...remove
                         adFieldName = field; //For testing only...remove
-                        dr[spFieldName] = sr.Properties[field][0].ToString();
+                        dr[spFieldName] = searchResult.Properties[field][0].ToString();
                     }
                     catch (Exception ex)
                     {
@@ -829,8 +851,10 @@ namespace EPMLiveCore
             try
             {
                 string path = "LDAP://CN=" + CN + ",CN=Users," + fullDomain;
-                DirectoryEntry root = new DirectoryEntry(path, null, null, AuthenticationTypes.Secure);
-                sid = new SecurityIdentifier((byte[])root.Properties["objectSid"][0], 0).Value.ToUpper();
+                using (var root = new DirectoryEntry(path, null, null, AuthenticationTypes.Secure))
+                {
+                    sid = new SecurityIdentifier((byte[])root.Properties["objectSid"][0], 0).Value.ToUpper();
+                }
             }
             catch (Exception ex)
             {
@@ -845,8 +869,10 @@ namespace EPMLiveCore
             string sid = string.Empty;
             try
             {
-                DirectoryEntry root = new DirectoryEntry(path, null, null, AuthenticationTypes.Secure);
-                sid = new SecurityIdentifier((byte[])root.Properties["objectSid"][0], 0).Value;
+                using (var root = new DirectoryEntry(path, null, null, AuthenticationTypes.Secure))
+                {
+                    sid = new SecurityIdentifier((byte[])root.Properties["objectSid"][0], 0).Value;
+                }
             }
             catch (Exception ex)
             {
