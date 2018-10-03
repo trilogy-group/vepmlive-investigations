@@ -1,7 +1,4 @@
-﻿using System;
-using System.Data;
-using System.Threading;
-using Microsoft.SharePoint;
+﻿using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 {
@@ -9,9 +6,22 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
     public class AddListData : Step
     {
+        private readonly ListDataResourceProcessor _listDataResourceProcessor;
+        private readonly ListDataRolesProcessor _listDataRolesProcessor;
+        private readonly ListDataWorkHoursProcessor _listDataWorkHoursProcessor;
+        private readonly ListDataHolidaysProcessor _listDataHolidaysProcessor;
+        private readonly ListDataDepartmentsProcessor _listDataDepartmentsProcessor;
+        private readonly ListDataNonWorkProcessor _listDataNonWorkProcessor;
+
         public AddListData(SPWeb spWeb, string data, int stepNumber, bool bispfe)
             : base(spWeb, data, stepNumber, bispfe)
         {
+            _listDataResourceProcessor = new ListDataResourceProcessor(LogMessage, LogMessage);
+            _listDataRolesProcessor = new ListDataRolesProcessor(SPWeb, LogMessage, LogMessage);
+            _listDataWorkHoursProcessor = new ListDataWorkHoursProcessor(SPWeb, LogMessage, LogMessage);
+            _listDataHolidaysProcessor = new ListDataHolidaysProcessor(SPWeb, LogMessage, LogMessage);
+            _listDataDepartmentsProcessor = new ListDataDepartmentsProcessor(SPWeb, LogMessage, LogMessage);
+            _listDataNonWorkProcessor = new ListDataNonWorkProcessor(SPWeb, LogMessage, LogMessage);
         }
 
         public override string Description
@@ -44,32 +54,32 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
         private void ProcessResources(SPList oResourcePool)
         {
-            new ListDataResourceProcessor(LogMessage, LogMessage).Process(oResourcePool);
+            _listDataResourceProcessor.Process(oResourcePool);
         }
 
         private void ProcessRoles(SPList oResourcePool)
         {
-            new ListDataRolesProcessor(SPWeb, LogMessage, LogMessage).Process(oResourcePool, bIsPfe);
+            _listDataRolesProcessor.Process(oResourcePool, bIsPfe);
         }
 
         private void ProcessWorkHours(SPList oResourcePool)
         {
-            new ListDataWorkHoursProcessor(SPWeb, LogMessage, LogMessage).Process(oResourcePool, bIsPfe);
+            _listDataWorkHoursProcessor.Process(oResourcePool, bIsPfe);
         }
 
         private void ProcessHolidays(SPList oResourcePool)
         {
-            new ListDataHolidaysProcessor(SPWeb, LogMessage, LogMessage).Process(oResourcePool, bIsPfe);
+            _listDataHolidaysProcessor.Process(oResourcePool, bIsPfe);
         }
 
         private void ProcessDepartments(SPList oResourcePool)
         {
-            new ListDataDepartmentsProcessor(SPWeb, LogMessage, LogMessage).Process(oResourcePool, bIsPfe);
+            _listDataDepartmentsProcessor.Process(oResourcePool, bIsPfe);
         }
 
         private void ProcessNonWork(SPList oResourcePool)
         {
-            new ListDataNonWorkProcessor(SPWeb, LogMessage, LogMessage).Process();
+            _listDataNonWorkProcessor.Process();
         }
     }
 }
