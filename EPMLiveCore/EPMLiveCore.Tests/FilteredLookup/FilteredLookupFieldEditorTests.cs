@@ -1,31 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.UI.Fakes;
-using Microsoft.QualityTools.Testing.Fakes;
-using Microsoft.SharePoint.Fakes;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Web.UI.WebControls;
 using System.Web.Fakes;
-using System.Web.UI.HtmlControls;
 using System.Web.UI;
-using Microsoft.SharePoint;
-using Shouldly;
-using EPMLiveCore.Fakes;
+using System.Web.UI.Fakes;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.Fakes;
+using EPMLiveCore.Fakes;
+using EPMLiveCore.Infrastructure.Logging.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
+using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.WebControls.Fakes;
-using System.Web;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Shouldly;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace EPMLiveCore.Tests.FilteredLookup
 {
     [TestClass]
     public class FilteredLookupFieldEditorTests
     {
-        private IDisposable shimsContext;
-        private FilteredLookupFieldEditor filteredLookupFieldEditor;
-        private PrivateObject privateObject;
+        private const string SetControlVisibilityMethodName = "SetControlVisibility";
+        private const string SetTargetColumnMethodName = "SetTargetColumn";
+        private const string CanFieldBeDisplayedMethodName = "CanFieldBeDisplayed";
+        private const string SetTargetListViewMethodName = "SetTargetListView";
+        private const string SetTargetListMethodName = "SetTargetList";
+        private const string OnInitMethodName = "OnInit";
+        private const string TargetListId = "TARGET_LIST_ID";
+        private const string TargetListViewId = "TARGET_LISTVIEW_ID";
+        private const string TargetColumnId = "TARGET_COLUMN_ID";
+        private const string TargetwebId = "TARGET_WEB_ID";
+        private const string SelectedTargetListChangedMethodName = "SelectedTargetListChanged";
+        private const string SelectedTargetWebChangedMethodName = "SelectedTargetWebChanged";
+        private const string SelectedFilterOptionChangedMethodName = "SelectedFilterOptionChanged";
+        private const string SetTargetWebMethodName = "SetTargetWeb";
+        private const string DummyUrl = "https://dummy.org/";
+        private const string DummyString = "DummyString";
+        private static readonly Guid DummyGuid = Guid.NewGuid();
+        private static readonly StateBag ViewState = new StateBag();
         private readonly CheckBox cbxAllowMultiValue = new CheckBox();
         private readonly CheckBox cbxUnlimitedLengthInDocLib = new CheckBox();
         private readonly CheckBox cbxRecursiveFilter = new CheckBox();
@@ -41,22 +56,9 @@ namespace EPMLiveCore.Tests.FilteredLookup
         private readonly RadioButtonList rdFilterOption = new RadioButtonList();
         private readonly HtmlGenericControl SpanDocLibWarning = new HtmlGenericControl();
         private readonly HtmlGenericControl SpanLengthWarning = new HtmlGenericControl();
-
-        private const string DummyUrl = "https://dummy.org/";
-        private const string DummyString = "DummyString";
-        private static readonly Guid DummyGuid = Guid.NewGuid();
-        private static StateBag ViewState = new StateBag();
-
-        private const string SetControlVisibilityMethodName = "SetControlVisibility";
-        private const string SetTargetColumnMethodName = "SetTargetColumn";
-        private const string CanFieldBeDisplayedMethodName = "CanFieldBeDisplayed";
-        private const string SetTargetListViewMethodName = "SetTargetListView";
-        private const string SetTargetListMethodName = "SetTargetList";
-        private const string OnInitMethodName = "OnInit";
-        private const string TargetListId = "TARGET_LIST_ID";
-        private const string TargetListViewId = "TARGET_LISTVIEW_ID";
-        private const string TargetColumnId = "TARGET_COLUMN_ID";
-        private const string TargetwebId = "TARGET_WEB_ID";
+        private IDisposable shimsContext;
+        private FilteredLookupFieldEditor filteredLookupFieldEditor;
+        private PrivateObject privateObject;
 
         [TestInitialize]
         public void Initialize()
@@ -65,7 +67,6 @@ namespace EPMLiveCore.Tests.FilteredLookup
             SetupShims();
             filteredLookupFieldEditor = new FilteredLookupFieldEditor();
             privateObject = new PrivateObject(filteredLookupFieldEditor);
-
             privateObject.SetFieldOrProperty("cbxAllowMultiValue", cbxAllowMultiValue);
             privateObject.SetFieldOrProperty("cbxUnlimitedLengthInDocLib", cbxUnlimitedLengthInDocLib);
             privateObject.SetFieldOrProperty("cbxRecursiveFilter", cbxRecursiveFilter);
@@ -81,7 +82,6 @@ namespace EPMLiveCore.Tests.FilteredLookup
             privateObject.SetFieldOrProperty("SpanDocLibWarning", SpanDocLibWarning);
             privateObject.SetFieldOrProperty("SpanLengthWarning", SpanLengthWarning);
             privateObject.SetFieldOrProperty("listTargetColumn", listTargetColumn);
-
         }
 
         [TestCleanup]
@@ -102,6 +102,7 @@ namespace EPMLiveCore.Tests.FilteredLookup
             rdFilterOption?.Dispose();
             SpanDocLibWarning?.Dispose();
             SpanLengthWarning?.Dispose();
+            listTargetColumn?.Dispose();
         }
 
         private void SetupShims()
@@ -117,8 +118,6 @@ namespace EPMLiveCore.Tests.FilteredLookup
             ShimSPControl.GetContextSiteHttpContext = _ => new ShimSPSite();
             ShimControl.AllInstances.ContextGet = _ => new ShimHttpContext();
             ShimListItemCollection.AllInstances.FindByValueString = (_, searchValue) => new ListItem();
-
-
         }
 
         [TestMethod]
@@ -616,9 +615,9 @@ namespace EPMLiveCore.Tests.FilteredLookup
             ViewState[TargetListId] = DummyString;
             ShimListItemCollection.AllInstances.IndexOfListItem = (_, searchValue) => IndexValue;
             ShimDropDownList.AllInstances.SelectedIndexSetInt32 = (_, value) => index = value;
-            ShimFilteredLookupFieldEditor.AllInstances.SetTargetColumnStringString = 
+            ShimFilteredLookupFieldEditor.AllInstances.SetTargetColumnStringString =
                 (_, webId, siteId) => setTargetColumnWasCalled = true;
-            ShimFilteredLookupFieldEditor.AllInstances.SetTargetListViewStringString = 
+            ShimFilteredLookupFieldEditor.AllInstances.SetTargetListViewStringString =
                 (_, webId, siteId) => setTargetListViewWasCalled = true;
 
             // Act
@@ -694,6 +693,262 @@ namespace EPMLiveCore.Tests.FilteredLookup
                 () => enableViewState.ShouldBeTrue());
         }
 
+        [TestMethod]
+        public void SelectedTargetListChanged_TargetWebItemsNotEmpty_ExecutesCorrectly()
+        {
+            // Arrange
+            var sender = new object();
+            var controlToFocus = new Control();
+            ShimDropDownList.AllInstances.SelectedIndexGet = _ => 1;
+            ShimListControl.AllInstances.ItemsGet = _ => new ShimListItemCollection
+            {
+                CountGet = () => 1
+            };
+            ShimListControl.AllInstances.SelectedItemGet = _ => new ListItem(DummyString, DummyString);
+            ShimFilteredLookupFieldEditor.AllInstances.SetTargetColumnStringString = (_, webId, listId) => { };
+            ShimFilteredLookupFieldEditor.AllInstances.SetTargetListViewStringString = (_, webId, listId) => { };
+            ShimControl.AllInstances.PageGet = _ => new ShimPage
+            {
+                SetFocusControl = control => controlToFocus = control
+            };
 
+            // Act
+            privateObject.Invoke(SelectedTargetListChangedMethodName, sender, EventArgs.Empty);
+
+            // Assert
+            controlToFocus.ShouldSatisfyAllConditions(
+                () => controlToFocus.ShouldNotBeNull(),
+                () => controlToFocus.ShouldBe(listTargetColumn));
+        }
+
+        [TestMethod]
+        public void SelectedTargetListChanged_TargetWebItemsEmpty_ExecutesCorrectly()
+        {
+            // Arrange
+            var sender = new object();
+            var controlToFocus = new Control();
+            ShimDropDownList.AllInstances.SelectedIndexGet = _ => 1;
+            ShimListControl.AllInstances.ItemsGet = _ => new ShimListItemCollection
+            {
+                CountGet = () => 0
+            };
+            ShimListControl.AllInstances.SelectedItemGet = _ => new ListItem(DummyString, DummyString);
+            ViewState[TargetwebId] = DummyString;
+            ShimFilteredLookupFieldEditor.AllInstances.SetTargetColumnStringString = (_, webId, listId) => { };
+            ShimFilteredLookupFieldEditor.AllInstances.SetTargetListViewStringString = (_, webId, listId) => { };
+            ShimControl.AllInstances.PageGet = _ => new ShimPage
+            {
+                SetFocusControl = control => controlToFocus = control
+            };
+
+            // Act
+            privateObject.Invoke(SelectedTargetListChangedMethodName, sender, EventArgs.Empty);
+
+            // Assert
+            controlToFocus.ShouldSatisfyAllConditions(
+                () => controlToFocus.ShouldNotBeNull(),
+                () => controlToFocus.ShouldBe(listTargetColumn));
+        }
+
+        [TestMethod]
+        public void SelectedTargetWebChanged_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            var sender = new object();
+            var controlToFocus = new Control();
+            ShimFilteredLookupFieldEditor.AllInstances.SetTargetListStringBoolean = (_, webId, listId) => { };
+            ShimListControl.AllInstances.SelectedItemGet = _ => new ListItem(DummyString, DummyString);
+            ShimDropDownList.AllInstances.SelectedIndexGet = _ => 1;
+            ShimControl.AllInstances.PageGet = _ => new ShimPage
+            {
+                SetFocusControl = control => controlToFocus = control
+            };
+
+            // Act
+            privateObject.Invoke(SelectedTargetWebChangedMethodName, sender, EventArgs.Empty);
+
+            // Assert
+            controlToFocus.ShouldSatisfyAllConditions(
+                () => controlToFocus.ShouldNotBeNull(),
+                () => controlToFocus.ShouldBe(listTargetList));
+        }
+
+        [TestMethod]
+        public void SelectedFilterOptionChanged_FilterOptionSelectedItemEquals1_ExecutesCorrectly()
+        {
+            // Arrange
+            var sender = new object();
+            var setTargetListViewWasCalled = false;
+            ShimListControl.AllInstances.SelectedIndexGet = _ => 1;
+            ShimListControl.AllInstances.SelectedItemGet = _ => new ListItem(DummyString, DummyString);
+            ShimFilteredLookupFieldEditor.AllInstances.SetTargetListViewStringString = (_, webId, listId) => 
+            {
+                setTargetListViewWasCalled = true;
+            }; 
+
+            // Act
+            privateObject.Invoke(SelectedFilterOptionChangedMethodName, sender, EventArgs.Empty);
+
+            // Assert
+            filteredLookupFieldEditor.ShouldSatisfyAllConditions(
+                () => setTargetListViewWasCalled.ShouldBeTrue(),
+                () => tdListView.Visible.ShouldBeTrue(),
+                () => listTargetListView.Visible.ShouldBeTrue(),
+                () => cbxRecursiveFilter.Visible.ShouldBeFalse(),
+                () => cbxRecursiveFilter.Checked.ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void SelectedFilterOptionChanged_FilterOptionSelectedItemEquals0_ExecutesCorrectly()
+        {
+            // Arrange
+            var sender = new object();
+            var setTargetListViewWasCalled = false;
+            ShimListControl.AllInstances.SelectedIndexGet = _ => 0;
+            ShimListControl.AllInstances.SelectedItemGet = _ => new ListItem(DummyString, DummyString);
+            ShimFilteredLookupFieldEditor.AllInstances.SetTargetListViewStringString = (_, webId, listId) =>
+            {
+                setTargetListViewWasCalled = true;
+            };
+
+            // Act
+            privateObject.Invoke(SelectedFilterOptionChangedMethodName, sender, EventArgs.Empty);
+
+            // Assert
+            filteredLookupFieldEditor.ShouldSatisfyAllConditions(
+                () => setTargetListViewWasCalled.ShouldBeFalse(),
+                () => tdQuery.Visible.ShouldBeTrue(),
+                () => txtQueryFilter.Visible.ShouldBeTrue(),
+                () => cbxRecursiveFilter.Visible.ShouldBeTrue(),
+                () => cbxRecursiveFilter.Checked.ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void SetTargetWeb_TargetWebItemNotNull_ExecutesCorrectly()
+        {
+            // Arrange
+            const int IndexValue = 6;
+            var setTargetListWasCalled = false;
+            var index = 0;
+            ShimSPControl.GetContextWebHttpContext = _ => new ShimSPWeb
+            {
+                IDGet = () => DummyGuid
+            };
+            ShimSPSite.AllInstances.AllWebsGet = _ =>
+            {
+                var list = new List<SPWeb>
+                {
+                    new ShimSPWeb
+                    {
+                        TitleGet = () => DummyString,
+                        IDGet = () => DummyGuid
+                    }
+                }.AsEnumerable();
+                return new ShimSPWebCollection().Bind(list);
+            };
+            ShimSPWeb.AllInstances.IDGet = _ => DummyGuid;
+            ShimListItemCollection.AllInstances.IndexOfListItem = (_, searchValue) => IndexValue;
+            ShimFilteredLookupFieldEditor.AllInstances.SetTargetListStringBoolean =
+                (_, webId, siteId) => setTargetListWasCalled = true;
+            ShimDropDownList.AllInstances.SelectedIndexSetInt32 = (_, value) => index = value;
+            ShimSPSecurableObject.AllInstances.DoesUserHavePermissionsSPBasePermissions = (_, permissions) => true;
+            ViewState[TargetwebId] = string.Empty;
+
+            // Act
+            privateObject.Invoke(SetTargetWebMethodName);
+
+            // Assert
+            filteredLookupFieldEditor.ShouldSatisfyAllConditions(
+                () => setTargetListWasCalled.ShouldBeTrue(),
+                () => index.ShouldBe(IndexValue));
+        }
+
+        [TestMethod]
+        public void SetTargetWeb_TargetWebItemNull_ExecutesCorrectly()
+        {
+            // Arrange
+            const int IndexValue = 6;
+            var setTargetListWasCalled = false;
+            var index = 1;
+            ShimSPControl.GetContextWebHttpContext = _ => new ShimSPWeb
+            {
+                IDGet = () => DummyGuid
+            };
+            ShimSPSite.AllInstances.AllWebsGet = _ =>
+            {
+                var list = new List<SPWeb>
+                {
+                    new ShimSPWeb
+                    {
+                        TitleGet = () => DummyString,
+                        IDGet = () => DummyGuid
+                    },
+                    new ShimSPWeb
+                    {
+                        TitleGet = () => DummyString,
+                        IDGet = () => DummyGuid
+                    }
+                }.AsEnumerable();
+                return new ShimSPWebCollection().Bind(list);
+            };
+            ShimSPWeb.AllInstances.IDGet = _ => DummyGuid;
+            ShimListItemCollection.AllInstances.IndexOfListItem = (_, searchValue) => IndexValue;
+            ShimFilteredLookupFieldEditor.AllInstances.SetTargetListStringBoolean =
+                (_, webId, siteId) => setTargetListWasCalled = true;
+            ShimDropDownList.AllInstances.SelectedIndexSetInt32 = (_, value) => index = value;
+            ShimSPSecurableObject.AllInstances.DoesUserHavePermissionsSPBasePermissions = (_, permissions) => true;
+            ViewState[TargetwebId] = DummyString;
+            ShimListItemCollection.AllInstances.FindByValueString = (_, searchValue) => null; 
+
+            // Act
+            privateObject.Invoke(SetTargetWebMethodName);
+
+            // Assert
+            filteredLookupFieldEditor.ShouldSatisfyAllConditions(
+                () => setTargetListWasCalled.ShouldBeTrue(),
+                () => index.ShouldBe(0));
+        }
+
+        [TestMethod]
+        public void SetTargetWeb_OnException_ExecutesCorrectly()
+        {
+            // Arrange
+            var exceptionMessage = string.Empty;
+            var setTargetListWasCalled = false;
+            ShimSPControl.GetContextWebHttpContext = _ => new ShimSPWeb
+            {
+                IDGet = () => DummyGuid
+            };
+            ShimSPSite.AllInstances.AllWebsGet = _ =>
+            {
+                var list = new List<SPWeb>
+                {
+                    new ShimSPWeb
+                    {
+                        TitleGet = () => DummyString,
+                        IDGet = () => DummyGuid
+                    }
+                }.AsEnumerable();
+                return new ShimSPWebCollection().Bind(list);
+            };
+            ShimSPSecurableObject.AllInstances.DoesUserHavePermissionsSPBasePermissions = (_, permissions) =>
+            {
+                throw new Exception();
+            };
+            ShimLoggingService.WriteTraceStringStringTraceSeverityString = (area, category, severity, message) =>
+            {
+                exceptionMessage = $"{area} = {category} - {severity} - {message}";
+            };
+
+            // Act
+            privateObject.Invoke(SetTargetWebMethodName);
+
+            // Assert
+            filteredLookupFieldEditor.ShouldSatisfyAllConditions(
+                () => setTargetListWasCalled.ShouldBeFalse(),
+                () => exceptionMessage.ShouldContain(Area.EPMLiveCore),
+                () => exceptionMessage.ShouldContain(Categories.EPMLiveCore.IntegrationCore),
+                () => exceptionMessage.ShouldContain(TraceSeverity.Medium.ToString()));
+        }
     }
 }
