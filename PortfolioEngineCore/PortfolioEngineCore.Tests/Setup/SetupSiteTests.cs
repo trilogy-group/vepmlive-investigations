@@ -4,9 +4,6 @@ using System.Data;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Fakes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Win32.Fakes;
@@ -46,6 +43,18 @@ namespace PortfolioEngineCore.Tests.Setup
         private const string RunDBScriptMethod = "RunDBScript";
         private const string GetAssemblyVersionMethod = "GetAssemblyVersion";
 
+        private const string SoftwareKey = "Software";
+        private const string Wow6432NodeKey = "Wow6432Node";
+        private const string EPMLiveKey = "EPMLive";
+        private const string PortfolioEngineKey = "PortfolioEngine";
+        private const string CNValue = "CN";
+        private const string PIDValue = "PID";
+        private const string ConnectionStringValue = "ConnectionString";
+        private const string QMActiveValue = "QMActive";
+        private const string CNField = "_CN";
+        private const string CreateDataBaseError = "CreateDataBaseError";
+        private const string CreateUserError = "CreateUserError";
+
         [TestInitialize]
         public void TestInitialize()
         {
@@ -73,18 +82,20 @@ namespace PortfolioEngineCore.Tests.Setup
         public void GetBaseKey_WhenKeyFound_ConfirmResult()
         {
             // Arrange
+            const string ExistingRegistryKey = "ExistingRegistryKey";
+
             ShimRegistryKey.OpenRemoteBaseKeyRegistryHiveString = (_, __) => new ShimRegistryKey();
             ShimRegistryKey.AllInstances.OpenSubKeyStringBoolean = (_, name, __) =>
             {
                 switch (name)
                 {
-                    case "Software":
-                    case "Wow6432Node":
-                    case "EPMLive":
-                    case "PortfolioEngine":
+                    case SoftwareKey:
+                    case Wow6432NodeKey:
+                    case EPMLiveKey:
+                    case PortfolioEngineKey:
                         return new ShimRegistryKey
                         {
-                            NameGet = () => "ExistingRegistryKey"
+                            NameGet = () => ExistingRegistryKey
                         };
                     default:
                         return null;
@@ -98,19 +109,21 @@ namespace PortfolioEngineCore.Tests.Setup
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNull(),
-                () => result.Name.ShouldBe("ExistingRegistryKey"));
+                () => result.Name.ShouldBe(ExistingRegistryKey));
         }
 
         [TestMethod]
         public void GetBaseKey_WhenKeyNotFound_ConfirmResult()
         {
             // Arrange
+            const string CreatedRegistryKey = "CreatedRegistryKey";
+
             ShimRegistryKey.OpenRemoteBaseKeyRegistryHiveString = (_, __) => new ShimRegistryKey();
             ShimRegistryKey.AllInstances.OpenSubKeyStringBoolean = (_, name, __) =>
             {
                 switch (name)
                 {
-                    case "Software":
+                    case SoftwareKey:
                         return new ShimRegistryKey();
                     default:
                         return null;
@@ -118,9 +131,8 @@ namespace PortfolioEngineCore.Tests.Setup
             };
             ShimRegistryKey.AllInstances.CreateSubKeyString = (_, __) => new ShimRegistryKey
             {
-                NameGet = () => "CreatedRegistryKey"
+                NameGet = () => CreatedRegistryKey
             };
-
 
             // Act
             var result = _testObj.GetBaseKey(DummyString);
@@ -128,7 +140,7 @@ namespace PortfolioEngineCore.Tests.Setup
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNull(),
-                () => result.Name.ShouldBe("CreatedRegistryKey"));
+                () => result.Name.ShouldBe(CreatedRegistryKey));
         }
 
         [TestMethod]
@@ -156,10 +168,10 @@ namespace PortfolioEngineCore.Tests.Setup
             this.ShouldSatisfyAllConditions(
                 () => subKeyCreated.ShouldBeTrue(),
                 () => values.Count.ShouldBe(4),
-                () => values.ShouldContain("CN"),
-                () => values.ShouldContain("PID"),
-                () => values.ShouldContain("ConnectionString"),
-                () => values.ShouldContain("QMActive"));
+                () => values.ShouldContain(CNValue),
+                () => values.ShouldContain(PIDValue),
+                () => values.ShouldContain(ConnectionStringValue),
+                () => values.ShouldContain(QMActiveValue));
         }
 
         [TestMethod]
@@ -188,10 +200,10 @@ namespace PortfolioEngineCore.Tests.Setup
             this.ShouldSatisfyAllConditions(
                 () => subKeyCreated.ShouldBeTrue(),
                 () => values.Count.ShouldBe(4),
-                () => values.ShouldContain("CN"),
-                () => values.ShouldContain("PID"),
-                () => values.ShouldContain("ConnectionString"),
-                () => values.ShouldContain("QMActive"),
+                () => values.ShouldContain(CNValue),
+                () => values.ShouldContain(PIDValue),
+                () => values.ShouldContain(ConnectionStringValue),
+                () => values.ShouldContain(QMActiveValue),
                 () => message.ShouldBe("<br>Adding Registry Entries...Success"));
         }
 
@@ -230,7 +242,7 @@ namespace PortfolioEngineCore.Tests.Setup
 
             ShimSqlConnection.AllInstances.Close = _ => dbClosed = true;
 
-            _privateObj.SetFieldOrProperty("_CN", new ShimSqlConnection().Instance);
+            _privateObj.SetFieldOrProperty(CNField, new ShimSqlConnection().Instance);
             
             // Act
             _testObj.UpgradeDB(DummyString);
@@ -367,7 +379,7 @@ namespace PortfolioEngineCore.Tests.Setup
 
             ShimSqlConnection.AllInstances.Close = _ => _dbClosed = true;
 
-            _privateObj.SetFieldOrProperty("_CN", new ShimSqlConnection().Instance);
+            _privateObj.SetFieldOrProperty(CNField, new ShimSqlConnection().Instance);
         }
 
         [TestMethod]
@@ -498,7 +510,7 @@ namespace PortfolioEngineCore.Tests.Setup
 
             ShimSqlConnection.AllInstances.Close = _ => _dbClosed = true;
 
-            _privateObj.SetFieldOrProperty("_CN", new ShimSqlConnection().Instance);
+            _privateObj.SetFieldOrProperty(CNField, new ShimSqlConnection().Instance);
 
             // Act
             _testObj.RenamePermissions(DummyString, new Dictionary<string, string>());
@@ -544,7 +556,7 @@ namespace PortfolioEngineCore.Tests.Setup
             };
             var sqlCommand = string.Empty;
 
-            _privateObj.SetFieldOrProperty("_CN", new ShimSqlConnection().Instance);
+            _privateObj.SetFieldOrProperty(CNField, new ShimSqlConnection().Instance);
 
             ShimSqlCommand.ConstructorStringSqlConnection = (instance, command, ___) => 
             {
@@ -584,7 +596,7 @@ namespace PortfolioEngineCore.Tests.Setup
                 [DummyString] = DummyString
             };
 
-            _privateObj.SetFieldOrProperty("_CN", new ShimSqlConnection().Instance);
+            _privateObj.SetFieldOrProperty(CNField, new ShimSqlConnection().Instance);
 
             ShimSqlCommand.ConstructorStringSqlConnection = (_, __, ___) =>
             {
@@ -723,7 +735,7 @@ namespace PortfolioEngineCore.Tests.Setup
                 () => _dataReaderClosed.ShouldBeTrue(),
                 () => sqlCommands.Count.ShouldBe(0),
                 () => errors.ShouldBeTrue(),
-                () => message.ShouldContain("<br>Creating Database...Error: CreateDataBaseError"));
+                () => message.ShouldContain($"<br>Creating Database...Error: {CreateDataBaseError}"));
         }
 
         [TestMethod]
@@ -798,7 +810,7 @@ namespace PortfolioEngineCore.Tests.Setup
                 () => errors.ShouldBeTrue(),
                 () => message.ShouldContain("<br>Creating Database...Success"),
                 () => message.ShouldContain($"<br>Creating Login...Success"),
-                () => message.ShouldContain($"<br>Granting Permissions To Login...Error: CreateUserError"));
+                () => message.ShouldContain($"<br>Granting Permissions To Login...Error: {CreateUserError}"));
         }
 
         [TestMethod]
@@ -817,7 +829,7 @@ namespace PortfolioEngineCore.Tests.Setup
 
         private void SetupForCreateDBMethod(List<string> sqlCommands, bool read, bool createDatabase, bool createLogin, string loginErrorMessage, bool createUser)
         {
-            _privateObj.SetFieldOrProperty("_CN", new ShimSqlConnection().Instance);
+            _privateObj.SetFieldOrProperty(CNField, new ShimSqlConnection().Instance);
 
             ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
             ShimSqlConnection.AllInstances.Close = _ => { };
@@ -844,7 +856,7 @@ namespace PortfolioEngineCore.Tests.Setup
                 {
                     if (!createDatabase)
                     {
-                        throw new Exception("CreateDataBaseError");
+                        throw new Exception(CreateDataBaseError);
                     }
                 }
 
@@ -860,7 +872,7 @@ namespace PortfolioEngineCore.Tests.Setup
                 {
                     if (!createUser)
                     {
-                        throw new Exception("CreateUserError");
+                        throw new Exception(CreateUserError);
                     }
                 }
 
