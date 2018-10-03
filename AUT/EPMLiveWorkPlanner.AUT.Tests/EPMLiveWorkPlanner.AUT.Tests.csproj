@@ -98,7 +98,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EPMLiveCore\Layouts\epmlive\AddFragmentTest.cs" />
     <Compile Include="EPMLiveCore\Layouts\epmlive\ManageFragmentTest.cs" />
     <Compile Include="EPMLiveCore\Layouts\epmlive\SaveFragmentTest.cs" />
     <Compile Include="EPMLiveWorkPlanner\CsvImportJobTest.cs" />
