@@ -26,6 +26,7 @@ using Microsoft.SharePoint.WebPartPages.Fakes;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.Administration.Fakes;
 using System.Data.SqlClient.Fakes;
+using WP = System.Web.UI.WebControls.WebParts;
 
 namespace EPMLiveWebParts.Tests
 {
@@ -154,6 +155,11 @@ namespace EPMLiveWebParts.Tests
             ShimSPWeb.AllInstances.PropertiesGet = (_) => new ShimSPPropertyBag().Instance;
             ShimSPSite.AllInstances.Dispose = (_) => { };
             ShimSPContext.AllInstances.ListItemGet = (_) => _sharepointShims.ListItemShim.Instance;
+            ShimWebPart.AllInstances.WebPartManagerGet = (_) => new ShimSPWebPartManager().Instance;
+            WP.Fakes.ShimWebPartManager.AllInstances.WebPartsGet = (_) => new WP.WebPartCollection(new List<WP.WebPart>()
+            {
+                new BackButton()
+            });
         }
 
         private void SetUpDefaultValues()
