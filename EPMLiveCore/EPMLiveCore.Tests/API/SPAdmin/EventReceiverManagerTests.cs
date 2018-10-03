@@ -30,6 +30,16 @@ namespace EPMLiveCore.Tests.API.SPAdmin
         private const string TypeNameAssembly = "Assembly";
         private const string TypeNameClassName = "ClassName";
         private const string ParseRequestDataMethodName = "ParseRequestData";
+        private const string WebIdAttribute = "WebId";
+        private const string SiteIdAttribute = "SiteId";
+        private const string ListIdAttribute = "ListId";
+        private const string ListAttribute = "List";
+        private const string StatusAttribute = "Status";
+        private const string DataAttribute = "Data";
+        private const string AddOperation = "ADD";
+        private const string ListOperation = "LIST";
+        private const string RemoveOperation = "REMOVE";
+        private const string EPMLiveCoreDll = "EPM Live Core.dll";
         private static bool RemoveEventReceiverWasCalled = false;
         private static bool AddEventReceiverWasCalled = false;
         private static bool ListEventReceiversWasCalled = false;
@@ -129,6 +139,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             // Arrange
             ShimEventReceiverManager.AllInstances.AddEventReceiverSPListStringStringSPEventReceiverTypeXElementRef = null;
             ShimXContainer.AllInstances.ElementXName = null;
+            const string ExpectedValue = "1";
             const string ExpectedMessage = "Operation not performed. Event receiver already exists.";
             var receiverType = SPEventReceiverType.GroupUserDeleted;
             var receiverElement = new XElement(DummyString);
@@ -168,13 +179,13 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             // Actpriv
             privateObject.Invoke(AddEventReceiverMethodName, args);
             receiverElement = args[4] as XElement;
-            var dataElement = receiverElement.Element("Data");
+            var dataElement = receiverElement.Element(DataAttribute);
 
             // Assert
             receiverElement.ShouldNotBeNull();
             dataElement.ShouldNotBeNull();
             dataElement.Value.ShouldBe(ExpectedMessage);
-            dataElement.Attribute("Status")?.Value.ShouldBe("1");
+            dataElement.Attribute(StatusAttribute)?.Value.ShouldBe(ExpectedValue);
         }
 
         [TestMethod]
@@ -183,6 +194,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             // Arrange
             ShimEventReceiverManager.AllInstances.AddEventReceiverSPListStringStringSPEventReceiverTypeXElementRef = null;
             ShimXContainer.AllInstances.ElementXName = null;
+            const string ExpectedValue = "0";
             const string ExpectedMessage = "Event receiver successfully installed.";
             var receiverType = SPEventReceiverType.GroupUserDeleted;
             var receiverElement = new XElement(DummyString);
@@ -214,13 +226,13 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             // Actpriv
             privateObject.Invoke(AddEventReceiverMethodName, args);
             receiverElement = args[4] as XElement;
-            var dataElement = receiverElement.Element("Data");
+            var dataElement = receiverElement.Element(DataAttribute);
 
             // Assert
             receiverElement.ShouldNotBeNull();
             dataElement.ShouldNotBeNull();
             dataElement.Value.ShouldBe(ExpectedMessage);
-            dataElement.Attribute("Status")?.Value.ShouldBe("0");
+            dataElement.Attribute(StatusAttribute)?.Value.ShouldBe(ExpectedValue);
         }
 
         [TestMethod]
@@ -229,6 +241,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             // Arrange
             ShimEventReceiverManager.AllInstances.RemoveEventReceiverSPListStringStringSPEventReceiverTypeXElementRef = null;
             ShimXContainer.AllInstances.ElementXName = null;
+            const string ExpectedValue = "0";
             const string ExpectedMessage = "Event receiver successfully uninstalled.";
             var receiverType = SPEventReceiverType.GroupUserDeleted;
             var receiverElement = new XElement(DummyString);
@@ -268,13 +281,13 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             // Act
             privateObject.Invoke(RemoveEventReceiverMethodName, args);
             receiverElement = args[4] as XElement;
-            var dataElement = receiverElement.Element("Data");
+            var dataElement = receiverElement.Element(DataAttribute);
 
             // Assert
             receiverElement.ShouldNotBeNull();
             dataElement.ShouldNotBeNull();
             dataElement.Value.ShouldBe(ExpectedMessage);
-            dataElement.Attribute("Status")?.Value.ShouldBe("0");
+            dataElement.Attribute(StatusAttribute)?.Value.ShouldBe(ExpectedValue);
         }
 
         [TestMethod]
@@ -283,6 +296,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             // Arrange
             ShimEventReceiverManager.AllInstances.RemoveEventReceiverSPListStringStringSPEventReceiverTypeXElementRef = null;
             ShimXContainer.AllInstances.ElementXName = null;
+            const string ExpectedValue = "1";
             const string ExpectedMessage = "Operation not performed. Event receiver was not found.";
             var receiverType = SPEventReceiverType.GroupUserDeleted;
             var receiverElement = new XElement(DummyString);
@@ -314,13 +328,13 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             // Actpriv
             privateObject.Invoke(RemoveEventReceiverMethodName, args);
             receiverElement = args[4] as XElement;
-            var dataElement = receiverElement.Element("Data");
+            var dataElement = receiverElement.Element(DataAttribute);
 
             // Assert
             receiverElement.ShouldNotBeNull();
             dataElement.ShouldNotBeNull();
             dataElement.Value.ShouldBe(ExpectedMessage);
-            dataElement.Attribute("Status")?.Value.ShouldBe("1");
+            dataElement.Attribute(StatusAttribute)?.Value.ShouldBe(ExpectedValue);
         }
 
         [TestMethod]
@@ -341,11 +355,11 @@ namespace EPMLiveCore.Tests.API.SPAdmin
                         },
                         new ShimDataRow()
                         {
-                            ItemGetString = name => name == "WebId" ? Guid.NewGuid() : DummyGuid
+                            ItemGetString = name => name == WebIdAttribute ? Guid.NewGuid() : DummyGuid
                         },
                         new ShimDataRow()
                         {
-                            ItemGetString = name => name == "List" ? Guid.NewGuid() : DummyGuid
+                            ItemGetString = name => name == ListAttribute ? Guid.NewGuid() : DummyGuid
                         },
                         new ShimDataRow
                         {
@@ -357,15 +371,15 @@ namespace EPMLiveCore.Tests.API.SPAdmin
                 {
                     new ShimDataRow
                     {
-                        ItemGetString = GetDataRowItemValue(SPEventReceiverType.AppInstalled, "ADD", DummyString)
+                        ItemGetString = GetDataRowItemValue(SPEventReceiverType.AppInstalled, AddOperation, DummyString)
                     },
                     new ShimDataRow
                     {
-                        ItemGetString = GetDataRowItemValue(SPEventReceiverType.AppInstalled, "REMOVE", DummyString)
+                        ItemGetString = GetDataRowItemValue(SPEventReceiverType.AppInstalled, RemoveOperation, DummyString)
                     },
                     new ShimDataRow
                     {
-                        ItemGetString = GetDataRowItemValue(SPEventReceiverType.AppInstalled, "LIST", DummyString)
+                        ItemGetString = GetDataRowItemValue(SPEventReceiverType.AppInstalled, ListOperation, DummyString)
                     }
                 }
             };
@@ -438,11 +452,11 @@ namespace EPMLiveCore.Tests.API.SPAdmin
                         },
                         new ShimDataRow()
                         {
-                            ItemGetString = name => name == "WebId" ? Guid.NewGuid() : DummyGuid
+                            ItemGetString = name => name == WebIdAttribute ? Guid.NewGuid() : DummyGuid
                         },
                         new ShimDataRow()
                         {
-                            ItemGetString = name => name == "List" ? Guid.NewGuid() : DummyGuid
+                            ItemGetString = name => name == ListAttribute ? Guid.NewGuid() : DummyGuid
                         },
                         new ShimDataRow
                         {
@@ -454,7 +468,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
                 {
                     new ShimDataRow
                     {
-                        ItemGetString = GetDataRowItemValue(SPEventReceiverType.AppInstalled, "ADD", DummyString)
+                        ItemGetString = GetDataRowItemValue(SPEventReceiverType.AppInstalled, AddOperation, DummyString)
                     }
                 }
             };
@@ -491,11 +505,11 @@ namespace EPMLiveCore.Tests.API.SPAdmin
                         },
                         new ShimDataRow()
                         {
-                            ItemGetString = name => name == "WebId" ? Guid.NewGuid() : DummyGuid
+                            ItemGetString = name => name == WebIdAttribute ? Guid.NewGuid() : DummyGuid
                         },
                         new ShimDataRow()
                         {
-                            ItemGetString = name => name == "List" ? Guid.NewGuid() : DummyGuid
+                            ItemGetString = name => name == ListAttribute ? Guid.NewGuid() : DummyGuid
                         },
                         new ShimDataRow
                         {
@@ -507,7 +521,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
                 {
                     new ShimDataRow
                     {
-                        ItemGetString = GetDataRowItemValue(SPEventReceiverType.AppInstalled, "ADD", DummyString)
+                        ItemGetString = GetDataRowItemValue(SPEventReceiverType.AppInstalled, AddOperation, DummyString)
                     }
                 }
             };
@@ -596,7 +610,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             // Assert
             action.ShouldThrow<APIException>();
         }
-
+      
         [TestMethod]
         public void ParseRequestData_EventReceiverElementSiteIdNull_ThrowsException()
         {
@@ -609,7 +623,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             {
                 new ShimXElement()
                 {
-                    AttributeXName = attributeName => attributeName == "SiteId" ? null : new XAttribute(attributeName, DummyGuid)
+                    AttributeXName = attributeName => attributeName == SiteIdAttribute ? null : new XAttribute(attributeName, DummyGuid)
                 }
             };
 
@@ -632,7 +646,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             {
                 new ShimXElement()
                 {
-                    AttributeXName = attributeName => attributeName == "WebId" ? null : new XAttribute(attributeName, DummyGuid)
+                    AttributeXName = attributeName => attributeName == WebIdAttribute ? null : new XAttribute(attributeName, DummyGuid)
                 }
             };
 
@@ -655,7 +669,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             {
                 new ShimXElement()
                 {
-                    AttributeXName = attributeName => attributeName == "ListId" ? null : new XAttribute(attributeName, DummyGuid)
+                    AttributeXName = attributeName => attributeName == ListIdAttribute ? null : new XAttribute(attributeName, DummyGuid)
                 }
             };
 
@@ -678,7 +692,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             {
                 new ShimXElement()
                 {
-                    AttributeXName = attributeName => attributeName == "Type" ? null : new XAttribute(attributeName, DummyGuid)
+                    AttributeXName = attributeName => attributeName == TypeNameType ? null : new XAttribute(attributeName, DummyGuid)
                 }
             };
 
@@ -726,11 +740,11 @@ namespace EPMLiveCore.Tests.API.SPAdmin
                 {
                     AttributeXName = attributeName =>
                     {
-                        if (attributeName == "Operation")
+                        if (attributeName == TypeNameOperation)
                         {
                             return null;
                         }
-                        else if (attributeName == "Type")
+                        else if (attributeName == TypeNameType)
                         {
                             return new XAttribute(attributeName, SPEventReceiverType.AppInstalled);
                         }
@@ -784,7 +798,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             {
                 new ShimXElement()
                 {
-                    AttributeXName = GetItemAttribute("ADD", SPEventReceiverType.AppInstalled, DummyGuid, null)
+                    AttributeXName = GetItemAttribute(AddOperation, SPEventReceiverType.AppInstalled, DummyGuid, null)
                 }
             };
 
@@ -807,7 +821,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             {
                 new ShimXElement()
                 {
-                    AttributeXName = GetItemAttribute("ADD", SPEventReceiverType.AppInstalled, DummyGuid, DummyString)
+                    AttributeXName = GetItemAttribute(AddOperation, SPEventReceiverType.AppInstalled, DummyGuid, DummyString)
                 }
             };
 
@@ -831,7 +845,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             {
                 new ShimXElement()
                 {
-                    AttributeXName = GetItemAttribute("ADD", SPEventReceiverType.AppInstalled, DummyGuid, assemblyName, null)
+                    AttributeXName = GetItemAttribute(AddOperation, SPEventReceiverType.AppInstalled, DummyGuid, assemblyName, null)
                 }
             };
 
@@ -855,7 +869,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             {
                 new ShimXElement()
                 {
-                    AttributeXName = GetItemAttribute("ADD", SPEventReceiverType.AppInstalled, DummyGuid, assemblyName, DummyString)
+                    AttributeXName = GetItemAttribute(AddOperation, SPEventReceiverType.AppInstalled, DummyGuid, assemblyName, DummyString)
                 }
             };
 
@@ -879,7 +893,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             {
                 new ShimXElement()
                 {
-                    AttributeXName = GetItemAttribute("ADD", SPEventReceiverType.AppInstalled, DummyGuid, assemblyName, "EPMLiveCore.Act")
+                    AttributeXName = GetItemAttribute(AddOperation, SPEventReceiverType.AppInstalled, DummyGuid, assemblyName, "EPMLiveCore.Act")
                 }
             };
 
@@ -915,6 +929,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNull(),
                 () => result.Rows.Count.ShouldBeGreaterThan(0),
+                () => result.Rows[0].ItemArray.Length.ShouldBeGreaterThanOrEqualTo(8),
                 () => result.Rows[0][0].ShouldBe(DummyGuid),
                 () => result.Rows[0][3].ShouldBe(ExpectedOperation));
         }
@@ -932,7 +947,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
             {
                 new ShimXElement()
                 {
-                    AttributeXName = GetItemAttribute("LIST", SPEventReceiverType.AppInstalled, DummyGuid, assemblyName, "EPMLiveCore.ChildParentSync")
+                    AttributeXName = GetItemAttribute(ListOperation, SPEventReceiverType.AppInstalled, DummyGuid, assemblyName, "EPMLiveCore.ChildParentSync")
                 }
             };
             ShimSPSite.AllInstances.OpenWebGuid = (_, guid) =>
@@ -949,7 +964,7 @@ namespace EPMLiveCore.Tests.API.SPAdmin
 
         private string GetAssemblyFullName()
         {
-            var assembly = Assembly.LoadFrom("EPM Live Core.dll");
+            var assembly = Assembly.LoadFrom(EPMLiveCoreDll);
             return assembly?.FullName;
         }
 
