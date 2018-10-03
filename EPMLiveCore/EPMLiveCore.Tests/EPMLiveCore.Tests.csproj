@@ -37,6 +37,12 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PortfolioEngineCore.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\PortfolioEngineCore.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Services" />
+  </ItemGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
@@ -126,6 +132,9 @@
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="System.XML.4.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml.Linq.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Xml.Linq.4.0.0.0.Fakes.dll</HintPath>
@@ -186,6 +195,8 @@
     <Compile Include="Infrastructure\ResourceManagment\ResourcePoolManagerTests.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
     <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
+    <Compile Include="ISAPI\WorkEngineAPITests.cs" />
+    <Compile Include="ISAPI\WorkEngineAPITests.RemainingMethods.cs" />
     <Compile Include="Jobs\NotificationsTests.cs" />
     <Compile Include="Jobs\ResourceImportJobTests.cs" />
     <Compile Include="Jobs\ResourcePlanTest.cs" />
