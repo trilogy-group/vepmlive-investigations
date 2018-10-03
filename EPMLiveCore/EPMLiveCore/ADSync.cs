@@ -174,16 +174,17 @@ namespace EPMLiveCore
         private bool userDisabled(string sid)
         {
             string path = "LDAP://<SID=" + sid + ">";
-            DirectoryEntry user = new DirectoryEntry(path);
-            DirectorySearcher ds = new DirectorySearcher(user);
-            SearchResult sr;
-            ds.Filter = "(&(userAccountControl:1.2.840.113556.1.4.803:=2))";
-            sr = ds.FindOne();
-            if (sr != null)
+            SearchResult result;
+            using (var userDirectory = new DirectoryEntry(path))
             {
-                return true;
+                using (var searcher = new DirectorySearcher(userDirectory))
+                {
+                    searcher.Filter = "(&(userAccountControl:1.2.840.113556.1.4.803:=2))";
+                    result = searcher.FindOne();
+                }
             }
-            return false;
+
+            return result != null;
         }
 
         private void UpdateResourcePool()

@@ -171,6 +171,29 @@ namespace EPMLiveCore.Tests
             Assert.IsTrue(directoryShims.DirectoryEntriesDisposed.Any());
         }
 
+        [TestMethod]
+        public void userDisabled_Called_DirectoryDisposed()
+        {
+            // Arrange
+            var directoryShims = DirectoryShims.ShimDirectoryCalls();
+            ShimDirectorySearcher.ConstructorDirectoryEntry = (instance, _) =>
+            {
+                new ShimDirectorySearcher(instance)
+                {
+                    FindOne = () => directoryShims.SearchResultShim
+                };
+            };
+
+            // Act
+            var result = _adSyncObject.Invoke("userDisabled", SampleSid);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(bool));
+            Assert.IsTrue((bool)result);
+            Assert.IsTrue(directoryShims.DirectorySearchersDisposed.Any());
+            Assert.IsTrue(directoryShims.DirectoryEntriesDisposed.Any());
+        }
+
         private void SetupShims()
         {
             ShimDirectoryEntry.ConstructorStringStringStringAuthenticationTypes = (instance, __, ___, ____, _____) =>
