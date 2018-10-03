@@ -162,8 +162,17 @@
     <Compile Include="API\Analytics\FRFQueryFactoryTests.cs" />
     <Compile Include="API\Analytics\RecentItemsTests.cs" />
     <Compile Include="API\APITeamTests.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallAndConfigureApp.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallFeatures.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallLists.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallListsFields.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallListsLookups.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallListsViews.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallListsViewsWebpartsInstall.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallListsWorkflows.cs" />
     <Compile Include="API\Applications\ApplicationInstallerTests.iInstallProperties.cs" />
     <Compile Include="API\Applications\ApplicationInstallerTests.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallSolutions.cs" />
     <Compile Include="API\Applications\ApplicationsTests.cs" />
     <Compile Include="API\AssociatedListItems\AssociatedListItemsTests.cs" />
     <Compile Include="API\Comments\CommentManagerTests.cs" />

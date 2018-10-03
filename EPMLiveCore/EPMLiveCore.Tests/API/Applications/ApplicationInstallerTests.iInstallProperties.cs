@@ -1,11 +1,12 @@
 ﻿using System.Collections.Specialized.Fakes;
 using System.Data;
 using System.Text;
+using EPMLiveCore.API;
 using EPMLiveCore.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EPMLiveCore.API
+namespace EPMLiveCore.Tests.API
 {
     public partial class ApplicationInstallerTests
     {
@@ -97,6 +98,7 @@ namespace EPMLiveCore.API
                 .Append("</Properties>")
                 .Append("</Web>")
                 .Append("</root>");
+
             appDef.ApplicationXml.LoadXml(xml.ToString());
             _privateObject.SetFieldOrProperty(AppDefProp, appDef);
             _privateObject.SetFieldOrProperty(OWebProp, new ShimSPWeb().Instance);
