@@ -1387,6 +1387,7 @@
     <Compile Include="SPUtilities\SPListUtility.cs" />
     <Compile Include="SPUtilities\SPProjectUtility.cs" />
     <Compile Include="StatusingEvent.cs" />
+    <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="TagManager\API\Gateway.cs" />
     <Compile Include="TagManager\Tag.cs" />
     <Compile Include="TagManager\TagManager.cs" />
