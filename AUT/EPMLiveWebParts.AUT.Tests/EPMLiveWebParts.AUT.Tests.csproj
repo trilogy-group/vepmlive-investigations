@@ -34,8 +34,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AUT.ConfigureTestProjects, Version=5.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\AUT.ConfigureTestProjects.5.4.0\lib\net462\AUT.ConfigureTestProjects.dll</HintPath>
+    <Reference Include="AUT.ConfigureTestProjects, Version=4.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AUT.ConfigureTestProjects.4.2.2\lib\net462\AUT.ConfigureTestProjects.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AutoFixture, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
@@ -109,17 +109,14 @@
     <Compile Include="API\WPAPITest.cs" />
     <Compile Include="BackButton\BackButtonTest.cs" />
     <Compile Include="BuyNow\BuyNowTest.cs" />
-    <Compile Include="ChartControl\ChartControlTest.cs" />
     <Compile Include="ChartControl\ChartControlToolpartBaseTest.cs" />
     <Compile Include="ChartControl\EpmChartTest.cs" />
     <Compile Include="ChartControl\ExtensionsTest.cs" />
     <Compile Include="ChartControl\VfChartSeriesTest.cs" />
     <Compile Include="ChartControl\VfChartTest.cs" />
     <Compile Include="ChartControl\VfPointTest.cs" />
-    <Compile Include="Comments\CommentsTest.cs" />
     <Compile Include="Comments\CommentsToolPartTest.cs" />
     <Compile Include="ContentView\ContentViewTest.cs" />
-    <Compile Include="ContextualHelpSlideOut\ContextualHelpSlideOutTest.cs" />
     <Compile Include="CONTROLTEMPLATES\MyWork\MyWorkParamsTest.cs" />
     <Compile Include="CONTROLTEMPLATES\MyWork\WorkingOnParamsTest.cs" />
     <Compile Include="DomainModel\ExcelConnectionInfoTest.cs" />
@@ -206,7 +203,6 @@
     <Compile Include="RollupSummary\SummaryRollupToolpartTest.cs" />
     <Compile Include="SiteCollectionSetupWizard\SiteCollectionSetupWizardTest.cs" />
     <Compile Include="SocialStream\SocialStreamTest.cs" />
-    <Compile Include="UserProfileDisplay\DisplayProfilePicturesTest.cs" />
     <Compile Include="UserProfileDisplay\UserProfileToolPartTest.cs" />
     <Compile Include="Utilities\ExtensionsTest.cs" />
     <Compile Include="Utilities\LookupFilterHelperTest.cs" />
@@ -573,7 +569,6 @@
     <Compile Include="Web References\SSRS2010\WeeklyRecurrenceTest.cs" />
     <Compile Include="WebPageCode\AjaxpostTest.cs" />
     <Compile Include="WebPageCode\CheckresganttTest.cs" />
-    <Compile Include="WebPageCode\ContextualslideoutTest.cs" />
     <Compile Include="WebPageCode\GetedititemTest.cs" />
     <Compile Include="WebPageCode\GetganttitemsTest.cs" />
     <Compile Include="WebPageCode\GetgantttasksTest.cs" />
@@ -622,7 +617,9 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="ContextualHelpSlideOut\" />
+  </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>

@@ -3140,39 +3140,7 @@ namespace CADataCache
         }
 
         #endregion
-
-        #region Method Call : (GetDetFieldValue) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CostAnalyzerDataCache_GetDetFieldValue_Method_Call_Void_With_4_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var odet = CreateType<clsDetailRowData>();
-            var fid = CreateType<int>();
-            var lVal = CreateType<int>();
-            var sVal = CreateType<string>();
-            var methodGetDetFieldValuePrametersTypes = new Type[] { typeof(clsDetailRowData), typeof(int), typeof(int), typeof(string) };
-            object[] parametersOfGetDetFieldValue = { odet, fid, lVal, sVal };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetDetFieldValue, methodGetDetFieldValuePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_costAnalyzerDataCacheInstanceFixture, parametersOfGetDetFieldValue);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetDetFieldValue.ShouldNotBeNull();
-            parametersOfGetDetFieldValue.Length.ShouldBe(4);
-            methodGetDetFieldValuePrametersTypes.Length.ShouldBe(4);
-            methodGetDetFieldValuePrametersTypes.Length.ShouldBe(parametersOfGetDetFieldValue.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (GetDetFieldValue) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]

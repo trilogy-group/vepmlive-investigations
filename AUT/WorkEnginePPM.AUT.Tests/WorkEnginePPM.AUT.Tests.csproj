@@ -34,8 +34,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AUT.ConfigureTestProjects, Version=5.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\AUT.ConfigureTestProjects.5.4.0\lib\net462\AUT.ConfigureTestProjects.dll</HintPath>
+    <Reference Include="AUT.ConfigureTestProjects, Version=4.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AUT.ConfigureTestProjects.4.2.2\lib\net462\AUT.ConfigureTestProjects.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AutoFixture, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
