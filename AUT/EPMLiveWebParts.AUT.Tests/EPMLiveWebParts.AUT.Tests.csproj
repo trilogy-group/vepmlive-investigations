@@ -203,7 +203,6 @@
     <Compile Include="RollupSummary\SummaryRollupToolpartTest.cs" />
     <Compile Include="SiteCollectionSetupWizard\SiteCollectionSetupWizardTest.cs" />
     <Compile Include="SocialStream\SocialStreamTest.cs" />
-    <Compile Include="UserProfileDisplay\DisplayProfilePicturesTest.cs" />
     <Compile Include="UserProfileDisplay\UserProfileToolPartTest.cs" />
     <Compile Include="Utilities\ExtensionsTest.cs" />
     <Compile Include="Utilities\LookupFilterHelperTest.cs" />
