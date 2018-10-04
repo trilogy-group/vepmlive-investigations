@@ -47,15 +47,15 @@ namespace EPMLiveCore
         private const string Fieldm_dataSource = "_dataSource";
         private const string Field_lookupList = "_lookupList";
         private const string Field_parentLookupList = "_parentLookupList";
-        private const string Fieldm_throttled = "m_throttled";
-        private const string Fieldm_dropList = "_dropList";
-        private const string Fieldm_tbx = "_textBox";
-        private const string Fieldm_dropImage = "_dropImage";
+        private const string Fieldm_throttled = "_throttled";
+        private const string Fieldm_dropList = "DropList";
+        private const string Fieldm_tbx = "TextField";
+        private const string Fieldm_dropImage = "DropImage";
         private const string Fieldm_ids = "m_ids";
-        private const string Fieldm_value = "m_value";
-        private const string Fieldm_selectedValueIndex = "m_selectedValueIndex";
-        private const string Fieldm_webForeign = "m_webForeign";
-        private const string Fieldm_hasValueSet = "m_hasValueSet";
+        private const string Fieldm_value = "LookupValue";
+        private const string Fieldm_selectedValueIndex = "SelectedValueIndex";
+        private const string Fieldm_webForeign = "WebForeign";
+        private const string Fieldm_hasValueSet = "HasValueSet";
         private Type _cascadingLookupRenderControlInstanceType;
         private const int TestsTimeOut = TestContants.TimeOutFiveSeconds;
         private CascadingLookupRenderControl _cascadingLookupRenderControlInstance;
@@ -127,6 +127,13 @@ namespace EPMLiveCore
         [TestCase(PropertyDataSource)]
         [TestCase(PropertyChoices)]
         [TestCase(PropertyHiddenFieldName)]
+        [TestCase(Fieldm_dropList)]
+        [TestCase(Fieldm_tbx)]
+        [TestCase(Fieldm_dropImage)]
+        [TestCase(Fieldm_value)]
+        [TestCase(Fieldm_selectedValueIndex)]
+        [TestCase(Fieldm_webForeign)]
+        [TestCase(Fieldm_hasValueSet)]
         public void AUT_CascadingLookupRenderControl_All_Properties_Explore_Verify_By_Name_Test(string name)
         {
             // Arrange
@@ -155,16 +162,7 @@ namespace EPMLiveCore
         [TestCase(Fieldparent)]
         [TestCase(Fieldm_dataSource)]
         [TestCase(Field_lookupList)]
-        [TestCase(Field_parentLookupList)]
         [TestCase(Fieldm_throttled)]
-        [TestCase(Fieldm_dropList)]
-        [TestCase(Fieldm_tbx)]
-        [TestCase(Fieldm_dropImage)]
-        [TestCase(Fieldm_ids)]
-        [TestCase(Fieldm_value)]
-        [TestCase(Fieldm_selectedValueIndex)]
-        [TestCase(Fieldm_webForeign)]
-        [TestCase(Fieldm_hasValueSet)]
         public void AUT_CascadingLookupRenderControl_All_Fields_Explore_Verify_By_Name_Test(string name)
         {
             // Arrange

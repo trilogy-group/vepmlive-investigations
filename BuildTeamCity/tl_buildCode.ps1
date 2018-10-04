@@ -222,8 +222,6 @@ if ($TestsOnly)
 	& $MSBuildExec $projectPath `
 	/t:Build `
 	/p:OutputPath="$projOutput" `
-    /p:PreBuildEvent= `
-    /p:PostBuildEvent= `
     /p:Configuration="Debug" `
     /p:Platform="$PlatformToBuild" `
 	/p:langversion="$langversion" `
@@ -259,8 +257,6 @@ Log-SubSection "Building '$projName'..."
     
 # Run MSBuild
 & $MSBuildExec $projAbsPath `
-    /p:PreBuildEvent= `
-    /p:PostBuildEvent= `
     /p:Configuration="$ConfigurationToBuild" `
     /p:Platform="$PlatformToBuild" `
 	/p:langversion="$langversion" `
@@ -288,8 +284,6 @@ $sGenToolPath = $sGenToolPath -replace "\s","%20"
 
 # Run MSBuild
 & $MSBuildExec $projPublisherAbsPath `
-    /p:PreBuildEvent= `
-    /p:PostBuildEvent= `
     /p:Configuration="$ConfigurationToBuild" `
     /p:Platform="$PlatformToBuild" `
 	/p:langversion="$langversion" `
@@ -310,8 +304,6 @@ Log-SubSection "Building SSRS Injector"
     
 # Run MSBuild
 & $MSBuildExec $projSSRSPath `
-    /p:PreBuildEvent= `
-    /p:PostBuildEvent= `
     /p:Configuration="$ConfigurationToBuild" `
     /p:Platform="$PlatformToBuild" `
 	/p:langversion="$langversion" `
@@ -332,8 +324,6 @@ Log-SubSection "Building AUT"
     
 # Run MSBuild
 & $MSBuildExec $projAUTPath `
-    /p:PreBuildEvent= `
-    /p:PostBuildEvent= `
     /p:Configuration="$ConfigurationToBuild" `
     /p:Platform="$PlatformToBuild" `
 	/p:langversion="$langversion" `

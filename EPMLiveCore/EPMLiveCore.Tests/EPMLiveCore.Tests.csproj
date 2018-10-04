@@ -37,6 +37,12 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PortfolioEngineCore.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\PortfolioEngineCore.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Services" />
+  </ItemGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
@@ -47,6 +53,10 @@
     <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Castle.Core.4.3.0\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="DocumentFormat.OpenXml.2.5.5631.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\DocumentFormat.OpenXml.2.5.5631.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="EPM Live Core.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -104,6 +114,10 @@
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Data.DataSetExtensions.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.DirectoryServices.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System.Security" />
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Threading.Tasks.Extensions.4.3.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
@@ -118,9 +132,15 @@
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="System.XML.4.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml.Linq.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Xml.Linq.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="WorkEnginePPM.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Choose>
@@ -133,30 +153,54 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ActTests.cs" />
+    <Compile Include="ADSyncLeakTest.cs" />
+    <Compile Include="ADSyncTests.cs" />
     <Compile Include="API\Analytics\AnalyticsDataTests.cs" />
     <Compile Include="API\Analytics\FRFQueryFactoryTests.cs" />
     <Compile Include="API\Analytics\RecentItemsTests.cs" />
     <Compile Include="API\APITeamTests.cs" />
+    <Compile Include="API\Applications\ApplicationsTests.cs" />
+    <Compile Include="API\AssociatedListItems\AssociatedListItemsTests.cs" />
     <Compile Include="API\Comments\CommentManagerTests.cs" />
     <Compile Include="API\CreateWorkspace\DALTests.cs" />
     <Compile Include="API\CreateWorkspace\WorkspaceFactoryTests.cs" />
+    <Compile Include="API\CreateWorkspace\WorkspaceTimerJobAgentTest.cs" />
     <Compile Include="API\Integration\IntegrationAdminTests.cs" />
     <Compile Include="API\Integration\IntegrationCoreTest.cs" />
+    <Compile Include="API\Integration\SqlIntegrationTest.cs" />
     <Compile Include="API\MyWork\MyWorkTests.cs" />
     <Compile Include="API\MyWork\MyWorkTestsSplitOne.cs" />
+    <Compile Include="API\MyWork\MyWorkTestsSplitThree.cs" />
     <Compile Include="API\MyWork\MyWorkTestsSplitTwo.cs" />
+    <Compile Include="API\MyWork\UtilsTests.cs" />
     <Compile Include="API\NavigationServiceTests.cs" />
     <Compile Include="API\Notification\APIEmailTests.cs" />
+    <Compile Include="API\Applications\ApplicationUninstallerTests.cs" />
     <Compile Include="API\Publish\APIPublishTests.cs" />
     <Compile Include="API\ResourceGrid\ResourceExporterTests.cs" />
+    <Compile Include="API\ResourceGrid\ResourceGridTests.cs" />
+    <Compile Include="API\SolGalTemplatesManagerTests.cs" />
+    <Compile Include="API\ResourceGrid\ResourceImporterTests.cs" />
+    <Compile Include="API\SPAdmin\EventReceiverManagerTests.cs" />
     <Compile Include="API\TimerTests.cs" />
+    <Compile Include="AppSettingsHelperTests.cs" />
+    <Compile Include="AssignmentPlanner\GridManagerTests.cs" />
+    <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControlTests.cs" />
     <Compile Include="CheckOpenCloseConnections.cs" />
     <Compile Include="ControlDataBuilderTest.cs" />
     <Compile Include="CoreFunctions.GetPlannerList.Tests.cs" />
+    <Compile Include="CoreFunctionsRemTestsSplitOne.cs" />
+    <Compile Include="CoreFunctionsRemTestsSplitThree.cs" />
     <Compile Include="CoreFunctionsTest.cs" />
     <Compile Include="EditableFieldDisplayTests.cs" />
+    <Compile Include="ExtensionMethodsTest.cs" />
+    <Compile Include="Infrastructure\BaseClasses\SPListItemManagerTests.cs" />
+    <Compile Include="Infrastructure\ResourceManagment\ResourcePoolManagerTests.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
     <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
+    <Compile Include="ISAPI\WorkEngineAPITests.cs" />
+    <Compile Include="ISAPI\WorkEngineAPITests.RemainingMethods.cs" />
+    <Compile Include="Jobs\NotificationsTests.cs" />
     <Compile Include="Jobs\ResourceImportJobTests.cs" />
     <Compile Include="Jobs\ResourcePlanTest.cs" />
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
@@ -167,17 +211,28 @@
     <Compile Include="Layouts\epmlive\GenericQueryControlTests.cs" />
     <Compile Include="Layouts\epmlive\GridGanttSettingsTest.cs" />
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
+    <Compile Include="Layouts\epmlive\SolutionStoreProxyTests.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.AddEntityPickersToLookups.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.IsFieldExcluded.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.OnInit.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.RenderControl.cs" />
     <Compile Include="NewAppTest.cs" />
     <Compile Include="PlatformIntegrationEventTest.cs" />
+    <Compile Include="Properties\Resources.Designer.cs" />
     <Compile Include="ReportHelper\EPMDataTest.Part3.cs" />
     <Compile Include="ReportHelper\EPMDataTest.Part2.cs" />
+    <Compile Include="ReportHelper\ListBizTest.cs" />
+    <Compile Include="ReportHelper\MyWorkReportDataTest.cs" />
     <Compile Include="RequestWorkspaceTest.cs" />
     <Compile Include="NewProjectTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportHelper\EPMDataTest.cs" />
     <Compile Include="ReportHelper\ReportDataTests.cs" />
+    <Compile Include="ResourcePoolEvent\ResourcePoolEventTest.cs" />
     <Compile Include="Shared\AssertException.cs" />
+    <Compile Include="SocialEngine\Core\ThreadManagerTest.cs" />
     <Compile Include="SocialEngine\Modules\ListItemTests.cs" />
     <Compile Include="SPUtilities\SPListUtilityTest.cs" />
     <Compile Include="Testables\InputFormSectionTestable.cs">
@@ -194,6 +249,7 @@
     </Compile>
     <Compile Include="TestCheck.cs" />
     <Compile Include="WebPageCode\AdminConnsTest.cs" />
+    <Compile Include="WebPageCode\CreateDatabaseTest.cs" />
     <Compile Include="WebPageCode\ListDisplayPageTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -213,6 +269,10 @@
       <Project>{fcf0c151-0a3f-4b9f-9327-3bbbf109d776}</Project>
       <Name>EPMLiveWorkPlanner</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\PortfolioEngineCore\WorkEnginePPM\WorkEnginePPM.csproj">
+      <Project>{51caf42a-31af-4b74-853f-24b672c185c2}</Project>
+      <Name>WorkEnginePPM</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveCore\EPMLiveCore.csproj">
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
       <Name>EPMLiveCore</Name>
@@ -229,6 +289,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Fakes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

@@ -1,6 +1,8 @@
-﻿using System;
+﻿using PortfolioEngineCore.Services;
+using System;
 using System.Data.SqlClient;
 using System.Reflection;
+
 
 namespace PortfolioEngineCore
 {
@@ -273,13 +275,8 @@ namespace PortfolioEngineCore
             try
             {
                 string sXML = BuildProductInfoString(IntPtr.Zero);
-                // this is what we have to do to late bind to a 32bit com+ vb6 object from a 64bit .net process
-                Type comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
-                object comObject = Activator.CreateInstance(comObjectType);
-                object[] myparams = new object[] { sContext, BasePath};
-                sReply = (string)comObjectType.InvokeMember("RSVPRequest", BindingFlags.InvokeMethod, null, comObject, myparams);
-
-                comObject = null;
+                WSSAdmin wssadmin = new WSSAdmin();
+                sReply = wssadmin.RSVPRequest(sContext, BasePath);
             }
             catch (Exception ex)
             {
