@@ -61,11 +61,7 @@ namespace EPMLiveCore.Tests.API
                 .Append("<Lists>")
                 .AppendFormat("<List Name='name' CanUpgrade='{0}' Reporting='true' Template='template' ", canUpgrade)
                 .Append(hasNoDelete ? "NoDelete=''" :string.Empty)
-                .Append(" />")
-                //.Append("<Workflows>")
-                //.Append("<Workflow Name='name' Overwrite=''/>")
-                //.Append("</Workflows>")
-                //.Append("</List>")
+                .Append(" />")                
                 .Append("</Lists>")
                 .Append("</root>");
             appDef.ApplicationXml.LoadXml(xml.ToString());

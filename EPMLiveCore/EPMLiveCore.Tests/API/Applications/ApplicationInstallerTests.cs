@@ -3,6 +3,7 @@ using System.Collections.Fakes;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.SqlClient.Fakes;
+using System.IO.Fakes;
 using System.Linq;
 using System.Net.Fakes;
 using System.Xml;
@@ -72,11 +73,15 @@ namespace EPMLiveCore.Tests.API
             ShimSPWeb.AllInstances.FeaturesGet = _ => new ShimSPFeatureCollection();
             ShimSPWeb.AllInstances.RootFolderGet = _ => new ShimSPFolder();
             ShimSPWeb.AllInstances.NavigationGet = _ => new ShimSPNavigation();
+            ShimSPWeb.AllInstances.AllUsersGet = _ => new ShimSPUserCollection();
+
+            ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => new ShimSPUser();
 
             ShimSPNavigation.AllInstances.QuickLaunchGet = _ => new ShimSPNavigationNodeCollection();
             ShimSPNavigation.AllInstances.TopNavigationBarGet = _ => new ShimSPNavigationNodeCollection();
 
             ShimSPSite.ConstructorGuid = (_, __) => { };
+            ShimSPSite.ConstructorGuidSPUserToken = (_, __, ___) => { };
             ShimSPSite.AllInstances.GetCatalogSPListTemplateType = (a, b) => new ShimSPDocumentLibrary();
             ShimSPSite.AllInstances.SolutionsGet = _ => new ShimSPUserSolutionCollection();
             ShimSPSite.AllInstances.RootWebGet = _ => new ShimSPWeb();
@@ -207,6 +212,12 @@ namespace EPMLiveCore.Tests.API
             ShimReportBiz.AllInstances.CreateListBizGuid = (a, b) => new ShimListBiz();
 
             ShimListBiz.AllInstances.ListNameGet = _ => string.Empty;
+
+            ShimPath.GetDirectoryNameString = _ => string.Empty;
+            ShimPath.GetExtensionString = _ => ".txt";
+
+            ShimSPFieldLookupValue.ConstructorString = (_, __) => { };
+            ShimSPFieldLookupValue.AllInstances.LookupValueGet = _ => "lookupValue";
         }
     }
 }
