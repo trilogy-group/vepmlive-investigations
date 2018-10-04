@@ -101,6 +101,7 @@
     <Add FullName="EPMLiveCore.ListDisplaySettingIteratorHelpers!"/>
     <Add FullName="EPMLiveCore.ListDisplaySettingIteratorRenderHelpers!"/>
     <Add FullName="EPMLiveCore.ReportingData!"/>
+    <Add FullName="EPMLiveCore.timersettings!"/>
     <Add FullName="EPMLiveCore.ADSync!"/>
     <Add FullName="EPMLiveCore.FilteredLookupField!"/>
     <Add FullName="EPMLiveCore.FilteredLookupFieldEditor!"/>
