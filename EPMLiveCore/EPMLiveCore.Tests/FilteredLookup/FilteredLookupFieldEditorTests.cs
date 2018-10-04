@@ -406,6 +406,7 @@ namespace EPMLiveCore.Tests.FilteredLookup
             ShimFilteredLookupFieldEditor.AllInstances.CanFieldBeDisplayedSPField = (_, field) => true;
             ShimListItemCollection.AllInstances.IndexOfListItem = (_, searchValue) => IndexValue;
             ShimDropDownList.AllInstances.SelectedIndexSetInt32 = (_, value) => index = value;
+            ViewState[TargetColumnId] = string.Empty;
 
             // Act
             privateObject.Invoke(SetTargetColumnMethodName, DummyGuid.ToString(), DummyGuid.ToString());
@@ -540,6 +541,7 @@ namespace EPMLiveCore.Tests.FilteredLookup
             ShimFilteredLookupFieldEditor.AllInstances.CanFieldBeDisplayedSPField = (_, field) => true;
             ShimListItemCollection.AllInstances.IndexOfListItem = (_, searchValue) => IndexValue;
             ShimDropDownList.AllInstances.SelectedIndexSetInt32 = (_, value) => index = value;
+            ViewState[TargetListViewId] = string.Empty;
 
             // Act
             privateObject.Invoke(SetTargetListViewMethodName, DummyGuid.ToString(), DummyGuid.ToString());
