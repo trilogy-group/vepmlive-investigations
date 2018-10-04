@@ -194,6 +194,7 @@
     <Compile Include="CoreFunctionsTest.cs" />
     <Compile Include="EditableFieldDisplayTests.cs" />
     <Compile Include="ExtensionMethodsTest.cs" />
+    <Compile Include="FilteredLookup\FilteredLookupFieldEditorTests.cs" />
     <Compile Include="Infrastructure\BaseClasses\SPListItemManagerTests.cs" />
     <Compile Include="Infrastructure\ResourceManagment\ResourcePoolManagerTests.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
@@ -212,6 +213,7 @@
     <Compile Include="Layouts\epmlive\GridGanttSettingsTest.cs" />
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
     <Compile Include="Layouts\epmlive\SolutionStoreProxyTests.cs" />
+    <Compile Include="Layouts\epmlive\TimerSettingsTests.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.AddEntityPickersToLookups.cs" />
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.cs" />

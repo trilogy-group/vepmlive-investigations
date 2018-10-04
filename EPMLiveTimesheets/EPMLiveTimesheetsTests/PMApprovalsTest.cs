@@ -49,6 +49,13 @@ namespace EPMLiveTimesheets.Tests
     public class PMApprovalsTest : TestClassInitializer<PMApprovals>
     {
         private const string DummyUrl = "http://dummy.url";
+        private const string Periods = "Periods";
+        private const string SpList = "SpList";
+        private const string View = "View";
+        private const string Status = "Status";
+        private const string ActivationText = "Activation";
+        private const string ActText = "Act";
+        private const string DropDownListText = "_dropDownList";
         private HttpContext _httpContext;
         private HttpRequest _httpRequest;
         private HttpResponse _httpResponse;
@@ -217,13 +224,13 @@ namespace EPMLiveTimesheets.Tests
 
             // Act
             PrivateObject.Invoke("CreateChildControls");
-            var arrPeriods = Get<SortedList>("arrPeriods");
+            var arrPeriods = Get<SortedList>(Periods);
 
             // Assert
             this.ShouldSatisfyAllConditions(
                 () =>
                 {
-                    var timesheetMenu = Get<TimesheetMenu>("ts");
+                    var timesheetMenu = Get<TimesheetMenu>("_timeSheetMenu");
                     timesheetMenu.Text.ShouldContain("Actions");
                     timesheetMenu.TemplateName.ShouldContain("ToolbarPMMenu");
                 },
@@ -323,7 +330,7 @@ namespace EPMLiveTimesheets.Tests
             ShimControl.AllInstances.FindControlString = (_, __) => lblFilterText;
 
             // Act
-            PrivateObject.Invoke("processControls", control, DummyString, DummyString, new ShimSPWeb().Instance);
+            PrivateObject.Invoke("ProcessControls", control, DummyString, DummyString, new ShimSPWeb().Instance);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -366,25 +373,26 @@ namespace EPMLiveTimesheets.Tests
             SetupShimsForSqlClient();
             SetupShimsForHttpRequest();
             SetupShimsForSharePoint();
-            PrivateObject.SetField("activation", activation);
-            PrivateObject.SetField("list", new ShimSPList().Instance);
-            PrivateObject.SetField("view", new ShimSPView().Instance);
-            PrivateObject.SetField("act", new Act(new ShimSPWeb()));
+            PrivateObject.SetFieldOrProperty(ActivationText, activation);
+            PrivateObject.SetFieldOrProperty(SpList, new ShimSPList().Instance);
+            PrivateObject.SetFieldOrProperty(View, new ShimSPView().Instance);
+            PrivateObject.SetFieldOrProperty(ActText, new Act(new ShimSPWeb()));
             if (arrPeriodsCount > 0)
             {
-                var ddl = Get<DropDownList>("ddl");
+                var ddl = Get<DropDownList>(DropDownListText);
                 ddl.Items.Clear();
                 ddl.Items.Add(new ListItem(DummyString, newPeriod));
                 ddl.SelectedIndex = 0;
             }
 
-            PrivateObject.SetField("arrPeriods", new SortedList {{2, 2}, {DummyInt, DummyInt}});
-            PrivateObject.SetField("error", DummyString);
-            PrivateObject.SetField("toolbar", new ViewToolBar());
+            PrivateObject.SetFieldOrProperty(Periods, new SortedList {{2, 2}, {DummyInt, DummyInt}});
+            PrivateObject.SetFieldOrProperty("Error", DummyString);
+            PrivateObject.SetFieldOrProperty("_viewToolbar", new ViewToolBar());
             _queryString.Add("NewPeriod", newPeriod);
             _queryString.Add("webpartid", DummyString);
             ShimSPUser.AllInstances.IsSiteAdminGet = _ => true;
-            ShimPMApprovals.AllInstances.renderGridHtmlTextWriterSPWeb = (_, _2, _3) => { };
+            ShimApprovalsBase.AllInstances.RenderGridHtmlTextWriterSPWebStringStringStringStringStringStringBoolean =
+                (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10) => { };
             SystemWebPartsFakes.AllInstances.WebPartManagerGet = _ => new ShimSPWebPartManager();
             ShimWebPart.AllInstances.WebPartManagerGet = _ => new ShimSPWebPartManager();
             SystemWebPartManagerFakes.AllInstances.WebPartsGet = _ => new SystemWebPartCollection();
@@ -417,9 +425,9 @@ namespace EPMLiveTimesheets.Tests
             {
                 actualResult.ShouldSatisfyAllConditions(
                     () => actualResult.ShouldContain(DummyString),
-                    () => Get<string>("status").ShouldContain("Closed"),
-                    () => Get<ImageButton>("btnPrev").Visible.ShouldBeFalse(),
-                    () => Get<ImageButton>("btnNext").Visible.ShouldBeFalse(),
+                    () => Get<string>(Status).ShouldContain("Closed"),
+                    () => Get<ImageButton>("_buttonPrev").Visible.ShouldBeFalse(),
+                    () => Get<ImageButton>("_buttonNext").Visible.ShouldBeFalse(),
                     () =>
                     {
                         if (!string.IsNullOrEmpty(newPeriod))
@@ -439,8 +447,8 @@ namespace EPMLiveTimesheets.Tests
             TestEntity.ID = DummyString;
             TestEntity.ZoneID = DummyString;
             SetupShimsForSqlClient();
-            PrivateObject.SetField("list", new ShimSPList().Instance);
-            PrivateObject.SetField("view", new ShimSPView().Instance);
+            PrivateObject.SetFieldOrProperty(SpList, new ShimSPList().Instance);
+            PrivateObject.SetFieldOrProperty(View, new ShimSPView().Instance);
             ShimSPContext.AllInstances.SiteGet = _ => new ShimSPSite();
             ShimSPForm.AllInstances.ServerRelativeUrlGet = _ => DummyUrl;
             ShimSPView.AllInstances.IDGet = _ => Guid.NewGuid();
@@ -495,7 +503,7 @@ namespace EPMLiveTimesheets.Tests
                 }
                 return new Control();
             };
-            PrivateObject.SetField("status", "New");
+            PrivateObject.SetFieldOrProperty(Status, "New");
             ShimToolBar.AllInstances.ButtonsGet = _ => new RepeatedControls();
             ShimToolBar.AllInstances.RightButtonsGet = _ => new RepeatedControls();
             ShimControl.AllInstances.ClientIDGet = _ => DummyString;
@@ -528,7 +536,7 @@ namespace EPMLiveTimesheets.Tests
             // Act
             using (var htmlTextWriter = new HtmlTextWriter(stringWriter))
             {
-                PrivateObject.Invoke("renderGrid", htmlTextWriter, new ShimSPWeb().Instance);
+                PrivateObject.Invoke("RenderGrid", htmlTextWriter, new ShimSPWeb().Instance);
             }
             var actualResult = stringWriter.ToString();
 
