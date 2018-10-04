@@ -1,24 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Data;
-using System.Web.UI.WebControls.WebParts;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.Workflow;
-using Microsoft.SharePoint.Administration;
-using Microsoft.SharePoint.Navigation;
 using System.Collections;
-using System.Xml;
-using System.Text.RegularExpressions;
-using System.Net;
-using Microsoft.SharePoint.WebPartPages;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
+using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml;
 using EPMLiveCore.WebPartsHelper;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
+using Microsoft.SharePoint.Navigation;
+using Microsoft.SharePoint.WebPartPages;
+using Microsoft.SharePoint.Workflow;
 using WebPart = Microsoft.SharePoint.WebPartPages.WebPart;
-using System.Diagnostics;
 
 namespace EPMLiveCore.API
 {
@@ -1503,134 +1501,6 @@ namespace EPMLiveCore.API
 
         
 
-        private void iInstallListsFields(SPList list, XmlNode ndList, int ParentMessageId, bool added)
-        {
-            XmlNode ndFields = ndList.SelectSingleNode("Fields");
-
-            if (ndFields != null)
-            {
-                if (bVerifyOnly)
-                    ParentMessageId = addMessage(0, "Checking Fields", "", ParentMessageId);
-                else
-                    ParentMessageId = addMessage(0, "Updating Fields", "", ParentMessageId);
-
-                foreach (XmlNode ndField in ndFields.SelectNodes("Field"))
-                {
-
-                    string sInternalName = getAttribute(ndField, "InternalName");
-                    XmlNode ndInternalFieldXml = ndField.SelectSingleNode("Field");
-                    string sType = getAttribute(ndInternalFieldXml, "Type");
-                    bool bOverwrite = false;
-                    bool.TryParse(getAttribute(ndField, "Overwrite"), out bOverwrite);
-
-                    string sTotal = getAttribute(ndField, "Total");
-
-                    SPField oField = null;
-                    try
-                    {
-                        oField = list.Fields.GetFieldByInternalName(sInternalName);
-                    }
-                    catch { }
-
-                    if (oField == null)//field new let's add
-                    {
-                        if (bVerifyOnly)
-                        {
-                            SPFieldType oType = iGetFieldTypeByString(sType);
-
-                            addMessage(ErrorLevels.NoError, sInternalName, "", ParentMessageId);
-
-                        }
-                        else
-                        {
-                            try
-                            {
-                                oField = iInstallListFieldsAddField(list, sInternalName, sType, ndInternalFieldXml);
-                                try
-                                {
-                                    if (oField != null)
-                                        iInstallListFieldSwapXml(list, oField, ndInternalFieldXml);
-
-                                    addMessage(ErrorLevels.NoError, sInternalName, "", ParentMessageId);
-                                }
-                                catch (Exception ex)
-                                {
-                                    addMessage(ErrorLevels.Error, sInternalName, "Error updating field schema: " + ex.Message, ParentMessageId);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                addMessage(ErrorLevels.Error, sInternalName, "Error adding field: " + ex.Message, ParentMessageId);
-                            }
-
-
-                        }
-                    }
-                    else//field exists so we can upgrade
-                    {
-                        if (oField.TypeAsString.ToLower() == sType.ToLower())
-                        {
-                            if (bOverwrite)
-                            {
-                                if (bVerifyOnly)
-                                {
-                                    addMessage(ErrorLevels.Upgrade, sInternalName, "Field exists and will overwrite", ParentMessageId);
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        if (oField != null)
-                                            iInstallListFieldSwapXml(list, oField, ndInternalFieldXml);
-
-                                        addMessage(ErrorLevels.NoError, sInternalName, "Field updated", ParentMessageId);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        addMessage(ErrorLevels.Error, sInternalName, "Error updating field schema: " + ex.Message, ParentMessageId);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                addMessage(ErrorLevels.Warning, sInternalName, "Field exists and cannot overwrite", ParentMessageId);
-                            }
-                        }
-                        else
-                        {
-                            addMessage(ErrorLevels.Error, sInternalName, "Field type mistmatch", ParentMessageId);
-                        }
-                    }
-
-                    if (!string.IsNullOrEmpty(sTotal))
-                    {
-                        GridGanttSettings gSettings = new GridGanttSettings(list);
-
-                        string output = "";
-
-                        string[] fieldList = gSettings.TotalSettings.Split('\n');
-
-                        foreach (string field in fieldList)
-                        {
-                            if (field != "")
-                            {
-                                string[] fieldData = field.Split('|');
-                                if (fieldData[0] != sInternalName)
-                                {
-                                    output += "\n" + field;
-                                }
-                            }
-                        }
-
-                        output += "\n" + sInternalName + "|" + sTotal;
-
-                        gSettings.TotalSettings = output.Trim('\n');
-                        gSettings.SaveSettings(list);
-                    }
-                }
-            }
-        }
-
         private void iInstallListsLookups(SPList list, XmlNode ndList, int ParentMessageId)
         {
             XmlNode ndParent = ndList.ParentNode;
@@ -1924,7 +1794,7 @@ namespace EPMLiveCore.API
                             oList = oWeb.Lists.TryGetList(sListName);
 
                             if (oList != null)
-                                iInstallListsFields(oList, ndList, ListParentMessageId, bListAdded);
+                                InstallListsFields(oList, ndList, ListParentMessageId);
 
                             iInstallListsLookups(oList, ndList, ListParentMessageId);
                             InstallListsViews(oList, ndList, ListParentMessageId);

@@ -150,6 +150,7 @@
     <Compile Include="API\Applications\ApplicationInstaller.cs" />
     <Compile Include="API\Applications\ApplicationInstaller.InstallListsViews.cs" />
     <Compile Include="API\Applications\ApplicationInstaller.InstallListsViewsWebPartsInstall.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallListsFields.cs" />
     <Compile Include="API\Applications\Applications.cs" />
     <Compile Include="API\Applications\ApplicationUninstaller.cs" />
     <Compile Include="API\Applications\ApplicationInstaller.InstallProperties.cs" />

@@ -9,7 +9,7 @@ namespace EPMLiveCore.Tests.API
 {
     public partial class ApplicationInstallerTests
     {
-        private const string InstallListsFieldsMethod = "iInstallListsFields";
+        private const string InstallListsFieldsMethod = "InstallListsFields";
 
         [TestMethod]
         public void InstallListsFields_When_Field_New()
@@ -71,7 +71,7 @@ namespace EPMLiveCore.Tests.API
             ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Choice;
 
             // Act
-            _privateObject.Invoke(InstallListsFieldsMethod, new object[] { new ShimSPList().Instance, ndList, 0, true });
+            _privateObject.Invoke(InstallListsFieldsMethod, new object[] { new ShimSPList().Instance, ndList, 0});
             var dtMessages = _privateObject.GetFieldOrProperty(DTMessagesProp) as DataTable;
 
             // Assert
