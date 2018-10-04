@@ -428,7 +428,7 @@ namespace EPMLiveCore
                 if (!string.IsNullOrWhiteSpace(planner))
                 {
                     var sPlanner = planner.Split('|');
-                    ValidatePlannerLength(sPlanner, 1);
+                    EnsureEnoughPlanners(sPlanner, 1);
                     var canProject = false;
                     var canOnline = false;
                     bool.TryParse(getConfigSetting(inWeb, $"EPMLivePlanner{sPlanner[0]}EnableOnline"), out canOnline);
@@ -449,7 +449,7 @@ namespace EPMLiveCore
                             isProjectFound = true;
                             if (listTitle == projectCenterList.Title)
                             {
-                                ValidatePlannerLength(sPlanner, 2);
+                                EnsureEnoughPlanners(sPlanner, 2);
                                 plannerList.Add(
                                     sPlanner[0],
                                     CreatePlannerDef(
@@ -463,7 +463,7 @@ namespace EPMLiveCore
                             }
                             else if (listTitle == taskCenterList.Title)
                             {
-                                ValidatePlannerLength(sPlanner, 2);
+                                EnsureEnoughPlanners(sPlanner, 2);
                                 plannerList.Add(
                                     sPlanner[0],
                                     CreatePlannerDef(
@@ -483,11 +483,11 @@ namespace EPMLiveCore
             return isProjectFound;
         }
 
-        private static void ValidatePlannerLength(string[] sPlanner, int requiredMinLength)
+        private static void EnsureEnoughPlanners(string[] sPlanner, int requiredMinLength)
         {
-            if (sPlanner.Length < requiredMinLength)
+            if (sPlanner?.Length < requiredMinLength)
             {
-                throw new InvalidOperationException($"There is no enough values for the planner.");
+                throw new InvalidOperationException($"There are no enough values for the planner.");
             }
         }
 
@@ -655,6 +655,7 @@ namespace EPMLiveCore
                 if (!string.IsNullOrWhiteSpace(planner))
                 {
                     var sPlanner = planner.Split('|');
+                    EnsureEnoughPlanners(sPlanner, 1);
                     var taskCenter = getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}TaskCenter");
                     var projectCenter = getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}ProjectCenter");
                     var description = getConfigSetting(lockedWeb, $"EPMLivePlanner{sPlanner[0]}Description");
@@ -690,6 +691,7 @@ namespace EPMLiveCore
 
                         if (projectCenterList != null && taskCenterList != null)
                         {
+                            EnsureEnoughPlanners(sPlanner, 2);
                             plannerList.Add(
                                 sPlanner[0],
                                 CreatePlannerDef(
