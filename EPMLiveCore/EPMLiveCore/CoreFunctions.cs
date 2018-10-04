@@ -163,7 +163,18 @@ namespace EPMLiveCore
 
     public class CoreFunctions
     {
+        private const string ImagePlanner16 = "/_layouts/epmlive/images/planner16.png";
+        private const string MicrosoftOfficeProject = "Microsoft Office Project";
+        private const string ListEPMLivePlannerCommand = "ListEPMLivePlanner";
+        private const string PlannerCommandPerfix = "planner:";
+        private const string ListEPMLiveTaskPlannerCommand = "ListEPMLiveTaskPlanner";
+        private const string TaskPlannerCommandPerfix = "taskplanner:";
+        private const string Project2007LogoSmall = "/_layouts/images/Project2007LogoSmall.gif";
+        private const string EditInMicrosoftProject = "EditInMicrosoftProject";
+        private const string MicrosoftProject = "Microsoft Project";
+        private const string Feature = "91f0c887-2db2-44b2-b15c-47c69809c767";
         private const string SharepointSystemAccountLowercase = "sharepoint\\system";
+        private const string EditScheduleInMSOfficeProject = "Edit Schedule in Microsoft Office Project";
         private const string InitVector = "77B2c3D4e1F3g7R1";
         private const string SaltValue = "f53fNDH@";
         private const string HashAlgorithm = "SHA1";
@@ -303,26 +314,25 @@ namespace EPMLiveCore
                     }
 
                     var isProjectFound = AddParentPlanners(lockedWeb, inWeb, plannerList, list.Title, planners, disableProject, disablePlan);
-                    if (!isProjectFound && list.Title == "Project Center")
+                    if (!isProjectFound
+                        && list.Title == "Project Center"
+                        && lockedWeb.Lists.TryGetList("Planner Templates") == null)
                     {
-                        if (lockedWeb.Lists.TryGetList("Planner Templates") == null)
-                        {
-                            plannerList.Add(
-                                "MPP",
-                                CreatePlannerDef(
-                                    "Microsoft Office Project",
-                                    "/_layouts/epmlive/images/planner16.png",
-                                    true,
-                                    "ListEPMLivePlanner",
-                                    string.Empty,
-                                    1,
-                                    "planner:"));
-                        }
+                        plannerList.Add(
+                            "MPP",
+                            CreatePlannerDef(
+                                MicrosoftOfficeProject,
+                                ImagePlanner16,
+                                true,
+                                ListEPMLivePlannerCommand,
+                                string.Empty,
+                                1,
+                                PlannerCommandPerfix));
                     }
 
                     if (!disablePlan)
                     {
-                        if (FeatureExists(inWeb, "91f0c887-2db2-44b2-b15c-47c69809c767"))
+                        if (FeatureExists(inWeb, Feature))
                         {
                             AddParentWorkOrAgilePlanner(lockedWeb, inWeb, plannerList, list.Title, "WP", "Work");
                         }
@@ -349,25 +359,23 @@ namespace EPMLiveCore
             bool.TryParse(getConfigSetting(inWeb, "EPMLiveDisablePlanners"), out disablePlan);
 
             var isProjectFound = AddPlannersToPlannersList(lockedWeb, inWeb, plannerList, planners, disableProject, disablePlan);
-            if (!isProjectFound)
+            if (!isProjectFound
+                && lockedWeb.Lists.TryGetList("Planner Templates") == null)
             {
-                if (lockedWeb.Lists.TryGetList("Planner Templates") == null)
-                {
-                    plannerList.Add(
-                        "MPP",
-                        CreatePlannerDef("Microsoft Office Project",
-                        "/_layouts/epmlive/images/planner16.png",
-                        true,
-                        "Task Center",
-                        string.Empty,
-                        1,
-                        "Project Center"));
-                }
+                plannerList.Add(
+                    "MPP",
+                    CreatePlannerDef(MicrosoftOfficeProject,
+                    ImagePlanner16,
+                    true,
+                    "Task Center",
+                    string.Empty,
+                    1,
+                    "Project Center"));
             }
 
             if (!disablePlan)
             {
-                if (FeatureExists(inWeb, "91f0c887-2db2-44b2-b15c-47c69809c767"))
+                if (FeatureExists(inWeb, Feature))
                 {
                     AddWorkOrAgilePlanner(lockedWeb, inWeb, plannerList, "WP", "Work");
                 }
@@ -390,13 +398,13 @@ namespace EPMLiveCore
                     if (foundmpp)
                     {
                         plannerList.Add(
-                            "EditInMicrosoftProject",
+                            EditInMicrosoftProject,
                             CreatePlannerDef(
-                                "Microsoft Project",
-                                "/_layouts/images/Project2007LogoSmall.gif",
+                                MicrosoftProject,
+                                Project2007LogoSmall,
                                 true,
                                 taskCenterList.Title,
-                                "Edit Schedule in Microsoft Office Project",
+                                EditScheduleInMSOfficeProject,
                                 2,
                                 projectCenterList.Title));
                     }
@@ -420,7 +428,7 @@ namespace EPMLiveCore
                 if (!string.IsNullOrWhiteSpace(planner))
                 {
                     var sPlanner = planner.Split('|');
-
+                    ValidatePlannerLength(sPlanner, 1);
                     var canProject = false;
                     var canOnline = false;
                     bool.TryParse(getConfigSetting(inWeb, $"EPMLivePlanner{sPlanner[0]}EnableOnline"), out canOnline);
@@ -441,29 +449,31 @@ namespace EPMLiveCore
                             isProjectFound = true;
                             if (listTitle == projectCenterList.Title)
                             {
+                                ValidatePlannerLength(sPlanner, 2);
                                 plannerList.Add(
                                     sPlanner[0],
                                     CreatePlannerDef(
                                         sPlanner[1],
-                                        "/_layouts/epmlive/images/planner16.png",
+                                        ImagePlanner16,
                                         true,
-                                        "ListEPMLivePlanner",
+                                        ListEPMLivePlannerCommand,
                                         description,
                                         1,
-                                        "planner:"));
+                                        PlannerCommandPerfix));
                             }
                             else if (listTitle == taskCenterList.Title)
                             {
+                                ValidatePlannerLength(sPlanner, 2);
                                 plannerList.Add(
                                     sPlanner[0],
                                     CreatePlannerDef(
                                         sPlanner[1],
-                                        "/_layouts/epmlive/images/planner16.png",
+                                        ImagePlanner16,
                                         true,
-                                        "ListEPMLiveTaskPlanner",
+                                        ListEPMLiveTaskPlannerCommand,
                                         description,
                                         1,
-                                        "taskplanner:"));
+                                        TaskPlannerCommandPerfix));
                             }
                         }
                     }
@@ -471,6 +481,14 @@ namespace EPMLiveCore
             }
 
             return isProjectFound;
+        }
+
+        private static void ValidatePlannerLength(string[] sPlanner, int requiredMinLength)
+        {
+            if (sPlanner.Length < requiredMinLength)
+            {
+                throw new InvalidOperationException($"There is no enough values for the planner.");
+            }
         }
 
         private static void AddEditInProject(SPWeb inWeb, Dictionary<string, PlannerDefinition> plannerList, SPList list)
@@ -483,20 +501,20 @@ namespace EPMLiveCore
                 var publisherProjectCenter = getLockConfigSetting(inWeb, "epmlivepub-pc", false);
                 if (string.Equals(publisherProjectCenter, list.Title, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    var publisherTaskCenter = getLockConfigSetting(inWeb, "epmlivepub-tc", false);
+                    getLockConfigSetting(inWeb, "epmlivepub-tc", false);
                     var foundmpp = HasMicrosoftProjectTemplate(inWeb);
                     if (foundmpp)
                     {
                         plannerList.Add(
-                            "EditInMicrosoftProject",
+                            EditInMicrosoftProject,
                             CreatePlannerDef(
-                                "Microsoft Project",
-                                "/_layouts/images/Project2007LogoSmall.gif",
+                                MicrosoftProject,
+                                Project2007LogoSmall,
                                 true,
-                                FeatureExists(inWeb, "91f0c887-2db2-44b2-b15c-47c69809c767")
+                                FeatureExists(inWeb, Feature)
                                     ? "EditInPSProject"
                                     : "EditInProject",
-                                "Edit Schedule in Microsoft Office Project",
+                                EditScheduleInMSOfficeProject,
                                 2,
                                 string.Empty));
                     }
@@ -593,7 +611,7 @@ namespace EPMLiveCore
                     $"WorkEngine{plannerDefinition}Planner",
                     CreatePlannerDef(
                         $"{plannerDefinition} Planner",
-                        "/_layouts/epmlive/images/planner16.png",
+                        ImagePlanner16,
                         true,
                         taskCenterList.Title,
                         $"WorkEngine {plannerDefinition} Planner",
@@ -676,7 +694,7 @@ namespace EPMLiveCore
                                 sPlanner[0],
                                 CreatePlannerDef(
                                     sPlanner[1],
-                                    "/_layouts/epmlive/images/planner16.png",
+                                    ImagePlanner16,
                                     true,
                                     taskCenterList.Title,
                                     description,
