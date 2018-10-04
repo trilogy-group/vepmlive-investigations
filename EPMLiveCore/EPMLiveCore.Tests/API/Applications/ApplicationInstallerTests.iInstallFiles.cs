@@ -12,7 +12,7 @@ namespace EPMLiveCore.Tests.API
     
     public partial class ApplicationInstallerTests
     {
-        private const string iInstallFilesMethod = "iInstallFiles";
+        private const string iInstallFilesMethod = "InstallFiles";
 
         [TestMethod]
         public void InstallFiles()

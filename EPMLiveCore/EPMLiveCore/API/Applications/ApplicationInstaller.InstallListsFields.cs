@@ -40,13 +40,13 @@ namespace EPMLiveCore.API
             {
                 throw new ArgumentNullException(nameof(ndField));
             }
-            var internalName = getAttribute(ndField, "InternalName");
+            var internalName = ApplicationInstallerHelpers.getAttribute(ndField, "InternalName");
             var internalFieldXml = ndField.SelectSingleNode("Field");
-            var typeValue = getAttribute(internalFieldXml, "Type");
+            var typeValue = ApplicationInstallerHelpers.getAttribute(internalFieldXml, "Type");
             bool overwrite;
-            bool.TryParse(getAttribute(ndField, "Overwrite"), out overwrite);
+            bool.TryParse(ApplicationInstallerHelpers.getAttribute(ndField, "Overwrite"), out overwrite);
 
-            var total = getAttribute(ndField, "Total");
+            var total = ApplicationInstallerHelpers.getAttribute(ndField, "Total");
 
             SPField spField = null;
             try
@@ -89,7 +89,7 @@ namespace EPMLiveCore.API
         {
             if (bVerifyOnly)
             {
-                iGetFieldTypeByString(typeValue);
+                ApplicationInstallerHelpers.GetFieldTypeByString(typeValue);
 
                 addMessage(ErrorLevels.NoError, internalName, string.Empty, parentMessageId);
             }
@@ -97,12 +97,12 @@ namespace EPMLiveCore.API
             {
                 try
                 {
-                    var spField = iInstallListFieldsAddField(list, internalName, typeValue, internalFieldXml);
+                    var spField = ApplicationInstallerHelpers.InstallListFieldsAddField(list, internalName, typeValue, internalFieldXml);
                     try
                     {
                         if (spField != null)
                         {
-                            iInstallListFieldSwapXml(list, spField, internalFieldXml);
+                            ApplicationInstallerHelpers.InstallListFieldSwapXml(list, spField, internalFieldXml);
                         }
 
                         addMessage(ErrorLevels.NoError, internalName, string.Empty, parentMessageId);
@@ -146,7 +146,7 @@ namespace EPMLiveCore.API
                     {
                         try
                         {
-                            iInstallListFieldSwapXml(list, spField, internalFieldXml);
+                            ApplicationInstallerHelpers.InstallListFieldSwapXml(list, spField, internalFieldXml);
 
                             addMessage(ErrorLevels.NoError, internalName, "Field updated", parentMessageId);
                         }

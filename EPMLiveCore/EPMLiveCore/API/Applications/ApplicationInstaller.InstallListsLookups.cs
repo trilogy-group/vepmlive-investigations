@@ -9,10 +9,6 @@ namespace EPMLiveCore.API
     {
         private void iInstallListsLookups(SPList list, XmlNode ndList, int parentMessageId)
         {
-            if (list == null)
-            {
-                throw new ArgumentNullException(nameof(list));
-            }
             if (ndList == null)
             {
                 throw new ArgumentNullException(nameof(ndList));
@@ -27,7 +23,7 @@ namespace EPMLiveCore.API
 
                 foreach (XmlNode ndLookup in ndLookups.SelectNodes("Lookup"))
                 {
-                    var internalName = getAttribute(ndLookup, "InternalName");
+                    var internalName = ApplicationInstallerHelpers.getAttribute(ndLookup, "InternalName");
 
                     try
                     {
@@ -49,19 +45,19 @@ namespace EPMLiveCore.API
                 throw new ArgumentNullException(nameof(list));
             }
 
-            var listValue = getAttribute(ndLookup, "List");
-            var field = getAttribute(ndLookup, "Field");
-            var displayName = getAttribute(ndLookup, "DisplayName");
-            var advancedLookup = getAttribute(ndLookup, "AdvancedLookup");
+            var listValue = ApplicationInstallerHelpers.getAttribute(ndLookup, "List");
+            var field = ApplicationInstallerHelpers.getAttribute(ndLookup, "Field");
+            var displayName = ApplicationInstallerHelpers.getAttribute(ndLookup, "DisplayName");
+            var advancedLookup = ApplicationInstallerHelpers.getAttribute(ndLookup, "AdvancedLookup");
 
             bool overwrite;
-            bool.TryParse(getAttribute(ndLookup, "Overwrite"), out overwrite);
+            bool.TryParse(ApplicationInstallerHelpers.getAttribute(ndLookup, "Overwrite"), out overwrite);
 
             bool required;
-            bool.TryParse(getAttribute(ndLookup, "Required"), out required);
+            bool.TryParse(ApplicationInstallerHelpers.getAttribute(ndLookup, "Required"), out required);
 
             bool deleteIfNoList;
-            bool.TryParse(getAttribute(ndLookup, "DeleteIfNoList"), out deleteIfNoList);
+            bool.TryParse(ApplicationInstallerHelpers.getAttribute(ndLookup, "DeleteIfNoList"), out deleteIfNoList);
 
             var tList = oWeb.Lists.TryGetList(listValue);
             SPField spField = null;

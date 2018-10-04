@@ -13,7 +13,7 @@ namespace EPMLiveCore.Tests.API
     
     public partial class ApplicationInstallerTests
     {
-        private const string iInstallFilesProcessFolderMethod = "iInstallFilesProcessFolder";
+        private const string iInstallFilesProcessFolderMethod = "InstallFilesProcessFolder";
 
         [TestMethod]
         public void InstallFilesProcessFolder_When_SkipReport()

@@ -9,7 +9,7 @@ namespace EPMLiveCore.Tests.API
 
     public partial class ApplicationInstallerTests
     {
-        private const string InstallAndConfigureAppMethod = "iInstallAndConfigureApp";
+        private const string InstallAndConfigureAppMethod = "InstallAndConfigureApp";
         private const string AppListProp = "oAppList";
         private const string CommunityProp = "iCommunity";
 

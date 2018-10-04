@@ -8,10 +8,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EPMLiveCore.Tests.API
 {
-
     public partial class ApplicationInstallerTests
     {
-        private const string iInstallListsMethod = "iInstallLists";
+        private const string iInstallListsMethod = "InstallLists";
 
         [TestMethod]
         public void iInstallLists_When_Checking_And_ListExist_And_HasNoDelete()

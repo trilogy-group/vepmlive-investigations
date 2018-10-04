@@ -115,7 +115,7 @@ namespace EPMLiveCore.API
                             }
                         }
 
-                        ConnectWebPartConsumersToReportFilter(viewWebManager);
+                        ApplicationInstallerHelpers.ConnectWebPartConsumersToReportFilter(viewWebManager);
 
                         addMessage(0, viewTitle, string.Empty, arentMessageId);
                     }

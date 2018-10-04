@@ -4,7 +4,6 @@ using System.Xml;
 using EPMLiveCore.API;
 using EPMLiveCore.Jobs.Applications.Fakes;
 using EPMLiveCore.WorkEngineSolutionStoreListSvc.Fakes;
-using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

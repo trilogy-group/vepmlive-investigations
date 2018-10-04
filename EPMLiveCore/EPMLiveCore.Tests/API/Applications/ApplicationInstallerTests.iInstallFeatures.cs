@@ -14,7 +14,7 @@ namespace EPMLiveCore.Tests.API
 
     public partial class ApplicationInstallerTests
     {
-        private const string iInstallFeaturesMethod = "iInstallFeatures";
+        private const string iInstallFeaturesMethod = "InstallFeatures";
 
         [TestMethod]
         public void InstallFeatures_When_Checking()

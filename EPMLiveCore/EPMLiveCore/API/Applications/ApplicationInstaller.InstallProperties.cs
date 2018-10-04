@@ -35,9 +35,9 @@ namespace EPMLiveCore.API
                             bool overWrite;
                             bool isLockWeb;
 
-                            bool.TryParse(getAttribute(propertyNode, "Append"), out append);
-                            bool.TryParse(getAttribute(propertyNode, "Overwrite"), out overWrite);
-                            bool.TryParse(getAttribute(propertyNode, "LockWebProperty"), out isLockWeb);
+                            bool.TryParse(ApplicationInstallerHelpers.getAttribute(propertyNode, "Append"), out append);
+                            bool.TryParse(ApplicationInstallerHelpers.getAttribute(propertyNode, "Overwrite"), out overWrite);
+                            bool.TryParse(ApplicationInstallerHelpers.getAttribute(propertyNode, "LockWebProperty"), out isLockWeb);
 
                             if (append)
                             {
@@ -75,7 +75,7 @@ namespace EPMLiveCore.API
             {
                 var separator = GetSeparator(propertyNode);
 
-                var duplicateRegEx = getAttribute(propertyNode, "DuplicateRegEx");
+                var duplicateRegEx = ApplicationInstallerHelpers.getAttribute(propertyNode, "DuplicateRegEx");
 
                 var curProp = iInstallPropertiesGet(propertyName, isLockWeb);
 
@@ -123,13 +123,13 @@ namespace EPMLiveCore.API
 
         private static char GetSeparator(XmlNode propertyNode)
         {
-            var separator = getAttribute(propertyNode, Seperator)[0];
-            if (getAttribute(propertyNode, Seperator) == "\\n")
+            var separator = ApplicationInstallerHelpers.getAttribute(propertyNode, Seperator)[0];
+            if (ApplicationInstallerHelpers.getAttribute(propertyNode, Seperator) == "\\n")
             {
                 separator = '\n';
             }
 
-            if (getAttribute(propertyNode, Seperator) == "\\r")
+            if (ApplicationInstallerHelpers.getAttribute(propertyNode, Seperator) == "\\r")
             {
                 separator = '\r';
             }

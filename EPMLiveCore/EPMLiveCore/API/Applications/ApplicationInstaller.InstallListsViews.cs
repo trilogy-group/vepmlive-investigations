@@ -26,10 +26,10 @@ namespace EPMLiveCore.API
 
                 foreach (XmlNode nodeView in nodeViews.SelectNodes("View"))
                 {
-                    var name = getAttribute(nodeView, "Name");
+                    var name = ApplicationInstallerHelpers.getAttribute(nodeView, "Name");
 
                     bool overWrite;
-                    bool.TryParse(getAttribute(nodeView, "Overwrite"), out overWrite);
+                    bool.TryParse(ApplicationInstallerHelpers.getAttribute(nodeView, "Overwrite"), out overWrite);
 
                     SPView view = null;
                     try
@@ -122,15 +122,15 @@ namespace EPMLiveCore.API
             }
             var fields = new StringCollection();
             fields.AddRange(nodeView.SelectSingleNode(Fields).InnerText.Split(SeparatorComma));
-            var query = getChildNodeText(nodeView, Query);
-            var projectedFields = getChildNodeText(nodeView, ProjectedFields);
-            var joins = getChildNodeText(nodeView, Joins);
+            var query = ApplicationInstallerHelpers.getChildNodeText(nodeView, Query);
+            var projectedFields = ApplicationInstallerHelpers.getChildNodeText(nodeView, ProjectedFields);
+            var joins = ApplicationInstallerHelpers.getChildNodeText(nodeView, Joins);
 
             uint rowLimit;
-            uint.TryParse(getAttribute(nodeView, RowLimit), out rowLimit);
+            uint.TryParse(ApplicationInstallerHelpers.getAttribute(nodeView, RowLimit), out rowLimit);
 
             bool isDefault;
-            bool.TryParse(getAttribute(nodeView, MakeDefault), out isDefault);
+            bool.TryParse(ApplicationInstallerHelpers.getAttribute(nodeView, MakeDefault), out isDefault);
 
             list.Views.Add(name, fields, query, joins, projectedFields, rowLimit, false, isDefault, SPViewCollection.SPViewType.Html, false);
 
@@ -152,15 +152,15 @@ namespace EPMLiveCore.API
                 throw new ArgumentNullException(nameof(view));
             }
             var fields = nodeView.SelectSingleNode(Fields).InnerText.Split(SeparatorComma);
-            var query = getChildNodeText(nodeView, Query);
-            var projectedFields = getChildNodeText(nodeView, ProjectedFields);
-            var joins = getChildNodeText(nodeView, Joins);
+            var query = ApplicationInstallerHelpers.getChildNodeText(nodeView, Query);
+            var projectedFields = ApplicationInstallerHelpers.getChildNodeText(nodeView, ProjectedFields);
+            var joins = ApplicationInstallerHelpers.getChildNodeText(nodeView, Joins);
 
             uint iRowLimit = 0;
-            uint.TryParse(getAttribute(nodeView, RowLimit), out iRowLimit);
+            uint.TryParse(ApplicationInstallerHelpers.getAttribute(nodeView, RowLimit), out iRowLimit);
 
             var bDefault = false;
-            bool.TryParse(getAttribute(nodeView, MakeDefault), out bDefault);
+            bool.TryParse(ApplicationInstallerHelpers.getAttribute(nodeView, MakeDefault), out bDefault);
 
             view.ViewFields.DeleteAll();
 
