@@ -150,6 +150,7 @@
     <Compile Include="API\Applications\ApplicationInstaller.cs" />
     <Compile Include="API\Applications\Applications.cs" />
     <Compile Include="API\Applications\ApplicationUninstaller.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallProperties.cs" />
     <Compile Include="API\AppsStoreHelper.cs" />
     <Compile Include="API\AssociatedListItems\AssociatedListItems.cs" />
     <Compile Include="API\BaseJob.cs" />

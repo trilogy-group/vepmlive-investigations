@@ -10,7 +10,7 @@ namespace EPMLiveCore.Tests.API
 {
     public partial class ApplicationInstallerTests
     {
-        private const string InstallPropertiesMethod = "iInstallProperties";
+        private const string InstallPropertiesMethod = "InstallProperties";
         private const string AppDefProp = "appDef";
         private const string OWebProp = "oWeb";
         private const string VerifyOnlyProp = "bVerifyOnly";

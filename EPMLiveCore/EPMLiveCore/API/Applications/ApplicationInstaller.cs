@@ -18,10 +18,11 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using EPMLiveCore.WebPartsHelper;
 using WebPart = Microsoft.SharePoint.WebPartPages.WebPart;
+using System.Diagnostics;
 
 namespace EPMLiveCore.API
 {
-    internal class ApplicationInstaller
+    internal partial class ApplicationInstaller
     {
         private enum ErrorLevels
         {
@@ -862,212 +863,6 @@ namespace EPMLiveCore.API
             }
         }
 
-        private void iInstallProperties()
-        {
-            XmlNode ndWeb = appDef.ApplicationXml.FirstChild.SelectSingleNode("Web");
-            if (ndWeb != null)
-            {
-                XmlNode ndProperties = ndWeb.SelectSingleNode("Properties");
-                if (ndProperties != null)
-                {
-                    int ParentMessageId = 0;
-
-                    if (bVerifyOnly)
-                    {
-                        ParentMessageId = addMessage(0, "Checking Properties", "", 0);
-                    }
-                    else
-                    {
-                        ParentMessageId = addMessage(0, "Installing Properties", "", 0);
-                    }
-
-                    float percent = 0;
-
-                    XmlNodeList ListNdProperties = ndProperties.SelectNodes("Property");
-                    float max = ListNdProperties.Count;
-                    float counter = 0;
-
-                    foreach (XmlNode ndProperty in ListNdProperties)
-                    {
-
-                        try
-                        {
-                            string sPropertyName = ndProperty.Attributes["Name"].Value;
-                            string sPropertyValue = ndProperty.Attributes["Value"].Value;
-                            bool bAppend = false;
-                            bool bOverwrite = false;
-                            bool bIsLockWeb = false;
-                            bool.TryParse(getAttribute(ndProperty, "Append"), out bAppend);
-                            bool.TryParse(getAttribute(ndProperty, "Overwrite"), out bOverwrite);
-                            bool.TryParse(getAttribute(ndProperty, "LockWebProperty"), out bIsLockWeb);
-
-                            if (bAppend)
-                            {
-                                if (oWeb.Properties.ContainsKey(sPropertyName))
-                                {
-
-                                    char sSeperator = getAttribute(ndProperty, "Seperator")[0];
-                                    if (getAttribute(ndProperty, "Seperator") == "\\n")
-                                        sSeperator = '\n';
-
-                                    if (getAttribute(ndProperty, "Seperator") == "\\r")
-                                        sSeperator = '\r';
-
-                                    if (sSeperator == '\0')
-                                        sSeperator = ',';
-
-                                    string DuplicateRegEx = getAttribute(ndProperty, "DuplicateRegEx");
-
-                                    string curProp = iInstallPropertiesGet(sPropertyName, bIsLockWeb);
-
-                                    if (sSeperator == '\r')
-                                        curProp = curProp.Replace("\r\n", "\r");
-
-                                    string[] sCurVals = curProp.Split(sSeperator);
-
-                                    if (DuplicateRegEx == "")
-                                        DuplicateRegEx = sPropertyValue;
-
-                                    bool found = false;
-
-                                    foreach (string sCurVal in sCurVals)
-                                    {
-                                        Match m = Regex.Match(sCurVal, DuplicateRegEx);
-                                        if (m.Length > 0)
-                                        {
-                                            found = true;
-                                        }
-                                    }
-
-                                    if (found)
-                                    {
-                                        if (bOverwrite)
-                                        {
-                                            if (!bVerifyOnly)
-                                            {
-                                                string newVal = "";
-
-                                                foreach (string sCurVal in sCurVals)
-                                                {
-                                                    Match m = Regex.Match(sCurVal, DuplicateRegEx);
-                                                    if (m.Length > 0)
-                                                    {
-                                                        if (sSeperator == '\r')
-                                                            newVal += "\r\n" + sPropertyValue;
-                                                        else
-                                                            newVal += sSeperator + sPropertyValue;
-                                                    }
-                                                    else
-                                                    {
-                                                        if (sSeperator == '\r')
-                                                            newVal += "\r\n" + sCurVal;
-                                                        else
-                                                            newVal += sSeperator + sCurVal;
-                                                    }
-                                                }
-
-                                                if (sSeperator == '\r')
-                                                    newVal = newVal.Trim('\n').Trim('\r');
-                                                else
-                                                    newVal = newVal.Trim(sSeperator);
-
-                                                iInstallPropertiesSet(sPropertyName, newVal, bIsLockWeb);
-                                            }
-
-                                            addMessage(ErrorLevels.NoError, sPropertyName, "Property found and will append", ParentMessageId);
-                                        }
-                                        else
-                                        {
-                                            addMessage(ErrorLevels.Warning, sPropertyName, "Cannot append value, value already exists", ParentMessageId);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (!bVerifyOnly)
-                                        {
-                                            string newVal = iInstallPropertiesGet(sPropertyName, bIsLockWeb);
-
-                                            if (sSeperator == '\r')
-                                                newVal += "\r\n" + sPropertyValue;
-                                            else
-                                                newVal += sSeperator + sPropertyValue;
-
-                                            if (sSeperator == '\r')
-                                                newVal = newVal.Trim('\n').Trim('\r');
-                                            else
-                                                newVal = newVal.Trim(sSeperator);
-
-                                            iInstallPropertiesSet(sPropertyName, newVal, bIsLockWeb);
-                                        }
-
-                                        addMessage(ErrorLevels.NoError, sPropertyName, "", ParentMessageId);
-                                    }
-                                }
-                                else
-                                {
-                                    if (!bVerifyOnly)
-                                    {
-                                        iInstallPropertiesSet(sPropertyName, sPropertyValue, bIsLockWeb);
-                                    }
-
-                                    addMessage(ErrorLevels.NoError, sPropertyName, "", ParentMessageId);
-                                }
-                            }
-                            else
-                            {
-                                if (bOverwrite)
-                                {
-                                    if (bVerifyOnly)
-                                    {
-                                        if (oWeb.Properties.ContainsKey(sPropertyName) && iInstallPropertiesGet(sPropertyName, bIsLockWeb) != sPropertyValue)
-                                        {
-                                            addMessage(ErrorLevels.Upgrade, sPropertyName, "Property already exists and will overwrite", ParentMessageId);
-                                        }
-                                        else
-                                        {
-                                            addMessage(ErrorLevels.NoError, sPropertyName, "", ParentMessageId);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        iInstallPropertiesSet(sPropertyName, sPropertyValue, bIsLockWeb);
-
-                                        addMessage(ErrorLevels.NoError, sPropertyName, "", ParentMessageId);
-                                    }
-                                }
-                                else
-                                {
-                                    if (oWeb.Properties.ContainsKey(sPropertyName) && iInstallPropertiesGet(sPropertyName, bIsLockWeb) != sPropertyValue)
-                                    {
-                                        addMessage(ErrorLevels.Warning, sPropertyName, "Property already exists and cannot overwrite", ParentMessageId);
-                                    }
-                                    else
-                                    {
-                                        if (!bVerifyOnly)
-                                        {
-                                            iInstallPropertiesSet(sPropertyName, sPropertyValue, bIsLockWeb);
-                                        }
-
-                                        addMessage(ErrorLevels.NoError, sPropertyName, "", ParentMessageId);
-                                    }
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            addMessage(ErrorLevels.Error, ndProperty.Attributes["Name"].Value, ex.Message, ParentMessageId);
-                        }
-
-                        counter++;
-                        percent = counter / max;
-                        updateLIPercent(percent);
-
-                    }
-
-
-                }
-            }
-        }
         #endregion
 
         #region List Installer
@@ -3142,7 +2937,7 @@ namespace EPMLiveCore.API
 
                     _currentPercentSpan = 10;
                     _currentBasePercent = 60;
-                    iInstallProperties();
+                    InstallProperties();
 
                     _currentPercentSpan = 10;
                     _currentBasePercent = 70;
