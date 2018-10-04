@@ -6,6 +6,7 @@ using System.Web.Fakes;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.Fakes;
+using EPMLive.TestFakes.Utility;
 using EPMLiveCore.Layouts.epmlive.reporting.izenda;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
@@ -78,11 +79,9 @@ namespace EPMLiveCore.Tests.Layouts.Reporting
                 SetupSqlCommandAndDataReader(false);
                 ShimSPUtility.RedirectStringSPRedirectFlagsHttpContext = (_1, _2, _3) => true;
                 ShimHttpContext.CurrentGet = () => new ShimHttpContext();
-                object sender = null;
-                EventArgs e = null;
 
                 // Act
-                _privateEditObject.Invoke("btnSave_Click", sender, e);
+                _privateEditObject.Invoke("btnSave_Click", this, EventArgs.Empty);
 
                 // Assert
                 this.ShouldSatisfyAllConditions(
@@ -101,11 +100,9 @@ namespace EPMLiveCore.Tests.Layouts.Reporting
                 SetupShimSecurity();
                 SetupSqlCommandAndDataReader(readerShouldThrow);
                 SetupEditFields();
-                object sender = null;
-                EventArgs e = null;
 
                 // Act
-                Action action = () => _privateEditObject.Invoke(PageLoadMethodName, sender, e);
+                Action action = () => _privateEditObject.Invoke(PageLoadMethodName, this, EventArgs.Empty);
 
                 // Assert
                 this.ShouldSatisfyAllConditions(

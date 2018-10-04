@@ -33,9 +33,9 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
                                 {
                                     if (hdnFullName.Value.Contains("\\"))
                                     {
-                                        var sName = hdnFullName.Value.Split('\\');
-                                        txtName.Text = sName[1];
-                                        txtCategory.Text = sName[0];
+                                        var newName = hdnFullName.Value.Split('\\');
+                                        txtName.Text = newName[1];
+                                        txtCategory.Text = newName[0];
                                     }
                                     else
                                     {
@@ -58,7 +58,7 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
                 {
                     sqlConnection.Open();
                     var newName = txtName.Text;
-                    if (txtCategory.Text != "")
+                    if (txtCategory.Text != string.Empty)
                     {
                         newName = string.Format("{0}\\{1}", txtCategory.Text, newName);
                     }
