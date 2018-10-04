@@ -261,14 +261,6 @@ namespace EPMLiveCore.API
             return true;
         }
 
-        private enum ErrorLevels
-        {
-            NoError = 0,
-            Upgrade = 1,
-            Warning = 5,
-            Error = 10
-        }
-
         private void iInstallFeature(Guid gFeatureId, SPFeatureDefinition def, SPFeatureDefinitionScope scope, int ParentMessageId)
         {
             switch (def.Scope)

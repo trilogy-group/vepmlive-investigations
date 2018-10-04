@@ -171,7 +171,7 @@ namespace EPMLiveCore.API
         {
             if (MaxErrorLevel < (int)level)
             {
-                MaxErrorLevel = (int)level;
+                _maxErrorLevel = (int)level;
             }
 
             _MessageId++;
