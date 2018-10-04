@@ -101,7 +101,6 @@ namespace PortfolioEngineCore.Tests.Setup
                         return null;
                 }
             };
-            //ShimActivation.Constructor
             
             // Act
             var result = _testObj.GetBaseKey(DummyString);
@@ -827,7 +826,13 @@ namespace PortfolioEngineCore.Tests.Setup
                 () => message.ShouldContain("<br>Error: master Database not open"));
         }
 
-        private void SetupForCreateDBMethod(List<string> sqlCommands, bool read, bool createDatabase, bool createLogin, string loginErrorMessage, bool createUser)
+        private void SetupForCreateDBMethod(
+            List<string> sqlCommands, 
+            bool read, 
+            bool createDatabase, 
+            bool createLogin, 
+            string loginErrorMessage, 
+            bool createUser)
         {
             _privateObj.SetFieldOrProperty(CNField, new ShimSqlConnection().Instance);
 
