@@ -86,6 +86,7 @@
     <Compile Include="AllSnapshotsTests.cs" />
     <Compile Include="EventAuditTests.cs" />
     <Compile Include="DataScrubberTests.cs" />
+    <Compile Include="ListRefreshTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
