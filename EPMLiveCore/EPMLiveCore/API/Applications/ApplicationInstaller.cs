@@ -1501,139 +1501,7 @@ namespace EPMLiveCore.API
             }
         }
 
-        private void iInstallListsViews(SPList list, XmlNode ndList, int ParentMessageId, bool added)
-        {
-            XmlNode ndViews = ndList.SelectSingleNode("Views");
-
-            if (ndViews != null)
-            {
-                if (bVerifyOnly)
-                    ParentMessageId = addMessage(0, "Checking Views", "", ParentMessageId);
-                else
-                    ParentMessageId = addMessage(0, "Updating Views", "", ParentMessageId);
-
-                foreach (XmlNode ndView in ndViews.SelectNodes("View"))
-                {
-                    string sName = getAttribute(ndView, "Name");
-                    //XmlNode ndInternalViewXml = ndView.SelectSingleNode("Field");
-                    bool bOverwrite = false;
-                    bool.TryParse(getAttribute(ndView, "Overwrite"), out bOverwrite);
-
-                    SPView view = null;
-                    try
-                    {
-                        view = list.Views[sName];
-                    }
-                    catch { }
-
-                    int ViewParentMessageId = 0;
-
-                    if (bVerifyOnly)
-                    {
-                        if (view == null)
-                        {
-                            ViewParentMessageId = addMessage(0, sName, "", ParentMessageId);
-                        }
-                        else
-                        {
-                            if (bOverwrite)
-                            {
-                                ViewParentMessageId = addMessage(ErrorLevels.Upgrade, sName, "View exists and will overwrite", ParentMessageId);
-                            }
-                            else
-                            {
-                                ViewParentMessageId = addMessage(ErrorLevels.Warning, sName, "View exists but can't overwrite", ParentMessageId);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (list != null)
-                        {
-                            if (view == null)
-                            {
-                                try
-                                {
-                                    System.Collections.Specialized.StringCollection sFields = new System.Collections.Specialized.StringCollection();
-                                    sFields.AddRange(ndView.SelectSingleNode("Fields").InnerText.Split(','));
-                                    string sQuery = getChildNodeText(ndView, "Query");
-                                    string sProjectedFields = getChildNodeText(ndView, "ProjectedFields");
-                                    string sJoins = getChildNodeText(ndView, "Joins");
-
-                                    uint iRowLimit = 0;
-                                    uint.TryParse(getAttribute(ndView, "RowLimit"), out iRowLimit);
-
-                                    bool bDefault = false;
-                                    bool.TryParse(getAttribute(ndView, "MakeDefault"), out bDefault);
-
-                                    view = list.Views.Add(sName, sFields, sQuery, sJoins, sProjectedFields, iRowLimit, false, bDefault, SPViewCollection.SPViewType.Html, false);
-
-                                    ViewParentMessageId = addMessage(0, sName, "", ParentMessageId);
-
-                                }
-                                catch (Exception ex)
-                                {
-                                    ViewParentMessageId = addMessage(ErrorLevels.Error, sName, "Error adding view: " + ex.Message, ParentMessageId);
-                                }
-                            }
-                            else
-                            {
-                                if (bOverwrite)
-                                {
-
-                                    try
-                                    {
-
-                                        string[] sFields = ndView.SelectSingleNode("Fields").InnerText.Split(',');
-                                        string sQuery = getChildNodeText(ndView, "Query");
-                                        string sProjectedFields = getChildNodeText(ndView, "ProjectedFields");
-                                        string sJoins = getChildNodeText(ndView, "Joins");
-
-                                        uint iRowLimit = 0;
-                                        uint.TryParse(getAttribute(ndView, "RowLimit"), out iRowLimit);
-
-                                        bool bDefault = false;
-                                        bool.TryParse(getAttribute(ndView, "MakeDefault"), out bDefault);
-
-                                        view.ViewFields.DeleteAll();
-
-                                        foreach (string sField in sFields)
-                                        {
-                                            SPField oField = null;
-                                            try
-                                            {
-                                                oField = list.Fields.GetFieldByInternalName(sField);
-                                            }
-                                            catch { }
-                                            if (oField != null)
-                                                view.ViewFields.Add(oField);
-                                        }
-
-                                        view.Query = sQuery;
-                                        view.ProjectedFields = sProjectedFields;
-                                        view.Joins = sJoins;
-                                        view.RowLimit = iRowLimit;
-                                        view.DefaultView = bDefault;
-                                        view.Update();
-
-                                        ViewParentMessageId = addMessage(ErrorLevels.Upgrade, sName, "View exists and will overwrite", ParentMessageId);
-
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        ViewParentMessageId = addMessage(ErrorLevels.Error, sName, "Error updating view: " + ex.Message, ParentMessageId);
-                                    }
-                                }
-                                else
-                                {
-                                    ViewParentMessageId = addMessage(ErrorLevels.Warning, sName, "View exists but can't overwrite", ParentMessageId);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        
 
         private void iInstallListsFields(SPList list, XmlNode ndList, int ParentMessageId, bool added)
         {
@@ -2059,7 +1927,7 @@ namespace EPMLiveCore.API
                                 iInstallListsFields(oList, ndList, ListParentMessageId, bListAdded);
 
                             iInstallListsLookups(oList, ndList, ListParentMessageId);
-                            iInstallListsViews(oList, ndList, ListParentMessageId, bListAdded);
+                            InstallListsViews(oList, ndList, ListParentMessageId);
                             iInstallListsViewsWebparts(oList, ndList, ListParentMessageId, bListAdded);
                             iInstallListsWorkflows(oList, ndList, ListParentMessageId, bListAdded);
                             iInstallListsEvents(oList, ndList, ListParentMessageId, bListAdded);

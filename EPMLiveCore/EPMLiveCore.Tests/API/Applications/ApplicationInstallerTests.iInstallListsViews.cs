@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using System.Xml;
 using EPMLiveCore.API;
-using EPMLiveCore.ApplicationStore.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -9,7 +8,7 @@ namespace EPMLiveCore.Tests.API
 {
     public partial class ApplicationInstallerTests
     {
-        private const string InstallListsViewsMethod = "iInstallListsViews";
+        private const string InstallListsViewsMethod = "InstallListsViews";
 
         [TestMethod]
         public void InstallListsViews_When_VerifyOnly()
@@ -68,7 +67,7 @@ namespace EPMLiveCore.Tests.API
             ShimSPViewCollection.AllInstances.ItemGetString = (_, __) => hasView ? new ShimSPView(): null;
 
             // Act
-            _privateObject.Invoke(InstallListsViewsMethod, new object[] { new ShimSPList().Instance, ndList, 0, true });
+            _privateObject.Invoke(InstallListsViewsMethod, new object[] { new ShimSPList().Instance, ndList, 0});
             var dtMessages = _privateObject.GetFieldOrProperty(DTMessagesProp) as DataTable;
 
             // Assert
