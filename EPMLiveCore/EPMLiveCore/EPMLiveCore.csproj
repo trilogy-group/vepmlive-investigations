@@ -1564,6 +1564,15 @@
     <Compile Include="WebPageCode\ListDisplayPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebPageCode\ListDisplayPage.RegisterScript.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\ListDisplayPage.Render.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\ListDisplayPage.RenderWhere.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="WebPageCode\manageschedule.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
