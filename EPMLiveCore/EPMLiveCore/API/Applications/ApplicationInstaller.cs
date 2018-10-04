@@ -1413,145 +1413,7 @@ namespace EPMLiveCore.API
             }
         }
 
-        private void iInstallListsViewsWebpartsInstall(SPView oView, XmlNode ndView, bool bInstallGrid, ApplicationStore.AppStore copy, int ParentMessageId)
-        {
-            SPFile oViewFile = oWeb.GetFile(oView.Url);
-
-            if (oViewFile.Exists)
-            {
-
-                string sUrl = appDef.fullurl + "/Lists/" + oView.ParentList.Title + "/" + oView.Title + ".txt";
-
-                bool bHasViewFile = false;
-                try
-                {
-                    byte[] fileBytes = copy.GetFile(sUrl);
-                    if (fileBytes != null)
-                    {
-                        SPFolder folder = oWeb.GetFolder("TempViewStorage");
-
-                        if (!folder.Exists)
-                            folder = oWeb.Folders.Add("TempViewStorage");
-
-                        if (!bVerifyOnly)
-                            folder.Files.Add(oView.Title + ".aspx", fileBytes);
-
-                        bHasViewFile = true;
-                    }
-                }
-                catch { }
-
-                if (bVerifyOnly)
-                {
-                    if (bHasViewFile || bInstallGrid)
-                    {
-                        addMessage(0, oView.Title, "", ParentMessageId);
-                    }
-                }
-                else
-                {
-                    using (SPLimitedWebPartManager oViewWebManager = oViewFile.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared))
-                    {
-                        if (bHasViewFile)
-                        {
-                            SPFile oTempFile = null;
-                            try
-                            {
-
-                                oTempFile = oWeb.GetFile("TempViewStorage/" + oView.Title + ".aspx");
-                                var tempFileContents = oTempFile.GetContents();
-                                oViewFile.UpdateContentsAndSave(tempFileContents);
-
-                                SPLimitedWebPartManager oTempFileWebManager = oTempFile.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
-
-                                ArrayList arrWebParts = new ArrayList();
-
-                                foreach (WebPart wp in oViewWebManager.WebParts)
-                                {
-                                    if (wp is XsltListViewWebPart)
-                                    {
-                                        wp.Hidden = true;
-                                        oViewWebManager.SaveChanges(wp);
-                                    }
-
-                                    if (wp.GetType().ToString() != "Microsoft.SharePoint.WebPartPages.ErrorWebPart" && !(wp is XsltListViewWebPart))
-                                    {
-                                        arrWebParts.Add(wp);
-                                    }
-                                }
-
-                                foreach (WebPart wp in arrWebParts)
-                                {
-                                    oViewWebManager.DeleteWebPart(wp);
-                                }
-
-                                foreach (WebPart wp in oTempFileWebManager.WebParts)
-                                {
-                                    if (wp.GetType().ToString() != "Microsoft.SharePoint.WebPartPages.ErrorWebPart" && !(wp is XsltListViewWebPart))
-                                    {
-                                        oViewWebManager.AddWebPart(wp, wp.ZoneID, wp.ZoneIndex);
-                                    }
-                                }
-
-
-                                ConnectWebPartConsumersToReportFilter(oViewWebManager);
-
-
-                                addMessage(0, oView.Title, "", ParentMessageId);
-                            }
-                            catch (Exception ex)
-                            {
-                                addMessage(ErrorLevels.Error, oView.Title, "Error: " + ex.Message, ParentMessageId);
-                            }
-                            finally
-                            {
-                                if (oTempFile != null) oTempFile.Delete();
-                                oViewWebManager.Web.Dispose();
-                            }
-                        }
-                        else
-                        {
-                            bool bHasGrid = false;
-
-                            try
-                            {
-                                if (bInstallGrid)
-                                {
-                                    foreach (WebPart wp in oViewWebManager.WebParts)
-                                    {
-                                        if (wp.GetType().ToString() == "EPMLiveWebParts.GridListView")
-                                        {
-                                            bHasGrid = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if (!bHasGrid)
-                                    {
-                                        //EPMLiveWebParts.GridListView gv = new EPMLiveWebParts.GridListView();
-                                        //oViewWebManager.AddWebPart(gv, "Main", 0);
-                                        var gv = WebPartsReflector.CreateGridListViewWebPart();
-                                        oViewWebManager.AddWebPart(gv, "Main", 0);
-                                    }
-                                }
-                                addMessage(0, oView.Title, "", ParentMessageId);
-                            }
-                            catch (Exception ex)
-                            {
-                                addMessage(ErrorLevels.Error, oView.Title, "Error: " + ex.Message, ParentMessageId);
-                            }
-                            finally
-                            {
-                                if (oViewWebManager != null)
-                                    oViewWebManager.Web.Dispose();
-                            }
-                        }
-                    }
-
-
-                }
-            }
-        }
+        
 
         private void ConnectWebPartConsumersToReportFilter(SPLimitedWebPartManager webPartManager)
         {
@@ -1631,7 +1493,7 @@ namespace EPMLiveCore.API
                         {
                             XmlNode ndView = ndViews.SelectSingleNode("View[@Name='" + oView.Title + "']");
 
-                            iInstallListsViewsWebpartsInstall(oView, ndView, bInstallAll, copy, ParentMessageId);
+                            InstallListsViewsWebPartsInstall(oView, bInstallAll, copy, ParentMessageId);
 
                         }
                     }

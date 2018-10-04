@@ -9,7 +9,7 @@ namespace EPMLiveCore.Tests.API
 {
     public partial class ApplicationInstallerTests
     {
-        private const string InstallListsViewsWebpartsInstallMethod = "iInstallListsViewsWebpartsInstall";
+        private const string InstallListsViewsWebpartsInstallMethod = "InstallListsViewsWebPartsInstall";
 
        [TestMethod]
         public void InstallListsViewsWebpartsInstall_When_VerifyOnly()
@@ -33,12 +33,7 @@ namespace EPMLiveCore.Tests.API
         {
             // Arrange
             var appDef = new ApplicationDef();
-            var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(@"
-<root>
-</root>");
-            var ndView = xmlDoc.FirstChild;
-
+            
             _privateObject.SetFieldOrProperty(OWebProp, new ShimSPWeb().Instance);
             _privateObject.SetFieldOrProperty(AppDefProp, appDef);
             _privateObject.SetFieldOrProperty(VerifyOnlyProp, verifyOnly);
@@ -46,7 +41,7 @@ namespace EPMLiveCore.Tests.API
             ShimAppStore.AllInstances.GetFileString = (a, b) => hasViewFile ? new byte[] { 0 } : null;
 
             // Act
-            _privateObject.Invoke(InstallListsViewsWebpartsInstallMethod, new object[] { new ShimSPView().Instance, ndView, true, new ShimAppStore().Instance, 0 });
+            _privateObject.Invoke(InstallListsViewsWebpartsInstallMethod, new object[] { new ShimSPView().Instance, true, new ShimAppStore().Instance, 0 });
             var dtMessages = _privateObject.GetFieldOrProperty(DTMessagesProp) as DataTable;
 
             // Assert

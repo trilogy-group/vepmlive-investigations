@@ -148,6 +148,7 @@
     <Compile Include="API\APIException.cs" />
     <Compile Include="API\APITeam.cs" />
     <Compile Include="API\Applications\ApplicationInstaller.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.iInstallListsViewsWebpartsInstall.cs" />
     <Compile Include="API\Applications\Applications.cs" />
     <Compile Include="API\Applications\ApplicationUninstaller.cs" />
     <Compile Include="API\Applications\ApplicationInstaller.InstallProperties.cs" />
