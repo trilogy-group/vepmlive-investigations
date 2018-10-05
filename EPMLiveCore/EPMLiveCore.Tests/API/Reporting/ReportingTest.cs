@@ -11,6 +11,7 @@ using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
+using ApiReporting = EPMLiveCore.API.Reporting;
 
 namespace EPMLiveCore.Tests.API.Reporting
 {
@@ -27,8 +28,8 @@ namespace EPMLiveCore.Tests.API.Reporting
         public void Setup()
         {
             _context = ShimsContext.Create();
-            _reporting = new EPMLiveCore.API.Reporting();
-            _privateType = new PrivateType(typeof(EPMLiveCore.API.Reporting));
+            _reporting = new ApiReporting();
+            _privateType = new PrivateType(typeof(ApiReporting));
         }
 
         [TestCleanup]
@@ -48,7 +49,7 @@ namespace EPMLiveCore.Tests.API.Reporting
                 ArrangeAddIzendaReport(shouldThrow);
 
                 // Act
-                Action action = () => EPMLiveCore.API.Reporting.ProcessIzendaReportsFromList(new ShimSPList(), out _errorString);
+                Action action = () => ApiReporting.ProcessIzendaReportsFromList(new ShimSPList(), out _errorString);
 
                 // Assert
                 this.ShouldSatisfyAllConditions(
@@ -79,7 +80,7 @@ namespace EPMLiveCore.Tests.API.Reporting
                 ArrangeAddIzendaReport(shouldThrow);
 
                 // Act
-                Action action = () => EPMLiveCore.API.Reporting.AddIzendaReport(new ShimSPWeb(), "DummyTitle", "DummyXml", out _errorString);
+                Action action = () => ApiReporting.AddIzendaReport(new ShimSPWeb(), "DummyTitle", "DummyXml", out _errorString);
 
                 // Assert
                 this.ShouldSatisfyAllConditions(
@@ -146,7 +147,7 @@ namespace EPMLiveCore.Tests.API.Reporting
             {
                 // Arrange
                 var parameters = new Dictionary<string, object>();
-                ShimSqlCommand.ConstructorStringSqlConnection = (command, _2, _3) => { };
+                ShimSqlCommand.ConstructorStringSqlConnection = (_1, _2, _3) => { };
                 ShimSqlCommand.AllInstances.ParametersGet = _ => new ShimSqlParameterCollection();
                 ShimSqlParameterCollection.AllInstances.AddWithValueStringObject = (_1, str, obj) =>
                 {
@@ -191,19 +192,14 @@ namespace EPMLiveCore.Tests.API.Reporting
                         if (!shouldReaderThrow
                             && !shouldRead)
                         {
-                            parameters["@name"]
-                                .ShouldBe(title);
-                            parameters["@siteid"]
-                                .ShouldBe(siteId);
-                            parameters["@xml"]
-                                .ShouldBe(xml);
+                            parameters["@name"].ShouldBe(title);
+                            parameters["@siteid"].ShouldBe(siteId);
+                            parameters["@xml"].ShouldBe(xml);
                         }
                         else if (!shouldReaderThrow && shouldRead)
                         {
-                            parameters["@name"]
-                                .ShouldBe(title);
-                            parameters["@siteid"]
-                                .ShouldBe(siteId);
+                            parameters["@name"].ShouldBe(title);
+                            parameters["@siteid"].ShouldBe(siteId);
                         }
                     });
             }

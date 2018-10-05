@@ -17,7 +17,8 @@ namespace EPMLiveCore.API
             SPSecurity.RunWithElevatedPrivileges(
                 delegate
                 {
-                    using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(list.ParentWeb.Site.WebApplication.Id)))
+                    var connectionString = CoreFunctions.getConnectionString(list.ParentWeb.Site.WebApplication.Id);
+                    using (var sqlConnection = new SqlConnection(connectionString))
                     {
                         sqlConnection.Open();
                         try
