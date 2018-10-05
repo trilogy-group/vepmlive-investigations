@@ -15,7 +15,8 @@ using Shouldly;
 
 namespace EPMLiveCore.Tests.Layouts.epmlive
 {
-    [TestClass, ExcludeFromCodeCoverage]
+    [TestClass]
+    [ExcludeFromCodeCoverage]
     public class TimerSettingsRemTests
     {
         private timersettings testObject;
