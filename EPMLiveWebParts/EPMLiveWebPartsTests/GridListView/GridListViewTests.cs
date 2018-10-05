@@ -19,6 +19,14 @@ using EPMLiveWebParts.Fakes;
 using System.Globalization;
 using System.Threading;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.SharePoint.WebControls;
+using Microsoft.SharePoint.WebControls.Fakes;
+using System.Collections.Generic;
+using Microsoft.SharePoint.WebPartPages.Fakes;
+using Microsoft.SharePoint.Utilities;
+using Microsoft.SharePoint.Administration.Fakes;
+using System.Data.SqlClient.Fakes;
+using WP = System.Web.UI.WebControls.WebParts;
 
 namespace EPMLiveWebParts.Tests
 {
@@ -52,6 +60,7 @@ namespace EPMLiveWebParts.Tests
         private bool _hasSearchResults;
         private string _searchField;
         private string _searchString;
+        private StringBuilder _controlOutputString;
 
         [TestInitialize]
         public void SetUp()
@@ -96,6 +105,61 @@ namespace EPMLiveWebParts.Tests
                     }
                });
             ShimHttpRequest.AllInstances.UrlGet = (_) => new Uri(DummyUrl);
+            _testablePrivate.SetFieldOrProperty("peMulti", new PeopleEditor());
+            _testablePrivate.SetFieldOrProperty("peSingle", new PeopleEditor());
+            _controlOutputString = new StringBuilder();
+            ShimControl.AllInstances.RenderControlHtmlTextWriter = (_, __) => { };
+            ShimSPField.AllInstances.ReorderableGet = (_) => true;
+            ShimSPField.AllInstances.HiddenGet = (_) => false;
+            ShimSPField.AllInstances.TitleGet = (field) => field.InternalName;
+            ShimSPField.AllInstances.TypeGet = (_) => SPFieldType.Boolean;
+            ShimSPField.AllInstances.SchemaXmlGet = (_) => $"<Element List=\"{DummyString}\" WebId=\"{DummyString}\" Min=\"1\" Max=\"1\"/>";
+            ShimCoreFunctions.getListSettingStringSPList = (_, __) => DummyString;
+            ShimGridGanttSettings.ConstructorSPList = (_, __) => { };
+            ShimListDisplayUtils.ConvertFromStringString = (_) => new Dictionary<string, Dictionary<string, string>>()
+            {
+                {
+                    DummyString,
+                    new Dictionary<string, string>()
+                }
+            };
+            ShimHttpContext.CurrentGet = () => new ShimHttpContext()
+            {
+                RequestGet = () => new ShimHttpRequest()
+                {
+                    UrlGet = () => new Uri("http://fake.url")
+                },
+            };
+            ShimWebPart.AllInstances.QualifierGet = (_) => DummyString;
+            ShimSPList.AllInstances.ParentWebGet = (_) => new ShimSPWeb()
+            {
+                PropertiesGet = () => new ShimSPPropertyBag()
+                {
+                }.Instance,
+                SiteGet = () => _sharepointShims.SiteShim.Instance,
+            }.Instance;
+            ShimStringDictionary.AllInstances.ItemGetString = (_, __) => "1";
+            ShimSPUser.AllInstances.GroupsGet = (_) => _sharepointShims.GroupsShim;
+            ShimCoreFunctions.getConnectionStringGuid = (_) => DummyString;
+            ShimSqlConnection.ConstructorString = (_,__) => { };
+            ShimSqlConnection.AllInstances.Open = (_) => { };
+            ShimSqlConnection.AllInstances.Close = (_) => { };
+            ShimSqlCommand.ConstructorString = (_, __) => { };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = (_) => 0;
+            ShimSqlCommand.AllInstances.ExecuteReader = (_) => new ShimSqlDataReader().Instance;
+            ShimSqlDataReader.AllInstances.Read = (_) => true;
+            ShimSPSite.AllInstances.OpenWeb = (_) => _sharepointShims.WebShim.Instance;
+            ShimSPWeb.AllInstances.WebsGet = (_) => new ShimSPWebCollection();
+            ShimSPSite.AllInstances.RootWebGet = (_) => _sharepointShims.WebShim.Instance;
+            ShimSPSite.AllInstances.FeaturesGet = (_) => new ShimSPFeatureCollection().Instance;
+            ShimSPWeb.AllInstances.PropertiesGet = (_) => new ShimSPPropertyBag().Instance;
+            ShimSPSite.AllInstances.Dispose = (_) => { };
+            ShimSPContext.AllInstances.ListItemGet = (_) => _sharepointShims.ListItemShim.Instance;
+            ShimWebPart.AllInstances.WebPartManagerGet = (_) => new ShimSPWebPartManager().Instance;
+            WP.Fakes.ShimWebPartManager.AllInstances.WebPartsGet = (_) => new WP.WebPartCollection(new List<WP.WebPart>()
+            {
+                new BackButton()
+            });
         }
 
         private void SetUpDefaultValues()

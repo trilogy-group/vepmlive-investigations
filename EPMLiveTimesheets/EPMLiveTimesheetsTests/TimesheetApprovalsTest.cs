@@ -43,6 +43,11 @@ namespace EPMLiveTimesheets.Tests
     public class TimesheetApprovalsTest : TestClassInitializer<TimesheetApprovals>
     {
         private const string DummyUrl = "http://dummy.url";
+        private const string SpList = "SpList";
+        private const string View = "View";
+        private const string Status = "Status";
+        private const string Periods = "Periods";
+        private const string Disabled = "_disabled";
         private HttpContext _httpContext;
         private HttpRequest _httpRequest;
         private HttpResponse _httpResponse;
@@ -104,8 +109,8 @@ namespace EPMLiveTimesheets.Tests
             SetupShimsForSqlClient();
             SetupShimsForSharePoint();
             SetupShimsForHttpRequest();
-            PrivateObject.SetField("disabled", false);
-            PrivateObject.SetField("sFullGridId", DummyString);
+            PrivateObject.SetField(Disabled, false);
+            PrivateObject.SetFieldOrProperty("FullGridId", DummyString);
             _queryString.Add("FilterField1", DummyString);
             _queryString.Add("FilterValue1", DummyString);
             ShimSPRibbon.GetCurrentPage = _ => new ShimSPRibbon();
@@ -184,7 +189,7 @@ namespace EPMLiveTimesheets.Tests
 
             // Act
             PrivateObject.Invoke("CreateChildControls");
-            var arrPeriods = Get<SortedList>("arrPeriods");
+            var arrPeriods = Get<SortedList>("Periods");
 
             // Assert
             if (!activation.Equals(0) || disableApprovals)
@@ -225,7 +230,7 @@ namespace EPMLiveTimesheets.Tests
             ShimControl.AllInstances.FindControlString = (_, __) => lblFilterText;
 
             // Act
-            PrivateObject.Invoke("processControls", control, DummyString, DummyString, new ShimSPWeb().Instance);
+            PrivateObject.Invoke("ProcessControls", control, DummyString, DummyString, new ShimSPWeb().Instance);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -275,18 +280,19 @@ namespace EPMLiveTimesheets.Tests
             SetupShimsForSqlClient();
             SetupShimsForSharePoint();
             SetupShimsForHttpRequest();
-            PrivateObject.SetField("activation", activation);
-            PrivateObject.SetField("disabled", disabled);
-            PrivateObject.SetField("error", DummyString);
-            PrivateObject.SetField("act", new Act(new ShimSPWeb()));
+            PrivateObject.SetFieldOrProperty("Activation", activation);
+            PrivateObject.SetFieldOrProperty(Disabled, disabled);
+            PrivateObject.SetFieldOrProperty("Error", DummyString);
+            PrivateObject.SetFieldOrProperty("Act", new Act(new ShimSPWeb()));
             var sortedList = new SortedList();
             if (arrPeriodsCount > 0)
             {
                 sortedList.Add(DummyInt, DummyInt);
             }
-            PrivateObject.SetField("arrPeriods", sortedList);
+            PrivateObject.SetFieldOrProperty(Periods, sortedList);
             _queryString.Add("NewPeriod", newPeriod);
-            ShimTimesheetApprovals.AllInstances.renderGridHtmlTextWriterSPWeb = (_, _2, _3) => { };
+            ShimApprovalsBase.AllInstances.RenderGridHtmlTextWriterSPWebStringStringStringStringStringStringBoolean =
+                (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10) => { };
             SystemWebPartsFakes.AllInstances.WebPartManagerGet = _ => new ShimSPWebPartManager();
             ShimWebPart.AllInstances.WebPartManagerGet = _ => new ShimSPWebPartManager();
             SystemWebPartManagerFakes.AllInstances.WebPartsGet = _ => new SystemWebPartCollection();
@@ -353,8 +359,8 @@ namespace EPMLiveTimesheets.Tests
             TestEntity.ID = DummyString;
             TestEntity.ZoneID = DummyString;
             SetupShimsForSqlClient();
-            PrivateObject.SetField("list", new ShimSPList().Instance);
-            PrivateObject.SetField("view", new ShimSPView().Instance);
+            PrivateObject.SetFieldOrProperty(SpList, new ShimSPList().Instance);
+            PrivateObject.SetFieldOrProperty(View, new ShimSPView().Instance);
             ShimSPContext.AllInstances.SiteGet = _ => new ShimSPSite();
             ShimSPForm.AllInstances.ServerRelativeUrlGet = _ => DummyUrl;
             ShimSPView.AllInstances.IDGet = _ => Guid.NewGuid();
@@ -401,7 +407,7 @@ namespace EPMLiveTimesheets.Tests
             ShimSPField.AllInstances.ReorderableGet = _ => true;
             ShimSPField.AllInstances.InternalNameGet = _ => DummyString;
             ShimSPField.AllInstances.TitleGet = _ => DummyString;
-            PrivateObject.SetField("status", "New");
+            PrivateObject.SetFieldOrProperty(Status, "New");
             ShimHttpUtility.UrlEncodeString = str => str;
             ShimSPWeb.AllInstances.SiteGet = _ => new ShimSPSite();
             ShimSPWeb.AllInstances.LanguageGet = _ => DummyInt;
@@ -430,7 +436,7 @@ namespace EPMLiveTimesheets.Tests
             // Act
             using (var htmlTextWriter = new HtmlTextWriter(stringWriter))
             {
-                PrivateObject.Invoke("renderGrid", htmlTextWriter, new ShimSPWeb().Instance);
+                PrivateObject.Invoke("RenderGrid", htmlTextWriter, new ShimSPWeb().Instance);
             }
             var actualResult = stringWriter.ToString();
 
