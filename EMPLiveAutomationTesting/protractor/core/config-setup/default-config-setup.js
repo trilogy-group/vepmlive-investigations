@@ -69,8 +69,8 @@ const configSetup = {
         maxInstances: maxBrowserInstances
     }],
     params: {
-        maxInstances: 5,
-        maxSessions: 5,
+        maxInstances: maxBrowserInstances,
+        maxSessions: maxBrowserInstances,
         testrail: {
             projectId: process.env.TESTRAIL_PROJECT_ID || setupUtilities.getParam(345, "--params.testrail.projectId", false),
             milestoneName: process.env.TESTRAIL_MILESTONE_NAME || setupUtilities.getParam("Automation milestone week", "--params.testrail.milestoneName", false),
