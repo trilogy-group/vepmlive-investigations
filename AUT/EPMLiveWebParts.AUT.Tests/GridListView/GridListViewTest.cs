@@ -2854,36 +2854,7 @@ namespace EPMLiveWebParts
         }
 
         #endregion
-
-        #region Method Call : (RenderWebPart) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_RenderWebPart_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var output = CreateType<HtmlTextWriter>();
-            var methodRenderWebPartPrametersTypes = new Type[] { typeof(HtmlTextWriter) };
-            object[] parametersOfRenderWebPart = { output };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodRenderWebPart, methodRenderWebPartPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_gridListViewInstanceFixture, parametersOfRenderWebPart);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfRenderWebPart.ShouldNotBeNull();
-            parametersOfRenderWebPart.Length.ShouldBe(1);
-            methodRenderWebPartPrametersTypes.Length.ShouldBe(1);
-            methodRenderWebPartPrametersTypes.Length.ShouldBe(parametersOfRenderWebPart.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (RenderWebPart) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]

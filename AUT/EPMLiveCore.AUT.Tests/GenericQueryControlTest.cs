@@ -1517,62 +1517,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region Method Call : (GenerateContextScript) (Return Type : string) Results Not Null and no exception thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_GenericQueryControl_GenerateContextScript_Method_Call_With_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Type [] methodGenerateContextScriptPrametersTypes = null;
-            object[] parametersOfGenerateContextScript = null; // no parameter present
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodGenerateContextScript, methodGenerateContextScriptPrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<GenericQueryControl, string>(_genericQueryControlInstanceFixture, out exception1, parametersOfGenerateContextScript);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<GenericQueryControl, string>(_genericQueryControlInstance, MethodGenerateContextScript, parametersOfGenerateContextScript, methodGenerateContextScriptPrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfGenerateContextScript.ShouldBeNull();
-            methodGenerateContextScriptPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (GenerateContextScript) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_GenericQueryControl_GenerateContextScript_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodGenerateContextScriptPrametersTypes = null;
-            object[] parametersOfGenerateContextScript = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGenerateContextScript, methodGenerateContextScriptPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_genericQueryControlInstanceFixture, parametersOfGenerateContextScript);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGenerateContextScript.ShouldBeNull();
-            methodGenerateContextScriptPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (GenerateContextScript) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -1615,28 +1560,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region Method Call : (GenerateContextScript) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_GenericQueryControl_GenerateContextScript_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGenerateContextScript, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_genericQueryControlInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
+        
         #region Method Call : (GetCallbackResult) (Return Type : string) private call definition
 
         [ExcludeFromCodeCoverage]
