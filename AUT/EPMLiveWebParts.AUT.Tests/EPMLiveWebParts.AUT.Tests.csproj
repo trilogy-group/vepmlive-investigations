@@ -132,7 +132,6 @@
     <Compile Include="EpmCharting\DomainServices\ChartHelperTest.cs" />
     <Compile Include="EpmCharting\DomainServices\HtmlColorServiceTest.cs" />
     <Compile Include="EpmCharting\Mappers\EpmChartSeriesToVisifireChartSeriesMapperTest.cs" />
-    <Compile Include="EpmCharting\Repositories\EpmChartUserSettingsRepositoryTest.cs" />
     <Compile Include="EPMLiveQuickLaunchModifier\EPMLiveQuickLaunchModifierTest.cs" />
     <Compile Include="GridListView\DependencyTest.cs" />
     <Compile Include="GridListView\FieldValuesTest.cs" />
@@ -618,6 +617,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ContextualHelpSlideOut\" />
+    <Folder Include="EpmCharting\Repositories\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
