@@ -1,64 +1,79 @@
+using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Text;
+using System.Web;
 using System.Xml;
 
 namespace EPMLiveCore.API
 {
     internal abstract class ApplicationBase
     {
+        protected SqlConnection _cn;
+        protected DataTable _dtMessages = new DataTable();
         protected string _id;
         protected int _maxErrorLevel = 0;
-        protected DataTable _dtMessages = new DataTable();
-        protected SqlConnection _cn;
+
+        protected ApplicationBase(string id, SqlConnection connection)
+        {
+            _id = id;
+            _cn = connection;
+
+            _dtMessages.Columns.Add(new DataColumn("ID", typeof(int)));
+            _dtMessages.Columns.Add(new DataColumn("ParentID", typeof(int)));
+            _dtMessages.Columns.Add(new DataColumn("ErrorLevel", typeof(int)));
+            _dtMessages.Columns.Add(new DataColumn("Message", typeof(string)));
+            _dtMessages.Columns.Add(new DataColumn("Details", typeof(string)));
+            _dtMessages.Columns.Add(new DataColumn("Tabbing", typeof(string)));
+        }
 
         public DataTable DtMessages
         {
-            get
-            {
-                return _dtMessages;
-            }
+            get { return _dtMessages; }
         }
 
         public XmlDocument XmlMessages
         {
             get
             {
-                XmlDocument docMessages = new XmlDocument();
+                var docMessages = new XmlDocument();
                 docMessages.LoadXml("<Messages/>");
-                XmlNode ndParent = docMessages.FirstChild;
+                var ndParent = docMessages.FirstChild;
 
-                foreach (DataRow dr in _dtMessages.Rows)
+                foreach (DataRow dataRow in _dtMessages.Rows)
                 {
-                    XmlNode ndMessageRow = docMessages.CreateNode(XmlNodeType.Element, "MessageRow", docMessages.NamespaceURI);
+                    var ndMessageRow = docMessages.CreateNode(XmlNodeType.Element, "MessageRow", docMessages.NamespaceURI);
 
-                    XmlAttribute attr = docMessages.CreateAttribute("ID");
-                    attr.Value = dr["ID"].ToString();
+                    var attr = docMessages.CreateAttribute("ID");
+                    attr.Value = dataRow["ID"].ToString();
                     ndMessageRow.Attributes.Append(attr);
 
                     attr = docMessages.CreateAttribute("ErrorLevel");
-                    attr.Value = dr["ErrorLevel"].ToString();
+                    attr.Value = dataRow["ErrorLevel"].ToString();
                     ndMessageRow.Attributes.Append(attr);
 
-                    XmlNode ndMessage = docMessages.CreateNode(XmlNodeType.Element, "Message", docMessages.NamespaceURI);
-                    ndMessage.InnerXml = "<![CDATA[" + System.Web.HttpUtility.HtmlEncode(dr["Message"].ToString()) + "]]>";
+                    var ndMessage = docMessages.CreateNode(XmlNodeType.Element, "Message", docMessages.NamespaceURI);
+                    ndMessage.InnerXml = $"<![CDATA[{HttpUtility.HtmlEncode(dataRow["Message"].ToString())}]]>";
 
                     ndMessageRow.AppendChild(ndMessage);
 
                     ndMessage = docMessages.CreateNode(XmlNodeType.Element, "Details", docMessages.NamespaceURI);
-                    ndMessage.InnerXml = "<![CDATA[" + System.Web.HttpUtility.HtmlEncode(dr["Details"].ToString()) + "]]>";
+                    ndMessage.InnerXml = $"<![CDATA[{HttpUtility.HtmlEncode(dataRow["Details"].ToString())}]]>";
 
                     ndMessageRow.AppendChild(ndMessage);
 
-                    XmlNode ndParentMessageRow = ndParent.SelectSingleNode("//MessageRow[@ID='" + dr["ParentID"].ToString() + "']");
+                    var ndParentMessageRow = ndParent.SelectSingleNode("//MessageRow[@ID='" + dataRow["ParentID"] + "']");
 
                     if (ndParentMessageRow != null)
+                    {
                         ndParentMessageRow.AppendChild(ndMessageRow);
+                    }
                     else
+                    {
                         ndParent.AppendChild(ndMessageRow);
-
+                    }
                 }
-
 
                 return docMessages;
             }
@@ -68,17 +83,17 @@ namespace EPMLiveCore.API
         {
             get
             {
-                DataTable dt = DtMessages.Clone();
-                foreach (DataRow dr in DtMessages.Rows)
+                var dataTable = DtMessages.Clone();
+                foreach (DataRow dataRow in DtMessages.Rows)
                 {
-                    DataRow drNew = dt.Rows.Add(new object[] { dr[0], dr[1], dr[2], dr[3], dr[4], dr[5] });
+                    var drNew = dataTable.Rows.Add(dataRow[0], dataRow[1], dataRow[2], dataRow[3], dataRow[4], dataRow[5]);
 
-                    for (int i = 0; i < int.Parse(drNew["Tabbing"].ToString()); i++)
+                    for (var i = 0; i < int.Parse(drNew["Tabbing"].ToString()); i++)
                     {
-                        drNew["Message"] = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + drNew["Message"].ToString();
+                        drNew["Message"] = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + drNew["Message"];
                     }
                 }
-                return dt;
+                return dataTable;
             }
         }
 
@@ -86,14 +101,14 @@ namespace EPMLiveCore.API
         {
             get
             {
-                StringBuilder sbMessage = new StringBuilder();
-                DataTable dt = DtMessagesHTML;
-                foreach (DataRow dr in dt.Rows)
+                var sbMessage = new StringBuilder();
+                var dt = DtMessagesHTML;
+                foreach (DataRow dataRow in dt.Rows)
                 {
-                    sbMessage.Append(dr[3].ToString());
+                    sbMessage.Append(dataRow[3]);
                     sbMessage.Append("...");
 
-                    switch ((ErrorLevels)int.Parse(dr[2].ToString()))
+                    switch ((ErrorLevels)int.Parse(dataRow[2].ToString()))
                     {
                         case ErrorLevels.NoError:
                         case ErrorLevels.Skip:
@@ -105,12 +120,15 @@ namespace EPMLiveCore.API
                         case ErrorLevels.Error:
                             sbMessage.Append("Failed");
                             break;
+                        default:
+                            Trace.WriteLine("ArgumentOutOfRangeException dataRow[2]");
+                            break;
                     }
 
-                    if (dr[4].ToString().Length > 0)
+                    if (dataRow[4].ToString().Length > 0)
                     {
                         sbMessage.Append(" (");
-                        sbMessage.Append(dr[4].ToString());
+                        sbMessage.Append(dataRow[4]);
                         sbMessage.Append(")");
                     }
                     sbMessage.Append("<br>");
@@ -122,23 +140,7 @@ namespace EPMLiveCore.API
 
         public int MaxErrorLevel
         {
-            get
-            {
-                return _maxErrorLevel;
-            }
-        }
-
-        protected ApplicationBase(string id, SqlConnection cn)
-        {
-            _id = id;
-            _cn = cn;
-            
-            _dtMessages.Columns.Add(new DataColumn("ID", typeof(int)));
-            _dtMessages.Columns.Add(new DataColumn("ParentID", typeof(int)));
-            _dtMessages.Columns.Add(new DataColumn("ErrorLevel", typeof(int)));
-            _dtMessages.Columns.Add(new DataColumn("Message", typeof(string)));
-            _dtMessages.Columns.Add(new DataColumn("Details", typeof(string)));
-            _dtMessages.Columns.Add(new DataColumn("Tabbing", typeof(string)));
+            get { return _maxErrorLevel; }
         }
     }
 }

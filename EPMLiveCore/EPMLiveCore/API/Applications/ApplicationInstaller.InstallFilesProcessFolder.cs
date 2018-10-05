@@ -20,7 +20,7 @@ namespace EPMLiveCore.API
             {
                 var remoteName = ApplicationInstallerHelpers.getAttribute(ndChild, "RemoteFile");
                 var sType = ApplicationInstallerHelpers.getAttribute(ndChild, "Type");
-                var fullFile = remoteName.Replace(appDef.appurl + "/Files/", "");
+                var fullFile = remoteName.Replace(appDef.appurl + "/Files/", string.Empty);
                 var fileName = ApplicationInstallerHelpers.getAttribute(ndChild, "Name");
                 var parentFolder = Path.GetDirectoryName(fullFile).Replace("\\", "/");
 
@@ -71,8 +71,9 @@ namespace EPMLiveCore.API
                 {
                     overwriteFolder = bool.Parse(ApplicationInstallerHelpers.getAttribute(ndChild, "Overwrite"));
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Trace.WriteLine(ex.ToString());
                 }
 
                 if (bProcessFolder)
@@ -87,8 +88,9 @@ namespace EPMLiveCore.API
                 {
                     overWriteFile = bool.Parse(ApplicationInstallerHelpers.getAttribute(ndChild, "Overwrite"));
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Trace.WriteLine(ex.ToString());
                 }
 
                 InstallFile(parentMessageId, appCopy, overwrite, ndChild, fullFile, fileName, parentFolder, overWriteFile);
@@ -106,26 +108,27 @@ namespace EPMLiveCore.API
                     oWeb.GetFolder(fullFile);
                 }
                 bProcessFolder = true;
-                id = addMessage(ErrorLevels.NoError, "Folder: " + fileName, "", parentMessageId);
+                id = addMessage(ErrorLevels.NoError, $"Folder: {fileName}", string.Empty, parentMessageId);
             }
             else
             {
                 XmlNode ndList = null;
                 try
                 {
-                    ndList = ndLists.SelectSingleNode("List[@Name='" + fileName + "']");
+                    ndList = ndLists.SelectSingleNode($"List[@Name='{fileName}']");
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Trace.WriteLine(ex.ToString());
                 }
 
                 if (ndList == null)
                 {
-                    id = addMessage(ErrorLevels.Error, "Folder: " + fileName, "Document Library or Folder does not exist.", parentMessageId);
+                    id = addMessage(ErrorLevels.Error, $"Folder: {fileName}", "Document Library or Folder does not exist.", parentMessageId);
                 }
                 else
                 {
-                    id = addMessage(ErrorLevels.NoError, "Folder: " + fileName, "", parentMessageId);
+                    id = addMessage(ErrorLevels.NoError, $"Folder: {fileName}", string.Empty, parentMessageId);
                     bProcessFolder = true;
                 }
             }
@@ -146,7 +149,7 @@ namespace EPMLiveCore.API
             }
 
             bProcessFolder = true;
-            id = addMessage(ErrorLevels.NoError, "Folder: " + fileName, "", parentMessageId);
+            id = addMessage(ErrorLevels.NoError, "Folder: " + fileName, string.Empty, parentMessageId);
         }
 
         private void InstallFile(int parentMessageId, AppStore appCopy, bool overwrite, XmlNode ndChild, string fullFile, string fileName, string parentFolder, bool overWriteFile)
@@ -163,11 +166,12 @@ namespace EPMLiveCore.API
                             iInstallFile(fileName, parentFolder, fullFile, appCopy);
                         }
 
-                        addMessage(ErrorLevels.NoError, "File: " + fileName, "", parentMessageId);
+                        addMessage(ErrorLevels.NoError, "File: " + fileName, string.Empty, parentMessageId);
                     }
                     catch (Exception ex)
                     {
                         addMessage(ErrorLevels.Error, "File: " + fileName, "Error: " + ex.Message, parentMessageId);
+                        Trace.WriteLine(ex.ToString());
                     }
                 }
                 else
@@ -184,7 +188,7 @@ namespace EPMLiveCore.API
                         iInstallFile(fileName, parentFolder, fullFile, appCopy);
                     }
 
-                    addMessage(ErrorLevels.NoError, "File: " + fileName, "", parentMessageId);
+                    addMessage(ErrorLevels.NoError, "File: " + fileName, string.Empty, parentMessageId);
                 }
                 catch (Exception ex)
                 {

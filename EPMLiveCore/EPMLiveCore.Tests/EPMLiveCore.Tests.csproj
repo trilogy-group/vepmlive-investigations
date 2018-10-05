@@ -164,6 +164,7 @@
     <Compile Include="API\APITeamTests.cs" />
     <Compile Include="API\Applications\ApplicationInstallerTests.CheckPermissions.cs" />
     <Compile Include="API\Applications\ApplicationInstallerTests.iInstallAndConfigureApp.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallAndConfigureApp2.cs" />
     <Compile Include="API\Applications\ApplicationInstallerTests.iInstallFeatures.cs" />
     <Compile Include="API\Applications\ApplicationInstallerTests.iInstallFiles.cs" />
     <Compile Include="API\Applications\ApplicationInstallerTests.iInstallFilesProcessFolder.cs" />

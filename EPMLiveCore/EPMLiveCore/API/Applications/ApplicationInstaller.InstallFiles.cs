@@ -17,11 +17,11 @@ namespace EPMLiveCore.API
 
             if (bVerifyOnly)
             {
-                parentMessageId = addMessage(0, "Checking Files", "", 0);
+                parentMessageId = addMessage(0, "Checking Files", string.Empty, 0);
             }
             else
             {
-                parentMessageId = addMessage(0, "Installing Files", "", 0);
+                parentMessageId = addMessage(0, "Installing Files", string.Empty, 0);
             }
 
             var docFiles = new XmlDocument();
@@ -52,10 +52,6 @@ namespace EPMLiveCore.API
                         float.TryParse(xmloNode.Attributes["ItemCount"].Value, out max);
                         if (max > 0)
                         {
-                            if (!bVerifyOnly)
-                            {
-                            }
-
                             foreach (XmlNode ndChild in xmloNode.ChildNodes)
                             {
                                 if (ndChild.Name == "z:row")
@@ -72,6 +68,7 @@ namespace EPMLiveCore.API
             catch (Exception ex)
             {
                 addMessage(ErrorLevels.Error, "Installing Files", "Error: " + ex.Message, parentMessageId);
+                Trace.WriteLine(ex.ToString());
             }
 
             return docFiles.FirstChild;
@@ -95,7 +92,7 @@ namespace EPMLiveCore.API
             }
 
             var remoteFile = lvFileRef.LookupValue;
-            var fullFile = remoteFile.Replace(appDef.appurl + "/Files/", "");
+            var fullFile = remoteFile.Replace(appDef.appurl + "/Files/", string.Empty);
             var fileName = Path.GetFileName(fullFile);
             var parentFolder = Path.GetDirectoryName(fullFile).Replace("\\", "/");
 
@@ -125,19 +122,21 @@ namespace EPMLiveCore.API
 
         private XmlNode GetItem(string storeUrl)
         {
-            var listSvc = new Lists();
-            listSvc.Url = storeUrl + "_vti_bin/lists.asmx";
-            listSvc.Credentials = CoreFunctions.GetStoreCreds();
+            var listSvc = new Lists
+            {
+                Url = storeUrl + "_vti_bin/lists.asmx",
+                Credentials = CoreFunctions.GetStoreCreds()
+            };
 
             var xDoc = new XmlDocument();
 
-            var ndQuery = xDoc.CreateNode(XmlNodeType.Element, "Query", "");
+            var ndQuery = xDoc.CreateNode(XmlNodeType.Element, "Query", string.Empty);
             ndQuery.InnerXml = "<OrderBy><FieldRef Name='FileRef'/></OrderBy>";
 
-            var ndQueryOptions = xDoc.CreateNode(XmlNodeType.Element, "QueryOptions", "");
-            ndQueryOptions.InnerXml = "<Folder>" + appDef.appurl + "/Files</Folder><ViewAttributes Scope=\"RecursiveAll\" />";
+            var ndQueryOptions = xDoc.CreateNode(XmlNodeType.Element, "QueryOptions", string.Empty);
+            ndQueryOptions.InnerXml = $"<Folder>{appDef.appurl}/Files</Folder><ViewAttributes Scope=\"RecursiveAll\" />";
 
-            var ndViewFields = xDoc.CreateNode(XmlNodeType.Element, "ViewFields", "");
+            var ndViewFields = xDoc.CreateNode(XmlNodeType.Element, "ViewFields", string.Empty);
             ndViewFields.InnerXml = "<FieldRef Name='Title'/>";
 
             var ndItems = listSvc.GetListItems("Applications", null, ndQuery, ndViewFields, "10000", ndQueryOptions, null);
@@ -155,7 +154,7 @@ namespace EPMLiveCore.API
 
             try
             {
-                bOverwrite = bool.Parse(ndFiles.SelectSingleNode("File[@Path='" + fullFile + "']").Attributes["Overwrite"].Value);
+                bOverwrite = bool.Parse(ndFiles.SelectSingleNode($"File[@Path='{fullFile}']").Attributes["Overwrite"].Value);
                 attr = docFiles.CreateAttribute("Overwrite");
                 attr.Value = bOverwrite.ToString();
                 ndNew.Attributes.Append(attr);
@@ -168,7 +167,7 @@ namespace EPMLiveCore.API
             try
             {
                 attr = docFiles.CreateAttribute("NoDelete");
-                attr.Value = ndFiles.SelectSingleNode("File[@Path='" + fullFile + "']").Attributes["NoDelete"].Value;
+                attr.Value = ndFiles.SelectSingleNode($"File[@Path='{fullFile}']").Attributes["NoDelete"].Value;
                 ndNew.Attributes.Append(attr);
             }
             catch (Exception ex)
@@ -183,7 +182,7 @@ namespace EPMLiveCore.API
 
         private string GetFullFile(string remoteFile, string fileName)
         {
-            var fullFile = Path.GetDirectoryName(remoteFile.Replace(appDef.appurl + "/Files/", "")) + "/" + fileName;
+            var fullFile = Path.GetDirectoryName(remoteFile.Replace(appDef.appurl + "/Files/", string.Empty)) + "/" + fileName;
 
             return fullFile.Replace("\\", "/").Trim('/'); ;
         }

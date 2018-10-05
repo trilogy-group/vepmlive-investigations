@@ -143,7 +143,6 @@ namespace EPMLiveCore.API
                 catch (Exception ex)
                 {
                     Trace.WriteLine(ex.ToString());
-
                     addMessage(ErrorLevels.Error, "Creating Community", "Error: " + ex.Message, 0);
                 }
             }
