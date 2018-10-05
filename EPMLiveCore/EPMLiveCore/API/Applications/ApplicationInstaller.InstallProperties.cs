@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -197,7 +198,7 @@ namespace EPMLiveCore.API
                 throw new ArgumentNullException(nameof(currentValues));
             }
 
-            var newVal = string.Empty;
+            var builder = new StringBuilder();
 
             foreach (var curVal in currentValues)
             {
@@ -206,33 +207,37 @@ namespace EPMLiveCore.API
                 {
                     if (separator == '\r')
                     {
-                        newVal += "\r\n" + propertyValue;
+                        builder.Append("\r\n")
+                            .Append(propertyValue);
                     }
                     else
                     {
-                        newVal += separator + propertyValue;
+                        builder.Append(separator)
+                            .Append(propertyValue);
                     }
                 }
                 else
                 {
                     if (separator == '\r')
                     {
-                        newVal += "\r\n" + curVal;
+                        builder.Append("\r\n")
+                            .Append(curVal);
                     }
                     else
                     {
-                        newVal += separator + curVal;
+                        builder.Append(separator)
+                            .Append(curVal);
                     }
                 }
             }
-
+            var newVal = string.Empty;
             if (separator == '\r')
             {
-                newVal = newVal.Trim('\n').Trim('\r');
+                newVal = builder.ToString().Trim('\n').Trim('\r');
             }
             else
             {
-                newVal = newVal.Trim(separator);
+                newVal = builder.ToString().Trim(separator);
             }
 
             return newVal;
