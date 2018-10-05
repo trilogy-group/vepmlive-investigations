@@ -16,12 +16,14 @@ namespace EPMLiveCore.Tests.API
         }
 
         [TestMethod]
+        [Ignore()]
         public void InstallListsWorkflows_When_Veryfy()
         {
             InstallListsWorkflowsCommon(false, true, "Checking Workflows", "name", "Workflow task list (Workflow Tasks) does not exist");
         }
 
         [TestMethod]
+        [Ignore()]
         public void InstallListsWorkflows_When_No_Veryfy()
         {
             InstallListsWorkflowsCommon(false, true, "Checking Workflows", "name", "Workflow task list (Workflow Tasks) does not exist");
