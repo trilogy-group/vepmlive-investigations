@@ -1932,7 +1932,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
             ShimCStruct.AllInstances.GetListString = (_, _2) => new List<CStruct> {new CStruct()};
             ShimPfeJob.AllInstances.QueueIDbRepositoryIMessageQueueString = (_, _2, _3, _4) => DummyInt;
             ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Closed;
-            ShimPfeJob.AllInstances.QueueIDbRepositoryIMessageQueueString = (_, _2, _3, _4) => DummyInt;
+            ShimSqlDb.AllInstances.StatusGet = _ => StatusEnum.rsSuccess;
 
             // Act
             var actualResult = _privateObject.Invoke("PostCostValuesForScheduledWork") as bool?;
