@@ -39,30 +39,9 @@ namespace EPMLiveReporting.Tests
             LogStatus.Clear();
             refreshLists = new RefreshLists(new ShimSPWeb(), DummyString);
             privateObject = new PrivateObject(refreshLists);
-
             privateObject.SetFieldOrProperty("_ArrayListTableNames", new ArrayList());
             privateObject.SetFieldOrProperty("_dsMyWorkLists", new ShimDataSet().Instance);
-            //{
-            //    TablesGet = () =>
-            //    {
-            //        var list = new List<DataTable>
-            //        {
-            //            new ShimDataTable()
-            //        };
-            //        return new ShimDataTableCollection().Bind(list);
-            //    }
-            //}.Instance);
             privateObject.SetFieldOrProperty("_dsLists", new ShimDataSet().Instance);
-            //{
-            //    TablesGet = () =>
-            //    {
-            //        var list = new List<DataTable>
-            //        {
-            //            new ShimDataTable()
-            //        }.AsEnumerable();
-            //        return new ShimDataTableCollection().Bind(list);
-            //    }
-            //}.Instance);
             privateObject.SetFieldOrProperty("_ArrayListNames", new string[]
             {
                 DummyString,
@@ -111,8 +90,6 @@ namespace EPMLiveReporting.Tests
                 };
                 return new ShimDataTableCollection().Bind(list);
             };
-
-
         }
 
         [TestMethod]
@@ -154,7 +131,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -189,7 +166,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -224,7 +201,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -259,7 +236,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -293,7 +270,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -325,7 +302,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -388,7 +365,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -438,7 +415,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -470,7 +447,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -507,7 +484,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -542,7 +519,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -577,7 +554,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -612,7 +589,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -646,7 +623,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -681,7 +658,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -716,7 +693,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -746,13 +723,12 @@ namespace EPMLiveReporting.Tests
             ShimRefreshLists.AllInstances.IsReportingListString = (_, name) => false;
             ShimRefreshLists.AllInstances.AddItems_MyWorkGuidStringGuidBooleanOutStringOut = AddItemsMyWorkError;
             ShimGridGanttSettings.ConstructorSPList = null;
-
             ShimSPListCollection.AllInstances.TryGetListString = (_, name) => name == DummyString ? new ShimSPList() : null;
             ShimDataTable.AllInstances.SelectString = (_, query) => new DataRow[]
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -786,7 +762,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -821,7 +797,6 @@ namespace EPMLiveReporting.Tests
                 return true;
             };
 
-
             // Act
             refreshLists.StartRefresh(DummyGuid, out resultsDataTable, false);
 
@@ -853,7 +828,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -889,7 +864,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -927,7 +902,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -962,7 +937,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -996,12 +971,11 @@ namespace EPMLiveReporting.Tests
             };
             ShimGridGanttSettings.ConstructorSPList = null;
             ShimCoreFunctions.getListSettingStringSPList = (name, list) => GetSettingsContent();
-
             ShimDataTable.AllInstances.SelectString = (_, query) => new DataRow[]
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -1039,7 +1013,7 @@ namespace EPMLiveReporting.Tests
             {
                 new ShimDataRow
                 {
-                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemGetString = name => string.IsNullOrWhiteSpace(errorMessage) ? null : errorMessage,
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
@@ -1076,7 +1050,7 @@ namespace EPMLiveReporting.Tests
         {
             AddItemsWasCalled = true;
             error = true;
-            errorMessage = string.IsNullOrEmpty(CustomErrorMessageAddItemMethod) ? DummyString : CustomErrorMessageAddItemMethod;
+            errorMessage = string.IsNullOrWhiteSpace(CustomErrorMessageAddItemMethod) ? DummyString : CustomErrorMessageAddItemMethod;
         }
 
         /// <summary>
@@ -1122,7 +1096,7 @@ namespace EPMLiveReporting.Tests
         {
             AddItemsMyWorkWasCalled = true;
             error = true;
-            errorMessage = string.IsNullOrEmpty(CustomErrorMessageAddItemsMyWorkMethod) ? DummyString : CustomErrorMessageAddItemsMyWorkMethod;
+            errorMessage = string.IsNullOrWhiteSpace(CustomErrorMessageAddItemsMyWorkMethod) ? DummyString : CustomErrorMessageAddItemsMyWorkMethod;
         }
 
         /// <summary>
