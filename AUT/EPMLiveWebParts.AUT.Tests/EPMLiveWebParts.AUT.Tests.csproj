@@ -110,7 +110,6 @@
     <Compile Include="BackButton\BackButtonTest.cs" />
     <Compile Include="BuyNow\BuyNowTest.cs" />
     <Compile Include="ChartControl\ChartControlToolpartBaseTest.cs" />
-    <Compile Include="ChartControl\EpmChartTest.cs" />
     <Compile Include="ChartControl\ExtensionsTest.cs" />
     <Compile Include="ChartControl\VfChartSeriesTest.cs" />
     <Compile Include="ChartControl\VfChartTest.cs" />
