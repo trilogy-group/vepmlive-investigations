@@ -5,14 +5,11 @@ using System.Data;
 using System.Data.Fakes;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.ReportHelper.Fakes;
 using EPMLiveReportsAdmin;
 using EPMLiveReportsAdmin.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
-using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
@@ -105,7 +102,7 @@ namespace EPMLiveReporting.Tests
             ShimSPWeb.AllInstances.ListsGet = _ => new ShimSPListCollection();
             ShimSPListCollection.AllInstances.ItemGetString = (_, listName) => new ShimSPList();
             ShimSPList.AllInstances.TitleGet = _ => DummyString;
-            ShimCoreFunctions.getListSettingStringSPList = (name, list) => GetSettings();
+            ShimCoreFunctions.getListSettingStringSPList = (name, list) => GetSettingsContent();
             ShimDataSet.AllInstances.TablesGet = _ =>
             {
                 var list = new List<DataTable>
@@ -176,6 +173,41 @@ namespace EPMLiveReporting.Tests
         }
 
         [TestMethod]
+        public void StartRefresh_RefreshAllWorkHoursListErrorAddMessage_ExecutesCorrectly()
+        {
+            // Arrange
+            const string ExpectedLogMessage = "ProcessSecurity processed successfully on refresh all for web";
+            var resultsDataTable = new DataTable();
+            var errorMessage = DummyString;
+            var expectedErrorMessage = $"{DummyString}&nbsp;{DummyString}";
+            const string ListName = "Work Hours";
+            ShimRefreshLists.AllInstances.IsReportingListString = (_, name) => true;
+            ShimRefreshLists.AllInstances.AddItems_MyWorkGuidStringGuidBooleanOutStringOut = AddItemsMyWorkSuccess;
+            ShimRefreshLists.AllInstances.AddItemsGuidStringBooleanOutStringOut = AddItemsError;
+            ShimSPListCollection.AllInstances.TryGetListString = (_, name) => name == ListName ? new ShimSPList() : null;
+            ShimDataTable.AllInstances.SelectString = (_, query) => new DataRow[]
+            {
+                new ShimDataRow
+                {
+                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemSetStringObject = (name, value) => errorMessage = value.ToString()
+                }
+            };
+            CustomErrorMessageAddItemMethod = string.Empty;
+
+            // Act
+            refreshLists.StartRefresh(DummyGuid, out resultsDataTable, true);
+
+            // Assert
+            resultsDataTable.ShouldSatisfyAllConditions(
+                () => errorMessage.ShouldStartWith(expectedErrorMessage),
+                () => resultsDataTable.ShouldNotBeNull(),
+                () => AddItemsWasCalled.ShouldBeTrue(),
+                () => LogStatus.ShouldNotBeEmpty(),
+                () => LogStatus.Any(p => p.Contains(ExpectedLogMessage)).ShouldBeTrue());
+        }
+
+        [TestMethod]
         public void StartRefresh_RefreshAllWorkHoursListNotFoundError_ExecutesCorrectly()
         {
             // Arrange
@@ -204,6 +236,41 @@ namespace EPMLiveReporting.Tests
             // Assert
             resultsDataTable.ShouldSatisfyAllConditions(
                 () => errorMessage.ShouldContain(expectedErrorMessage),
+                () => resultsDataTable.ShouldNotBeNull(),
+                () => AddItemsWasCalled.ShouldBeTrue(),
+                () => LogStatus.ShouldNotBeEmpty(),
+                () => LogStatus.Any(p => p.Contains(ExpectedLogMessage)).ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void StartRefresh_RefreshAllWorkHoursListNotFoundErrorAddMessage_ExecutesCorrectly()
+        {
+            // Arrange
+            const string ExpectedLogMessage = "ProcessSecurity processed successfully on refresh all for web";
+            var resultsDataTable = new DataTable();
+            var errorMessage = DummyString;
+            var expectedErrorMessage = $"{DummyString}&nbsp;List not present";
+            const string ListName = "Work Hours";
+            ShimRefreshLists.AllInstances.IsReportingListString = (_, name) => true;
+            ShimRefreshLists.AllInstances.AddItems_MyWorkGuidStringGuidBooleanOutStringOut = AddItemsMyWorkSuccess;
+            ShimRefreshLists.AllInstances.AddItemsGuidStringBooleanOutStringOut = AddItemsError;
+            ShimSPListCollection.AllInstances.TryGetListString = (_, name) => name == ListName ? new ShimSPList() : null;
+            ShimDataTable.AllInstances.SelectString = (_, query) => new DataRow[]
+            {
+                new ShimDataRow
+                {
+                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemSetStringObject = (name, value) => errorMessage = value.ToString()
+                }
+            };
+            CustomErrorMessageAddItemMethod = "List does not exist at site with url";
+
+            // Act
+            refreshLists.StartRefresh(DummyGuid, out resultsDataTable, true);
+
+            // Assert
+            resultsDataTable.ShouldSatisfyAllConditions(
+                () => errorMessage.ShouldStartWith(expectedErrorMessage),
                 () => resultsDataTable.ShouldNotBeNull(),
                 () => AddItemsWasCalled.ShouldBeTrue(),
                 () => LogStatus.ShouldNotBeEmpty(),
@@ -300,7 +367,7 @@ namespace EPMLiveReporting.Tests
             resultsDataTable.ShouldSatisfyAllConditions(
                 () => resultsDataTable.ShouldNotBeNull(),
                 () => LogStatus.ShouldNotBeEmpty(),
-                () => LogStatus.Any(p=>p.Contains(expectedMessage)).ShouldBeTrue());
+                () => LogStatus.Any(p => p.Contains(expectedMessage)).ShouldBeTrue());
         }
 
         [TestMethod]
@@ -328,7 +395,7 @@ namespace EPMLiveReporting.Tests
 
             // Act
             refreshLists.StartRefresh(DummyGuid, out resultsDataTable, false);
-            
+
             // Assert
             resultsDataTable.ShouldSatisfyAllConditions(
                 () => resultsDataTable.ShouldNotBeNull(),
@@ -343,10 +410,10 @@ namespace EPMLiveReporting.Tests
             var expectedErrroMessage = $"Error: {DummyException}";
             var errorMessage = string.Empty;
             var resultsDataTable = new DataTable();
-            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated  = _ =>
-            {
-                throw new Exception(DummyException);
-            };
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = _ =>
+           {
+               throw new Exception(DummyException);
+           };
 
             // Act
             refreshLists.StartRefresh(DummyGuid, out resultsDataTable, false);
@@ -459,6 +526,41 @@ namespace EPMLiveReporting.Tests
         }
 
         [TestMethod]
+        public void StartRefresh_RefreshAllResourcesListErrorAddError_ExecutesCorrectly()
+        {
+            // Arrange
+            const string ExpectedLogMessage = "ProcessSecurity processed successfully on refresh all for web";
+            var resultsDataTable = new DataTable();
+            var errorMessage = DummyString;
+            var expectedErrorMessage = $"{DummyString}&nbsp;{DummyString}";
+            const string ListName = "Resources";
+            ShimRefreshLists.AllInstances.IsReportingListString = (_, name) => true;
+            ShimRefreshLists.AllInstances.AddItems_MyWorkGuidStringGuidBooleanOutStringOut = AddItemsMyWorkSuccess;
+            ShimRefreshLists.AllInstances.AddItemsGuidStringBooleanOutStringOut = AddItemsError;
+            ShimSPListCollection.AllInstances.TryGetListString = (_, name) => name == ListName ? new ShimSPList() : null;
+            ShimDataTable.AllInstances.SelectString = (_, query) => new DataRow[]
+            {
+                new ShimDataRow
+                {
+                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemSetStringObject = (name, value) => errorMessage = value.ToString()
+                }
+            };
+            CustomErrorMessageAddItemMethod = string.Empty;
+
+            // Act
+            refreshLists.StartRefresh(DummyGuid, out resultsDataTable, true);
+
+            // Assert
+            resultsDataTable.ShouldSatisfyAllConditions(
+                () => errorMessage.ShouldContain(expectedErrorMessage),
+                () => resultsDataTable.ShouldNotBeNull(),
+                () => AddItemsWasCalled.ShouldBeTrue(),
+                () => LogStatus.ShouldNotBeEmpty(),
+                () => LogStatus.Any(p => p.Contains(ExpectedLogMessage)).ShouldBeTrue());
+        }
+
+        [TestMethod]
         public void StartRefresh_RefreshAllResorucesListNotFoundError_ExecutesCorrectly()
         {
             // Arrange
@@ -466,6 +568,41 @@ namespace EPMLiveReporting.Tests
             var resultsDataTable = new DataTable();
             var errorMessage = string.Empty;
             var expectedErrorMessage = $"&nbsp;List not present";
+            const string ListName = "Resources";
+            ShimRefreshLists.AllInstances.IsReportingListString = (_, name) => true;
+            ShimRefreshLists.AllInstances.AddItems_MyWorkGuidStringGuidBooleanOutStringOut = AddItemsMyWorkSuccess;
+            ShimRefreshLists.AllInstances.AddItemsGuidStringBooleanOutStringOut = AddItemsError;
+            ShimSPListCollection.AllInstances.TryGetListString = (_, name) => name == ListName ? new ShimSPList() : null;
+            ShimDataTable.AllInstances.SelectString = (_, query) => new DataRow[]
+            {
+                new ShimDataRow
+                {
+                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemSetStringObject = (name, value) => errorMessage = value.ToString()
+                }
+            };
+            CustomErrorMessageAddItemMethod = "List does not exist at site with url";
+
+            // Act
+            refreshLists.StartRefresh(DummyGuid, out resultsDataTable, true);
+
+            // Assert
+            resultsDataTable.ShouldSatisfyAllConditions(
+                () => errorMessage.ShouldContain(expectedErrorMessage),
+                () => resultsDataTable.ShouldNotBeNull(),
+                () => AddItemsWasCalled.ShouldBeTrue(),
+                () => LogStatus.ShouldNotBeEmpty(),
+                () => LogStatus.Any(p => p.Contains(ExpectedLogMessage)).ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void StartRefresh_RefreshAllResorucesListNotFoundErrorAddMessage_ExecutesCorrectly()
+        {
+            // Arrange
+            const string ExpectedLogMessage = "ProcessSecurity processed successfully on refresh all for web";
+            var resultsDataTable = new DataTable();
+            var errorMessage = DummyString;
+            var expectedErrorMessage = $"{DummyString}&nbsp;List not present";
             const string ListName = "Resources";
             ShimRefreshLists.AllInstances.IsReportingListString = (_, name) => true;
             ShimRefreshLists.AllInstances.AddItems_MyWorkGuidStringGuidBooleanOutStringOut = AddItemsMyWorkSuccess;
@@ -529,6 +666,41 @@ namespace EPMLiveReporting.Tests
         }
 
         [TestMethod]
+        public void StartRefresh_RefreshAllResorucesListExceptionAddMessage_ExecutesCorrectly()
+        {
+            // Arrange
+            var resultsDataTable = new DataTable();
+            var errorMessage = DummyString;
+            var expectedErrorMessage = $"{DummyString}&nbsp;{DummyException}";
+            const string ListName = "Resources";
+            ShimRefreshLists.AllInstances.IsReportingListString = (_, name) => true;
+            ShimRefreshLists.AllInstances.AddItems_MyWorkGuidStringGuidBooleanOutStringOut = AddItemsMyWorkSuccess;
+            ShimRefreshLists.AllInstances.AddItemsGuidStringBooleanOutStringOut = AddItemsScuccess;
+            ShimSPListCollection.AllInstances.TryGetListString = (_, name) => name == ListName ? new ShimSPList() : null;
+            ShimDataTable.AllInstances.SelectString = (_, query) => new DataRow[]
+            {
+                new ShimDataRow
+                {
+                    ItemGetString = name => string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+                    ItemSetStringObject = (name, value) => errorMessage = value.ToString()
+                }
+            };
+            ShimReportData.AllInstances.GetTableNameString = (_, name) =>
+            {
+                throw new Exception(DummyException);
+            };
+
+            // Act
+            refreshLists.StartRefresh(DummyGuid, out resultsDataTable, true);
+
+            // Assert
+            resultsDataTable.ShouldSatisfyAllConditions(
+                () => errorMessage.ShouldContain(expectedErrorMessage),
+                () => resultsDataTable.ShouldNotBeNull(),
+                () => LogStatus.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
         public void StartRefresh_RefreshAllListError_ExecutesCorrectly()
         {
             // Arrange
@@ -549,6 +721,7 @@ namespace EPMLiveReporting.Tests
                 }
             };
             privateObject.SetFieldOrProperty("_sListNames", $"{DummyString},{DummyString}");
+            CustomErrorMessageAddItemsMyWorkMethod = null;
 
             // Act
             refreshLists.StartRefresh(DummyGuid, out resultsDataTable, true);
@@ -684,6 +857,7 @@ namespace EPMLiveReporting.Tests
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
+            CustomErrorMessageAddItemMethod = null;
 
             // Act
             refreshLists.StartRefresh(DummyGuid, out resultsDataTable, false);
@@ -792,6 +966,7 @@ namespace EPMLiveReporting.Tests
                     ItemSetStringObject = (name, value) => errorMessage = value.ToString()
                 }
             };
+            CustomErrorMessageAddItemsMyWorkMethod = null;
 
             // Act
             refreshLists.StartRefresh(DummyGuid, out resultsDataTable, false);
@@ -820,7 +995,7 @@ namespace EPMLiveReporting.Tests
                 return true;
             };
             ShimGridGanttSettings.ConstructorSPList = null;
-            ShimCoreFunctions.getListSettingStringSPList = (name, list) => GetSettings();
+            ShimCoreFunctions.getListSettingStringSPList = (name, list) => GetSettingsContent();
 
             ShimDataTable.AllInstances.SelectString = (_, query) => new DataRow[]
             {
@@ -859,7 +1034,7 @@ namespace EPMLiveReporting.Tests
                 return true;
             };
             ShimGridGanttSettings.ConstructorSPList = null;
-            ShimCoreFunctions.getListSettingStringSPList = (name, list) => GetSettings();
+            ShimCoreFunctions.getListSettingStringSPList = (name, list) => GetSettingsContent();
             ShimDataTable.AllInstances.SelectString = (_, query) => new DataRow[]
             {
                 new ShimDataRow
@@ -881,36 +1056,10 @@ namespace EPMLiveReporting.Tests
                 () => insertAllItemsDBWasCalled.ShouldBeTrue());
         }
 
-        private string GetSettings()
+        private string GetSettingsContent()
         {
-            var settings = new string[]
-            {
-                DummyString,
-                DummyString,
-                DummyString,
-                DummyString,
-                DummyString,
-                DummyString,
-                DummyString,
-                DummyString,
-                DummyString,
-                DummyString,
-                bool.TrueString,
-                bool.TrueString,
-                bool.TrueString,
-                bool.TrueString,
-                bool.TrueString,
-                bool.TrueString,
-                bool.TrueString,
-                bool.TrueString,
-                bool.TrueString,
-                bool.TrueString,
-                bool.TrueString,
-                bool.TrueString,
-                bool.TrueString,
-                bool.TrueString,
-                bool.TrueString,
-            };
+            var settings = Enumerable.Range(1, 30)
+                .Select(p => bool.TrueString);
 
             return string.Join("\n", settings);
         }
@@ -919,10 +1068,10 @@ namespace EPMLiveReporting.Tests
         /// This method is fake. All the parameters are required, even though not all of them are used
         /// </summary>
         private void AddItemsError(
-            RefreshLists refreshList, 
-            Guid jobGuid, 
-            string listName, 
-            out bool error, 
+            RefreshLists refreshList,
+            Guid jobGuid,
+            string listName,
+            out bool error,
             out string errorMessage)
         {
             AddItemsWasCalled = true;
@@ -934,10 +1083,10 @@ namespace EPMLiveReporting.Tests
         /// This method is fake. All the parameters are required, even though not all of them are used
         /// </summary>
         private void AddItemsScuccess(
-            RefreshLists refreshList, 
-            Guid jobGuid, 
-            string listName, 
-            out bool error, 
+            RefreshLists refreshList,
+            Guid jobGuid,
+            string listName,
+            out bool error,
             out string errorMessage)
         {
             AddItemsWasCalled = true;
@@ -949,11 +1098,11 @@ namespace EPMLiveReporting.Tests
         /// This method is fake. All the parameters are required, even though not all of them are used
         /// </summary>
         private void AddItemsMyWorkSuccess(
-            RefreshLists refreshList, 
-            Guid jobGuid, 
-            string listName, 
-            Guid listId, 
-            out bool error, 
+            RefreshLists refreshList,
+            Guid jobGuid,
+            string listName,
+            Guid listId,
+            out bool error,
             out string errorMessage)
         {
             error = false;
@@ -964,11 +1113,11 @@ namespace EPMLiveReporting.Tests
         /// This method is fake. All the parameters are required, even though not all of them are used
         /// </summary>
         private void AddItemsMyWorkError(
-            RefreshLists refreshList, 
-            Guid jobGuid, 
-            string listName, 
-            Guid listId, 
-            out bool error, 
+            RefreshLists refreshList,
+            Guid jobGuid,
+            string listName,
+            Guid listId,
+            out bool error,
             out string errorMessage)
         {
             AddItemsMyWorkWasCalled = true;
@@ -980,11 +1129,11 @@ namespace EPMLiveReporting.Tests
         /// This method is fake. All the parameters are required, even though not all of them are used
         /// </summary>
         private void AddItemsMyWorkException(
-            RefreshLists refreshList, 
-            Guid jobGuid, 
-            string listName, 
-            Guid listId, 
-            out bool error, 
+            RefreshLists refreshList,
+            Guid jobGuid,
+            string listName,
+            Guid listId,
+            out bool error,
             out string errorMessage)
         {
             throw new Exception(DummyException);
