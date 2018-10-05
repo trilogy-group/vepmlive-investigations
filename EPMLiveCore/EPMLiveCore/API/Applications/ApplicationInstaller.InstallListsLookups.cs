@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text;
 using System.Xml;
 using Microsoft.SharePoint;
 
@@ -196,24 +197,28 @@ namespace EPMLiveCore.API
 
             var LookupArray = gSettings.Lookups.Split('|');
 
-            var output = string.Empty;
+            var output = new StringBuilder();
 
             foreach (var sLookup in LookupArray)
             {
-                if (sLookup != string.Empty)
+                if (!string.IsNullOrWhiteSpace(sLookup))
                 {
                     var sLookupInfo = sLookup.Split('^');
 
                     if (sLookupInfo[0] != internalName)
                     {
-                        output += "|" + sLookup;
+                        output.Append("|")
+                            .Append(sLookup);
                     }
                 }
             }
 
-            output += "|" + internalName + "^" + advancedLookup;
+            output.Append("|")
+                .Append(internalName)
+                .Append("^")
+                .Append(advancedLookup);
 
-            gSettings.Lookups = output.Trim('|');
+            gSettings.Lookups = output.ToString().Trim('|');
             gSettings.SaveSettings(list);
 
             addMessage(ErrorLevels.NoError, "Enabled Advanced Lookup", string.Empty, messageId);
@@ -228,7 +233,7 @@ namespace EPMLiveCore.API
 
             if (bVerifyOnly)
             {
-                if (ndParent.SelectSingleNode("List[@Name='" + listValue + "']") != null)
+                if (ndParent.SelectSingleNode($"List[@Name='{listValue}']") != null)
                 {
                     addMessage(0, internalName, string.Empty, parentMessageId);
                 }
@@ -236,13 +241,11 @@ namespace EPMLiveCore.API
                 {
                     if (deleteIfNoList)
                     {
-                        addMessage(ErrorLevels.Upgrade, internalName, "Lookup List missing (" + listValue + ") field will be deleted",
-                            parentMessageId);
+                        addMessage(ErrorLevels.Upgrade, internalName, $"Lookup List missing ({listValue}) field will be deleted", parentMessageId);
                     }
                     else
                     {
-                        addMessage(ErrorLevels.Upgrade, internalName, "Lookup List missing (" + listValue + ") field ignored",
-                            parentMessageId);
+                        addMessage(ErrorLevels.Upgrade, internalName, $"Lookup List missing ({listValue}) field ignored", parentMessageId);
                     }
                 }
             }
@@ -272,17 +275,17 @@ namespace EPMLiveCore.API
                     spField.Delete();
                     list.Update();
 
-                    addMessage(ErrorLevels.Upgrade, internalName, "Lookup List missing (" + listValue + ") field deleted",
-                        parentMessageId);
+                    addMessage(ErrorLevels.Upgrade, internalName, $"Lookup List missing ({listValue}) field deleted", parentMessageId);
                 }
                 catch (Exception ex)
                 {
-                    addMessage(ErrorLevels.Error, internalName, "Lookup List missing (" + listValue + ") field failed to delete: " + ex.Message, parentMessageId);
+                    addMessage(ErrorLevels.Error, internalName, $"Lookup List missing ({listValue}) field failed to delete: " + ex.Message, parentMessageId);
+                    Trace.WriteLine(ex.ToString());
                 }
             }
             else
             {
-                addMessage(ErrorLevels.Upgrade, internalName, "Lookup List missing (" + listValue + ") field ignored", parentMessageId);
+                addMessage(ErrorLevels.Upgrade, internalName, $"Lookup List missing ({listValue}) field ignored", parentMessageId);
             }
         }
     }

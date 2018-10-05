@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text;
 using System.Xml;
 using Microsoft.SharePoint;
 
@@ -172,25 +173,29 @@ namespace EPMLiveCore.API
         {
             var gridGanttSettings = new GridGanttSettings(list);
 
-            var output = string.Empty;
+            var output = new StringBuilder();
 
             var fieldList = gridGanttSettings.TotalSettings.Split('\n');
 
             foreach (var field in fieldList)
             {
-                if (field != string.Empty)
+                if (!string.IsNullOrWhiteSpace(field))
                 {
                     var fieldData = field.Split('|');
                     if (fieldData[0] != internalName)
                     {
-                        output += "\n" + field;
+                        output.Append("\n")
+                            .Append(field);
                     }
                 }
             }
 
-            output += "\n" + internalName + "|" + total;
+            output.Append("\n")
+                .Append(internalName)
+                .Append("|")
+                .Append(total);
 
-            gridGanttSettings.TotalSettings = output.Trim('\n');
+            gridGanttSettings.TotalSettings = output.ToString().Trim('\n');
             gridGanttSettings.SaveSettings(list);
         }
     }
