@@ -149,11 +149,11 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
 
             ShimSPUtility.TransferToErrorPageString = _ =>
             {
-                validation = validation + 1;
+                validation += 1;
             };
             Shimtimersettings.AllInstances.loadDataSPWeb = (_, __) =>
             {
-                validation = validation + 1;
+                validation += 1;
             };
             spWeb.IsRootWebGet = () => true;
 
@@ -177,11 +177,11 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
 
             ShimSPUtility.TransferToErrorPageString = _ =>
             {
-                validation = validation + 1;
+                validation += 1;
             };
             Shimtimersettings.AllInstances.loadDataSPWeb = (_, __) =>
             {
-                validation = validation + 1;
+                validation += 1;
             };
             spWeb.IsRootWebGet = () => false;
 
@@ -212,7 +212,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             };
             Shimtimersettings.AllInstances.saveSettingsSPWeb = (_, __) =>
             {
-                validation = validation + 1;
+                validation += 1;
             };
             ShimHttpRequest.AllInstances.ItemGetString = (_, __) => "Run Timer Now";
 
@@ -246,7 +246,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             };
             Shimtimersettings.AllInstances.saveSettingsSPWeb = (_, __) =>
             {
-                validation = validation + 1;
+                validation += 1;
             };
             ShimHttpRequest.AllInstances.ItemGetString = (_, __) => "Run Timer Now";
 
@@ -280,7 +280,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             };
             Shimtimersettings.AllInstances.saveSettingsSPWeb = (_, __) =>
             {
-                validation = validation + 1;
+                validation += 1;
             };
             ShimHttpRequest.AllInstances.ItemGetString = (_, __) => "Run Timer Now";
 
@@ -316,7 +316,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             };
             Shimtimersettings.AllInstances.saveSettingsSPWeb = (_, __) =>
             {
-                validation = validation + 1;
+                validation += 1;
             };
             ShimHttpRequest.AllInstances.ItemGetString = (_, __) => "Run Timer Now";
 
@@ -352,7 +352,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             };
             Shimtimersettings.AllInstances.saveSettingsSPWeb = (_, __) =>
             {
-                validation = validation + 1;
+                validation += 1;
             };
             ShimHttpRequest.AllInstances.ItemGetString = (_, __) => "Run Timer Now";
 
@@ -384,16 +384,16 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             {
                 if (path.Equals(DummyString))
                 {
-                    validation = validation + 10;
+                    validation += 10;
                 }
             };
             Shimtimersettings.AllInstances.saveSettingsSPWeb = (_, __) =>
             {
-                validation = validation + 1;
+                validation += 1;
             };
             ShimSPUtility.RedirectStringSPRedirectFlagsHttpContext = (_, _1, _2) =>
             {
-                validation = validation + 20;
+                validation += 20;
                 return true;
             };
 
@@ -415,16 +415,16 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             {
                 if (path.Equals(DummyString))
                 {
-                    validation = validation + 10;
+                    validation += 10;
                 }
             };
             Shimtimersettings.AllInstances.saveSettingsSPWeb = (_, __) =>
             {
-                validation = validation + 1;
+                validation += 1;
             };
             ShimSPUtility.RedirectStringSPRedirectFlagsHttpContext = (_, _1, _2) =>
             {
-                validation = validation + 20;
+                validation += 20;
                 return true;
             };
 
