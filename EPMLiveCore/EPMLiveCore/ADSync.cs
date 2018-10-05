@@ -163,27 +163,37 @@ namespace EPMLiveCore
         private bool userDeleted(string sid)
         {
             string path = "LDAP://<SID=" + sid + ">";
-            DirectoryEntry user = new DirectoryEntry(path);
-            if (user != null)
+            var userDirectory = default(DirectoryEntry);
+            try
             {
+                userDirectory = new DirectoryEntry(path);
                 return false;
             }
-            return true;
+            catch (Exception exception)
+            {
+                Trace.TraceError(exception.ToString());
+                return true;
+            }
+            finally
+            {
+                userDirectory?.Dispose();
+            }
         }
 
         private bool userDisabled(string sid)
         {
             string path = "LDAP://<SID=" + sid + ">";
-            DirectoryEntry user = new DirectoryEntry(path);
-            DirectorySearcher ds = new DirectorySearcher(user);
-            SearchResult sr;
-            ds.Filter = "(&(userAccountControl:1.2.840.113556.1.4.803:=2))";
-            sr = ds.FindOne();
-            if (sr != null)
+            SearchResult result;
+            using (var userDirectory = new DirectoryEntry(path))
             {
-                return true;
+                using (var searcher = new DirectorySearcher(userDirectory))
+                {
+                    searcher.Filter = "(&(userAccountControl:1.2.840.113556.1.4.803:=2))";
+                    result = searcher.FindOne();
+                }
             }
-            return false;
+
+            return result != null;
         }
 
         private void UpdateResourcePool()
@@ -288,35 +298,32 @@ namespace EPMLiveCore
 
         public List<string> GetGroups(string path)
         {
-            DirectoryEntry objADAM = default(DirectoryEntry);
             DirectoryEntry objGroupEntry = default(DirectoryEntry);
-            DirectorySearcher objSearchADAM = default(DirectorySearcher);
             SearchResultCollection objSearchResults = default(SearchResultCollection);
             List<string> result = new List<string>();
 
+            var directoryAdam = default(DirectoryEntry);
             try
             {
-                objADAM = new DirectoryEntry(path);
-                objADAM.RefreshCache();
-            }
-            catch (Exception e)
-            {
-                _ExecutionLogs.Add("     WARNING -- Location: GetGroups() -- Path:" + path + " -- Message:" + e.Message);
-            }
+                directoryAdam = new DirectoryEntry(path);
+                directoryAdam.RefreshCache();
 
-            // Get search object, specify filter and scope,  
-            // perform search.  
-            try
-            {
-                objSearchADAM = new DirectorySearcher(objADAM);
-                objSearchADAM.Filter = "(&(objectClass=group))";
-                objSearchADAM.PageSize = GetSizeLimit();
-                objSearchADAM.SearchScope = SearchScope.Subtree;
-                objSearchResults = objSearchADAM.FindAll();
+                using (var searchAdam = new DirectorySearcher(directoryAdam))
+                {
+                    searchAdam.Filter = "(&(objectClass=group))";
+                    searchAdam.PageSize = GetSizeLimit();
+                    searchAdam.SearchScope = SearchScope.Subtree;
+                    objSearchResults = searchAdam.FindAll();
+                }
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                _ExecutionLogs.Add("     WARNING -- Location: GetGroups() -- Path:" + path + " -- Message:" + e.Message);
+                Trace.TraceError(exception.ToString());
+                _ExecutionLogs.Add($"     WARNING -- Location: GetGroups() -- Path:{path} -- Message:{exception.Message}");
+            }
+            finally
+            {
+                directoryAdam?.Dispose();
             }
 
             // Enumerate groups  
@@ -767,34 +774,6 @@ namespace EPMLiveCore
             sb.Append("AD Sync process finished at:" + DateTime.Now.ToString() + "<br/>");
             _processLog = sb.ToString();
         }
-
-        //private void CreateExecutionLog()
-        //{
-        //    StreamWriter SW;
-        //    if (Directory.Exists(@"C:\EPMLive"))
-        //    {
-        //        if (File.Exists(@"C:\EPMLive\EPMLiveADSyncProcessLog.txt"))
-        //        {
-        //            try
-        //            {
-        //                File.Delete(@"C:\EPMLive\EPMLiveADSyncProcessLog.txt");
-        //            }
-        //            catch (Exception ex)
-        //            {
-
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        Directory.CreateDirectory(@"C:\EPMLive");
-        //    }
-
-        //    SW = File.CreateText(@"C:\EPMLive\EPMLiveADSyncProcessLog.txt");
-        //    SW.Close();
-        //    SW.Dispose();
-        //    _ExecutionLogs.Add("EPMLive -- AD Sync process started at: " + DateTime.Now.ToString());
-        //}        
 
         private void AddProperties(DirectorySearcher ds)
         {

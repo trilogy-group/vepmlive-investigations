@@ -1,834 +1,298 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Web;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
-using System.Web;
-using System.Configuration;
-using System.Linq;
+using SystemTrace = System.Diagnostics.Trace;
 
 namespace EPMLiveCore
 {
-    public class ListDisplayPage : LayoutsPageBase
+    public partial class ListDisplayPage : LayoutsPageBase
     {
-        private string pageRender;
-        private SPList currentList;
-        private SortedList<string, SPField> displayableFields = new SortedList<string, SPField>();
-        private List<SPGroup> groups = new List<SPGroup>();
-        private StringBuilder computeFieldsScript = new StringBuilder();
-        
-        private Dictionary<string, Dictionary<string, string>> fieldProperties = null;
-        
+        private const int PageSize = 5;
+        private const string Selected = "selected ";
+        private const string WhereText = "where";
+        private const string NewText = "New";
+        private const string Edit = "Edit";
+        private const string DisplayText = "Display";
+        private const string EditableText = "Editable";
+        private const string Always = "always";
+        private const string Never = "never";
+        private string _pageRender;
+        private SPList _currentList;
+        private readonly SortedList<string, SPField> _displayableFields = new SortedList<string, SPField>();
+        private readonly List<SPGroup> _groups = new List<SPGroup>();
+        private readonly StringBuilder _computeFieldsScript = new StringBuilder();
+        private Dictionary<string, Dictionary<string, string>> _fieldProperties;
+
         protected Button OK = new Button();
         protected Button Cancel = new Button();
+        private bool _disposed;
 
-        protected override void OnLoad(EventArgs e) 
+        protected override void OnLoad(EventArgs eventArgs)
         {
-            this.Title = "Editable Fields";
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException(nameof(eventArgs));
+            }
 
-            //if (this.CurrentList.ParentWeb.Properties.ContainsKey(String.Format("DisplaySetting{0}", System.IO.Path.GetDirectoryName(CurrentList.DefaultView.Url))))
-            //    fieldProperties = ListDisplayUtils.ConvertFromString(this.CurrentList.ParentWeb.Properties[String.Format("DisplaySetting{0}", System.IO.Path.GetDirectoryName(CurrentList.DefaultView.Url))]);
+            Title = "Editable Fields";
 
-            GridGanttSettings gSettings = new GridGanttSettings(CurrentList);
+            var gSettings = new GridGanttSettings(CurrentList);
 
-            if (gSettings.DisplaySettings != "")
-                fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
+            if (!string.IsNullOrWhiteSpace(gSettings.DisplaySettings))
+            {
+                _fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
+            }
 
-            foreach (SPField field in this.CurrentList.Fields)
+            foreach (SPField field in CurrentList.Fields)
             {
                 if (field.Reorderable && !field.Sealed)
-                    displayableFields.Add(field.Title, field);
+                {
+                    _displayableFields.Add(field.Title, field);
+                }
                 else
                 {
                     if (MatchROFields(field.Id))
-                         displayableFields.Add(field.Title, field);
+                    {
+                        _displayableFields.Add(field.Title, field);
+                    }
                 }
-            } 
+            }
 
-            foreach (SPGroup group in this.CurrentList.ParentWeb.Groups)
-                groups.Add(group);
-            this.Cancel.PostBackUrl = string.Format("~/_layouts/listedit.aspx?List={0}", CurrentList.ID.ToString());
+            foreach (SPGroup group in CurrentList.ParentWeb.Groups)
+            {
+                _groups.Add(group);
+            }
+
+            Cancel.PostBackUrl = $"~/_layouts/listedit.aspx?List={CurrentList.ID.ToString()}";
+
             if (IsPostBack)
+            {
                 return;
-            pageRender = this.PrepareRenderPage();
-            RegisterScript();
+            }
 
-            
+            _pageRender = PrepareRenderPage();
+            RegisterScript();
         }
 
         protected string RenderPage()
         {
-            return pageRender;
+            return _pageRender;
         }
 
         protected SPList CurrentList
         {
-            get
-            {
-                if (currentList == null)
-                    currentList = SPContext.Current.Web.Lists[new Guid(Request.QueryString["List"])];
-
-                return currentList;
-            }
+            get { return _currentList ?? (_currentList = SPContext.Current.Web.Lists[new Guid(Request.QueryString["List"])]); }
         }
-        const int PAGE_SIZE = 5;
+
         private string PrepareRenderPage()
         {
-            StringBuilder result = new StringBuilder();
-            int page = 0;
+            var result = new StringBuilder();
+            var page = 0;
+
             if (Request.QueryString["Page"] != null)
+            {
                 int.TryParse(Request.QueryString["Page"], out page);
-            string currentQueryString = Request.QueryString.ToString().Replace("&Page=" + page, "");
+            }
 
-            List<SPField> fields = new List<SPField>();
-            foreach (SPField validField in displayableFields.Values)
+            var currentQueryString = Request.QueryString.ToString().Replace("&Page=" + page, string.Empty);
+
+            var fields = _displayableFields.Values.Where(validField => MatchROFields(validField.Id) == false).ToList();
+
+            result.Append("\n<style>.pageNumber, .pageNumber:visited, .pageNumber:active { color:inherit; text-decoration:none;}</style>")
+               .Append($"\n{(page > 0 ? $"<a class=\'pageNumber\' href =\'?{currentQueryString}&Page={page - 1}\'>Previous</a>" : "<span>Previous</span>")}<span>&nbsp;&nbsp;&nbsp;</span>");
+
+            for (var i = 0; i < fields.Count; i += PageSize)
             {
-                if (MatchROFields(validField.Id) == false)
+                var tooltip = string.Empty;
+
+                for (var j = i; j < Math.Min(fields.Count, i + PageSize); j++)
                 {
-                    fields.Add(validField);
+                    tooltip += $"{fields[j].Title}&#013;";
                 }
-            }
-            result.Append("\n" + "<style>.pageNumber, .pageNumber:visited, .pageNumber:active { color:inherit; text-decoration:none;}</style>");
- 
-           result.Append("\n" +  (page > 0? "<a class='pageNumber' href ='?" + currentQueryString + "&Page=" + (page - 1) + "'>Previous</a>":"<span>Previous</span>") + "<span>&nbsp;&nbsp;&nbsp;</span>");
 
-            for (int i = 0; i < fields.Count; i+=PAGE_SIZE)
+                var pageNumber = (i + PageSize - 1) / PageSize;
+                result.Append($"\n<a class=\'pageNumber\' title=\'{tooltip}\' href=\'?{currentQueryString}&Page={pageNumber}\'>{(page == pageNumber ? $"<b>[{pageNumber}]</b>" : $"[{pageNumber}]")}</a>&nbsp;");
+            }
+
+            result.Append($"\n<span>&nbsp;&nbsp;&nbsp;</span>{((page + 1) * PageSize < fields.Count ? $"<a class=\'pageNumber\' href = \'?{currentQueryString}&Page={page + 1}\'>Next</a>" : "<span>Next</span>")}")
+               .Append("\n<br><br><br>");
+
+            for (var i = page * PageSize; i < Math.Min(fields.Count, (page + 1) * PageSize); i++)
             {
-                string tooltip = "";
-                for (int j = i; j < Math.Min(fields.Count, i + PAGE_SIZE); j++)
-                    tooltip += fields[j].Title + "&#013;";
-                int pageNumber = ((i + PAGE_SIZE - 1) / PAGE_SIZE);
-                result.Append("\n" + "<a class='pageNumber' title='" + tooltip + "' href='?" + currentQueryString + "&Page=" +  pageNumber  + "'>" + (page ==pageNumber? "<b>[" + pageNumber + "]</b>":"[" + pageNumber + "]") +"</a>&nbsp;");
+                var field = fields[i];
+
+                result.Append("\n<table style=\"width:100%\" cellpadding=\"0\" cellspacing=\"0\">")
+                   .Append("\n<tr><td colspan=\"2\" class=\"ms-sectionline\" style=\"height:1px;\" ></td></tr>")
+                   .Append($"\n<tr><td valign=\"top\" class=\"ms-sectionheader\" style=\"width:120px\">{field.Title}</td>")
+                   .Append("\n<td class=\"ms-authoringcontrols\">")
+                   .Append($"\n{RenderOptions(field)}")
+                   .Append("\n</td></tr><tr><td></td><td class=\"ms-authoringcontrols\" style=\"height:10px;\"></td></tr>")
+                   .Append("\n</table>");
             }
-           
-          
-           result.Append("\n" + "<span>&nbsp;&nbsp;&nbsp;</span>" + (((page + 1) * PAGE_SIZE) < fields.Count? "<a class='pageNumber' href = '?" + currentQueryString + "&Page=" + (page + 1) + "'>Next</a>" : "<span>Next</span>") );
-
-            result.Append("\n" + "<br><br><br>");
-
-            for (int i = page * PAGE_SIZE; i < Math.Min(fields.Count, (page + 1) * PAGE_SIZE); i++)
-            {
-                SPField field = fields[i];
-
-                result.Append("\n" +  "<table style=\"width:100%\" cellpadding=\"0\" cellspacing=\"0\">");
-                result.Append("\n" +  "<tr><td colspan=\"2\" class=\"ms-sectionline\" style=\"height:1px;\" ></td></tr>");
-
-                result.Append("\n" +  string.Format("<tr><td valign=\"top\" class=\"ms-sectionheader\" style=\"width:120px\">{0}</td>", field.Title));
-                //else
-                //    result.Append("\n" +  string.Format("<tr style=\"display:none;\"><td valign=\"top\" class=\"ms-sectionheader\" style=\"width:120px\">{0}</td>", field.Title));
-                result.Append("\n" +  "<td class=\"ms-authoringcontrols\">");
-                result.Append("\n" + RenderOptions(field));
-                result.Append("\n" +  "</td></tr><tr><td></td><td class=\"ms-authoringcontrols\" style=\"height:10px;\"></td></tr>");
-                result.Append("\n" +  "</table>");
-
-            }
-            
-
-           
 
             return result.ToString();
         }
 
-        ///EPML4718 : checked for is fields are ID,Author or Editor, those fields need display always but it will be in hidden in Manage editable field page.
         private bool MatchROFields(Guid fieldId)
         {
-            if (SPBuiltInFieldId.ID == fieldId || SPBuiltInFieldId.Author == fieldId || SPBuiltInFieldId.Editor == fieldId)
-                return true;            
-            else
-                return false;
-        }
-
-        private string RenderOptions(SPField field)
-        {
-            StringBuilder result = new StringBuilder();
-            bool showWhere = false;
-            bool showEdit = false;
-            // New mode
-            if (field.Type != SPFieldType.Calculated)
-            {
-                result.Append("\n" + "<table style=\"width: 100%\">");
-                result.Append("\n" + "<tr><td style=\"width: 150px;\"  class=\"ms-authoringcontrols\">");
-                result.Append("\n" + "On new item, display field : ");
-                result.Append("\n" + "</td><td class=\"ms-authoringcontrols\">");
-                if (field.Required)
-                    result.Append("\n" + "Always (This field is required)");
-                else
-                {
-                    result.Append("\n" + RenderOption(field, "New", ref showWhere, ref showEdit));
-                    result.Append("\n" + RenderPanelWhere(field, "New", ref showWhere));
-                    UpdateGlobalScript(field, "New");
-                }
-                result.Append("\n" + "</td></tr>");
-                result.Append("\n" + "</table>");
-            }
-            // Display mode
-            result.Append("\n" + "<table style=\"width: 100%\">");
-            result.Append("\n" + "<tr><td style=\"width: 150px;\" class=\"ms-authoringcontrols\">");
-            result.Append("\n" + "On display item, display field : ");
-            result.Append("\n" + "</td><td class=\"ms-authoringcontrols\">");
-            result.Append("\n" + RenderOption(field, "Display", ref showWhere, ref showEdit));
-            result.Append("\n" + RenderPanelWhere(field, "Display", ref showWhere));
-            UpdateGlobalScript(field, "Display");
-            result.Append("\n" + "</td></tr>");
-            result.Append("\n" + "</table>");
-
-            // Edit mode
-            //if (field.Type != SPFieldType.Calculated)
-            showEdit = false;
-            {
-                result.Append("\n" + "<table style=\"width: 100%\">");
-                result.Append("\n" + "<tr><td style=\"width: 150px;\"  class=\"ms-authoringcontrols\">");
-                result.Append("\n" + "On edit item, display field : ");
-                result.Append("\n" + "</td><td class=\"ms-authoringcontrols\">");
-                result.Append("\n" + RenderOption(field, "Edit", ref showWhere, ref showEdit));
-                result.Append("\n" + RenderPanelWhere(field, "Edit", ref showWhere));
-                UpdateGlobalScript(field, "Edit");
-                result.Append("\n" + "</td></tr>");
-                result.Append("\n" + "</table>");
-            }
-
-            if (field.Type != SPFieldType.Calculated)
-            {
-                result.Append("\n" + "<table style=\"width: 100%\" id=\"Editable" + field.InternalName + "Edit\" style=\"display:");
-                if (!showEdit)
-                    result.Append("\n" + "none");                        
-                result.Append("\n" + ";\">");
-                result.Append("\n" + "<tr><td style=\"width: 150px;\"  class=\"ms-authoringcontrols\">");
-                result.Append("\n" + "On edit item, editable: ");
-                result.Append("\n" + "</td><td class=\"ms-authoringcontrols\">");
-                result.Append("\n" + RenderOption(field, "Editable", ref showWhere, ref showEdit));
-                result.Append("\n" + RenderPanelWhere(field, "Editable", ref showWhere));
-                UpdateGlobalScript(field, "Editable");
-                result.Append("\n" + "</td></tr>");
-                result.Append("\n" + "</table>");
-            }
-            return result.ToString();
+            return SPBuiltInFieldId.ID == fieldId || SPBuiltInFieldId.Author == fieldId || SPBuiltInFieldId.Editor == fieldId;
         }
 
         private void UpdateGlobalScript(SPField field, string mode)
         {
-            computeFieldsScript.Append(String.Format("ComputeField(\"{0}{1}\");", field.InternalName, mode));
-           
-            this.ClientScript.RegisterHiddenField(String.Format("Hidden{0}{1}", field.InternalName, mode), "");
+            _computeFieldsScript.Append($"ComputeField(\"{field.InternalName}{mode}\");");
+
+            ClientScript.RegisterHiddenField($"Hidden{field.InternalName}{mode}", string.Empty);
         }
 
         protected void SaveCustomDisplay(object sender, EventArgs e)
         {
-            Dictionary<string, Dictionary<string, string>> newFieldProperties = new Dictionary<string, Dictionary<string, string>>();
-            this.CurrentList.ParentWeb.AllowUnsafeUpdates = true;
-            string[] modes = new string[] { "New", "Display", "Edit", "Editable" };
-            foreach (SPField currentField in displayableFields.Values)
+            var newFieldProperties = new Dictionary<string, Dictionary<string, string>>();
+            CurrentList.ParentWeb.AllowUnsafeUpdates = true;
+            string[] modes = {NewText, DisplayText, Edit, EditableText};
+
+            foreach (var field in _displayableFields.Values.Select(currentField => currentField.InternalName))
             {
-                string field = currentField.InternalName;
                 newFieldProperties.Add(field, new Dictionary<string, string>());
 
-
-                foreach (string mode in modes)
+                foreach (var mode in modes)
                 {
-                    string hiddenValue = HttpContext.Current.Request.Params[string.Format("Hidden{0}{1}", field, mode)];
-                    if (string.IsNullOrEmpty(hiddenValue))
-                        continue;
-                    string condition = hiddenValue.Split(";".ToCharArray())[0].ToLower();
-                    SPField fld = this.CurrentList.Fields.GetFieldByInternalName(field);
+                    var hiddenValue = HttpContext.Current.Request.Params[$"Hidden{field}{mode}"];
 
-                    if (condition == "always" || condition == "where")
+                    if (string.IsNullOrWhiteSpace(hiddenValue))
                     {
-                        switch (mode)
-                        {
-                            case "New":
-                                fld.ShowInNewForm = true;
-                                break;
-                            case "Edit":
-                                fld.ShowInEditForm = true;
-                                break;
-                            case "Display":
-                                fld.ShowInDisplayForm = true;
-                                break;
-                        }
+                        continue;
                     }
-                    else
+
+                    var condition = hiddenValue.Split(";".ToCharArray())[0].ToLower();
+                    var spField = CurrentList.Fields.GetFieldByInternalName(field);
+
+                    var conditionAlwaysOrWhere = condition == Always || condition == WhereText;
+
+                    switch (mode)
                     {
-                        switch (mode)
-                        {
-                            case "New":
-                                fld.ShowInNewForm = false;
-                                break;
-                            case "Edit":
-                                fld.ShowInEditForm = false;
-                                break;
-                            case "Display":
-                                fld.ShowInDisplayForm = false;
-                                break;
-                        }
+                        case NewText:
+                            spField.ShowInNewForm = conditionAlwaysOrWhere;
+                            break;
+                        case Edit:
+                            spField.ShowInEditForm = conditionAlwaysOrWhere;
+                            break;
+                        case DisplayText:
+                            spField.ShowInDisplayForm = conditionAlwaysOrWhere;
+                            break;
+                        default:
+                            SystemTrace.WriteLine($"Unexpected value : {mode}");
+                            break;
                     }
+
                     try
                     {
-                        fld.Update();
+                        spField.Update();
                     }
-                    catch { }
+                    catch (Exception exception)
+                    {
+                        SystemTrace.WriteLine(exception);
+                    }
+
                     newFieldProperties[field].Add(mode, hiddenValue);
                 }
             }
 
-            //if (!this.CurrentList.ParentWeb.Properties.ContainsKey(String.Format("DisplaySetting{0}", System.IO.Path.GetDirectoryName(CurrentList.DefaultView.Url))))
-            //    this.CurrentList.ParentWeb.Properties.Add(String.Format("DisplaySetting{0}", System.IO.Path.GetDirectoryName(CurrentList.DefaultView.Url)), ListDisplayUtils.ConvertToString(fieldProperties));
-            //else
-            //    this.CurrentList.ParentWeb.Properties[String.Format("DisplaySetting{0}", System.IO.Path.GetDirectoryName(CurrentList.DefaultView.Url))] = ListDisplayUtils.ConvertToString(fieldProperties);
-
-            //this.CurrentList.ParentWeb.Properties.Update();
-
-            GridGanttSettings gSettings = new GridGanttSettings(CurrentList);
-            gSettings.DisplaySettings = ListDisplayUtils.ConvertToString(newFieldProperties);
+            var gSettings = new GridGanttSettings(CurrentList)
+            {
+                DisplaySettings = ListDisplayUtils.ConvertToString(newFieldProperties)
+            };
             gSettings.SaveSettings(CurrentList);
 
-            //CoreFunctions.setListSetting(CurrentList, "DisplaySettings", ListDisplayUtils.ConvertToString(fieldProperties));
+            CurrentList.ParentWeb.AllowUnsafeUpdates = false;
 
-            this.CurrentList.ParentWeb.AllowUnsafeUpdates = false;
-
-            Microsoft.SharePoint.Utilities.SPUtility.Redirect("listedit.aspx?List=" + this.CurrentList.ID.ToString(), Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-
+            SPUtility.Redirect($"listedit.aspx?List={CurrentList.ID}", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
         }
 
-        //private string RenderCheck(SPField field)
-        //{
-        //    StringBuilder result = new StringBuilder();
-    
-        //    string chk = "";
-
-        //    if ((fieldProperties != null) && (fieldProperties.ContainsKey(field.InternalName)) && (fieldProperties[field.InternalName].ContainsKey("ro")))
-        //    {
-        //        try
-        //        {
-        //            if (fieldProperties[field.InternalName]["ro"] == "true")
-        //                chk = " checked";
-        //        }
-        //        catch { }
-        //    }
-        //    result.Append("\n" + String.Format("<input type=\"checkbox\" value=\"true\" id=\"Option{0}ro\"{1}> Read-Only", field.InternalName, chk));
-
-        //    return result.ToString();
-        //}
-
-        private string RenderOption(SPField field, string mode, ref bool showWhere, ref bool showEdit)
+        private void ProcessMode(SPField field, string mode, ref bool showEdit, ref string optionValueAlways, ref string optionValueNever)
         {
-            StringBuilder result = new StringBuilder();                        
-            result.Append("\n" + String.Format("<select id=\"Option{0}{1}\" runat=\"server\" onchange=\"javascript:OptionChange('{0}{1}');\" style=\"width: 100px;\">", field.InternalName, mode));
-
-            
-            string optionValueAlways = "";
-            string optionValueNever = "";
-            string optionValueWhere = "";
-
-            if ((fieldProperties != null) && (fieldProperties.ContainsKey(field.InternalName)) && (fieldProperties[field.InternalName].ContainsKey(mode)))
+            if (field == null)
             {
-                string optionMode = "";
-                try
-                {                    
-                    optionMode = fieldProperties[field.InternalName][mode];                 
-                }
-                catch { }
-                string sSelectOption = optionMode.Split(";".ToCharArray())[0];
+                throw new ArgumentNullException(nameof(field));
+            }
 
-                if (sSelectOption.ToLower().Equals("where"))
+            if (mode == NewText)
+            {
+                if (field.ShowInNewForm == null || (field.ShowInNewForm.Value && MatchROFields(field.Id) == false))
                 {
-                    optionValueWhere = "selected ";
-                    showEdit = true;
+                    optionValueAlways = Selected;
                 }
                 else
                 {
-                    switch (mode)
-                    {
-                        case "New":
-                            if (field.ShowInNewForm == null)
-                            {
-                                optionValueAlways = "selected ";
-                            }
-                            else
-                            {
-                                if (field.ShowInNewForm.Value && MatchROFields(field.Id) == false)
-                                    optionValueAlways = "selected ";
-                                else
-                                    optionValueNever = "selected ";
-                            }
-                            break;
-                        case "Edit":
-                            if (field.ShowInEditForm == null)
-                            {
-                                if (field.Type == SPFieldType.Calculated)
-                                {
-                                    optionValueNever = "selected ";
-                                }
-                                else
-                                {
-                                    showEdit = true;
-                                    optionValueAlways = "selected ";
-                                }
-                            }
-                            else
-                            {
-                                if (field.ShowInEditForm.Value && MatchROFields(field.Id) == false)
-                                {
-                                    showEdit = true;
-                                    optionValueAlways = "selected ";
-                                }
-                                else
-                                    optionValueNever = "selected ";
-                            }
-                            break;
-                        case "Display":
-                            if (field.ShowInDisplayForm == null)
-                            {
-                                optionValueAlways = "selected ";
-                            }
-                            else
-                            {
-                                if (field.ShowInDisplayForm.Value)
-                                    optionValueAlways = "selected ";
-                                else
-                                    optionValueNever = "selected ";
-                            }
-                            break;
-                        case "Editable":
-                            if (sSelectOption.ToLower().Equals(""))
-                                optionValueAlways = "selected ";
-                            else if (sSelectOption.ToLower().Equals("always"))
-                                optionValueAlways = "selected ";
-                            else if (sSelectOption.ToLower().Equals("never"))
-                                optionValueNever = "selected ";
-                            else if (sSelectOption.ToLower().Equals("where"))
-                                optionValueWhere = "selected ";
-                            break;
-                    }
+                    optionValueNever = Selected;
                 }
-
-                result.Append("\n" + String.Format("<option {0}value=\"always\">Always</option>", optionValueAlways));
-                result.Append("\n" + String.Format("<option {0}value=\"never\">Never</option>", optionValueNever));
-                result.Append("\n" + String.Format("<option {0}value=\"where\">Where</option>", optionValueWhere));
-                
-                showWhere = sSelectOption.Equals("where") ? true : false;
             }
-            else
+            else if (mode == Edit)
             {
-                switch (mode)
+                if (field.ShowInEditForm == null)
                 {
-                    case "New":
-                        if (field.ShowInNewForm == null)
-                        {
-                            optionValueAlways = "selected ";
-                        }
-                        else
-                        {
-                            if (field.ShowInNewForm.Value && MatchROFields(field.Id) == false)
-                                optionValueAlways = "selected ";
-                            else
-                                optionValueNever = "selected ";
-                        }
-                        break;
-                    case "Edit":
-                        if (field.ShowInEditForm == null)
-                        {
-                            if (field.Type == SPFieldType.Calculated)
-                            {
-                                optionValueNever = "selected ";
-                            }
-                            else
-                            {
-                                showEdit = true;
-                                optionValueAlways = "selected ";
-                            }
-                        }
-                        else
-                        {
-                            if (field.ShowInEditForm.Value && MatchROFields(field.Id) == false)
-                            {
-                                showEdit = true;
-                                optionValueAlways = "selected ";
-                            }
-                            else
-                                optionValueNever = "selected ";
-                        }
-                        break;
-                    case "Display":
-                        if (field.ShowInDisplayForm == null)
-                        {
-                            optionValueAlways = "selected ";
-                        }
-                        else
-                        {
-                            if(field.ShowInDisplayForm.Value)
-                                optionValueAlways = "selected ";
-                            else
-                                optionValueNever = "selected ";
-                        }
-                        break;
-                    case "Editable":
-                        if (MatchROFields(field.Id) == false)
-                            optionValueAlways = "selected ";
-                        else
-                            optionValueNever = "selected ";
-                        break;
-                }
-
-                result.Append("\n" + String.Format("<option {0}value=\"always\">Always</option>", optionValueAlways));
-                result.Append("\n" + String.Format("<option {0}value=\"never\">Never</option>", optionValueNever));
-                result.Append("\n" + "<option value=\"where\">Where</option>");
-
-                showWhere = false;
-            }
-
-            result.Append("\n" + "</select>");
-            result.Append("\n" + "</td></tr>");
-
-            return result.ToString();
-        }
-
-        private string RenderPanelWhere(SPField field, string mode, ref bool showWhere)
-        {
-            StringBuilder result = new StringBuilder();
-
-            if (showWhere)
-                result.Append("\n" + String.Format("<tr id=\"RowOptionPanel{0}{1}\" style=\"display:inline;\"><td style=\"width: 150px;\" ></td><td class=\"ms-authoringcontrols\">", field.InternalName, mode));
-            else
-                result.Append("\n" + String.Format("<tr id=\"RowOptionPanel{0}{1}\" style=\"display:none;\"><td style=\"width: 150px;\" ></td><td class=\"ms-authoringcontrols\">", field.InternalName, mode));
-
-            result.Append("\n" + RenderWhere(field, mode));
-            showWhere = false;
-
-            return result.ToString();
-        }
-
-        private string RenderWhere(SPField field, string mode)
-        {
-            StringBuilder result = new StringBuilder();
-
-            result.Append("\n" + "<table cellpadding=\"0px\" cellspacing=\"0px\" style=\"width: 100%;\">");
-            result.Append("\n" + "<tr><td>");
-
-            if ((fieldProperties != null) && (fieldProperties.ContainsKey(field.InternalName)) && (fieldProperties[field.InternalName].ContainsKey(mode)))
-            {
-                string memMode = fieldProperties[field.InternalName][mode];
-                if (memMode.Split(";".ToCharArray()).Length > 3)
-                {
-                    string memModeValue = memMode.Split(";".ToCharArray())[0];
-                    string memOptionFieldWhere = memMode.Split(";".ToCharArray())[1];
-                    string memOptionValueFieldNameWhere = "";
-                    string memOptionConditionWhere = "";
-                    string memOptionValueUserWhere = "";
-                    string memOptionValueFieldWhere = "";
-
-                    if (memOptionFieldWhere == "[Me]")
+                    if (field.Type == SPFieldType.Calculated)
                     {
-                        memOptionConditionWhere = memMode.Split(";".ToCharArray())[2];
-                        memOptionValueUserWhere = memMode.Split(";".ToCharArray())[3];
-                    }
-                    else // [Field]
-                    {
-                        memOptionValueFieldNameWhere = memMode.Split(";".ToCharArray())[2];
-                        memOptionConditionWhere = memMode.Split(";".ToCharArray())[3];
-                        if (memMode.Split(";".ToCharArray()).Length > 4)
-                        {
-                            memOptionValueFieldWhere = memMode.Split(";".ToCharArray())[4];
-                        }
-                    }
-
-                    if (memModeValue.Equals("where"))
-                    {
-                        result.Append("\n" + String.Format("<select id=\"OptionFieldWhere{0}{1}\" runat=\"server\" onchange=\"javascript:OptionFieldWhereChange('{0}{1}');\">", field.InternalName, mode));
-                        if (memOptionFieldWhere.Equals("[Me]"))
-                        {
-                            result.Append("\n" + "<option selected=\"selected\" value=\"[Me]\">[Me]</option>");
-                            result.Append("\n" + "<option value=\"[Field]\">Field</option>");
-                        }
-                        else
-                        {
-                            result.Append("\n" + "<option selected=\"selected\" value=\"[Field]\">Field</option>");
-                            result.Append("\n" + "<option value=\"[Me]\">[Me]</option>");
-                        }
-                        result.Append("\n" + "</select>");
-
-                        if (memOptionFieldWhere.Equals("[Me]"))
-                        {
-                            result.Append("\n" + String.Format("<select id=\"OptionFieldNameWhere{0}{1}\" runat=\"server\" style=\"display:none\" >", field.InternalName, mode));
-                        }
-                        else
-                        {
-                            result.Append("\n" + String.Format("<select id=\"OptionFieldNameWhere{0}{1}\" runat=\"server\" >", field.InternalName, mode));
-                        }
-                        foreach (SPField fieldItem in displayableFields.Values)
-                        {
-                            if (memOptionValueFieldNameWhere.Equals(fieldItem.InternalName))
-                                result.Append("\n" + String.Format("<option selected=\"selected\" value=\"{0}\">{1}</option>", fieldItem.InternalName, fieldItem.Title));
-                            else
-                                result.Append("\n" + String.Format("<option value=\"{0}\">{1}</option>", fieldItem.InternalName, fieldItem.Title));
-                        }
-                        //
-                        result.Append("\n" + "</select>");
-
-
-
-                        result.Append("\n" + String.Format("<select id=\"OptionConditionWhere{0}{1}\" runat=\"server\" style=\"width: 200px\">", field.InternalName, mode));
-                        if (memOptionFieldWhere.Equals("[Me]"))
-                        {
-                            result.Append("\n" + String.Format("<option {0}value=\"IsInGroup\">Is in group</option>", memOptionConditionWhere.Equals("IsInGroup") ? "selected=\"selected\" " : ""));
-                            result.Append("\n" + String.Format("<option {0}value=\"IsNotInGroup\">Is not in group</option>", memOptionConditionWhere.Equals("IsNotInGroup") ? "selected=\"selected\" " : ""));
-                        }
-                        else
-                        {
-                            result.Append("\n" + String.Format("<option {0}value=\"IsEqualTo\">Is equal to</option>", memOptionConditionWhere.Equals("IsEqualTo") ? "selected=\"selected\" " : ""));
-                            result.Append("\n" + String.Format("<option {0}value=\"IsNotEqualTo\">Is not equal to</option>", memOptionConditionWhere.Equals("IsNotEqualTo") ? "selected=\"selected\" " : ""));
-                            result.Append("\n" + String.Format("<option {0}value=\"IsGreaterThan\">Is greater than</option>", memOptionConditionWhere.Equals("IsGreaterThan") ? "selected=\"selected\" " : ""));
-                            result.Append("\n" + String.Format("<option {0}value=\"IsLessThan\">Is less than</option>", memOptionConditionWhere.Equals("IsLessThan") ? "selected=\"selected\" " : ""));
-                            result.Append("\n" + String.Format("<option {0}value=\"IsGreaterThanOrEqual\">Is greater than or equal to</option>", memOptionConditionWhere.Equals("IsGreaterThanOrEqual") ? "selected=\"selected\" " : ""));
-                            result.Append("\n" + String.Format("<option {0}value=\"IsLessThanOrEqual\">Is less than or equal to</option>", memOptionConditionWhere.Equals("IsLessThanOrEqual") ? "selected=\"selected\" " : ""));
-                            result.Append("\n" + String.Format("<option {0}value=\"BeginWith\">Begins with</option>", memOptionConditionWhere.Equals("BeginWith") ? "selected=\"selected\" " : ""));
-                            result.Append("\n" + String.Format("<option {0}value=\"EndWith\">Ends with</option>", memOptionConditionWhere.Equals("EndWith") ? "selected=\"selected\" " : ""));
-                            result.Append("\n" + String.Format("<option {0}value=\"Contains\">Contains</option>", memOptionConditionWhere.Equals("Contains") ? "selected=\"selected\" " : ""));
-                        }
-                        result.Append("\n" + "</select>");
-
-                        if (memOptionFieldWhere.Equals("[Me]"))
-                        {
-                            result.Append("\n" + String.Format("<select id=\"OptionValueUserWhere{0}{1}\" runat=\"server\" style=\"width: 200px; display:inline\">", field.InternalName, mode));
-                            foreach (SPGroup group in groups)
-                                if (memOptionValueFieldWhere.Equals(group.Name))
-                                    result.Append("\n" + String.Format("<option {0}value=\"{1}\" selected=\"selected\" >{2}</option>", memOptionValueUserWhere.Equals(group.Name) ? "selected=\"selected\" " : "", group.Name, group.Name));
-                                else
-                                    result.Append("\n" + String.Format("<option {0}value=\"{1}\">{2}</option>", memOptionValueUserWhere.Equals(group.Name) ? "selected=\"selected\" " : "", group.Name, group.Name));
-                        }
-                        else
-                        {
-                            result.Append("\n" + String.Format("<select id=\"OptionValueUserWhere{0}{1}\" runat=\"server\" style=\"width: 200px; display:none\">", field.InternalName, mode));
-                            foreach (SPGroup group in groups)
-                                if (memOptionValueFieldWhere.Equals(group.Name))
-                                    result.Append("\n" + String.Format("<option selected=\"selected\" value=\"{0}\">{1}</option>", group.Name, group.Name));
-                                else
-                                    result.Append("\n" + String.Format("<option value=\"{0}\">{1}</option>", group.Name, group.Name));
-                        }
-                        result.Append("\n" + "</select>");
-
-                        if (memOptionFieldWhere.Equals("[Me]"))
-                            result.Append("\n" + String.Format("<input id=\"OptionValueFieldWhere{0}{1}\" class=\"ms-long\" style=\"width: 200px; display: none\" />", field.InternalName, mode));
-                        else
-                            result.Append("\n" + String.Format("<input id=\"OptionValueFieldWhere{0}{1}\" class=\"ms-long\" style=\"width: 200px; display: inline\" value=\"{2}\" />", field.InternalName, mode, memOptionValueFieldWhere));
+                        optionValueNever = Selected;
                     }
                     else
                     {
-                        result.Append("\n" + String.Format("<select id=\"OptionFieldWhere{0}{1}\" runat=\"server\" onchange=\"javascript:OptionFieldWhereChange('{0}{1}');\">", field.InternalName, mode));
-                        result.Append("\n" + "<option selected=\"selected\" value=\"[Me]\">[Me]</option>");
-                        result.Append("\n" + "<option value=\"[Field]\">Field</option>");
-                        result.Append("\n" + "</select>");
-
-                        result.Append("\n" + String.Format("<select id=\"OptionFieldNameWhere{0}{1}\" runat=\"server\" style=\"display:none\" >", field.InternalName, mode));
-                        foreach (SPField fieldItem in displayableFields.Values)
-                            result.Append("\n" + String.Format("<option value=\"{0}\">{1}</option>", fieldItem.InternalName, fieldItem.Title));
-
-                        result.Append("\n" + "</select>");
-
-                        result.Append("\n" + String.Format("<select id=\"OptionConditionWhere{0}{1}\" runat=\"server\" style=\"width: 200px\">", field.InternalName, mode));
-                        result.Append("\n" + "<option selected=\"selected\" value=\"IsInGroup\">Is in group</option>");
-                        result.Append("\n" + "<option value=\"IsNotInGroup\">Is not in group</option>");
-                        result.Append("\n" + "</select>");
-
-                        result.Append("\n" + String.Format("<select id=\"OptionValueUserWhere{0}{1}\" runat=\"server\" style=\"width: 200px\">", field.InternalName, mode));
-                        foreach (SPGroup group in groups)
-                            result.Append("\n" + String.Format("<option value=\"{0}\">{1}</option>", group.Name, group.Name));
-                        result.Append("\n" + "</select>");
-
-                        result.Append("\n" + String.Format("<input id=\"OptionValueFieldWhere{0}{1}\" class=\"ms-long\" style=\"width: 200px; display: none\" />", field.InternalName, mode));
+                        showEdit = true;
+                        optionValueAlways = Selected;
+                    }
+                }
+                else
+                {
+                    if (field.ShowInEditForm.Value && MatchROFields(field.Id) == false)
+                    {
+                        showEdit = true;
+                        optionValueAlways = Selected;
+                    }
+                    else
+                    {
+                        optionValueNever = Selected;
                     }
                 }
             }
-            else
+            else if (mode == DisplayText)
             {
-                result.Append("\n" + String.Format("<select id=\"OptionFieldWhere{0}{1}\" runat=\"server\" onchange=\"javascript:OptionFieldWhereChange('{0}{1}');\">", field.InternalName, mode));
-                result.Append("\n" + "<option selected=\"selected\" value=\"[Me]\">[Me]</option>");
-                result.Append("\n" + "<option value=\"[Field]\">Field</option>");
-                result.Append("\n" + "</select>");
-
-                result.Append("\n" + String.Format("<select id=\"OptionFieldNameWhere{0}{1}\" runat=\"server\" style=\"display:none\" >", field.InternalName, mode));
-                foreach (SPField fieldItem in displayableFields.Values)
-                    result.Append("\n" + String.Format("<option value=\"{0}\">{1}</option>", fieldItem.InternalName, fieldItem.Title));
-                //
-                result.Append("\n" + "</select>");
-
-                result.Append("\n" + String.Format("<select id=\"OptionConditionWhere{0}{1}\" runat=\"server\" style=\"width: 200px\">", field.InternalName, mode));
-                result.Append("\n" + "<option selected=\"selected\" value=\"IsInGroup\">Is in group</option>");
-                result.Append("\n" + "<option value=\"IsNotInGroup\">Is not in group</option>");
-                result.Append("\n" + "</select>");
-
-                result.Append("\n" + String.Format("<select id=\"OptionValueUserWhere{0}{1}\" runat=\"server\" style=\"width: 200px\">", field.InternalName, mode));
-                foreach (SPGroup group in groups)
-                    result.Append("\n" + String.Format("<option value=\"{0}\">{1}</option>", group.Name, group.Name));
-                result.Append("\n" + "</select>");
-
-                result.Append("\n" + String.Format("<input id=\"OptionValueFieldWhere{0}{1}\" class=\"ms-long\" style=\"width: 200px; display: none\" />", field.InternalName, mode));
+                if (field.ShowInDisplayForm != false)
+                {
+                    optionValueAlways = Selected;
+                }
+                else
+                {
+                    optionValueNever = Selected;
+                }
             }
-
-            //result.Append("\n" + String.Format("&nbsp<a id=\"OptionAddMoreWhere{0}{1}\" class=\"ms-authoringcontrols\" style=\"cursor: pointer;\" onclick=\"javascript:AddMoreCondition('OptionAddMoreWhere{0}{1}','{0}{1}');\">Add more condition ...</a>", field.InternalName, mode));        
-            result.Append("\n" + String.Format("<input id=\"Hidden{0}{1}\" type=\"hidden\" />", field.InternalName, mode));
-
-            result.Append("\n" + "</td></tr>");
-            result.Append("\n" + "</table>");
-
-            return result.ToString();
         }
 
-        private void RegisterScript()
+        protected virtual void Dispose(bool disposing)
         {
-            computeFieldsScript.Insert(0, "function ComputeFields(){");
-            computeFieldsScript.Append("}");
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "ComputeFields", computeFieldsScript.ToString(), true);
+            if (disposing)
+            {
+                base.Dispose();
+                OK?.Dispose();
+                Cancel?.Dispose();
+            }
 
+            _disposed = true;
+        }
 
-            string OptionChangeScript = @"function OptionChange(senderPartialId) 
-                                        {
-                                            var control = document.getElementById('Option' + senderPartialId);
-                                            var selectedValue = control.options[control.selectedIndex].value;
-                                            var controlToChange = document.getElementById('RowOptionPanel' + senderPartialId);
+        public override void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
 
-                                            var controlToChange2 = document.getElementById('Editable' + senderPartialId);
-                                            if(controlToChange2 != null)
-                                            {
-                                                if(selectedValue == 'never')
-                                                {
-                                                    controlToChange2.style.display = 'none';
-                                                }
-                                                else
-                                                {
-                                                    controlToChange2.style.display = '';
-                                                }
-                                            }
-
-                                            if(selectedValue == 'where')
-                                            {
-                                                controlToChange.style.display = 'inline';
-                                            }
-                                            else
-                                            {
-                                                controlToChange.style.display = 'none';
-                                            }
-                                        }";
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "OptionChange", OptionChangeScript, true);
-
-
-            string OptionFieldWhereChangeScript = @"function OptionFieldWhereChange(senderPartialId)
-                                                    {
-                                                        var fieldControl = document.getElementById('OptionFieldWhere' + senderPartialId);
-                                                        var conditionControl = document.getElementById('OptionConditionWhere' + senderPartialId);
-                                                        var selectedValue =  fieldControl.options[fieldControl.selectedIndex].value;
-                                                        
-                                                        if(selectedValue == '[Me]') {
-                                                            FillConditionForUser(conditionControl);
-                                                            document.getElementById('OptionValueFieldWhere' + senderPartialId).style.display = 'none';
-                                                            document.getElementById('OptionFieldNameWhere' + senderPartialId).style.display = 'none';
-                                                            document.getElementById('OptionValueUserWhere' + senderPartialId).style.display = 'inline';
-                                                        }
-                                                        else {
-                                                            FillConditionForField(conditionControl);
-                                                            document.getElementById('OptionFieldNameWhere' + senderPartialId).style.display = 'inline';
-                                                            document.getElementById('OptionValueUserWhere' + senderPartialId).style.display = 'none';
-                                                            document.getElementById('OptionValueFieldWhere' + senderPartialId).style.display = 'inline';
-                                                        }
-                                                    }";
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "OptionFieldWhereChange", OptionFieldWhereChangeScript, true);
-
-            string FillConditionForUserScript = @"function FillConditionForUser(conditionControl) 
-                                                {
-                                                    conditionControl.options.length = 2                
-                                                    conditionControl.options[0].value = 'InGroup';
-                                                    conditionControl.options[0].text = 'Is in group';
-                                                    conditionControl.options[1].value = 'NotInGroup';
-                                                    conditionControl.options[1].text = 'Is not in group';
-                                                    conditionControl.selectedIndex = 0;        
-                                                }";
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "FillConditionForUser", FillConditionForUserScript, true);
-
-            string FillConditionForFieldScript = @"function FillConditionForField(conditionControl) 
-                                                {
-                                                    conditionControl.options.length = 9                
-                                                    conditionControl.options[0].value = 'IsEqualTo';
-                                                    conditionControl.options[0].text = 'Is equal to';
-                                                    conditionControl.options[1].value = 'IsNotEqualTo';
-                                                    conditionControl.options[1].text = 'Is not equal to';
-                                                    conditionControl.options[2].value = 'IsGreaterThan';
-                                                    conditionControl.options[2].text = 'Is greater than';
-                                                    conditionControl.options[3].value = 'IsLessThan';
-                                                    conditionControl.options[3].text = 'Is less than';
-                                                    conditionControl.options[4].value = 'IsGreaterThanOrEqual';
-                                                    conditionControl.options[4].text = 'Is greater than or equal to';
-                                                    conditionControl.options[5].value = 'IsLessThanOrEqual';
-                                                    conditionControl.options[5].text = 'Is less than or equal to';
-                                                    conditionControl.options[6].value = 'BeginWith';
-                                                    conditionControl.options[6].text = 'Begins with';
-                                                    conditionControl.options[7].value = 'EndWith';
-                                                    conditionControl.options[7].text = 'Ends with';
-                                                    conditionControl.options[8].value = 'Contains';
-                                                    conditionControl.options[8].text = 'Contains';
-                                                    conditionControl.selectedIndex = 0;        
-                                                }";
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "FillConditionForField", FillConditionForFieldScript, true);
-
-            string ComputeFieldScript = @"function ComputeField(senderPartialId) 
-                                        {
-                                            var hiddenField = document.getElementById('Hidden' + senderPartialId);
-                                            var option = document.getElementById('Option' + senderPartialId);
-                                            var optionFieldWhere = document.getElementById('OptionFieldWhere' + senderPartialId);
-                                            var optionFieldNameWhere = document.getElementById('OptionFieldNameWhere' + senderPartialId);
-                                            var optionConditionWhere = document.getElementById('OptionConditionWhere' + senderPartialId);
-                                            var optionValueUserWhere = document.getElementById('OptionValueUserWhere' + senderPartialId);
-                                            var optionValueFieldWhere = document.getElementById('OptionValueFieldWhere' + senderPartialId);
-                                            
-                                            var optionValue = '';
-                                            if(option.type != 'checkbox')
-                                            {
-                                                if (option != null) optionValue = option.options[option.selectedIndex].value;
-                                                var optionFieldWhereValue = '';
-                                                if (optionValue == 'where') if (optionFieldWhere != null) optionFieldWhereValue = optionFieldWhere.options[optionFieldWhere.selectedIndex].value;
-                                                var optionFieldNameWhereValue = '';
-                                                if (optionValue == 'where') if (optionFieldNameWhere != null) optionFieldNameWhereValue = optionFieldNameWhere.options[optionFieldNameWhere.selectedIndex].value;
-                                                var optionConditionWhereValue = '';
-                                                if (optionValue == 'where') if (optionConditionWhere != null) optionConditionWhereValue = optionConditionWhere.options[optionConditionWhere.selectedIndex].value;
-                                                var optionValueUserWhereValue = '';
-                                                if (optionValue == 'where') if (optionValueUserWhere != null) optionValueUserWhereValue = optionValueUserWhere.options[optionValueUserWhere.selectedIndex].value;
-                                                var optionValueFieldWhereValue = '';
-                                                if (optionValue == 'where') if (optionValueFieldWhere != null) optionValueFieldWhereValue = optionValueFieldWhere.value;
-                                                
-                                                if (optionFieldWhereValue == '[Me]')
-                                                {
-                                                    hiddenField.value = optionValue + ';' + optionFieldWhereValue + ';' + optionConditionWhereValue + ';' + optionValueUserWhereValue;
-                                                }
-                                                else
-                                                {
-                                                    hiddenField.value = optionValue + ';' + optionFieldWhereValue + ';' + optionFieldNameWhereValue + ';' + optionConditionWhereValue + ';' + optionValueFieldWhereValue;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                hiddenField.value = option.checked;
-                                            }
-                                            
-                                          
-                                         }";
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "ComputeField", ComputeFieldScript, true);
-
-            string AddMoreConditionScript = @"function AddMoreCondition(sender, senderPartialId) 
-                                            {
-                                                var senderControl = document.getElementById(sender);
-                                                senderControl.style.display = 'none';
-                                                
-                                                var newLine = document.createElement('<br/>');
-                                                var newLabelAnd = document.createTextNode('And ');
-                                                var newOptionAnd = document.createElement('<input type=""radio"" name=""AndOr' + senderPartialId + '"" value=""And"" checked=""checked""/>');
-                                                var newLabelOr = document.createTextNode('  Or ');
-                                                var newOptionOr = document.createElement('<input type=""radio"" name=""AndOr' + senderPartialId + '"" value=""Or""/>');
-                                                
-                                                senderControl.parentNode.appendChild(newLine);
-                                                senderControl.parentNode.appendChild(newLabelAnd);
-                                                senderControl.parentNode.appendChild(newOptionAnd);
-                                                senderControl.parentNode.appendChild(newLabelOr);
-                                                senderControl.parentNode.appendChild(newOptionOr);  
-                                            }";
+            Dispose(true);
         }
     }
 }
