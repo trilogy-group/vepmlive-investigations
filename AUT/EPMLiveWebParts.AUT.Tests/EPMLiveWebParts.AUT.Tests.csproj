@@ -132,7 +132,6 @@
     <Compile Include="EpmCharting\DomainServices\ChartHelperTest.cs" />
     <Compile Include="EpmCharting\DomainServices\HtmlColorServiceTest.cs" />
     <Compile Include="EpmCharting\Mappers\EpmChartSeriesToVisifireChartSeriesMapperTest.cs" />
-    <Compile Include="EpmCharting\Mappers\EpmChartUserSettingsToPersonalizationDataMapperTest.cs" />
     <Compile Include="EpmCharting\Repositories\EpmChartUserSettingsRepositoryTest.cs" />
     <Compile Include="EPMLiveQuickLaunchModifier\EPMLiveQuickLaunchModifierTest.cs" />
     <Compile Include="GridListView\DependencyTest.cs" />
