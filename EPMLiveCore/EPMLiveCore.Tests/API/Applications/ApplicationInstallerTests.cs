@@ -4,13 +4,18 @@ using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Fakes;
 using System.Net.Fakes;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.WebControls.WebParts.Fakes;
 using System.Xml;
 using EPMLiveCore.API;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.ApplicationStore.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.Jobs.Applications.Fakes;
+using EPMLiveCore.ReportHelper.Fakes;
+using EPMLiveCore.WebPartsHelper;
 using EPMLiveCore.WorkEngineSolutionStoreListSvc.Fakes;
+using EPMLiveWebParts.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
@@ -18,10 +23,14 @@ using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Navigation.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
+using Microsoft.SharePoint.WebPartPages;
+using Microsoft.SharePoint.WebPartPages.Fakes;
 using Microsoft.SharePoint.Workflow;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Shouldly;
+using ShimExtensionMethods = EPMLiveCore.Fakes.ShimExtensionMethods;
+using WebPart = Microsoft.SharePoint.WebPartPages.WebPart;
 
 namespace EPMLiveCore.Tests.API.Applications
 {
@@ -37,6 +46,25 @@ namespace EPMLiveCore.Tests.API.Applications
         private bool _listItemUpdated;
         private bool _gridGanttSettingsSaved;
         private bool _folderAdded;
+        private bool _verifyOnly;
+        private bool _webFeatureAdded;
+        private bool _siteFeatureAdded;
+        private bool _fieldUpdated;
+        private bool _fieldBooleanUpdated;
+        private bool _viewFieldsAllDeleted;
+        private bool _viewFieldAdded;
+        private bool _viewUpdated;
+        private bool _fileAdded;
+        private bool _fileContentSaved;
+        private bool _webPartSaved;
+        private bool _webPartDeleted;
+        private bool _webPartAdded;
+        private bool _webPartConnected;
+        private bool _fileDeleted;
+        private bool _listItemAdded;
+        private bool _listBizCreated;
+        private bool _configSettingSet;
+        private bool _communityCreated;
 
         private const int DummyInt = 1;
         private const string DummyString = "DummyString";
@@ -60,6 +88,25 @@ namespace EPMLiveCore.Tests.API.Applications
             _listItemUpdated = false;
             _gridGanttSettingsSaved = false;
             _folderAdded = false;
+            _verifyOnly = false;
+            _webFeatureAdded = false;
+            _siteFeatureAdded = false;
+            _fieldUpdated = false;
+            _fieldBooleanUpdated = false;
+            _viewFieldsAllDeleted = false;
+            _viewFieldAdded = false;
+            _viewUpdated = false;
+            _fileAdded = false;
+            _fileContentSaved = false;
+            _webPartSaved = false;
+            _webPartDeleted = false;
+            _webPartAdded = false;
+            _webPartConnected = false;
+            _fileDeleted = false;
+            _listItemAdded = false;
+            _listBizCreated = false;
+            _configSettingSet = false;
+            _communityCreated = false;
 
             _shimObject = ShimsContext.Create();
 
@@ -92,7 +139,7 @@ namespace EPMLiveCore.Tests.API.Applications
                         case "AppUrl":
                             return DummyUrl;
                         case "Status":
-                            return "PreCheck Queued";
+                            return _verifyOnly ? "PreCheck Queued" : "Install Queued";
                         default:
                             return DummyString;
                     }
@@ -102,8 +149,6 @@ namespace EPMLiveCore.Tests.API.Applications
             }.Instance;
 
             _privateObj.SetFieldOrProperty("oListItem", listItem);
-
-            var wfAssociationCollection = new Mock<SPWorkflowAssociationCollection>(MockBehavior.Loose, null);
 
             _list = new ShimSPList
             {
@@ -134,7 +179,15 @@ namespace EPMLiveCore.Tests.API.Applications
                 },
                 ViewsGet = () => new ShimSPViewCollection
                 {
-                    ItemGetString = _ => new ShimSPView()
+                    ItemGetString = _ => new ShimSPView
+                    {
+                        ViewFieldsGet = () => new ShimSPViewFieldCollection
+                        {
+                            DeleteAll = () => _viewFieldsAllDeleted = true,
+                            AddSPField = __ => _viewFieldAdded = true
+                        },
+                        Update = () => _viewUpdated = true
+                    }
                 }.Bind(new SPView[]
                 {
                     new ShimSPView
@@ -145,7 +198,24 @@ namespace EPMLiveCore.Tests.API.Applications
                         ParentListGet = () => _list
                     }
                 }),
-                WorkflowAssociationsGet = () => wfAssociationCollection.Object
+                EventReceiversGet = () => new ShimSPEventReceiverDefinitionCollection().Bind(new SPEventReceiverDefinition[] 
+                {
+                    new ShimSPEventReceiverDefinition
+                    {
+                        TypeGet = () => SPEventReceiverType.ItemAdding,
+                        AssemblyGet = () => DummyString,
+                        ClassGet = () => DummyClass
+                    }
+                }),
+                ItemsGet = () => new ShimSPListItemCollection
+                {
+                    Add = () =>
+                    {
+                        _listItemAdded = true;
+
+                        return listItem;
+                    }
+                }
             };
 
             ShimSPField.AllInstances.TypeGet = field =>
@@ -157,7 +227,12 @@ namespace EPMLiveCore.Tests.API.Applications
 
                 return SPFieldType.Text;
             };
+            ShimSPField.AllInstances.SealedGet = _ => true;
+            ShimSPField.AllInstances.Update = _ => _fieldUpdated = true;
+            ShimSPField.AllInstances.UpdateBoolean = (_, __) => _fieldBooleanUpdated = true;
+            ShimSPField.AllInstances.SchemaXmlGet = _ => CreateFieldXml();
 
+            var countFolderExists = 0;
             _web = new ShimSPWeb
             {
                 SiteGet = () => _site,
@@ -174,11 +249,55 @@ namespace EPMLiveCore.Tests.API.Applications
                 },
                 GetFileString = _ => new ShimSPFile
                 {
-                    ExistsGet = () => true
+                    ExistsGet = () => true,
+                    GetLimitedWebPartManagerPersonalizationScope = __ => new ShimSPLimitedWebPartManager
+                    {
+                        Dispose = () => { },
+                        WebPartsGet = () => new ShimSPLimitedWebPartCollection().Bind(new WebPart[] 
+                        {
+                            new ShimXsltListViewWebPart(),
+                            new ShimReportingFilter()
+                        }),
+                        SaveChangesWebPart = ___ => _webPartSaved = true,
+                        DeleteWebPartWebPart = ___ => _webPartDeleted = true,
+                        AddWebPartWebPartStringInt32 = (_1, _2, _3) => _webPartAdded = true,
+                        GetProviderConnectionPointsWebPart = ___ => new ShimProviderConnectionPointCollection()
+                        .Bind(new ProviderConnectionPoint[]
+                        {
+                            new ShimProviderConnectionPoint()
+                        }),
+                        GetConsumerConnectionPointsWebPart = ___ => new ShimConsumerConnectionPointCollection()
+                        .Bind(new ConsumerConnectionPoint[]
+                        {
+                            new ShimConsumerConnectionPoint()
+                        }),
+                        SPConnectWebPartsWebPartProviderConnectionPointWebPartConsumerConnectionPoint = (_1, _2, _3, _4) =>
+                        {
+                            _webPartConnected = true;
+
+                            return null;
+                        },
+                        WebGet = () => _web
+                    },
+                    Delete = () => _fileDeleted = true
                 },
                 GetFolderString = _ => new ShimSPFolder
                 {
-                    ExistsGet = () => false
+                    ExistsGet = () =>
+                    {
+                        countFolderExists++;
+
+                        return countFolderExists > 1;
+                    },
+                    FilesGet = () => new ShimSPFileCollection
+                    {
+                        AddStringByteArrayBoolean = (_1, _2, _3) =>
+                        {
+                            _fileAdded = true;
+
+                            return null;
+                        }
+                    }
                 },
                 FoldersGet = () => new ShimSPFolderCollection
                 {
@@ -186,7 +305,18 @@ namespace EPMLiveCore.Tests.API.Applications
                     {
                         _folderAdded = true;
 
-                        return new ShimSPFolder();
+                        return new ShimSPFolder
+                        {
+                            FilesGet = () => new ShimSPFileCollection
+                            {
+                                AddStringByteArray = (__, ___) =>
+                                {
+                                    _fileAdded = true;
+
+                                    return new ShimSPFile();
+                                }
+                            }
+                        };
                     }
                 },
                 PropertiesGet = () =>
@@ -204,17 +334,37 @@ namespace EPMLiveCore.Tests.API.Applications
 
                     }
                 },
-                ServerRelativeUrlGet = () => "/"
+                ServerRelativeUrlGet = () => "/",
+                FeaturesGet = () => new ShimSPFeatureCollection
+                {
+                    AddGuidBooleanSPFeatureDefinitionScope = (_, __, ___) =>
+                    {
+                        _webFeatureAdded = true;
+
+                        return null;
+                    }
+                }
             };
 
             _site = new ShimSPSite
             {
-                IDGet = () => Guid.NewGuid()
+                IDGet = () => Guid.NewGuid(),
+                FeaturesGet = () => new ShimSPFeatureCollection
+                {
+                    AddGuidBooleanSPFeatureDefinitionScope = (_, __, ___) =>
+                    {
+                        _siteFeatureAdded = true;
+
+                        return null;
+                    }
+                },
+                RootWebGet = () => _web
             };
 
             var appDef = new ApplicationDef
             {
-                Id = DummyInt
+                Id = DummyInt,
+                Community = DummyString
             };
             appDef.PreReqs.Add(DummyString, DummyString);
 
@@ -274,6 +424,11 @@ namespace EPMLiveCore.Tests.API.Applications
 
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = action => action();
 
+            ShimSPContext.CurrentGet = () => new ShimSPContext
+            {
+                SiteGet = () => _site
+            };
+
             ShimCoreFunctions.getFarmSettingString = _ => DummyUrl;
             ShimCoreFunctions.getFeatureNameString = _ => DummyString;
             ShimCoreFunctions.getListSettingStringSPList = (setting, __) =>
@@ -286,7 +441,16 @@ namespace EPMLiveCore.Tests.API.Applications
                 return $"{DummyString}1";
             };
             ShimCoreFunctions.GetStoreCreds = () => new ShimNetworkCredential();
-            ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => DummyString;
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, setting) =>
+            {
+                if (setting == "reportingV2")
+                {
+                    return "true";
+                }
+
+                return DummyString;
+            };
+            ShimCoreFunctions.setConfigSettingSPWebStringString = (_, __, ___) => _configSettingSet = true;
 
             ShimAct.ConstructorSPWeb = (_, __) => { };
             ShimAct.AllInstances.CheckFeatureLicenseActFeature = (_, __) => 0;
@@ -303,6 +467,32 @@ namespace EPMLiveCore.Tests.API.Applications
             ShimPath.GetFileNameString = name => name;
             ShimPath.GetExtensionString = _ => ".txt";
             ShimPath.GetDirectoryNameString = name => name;
+
+            ShimExtensionMethods.GetContentsSPFile = _ => DummyString;
+            ShimExtensionMethods.UpdateContentsAndSaveSPFileString = (_, __) => _fileContentSaved = true;
+
+            ShimConnectionPoint.AllInstances.InterfaceTypeGet = _ => typeof(IReportID);
+
+            ShimReportBiz.ConstructorGuidGuidBoolean = (_, _1, _2, _3) => { };
+            ShimReportBiz.AllInstances.GetListBizGuid = (_, __) => new ShimListBiz();
+            ShimReportBiz.AllInstances.CreateListBizGuid = (_, __) =>
+            {
+                _listBizCreated = true;
+
+                return new ShimListBiz();
+            };
+
+            ShimApplications.CreateCommunityStringSPWeb = (_, __) =>
+            {
+                _communityCreated = true;
+
+                return DummyInt;
+            };
+        }
+
+        private string CreateFieldXml()
+        {
+            return "<Field List='' ShowField=''></Field>";
         }
 
         private string CreateXmlApplication()
@@ -338,7 +528,12 @@ namespace EPMLiveCore.Tests.API.Applications
                                     <Lookup InternalName='{LookupField}' List='{DummyString}' Field='{DummyString}' DisplayName='{DummyString}' AdvancedLookup='{DummyString}' Overwrite='true'></Lookup>
                                 </Lookups>
                                 <Views InstallGridOnAllViews='true'>
-                                    <View Name='{DummyView}' Overwrite='true'></View>
+                                    <View Name='{DummyView}' Overwrite='true' RowLimit='{DummyInt}' MakeDefault='true'>
+                                        <Fields>{DummyString}</Fields>
+                                        <Query>{DummyString}</Query>
+                                        <ProjectedFields>{DummyString}</ProjectedFields>
+                                        <Joins>{DummyString}</Joins>
+                                    </View>
                                 </Views>
                                 <Workflows>
                                     <Workflow Name='{DummyWorkflow}' Overwrite='true'></Workflow>
@@ -348,7 +543,7 @@ namespace EPMLiveCore.Tests.API.Applications
                                 </EventHandlers>
                                 <Items>
                                     <Item>
-                                        <Field>Item Title</Field>
+                                        <Field Name='{DummyString}'>Item Title</Field>
                                         <Field Name='Title'></Field>
                                     </Item>
                                 </Items>
@@ -384,13 +579,14 @@ namespace EPMLiveCore.Tests.API.Applications
         {
             // Arrange
             var iInstallListsWorkflowsCalled = false;
+            _verifyOnly = true;
             ShimSPSecurableObject.AllInstances.DoesUserHavePermissionsSPBasePermissions = (_, __) => true;
 
             ShimApplicationInstaller.AllInstances.iInstallListsWorkflowsSPListXmlNodeInt32Boolean = 
                 (_, _1, _2, _3, _4) => iInstallListsWorkflowsCalled = true;
 
             // Act
-            _testObj.InstallAndConfigureApp(true, _web.Instance, DummyInt);
+            _testObj.InstallAndConfigureApp(_verifyOnly, _web.Instance, DummyInt);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -443,6 +639,45 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _gridGanttSettingsSaved.ShouldBeTrue(),
                 () => _folderAdded.ShouldBeTrue(),
                 () => iInstallListsWorkflowsCalled.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void InstallAndConfigureApp_WhenNotVerifyOnly_ConfirmResult()
+        {
+            // Arrange
+            var iInstallListsWorkflowsCalled = false;
+            ShimSPSecurableObject.AllInstances.DoesUserHavePermissionsSPBasePermissions = (_, __) => true;
+
+            ShimApplicationInstaller.AllInstances.iInstallListsWorkflowsSPListXmlNodeInt32Boolean =
+                (_, _1, _2, _3, _4) => iInstallListsWorkflowsCalled = true;
+
+            // Act
+            _testObj.InstallAndConfigureApp(_verifyOnly, _web.Instance, DummyInt);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _listItemUpdated.ShouldBeTrue(),
+                () => _gridGanttSettingsSaved.ShouldBeTrue(),
+                () => _folderAdded.ShouldBeTrue(),
+                () => iInstallListsWorkflowsCalled.ShouldBeTrue(),
+                () => _webFeatureAdded.ShouldBeTrue(),
+                () => _siteFeatureAdded.ShouldBeTrue(),
+                () => _fieldUpdated.ShouldBeTrue(),
+                () => _fieldBooleanUpdated.ShouldBeTrue(),
+                () => _viewFieldsAllDeleted.ShouldBeTrue(),
+                () => _viewFieldAdded.ShouldBeTrue(),
+                () => _viewUpdated.ShouldBeTrue(),
+                () => _fileAdded.ShouldBeTrue(),
+                () => _fileContentSaved.ShouldBeTrue(),
+                () => _webPartSaved.ShouldBeTrue(),
+                () => _webPartDeleted.ShouldBeTrue(),
+                () => _webPartAdded.ShouldBeTrue(),
+                () => _webPartConnected.ShouldBeTrue(),
+                () => _fileDeleted.ShouldBeTrue(),
+                () => _listItemAdded.ShouldBeTrue(),
+                () => _listBizCreated.ShouldBeTrue(),
+                () => _configSettingSet.ShouldBeTrue(),
+                () => _communityCreated.ShouldBeTrue());
         }
     }
 }
