@@ -131,7 +131,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
     });
 
-    xit('View the options on "Resource Capacity Heat map" report page" - 743179 - Disabled Duplication', async () => {
+    /*it('View the options on "Resource Capacity Heat map" report page" - 743179', async () => {
         stepLogger.caseId = 743179;
         stepLogger.stepId(1);
         stepLogger.step('Go to Navigation > Projects > Projects');
@@ -215,5 +215,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.reportParameters.department))
             .toBe(true,
                 ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.reportParameter.department));
-    });
+    });*/
 });

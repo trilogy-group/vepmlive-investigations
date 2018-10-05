@@ -13,7 +13,7 @@ import {ProjectItemPageConstants} from '../../../page-objects/pages/items-page/p
 import {ProjectItemPageHelper} from '../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {LoginPage} from '../../../page-objects/pages/login/login.po';
 
-describe(SuiteNames.regressionTestSuite, () => {
+describe(SuiteNames.endToEndSuite, () => {
     let loginPage: LoginPage;
     let stepLogger: StepLogger;
     beforeEach(async () => {

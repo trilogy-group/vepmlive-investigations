@@ -212,25 +212,4 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.periodfields.toPeriod));
     });
 
-    it('Validate right click for Projects > Project name." - [14119624]', async () => {
-        stepLogger.caseId = 14119624;
-        stepLogger.stepId(1);
-        stepLogger.step('Under Navigations, click on Projects');
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-
-        stepLogger.stepId(2);
-        stepLogger.step('Select the project that has to be opened and right click on the hyperlink.');
-        await PageHelper.isElementDisplayed(CommonPage.record);
-        await ElementHelper.actionHoverOver(CommonPage.record);
-        await ElementHelper.rightClickAndSelectNewTab();
-        await PageHelper.switchToNewTabIfAvailable(1);
-
-        stepLogger.stepId(3);
-        stepLogger.step('Verify The project gets opened in a new tab as shown.');
-        await PageHelper.isElementDisplayed(ProjectItemPage.inputs.projectName);
-    });
 });

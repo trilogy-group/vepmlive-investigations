@@ -7,7 +7,7 @@ import {CommonPage} from '../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../page-objects/pages/common/common-page.constants';
 import {WorkspacePageHelper} from '../../../page-objects/pages/workspaces/workspace-page.helper';
 
-describe(SuiteNames.regressionTestSuite, () => {
+describe(SuiteNames.endToEndSuite, () => {
     let loginPage: LoginPage;
     let stepLogger: StepLogger;
     beforeEach(async () => {
