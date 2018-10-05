@@ -57,22 +57,23 @@ namespace EPMLiveCore
                     m = thisClass.GetMethod("getConnectionStringByWebApp");
                     string sConn = (string)m.Invoke(null, new object[] { web.Site.WebApplication.Name });
 
-                    SqlConnection cn = new SqlConnection(sConn);
-                    cn.Open();
-
-                    SqlCommand cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                    cmd.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel(web.Site));
-
-                    SqlDataReader dr = cmd.ExecuteReader();
-
-                    if(dr.Read())
+                    using (var sqlConnection = new SqlConnection(sConn))
                     {
-                        OwnerUsername = dr.GetString(13);
+                        sqlConnection.Open();
+
+                        var sqlCommand = new SqlCommand("2010SP_GetSiteAccountNums", sqlConnection);
+                        sqlCommand.CommandType = CommandType.StoredProcedure;
+                        sqlCommand.Parameters.AddWithValue("@siteid", web.Site.ID);
+                        sqlCommand.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel(web.Site));
+
+                        using (var dataReader = sqlCommand.ExecuteReader())
+                        {
+                            if (dataReader.Read())
+                            {
+                                OwnerUsername = dataReader.GetString(13);
+                            }
+                        }
                     }
-                    dr.Close();
-                    cn.Close();
                 });
             }
 

@@ -7,6 +7,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using System.Text;
 
@@ -16,6 +17,24 @@ namespace EPMLiveCore.Layouts.epmlive
     {
         protected Panel pnlFields;
         private SortedList<string, SPField> displayableFields = new SortedList<string, SPField>();
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                pnlFields?.Dispose();
+                InputFormSection1?.Dispose();
+                ButtonSection1?.Dispose();
+                FormDigest1?.Dispose();
+            }
+        }
+
+        /// <inheritdoc />
+        public sealed override void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         public override string PageToRedirectOnCancel
         {
