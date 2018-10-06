@@ -14,5 +14,6 @@ exports.config = {
     jasmineNodeOpts: defaultConfigSetup.jasmineNodeOpts,
     onPrepare() {
         reportersSetup.onPrepareSetup();
-    }
+    },
+    onComplete: reportersSetup.testRailSetupOnComplete
 };

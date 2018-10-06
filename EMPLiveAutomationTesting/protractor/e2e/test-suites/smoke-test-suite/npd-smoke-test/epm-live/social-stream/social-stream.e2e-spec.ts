@@ -6,7 +6,6 @@ import {ValidationsHelper} from '../../../../../components/misc-utils/validation
 import {HomePageConstants} from '../../../../../page-objects/pages/homepage/home-page.constants';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
-import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {ElementHelper} from '../../../../../components/html/element-helper';
@@ -17,7 +16,6 @@ import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/
 import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
 import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -141,40 +139,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     });
 
-    it('Add Time Off - [891123]', async () => {
-        StepLogger.caseId = 891123;
-
-        StepLogger.step('Click on "More" Link on the top menu bar');
-        await ElementHelper.click(HomePage.toolBarMenuItems.more);
-
-        StepLogger.step('Click on "Time Off" Link on the top menu bar');
-        await ElementHelper.click(HomePage.toolBarMenuItems.timeOff);
-
-        StepLogger.verification('"Time Off - New Item" window is displayed');
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
-        await expect(await CommonPage.dialogTitle.getText())
-            .toBe(MyTimeOffPageConstants.pageName,
-                ValidationsHelper.getPageDisplayedValidation(MyTimeOffPageConstants.pageName));
-
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
-
-        StepLogger.step(`Enter/Select below details in 'My Time Off' page`);
-        const uniqueId = PageHelper.getUniqueId();
-        const labels = MyTimeOffPageConstants.inputLabels;
-        const input = MyTimeOffPageConstants.inputValues;
-        const title = `${labels.title} ${uniqueId}`;
-        const timeOffType = MyTimeOffPageConstants.timeOffTypes.holiday;
-        const requestor = input.requestorValue;
-        const startDate = input.startDate;
-        const finishDate = input.finishDate;
-        await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate,);
-
-        await PageHelper.switchToDefaultContent();
-
-        StepLogger.verification('Newly created Time off displayed in Home page');
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(title)))
-            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
-    });
     it('Add an item from Social Stream - [1124294]', async () => {
         StepLogger.caseId = 1124294;
 
