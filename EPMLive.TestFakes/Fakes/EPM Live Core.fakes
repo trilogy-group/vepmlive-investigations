@@ -6,6 +6,7 @@
   </StubGeneration>
   <ShimGeneration>
     <Clear/>
+    <Add FullName="EPMLiveCore.Security!"/>
     <Add FullName="EPMLiveCore.AssignmentPlanner.GridManager!"/>
     <Add FullName="EPMLiveCore.AppSettingsHelper!"/>
     <Add FullName="EPMLiveCore.EditableFieldDisplay!"/>

@@ -59,6 +59,7 @@ namespace EPMLiveCore.Tests
         public void Setup()
         {
             SetupShims();
+            SetupShimsSplitTwo();
 
             testObject = new CoreFunctions();
             privateObject = new PrivateObject(testObject);
@@ -100,6 +101,7 @@ namespace EPMLiveCore.Tests
                 UserGet = () => null,
                 LookupValueGet = () => DummyString
             };
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
         }
 
         private void SetupVariables()

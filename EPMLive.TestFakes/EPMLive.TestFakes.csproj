@@ -255,7 +255,9 @@
     <Fakes Include="Fakes\DocumentFormat.OpenXml.fakes" />
     <Fakes Include="Fakes\System.Web.Services.fakes" />
     <Fakes Include="Fakes\Microsoft.Office.Project.Server.Library.fakes" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
