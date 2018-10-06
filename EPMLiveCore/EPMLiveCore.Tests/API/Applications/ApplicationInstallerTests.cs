@@ -11,6 +11,7 @@ using EPMLiveCore.API;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.ApplicationStore.Fakes;
 using EPMLiveCore.Fakes;
+using EPMLiveCore.Infrastructure.Fakes;
 using EPMLiveCore.Jobs.Applications.Fakes;
 using EPMLiveCore.ReportHelper.Fakes;
 using EPMLiveCore.WebPartsHelper;
@@ -23,13 +24,11 @@ using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Navigation.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
-using Microsoft.SharePoint.WebPartPages;
 using Microsoft.SharePoint.WebPartPages.Fakes;
-using Microsoft.SharePoint.Workflow;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using Shouldly;
 using ShimExtensionMethods = EPMLiveCore.Fakes.ShimExtensionMethods;
+using ShimReportingAppStore = EPMLiveCore.AppStoreReporting.Fakes.ShimAppStore;
 using WebPart = Microsoft.SharePoint.WebPartPages.WebPart;
 
 namespace EPMLiveCore.Tests.API.Applications
@@ -65,6 +64,15 @@ namespace EPMLiveCore.Tests.API.Applications
         private bool _listBizCreated;
         private bool _configSettingSet;
         private bool _communityCreated;
+        private bool _quickLaunchAddedAsLast;
+        private bool _nodeChildAddedAsLast;
+        private bool _nodeUpdated;
+        private bool _topNavAddedAsLast;
+        private bool _quickLaunchXMLCreated;
+        private bool _topNavXMLCreated;
+        private bool _reportDataSourcesProcessed;
+        private bool _cacheRemoved;
+        private bool _storeInformationAdded;
 
         private const int DummyInt = 1;
         private const string DummyString = "DummyString";
@@ -107,6 +115,15 @@ namespace EPMLiveCore.Tests.API.Applications
             _listBizCreated = false;
             _configSettingSet = false;
             _communityCreated = false;
+            _quickLaunchAddedAsLast = false;
+            _nodeChildAddedAsLast = false;
+            _nodeUpdated = false;
+            _topNavAddedAsLast = false;
+            _quickLaunchXMLCreated = false;
+            _topNavXMLCreated = false;
+            _reportDataSourcesProcessed = false;
+            _cacheRemoved = false;
+            _storeInformationAdded = false;
 
             _shimObject = ShimsContext.Create();
 
@@ -215,7 +232,8 @@ namespace EPMLiveCore.Tests.API.Applications
 
                         return listItem;
                     }
-                }
+                },
+                GetItemByIdInt32 = _ => listItem
             };
 
             ShimSPField.AllInstances.TypeGet = field =>
@@ -331,7 +349,21 @@ namespace EPMLiveCore.Tests.API.Applications
                 {
                     QuickLaunchGet = () => new ShimSPNavigationNodeCollection
                     {
+                        AddAsLastSPNavigationNode = _ =>
+                        {
+                            _quickLaunchAddedAsLast = true;
 
+                            return null;
+                        }
+                    },
+                    TopNavigationBarGet = () => new ShimSPNavigationNodeCollection
+                    {
+                        AddAsLastSPNavigationNode = _ =>
+                        {
+                            _topNavAddedAsLast = true;
+
+                            return null;
+                        }
                     }
                 },
                 ServerRelativeUrlGet = () => "/",
@@ -369,6 +401,14 @@ namespace EPMLiveCore.Tests.API.Applications
             appDef.PreReqs.Add(DummyString, DummyString);
 
             ShimApplications.GetApplicationInfoString = _ => appDef;
+            ShimApplications.CreateCommunityStringSPWeb = (_, __) =>
+            {
+                _communityCreated = true;
+
+                return DummyInt;
+            };
+            ShimApplications.CreateQuickLaunchXMLInt32SPWeb = (_, __) => _quickLaunchXMLCreated = true;
+            ShimApplications.CreateTopNavXMLInt32SPWeb = (_, __) => _topNavXMLCreated = true;
 
             ShimSPSite.ConstructorGuid = (_, __) => { };
             ShimSPSite.ConstructorGuidSPUserToken = (_, __, ___) => { };
@@ -422,6 +462,18 @@ namespace EPMLiveCore.Tests.API.Applications
             ShimSPFieldLookupValue.ConstructorString = (_, __) => { };
             ShimSPFieldLookupValue.AllInstances.LookupValueGet = _ => DummyString;
 
+            ShimSPNavigationNode.ConstructorStringStringBoolean = (_, _1, _2, _3) => { };
+            ShimSPNavigationNode.AllInstances.ChildrenGet = _ => new ShimSPNavigationNodeCollection
+            {
+                AddAsLastSPNavigationNode = __ =>
+                {
+                    _nodeChildAddedAsLast = true;
+
+                    return null;
+                }
+            };
+            ShimSPNavigationNode.AllInstances.Update = _ => _nodeUpdated = true;
+
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = action => action();
 
             ShimSPContext.CurrentGet = () => new ShimSPContext
@@ -454,11 +506,20 @@ namespace EPMLiveCore.Tests.API.Applications
 
             ShimAct.ConstructorSPWeb = (_, __) => { };
             ShimAct.AllInstances.CheckFeatureLicenseActFeature = (_, __) => 0;
+            ShimAct.AllInstances.IsOnlineGet = _ => true;
 
             ShimGridGanttSettings.AllInstances.SaveSettingsSPList = (_, __) => _gridGanttSettingsSaved = true;
 
             ShimAppStore.Constructor = _ => { };
             ShimAppStore.AllInstances.GetFileString = (_, __) => new byte[] { };
+
+            ShimReportingAppStore.Constructor = _ => { };
+            ShimReportingAppStore.AllInstances.AddStoreInformationString = (_, __) =>
+            {
+                _storeInformationAdded = true;
+
+                return DummyString;
+            };
 
             ShimLists.Constructor = _ => { };
             ShimLists.AllInstances.GetListItemsStringStringXmlNodeXmlNodeStringXmlNodeString =
@@ -482,12 +543,15 @@ namespace EPMLiveCore.Tests.API.Applications
                 return new ShimListBiz();
             };
 
-            ShimApplications.CreateCommunityStringSPWeb = (_, __) =>
-            {
-                _communityCreated = true;
+            ShimReporting.ProcessReportDataSourcesSPWebString = (_, __) => _reportDataSourcesProcessed = true;
 
-                return DummyInt;
+            ShimCacheStore.CurrentGet = () => new ShimCacheStore
+            {
+                RemoveSafelyStringStringString = (_, __, ___) => _cacheRemoved = true
             };
+
+            ShimCacheStoreCategory.ConstructorSPWeb = (_, __) => { };
+            ShimCacheStoreCategory.AllInstances.NavigationGet = _ => DummyString;
         }
 
         private string CreateFieldXml()
@@ -677,7 +741,62 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _listItemAdded.ShouldBeTrue(),
                 () => _listBizCreated.ShouldBeTrue(),
                 () => _configSettingSet.ShouldBeTrue(),
-                () => _communityCreated.ShouldBeTrue());
+                () => _communityCreated.ShouldBeTrue(),
+                () => _quickLaunchAddedAsLast.ShouldBeTrue(),
+                () => _nodeChildAddedAsLast.ShouldBeTrue(),
+                () => _nodeUpdated.ShouldBeTrue(),
+                () => _topNavAddedAsLast.ShouldBeTrue(),
+                () => _quickLaunchXMLCreated.ShouldBeTrue(),
+                () => _topNavXMLCreated.ShouldBeTrue(),
+                () => _reportDataSourcesProcessed.ShouldBeTrue(),
+                () => _cacheRemoved.ShouldBeTrue(),
+                () => _storeInformationAdded.ShouldBeTrue(),
+                () => _testObj.DtMessages.Rows.Count.ShouldBe(43),
+                () => _testObj.DtMessages.Rows[0][MessageField].ShouldBe("Application Install"),
+                () => _testObj.DtMessages.Rows[0][DetailsField].ShouldBe("Application is already installed in site collection and will configure."),
+                () => _testObj.DtMessages.Rows[1][MessageField].ShouldBe("Permissions Check"),
+                () => _testObj.DtMessages.Rows[2][MessageField].ShouldBe("Application List"),
+                () => _testObj.DtMessages.Rows[3][MessageField].ShouldBe("Pre Requisite Check"),
+                () => _testObj.DtMessages.Rows[4][MessageField].ShouldBe(DummyString),
+                () => _testObj.DtMessages.Rows[5][MessageField].ShouldBe("Activation Key Check"),
+                () => _testObj.DtMessages.Rows[6][MessageField].ShouldBe(DummyString),
+                () => _testObj.DtMessages.Rows[7][MessageField].ShouldBe("Install Version"),
+                () => _testObj.DtMessages.Rows[8][MessageField].ShouldBe("Installing Features"),
+                () => _testObj.DtMessages.Rows[9][MessageField].ShouldBe("Feature1"),
+                () => _testObj.DtMessages.Rows[10][MessageField].ShouldBe("Feature2"),
+                () => _testObj.DtMessages.Rows[11][MessageField].ShouldBe("Feature3"),
+                () => _testObj.DtMessages.Rows[12][MessageField].ShouldBe("Feature4"),
+                () => _testObj.DtMessages.Rows[13][MessageField].ShouldBe("Installing Lists"),
+                () => _testObj.DtMessages.Rows[14][DetailsField].ShouldBe("List exists and will upgrade"),
+                () => _testObj.DtMessages.Rows[15][MessageField].ShouldBe("Updating Fields"),
+                () => _testObj.DtMessages.Rows[16][DetailsField].ShouldBe("Field updated"),
+                () => _testObj.DtMessages.Rows[17][MessageField].ShouldBe("Fixing Lookups"),
+                () => _testObj.DtMessages.Rows[18][DetailsField].ShouldBe("Field updated"),
+                () => _testObj.DtMessages.Rows[19][MessageField].ShouldBe("Enabled Advanced Lookup"),
+                () => _testObj.DtMessages.Rows[20][MessageField].ShouldBe("Updating Views"),
+                () => _testObj.DtMessages.Rows[21][DetailsField].ShouldBe("View exists and will overwrite"),
+                () => _testObj.DtMessages.Rows[22][MessageField].ShouldBe("Updating WebParts"),
+                () => _testObj.DtMessages.Rows[23][MessageField].ShouldBe("Grid on All Views"),
+                () => _testObj.DtMessages.Rows[24][MessageField].ShouldBe(DummyView),
+                () => _testObj.DtMessages.Rows[25][MessageField].ShouldBe("Installing Event Handlers"),
+                () => _testObj.DtMessages.Rows[26][MessageField].ShouldBe($"ItemAdding({DummyClass})"),
+                () => _testObj.DtMessages.Rows[27][MessageField].ShouldBe("Installing Items"),
+                () => _testObj.DtMessages.Rows[28][MessageField].ShouldBe("Item Title"),
+                () => _testObj.DtMessages.Rows[29][MessageField].ShouldBe("Add to Reporting Database"),
+                () => _testObj.DtMessages.Rows[30][MessageField].ShouldBe("Installing Properties"),
+                () => _testObj.DtMessages.Rows[31][MessageField].ShouldBe(DummyString),
+                () => _testObj.DtMessages.Rows[31][DetailsField].ShouldBe("Property found and will append"),
+                () => _testObj.DtMessages.Rows[32][MessageField].ShouldBe("Installing Files"),
+                () => _testObj.DtMessages.Rows[33][MessageField].ShouldBe($"File: {DummyString}.txt"),
+                () => _testObj.DtMessages.Rows[34][MessageField].ShouldBe("Creating Community"),
+                () => _testObj.DtMessages.Rows[35][MessageField].ShouldBe("Installing Navigation"),
+                () => _testObj.DtMessages.Rows[36][MessageField].ShouldBe("QuickLaunch"),
+                () => _testObj.DtMessages.Rows[37][MessageField].ShouldBe(DummyString),
+                () => _testObj.DtMessages.Rows[38][MessageField].ShouldBe(DummyString),
+                () => _testObj.DtMessages.Rows[39][MessageField].ShouldBe("TopNav"),
+                () => _testObj.DtMessages.Rows[40][MessageField].ShouldBe(DummyString),
+                () => _testObj.DtMessages.Rows[41][MessageField].ShouldBe(DummyString),
+                () => _testObj.DtMessages.Rows[42][MessageField].ShouldBe("Processing Reports"));
         }
     }
 }
