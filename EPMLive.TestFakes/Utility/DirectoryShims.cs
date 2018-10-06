@@ -11,6 +11,7 @@ namespace EPMLive.TestFakes.Utility
 {
     public class DirectoryShims
     {
+        public ShimDirectoryEntry DirectoryEntryShim { get; private set; }
         public ShimSearchResult SearchResultShim { get; private set; }
         public ShimSearchResultCollection SearchResultsShim { get; private set; }
 
@@ -19,6 +20,7 @@ namespace EPMLive.TestFakes.Utility
 
         private DirectoryShims()
         {
+            DirectoryEntryShim = InitializeShimDirectoryEntry();
             SearchResultShim = InitializeShimSearchResult();
             SearchResultsShim = InitializeShimSearchResultCollection();
 
@@ -26,10 +28,23 @@ namespace EPMLive.TestFakes.Utility
             DirectorySearchersDisposed = new List<DirectorySearcher>();
         }
 
+        public ShimDirectoryEntry InitializeShimDirectoryEntry()
+        {
+            var directoryEntryShim = new ShimDirectoryEntry
+            {
+                NameGet = () => string.Empty
+            };
+            return directoryEntryShim;
+        }
+
         public ShimSearchResult InitializeShimSearchResult()
         {
-            return new ShimSearchResult();
+            return new ShimSearchResult
+            {
+                GetDirectoryEntry = () => DirectoryEntryShim
+            };
         }
+
         public ShimSearchResultCollection InitializeShimSearchResultCollection()
         {
             var result = new ShimSearchResultCollection

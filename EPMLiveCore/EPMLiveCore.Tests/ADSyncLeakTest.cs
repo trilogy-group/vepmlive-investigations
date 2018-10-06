@@ -13,12 +13,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EPMLiveCore.Tests
 {
     [TestClass]
-    public class ADSyncLeakTest
+    public class ADSyncLeakTests
     {
         private const string SampleSid = "SampleSID";
         private const string SamplePropertyValue = "SamplePropertyValue";
         private const string ColumnSid = "SID";
         private const string SampleGroup = "SampleGroup";
+        private const string SampleName = "SampleName";
 
         private IDisposable _shims;
         private ADSync _adSync;
@@ -152,6 +153,62 @@ namespace EPMLiveCore.Tests
             Assert.IsTrue(directoryShims.DirectoryEntriesDisposed.Any());
         }
 
+        [TestMethod]
+        public void GetGroups_Called_DirectoryDisposed()
+        {
+            // Arrange
+            var directoryShims = DirectoryShims.ShimDirectoryCalls();
+            directoryShims.DirectoryEntryShim.NameGet = () => SampleName;
+
+            // Act
+            var result = _adSync.GetGroups(string.Empty);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(SampleName, result[0]);
+            Assert.IsTrue(directoryShims.DirectorySearchersDisposed.Any());
+            Assert.IsTrue(directoryShims.DirectoryEntriesDisposed.Any());
+        }
+
+        [TestMethod]
+        public void userDisabled_Called_DirectoryDisposed()
+        {
+            // Arrange
+            var directoryShims = DirectoryShims.ShimDirectoryCalls();
+            ShimDirectorySearcher.ConstructorDirectoryEntry = (instance, _) =>
+            {
+                new ShimDirectorySearcher(instance)
+                {
+                    FindOne = () => directoryShims.SearchResultShim
+                };
+            };
+
+            // Act
+            var result = _adSyncObject.Invoke("userDisabled", SampleSid);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(bool));
+            Assert.IsTrue((bool)result);
+            Assert.IsTrue(directoryShims.DirectorySearchersDisposed.Any());
+            Assert.IsTrue(directoryShims.DirectoryEntriesDisposed.Any());
+        }
+
+        [TestMethod]
+        public void userDeleted_Called_DirectoryDisposed()
+        {
+            // Arrange
+            var directoryShims = DirectoryShims.ShimDirectoryCalls();
+
+            // Act
+            var result = _adSyncObject.Invoke("userDeleted", SampleSid);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(bool));
+            Assert.IsFalse((bool)result);
+            Assert.IsTrue(directoryShims.DirectoryEntriesDisposed.Any());
+        }
+
         private void SetupShims()
         {
             ShimDirectoryEntry.ConstructorStringStringStringAuthenticationTypes = (instance, __, ___, ____, _____) =>
@@ -169,7 +226,7 @@ namespace EPMLiveCore.Tests
             {
                 ItemGetInt32 = index => new byte[] { }
             };
-            new ShimCollectionBase(shimPropertyValueCollection)
+            new System.Collections.Fakes.ShimCollectionBase(shimPropertyValueCollection)
             {
                 GetEnumerator = () => new[] { SamplePropertyValue }.GetEnumerator()
             };
@@ -179,6 +236,7 @@ namespace EPMLiveCore.Tests
             };
             ShimDirectoryEntry.AllInstances.PropertiesGet = _ => shimPropertyCollection;
             ShimDirectoryEntry.AllInstances.RefreshCacheStringArray = (entry, strings) => { };
+            ShimDirectoryEntry.AllInstances.RefreshCache = entry => { };
 
             ShimSecurityIdentifier.ConstructorByteArrayInt32 = (instance, __, ___) =>
             {

@@ -85,6 +85,8 @@
     </Compile>
     <Compile Include="API\SPRoleChecker.cs" />
     <Compile Include="API\TimesheetAPI.cs" />
+    <Compile Include="ApprovalsBase.cs" />
+    <Compile Include="ApprovalsBase.RenderWebPart.cs" />
     <Compile Include="Jobs\ApprovalJob.cs" />
     <Compile Include="Jobs\BaseJob.cs" />
     <Compile Include="Jobs\SaveDataJob.cs" />
