@@ -31,6 +31,8 @@ using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
+using WebSvcResourceFakes = EPMLiveEnterprise.WebSvcResource.Fakes;
+using WebSvcProjectFakes = EPMLiveEnterprise.WebSvcProject.Fakes;
 using static EPMLiveEnterprise.WebSvcCustomFields.CustomFieldDataSet;
 using static EPMLiveEnterprise.WebSvcCustomFields.Fakes.ShimCustomFieldDataSet;
 using static EPMLiveEnterprise.WebSvcLookupTables.Fakes.ShimLookupTableDataSet;
@@ -43,7 +45,7 @@ using static EPMLiveEnterprise.WebSvcWssInterop.Fakes.ShimWssSettingsDataSet;
 
 namespace EPMLivePS.Tests
 {
-    [TestClass]
+    [TestClass, ExcludeFromCodeCoverage]
     public class PublisherTests
     {
         private object reflectionObject;
@@ -151,17 +153,17 @@ namespace EPMLivePS.Tests
             ShimHttpUtility.UrlDecodeString = input => input;
             ShimCustomFields.Constructor = _ => new ShimCustomFields();
             ShimLookupTable.Constructor = _ => new ShimLookupTable();
-            EPMLiveEnterprise.WebSvcResource.Fakes.ShimResource.Constructor = _ => new EPMLiveEnterprise.WebSvcResource.Fakes.ShimResource();
-            EPMLiveEnterprise.WebSvcProject.Fakes.ShimProject.Constructor = _ => new EPMLiveEnterprise.WebSvcProject.Fakes.ShimProject();
+            WebSvcResourceFakes.ShimResource.Constructor = _ => new WebSvcResourceFakes.ShimResource();
+            WebSvcProjectFakes.ShimProject.Constructor = _ => new WebSvcProjectFakes.ShimProject();
             ShimStatusing.Constructor = _ => new ShimStatusing();
             ShimWssInterop.Constructor = _ => new ShimWssInterop();
             ShimCustomFields.AllInstances.UrlSetString = (_, __) => { };
             ShimLookupTable.AllInstances.UrlSetString = (_, __) => { };
-            EPMLiveEnterprise.WebSvcResource.Fakes.ShimResource.AllInstances.UrlSetString = (_, __) => { };
-            EPMLiveEnterprise.WebSvcProject.Fakes.ShimProject.AllInstances.UrlSetString = (_, __) => { };
+            WebSvcResourceFakes.ShimResource.AllInstances.UrlSetString = (_, __) => { };
+            WebSvcProjectFakes.ShimProject.AllInstances.UrlSetString = (_, __) => { };
             ShimStatusing.AllInstances.UrlSetString = (_, __) => { };
             ShimWssInterop.AllInstances.UrlSetString = (_, __) => { };
-            EPMLiveEnterprise.WebSvcProject.Fakes.ShimProjectDataSet.Constructor = _AppDomain => new EPMLiveEnterprise.WebSvcProject.Fakes.ShimProjectDataSet();
+            WebSvcProjectFakes.ShimProjectDataSet.Constructor = _AppDomain => new WebSvcProjectFakes.ShimProjectDataSet();
         }
 
         private void ShimSelectMethod()
@@ -415,8 +417,8 @@ namespace EPMLivePS.Tests
             privateObject.SetFieldOrProperty("pWssInterop", nonPublicInstance, new ShimWssInterop().Instance);
             privateObject.SetFieldOrProperty("cn", nonPublicInstance, new ShimSqlConnection().Instance);
             privateObject.SetFieldOrProperty("pctComplete", nonPublicInstance, 10D);
-            privateObject.SetFieldOrProperty("pService", nonPublicInstance, new EPMLiveEnterprise.WebSvcProject.Fakes.ShimProject().Instance);
-            privateObject.SetFieldOrProperty("pResource", nonPublicInstance, new EPMLiveEnterprise.WebSvcResource.Fakes.ShimResource().Instance);
+            privateObject.SetFieldOrProperty("pService", nonPublicInstance, new WebSvcProjectFakes.ShimProject().Instance);
+            privateObject.SetFieldOrProperty("pResource", nonPublicInstance, new WebSvcResourceFakes.ShimResource().Instance);
             privateObject.SetFieldOrProperty("rDs", nonPublicInstance, new ShimResourceDataSet().Instance);
             privateObject.SetFieldOrProperty("mySiteToPublish", nonPublicInstance, spWeb.Instance);
             privateObject.SetFieldOrProperty("mySite", nonPublicInstance, spSite.Instance);
@@ -432,7 +434,7 @@ namespace EPMLivePS.Tests
             privateObject.SetFieldOrProperty("arrDelNewTasks", nonPublicInstance, new ArrayList());
             privateObject.SetFieldOrProperty("dsFields", nonPublicInstance, new ShimCustomFieldDataSet().Instance);
             privateObject.SetFieldOrProperty("dsLt", nonPublicInstance, new ShimLookupTableDataSet().Instance);
-            privateObject.SetFieldOrProperty("pService", nonPublicInstance, new EPMLiveEnterprise.WebSvcProject.Fakes.ShimProject().Instance);
+            privateObject.SetFieldOrProperty("pService", nonPublicInstance, new WebSvcProjectFakes.ShimProject().Instance);
             privateObject.SetFieldOrProperty("workspaceSynch", nonPublicInstance, new ShimProjectWorkspaceSynch().Instance);
             privateObject.SetFieldOrProperty("psiLookupTable", nonPublicInstance, new ShimLookupTable().Instance);
         }
@@ -547,7 +549,7 @@ namespace EPMLivePS.Tests
                 row
             };
 
-            EPMLiveEnterprise.WebSvcProject.Fakes.ShimProject.AllInstances.ReadProjectGuidDataStoreEnum = (_, _1, _2) => new EPMLiveEnterprise.WebSvcProject.Fakes.ShimProjectDataSet()
+            WebSvcProjectFakes.ShimProject.AllInstances.ReadProjectGuidDataStoreEnum = (_, _1, _2) => new WebSvcProjectFakes.ShimProjectDataSet()
             {
                 AssignmentGet = () => new ShimAssignmentDataTable()
                 {
@@ -599,7 +601,7 @@ namespace EPMLivePS.Tests
                 });
                 return result;
             };
-            var projectDataSet = new EPMLiveEnterprise.WebSvcProject.Fakes.ShimProjectDataSet()
+            var projectDataSet = new WebSvcProjectFakes.ShimProjectDataSet()
             {
                 AssignmentGet = () => new ShimAssignmentDataTable(),
                 ProjectResourceGet = () => new ShimProjectResourceDataTable()
@@ -800,7 +802,7 @@ namespace EPMLivePS.Tests
                 "###4#BOOLEAN###",
                 "###4#TEXT###"
             };
-            var dataSet = new EPMLiveEnterprise.WebSvcProject.Fakes.ShimProjectDataSet()
+            var dataSet = new WebSvcProjectFakes.ShimProjectDataSet()
             {
                 TaskGet = () => new ShimTaskDataTable(),
                 DependencyGet = () => new ShimDependencyDataTable(),
@@ -902,7 +904,7 @@ namespace EPMLivePS.Tests
 
         private void PublishTasksShim()
         {
-            EPMLiveEnterprise.WebSvcProject.Fakes.ShimProject.AllInstances.ReadProjectGuidDataStoreEnum = (_, _1, _2) => new EPMLiveEnterprise.WebSvcProject.Fakes.ShimProjectDataSet()
+            WebSvcProjectFakes.ShimProject.AllInstances.ReadProjectGuidDataStoreEnum = (_, _1, _2) => new WebSvcProjectFakes.ShimProjectDataSet()
             {
                 TaskGet = () => new ShimTaskDataTable()
                 {
@@ -1143,7 +1145,7 @@ namespace EPMLivePS.Tests
             {
                 [guid] = string.Empty
             };
-            var projectDataSet = new EPMLiveEnterprise.WebSvcProject.Fakes.ShimProjectDataSet()
+            var projectDataSet = new WebSvcProjectFakes.ShimProjectDataSet()
             {
                 TaskGet = () => new ShimTaskDataTable()
             };
@@ -1199,7 +1201,7 @@ namespace EPMLivePS.Tests
                 }
             };
             ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => DummyString;
-            EPMLiveEnterprise.WebSvcResource.Fakes.ShimResource.AllInstances.ReadResourcesStringBoolean = (_, _1, _2) => new ShimResourceDataSet();
+            WebSvcResourceFakes.ShimResource.AllInstances.ReadResourcesStringBoolean = (_, _1, _2) => new ShimResourceDataSet();
             ShimCustomFields.AllInstances.ReadCustomFieldsByEntityGuid = (_, __) => new ShimCustomFieldDataSet();
             ShimLookupTable.AllInstances.ReadLookupTablesStringBooleanInt32 = (_, _1, _2, _3) => new ShimLookupTableDataSet();
             ShimEntityCollection.EntitiesGet = () => new ShimEntityCollection()
@@ -1325,7 +1327,7 @@ namespace EPMLivePS.Tests
                 return 1;
             };
             ShimPortfolioEngineAPI.AllInstances.ExecuteStringString = (_, _1, xmlString) => string.Empty;
-            EPMLiveEnterprise.WebSvcProject.Fakes.ShimProject.AllInstances.ReadProjectGuidDataStoreEnum = (_, _1, _2) => new EPMLiveEnterprise.WebSvcProject.Fakes.ShimProjectDataSet()
+            WebSvcProjectFakes.ShimProject.AllInstances.ReadProjectGuidDataStoreEnum = (_, _1, _2) => new WebSvcProjectFakes.ShimProjectDataSet()
             {
                 AssignmentGet = () => new ShimAssignmentDataTable()
                 {
