@@ -402,33 +402,7 @@ namespace EPMLiveCore.Layouts.epmlive
         }
 
         #endregion
-
-        #region Method Call : (Respond) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_QueueCreateWorkspace_Respond_Method_Call_Void_With_No_Parameters_Call_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodRespondPrametersTypes = null;
-            object[] parametersOfRespond = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodRespond, methodRespondPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_queueCreateWorkspaceInstanceFixture, parametersOfRespond);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfRespond.ShouldBeNull();
-            methodRespondPrametersTypes.ShouldBeNull();
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (Respond) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
