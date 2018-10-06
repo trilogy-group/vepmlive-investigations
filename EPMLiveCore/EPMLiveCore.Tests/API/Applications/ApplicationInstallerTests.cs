@@ -89,6 +89,53 @@ namespace EPMLiveCore.Tests.API.Applications
         private const string LookupField = "LookupField";
         private const string MessageField = "Message";
         private const string DetailsField = "Details";
+        private const string ApplicationInstall = "Application Install";
+        private const string ApplicatinAlreadyInstalled = "Application is already installed in site collection and will configure.";
+        private const string PermissionsCheck = "Permissions Check";
+        private const string ApplicationList = "Application List";
+        private const string PreRequisiteCheck = "Pre Requisite Check";
+        private const string ActivationKeyCheck = "Activation Key Check";
+        private const string InstallVersion = "Install Version";
+        private const string InstallingFeatures = "Installing Features";
+        private const string Feature1 = "Feature1";
+        private const string Feature2 = "Feature2";
+        private const string Feature3 = "Feature3";
+        private const string Feature4 = "Feature4";
+        private const string InstallingLists = "Installing Lists";
+        private const string ListExists = "List exists and will upgrade";
+        private const string UpdatingFields = "Updating Fields";
+        private const string FieldUpdated = "Field updated";
+        private const string FixingLookups = "Fixing Lookups";
+        private const string EnabledAdvancedLookup = "Enabled Advanced Lookup";
+        private const string UpdatingViews = "Updating Views";
+        private const string ViewExists = "View exists and will overwrite";
+        private const string UpdatingWebParts = "Updating WebParts";
+        private const string GridOnAllViews = "Grid on All Views";
+        private const string InstallingEventHandlers = "Installing Event Handlers";
+        private const string ItemAdding = "ItemAdding";
+        private const string InstallingItems = "Installing Items";
+        private const string ItemTitle = "Item Title";
+        private const string AddToReportingDatabase = "Add to Reporting Database";
+        private const string InstallingProperties = "Installing Properties";
+        private const string PropertyFound = "Property found and will append";
+        private const string InstallingFiles = "Installing Files";
+        private const string CreatingCommunity = "Creating Community";
+        private const string InstallingNavigation = "Installing Navigation";
+        private const string QuickLaunch = "QuickLaunch";
+        private const string TopNav = "TopNav";
+        private const string ProcessingReports = "Processing Reports";
+        private const string CheckingFeatures = "Checking Features";
+        private const string CheckingLists = "Checking Lists";
+        private const string CheckingFields = "Checking Fields";
+        private const string FieldExists = "Field exists and will overwrite";
+        private const string CheckingLookups = "Checking Lookups";
+        private const string CheckingViews = "Checking Views";
+        private const string CheckingWebParts = "Checking WebParts";
+        private const string CheckingEventHandlers = "Checking Event Handlers";
+        private const string CheckingItems = "Checking Items";
+        private const string CheckingProperties = "Checking Properties";
+        private const string CheckingFiles = "Checking Files";
+        private const string CheckingNavigation = "Checking Navigation";
 
         [TestInitialize]
         public void TestInitialize()
@@ -421,14 +468,14 @@ namespace EPMLiveCore.Tests.API.Applications
                 {
                     IdGet = () => new Guid(Feature3Id),
                     CompatibilityLevelGet = () => CompatibilityLevel14,
-                    DisplayNameGet = () => "Feature3",
+                    DisplayNameGet = () => Feature3,
                     ScopeGet = () => SPFeatureScope.Site
                 },
                 new ShimSPFeatureDefinition
                 {
                     IdGet = () => new Guid(Feature4Id),
                     CompatibilityLevelGet = () => CompatibilityLevel15,
-                    DisplayNameGet = () => "Feature4",
+                    DisplayNameGet = () => Feature4,
                     ScopeGet = () => SPFeatureScope.Site
                 }
             });
@@ -444,14 +491,14 @@ namespace EPMLiveCore.Tests.API.Applications
                     {
                         IdGet = () => new Guid(Feature1Id),
                         CompatibilityLevelGet = () => CompatibilityLevel14,
-                        DisplayNameGet = () => "Feature1",
+                        DisplayNameGet = () => Feature1,
                         ScopeGet = () => SPFeatureScope.Web
                     },
                     new ShimSPFeatureDefinition
                     {
                         IdGet = () => new Guid(Feature2Id),
                         CompatibilityLevelGet = () => CompatibilityLevel15,
-                        DisplayNameGet = () => "Feature2",
+                        DisplayNameGet = () => Feature2,
                         ScopeGet = () => SPFeatureScope.Web
                     }
                 })
@@ -603,11 +650,11 @@ namespace EPMLiveCore.Tests.API.Applications
                                     <Workflow Name='{DummyWorkflow}' Overwrite='true'></Workflow>
                                 </Workflows>
                                 <EventHandlers>
-                                    <EventHandler Type='ItemAdding' Class='{DummyClass}' Assembly='{DummyString}'></EventHandler>
+                                    <EventHandler Type='{ItemAdding}' Class='{DummyClass}' Assembly='{DummyString}'></EventHandler>
                                 </EventHandlers>
                                 <Items>
                                     <Item>
-                                        <Field Name='{DummyString}'>Item Title</Field>
+                                        <Field Name='{DummyString}'>{ItemTitle}</Field>
                                         <Field Name='Title'></Field>
                                     </Item>
                                 </Items>
@@ -655,50 +702,50 @@ namespace EPMLiveCore.Tests.API.Applications
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => _testObj.DtMessages.Rows.Count.ShouldBe(42),
-                () => _testObj.DtMessages.Rows[0][MessageField].ShouldBe("Application Install"),
-                () => _testObj.DtMessages.Rows[0][DetailsField].ShouldBe("Application is already installed in site collection and will configure."),
-                () => _testObj.DtMessages.Rows[1][MessageField].ShouldBe("Permissions Check"),
-                () => _testObj.DtMessages.Rows[2][MessageField].ShouldBe("Application List"),
-                () => _testObj.DtMessages.Rows[3][MessageField].ShouldBe("Pre Requisite Check"),
+                () => _testObj.DtMessages.Rows[0][MessageField].ShouldBe(ApplicationInstall),
+                () => _testObj.DtMessages.Rows[0][DetailsField].ShouldBe(ApplicatinAlreadyInstalled),
+                () => _testObj.DtMessages.Rows[1][MessageField].ShouldBe(PermissionsCheck),
+                () => _testObj.DtMessages.Rows[2][MessageField].ShouldBe(ApplicationList),
+                () => _testObj.DtMessages.Rows[3][MessageField].ShouldBe(PreRequisiteCheck),
                 () => _testObj.DtMessages.Rows[4][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[5][MessageField].ShouldBe("Activation Key Check"),
+                () => _testObj.DtMessages.Rows[5][MessageField].ShouldBe(ActivationKeyCheck),
                 () => _testObj.DtMessages.Rows[6][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[7][MessageField].ShouldBe("Install Version"),
-                () => _testObj.DtMessages.Rows[8][MessageField].ShouldBe("Checking Features"),
-                () => _testObj.DtMessages.Rows[9][MessageField].ShouldBe("Feature1"),
-                () => _testObj.DtMessages.Rows[10][MessageField].ShouldBe("Feature2"),
-                () => _testObj.DtMessages.Rows[11][MessageField].ShouldBe("Feature3"),
-                () => _testObj.DtMessages.Rows[12][MessageField].ShouldBe("Feature4"),
-                () => _testObj.DtMessages.Rows[13][MessageField].ShouldBe("Checking Lists"),
-                () => _testObj.DtMessages.Rows[14][DetailsField].ShouldBe("List exists and will upgrade"),
-                () => _testObj.DtMessages.Rows[15][MessageField].ShouldBe("Checking Fields"),
-                () => _testObj.DtMessages.Rows[16][DetailsField].ShouldBe("Field exists and will overwrite"),
-                () => _testObj.DtMessages.Rows[17][MessageField].ShouldBe("Checking Lookups"),
-                () => _testObj.DtMessages.Rows[18][DetailsField].ShouldBe("Field exists and will overwrite"),
-                () => _testObj.DtMessages.Rows[19][MessageField].ShouldBe("Enabled Advanced Lookup"),
-                () => _testObj.DtMessages.Rows[20][MessageField].ShouldBe("Checking Views"),
-                () => _testObj.DtMessages.Rows[21][DetailsField].ShouldBe("View exists and will overwrite"),
-                () => _testObj.DtMessages.Rows[22][MessageField].ShouldBe("Checking WebParts"),
-                () => _testObj.DtMessages.Rows[23][MessageField].ShouldBe("Grid on All Views"),
+                () => _testObj.DtMessages.Rows[7][MessageField].ShouldBe(InstallVersion),
+                () => _testObj.DtMessages.Rows[8][MessageField].ShouldBe(CheckingFeatures),
+                () => _testObj.DtMessages.Rows[9][MessageField].ShouldBe(Feature1),
+                () => _testObj.DtMessages.Rows[10][MessageField].ShouldBe(Feature2),
+                () => _testObj.DtMessages.Rows[11][MessageField].ShouldBe(Feature3),
+                () => _testObj.DtMessages.Rows[12][MessageField].ShouldBe(Feature4),
+                () => _testObj.DtMessages.Rows[13][MessageField].ShouldBe(CheckingLists),
+                () => _testObj.DtMessages.Rows[14][DetailsField].ShouldBe(ListExists),
+                () => _testObj.DtMessages.Rows[15][MessageField].ShouldBe(CheckingFields),
+                () => _testObj.DtMessages.Rows[16][DetailsField].ShouldBe(FieldExists),
+                () => _testObj.DtMessages.Rows[17][MessageField].ShouldBe(CheckingLookups),
+                () => _testObj.DtMessages.Rows[18][DetailsField].ShouldBe(FieldExists),
+                () => _testObj.DtMessages.Rows[19][MessageField].ShouldBe(EnabledAdvancedLookup),
+                () => _testObj.DtMessages.Rows[20][MessageField].ShouldBe(CheckingViews),
+                () => _testObj.DtMessages.Rows[21][DetailsField].ShouldBe(ViewExists),
+                () => _testObj.DtMessages.Rows[22][MessageField].ShouldBe(CheckingWebParts),
+                () => _testObj.DtMessages.Rows[23][MessageField].ShouldBe(GridOnAllViews),
                 () => _testObj.DtMessages.Rows[24][MessageField].ShouldBe(DummyView),
-                () => _testObj.DtMessages.Rows[25][MessageField].ShouldBe("Checking Event Handlers"),
-                () => _testObj.DtMessages.Rows[26][MessageField].ShouldBe($"ItemAdding({DummyClass})"),
-                () => _testObj.DtMessages.Rows[27][MessageField].ShouldBe("Checking Items"),
-                () => _testObj.DtMessages.Rows[28][MessageField].ShouldBe("Item Title"),
-                () => _testObj.DtMessages.Rows[29][MessageField].ShouldBe("Add to Reporting Database"),
-                () => _testObj.DtMessages.Rows[30][MessageField].ShouldBe("Checking Properties"),
+                () => _testObj.DtMessages.Rows[25][MessageField].ShouldBe(CheckingEventHandlers),
+                () => _testObj.DtMessages.Rows[26][MessageField].ShouldBe($"{ItemAdding}({DummyClass})"),
+                () => _testObj.DtMessages.Rows[27][MessageField].ShouldBe(CheckingItems),
+                () => _testObj.DtMessages.Rows[28][MessageField].ShouldBe(ItemTitle),
+                () => _testObj.DtMessages.Rows[29][MessageField].ShouldBe(AddToReportingDatabase),
+                () => _testObj.DtMessages.Rows[30][MessageField].ShouldBe(CheckingProperties),
                 () => _testObj.DtMessages.Rows[31][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[31][DetailsField].ShouldBe("Property found and will append"),
-                () => _testObj.DtMessages.Rows[32][MessageField].ShouldBe("Checking Files"),
+                () => _testObj.DtMessages.Rows[31][DetailsField].ShouldBe(PropertyFound),
+                () => _testObj.DtMessages.Rows[32][MessageField].ShouldBe(CheckingFiles),
                 () => _testObj.DtMessages.Rows[33][MessageField].ShouldBe($"File: {DummyString}.txt"),
-                () => _testObj.DtMessages.Rows[34][MessageField].ShouldBe("Checking Navigation"),
-                () => _testObj.DtMessages.Rows[35][MessageField].ShouldBe("QuickLaunch"),
+                () => _testObj.DtMessages.Rows[34][MessageField].ShouldBe(CheckingNavigation),
+                () => _testObj.DtMessages.Rows[35][MessageField].ShouldBe(QuickLaunch),
                 () => _testObj.DtMessages.Rows[36][MessageField].ShouldBe(DummyString),
                 () => _testObj.DtMessages.Rows[37][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[38][MessageField].ShouldBe("TopNav"),
+                () => _testObj.DtMessages.Rows[38][MessageField].ShouldBe(TopNav),
                 () => _testObj.DtMessages.Rows[39][MessageField].ShouldBe(DummyString),
                 () => _testObj.DtMessages.Rows[40][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[41][MessageField].ShouldBe("Processing Reports"),
+                () => _testObj.DtMessages.Rows[41][MessageField].ShouldBe(ProcessingReports),
                 () => _listItemUpdated.ShouldBeTrue(),
                 () => _gridGanttSettingsSaved.ShouldBeTrue(),
                 () => _folderAdded.ShouldBeTrue(),
@@ -752,51 +799,51 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _cacheRemoved.ShouldBeTrue(),
                 () => _storeInformationAdded.ShouldBeTrue(),
                 () => _testObj.DtMessages.Rows.Count.ShouldBe(43),
-                () => _testObj.DtMessages.Rows[0][MessageField].ShouldBe("Application Install"),
-                () => _testObj.DtMessages.Rows[0][DetailsField].ShouldBe("Application is already installed in site collection and will configure."),
-                () => _testObj.DtMessages.Rows[1][MessageField].ShouldBe("Permissions Check"),
-                () => _testObj.DtMessages.Rows[2][MessageField].ShouldBe("Application List"),
-                () => _testObj.DtMessages.Rows[3][MessageField].ShouldBe("Pre Requisite Check"),
+                () => _testObj.DtMessages.Rows[0][MessageField].ShouldBe(ApplicationInstall),
+                () => _testObj.DtMessages.Rows[0][DetailsField].ShouldBe(ApplicatinAlreadyInstalled),
+                () => _testObj.DtMessages.Rows[1][MessageField].ShouldBe(PermissionsCheck),
+                () => _testObj.DtMessages.Rows[2][MessageField].ShouldBe(ApplicationList),
+                () => _testObj.DtMessages.Rows[3][MessageField].ShouldBe(PreRequisiteCheck),
                 () => _testObj.DtMessages.Rows[4][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[5][MessageField].ShouldBe("Activation Key Check"),
+                () => _testObj.DtMessages.Rows[5][MessageField].ShouldBe(ActivationKeyCheck),
                 () => _testObj.DtMessages.Rows[6][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[7][MessageField].ShouldBe("Install Version"),
-                () => _testObj.DtMessages.Rows[8][MessageField].ShouldBe("Installing Features"),
-                () => _testObj.DtMessages.Rows[9][MessageField].ShouldBe("Feature1"),
-                () => _testObj.DtMessages.Rows[10][MessageField].ShouldBe("Feature2"),
-                () => _testObj.DtMessages.Rows[11][MessageField].ShouldBe("Feature3"),
-                () => _testObj.DtMessages.Rows[12][MessageField].ShouldBe("Feature4"),
-                () => _testObj.DtMessages.Rows[13][MessageField].ShouldBe("Installing Lists"),
-                () => _testObj.DtMessages.Rows[14][DetailsField].ShouldBe("List exists and will upgrade"),
-                () => _testObj.DtMessages.Rows[15][MessageField].ShouldBe("Updating Fields"),
-                () => _testObj.DtMessages.Rows[16][DetailsField].ShouldBe("Field updated"),
-                () => _testObj.DtMessages.Rows[17][MessageField].ShouldBe("Fixing Lookups"),
-                () => _testObj.DtMessages.Rows[18][DetailsField].ShouldBe("Field updated"),
-                () => _testObj.DtMessages.Rows[19][MessageField].ShouldBe("Enabled Advanced Lookup"),
-                () => _testObj.DtMessages.Rows[20][MessageField].ShouldBe("Updating Views"),
-                () => _testObj.DtMessages.Rows[21][DetailsField].ShouldBe("View exists and will overwrite"),
-                () => _testObj.DtMessages.Rows[22][MessageField].ShouldBe("Updating WebParts"),
-                () => _testObj.DtMessages.Rows[23][MessageField].ShouldBe("Grid on All Views"),
+                () => _testObj.DtMessages.Rows[7][MessageField].ShouldBe(InstallVersion),
+                () => _testObj.DtMessages.Rows[8][MessageField].ShouldBe(InstallingFeatures),
+                () => _testObj.DtMessages.Rows[9][MessageField].ShouldBe(Feature1),
+                () => _testObj.DtMessages.Rows[10][MessageField].ShouldBe(Feature2),
+                () => _testObj.DtMessages.Rows[11][MessageField].ShouldBe(Feature3),
+                () => _testObj.DtMessages.Rows[12][MessageField].ShouldBe(Feature4),
+                () => _testObj.DtMessages.Rows[13][MessageField].ShouldBe(InstallingLists),
+                () => _testObj.DtMessages.Rows[14][DetailsField].ShouldBe(ListExists),
+                () => _testObj.DtMessages.Rows[15][MessageField].ShouldBe(UpdatingFields),
+                () => _testObj.DtMessages.Rows[16][DetailsField].ShouldBe(FieldUpdated),
+                () => _testObj.DtMessages.Rows[17][MessageField].ShouldBe(FixingLookups),
+                () => _testObj.DtMessages.Rows[18][DetailsField].ShouldBe(FieldUpdated),
+                () => _testObj.DtMessages.Rows[19][MessageField].ShouldBe(EnabledAdvancedLookup),
+                () => _testObj.DtMessages.Rows[20][MessageField].ShouldBe(UpdatingViews),
+                () => _testObj.DtMessages.Rows[21][DetailsField].ShouldBe(ViewExists),
+                () => _testObj.DtMessages.Rows[22][MessageField].ShouldBe(UpdatingWebParts),
+                () => _testObj.DtMessages.Rows[23][MessageField].ShouldBe(GridOnAllViews),
                 () => _testObj.DtMessages.Rows[24][MessageField].ShouldBe(DummyView),
-                () => _testObj.DtMessages.Rows[25][MessageField].ShouldBe("Installing Event Handlers"),
-                () => _testObj.DtMessages.Rows[26][MessageField].ShouldBe($"ItemAdding({DummyClass})"),
-                () => _testObj.DtMessages.Rows[27][MessageField].ShouldBe("Installing Items"),
-                () => _testObj.DtMessages.Rows[28][MessageField].ShouldBe("Item Title"),
-                () => _testObj.DtMessages.Rows[29][MessageField].ShouldBe("Add to Reporting Database"),
-                () => _testObj.DtMessages.Rows[30][MessageField].ShouldBe("Installing Properties"),
+                () => _testObj.DtMessages.Rows[25][MessageField].ShouldBe(InstallingEventHandlers),
+                () => _testObj.DtMessages.Rows[26][MessageField].ShouldBe($"{ItemAdding}({DummyClass})"),
+                () => _testObj.DtMessages.Rows[27][MessageField].ShouldBe(InstallingItems),
+                () => _testObj.DtMessages.Rows[28][MessageField].ShouldBe(ItemTitle),
+                () => _testObj.DtMessages.Rows[29][MessageField].ShouldBe(AddToReportingDatabase),
+                () => _testObj.DtMessages.Rows[30][MessageField].ShouldBe(InstallingProperties),
                 () => _testObj.DtMessages.Rows[31][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[31][DetailsField].ShouldBe("Property found and will append"),
-                () => _testObj.DtMessages.Rows[32][MessageField].ShouldBe("Installing Files"),
+                () => _testObj.DtMessages.Rows[31][DetailsField].ShouldBe(PropertyFound),
+                () => _testObj.DtMessages.Rows[32][MessageField].ShouldBe(InstallingFiles),
                 () => _testObj.DtMessages.Rows[33][MessageField].ShouldBe($"File: {DummyString}.txt"),
-                () => _testObj.DtMessages.Rows[34][MessageField].ShouldBe("Creating Community"),
-                () => _testObj.DtMessages.Rows[35][MessageField].ShouldBe("Installing Navigation"),
-                () => _testObj.DtMessages.Rows[36][MessageField].ShouldBe("QuickLaunch"),
+                () => _testObj.DtMessages.Rows[34][MessageField].ShouldBe(CreatingCommunity),
+                () => _testObj.DtMessages.Rows[35][MessageField].ShouldBe(InstallingNavigation),
+                () => _testObj.DtMessages.Rows[36][MessageField].ShouldBe(QuickLaunch),
                 () => _testObj.DtMessages.Rows[37][MessageField].ShouldBe(DummyString),
                 () => _testObj.DtMessages.Rows[38][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[39][MessageField].ShouldBe("TopNav"),
+                () => _testObj.DtMessages.Rows[39][MessageField].ShouldBe(TopNav),
                 () => _testObj.DtMessages.Rows[40][MessageField].ShouldBe(DummyString),
                 () => _testObj.DtMessages.Rows[41][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[42][MessageField].ShouldBe("Processing Reports"));
+                () => _testObj.DtMessages.Rows[42][MessageField].ShouldBe(ProcessingReports));
         }
     }
 }
