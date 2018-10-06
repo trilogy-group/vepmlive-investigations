@@ -10,126 +10,126 @@ import {ModelerPageHelper} from '../../../../page-objects/pages/items-page/proje
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Verify the Modeler page. - [744256]', async () => {
-        stepLogger.caseId = 744256;
+        StepLogger.caseId = 744256;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
 
-        stepLogger.stepId(3);
-        await CommonPageHelper.gotoModeler(stepLogger);
-        await ModelerPageHelper.verifyModelerPopupDisplayed(stepLogger);
+        StepLogger.stepId(3);
+        await CommonPageHelper.gotoModeler();
+        await ModelerPageHelper.verifyModelerPopupDisplayed();
     });
 
     it('Verify the content of Modeler popup window. - [744257]', async () => {
-        stepLogger.caseId = 744257;
+        StepLogger.caseId = 744257;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
 
-        stepLogger.stepId(3);
-        await CommonPageHelper.gotoModeler(stepLogger);
-        await ModelerPageHelper.verifyModelerPopupContent(stepLogger);
+        StepLogger.stepId(3);
+        await CommonPageHelper.gotoModeler();
+        await ModelerPageHelper.verifyModelerPopupContent();
     });
 
     it('Verify the content of View Modeler page. - [744260]', async () => {
-        stepLogger.caseId = 744260;
+        StepLogger.caseId = 744260;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
 
-        stepLogger.stepId(3);
-        await CommonPageHelper.gotoModeler(stepLogger);
-        await ModelerPageHelper.verifyModelerPopupDisplayed(stepLogger);
+        StepLogger.stepId(3);
+        await CommonPageHelper.gotoModeler();
+        await ModelerPageHelper.verifyModelerPopupDisplayed();
 
-        stepLogger.stepId(4);
-        await ModelerPageHelper.clickOkButtonOnPopup(stepLogger);
-        await ModelerPageHelper.modelerPageDisplayed(stepLogger);
+        StepLogger.stepId(4);
+        await ModelerPageHelper.clickOkButtonOnPopup();
+        await ModelerPageHelper.modelerPageDisplayed();
 
-        stepLogger.stepId(5);
-        await ModelerPageHelper.verifyDisplayTabSelectedDefault(stepLogger);
+        StepLogger.stepId(5);
+        await ModelerPageHelper.verifyDisplayTabSelectedDefault();
 
-        stepLogger.stepId(6);
-        await ModelerPageHelper.clickViewTab(stepLogger);
-        await ModelerPageHelper.verifyViewTabDisplayed(stepLogger);
+        StepLogger.stepId(6);
+        await ModelerPageHelper.clickViewTab();
+        await ModelerPageHelper.verifyViewTabDisplayed();
     });
 
     it('Verify the search setting button. - [744262]', async () => {
-        stepLogger.caseId = 744262;
+        StepLogger.caseId = 744262;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
 
-        stepLogger.stepId(3);
-        await CommonPageHelper.gotoModeler(stepLogger);
-        await ModelerPageHelper.verifyModelerPopupDisplayed(stepLogger);
+        StepLogger.stepId(3);
+        await CommonPageHelper.gotoModeler();
+        await ModelerPageHelper.verifyModelerPopupDisplayed();
 
-        stepLogger.stepId(4);
-        await ModelerPageHelper.clickOkButtonOnPopup(stepLogger);
-        await ModelerPageHelper.modelerPageDisplayed(stepLogger);
+        StepLogger.stepId(4);
+        await ModelerPageHelper.clickOkButtonOnPopup();
+        await ModelerPageHelper.modelerPageDisplayed();
 
-        stepLogger.stepId(5);
-        await ModelerPageHelper.clicksSearchSettings(stepLogger);
-        await ModelerPageHelper.verifySearchSettingsPopup(stepLogger);
+        StepLogger.stepId(5);
+        await ModelerPageHelper.clicksSearchSettings();
+        await ModelerPageHelper.verifySearchSettingsPopup();
     });
 
     it('Verify the Find next button - [744263]', async () => {
-        stepLogger.caseId = 744263;
+        StepLogger.caseId = 744263;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
 
-        stepLogger.stepId(3);
-        await CommonPageHelper.gotoModeler(stepLogger);
-        await ModelerPageHelper.verifyModelerPopupDisplayed(stepLogger);
+        StepLogger.stepId(3);
+        await CommonPageHelper.gotoModeler();
+        await ModelerPageHelper.verifyModelerPopupDisplayed();
 
-        stepLogger.stepId(4);
-        await ModelerPageHelper.clickOkButtonOnPopup(stepLogger);
-        await ModelerPageHelper.modelerPageDisplayed(stepLogger);
+        StepLogger.stepId(4);
+        await ModelerPageHelper.clickOkButtonOnPopup();
+        await ModelerPageHelper.modelerPageDisplayed();
 
-        stepLogger.stepId(5);
-        await ModelerPageHelper.verifyFindNext(stepLogger);
+        StepLogger.stepId(5);
+        await ModelerPageHelper.verifyFindNext();
     });
 });

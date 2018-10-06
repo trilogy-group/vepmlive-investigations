@@ -5,80 +5,84 @@ import {StepLogger} from '../../../../../core/logger/step-logger';
 import {MyWorkPageHelper} from '../../../../page-objects/pages/my-workplace/my-work/my-work-page.helper';
 
 describe(SuiteNames.endToEndSuite, () => {
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         await new LoginPage().goToAndLogin();
-        stepLogger.preCondition('User should be on "My Work" page.');
-        await MyWorkPageHelper.navigateToMyWork(stepLogger);
-        await MyWorkPageHelper.verifyMyWorkPageDisplayed(stepLogger);
+        StepLogger.preCondition('User should be on "My Work" page.');
+        await MyWorkPageHelper.navigateToMyWork();
+        await MyWorkPageHelper.verifyMyWorkPageDisplayed();
+    });
+
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
     });
 
     it('"Edit Item" via "Edit Item" button. - [745091]', async () => {
-        stepLogger.caseId = 745091;
+        StepLogger.caseId = 745091;
 
-        stepLogger.stepId(1);
-        await MyWorkPageHelper.clickOnAnyCreatedItem(stepLogger);
-        await MyWorkPageHelper.verifyEditItemButtonEnabled(stepLogger);
+        StepLogger.stepId(1);
+        await MyWorkPageHelper.clickOnAnyCreatedItem();
+        await MyWorkPageHelper.verifyEditItemButtonEnabled();
 
-        stepLogger.stepId(2);
-        await MyWorkPageHelper.clickOnEditItem(stepLogger);
-        await MyWorkPageHelper.verifyEditPageOpened(stepLogger);
+        StepLogger.stepId(2);
+        await MyWorkPageHelper.clickOnEditItem();
+        await MyWorkPageHelper.verifyEditPageOpened();
 
-        stepLogger.stepId(3);
-        const editedItemTitle = await MyWorkPageHelper.editTitle(stepLogger);
-        await MyWorkPageHelper.clickSaveButton(stepLogger);
-        await MyWorkPageHelper.verifyCreateItem(editedItemTitle, stepLogger);
+        StepLogger.stepId(3);
+        const editedItemTitle = await MyWorkPageHelper.editTitle();
+        await MyWorkPageHelper.clickSaveButton();
+        await MyWorkPageHelper.verifyCreateItem(editedItemTitle);
 
-        stepLogger.stepId(4);
-        await MyWorkPageHelper.clickOnAnyCreatedItem(stepLogger);
-        await MyWorkPageHelper.clickOnEditItem(stepLogger);
-        const editedItemTitleForCancel = await MyWorkPageHelper.editTitle(stepLogger);
+        StepLogger.stepId(4);
+        await MyWorkPageHelper.clickOnAnyCreatedItem();
+        await MyWorkPageHelper.clickOnEditItem();
+        const editedItemTitleForCancel = await MyWorkPageHelper.editTitle();
 
-        stepLogger.stepId(5);
-        await MyWorkPageHelper.clickCancelButton(stepLogger);
-        await MyWorkPageHelper.verifyChangesNotReflected(editedItemTitleForCancel, stepLogger);
+        StepLogger.stepId(5);
+        await MyWorkPageHelper.clickCancelButton();
+        await MyWorkPageHelper.verifyChangesNotReflected(editedItemTitleForCancel);
     });
 
     it('"Close the Edit item pop-up via Close button/icon. - [745095]', async () => {
-        stepLogger.caseId = 745095;
+        StepLogger.caseId = 745095;
 
-        stepLogger.stepId(1);
-        await MyWorkPageHelper.clickOnAnyCreatedItem(stepLogger);
-        await MyWorkPageHelper.verifyEditItemButtonEnabled(stepLogger);
+        StepLogger.stepId(1);
+        await MyWorkPageHelper.clickOnAnyCreatedItem();
+        await MyWorkPageHelper.verifyEditItemButtonEnabled();
 
-        stepLogger.stepId(2);
-        await MyWorkPageHelper.clickOnEditItem(stepLogger);
-        await MyWorkPageHelper.verifyEditPageOpened(stepLogger);
+        StepLogger.stepId(2);
+        await MyWorkPageHelper.clickOnEditItem();
+        await MyWorkPageHelper.verifyEditPageOpened();
 
-        stepLogger.stepId(3);
-        const editedItemTitleForCancel = await MyWorkPageHelper.editTitle(stepLogger);
-        await MyWorkPageHelper.clickCancelIcon(stepLogger);
-        await MyWorkPageHelper.verifyChangesNotReflected(editedItemTitleForCancel, stepLogger);
+        StepLogger.stepId(3);
+        const editedItemTitleForCancel = await MyWorkPageHelper.editTitle();
+        await MyWorkPageHelper.clickCancelIcon();
+        await MyWorkPageHelper.verifyChangesNotReflected(editedItemTitleForCancel);
     });
 
     it('Edit the comments. - [745098]', async () => {
-        stepLogger.caseId = 745098;
+        StepLogger.caseId = 745098;
 
-        stepLogger.stepId(1);
-        await MyWorkPageHelper.clickOnAnyCreatedItem(stepLogger);
-        await MyWorkPageHelper.verifyCommentButtonEnabled(stepLogger);
+        StepLogger.stepId(1);
+        await MyWorkPageHelper.clickOnAnyCreatedItem();
+        await MyWorkPageHelper.verifyCommentButtonEnabled();
 
-        stepLogger.stepId(2);
-        await MyWorkPageHelper.clickOnComment(stepLogger);
-        const commentText = await MyWorkPageHelper.addComment(stepLogger);
+        StepLogger.stepId(2);
+        await MyWorkPageHelper.clickOnComment();
+        const commentText = await MyWorkPageHelper.addComment();
 
-        stepLogger.stepId(3);
-        await MyWorkPageHelper.clickOnPost(stepLogger);
-        await MyWorkPageHelper.verifyCommentedPost(commentText, stepLogger);
+        StepLogger.stepId(3);
+        await MyWorkPageHelper.clickOnPost();
+        await MyWorkPageHelper.verifyCommentedPost(commentText);
 
-        stepLogger.stepId(4);
-        await MyWorkPageHelper.clickEditOnAnyComment(stepLogger);
-        const editedText = await MyWorkPageHelper.editComment(stepLogger);
+        StepLogger.stepId(4);
+        await MyWorkPageHelper.clickEditOnAnyComment();
+        const editedText = await MyWorkPageHelper.editComment();
 
-        stepLogger.stepId(5);
-        await MyWorkPageHelper.clickOnPostForEditComment(stepLogger);
-        await MyWorkPageHelper.verifyCommentedPost(editedText, stepLogger);
+        StepLogger.stepId(5);
+        await MyWorkPageHelper.clickOnPostForEditComment();
+        await MyWorkPageHelper.verifyCommentedPost(editedText);
     });
 });

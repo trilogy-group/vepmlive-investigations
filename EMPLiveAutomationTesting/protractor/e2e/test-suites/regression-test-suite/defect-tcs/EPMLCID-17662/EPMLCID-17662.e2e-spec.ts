@@ -7,56 +7,56 @@ import {CommonPageHelper} from '../../../../page-objects/pages/common/common-pag
 import {ResourcePlannerPageHelper} from '../../../../page-objects/pages/resource-planner-page/resource-planner-page.helper';
 
 describe(SuiteNames.regressionTestSuite, () => {
-    let stepLogger: StepLogger;
+
     let displayName: string;
 
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         await new LoginPage().goToAndLogin();
     });
 
     it('Part-1 Disable one resource - [15377923]', async () => {
-        stepLogger.caseId = 15377923;
-        stepLogger.stepId(1);
-        await ResourcesPageHelper.navigateToResourcesPage(stepLogger);
-        await ResourcesPageHelper.hoverOnResource(stepLogger);
-        await ResourcesPageHelper.verifyEllipsisDisplayed(stepLogger);
+        StepLogger.caseId = 15377923;
+        StepLogger.stepId(1);
+        await ResourcesPageHelper.navigateToResourcesPage();
+        await ResourcesPageHelper.hoverOnResource();
+        await ResourcesPageHelper.verifyEllipsisDisplayed();
 
-        stepLogger.stepId(2);
-        await ResourcesPageHelper.clickOnEllipsis(stepLogger);
-        await ResourcesPageHelper.verifyMenuItemDisplayed(stepLogger);
+        StepLogger.stepId(2);
+        await ResourcesPageHelper.clickOnEllipsis();
+        await ResourcesPageHelper.verifyMenuItemDisplayed();
 
-        stepLogger.stepId(3);
-        await ResourcesPageHelper.clickOnEditItem(stepLogger);
-        await ResourcesPageHelper.editResourcePageDisplayed(stepLogger);
+        StepLogger.stepId(3);
+        await ResourcesPageHelper.clickOnEditItem();
+        await ResourcesPageHelper.editResourcePageDisplayed();
 
-        stepLogger.stepId(4);
-        displayName = await ResourcesPageHelper.getDisplayNameInEditResourcePage(stepLogger);
-        await ResourcesPageHelper.selectDisabled(stepLogger);
-        await ResourcesPageHelper.verifyDisabledChecked(stepLogger);
+        StepLogger.stepId(4);
+        displayName = await ResourcesPageHelper.getDisplayNameInEditResourcePage();
+        await ResourcesPageHelper.selectDisabled();
+        await ResourcesPageHelper.verifyDisabledChecked();
 
-        stepLogger.stepId(5);
-        await ResourcesPageHelper.clickSave(stepLogger);
-        await ResourcesPageHelper.verifyResourceSaved(displayName, stepLogger);
+        StepLogger.stepId(5);
+        await ResourcesPageHelper.clickSave();
+        await ResourcesPageHelper.verifyResourceSaved(displayName);
     });
 
     it('Part-2 Check disabled resource in resource Planner - [15377921]', async () => {
-        stepLogger.caseId = 15377921;
+        StepLogger.caseId = 15377921;
         // precondition
-        await CommonPageHelper.navigateToProjectCenter(stepLogger);
+        await CommonPageHelper.navigateToProjectCenter();
 
         // Step 1 and 2 are inside below function
-        stepLogger.stepId(1);
-        stepLogger.stepId(2);
-        await CommonPageHelper.selectProjectAndClickEllipsisButton(stepLogger);
-        await CommonPageHelper.verifyContextMenuDisplayed(stepLogger);
+        StepLogger.stepId(1);
+        StepLogger.stepId(2);
+        await CommonPageHelper.selectProjectAndClickEllipsisButton();
+        await CommonPageHelper.verifyContextMenuDisplayed();
 
-        stepLogger.stepId(3);
-        await CommonPageHelper.clickEditResourcePlan(stepLogger);
-        await ResourcePlannerPageHelper.verifyResourcePlanDisplayed(stepLogger);
+        StepLogger.stepId(3);
+        await CommonPageHelper.clickEditResourcePlan();
+        await ResourcePlannerPageHelper.verifyResourcePlanDisplayed();
 
-        stepLogger.stepId(4);
-        await ResourcePlannerPageHelper.verifyDisabledResourceNotDisplayed(displayName, stepLogger);
+        StepLogger.stepId(4);
+        await ResourcePlannerPageHelper.verifyDisabledResourceNotDisplayed(displayName);
     });
 });

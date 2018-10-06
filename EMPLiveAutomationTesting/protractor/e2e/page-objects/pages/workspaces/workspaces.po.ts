@@ -1,6 +1,6 @@
 import {BasePage} from '../base-page';
 import {WorkspacesConstants} from './workspaces.constants';
-import {element, By} from 'protractor';
+import {By, element} from 'protractor';
 import {ComponentHelpers} from '../../../components/devfactory/component-helpers/component-helpers';
 import {CommonPageHelper} from '../common/common-page.helper';
 import {TextComponentSelectors} from '../../../components/component-types/text-component/text-component-selectors';

@@ -6,30 +6,21 @@ export class ResourceAnalyzerPage extends BasePage {
     static get display() {
         return element(By.id('idDisplayPress'));
     }
+
     static get cancel() {
         return element(By.xpath('//*[@class="button-container"]//*[@value="Cancel"]'));
     }
+
     static get fiscalCalendarDropDown() {
         return element(By.id('idCalList'));
     }
+
     static get analyzerTab() {
         return element(By.xpath('//*[@tab_id= "tab_Display"]//*[text()="Analyzer"]'));
     }
+
     static get viewTab() {
         return element(By.css('[tab_id= "tab_View"]'));
-    }
-    static getTopAnalyserTabButtonById(id: string) {
-        return element(By.css(`#idAnalyzerTabDiv_ul #${id}`));
-    }
-
-    static getTopViewTabButtonById(id: string) {
-        return element(By.css(`#idViewTabDiv_ul #${id}`));
-    }
-    static getBottomTabButtonById(id: string) {
-        return element(By.css(`#idBottomTabDiv_ribbon #${id}`));
-    }
-    static getBottomTabButtonByText(text: string) {
-        return element(By.xpath(`//*[@id='idBottomTabDiv_ribbon']//*[contains(text(),'${text}')]//parent::a`));
     }
 
     static get topPannelAnalyserTab() {
@@ -69,6 +60,7 @@ export class ResourceAnalyzerPage extends BasePage {
 
         };
     }
+
     static get bottomPannel() {
         const labels = ResourceAnalyzerPageConstants.bottomPannel;
         return {
@@ -86,6 +78,22 @@ export class ResourceAnalyzerPage extends BasePage {
             exportExcel: ResourceAnalyzerPage.getBottomTabButtonById(labels.exportExcel),
             print: ResourceAnalyzerPage.getBottomTabButtonById(labels.print),
             comparisonData: ResourceAnalyzerPage.getBottomTabButtonByText(labels.comparisonData),
-             };
+        };
     }
- }
+
+    static getTopAnalyserTabButtonById(id: string) {
+        return element(By.css(`#idAnalyzerTabDiv_ul #${id}`));
+    }
+
+    static getTopViewTabButtonById(id: string) {
+        return element(By.css(`#idViewTabDiv_ul #${id}`));
+    }
+
+    static getBottomTabButtonById(id: string) {
+        return element(By.css(`#idBottomTabDiv_ribbon #${id}`));
+    }
+
+    static getBottomTabButtonByText(text: string) {
+        return element(By.xpath(`//*[@id='idBottomTabDiv_ribbon']//*[contains(text(),'${text}')]//parent::a`));
+    }
+}

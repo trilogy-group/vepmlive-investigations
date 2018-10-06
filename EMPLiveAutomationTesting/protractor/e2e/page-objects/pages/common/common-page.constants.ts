@@ -155,7 +155,7 @@ export class CommonPageConstants {
     }
 
     static get documentUploadText() {
-        return  'The document was uploaded successfully. Use this form to update the properties of the document.';
+        return 'The document was uploaded successfully. Use this form to update the properties of the document.';
     }
 
     static get cell() {
@@ -163,7 +163,7 @@ export class CommonPageConstants {
             cell1: 'HideCol0C10',
             cell2: 'HideCol0C11',
             cell3: 'HideCol0C13',
-            cell4:  'HideCol0C15',
+            cell4: 'HideCol0C15',
             cell5: 'HideCol0C1',
             cell6: 'HideCol1C1',
             cell7: 'HideCol2C1'
@@ -294,7 +294,7 @@ export class CommonPageConstants {
         return {
             budget: 'Budget',
             actualCost: 'Actual Costs',
-            benefits:   'Benefits'
+            benefits: 'Benefits'
         };
     }
 
@@ -326,26 +326,26 @@ export class CommonPageConstants {
 
     static get searchControl() {
         return {
-            searchComponentDropdown : 'Component dropdown',
+            searchComponentDropdown: 'Component dropdown',
             searchOperatorDropdown: 'Search Operator dropdown',
-            searchField : 'Search Field',
+            searchField: 'Search Field',
         };
     }
 
     static get messages() {
         return {
-            noDataFound : 'No data found',
+            noDataFound: 'No data found',
         };
     }
 
     static get hours() {
         return {
-            durationHours1 : '10.00',
+            durationHours1: '10.00',
             effortHours: '80',
-            durationHours2 : '20.00',
-            durationHours3 : '30.00',
-            durationHours4 : '5.00',
-            updatedEffortHours : '160.00'
+            durationHours2: '20.00',
+            durationHours3: '30.00',
+            durationHours4: '5.00',
+            updatedEffortHours: '160.00'
         };
     }
 

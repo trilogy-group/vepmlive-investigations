@@ -5,7 +5,6 @@ import {browser, ElementArrayFinder, ElementFinder, protractor, WebElement} from
 import {WaitHelper} from './wait-helper';
 import {JsHelper} from '../misc-utils/js-helper';
 import {ElementHelper} from './element-helper';
-import {StepLogger} from '../../../core/logger/step-logger';
 
 const shortId = require('shortid');
 const remote = require('selenium-webdriver/remote');
@@ -186,18 +185,8 @@ export class PageHelper {
      * @returns {any}
      */
     static async click(targetElement: ElementFinder) {
-
-        await WaitHelper.waitForElementToBeClickable(targetElement);
-        return targetElement.click();
-    }
-
-    static async fixHeader(stepLogger: StepLogger) {
-        stepLogger.step('Fix the header');
-        await this.executeScript(`try{
-        if(location.href.indexOf('kitty')){
-        document.getElementById('stickyHeader').className
-        = document.getElementById('stickyHeader').className.replace(/affix(?!\\\\S)/,'')+' affix-top';
-        console.log('executed menu correction')}}catch{}`);
+        await WaitHelper.waitForElementToBePresent(targetElement);
+        await ElementHelper.clickUsingJs(targetElement);
     }
 
     static async clickIfPresent(targetElement: ElementFinder) {

@@ -19,155 +19,159 @@ import {SocialStreamPageConstants} from '../../../../../page-objects/pages/setti
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Navigate to To Do page - [785576]', async () => {
-        stepLogger.caseId = 785576;
-        stepLogger.stepId(1);
+        StepLogger.caseId = 785576;
+        StepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.toDo,
             CommonPage.pageHeaders.myWorkplace.toDo,
             CommonPageConstants.pageHeaders.myWorkplace.toDo,
-            stepLogger);
+        );
     });
 
     it('Add a To Do item - [785580]', async () => {
-        stepLogger.caseId = 785580;
-        stepLogger.step('preCondition: navigate to To Do page');
+        StepLogger.caseId = 785580;
+        StepLogger.step('preCondition: navigate to To Do page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.toDo,
             CommonPage.pageHeaders.myWorkplace.toDo,
             CommonPageConstants.pageHeaders.myWorkplace.toDo,
-            stepLogger);
+        );
 
-        stepLogger.stepId(1);
-        stepLogger.step('Click on "+ new link" link displayed on top of "Discussions" page');
+        StepLogger.stepId(1);
+        StepLogger.step('Click on "+ new link" link displayed on top of "Discussions" page');
         await PageHelper.click(CommonPage.addNewLink);
-        stepLogger.verification('"To Do - New Item" window is displayed');
+        StepLogger.verification('"To Do - New Item" window is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(ToDoPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ToDoPageConstants.pageName));
 
-        stepLogger.stepId(2);
-        stepLogger.step(`Enter/Select below details in 'New To Do' page`);
+        StepLogger.stepId(2);
+        StepLogger.step(`Enter/Select below details in 'New To Do' page`);
         const uniqueId = PageHelper.getUniqueId();
         const labels = ToDoPageConstants.inputLabels;
         const title = `${labels.title} ${uniqueId}`;
         const status = CommonPageConstants.statuses.notStarted;
         const description = `${labels.description} ${uniqueId}`;
         // step#3 is inside this function
-        await ToDoPageHelper.fillFormAndSave(title, status, description, stepLogger);
+        await ToDoPageHelper.fillFormAndSave(title, status, description);
 
-        stepLogger.stepId(4);
-        stepLogger.step(`click on Close button`);
+        StepLogger.stepId(4);
+        StepLogger.step(`click on Close button`);
         await PageHelper.click(ToDoPage.closeButton.first());
-        stepLogger.verification(`To Do page is displayed`);
+        StepLogger.verification(`To Do page is displayed`);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.toDo))
             .toBe(true,
-        ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
         const label = AnchorHelper.getElementsByTextInsideGrid(labels.title);
-        stepLogger.step(`Newly created ToDo [Ex: Title 1] displayed in "ToDo" page`);
+        StepLogger.step(`Newly created ToDo [Ex: Title 1] displayed in "ToDo" page`);
         await CommonPageHelper.checkItemCreated(title, label);
     });
 
     it('Edit To Do from Workplace - [785584]', async () => {
-        stepLogger.caseId = 785584;
-        stepLogger.step('preCondition: Navigate to To Page');
+        StepLogger.caseId = 785584;
+        StepLogger.step('preCondition: Navigate to To Page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.toDo,
             CommonPage.pageHeaders.myWorkplace.toDo,
             CommonPageConstants.pageHeaders.myWorkplace.toDo,
-            stepLogger);
+        );
 
-        stepLogger.stepId(1);
+        StepLogger.stepId(1);
         // step#2 is inside this function
         await CommonPageHelper.actionTakenViaContextMenu(CommonPage.recordWithoutGreenTicket,
-            CommonPage.contextMenuOptions.editItem, stepLogger);
-        stepLogger.verification('"Edit Project" page is displayed');
+            CommonPage.contextMenuOptions.editItem);
+        StepLogger.verification('"Edit Project" page is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(ToDoPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ToDoPageConstants.editPageName));
 
-        stepLogger.stepId(3);
-        stepLogger.step(`Enter/Select below details in 'Edit To Do' page`);
+        StepLogger.stepId(3);
+        StepLogger.step(`Enter/Select below details in 'Edit To Do' page`);
         const uniqueId = PageHelper.getUniqueId();
         const labels = ToDoPageConstants.inputLabels;
         const title = `${labels.title} ${uniqueId}`;
         const status = CommonPageConstants.statuses.inProgress;
         const description = `${labels.description} ${uniqueId}`;
-        await ToDoPageHelper.fillFormAndSave(title, status, description, stepLogger);
-        stepLogger.verification(`'Edit To Do' page is closed`);
+        await ToDoPageHelper.fillFormAndSave(title, status, description);
+        StepLogger.verification(`'Edit To Do' page is closed`);
         await expect(await ToDoPage.inputs.title.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ToDoPageConstants.editPageName));
-        stepLogger.verification(`To Do page is displayed`);
+        StepLogger.verification(`To Do page is displayed`);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.toDo))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
         const label = AnchorHelper.getElementsByTextInsideGrid(labels.title, true);
-        stepLogger.step(`Modified Title of ToDo [Ex: Title 1] displayed in "ToDo" page`);
+        StepLogger.step(`Modified Title of ToDo [Ex: Title 1] displayed in "ToDo" page`);
         await CommonPageHelper.checkItemCreated(title, label);
     });
 
     it('To Do - Attach File - [852049]', async () => {
-        stepLogger.caseId = 1176340;
-        stepLogger.stepId(1);
+        StepLogger.caseId = 1176340;
+        StepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.toDo,
             CommonPage.pageHeaders.myWorkplace.toDo,
             CommonPageConstants.pageHeaders.myWorkplace.toDo,
-            stepLogger);
+        );
 
         // Common functionality to edit any item
         const item = CommonPage.recordWithoutGreenTicket;
         await WaitHelper.waitForElementToBeDisplayed(item);
 
-        stepLogger.stepId(1);
-        stepLogger.step('Click on the row of item created as per pre requisites');
+        StepLogger.stepId(1);
+        StepLogger.step('Click on the row of item created as per pre requisites');
         await PageHelper.click(item);
-        stepLogger.step('Click on "ITEMS" tab');
+        StepLogger.step('Click on "ITEMS" tab');
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
-        stepLogger.verification('contents of the ITEMS tan should be displayed');
+        StepLogger.verification('contents of the ITEMS tan should be displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.ribbonItems.attachFile))
             .toBe(true,
                 ValidationsHelper.getItemsUnderTabShouldBeDisplayed(CommonPageConstants.ribbonMenuTitles.items));
 
-        stepLogger.stepId(2);
-        stepLogger.step('Click on "Attach File" button from button menu of popup');
+        StepLogger.stepId(2);
+        StepLogger.step('Click on "Attach File" button from button menu of popup');
         await PageHelper.click(CommonPage.ribbonItems.attachFile);
 
-        await CommonPageHelper.switchToContentFrame(stepLogger);
+        await CommonPageHelper.switchToContentFrame();
 
-        stepLogger.verification('A popup displayed to attach file');
+        StepLogger.verification('A popup displayed to attach file');
         await expect(await PageHelper.isElementDisplayed(CommonPage.fileUploadControl))
             .toBe(true,
                 ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.fileUpload));
 
         // 3 and 4 are same from automation perspective
-        stepLogger.stepId(3);
-        stepLogger.stepId(4);
-        stepLogger.step('Click on "Choose File" button in the pop up window Search and select the file to attach');
+        StepLogger.stepId(3);
+        StepLogger.stepId(4);
+        StepLogger.step('Click on "Choose File" button in the pop up window Search and select the file to attach');
         const {fullFilePath, newFileName} = CommonPageHelper.uniqueDocumentFilePath;
         await PageHelper.uploadFile(CommonPage.fileUploadControl, fullFilePath);
 
-        stepLogger.verification('Selected file name should be displayed in popup');
+        StepLogger.verification('Selected file name should be displayed in popup');
         await expect(await ElementHelper.getValue(CommonPage.fileUploadControl))
             .toContain(newFileName,
                 ValidationsHelper.getFieldShouldHaveValueValidation(CommonPageConstants.fileUpload, newFileName));
 
-        stepLogger.stepId(5);
-        stepLogger.step('Click on "OK" button');
+        StepLogger.stepId(5);
+        StepLogger.step('Click on "OK" button');
         await PageHelper.click(CommonPage.formButtons.okWithSmallK);
 
         await PageHelper.switchToDefaultContent();
@@ -175,103 +179,103 @@ describe(SuiteNames.smokeTestSuite, () => {
         // Nothing else is working to have it frame invisible
         await browser.sleep(PageHelper.timeout.m);
 
-        stepLogger.verification('Popup window is closed');
+        StepLogger.verification('Popup window is closed');
         await WaitHelper.waitForElementToBeHidden(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editItem));
 
-        stepLogger.stepId(6);
-        stepLogger.step('Select that "To Do" item from grid and click on "View Item" from its contextual menu');
+        StepLogger.stepId(6);
+        StepLogger.step('Select that "To Do" item from grid and click on "View Item" from its contextual menu');
         await CommonPageHelper.actionTakenViaContextMenu(CommonPage.recordWithoutGreenTicket,
             CommonPage.contextMenuOptions.viewItem,
-            stepLogger);
+        );
 
-        stepLogger.stepId(7);
-        stepLogger.step('Check that the attached file get display under "Attachments" section');
-        stepLogger.step('The attached file should be displayed under "Attachments" section');
+        StepLogger.stepId(7);
+        StepLogger.step('Check that the attached file get display under "Attachments" section');
+        StepLogger.step('The attached file should be displayed under "Attachments" section');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFileName));
 
-        stepLogger.stepId(8);
-        stepLogger.step('Click on "Close" button');
+        StepLogger.stepId(8);
+        StepLogger.step('Click on "Close" button');
         await PageHelper.click(CommonPage.formButtons.close);
 
-        stepLogger.verification('View item page should be displayed and user should be in "To Do" list page');
+        StepLogger.verification('View item page should be displayed and user should be in "To Do" list page');
         await expect(await PageHelper.isElementDisplayed(item))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
     });
 
     it('Add Grid/Gantt web part - [785834]', async () => {
-        stepLogger.caseId = 785834;
+        StepLogger.caseId = 785834;
         // Delete previous created Grid/Gantt
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.toDo,
             CommonPage.pageHeaders.myWorkplace.toDo,
             CommonPageConstants.pageHeaders.myWorkplace.toDo,
-            stepLogger);
+        );
         await PageHelper.click(CommonPage.sidebarMenus.settings);
         await PageHelper.click(SocialStreamPage.settingItems.editPage);
         await ToDoPageHelper.deleteGridGantt();
 
-        stepLogger.step('preCondition: navigate to To Do page');
+        StepLogger.step('preCondition: navigate to To Do page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.toDo,
             CommonPage.pageHeaders.myWorkplace.toDo,
             CommonPageConstants.pageHeaders.myWorkplace.toDo,
-            stepLogger);
+        );
 
-        stepLogger.stepId(1);
-        stepLogger.step('Verify that the Grid/ Gantt web part is not added in page and page looks as below:');
-        stepLogger.verification('Grid/ Gantt web part should not have got added in the page');
+        StepLogger.stepId(1);
+        StepLogger.step('Verify that the Grid/ Gantt web part is not added in page and page looks as below:');
+        StepLogger.verification('Grid/ Gantt web part should not have got added in the page');
         await expect(await ToDoPage.gridGantt.isPresent())
             .toBe(false,
                 ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.gridGantt));
 
-        stepLogger.stepId(2);
-        stepLogger.step(`Click on 'Main Gear Settings' display in left bottom corner`);
+        StepLogger.stepId(2);
+        StepLogger.step(`Click on 'Main Gear Settings' display in left bottom corner`);
         await PageHelper.click(CommonPage.sidebarMenus.settings);
 
-        stepLogger.verification('the Settings menu should be displayed in the left navigation');
+        StepLogger.verification('the Settings menu should be displayed in the left navigation');
         await expect(await PageHelper.isElementDisplayed(SocialStreamPage.settingMenu)).toBe(true,
             ValidationsHelper.getMenuDisplayedValidation(SocialStreamPageConstants.validations.settingMenu));
 
-        stepLogger.stepId(3);
-        stepLogger.step('Click on Edit Page');
+        StepLogger.stepId(3);
+        StepLogger.step('Click on Edit Page');
         await PageHelper.click(SocialStreamPage.settingItems.editPage);
 
-        stepLogger.verification('the page should be opened in Edit mode');
+        StepLogger.verification('the page should be opened in Edit mode');
         await expect(await PageHelper.isElementDisplayed(SocialStreamPage.webPartAdderUpdatePanel)).toBe(true,
             ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.validations.homePage));
 
-        stepLogger.stepId(4);
-        stepLogger.step(`Click on 'Add a Web Part' link`);
+        StepLogger.stepId(4);
+        StepLogger.step(`Click on 'Add a Web Part' link`);
         await PageHelper.click(SocialStreamPage.addAWebpart);
 
-        stepLogger.verification('the respective section to add a web part should be opened and displayed');
+        StepLogger.verification('the respective section to add a web part should be opened and displayed');
         await expect(await PageHelper.isElementDisplayed(SocialStreamPage.webPartAdderUpdatePanel)).toBe(true,
             ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.validations.homePage));
 
-        stepLogger.stepId(5);
-        stepLogger.step('Select Categories EPM Live and Part as Grid/ Gantt Click on Add');
+        StepLogger.stepId(5);
+        StepLogger.step('Select Categories EPM Live and Part as Grid/ Gantt Click on Add');
         await PageHelper.click(SocialStreamPage.settingItems.epmLive);
         await PageHelper.click(SocialStreamPage.settingItems.gridGantt);
         await PageHelper.click(SocialStreamPage.addButton);
 
-        stepLogger.verification('Grid/ Gantt web part should be applied in To Do page');
+        StepLogger.verification('Grid/ Gantt web part should be applied in To Do page');
         await expect(await PageHelper.isElementDisplayed(ToDoPage.gridGantt)).toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.gridGantt));
+            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.gridGantt));
 
-        stepLogger.stepId(6);
-        stepLogger.step(`Click on Page tab >> 'Stop Editing'`);
+        StepLogger.stepId(6);
+        StepLogger.step(`Click on Page tab >> 'Stop Editing'`);
         await PageHelper.click(SocialStreamPage.settingItems.page);
         await PageHelper.click(SocialStreamPage.stopEditing);
 
-        stepLogger.verification('User should be on To Do list page and all item should be displayed in grid.');
+        StepLogger.verification('User should be on To Do list page and all item should be displayed in grid.');
         await browser.sleep(PageHelper.timeout.m);
         await expect(await PageHelper.isElementDisplayed(ToDoPage.gridGantt)).toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
+            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
     });
 });

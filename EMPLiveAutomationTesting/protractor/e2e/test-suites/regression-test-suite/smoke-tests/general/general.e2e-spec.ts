@@ -11,30 +11,30 @@ import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Check behavior of "Save and Close" button - [743175]', async () => {
-        stepLogger.caseId = 743175;
+        StepLogger.caseId = 743175;
         const uniqueId = PageHelper.getUniqueId();
 
-        stepLogger.step('Create a new project and navigate to build team page');
-        await ProjectItemPageHelper.createProjectAndNavigateToBuildTeamPage(uniqueId, stepLogger);
+        StepLogger.step('Create a new project and navigate to build team page');
+        await ProjectItemPageHelper.createProjectAndNavigateToBuildTeamPage(uniqueId,);
 
-        stepLogger.verification('Verify Save and Close button is disabled by default');
+        StepLogger.verification('Verify Save and Close button is disabled by default');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.saveAndClose);
         await expect(await ElementHelper.hasClass(ProjectItemPage.saveAndClose,
             ProjectItemPageConstants.buildTeamContentClass.saveAndCloseDisabled))
             .toBe(true,
                 ProjectItemPageConstants.messageText.saveAndCloseDisabled);
 
-        stepLogger.step('Add resource to Current team and verify');
-        await ProjectItemPageHelper.addResourceAndVerifyUserMovedUnderCurrentTeam(uniqueId, stepLogger);
+        StepLogger.step('Add resource to Current team and verify');
+        await ProjectItemPageHelper.addResourceAndVerifyUserMovedUnderCurrentTeam(uniqueId,);
     });
 
 });

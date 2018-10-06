@@ -15,41 +15,45 @@ import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Navigate to Associated Items page - [966382]', async () => {
-        stepLogger.caseId = 966382;
-        stepLogger.preCondition('Select "Navigation" icon  from left side menu');
-        stepLogger.preCondition('Select Projects -> Projects from the options displayed');
+        StepLogger.caseId = 966382;
+        StepLogger.preCondition('Select "Navigation" icon  from left side menu');
+        StepLogger.preCondition('Select Projects -> Projects from the options displayed');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        stepLogger.preCondition('Select any project from project center');
+        );
+        StepLogger.preCondition('Select any project from project center');
         await PageHelper.click(CommonPage.project);
-        stepLogger.preCondition('Click ITEMS tab select Edit Plan');
+        StepLogger.preCondition('Click ITEMS tab select Edit Plan');
         await PageHelper.click(CommonPage.editPlan);
-        stepLogger.preCondition('click on Project Planner');
+        StepLogger.preCondition('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
         // Planner takes time to get open so sleep required
         await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
 
-        stepLogger.stepId(1);
-        stepLogger.step('Click on Project tab');
+        StepLogger.stepId(1);
+        StepLogger.step('Click on Project tab');
         await PageHelper.click(CommonPage.projectTab);
 
-        stepLogger.step('Click on "Associated Items" icon from the button menu');
+        StepLogger.step('Click on "Associated Items" icon from the button menu');
         await PageHelper.click(ProjectItemPage.associatedItemsDropDown);
 
-        stepLogger.verification('Below Options displayed\n' +
+        StepLogger.verification('Below Options displayed\n' +
             '- Lists\n' +
             '- Changes\n' +
             '- Issues\n' +
@@ -67,46 +71,46 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.associatedItems.documentLibraries))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.associatedItems.documentLibraries));
 
-        stepLogger.stepId(2);
-        stepLogger.step('Click on Changes from the options displayed');
+        StepLogger.stepId(2);
+        StepLogger.step('Click on Changes from the options displayed');
         await PageHelper.click(ProjectItemPage.associatedItems.changes);
 
-        stepLogger.verification('Changes - Benefits View window is displayed');
+        StepLogger.verification('Changes - Benefits View window is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.changeWindow))
             .toBe(true, ValidationsHelper.getWindowShouldBeDisplayedValidation(ProjectItemPageConstants.changeWindow));
 
-        stepLogger.stepId(3);
-        stepLogger.step('Click X in Changes - Benefits View window');
+        StepLogger.stepId(3);
+        StepLogger.step('Click X in Changes - Benefits View window');
         await ProjectItemPageHelper.closeResourcePage();
 
-        stepLogger.verification('Changes - Benefits View window is displayed');
+        StepLogger.verification('Changes - Benefits View window is displayed');
         await expect(await ProjectItemPage.changeWindow.isPresent())
             .toBe(false, ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.changeWindow));
 
-        stepLogger.verification('Project Planner page is displayed');
+        StepLogger.verification('Project Planner page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner)).toBe(true,
             ValidationsHelper.getDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
-        stepLogger.stepId(4);
-        stepLogger.step('Click on "Associated Items" icon from the button menu');
+        StepLogger.stepId(4);
+        StepLogger.step('Click on "Associated Items" icon from the button menu');
         await PageHelper.click(ProjectItemPage.associatedItemsDropDown);
 
-        stepLogger.step('Click on Issues from the options displayed');
+        StepLogger.step('Click on Issues from the options displayed');
         await PageHelper.click(ProjectItemPage.associatedItems.issues);
 
-        stepLogger.verification('Changes - Benefits View window is displayed');
+        StepLogger.verification('Changes - Benefits View window is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.issueWindow))
             .toBe(true, ValidationsHelper.getWindowShouldBeDisplayedValidation(ProjectItemPageConstants.issueWindow));
 
-        stepLogger.stepId(5);
-        stepLogger.step('Click X in Changes - Benefits View window');
+        StepLogger.stepId(5);
+        StepLogger.step('Click X in Changes - Benefits View window');
         await ProjectItemPageHelper.closeResourcePage();
 
-        stepLogger.verification('Changes - Benefits View window is displayed');
+        StepLogger.verification('Changes - Benefits View window is displayed');
         await expect(await ProjectItemPage.issueWindow.isPresent())
             .toBe(false, ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.issueWindow));
 
-        stepLogger.verification('Project Planner page is displayed');
+        StepLogger.verification('Project Planner page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner)).toBe(true,
             ValidationsHelper.getDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
     });

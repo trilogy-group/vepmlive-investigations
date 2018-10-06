@@ -7,7 +7,7 @@ export class DepartmentsPageConstants {
     static readonly executivesSelectedLabel = 'Executives Selected Dropdown';
 
     static get addNewItemOptions() {
-        return{
+        return {
             title: 'Title Required Field',
             parentDepartment: 'Parent Department',
             managerPossibleValue: 'Managers possible values',

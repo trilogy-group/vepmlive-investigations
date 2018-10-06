@@ -21,7 +21,7 @@ export class ToDoPage {
 
     static get closeButton() {
         return CommonPageHelper.getAllElementsByType(HtmlHelper.tags.submit);
-   }
+    }
 
     static get menueLink() {
         return element.all(By.xpath(`${this.gridTab}//*[contains(@class,'menuLink')]`));

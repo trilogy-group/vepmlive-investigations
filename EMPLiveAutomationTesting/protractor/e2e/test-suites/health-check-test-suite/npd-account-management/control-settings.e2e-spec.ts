@@ -8,19 +8,24 @@ import {CommonPageConstants} from '../../../page-objects/pages/common/common-pag
 import {StepLogger} from '../../../../core/logger/step-logger';
 
 describe(SuiteNames.healthCheckTestSuite, () => {
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         await new LoginPage().goToAndLogin();
     });
+
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Valid License for viewing EPM Live site- [743132]', async () => {
-        stepLogger.caseId = 743132;
-        stepLogger.stepId(1);
+        StepLogger.caseId = 743132;
+        StepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
     });
 });

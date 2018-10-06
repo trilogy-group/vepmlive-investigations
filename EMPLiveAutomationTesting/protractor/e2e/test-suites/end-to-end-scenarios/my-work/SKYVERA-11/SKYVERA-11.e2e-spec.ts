@@ -5,67 +5,71 @@ import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 import {MyWorkPageHelper} from '../../../../page-objects/pages/my-workplace/my-work/my-work-page.helper';
 
 describe(SuiteNames.endToEndSuite, () => {
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         await new LoginPage().goToAndLogin();
-        stepLogger.preCondition('User should be on "My Work" page.');
-        await MyWorkPageHelper.navigateToMyWork(stepLogger);
-        await MyWorkPageHelper.verifyMyWorkPageDisplayed(stepLogger);
+        StepLogger.preCondition('User should be on "My Work" page.');
+        await MyWorkPageHelper.navigateToMyWork();
+        await MyWorkPageHelper.verifyMyWorkPageDisplayed();
+    });
+
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
     });
 
     it('Check the ellipsis icon (…) on the grid.- [745063]', async () => {
-        stepLogger.caseId = 745063;
+        StepLogger.caseId = 745063;
 
-        stepLogger.stepId(1);
-        await MyWorkPageHelper.clickEllipsesIcon(stepLogger);
-        await MyWorkPageHelper.hoverOnAnyOption(stepLogger);
-        await MyWorkPageHelper.verifySubmenuDisplayed(stepLogger);
+        StepLogger.stepId(1);
+        await MyWorkPageHelper.clickEllipsesIcon();
+        await MyWorkPageHelper.hoverOnAnyOption();
+        await MyWorkPageHelper.verifySubmenuDisplayed();
 
-        stepLogger.stepId(2);
-        const workType = await MyWorkPageHelper.clickWorkTypeOption(stepLogger);
-        await MyWorkPageHelper.verifySearchResults(workType, stepLogger);
+        StepLogger.stepId(2);
+        const workType = await MyWorkPageHelper.clickWorkTypeOption();
+        await MyWorkPageHelper.verifySearchResults(workType);
     });
 
     it('Close the ellipsis (…) pop-up. - [745064]', async () => {
-        stepLogger.caseId = 745064;
+        StepLogger.caseId = 745064;
 
-        stepLogger.stepId(1);
-        await MyWorkPageHelper.clickEllipsesIcon(stepLogger);
-        await MyWorkPageHelper.verifyEllipsesDropdownDisplayed(stepLogger);
+        StepLogger.stepId(1);
+        await MyWorkPageHelper.clickEllipsesIcon();
+        await MyWorkPageHelper.verifyEllipsesDropdownDisplayed();
 
-        stepLogger.stepId(2);
-        await MyWorkPageHelper.clickCloseOnEllipsesDropdown(stepLogger);
-        await MyWorkPageHelper.verifyEllipsesDropdownClosed(stepLogger);
+        StepLogger.stepId(2);
+        await MyWorkPageHelper.clickCloseOnEllipsesDropdown();
+        await MyWorkPageHelper.verifyEllipsesDropdownClosed();
     });
 
     it('Set the "Working on" via grid. - [745070]', async () => {
-        stepLogger.caseId = 745070;
+        StepLogger.caseId = 745070;
 
-        stepLogger.stepId(1);
-        const itemTitle = await MyWorkPageHelper.clickOnWorkingOnForAnyItem(stepLogger);
-        await MyWorkPageHelper.verifyRadioButtonSelected(stepLogger);
+        StepLogger.stepId(1);
+        const itemTitle = await MyWorkPageHelper.clickOnWorkingOnForAnyItem();
+        await MyWorkPageHelper.verifyRadioButtonSelected();
 
-        stepLogger.stepId(2);
-        await MyWorkPageHelper.clickViewsTab(stepLogger);
-        await MyWorkPageHelper.selectWorkingOnView(stepLogger);
-        await MyWorkPageHelper.verifyWorkingOnItemDisplayed(itemTitle, stepLogger);
+        StepLogger.stepId(2);
+        await MyWorkPageHelper.clickViewsTab();
+        await MyWorkPageHelper.selectWorkingOnView();
+        await MyWorkPageHelper.verifyWorkingOnItemDisplayed(itemTitle);
     });
 
     it('Delete the item through ellipsis menu. - [745074]', async () => {
-        stepLogger.caseId = 745074;
+        StepLogger.caseId = 745074;
 
-        stepLogger.stepId(1);
-        const itemTitle = await MyWorkPageHelper.clickOnEllipsesForAnyItem(stepLogger);
-        await MyWorkPageHelper.verifyEllipsesDropdownForItemDisplayed(stepLogger);
+        StepLogger.stepId(1);
+        const itemTitle = await MyWorkPageHelper.clickOnEllipsesForAnyItem();
+        await MyWorkPageHelper.verifyEllipsesDropdownForItemDisplayed();
 
-        stepLogger.stepId(2);
-        await MyWorkPageHelper.clickOnDeleteItem(stepLogger);
-        await MyWorkPageHelper.verifyDeleteItemPopup(stepLogger);
+        StepLogger.stepId(2);
+        await MyWorkPageHelper.clickOnDeleteItem();
+        await MyWorkPageHelper.verifyDeleteItemPopup();
 
-        stepLogger.stepId(3);
-        await MyWorkPageHelper.clickOKAlert(stepLogger);
-        await MyWorkPageHelper.verifyItemDeleted(itemTitle, stepLogger);
+        StepLogger.stepId(3);
+        await MyWorkPageHelper.clickOKAlert();
+        await MyWorkPageHelper.verifyItemDeleted(itemTitle);
     });
 });

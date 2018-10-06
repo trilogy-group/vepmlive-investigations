@@ -18,136 +18,140 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Add Changes Functionality - [1124277]', async () => {
-        stepLogger.caseId = 1124277;
+        StepLogger.caseId = 1124277;
 
-        stepLogger.stepId(1);
+        StepLogger.stepId(1);
 
-        stepLogger.step('Select "Create New" icon  from left side menu');
+        StepLogger.step('Select "Create New" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.createNew);
 
-        stepLogger.step('Various Create New options are displayed');
+        StepLogger.step('Various Create New options are displayed');
         await expect(await PageHelper.isElementDisplayed(CreateNewPage.navigation.listApps.change))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(CreateNewPageConstants.navigationLabels.listApps.change));
 
-        stepLogger.stepId(2);
-        stepLogger.step('Click on "Change" link from the options displayed');
+        StepLogger.stepId(2);
+        StepLogger.step('Click on "Change" link from the options displayed');
         await PageHelper.click(CreateNewPage.navigation.listApps.change);
 
-        stepLogger.verification('"Changes - New Item" window is displayed');
+        StepLogger.verification('"Changes - New Item" window is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(ChangeItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(ChangeItemPageConstants.pageName));
 
-        stepLogger.stepId(3);
-        stepLogger.step('Enter/Select required details in "Changes - New Item" window as described below');
+        StepLogger.stepId(3);
+        StepLogger.step('Enter/Select required details in "Changes - New Item" window as described below');
         const uniqueId = PageHelper.getUniqueId();
         const labels = ChangeItemPageConstants.inputLabels;
         const titleValue = `${labels.title} ${uniqueId}`;
         const priority = CommonPageConstants.priorities.high;
 
-        stepLogger.step('Switch to frame');
+        StepLogger.step('Switch to frame');
         await CommonPageHelper.switchToFirstContentFrame();
-        await ChangeItemPageHelper.fillForm(titleValue, priority, stepLogger);
+        await ChangeItemPageHelper.fillForm(titleValue, priority);
 
-        stepLogger.verification('"Changes - New Item" window is closed');
+        StepLogger.verification('"Changes - New Item" window is closed');
         await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ChangeItemPageConstants.pageName));
 
         await PageHelper.switchToDefaultContent();
-        stepLogger
-            .verification('Notification about New Changes created [Ex: New Change Item 1]' +
-                ' displayed on the Home Page');
+
+        StepLogger.verification('Notification about New Changes created [Ex: New Change Item 1]' +
+            ' displayed on the Home Page');
 
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getNotificationByText(titleValue)))
             .toBe(true,
                 ValidationsHelper.getNotificationDisplayedValidation(ChangeItemPageConstants.pageName));
 
-        stepLogger.stepId(5);
+        StepLogger.stepId(5);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.changes,
             CommonPage.pageHeaders.projects.changes,
             CommonPageConstants.pageHeaders.projects.changes,
-            stepLogger);
+        );
 
         await CommonPageHelper.searchItemByTitle(titleValue,
             ChangeItemPageConstants.columnNames.linkTitleNoMenu,
-            stepLogger);
+        );
 
-        stepLogger.verification('Newly created Change [Ex: New Change Item 1] displayed in "Changes" page');
+        StepLogger.verification('Newly created Change [Ex: New Change Item 1] displayed in "Changes" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
 
     it('Edit Changes Functionality - [1124278]', async () => {
-        stepLogger.caseId = 1124275;
-        stepLogger.stepId(1);
+        StepLogger.caseId = 1124275;
+        StepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.changes,
             CommonPage.pageHeaders.projects.changes,
             CommonPageConstants.pageHeaders.projects.changes,
-            stepLogger);
+        );
 
         // Step #3
-        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.record, CommonPage.contextMenuOptions.editItem, stepLogger);
+        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.record, CommonPage.contextMenuOptions.editItem);
 
-        stepLogger.verification('"Edit Change" page is displayed');
+        StepLogger.verification('"Edit Change" page is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(ChangeItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
 
-        stepLogger.stepId(4);
-        stepLogger.step('Enter/Select required details in "Changes - New Item" window as described below');
+        StepLogger.stepId(4);
+        StepLogger.step('Enter/Select required details in "Changes - New Item" window as described below');
         const uniqueId = PageHelper.getUniqueId();
         const labels = ChangeItemPageConstants.inputLabels;
         const titleValue = `${labels.title} ${uniqueId}`;
         const priority = CommonPageConstants.priorities.low;
-        const projectName = await ChangeItemPageHelper.fillForm(titleValue, priority, stepLogger);
+        const projectName = await ChangeItemPageHelper.fillForm(titleValue, priority);
 
-        stepLogger.verification('"Change" page is displayed');
+        StepLogger.verification('"Change" page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.changes))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.changes));
 
-        stepLogger.verification('"Edit Issue" page is closed');
+        StepLogger.verification('"Edit Issue" page is closed');
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(IssueItemPageConstants.editPageName));
 
-        stepLogger.verification('Search item by title');
-        await CommonPageHelper.searchItemByTitle(titleValue, ChangeItemPageConstants.columnNames.linkTitleNoMenu, stepLogger);
+        StepLogger.verification('Search item by title');
+        await CommonPageHelper.searchItemByTitle(titleValue, ChangeItemPageConstants.columnNames.linkTitleNoMenu);
 
-        stepLogger.verification('Show columns whatever is required');
+        StepLogger.verification('Show columns whatever is required');
         await CommonPageHelper.showColumns([
             ChangeItemPageConstants.columnNames.linkTitleNoMenu,
             ChangeItemPageConstants.columnNames.project,
             ChangeItemPageConstants.columnNames.priority]);
 
-        stepLogger.verification('Click on searched record');
+        StepLogger.verification('Click on searched record');
         await PageHelper.click(CommonPage.record);
 
-        stepLogger.verification('Verify record by title');
+        StepLogger.verification('Verify record by title');
         const firstTableColumns = [titleValue];
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(firstTableColumns)))
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
-        stepLogger.verification('Verify by other properties');
+        StepLogger.verification('Verify by other properties');
         const secondTableColumns = [priority, projectName];
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
             .toBe(true,

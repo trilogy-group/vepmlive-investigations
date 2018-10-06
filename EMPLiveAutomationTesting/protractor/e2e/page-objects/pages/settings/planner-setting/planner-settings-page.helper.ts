@@ -70,74 +70,74 @@ export class PlannerSettingsPageHelper {
         await PageHelper.click(PlannerSettingPage.saveButton);
     }
 
-    static async saveAndVerifyCreatePlanner(name: string, stepLogger: StepLogger, navigatedTOCreatedPlanner: Boolean ) {
+    static async saveAndVerifyCreatePlanner(name: string, navigatedTOCreatedPlanner: Boolean) {
 
-        stepLogger.stepId(5);
-        stepLogger.step('Scroll down to end of page');
+        StepLogger.stepId(5);
+        StepLogger.step('Scroll down to end of page');
         await ElementHelper.scrollToBottomOfPage();
 
-        stepLogger.step('Click on Save Settings button');
+        StepLogger.step('Click on Save Settings button');
         await PageHelper.click(PlannerSettingPage.saveButton);
 
-        stepLogger.verification('"Planner Settings" page is closed');
+        StepLogger.verification('"Planner Settings" page is closed');
         await expect(await browser.getTitle()).not.toBe(PlannerSettingsPageConstants.plannerPage,
             ValidationsHelper.getNotDisplayedValidation(PlannerSettingsPageConstants.plannerPage));
 
-        stepLogger.verification('Planner Administration page is displayed');
+        StepLogger.verification('Planner Administration page is displayed');
         await expect(await browser.getTitle()).toBe(PlannerSettingsPageConstants.administration,
             ValidationsHelper.getPageDisplayedValidation(PlannerSettingsPageConstants.administration));
 
-        stepLogger.verification('Newly created Planner [Ex: Smoke Test Planner 1] is displayed in the list');
+        StepLogger.verification('Newly created Planner [Ex: Smoke Test Planner 1] is displayed in the list');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(name)))
             .toBe(true, ValidationsHelper.getRecordCreatedValidation([name]));
 
-        stepLogger.stepId(6);
-        stepLogger.step('Select "Navigation" icon  from left side menu');
-        stepLogger.step('Select Projects -> Projects from the options displayed');
+        StepLogger.stepId(6);
+        StepLogger.step('Select "Navigation" icon  from left side menu');
+        StepLogger.step('Select Projects -> Projects from the options displayed');
 
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.verification('Project Center page is displayed');
+        StepLogger.verification('Project Center page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
-        stepLogger.stepId(7);
-        stepLogger.step('Select the project created as per pre requisites [Ex: Smoke Test Project 2]');
+        StepLogger.stepId(7);
+        StepLogger.step('Select the project created as per pre requisites [Ex: Smoke Test Project 2]');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.project);
         const projectName = await ElementHelper.getText(CommonPage.project);
         await PageHelper.click(CommonPage.project);
 
-        stepLogger.step('Click on the ITEMS tab above the grid\n' +
+        StepLogger.step('Click on the ITEMS tab above the grid\n' +
             'From the ITEMS ribbon menu, click on Edit Plan');
         await PageHelper.click(CommonPage.editPlan);
 
-        stepLogger.verification('Select Planner pop-up displays with different planner options to select');
+        StepLogger.verification('Select Planner pop-up displays with different planner options to select');
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.selectPlanner));
 
-        stepLogger.verification('Newly created Planner [Ex: Smoke Test Planner 1] is displayed in the list');
+        StepLogger.verification('Newly created Planner [Ex: Smoke Test Planner 1] is displayed in the list');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(name)))
             .toBe(true, ValidationsHelper.getRecordCreatedValidation([name]));
         await PageHelper.switchToDefaultContent();
 
         if (navigatedTOCreatedPlanner === true) {
-            await this.navigatedTOCreatedPlanner(name, stepLogger, projectName );
+            await this.navigatedTOCreatedPlanner(name, projectName);
         }
     }
 
-    static async navigatedTOCreatedPlanner(name: string, stepLogger: StepLogger, projectName: string) {
+    static async navigatedTOCreatedPlanner(name: string, projectName: string) {
 
-        stepLogger.stepId(8);
-        stepLogger.step('Select the newly added planner [Ex: Smoke Test Planner 1] in Select Planner pop up');
+        StepLogger.stepId(8);
+        StepLogger.step('Select the newly added planner [Ex: Smoke Test Planner 1] in Select Planner pop up');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ElementHelper.getElementByText(name));
 
-        stepLogger.verification('Selected Project is opened using the Newly created Planner [Ex: Smoke Test Planner 1]');
+        StepLogger.verification('Selected Project is opened using the Newly created Planner [Ex: Smoke Test Planner 1]');
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
@@ -146,20 +146,20 @@ export class PlannerSettingsPageHelper {
         await expect(await browser.getTitle()).toContain(name,
             ValidationsHelper.getDisplayedValidation(name));
 
-        stepLogger.stepId(9);
-        stepLogger.step('Click Close button in Project Planner window [Ex: Smoke Test Planner 1]');
+        StepLogger.stepId(9);
+        StepLogger.step('Click Close button in Project Planner window [Ex: Smoke Test Planner 1]');
         await PageHelper.click(ProjectItemPage.close);
 
-        stepLogger.stepId(10);
-        stepLogger.step('Click on Leave button in the confirmation dialog');
+        StepLogger.stepId(10);
+        StepLogger.step('Click on Leave button in the confirmation dialog');
         await browser.switchTo().alert().accept();
 
-        stepLogger.verification('Project Planner window [Ex: Smoke Test Planner 1] is closed');
+        StepLogger.verification('Project Planner window [Ex: Smoke Test Planner 1] is closed');
         await WaitHelper.waitForElementToBeClickable(CommonPage.editPlan);
         await expect(await CommonPage.pageHeaders.projects.projectPlanner.isPresent()).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
-        stepLogger.verification('Project Center page is displayed');
+        StepLogger.verification('Project Center page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
     }

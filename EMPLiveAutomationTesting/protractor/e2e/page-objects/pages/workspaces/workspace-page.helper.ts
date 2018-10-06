@@ -13,121 +13,121 @@ import {browser} from 'protractor';
 
 export class WorkspacePageHelper {
 
-    static async createWorkspace(stepLogger: StepLogger) {
-        stepLogger.stepId(1);
-        stepLogger.step('Click on Workspaces icon from the left navigation panel');
+    static async createWorkspace() {
+        StepLogger.stepId(1);
+        StepLogger.step('Click on Workspaces icon from the left navigation panel');
         await PageHelper.click(CommonPage.sidebarMenus.workspaces);
-        stepLogger.stepId(2);
-        stepLogger.step(`Click on the 'New Workspace' button`);
+        StepLogger.stepId(2);
+        StepLogger.step(`Click on the 'New Workspace' button`);
         await ElementHelper.click(WorkSpacesPage.newWorkSpaceButton);
-        stepLogger.step('Waiting for page to open');
+        StepLogger.step('Waiting for page to open');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
-        stepLogger.verification(`'Create Workspace' pop-up displayed with the following details`);
+        StepLogger.verification(`'Create Workspace' pop-up displayed with the following details`);
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(WorkspacesConstants.windowTitle,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(WorkspacesConstants.windowTitle));
-        stepLogger.step('Switch to frame');
+        StepLogger.step('Switch to frame');
         await CommonPageHelper.switchToFirstContentFrame();
-        stepLogger.stepId(3);
-        stepLogger.step(`Select/Enter below details in 'Create Workspace' pop-up`);
-        stepLogger.step(`Enter a Title for work space`);
+        StepLogger.stepId(3);
+        StepLogger.step(`Select/Enter below details in 'Create Workspace' pop-up`);
+        StepLogger.step(`Enter a Title for work space`);
         const uniqueId = PageHelper.getUniqueId();
         const labels = WorkspacesConstants.inputLabels;
         const title = `${labels.title} ${uniqueId}`;
         await TextboxHelper.sendKeys(WorkSpacesPage.titleInputField, title);
-        stepLogger.step(`Enter a Description for work space`);
+        StepLogger.step(`Enter a Description for work space`);
         const description = `${labels.description} ${uniqueId}`;
         await TextboxHelper.sendKeys(WorkSpacesPage.descInputField, description);
-        stepLogger.step(`Select the radio button 'Open - Accessible and open to anyone who has permission to the parent site'`);
+        StepLogger.step(`Select the radio button 'Open - Accessible and open to anyone who has permission to the parent site'`);
         await ElementHelper.click(WorkSpacesPage.openPermission);
         await WaitHelper.waitForElementToBeDisplayed(WorkSpacesPage.projectTemplate);
-        stepLogger.step(`Select 'Project' as the 'Online' template`);
+        StepLogger.step(`Select 'Project' as the 'Online' template`);
         await ElementHelper.click(WorkSpacesPage.projectTemplate);
-        stepLogger.stepId(4);
-        stepLogger.step(`Click 'Create Workspace' button in 'Create Workspace' pop-up`);
+        StepLogger.stepId(4);
+        StepLogger.step(`Click 'Create Workspace' button in 'Create Workspace' pop-up`);
         await ElementHelper.click(WorkSpacesPage.createWorkSpaceButton);
-        stepLogger.verification(`'Create Workspace' pop-up is closed`);
+        StepLogger.verification(`'Create Workspace' pop-up is closed`);
         await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false, ValidationsHelper.getWindowShouldNotBeDisplayedValidation(WorkspacesConstants.windowTitle));
         await PageHelper.switchToDefaultContent();
-        stepLogger.verification(`Blue notification displayed briefly on the right top corner stating
+        StepLogger.verification(`Blue notification displayed briefly on the right top corner stating
         'Your workspace is being created - we will notify you once it is ready'`);
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementUsingText(WorkspacesConstants.notification, true)))
             .toBe(true, ValidationsHelper.getNotificationDisplayedValidation(WorkspacesConstants.notification));
         return title;
     }
 
-    static async verifyWorkpaceMenuPanelOptions(stepLogger: StepLogger) {
+    static async verifyWorkpaceMenuPanelOptions() {
         const option = WorkSpacesPage.workspacesMenuOptions;
         const optionName = WorkspacesConstants.workspacesMenuOptions;
-        stepLogger.verification(`verify "New workspace" option is displayed`);
+        StepLogger.verification(`verify "New workspace" option is displayed`);
         const newWorkspaceDisplayed = await PageHelper.isElementDisplayed(option.newWorkspace);
         await expect(newWorkspaceDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             optionName.newWorkspace));
 
-        stepLogger.verification(`verify "Favourite Workspaces" option is displayed`);
+        StepLogger.verification(`verify "Favourite Workspaces" option is displayed`);
         const favouriteWorkspacesDisplayed = await PageHelper.isElementDisplayed(option.favoriteWorkspaces);
         await expect(favouriteWorkspacesDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             optionName.favoriteWorkspaces));
 
-        stepLogger.verification(`verify "All Workspaces" option is displayed`);
+        StepLogger.verification(`verify "All Workspaces" option is displayed`);
         const AllWorkspacesDisplayed = await PageHelper.isElementDisplayed(option.allWorkspaces);
         await expect(AllWorkspacesDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             optionName.allWorkspaces));
     }
 
-    static async verifyWorkpaceListingInMenuPanel(stepLogger: StepLogger) {
-        stepLogger.verification(`verify all available Workspaces are listed`);
+    static async verifyWorkpaceListingInMenuPanel() {
+        StepLogger.verification(`verify all available Workspaces are listed`);
         const workspaceDisplayed = await PageHelper.isElementDisplayed(
             WorkSpacesPage.allWorkspaceListing);
         await expect(workspaceDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             WorkspacesConstants.workspaceListing));
     }
 
-    static async expandEllipsisAndSelectEditTeamOption(stepLogger: StepLogger) {
-        stepLogger.step('Mouse over on first listed workspace');
+    static async expandEllipsisAndSelectEditTeamOption() {
+        StepLogger.step('Mouse over on first listed workspace');
         await ElementHelper.actionHoverOver(WorkSpacesPage.allWorkspaceListing);
-        stepLogger.step(`expand ellipsis against any workspace listed `);
+        StepLogger.step(`expand ellipsis against any workspace listed `);
         await PageHelper.click(WorkSpacesPage.workspaceEllipsis);
-        stepLogger.step(`select "Edit Team" option`);
+        StepLogger.step(`select "Edit Team" option`);
         await PageHelper.click(WorkSpacesPage.contextMenu.editTeam);
     }
 
-    static async verifyEditTeamWindowOpened(stepLogger: StepLogger) {
-        stepLogger.step('Switch to default frame');
+    static async verifyEditTeamWindowOpened() {
+        StepLogger.step('Switch to default frame');
         await PageHelper.switchToDefaultContent();
-        stepLogger.verification(`verify "Edit Team" pop-up opened.`);
+        StepLogger.verification(`verify "Edit Team" pop-up opened.`);
         const editTeamDisplayed = await PageHelper.isElementDisplayed(
             WorkSpacesPage.editTeamPopupHeading);
         await expect(editTeamDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             WorkspacesConstants.editTeam));
     }
 
-    static async clickOnCloseButton(stepLogger: StepLogger) {
-        stepLogger.step('Switch to content frame');
+    static async clickOnCloseButton() {
+        StepLogger.step('Switch to content frame');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
-        stepLogger.step(`click on Close button`);
+        StepLogger.step(`click on Close button`);
         await PageHelper.click(CommonPage.ribbonItems.close);
     }
 
-    static async verifyEditTeamWindowClosed(stepLogger: StepLogger) {
-        stepLogger.verification('"Edit Team" window is closed');
+    static async verifyEditTeamWindowClosed() {
+        StepLogger.verification('"Edit Team" window is closed');
         await expect(await PageHelper.isElementPresent(CommonPage.ribbonItems.close, false))
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(
                     CommonPageConstants.ribbonLabels.close));
     }
 
-    static async validateLatestNotification(stepLogger: StepLogger, title: string) {
+    static async validateLatestNotification(title: string) {
         let maxAttempts = 0;
         let maxClickAttempts = 0;
         const modifiedTitle = title.replace('* ', '').replace(/-/g, '').replace(/_/g, '');
 
-        stepLogger.step('Title is ' + modifiedTitle);
+        StepLogger.step('Title is ' + modifiedTitle);
         // tslint:disable-next-line:max-line-length
 
         while (!((await CommonPage.latestNotification.getText()).includes(modifiedTitle)) && maxAttempts++ < 30) {
-            stepLogger.step(await CommonPage.latestNotification.getText());
+            StepLogger.step(await CommonPage.latestNotification.getText());
             await browser.refresh();
 
             await PageHelper.click(CommonPage.personIcon);
@@ -142,7 +142,7 @@ export class WorkspacePageHelper {
 
         }
 
-        stepLogger.verification(`Notification 'Your Workspace <Name of Workspace entered in step# 3> is now ready!'
+        StepLogger.verification(`Notification 'Your Workspace <Name of Workspace entered in step# 3> is now ready!'
         displayed in the pop down`);
         await CommonPageHelper.labelContainValidation(modifiedTitle);
     }

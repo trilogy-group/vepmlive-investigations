@@ -1,9 +1,9 @@
 export class ResourcePlannerConstants {
     static readonly department = 'Test department 1';
-    static readonly  title = 'Resource Planner - Project Mode';
+    static readonly title = 'Resource Planner - Project Mode';
     static readonly user = 'Ajay Suwalka';
     static readonly greenCheckImg = 'Mark should turn to a green check';
-    static readonly  privateCheckImg = 'Private Image is Displayed';
+    static readonly privateCheckImg = 'Private Image is Displayed';
 
     static get topSection() {
         return {
@@ -20,14 +20,16 @@ export class ResourcePlannerConstants {
 
         };
     }
+
     static get topGrid() {
         return {
             itemName: 'Item Name',
             department: 'Department',
             role: 'Role',
             comment: 'Comment',
-               };
+        };
     }
+
     static get buttonSection() {
         return {
             matchButton: 'MatchBtn',

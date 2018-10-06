@@ -13,64 +13,64 @@ import {IssueItemPageHelper} from '../../../../../page-objects/pages/items-page/
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Validate Edit Cost Functionality in Cost Planner - [783206]', async () => {
-        stepLogger.caseId = 783206;
-        const cost =  4;
+        StepLogger.caseId = 783206;
+        const cost = 4;
 
         const uniqueId = PageHelper.getUniqueId();
 
-        const  projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
-        stepLogger.stepId(1);
+        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId);
+        StepLogger.stepId(1);
 
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger,
+
             projectNameValue,
             ProjectItemPageConstants.columnNames.title);
 
-        await CommonPageHelper.clickItemTab(stepLogger);
+        await CommonPageHelper.clickItemTab();
 
-        await IssueItemPageHelper.validateContentOfItemTabIsDisabled(stepLogger);
+        await IssueItemPageHelper.validateContentOfItemTabIsDisabled();
 
-        stepLogger.stepId(2);
-        await EditCostHelper.validateEditCostIsDisabled(stepLogger);
+        StepLogger.stepId(2);
+        await EditCostHelper.validateEditCostIsDisabled();
 
-        stepLogger.stepId(3);
+        StepLogger.stepId(3);
 
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger,
+
             projectNameValue,
             ProjectItemPageConstants.columnNames.title);
 
-        await EditCostHelper.validateEditCostIsEnable(stepLogger);
+        await EditCostHelper.validateEditCostIsEnable();
 
-        stepLogger.stepId(4);
+        StepLogger.stepId(4);
 
-        await CommonPageHelper.editCostViaRibbon(stepLogger);
+        await CommonPageHelper.editCostViaRibbon();
 
         await CommonPageHelper.switchToFirstContentFrame();
 
-        await EditCostHelper.validateEditCostWebElements(stepLogger);
+        await EditCostHelper.validateEditCostWebElements();
 
-        stepLogger.stepId(5);
-        await EditCostHelper.validateCostCategoriesInEachTab(stepLogger);
+        StepLogger.stepId(5);
+        await EditCostHelper.validateCostCategoriesInEachTab();
 
-        stepLogger.stepId(6);
-        await EditCostHelper.clickBudgetTabCostsTab(stepLogger);
+        StepLogger.stepId(6);
+        await EditCostHelper.clickBudgetTabCostsTab();
 
-        await EditCostHelper.enterValueInVariousCategories(stepLogger, cost);
+        await EditCostHelper.enterValueInVariousCategories(cost);
 
-        await EditCostHelper.verifyValueInVariousCategories(stepLogger, cost);
+        await EditCostHelper.verifyValueInVariousCategories(cost);
     });
 });

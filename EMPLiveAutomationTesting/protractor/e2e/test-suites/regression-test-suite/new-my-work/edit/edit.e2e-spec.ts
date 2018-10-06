@@ -10,35 +10,35 @@ import {MyWorkPageHelper} from '../../../../page-objects/pages/my-workplace/my-w
 
 describe(SuiteNames.endToEndSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
     it('Edit page via Edit page option. - [745079]', async () => {
-        stepLogger.caseId = 745079;
+        StepLogger.caseId = 745079;
         const pageHeader = CommonPage.pageHeaders;
         const pageHeaderName = CommonPageConstants.pageHeaders.myWorkplace;
 
-        stepLogger.stepId(1);
+        StepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(MyWorkplacePage.navigation.myWork,
-            pageHeader.myWorkplace.myWork, pageHeaderName.myWork, stepLogger);
-        await MyWorkPageHelper.verifyMyWorkPageDisplayed(stepLogger);
+            pageHeader.myWorkplace.myWork, pageHeaderName.myWork);
+        await MyWorkPageHelper.verifyMyWorkPageDisplayed();
 
-        stepLogger.stepId(2);
-        await MyWorkPageHelper.clickOnPageTab(stepLogger);
-        await MyWorkPageHelper.verifyPageTabIsSelected(stepLogger );
+        StepLogger.stepId(2);
+        await MyWorkPageHelper.clickOnPageTab();
+        await MyWorkPageHelper.verifyPageTabIsSelected();
 
-        stepLogger.stepId(3);
-        await MyWorkPageHelper.expandEditPageDropdown(stepLogger);
-        await MyWorkPageHelper.verifyEditPageDropdownOptions(stepLogger);
+        StepLogger.stepId(3);
+        await MyWorkPageHelper.expandEditPageDropdown();
+        await MyWorkPageHelper.verifyEditPageDropdownOptions();
 
-        stepLogger.stepId(4);
-        await MyWorkPageHelper.clickOnEditPageMenuOption(stepLogger);
-        await MyWorkPageHelper.verifyEditPageOpened(stepLogger);
+        StepLogger.stepId(4);
+        await MyWorkPageHelper.clickOnEditPageMenuOption();
+        await MyWorkPageHelper.verifyEditPageOpened();
 
     });
 });

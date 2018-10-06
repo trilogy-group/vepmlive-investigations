@@ -265,9 +265,11 @@ export class CommonPage extends BasePage {
     static get timeZone() {
         return element(By.css('[name*="TimeZone"][disabled]'));
     }
+
     static get iconEllipsisHorizontal() {
         return element(By.xpath('//*[@class="GMSection"]//*[@class="icon-ellipsis-horizontal"]'));
     }
+
     static get selectorForRecordsWithGreenTick() {
         return `${this.selectorForRecordsWithoutGreenTick}//img[contains(@src,"green") or contains(@src,"checkmark")]`;
     }
@@ -546,6 +548,18 @@ export class CommonPage extends BasePage {
         return element.all(By.className('EPMLiveNotificationTitle')).get(0);
     }
 
+    static get modelerButton() {
+        return CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.modeler);
+    }
+
+    static get gridDetails() {
+        const gridLabels = CommonPageConstants.gridDetails;
+        return {
+            editField: element(By.css(`.${gridLabels.editTitle}`)),
+            scroll: element(By.css(`.${gridLabels.scroll}`)),
+        };
+    }
+
     static getDropDownByParameterNameXpath(name: string) {
         return `//*[@data-parametername="${name}"]//select`;
     }
@@ -567,20 +581,8 @@ export class CommonPage extends BasePage {
         return element.all(By.xpath(`(${this.selectorForRecordsWithoutGreenTick}//td[contains(@class,'GMCellPanel')])`)).get(index);
     }
 
-    static get modelerButton() {
-        return CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.modeler);
-    }
-
     static getGridRowByTitle(titleName: string) {
         return element(By.xpath(`//td[contains(@class,"${CommonPageConstants.gridDetails.title}")]//a[text()="${titleName}"]`));
-    }
-
-    static get gridDetails() {
-        const gridLabels = CommonPageConstants.gridDetails;
-        return {
-            editField: element(By.css(`.${gridLabels.editTitle}`)),
-            scroll: element(By.css(`.${gridLabels.scroll}`)),
-        };
     }
 
     static getOptionsUnderUserManagement(option: string) {

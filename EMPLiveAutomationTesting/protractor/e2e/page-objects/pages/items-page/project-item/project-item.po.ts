@@ -240,7 +240,7 @@ export class ProjectItemPage extends BasePage {
 
     static get linkTypeDropDownId() {
         return element(By.id(`slctAddLinkType`));
-}
+    }
 
     static get lagTimeTextBox() {
         return element(By.id(`txtAddLinkLag`));
@@ -268,12 +268,6 @@ export class ProjectItemPage extends BasePage {
 
     static get title() {
         return element(By.xpath('//*[@id="ResourceGrid"]//*[.="Title"]'));
-    }
-
-    static async getUserCheckBoxForTeamType(teamType: string, userName: string) {
-        const xpathForUser = `//td[normalize-space(@id)="${teamType}"]//a[normalize-space(text())="${userName}"]
-        //parent::td//parent::tr/td[contains(@class,"GMCellPanel")]`;
-        return element(By.xpath(xpathForUser));
     }
 
     static get itemOptions() {
@@ -377,10 +371,18 @@ export class ProjectItemPage extends BasePage {
     static get cancelButton() {
         return element(By.css('#addlinkdiv [value="Cancel"]'));
     }
+
     static get noProjecrMsg() {
         return ElementHelper.getElementByText(ProjectItemPageConstants.noDataFound);
     }
+
     static get clickProjectLink() {
         return CommonPage.getNthProject(2);
+    }
+
+    static async getUserCheckBoxForTeamType(teamType: string, userName: string) {
+        const xpathForUser = `//td[normalize-space(@id)="${teamType}"]//a[normalize-space(text())="${userName}"]
+        //parent::td//parent::tr/td[contains(@class,"GMCellPanel")]`;
+        return element(By.xpath(xpathForUser));
     }
 }

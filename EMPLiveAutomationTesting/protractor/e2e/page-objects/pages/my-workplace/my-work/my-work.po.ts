@@ -59,26 +59,6 @@ export class MyWorkPage {
         };
     }
 
-    static menuItem(option: string) {
-        return element(By.css(`[id*='${option}']`));
-    }
-
-    static dialogWindowTitle(title: string) {
-        return CommonPageHelper.getElementByTitle(`${title}`);
-    }
-
-    static getInputByTitle(text: string) {
-        return element(By.css(`input[title*='${text}']`));
-    }
-
-    static selectValueFromSuggestions(text: string) {
-        return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(text)}]`));
-    }
-
-    static selectDropdownOption(option: string) {
-        return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(option)}]`));
-    }
-
     static get editPageDropdown() {
         const idXpath = `//*[contains(@id,'${MyWorkPageConstants.edit}')]`;
         const anchorXpath = `//a[contains(@class,'${HtmlHelper.attributeValue.dropdown}')]`;
@@ -105,7 +85,7 @@ export class MyWorkPage {
 
     static get selectRibbonTabs() {
         const tabNames = MyWorkPageConstants.ribbonTabs;
-        return{
+        return {
             page: this.getLinkByTitle(tabNames.page),
             hide: this.getLinkByTitle(tabNames.hide),
             manage: this.getLinkByTitle(tabNames.manage),
@@ -115,7 +95,7 @@ export class MyWorkPage {
 
     static get getViewRibbonOptions() {
         const viewRibbonlabel = MyWorkPageConstants.viewRibbonOptions;
-        return{
+        return {
             saveView: AnchorHelper.getAnchorById(viewRibbonlabel.saveView),
             renameView: AnchorHelper.getAnchorById(viewRibbonlabel.renameView),
             deleteView: AnchorHelper.getAnchorById(viewRibbonlabel.deleteView),
@@ -130,7 +110,7 @@ export class MyWorkPage {
 
     static get viewsPopup() {
         const viewPopuplabel = MyWorkPageConstants.viewsPopUp;
-        return{
+        return {
             title: AnchorHelper.getItemById(viewPopuplabel.title),
             name: this.saveViewElements(viewPopuplabel.name),
             defaultView: this.saveViewElements(viewPopuplabel.defaultView),
@@ -145,20 +125,8 @@ export class MyWorkPage {
         return element(By.css('.ms-cui-dd-text>a'));
     }
 
-    static getLinkByTitle(text: string) {
-        return element(By.css(`[title='${text}']`));
-    }
-
-    static saveViewElements(idOrAny: string) {
-        return element(By.xpath(`//div[@class='ms-dlgBorder']//input[@*="${idOrAny}"]`));
-    }
-
     static get stopEditing() {
         return element(By.xpath('//li[@id= "Ribbon.WebPartPage.Edit"]//a[1]'));
-    }
-
-    static getItemByName(itemName: string) {
-        return element(By.xpath(`//td[contains(@class,"EPMLiveMyWorkTitle")] //a[text()="${itemName}"]`));
     }
 
     static get validationMessage() {
@@ -194,9 +162,9 @@ export class MyWorkPage {
         const commentsPopUpLabels = MyWorkPageConstants.commentsPopupDetails;
         const commentLinksSection = `table.customCommentItem .socialcomment-cmdlink>a`;
         const editCommentSection = `.commentsContainer .ms-socialCommentLoading`;
-        return{
+        return {
             cc: element(By.name(commentsPopUpLabels.cc)),
-            commentTextArea : element(By.id(commentsPopUpLabels.commentTextArea)),
+            commentTextArea: element(By.id(commentsPopUpLabels.commentTextArea)),
             post: element(By.id(commentsPopUpLabels.post)),
             edit: element(By.css(`${commentLinksSection}:first-child`)),
             delete: element(By.css(`${commentLinksSection}:last-child`)),
@@ -206,25 +174,8 @@ export class MyWorkPage {
         };
     }
 
-    static getCommentByName(commentName: string) {
-        return element(By.xpath(`//div[@class="socialcomment-contents-TRC"  and text()="${commentName}"]`));
-    }
-
-    static getCurrentViewByName(viewName: string) {
-        return element(By.xpath(`//a[@role="button"] //span[text()="${viewName}"]`));
-    }
-
     static get selectViewNameOtherThanDefault() {
         return element(By.xpath('//div[text()="Personal Views"]/following-sibling::ul[1]'));
-    }
-
-    static getColumnSelectedOnSelectColumnsPopup(column: string) {
-        const columnChecked = CommonPageConstants.selectColumnsPopup.columnChecked;
-        return element(By.xpath(`//div[contains(@class, "${columnChecked}")]/div[text()='${column}']`));
-    }
-
-    static columnDisplayed(column: string) {
-        return element(By.xpath(`//td[contains(@class,"GMHeaderText") and (text()='${column}')]`));
     }
 
     static get headerOptions() {
@@ -290,6 +241,55 @@ export class MyWorkPage {
     static get newlyCreatedView() {
         const workSummary = MyWorkPageConstants.workSummaryLabel;
         return element(By.xpath(`//span[text()="${workSummary}"]/ancestor::li[1]/following-sibling::li[1]//span[@class="ms-cui-ctl-mediumlabel"]`));
+    }
+
+    static menuItem(option: string) {
+        return element(By.css(`[id*='${option}']`));
+    }
+
+    static dialogWindowTitle(title: string) {
+        return CommonPageHelper.getElementByTitle(`${title}`);
+    }
+
+    static getInputByTitle(text: string) {
+        return element(By.css(`input[title*='${text}']`));
+    }
+
+    static selectValueFromSuggestions(text: string) {
+        return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(text)}]`));
+    }
+
+    static selectDropdownOption(option: string) {
+        return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(option)}]`));
+    }
+
+    static getLinkByTitle(text: string) {
+        return element(By.css(`[title='${text}']`));
+    }
+
+    static saveViewElements(idOrAny: string) {
+        return element(By.xpath(`//div[@class='ms-dlgBorder']//input[@*="${idOrAny}"]`));
+    }
+
+    static getItemByName(itemName: string) {
+        return element(By.xpath(`//td[contains(@class,"EPMLiveMyWorkTitle")] //a[text()="${itemName}"]`));
+    }
+
+    static getCommentByName(commentName: string) {
+        return element(By.xpath(`//div[@class="socialcomment-contents-TRC"  and text()="${commentName}"]`));
+    }
+
+    static getCurrentViewByName(viewName: string) {
+        return element(By.xpath(`//a[@role="button"] //span[text()="${viewName}"]`));
+    }
+
+    static getColumnSelectedOnSelectColumnsPopup(column: string) {
+        const columnChecked = CommonPageConstants.selectColumnsPopup.columnChecked;
+        return element(By.xpath(`//div[contains(@class, "${columnChecked}")]/div[text()='${column}']`));
+    }
+
+    static columnDisplayed(column: string) {
+        return element(By.xpath(`//td[contains(@class,"GMHeaderText") and (text()='${column}')]`));
     }
 
     static getColumnByNameOnSelectColumnsPopup(columnName: string) {

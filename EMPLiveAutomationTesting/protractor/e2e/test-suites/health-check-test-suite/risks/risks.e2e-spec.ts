@@ -6,20 +6,25 @@ import {RiskItemPageHelper} from '../../../page-objects/pages/items-page/risk-it
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
+
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Add, Edit and Delete Risk- [829719]', async () => {
-        stepLogger.caseId = 829719;
-        stepLogger.stepId(1);
-        let titleValue = await RiskItemPageHelper.createRiskAndValidateIt(stepLogger);
+        StepLogger.caseId = 829719;
+        StepLogger.stepId(1);
+        let titleValue = await RiskItemPageHelper.createRiskAndValidateIt();
 
-        titleValue = await RiskItemPageHelper.editRiskAndValidateIt(stepLogger, titleValue);
+        titleValue = await RiskItemPageHelper.editRiskAndValidateIt(titleValue);
 
-        await RiskItemPageHelper.deleteRiskAndValidateIt(stepLogger, titleValue);
+        await RiskItemPageHelper.deleteRiskAndValidateIt(titleValue);
     });
 });

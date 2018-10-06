@@ -17,114 +17,118 @@ import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
-    let stepLogger: StepLogger;
+
     beforeEach(async () => {
-        stepLogger = new StepLogger();
+
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('View the Build Team-Current team members in Project Planner - [743198]', async () => {
-        stepLogger.caseId = 743198;
+        StepLogger.caseId = 743198;
         const uniqueId = PageHelper.getUniqueId();
-        stepLogger.stepId(1);
-        stepLogger.step('Select "Navigation" icon  from left side menu');
-        stepLogger.step('Select Projects -> Projects from the options displayed');
+        StepLogger.stepId(1);
+        StepLogger.step('Select "Navigation" icon  from left side menu');
+        StepLogger.step('Select Projects -> Projects from the options displayed');
         // Step #1 and #2 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.step('Select check-box for any Project');
+        StepLogger.step('Select check-box for any Project');
         await PageHelper.click(CommonPage.record);
 
-        stepLogger.step('Click on "Items" tab');
+        StepLogger.step('Click on "Items" tab');
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
-        stepLogger.step('Click on "Edit Team" icon from ribbon panel');
+        StepLogger.step('Click on "Edit Team" icon from ribbon panel');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
-        stepLogger.verification('"Edit Team" window is displayed');
+        StepLogger.verification('"Edit Team" window is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        await CommonPageHelper.switchToContentFrame(stepLogger);
+        await CommonPageHelper.switchToContentFrame();
 
-        stepLogger.step('Select check-box for any of the resources displayed in "Resource Pool" (Right side)');
+        StepLogger.step('Select check-box for any of the resources displayed in "Resource Pool" (Right side)');
         await PageHelper.click(ProjectItemPage.teamRecords.resourcePool.first());
         const selectedResourcePoolResourceName = await ProjectItemPage.teamRecordsName.resourcePool.first().getText();
 
-        stepLogger.step('Click on "< Add" button');
+        StepLogger.step('Click on "< Add" button');
         await PageHelper.click(ProjectItemPage.teamChangeButtons.add);
 
-        stepLogger.verification('Selected resource [Ex: Generic Resource 1] is added to "Current Team" (Left Side) grid');
+        StepLogger.verification('Selected resource [Ex: Generic Resource 1] is added to "Current Team" (Left Side) grid');
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
             .toBe(true,
                 ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
-        stepLogger.stepId(2);
-        stepLogger.step('Click on "Save & Close" button in "Edit Team" window');
+        StepLogger.stepId(2);
+        StepLogger.step('Click on "Save & Close" button in "Edit Team" window');
         await WaitHelper.waitForElementToBeClickable(CommonPage.ribbonItems.saveAndClose);
         await PageHelper.click(CommonPage.ribbonItems.saveAndClose);
 
-        stepLogger.step('switch to default content');
+        StepLogger.step('switch to default content');
         await PageHelper.switchToDefaultContent();
 
-        stepLogger.stepId(3);
-        stepLogger.step('Navigate to Project Center');
+        StepLogger.stepId(3);
+        StepLogger.step('Navigate to Project Center');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        );
 
-        stepLogger.stepId(4);
-        stepLogger.step('Mouse hover on any Project created as per pre requisites');
+        StepLogger.stepId(4);
+        StepLogger.step('Mouse hover on any Project created as per pre requisites');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.record);
         await ElementHelper.actionHoverOver(CommonPage.record);
 
-        stepLogger.step('Click on the Ellipses button (...)');
+        StepLogger.step('Click on the Ellipses button (...)');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ellipse);
         await PageHelper.click(CommonPage.ellipse);
 
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.contextMenuOptions.editPlan);
-        stepLogger.step('select "Edit Plan" from the options displayed');
+        StepLogger.step('select "Edit Plan" from the options displayed');
         await PageHelper.click(CommonPage.contextMenuOptions.editPlan);
 
-        stepLogger.stepId(5);
-        stepLogger.step('click on Project Planner');
+        StepLogger.stepId(5);
+        StepLogger.step('click on Project Planner');
 
         // If user has default planner selected then then selectPlanner PopUp won't appear
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
 
-        stepLogger.verification('Observe that the "Project Planner" is displayed');
-        stepLogger.verification('"Project Planner" window is displayed');
+        StepLogger.verification('Observe that the "Project Planner" is displayed');
+        StepLogger.verification('"Project Planner" window is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
-        stepLogger.stepId(6);
-        stepLogger.step('Enter New Task in the "Add a Task"');
+        StepLogger.stepId(6);
+        StepLogger.step('Enter New Task in the "Add a Task"');
         await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.newTask);
         await TextboxHelper.sendKeys(ProjectItemPage.newTask, uniqueId, true);
 
-        stepLogger.step('click on "Edit Team" button');
+        StepLogger.step('click on "Edit Team" button');
         await WaitHelper.waitForElementToBeClickable(CommonPage.ribbonItems.editTeamProjectPlanner);
         await PageHelper.click(CommonPage.ribbonItems.editTeamProjectPlanner);
 
-        stepLogger.verification('"Edit Team" window is displayed');
+        StepLogger.verification('"Edit Team" window is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
-        await CommonPageHelper.switchToContentFrame(stepLogger);
+        await CommonPageHelper.switchToContentFrame();
 
-        stepLogger.verification('Observe that the newly added "Resource" is displayed');
+        StepLogger.verification('Observe that the newly added "Resource" is displayed');
         await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.first());
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
             .toBe(true,
