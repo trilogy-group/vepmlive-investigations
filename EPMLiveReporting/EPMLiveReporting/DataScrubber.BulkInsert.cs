@@ -175,7 +175,7 @@ namespace EPMLiveReportsAdmin
                         using (var sqlBulkCopy = new SqlBulkCopy(epmData.GetEPMLiveConnection, new SqlBulkCopyOptions(), beginTransaction))
                         {
                             sqlBulkCopy.DestinationTableName = FrfTableName;
-                            void addColumnMappings(string columnName) => sqlBulkCopy.ColumnMappings.Add(columnName, columnName);
+                            Action<string> addColumnMappings = (columnName) => sqlBulkCopy.ColumnMappings.Add(columnName, columnName);
 
                             addColumnMappings(FrfId);
                             addColumnMappings(SiteId1);
