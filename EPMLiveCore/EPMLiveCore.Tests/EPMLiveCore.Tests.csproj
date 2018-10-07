@@ -231,6 +231,7 @@
     <Compile Include="ReportHelper\EPMDataTest.Part2.cs" />
     <Compile Include="ReportHelper\ListBizTest.cs" />
     <Compile Include="ReportHelper\MyWorkReportDataTest.cs" />
+    <Compile Include="ReportingDataTest.cs" />
     <Compile Include="RequestWorkspaceTest.cs" />
     <Compile Include="NewProjectTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
