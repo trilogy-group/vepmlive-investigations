@@ -6432,37 +6432,7 @@ namespace EPMLiveWebParts
         }
 
         #endregion
-
-        #region Method Call : (ApplyGanttStyles) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_GridData_ApplyGanttStyles_Method_Call_Void_With_2_Parameters_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            var item = CreateType<DataRow>();
-            var type = CreateType<string>();
-            var methodApplyGanttStylesPrametersTypes = new Type[] { typeof(DataRow), typeof(string) };
-            object[] parametersOfApplyGanttStyles = { item, type };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodApplyGanttStyles, methodApplyGanttStylesPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_gridDataInstanceFixture, parametersOfApplyGanttStyles);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfApplyGanttStyles.ShouldNotBeNull();
-            parametersOfApplyGanttStyles.Length.ShouldBe(2);
-            methodApplyGanttStylesPrametersTypes.Length.ShouldBe(2);
-            methodApplyGanttStylesPrametersTypes.Length.ShouldBe(parametersOfApplyGanttStyles.Length);
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (ApplyGanttStyles) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -7057,33 +7027,7 @@ namespace EPMLiveWebParts
         }
 
         #endregion
-
-        #region Method Call : (InitViewFieldNames) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_GridData_InitViewFieldNames_Method_Call_Void_With_No_Parameters_Call_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodInitViewFieldNamesPrametersTypes = null;
-            object[] parametersOfInitViewFieldNames = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodInitViewFieldNames, methodInitViewFieldNamesPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_gridDataInstanceFixture, parametersOfInitViewFieldNames);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfInitViewFieldNames.ShouldBeNull();
-            methodInitViewFieldNamesPrametersTypes.ShouldBeNull();
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (InitViewFieldNames) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
