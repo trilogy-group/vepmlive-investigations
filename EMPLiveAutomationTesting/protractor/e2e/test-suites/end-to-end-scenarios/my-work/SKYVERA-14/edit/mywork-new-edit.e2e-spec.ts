@@ -108,4 +108,54 @@ describe(SuiteNames.endToEndSuite, () => {
         await MyWorkPageHelper.clickCancelButton();
         await MyWorkPageHelper.verifyPopupClosed();
     });
+
+    it('Create New "To Do" Item. - [745088]', async () => {
+        StepLogger.stepId(2);
+        StepLogger.step(`Click on "Manage" tab and Expand the "New Item" drop-down.`);
+        await MyWorkPageHelper.clickOnManageTab();
+        await MyWorkPageHelper.expandNewItem();
+
+        StepLogger.verification(`Dropdown with various menu should be displayed.`);
+        await MyWorkPageHelper.newItemsDropdownDisplayed();
+
+        StepLogger.stepId(3);
+        StepLogger.step(`Click on "To Do Item".`);
+        await MyWorkPageHelper.clickToDoItem();
+        StepLogger.verification(`Verify that the new pop-up should open.`);
+        await  MyWorkPageHelper.verifyToDoNewItemPopupDisplayed();
+
+        StepLogger.stepId(4);
+        StepLogger.step(`Populate the necessary fields, Enter resource name in "Assigned To" field(for e.g. Administrator.) Click on "Save" button. `);
+        const todoTitle = await MyWorkPageHelper.fillNewItemFormForTodo();
+        StepLogger.verification(`Verify that the new item should be created successfully
+        and should get display in the grid [In case if created item is assigned to logged in user].`);
+        await MyWorkPageHelper.verifyToDoCreateItem(todoTitle);
+
+    });
+
+    // Jira References - SKYVERA-14
+    fit('Create New "Time-Offs" Item. - [745087]', async () => {
+        StepLogger.stepId(2);
+        StepLogger.step(`Click on "Manage" tab.`);
+        await MyWorkPageHelper.clickOnManageTab();
+        StepLogger.verification(`Manage tab should be displayed.`);
+        await  MyWorkPageHelper.verifyManageTabDisplayed();
+
+        StepLogger.stepId(3);
+        StepLogger.step(`Expand the "New Item" drop-down, Click on "Time-Offs Item`);
+        await MyWorkPageHelper.expandNewItem();
+        await  MyWorkPageHelper.clickTimeOffItem();
+
+        StepLogger.verification(`Verify that the new pop-up should open.`);
+        await  MyWorkPageHelper.verifyTimeOffNewItemPopupDisplayed();
+
+        StepLogger.stepId(4);
+        StepLogger.step(`Populate the necessary fields, Enter resource name in "Assigned To" field(for e.g. Administrator.)Click on "Save" button.`);
+        const title = await MyWorkPageHelper.fillNewItemFormForTimeoff();
+
+        StepLogger.verification(`Verify that the new item should be created successfully.`);
+        await MyWorkPageHelper.verifyToDoCreateItem(title);
+
+    });
+
 });

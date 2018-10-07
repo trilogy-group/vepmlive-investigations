@@ -15,6 +15,11 @@ import {MyWorkplacePage} from '../my-workplace.po';
 import {browser} from 'protractor';
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
+import {ToDoPageConstants} from '../to-do/to-do-page.constants';
+import {ToDoPageHelper} from '../to-do/to-do-page.helper';
+import {TextComponentSelectors} from '../../../../components/component-types/text-component/text-component-selectors';
+import {MyTimeOffPageHelper} from '../my-time-off/my-time-off-page.helper';
+import {MyTimeOffPageConstants} from '../my-time-off/my-time-off-page.constants';
 
 export class MyWorkPageHelper {
 
@@ -228,6 +233,29 @@ export class MyWorkPageHelper {
         return await MyWorkPageHelper.fillNewItemForm(MyWorkPageConstants.newItemTypeLabels.issues);
     }
 
+    static async fillNewItemFormForTimeoff() {
+        await CommonPageHelper.switchToFirstContentFrame();
+        const uniqueId = PageHelper.getUniqueId();
+        const labels = MyTimeOffPageConstants.inputLabels;
+        const input = MyTimeOffPageConstants.inputValues;
+        const title = `${labels.title} ${uniqueId}`;
+        const timeOffType = MyTimeOffPageConstants.timeOffTypes.holiday;
+        const requestor = input.requestorValue;
+        const startDate = input.startDate;
+        const finishDate = input.finishDate;
+        MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate);
+        return title;
+    }
+
+    static async fillNewItemFormForTodo() {
+        const uniqueId = PageHelper.getUniqueId();
+        const itemTitle = `ToDo ${uniqueId}`;
+        await CommonPageHelper.switchToFirstContentFrame();
+        await TextboxHelper.sendKeys(MyWorkPage.inputs.title, itemTitle);
+        await this.clickSaveButton();
+        return itemTitle;
+    }
+
     static async fillNewItemForm(itemType: string) {
         StepLogger.step('Populate the necessary fields. Enter resource name in "Assigned To"' +
             ' field(for e.g. Administrator.) Click on "Save" button.');
@@ -237,7 +265,7 @@ export class MyWorkPageHelper {
         await TextboxHelper.sendKeys(MyWorkPage.inputs.title, itemTitle);
         await PageHelper.click(MyWorkPage.dropdownAll.project);
         await PageHelper.click(MyWorkPage.inputs.project);
-        const assignedTo = `${MyWorkPageConstants.adMembersLabel}${LoginPageHelper.adminEmailId}`;
+        const assignedTo = `${MyWorkPageConstants.administrator}`;
         await TextboxHelper.sendKeys(MyWorkPage.inputs.assignedTo, assignedTo);
         await PageHelper.click(MyWorkPage.assignedToSuggestions);
         await this.clickSaveButton();
@@ -260,6 +288,18 @@ export class MyWorkPageHelper {
         );
     }
 
+    static async verifyToDoCreateItem(itemTitle: string) {
+        await browser.sleep(PageHelper.timeout.s);
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.toDo,
+            CommonPage.pageHeaders.myWorkplace.toDo,
+            CommonPageConstants.pageHeaders.myWorkplace.toDo,
+        );
+        await ExpectationHelper.verifyElementPresentStatus(
+            TextComponentSelectors.getItemByText(itemTitle), itemTitle
+        );
+    }
+
     static async goToDoNewItem() {
         StepLogger.step('Expand the "New Item < ToDo Item" drop-down.');
         await PageHelper.click(MyWorkPage.newItem);
@@ -273,6 +313,26 @@ export class MyWorkPageHelper {
             toDoPopup,
             MyWorkPageConstants.pageName.toDo,
         );
+    }
+
+    static async verifyTimeOffNewItemPopupDisplayed() {
+        const toDoPopup = `${MyWorkPageConstants.newItemTypeLabels.timeOff} ${MyWorkPageConstants.newItemPopupLabel}`;
+        await ExpectationHelper.verifyText(
+            MyWorkPage.inputs.heading,
+            toDoPopup,
+            MyWorkPageConstants.pageName.timeOff,
+        );
+    }
+
+    static async fillToToDeatilsAndSave() {
+        const uniqueId = PageHelper.getUniqueId();
+        const labels = ToDoPageConstants.inputLabels;
+        const title = `${labels.title} ${uniqueId}`;
+        const status = CommonPageConstants.statuses.notStarted;
+        const description = `${labels.description} ${uniqueId}`;
+        // step#3 is inside this function
+        await ToDoPageHelper.fillFormAndSave(title, status, description);
+
     }
 
     static async verifyTitleValidationMessage() {
@@ -334,6 +394,16 @@ export class MyWorkPageHelper {
     static async clickRisksItem() {
         StepLogger.step('Click on "Risks Item"');
         await PageHelper.click(MyWorkPage.newItemMenu.risksItem);
+    }
+
+    static async clickToDoItem() {
+        StepLogger.step('Click on "To-Do Item"');
+        await PageHelper.click(MyWorkPage.newItemMenu.toDoItem);
+    }
+
+    static async clickTimeOffItem() {
+        StepLogger.step('Click on "To-Do Item"');
+        await PageHelper.click(MyWorkPage.newItemMenu.timeOffItem);
     }
 
     static async clickOnAnyCreatedItem() {
