@@ -134,7 +134,7 @@ describe(SuiteNames.endToEndSuite, () => {
     });
 
     // Jira References - SKYVERA-14
-    fit('Create New "Time-Offs" Item. - [745087]', async () => {
+    it('Create New "Time-Offs" Item. - [745087]', async () => {
         StepLogger.stepId(2);
         StepLogger.step(`Click on "Manage" tab.`);
         await MyWorkPageHelper.clickOnManageTab();
