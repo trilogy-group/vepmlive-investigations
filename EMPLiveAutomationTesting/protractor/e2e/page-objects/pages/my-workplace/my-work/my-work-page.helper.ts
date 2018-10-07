@@ -115,6 +115,14 @@ export class MyWorkPageHelper {
         await PageHelper.click(MyWorkPage.editPageDropdown);
     }
 
+    static  async verifyStopEditingOptionDisabled() {
+        StepLogger.verification(`verify "Stop Editing" option is shown as disabled`);
+        const stopEditingDisplayed = await PageHelper.isElementDisplayed(
+            MyWorkPage.disabledStopEditingOption);
+        await expect(stopEditingDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
+            MyWorkPageConstants.editPageActions.stopEditing));
+    }
+
     static async verifyEditPageDropdownOptions() {
         StepLogger.verification(`verify "Edit Page" option is shown`);
         const editPageDisplayed = await PageHelper.isElementDisplayed(
@@ -122,11 +130,7 @@ export class MyWorkPageHelper {
         await expect(editPageDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             MyWorkPageConstants.editPageActions.editPage));
 
-        StepLogger.verification(`verify "Stop Editing" option is shown as disabled`);
-        const stopEditingDisplayed = await PageHelper.isElementDisplayed(
-            MyWorkPage.disabledStopEditingOption);
-        await expect(stopEditingDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
-            MyWorkPageConstants.editPageActions.stopEditing));
+        this.verifyStopEditingOptionDisabled();
     }
 
     static async clickOnEditPageMenuOption() {

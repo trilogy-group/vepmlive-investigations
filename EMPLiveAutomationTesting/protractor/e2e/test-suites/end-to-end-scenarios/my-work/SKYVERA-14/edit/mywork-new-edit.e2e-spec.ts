@@ -158,4 +158,28 @@ describe(SuiteNames.endToEndSuite, () => {
 
     });
 
+    // Jira References - SKYVERA-14
+    it('Edit page via Edit page option. - [745079]', async () => {
+        StepLogger.caseId = 745079;
+        StepLogger.stepId(2);
+        StepLogger.step(`Click on "Page" tab.`);
+        await MyWorkPageHelper.clickOnPageTab();
+
+        StepLogger.verification(`Page tab should be opened.`);
+        await MyWorkPageHelper.verifyPageTabIsSelected();
+
+        StepLogger.stepId(3);
+        StepLogger.step(`Expand the "Edit page" drop-down.`);
+        await MyWorkPageHelper.expandEditPageDropdown();
+        StepLogger.verification(`Verify that "Stop-editing" option should be disabled.`);
+        await  MyWorkPageHelper.verifyStopEditingOptionDisabled();
+
+        StepLogger.stepId(4);
+        StepLogger.step(`Click on "Edit page" option`);
+        await MyWorkPageHelper.clickOnEditItem();
+
+        StepLogger.verification(`The page should be editable mode. `);
+        await  MyWorkPageHelper.verifyEditPageOpened();
+    });
+
 });
