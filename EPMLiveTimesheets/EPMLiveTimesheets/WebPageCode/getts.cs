@@ -35,8 +35,8 @@ namespace TimeSheets
         private const string Two = "2";
         XmlDocument docXml = new XmlDocument();
         XmlNode ndMainParent;
-        protected string data = "";
-        private string period = "";
+        protected string data = string.Empty;
+        private string period = string.Empty;
         private DateTime periodStart;
         private DateTime periodEnd;
         private DataSet dsTimesheets;
@@ -92,7 +92,7 @@ namespace TimeSheets
 
                 string resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL", true, false);
                 SPWeb resWeb = null;
-                if (resUrl != "")
+                if (resUrl != string.Empty)
                 {
                     if (resUrl.ToLower() != web.Url.ToLower())
                     {
@@ -124,163 +124,134 @@ namespace TimeSheets
 
         private void addHeader(SPWeb curWeb)
         {
-            XmlNode ndHead = docXml.CreateNode(XmlNodeType.Element, "head", docXml.NamespaceURI);
+            var ndHead = docXml.CreateNode(XmlNodeType.Element, "head", docXml.NamespaceURI);
             docXml.ChildNodes[0].AppendChild(ndHead);
             ndBeforeInit = docXml.CreateNode(XmlNodeType.Element, "beforeInit", docXml.NamespaceURI);
             ndHead.AppendChild(ndBeforeInit);
-            XmlNode afterInitNode = docXml.CreateNode(XmlNodeType.Element, "afterInit", docXml.NamespaceURI);
+            var afterInitNode = docXml.CreateNode(XmlNodeType.Element, "afterInit", docXml.NamespaceURI);
             ndHead.AppendChild(afterInitNode);
 
-            //XmlNode ndSettings = docXml.CreateNode(XmlNodeType.Element, "settings", docXml.NamespaceURI);
-            //XmlNode ndColwith = docXml.CreateNode(XmlNodeType.Element, "colwidth", docXml.NamespaceURI);
-            //ndColwith.InnerText = "%";
-            //ndSettings.AppendChild(ndColwith);
-            //ndHead.AppendChild(ndSettings);
+            AddColumns(ndHead);
 
-            XmlNode ndNewColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            ndNewColumn.InnerXml = "#master_checkbox";
-
-            XmlAttribute attrType = docXml.CreateAttribute(TypeConst);
-            attrType.Value = "ch";
-            XmlAttribute attrWidth = docXml.CreateAttribute("width");
-            attrWidth.Value = "20";
-            XmlAttribute attrAlign = docXml.CreateAttribute("align");
-            attrAlign.Value = "center";
-
-            ndNewColumn.Attributes.Append(attrType);
-            ndNewColumn.Attributes.Append(attrWidth);
-            ndNewColumn.Attributes.Append(attrAlign);
-            ndHead.AppendChild(ndNewColumn);
-
-            ndNewColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            ndNewColumn.InnerXml = "<![CDATA[Notes]]>";
-
-            attrType = docXml.CreateAttribute(TypeConst);
-            attrType.Value = "tsnotes";
-            attrWidth = docXml.CreateAttribute("width");
-            attrWidth.Value = "50";
-            attrAlign = docXml.CreateAttribute("align");
-            attrAlign.Value = "center";
-
-            ndNewColumn.Attributes.Append(attrType);
-            ndNewColumn.Attributes.Append(attrWidth);
-            ndNewColumn.Attributes.Append(attrAlign);
-            ndHead.AppendChild(ndNewColumn);
-
-
-            ndNewColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            ndNewColumn.InnerXml = "<![CDATA[Resource Name]]>";
-
-            attrType = docXml.CreateAttribute(TypeConst);
-            attrType.Value = "tree";
-            attrWidth = docXml.CreateAttribute("width");
-            attrWidth.Value = "*";
-            attrAlign = docXml.CreateAttribute("align");
-            attrAlign.Value = "left";
-
-            ndNewColumn.Attributes.Append(attrType);
-            ndNewColumn.Attributes.Append(attrWidth);
-            ndNewColumn.Attributes.Append(attrAlign);
-            ndHead.AppendChild(ndNewColumn);
-
-
-            ndNewColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            ndNewColumn.InnerXml = "<![CDATA[TM]]>";
-
-            attrType = docXml.CreateAttribute(TypeConst);
-            attrType.Value = Ro;
-            attrWidth = docXml.CreateAttribute("width");
-            attrWidth.Value = "35";
-            attrAlign = docXml.CreateAttribute("align");
-            attrAlign.Value = "center";
-
-            ndNewColumn.Attributes.Append(attrType);
-            ndNewColumn.Attributes.Append(attrWidth);
-            ndNewColumn.Attributes.Append(attrAlign);
-            ndHead.AppendChild(ndNewColumn);
-
-            ndNewColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            ndNewColumn.InnerXml = "<![CDATA[PM]]>";
-
-            attrType = docXml.CreateAttribute(TypeConst);
-            attrType.Value = Ro;
-            attrWidth = docXml.CreateAttribute("width");
-            attrWidth.Value = "35";
-            attrAlign = docXml.CreateAttribute("align");
-            attrAlign.Value = "center";
-
-            ndNewColumn.Attributes.Append(attrType);
-            ndNewColumn.Attributes.Append(attrWidth);
-            ndNewColumn.Attributes.Append(attrAlign);
-            ndHead.AppendChild(ndNewColumn);
-
-            SqlCommand cmd = new SqlCommand("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@period_id", period);
-            cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-            SqlDataReader dr = cmd.ExecuteReader();
-            //DataSet ds = new DataSet();
-            //SqlDataAdapter da = new SqlDataAdapter(cmd);
-            //da.Fill(ds);
-            if (dr.Read())
+            var sql = "select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid";
+            using (var cmd = new SqlCommand(sql, cn))
             {
-                periodStart = dr.GetDateTime(0);
-                periodEnd = dr.GetDateTime(1);
+                cmd.CommandType = CommandType.Text;
+                cmd.Parameters.AddWithValue("@period_id", period);
+                cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
+                using (var dataReader = cmd.ExecuteReader())
+                {
+                    if (dataReader.Read())
+                    {
+                        periodStart = dataReader.GetDateTime(0);
+                        periodEnd = dataReader.GetDateTime(1);
+                    }
+                }
             }
-            dr.Close();
 
             dayDefs = EPMLiveCore.CoreFunctions.getConfigSetting(curWeb.Site.RootWeb, "EPMLiveDaySettings").Split('|');
 
-            TimeSpan ts = periodEnd - periodStart;
-            for (int i = 0; i <= ts.Days; i++)
+            var timeSpan = periodEnd - periodStart;
+            for (var day = 0; day <= timeSpan.Days; day++)
             {
-                string showday = "";
+                var showDay = string.Empty;
                 try
                 {
-                    showday = dayDefs[((int)periodStart.AddDays(i).DayOfWeek) * 3];
+                    showDay = dayDefs[((int)periodStart.AddDays(day).DayOfWeek) * 3];
                 }
-                catch { }
-                if (showday == True)
+                catch (Exception ex)
                 {
-                    XmlNode newCol = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-                    newCol.InnerXml = "<![CDATA[" + periodStart.AddDays(i).DayOfWeek.ToString().Substring(0, 3) + "<br>" + periodStart.AddDays(i).Day + "]]>";
-                    attrType = docXml.CreateAttribute(TypeConst);
-                    attrType.Value = "ro[=sum]";
-                    attrWidth = docXml.CreateAttribute("width");
-                    attrWidth.Value = "40";
-                    attrAlign = docXml.CreateAttribute("align");
-                    attrAlign.Value = "right";
-                    XmlAttribute attrId1 = docXml.CreateAttribute(Id);
-                    attrId1.Value = "_TsDate_" + periodStart.AddDays(i).ToShortDateString().Replace("/", "_"); ;
-
-                    newCol.Attributes.Append(attrType);
-                    newCol.Attributes.Append(attrWidth);
-                    newCol.Attributes.Append(attrAlign);
-                    newCol.Attributes.Append(attrId1);
+                    SystemTrace.WriteLine(ex.ToString());
+                }
+                if (showDay == True)
+                {
+                    var newCol = AddNewColumn(day);
 
                     ndHead.AppendChild(newCol);
                 }
             }
 
-            XmlNode newColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            newColumn.InnerXml = "Total";
-            attrType = docXml.CreateAttribute(TypeConst);
+            var newColumn = AddNewColumn();
+
+            ndHead.AppendChild(newColumn);
+
+            InitializeTimSheets(curWeb.Site.ID);
+        }
+
+        private void AddColumns(XmlNode ndHead)
+        {
+            var ndNewColumn = AddNewColumn("#master_checkbox", "ch", "20", "center");
+            ndHead.AppendChild(ndNewColumn);
+
+            ndNewColumn = AddNewColumn("<![CDATA[Notes]]>", "tsnotes", "50", "center");
+            ndHead.AppendChild(ndNewColumn);
+
+            ndNewColumn = AddNewColumn("<![CDATA[Resource Name]]>", "tree", "*", "left");
+            ndHead.AppendChild(ndNewColumn);
+
+            ndNewColumn = AddNewColumn("<![CDATA[TM]]>", Ro, "35", "center");
+            ndHead.AppendChild(ndNewColumn);
+
+            ndNewColumn = AddNewColumn("<![CDATA[PM]]>", Ro, "35", "center");
+            ndHead.AppendChild(ndNewColumn);
+        }
+
+        private XmlNode AddNewColumn(string innerXm, string typeValue, string withdValue, string alignValue)
+        {
+            XmlNode ndNewColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
+            ndNewColumn.InnerXml = innerXm;
+
+            var attrType = docXml.CreateAttribute(TypeConst);
+            attrType.Value = typeValue;
+            var attrWidth = docXml.CreateAttribute("width");
+            attrWidth.Value = withdValue;
+            var attrAlign = docXml.CreateAttribute("align");
+            attrAlign.Value = alignValue;
+
+            ndNewColumn.Attributes.Append(attrType);
+            ndNewColumn.Attributes.Append(attrWidth);
+            ndNewColumn.Attributes.Append(attrAlign);
+            return ndNewColumn;
+        }
+
+        private XmlNode AddNewColumn(int days)
+        {
+            XmlNode newCol = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
+            newCol.InnerXml = "<![CDATA[" + periodStart.AddDays(days).DayOfWeek.ToString().Substring(0, 3) + "<br>" + periodStart.AddDays(days).Day + "]]>";
+            var attrType = docXml.CreateAttribute(TypeConst);
             attrType.Value = "ro[=sum]";
-            attrWidth = docXml.CreateAttribute("width");
-            attrWidth.Value = "60";
-            attrAlign = docXml.CreateAttribute("align");
+            var attrWidth = docXml.CreateAttribute("width");
+            attrWidth.Value = "40";
+            var attrAlign = docXml.CreateAttribute("align");
             attrAlign.Value = "right";
-            XmlAttribute attrId = docXml.CreateAttribute(Id);
+            var attrId = docXml.CreateAttribute(Id);
+            attrId.Value = "_TsDate_" + periodStart.AddDays(days).ToShortDateString().Replace("/", "_"); ;
+
+            newCol.Attributes.Append(attrType);
+            newCol.Attributes.Append(attrWidth);
+            newCol.Attributes.Append(attrAlign);
+            newCol.Attributes.Append(attrId);
+            return newCol;
+        }
+
+        private XmlNode AddNewColumn()
+        {
+            var newColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
+            newColumn.InnerXml = "Total";
+            var attrType = docXml.CreateAttribute(TypeConst);
+            attrType.Value = "ro[=sum]";
+            var attrWidth = docXml.CreateAttribute("width");
+            attrWidth.Value = "60";
+            var attrAlign = docXml.CreateAttribute("align");
+            attrAlign.Value = "right";
+            var attrId = docXml.CreateAttribute(Id);
             attrId.Value = "Total";
 
             newColumn.Attributes.Append(attrType);
             newColumn.Attributes.Append(attrWidth);
             newColumn.Attributes.Append(attrAlign);
             newColumn.Attributes.Append(attrId);
-
-            ndHead.AppendChild(newColumn);
-
-            InitializeTimSheets(curWeb.Site.ID);
+            return newColumn;
         }
 
         private void InitializeTimSheets(Guid siteId)
@@ -901,7 +872,7 @@ namespace TimeSheets
 
                                 if (!arrGTemp.Contains(group))
                                 {
-                                    arrGTemp.Add(group, "");
+                                    arrGTemp.Add(group, string.Empty);
                                 }
                             }
                         }
@@ -924,13 +895,13 @@ namespace TimeSheets
                         XmlDocument fieldXml = new XmlDocument();
                         fieldXml.LoadXml(field.SchemaXml);
 
-                        string parentField = "";
+                        string parentField = string.Empty;
                         try
                         {
                             parentField = fieldXml.FirstChild.Attributes["DisplayNameSrcField"].Value;
                         }
                         catch { }
-                        if (parentField != "")
+                        if (parentField != string.Empty)
                         {
                             try
                             {
