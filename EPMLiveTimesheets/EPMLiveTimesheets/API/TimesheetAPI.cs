@@ -770,9 +770,10 @@ namespace TimeSheets
                             SPListItem li = iList.GetItemById(int.Parse(dataRow["ITEM_ID"].ToString()));
                             SharedFunctions.processMeta(iWeb, iList, li, new Guid(dataRow["ts_item_uid"].ToString()), dataRow["project"].ToString(), cn, pList);
                         }
-                        catch
+                        catch(Exception ex)
                         {
                             //The item is deleted and not found in SPList
+                            Logger.WriteLog(Logger.Category.Information, "Timesheet submission", ex.ToString());
                         }
                     }
                 }
