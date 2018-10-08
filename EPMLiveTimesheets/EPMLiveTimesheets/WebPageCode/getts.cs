@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
 using Microsoft.SharePoint;
+using TimeSheets.WebPageCode;
 using SystemTrace = System.Diagnostics.Trace;
 
 
@@ -279,54 +280,30 @@ namespace TimeSheets
 
             ndHead.AppendChild(newColumn);
 
-
-            cmd = new SqlCommand("select ts_uid,username,submitted,approval_status,approval_notes from TSTIMESHEET where period_id=@period_id and site_uid=@siteid", cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@period_id", period);
-            cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-            dsTimesheets = new DataSet();
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            da.Fill(dsTimesheets);
-
-            cmd = new SqlCommand("select hours,ts_item_date,ts_uid from vwTSTimesheetTotals where period_id=@period_id and site_uid=@siteid", cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@period_id", period);
-            cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-            dsTimesheetTotals = new DataSet();
-            da = new SqlDataAdapter(cmd);
-            da.Fill(dsTimesheetTotals);
-
-            cmd = new SqlCommand("select title,project,ts_uid,ts_item_uid,approval_status from vwTSTasks where period_id=@period_id and site_uid=@siteid order by project", cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@period_id", period);
-            cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-            dsTimesheetTasks = new DataSet();
-            da = new SqlDataAdapter(cmd);
-            da.Fill(dsTimesheetTasks);
-
-            cmd = new SqlCommand("select Hours,ts_item_date,ts_item_uid,ts_item_type_id from vwTSHoursByTask where period_id=@period_id and site_uid=@siteid", cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@period_id", period);
-            cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-            dsTimesheetTaskHours = new DataSet();
-            da = new SqlDataAdapter(cmd);
-            da.Fill(dsTimesheetTaskHours);
-
-            cmd = new SqlCommand("select tstype_id from TSTYPE where site_uid=@siteid", cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-            dsTimesheetTypes = new DataSet();
-            da = new SqlDataAdapter(cmd);
-            da.Fill(dsTimesheetTypes);
-
-            cmd = new SqlCommand("select ts_item_uid,ts_item_notes,ts_item_date from vwTSNotes where period_id=@period_id and site_uid=@siteid", cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@period_id", period);
-            cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-            dsTimesheetNotes = new DataSet();
-            da = new SqlDataAdapter(cmd);
-            da.Fill(dsTimesheetNotes);
+            InitializeTimSheets(curWeb.Site.ID);
         }
+
+        private void InitializeTimSheets(Guid siteId)
+        {
+            var sql = "select ts_uid,username,submitted,approval_status,approval_notes from TSTIMESHEET where period_id=@period_id and site_uid=@siteid";
+            dsTimesheets = DataSetUtils.CreateDataSet(cn, sql, period, siteId);
+
+            sql = "select hours,ts_item_date,ts_uid from vwTSTimesheetTotals where period_id=@period_id and site_uid=@siteid";
+            dsTimesheetTotals = DataSetUtils.CreateDataSet(cn, sql, period, siteId);
+
+            sql = "select title,project,ts_uid,ts_item_uid,approval_status from vwTSTasks where period_id=@period_id and site_uid=@siteid order by project";
+            dsTimesheetTasks = DataSetUtils.CreateDataSet(cn, sql, period, siteId);
+
+            sql = "select Hours,ts_item_date,ts_item_uid,ts_item_type_id from vwTSHoursByTask where period_id=@period_id and site_uid=@siteid";
+            dsTimesheetTaskHours = DataSetUtils.CreateDataSet(cn, sql, period, siteId);
+
+            sql = "select tstype_id from TSTYPE where site_uid=@siteid";
+            dsTimesheetTypes = DataSetUtils.CreateDataSet(cn, sql, period, siteId);
+
+            sql = "select ts_item_uid,ts_item_notes,ts_item_date from vwTSNotes where period_id=@period_id and site_uid=@siteid";
+            dsTimesheetNotes = DataSetUtils.CreateDataSet(cn, sql, period, siteId);
+        }
+
         private void addGroups(SPWeb curWeb)
         {
             var arrGTemp = new SortedList();
