@@ -764,8 +764,16 @@ namespace TimeSheets
 
                             listGuid = iList.ID;
                         }
-                        SPListItem li = iList.GetItemById(int.Parse(dataRow["ITEM_ID"].ToString()));
-                        SharedFunctions.processMeta(iWeb, iList, li, new Guid(dataRow["ts_item_uid"].ToString()), dataRow["project"].ToString(), cn, pList);
+                        try
+                        {
+                            // This will throw error if task is deleted
+                            SPListItem li = iList.GetItemById(int.Parse(dataRow["ITEM_ID"].ToString()));
+                            SharedFunctions.processMeta(iWeb, iList, li, new Guid(dataRow["ts_item_uid"].ToString()), dataRow["project"].ToString(), cn, pList);
+                        }
+                        catch
+                        {
+                            //The item is deleted and not found in SPList
+                        }
                     }
                 }
                 finally
