@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Fakes;
+﻿using System.Web.Fakes;
 using System.Web.UI.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveWebParts.Fakes;
@@ -16,13 +11,13 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
 {
     public partial class GetTsApprovalsTests
     {
-		[TestMethod]
+        [TestMethod]
         public void getParams_Should_Succed()
         {
             GetParamsCommon();
         }
 
-		private void GetParamsCommon()
+        private void GetParamsCommon()
         {
             // Arange
             var approval = new GetTsApprovals();

@@ -66,8 +66,6 @@ namespace TimeSheets
             InitializeTimSheets(curWeb.Site.ID);
         }
 
-
-
         private void AddColumns(XmlNode ndHead)
         {
             var ndNewColumn = AddNewColumn("#master_checkbox", "ch", "20", "center");
@@ -85,7 +83,6 @@ namespace TimeSheets
             ndNewColumn = AddNewColumn("<![CDATA[PM]]>", Ro, "35", "center");
             ndHead.AppendChild(ndNewColumn);
         }
-
 
         private XmlNode AddNewColumn(string innerXm, string typeValue, string withdValue, string alignValue)
         {

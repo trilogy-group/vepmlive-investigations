@@ -80,7 +80,7 @@ namespace TimeSheets
                     Query = "<OrderBy><FieldRef Name = 'FirstName' Ascending = 'True'/><FieldRef Name = 'LastName' Ascending = 'True'/></OrderBy>"
                 };
                 var listItems = list.GetItems(query);
-                if (listItems != null && listItems.Count > 0)
+                if (listItems?.Count > 0)
                 {
                     foreach (SPListItem listItem in listItems)
                     {
