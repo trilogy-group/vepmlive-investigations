@@ -38,7 +38,7 @@ using WebPart = Microsoft.SharePoint.WebPartPages.WebPart;
 namespace EPMLiveCore.Tests.API.Applications
 {
     [TestClass, ExcludeFromCodeCoverage]
-    public class ApplicationInstallerTests
+    public class ApplicationInstallerTestsPartOne
     {
         private IDisposable _shimObject;
         private ApplicationInstaller _testObj;
