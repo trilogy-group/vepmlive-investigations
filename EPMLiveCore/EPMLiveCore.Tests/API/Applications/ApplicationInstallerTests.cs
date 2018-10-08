@@ -73,6 +73,10 @@ namespace EPMLiveCore.Tests.API.Applications
         private bool _reportDataSourcesProcessed;
         private bool _cacheRemoved;
         private bool _storeInformationAdded;
+        private bool _fileDeletedFromSolution;
+        private bool _fileAddedToSolution;
+        private bool _solutionRemoved;
+        private bool _solutionAdded;
 
         private const int DummyInt = 1;
         private const string DummyString = "DummyString";
@@ -136,6 +140,7 @@ namespace EPMLiveCore.Tests.API.Applications
         private const string CheckingProperties = "Checking Properties";
         private const string CheckingFiles = "Checking Files";
         private const string CheckingNavigation = "Checking Navigation";
+        private const string InstallingSolutionsAndLists = "Installing Solutions and Lists";
 
         [TestInitialize]
         public void TestInitialize()
@@ -171,6 +176,10 @@ namespace EPMLiveCore.Tests.API.Applications
             _reportDataSourcesProcessed = false;
             _cacheRemoved = false;
             _storeInformationAdded = false;
+            _fileDeletedFromSolution = false;
+            _fileAddedToSolution = false;
+            _solutionRemoved = false;
+            _solutionAdded = false;
 
             _shimObject = ShimsContext.Create();
 
@@ -214,16 +223,25 @@ namespace EPMLiveCore.Tests.API.Applications
 
             _privateObj.SetFieldOrProperty("oListItem", listItem);
 
+            var count = 0;
             _list = new ShimSPList
             {
                 TitleGet = () => DummyString,
-                GetItemsSPQuery = _ => new ShimSPListItemCollection
+                GetItemsSPQuery = _ =>
                 {
-                    ItemGetInt32 = __ => listItem
-                }.Bind(new SPListItem[]
-                {
-                    listItem
-                }),
+                    count++;
+                    if (count > 1 || _verifyOnly) {
+                        return new ShimSPListItemCollection
+                        {
+                            ItemGetInt32 = __ => listItem
+                        }.Bind(new SPListItem[]
+                        {
+                            listItem
+                        });
+                    }
+
+                    return new ShimSPListItemCollection();
+                },
                 ParentWebGet = () => _web,
                 FieldsGet = () => new ShimSPFieldCollection
                 {
@@ -309,7 +327,8 @@ namespace EPMLiveCore.Tests.API.Applications
                 {
                     GetByIDInt32 = _ => new ShimSPUser
                     {
-                        UserTokenGet = () => new ShimSPUserToken()
+                        UserTokenGet = () => new ShimSPUserToken(),
+                        IsSiteAdminGet = () => true
                     }
                 },
                 GetFileString = _ => new ShimSPFile
@@ -437,7 +456,24 @@ namespace EPMLiveCore.Tests.API.Applications
                         return null;
                     }
                 },
-                RootWebGet = () => _web
+                RootWebGet = () => _web,
+                GetCatalogSPListTemplateType = _ => new ShimSPDocumentLibrary().Instance,
+                SolutionsGet = () => new ShimSPUserSolutionCollection
+                {
+                    AddInt32 = _ =>
+                    {
+                        _solutionAdded = true;
+
+                        return new ShimSPUserSolution();
+                    },
+                    RemoveSPUserSolution = _ => _solutionRemoved = true
+                }.Bind(new SPUserSolution[]
+                {
+                    new ShimSPUserSolution
+                    {
+                        NameGet = () => DummyString
+                    }
+                })
             };
 
             var appDef = new ApplicationDef
@@ -446,6 +482,31 @@ namespace EPMLiveCore.Tests.API.Applications
                 Community = DummyString
             };
             appDef.PreReqs.Add(DummyString, DummyString);
+            appDef.ApplicationXml.LoadXml(CreateXmlApplication());
+
+            ShimSPList.AllInstances.RootFolderGet = _ => new ShimSPFolder
+            {
+                FilesGet = () => new ShimSPFileCollection
+                {
+                    AddStringByteArray = (__, ___) =>
+                    {
+                        _fileAddedToSolution = true;
+
+                        return new ShimSPFile
+                        {
+                            ItemGet = () => listItem
+                        };
+                    }
+                }.Bind(new SPFile[]
+                {
+                    new ShimSPFile
+                    {
+                        NameGet = () => DummyString,
+                        Delete = () => _fileDeletedFromSolution = true
+                    }
+                })
+            };
+
 
             ShimApplications.GetApplicationInfoString = _ => appDef;
             ShimApplications.CreateCommunityStringSPWeb = (_, __) =>
@@ -456,6 +517,7 @@ namespace EPMLiveCore.Tests.API.Applications
             };
             ShimApplications.CreateQuickLaunchXMLInt32SPWeb = (_, __) => _quickLaunchXMLCreated = true;
             ShimApplications.CreateTopNavXMLInt32SPWeb = (_, __) => _topNavXMLCreated = true;
+            ShimApplications.GetApplicationListSPWeb = _ => _list;
 
             ShimSPSite.ConstructorGuid = (_, __) => { };
             ShimSPSite.ConstructorGuidSPUserToken = (_, __, ___) => { };
@@ -479,6 +541,7 @@ namespace EPMLiveCore.Tests.API.Applications
                     ScopeGet = () => SPFeatureScope.Site
                 }
             });
+            ShimSPSite.AllInstances.RootWebGet = _ => _web;
             ShimSPSite.AllInstances.Dispose = _ => { };
 
             ShimSPWeb.AllInstances.Dispose = _ => { };
@@ -599,6 +662,9 @@ namespace EPMLiveCore.Tests.API.Applications
 
             ShimCacheStoreCategory.ConstructorSPWeb = (_, __) => { };
             ShimCacheStoreCategory.AllInstances.NavigationGet = _ => DummyString;
+
+            ShimWebClient.Constructor = _ => { };
+            ShimWebClient.AllInstances.DownloadDataString = (_, __) => new byte[] { };
         }
 
         private string CreateFieldXml()
@@ -668,6 +734,10 @@ namespace EPMLiveCore.Tests.API.Applications
                         <Files>
                             <File Path='{DummyString}/{DummyString}.txt' Overwrite='true' NoDelete='false'></File>
                         </Files>
+                        <Solutions>
+                            <Solution FileName='{DummyString}' Overwrite='true'></Solution>
+                            <ListTemplate FileName='{DummyString}' Overwrite='true'></ListTemplate>
+                        </Solutions>
                       </Root>";
         }
 
@@ -702,50 +772,43 @@ namespace EPMLiveCore.Tests.API.Applications
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => _testObj.DtMessages.Rows.Count.ShouldBe(42),
-                () => _testObj.DtMessages.Rows[0][MessageField].ShouldBe(ApplicationInstall),
-                () => _testObj.DtMessages.Rows[0][DetailsField].ShouldBe(ApplicatinAlreadyInstalled),
-                () => _testObj.DtMessages.Rows[1][MessageField].ShouldBe(PermissionsCheck),
-                () => _testObj.DtMessages.Rows[2][MessageField].ShouldBe(ApplicationList),
-                () => _testObj.DtMessages.Rows[3][MessageField].ShouldBe(PreRequisiteCheck),
-                () => _testObj.DtMessages.Rows[4][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[5][MessageField].ShouldBe(ActivationKeyCheck),
-                () => _testObj.DtMessages.Rows[6][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[7][MessageField].ShouldBe(InstallVersion),
-                () => _testObj.DtMessages.Rows[8][MessageField].ShouldBe(CheckingFeatures),
-                () => _testObj.DtMessages.Rows[9][MessageField].ShouldBe(Feature1),
-                () => _testObj.DtMessages.Rows[10][MessageField].ShouldBe(Feature2),
-                () => _testObj.DtMessages.Rows[11][MessageField].ShouldBe(Feature3),
-                () => _testObj.DtMessages.Rows[12][MessageField].ShouldBe(Feature4),
-                () => _testObj.DtMessages.Rows[13][MessageField].ShouldBe(CheckingLists),
-                () => _testObj.DtMessages.Rows[14][DetailsField].ShouldBe(ListExists),
-                () => _testObj.DtMessages.Rows[15][MessageField].ShouldBe(CheckingFields),
-                () => _testObj.DtMessages.Rows[16][DetailsField].ShouldBe(FieldExists),
-                () => _testObj.DtMessages.Rows[17][MessageField].ShouldBe(CheckingLookups),
-                () => _testObj.DtMessages.Rows[18][DetailsField].ShouldBe(FieldExists),
-                () => _testObj.DtMessages.Rows[19][MessageField].ShouldBe(EnabledAdvancedLookup),
-                () => _testObj.DtMessages.Rows[20][MessageField].ShouldBe(CheckingViews),
-                () => _testObj.DtMessages.Rows[21][DetailsField].ShouldBe(ViewExists),
-                () => _testObj.DtMessages.Rows[22][MessageField].ShouldBe(CheckingWebParts),
-                () => _testObj.DtMessages.Rows[23][MessageField].ShouldBe(GridOnAllViews),
-                () => _testObj.DtMessages.Rows[24][MessageField].ShouldBe(DummyView),
-                () => _testObj.DtMessages.Rows[25][MessageField].ShouldBe(CheckingEventHandlers),
-                () => _testObj.DtMessages.Rows[26][MessageField].ShouldBe($"{ItemAdding}({DummyClass})"),
-                () => _testObj.DtMessages.Rows[27][MessageField].ShouldBe(CheckingItems),
-                () => _testObj.DtMessages.Rows[28][MessageField].ShouldBe(ItemTitle),
-                () => _testObj.DtMessages.Rows[29][MessageField].ShouldBe(AddToReportingDatabase),
-                () => _testObj.DtMessages.Rows[30][MessageField].ShouldBe(CheckingProperties),
-                () => _testObj.DtMessages.Rows[31][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[31][DetailsField].ShouldBe(PropertyFound),
-                () => _testObj.DtMessages.Rows[32][MessageField].ShouldBe(CheckingFiles),
-                () => _testObj.DtMessages.Rows[33][MessageField].ShouldBe($"File: {DummyString}.txt"),
-                () => _testObj.DtMessages.Rows[34][MessageField].ShouldBe(CheckingNavigation),
-                () => _testObj.DtMessages.Rows[35][MessageField].ShouldBe(QuickLaunch),
-                () => _testObj.DtMessages.Rows[36][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[37][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[38][MessageField].ShouldBe(TopNav),
-                () => _testObj.DtMessages.Rows[39][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[40][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[41][MessageField].ShouldBe(ProcessingReports),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(ApplicationInstall),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(ApplicatinAlreadyInstalled),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(PermissionsCheck),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(ApplicationList),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(PreRequisiteCheck),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(ActivationKeyCheck),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(InstallVersion),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(CheckingFeatures),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(Feature1),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(Feature2),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(Feature3),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(Feature4),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(CheckingLists),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(ListExists),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(CheckingFields),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(FieldExists),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(CheckingLookups),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(FieldExists),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(EnabledAdvancedLookup),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(CheckingViews),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(ViewExists),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(CheckingWebParts),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(GridOnAllViews),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(DummyView),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(CheckingEventHandlers),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain($"{ItemAdding}({DummyClass})"),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(CheckingItems),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(ItemTitle),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(AddToReportingDatabase),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(CheckingProperties),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(PropertyFound),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(CheckingFiles),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain($"File: {DummyString}.txt"),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(CheckingNavigation),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(QuickLaunch),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(TopNav),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(ProcessingReports),
                 () => _listItemUpdated.ShouldBeTrue(),
                 () => _gridGanttSettingsSaved.ShouldBeTrue(),
                 () => _folderAdded.ShouldBeTrue(),
@@ -770,6 +833,10 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _listItemUpdated.ShouldBeTrue(),
                 () => _gridGanttSettingsSaved.ShouldBeTrue(),
                 () => _folderAdded.ShouldBeTrue(),
+                () => _fileDeletedFromSolution.ShouldBeTrue(),
+                () => _fileAddedToSolution.ShouldBeTrue(),
+                () => _solutionRemoved.ShouldBeTrue(),
+                () => _solutionAdded.ShouldBeTrue(),
                 () => iInstallListsWorkflowsCalled.ShouldBeTrue(),
                 () => _webFeatureAdded.ShouldBeTrue(),
                 () => _siteFeatureAdded.ShouldBeTrue(),
@@ -798,52 +865,44 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _reportDataSourcesProcessed.ShouldBeTrue(),
                 () => _cacheRemoved.ShouldBeTrue(),
                 () => _storeInformationAdded.ShouldBeTrue(),
-                () => _testObj.DtMessages.Rows.Count.ShouldBe(43),
-                () => _testObj.DtMessages.Rows[0][MessageField].ShouldBe(ApplicationInstall),
-                () => _testObj.DtMessages.Rows[0][DetailsField].ShouldBe(ApplicatinAlreadyInstalled),
-                () => _testObj.DtMessages.Rows[1][MessageField].ShouldBe(PermissionsCheck),
-                () => _testObj.DtMessages.Rows[2][MessageField].ShouldBe(ApplicationList),
-                () => _testObj.DtMessages.Rows[3][MessageField].ShouldBe(PreRequisiteCheck),
-                () => _testObj.DtMessages.Rows[4][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[5][MessageField].ShouldBe(ActivationKeyCheck),
-                () => _testObj.DtMessages.Rows[6][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[7][MessageField].ShouldBe(InstallVersion),
-                () => _testObj.DtMessages.Rows[8][MessageField].ShouldBe(InstallingFeatures),
-                () => _testObj.DtMessages.Rows[9][MessageField].ShouldBe(Feature1),
-                () => _testObj.DtMessages.Rows[10][MessageField].ShouldBe(Feature2),
-                () => _testObj.DtMessages.Rows[11][MessageField].ShouldBe(Feature3),
-                () => _testObj.DtMessages.Rows[12][MessageField].ShouldBe(Feature4),
-                () => _testObj.DtMessages.Rows[13][MessageField].ShouldBe(InstallingLists),
-                () => _testObj.DtMessages.Rows[14][DetailsField].ShouldBe(ListExists),
-                () => _testObj.DtMessages.Rows[15][MessageField].ShouldBe(UpdatingFields),
-                () => _testObj.DtMessages.Rows[16][DetailsField].ShouldBe(FieldUpdated),
-                () => _testObj.DtMessages.Rows[17][MessageField].ShouldBe(FixingLookups),
-                () => _testObj.DtMessages.Rows[18][DetailsField].ShouldBe(FieldUpdated),
-                () => _testObj.DtMessages.Rows[19][MessageField].ShouldBe(EnabledAdvancedLookup),
-                () => _testObj.DtMessages.Rows[20][MessageField].ShouldBe(UpdatingViews),
-                () => _testObj.DtMessages.Rows[21][DetailsField].ShouldBe(ViewExists),
-                () => _testObj.DtMessages.Rows[22][MessageField].ShouldBe(UpdatingWebParts),
-                () => _testObj.DtMessages.Rows[23][MessageField].ShouldBe(GridOnAllViews),
-                () => _testObj.DtMessages.Rows[24][MessageField].ShouldBe(DummyView),
-                () => _testObj.DtMessages.Rows[25][MessageField].ShouldBe(InstallingEventHandlers),
-                () => _testObj.DtMessages.Rows[26][MessageField].ShouldBe($"{ItemAdding}({DummyClass})"),
-                () => _testObj.DtMessages.Rows[27][MessageField].ShouldBe(InstallingItems),
-                () => _testObj.DtMessages.Rows[28][MessageField].ShouldBe(ItemTitle),
-                () => _testObj.DtMessages.Rows[29][MessageField].ShouldBe(AddToReportingDatabase),
-                () => _testObj.DtMessages.Rows[30][MessageField].ShouldBe(InstallingProperties),
-                () => _testObj.DtMessages.Rows[31][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[31][DetailsField].ShouldBe(PropertyFound),
-                () => _testObj.DtMessages.Rows[32][MessageField].ShouldBe(InstallingFiles),
-                () => _testObj.DtMessages.Rows[33][MessageField].ShouldBe($"File: {DummyString}.txt"),
-                () => _testObj.DtMessages.Rows[34][MessageField].ShouldBe(CreatingCommunity),
-                () => _testObj.DtMessages.Rows[35][MessageField].ShouldBe(InstallingNavigation),
-                () => _testObj.DtMessages.Rows[36][MessageField].ShouldBe(QuickLaunch),
-                () => _testObj.DtMessages.Rows[37][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[38][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[39][MessageField].ShouldBe(TopNav),
-                () => _testObj.DtMessages.Rows[40][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[41][MessageField].ShouldBe(DummyString),
-                () => _testObj.DtMessages.Rows[42][MessageField].ShouldBe(ProcessingReports));
+                () => _testObj.DtMessages.Rows.Count.ShouldBe(45),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(PermissionsCheck),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(ApplicationList),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(PreRequisiteCheck),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(ActivationKeyCheck),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(InstallVersion),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(InstallingSolutionsAndLists),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(InstallingFeatures),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(Feature1),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(Feature2),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(Feature3),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(Feature4),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(InstallingLists),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(ListExists),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(UpdatingFields),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(FieldUpdated),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(FixingLookups),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(FieldUpdated),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(EnabledAdvancedLookup),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(UpdatingViews),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(ViewExists),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(UpdatingWebParts),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(GridOnAllViews),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(DummyView),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(InstallingEventHandlers),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain($"{ItemAdding}({DummyClass})"),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(InstallingItems),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(ItemTitle),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(AddToReportingDatabase),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(InstallingProperties),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(PropertyFound),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(InstallingFiles),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain($"File: {DummyString}.txt"),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(CreatingCommunity),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(InstallingNavigation),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(QuickLaunch),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(TopNav),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(ProcessingReports));
         }
     }
 }
