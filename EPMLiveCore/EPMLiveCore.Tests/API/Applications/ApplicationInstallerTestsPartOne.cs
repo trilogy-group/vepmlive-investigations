@@ -1075,26 +1075,6 @@ namespace EPMLiveCore.Tests.API.Applications
         }
 
         [TestMethod]
-        public void GetTemplateType_OnValidType_ConfirmResult()
-        {
-            // Arrange, Act
-            var result = (SPListTemplateType)_privateObj.Invoke(GetTemplateTypeMethod, "101");
-
-            // Assert
-            result.ShouldBe(SPListTemplateType.DocumentLibrary);
-        }
-
-        [TestMethod]
-        public void GetTemplateType_OnInvalidValidType_ConfirmResult()
-        {
-            // Arrange, Act
-            var result = (SPListTemplateType)_privateObj.Invoke(GetTemplateTypeMethod, DummyString);
-
-            // Assert
-            result.ShouldBe(SPListTemplateType.NoListTemplate);
-        }
-
-        [TestMethod]
         public void IInstallListsAddList_OnValidCall_ConfirmResult()
         {
             // Arrage
@@ -1133,32 +1113,6 @@ namespace EPMLiveCore.Tests.API.Applications
             this.ShouldSatisfyAllConditions(
                 () => _fieldAsXmlAdded.ShouldBeTrue(),
                 () => result.ShouldNotBeNull());
-        }
-
-        [TestMethod]
-        public void IInstallListsWorkflowsInstall_OnValidCall_ConfirmResult()
-        {
-            // Arrange
-            var xmlString = "<Workflow AllowManual='true' StartOnCreate='true' StartOnChange='true'></Workflow>";
-            var xmlDocument = new XmlDocument();
-            xmlDocument.LoadXml(xmlString);
-
-            var node = xmlDocument.SelectSingleNode("/Workflow");
-
-            _privateObj.SetFieldOrProperty(OWebField, _web.Instance);
-
-            // Act
-            _privateObj.Invoke(
-                IInstallListsWorkflowsInstallMethod, 
-                _list.Instance, 
-                DummyString, 
-                DummyString, 
-                _list.Instance, 
-                _list.Instance, 
-                node);
-
-            // Assert
-            _workFlowAssociationCreated.ShouldBeTrue();
         }
 
         [TestMethod]
