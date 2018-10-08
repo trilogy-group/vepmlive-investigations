@@ -104,6 +104,9 @@
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Configuration.4.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Configuration.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -160,6 +163,21 @@
     <Compile Include="API\Analytics\RecentItemsTests.cs" />
     <Compile Include="API\APITeamTests.cs" />
     <Compile Include="API\Applications\ApplicationInstallerTestsPartOne.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.CheckPermissions.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallAndConfigureApp.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallAndConfigureApp2.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallFeatures.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallFiles.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallFilesProcessFolder.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallLists.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallListsFields.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallListsLookups.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallListsViews.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallListsViewsWebpartsInstall.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallListsWorkflows.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallProperties.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerTests.iInstallSolutions.cs" />
     <Compile Include="API\Applications\ApplicationsTests.cs" />
     <Compile Include="API\AssociatedListItems\AssociatedListItemsTests.cs" />
     <Compile Include="API\Comments\CommentManagerTests.cs" />
@@ -192,9 +210,11 @@
     <Compile Include="CoreFunctions.GetPlannerList.Tests.cs" />
     <Compile Include="CoreFunctionsRemTestsSplitOne.cs" />
     <Compile Include="CoreFunctionsRemTestsSplitThree.cs" />
+    <Compile Include="CoreFunctionsRemTestsSplitTwo.cs" />
     <Compile Include="CoreFunctionsTest.cs" />
     <Compile Include="EditableFieldDisplayTests.cs" />
     <Compile Include="ExtensionMethodsTest.cs" />
+    <Compile Include="FilteredLookup\FilteredLookupFieldEditorTests.cs" />
     <Compile Include="Infrastructure\BaseClasses\SPListItemManagerTests.cs" />
     <Compile Include="Infrastructure\ResourceManagment\ResourcePoolManagerTests.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
@@ -213,6 +233,8 @@
     <Compile Include="Layouts\epmlive\GridGanttSettingsTest.cs" />
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
     <Compile Include="Layouts\epmlive\SolutionStoreProxyTests.cs" />
+    <Compile Include="Layouts\epmlive\TimerSettingsRemTests.cs" />
+    <Compile Include="Layouts\epmlive\TimerSettingsTests.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.AddEntityPickersToLookups.cs" />
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.cs" />
@@ -226,6 +248,7 @@
     <Compile Include="ReportHelper\EPMDataTest.Part2.cs" />
     <Compile Include="ReportHelper\ListBizTest.cs" />
     <Compile Include="ReportHelper\MyWorkReportDataTest.cs" />
+    <Compile Include="ReportingDataTest.cs" />
     <Compile Include="RequestWorkspaceTest.cs" />
     <Compile Include="NewProjectTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

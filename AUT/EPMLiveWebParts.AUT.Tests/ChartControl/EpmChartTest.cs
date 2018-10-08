@@ -3458,37 +3458,6 @@ namespace EPMLiveWebParts
 
         #endregion
 
-        #region Method Call : (BuildSeriesArray) (Return Type : VfChartSeries) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_EpmChart_BuildSeriesArray_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var sSeriesName = CreateType<string>();
-            var sAggregType = CreateType<string>();
-            var methodBuildSeriesArrayPrametersTypes = new Type[] { typeof(string), typeof(string) };
-            object[] parametersOfBuildSeriesArray = { sSeriesName, sAggregType };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodBuildSeriesArray, methodBuildSeriesArrayPrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<EpmChart, VfChartSeries>(_epmChartInstanceFixture, out exception1, parametersOfBuildSeriesArray);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<EpmChart, VfChartSeries>(_epmChartInstance, MethodBuildSeriesArray, parametersOfBuildSeriesArray, methodBuildSeriesArrayPrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
-            parametersOfBuildSeriesArray.ShouldNotBeNull();
-            parametersOfBuildSeriesArray.Length.ShouldBe(2);
-            methodBuildSeriesArrayPrametersTypes.Length.ShouldBe(2);
-        }
-
-        #endregion
-
         #region Method Call : (BuildSeriesArray) (Return Type : VfChartSeries) No Exception with encapsulation Thrown
 
         [Test]
@@ -3551,27 +3520,6 @@ namespace EPMLiveWebParts
             // Assert
             Should.NotThrow(currentAction);
             methodBuildSeriesArrayPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (BuildSeriesArray) (Return Type : VfChartSeries) without parameters value verify result should be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_EpmChart_BuildSeriesArray_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodBuildSeriesArray, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_epmChartInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldBeNull();
         }
 
         #endregion
@@ -3993,68 +3941,6 @@ namespace EPMLiveWebParts
 
         #endregion
 
-        #region Method Call : (SeriesExistsInChartDataTable) (Return Type : bool) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_EpmChart_SeriesExistsInChartDataTable_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var sName = CreateType<string>();
-            var methodSeriesExistsInChartDataTablePrametersTypes = new Type[] { typeof(string) };
-            object[] parametersOfSeriesExistsInChartDataTable = { sName };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodSeriesExistsInChartDataTable, methodSeriesExistsInChartDataTablePrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<EpmChart, bool>(_epmChartInstanceFixture, out exception1, parametersOfSeriesExistsInChartDataTable);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<EpmChart, bool>(_epmChartInstance, MethodSeriesExistsInChartDataTable, parametersOfSeriesExistsInChartDataTable, methodSeriesExistsInChartDataTablePrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfSeriesExistsInChartDataTable.ShouldNotBeNull();
-            parametersOfSeriesExistsInChartDataTable.Length.ShouldBe(1);
-            methodSeriesExistsInChartDataTablePrametersTypes.Length.ShouldBe(1);
-        }
-
-        #endregion
-
-        #region Method Call : (SeriesExistsInChartDataTable) (Return Type : bool) Results Not Null and no exception thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_EpmChart_SeriesExistsInChartDataTable_Method_Call_With_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            var sName = CreateType<string>();
-            var methodSeriesExistsInChartDataTablePrametersTypes = new Type[] { typeof(string) };
-            object[] parametersOfSeriesExistsInChartDataTable = { sName };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodSeriesExistsInChartDataTable, methodSeriesExistsInChartDataTablePrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<EpmChart, bool>(_epmChartInstanceFixture, out exception1, parametersOfSeriesExistsInChartDataTable);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<EpmChart, bool>(_epmChartInstance, MethodSeriesExistsInChartDataTable, parametersOfSeriesExistsInChartDataTable, methodSeriesExistsInChartDataTablePrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfSeriesExistsInChartDataTable.ShouldNotBeNull();
-            parametersOfSeriesExistsInChartDataTable.Length.ShouldBe(1);
-            methodSeriesExistsInChartDataTablePrametersTypes.Length.ShouldBe(1);
-        }
-
-        #endregion
-
         #region Method Call : (SeriesExistsInChartDataTable) (Return Type : bool) No Exception Thrown
 
         [Test]
@@ -4314,74 +4200,6 @@ namespace EPMLiveWebParts
         {
             var methodUpdateCellValuePrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_epmChartInstance, MethodUpdateCellValue, Fixture, methodUpdateCellValuePrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (UpdateCellValue) (Return Type : bool) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_EpmChart_UpdateCellValue_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var sRowName = CreateType<string>();
-            var sColName = CreateType<string>();
-            var sColVal = CreateType<string>();
-            var sAggregType = CreateType<string>();
-            var methodUpdateCellValuePrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string) };
-            object[] parametersOfUpdateCellValue = { sRowName, sColName, sColVal, sAggregType };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodUpdateCellValue, methodUpdateCellValuePrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<EpmChart, bool>(_epmChartInstanceFixture, out exception1, parametersOfUpdateCellValue);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<EpmChart, bool>(_epmChartInstance, MethodUpdateCellValue, parametersOfUpdateCellValue, methodUpdateCellValuePrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfUpdateCellValue.ShouldNotBeNull();
-            parametersOfUpdateCellValue.Length.ShouldBe(4);
-            methodUpdateCellValuePrametersTypes.Length.ShouldBe(4);
-        }
-
-        #endregion
-
-        #region Method Call : (UpdateCellValue) (Return Type : bool) Results Not Null and no exception thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_EpmChart_UpdateCellValue_Method_Call_With_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            var sRowName = CreateType<string>();
-            var sColName = CreateType<string>();
-            var sColVal = CreateType<string>();
-            var sAggregType = CreateType<string>();
-            var methodUpdateCellValuePrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string) };
-            object[] parametersOfUpdateCellValue = { sRowName, sColName, sColVal, sAggregType };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodUpdateCellValue, methodUpdateCellValuePrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<EpmChart, bool>(_epmChartInstanceFixture, out exception1, parametersOfUpdateCellValue);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<EpmChart, bool>(_epmChartInstance, MethodUpdateCellValue, parametersOfUpdateCellValue, methodUpdateCellValuePrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfUpdateCellValue.ShouldNotBeNull();
-            parametersOfUpdateCellValue.Length.ShouldBe(4);
-            methodUpdateCellValuePrametersTypes.Length.ShouldBe(4);
         }
 
         #endregion

@@ -1480,32 +1480,6 @@ namespace EPMLiveCore
 
         #endregion
 
-        #region Method Call : (LoadHeadingDropDownList) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CustomNewNav_LoadHeadingDropDownList_Method_Call_Void_With_No_Parameters_Call_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodLoadHeadingDropDownListPrametersTypes = null;
-            object[] parametersOfLoadHeadingDropDownList = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodLoadHeadingDropDownList, methodLoadHeadingDropDownListPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_customNewNavInstanceFixture, parametersOfLoadHeadingDropDownList);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfLoadHeadingDropDownList.ShouldBeNull();
-            methodLoadHeadingDropDownListPrametersTypes.ShouldBeNull();
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (LoadHeadingDropDownList) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
