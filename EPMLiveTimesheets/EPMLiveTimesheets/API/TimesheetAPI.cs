@@ -773,7 +773,7 @@ namespace TimeSheets
                         catch(Exception ex)
                         {
                             //The item is deleted and not found in SPList
-                            Logger.WriteLog(Logger.Category.Information, "Timesheet submission", ex.ToString());
+                            Logger.WriteLog(Logger.Category.Unexpected, "Timesheet submission", ex.ToString());
                         }
                     }
                 }
