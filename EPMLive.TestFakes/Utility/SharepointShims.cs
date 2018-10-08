@@ -290,7 +290,8 @@ namespace EPMLive.TestFakes.Utility
 
             ShimSPContext.CurrentGet = () => new ShimSPContext
             {
-                WebGet = () => WebShim
+                WebGet = () => WebShim,
+                SiteGet = () => SiteShim
             };
 
             ShimSPSite.ConstructorGuid = (instance, guid) => new Func<ShimSPSite>(() => SiteShim)();
