@@ -24,7 +24,7 @@ using TimeSheets;
 namespace EPMLiveTimesheets.Tests.WebPageCode
 {
     [TestClass]
-    public class GetTsApprovalsTests
+    public partial class GetTsApprovalsTests
     {
         private IDisposable _shimContext;
         private bool _readFirstCall;
