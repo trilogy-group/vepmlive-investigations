@@ -1097,22 +1097,29 @@ namespace EPMLiveCore.Tests.API.Applications
         }
 
         [TestMethod]
-        public void IInstallListFieldsAddField_WhenInvalidType_ConfirmResult()
+        public void IInstallListsWorkflowsInstall_OnValidCall_ConfirmResult()
         {
             // Arrange
-            var xmlString = $"<Field ID='{DummyInt}' DisplayName='{DummyString}'></Field>";
+            var xmlString = "<Workflow AllowManual='true' StartOnCreate='true' StartOnChange='true'></Workflow>";
             var xmlDocument = new XmlDocument();
             xmlDocument.LoadXml(xmlString);
 
-            var node = xmlDocument.SelectSingleNode("/Field");
+            var node = xmlDocument.SelectSingleNode("/Workflow");
+
+            _privateObj.SetFieldOrProperty(OWebField, _web.Instance);
 
             // Act
-            var result = (SPField)_privateObj.Invoke(IInstallListFieldsAddFieldMethod, _list.Instance, DummyString, DummyString, node);
+            _privateObj.Invoke(
+                IInstallListsWorkflowsInstallMethod, 
+                _list.Instance, 
+                DummyString, 
+                DummyString, 
+                _list.Instance, 
+                _list.Instance, 
+                node);
 
             // Assert
-            this.ShouldSatisfyAllConditions(
-                () => _fieldAsXmlAdded.ShouldBeTrue(),
-                () => result.ShouldNotBeNull());
+            _workFlowAssociationCreated.ShouldBeTrue();
         }
 
         [TestMethod]
