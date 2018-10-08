@@ -152,6 +152,12 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="WebPageCode\DataSetUtils.cs" />
+    <Compile Include="WebPageCode\getts.addGroups.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\getts.addHeader.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="WebPageCode\timesheetapprovalpage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

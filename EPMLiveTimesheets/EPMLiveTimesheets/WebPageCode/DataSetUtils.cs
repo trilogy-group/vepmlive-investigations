@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 
-namespace TimeSheets.WebPageCode
+namespace TimeSheets
 {
     public class DataSetUtils
     {
