@@ -260,7 +260,8 @@ namespace EPMLiveCore.Tests.API.Applications
                 GetItemsSPQuery = _ =>
                 {
                     count++;
-                    if (count > 1 || _returnFirstList) {
+                    if (count > 1 || _returnFirstList)
+                    {
                         return new ShimSPListItemCollection
                         {
                             ItemGetInt32 = __ => listItem
