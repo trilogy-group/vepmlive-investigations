@@ -217,6 +217,7 @@
     <Compile Include="Layouts\epmlive\GridGanttSettingsTest.cs" />
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
     <Compile Include="Layouts\epmlive\SolutionStoreProxyTests.cs" />
+    <Compile Include="Layouts\epmlive\TimerSettingsRemTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsTests.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.AddEntityPickersToLookups.cs" />
