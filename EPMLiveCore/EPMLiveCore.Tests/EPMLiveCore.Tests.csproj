@@ -217,6 +217,7 @@
     <Compile Include="Layouts\epmlive\GridGanttSettingsTest.cs" />
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
     <Compile Include="Layouts\epmlive\SolutionStoreProxyTests.cs" />
+    <Compile Include="Layouts\epmlive\TimerSettingsRemTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsTests.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.AddEntityPickersToLookups.cs" />
@@ -231,6 +232,7 @@
     <Compile Include="ReportHelper\EPMDataTest.Part2.cs" />
     <Compile Include="ReportHelper\ListBizTest.cs" />
     <Compile Include="ReportHelper\MyWorkReportDataTest.cs" />
+    <Compile Include="ReportingDataTest.cs" />
     <Compile Include="RequestWorkspaceTest.cs" />
     <Compile Include="NewProjectTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
