@@ -775,8 +775,8 @@ namespace EPMLivePS.Tests.HelperClasses
             ShimSPSite.AllInstances.OpenWeb = _ => new ShimSPWeb();
             ShimCustomFields.Constructor = _ => new ShimCustomFields();
             ShimLookupTable.Constructor = _ => new ShimLookupTable();
-            EPMLiveEnterprise.WebSvcProject.Fakes.ShimProject.Constructor = _ => new EPMLiveEnterprise.WebSvcProject.Fakes.ShimProject();
-            EPMLiveEnterprise.WebSvcResource.Fakes.ShimResource.Constructor = _ => new EPMLiveEnterprise.WebSvcResource.Fakes.ShimResource();
+            ShimProject.Constructor = _ => new ShimProject();
+            ShimResource.Constructor = _ => new ShimResource();
             ShimCustomFieldDataSet.Constructor = _ => new ShimCustomFieldDataSet();
             ShimCustomFieldDataSet.AllInstances.CustomFieldsGet = _ => new ShimCustomFieldsDataTable();
             ShimLookupTableDataSet.Constructor = _ => new ShimLookupTableDataSet();
