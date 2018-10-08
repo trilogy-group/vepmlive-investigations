@@ -4,32 +4,32 @@ using System.Data.Fakes;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Fakes;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using EPMLiveEnterprise.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveEnterprise;
 using EPMLiveEnterprise.WebSvcCustomFields.Fakes;
 using EPMLiveEnterprise.WebSvcLookupTables.Fakes;
 using EPMLiveEnterprise.WebSvcProject.Fakes;
 using EPMLiveEnterprise.WebSvcResource.Fakes;
+using EPMLiveEnterprise.WebSvcLookupTables;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Shouldly;
-using static EPMLiveEnterprise.WebSvcCustomFields.Fakes.ShimCustomFieldDataSet;
+using Microsoft.SharePoint.BusinessData.MetadataModel.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.BusinessData.Administration.Fakes;
-using static EPMLiveEnterprise.WebSvcCustomFields.CustomFieldDataSet;
-using EPMLiveEnterprise.WebSvcLookupTables;
-using static EPMLiveEnterprise.WebSvcLookupTables.Fakes.ShimLookupTableDataSet;
-using System.Collections.Generic;
 using static EPMLiveEnterprise.WebSvcLookupTables.LookupTableDataSet;
-using System.Data.SqlClient;
-using EPMLiveEnterprise.Fakes;
+using static EPMLiveEnterprise.WebSvcLookupTables.Fakes.ShimLookupTableDataSet;
 using static EPMLiveEnterprise.WebSvcProject.ProjectDataSet;
 using static EPMLiveEnterprise.WebSvcProject.Fakes.ShimProjectDataSet;
 using static EPMLiveEnterprise.WebSvcProject.Fakes.ShimProjectRelationsDataSet;
-using Microsoft.SharePoint.BusinessData.MetadataModel.Fakes;
+using static EPMLiveEnterprise.WebSvcCustomFields.CustomFieldDataSet;
 using static EPMLiveEnterprise.WebSvcResource.Fakes.ShimResourceDataSet;
+using static EPMLiveEnterprise.WebSvcCustomFields.Fakes.ShimCustomFieldDataSet;
+using Shouldly;
 
 namespace EPMLivePS.Tests.HelperClasses
 {
@@ -111,11 +111,7 @@ namespace EPMLivePS.Tests.HelperClasses
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun =>
             {
                 counter++;
-                if (counter == 3)
-                {
-                    { };
-                }
-                else
+                if (counter != 3)
                 {
                     codeToRun();
                 }
@@ -145,7 +141,6 @@ namespace EPMLivePS.Tests.HelperClasses
                 parameters);
 
             // Assert
-            actualResult.ShouldNotBeNull();
             actualResult.ShouldBe(string.Empty);
         }
 
@@ -163,7 +158,6 @@ namespace EPMLivePS.Tests.HelperClasses
                 parameters);
 
             // Assert
-            actualResult.ShouldNotBeNull();
             actualResult.ShouldBe(string.Empty);
         }
 
@@ -337,7 +331,6 @@ namespace EPMLivePS.Tests.HelperClasses
                 parameters);
 
             // Assert
-            actualResult.ShouldNotBeNull();
             actualResult.ShouldBe(true);
         }
 
@@ -354,7 +347,6 @@ namespace EPMLivePS.Tests.HelperClasses
                 parameters);
 
             // Assert
-            actualResult.ShouldNotBeNull();
             actualResult.ShouldBe(false);
         }
 
@@ -391,7 +383,6 @@ namespace EPMLivePS.Tests.HelperClasses
                 parameters);
 
             // Assert
-            actualResult.ShouldNotBeNull();
             actualResult.ShouldSatisfyAllConditions(
                 () => actualResult.ID.ShouldBe(0),
                 () => actualResult.Description.ShouldBeNull());
@@ -656,7 +647,6 @@ namespace EPMLivePS.Tests.HelperClasses
                 parameters);
 
             // Assert
-            actualResult.ShouldNotBeNull();
             actualResult.ShouldBe(DummyInt);
         }
 
@@ -684,7 +674,6 @@ namespace EPMLivePS.Tests.HelperClasses
                 parameters);
 
             // Assert
-            actualResult.ShouldNotBeNull();
             actualResult.ShouldBe(DummyInt);
         }
 
@@ -710,7 +699,6 @@ namespace EPMLivePS.Tests.HelperClasses
                 parameters);
 
             // Assert
-            actualResult.ShouldNotBeNull();
             actualResult.ShouldBe(DummyInt);
         }
 
@@ -743,7 +731,6 @@ namespace EPMLivePS.Tests.HelperClasses
                 parameters);
 
             // Assert
-            actualResult.ShouldNotBeNull();
             actualResult.ShouldBe(DummyString);
         }
 
@@ -773,7 +760,6 @@ namespace EPMLivePS.Tests.HelperClasses
                 parameters);
 
             // Assert
-            actualResult.ShouldNotBeNull();
             actualResult.ShouldBe(DummyInt);
         }
 
