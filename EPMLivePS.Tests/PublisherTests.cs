@@ -2,12 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
+using System.Data.Common.Fakes;
 using System.Data.Fakes;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Fakes;
 using System.Reflection;
+using System.Web.Fakes;
 using System.Web.Services.Protocols.Fakes;
 using System.Xml.Linq;
 using EPMLiveCore.Fakes;
@@ -15,8 +18,9 @@ using EPMLiveEnterprise;
 using EPMLiveEnterprise.EPMLivePortfolioEngine.Fakes;
 using EPMLiveEnterprise.Fakes;
 using EPMLiveEnterprise.WebSvcCustomFields.Fakes;
-using EPMLiveEnterprise.WebSvcProject.Fakes;
+using EPMLiveEnterprise.WebSvcLookupTables.Fakes;
 using EPMLiveEnterprise.WebSvcResource.Fakes;
+using EPMLiveEnterprise.WebSvcStatusing.Fakes;
 using EPMLiveEnterprise.WebSvcWssInterop.Fakes;
 using Microsoft.Office.Project.Server.Events;
 using Microsoft.Office.Project.Server.Library;
@@ -27,8 +31,12 @@ using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
+using WebSvcResourceFakes = EPMLiveEnterprise.WebSvcResource.Fakes;
+using WebSvcProjectFakes = EPMLiveEnterprise.WebSvcProject.Fakes;
 using static EPMLiveEnterprise.WebSvcCustomFields.CustomFieldDataSet;
 using static EPMLiveEnterprise.WebSvcCustomFields.Fakes.ShimCustomFieldDataSet;
+using static EPMLiveEnterprise.WebSvcLookupTables.Fakes.ShimLookupTableDataSet;
+using static EPMLiveEnterprise.WebSvcLookupTables.LookupTableDataSet;
 using static EPMLiveEnterprise.WebSvcProject.Fakes.ShimProjectDataSet;
 using static EPMLiveEnterprise.WebSvcProject.ProjectDataSet;
 using static EPMLiveEnterprise.WebSvcResource.Fakes.ShimResourceDataSet;
@@ -51,11 +59,12 @@ namespace EPMLivePS.Tests
         private ShimSPUser spUser;
         private ShimSPField spField;
         private ShimSqlDataReader dataReader;
-        private BindingFlags publicStatic;
-        private BindingFlags nonPublicStatic;
         private BindingFlags publicInstance;
         private BindingFlags nonPublicInstance;
+        private ArrayList fieldsToPublish;
         private const string GuidString = "83e81819-0112-4c22-bb70-d8ba101e9e0c";
+        private const string GuidString1 = "83e81819-9108-4c22-bb70-d8ba101e9e0c";
+        private const string GuidString2 = "83e81819-2580-4c22-bb70-d8ba101e9e0c";
         private const string DummyString = "DummyString";
         private const string PublishSiteUrl = "somedomain.com/sampleApp/sampleAction";
         private const string LinkProjectWssMethodName = "linkProjectWss";
@@ -70,8 +79,13 @@ namespace EPMLivePS.Tests
         private const string ProcessProjectCenterFieldsMethodName = "processProjectCenterFields";
         private const string ProcessTaskMethodName = "processTask";
         private const string GetResourceUsernameMethodName = "getResourceUsername";
+        private const string GetLookupValueMethodName = "getLookupValue";
+        private const string PublishProjectCenterMethodName = "publishProjectCenter";
+        private const string PublishTasksMethodName = "publishTasks";
+        private const string GetHierarchyMethodName = "getHierarchy";
+        private const string DoPublishMethodName = "doPublish";
 
-        [TestInitialize]
+        [TestInitialize, ExcludeFromCodeCoverage]
         public void Setup()
         {
             SetupShims();
@@ -82,7 +96,8 @@ namespace EPMLivePS.Tests
             };
             var eventArgs = new ProjectPostPublishEventArgs()
             {
-                ProjectGuid = guid
+                ProjectGuid = guid,
+                ProjectName = DummyString
             };
 
             Type type = typeof(EPMLivePublisher).Assembly.GetType("EPMLiveEnterprise.Publisher");
@@ -107,9 +122,14 @@ namespace EPMLivePS.Tests
             ShimSelectMethod();
 
             ShimSPSite.ConstructorGuid = (_, __) => new ShimSPSite();
+            ShimSPSite.ConstructorString = (_, __) => new ShimSPSite();
             ShimSPSite.AllInstances.WebApplicationGet = _ => new ShimSPWebApplication();
+            ShimSPSite.AllInstances.RootWebGet = _ => spWeb;
+            ShimSPSite.AllInstances.OpenWeb = _ => spWeb;
+            ShimSPSite.AllInstances.UrlGet = _ => DummyString;
             ShimSPPersistedObject.AllInstances.IdGet = _ => guid;
             ShimSqlConnection.ConstructorString = (_, __) => new ShimSqlConnection();
+            ShimSqlDataAdapter.ConstructorSqlCommand = (_, __) => new ShimSqlDataAdapter();
             ShimCoreFunctions.getConnectionStringGuid = _ => DummyString;
             ShimSqlConnection.AllInstances.Open = _ => { };
             ShimSqlConnection.AllInstances.Close = _ => { };
@@ -128,6 +148,22 @@ namespace EPMLivePS.Tests
             ShimPortfolioEngineAPI.AllInstances.UseDefaultCredentialsSetBoolean = (_, __) => { };
             ShimSPSecurableObject.AllInstances.RoleAssignmentsGet = _ => new ShimSPRoleAssignmentCollection();
             ShimResourceDataSet.AllInstances.ResourcesGet = _ => new ShimResourcesDataTable();
+            ShimCustomFieldDataSet.AllInstances.CustomFieldsGet = _ => new ShimCustomFieldsDataTable();
+            ShimLookupTableDataSet.AllInstances.LookupTableTreesGet = _ => new ShimLookupTableTreesDataTable();
+            ShimHttpUtility.UrlDecodeString = input => input;
+            ShimCustomFields.Constructor = _ => new ShimCustomFields();
+            ShimLookupTable.Constructor = _ => new ShimLookupTable();
+            WebSvcResourceFakes.ShimResource.Constructor = _ => new WebSvcResourceFakes.ShimResource();
+            WebSvcProjectFakes.ShimProject.Constructor = _ => new WebSvcProjectFakes.ShimProject();
+            ShimStatusing.Constructor = _ => new ShimStatusing();
+            ShimWssInterop.Constructor = _ => new ShimWssInterop();
+            ShimCustomFields.AllInstances.UrlSetString = (_, __) => { };
+            ShimLookupTable.AllInstances.UrlSetString = (_, __) => { };
+            WebSvcResourceFakes.ShimResource.AllInstances.UrlSetString = (_, __) => { };
+            WebSvcProjectFakes.ShimProject.AllInstances.UrlSetString = (_, __) => { };
+            ShimStatusing.AllInstances.UrlSetString = (_, __) => { };
+            ShimWssInterop.AllInstances.UrlSetString = (_, __) => { };
+            WebSvcProjectFakes.ShimProjectDataSet.Constructor = _AppDomain => new WebSvcProjectFakes.ShimProjectDataSet();
         }
 
         private void ShimSelectMethod()
@@ -158,6 +194,21 @@ namespace EPMLivePS.Tests
                     {
                         return rowArray;
                     }
+                    if (condition.Contains(new Guid(GuidString1).ToString()))
+                    {
+                        return new AssignmentRow[]
+                        {
+                            new ShimAssignmentRow()
+                            {
+                                TASK_UIDGet = () => guid,
+                                ASSN_UIDGet = () => guid,
+                                ASSN_NOTESGet = () => DummyString,
+                                RES_UID_OWNERGet = () => guid,
+                                ASSN_PCT_WORK_COMPLETEGet = () => 100,
+                                IsASSN_NOTESNull = () => false
+                            }
+                        };
+                    }
                     return new TaskRow[]
                     {
                         new ShimTaskRow()
@@ -173,7 +224,40 @@ namespace EPMLivePS.Tests
                 }
                 else if (condition.Contains("MD_PROP_ID"))
                 {
+                    if (condition.Contains("CODE_VALUE"))
+                    {
+                        return new CustomFieldsRow[]
+                        {
+                            new ShimCustomFieldsRow()
+                        };
+                    }
                     return rowArray;
+                }
+                else if (condition.Contains("LT_STRUCT_UID"))
+                {
+                    return new LookupTableTreesRow[]
+                    {
+                        new ShimLookupTableTreesRow()
+                        {
+                            LT_VALUE_TEXTGet = () => DummyString,
+                            LT_VALUE_NUMGet = () => 111
+                        }
+                    };
+                }
+                else if (condition.Contains("TASK_ID"))
+                {
+                    return new TaskRow[]
+                    {
+                        new ShimTaskRow()
+                        {
+                            TASK_PARENT_UIDGet = () => guid,
+                            TASK_NAMEGet = () => DummyString,
+                            TASK_WBSGet = () => DummyString,
+                            TASK_UIDGet = () => guid,
+                            TASK_IDGet = () => 111,
+                            TASK_IS_SUMMARYGet = () => true
+                        }
+                    };
                 }
                 else if (condition.Contains("RES_UID"))
                 {
@@ -222,9 +306,33 @@ namespace EPMLivePS.Tests
         {
             publicInstance = BindingFlags.Instance | BindingFlags.Public;
             nonPublicInstance = BindingFlags.Instance | BindingFlags.NonPublic;
-            publicStatic = BindingFlags.Static | BindingFlags.Public;
-            nonPublicStatic = BindingFlags.Static | BindingFlags.NonPublic;
             guid = new Guid(GuidString);
+            fieldsToPublish = new ArrayList()
+            {
+                "TASK_RESNAMES#######",
+                "TASK_PCT_COMP#######",
+                "Other###3#DATETIME###",
+                "Other###3#DURATION###",
+                "Other###3#NUMBER###",
+                "Other###3#CURRENCY###",
+                "Other###3#BOOLEAN###",
+                "Other###3#TEXT###",
+                "Other##rolldown#3#DATETIME###true",
+                "Other##rolldown#3#DURATION###true",
+                "Other##rolldown#3#NUMBER###true",
+                "Other##rolldown#3#CURRENCY###true",
+                "Other##rolldown#3#BOOLEAN###true",
+                "Other##rolldown#3#TEXT###true",
+                "Other###2#DATETIME###",
+                "Other###2#DURATION###",
+                "Other###2#NUMBER###",
+                "Other###2#CURRENCY###",
+                "Other###2#BOOLEAN###",
+                "Other###2#TEXT###",
+                "TASK_PREDECESSORS###1#TEXT###",
+                "Other##Custom#1#DATETIME###",
+                "Other##Custom#1#ELSE#100##"
+            };
             dataReader = new ShimSqlDataReader()
             {
                 Close = () => { }
@@ -233,22 +341,47 @@ namespace EPMLivePS.Tests
             {
                 IdGet = () => guid
             };
-            spSite = new ShimSPSite();
+            spSite = new ShimSPSite()
+            {
+                UrlGet = () => DummyString
+            };
             spList = new ShimSPList()
             {
                 GetItemByIdInt32 = _ => spListItem,
-                FieldsGet = () => new ShimSPFieldCollection(),
+                GetItemByUniqueIdGuid = _ => spListItem,
+                FieldsGet = () => new ShimSPFieldCollection()
+                {
+                    GetFieldByInternalNameString = _ => spField,
+                    ContainsFieldString = _ => true
+                },
                 GetItemsSPQuery = _ => new ShimSPListItemCollection()
+                {
+                    CountGet = () => 1,
+                    ItemGetInt32 = __ => spListItem
+                },
+                ItemsGet = () => new ShimSPListItemCollection()
+                {
+                    Add = () => spListItem
+                }
             };
             spListItem = new ShimSPListItem()
             {
-                ItemGetString = _ => DummyString,
+                IDGet = () => 111,
+                ItemGetString = key =>
+                {
+                    if (key.Equals("IsProjectServer"))
+                    {
+                        return "True";
+                    }
+                    return DummyString;
+                },
                 HasUniqueRoleAssignmentsGet = () => true,
                 FieldsGet = () => new ShimSPFieldCollection()
                 {
                     GetFieldByInternalNameString = _ => spField,
                     ContainsFieldString = _ => true
-                }
+                },
+                ParentListGet = () => spList
             };
             spUser = new ShimSPUser()
             {
@@ -278,22 +411,32 @@ namespace EPMLivePS.Tests
         private void SetFieldsOrProperties()
         {
             privateObject.SetFieldOrProperty("publishSiteUrl", nonPublicInstance, PublishSiteUrl);
+            privateObject.SetFieldOrProperty("projectServerUrl", nonPublicInstance, PublishSiteUrl);
             privateObject.SetFieldOrProperty("mySiteGuid", nonPublicInstance, guid);
             privateObject.SetFieldOrProperty("lastTransUid", nonPublicInstance, guid);
             privateObject.SetFieldOrProperty("pWssInterop", nonPublicInstance, new ShimWssInterop().Instance);
             privateObject.SetFieldOrProperty("cn", nonPublicInstance, new ShimSqlConnection().Instance);
             privateObject.SetFieldOrProperty("pctComplete", nonPublicInstance, 10D);
-            privateObject.SetFieldOrProperty("pService", nonPublicInstance, new EPMLiveEnterprise.WebSvcProject.Fakes.ShimProject().Instance);
+            privateObject.SetFieldOrProperty("pService", nonPublicInstance, new WebSvcProjectFakes.ShimProject().Instance);
+            privateObject.SetFieldOrProperty("pResource", nonPublicInstance, new WebSvcResourceFakes.ShimResource().Instance);
             privateObject.SetFieldOrProperty("rDs", nonPublicInstance, new ShimResourceDataSet().Instance);
             privateObject.SetFieldOrProperty("mySiteToPublish", nonPublicInstance, spWeb.Instance);
+            privateObject.SetFieldOrProperty("mySite", nonPublicInstance, spSite.Instance);
             privateObject.SetFieldOrProperty("pCf", nonPublicInstance, new ShimCustomFields().Instance);
             privateObject.SetFieldOrProperty("taskEntity", nonPublicInstance, guid);
+            privateObject.SetFieldOrProperty("projectGuid", nonPublicInstance, guid);
             privateObject.SetFieldOrProperty("hshTaskCenterFields", nonPublicInstance, new Hashtable());
             privateObject.SetFieldOrProperty("hshProjectCenterFields", nonPublicInstance, new Hashtable());
             privateObject.SetFieldOrProperty("hshCurTasks", nonPublicInstance, new Hashtable());
+            privateObject.SetFieldOrProperty("hshTaskHierarchy", nonPublicInstance, new Hashtable());
             privateObject.SetFieldOrProperty("arrFieldsToPublish", nonPublicInstance, new ArrayList());
             privateObject.SetFieldOrProperty("arrPJFieldsToPublish", nonPublicInstance, new ArrayList());
             privateObject.SetFieldOrProperty("arrDelNewTasks", nonPublicInstance, new ArrayList());
+            privateObject.SetFieldOrProperty("dsFields", nonPublicInstance, new ShimCustomFieldDataSet().Instance);
+            privateObject.SetFieldOrProperty("dsLt", nonPublicInstance, new ShimLookupTableDataSet().Instance);
+            privateObject.SetFieldOrProperty("pService", nonPublicInstance, new WebSvcProjectFakes.ShimProject().Instance);
+            privateObject.SetFieldOrProperty("workspaceSynch", nonPublicInstance, new ShimProjectWorkspaceSynch().Instance);
+            privateObject.SetFieldOrProperty("psiLookupTable", nonPublicInstance, new ShimLookupTable().Instance);
         }
 
         [TestMethod]
@@ -406,7 +549,7 @@ namespace EPMLivePS.Tests
                 row
             };
 
-            EPMLiveEnterprise.WebSvcProject.Fakes.ShimProject.AllInstances.ReadProjectGuidDataStoreEnum = (_, _1, _2) => new ShimProjectDataSet()
+            WebSvcProjectFakes.ShimProject.AllInstances.ReadProjectGuidDataStoreEnum = (_, _1, _2) => new WebSvcProjectFakes.ShimProjectDataSet()
             {
                 AssignmentGet = () => new ShimAssignmentDataTable()
                 {
@@ -458,7 +601,7 @@ namespace EPMLivePS.Tests
                 });
                 return result;
             };
-            var projectDataSet = new ShimProjectDataSet()
+            var projectDataSet = new WebSvcProjectFakes.ShimProjectDataSet()
             {
                 AssignmentGet = () => new ShimAssignmentDataTable(),
                 ProjectResourceGet = () => new ShimProjectResourceDataTable()
@@ -574,7 +717,7 @@ namespace EPMLivePS.Tests
 
             // Act
             InvokeMethod(LoadFieldsMethodName, nonPublicInstance, new object[] { });
-            var fieldsToPublish = (ArrayList)privateObject.GetFieldOrProperty("arrFieldsToPublish", nonPublicInstance);
+            fieldsToPublish = (ArrayList)privateObject.GetFieldOrProperty("arrFieldsToPublish", nonPublicInstance);
             var pjFieldsToPublish = (ArrayList)privateObject.GetFieldOrProperty("arrPJFieldsToPublish", nonPublicInstance);
 
             // Assert
@@ -621,152 +764,10 @@ namespace EPMLivePS.Tests
         }
 
         [TestMethod]
-        public void ProcessAssignment_WhenCalled_ProcessAssignment()
+        public void PublishProjectCenter_WhenCalled_ReturnsInteger()
         {
             // Arrange
             var validation = 0;
-            var taskHierarchy = new Hashtable()
-            {
-                [guid] = guid
-            };
-            var fieldsToPublish = new ArrayList()
-            {
-                "TASK_RESNAMES#######",
-                "TASK_PCT_COMP#######",
-                "Other###3#DATETIME###",
-                "Other###3#DURATION###",
-                "Other###3#NUMBER###",
-                "Other###3#CURRENCY###",
-                "Other###3#BOOLEAN###",
-                "Other###3#TEXT###",
-                "Other##rolldown#3#DATETIME###true",
-                "Other##rolldown#3#DURATION###true",
-                "Other##rolldown#3#NUMBER###true",
-                "Other##rolldown#3#CURRENCY###true",
-                "Other##rolldown#3#BOOLEAN###true",
-                "Other##rolldown#3#TEXT###true",
-                "Other###2#DATETIME###",
-                "Other###2#DURATION###",
-                "Other###2#NUMBER###",
-                "Other###2#CURRENCY###",
-                "Other###2#BOOLEAN###",
-                "Other###2#TEXT###",
-                "TASK_PREDECESSORS###1#TEXT###",
-                "Other##Custom#1#DATETIME###",
-                "Other##Custom#1#ELSE#100##"
-            };
-            var assignmentRow = new ShimAssignmentRow()
-            {
-                TASK_UIDGet = () => guid,
-                ASSN_UIDGet = () => guid,
-                ASSN_NOTESGet = () => DummyString,
-                RES_UID_OWNERGet = () => guid,
-                ASSN_PCT_WORK_COMPLETEGet = () => 100,
-                IsASSN_NOTESNull = () => false
-            };
-            var dataSet = new ShimProjectDataSet()
-            {
-                TaskGet = () => new ShimTaskDataTable(),
-                DependencyGet = () => new ShimDependencyDataTable(),
-                TaskCustomFieldsGet = () => new ShimTaskCustomFieldsDataTable(),
-                AssignmentCustomFieldsGet = () => new ShimAssignmentCustomFieldsDataTable()
-            };
-            ShimDataRow.AllInstances.ItemGetString = (instance, key) =>
-            {
-                var result = default(object);
-                if (key.Equals("Custom"))
-                {
-                    result = 100;
-                }
-                else
-                {
-                    ShimsContext.ExecuteWithoutShims(() =>
-                    {
-                        result = instance[key];
-                    });
-                }
-                return result;
-            };
-            spListItem.FieldsGet = () => new ShimSPFieldCollection()
-            {
-                GetFieldByInternalNameString = _ => spField,
-                ContainsFieldString = _ => true
-            };
-            spListItem.ItemSetGuidObject = (_, __) =>
-            {
-                validation = validation + 1;
-            };
-            spListItem.ItemSetStringObject = (_, __) =>
-            {
-                validation = validation + 1;
-            };
-            spListItem.Update = () =>
-            {
-                validation = validation + 1;
-            };
-
-            SetFieldsOrProperties();
-            privateObject.SetFieldOrProperty("hshTaskHierarchy", nonPublicInstance, taskHierarchy);
-            privateObject.SetFieldOrProperty("arrFieldsToPublish", nonPublicInstance, fieldsToPublish);
-            privateObject.SetFieldOrProperty("strTimesheetField", nonPublicInstance, DummyString);
-
-            // Act
-            privateObject.Invoke(
-                ProcessAssignmentMethodName,
-                nonPublicInstance,
-                new object[] { assignmentRow.Instance, dataSet.Instance, spListItem.Instance });
-
-            // Assert
-            validation.ShouldBe(35);
-        }
-
-        [TestMethod]
-        public void ProcessProjectCenterFields_WhenCalled_ProcessFields()
-        {
-            // Arrange
-            var validation = 0;
-            var fieldsToPublish = new ArrayList()
-            {
-                "###4#DATETIME###",
-                "###4#DURATION###",
-                "###4#NUMBER###",
-                "###4#CURRENCY###",
-                "###4#BOOLEAN###",
-                "###4#TEXT###"
-            };
-            var dataSet = new ShimProjectDataSet()
-            {
-                ProjectCustomFieldsGet = () => new ShimProjectCustomFieldsDataTable()
-            };
-            spListItem.ItemSetStringObject = (_, __) =>
-            {
-                validation = validation + 1;
-            };
-            spListItem.ItemSetGuidObject = (_, __) =>
-            {
-                validation = validation + 1;
-            };
-            spListItem.Update = () =>
-            {
-                validation = validation + 1;
-            };
-
-            // Act
-            InvokeMethod(ProcessProjectCenterFieldsMethodName, nonPublicInstance, new object[] { dataSet.Instance, fieldsToPublish, spListItem.Instance });
-
-            // Assert
-            validation.ShouldBe(7);
-        }
-
-        [TestMethod]
-        public void ProcessTask_WhenCalled_ProcessTasks()
-        {
-            // Arrange
-            var validation = 0;
-            var taskHierarchy = new Hashtable()
-            {
-                [guid] = guid
-            };
             var taskRow = new ShimTaskRow()
             {
                 TASK_PARENT_UIDGet = () => guid,
@@ -776,7 +777,7 @@ namespace EPMLivePS.Tests
                 TASK_IDGet = () => 111,
                 TASK_IS_SUMMARYGet = () => true
             };
-            var fieldsToPublish = new ArrayList()
+            fieldsToPublish = new ArrayList()
             {
                 "TASK_RESNAMES###1####",
                 "Other###3#DATETIME###",
@@ -793,13 +794,29 @@ namespace EPMLivePS.Tests
                 "Other###2#TEXT###",
                 "TASK_PREDECESSORS###1#TEXT###",
                 "DATETIME##Custom#1#DATETIME###",
-                "FLOAT##Custom#1#ELSE#100##"
+                "FLOAT##Custom#1#ELSE#100##",
+                "###4#DATETIME###",
+                "###4#DURATION###",
+                "###4#NUMBER###",
+                "###4#CURRENCY###",
+                "###4#BOOLEAN###",
+                "###4#TEXT###"
             };
-            var dataSet = new ShimProjectDataSet()
+            var dataSet = new WebSvcProjectFakes.ShimProjectDataSet()
             {
                 TaskGet = () => new ShimTaskDataTable(),
                 DependencyGet = () => new ShimDependencyDataTable(),
-                TaskCustomFieldsGet = () => new ShimTaskCustomFieldsDataTable()
+                TaskCustomFieldsGet = () => new ShimTaskCustomFieldsDataTable(),
+                ProjectCustomFieldsGet = () => new ShimProjectCustomFieldsDataTable(),
+                ProjectGet = () => new ShimProjectDataTable()
+                {
+                    ItemGetInt32 = _ => new ShimProjectRow()
+                    {
+                        PROJ_NAMEGet = () => DummyString,
+                        PROJ_UIDGet = () => guid,
+                        ProjectOwnerIDGet = () => guid
+                    }
+                }
             };
             ShimDataRow.AllInstances.ItemGetString = (instance, key) =>
             {
@@ -836,15 +853,17 @@ namespace EPMLivePS.Tests
 
             SetFieldsOrProperties();
             privateObject.SetFieldOrProperty("strTimesheetField", nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty("arrPJFieldsToPublish", nonPublicInstance, fieldsToPublish);
 
             // Act
-            privateObject.Invoke(
-                ProcessTaskMethodName,
-                nonPublicInstance,
-                new object[] { taskRow.Instance, dataSet.Instance, fieldsToPublish, spListItem.Instance, taskHierarchy, guid.ToString(), 10 });
+            var actual = (int)privateObject.Invoke(PublishProjectCenterMethodName, nonPublicInstance, new object[] { dataSet.Instance });
+            var taskHierarchy = (Hashtable)privateObject.GetFieldOrProperty("hshTaskHierarchy", nonPublicInstance);
 
             // Assert
-            validation.ShouldBe(18);
+            actual.ShouldSatisfyAllConditions(
+                () => validation.ShouldBe(31),
+                () => actual.ShouldBe(111),
+                () => taskHierarchy.Count.ShouldBe(1));
         }
 
         [TestMethod]
@@ -855,6 +874,495 @@ namespace EPMLivePS.Tests
 
             // Assert
             actual.ShouldBe(DummyString);
+        }
+
+        [TestMethod]
+        public void GetLookupValue_StringType_ReturnsString()
+        {
+            // Arrange
+            ShimCustomFieldsRow.AllInstances.MD_PROP_TYPE_ENUMGet = _ => (byte)PSDataType.STRING;
+
+            // Act
+            var actual = (string)InvokeMethod(GetLookupValueMethodName, nonPublicInstance, new object[] { "CODE_VALUE", DummyString });
+
+            // Assert
+            actual.ShouldBe(DummyString);
+        }
+
+        [TestMethod]
+        public void GetLookupValue_NumberType_ReturnsString()
+        {
+            // Arrange
+            ShimCustomFieldsRow.AllInstances.MD_PROP_TYPE_ENUMGet = _ => (byte)PSDataType.NUMBER;
+
+            // Act
+            var actual = (string)InvokeMethod(GetLookupValueMethodName, nonPublicInstance, new object[] { "CODE_VALUE", DummyString });
+
+            // Assert
+            actual.ShouldBe("111");
+        }
+
+        private void PublishTasksShim()
+        {
+            WebSvcProjectFakes.ShimProject.AllInstances.ReadProjectGuidDataStoreEnum = (_, _1, _2) => new WebSvcProjectFakes.ShimProjectDataSet()
+            {
+                TaskGet = () => new ShimTaskDataTable()
+                {
+                    CountGet = () => 1,
+                    GetEnumerator = () => new List<TaskRow>()
+                    {
+                        new ShimTaskRow()
+                        {
+                            TASK_PARENT_UIDGet = () => guid,
+                            TASK_NAMEGet = () => DummyString,
+                            TASK_WBSGet = () => DummyString,
+                            TASK_NOTESGet = () => DummyString,
+                            TASK_UIDGet = () => new Guid(GuidString1),
+                            TASK_IDGet = () => 111,
+                            TASK_IS_SUMMARYGet = () => true,
+                            IsTASK_NAMENull = () => false,
+                            IsTASK_WBSNull = () => false,
+                            IsTASK_NOTESNull = () => false,
+                            TASK_IS_SUBPROJGet = () => false
+                        }
+                    }.GetEnumerator()
+                },
+                AssignmentGet = () => new ShimAssignmentDataTable()
+                {
+                    CountGet = () => 1,
+                    GetEnumerator = () => new List<AssignmentRow>()
+                    {
+                        new ShimAssignmentRow()
+                        {
+                            TASK_UIDGet = () => guid,
+                            ASSN_UIDGet = () => guid,
+                            ASSN_NOTESGet = () => DummyString,
+                            RES_UID_OWNERGet = () => guid,
+                            ASSN_PCT_WORK_COMPLETEGet = () => 100,
+                            IsASSN_NOTESNull = () => false
+                        }
+                    }.GetEnumerator()
+                },
+                DependencyGet = () => new ShimDependencyDataTable(),
+                TaskCustomFieldsGet = () => new ShimTaskCustomFieldsDataTable(),
+                AssignmentCustomFieldsGet = () => new ShimAssignmentCustomFieldsDataTable()
+            };
+            ShimProjectWorkspaceSynch.AllInstances.getResourceIdForTaskGuidProjectDataSet = (_, _1, _2) => 10;
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
+            ShimStatusing.Constructor = _ => new ShimStatusing();
+            ShimStatusing.AllInstances.ReadStatusApprovalDetailsGuid = (_, __) =>
+            {
+                throw new Exception();
+            };
+            ShimStatusing.AllInstances.UrlSetString = (_, __) => { };
+            ShimDataRow.AllInstances.ItemGetString = (instance, key) =>
+            {
+                var result = default(object);
+                if (key.Equals("Custom"))
+                {
+                    result = 100;
+                }
+                else if (key.Equals("FLOAT"))
+                {
+                    result = 100;
+                }
+                else if (key.Equals("DATETIME"))
+                {
+                    result = DateTime.Now;
+                }
+                else
+                {
+                    ShimsContext.ExecuteWithoutShims(() =>
+                    {
+                        result = instance[key];
+                    });
+                }
+                return result;
+            };
+        }
+
+        [TestMethod]
+        public void PublishTasks_PubType1_PublishesTasks()
+        {
+            // Arrange
+            var pubType = 1;
+            var validation = 0;
+            var taskHierarchy = new Hashtable()
+            {
+                [guid] = guid
+            };
+            var currentTasksHashTable = new Hashtable()
+            {
+                [$"{guid.ToString().ToUpper()}.{guid.ToString().ToUpper()}"] = guid,
+                [new Guid(GuidString1).ToString().ToUpper()] = guid,
+                [guid.ToString().ToUpper()] = guid,
+                [guid.ToString().ToLower()] = guid
+            };
+            spListItem.ItemSetGuidObject = (_, __) =>
+            {
+                validation = validation + 1;
+            };
+            spListItem.ItemSetStringObject = (_, __) =>
+            {
+                validation = validation + 1;
+            };
+            spListItem.Update = () =>
+            {
+                validation = validation + 1;
+            };
+            spListItem.Delete = () =>
+            {
+                validation = validation + 1;
+            };
+
+            PublishTasksShim();
+            SetFieldsOrProperties();
+            privateObject.SetFieldOrProperty("hshCurTasks", nonPublicInstance, currentTasksHashTable);
+            privateObject.SetFieldOrProperty("hshTaskHierarchy", nonPublicInstance, taskHierarchy);
+            privateObject.SetFieldOrProperty("arrFieldsToPublish", nonPublicInstance, fieldsToPublish);
+            privateObject.SetFieldOrProperty("strTimesheetField", nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty("arrDelNewTasks", nonPublicInstance, new ArrayList() { guid });
+
+            // Act
+            privateObject.Invoke(
+                PublishTasksMethodName,
+                nonPublicInstance,
+                new object[] { 1, pubType, guid, guid });
+
+            // Assert
+            validation.ShouldBe(76);
+        }
+
+        [TestMethod]
+        public void PublishTasks_PubType2_PublishesTasks()
+        {
+            // Arrange
+            var pubType = 2;
+            var validation = 0;
+            var taskHierarchy = new Hashtable()
+            {
+                [guid] = guid
+            };
+            var currentTasksHashTable = new Hashtable()
+            {
+                [$"{guid.ToString().ToUpper()}.{guid.ToString().ToUpper()}"] = guid,
+                [new Guid(GuidString1).ToString().ToUpper()] = guid,
+                [guid.ToString().ToUpper()] = guid,
+                [guid.ToString().ToLower()] = guid
+            };
+            spListItem.ItemSetGuidObject = (_, __) =>
+            {
+                validation = validation + 1;
+            };
+            spListItem.ItemSetStringObject = (_, __) =>
+            {
+                validation = validation + 1;
+            };
+            spListItem.Update = () =>
+            {
+                validation = validation + 1;
+            };
+            spListItem.Delete = () =>
+            {
+                validation = validation + 1;
+            };
+
+            PublishTasksShim();
+            SetFieldsOrProperties();
+            privateObject.SetFieldOrProperty("hshCurTasks", nonPublicInstance, currentTasksHashTable);
+            privateObject.SetFieldOrProperty("hshTaskHierarchy", nonPublicInstance, taskHierarchy);
+            privateObject.SetFieldOrProperty("arrFieldsToPublish", nonPublicInstance, fieldsToPublish);
+            privateObject.SetFieldOrProperty("strTimesheetField", nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty("arrDelNewTasks", nonPublicInstance, new ArrayList() { guid });
+
+            // Act
+            privateObject.Invoke(
+                PublishTasksMethodName,
+                nonPublicInstance,
+                new object[] { 1, pubType, guid, guid });
+
+            // Assert
+            validation.ShouldBe(7);
+        }
+
+        [TestMethod]
+        public void PublishTasks_PubType3_PublishesTasks()
+        {
+            // Arrange
+            var pubType = 3;
+            var validation = 0;
+            var taskHierarchy = new Hashtable()
+            {
+                [guid] = guid
+            };
+            var currentTasksHashTable = new Hashtable()
+            {
+                [$"{guid.ToString().ToUpper()}.{guid.ToString().ToUpper()}"] = guid,
+                [new Guid(GuidString1).ToString().ToUpper()] = guid,
+                [guid.ToString().ToUpper()] = guid,
+                [guid.ToString().ToLower()] = guid
+            };
+            spListItem.ItemSetGuidObject = (_, __) =>
+            {
+                validation = validation + 1;
+            };
+            spListItem.ItemSetStringObject = (_, __) =>
+            {
+                validation = validation + 1;
+            };
+            spListItem.Update = () =>
+            {
+                validation = validation + 1;
+            };
+            spListItem.Delete = () =>
+            {
+                validation = validation + 1;
+            };
+
+            PublishTasksShim();
+            SetFieldsOrProperties();
+            privateObject.SetFieldOrProperty("hshCurTasks", nonPublicInstance, currentTasksHashTable);
+            privateObject.SetFieldOrProperty("hshTaskHierarchy", nonPublicInstance, taskHierarchy);
+            privateObject.SetFieldOrProperty("arrFieldsToPublish", nonPublicInstance, fieldsToPublish);
+            privateObject.SetFieldOrProperty("strTimesheetField", nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty("arrDelNewTasks", nonPublicInstance, new ArrayList() { guid });
+
+            // Act
+            privateObject.Invoke(
+                PublishTasksMethodName,
+                nonPublicInstance,
+                new object[] { 1, pubType, guid, guid });
+
+            // Assert
+            validation.ShouldBe(6);
+        }
+
+        [TestMethod]
+        public void GetHierarchy_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            var taskHierarchy = new Hashtable()
+            {
+                [guid] = string.Empty
+            };
+            var projectDataSet = new WebSvcProjectFakes.ShimProjectDataSet()
+            {
+                TaskGet = () => new ShimTaskDataTable()
+            };
+
+            ShimDataTable.AllInstances.SelectString = (_, __) =>
+            {
+                return new TaskRow[]
+                {
+                    new ShimTaskRow()
+                    {
+                        TASK_PARENT_UIDGet = () => guid,
+                        TASK_UIDGet = () => new Guid(GuidString2),
+                        TASK_NAMEGet = () => DummyString
+                    }
+                };
+            };
+
+            SetFieldsOrProperties();
+            privateObject.SetFieldOrProperty("hshTaskHierarchy", nonPublicInstance, taskHierarchy);
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetHierarchyMethodName, nonPublicInstance, new object[] { projectDataSet.Instance, new Guid(GuidString2) });
+            var hierarchyOutput = (Hashtable)privateObject.GetFieldOrProperty("hshTaskHierarchy", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(DummyString),
+                () => hierarchyOutput.Count.ShouldBe(2));
+        }
+
+        private void DoPublishShims()
+        {
+            ShimCredentialCache.DefaultCredentialsGet = () => null;
+            ShimWssInterop.AllInstances.ReadWssDataGuid = (_, __) => new ShimProjectWSSInfoDataSet()
+            {
+                ProjWssInfoGet = () => new ShimProjWssInfoDataTable()
+                {
+                    CountGet = () => 10,
+                    ItemGetInt32 = index => new ShimProjWssInfoRow()
+                    {
+                        PROJECT_WORKSPACE_URLGet = () => DummyString
+                    }
+                }
+            };
+            ShimWssInterop.AllInstances.ReadWssSettings = _ => new ShimWssSettingsDataSet()
+            {
+                WssAdminGet = () => new ShimWssAdminDataTable()
+                {
+                    ItemGetInt32 = __ => new ShimWssAdminRow()
+                    {
+                        WADMIN_CURRENT_STS_SERVER_UIDGet = () => guid
+                    }
+                }
+            };
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => DummyString;
+            WebSvcResourceFakes.ShimResource.AllInstances.ReadResourcesStringBoolean = (_, _1, _2) => new ShimResourceDataSet();
+            ShimCustomFields.AllInstances.ReadCustomFieldsByEntityGuid = (_, __) => new ShimCustomFieldDataSet();
+            ShimLookupTable.AllInstances.ReadLookupTablesStringBooleanInt32 = (_, _1, _2, _3) => new ShimLookupTableDataSet();
+            ShimEntityCollection.EntitiesGet = () => new ShimEntityCollection()
+            {
+                TaskEntityGet = () => new ShimEntity()
+                {
+                    UniqueIdGet = () => GuidString
+                }
+            };
+            ShimCustomFields.AllInstances.ReadCustomFieldsByEntityGuid = (_, __) => new ShimCustomFieldDataSet()
+            {
+                CustomFieldsGet = () => new ShimCustomFieldsDataTable()
+            };
+            ShimDataTable.AllInstances.SelectString = (_, __) => new CustomFieldsRow[]
+            {
+                new ShimCustomFieldsRow()
+                {
+                    MD_PROP_ROLLDOWN_TO_ASSNGet = () => true,
+                    MD_PROP_IDGet = () => 111,
+                    MD_PROP_UID_SECONDARYGet = () => guid,
+                    MD_PROP_TYPE_ENUMGet = () => (byte)PropertyType.CostEng96,
+                    IsMD_LOOKUP_TABLE_UIDNull = () => true
+                }.Instance
+            };
+            ShimSPListItemCollection.AllInstances.GetEnumerator = __ => new List<SPListItem>()
+            {
+                new ShimSPListItem()
+                {
+                    ItemGetString = _ => DummyString,
+                    UniqueIdGet = () => guid
+                }.Instance,
+                new ShimSPListItem()
+                {
+                    ItemGetString = key =>
+                    {
+                        if(key.Equals("transuid"))
+                        {
+                            return guid.ToString();
+                        }
+                        return string.Empty;
+                    },
+                    UniqueIdGet = () => guid
+                }.Instance
+            }.GetEnumerator();
+            ShimPSContextInfo.ConstructorBooleanStringGuidGuidGuidString = (_, _1, _2, _3, _4, _5, _6) => new ShimPSContextInfo();
+            ShimPSContextInfo.SerializeToStringPSContextInfo = _ => DummyString;
+            ShimProjectWorkspaceSynch.ConstructorGuidStringGuidString = (_, _1, _2, _3, _5) => new ShimProjectWorkspaceSynch();
+        }
+
+        [TestMethod]
+        public void DoPublish_WhenCalled_Publishes()
+        {
+            // Arrange
+            var validation = 0;
+            var readHit = -1;
+            var today = DateTime.Now;
+            var readOutput = new bool[]
+            {
+                true,
+                false,
+                true,
+                true,
+                false,
+                true,
+                false
+            };
+            var field1 = new ShimSPField()
+            {
+                InternalNameGet = () => "Int32",
+                IdGet = () => guid,
+                HiddenGet = () => false,
+                ReadOnlyFieldGet = () => false,
+                TypeGet = () => SPFieldType.Threading
+            };
+            var field2 = new ShimSPField()
+            {
+                InternalNameGet = () => "Int64",
+                IdGet = () => guid,
+                HiddenGet = () => false,
+                ReadOnlyFieldGet = () => false,
+                TypeGet = () => SPFieldType.Threading
+            };
+            var fieldList = new List<SPField>()
+            {
+                field1.Instance,
+                field2.Instance
+            };
+
+            dataReader.Read = () =>
+            {
+                readHit = readHit + 1;
+                return readOutput[readHit];
+            };
+            dataReader.GetInt32Int32 = _ => 1;
+            dataReader.IsDBNullInt32 = _ => false;
+            dataReader.GetGuidInt32 = _ => guid;
+            dataReader.GetStringInt32 = _ => string.Empty;
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => fieldList.GetEnumerator();
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            {
+                validation = validation + 1;
+                return 1;
+            };
+            ShimProjectWorkspaceSynch.AllInstances.setUpGroups = _ =>
+            {
+                validation = validation + 1;
+            };
+            ShimProjectWorkspaceSynch.AllInstances.processTaskCenter = _ =>
+            {
+                validation = validation + 1;
+            };
+            ShimProjectWorkspaceSynch.AllInstances.processProjectCenter = _ =>
+            {
+                validation = validation + 1;
+            };
+            ShimProjectWorkspaceSynch.AllInstances.processResources = _ =>
+            {
+                validation = validation + 1;
+            };
+            ShimDbDataAdapter.AllInstances.FillDataSet = (DbDataAdapter instance, DataSet dataSet) =>
+            {
+                dataSet.Tables.Add(new DataTable());
+                return 1;
+            };
+            ShimPortfolioEngineAPI.AllInstances.ExecuteStringString = (_, _1, xmlString) => string.Empty;
+            WebSvcProjectFakes.ShimProject.AllInstances.ReadProjectGuidDataStoreEnum = (_, _1, _2) => new WebSvcProjectFakes.ShimProjectDataSet()
+            {
+                AssignmentGet = () => new ShimAssignmentDataTable()
+                {
+                    GetEnumerator = () => new List<AssignmentRow>()
+                    {
+                        new ShimAssignmentRow()
+                        {
+                            ASSN_START_DATEGet = () => today,
+                            ASSN_FINISH_DATEGet = () => today,
+                            ASSN_WORKGet = () => 6,
+                            ASSN_UNITSGet = () => 1
+                        }
+                    }.GetEnumerator()
+                },
+                TaskGet = () => new ShimTaskDataTable(),
+                DependencyGet = () => new ShimDependencyDataTable(),
+                TaskCustomFieldsGet = () => new ShimTaskCustomFieldsDataTable(),
+                ProjectCustomFieldsGet = () => new ShimProjectCustomFieldsDataTable(),
+                ProjectGet = () => new ShimProjectDataTable()
+                {
+                    ItemGetInt32 = __ => new ShimProjectRow()
+                    {
+                        PROJ_NAMEGet = () => DummyString,
+                        PROJ_UIDGet = () => guid,
+                        ProjectOwnerIDGet = () => guid
+                    }
+                }
+            };
+            DoPublishShims();
+
+            // Act
+            InvokeMethod(DoPublishMethodName, publicInstance, new object[] { });
+
+            // Assert
+            validation.ShouldBe(9);
         }
     }
 }
