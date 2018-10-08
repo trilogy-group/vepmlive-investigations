@@ -132,6 +132,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="EPMLiveEnterpriseTaskEventReceiverTests.cs" />
     <Compile Include="EPMLivePublisherTests.cs" />
     <Compile Include="Layouts\epmlive\EconfigTest.cs" />
     <Compile Include="Layouts\epmlive\RunEnterpriseSynchTest.cs" />
@@ -142,6 +143,10 @@
     <ProjectReference Include="..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
       <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
       <Name>EPMLive.TestFakes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
+      <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
+      <Name>EPMLiveCore</Name>
     </ProjectReference>
     <ProjectReference Include="..\EPMLivePS\EPMLivePS\EPMLivePS.csproj">
       <Project>{1121d2ff-7eaa-4532-a1ce-473de551dd70}</Project>
