@@ -13,6 +13,8 @@ namespace EPMLiveReportsAdmin
 {
     public static partial class DataScrubber
     {
+        private const int OwnerId = 1073741823;
+
         public static void CleanTables(SPSite site, EPMData epmData)
         {
             Guard.ArgumentIsNotNull(site, nameof(site));
@@ -99,15 +101,15 @@ namespace EPMLiveReportsAdmin
                 LogStatusLevel2Type3(PopulateRptWebGroupsId, StartBulkInsertRptWebGroups, epmData);
 
                 var dataTable = new DataTable();
-                var dataColumn = new DataColumn(RptWebGroups) {DataType = typeof(Guid)};
+                var dataColumn = new DataColumn(RptWebGroups) { DataType = typeof(Guid) };
                 dataTable.Columns.Add(dataColumn);
-                dataColumn = new DataColumn(SiteId.ToUpper()) {DataType = typeof(Guid)};
+                dataColumn = new DataColumn(SiteId.ToUpper()) { DataType = typeof(Guid) };
                 dataTable.Columns.Add(dataColumn);
-                dataColumn = new DataColumn(WebId.ToUpper()) {DataType = typeof(Guid)};
+                dataColumn = new DataColumn(WebId.ToUpper()) { DataType = typeof(Guid) };
                 dataTable.Columns.Add(dataColumn);
-                dataColumn = new DataColumn(GroupId) {DataType = typeof(int)};
+                dataColumn = new DataColumn(GroupId) { DataType = typeof(int) };
                 dataTable.Columns.Add(dataColumn);
-                dataColumn = new DataColumn(SecType) {DataType = typeof(int)};
+                dataColumn = new DataColumn(SecType) { DataType = typeof(int) };
                 dataTable.Columns.Add(dataColumn);
 
                 foreach (SPRoleAssignment spRoleAssignment in spWeb.RoleAssignments)
@@ -252,7 +254,7 @@ namespace EPMLiveReportsAdmin
 
             try
             {
-                dataRow[WebOwnerId] = spWeb.Author.ID == 1073741823
+                dataRow[WebOwnerId] = spWeb.Author.ID == OwnerId
                     ? 1
                     : (object)spWeb.Author.ID;
             }
