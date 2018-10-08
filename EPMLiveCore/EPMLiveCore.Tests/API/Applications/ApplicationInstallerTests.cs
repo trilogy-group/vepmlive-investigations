@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Collections.Specialized.Fakes;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
@@ -25,6 +27,8 @@ using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Navigation.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.SharePoint.WebPartPages.Fakes;
+using Microsoft.SharePoint.Workflow;
+using Microsoft.SharePoint.Workflow.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 using ShimExtensionMethods = EPMLiveCore.Fakes.ShimExtensionMethods;
@@ -77,6 +81,13 @@ namespace EPMLiveCore.Tests.API.Applications
         private bool _fileAddedToSolution;
         private bool _solutionRemoved;
         private bool _solutionAdded;
+        private bool _returnFirstList;
+        private bool _listAdded;
+        private bool _fieldAdded;
+        private bool _choiceUpdated;
+        private bool _fieldAsXmlAdded;
+        private bool _fileAddedToWeb;
+        private bool _workFlowAssociationCreated;
 
         private const int DummyInt = 1;
         private const string DummyString = "DummyString";
@@ -93,6 +104,7 @@ namespace EPMLiveCore.Tests.API.Applications
         private const string LookupField = "LookupField";
         private const string MessageField = "Message";
         private const string DetailsField = "Details";
+        private const string OWebField = "oWeb";
         private const string ApplicationInstall = "Application Install";
         private const string ApplicatinAlreadyInstalled = "Application is already installed in site collection and will configure.";
         private const string PermissionsCheck = "Permissions Check";
@@ -141,6 +153,16 @@ namespace EPMLiveCore.Tests.API.Applications
         private const string CheckingFiles = "Checking Files";
         private const string CheckingNavigation = "Checking Navigation";
         private const string InstallingSolutionsAndLists = "Installing Solutions and Lists";
+        private const string FieldBoolean = "FieldBoolean";
+        private const string FieldCalculated = "FieldCalculated";
+        private const string FieldChoice = "FieldChoice";
+
+        private const string INavGetParentAppMethod = "iNavGetParentApp";
+        private const string GetTemplateTypeMethod = "GetTemplateType";
+        private const string IInstallListsAddListMethod = "iInstallListsAddList";
+        private const string IInstallListFieldsAddFieldMethod = "iInstallListFieldsAddField";
+        private const string IInstallListsWorkflowsInstallMethod = "iInstallListsWorkflowsInstall";
+        private const string IInstallListsWorkflowsMethod = "iInstallListsWorkflows";
 
         [TestInitialize]
         public void TestInitialize()
@@ -180,6 +202,13 @@ namespace EPMLiveCore.Tests.API.Applications
             _fileAddedToSolution = false;
             _solutionRemoved = false;
             _solutionAdded = false;
+            _returnFirstList = true;
+            _listAdded = false;
+            _fieldAdded = false;
+            _choiceUpdated = false;
+            _fieldAsXmlAdded = false;
+            _fileAddedToWeb = false;
+            _workFlowAssociationCreated = false;
 
             _shimObject = ShimsContext.Create();
 
@@ -224,13 +253,14 @@ namespace EPMLiveCore.Tests.API.Applications
             _privateObj.SetFieldOrProperty("oListItem", listItem);
 
             var count = 0;
+            var fieldList = new List<string>();
             _list = new ShimSPList
             {
                 TitleGet = () => DummyString,
                 GetItemsSPQuery = _ =>
                 {
                     count++;
-                    if (count > 1 || _verifyOnly) {
+                    if (count > 1 || _returnFirstList) {
                         return new ShimSPListItemCollection
                         {
                             ItemGetInt32 = __ => listItem
@@ -251,12 +281,32 @@ namespace EPMLiveCore.Tests.API.Applications
                         {
                             case LookupField:
                                 return new ShimSPFieldLookup().Instance;
-                            default:
+                            case DummyString:
                                 return new ShimSPField
                                 {
                                     TypeAsStringGet = () => DummyString
                                 }.Instance;
+                            default:
+                                if (!fieldList.Contains(name))
+                                {
+                                    fieldList.Add(name);
+                                    return null;
+                                }
+
+                                return VerifyField(name);
                         }
+                    },
+                    AddStringSPFieldTypeBoolean = (name, __, ___) =>
+                    {
+                        _fieldAdded = true;
+
+                        return name;
+                    },
+                    AddFieldAsXmlString = _ =>
+                    {
+                        _fieldAsXmlAdded = true;
+
+                        return DummyString;
                     }
                 },
                 ViewsGet = () => new ShimSPViewCollection
@@ -308,12 +358,38 @@ namespace EPMLiveCore.Tests.API.Applications
                     return SPFieldType.Lookup;
                 }
 
-                return SPFieldType.Text;
+                switch (field.InternalName)
+                {
+                    case FieldBoolean:
+                        return SPFieldType.Boolean;
+                    case FieldCalculated:
+                        return SPFieldType.Calculated;
+                    case FieldChoice:
+                        return SPFieldType.Choice;
+                    default:
+                        return SPFieldType.Text;
+                }
             };
             ShimSPField.AllInstances.SealedGet = _ => true;
             ShimSPField.AllInstances.Update = _ => _fieldUpdated = true;
             ShimSPField.AllInstances.UpdateBoolean = (_, __) => _fieldBooleanUpdated = true;
             ShimSPField.AllInstances.SchemaXmlGet = _ => CreateFieldXml();
+            ShimSPField.AllInstances.InternalNameGet = field =>
+            {
+                if (field is SPFieldCalculated)
+                {
+                    return FieldCalculated;
+                }
+                if (field is SPFieldChoice)
+                {
+                    return FieldChoice;
+                }
+
+                return DummyString;
+            };
+
+            ShimSPFieldMultiChoice.AllInstances.ChoicesGet = _ => new StringCollection();
+            ShimSPFieldMultiChoice.AllInstances.Update = _ => _choiceUpdated = true;
 
             var countFolderExists = 0;
             _web = new ShimSPWeb
@@ -321,7 +397,14 @@ namespace EPMLiveCore.Tests.API.Applications
                 SiteGet = () => _site,
                 ListsGet = () => new ShimSPListCollection
                 {
-                    TryGetListString = _ => _list
+                    TryGetListString = _ => _list,
+                    AddStringStringSPListTemplate = (_, __, ___) =>
+                    {
+                        _listAdded = true;
+
+                        return Guid.NewGuid();
+                    },
+                    ItemGetGuid = _ => _list
                 },
                 AllUsersGet = () => new ShimSPUserCollection
                 {
@@ -441,7 +524,23 @@ namespace EPMLiveCore.Tests.API.Applications
 
                         return null;
                     }
-                }
+                },
+                FilesGet = () => new ShimSPFileCollection
+                {
+                    AddStringByteArrayBoolean = (_, __, ___) =>
+                    {
+                        _fileAddedToWeb = true;
+
+                        return null;
+                    }
+                },
+                WorkflowTemplatesGet = () => new ShimSPWorkflowTemplateCollection().Bind(new SPWorkflowTemplate[]
+                {
+                    new ShimSPWorkflowTemplate
+                    {
+                        NameGet = () => DummyString
+                    }
+                })
             };
 
             _site = new ShimSPSite
@@ -473,13 +572,21 @@ namespace EPMLiveCore.Tests.API.Applications
                     {
                         NameGet = () => DummyString
                     }
+                }),
+                GetCustomListTemplatesSPWeb = _ => new ShimSPListTemplateCollection().Bind(new SPListTemplate[]
+                {
+                    new ShimSPListTemplate
+                    {
+                        InternalNameGet = () => DummyString
+                    }
                 })
             };
 
             var appDef = new ApplicationDef
             {
                 Id = DummyInt,
-                Community = DummyString
+                Community = DummyString,
+                Icon = DummyString
             };
             appDef.PreReqs.Add(DummyString, DummyString);
             appDef.ApplicationXml.LoadXml(CreateXmlApplication());
@@ -545,6 +652,13 @@ namespace EPMLiveCore.Tests.API.Applications
             ShimSPSite.AllInstances.Dispose = _ => { };
 
             ShimSPWeb.AllInstances.Dispose = _ => { };
+
+            ShimSPWorkflowAssociation.CreateListAssociationSPWorkflowTemplateStringSPListSPList = (_1, _2, _3, _4) =>
+            {
+                _workFlowAssociationCreated = true;
+
+                return null;
+            };
 
             ShimSPPersistedObject.AllInstances.FarmGet = _ => new ShimSPFarm
             {
@@ -667,6 +781,22 @@ namespace EPMLiveCore.Tests.API.Applications
             ShimWebClient.AllInstances.DownloadDataString = (_, __) => new byte[] { };
         }
 
+        private SPField VerifyField(string fieldName)
+        {
+            switch (fieldName)
+            {
+                case FieldCalculated:
+                    return new ShimSPFieldCalculated().Instance;
+                case FieldChoice:
+                    return new ShimSPFieldChoice().Instance;
+                default:
+                    return new ShimSPField
+                    {
+                        InternalNameGet = () => fieldName
+                    }.Instance;
+            }
+        }
+
         private string CreateFieldXml()
         {
             return "<Field List='' ShowField=''></Field>";
@@ -698,7 +828,22 @@ namespace EPMLiveCore.Tests.API.Applications
                             <List Name='{DummyString}' CanUpgrade='true' Reporting='true'>
                                 <Fields>
                                     <Field InternalName='{DummyString}' Overwrite='true' Total='{DummyInt}'>
-                                        <Field Type='{DummyString}'></Field>
+                                        <Field Type='{DummyString}' DisplayName='{DummyString}' ShowField='true'></Field>
+                                    </Field>
+                                    <Field InternalName='{FieldBoolean}' Overwrite='true'>
+                                        <Field Type='Boolean'></Field>
+                                    </Field>
+                                    <Field InternalName='{FieldCalculated}' Overwrite='true'>
+                                        <Field Type='Calculated'>
+                                            <FormulaDisplayNames>{DummyString}</FormulaDisplayNames>
+                                        </Field>
+                                    </Field>
+                                    <Field InternalName='{FieldChoice}' Overwrite='true' Total='{DummyInt}'>
+                                        <Field Type='Choice' ShowInEditForm='true' ShowInNewForm='true' ShowInDisplayForm='true' DisplayName='{DummyString}' FillInChoice='true'>
+                                            <CHOICES>
+                                                <CHOICE>{DummyString}</CHOICE>
+                                            </CHOICES>
+                                        </Field>
                                     </Field>
                                 </Fields>
                                 <Lookups>
@@ -771,7 +916,7 @@ namespace EPMLiveCore.Tests.API.Applications
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => _testObj.DtMessages.Rows.Count.ShouldBe(42),
+                () => _testObj.DtMessages.Rows.Count.ShouldBe(45),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(ApplicationInstall),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(ApplicatinAlreadyInstalled),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(PermissionsCheck),
@@ -787,6 +932,9 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(CheckingLists),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(ListExists),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(CheckingFields),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(FieldBoolean),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(FieldCalculated),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(FieldChoice),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(FieldExists),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(CheckingLookups),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(FieldExists),
@@ -825,6 +973,8 @@ namespace EPMLiveCore.Tests.API.Applications
             ShimApplicationInstaller.AllInstances.iInstallListsWorkflowsSPListXmlNodeInt32Boolean =
                 (_, _1, _2, _3, _4) => iInstallListsWorkflowsCalled = true;
 
+            _returnFirstList = false;
+
             // Act
             _testObj.InstallAndConfigureApp(_verifyOnly, _web.Instance, DummyInt);
 
@@ -841,11 +991,13 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _webFeatureAdded.ShouldBeTrue(),
                 () => _siteFeatureAdded.ShouldBeTrue(),
                 () => _fieldUpdated.ShouldBeTrue(),
+                () => _choiceUpdated.ShouldBeTrue(),
                 () => _fieldBooleanUpdated.ShouldBeTrue(),
                 () => _viewFieldsAllDeleted.ShouldBeTrue(),
                 () => _viewFieldAdded.ShouldBeTrue(),
                 () => _viewUpdated.ShouldBeTrue(),
                 () => _fileAdded.ShouldBeTrue(),
+                () => _fileAddedToWeb.ShouldBeTrue(),
                 () => _fileContentSaved.ShouldBeTrue(),
                 () => _webPartSaved.ShouldBeTrue(),
                 () => _webPartDeleted.ShouldBeTrue(),
@@ -853,6 +1005,7 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _webPartConnected.ShouldBeTrue(),
                 () => _fileDeleted.ShouldBeTrue(),
                 () => _listItemAdded.ShouldBeTrue(),
+                () => _fieldAdded.ShouldBeTrue(),
                 () => _listBizCreated.ShouldBeTrue(),
                 () => _configSettingSet.ShouldBeTrue(),
                 () => _communityCreated.ShouldBeTrue(),
@@ -865,7 +1018,7 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _reportDataSourcesProcessed.ShouldBeTrue(),
                 () => _cacheRemoved.ShouldBeTrue(),
                 () => _storeInformationAdded.ShouldBeTrue(),
-                () => _testObj.DtMessages.Rows.Count.ShouldBe(45),
+                () => _testObj.DtMessages.Rows.Count.ShouldBe(48),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(PermissionsCheck),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(ApplicationList),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(PreRequisiteCheck),
@@ -880,6 +1033,9 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(InstallingLists),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(ListExists),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(UpdatingFields),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(FieldBoolean),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(FieldCalculated),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(FieldChoice),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(FieldUpdated),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(FixingLookups),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(FieldUpdated),
@@ -903,6 +1059,128 @@ namespace EPMLiveCore.Tests.API.Applications
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(QuickLaunch),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(TopNav),
                 () => _testObj.XmlMessages.OuterXml.ShouldContain(ProcessingReports));
+        }
+
+        [TestMethod]
+        public void INavGetParentApp_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            _privateObj.SetFieldOrProperty("oAppList", _list.Instance);
+
+            // Act
+            var result = (SPListItem)_privateObj.Invoke(INavGetParentAppMethod, DummyString);
+
+            // Assert
+            result.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void GetTemplateType_OnValidType_ConfirmResult()
+        {
+            // Arrange, Act
+            var result = (SPListTemplateType)_privateObj.Invoke(GetTemplateTypeMethod, "101");
+
+            // Assert
+            result.ShouldBe(SPListTemplateType.DocumentLibrary);
+        }
+
+        [TestMethod]
+        public void GetTemplateType_OnInvalidValidType_ConfirmResult()
+        {
+            // Arrange, Act
+            var result = (SPListTemplateType)_privateObj.Invoke(GetTemplateTypeMethod, DummyString);
+
+            // Assert
+            result.ShouldBe(SPListTemplateType.NoListTemplate);
+        }
+
+        [TestMethod]
+        public void IInstallListsAddList_OnValidCall_ConfirmResult()
+        {
+            // Arrage
+            var error = string.Empty;
+            var xmlString = $"<List Name='{DummyString}' FileName='{DummyString}' Template='{DummyString}' Description='{DummyString}'></List>";
+            var xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml(xmlString);
+
+            var node = xmlDocument.SelectSingleNode("/List");
+
+            _privateObj.SetFieldOrProperty(OWebField, _web.Instance);
+
+            // Act
+            var result = (SPList)_privateObj.Invoke(IInstallListsAddListMethod, node, error);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _listAdded.ShouldBeTrue(),
+                () => result.ShouldNotBeNull());
+        }
+
+        [TestMethod]
+        public void IInstallListFieldsAddField_WhenInvalidType_ConfirmResult()
+        {
+            // Arrange
+            var xmlString = $"<Field ID='{DummyInt}' DisplayName='{DummyString}'></Field>";
+            var xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml(xmlString);
+
+            var node = xmlDocument.SelectSingleNode("/Field");
+
+            // Act
+            var result = (SPField)_privateObj.Invoke(IInstallListFieldsAddFieldMethod, _list.Instance, DummyString, DummyString, node);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _fieldAsXmlAdded.ShouldBeTrue(),
+                () => result.ShouldNotBeNull());
+        }
+
+        [TestMethod]
+        public void IInstallListsWorkflowsInstall_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            var xmlString = "<Workflow AllowManual='true' StartOnCreate='true' StartOnChange='true'></Workflow>";
+            var xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml(xmlString);
+
+            var node = xmlDocument.SelectSingleNode("/Workflow");
+
+            _privateObj.SetFieldOrProperty(OWebField, _web.Instance);
+
+            // Act
+            _privateObj.Invoke(
+                IInstallListsWorkflowsInstallMethod, 
+                _list.Instance, 
+                DummyString, 
+                DummyString, 
+                _list.Instance, 
+                _list.Instance, 
+                node);
+
+            // Assert
+            _workFlowAssociationCreated.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void IInstallListsWorkflows_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            var xmlString = $"<Root><Workflows><Workflow Name='{DummyString}' Overwrite='true'></Workflow></Workflows></Root>";
+            var xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml(xmlString);
+
+            var node = xmlDocument.SelectSingleNode("/Root");
+
+            _privateObj.SetFieldOrProperty("bVerifyOnly", true);
+            _privateObj.SetFieldOrProperty(OWebField, _web.Instance);
+
+            // Act
+            _privateObj.Invoke(IInstallListsWorkflowsMethod, null, node, 0, true);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _testObj.XmlMessages.OuterXml.ShouldContain("Checking Workflows"),
+                () => _testObj.XmlMessages.OuterXml.ShouldContain(DummyString));
         }
     }
 }
