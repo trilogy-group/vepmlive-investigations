@@ -531,7 +531,10 @@ namespace EPMLiveCore.API
                             {
                                 using (var connection = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
                                 {
-                                    SPSecurity.RunWithElevatedPrivileges(connection.Open);
+                                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                                    {
+                                        connection.Open();
+                                    });
                                     using (var command = new SqlCommand(
                                         "select percentComplete,status,dtfinished,result,resulttext from vwQueueTimerLog " +
                                         "where siteguid=@siteguid and webguid=@webguid " +
