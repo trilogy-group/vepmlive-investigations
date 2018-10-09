@@ -764,17 +764,19 @@ namespace TimeSheets
 
                             listGuid = iList.ID;
                         }
+                        
                         try
                         {
                             // This will throw error if task is deleted
                             SPListItem li = iList.GetItemById(int.Parse(dataRow["ITEM_ID"].ToString()));
                             SharedFunctions.processMeta(iWeb, iList, li, new Guid(dataRow["ts_item_uid"].ToString()), dataRow["project"].ToString(), cn, pList);
                         }
-                        catch(Exception ex)
+                        catch(ArgumentException ex)
                         {
                             //The item is deleted and not found in SPList
                             Logger.WriteLog(Logger.Category.Unexpected, "Timesheet submission", ex.ToString());
                         }
+                        
                     }
                 }
                 finally
