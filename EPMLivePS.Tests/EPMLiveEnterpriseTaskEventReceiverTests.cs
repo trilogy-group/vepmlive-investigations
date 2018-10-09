@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Fakes;
 using System.Data.SqlClient.Fakes;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using EPMLiveCore.Fakes;
 using EPMLiveEnterprise;
 using EPMLiveEnterprise.Fakes;
 using EPMLiveEnterprise.WebSvcCustomFields.Fakes;
 using EPMLiveEnterprise.WebSvcLookupTables.Fakes;
-using EPMLiveEnterprise.WebSvcProject.Fakes;
 using EPMLiveEnterprise.WebSvcStatusing.Fakes;
 using Microsoft.Office.Project.Server.Library;
 using Microsoft.Office.Project.Server.Library.Fakes;
@@ -27,10 +23,12 @@ using static EPMLiveEnterprise.WebSvcCustomFields.CustomFieldDataSet;
 using static EPMLiveEnterprise.WebSvcCustomFields.Fakes.ShimCustomFieldDataSet;
 using static EPMLiveEnterprise.WebSvcLookupTables.LookupTableDataSet;
 using static EPMLiveEnterprise.WebSvcLookupTables.Fakes.ShimLookupTableDataSet;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EPMLivePS.Tests
 {
     [TestClass]
+    [ExcludeFromCodeCoverage]
     public class EPMLiveEnterpriseTaskEventReceiverItemEventReceiverTests
     {
         private EPMLiveEnterpriseTaskEventReceiverItemEventReceiver testObject;
@@ -49,14 +47,6 @@ namespace EPMLivePS.Tests
         private const int DummyInt32 = 111;
         private const string DummyString = "DummyString";
         private const string GuidString = "83e81819-0112-4c22-bb70-d8ba101e9e0c";
-        private const string ItemAddingMethodName = "ItemAdding";
-        private const string ItemUpdatingMethodName = "ItemUpdating";
-        private const string UpdateHandleMethodName = "UpdateHandle";
-        private const string InsertHandleMethodName = "InsertHandle";
-        private const string GetProjectUidMethodName = "getProjectUid";
-        private const string IsFieldEditableMethodName = "isFieldEditable";
-        private const string UpdateTaskMethodName = "UpdateTask";
-        private const string ValueToUseMethodName = "ValueToUse";
         private const string WssFieldNameColumn = "wssFieldName";
         private const string AssnFieldNameColumn = "assnfieldname";
         private const string FieldTypeColumn = "fieldtype";
@@ -66,6 +56,8 @@ namespace EPMLivePS.Tests
         private const string SchemaXml = @"<SchemaXml Format=""DateOnly""/>";
         private const string DateTimeType = "DATETIME";
         private const string NumberType = "Number";
+        private const string CurrencyType = "CURRENCY";
+        private const string DurationType = "DURATION";
         private const string DurType = "Dur";
         private const string TimeSheetHours = "251658250";
         private const string FieldPropertiesFieldName = "fieldProperties";
@@ -73,6 +65,15 @@ namespace EPMLivePS.Tests
         private const string SiteGuidFieldName = "pwaSiteGuid";
         private const string CustomFieldsFieldName = "CustomFields";
         private const string LookupTableFieldName = "LookupTable";
+        private const string ItemAddingMethodName = "ItemAdding";
+        private const string ItemUpdatingMethodName = "ItemUpdating";
+        private const string UpdateHandleMethodName = "UpdateHandle";
+        private const string InsertHandleMethodName = "InsertHandle";
+        private const string GetProjectUidMethodName = "getProjectUid";
+        private const string IsFieldEditableMethodName = "isFieldEditable";
+        private const string UpdateTaskMethodName = "UpdateTask";
+        private const string ValueToUseMethodName = "ValueToUse";
+        private const string ReturnCalculatedFieldMethodName = "ReturnCalculatedField";
 
         [TestInitialize]
         public void Setup()
@@ -861,6 +862,66 @@ namespace EPMLivePS.Tests
 
             // Act
             var actual = (string)privateObject.Invoke(ValueToUseMethodName, nonPublicInstance, new object[] { properties.Instance, spField.Instance });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void ReturnCalculatedField_FieldCategory1_ReturnsString()
+        {
+            // Arrange
+            const string value = "10";
+            const string fieldType = NumberType;
+            const int fieldCategory = 1;
+            const int multiplier = 10;
+            const string expected = "100";
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                ReturnCalculatedFieldMethodName,
+                nonPublicInstance,
+                new object[] { value, fieldCategory, fieldType, multiplier });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void ReturnCalculatedField_FieldCategory2_ReturnsString()
+        {
+            // Arrange
+            const string value = "10";
+            const string fieldType = CurrencyType;
+            const int fieldCategory = 2;
+            const int multiplier = 10;
+            const string expected = "1000";
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                ReturnCalculatedFieldMethodName,
+                nonPublicInstance,
+                new object[] { value, fieldCategory, fieldType, multiplier });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void ReturnCalculatedField_FieldCategory3_ReturnsString()
+        {
+            // Arrange
+            const string value = "10";
+            const string fieldType = DurationType;
+            const int fieldCategory = 3;
+            const int multiplier = 10;
+            const string expected = "48000";
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                ReturnCalculatedFieldMethodName,
+                nonPublicInstance,
+                new object[] { value, fieldCategory, fieldType, multiplier });
 
             // Assert
             actual.ShouldBe(expected);
