@@ -105,8 +105,7 @@ namespace TimeSheets
         private XmlNode AddNewColumn(int days)
         {
             var newCol = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            newCol.InnerXml = "<![CDATA[" + periodStart.AddDays(days).DayOfWeek.ToString().Substring(0, 3) + "<br>" + periodStart.AddDays(days).Day +
-                              "]]>";
+            newCol.InnerXml = "<![CDATA[" + periodStart.AddDays(days).DayOfWeek.ToString().Substring(0, 3) + "<br>" + periodStart.AddDays(days).Day + "]]>";
             var attrType = docXml.CreateAttribute(TypeConst);
             attrType.Value = "ro[=sum]";
             var attrWidth = docXml.CreateAttribute("width");
@@ -114,8 +113,7 @@ namespace TimeSheets
             var attrAlign = docXml.CreateAttribute("align");
             attrAlign.Value = "right";
             var attrId = docXml.CreateAttribute(Id);
-            attrId.Value = "_TsDate_" + periodStart.AddDays(days).ToShortDateString().Replace("/", "_");
-            ;
+            attrId.Value = "_TsDate_" + periodStart.AddDays(days).ToShortDateString().Replace("/", "_");            
 
             newCol.Attributes.Append(attrType);
             newCol.Attributes.Append(attrWidth);
