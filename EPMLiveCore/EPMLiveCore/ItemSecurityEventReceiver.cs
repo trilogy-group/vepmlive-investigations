@@ -50,19 +50,20 @@ namespace EPMLiveCore
                 if (isSecure)
                     priority = 0;
 
-                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(properties.Web.Site.WebApplication.Id));
-                cn.Open();
-
-                SqlCommand cmd = new SqlCommand("INSERT INTO ITEMSEC (SITE_ID, WEB_ID, LIST_ID, ITEM_ID, USER_ID, priority) VALUES (@siteid, @webid, @listid, @itemid, @userid, @priority)", cn);
-                cmd.Parameters.AddWithValue("@siteid", properties.SiteId);
-                cmd.Parameters.AddWithValue("@webid", properties.Web.ID);
-                cmd.Parameters.AddWithValue("@listid", properties.ListId);
-                cmd.Parameters.AddWithValue("@itemid", properties.ListItemId);
-                cmd.Parameters.AddWithValue("@userid", properties.CurrentUserId);
-                cmd.Parameters.AddWithValue("@priority", priority);
-                cmd.ExecuteNonQuery();
-
-                cn.Close();
+                using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(properties.Web.Site.WebApplication.Id)))
+                {
+                    sqlConnection.Open();
+                    using (var sqlCommand = new SqlCommand("INSERT INTO ITEMSEC (SITE_ID, WEB_ID, LIST_ID, ITEM_ID, USER_ID, priority) VALUES (@siteid, @webid, @listid, @itemid, @userid, @priority)", sqlConnection))
+                    {
+                        sqlCommand.Parameters.AddWithValue("@siteid", properties.SiteId);
+                        sqlCommand.Parameters.AddWithValue("@webid", properties.Web.ID);
+                        sqlCommand.Parameters.AddWithValue("@listid", properties.ListId);
+                        sqlCommand.Parameters.AddWithValue("@itemid", properties.ListItemId);
+                        sqlCommand.Parameters.AddWithValue("@userid", properties.CurrentUserId);
+                        sqlCommand.Parameters.AddWithValue("@priority", priority);
+                        sqlCommand.ExecuteNonQuery();
+                    }
+                }
                 SPUser orignalUser = properties.Web.AllUsers.GetByID(properties.CurrentUserId);
 
                 if (isSecure)

@@ -780,35 +780,6 @@ namespace EPMLiveCore.API
         }
 
         #endregion
-        
-        #region Method Call : (Add) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_PropertyHash_Add_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var pair = CreateType<KeyValuePair<int, Dictionary<object, object>>>();
-            var methodAddPrametersTypes = new Type[] { typeof(KeyValuePair<int, Dictionary<object, object>>) };
-            object[] parametersOfAdd = { pair };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodAdd, methodAddPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_propertyHashInstanceFixture, parametersOfAdd);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfAdd.ShouldNotBeNull();
-            parametersOfAdd.Length.ShouldBe(1);
-            methodAddPrametersTypes.Length.ShouldBe(1);
-            methodAddPrametersTypes.Length.ShouldBe(parametersOfAdd.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
 
         #region Method Call : (Add) (Return Type : void) No Exception with encapsulation Thrown
 
@@ -903,36 +874,6 @@ namespace EPMLiveCore.API
         {
             var methodAddPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_propertyHashInstance, MethodAdd, Fixture, methodAddPrametersTypes);
-        }
-
-        #endregion
-        
-        #region Method Call : (Add) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_PropertyHash_Add_Method_Call_Void_Overloading_Of_1_With_2_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var key = CreateType<int>();
-            var value = CreateType<Dictionary<object, object>>();
-            var methodAddPrametersTypes = new Type[] { typeof(int), typeof(Dictionary<object, object>) };
-            object[] parametersOfAdd = { key, value };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodAdd, methodAddPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_propertyHashInstanceFixture, parametersOfAdd);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfAdd.ShouldNotBeNull();
-            parametersOfAdd.Length.ShouldBe(2);
-            methodAddPrametersTypes.Length.ShouldBe(2);
-            methodAddPrametersTypes.Length.ShouldBe(parametersOfAdd.Length);
-            Should.NotThrow(currentAction);
         }
 
         #endregion

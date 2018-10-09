@@ -109,17 +109,13 @@
     <Compile Include="API\WPAPITest.cs" />
     <Compile Include="BackButton\BackButtonTest.cs" />
     <Compile Include="BuyNow\BuyNowTest.cs" />
-    <Compile Include="ChartControl\ChartControlTest.cs" />
     <Compile Include="ChartControl\ChartControlToolpartBaseTest.cs" />
-    <Compile Include="ChartControl\EpmChartTest.cs" />
     <Compile Include="ChartControl\ExtensionsTest.cs" />
     <Compile Include="ChartControl\VfChartSeriesTest.cs" />
     <Compile Include="ChartControl\VfChartTest.cs" />
     <Compile Include="ChartControl\VfPointTest.cs" />
-    <Compile Include="Comments\CommentsTest.cs" />
     <Compile Include="Comments\CommentsToolPartTest.cs" />
     <Compile Include="ContentView\ContentViewTest.cs" />
-    <Compile Include="ContextualHelpSlideOut\ContextualHelpSlideOutTest.cs" />
     <Compile Include="CONTROLTEMPLATES\MyWork\MyWorkParamsTest.cs" />
     <Compile Include="CONTROLTEMPLATES\MyWork\WorkingOnParamsTest.cs" />
     <Compile Include="DomainModel\ExcelConnectionInfoTest.cs" />
@@ -135,8 +131,6 @@
     <Compile Include="EpmCharting\DomainServices\ChartHelperTest.cs" />
     <Compile Include="EpmCharting\DomainServices\HtmlColorServiceTest.cs" />
     <Compile Include="EpmCharting\Mappers\EpmChartSeriesToVisifireChartSeriesMapperTest.cs" />
-    <Compile Include="EpmCharting\Mappers\EpmChartUserSettingsToPersonalizationDataMapperTest.cs" />
-    <Compile Include="EpmCharting\Repositories\EpmChartUserSettingsRepositoryTest.cs" />
     <Compile Include="EPMLiveQuickLaunchModifier\EPMLiveQuickLaunchModifierTest.cs" />
     <Compile Include="GridListView\DependencyTest.cs" />
     <Compile Include="GridListView\FieldValuesTest.cs" />
@@ -206,7 +200,6 @@
     <Compile Include="RollupSummary\SummaryRollupToolpartTest.cs" />
     <Compile Include="SiteCollectionSetupWizard\SiteCollectionSetupWizardTest.cs" />
     <Compile Include="SocialStream\SocialStreamTest.cs" />
-    <Compile Include="UserProfileDisplay\DisplayProfilePicturesTest.cs" />
     <Compile Include="UserProfileDisplay\UserProfileToolPartTest.cs" />
     <Compile Include="Utilities\ExtensionsTest.cs" />
     <Compile Include="Utilities\LookupFilterHelperTest.cs" />
@@ -573,7 +566,6 @@
     <Compile Include="Web References\SSRS2010\WeeklyRecurrenceTest.cs" />
     <Compile Include="WebPageCode\AjaxpostTest.cs" />
     <Compile Include="WebPageCode\CheckresganttTest.cs" />
-    <Compile Include="WebPageCode\ContextualslideoutTest.cs" />
     <Compile Include="WebPageCode\GetedititemTest.cs" />
     <Compile Include="WebPageCode\GetganttitemsTest.cs" />
     <Compile Include="WebPageCode\GetgantttasksTest.cs" />
@@ -622,7 +614,10 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="ContextualHelpSlideOut\" />
+    <Folder Include="EpmCharting\Repositories\" />
+  </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
