@@ -1331,141 +1331,152 @@ namespace PortfolioEngineCore
             return true;
         }
 
-        private static void WriteToDatabaseThisPI(DBAccess dba, int ProjectID, int nCB_ID, int nCT_ID,
-                                                    bool allPIs, ref bool firsttimethrough,
-                                                    double[,] quantity, double[,] cost, Dictionary<int, PfECostCategory> costcategories)
+        private static void WriteToDatabaseThisPI(DBAccess dbAccess, int projectId, int calId, int ctId,
+                                                    bool allPIs, ref bool firstTimeThrough,
+                                                    double[,] quantity, double[,] cost, IDictionary<int, PfECostCategory> costcategories)
         {
-            SqlCommand oCommand;
-            string cmdText;
+            dbAccess.BeginTransaction();
 
-            string swhereclause;
-            dba.BeginTransaction();
-
-            // clear all existing values and write out new ones, all at once when for allPIs
-            if (!allPIs || firsttimethrough)
-            {
-                firsttimethrough = false;
-                if (allPIs)
-                {
-                    swhereclause = " WHERE CB_ID=@CalID And CT_ID=@CTID";
-                }
-                else
-                {
-                    swhereclause = " WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
-                }
-                cmdText = "DELETE FROM  EPGP_COST_VALUES" + swhereclause;
-                oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                oCommand.CommandType = CommandType.Text;
-                oCommand.ExecuteNonQuery();
-
-                cmdText = "DELETE FROM  EPGP_DETAIL_VALUES" + swhereclause;
-                oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                oCommand.CommandType = CommandType.Text;
-                oCommand.ExecuteNonQuery();
-
-                cmdText = "DELETE FROM  EPGP_COST_DETAILS" + swhereclause;
-                oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                oCommand.CommandType = CommandType.Text;
-                oCommand.ExecuteNonQuery();
-
-                if (allPIs)
-                {
-                    swhereclause = " WHERE CB_ID=@CalID And CT_ID=@CTID";
-                    cmdText = "DELETE FROM  EPGP_COST_VALUES_INFO" + swhereclause;
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.CommandType = CommandType.Text;
-                    oCommand.ExecuteNonQuery();
-                }
-            }
+            firstTimeThrough = ClearAllExistingValues(dbAccess, projectId, calId, ctId, allPIs, firstTimeThrough);
 
             // Create new values 
-
             // set up the INSERT I need to add new records
-            cmdText = "INSERT INTO EPGP_COST_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID,BD_PERIOD,BD_VALUE,BD_COST,BD_IS_SUMMARY)"
+            var commandText = "INSERT INTO EPGP_COST_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID,BD_PERIOD,BD_VALUE,BD_COST,BD_IS_SUMMARY)"
                     + " VALUES(@CalID,@CTID,@ProjectID,@BC_UID,@BD_PERIOD,@BD_VALUE,@BD_COST,@SUM_FLAG)";
-            oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-            oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-            oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-            oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-            SqlParameter pBC_UID = oCommand.Parameters.Add("@BC_UID", SqlDbType.Int);
-            SqlParameter pBD_PERIOD = oCommand.Parameters.Add("@BD_PERIOD", SqlDbType.Int);
-            SqlParameter pBD_VALUE = oCommand.Parameters.Add("@BD_VALUE", SqlDbType.Decimal);
-            SqlParameter pBD_COST = oCommand.Parameters.Add("@BD_COST", SqlDbType.Decimal);
-            SqlParameter pSUM_FLAG = oCommand.Parameters.Add("@SUM_FLAG", SqlDbType.Int);
-            pBD_VALUE.Precision = 25;
-            pBD_VALUE.Scale = 6;
-            pBD_COST.Precision = 25;
-            pBD_COST.Scale = 6;
+            using (var command = new SqlCommand(commandText, dbAccess.Connection, dbAccess.Transaction))
+            {
+                command.Parameters.AddWithValue("@CalID", calId);
+                command.Parameters.AddWithValue("@CTID", ctId);
+                command.Parameters.AddWithValue("@ProjectID", projectId);
+                WriteTotalLineForEachCostCategory(quantity, cost, costcategories, command);
+            }
+            dbAccess.CommitTransaction();
+
+            // write n INFO record if appropriate
+            if (allPIs)
+            {
+                commandText = "INSERT INTO EPGP_COST_VALUES_INFO (CB_ID,CT_ID,CV_INFO,CV_TIMESTAMP)"
+                        + " VALUES(@CalID,@CTID,@INFO,GETDATE())";
+                using (var command = new SqlCommand(commandText, dbAccess.Connection, dbAccess.Transaction))
+                {
+                    command.Parameters.AddWithValue("@CalID", calId);
+                    command.Parameters.AddWithValue("@CTID", ctId);
+                    command.Parameters.AddWithValue("@INFO", "Post Cost Values");
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        private static void WriteTotalLineForEachCostCategory(
+            double[,] quantity,
+            double[,] cost,
+            IDictionary<int, PfECostCategory> costcategories,
+            SqlCommand command)
+        {
+            var uidParameter = command.Parameters.Add("@BC_UID", SqlDbType.Int);
+            var periodParameter = command.Parameters.Add("@BD_PERIOD", SqlDbType.Int);
+            var valueParameter = command.Parameters.Add("@BD_VALUE", SqlDbType.Decimal);
+            var costParameter = command.Parameters.Add("@BD_COST", SqlDbType.Decimal);
+            var sumFlagParameter = command.Parameters.Add("@SUM_FLAG", SqlDbType.Int);
+            valueParameter.Precision = 25;
+            valueParameter.Scale = 6;
+            costParameter.Precision = 25;
+            costParameter.Scale = 6;
 
             // go through each Cost Category
-            int numperiods = quantity.GetLength(1);
-            foreach (KeyValuePair<int, PfECostCategory> costcategory in costcategories)
+            var numperiods = quantity.GetLength(1);
+            foreach (var costcategory in costcategories)
             {
-
-                int catindex = costcategory.Value.ID;
+                var catindex = costcategory.Value.ID;
                 if (costcategory.Value.available == 1)
                 {
-                    for (int j = 1; j < numperiods; j++)
+                    for (var j = 1; j < numperiods; j++)
                     {
-                        double dQuantity = quantity[catindex, j];
-                        double dCost = cost[catindex, j];
+                        var dQuantity = quantity[catindex, j];
+                        var dCost = cost[catindex, j];
                         if (dQuantity != 0 || dCost != 0)
                         {
-                            pBC_UID.Value = costcategory.Value.UID;
-                            pBD_PERIOD.Value = j;
-                            pBD_VALUE.Value = dQuantity;
-                            pBD_COST.Value = dCost;
-                            if (costcategory.Value.flag == true) pSUM_FLAG.Value = 1; else pSUM_FLAG.Value = 0;
-                            oCommand.ExecuteNonQuery();
+                            uidParameter.Value = costcategory.Value.UID;
+                            periodParameter.Value = j;
+                            valueParameter.Value = dQuantity;
+                            costParameter.Value = dCost;
+                            sumFlagParameter.Value = costcategory.Value.flag
+                                ? 1
+                                : 0;
+                            command.ExecuteNonQuery();
                         }
                     }
                 }
             }
 
             // write out the TOTAL line 
+            for (var j = 1; j < numperiods; j++)
             {
-                for (int j = 1; j < numperiods; j++)
+                var theQuantity = quantity[0, j];
+                var theCost = cost[0, j];
+                if (theQuantity != 0 || theCost != 0)
                 {
-                    double dQuantity = quantity[0, j];
-                    double dCost = cost[0, j];
-                    if (dQuantity != 0 || dCost != 0)
-                    {
-                        pBC_UID.Value = 0;
-                        pBD_PERIOD.Value = j;
-                        pBD_VALUE.Value = dQuantity;
-                        pBD_COST.Value = dCost;
-                        pSUM_FLAG.Value = 1;
-                        oCommand.ExecuteNonQuery();
-                    }
+                    uidParameter.Value = 0;
+                    periodParameter.Value = j;
+                    valueParameter.Value = theQuantity;
+                    costParameter.Value = theCost;
+                    sumFlagParameter.Value = 1;
+                    command.ExecuteNonQuery();
                 }
             }
-            dba.CommitTransaction();
+        }
 
-            // write n INFO record if appropriate
-            if (allPIs)
+        // clear all existing values and write out new ones, all at once when for allPIs
+        private static bool ClearAllExistingValues(
+            DBAccess dbAccess, 
+            int projectId, 
+            int calId, 
+            int ctId, 
+            bool allPIs, 
+            bool firstTimeThrough)
+        {
+            string whereClause;
+            if (!allPIs || firstTimeThrough)
             {
-                cmdText = "INSERT INTO EPGP_COST_VALUES_INFO (CB_ID,CT_ID,CV_INFO,CV_TIMESTAMP)"
-                        + " VALUES(@CalID,@CTID,@INFO,GETDATE())";
-                oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                oCommand.Parameters.AddWithValue("@INFO", "Post Cost Values");
+                firstTimeThrough = false;
+                whereClause = allPIs
+                    ? " WHERE CB_ID=@CalID And CT_ID=@CTID"
+                    : " WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
 
-                oCommand.ExecuteNonQuery();
+                DeleteFromTable("EPGP_COST_VALUES", dbAccess, projectId, calId, ctId, whereClause);
+                DeleteFromTable("EPGP_DETAIL_VALUES", dbAccess, projectId, calId, ctId, whereClause);
+                DeleteFromTable("EPGP_COST_DETAILS", dbAccess, projectId, calId, ctId, whereClause);
+
+                if (allPIs)
+                {
+                    DeleteFromTable("EPGP_COST_VALUES_INFO", dbAccess, projectId, calId, ctId, whereClause, false);
+                }
             }
 
-            return;
+            return firstTimeThrough;
+        }
+
+        private static void DeleteFromTable(
+            string tableName,
+            DBAccess dbAccess,
+            int projectId,
+            int calId,
+            int ctId,
+            string whereClause,
+            bool addProjectParameter = true)
+        {
+            var commandText = string.Format("DELETE FROM  {0}{1}", tableName, whereClause);
+            using (var command = new SqlCommand(commandText, dbAccess.Connection, dbAccess.Transaction))
+            {
+                command.Parameters.AddWithValue("@CalID", calId);
+                command.Parameters.AddWithValue("@CTID", ctId);
+                if (addProjectParameter)
+                {
+                    command.Parameters.AddWithValue("@ProjectID", projectId);
+                }
+                command.CommandType = CommandType.Text;
+                command.ExecuteNonQuery();
+            }
         }
 
         private static bool SetCostTotals(DBAccess dba, int ProjectID, int nCB_ID, int nCT_ID)
