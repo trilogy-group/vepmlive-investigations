@@ -395,48 +395,57 @@ namespace EPMLiveCore.API
                                         logCommand.Parameters.AddWithValue("@itemid", sID);
                                         logCommand.Parameters.AddWithValue("@key", sPlannerID);
 
+                                        bool newGuid;
                                         using (var dataReader = logCommand.ExecuteReader())
                                         {
                                             if (!dataReader.Read())
                                             {
+                                                newGuid = true;
                                                 jobGuid = Guid.NewGuid();
-                                                using (var timeJobsCommand = new SqlCommand(
-                                                    "INSERT INTO TIMERJOBS " +
-                                                    "(timerjobuid, siteguid, jobtype, jobname,  scheduletype, " +
-                                                    "webguid, listguid, itemid, jobdata, [key]) " +
-                                                    "VALUES (" +
-                                                    "@timerjobuid, @siteguid, 9, @jobname, 9, @webguid, " +
-                                                    "@listguid, @itemid, @jobdata, @key)",
-                                                    connection))
-                                                {
-                                                    timeJobsCommand.Parameters.AddWithValue("@siteguid", oSite.ID.ToString());
-                                                    timeJobsCommand.Parameters.AddWithValue("@webguid", oWeb.ID);
-                                                    timeJobsCommand.Parameters.AddWithValue("@listguid", oList.ID);
-                                                    timeJobsCommand.Parameters.AddWithValue("@itemid", sID);
-                                                    timeJobsCommand.Parameters.AddWithValue("@jobdata", doc.FirstChild.OuterXml);
-                                                    timeJobsCommand.Parameters.AddWithValue("@timerjobuid", jobGuid);
-                                                    timeJobsCommand.Parameters.AddWithValue("@jobname",
-                                                        string.Format("Project Publish_{0}", projectName));
-                                                    timeJobsCommand.Parameters.AddWithValue("@key", sPlannerID);
-                                                    timeJobsCommand.ExecuteNonQuery();
-                                                }
                                             }
                                             else
                                             {
+                                                newGuid = false;
                                                 jobGuid = dataReader.GetGuid(0);
                                                 if (!dataReader.IsDBNull(1))
                                                 {
                                                     status = dataReader.GetInt32(1);
                                                 }
+                                            }
+                                        }
 
-                                                using (var timeJobsCommand = new SqlCommand(
-                                                    "update timerjobs set jobdata=@jobdata where timerjobuid=@timerjobuid",
-                                                    connection))
-                                                {
-                                                    timeJobsCommand.Parameters.AddWithValue("@jobdata", doc.FirstChild.OuterXml);
-                                                    timeJobsCommand.Parameters.AddWithValue("@timerjobuid", jobGuid);
-                                                    timeJobsCommand.ExecuteNonQuery();
-                                                }
+                                        if (newGuid)
+                                        {
+                                            using (var timeJobsCommand = new SqlCommand(
+                                                "INSERT INTO TIMERJOBS " +
+                                                "(timerjobuid, siteguid, jobtype, jobname,  scheduletype, " +
+                                                "webguid, listguid, itemid, jobdata, [key]) " +
+                                                "VALUES (" +
+                                                "@timerjobuid, @siteguid, 9, @jobname, 9, @webguid, " +
+                                                "@listguid, @itemid, @jobdata, @key)",
+                                                connection))
+                                            {
+                                                timeJobsCommand.Parameters.AddWithValue("@siteguid", oSite.ID.ToString());
+                                                timeJobsCommand.Parameters.AddWithValue("@webguid", oWeb.ID);
+                                                timeJobsCommand.Parameters.AddWithValue("@listguid", oList.ID);
+                                                timeJobsCommand.Parameters.AddWithValue("@itemid", sID);
+                                                timeJobsCommand.Parameters.AddWithValue("@jobdata", doc.FirstChild.OuterXml);
+                                                timeJobsCommand.Parameters.AddWithValue("@timerjobuid", jobGuid);
+                                                timeJobsCommand.Parameters.AddWithValue("@jobname",
+                                                    string.Format("Project Publish_{0}", projectName));
+                                                timeJobsCommand.Parameters.AddWithValue("@key", sPlannerID);
+                                                timeJobsCommand.ExecuteNonQuery();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (var timeJobsCommand = new SqlCommand(
+                                                "update timerjobs set jobdata=@jobdata where timerjobuid=@timerjobuid",
+                                                connection))
+                                            {
+                                                timeJobsCommand.Parameters.AddWithValue("@jobdata", doc.FirstChild.OuterXml);
+                                                timeJobsCommand.Parameters.AddWithValue("@timerjobuid", jobGuid);
+                                                timeJobsCommand.ExecuteNonQuery();
                                             }
                                         }
                                     }
