@@ -12,7 +12,7 @@ import {AnchorHelper} from '../../../../components/html/anchor-helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
 import {ExpectationHelper} from '../../../../components/misc-utils/expectation-helper';
 import {MyWorkplacePage} from '../my-workplace.po';
-import { browser, protractor } from 'protractor';
+import { browser } from 'protractor';
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 
@@ -253,8 +253,7 @@ export class MyWorkPageHelper {
 
     static async verifyCreateItem(itemTitle: string) {
         await browser.sleep(PageHelper.timeout.s);
-        await TextboxHelper.sendKeys(MyWorkPage.searchItem, itemTitle);
-        await PageHelper.actionSendKeys(protractor.Key.ENTER);
+        await TextboxHelper.sendKeys(MyWorkPage.searchItem, itemTitle, true);
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.getItemByName(itemTitle),
             itemTitle,
