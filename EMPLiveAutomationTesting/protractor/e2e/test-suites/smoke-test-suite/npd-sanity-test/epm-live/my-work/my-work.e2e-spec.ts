@@ -22,6 +22,7 @@ import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/proj
 import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {SocialStreamPage} from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
+import { ExpectationHelper } from '../../../../../components/misc-utils/expectation-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -71,12 +72,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.changes))
             .toBe(true, ValidationsHelper.getDisplayedValidation(MyWorkPageConstants.title.changes));
 
-        StepLogger.step('Switch to frame');
-        await CommonPageHelper.switchToFirstContentFrame();
-
         StepLogger.stepId(4);
         StepLogger.step('Enter/Select required details in "Changes - New Item" window');
-        await MyWorkPageHelper.fillFormAndSave();
+        await MyWorkPageHelper.fillNewItemFormForChanges();
     });
 
     it('Create New Issue - [855547]', async () => {
@@ -103,12 +101,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.issues))
             .toBe(true, ValidationsHelper.getDisplayedValidation(MyWorkPageConstants.title.issues));
 
-        StepLogger.step('Switch to frame');
-        await CommonPageHelper.switchToFirstContentFrame();
-
         StepLogger.stepId(4);
         StepLogger.step('Enter/Select required details in "Issues - New Item" window');
-        await MyWorkPageHelper.fillFormAndSave();
+        await MyWorkPageHelper.fillNewItemFormForIssues();
     });
 
     it('Create New Risks - [855550]', async () => {
@@ -135,12 +130,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.risks))
             .toBe(true, ValidationsHelper.getDisplayedValidation(MyWorkPageConstants.title.risks));
 
-        StepLogger.step('Switch to frame');
-        await CommonPageHelper.switchToFirstContentFrame();
-
         StepLogger.stepId(4);
         StepLogger.step('Enter/Select required details in "Risks - New Item" window');
-        await MyWorkPageHelper.fillFormAndSave();
+        await MyWorkPageHelper.fillNewItemFormForRisks();
     });
 
     it('Create New Time Off - [855551]', async () => {
@@ -176,7 +168,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const inputLabels = MyWorkPageConstants.inputLabels;
         const titleValue = `${inputLabels.title} ${uniqueId}`;
         // step#5 is inside this function
-        await MyWorkPageHelper.fillTimeOffFormAndSave(titleValue,);
+        await MyWorkPageHelper.fillTimeOffFormAndSave(titleValue);
 
         StepLogger.stepId(6);
         StepLogger.verification('"Navigate to My Time Off page');
@@ -227,19 +219,15 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.step(`Assigned To: New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.assignedTo, LoginPageHelper.adminEmailId);
         StepLogger.step(`select assignedTo value`);
-        await PageHelper.click(MyWorkPage.selectValueFromSuggestions(LoginPageHelper.adminEmailId));
+        await PageHelper.click(MyWorkPage.assignedToSuggestion);
 
         StepLogger.stepId(5);
         StepLogger.step('Click on save');
         await PageHelper.click(CommonPage.formButtons.save);
-        await PageHelper.switchToDefaultContent();
+        await WaitHelper.staticWait(PageHelper.timeout.s);
 
         StepLogger.verification('"To Do New Item" page is closed');
-        await expect(await CommonPage.formButtons.save.isPresent())
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyWorkPageConstants.editPageName));
-        // Wait for the page to close after clicking on save. This is to reduce window close synchronization issues
-        await WaitHelper.staticWait(PageHelper.timeout.m);
+        await ExpectationHelper.verifyNotDisplayedStatus(CommonPage.formButtons.save, CommonPageConstants.formLabels.save);
     });
 
     it('Edit Item - Attach File - [855672]', async () => {

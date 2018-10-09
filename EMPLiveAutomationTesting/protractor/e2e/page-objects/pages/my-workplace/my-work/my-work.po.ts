@@ -259,6 +259,10 @@ export class MyWorkPage {
         return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(text)}]`));
     }
 
+    static get assignedToSuggestion() {
+        return element.all(By.css('li.ms-core-menu-item')).first();
+    }
+
     static selectDropdownOption(option: string) {
         return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(option)}]`));
     }
@@ -294,5 +298,9 @@ export class MyWorkPage {
 
     static getColumnByNameOnSelectColumnsPopup(columnName: string) {
         return element(By.xpath(`//div[contains(@class,'GMColumnsMenuItemText') and text()='${columnName}']`));
+    }
+
+    static get searchItem() {
+        return element(By.id('MWG_Search'));
     }
 }

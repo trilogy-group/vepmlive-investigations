@@ -223,7 +223,7 @@ export class CommonPageHelper {
     ) {
         StepLogger.step('Select "Navigation" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.navigation);
-        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader,);
+        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader);
     }
 
     static async searchByTitle(linkOfThePage: ElementFinder,
@@ -233,19 +233,18 @@ export class CommonPageHelper {
         await this.navigateToItemPageUnderNavigation(
             linkOfThePage,
             pageHeader,
-            pageName,
-        );
-        await this.searchItemByTitle(titleValue, columnName,);
+            pageName);
+        await this.searchItemByTitle(titleValue, columnName);
     }
 
     static async navigateToItemPageUnderMyWorkplace(linkOfThePage: ElementFinder,
                                                     pageHeader: ElementFinder,
-                                                    pageName: string,
+                                                    pageName: string
     ) {
         StepLogger.step('Select "My Workplace" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.myWorkplace);
         StepLogger.stepId(2);
-        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader,);
+        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader);
     }
 
     static async navigateToSubPage(pageName: string, linkOfThePage: ElementFinder, pageHeader: ElementFinder) {
@@ -269,7 +268,7 @@ export class CommonPageHelper {
         await browser.sleep(PageHelper.timeout.m);
 
         StepLogger.step('Click on search');
-        await PageHelper.click(CommonPage.actionMenuIcons.search);
+        await PageHelper.click(CommonPage.actionMenuIcons.searchIcon);
 
         if (verifySearchControl === true) {
             StepLogger.verification('Search Component dropdown is available');
@@ -860,7 +859,7 @@ export class CommonPageHelper {
     }
 
     static async verifyItemDisabled(targetElement: ElementFinder) {
-        await ExpectationHelper.verifyAttributeValue(targetElement, 'aria-disabled', 'true',);
+        await ExpectationHelper.verifyAttributeValue(targetElement, 'aria-disabled', 'true');
     }
 
     static async clickIconEllipsisHorizontal() {

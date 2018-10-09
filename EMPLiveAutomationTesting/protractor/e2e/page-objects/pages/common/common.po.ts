@@ -213,6 +213,7 @@ export class CommonPage extends BasePage {
     static get actionMenuIcons() {
         const titles = CommonPageConstants.actionMenuIconTitles;
         return {
+            searchIcon:  element(By.css('span[class*=icon-search]')),
             search: CommonPageHelper.getActionMenuIcons(titles.search),
             toggleFilters: CommonPageHelper.getActionMenuIcons(titles.toggleFilters),
             defaultSort: CommonPageHelper.getActionMenuIcons(titles.defaultSort),
@@ -233,9 +234,9 @@ export class CommonPage extends BasePage {
 
     static get searchControls() {
         return {
-            text: element(By.css('#searchtext0Main,#searchtext2Main')),
-            type: element(By.css('#searchtype0Main,#searchtype2Main')),
-            column: element(By.css('#search0Main,#search2Main')),
+            text: element(By.css('#searchtext0Main')),
+            type: element(By.css('#searchtype0Main')),
+            column: element(By.css('#search0Main')),
             textChoice: element(By.css('#searchchoice0Main'))
         };
     }
