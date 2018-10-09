@@ -1,17 +1,17 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Data;
+using System.Data.Fakes;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.QualityTools.Testing.Fakes;
-using Shouldly;
 using System.Web.Fakes;
 using System.IO.Fakes;
 using System.IO;
 using WorkEnginePPM.Fakes;
 using PortfolioEngineCore.Fakes;
 using PortfolioEngineCore;
-using System.Data;
-using System.Data.Fakes;
-using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.QualityTools.Testing.Fakes;
+using Shouldly;
 
 namespace WorkEnginePPM.Tests.Layouts.ppm
 {
@@ -98,7 +98,7 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         {
             // Arrange
             var parameters = new object[] { new ShimHttpContext().Instance };
-            ShimWebAdmin.CheckRequestHttpContextStringString = (_, _1, _2) => "";
+            ShimWebAdmin.CheckRequestHttpContextStringString = (_, _1, _2) => string.Empty;
             ShimCStruct.AllInstances.LoadXMLString = (_, _1) => true;
             ShimWebAdmin.BuildReplyStringStringStringString = (_, _1, _2, _3) => DummyString;
             ShimCStruct.AllInstances.GetStringAttrString = (_, _1) => "CostCategoriesRequest";
