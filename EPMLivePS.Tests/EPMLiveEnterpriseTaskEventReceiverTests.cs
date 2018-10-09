@@ -57,6 +57,22 @@ namespace EPMLivePS.Tests
         private const string IsFieldEditableMethodName = "isFieldEditable";
         private const string UpdateTaskMethodName = "UpdateTask";
         private const string ValueToUseMethodName = "ValueToUse";
+        private const string WssFieldNameColumn = "wssFieldName";
+        private const string AssnFieldNameColumn = "assnfieldname";
+        private const string FieldTypeColumn = "fieldtype";
+        private const string FieldCategoryColumn = "fieldCategory";
+        private const string AssnUpdateColumnIdColumn = "assnUpdateColumnId";
+        private const string MultiplierColumn = "multiplier";
+        private const string SchemaXml = @"<SchemaXml Format=""DateOnly""/>";
+        private const string DateTimeType = "DATETIME";
+        private const string NumberType = "Number";
+        private const string DurType = "Dur";
+        private const string TimeSheetHours = "251658250";
+        private const string FieldPropertiesFieldName = "fieldProperties";
+        private const string SiteUrlFieldName = "pwaSiteUrl";
+        private const string SiteGuidFieldName = "pwaSiteGuid";
+        private const string CustomFieldsFieldName = "CustomFields";
+        private const string LookupTableFieldName = "LookupTable";
 
         [TestInitialize]
         public void Setup()
@@ -325,7 +341,7 @@ namespace EPMLivePS.Tests
         public void GetProjectUid_WhenCalled_ReturnsString()
         {
             // Arrange
-            var projectName = "111";
+            const string projectName = "111";
 
             // Act
             var actual = (string)privateObject.Invoke(GetProjectUidMethodName, publicInstance, new object[] { projectName, spWeb.Instance });
@@ -338,7 +354,7 @@ namespace EPMLivePS.Tests
         public void IsFieldEditable_WhereMe_ReturnsBoolean()
         {
             // Arrange
-            var displaySettings = "where;[Me];condition;group;valueCondition";
+            const string displaySettings = "where;[Me];condition;group;valueCondition";
             var fieldProperties = new Dictionary<string, Dictionary<string, string>>()
             {
                 [DummyString] = new Dictionary<string, string>()
@@ -349,7 +365,7 @@ namespace EPMLivePS.Tests
 
             ShimEditableFieldDisplay.RenderFieldSPFieldStringStringStringStringStringSPListItem = (_, _1, _2, _3, _4, _5, _6) => false;
 
-            privateObject.SetFieldOrProperty("fieldProperties", nonPublicInstance, fieldProperties);
+            privateObject.SetFieldOrProperty(FieldPropertiesFieldName, nonPublicInstance, fieldProperties);
 
             // Act
             var actual = (bool)privateObject.Invoke(IsFieldEditableMethodName, nonPublicInstance, new object[] { spField.Instance, spListItem.Instance });
@@ -362,7 +378,7 @@ namespace EPMLivePS.Tests
         public void IsFieldEditable_WhereNotMe_ReturnsBoolean()
         {
             // Arrange
-            var displaySettings = "where;[NotMe];condition;group;valueCondition";
+            const string displaySettings = "where;[NotMe];condition;group;valueCondition";
             var fieldProperties = new Dictionary<string, Dictionary<string, string>>()
             {
                 [DummyString] = new Dictionary<string, string>()
@@ -373,7 +389,7 @@ namespace EPMLivePS.Tests
 
             ShimEditableFieldDisplay.RenderFieldSPFieldStringStringStringStringStringSPListItem = (_, _1, _2, _3, _4, _5, _6) => true;
 
-            privateObject.SetFieldOrProperty("fieldProperties", nonPublicInstance, fieldProperties);
+            privateObject.SetFieldOrProperty(FieldPropertiesFieldName, nonPublicInstance, fieldProperties);
 
             // Act
             var actual = (bool)privateObject.Invoke(IsFieldEditableMethodName, nonPublicInstance, new object[] { spField.Instance, spListItem.Instance });
@@ -399,22 +415,22 @@ namespace EPMLivePS.Tests
             var fieldProperties = new Dictionary<string, Dictionary<string, string>>();
             var fieldDataSet = new DataSet();
             var dataTable = new DataTable();
-            dataTable.Columns.Add("wssFieldName");
-            dataTable.Columns.Add("fieldtype");
-            dataTable.Columns.Add("fieldCategory", typeof(int));
-            dataTable.Columns.Add("assnUpdateColumnId");
-            dataTable.Columns.Add("multiplier", typeof(int));
+            dataTable.Columns.Add(WssFieldNameColumn);
+            dataTable.Columns.Add(FieldTypeColumn);
+            dataTable.Columns.Add(FieldCategoryColumn, typeof(int));
+            dataTable.Columns.Add(AssnUpdateColumnIdColumn);
+            dataTable.Columns.Add(MultiplierColumn, typeof(int));
             var row = dataTable.NewRow();
-            row["wssFieldName"] = DummyString;
-            row["fieldtype"] = DummyString;
-            row["fieldCategory"] = 1;
-            row["assnUpdateColumnId"] = "assnUpdateColumn";
-            row["multiplier"] = 1;
+            row[WssFieldNameColumn] = DummyString;
+            row[FieldTypeColumn] = DummyString;
+            row[FieldCategoryColumn] = 1;
+            row[AssnUpdateColumnIdColumn] = AssnUpdateColumnIdColumn;
+            row[MultiplierColumn] = 1;
             dataTable.Rows.Add(row);
             fieldDataSet.Tables.Add(dataTable);
 
             spField.TypeGet = () => SPFieldType.DateTime;
-            spField.SchemaXmlGet = () => @"<SchemaXml Format=""DateOnly""/>";
+            spField.SchemaXmlGet = () => SchemaXml;
             ShimListDisplayUtils.ConvertFromStringString = _ => fieldProperties;
             ShimDataTable.AllInstances.SelectString = (_, _1) =>
             {
@@ -473,9 +489,9 @@ namespace EPMLivePS.Tests
                 return DummyInt32;
             };
 
-            privateObject.SetFieldOrProperty("pwaSiteUrl", nonPublicInstance, DummyString);
-            privateObject.SetFieldOrProperty("pwaSiteGuid", nonPublicInstance, guid);
-            privateObject.SetFieldOrProperty("CustomFields", nonPublicInstance, customFields.Instance);
+            privateObject.SetFieldOrProperty(SiteUrlFieldName, nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty(SiteGuidFieldName, nonPublicInstance, guid);
+            privateObject.SetFieldOrProperty(CustomFieldsFieldName, nonPublicInstance, customFields.Instance);
 
             // Act
             privateObject.Invoke(UpdateTaskMethodName, publicInstance, new object[] { guid, guid, properties.Instance });
@@ -501,23 +517,23 @@ namespace EPMLivePS.Tests
             var fieldProperties = new Dictionary<string, Dictionary<string, string>>();
             var fieldDataSet = new DataSet();
             var dataTable = new DataTable();
-            dataTable.Columns.Add("wssFieldName");
-            dataTable.Columns.Add("fieldtype");
-            dataTable.Columns.Add("fieldCategory", typeof(int));
-            dataTable.Columns.Add("assnUpdateColumnId");
-            dataTable.Columns.Add("multiplier", typeof(int));
+            dataTable.Columns.Add(WssFieldNameColumn);
+            dataTable.Columns.Add(FieldTypeColumn);
+            dataTable.Columns.Add(FieldCategoryColumn, typeof(int));
+            dataTable.Columns.Add(AssnUpdateColumnIdColumn);
+            dataTable.Columns.Add(MultiplierColumn, typeof(int));
             var row = dataTable.NewRow();
-            row["wssFieldName"] = "Dur";
-            row["fieldtype"] = "DATETIME";
-            row["fieldCategory"] = 2;
-            row["assnUpdateColumnId"] = "assnUpdateColumn";
-            row["multiplier"] = 1;
+            row[WssFieldNameColumn] = DurType;
+            row[FieldTypeColumn] = DateTimeType;
+            row[FieldCategoryColumn] = 2;
+            row[AssnUpdateColumnIdColumn] = AssnUpdateColumnIdColumn;
+            row[MultiplierColumn] = 1;
             dataTable.Rows.Add(row);
             fieldDataSet.Tables.Add(dataTable);
 
-            dataReader.GetStringInt32 = _ => "251658250";
+            dataReader.GetStringInt32 = _ => TimeSheetHours;
             spField.TypeGet = () => SPFieldType.DateTime;
-            spField.SchemaXmlGet = () => @"<SchemaXml Format=""DateOnly""/>";
+            spField.SchemaXmlGet = () => SchemaXml;
             ShimListDisplayUtils.ConvertFromStringString = _ => fieldProperties;
             ShimDataTable.AllInstances.SelectString = (_, _1) =>
             {
@@ -581,9 +597,9 @@ namespace EPMLivePS.Tests
                 return DummyInt32;
             };
 
-            privateObject.SetFieldOrProperty("pwaSiteUrl", nonPublicInstance, DummyString);
-            privateObject.SetFieldOrProperty("pwaSiteGuid", nonPublicInstance, guid);
-            privateObject.SetFieldOrProperty("CustomFields", nonPublicInstance, customFields.Instance);
+            privateObject.SetFieldOrProperty(SiteUrlFieldName, nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty(SiteGuidFieldName, nonPublicInstance, guid);
+            privateObject.SetFieldOrProperty(CustomFieldsFieldName, nonPublicInstance, customFields.Instance);
 
             // Act
             privateObject.Invoke(UpdateTaskMethodName, publicInstance, new object[] { guid, guid, properties.Instance });
@@ -609,25 +625,25 @@ namespace EPMLivePS.Tests
             var fieldProperties = new Dictionary<string, Dictionary<string, string>>();
             var fieldDataSet = new DataSet();
             var dataTable = new DataTable();
-            dataTable.Columns.Add("wssFieldName");
-            dataTable.Columns.Add("assnfieldname");
-            dataTable.Columns.Add("fieldtype");
-            dataTable.Columns.Add("fieldCategory", typeof(int));
-            dataTable.Columns.Add("assnUpdateColumnId");
-            dataTable.Columns.Add("multiplier", typeof(int));
+            dataTable.Columns.Add(WssFieldNameColumn);
+            dataTable.Columns.Add(AssnFieldNameColumn);
+            dataTable.Columns.Add(FieldTypeColumn);
+            dataTable.Columns.Add(FieldCategoryColumn, typeof(int));
+            dataTable.Columns.Add(AssnUpdateColumnIdColumn);
+            dataTable.Columns.Add(MultiplierColumn, typeof(int));
             var row = dataTable.NewRow();
-            row["wssFieldName"] = "Dur";
-            row["assnfieldname"] = "Dur";
-            row["fieldtype"] = "DATETIME";
-            row["fieldCategory"] = 3;
-            row["assnUpdateColumnId"] = "assnUpdateColumn";
-            row["multiplier"] = 1;
+            row[WssFieldNameColumn] = DurType;
+            row[AssnFieldNameColumn] = DurType;
+            row[FieldTypeColumn] = DateTimeType;
+            row[FieldCategoryColumn] = 3;
+            row[AssnUpdateColumnIdColumn] = AssnUpdateColumnIdColumn;
+            row[MultiplierColumn] = 1;
             dataTable.Rows.Add(row);
             fieldDataSet.Tables.Add(dataTable);
 
-            dataReader.GetStringInt32 = _ => "251658250";
+            dataReader.GetStringInt32 = _ => TimeSheetHours;
             spField.TypeGet = () => SPFieldType.DateTime;
-            spField.SchemaXmlGet = () => @"<SchemaXml Format=""DateOnly""/>";
+            spField.SchemaXmlGet = () => SchemaXml;
             ShimListDisplayUtils.ConvertFromStringString = _ => fieldProperties;
             ShimDataTable.AllInstances.SelectString = (_, _1) =>
             {
@@ -693,9 +709,9 @@ namespace EPMLivePS.Tests
                 return DummyInt32;
             };
 
-            privateObject.SetFieldOrProperty("pwaSiteUrl", nonPublicInstance, DummyString);
-            privateObject.SetFieldOrProperty("pwaSiteGuid", nonPublicInstance, guid);
-            privateObject.SetFieldOrProperty("CustomFields", nonPublicInstance, customFields.Instance);
+            privateObject.SetFieldOrProperty(SiteUrlFieldName, nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty(SiteGuidFieldName, nonPublicInstance, guid);
+            privateObject.SetFieldOrProperty(CustomFieldsFieldName, nonPublicInstance, customFields.Instance);
 
             // Act
             privateObject.Invoke(UpdateTaskMethodName, publicInstance, new object[] { guid, guid, properties.Instance });
@@ -728,25 +744,25 @@ namespace EPMLivePS.Tests
             var fieldProperties = new Dictionary<string, Dictionary<string, string>>();
             var fieldDataSet = new DataSet();
             var dataTable = new DataTable();
-            dataTable.Columns.Add("wssFieldName");
-            dataTable.Columns.Add("assnfieldname");
-            dataTable.Columns.Add("fieldtype");
-            dataTable.Columns.Add("fieldCategory", typeof(int));
-            dataTable.Columns.Add("assnUpdateColumnId");
-            dataTable.Columns.Add("multiplier", typeof(int));
+            dataTable.Columns.Add(WssFieldNameColumn);
+            dataTable.Columns.Add(AssnFieldNameColumn);
+            dataTable.Columns.Add(FieldTypeColumn);
+            dataTable.Columns.Add(FieldCategoryColumn, typeof(int));
+            dataTable.Columns.Add(AssnUpdateColumnIdColumn);
+            dataTable.Columns.Add(MultiplierColumn, typeof(int));
             var row = dataTable.NewRow();
-            row["wssFieldName"] = "Dur";
-            row["assnfieldname"] = "Dur";
-            row["fieldtype"] = "DATETIME";
-            row["fieldCategory"] = 3;
-            row["assnUpdateColumnId"] = "assnUpdateColumn";
-            row["multiplier"] = 1;
+            row[WssFieldNameColumn] = DurType;
+            row[AssnFieldNameColumn] = DurType;
+            row[FieldTypeColumn] = DateTimeType;
+            row[FieldCategoryColumn] = 3;
+            row[AssnUpdateColumnIdColumn] = AssnUpdateColumnIdColumn;
+            row[MultiplierColumn] = 1;
             dataTable.Rows.Add(row);
             fieldDataSet.Tables.Add(dataTable);
 
-            dataReader.GetStringInt32 = _ => "251658250";
+            dataReader.GetStringInt32 = _ => TimeSheetHours;
             spField.TypeGet = () => SPFieldType.DateTime;
-            spField.SchemaXmlGet = () => @"<SchemaXml Format=""DateOnly""/>";
+            spField.SchemaXmlGet = () => SchemaXml;
             ShimListDisplayUtils.ConvertFromStringString = _ => fieldProperties;
             ShimDataTable.AllInstances.SelectString = (_, condition) =>
             {
@@ -815,7 +831,7 @@ namespace EPMLivePS.Tests
             ShimEPMLiveEnterpriseTaskEventReceiverItemEventReceiver.AllInstances.getCustomFieldChangeTypePSDataType = (_, _1) =>
             {
                 validation += 1;
-                return "Number";
+                return NumberType;
             };
             ShimSPItemEventDataCollection.AllInstances.ItemGetString = (_, __) =>
             {
@@ -823,10 +839,10 @@ namespace EPMLivePS.Tests
                 return DummyInt32;
             };
 
-            privateObject.SetFieldOrProperty("pwaSiteUrl", nonPublicInstance, DummyString);
-            privateObject.SetFieldOrProperty("pwaSiteGuid", nonPublicInstance, guid);
-            privateObject.SetFieldOrProperty("CustomFields", nonPublicInstance, customFields.Instance);
-            privateObject.SetFieldOrProperty("LookupTable", nonPublicInstance, lookupTable.Instance);
+            privateObject.SetFieldOrProperty(SiteUrlFieldName, nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty(SiteGuidFieldName, nonPublicInstance, guid);
+            privateObject.SetFieldOrProperty(CustomFieldsFieldName, nonPublicInstance, customFields.Instance);
+            privateObject.SetFieldOrProperty(LookupTableFieldName, nonPublicInstance, lookupTable.Instance);
 
             // Act
             privateObject.Invoke(UpdateTaskMethodName, publicInstance, new object[] { guid, guid, properties.Instance });
