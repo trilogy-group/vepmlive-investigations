@@ -234,9 +234,9 @@ export class CommonPage extends BasePage {
 
     static get searchControls() {
         return {
-            text: element(By.css('#searchtext0Main')),
-            type: element(By.css('#searchtype0Main')),
-            column: element(By.css('#search0Main')),
+            text: element(By.css('#searchtext0Main,#searchtext2Main')),
+            type: element(By.css('#searchtype0Main,#searchtype2Main')),
+            column: element(By.css('#search0Main,#search2Main')),
             textChoice: element(By.css('#searchchoice0Main'))
         };
     }

@@ -70,7 +70,7 @@ export class MyWorkPageHelper {
         StepLogger.step(`Requestor* : New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.requestor, LoginPageHelper.adminEmailId);
         StepLogger.step(`select Requester* value`);
-        await PageHelper.click(MyWorkPage.assignedToSuggestion);
+        await PageHelper.click(MyWorkPage.assignedToSuggestions);
 
         StepLogger.step(`Enter Start Date: New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.start, CommonPageHelper.getTodayInMMDDYYYY);

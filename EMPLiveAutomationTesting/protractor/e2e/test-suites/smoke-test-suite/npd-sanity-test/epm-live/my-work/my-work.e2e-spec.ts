@@ -219,7 +219,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.step(`Assigned To: New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.assignedTo, LoginPageHelper.adminEmailId);
         StepLogger.step(`select assignedTo value`);
-        await PageHelper.click(MyWorkPage.assignedToSuggestion);
+        await PageHelper.click(MyWorkPage.assignedToSuggestions);
 
         StepLogger.stepId(5);
         StepLogger.step('Click on save');

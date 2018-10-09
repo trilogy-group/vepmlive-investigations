@@ -259,10 +259,6 @@ export class MyWorkPage {
         return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(text)}]`));
     }
 
-    static get assignedToSuggestion() {
-        return element.all(By.css('li.ms-core-menu-item')).first();
-    }
-
     static selectDropdownOption(option: string) {
         return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(option)}]`));
     }
