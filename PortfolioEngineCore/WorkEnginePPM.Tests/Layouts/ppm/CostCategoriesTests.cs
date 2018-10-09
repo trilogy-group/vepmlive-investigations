@@ -1,17 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Fakes;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Web.Fakes;
-using System.IO.Fakes;
 using System.IO;
-using WorkEnginePPM.Fakes;
-using PortfolioEngineCore.Fakes;
-using PortfolioEngineCore;
+using System.IO.Fakes;
+using System.Web.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.QualityTools.Testing.Fakes;
+using PortfolioEngineCore.Fakes;
+using PortfolioEngineCore;
 using Shouldly;
+using WorkEnginePPM.Fakes;
 
 namespace WorkEnginePPM.Tests.Layouts.ppm
 {
