@@ -213,6 +213,7 @@ export class CommonPage extends BasePage {
     static get actionMenuIcons() {
         const titles = CommonPageConstants.actionMenuIconTitles;
         return {
+            searchIcon:  element(By.css('span[class*=icon-search]')),
             search: CommonPageHelper.getActionMenuIcons(titles.search),
             toggleFilters: CommonPageHelper.getActionMenuIcons(titles.toggleFilters),
             defaultSort: CommonPageHelper.getActionMenuIcons(titles.defaultSort),

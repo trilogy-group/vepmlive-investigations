@@ -12,7 +12,7 @@ import {AnchorHelper} from '../../../../components/html/anchor-helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
 import {ExpectationHelper} from '../../../../components/misc-utils/expectation-helper';
 import {MyWorkplacePage} from '../my-workplace.po';
-import {browser} from 'protractor';
+import { browser } from 'protractor';
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 
@@ -70,7 +70,7 @@ export class MyWorkPageHelper {
         StepLogger.step(`Requestor* : New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.requestor, LoginPageHelper.adminEmailId);
         StepLogger.step(`select Requester* value`);
-        await PageHelper.click(MyWorkPage.selectValueFromSuggestions(LoginPageHelper.adminEmailId));
+        await PageHelper.click(MyWorkPage.assignedToSuggestions);
 
         StepLogger.step(`Enter Start Date: New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.start, CommonPageHelper.getTodayInMMDDYYYY);
@@ -81,7 +81,6 @@ export class MyWorkPageHelper {
         StepLogger.stepId(5);
         StepLogger.step('Click on save');
         await PageHelper.click(CommonPage.formButtons.save);
-        await PageHelper.switchToDefaultContent();
 
         StepLogger.verification('"New Item" page is closed');
         await expect(await CommonPage.formButtons.save.isPresent())
@@ -237,7 +236,7 @@ export class MyWorkPageHelper {
         await TextboxHelper.sendKeys(MyWorkPage.inputs.title, itemTitle);
         await PageHelper.click(MyWorkPage.dropdownAll.project);
         await PageHelper.click(MyWorkPage.inputs.project);
-        const assignedTo = `${MyWorkPageConstants.adMembersLabel}${LoginPageHelper.adminEmailId}`;
+        const assignedTo = `${LoginPageHelper.adminEmailId}`;
         await TextboxHelper.sendKeys(MyWorkPage.inputs.assignedTo, assignedTo);
         await PageHelper.click(MyWorkPage.assignedToSuggestions);
         await this.clickSaveButton();
@@ -254,6 +253,7 @@ export class MyWorkPageHelper {
 
     static async verifyCreateItem(itemTitle: string) {
         await browser.sleep(PageHelper.timeout.s);
+        await TextboxHelper.sendKeys(MyWorkPage.searchItem, itemTitle, true);
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.getItemByName(itemTitle),
             itemTitle,

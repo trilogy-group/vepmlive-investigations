@@ -295,4 +295,8 @@ export class MyWorkPage {
     static getColumnByNameOnSelectColumnsPopup(columnName: string) {
         return element(By.xpath(`//div[contains(@class,'GMColumnsMenuItemText') and text()='${columnName}']`));
     }
+
+    static get searchItem() {
+        return element(By.id('MWG_Search'));
+    }
 }
