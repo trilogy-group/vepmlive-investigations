@@ -173,7 +173,18 @@ namespace WE_QueueMgr
                 //System.Diagnostics.Debugger.Launch();
                 string sNTUserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
 
-                string basepaths = BuildSitesList();
+				string timeoutString = System.Configuration.ConfigurationManager.AppSettings["jobmaxtimeout"];
+				if (!string.IsNullOrEmpty(timeoutString))
+				{
+					int parsedTimeout;
+					int.TryParse(timeoutString, out parsedTimeout);
+					if (parsedTimeout > 15)
+					{
+						jobMaxTimeout = parsedTimeout;
+					}
+				}
+
+				string basepaths = BuildSitesList();
                 _cts = new CancellationTokenSource();
                 token = _cts.Token;
                 timerTask = Task.Run(() => DoWork(), token);
@@ -364,11 +375,9 @@ namespace WE_QueueMgr
                         site = longRunQueue[0];
                         jobId = longRunJobIds[0];
                     }
-                    try
-                    {
-                        jobMaxTimeout = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["jobmaxtimeout"]);
-                    }
-                    catch { }
+					
+
+				
 
                     CancellationTokenSource tokenSource = new CancellationTokenSource();
                     CancellationToken tasktoken = tokenSource.Token;
@@ -382,7 +391,7 @@ namespace WE_QueueMgr
                     {
                         if (task.IsCompleted)
                             break;
-                        Thread.Sleep(TimeSpan.FromSeconds(30));
+						task.Wait(TimeSpan.FromSeconds(30));
                     }
                     if (token.IsCancellationRequested || !task.IsCompleted)
                     {
@@ -473,7 +482,7 @@ namespace WE_QueueMgr
 
         private void ManageQueueJobs(QMSite site)
         {
-            if (site != null)
+			if (site != null)
             {
                 lock (_locks.GetOrAdd(site.basePath.ToLower(), s => new object()))
                 {
@@ -607,19 +616,8 @@ namespace WE_QueueMgr
 
         private string InvokeWSSAdminRSVPRequest(QMSite site, Guid jobId)
         {
-
-            try
-            {
-                WSSAdmin wssadmin = new WSSAdmin();
-                return wssadmin.RSVPRequest("ManageQueue", site.basePath, jobId.ToString());
-            }
-            catch (Exception ex)
-            {
-                return "<Reply><HRESULT>0</HRESULT><STATUS>0</STATUS></Reply>";
-            }
-            finally
-            {
-            }
+            WSSAdmin wssadmin = new WSSAdmin();
+            return wssadmin.RSVPRequest("ManageQueue", site.basePath, jobId.ToString());
         }
 
     }

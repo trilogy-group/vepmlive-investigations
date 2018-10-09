@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.UI.WebControls;
-using EPMLiveCore;
 using EPMLiveCore.Properties;
 using Microsoft.SharePoint;
 
@@ -16,7 +16,6 @@ namespace EPMLiveCore.ReportHelper
 {
     public class EPMData : IDisposable
     {
-        private readonly Guid _siteID;
         private readonly Guid _webAppId;
         private Guid _webId;
 
@@ -31,6 +30,11 @@ namespace EPMLiveCore.ReportHelper
         private const int UpdateForeignKeyEvent = 4001;
 
         private const string DotDelimiter = ".";
+        private const string HashSign = "#";
+        private const string Hyphen = "-";
+        private const string Apostrophe = "'";
+        private const string DoubleApostrophe = "''";
+        private const string DollarSign = "$";
         private const string EpmLiveKey = "EPM Live";
         private const string EpmLiveReportingKey = "EPMLive Reporting";
         private const string ExecuteScalarKey = "ExecuteScalar";
@@ -44,10 +48,11 @@ namespace EPMLiveCore.ReportHelper
         private const string OpenClientReportingConnectionKey = "OpenClientReportingConnection";
         private const string OpenMasterDbConnectionKey = "OpenMasterDbConnection";
         private const string UpdateForeignKeysKey = "UpdateForeignKeys";
-
+        private const string FieldTypeCurrency = "currency";
+        private const string FieldTypeNumber = "number";
+        private const string FieldTypeDateTime = "datetime";
+        private const string FieldTypeBool = "boolean";
         private string _DefaultLists;
-        private string _command;
-        private CommandType _commandType = CommandType.Text;
         private SqlConnection _conClientReporting;
         private SqlConnection _conEPMLive;
         private SqlConnection _conMaster;
@@ -58,20 +63,16 @@ namespace EPMLiveCore.ReportHelper
         private DataTable _dtStatusLog;
         private bool _epmLiveConOpen;
         private string _masterCs;
-        private List<SqlParameter> _params = new List<SqlParameter>();
-        private string _password;
         private string _remoteCs;
         private string _sTextFilePath;
         private string _siteName;
         private string _siteUrl;
         private string _sqlError;
         private bool _sqlErrorOccurred;
-        private bool _useSAccount;
-        private string _username;
 
         public EPMData(Guid siteID)
         {
-            _siteID = siteID;
+            SiteId = siteID;
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (var spSite = new SPSite(siteID))
@@ -97,7 +98,7 @@ namespace EPMLiveCore.ReportHelper
 
         public EPMData(bool tmp, Guid siteID, Guid webId)
         {
-            _siteID = siteID;
+            SiteId = siteID;
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (var spSite = new SPSite(siteID))
@@ -123,7 +124,7 @@ namespace EPMLiveCore.ReportHelper
 
         public EPMData(Guid siteID, Guid webAppId)
         {
-            _siteID = siteID;
+            SiteId = siteID;
             _webAppId = webAppId;
             using (var spSite = new SPSite(siteID))
             {
@@ -146,10 +147,9 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-
         public EPMData(Guid siteID, Guid webAppId, bool deleteDb)
         {
-            _siteID = siteID;
+            SiteId = siteID;
             _webAppId = webAppId;
             OpenEPMLiveConnection = CoreFunctions.getConnectionString(webAppId);
             if (_epmLiveConOpen)
@@ -162,12 +162,12 @@ namespace EPMLiveCore.ReportHelper
         public EPMData(Guid siteID, string sDbName, string sServerName, bool useSAccount, string username,
             string password)
         {
-            _siteID = siteID;
+            SiteId = siteID;
             _databaseName = sDbName;
             _databaseServer = sServerName;
-            _useSAccount = useSAccount;
-            _username = username;
-            _password = password;
+            UseSqlAccount = useSAccount;
+            UserName = username;
+            Password = password;
 
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
@@ -185,128 +185,23 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-        public string UserName
-        {
-            get
-            {
-                return _username;
-            }
-            set
-            {
-                _username = value;
-            }
-        }
+        public Guid SiteId { get; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
+        public bool UseSqlAccount { get; set; }
+        public string Command { get; set; }
+        public CommandType CommandType { get; set; } = CommandType.Text;
+        public List<SqlParameter> Params { get; set; } = new List<SqlParameter>();
+        public bool EPMLiveConOpen => _epmLiveConOpen;
+        public string SqlError => _sqlError;
+        public bool SqlErrorOccurred => _sqlErrorOccurred;
+        public string SiteName => _siteName;
+        public string SiteUrl => _siteUrl;
+        public string remoteCs => _remoteCs;
+        public string masterCs => _masterCs;
+        public string remoteDbName => _databaseName;
+        public string remoteServerName => _databaseServer;
 
-        public string Password
-        {
-            get
-            {
-                return _password;
-            }
-            set
-            {
-                _password = value;
-            }
-        }
-
-        public bool UseSqlAccount
-        {
-            get
-            {
-                return _useSAccount;
-            }
-            set
-            {
-                _useSAccount = value;
-            }
-        }
-
-        public Guid SiteId
-        {
-            get
-            {
-                return _siteID;
-            }
-        }
-
-        public string Command
-        {
-            get
-            {
-                return _command;
-            }
-            set
-            {
-                _command = value;
-            }
-        }
-
-        public bool EPMLiveConOpen
-        {
-            get
-            {
-                return _epmLiveConOpen;
-            }
-        }
-
-        public CommandType CommandType
-        {
-            get
-            {
-                return _commandType;
-            }
-            set
-            {
-                _commandType = value;
-            }
-        }
-
-        public List<SqlParameter> Params
-        {
-            get
-            {
-                return _params;
-            }
-            set
-            {
-                _params = value;
-            }
-        }
-
-        public string SqlError
-        {
-            get
-            {
-                return _sqlError;
-            }
-        }
-
-        public bool SqlErrorOccurred
-        {
-            get
-            {
-                return _sqlErrorOccurred;
-            }
-        }
-
-        public string SiteName
-        {
-            get
-            {
-                return _siteName;
-            }
-        }
-
-        public string SiteUrl
-        {
-            get
-            {
-                return _siteUrl;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
         public SqlConnection GetEPMLiveConnection
         {
             get
@@ -331,8 +226,6 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-        /// <summary>
-        /// </summary>
         public SqlConnection GetClientReportingConnection
         {
             get
@@ -362,7 +255,7 @@ namespace EPMLiveCore.ReportHelper
                 throw new ArgumentNullException(nameof(exception));
             }
 
-            return $"Name: {_siteName} Url: {_siteUrl} ID: {_siteID} : {exception.Message}{exception.StackTrace}";
+            return $"Name: {_siteName} Url: {_siteUrl} ID: {SiteId} : {exception.Message}{exception.StackTrace}";
         }
 
         private string CreateEventMessageWithParams(Exception exception, string command, IEnumerable<SqlParameter> parameters)
@@ -387,7 +280,7 @@ namespace EPMLiveCore.ReportHelper
                     : $"{cmdParams}[Name:{param.ParameterName} Value: Null],";
             }
 
-            return $"Name: {_siteName} Url: {_siteUrl}  ID: {_siteID} : {exception.Message}{cmdDetails}{cmdParams}";
+            return $"Name: {_siteName} Url: {_siteUrl}  ID: {SiteId} : {exception.Message}{cmdDetails}{cmdParams}";
         }
 
         private void LogWindowsEvents(string logName, string source, string eventMessage, bool modifyOverflowPolicy, int eventId)
@@ -414,8 +307,6 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-        /// <summary>
-        /// </summary>
         public SqlConnection GetMasterDbConnection
         {
             get
@@ -439,8 +330,6 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-        /// <summary>
-        /// </summary>
         public string OpenEPMLiveConnection
         {
             set
@@ -469,8 +358,6 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-        /// <summary>
-        /// </summary>
         public string OpenClientReportingConnection
         {
             set
@@ -480,7 +367,7 @@ namespace EPMLiveCore.ReportHelper
                 {
                     if (_databaseName != null && _databaseName != string.Empty)
                     {
-                        if (!_useSAccount)
+                        if (!UseSqlAccount)
                         {
                             SPSecurity.RunWithElevatedPrivileges(delegate
                             {
@@ -513,8 +400,6 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-        /// <summary>
-        /// </summary>
         public string OpenMasterDbConnection
         {
             set
@@ -522,7 +407,7 @@ namespace EPMLiveCore.ReportHelper
                 _conMaster = new SqlConnection(value);
                 try
                 {
-                    if (!_useSAccount)
+                    if (!UseSqlAccount)
                     {
                         SPSecurity.RunWithElevatedPrivileges(delegate
                         {
@@ -555,93 +440,34 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-        /// <summary>
-        /// </summary>
-        public string remoteCs
-        {
-            get
-            {
-                return _remoteCs;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        public string masterCs
-        {
-            get
-            {
-                return _masterCs;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        public string remoteDbName
-        {
-            get
-            {
-                return _databaseName;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        public string remoteServerName
-        {
-            get
-            {
-                return _databaseServer;
-            }
-        }
-
-        #region IDisposable Members
-
         public void Dispose()
         {
             SPSecurity.RunWithElevatedPrivileges(delegate
             {
-                if (_conEPMLive != null)
+                if (_conEPMLive != null && _conEPMLive.State == ConnectionState.Open)
                 {
-                    if (_conEPMLive.State == ConnectionState.Open)
-                    {
-                        _conEPMLive.Close();
-                    }
+                    _conEPMLive.Dispose();
                 }
             });
             SPSecurity.RunWithElevatedPrivileges(delegate
             {
-                if (_conClientReporting != null)
+                if (_conClientReporting != null && _conClientReporting.State == ConnectionState.Open)
                 {
-                    if (_conClientReporting.State == ConnectionState.Open)
-                    {
-                        _conClientReporting.Close();
-                    }
+                    _conClientReporting.Dispose();
                 }
             });
             SPSecurity.RunWithElevatedPrivileges(delegate
             {
-                if (_conMaster != null)
+                if (_conMaster != null && _conMaster.State == ConnectionState.Open)
                 {
-                    if (_conMaster.State == ConnectionState.Open)
-                    {
-                        _conMaster.Close();
-                    }
+                    _conMaster.Dispose();
                 }
             });
         }
 
-        #endregion
+        public string DefaultLists(SPWeb rootWeb) => GetDefaultLists(rootWeb);
 
-        public string DefaultLists(SPWeb rootWeb)
-        {
-            return GetDefaultLists(rootWeb);
-        }
-
-        public string DefaultLists()
-        {
-            return _DefaultLists;
-        }
+        public string DefaultLists() => _DefaultLists;
 
         public void CreateTextFile(string sPath)
         {
@@ -686,7 +512,7 @@ namespace EPMLiveCore.ReportHelper
             if (itemid != -1)
             {
                 Command = "DELETE RPTWork WHERE siteId=@siteId AND listid=@listId AND itemid=@itemId";
-                AddParam("@siteId", _siteID);
+                AddParam("@siteId", SiteId);
                 AddParam("@listId", listid);
                 AddParam("@itemId", itemid);
                 ExecuteNonQuery(GetClientReportingConnection);
@@ -694,7 +520,7 @@ namespace EPMLiveCore.ReportHelper
             else if (listid != Guid.Empty)
             {
                 Command = "DELETE RPTWork WHERE siteId=@siteId AND listid=@listId";
-                AddParam("@siteId", _siteID);
+                AddParam("@siteId", SiteId);
                 AddParam("@listId", listid);
                 ExecuteNonQuery(GetClientReportingConnection);
             }
@@ -702,62 +528,19 @@ namespace EPMLiveCore.ReportHelper
             {
                 //Delete ALL work for ALL lists
                 Command = "DELETE RPTWork WHERE siteId=@siteID";
-                AddParam("@siteID", _siteID);
+                AddParam("@siteID", SiteId);
                 ExecuteNonQuery(GetClientReportingConnection);
             }
             return true;
         }
 
-        //public bool DeleteWorkWithExceptions(Guid listid, int itemid, List<Guid> exceptionListIds)
-        //{
-        //    //List specific
-        //    if (itemid != -1)
-        //    {
-        //        Command = "DELETE RPTWork WHERE siteId=@siteId AND listid=@listId AND itemid=@itemId";
-        //        AddParam("@siteId", _siteID);
-        //        AddParam("@listId", listid);
-        //        AddParam("@itemId", itemid);
-        //        ExecuteNonQuery(GetClientReportingConnection);
-        //    }
-        //    else if (listid != Guid.Empty)
-        //    {
-        //        Command = "DELETE RPTWork WHERE siteId=@siteId AND listid=@listId";
-        //        AddParam("@siteId", _siteID);
-        //        AddParam("@listId", listid);
-        //        ExecuteNonQuery(GetClientReportingConnection);
-        //    }
-        //    else if (exceptionListIds.Count > 0)
-        //    {
-        //        //Delete ALL work except for exception lists
-        //        Command = "DELETE RPTWork WHERE siteId=@siteId";
-        //        AddParam("@siteId", _siteID);
-        //        int index = 0;
-        //        foreach (Guid id in exceptionListIds)
-        //        {
-        //            AddParam("@listid" + index.ToString(), id);
-        //            Command += (" AND listid <> @listid" + index.ToString());
-        //            index++;
-        //        }
-
-        //        ExecuteNonQuery(GetClientReportingConnection);
-        //    }
-        //    else
-        //    {
-        //        //Delete ALL work for ALL lists
-        //        Command = "DELETE RPTWork WHERE siteId=@siteID";
-        //        AddParam("@siteID", _siteID);
-        //        ExecuteNonQuery(GetClientReportingConnection);
-        //    }
-        //    return true;
-        //}
-
         public bool MapLists(ICollection<Guid> sListNames, Guid webId)
         {
+            CheckArgumentForNull(sListNames, nameof(sListNames));
+
             bool blnPassed = false;
-            char[] splitter = ",".ToCharArray();
-            //Array lists = sListNames.Split(splitter[0]);
             var fields = new ListItemCollection();
-            var spSite = new SPSite(_siteID);
+            var spSite = new SPSite(SiteId);
             SPList spList = null;
             bool isReportingV2Enabled = false;
 
@@ -778,7 +561,6 @@ namespace EPMLiveCore.ReportHelper
                     {
                         try
                         {
-                            spList = null;
                             spList = spWeb.Lists[listId];
                         }
                         catch { }
@@ -786,7 +568,7 @@ namespace EPMLiveCore.ReportHelper
                         if (spList != null && !ListMappedAlready(spList.ID))
                         {
                             fields = GetListFields(spList);
-                            var oMapList = new ReportBiz(_siteID, spWeb.ID, isReportingV2Enabled);
+                            var oMapList = new ReportBiz(SiteId, spWeb.ID, isReportingV2Enabled);
                             oMapList.CreateListBiz(spList.ID, spWeb.ID, fields);
                         }
                     }
@@ -796,8 +578,8 @@ namespace EPMLiveCore.ReportHelper
             try
             {
                 //FOREIGN IMPLEMENTATION -- START
-                var DAO = new EPMData(_siteID);
-                var rb = new ReportBiz(_siteID);
+                var DAO = new EPMData(SiteId);
+                var rb = new ReportBiz(SiteId);
                 rb.UpdateForeignKeys(DAO);
                 DAO.Dispose();
                 // -- END
@@ -817,11 +599,13 @@ namespace EPMLiveCore.ReportHelper
 
         public bool MapDefaultLists(string sListNames)
         {
+            CheckArgumentForNull(sListNames, nameof(sListNames));
+
             bool blnPassed = false;
             char[] splitter = ",".ToCharArray();
             Array lists = sListNames.Split(splitter[0]);
             var fields = new ListItemCollection();
-            var spSite = new SPSite(_siteID);
+            var spSite = new SPSite(SiteId);
             SPList spList = null;
 
             using (spSite)
@@ -840,10 +624,10 @@ namespace EPMLiveCore.ReportHelper
                             //Add Logging here...
                         }
 
-                        if (spList != null && !ListMappedAlready(spList.Title, _siteID))
+                        if (spList != null && !ListMappedAlready(spList.Title, SiteId))
                         {
                             fields = GetListFields(spList);
-                            var oMapList = new ReportBiz(_siteID);
+                            var oMapList = new ReportBiz(SiteId);
                             oMapList.CreateListBiz(spList.ID, fields);
                         }
                     }
@@ -854,15 +638,15 @@ namespace EPMLiveCore.ReportHelper
             try
             {
                 //FOREIGN IMPLEMENTATION -- START
-                var DAO = new EPMData(_siteID);
-                var rb = new ReportBiz(_siteID);
+                var DAO = new EPMData(SiteId);
+                var rb = new ReportBiz(SiteId);
                 rb.UpdateForeignKeys(DAO);
                 DAO.Dispose();
                 // -- END
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                SPSecurity.RunWithElevatedPrivileges(() =>
                 {
                     var eventMessage = CreateEventMessage(ex);
                     LogWindowsEvents(EpmLiveKey, UpdateForeignKeysKey, eventMessage, true, UpdateForeignKeyEvent);
@@ -879,7 +663,7 @@ namespace EPMLiveCore.ReportHelper
             {
                 foreach (KeyValuePair<String, String> listIconDetails in listIconsToBeSet)
                 {
-                    _command = "INSERT INTO ReportListIDs VALUES(@Id,@ListIcon)";
+                    Command = "INSERT INTO ReportListIDs VALUES(@Id,@ListIcon)";
                     AddParam("@Id", listIconDetails.Key.ToString());
                     AddParam("@ListIcon", listIconDetails.Value.ToString());
                     ExecuteNonQuery(GetClientReportingConnection);
@@ -892,14 +676,12 @@ namespace EPMLiveCore.ReportHelper
         {
             var fields = new ListItemCollection();
             ListItem listField;
-            var ListDefaults = new ListBiz(spList.ID, _siteID);
 
             foreach (SPField field in spList.Fields)
             {
                 try
                 {
-                    //Adding contenttype field specifically.
-                    if (field.InternalName.ToLower() == "contenttype")
+                    if (field.InternalName.Equals("contenttype", StringComparison.OrdinalIgnoreCase))
                     {
                         listField = new ListItem();
                         listField.Text = field.Title;
@@ -908,8 +690,7 @@ namespace EPMLiveCore.ReportHelper
                         continue;
                     }
 
-                    //Adding contenttype field specifically.
-                    if (field.InternalName.ToLower() == "extid")
+                    if (field.InternalName.Equals("extid", StringComparison.OrdinalIgnoreCase))
                     {
                         listField = new ListItem();
                         listField.Text = field.Title;
@@ -918,9 +699,7 @@ namespace EPMLiveCore.ReportHelper
                         continue;
                     }
 
-                    if (!field.Hidden
-                        && field.Type != SPFieldType.Computed
-                        )
+                    if (!field.Hidden && field.Type != SPFieldType.Computed)
                     {
                         listField = new ListItem();
                         listField.Text = field.Title;
@@ -936,38 +715,22 @@ namespace EPMLiveCore.ReportHelper
 
         public bool DeleteExistingTSData()
         {
-            //Get TIMESHEET safe table name -- START
-            string name = string.Empty;
-            if (GetTableCount() == 0)
-            {
-                name = "RPTTSData";
-            }
-            else
-            {
-                name = "RPTTSData" + GetTableCount();
-            }
-            // -- END
+            var name = GetTableCount() == 0
+                ? "RPTTSData"
+                : $"RPTTSData{GetTableCount()}";
 
-
-            //DELETE TIMESHEET DATA -- START
-            string script =
-                string.Format(
-                    @"IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}]') AND type in (N'U')) DROP TABLE [{0}]",
-                    name.Replace("'", "''")); // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //string script = "IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[@tableName]') AND type in (N'U')) DROP TABLE [@tableName]";
-            //AddParam("@tableName", name);
-            Command = script;
-            // -- END
+            Command = string.Format(
+                @"IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}]') AND type in (N'U')) DROP TABLE [{0}]",
+                name.Replace(Apostrophe, DoubleApostrophe));
 
             return ExecuteNonQuery(_conClientReporting);
         }
-
 
         public bool RefreshDefaultLists(string sListNames)
         {
             try
             {
-                using (var site = new SPSite(_siteID))
+                using (var site = new SPSite(SiteId))
                 {
                     using (SPWeb web = site.OpenWeb())
                     {
@@ -997,12 +760,7 @@ namespace EPMLiveCore.ReportHelper
         {
             if (string.IsNullOrEmpty(_DefaultLists))
             {
-                // ORIGINAL CODE
-                //_DefaultLists = CoreFunctions.getConfigSetting(rootWeb, "EPMLiveFixLists").Replace("\r\n", ",");
-                // get lists that have reporting events
-
-                const string sAssembly =
-                    "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
+                const string sAssembly = "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
                 const string sClass = "EPMLiveReportsAdmin.ListEvents";
 
                 var dLists = new List<string>();
@@ -1020,41 +778,26 @@ namespace EPMLiveCore.ReportHelper
                 _DefaultLists = string.Join(",", dLists);
             }
 
-            string resourceList =
-                CoreFunctions.getConfigSetting(rootWeb, "EPMLiveResourcePool").Replace("\r\n", ",").ToString();
+            var resourceList = CoreFunctions.getConfigSetting(rootWeb, "EPMLiveResourcePool").Replace("\r\n", ",");
             if (resourceList != string.Empty)
             {
                 _DefaultLists = _DefaultLists + "," + resourceList;
-                //EPMLiveCore.CoreFunctions.getWebAppSetting[""]
-                //EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "EPMLiveFixLists").Replace("\r\n",",")
             }
 
-            //Adding User Information List && Team
-            _DefaultLists = _DefaultLists + "," + "User Information List" + ","
-                            + "Team" + ","
-                            + "Holidays" + ","
-                            + "Holiday Schedules" + ","
-                            + "My Work" + ","
-                            + "Work Hours" + ","
-                            + "Time Off";
-
+            _DefaultLists += ",User Information List,Team,Holidays,Holiday Schedules,My Work,Work Hours,Time Off";
 
             return _DefaultLists;
         }
 
         public void AddParam(string name, object value)
         {
-            _params.Add(new SqlParameter(name, value));
+            Params.Add(new SqlParameter(name, value));
         }
 
         public static bool CheckConnection(string cs)
         {
             bool success = true;
-            SPSecurity.RunWithElevatedPrivileges(
-                delegate
-                {
-                    success = TryToConnect(cs);
-                });
+            SPSecurity.RunWithElevatedPrivileges(() => { success = TryToConnect(cs); });
             return success;
         }
 
@@ -1083,20 +826,19 @@ namespace EPMLiveCore.ReportHelper
             try
             {
                 object value;
-                using (
-                    var command = new SqlCommand { CommandType = _commandType, CommandText = _command, Connection = con })
+                using (var command = new SqlCommand { CommandType = CommandType, CommandText = Command, Connection = con })
                 {
                     command.CommandTimeout = 3600; // 1hour
-                    command.Parameters.AddRange(_params.ToArray());
+                    command.Parameters.AddRange(Params.ToArray());
                     value = command.ExecuteScalar();
                 }
                 return value;
             }
             catch (SqlException ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                SPSecurity.RunWithElevatedPrivileges(() =>
                 {
-                    var eventMessage = CreateEventMessageWithParams(ex, _command, _params);
+                    var eventMessage = CreateEventMessageWithParams(ex, Command, Params);
                     LogWindowsEvents(EpmLiveKey, ExecuteScalarKey, eventMessage, false, ExecuteScalarEvent);
                 });
                 _sqlErrorOccurred = true;
@@ -1105,9 +847,9 @@ namespace EPMLiveCore.ReportHelper
             }
             finally
             {
-                _command = null;
-                _params.Clear();
-                _commandType = CommandType.Text;
+                Command = null;
+                Params.Clear();
+                CommandType = CommandType.Text;
             }
         }
 
@@ -1115,24 +857,23 @@ namespace EPMLiveCore.ReportHelper
         {
             try
             {
-                using (
-                    var command = new SqlCommand
-                    {
-                        CommandType = _commandType,
-                        CommandText = (_command),
-                        Connection = con
-                    })
+                using (var command = new SqlCommand
+                {
+                    CommandType = CommandType,
+                    CommandText = (Command),
+                    Connection = con
+                })
                 {
                     command.CommandTimeout = 3600; // 1hour
-                    command.Parameters.AddRange(_params.ToArray());
+                    command.Parameters.AddRange(Params.ToArray());
                     command.ExecuteNonQuery();
                 }
             }
             catch (SqlException ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                SPSecurity.RunWithElevatedPrivileges(() =>
                 {
-                    var eventMessage = CreateEventMessageWithParams(ex, _command, _params);
+                    var eventMessage = CreateEventMessageWithParams(ex, Command, Params);
                     LogWindowsEvents(EpmLiveKey, ExecuteNonQueryKey, eventMessage, false, ExecuteScalarEvent);
                 });
                 _sqlErrorOccurred = true;
@@ -1141,9 +882,9 @@ namespace EPMLiveCore.ReportHelper
             }
             finally
             {
-                _command = null;
-                _params.Clear();
-                _commandType = CommandType.Text;
+                Command = null;
+                Params.Clear();
+                CommandType = CommandType.Text;
             }
             return true;
         }
@@ -1198,32 +939,32 @@ namespace EPMLiveCore.ReportHelper
             catch (SqlException ex)
             {
                 //Add Error Handling HERE
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                SPSecurity.RunWithElevatedPrivileges(() =>
                 {
                     if (!EventLog.SourceExists("EPMLive Reporting - ExecuteNonQuery"))
                         EventLog.CreateEventSource("EPMLive Reporting - ExecuteNonQuery", "EPM Live");
 
-                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting ExecuteNonQuery");
-                    myLog.MaximumKilobytes = 32768;
-                    string cmdDetails = "Command: " + sql;
-                    string cmdParams = " Params: ";
-
-                    foreach (SqlParameter param in paramCollection)
+                    using (var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting ExecuteNonQuery"))
                     {
-                        if (param.Value != DBNull.Value)
-                        {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value:" + param.Value.ToString() +
-                                        "],";
-                        }
-                        else
-                        {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value: Null],";
-                        }
-                    }
+                        myLog.MaximumKilobytes = 32768;
+                        var cmdDetails = new StringBuilder($"Command: {sql}");
+                        var cmdParams = new StringBuilder(" Params: ");
 
-                    myLog.WriteEntry(
-                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
-                        cmdDetails + cmdParams, EventLogEntryType.Error, 2050);
+                        foreach (SqlParameter param in paramCollection)
+                        {
+                            if (param.Value != DBNull.Value)
+                            {
+                                cmdParams.Append($"[Name:{param.ParameterName} Value:{param.Value}],");
+                            }
+                            else
+                            {
+                                cmdParams.Append($"[Name:{param.ParameterName} Value: Null],");
+                            }
+                        }
+
+                        myLog.WriteEntry($"Name: {_siteName} Url: {_siteUrl} ID: {SiteId} : {ex.Message}{cmdDetails}{cmdParams}",
+                                         EventLogEntryType.Error, 2050);
+                    }
                 });
                 _sqlErrorOccurred = true;
                 _sqlError = ex.Message;
@@ -1255,10 +996,10 @@ namespace EPMLiveCore.ReportHelper
             {
                 SqlDataAdapter da;
                 using (
-                    var command = new SqlCommand { CommandType = _commandType, CommandText = _command, Connection = con })
+                    var command = new SqlCommand { CommandType = CommandType, CommandText = Command, Connection = con })
                 {
                     command.CommandTimeout = 3600; // 1hour
-                    command.Parameters.AddRange(_params.ToArray());
+                    command.Parameters.AddRange(Params.ToArray());
                     da = new SqlDataAdapter(command);
                 }
                 var dt = new DataTable();
@@ -1272,7 +1013,7 @@ namespace EPMLiveCore.ReportHelper
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    var eventMessage = CreateEventMessageWithParams(ex, _command, _params);
+                    var eventMessage = CreateEventMessageWithParams(ex, Command, Params);
                     LogWindowsEvents(EpmLiveKey, GetTableKey, eventMessage, false, ExecuteScalarEvent);
                 });
 
@@ -1284,23 +1025,18 @@ namespace EPMLiveCore.ReportHelper
             }
             finally
             {
-                _command = null;
-                _params.Clear();
-                _commandType = CommandType.Text;
+                Command = null;
+                Params.Clear();
+                CommandType = CommandType.Text;
             }
         }
 
         public DataRow GetSite()
         {
-            //string sql = "'select * from @tableName where siteid = @SiteId'";
-            //Command = "DECLARE @tableName sysname SET @tableName = '" + Resources.ReportingDatabaseTable + "' exec(" + sql + ")";
-            //AddParam("@tableName", Resources.ReportingDatabaseTable);
-
             DataTable dt;
-            Command = string.Format("select * from [{0}] where siteid = @SiteId",
-                Resources.ReportingDatabaseTable.Replace("'", ""));
+            Command = string.Format("select * from [{0}] where siteid = @SiteId", Resources.ReportingDatabaseTable.Replace("'", ""));
             // - CAT.NET false-positive: All single quotes are escaped/removed.
-            AddParam("@SiteId", _siteID);
+            AddParam("@SiteId", SiteId);
             dt = GetTable(GetEPMLiveConnection);
 
             if (dt == null || dt.Rows.Count == 0)
@@ -1320,25 +1056,25 @@ namespace EPMLiveCore.ReportHelper
 
             if (siteDataRow["SAccount"] == DBNull.Value)
             {
-                _useSAccount = false;
+                UseSqlAccount = false;
             }
             else
             {
-                _useSAccount = (bool)siteDataRow["SAccount"];
+                UseSqlAccount = (bool)siteDataRow["SAccount"];
             }
 
-            if (_useSAccount)
+            if (UseSqlAccount)
             {
-                _username = siteDataRow["Username"].ToString().Replace("'", "");
+                UserName = siteDataRow["Username"].ToString().Replace("'", "");
                 // - CAT.NET false-positive: All single quotes are escaped/removed.
-                _password = siteDataRow["Password"].ToString().Replace("'", "");
+                Password = siteDataRow["Password"].ToString().Replace("'", "");
                 // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
         }
 
         private void PopulateConnectionStrings()
         {
-            if (!_useSAccount)
+            if (!UseSqlAccount)
             {
                 _remoteCs =
                     string.Format("Data Source={0};Initial Catalog={1};Integrated Security=SSPI", _databaseServer,
@@ -1352,22 +1088,19 @@ namespace EPMLiveCore.ReportHelper
             {
                 _remoteCs =
                     string.Format("Data Source={0};Initial Catalog={1};User Id={2};Password={3};", _databaseServer,
-                        _databaseName, _username, Decrypt(_password)).Replace("'", "");
+                        _databaseName, UserName, Decrypt(Password)).Replace("'", "");
                 // - CAT.NET false-positive: All single quotes are escaped/removed.
                 _masterCs =
                     string.Format("Data Source={0};Initial Catalog={1};User Id={2};Password={3};", _databaseServer,
-                        "master", _username, Decrypt(_password)).Replace("'", "");
+                        "master", UserName, Decrypt(Password)).Replace("'", "");
                 // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
         }
 
         public DataRow SAccountInfo()
         {
-            //Command = "SELECT * RPTDatabases WHERE WebApplicationId = @webAppId";
-            //AddParam("@webAppId",_webAppId);
-
             Command = "SELECT * FROM RPTDatabases WHERE SiteId = @siteId";
-            AddParam("@siteId", _siteID);
+            AddParam("@siteId", SiteId);
 
             DataTable dt = GetTable(GetEPMLiveConnection);
             if (dt != null && dt.Rows.Count > 0)
@@ -1410,18 +1143,24 @@ namespace EPMLiveCore.ReportHelper
 
         private static DataTable GetTable(SqlCommand cmd)
         {
-            SqlDataAdapter da;
-            var dt = new DataTable();
+            var dataAdapter = default(SqlDataAdapter);
+            var dataTable = new DataTable();
+
             try
             {
-                da = new SqlDataAdapter(cmd);
-                da.Fill(dt);
-                da.Dispose();
+                dataAdapter = new SqlDataAdapter(cmd);
+                dataAdapter.Fill(dataTable);
             }
-            catch (Exception ex) { }
-            finally { }
+            catch (Exception ex)
+            {
+                Trace.TraceError(ex.ToString());
+            }
+            finally
+            {
+                dataAdapter?.Dispose();
+            }
 
-            return dt;
+            return dataTable;
         }
 
         /// <summary>
@@ -1438,136 +1177,73 @@ namespace EPMLiveCore.ReportHelper
         /// </returns>
         public object GetCalculatedFieldValue(SPListItem li, SPFieldCalculated field)
         {
-            object oValue = DBNull.Value;
-            string sResultType = field.GetProperty("ResultType").ToLower();
+            CheckArgumentForNull(li, nameof(li));
+            CheckArgumentForNull(field, nameof(field));
 
-            //for testing purposes...start
-            //string sfieldValue = field.GetFieldValueAsText(li[field.InternalName]);
-            //..end
+            var resultType = field.GetProperty("ResultType").ToLower();
 
+            var cultureInfo = CultureInfo.GetCultureInfo(field.CurrencyLocaleId).NumberFormat;
+            var fieldRawValue = li[field.InternalName].ToString();
+            var fieldValue = field.GetFieldValueAsText(li[field.InternalName]);
 
-            //REFACTOR -- Start
-            //string sfieldValue = li[field.InternalName].ToString();
-
-            //if (sfieldValue != "")
-            //{
-            //    sfieldValue = sfieldValue.Replace(";#", "\n").Split('\n')[1];
-            //}
-
-            //return sfieldValue;
-            //END
-
-            System.Globalization.NumberFormatInfo nInfo = System.Globalization.CultureInfo.GetCultureInfo(field.CurrencyLocaleId).NumberFormat;
-            switch (sResultType)
+            switch (resultType)
             {
-                case "currency":
-                    if (
-                        field.GetFieldValueAsText(li[field.InternalName])
-                            .Replace(nInfo.CurrencySymbol, "")
-                            .Replace("#VALUE!", "")
-                            .Replace("<(", "")
-                            .Replace(")>", "")
-                            .Replace("%", "")
-                            .Replace("(", "-")
-                            .Replace(")", "") != string.Empty)
-                    {
-                        oValue =
-                            float.Parse(
-                                field.GetFieldValueAsText(li[field.InternalName])
-                                    .Replace(nInfo.CurrencySymbol, "")
-                                    .Replace("#VALUE!", "")
-                                    .Replace("<(", "")
-                                    .Replace(")>", "")
-                                    .Replace("%", "")
-                                    .Replace("(", "-")
-                                    .Replace(")", ""));
-                    }
-                    else
-                    {
-                        oValue = DBNull.Value;
-                    }
-                    break;
+                case FieldTypeCurrency:
+                case FieldTypeNumber:
 
-                case "number":
-                    if (
-                        field.GetFieldValueAsText(li[field.InternalName])
-                            .Replace("$", "")
-                            .Replace("#VALUE!", "")
-                            .Replace("<(", "")
-                            .Replace(")>", "")
-                            .Replace("%", "")
-                            .Replace("(", "-")
-                            .Replace(")", "") != string.Empty)
-                    {
-                        oValue =
-                            float.Parse(
-                                field.GetFieldValueAsText(li[field.InternalName])
-                                    .Replace("$", "")
-                                    .Replace("#VALUE!", "")
-                                    .Replace("<(", "")
-                                    .Replace(")>", "")
-                                    .Replace("%", "")
-                                    .Replace("(", "-")
-                                    .Replace(")", ""));
-                    }
-                    else
-                    {
-                        oValue = DBNull.Value;
-                    }
-                    break;
+                    float floatValue;
+                    var currencySymbol = resultType == FieldTypeCurrency
+                        ? cultureInfo.CurrencySymbol
+                        : DollarSign;
+                    var cleanValue = ClearSpecialChars(fieldValue, currencySymbol);
 
-                case "datetime":
-                    try
-                    {
-                        oValue = DateTime.Parse(field.GetFieldValueAsText(li[field.InternalName]));
-                    }
-                    catch (Exception ex)
-                    {
-                        oValue = DBNull.Value;
-                    }
-                    break;
+                    return !string.IsNullOrWhiteSpace(cleanValue) && float.TryParse(cleanValue, out floatValue)
+                        ? (object)floatValue
+                        : DBNull.Value;
 
-                case "boolean":
-                    try
-                    {
-                        oValue = bool.Parse(field.GetFieldValueAsText(li[field.InternalName]));
-                    }
-                    catch (Exception ex)
-                    {
-                        oValue = DBNull.Value;
-                    }
-                    break;
+                case FieldTypeDateTime:
+                    DateTime dateTimeValue;
+                    return DateTime.TryParse(fieldValue, out dateTimeValue)
+                        ? (object)dateTimeValue
+                        : DBNull.Value;
+
+                case FieldTypeBool:
+                    bool boolValue;
+                    return bool.TryParse(fieldValue, out boolValue)
+                        ? (object)boolValue
+                        : DBNull.Value;
 
                 default:
-
-                    //Used for debugging purposes only.
-                    if (li[field.InternalName] != null)
-                    {
-                        string sValue = li[field.InternalName].ToString();
-                    }
-                    //end
-
-                    if (li[field.InternalName].ToString().Contains("#"))
-                    {
-                        oValue =
-                            li[field.InternalName].ToString()
-                                .Substring(li[field.InternalName].ToString().IndexOf("#"))
-                                .Replace("#", "");
-                    }
-                    else
-                    {
-                        oValue = field.GetFieldValueAsText(li[field.InternalName]);
-                    }
-                    break;
+                    return fieldRawValue.Contains(HashSign)
+                        ? fieldRawValue.Substring(fieldRawValue.IndexOf(HashSign)).Replace(HashSign, string.Empty)
+                        : fieldValue;
             }
-            return oValue;
+        }
+
+        private string ClearSpecialChars(string text, string currencySymbol)
+        {
+            return text.Replace(currencySymbol, string.Empty)
+                       .Replace("#VALUE!", string.Empty)
+                       .Replace("<(", string.Empty)
+                       .Replace(")>", string.Empty)
+                       .Replace("%", string.Empty)
+                       .Replace("(", Hyphen)
+                       .Replace(")", string.Empty);
+        }
+
+        private void CheckArgumentForNull(object argument, string argumentName)
+        {
+            if (argument == null)
+            {
+                throw new ArgumentNullException(argumentName);
+            }
         }
 
         public void GetSnapshotQueueStatus(out int status, out string listguid, out int pctComplete, out bool queued)
         {
             DataTable dt;
             Command = " SELECT * FROM vwQueueTimerLog WHERE siteguid=@siteId and jobtype=7 and (NOT(status=2))";
-            AddParam("@siteId", _siteID);
+            AddParam("@siteId", SiteId);
 
             dt = GetTable(GetEPMLiveConnection);
 
@@ -1599,7 +1275,7 @@ namespace EPMLiveCore.ReportHelper
             DataTable dt;
             //Command = "SELECT dbo.QUEUE.status, dbo.QUEUE.percentComplete, dbo.TIMERJOBS.listguid, dbo.TIMERJOBS.jobtype, dbo.TIMERJOBS.lastqueuecheck FROM dbo.QUEUE RIGHT OUTER JOIN dbo.TIMERJOBS ON dbo.QUEUE.timerjobuid = dbo.TIMERJOBS.timerjobuid WHERE (dbo.TIMERJOBS.jobtype = 5) AND (dbo.TIMERJOBS.lastqueuecheck IS NULL) AND dbo.TIMERJOBS.siteguid =@siteId";
             Command = " SELECT * FROM vwQueueTimerLog WHERE siteguid=@siteId and jobtype=6 and (NOT(status=2))";
-            AddParam("@siteId", _siteID);
+            AddParam("@siteId", SiteId);
 
             dt = GetTable(GetEPMLiveConnection);
 
@@ -1749,10 +1425,8 @@ namespace EPMLiveCore.ReportHelper
                             }
                             finally
                             {
-                                if (tx != null)
-                                    tx.Dispose();
-                                if (sbc != null)
-                                    sbc.Close();
+                                tx?.Dispose();
+                                sbc?.Close();
                             }
                         }
                     }
@@ -1776,13 +1450,13 @@ namespace EPMLiveCore.ReportHelper
 
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
-                using (var s = new SPSite(_siteID))
+                using (var site = new SPSite(SiteId))
                 {
-                    using (SPWeb w = s.OpenWeb(_webId))
+                    using (SPWeb web = site.OpenWeb(_webId))
                     {
-                        foreach (SPList l in w.Lists)
+                        foreach (SPList list in web.Lists)
                         {
-                            List<SPEventReceiverDefinition> evts = GetListEvents(l,
+                            var events = GetListEvents(list,
                                 "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
                                 "EPMLiveReportsAdmin.ListEvents",
                                 new List<SPEventReceiverType>
@@ -1792,13 +1466,13 @@ namespace EPMLiveCore.ReportHelper
                                     SPEventReceiverType.ItemDeleting
                                 });
 
-                            if (evts.Count > 0 && !lListIDs.Contains(l.ID.ToString()))
+                            if (events.Count > 0 && !lListIDs.Contains(list.ID.ToString()))
                             {
-                                lListIDs.Add(l.ID.ToString());
+                                lListIDs.Add(list.ID.ToString());
                                 continue;
                             }
 
-                            List<SPEventReceiverDefinition> mwEvts = GetListEvents(l,
+                            var mwEvents = GetListEvents(list,
                                 "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
                                 "EPMLiveReportsAdmin.MyWorkListEvents",
                                 new List<SPEventReceiverType>
@@ -1808,15 +1482,10 @@ namespace EPMLiveCore.ReportHelper
                                     SPEventReceiverType.ItemDeleting
                                 });
 
-                            if (mwEvts.Count > 0 && !lListIDs.Contains(l.ID.ToString()))
+                            if (mwEvents.Count > 0 && !lListIDs.Contains(list.ID.ToString()))
                             {
-                                lListIDs.Add(l.ID.ToString());
+                                lListIDs.Add(list.ID.ToString());
                             }
-                        }
-
-                        if (w != null)
-                        {
-                            w.Dispose();
                         }
                     }
                 }
@@ -1831,62 +1500,48 @@ namespace EPMLiveCore.ReportHelper
         {
             string sLists = string.Empty;
             var lLists = new List<string>();
-            //Command = "SELECT ListName FROM RPTList WHERE SiteId ='" + _siteID + "'";
-            //Command = "SELECT ListName FROM RPTList WHERE SiteId =@siteId";
-            //AddParam("@siteId", _siteID);
-            //DataTable dtLists = GetTable(GetClientReportingConnection);
-
-            //if (dtLists != null && dtLists.Rows.Count > 0)
-            //{
-            //    foreach (DataRow list in dtLists.Rows)
-            //    {
-            //        sLists = sLists + list["ListName"].ToString() + ",";
-            //    }
-            //}
 
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
-                using (var s = new SPSite(_siteID))
+                using (var site = new SPSite(SiteId))
                 {
-                    foreach (SPWeb w in s.AllWebs)
+                    foreach (SPWeb web in site.AllWebs)
                     {
-                        foreach (SPList l in w.Lists)
+                        using (web)
                         {
-                            List<SPEventReceiverDefinition> evts = GetListEvents(l,
-                                "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
-                                "EPMLiveReportsAdmin.ListEvents",
-                                new List<SPEventReceiverType>
-                                {
-                                    SPEventReceiverType.ItemAdded,
-                                    SPEventReceiverType.ItemUpdated,
-                                    SPEventReceiverType.ItemDeleting
-                                });
-
-                            if (evts.Count > 0 && !lLists.Contains(l.Title))
+                            foreach (SPList list in web.Lists)
                             {
-                                lLists.Add(l.Title);
-                                continue;
-                            }
+                                var events = GetListEvents(list,
+                                    "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
+                                    "EPMLiveReportsAdmin.ListEvents",
+                                    new List<SPEventReceiverType>
+                                    {
+                                        SPEventReceiverType.ItemAdded,
+                                        SPEventReceiverType.ItemUpdated,
+                                        SPEventReceiverType.ItemDeleting
+                                    });
 
-                            List<SPEventReceiverDefinition> mwEvts = GetListEvents(l,
-                                "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
-                                "EPMLiveReportsAdmin.MyWorkListEvents",
-                                new List<SPEventReceiverType>
+                                if (events.Count > 0 && !lLists.Contains(list.Title))
                                 {
-                                    SPEventReceiverType.ItemAdded,
-                                    SPEventReceiverType.ItemUpdated,
-                                    SPEventReceiverType.ItemDeleting
-                                });
+                                    lLists.Add(list.Title);
+                                    continue;
+                                }
 
-                            if (mwEvts.Count > 0 && !lLists.Contains(l.Title))
-                            {
-                                lLists.Add(l.Title);
+                                var mwEvents = GetListEvents(list,
+                                    "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
+                                    "EPMLiveReportsAdmin.MyWorkListEvents",
+                                    new List<SPEventReceiverType>
+                                    {
+                                        SPEventReceiverType.ItemAdded,
+                                        SPEventReceiverType.ItemUpdated,
+                                        SPEventReceiverType.ItemDeleting
+                                    });
+
+                                if (mwEvents.Count > 0 && !lLists.Contains(list.Title))
+                                {
+                                    lLists.Add(list.Title);
+                                }
                             }
-                        }
-
-                        if (w != null)
-                        {
-                            w.Dispose();
                         }
                     }
                 }
@@ -1921,12 +1576,10 @@ namespace EPMLiveCore.ReportHelper
             bool blnStatus = false;
             try
             {
-                _command =
-                    "INSERT INTO RPTLog VALUES(@RPTList,@ListName,@ShortMsg,@LongMsg,@Level,@Type,getdate(),@timerjobguid)";
+                Command = "INSERT INTO RPTLog VALUES(@RPTList,@ListName,@ShortMsg,@LongMsg,@Level,@Type,getdate(),@timerjobguid)";
 
                 if (RPTListID != string.Empty)
                 {
-                    var lguid = new Guid(RPTListID);
                     AddParam("@RPTList", RPTListID);
                 }
                 else
@@ -1991,24 +1644,13 @@ namespace EPMLiveCore.ReportHelper
             return LogStatus(RPTListID.ToString(), listName, message, string.Empty, level, 3, timerjobguid.ToString());
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="timerjobguid"></param>
-        /// <returns></returns>
         public DataTable GetSnapshotResults(Guid timerjobguid)
         {
-            //_command = "SELECT * FROM RPTLog WHERE timerjobguid='" + timerjobguid + "'"; - CAT.NET
-            _command = "SELECT * FROM RPTLog WHERE timerjobguid=@uid";
+            Command = "SELECT * FROM RPTLog WHERE timerjobguid=@uid";
             AddParam("@uid", timerjobguid);
             return GetTable(GetClientReportingConnection);
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="timerjobguid"></param>
-        /// <param name="siteId"></param>
-        /// <param name="sLists"></param>
-        /// <returns></returns>
         public bool SnapshotLists(Guid timerjobguid, Guid siteId, string sListIDs)
         {
             bool status = true;
@@ -2043,15 +1685,11 @@ namespace EPMLiveCore.ReportHelper
             return status;
         }
 
-        /// <summary>
-        /// </summary>
-        /// <returns></returns>
         public DataTable GetStatusLog()
         {
             return _dtStatusLog;
         }
 
-        //Module Added On: 3/20/2011
         public SqlConnection GetSpecificReportingDbConnection(Guid siteId)
         {
             try
@@ -2089,10 +1727,6 @@ namespace EPMLiveCore.ReportHelper
             return _conClientReporting;
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="sListNames"></param>
-        /// <returns></returns>
         public bool DeleteAllItemsDB(string sListNames, bool refreshAll)
         {
             string sSQL = string.Empty;
@@ -2138,7 +1772,7 @@ namespace EPMLiveCore.ReportHelper
                         }
                     }
                 }
-                AddParam("@siteID", _siteID);
+                AddParam("@siteID", SiteId);
                 Command = sSQL;
                 if (!string.IsNullOrEmpty(Command))
                 {
@@ -2156,14 +1790,7 @@ namespace EPMLiveCore.ReportHelper
                     iListCounter++;
                 }
 
-                iListCounter = 0; //updated/added during CAT.NET fix iteration
-                //foreach (string sTableName in tableNames)
-                //{
-                //    sSQL = sSQL + " DELETE FROM RPTWork WHERE SiteId=@siteId AND ListId='" +
-                //           listIds[iListCounter].Replace("'", "") + "'";
-                //    // - CAT.NET false-positive: All single quotes are escaped/removed.
-                //}
-                AddParam("@siteId", _siteID);
+                AddParam("@siteId", SiteId);
                 Command = sSQL;
                 return ExecuteNonQuery(GetClientReportingConnection);
                 // -- END
@@ -2178,41 +1805,40 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="tableNameRoot"></param>
-        /// <returns></returns>
         public DataTable GetTableNames(string tableNameRoot)
         {
-            Command =
-                string.Format(
-                    "select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME like '{0}%' order by TABLE_NAME desc ",
-                    tableNameRoot.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //Command = "select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME like '[@tableName]%' order by TABLE_NAME desc ";
-            //AddParam("@tableName", tableNameRoot);
+            Command = string.Format(
+                "select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME like '{0}%' order by TABLE_NAME desc ",
+                tableNameRoot.Replace(Apostrophe, string.Empty)); 
             return GetTable(GetClientReportingConnection);
         }
 
-        public bool TableExists(string tableName, SqlConnection cn)
+        public bool TableExists(string tableName, SqlConnection connection)
         {
-            bool exists = false;
+            CheckArgumentForNull(tableName, nameof(tableName));
+            CheckArgumentForNull(connection, nameof(connection));
+
+            var exists = false;
+            var command = default(SqlCommand);
             try
             {
-                var cmd =
-                    new SqlCommand(
-                        "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = '" +
-                        tableName + "')) BEGIN SELECT 1 END ELSE BEGIN SELECT 0 END", cn);
-                exists = Convert.ToInt32(cmd.ExecuteScalar()) == 1;
+                command = new SqlCommand(
+                    "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = '"
+                    + tableName + "')) BEGIN SELECT 1 END ELSE BEGIN SELECT 0 END", connection);
+                exists = Convert.ToInt32(command.ExecuteScalar()) == 1;
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Trace.TraceError(ex.ToString());
+            }
+            finally
+            {
+                command?.Dispose();
+            }
 
             return exists;
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
         public string GetSafeTableName(string tableName)
         {
             DataTable dt = GetTableNames(tableName);
@@ -2222,132 +1848,23 @@ namespace EPMLiveCore.ReportHelper
             }
             else
             {
-                //foreach (DataRow row in dt.Rows)
-                //{
-                //    var suffix = row["TABLE_NAME"].ToString().Replace(tableName, "");
-                //    int index;
-                //    var success = int.TryParse(suffix, out index);
-                //    if (!success)
-                //        continue;
-                //    return tableName + ++index;
-                //}
-                //return tableName + "1";
-
                 tableName = tableName + GetTableCount().ToString();
                 return tableName;
             }
-
-            //Previous Implementation...commmented out on 3.22.2010 xjh
-            //foreach (DataRow row in dt.Rows)
-            //{
-            //    var suffix = row["TABLE_NAME"].ToString().Replace(tableName, "");
-            //    int index;
-            //    var success = int.TryParse(suffix, out index);
-            //    if (!success)
-            //        continue;
-            //    return tableName + ++index;
-            //}
-            //return tableName + "1";
         }
 
-        /// <summary>
-        /// </summary>
-        /// <returns></returns>
         public int GetTableCount()
         {
             int iTableCount = 0;
-            //Command = "SELECT TableCount FROM RPTSettings WHERE SiteID='" + _siteID.ToString() + "'"; - CAT.NET
             Command = "SELECT TableCount FROM RPTSettings WHERE SiteID=@siteId";
-            AddParam("@siteId", _siteID);
+            AddParam("@siteId", SiteId);
             iTableCount = (int)ExecuteScalar(GetClientReportingConnection);
             return iTableCount;
         }
 
-        //public string UpdateListNames(string sListNames)
-        //{
-        //    string sSQL = string.Empty;
-        //    char[] splitter = ",".ToCharArray();
-        //    string listNamesOUT = null;
-        //    string[] listNamesIN = null;
-        //    string sListName = string.Empty;
-        //    Guid RPTListID = Guid.Empty;
-        //    try
-        //    {
-        //        //ListNames IN -- START
-        //        if (sListNames.Contains(","))
-        //        {
-        //            listNamesIN = sListNames.Split(splitter[0]);
-        //        }
-        //        else
-        //        {
-        //            listNamesIN = new string[1];
-        //            listNamesIN[0] = sListNames;
-        //        }
-        //        // -- END
-        //        //listNamesOUT = new string[listNamesIN.Length];
-        //        int iListCounter = 0;
-        //        using (SPSite site = new SPSite(_siteID))
-        //        {
-        //            using (SPWeb web = site.OpenWeb())
-        //            {
-        //                while (iListCounter < listNamesIN.Length)
-        //                {
-        //                    RPTListID = GetListId(listNamesIN[iListCounter]);
-        //                    sListName = web.Lists[RPTListID].Title;
-        //                    if (sListName.Trim().ToLower() != listNamesIN[iListCounter].Trim().ToLower())
-        //                    {
-        //                        if (UpdateListName(RPTListID, sListName))
-        //                        {
-        //                            listNamesOUT = listNamesOUT + "," + sListName;
-        //                        }
-        //                        else
-        //                        {
-        //                            LogStatus(string.Empty, sListNames, "Error updating listname. For list:" + listNamesIN[iListCounter].Replace("'", ""), _sqlError, 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
-        //                        }
-        //                    }
-        //                    else
-        //                    {
-        //                        listNamesOUT = listNamesOUT + "," + listNamesIN[iListCounter];
-        //                    }
-        //                    iListCounter++;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LogStatus(string.Empty, sListNames, "Error processing UpdateListNames() -- " + ex.Message.Replace("'", ""), ex.StackTrace.Replace("'", ""), 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
-        //    }
-        //    if (listNamesOUT.IndexOf(",") == 0)
-        //    {
-        //        listNamesOUT = listNamesOUT.Remove(0, 1);
-        //    }
-        //    return listNamesOUT;
-        //}
-        /// <summary>
-        /// </summary>
-        /// <param name="sListNames"></param>
-        /// <returns></returns>
-        /// <summary>
-        /// </summary>
-        /// <param name="RPTListID"></param>
-        /// <param name="sListName"></param>
-        /// <returns></returns>
-        private bool UpdateListName(Guid RPTListID, string sListName)
-        {
-            Command = "UPDATE RPTList SET ListName = @listName WHERE RPTListID=@rptListID";
-            AddParam("@listName", sListName);
-            AddParam("@rptListID", RPTListID);
-            return ExecuteNonQuery(GetClientReportingConnection);
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="sListName"></param>
-        /// <returns></returns>
         public Guid GetListId(string sListName)
         {
-            using (var site = new SPSite(_siteID))
+            using (var site = new SPSite(SiteId))
             {
                 using (SPWeb spWeb = site.OpenWeb())
                 {
@@ -2366,7 +1883,7 @@ namespace EPMLiveCore.ReportHelper
 
         public Guid GetListId(string sListName, Guid webId)
         {
-            using (var site = new SPSite(_siteID))
+            using (var site = new SPSite(SiteId))
             {
                 using (SPWeb spWeb = site.OpenWeb(webId))
                 {
@@ -2383,11 +1900,6 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-
-        /// <summary>
-        /// </summary>
-        /// <param name="listName"></param>
-        /// <returns></returns>
         public string GetTableName(Guid listId)
         {
             try
@@ -2396,7 +1908,7 @@ namespace EPMLiveCore.ReportHelper
                 Command = "SELECT TableName FROM " + Resources.ReportingListTable.Replace("'", "") +
                           " WHERE RPTListId=@RPTListId AND SiteId=@siteID";
                 AddParam("@RPTListId", listId);
-                AddParam("@siteID", _siteID);
+                AddParam("@siteID", SiteId);
                 objTableName = ExecuteScalar(GetClientReportingConnection);
                 return objTableName.ToString();
             }
@@ -2404,50 +1916,34 @@ namespace EPMLiveCore.ReportHelper
             return null;
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="listName"></param>
-        /// <returns></returns>
         public string GetTableName(string listName)
         {
             object objTableName = null;
             Command = "SELECT TableName FROM " + Resources.ReportingListTable.Replace("'", "") +
                       " WHERE ListName=@listName AND SiteId=@siteID";
             AddParam("@listName", listName);
-            AddParam("@siteID", _siteID);
+            AddParam("@siteID", SiteId);
             objTableName = ExecuteScalar(GetClientReportingConnection);
             return objTableName.ToString();
         }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
+        
         public string GetListName(string tableName)
         {
             object objTableName = null;
             Command = "SELECT ListName FROM " + Resources.ReportingListTable.Replace("'", "") + " WHERE TableName='" +
                       tableName.Replace("'", "") + "' AND SiteId=@siteID";
             // - CAT.NET false-positive: All single quotes are escaped/removed.
-            AddParam("@siteID", _siteID);
+            AddParam("@siteID", SiteId);
             objTableName = ExecuteScalar(GetClientReportingConnection);
             return objTableName.ToString();
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="sMessage"></param>
-        /// <returns></returns>
         public bool RefreshTimesheets(out string sMessage, Guid jobUid, bool consolidationdone)
         {
-            var oTimeSheet = new ReportBiz(_siteID);
+            var oTimeSheet = new ReportBiz(SiteId);
             return (consolidationdone ? oTimeSheet.RefreshTimesheetInstant(out sMessage, jobUid) : oTimeSheet.RefreshTimesheet(out sMessage, jobUid));
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
         public bool SaveWork(SPListItem item)
         {
             bool blnWorkSaved = true;
@@ -2481,7 +1977,7 @@ namespace EPMLiveCore.ReportHelper
                     string sAssignedTo = ReportData.AddLookUpFieldValues(Convert.ToString(item["AssignedTo"]), "id");
                     object startDate = DateTime.Parse(Convert.ToString(item["StartDate"]));
                     object dueDate = DateTime.Parse(Convert.ToString(item["DueDate"]));
-                    if (!ProcessAssignments(sWork, sAssignedTo, startDate, dueDate, listId, _siteID, item.ID,
+                    if (!ProcessAssignments(sWork, sAssignedTo, startDate, dueDate, listId, SiteId, item.ID,
                             item.ParentList.Title))
                     {
                         LogStatus(string.Empty, string.Empty, "SaveWork() failed.", SqlError.Replace("'", ""), 2, 3,
@@ -2502,23 +1998,11 @@ namespace EPMLiveCore.ReportHelper
             return blnWorkSaved;
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="sWork"></param>
-        /// <param name="sAssignedTo"></param>
-        /// <param name="StartDate"></param>
-        /// <param name="DueDate"></param>
-        /// <param name="ListID"></param>
-        /// <param name="SiteID"></param>
-        /// <param name="ItemID"></param>
-        /// <param name="sListName"></param>
-        /// <returns></returns>
         public bool ProcessAssignments(string sWork, string sAssignedTo, object StartDate, object DueDate, Guid ListID,
             Guid SiteID, int ItemID, string sListName)
         {
             bool blnProcess = true;
             object objResults = null;
-
 
             Command = "spRPTProcessAssignments";
             CommandType = CommandType.StoredProcedure;
@@ -2555,23 +2039,10 @@ namespace EPMLiveCore.ReportHelper
             return version;
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="siteId"></param>
-        /// <param name="webId"></param>
-        /// <param name="serverName"></param>
-        /// <param name="dataBaseName"></param>
-        /// <param name="un"></param>
-        /// <param name="pw"></param>
-        /// <param name="useSA"></param>
-        /// <param name="dbExists"></param>
-        /// <param name="status"></param>
-        /// <returns></returns>
         public bool MapDataBase(Guid siteId, Guid webId, string serverName, string dataBaseName, string un, string pw,
             bool useSA, bool dbExists, out string status)
         {
             Guid webAppId = webId;
-            Guid selectedSiteId = siteId;
             ReportBiz rb = null;
             Dictionary<string, string> databases;
 
@@ -2726,7 +2197,7 @@ namespace EPMLiveCore.ReportHelper
             string un = string.Empty;
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
-                using (var site = new SPSite(_siteID))
+                using (var site = new SPSite(SiteId))
                 {
                     un = site.WebApplication.ApplicationPool.Username;
                 }
@@ -2741,19 +2212,11 @@ namespace EPMLiveCore.ReportHelper
                 sql = sql + " exec sp_grantdbaccess @userName, @userName";
                 sql = sql + " exec sp_addrolemember db_owner,@userName";
                 sql = sql + " COMMIT TRANSACTION END TRY BEGIN CATCH BEGIN ROLLBACK TRANSACTION; END END CATCH END";
-
-                //sql = string.Format("BEGIN BEGIN TRANSACTION BEGIN TRY IF NOT EXISTS (select * from sys.sysusers where name='{0}')", un);- CAT.NET
-                //sql = sql + string.Format(" exec sp_grantdbaccess '{0}', '{0}'", un);
-                //sql = sql + string.Format(" exec sp_addrolemember db_owner,'{0}'", un);
-                //sql = sql + " COMMIT TRANSACTION END TRY BEGIN CATCH BEGIN ROLLBACK TRANSACTION; END END CATCH END";
             }
             else
             {
                 sql = "IF NOT EXISTS (select * from sys.sysusers where name=@userName) " +
                       "BEGIN TRAN T1 BEGIN TRY exec('CREATE USER [@userName]') exec sp_addrolemember db_owner,@userName COMMIT TRAN T1 END TRY BEGIN CATCH ROLLBACK TRAN T1  PRINT ERROR_MESSAGE() END CATCH";
-
-                //sql = string.Format("IF NOT EXISTS (select * from sys.sysusers where name='{0}') " +
-                //      "BEGIN TRAN T1 BEGIN TRY exec('CREATE USER [{0}]') exec sp_addrolemember db_owner,'{0}' COMMIT TRAN T1 END TRY BEGIN CATCH ROLLBACK TRAN T1  PRINT ERROR_MESSAGE() END CATCH", un);- CAT.NET
             }
 
             Command = sql;
@@ -2761,29 +2224,6 @@ namespace EPMLiveCore.ReportHelper
             return ExecuteNonQuery(GetClientReportingConnection);
         }
 
-        //private bool GrantUserDbAccess()
-        //{
-        //    string un = string.Empty;
-        //    SPSecurity.RunWithElevatedPrivileges(delegate()
-        //    {
-        //        SPSite site = new SPSite(_siteID);
-        //        un = site.WebApplication.ApplicationPool.Username;
-        //    });
-
-        //    string sql = string.Format("BEGIN BEGIN TRANSACTION BEGIN TRY IF NOT EXISTS (select * from sys.sysusers where name='{0}')", un);
-        //    sql = sql + string.Format(" exec sp_grantdbaccess '{0}', '{0}'",un);
-        //    sql = sql + string.Format(" exec sp_addrolemember db_owner,'{0}'",un);
-        //    sql = sql + " COMMIT TRANSACTION END TRY BEGIN CATCH BEGIN ROLLBACK TRANSACTION; END END CATCH END";
-
-        //    Command = sql;
-        //    return ExecuteNonQuery(GetClientReportingConnection);
-        //}
-
-        /// <summary>
-        /// </summary>
-        /// <param name="sListName"></param>
-        /// <param name="siteId"></param>
-        /// <returns></returns>
         public bool ListMappedAlready(Guid listId)
         {
             //Command = string.Format("SELECT COUNT(*) as ListCount FROM RPTList WHERE siteId='{0}' AND ListName='{1}'", _siteID, sListName); - CAT.NET
@@ -2800,17 +2240,12 @@ namespace EPMLiveCore.ReportHelper
                 return false;
             }
         }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="sListName"></param>
-        /// <param name="siteId"></param>
-        /// <returns></returns>
+        
         public bool ListMappedAlready(string sListName, Guid siteId)
         {
             //Command = string.Format("SELECT COUNT(*) as ListCount FROM RPTList WHERE siteId='{0}' AND ListName='{1}'", _siteID, sListName); - CAT.NET
             Command = "SELECT COUNT(*) as ListCount FROM RPTList WHERE siteId=@siteId AND ListName=@listName";
-            AddParam("@siteId", _siteID);
+            AddParam("@siteId", SiteId);
             AddParam("@listName", sListName);
             object oResult = ExecuteScalar(GetClientReportingConnection);
 
@@ -2824,23 +2259,17 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="nonWorkingDays"></param>
-        /// <param name="workHrs"></param>
-        /// <param name="sResult"></param>
-        /// <returns></returns>
         public bool UpdateRPTSettings(string nonWorkingDays, int workHrs, out string sResult)
         {
-            LogStatus("", "", "Reporting Refresh UpdateRPTSettings", string.Format("SELECT ISNULL(COUNT(*),0) as SiteCount FROM RPTSettings WHERE SiteID={0}", _siteID), 2, 3, "");
+            LogStatus("", "", "Reporting Refresh UpdateRPTSettings", string.Format("SELECT ISNULL(COUNT(*),0) as SiteCount FROM RPTSettings WHERE SiteID={0}", SiteId), 2, 3, "");
             Command = "SELECT ISNULL(COUNT(*),0) as SiteCount FROM RPTSettings WHERE SiteID=@siteID";
             //
-            AddParam("@siteID", _siteID);
+            AddParam("@siteID", SiteId);
             string webName;
             string webUrl;
 
             object oResult = ExecuteScalar(GetClientReportingConnection);
-            using (var site = new SPSite(_siteID))
+            using (var site = new SPSite(SiteId))
             {
                 using (SPWeb web = site.OpenWeb())
                 {
@@ -2851,17 +2280,17 @@ namespace EPMLiveCore.ReportHelper
 
             if ((int)oResult == 0)
             {
-                LogStatus("", "", "Reporting Refresh UpdateRPTSettings", string.Format("INSERT INTO RPTSettings VALUES({0},{1},{2},{3},{4})", _siteID, nonWorkingDays, workHrs, SiteName, SiteUrl), 2, 3, "");
+                LogStatus("", "", "Reporting Refresh UpdateRPTSettings", string.Format("INSERT INTO RPTSettings VALUES({0},{1},{2},{3},{4})", SiteId, nonWorkingDays, workHrs, SiteName, SiteUrl), 2, 3, "");
                 Command = "INSERT INTO RPTSettings VALUES(@siteID,@nonWorkingDays,@workHrs,@SiteName,@SiteUrl)";
             }
             else
             {
-                LogStatus("", "", "Reporting Refresh UpdateRPTSettings",  string.Format("UPDATE RPTSettings SET NonWorkingDays={0}, WorkHours={1} WHERE SiteID={2}", nonWorkingDays, workHrs, _siteID), 2, 3, "");
+                LogStatus("", "", "Reporting Refresh UpdateRPTSettings",  string.Format("UPDATE RPTSettings SET NonWorkingDays={0}, WorkHours={1} WHERE SiteID={2}", nonWorkingDays, workHrs, SiteId), 2, 3, "");
                 Command =
                     "UPDATE RPTSettings SET NonWorkingDays=@nonWorkingDays, WorkHours=@workHrs WHERE SiteID=@siteID";
             }
 
-            AddParam("@siteID", _siteID);
+            AddParam("@siteID", SiteId);
             AddParam("@nonWorkingDays", nonWorkingDays);
             AddParam("@workHrs", workHrs);
             AddParam("@SiteName", webName);

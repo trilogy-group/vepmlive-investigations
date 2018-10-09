@@ -110,75 +110,7 @@ namespace EPMLiveCore
         }
 
         #endregion
-
-        #region General Initializer : Class (CascadingLookupRenderControl) All Properties Explore By Name
-
-        /// <summary>
-        ///     Class (<see cref="CascadingLookupRenderControl" />) explore and verify properties for coverage gain.
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT Initializer")]
-        [TestCase(PropertyLookupData)]
-        [TestCase(PropertyLookupField)]
-        [TestCase(PropertyCustomProperty)]
-        [TestCase(PropertyLookupList)]
-        [TestCase(PropertyThrottled)]
-        [TestCase(PropertyDataSource)]
-        [TestCase(PropertyChoices)]
-        [TestCase(PropertyHiddenFieldName)]
-        [TestCase(Fieldm_dropList)]
-        [TestCase(Fieldm_tbx)]
-        [TestCase(Fieldm_dropImage)]
-        [TestCase(Fieldm_value)]
-        [TestCase(Fieldm_selectedValueIndex)]
-        [TestCase(Fieldm_webForeign)]
-        [TestCase(Fieldm_hasValueSet)]
-        public void AUT_CascadingLookupRenderControl_All_Properties_Explore_Verify_By_Name_Test(string name)
-        {
-            // Arrange
-            var propertyInfo = GetPropertyInfo(name);
-
-            // Act
-            ShouldlyExtension.ExploreProperty(_cascadingLookupRenderControlInstanceFixture,
-                                              Fixture,
-                                              propertyInfo);
-
-            // Assert
-            propertyInfo.ShouldNotBeNull();
-        }
-
-        #endregion
-
-        #region General Initializer : Class (CascadingLookupRenderControl) All Fields Explore By Name
-
-        /// <summary>
-        ///     Class (<see cref="CascadingLookupRenderControl" />) explore and verify fields for coverage gain.
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT Initializer")]
-        [TestCase(FieldpropBag)]
-        [TestCase(Fieldparent)]
-        [TestCase(Fieldm_dataSource)]
-        [TestCase(Field_lookupList)]
-        [TestCase(Fieldm_throttled)]
-        public void AUT_CascadingLookupRenderControl_All_Fields_Explore_Verify_By_Name_Test(string name)
-        {
-            // Arrange
-            var fieldInfo = GetFieldInfo(name);
-
-            // Act
-            ShouldlyExtension.ExploreFieldWithOrWithoutInstance(_cascadingLookupRenderControlInstanceFixture, 
-                                                                Fixture, 
-                                                                fieldInfo);
-
-            // Assert
-            fieldInfo.ShouldNotBeNull();
-        }
-
-        #endregion
-
+        
         #endregion
 
         #endregion

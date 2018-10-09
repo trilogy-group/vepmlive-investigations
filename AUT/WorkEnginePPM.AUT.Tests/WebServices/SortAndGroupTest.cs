@@ -793,60 +793,36 @@ namespace WorkEnginePPM
 
         #endregion
 
-        #region Method Call : (DefineGroupingValue) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_SortAndGroup_DefineGroupingValue_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var group = CreateType<int>();
-            var parval = CreateType<int>();
-            var thisval = CreateType<int>();
-            var ElStr = CreateType<string>();
-            var ElDStr = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _sortAndGroupInstance.DefineGroupingValue(group, parval, thisval, ElStr, ElDStr);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
         #region Method Call : (DefineGroupingValue) (Return Type : void) No Exception Thrown
 
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_SortAndGroup_DefineGroupingValue_Method_Call_Void_With_5_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var group = CreateType<int>();
-            var parval = CreateType<int>();
-            var thisval = CreateType<int>();
-            var ElStr = CreateType<string>();
-            var ElDStr = CreateType<string>();
-            var methodDefineGroupingValuePrametersTypes = new Type[] { typeof(int), typeof(int), typeof(int), typeof(string), typeof(string) };
-            object[] parametersOfDefineGroupingValue = { group, parval, thisval, ElStr, ElDStr };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodDefineGroupingValue, methodDefineGroupingValuePrametersTypes, out exception);
+        //[Test]
+        //[Timeout(TestsTimeOut)]
+        //[Category("AUT MethodCallTest")]
+        //public void AUT_SortAndGroup_DefineGroupingValue_Method_Call_Void_With_5_Parameters_No_Exception_Thrown_Test()
+        //{
+        //    // Arrange
+        //    var group = CreateType<int>();
+        //    var parval = CreateType<int>();
+        //    var thisval = CreateType<int>();
+        //    var ElStr = CreateType<string>();
+        //    var ElDStr = CreateType<string>();
+        //    var methodDefineGroupingValuePrametersTypes = new Type[] { typeof(int), typeof(int), typeof(int), typeof(string), typeof(string) };
+        //    object[] parametersOfDefineGroupingValue = { group, parval, thisval, ElStr, ElDStr };
+        //    Exception exception = null;
+        //    var methodInfo = GetMethodInfo(MethodDefineGroupingValue, methodDefineGroupingValuePrametersTypes, out exception);
 
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_sortAndGroupInstanceFixture, parametersOfDefineGroupingValue);
+        //    // Act
+        //    Action currentAction = () => methodInfo.Invoke(_sortAndGroupInstanceFixture, parametersOfDefineGroupingValue);
 
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfDefineGroupingValue.ShouldNotBeNull();
-            parametersOfDefineGroupingValue.Length.ShouldBe(5);
-            methodDefineGroupingValuePrametersTypes.Length.ShouldBe(5);
-            methodDefineGroupingValuePrametersTypes.Length.ShouldBe(parametersOfDefineGroupingValue.Length);
-            Should.NotThrow(currentAction);
-        }
+        //    // Assert
+        //    methodInfo.ShouldNotBeNull();
+        //    exception.ShouldBeNull();
+        //    parametersOfDefineGroupingValue.ShouldNotBeNull();
+        //    parametersOfDefineGroupingValue.Length.ShouldBe(5);
+        //    methodDefineGroupingValuePrametersTypes.Length.ShouldBe(5);
+        //    methodDefineGroupingValuePrametersTypes.Length.ShouldBe(parametersOfDefineGroupingValue.Length);
+        //    Should.NotThrow(currentAction);
+        //}
 
         #endregion
 
@@ -1096,26 +1072,6 @@ namespace WorkEnginePPM
         {
             var methodDoNotSortGroupPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_sortAndGroupInstance, MethodDoNotSortGroup, Fixture, methodDoNotSortGroupPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (DoNotSortGroup) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_SortAndGroup_DoNotSortGroup_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var group = CreateType<int>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _sortAndGroupInstance.DoNotSortGroup(group);
-
-            // Assert
-            Should.NotThrow(executeAction);
         }
 
         #endregion

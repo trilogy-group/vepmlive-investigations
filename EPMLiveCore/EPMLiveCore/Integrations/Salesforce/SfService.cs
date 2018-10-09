@@ -62,7 +62,13 @@ namespace EPMLiveCore.Integrations.Salesforce
                 byte[] bytes = webClient.UploadValues(string.Empty, "POST", collection);
 
                 var serializer = new DataContractJsonSerializer(typeof (SalesforceAuthResponse));
-                _salesforceAuthResponse = serializer.ReadObject(new MemoryStream(bytes)) as SalesforceAuthResponse;
+                if (bytes != null)
+                {
+                    using (var memoryStream = new MemoryStream(bytes))
+                    {
+                        _salesforceAuthResponse = serializer.ReadObject(memoryStream) as SalesforceAuthResponse;
+                    }
+                }
             }
 
             // Validating "ModifyAllData" permission. Use of the Metadata API requires a user with the ModifyAllData permission.
@@ -246,18 +252,17 @@ namespace EPMLiveCore.Integrations.Salesforce
 
                 if (method.Equals("GET"))
                 {
-                    response =
-                        serializer.ReadObject(
-                            new MemoryStream(Encoding.Default.GetBytes(webClient.DownloadString(string.Empty)))) as
-                        SalesforceServiceResponse;
+                    using (var memoryStream = new MemoryStream(Encoding.Default.GetBytes(webClient.DownloadString(string.Empty))))
+                    {
+                        response = serializer.ReadObject(memoryStream) as SalesforceServiceResponse;
+                    }
                 }
                 else
                 {
-                    response =
-                        serializer.ReadObject(
-                            new MemoryStream(
-                                Encoding.Default.GetBytes(webClient.UploadString(string.Empty, method, data)))) as
-                        SalesforceServiceResponse;
+                    using (var memoryStream = new MemoryStream(Encoding.Default.GetBytes(webClient.UploadString(string.Empty, method, data))))
+                    {
+                        response = serializer.ReadObject(memoryStream) as SalesforceServiceResponse;
+                    }
                 }
             }
 

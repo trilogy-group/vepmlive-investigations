@@ -28,6 +28,10 @@ namespace EPMLiveCore
         static string sEventLogSource = "EPM Live Project Center Events";
         static string sEventLogName = "EPM Live";
         static string sEvent = "";
+
+        private const string TypeScheduleDriven = "Schedule Driven";
+        private const string StateFieldName = "State";
+        private const string ClosedState = "closed";
         /// <summary>
         /// Initializes a new instance of the Microsoft.SharePoint.SPItemEventReceiver class.
         /// </summary>
@@ -225,7 +229,14 @@ namespace EPMLiveCore
             {
                 var propertyValue = GetPropertyValue("ProjectUpdate", properties);
 
-                if (propertyValue != null && !propertyValue.ToString().Equals("Schedule Driven")) return;
+                //SKYVERA-455: if project update is schedule driven but project is closed, we should avoid automatic updates for project fields
+                if (propertyValue != null &&
+                    (!propertyValue.ToString().Equals(TypeScheduleDriven)
+                     || (properties.List.Fields.ContainsFieldWithInternalName(StateFieldName) &&
+                     properties.AfterProperties[StateFieldName].ToString().EndsWith(ClosedState, StringComparison.OrdinalIgnoreCase))))
+                {
+                    return;
+                }
 
                 foreach (SPField spField in properties.List.Fields)
                 {

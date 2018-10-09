@@ -69,36 +69,7 @@ namespace EPMLiveWebParts.Comments
         #endregion
 
         #region Explore Class for Coverage Gain : Class (Comments)
-
-        #region General Initializer : Class (Comments) All Methods Explore Verification.
-
-        /// <summary>
-        ///     Class (<see cref="Comments" />) explore and verify fields for coverage gain.
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT Initializer")]
-        [TestCase(MethodOnPreRender, 0)]
-        [TestCase(MethodRenderWebPart, 0)]
-        [TestCase(MethodGetToolParts, 0)]
-        [TestCase(MethodEnsurePublicCommentsListExist, 0)]
-        [TestCase(MethodEnsureCommentsListExist, 0)]
-        public void AUT_Comments_All_Methods_Explore_Verify_Test(string methodName, int overloadingIndex = 0)
-        {
-            // Arrange
-            var currentMethodInfo = GetMethodInfo(methodName, overloadingIndex);
-
-            // Act
-            ShouldlyExtension.ExploreMethodWithOrWithoutInstance(_commentsInstanceFixture, 
-                                                                 Fixture, 
-                                                                 currentMethodInfo);
-
-            // Assert
-            currentMethodInfo.ShouldNotBeNull();
-        }
-
-        #endregion
-
+        
         #region General Initializer : Class (Comments) All Properties Explore By Name
 
         /// <summary>

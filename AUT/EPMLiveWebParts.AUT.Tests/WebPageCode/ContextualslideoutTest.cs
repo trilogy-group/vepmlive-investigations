@@ -390,27 +390,7 @@ namespace EPMLiveWebParts
         }
 
         #endregion
-
-        #region Method Call : (HideSlideOut) (Return Type : void) Invoke Should Not Throw
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Contextualslideout_HideSlideOut_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
-        {
-            // Arrange
-            var methodHideSlideOutPrametersTypes = new Type[] { typeof(string) };
-
-            // Act
-            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_contextualslideoutInstance, MethodHideSlideOut, Fixture, methodHideSlideOutPrametersTypes);
-
-            // Assert
-            methodHideSlideOutPrametersTypes.Length.ShouldBe(1);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (HideSlideOut) (Return Type : void) Invoke without parameter types and should not throw
 
         [Test]

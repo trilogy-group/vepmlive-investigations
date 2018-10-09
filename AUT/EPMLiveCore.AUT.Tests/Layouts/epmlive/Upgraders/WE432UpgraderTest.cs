@@ -1005,36 +1005,7 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
         }
 
         #endregion
-
-        #region Method Call : (LogMessage) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_WE432Upgrader_LogMessage_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var message = CreateType<string>();
-            var methodLogMessagePrametersTypes = new Type[] { typeof(string) };
-            object[] parametersOfLogMessage = { message };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodLogMessage, methodLogMessagePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_wE432UpgraderInstanceFixture, parametersOfLogMessage);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfLogMessage.ShouldNotBeNull();
-            parametersOfLogMessage.Length.ShouldBe(1);
-            methodLogMessagePrametersTypes.Length.ShouldBe(1);
-            methodLogMessagePrametersTypes.Length.ShouldBe(parametersOfLogMessage.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (LogMessage) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]

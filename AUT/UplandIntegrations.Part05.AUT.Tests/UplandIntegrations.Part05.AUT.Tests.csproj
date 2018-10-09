@@ -1,0 +1,244 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props')" />
+  <Import Project="..\packages\NUnit.3.10.1\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1E6B4AD4-61DA-4ED2-8916-9D0F737AD78E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UplandIntegrations.Part05.AUT.Tests</RootNamespace>
+    <AssemblyName>UplandIntegrations.Part05.AUT.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AUT.ConfigureTestProjects, Version=5.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AUT.ConfigureTestProjects.5.4.0\lib\net462\AUT.ConfigureTestProjects.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AutoFixture, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.4.5.0\lib\net452\AutoFixture.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AutoFixture.AutoMoq, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.AutoMoq.4.5.0\lib\net452\AutoFixture.AutoMoq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AutoFixture.NUnit3, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.NUnit3.4.5.0\lib\net452\AutoFixture.NUnit3.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Castle.Core.4.3.1\lib\net45\Castle.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Fare, Version=2.1.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fare.2.1.1\lib\net35\Fare.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Moq, Version=4.9.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.9.0\lib\net45\Moq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=3.10.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.10.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RestSharp, Version=104.1.0.0, Culture=neutral, PublicKeyToken=a7d016d7dd2b4dca, processorArchitecture=MSIL" />
+    <Reference Include="Shouldly, Version=3.0.0.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
+      <HintPath>..\packages\Shouldly.3.0.0\lib\net451\Shouldly.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.1\lib\netstandard1.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.1\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TenroxProjectService\AccountingConnectionTest.cs" />
+    <Compile Include="TenroxProjectService\AccountTest.cs" />
+    <Compile Include="TenroxProjectService\AssignmentTest.cs" />
+    <Compile Include="TenroxProjectService\BaseWorkTypeTest.cs" />
+    <Compile Include="TenroxProjectService\BookingSkillTest.cs" />
+    <Compile Include="TenroxProjectService\BulkDeleteRequestTest.cs" />
+    <Compile Include="TenroxProjectService\BulkDeleteResponseTest.cs" />
+    <Compile Include="TenroxProjectService\BulkDeleteSerializedRequestTest.cs" />
+    <Compile Include="TenroxProjectService\BulkDeleteSerializedResponseTest.cs" />
+    <Compile Include="TenroxProjectService\BusinessUnitTest.cs" />
+    <Compile Include="TenroxProjectService\ChargeEntryTest.cs" />
+    <Compile Include="TenroxProjectService\ChargeTest.cs" />
+    <Compile Include="TenroxProjectService\ClientInvoiceOptionTest.cs" />
+    <Compile Include="TenroxProjectService\ClientTest.cs" />
+    <Compile Include="TenroxProjectService\CurrencyTest.cs" />
+    <Compile Include="TenroxProjectService\DeleteRequestTest.cs" />
+    <Compile Include="TenroxProjectService\DeleteResponseTest.cs" />
+    <Compile Include="TenroxProjectService\DeleteSerializedRequestTest.cs" />
+    <Compile Include="TenroxProjectService\DeleteSerializedResponseTest.cs" />
+    <Compile Include="TenroxProjectService\EntityKeyMemberTest.cs" />
+    <Compile Include="TenroxProjectService\EntityKeyTest.cs" />
+    <Compile Include="TenroxProjectService\ExpenseEntryTest.cs" />
+    <Compile Include="TenroxProjectService\ExpenseItemTest.cs" />
+    <Compile Include="TenroxProjectService\ExpenseReportTest.cs" />
+    <Compile Include="TenroxProjectService\GroupTest.cs" />
+    <Compile Include="TenroxProjectService\HolidayDescriptionTest.cs" />
+    <Compile Include="TenroxProjectService\HolidaySetTest.cs" />
+    <Compile Include="TenroxProjectService\HolidayTest.cs" />
+    <Compile Include="TenroxProjectService\InvoiceTest.cs" />
+    <Compile Include="TenroxProjectService\InvoiceTimeAdjTest.cs" />
+    <Compile Include="TenroxProjectService\InvoiceTimEntryTest.cs" />
+    <Compile Include="TenroxProjectService\LeaveTimeRuleSetupTest.cs" />
+    <Compile Include="TenroxProjectService\LeaveTimeRuleTest.cs" />
+    <Compile Include="TenroxProjectService\LeaveTimeUserHistoryTest.cs" />
+    <Compile Include="TenroxProjectService\MilestoneTaskTest.cs" />
+    <Compile Include="TenroxProjectService\MilestoneTest.cs" />
+    <Compile Include="TenroxProjectService\MultiTableAssociationsTest.cs" />
+    <Compile Include="TenroxProjectService\OfflineUserPermissionsTest.cs" />
+    <Compile Include="TenroxProjectService\PayableBatchTest.cs" />
+    <Compile Include="TenroxProjectService\PayrollBatchTest.cs" />
+    <Compile Include="TenroxProjectService\PhaseTest.cs" />
+    <Compile Include="TenroxProjectService\PlanningRoleTest.cs" />
+    <Compile Include="TenroxProjectService\PortfolioAllocatedBudgetTest.cs" />
+    <Compile Include="TenroxProjectService\PortfolioBudgetTest.cs" />
+    <Compile Include="TenroxProjectService\PortfolioTest.cs" />
+    <Compile Include="TenroxProjectService\PPMBaseLineExpectedCostBenefitTest.cs" />
+    <Compile Include="TenroxProjectService\PPMBaseLineExpectedDurationTest.cs" />
+    <Compile Include="TenroxProjectService\PPMBaseLineTest.cs" />
+    <Compile Include="TenroxProjectService\PPMBaseLineTimeHorizonTest.cs" />
+    <Compile Include="TenroxProjectService\PPMExpectedCostBenefitTest.cs" />
+    <Compile Include="TenroxProjectService\PPMExpectedDurationTest.cs" />
+    <Compile Include="TenroxProjectService\PPMGoalTest.cs" />
+    <Compile Include="TenroxProjectService\PPMProjectDependencyTest.cs" />
+    <Compile Include="TenroxProjectService\PPMResourceAllocationTest.cs" />
+    <Compile Include="TenroxProjectService\PPMRiskAssociationTest.cs" />
+    <Compile Include="TenroxProjectService\PPMSponsorTest.cs" />
+    <Compile Include="TenroxProjectService\PPMTimeHorizonTest.cs" />
+    <Compile Include="TenroxProjectService\ProficiencyDescriptionTest.cs" />
+    <Compile Include="TenroxProjectService\ProficiencyTest.cs" />
+    <Compile Include="TenroxProjectService\ProjectRevenueRecognitionPreferenceTest.cs" />
+    <Compile Include="TenroxProjectService\ProjectsClientTest.cs" />
+    <Compile Include="TenroxProjectService\ProjectTest.cs" />
+    <Compile Include="TenroxProjectService\ProjectTypeDescriptionTest.cs" />
+    <Compile Include="TenroxProjectService\ProjectTypeTest.cs" />
+    <Compile Include="TenroxProjectService\ProjectWorkflowMapTest.cs" />
+    <Compile Include="TenroxProjectService\ProjectWorkflowOptionTest.cs" />
+    <Compile Include="TenroxProjectService\ProjectWorkflowStateFlagTest.cs" />
+    <Compile Include="TenroxProjectService\ProjectWorkflowTransitionFlagTest.cs" />
+    <Compile Include="TenroxProjectService\QueryByAllSerializedRequestTest.cs" />
+    <Compile Include="TenroxProjectService\QueryByAllSerializedResponseTest.cs" />
+    <Compile Include="TenroxProjectService\QueryByIdSerializedRequestTest.cs" />
+    <Compile Include="TenroxProjectService\QueryByIdSerializedResponseTest.cs" />
+    <Compile Include="TenroxProjectService\QueryByNameSerializedRequestTest.cs" />
+    <Compile Include="TenroxProjectService\QueryByNameSerializedResponseTest.cs" />
+    <Compile Include="TenroxProjectService\QueryByUniqueIdSerializedRequestTest.cs" />
+    <Compile Include="TenroxProjectService\QueryByUniqueIdSerializedResponseTest.cs" />
+    <Compile Include="TenroxProjectService\ResourceTypeHistoryTest.cs" />
+    <Compile Include="TenroxProjectService\ResourceTypeTest.cs" />
+    <Compile Include="TenroxProjectService\RoleCalendarTest.cs" />
+    <Compile Include="TenroxProjectService\RuleExecutionHistoryTest.cs" />
+    <Compile Include="TenroxProjectService\SiteTest.cs" />
+    <Compile Include="TenroxProjectService\SkillSetTest.cs" />
+    <Compile Include="TenroxProjectService\SkillsMultiMappingTest.cs" />
+    <Compile Include="TenroxProjectService\SkillTest.cs" />
+    <Compile Include="TenroxProjectService\SystemDefaultTest.cs" />
+    <Compile Include="TenroxProjectService\TagAssociationTest.cs" />
+    <Compile Include="TenroxProjectService\TagTest.cs" />
+    <Compile Include="TenroxProjectService\TaskTest.cs" />
+    <Compile Include="TenroxProjectService\TenroxFaultContractTest.cs" />
+    <Compile Include="TenroxProjectService\TimeEntryTest.cs" />
+    <Compile Include="TenroxProjectService\TitleSkillTest.cs" />
+    <Compile Include="TenroxProjectService\TitleTest.cs" />
+    <Compile Include="TenroxProjectService\TPPAssignmentChangeRequestTest.cs" />
+    <Compile Include="TenroxProjectService\UserGroupTest.cs" />
+    <Compile Include="TenroxProjectService\UserLeaveTimeTest.cs" />
+    <Compile Include="TenroxProjectService\UserPlanningRoleTest.cs" />
+    <Compile Include="TenroxProjectService\UsersBusinessUnitsTest.cs" />
+    <Compile Include="TenroxProjectService\UserSkillTest.cs" />
+    <Compile Include="TenroxProjectService\UserTest.cs" />
+    <Compile Include="TenroxProjectService\UserTokenTest.cs" />
+    <Compile Include="TenroxProjectService\WorkflowEntryTest.cs" />
+    <Compile Include="TenroxProjectService\WorkflowMapTest.cs" />
+    <Compile Include="TenroxProjectService\WorkflowStateTest.cs" />
+    <Compile Include="TenroxProjectService\WorkflowTransitionTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\EPMLiveIntegration\EPMLiveIntegration\EPMLiveIntegration.csproj">
+      <Project>{4c63f23f-463c-409b-89ad-adc2e138b8e3}</Project>
+      <Name>EPMLiveIntegration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\UplandIntegrations\UplandIntegrations\UplandIntegrations.csproj">
+      <Project>{df0fef98-25c9-40dd-9893-ff7bed79ac4b}</Project>
+      <Name>UplandIntegrations</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.10.1\build\NUnit.props'))" />
+    <Error Condition="!Exists('..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

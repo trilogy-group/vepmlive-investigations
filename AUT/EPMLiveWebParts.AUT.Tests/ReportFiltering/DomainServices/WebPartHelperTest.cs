@@ -163,54 +163,6 @@ namespace EPMLiveWebParts.ReportFiltering.DomainServices
 
         #endregion
 
-        #region Method Call : (ConvertWebPartIdToGuid) (Return Type : Guid?) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_WebPartHelper_ConvertWebPartIdToGuid_Static_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var webPartId = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => WebPartHelper.ConvertWebPartIdToGuid(webPartId);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (ConvertWebPartIdToGuid) (Return Type : Guid?) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_WebPartHelper_ConvertWebPartIdToGuid_Static_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var webPartId = CreateType<string>();
-            var methodConvertWebPartIdToGuidPrametersTypes = new Type[] { typeof(string) };
-            object[] parametersOfConvertWebPartIdToGuid = { webPartId };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodConvertWebPartIdToGuid, methodConvertWebPartIdToGuidPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_webPartHelperInstanceFixture, parametersOfConvertWebPartIdToGuid);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfConvertWebPartIdToGuid.ShouldNotBeNull();
-            parametersOfConvertWebPartIdToGuid.Length.ShouldBe(1);
-            methodConvertWebPartIdToGuidPrametersTypes.Length.ShouldBe(1);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (ConvertWebPartIdToGuid) (Return Type : Guid?) No Exception with encapsulation Thrown
 
         [Test]
@@ -235,26 +187,6 @@ namespace EPMLiveWebParts.ReportFiltering.DomainServices
 
         #endregion
 
-        #region Method Call : (ConvertWebPartIdToGuid) (Return Type : Guid?) Results Not Null Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_WebPartHelper_ConvertWebPartIdToGuid_Static_Method_Call_Dynamic_Invoking_Results_Not_Null_Test()
-        {
-            // Arrange
-            var methodConvertWebPartIdToGuidPrametersTypes = new Type[] { typeof(string) };
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_webPartHelperInstanceFixture, _webPartHelperInstanceType, MethodConvertWebPartIdToGuid, Fixture, methodConvertWebPartIdToGuidPrametersTypes);
-
-            // Assert
-            result.ShouldNotBeNull();
-            methodConvertWebPartIdToGuidPrametersTypes.Length.ShouldBe(1);
-        }
-
-        #endregion
-
         #region Method Call : (ConvertWebPartIdToGuid) (Return Type : Guid?) Invoke Should Not Throw
 
         [Test]
@@ -272,27 +204,6 @@ namespace EPMLiveWebParts.ReportFiltering.DomainServices
             // Assert
             Should.NotThrow(currentAction);
             methodConvertWebPartIdToGuidPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (ConvertWebPartIdToGuid) (Return Type : Guid?) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_WebPartHelper_ConvertWebPartIdToGuid_Static_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodConvertWebPartIdToGuid, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_webPartHelperInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
         }
 
         #endregion

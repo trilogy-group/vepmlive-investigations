@@ -147,9 +147,24 @@
     <Compile Include="API\Analytics\RecentItems.cs" />
     <Compile Include="API\APIException.cs" />
     <Compile Include="API\APITeam.cs" />
+    <Compile Include="API\Applications\ApplicationBase.cs" />
     <Compile Include="API\Applications\ApplicationInstaller.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.iInstallQuickLaunch.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallAndConfigureApp.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallFeatures.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallFiles.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallFilesProcessFolder.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallLists.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallListsFields.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallListsLookups.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallListsViews.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallListsViewsWebPartsInstall.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallProperties.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.ReportToAppReporting.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerHelpers.cs" />
     <Compile Include="API\Applications\Applications.cs" />
     <Compile Include="API\Applications\ApplicationUninstaller.cs" />
+    <Compile Include="API\Applications\ErrorLevels.cs" />
     <Compile Include="API\AppsStoreHelper.cs" />
     <Compile Include="API\AssociatedListItems\AssociatedListItems.cs" />
     <Compile Include="API\BaseJob.cs" />
@@ -231,8 +246,15 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="ChildParentSync.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\700Steps.cs" />
+    <Compile Include="ListDisplaySettingIterator.OnInit.cs" />
+    <Compile Include="ListDisplaySettingIterator.RenderControl.cs" />
+    <Compile Include="ListDisplaySettingIterator.IsFieldExcluded.cs" />
+    <Compile Include="ListDisplaySettingIterator.AddEntityPickersToLookups.cs" />
     <Compile Include="CommentCCPeopleEditor.cs" />
+    <Compile Include="ControlCollectionExtensions.cs" />
     <Compile Include="ControlDataBuilder.cs" />
+    <Compile Include="ControlExtensions.cs" />
     <Compile Include="Controls\Navigation\EPMLiveNavigation.cs" />
     <Compile Include="Controls\Navigation\EPMLiveQuickLaunchProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\ApplicationsLinkProvider.cs" />
@@ -491,11 +513,18 @@
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\DBUpgrader.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\InstallAndConfigureLists.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\InstallReportingEvents.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ListDataRolesProcessor.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ListDataDepartmentsProcessor.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ListDataWorkHoursProcessor.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ListDataHolidaysProcessor.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ListDataNonWorkProcessor .cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ListDataResourceProcessor.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\MasterPageUpdateStep.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\Miscellaneous.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\PFEPermissionMapper.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ReportingUpgrade.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\SiteFeatures.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\StepProcessor.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\TimeOff.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePool.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateWebs.cs" />
@@ -1295,6 +1324,7 @@
     <Compile Include="ListDefinitions\EPMLiveLists.cs" />
     <Compile Include="ListDisplaySettingIterator.cs" />
     <Compile Include="ListDisplayUtils.cs" />
+    <Compile Include="ListFieldIteratorExtensions.cs" />
     <Compile Include="MultiAppCustomSiteMapProvider.cs" />
     <Compile Include="NotificationCounter.cs" />
     <Compile Include="NotificationCounterV2.cs" />
@@ -1379,6 +1409,7 @@
     <Compile Include="SPUtilities\SPListUtility.cs" />
     <Compile Include="SPUtilities\SPProjectUtility.cs" />
     <Compile Include="StatusingEvent.cs" />
+    <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="TagManager\API\Gateway.cs" />
     <Compile Include="TagManager\Tag.cs" />
     <Compile Include="TagManager\TagManager.cs" />
@@ -1546,6 +1577,15 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="WebPageCode\ListDisplayPage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\ListDisplayPage.RegisterScript.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\ListDisplayPage.Render.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\ListDisplayPage.RenderWhere.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="WebPageCode\manageschedule.aspx.cs">

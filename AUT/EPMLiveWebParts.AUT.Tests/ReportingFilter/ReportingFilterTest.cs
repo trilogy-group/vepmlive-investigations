@@ -1011,33 +1011,7 @@ namespace EPMLiveWebParts
         }
 
         #endregion
-
-        #region Method Call : (CreateChildControls) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingFilter_CreateChildControls_Method_Call_Void_With_No_Parameters_Call_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodCreateChildControlsPrametersTypes = null;
-            object[] parametersOfCreateChildControls = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodCreateChildControls, methodCreateChildControlsPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_reportingFilterInstanceFixture, parametersOfCreateChildControls);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfCreateChildControls.ShouldBeNull();
-            methodCreateChildControlsPrametersTypes.ShouldBeNull();
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (CreateChildControls) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -6504,28 +6478,7 @@ namespace EPMLiveWebParts
         }
 
         #endregion
-
-        #region Method Call : (GetScriptForFilterOperator) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_ReportingFilter_GetScriptForFilterOperator_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetScriptForFilterOperator, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_reportingFilterInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
+        
         #region Method Call : (GetScriptForSelectedFieldsAsCsv) (Return Type : string) private call definition
 
         [ExcludeFromCodeCoverage]

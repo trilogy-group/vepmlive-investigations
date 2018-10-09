@@ -157,7 +157,6 @@ namespace EPMLiveCore
         [TestCase(MethodClearCache, 0)]
         [TestCase(MethodOnInit, 0)]
         [TestCase(MethodRenderControl, 0)]
-        [TestCase(MethodDispose, 0)]
         [TestCase(MethodAddControlsToWriter, 0)]
         [TestCase(MethodCreateHtmlPanelText, 0)]
         [TestCase(MethodCreateChildControls, 0)]
@@ -1289,27 +1288,6 @@ namespace EPMLiveCore
 
             // Assert
             methodDisposePrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
-        #region Method Call : (Dispose) (Return Type : void) Invoke without parameter types and should not throw
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ListDisplaySettingIterator_Dispose_Method_Call_With_No_Parameters_Dynamic_Invoking_Without_Parameters_Should_Not_Throw_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodDispose, 0);
-
-            // Act
-            Action currentAction = () => methodInfo.InvokeStaticMethodWithDynamicParamters(_listDisplaySettingIteratorInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
             Should.NotThrow(currentAction);
         }
 
