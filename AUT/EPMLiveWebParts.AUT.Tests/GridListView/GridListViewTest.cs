@@ -2111,36 +2111,7 @@ namespace EPMLiveWebParts
         }
 
         #endregion
-
-        #region Method Call : (RenderWebPart) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_RenderWebPart_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var output = CreateType<HtmlTextWriter>();
-            var methodRenderWebPartPrametersTypes = new Type[] { typeof(HtmlTextWriter) };
-            object[] parametersOfRenderWebPart = { output };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodRenderWebPart, methodRenderWebPartPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_gridListViewInstanceFixture, parametersOfRenderWebPart);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfRenderWebPart.ShouldNotBeNull();
-            parametersOfRenderWebPart.Length.ShouldBe(1);
-            methodRenderWebPartPrametersTypes.Length.ShouldBe(1);
-            methodRenderWebPartPrametersTypes.Length.ShouldBe(parametersOfRenderWebPart.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (RenderWebPart) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -2950,36 +2921,6 @@ namespace EPMLiveWebParts
         {
             var methodrenderCostPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_gridListViewInstance, MethodrenderCost, Fixture, methodrenderCostPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (renderCost) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_GridListView_renderCost_Method_Call_Void_With_2_Parameters_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            var output = CreateType<HtmlTextWriter>();
-            var web = CreateType<SPWeb>();
-            var methodrenderCostPrametersTypes = new Type[] { typeof(HtmlTextWriter), typeof(SPWeb) };
-            object[] parametersOfrenderCost = { output, web };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodrenderCost, methodrenderCostPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_gridListViewInstanceFixture, parametersOfrenderCost);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfrenderCost.ShouldNotBeNull();
-            parametersOfrenderCost.Length.ShouldBe(2);
-            methodrenderCostPrametersTypes.Length.ShouldBe(2);
-            methodrenderCostPrametersTypes.Length.ShouldBe(parametersOfrenderCost.Length);
-            Should.Throw<Exception>(currentAction);
         }
 
         #endregion

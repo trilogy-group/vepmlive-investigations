@@ -884,21 +884,27 @@ namespace EPMLiveWebParts
                 throw new ArgumentNullException(nameof(site));
             }
 
-            var web = GetWeb(site);
-            var list = web.Lists[new Guid(Request[ArhiveRestoreListIdRequestParameter])];
-            var listItem = list.GetItemById(int.Parse(Request[ArchiveRestoreItemIdRequestParameter]));
-            var service = new ProjectArchiverService();
-
-            if (archive)
+            using (var web = GetWeb(site))
             {
-                service.ArchiveProject(listItem);
-            }
-            else
-            {
-                service.RestoreProject(listItem);
-            }
+                SPGroup group = web.Groups.GetByName("Administrators");
 
-            return SuccessMessage;
+                if (!web.IsCurrentUserMemberOfGroup(group.ID) && !web.CurrentUser.IsSiteAdmin)
+                    throw new UnauthorizedAccessException();
+
+                var list = web.Lists[new Guid(Request[ArhiveRestoreListIdRequestParameter])];
+                var listItem = list.GetItemById(int.Parse(Request[ArchiveRestoreItemIdRequestParameter]));
+                var service = new ProjectArchiverService();
+
+                if (archive)
+                {
+                    service.ArchiveProject(listItem);
+                }
+                else
+                {
+                    service.RestoreProject(listItem);
+                }
+                return SuccessMessage;
+            }
         }
     }
 }

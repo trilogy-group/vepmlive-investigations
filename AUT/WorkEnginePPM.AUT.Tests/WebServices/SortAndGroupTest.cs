@@ -793,30 +793,6 @@ namespace WorkEnginePPM
 
         #endregion
 
-        #region Method Call : (DefineGroupingValue) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_SortAndGroup_DefineGroupingValue_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var group = CreateType<int>();
-            var parval = CreateType<int>();
-            var thisval = CreateType<int>();
-            var ElStr = CreateType<string>();
-            var ElDStr = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _sortAndGroupInstance.DefineGroupingValue(group, parval, thisval, ElStr, ElDStr);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
         #region Method Call : (DefineGroupingValue) (Return Type : void) No Exception Thrown
 
         //[Test]
@@ -1096,26 +1072,6 @@ namespace WorkEnginePPM
         {
             var methodDoNotSortGroupPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_sortAndGroupInstance, MethodDoNotSortGroup, Fixture, methodDoNotSortGroupPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (DoNotSortGroup) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_SortAndGroup_DoNotSortGroup_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var group = CreateType<int>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _sortAndGroupInstance.DoNotSortGroup(group);
-
-            // Assert
-            Should.NotThrow(executeAction);
         }
 
         #endregion
