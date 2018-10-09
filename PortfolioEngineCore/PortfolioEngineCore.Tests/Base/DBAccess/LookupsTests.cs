@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Linq;
@@ -16,6 +17,10 @@ namespace PortfolioEngineCore.Tests.Base
     {
         private const string DummyString = "DummyString";
         private const int DummyInt = 1;
+        private const string LookupId = "LV_UID";
+        private const string LookupLevel = "LV_LEVEL";
+        private const string LookupInactive = "LV_INACTIVE";
+        private const string LookupValue = "LV_VALUE";
         private static string ExecutedCommand = string.Empty;
         private static string CustomReply = string.Empty;
         private IDisposable shimsContext;
@@ -52,6 +57,10 @@ namespace PortfolioEngineCore.Tests.Base
                     return DummyInt;
                 }
             };
+            ShimSqlDb.AllInstances.ConnectionGet = _ => new ShimSqlConnection();
+            ShimSqlConnection.AllInstances.BeginTransaction = _ => new ShimSqlTransaction();
+            ShimSqlTransaction.AllInstances.Commit = _ => { };
+            ShimDataTable.AllInstances.LoadIDataReader = (_, reader) => { };
         }
 
         [TestMethod]
@@ -255,7 +264,7 @@ namespace PortfolioEngineCore.Tests.Base
             var expectedContent = $"Timesheet  {DummyString}  {DummyString}:  {DummyString}";
             ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
             {
-                Read = () => 
+                Read = () =>
                 {
                     if (++count <= 1)
                     {
@@ -388,7 +397,7 @@ namespace PortfolioEngineCore.Tests.Base
                     }
                 }
             };
-            
+
             // Act
             var result = dbaLookups.CanDeleteLookupItems(dbAccess, LvuIds, out reply);
 
@@ -434,7 +443,7 @@ namespace PortfolioEngineCore.Tests.Base
                     }
                 }
             };
-            
+
 
             // Act
             var result = dbaLookups.CanDeleteLookupItems(dbAccess, LvuIds, out reply);
@@ -453,7 +462,7 @@ namespace PortfolioEngineCore.Tests.Base
             const string LvuIds = "1";
             var reply = string.Empty;
             var expectedContent = $"<message>{DummyString}</message>";
-            ShimSqlCommand.AllInstances.ExecuteReader = _ => 
+            ShimSqlCommand.AllInstances.ExecuteReader = _ =>
             {
                 throw new Exception(DummyString);
             };
@@ -466,6 +475,247 @@ namespace PortfolioEngineCore.Tests.Base
                 () => result.ShouldBe(StatusEnum.rsRequestCannotBeCompleted),
                 () => reply.ShouldNotBeNullOrEmpty(),
                 () => reply.ShouldContainWithoutWhitespace(expectedContent));
+        }
+
+        [TestMethod]
+        public void UpdateLookupInfo_NameEmpty_ReturnsExpectedValue()
+        {
+            // Arrange
+            var reply = string.Empty;
+            var dataTable = new DataTable();
+            var lookupId = 1;
+            const string ExpectedMessage = "Please enter a Lookup Name";
+
+            // Act
+            var result = dbaLookups.UpdateLookupInfo(dbAccess, ref lookupId, string.Empty, DummyString, dataTable, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsRequestCannotBeCompleted),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContain(ExpectedMessage));
+        }
+
+        [TestMethod]
+        public void UpdateLookupInfo_LookupAlreadyExists_ReturnsExpectedValue()
+        {
+            // Arrange
+            var reply = string.Empty;
+            var dataTable = new DataTable();
+            var lookupId = 2;
+            var expectedMessage = $"Can't save Lookup.\nA Lookup with name '{DummyString}' already exists";
+            ShimSqlDb.AllInstances.SelectDataByNameStringStringStatusEnumDataTableOut = SelectDataByNameSuccess;
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                CountGet = () => 1,
+                ItemGetInt32 = i => new ShimDataRow
+                {
+                    ItemGetString = name => DummyInt
+                }
+            };
+
+            // Act
+            var result = dbaLookups.UpdateLookupInfo(dbAccess, ref lookupId, DummyString, DummyString, dataTable, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsRequestCannotBeCompleted),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContain(expectedMessage));
+        }
+
+        [TestMethod]
+        public void UpdateLookupInfo_DuplicateValue_ReturnsExpectedValue()
+        {
+            // Arrange
+            var reply = string.Empty;
+            var dataTable = new DataTable();
+            var lookupId = 2;
+            var expectedMessage = $"Can't save Lookup.\nDuplicate value not allowed: {DummyString}";
+            ShimSqlDb.AllInstances.SelectDataByNameStringStringStatusEnumDataTableOut = SelectDataByNameError;
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                GetEnumerator = () => new List<DataRow>
+                {
+                    new ShimDataRow
+                    {
+                        ItemGetString = GetLookupItemValues(0, 1, 0, DummyString)
+                    },
+                    new ShimDataRow
+                    {
+                        ItemGetString = GetLookupItemValues(1, 1, 0, DummyString)
+                    }
+
+                }.GetEnumerator()
+            };
+
+            // Act
+            var result = dbaLookups.UpdateLookupInfo(dbAccess, ref lookupId, DummyString, DummyString, dataTable, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsRequestCannotBeCompleted),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContain(expectedMessage));
+        }
+
+        [TestMethod]
+        public void UpdateLookupInfo_LookupIdZero_ReturnsExpectedValue()
+        {
+            // Arrange
+            var reply = string.Empty;
+            var dataTable = new DataTable();
+            var lookupId = 0;
+            const string ExpectedMessage = "<message></message>";
+            ShimSqlDb.AllInstances.SelectDataByNameStringStringStatusEnumDataTableOut = SelectDataByNameError;
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                GetEnumerator = () => new List<DataRow>
+                {
+                    new ShimDataRow
+                    {
+                        ItemGetString = GetLookupItemValues(0, 5, 0, DummyString)
+                    },
+                    new ShimDataRow
+                    {
+                        ItemGetString = GetLookupItemValues(1, 4, 0, "Dummy")
+                    }
+
+                }.GetEnumerator()
+            };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
+            ShimSqlDb.AllInstances.GetLastIdentityValueInt32Out = GetLastIdentityValue;
+
+            // Act
+            var result = dbaLookups.UpdateLookupInfo(dbAccess, ref lookupId, DummyString, DummyString, dataTable, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsSuccess),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContain(ExpectedMessage));
+        }
+
+        [TestMethod]
+        public void UpdateLookupInfo_LookupIdGreaterThanZero_ReturnsExpectedValue()
+        {
+            // Arrange
+            var reply = string.Empty;
+            var dataTable = new DataTable();
+            var lookupId = 2;
+            const string ExpectedMessage = "<message></message>";
+            ShimSqlDb.AllInstances.SelectDataByNameStringStringStatusEnumDataTableOut = SelectDataByNameError;
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                GetEnumerator = () => new List<DataRow>
+                {
+                    new ShimDataRow
+                    {
+                        ItemGetString = GetLookupItemValues(0, 5, 0, DummyString),
+                        RowStateGet = () => DataRowState.Modified
+                    },
+                    new ShimDataRow
+                    {
+                        ItemGetString = GetLookupItemValues(1, 4, 0, "Dummy"),
+                        RowStateGet = () => DataRowState.Deleted
+                    }
+                }.GetEnumerator()
+            };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () => true
+            };
+
+            // Act
+            var result = dbaLookups.UpdateLookupInfo(dbAccess, ref lookupId, DummyString, DummyString, dataTable, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsSuccess),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContain(ExpectedMessage));
+        }
+
+        [TestMethod]
+        public void UpdateLookupInfo_OnException_ReturnsExpectedValue()
+        {
+            // Arrange
+            var reply = string.Empty;
+            var dataTable = new DataTable();
+            var lookupId = 2;
+            var expectedMessage = $"<message>{DummyString}</message>";
+            ShimSqlDb.AllInstances.SelectDataByNameStringStringStatusEnumDataTableOut = SelectDataByNameError;
+            ShimDataTable.AllInstances.RowsGet = _ => 
+            {
+                throw new Exception(DummyString);
+            };
+            
+            // Act
+            var result = dbaLookups.UpdateLookupInfo(dbAccess, ref lookupId, DummyString, DummyString, dataTable, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsRequestCannotBeCompleted),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContain(expectedMessage));
+        }
+
+        private FakesDelegates.Func<string, object> GetLookupItemValues(int id, int level, int inactive, string value)
+        {
+            return name =>
+            {
+                switch (name)
+                {
+                    case LookupId:
+                        return id;
+                    case LookupLevel:
+                        return level;
+                    case LookupInactive:
+                        return inactive;
+                    case LookupValue:
+                        return value;
+                    default:
+                        return DummyString;
+                }
+            };
+        }
+
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
+        private bool GetLastIdentityValue(SqlDb dbAccess, out int lookupId)
+        {
+            lookupId = 0;
+            return true;
+        }
+
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
+        private StatusEnum SelectDataByNameSuccess(
+            SqlDb db, 
+            string command, 
+            string name, 
+            StatusEnum enumError, 
+            out DataTable dataTable)
+        {
+            dataTable = new DataTable();
+            return StatusEnum.rsSuccess;
+        }
+
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
+        private StatusEnum SelectDataByNameError(
+            SqlDb db, 
+            string command, 
+            string name, 
+            StatusEnum enumError, 
+            out DataTable dataTable)
+        {
+            dataTable = new DataTable();
+            return StatusEnum.rsRequestCannotBeCompleted;
         }
 
         /// <summary>
@@ -490,10 +740,10 @@ namespace PortfolioEngineCore.Tests.Base
         /// This is a fake method. All the parameters are required, even though not all of them are used
         /// </summary>
         private StatusEnum SelectDataByIdSuccess(
-            SqlDb dbAccess, 
-            string command, 
-            int id, 
-            StatusEnum statusErrror, 
+            SqlDb dbAccess,
+            string command,
+            int id,
+            StatusEnum statusErrror,
             out DataTable dataTable)
         {
             ExecutedCommand = command;
@@ -505,9 +755,9 @@ namespace PortfolioEngineCore.Tests.Base
         /// This is a fake method. All the parameters are required, even though not all of them are used
         /// </summary>
         private StatusEnum SelectDataSuccess(
-            SqlDb dbAccess, 
-            string command, 
-            StatusEnum statusError, 
+            SqlDb dbAccess,
+            string command,
+            StatusEnum statusError,
             out DataTable dataTable)
         {
             ExecutedCommand = command;
