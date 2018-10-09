@@ -564,6 +564,9 @@ namespace EPMLiveCore.API
                                                     case 2:
                                                         status = "Complete";
                                                         break;
+                                                    default:
+                                                        status = string.Empty;
+                                                        break;
                                                 }
 
                                                 var parseResult = false;
