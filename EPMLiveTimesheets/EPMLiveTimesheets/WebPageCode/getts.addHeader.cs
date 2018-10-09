@@ -113,7 +113,7 @@ namespace TimeSheets
             var attrAlign = docXml.CreateAttribute("align");
             attrAlign.Value = "right";
             var attrId = docXml.CreateAttribute(Id);
-            attrId.Value = "_TsDate_" + periodStart.AddDays(days).ToShortDateString().Replace("/", "_");            
+            attrId.Value = $"_TsDate_{periodStart.AddDays(days).ToShortDateString().Replace("/", "_")}";
 
             newCol.Attributes.Append(attrType);
             newCol.Attributes.Append(attrWidth);
