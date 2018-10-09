@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortfolioEngineCore.Fakes;
@@ -15,13 +14,12 @@ namespace PortfolioEngineCore.Tests.Base
     [TestClass]
     public class LookupsTests
     {
-        private IDisposable shimsContext;
-        private DBAccess dbAccess;
         private const string DummyString = "DummyString";
         private const int DummyInt = 1;
         private static string ExecutedCommand = string.Empty;
         private static string CustomReply = string.Empty;
-
+        private IDisposable shimsContext;
+        private DBAccess dbAccess;
 
         [TestInitialize]
         public void Initialize()
@@ -42,7 +40,18 @@ namespace PortfolioEngineCore.Tests.Base
             ShimSqlDb.ReadStringValueObject = objectValue => objectValue == null
                                                                 ? string.Empty
                                                                 : objectValue.ToString();
-
+            ShimSqlDb.AllInstances.ConnectionGet = _ => new SqlConnection();
+            ShimSqlDb.ReadIntValueObject = objectValue =>
+            {
+                if (objectValue is int)
+                {
+                    return Convert.ToInt32(objectValue);
+                }
+                else
+                {
+                    return DummyInt;
+                }
+            };
         }
 
         [TestMethod]
@@ -236,28 +245,270 @@ namespace PortfolioEngineCore.Tests.Base
                 () => reply.ShouldContain(DummyString));
         }
 
+        [TestMethod]
+        public void CanDeleteLookupItems_CFieldId9105_ShouldReturnExpectedContent()
+        {
+            // Arrange
+            const string LvuIds = "1";
+            var reply = string.Empty;
+            var count = 1;
+            var expectedContent = $"Timesheet  {DummyString}  {DummyString}:  {DummyString}";
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () => 
+                {
+                    if (++count <= 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        count = 0;
+                        return false;
+                    }
+                },
+                ItemGetString = name => DummyString
+            };
+            ShimSqlDb.ReadIntValueObject = _ => 9105;
 
+            // Act
+            var result = dbaLookups.CanDeleteLookupItems(dbAccess, LvuIds, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsSuccess),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContainWithoutWhitespace(expectedContent));
+        }
+
+        [TestMethod]
+        public void CanDeleteLookupItems_CFieldId9305_ShouldReturnExpectedContent()
+        {
+            // Arrange
+            const string LvuIds = "1";
+            var reply = string.Empty;
+            var count = 1;
+            var expectedContent = $"Resource Plan  {DummyString}:  {DummyString}";
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () =>
+                {
+                    if (++count <= 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        count = 0;
+                        return false;
+                    }
+                },
+                ItemGetString = name => DummyString
+            };
+            ShimSqlDb.ReadIntValueObject = _ => 9305;
+
+            // Act
+            var result = dbaLookups.CanDeleteLookupItems(dbAccess, LvuIds, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsSuccess),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContainWithoutWhitespace(expectedContent));
+        }
+
+        [TestMethod]
+        public void CanDeleteLookupItems_CFieldId11801_ShouldReturnExpectedContent()
+        {
+            // Arrange
+            const string LvuIds = "1";
+            var reply = string.Empty;
+            var count = 1;
+            var expectedContent = $"PI Cost Value  {DummyString}  {DummyString}";
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () =>
+                {
+                    if (++count <= 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        count = 0;
+                        return false;
+                    }
+                },
+                ItemGetString = name => DummyString
+            };
+            ShimSqlDb.ReadIntValueObject = _ => 11801;
+
+            // Act
+            var result = dbaLookups.CanDeleteLookupItems(dbAccess, LvuIds, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsSuccess),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContainWithoutWhitespace(expectedContent));
+        }
+
+        [TestMethod]
+        public void CanDeleteLookupItems_CFieldId20001AndCFTableResourceINT_ShouldReturnExpectedContent()
+        {
+            // Arrange
+            const string LvuIds = "1";
+            var reply = string.Empty;
+            var count = 1;
+            var expectedContent = $"Resource  {DummyString}:  {DummyString}";
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () =>
+                {
+                    if (++count <= 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        count = 0;
+                        return false;
+                    }
+                },
+                ItemGetString = name =>
+                {
+                    switch (name)
+                    {
+                        case "Field_ID":
+                            return 20001;
+                        case "Table_ID":
+                            return 101;
+                        default:
+                            return DummyString;
+                    }
+                }
+            };
+            
+            // Act
+            var result = dbaLookups.CanDeleteLookupItems(dbAccess, LvuIds, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsSuccess),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContainWithoutWhitespace(expectedContent));
+        }
+
+        [TestMethod]
+        public void CanDeleteLookupItems_CFieldId20001AndCFTablePortfolioINT_ShouldReturnExpectedContent()
+        {
+            // Arrange
+            const string LvuIds = "1";
+            var reply = string.Empty;
+            var count = 1;
+            var expectedContent = $"Program Data  {DummyString}:  {DummyString}";
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () =>
+                {
+                    if (++count <= 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        count = 0;
+                        return false;
+                    }
+                },
+                ItemGetString = name =>
+                {
+                    switch (name)
+                    {
+                        case "Field_ID":
+                            return 20001;
+                        case "Table_ID":
+                            return 201;
+                        default:
+                            return DummyString;
+                    }
+                }
+            };
+            
+
+            // Act
+            var result = dbaLookups.CanDeleteLookupItems(dbAccess, LvuIds, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsSuccess),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContainWithoutWhitespace(expectedContent));
+        }
+
+        [TestMethod]
+        public void CanDeleteLookupItems_OnException_ReturnExpectedMessage()
+        {
+            // Arrange
+            const string LvuIds = "1";
+            var reply = string.Empty;
+            var expectedContent = $"<message>{DummyString}</message>";
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => 
+            {
+                throw new Exception(DummyString);
+            };
+
+            // Act
+            var result = dbaLookups.CanDeleteLookupItems(dbAccess, LvuIds, out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsRequestCannotBeCompleted),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContainWithoutWhitespace(expectedContent));
+        }
+
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum CanDeleteLookupSuccess(DBAccess dbAccess, int id, out string reply)
         {
             reply = CustomReply;
             return StatusEnum.rsSuccess;
         }
 
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum CanDeleteLookupError(DBAccess dbAccess, int id, out string reply)
         {
             reply = CustomReply;
             return StatusEnum.rsRequestCannotBeCompleted;
         }
 
-
-        private StatusEnum SelectDataByIdSuccess(SqlDb dbAccess, string command, int id, StatusEnum statusErrror, out DataTable dataTable)
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
+        private StatusEnum SelectDataByIdSuccess(
+            SqlDb dbAccess, 
+            string command, 
+            int id, 
+            StatusEnum statusErrror, 
+            out DataTable dataTable)
         {
             ExecutedCommand = command;
             dataTable = new DataTable();
             return StatusEnum.rsSuccess;
         }
 
-        private StatusEnum SelectDataSuccess(SqlDb dbAccess, string command, StatusEnum statusError, out DataTable dataTable)
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
+        private StatusEnum SelectDataSuccess(
+            SqlDb dbAccess, 
+            string command, 
+            StatusEnum statusError, 
+            out DataTable dataTable)
         {
             ExecutedCommand = command;
             dataTable = new DataTable();
