@@ -41,7 +41,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
         private const string ItemId = "ItemID";
         private const string UID = "UID";
         private IDisposable shimsContext;
-        private SaveJob saveJobs;
+        private SaveJob saveJob;
         private PrivateObject privateObject;
         private PrivateType privateType;
         
@@ -50,8 +50,8 @@ namespace EPMLiveTimesheets.Tests.Jobs
         {
             shimsContext = ShimsContext.Create();
             SetupShims();
-            saveJobs = new SaveJob();
-            privateObject = new PrivateObject(saveJobs);
+            saveJob = new SaveJob();
+            privateObject = new PrivateObject(saveJob);
             privateType = new PrivateType(typeof(SaveJob));
         }
 
@@ -257,7 +257,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
             privateObject.Invoke(ProcessTimesheetHoursMethodName, DummyString, row, sqlConnection, timesheetSettings, spWeb, DummyString);
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
+            saveJob.ShouldSatisfyAllConditions(
                 () => sqlCommands.ShouldNotBeEmpty(),
                 () => expectedSqlCommands.All(p => sqlCommands.Contains(p)).ShouldBeTrue());
         }
@@ -346,7 +346,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
                 list);
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
+            saveJob.ShouldSatisfyAllConditions(
                 () => sqlCommands.ShouldNotBeEmpty(),
                 () => expectedSqlCommands.All(p => sqlCommands.Contains(p)).ShouldBeTrue());
         }
@@ -414,7 +414,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
                 timeSettings);
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
+            saveJob.ShouldSatisfyAllConditions(
                 () => sqlCommands.ShouldNotBeEmpty(),
                 () => expectedSqlCommands.All(p => sqlCommands.Contains(p)).ShouldBeTrue());
         }
@@ -521,7 +521,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
                 false);
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
+            saveJob.ShouldSatisfyAllConditions(
                 () => processTimesheetFieldsWasCalled.ShouldBeTrue(),
                 () => processTimesheetHoursWasCalled.ShouldBeTrue(),
                 () => processListFieldsWasCalled.ShouldBeTrue(),
@@ -630,7 +630,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
                 false);
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
+            saveJob.ShouldSatisfyAllConditions(
                 () => processTimesheetFieldsWasCalled.ShouldBeTrue(),
                 () => processTimesheetHoursWasCalled.ShouldBeTrue(),
                 () => processListFieldsWasCalled.ShouldBeTrue(),
@@ -641,11 +641,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
         public void ProcessItemRow_DataTableItemsEmpty_ExecutesCorrectly()
         {
             // Arrange
-            const string ExpectedSqlCommand = @"INSERT INTO TSITEM SELECT DISTINCT TS_UID, case when TS_UID=@currenttsuid then @uidcurrent else NEWID() end,
-                                                            @webid,@listid,@itemtype,@itemid,@title,@project,@projectid,@list,0,@projectlistid,@assignedtoid,@rate 
-                                                            FROM TSTIMESHEET INNER JOIN TSUSER ON TSTIMESHEET.TSUSER_UID = TSUSER.TSUSERUID 
-                                                            WHERE TS_UID=@currenttsuid OR (TS_UID NOT IN (SELECT TS_UID FROM TSITEM WHERE ITEM_ID=@itemid AND ITEM_TYPE = @worktype) 
-                                                            AND PERIOD_ID > @currentperiodid AND SUBMITTED = 0 AND TSTIMESHEET.SITE_UID=@siteid AND TSUSEr.USER_ID=@userid)";
+            const string ExpectedSqlCommand = "INSERT INTO TSITEM SELECT DISTINCT TS_UID, case when TS_UID=@currenttsuid then @uidcurrent else NEWID() end";
             var sqlCommand = string.Empty;
             var processTimesheetHoursWasCalled = false;
             var processListFieldsWasCalled = false;
@@ -742,11 +738,11 @@ namespace EPMLiveTimesheets.Tests.Jobs
                 false);
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
+            saveJob.ShouldSatisfyAllConditions(
                 () => processTimesheetFieldsWasCalled.ShouldBeTrue(),
                 () => processTimesheetHoursWasCalled.ShouldBeTrue(),
                 () => processListFieldsWasCalled.ShouldBeTrue(),
-                () => sqlCommand.ShouldBe(ExpectedSqlCommand));
+                () => sqlCommand.ShouldContain(ExpectedSqlCommand));
         }
 
         [TestMethod]
@@ -798,8 +794,8 @@ namespace EPMLiveTimesheets.Tests.Jobs
             var errorContent = stringBuilder?.ToString();
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
-                () => saveJobs.bErrors.ShouldBeTrue(),
+            saveJob.ShouldSatisfyAllConditions(
+                () => saveJob.bErrors.ShouldBeTrue(),
                 () => errorContent.ShouldNotBeNullOrEmpty(),
                 () => errorContent.ShouldContain(expectedMessage));
         }
@@ -851,8 +847,8 @@ namespace EPMLiveTimesheets.Tests.Jobs
             var errorContent = stringBuilder?.ToString();
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
-                () => saveJobs.bErrors.ShouldBeTrue(),
+            saveJob.ShouldSatisfyAllConditions(
+                () => saveJob.bErrors.ShouldBeTrue(),
                 () => errorContent.ShouldNotBeNullOrEmpty(),
                 () => errorContent.ShouldContain(expectedMessage));
         }
@@ -885,8 +881,8 @@ namespace EPMLiveTimesheets.Tests.Jobs
             var errorContent = stringBuilder?.ToString();
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
-                () => saveJobs.bErrors.ShouldBeTrue(),
+            saveJob.ShouldSatisfyAllConditions(
+                () => saveJob.bErrors.ShouldBeTrue(),
                 () => errorContent.ShouldNotBeNullOrEmpty(),
                 () => errorContent.ShouldContain(ExpectedMessage));
         }
@@ -941,8 +937,8 @@ namespace EPMLiveTimesheets.Tests.Jobs
             var errorContent = stringBuilder?.ToString();
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
-                () => saveJobs.bErrors.ShouldBeTrue(),
+            saveJob.ShouldSatisfyAllConditions(
+                () => saveJob.bErrors.ShouldBeTrue(),
                 () => errorContent.ShouldNotBeNullOrEmpty(),
                 () => errorContent.ShouldContain(expectedMessage));
         }
@@ -997,8 +993,8 @@ namespace EPMLiveTimesheets.Tests.Jobs
             var errorContent = stringBuilder?.ToString();
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
-                () => saveJobs.bErrors.ShouldBeTrue(),
+            saveJob.ShouldSatisfyAllConditions(
+                () => saveJob.bErrors.ShouldBeTrue(),
                 () => errorContent.ShouldNotBeNullOrEmpty(),
                 () => errorContent.ShouldContain(expectedMessage));
         }
@@ -1053,8 +1049,8 @@ namespace EPMLiveTimesheets.Tests.Jobs
             var errorContent = stringBuilder?.ToString();
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
-                () => saveJobs.bErrors.ShouldBeTrue(),
+            saveJob.ShouldSatisfyAllConditions(
+                () => saveJob.bErrors.ShouldBeTrue(),
                 () => errorContent.ShouldNotBeNullOrEmpty(),
                 () => errorContent.ShouldContain(expectedMessage));
         }
@@ -1085,13 +1081,13 @@ namespace EPMLiveTimesheets.Tests.Jobs
             };
 
             // Act
-            saveJobs.execute(spSite, DummyString);
+            saveJob.execute(spSite, DummyString);
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
-                () => saveJobs.sErrors.ShouldNotBeEmpty(),
-                () => saveJobs.sErrors.ShouldContain(expectedErrorMessage),
-                () => saveJobs.bErrors.ShouldBeTrue());
+            saveJob.ShouldSatisfyAllConditions(
+                () => saveJob.sErrors.ShouldNotBeEmpty(),
+                () => saveJob.sErrors.ShouldContain(expectedErrorMessage),
+                () => saveJob.bErrors.ShouldBeTrue());
         }
 
         [TestMethod]
@@ -1119,13 +1115,13 @@ namespace EPMLiveTimesheets.Tests.Jobs
             };
 
             // Act
-            saveJobs.execute(spSite, DummyString);
+            saveJob.execute(spSite, DummyString);
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
-                () => saveJobs.sErrors.ShouldNotBeEmpty(),
-                () => saveJobs.sErrors.ShouldContain(DummyString),
-                () => saveJobs.bErrors.ShouldBeTrue());
+            saveJob.ShouldSatisfyAllConditions(
+                () => saveJob.sErrors.ShouldNotBeEmpty(),
+                () => saveJob.sErrors.ShouldContain(DummyString),
+                () => saveJob.bErrors.ShouldBeTrue());
         }
 
         [TestMethod]
@@ -1166,13 +1162,13 @@ namespace EPMLiveTimesheets.Tests.Jobs
             };
 
             // Act
-            saveJobs.execute(spSite, DummyString);
+            saveJob.execute(spSite, DummyString);
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
-                () => saveJobs.sErrors.ShouldNotBeEmpty(),
-                () => saveJobs.sErrors.ShouldContain(ExpectedErrorMessage),
-                () => saveJobs.bErrors.ShouldBeTrue());
+            saveJob.ShouldSatisfyAllConditions(
+                () => saveJob.sErrors.ShouldNotBeEmpty(),
+                () => saveJob.sErrors.ShouldContain(ExpectedErrorMessage),
+                () => saveJob.bErrors.ShouldBeTrue());
         }
 
         [TestMethod]
@@ -1213,13 +1209,13 @@ namespace EPMLiveTimesheets.Tests.Jobs
             };
 
             // Act
-            saveJobs.execute(spSite, DummyString);
+            saveJob.execute(spSite, DummyString);
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
-                () => saveJobs.sErrors.ShouldNotBeEmpty(),
-                () => saveJobs.sErrors.ShouldContain(ExpectedErrorMessage),
-                () => saveJobs.bErrors.ShouldBeTrue());
+            saveJob.ShouldSatisfyAllConditions(
+                () => saveJob.sErrors.ShouldNotBeEmpty(),
+                () => saveJob.sErrors.ShouldContain(ExpectedErrorMessage),
+                () => saveJob.bErrors.ShouldBeTrue());
         }
 
         [TestMethod]
@@ -1310,12 +1306,12 @@ namespace EPMLiveTimesheets.Tests.Jobs
             ShimSaveJob.AllInstances.ProcessItemRowXmlNodeDataTableRefSqlConnectionSPSiteTimesheetSettingsStringStringBooleanBoolean = ProcessItemRow;
 
             // Act
-            saveJobs.execute(spSite, DummyString);
+            saveJob.execute(spSite, DummyString);
 
             // Assert
-            saveJobs.ShouldSatisfyAllConditions(
-                () => saveJobs.sErrors.ShouldBeEmpty(),
-                () => saveJobs.bErrors.ShouldBeFalse(),
+            saveJob.ShouldSatisfyAllConditions(
+                () => saveJob.sErrors.ShouldBeEmpty(),
+                () => saveJob.bErrors.ShouldBeFalse(),
                 () => processResourcesWasCalled.ShouldBeTrue(),
                 () => submitTimesheetWasCalled.ShouldBeTrue(),
                 () => expectedSqlCommands.All(p => sqlCommandList.Contains(p)));
