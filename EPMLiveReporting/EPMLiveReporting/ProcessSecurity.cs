@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.SharePoint;
 
@@ -20,13 +21,13 @@ namespace EPMLiveReportsAdmin
 
             string[] sUsers = users.Split(',');
 
-            SqlCommand cmd;
-
-            if (users == "")
+            if (users == string.Empty)
             {
-                cmd = new SqlCommand("DELETE FROM RPTGROUPUSER where SITEID=@siteid", cn);
-                cmd.Parameters.AddWithValue("@siteid", site.ID);
-                cmd.ExecuteNonQuery();
+                using (var command = new SqlCommand("DELETE FROM RPTGROUPUSER where SITEID=@siteid", cn))
+                {
+                    command.Parameters.AddWithValue("@siteid", site.ID);
+                    command.ExecuteNonQuery();
+                }
             }
 
             var dt = new DataTable();
@@ -47,10 +48,12 @@ namespace EPMLiveReportsAdmin
                     {
                         SPUser user = site.RootWeb.SiteUsers.GetByID(int.Parse(sUser));
 
-                        cmd = new SqlCommand("DELETE FROM RPTGROUPUSER where SITEID=@siteid and userid=@userid", cn);
-                        cmd.Parameters.AddWithValue("@siteid", site.ID);
-                        cmd.Parameters.AddWithValue("@userid", sUser);
-                        cmd.ExecuteNonQuery();
+                        using (var command = new SqlCommand("DELETE FROM RPTGROUPUSER where SITEID=@siteid and userid=@userid", cn))
+                        {
+                            command.Parameters.AddWithValue("@siteid", site.ID);
+                            command.Parameters.AddWithValue("@userid", sUser);
+                            command.ExecuteNonQuery();
+                        }
 
                         foreach (SPGroup group in user.Groups)
                         {
@@ -181,16 +184,26 @@ namespace EPMLiveReportsAdmin
 
         private static bool SecurityTablesExist(SqlConnection cn)
         {
-            bool exists = false;
+            const string commandText =
+                "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = 'RPTGROUPUSER')) BEGIN SELECT 1 END ELSE BEGIN SELECT 0 END";
+
+            var exists = false;
+            var command = default(SqlCommand);
+
             try
             {
-                var cmd =
-                    new SqlCommand(
-                        "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = 'RPTGROUPUSER')) BEGIN SELECT 1 END ELSE BEGIN SELECT 0 END",
-                        cn);
-                exists = Convert.ToInt32(cmd.ExecuteScalar()) == 1;
+                command = new SqlCommand(commandText, cn);
+                exists = Convert.ToInt32(command.ExecuteScalar()) == 1;
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Trace.TraceError(ex.ToString());
+            }
+            finally
+            {
+                command?.Dispose();
+            }
+
             return exists;
         }
     }
