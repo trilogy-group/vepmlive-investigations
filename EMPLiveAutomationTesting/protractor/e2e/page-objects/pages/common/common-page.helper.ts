@@ -151,7 +151,7 @@ export class CommonPageHelper {
     }
 
     static getFirstAutoCompleteByLabel(title: string) {
-        return this.getInputByLabel('*[contains(@class,"autocomplete")]//*[contains(@class,"autoText")][1]', title);
+        return this.getInputByLabel('*[contains(@class,"autocomplete")]//*', title);
     }
 
     static getSelectByLabel(title: string) {
@@ -223,7 +223,7 @@ export class CommonPageHelper {
     ) {
         StepLogger.step('Select "Navigation" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.navigation);
-        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader,);
+        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, );
     }
 
     static async searchByTitle(linkOfThePage: ElementFinder,
@@ -235,7 +235,7 @@ export class CommonPageHelper {
             pageHeader,
             pageName,
         );
-        await this.searchItemByTitle(titleValue, columnName,);
+        await this.searchItemByTitle(titleValue, columnName, );
     }
 
     static async navigateToItemPageUnderMyWorkplace(linkOfThePage: ElementFinder,
@@ -245,7 +245,7 @@ export class CommonPageHelper {
         StepLogger.step('Select "My Workplace" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.myWorkplace);
         StepLogger.stepId(2);
-        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader,);
+        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, );
     }
 
     static async navigateToSubPage(pageName: string, linkOfThePage: ElementFinder, pageHeader: ElementFinder) {
@@ -320,7 +320,7 @@ export class CommonPageHelper {
     }
 
     static getMenuItemFromRibbonContainer(title: string) {
-        return element(By.css(`#RibbonContainer li[title="${title}"]`));
+        return element(By.css(`#RibbonContainer li[title="${title}"] span`));
     }
 
     static async refreshPageIfRibbonElementIsDisable(targetElement: ElementFinder, item = CommonPage.record) {
@@ -454,10 +454,12 @@ export class CommonPageHelper {
         StepLogger.stepId(2);
         StepLogger.step('Select the check box for record');
         await WaitHelper.waitForElementToBeDisplayed(item);
+        await ElementHelper.actionHoverOver(item);
         await PageHelper.click(item);
 
         StepLogger.step('Click on ITEMS on ribbon');
-        await PageHelper.click(CommonPage.ribbonTitles.items);
+        const itemsTitle = CommonPage.ribbonTitles.items;
+        await PageHelper.click(itemsTitle);
     }
 
     static async selectTwoRecordFromGrid() {
@@ -477,13 +479,18 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
 
-    static async selectTwoRecordsFromGrid(item = CommonPage.record) {
+    static async selectTwoRecordsFromGrid() {
         StepLogger.stepId(2);
         StepLogger.step('Select the check box for two record');
-        await WaitHelper.waitForElementToBeDisplayed(item);
-        await PageHelper.click(item);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.getNthRecord());
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord());
+        await PageHelper.click(CommonPage.getNthRecord());
+
+     //  await PageHelper.click(item);
         await browser.sleep(PageHelper.timeout.xs);
-        await PageHelper.click(CommonPage.secondRecord);
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord(3));
+        await PageHelper.click(CommonPage.getNthRecord(3));
+    //    await PageHelper.click(CommonPage.secondRecord);
         await this.clickItemTab();
     }
 
@@ -840,6 +847,7 @@ export class CommonPageHelper {
         await PageHelper.click(this.getOptimizerButton());
         // Takes time to load the iframe
         await browser.sleep(PageHelper.timeout.m);
+        StepLogger.step('switch To First Content Frame');
         await CommonPageHelper.switchToFirstContentFrame();
     }
 
@@ -860,7 +868,7 @@ export class CommonPageHelper {
     }
 
     static async verifyItemDisabled(targetElement: ElementFinder) {
-        await ExpectationHelper.verifyAttributeValue(targetElement, 'aria-disabled', 'true',);
+        await ExpectationHelper.verifyAttributeValue(targetElement, 'aria-disabled', 'true', );
     }
 
     static async clickIconEllipsisHorizontal() {

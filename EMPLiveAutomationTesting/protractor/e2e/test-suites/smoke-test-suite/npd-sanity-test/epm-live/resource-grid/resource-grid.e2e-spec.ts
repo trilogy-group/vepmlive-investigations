@@ -67,7 +67,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.step('Provide values in required fields');
         const uniqueId = PageHelper.getUniqueId();
         const displayName = `${ResourcesPageConstants.inputLabels.displayName} ${uniqueId}`;
-        await ResourcesPageHelper.fillFormAndSave(displayName,);
+        await ResourcesPageHelper.fillFormAndSave(displayName, );
 
         StepLogger.stepId(4);
         StepLogger.step('Click on search');

@@ -445,7 +445,6 @@ describe(SuiteNames.endToEndSuite, () => {
         StepLogger.step('Click on "Resource Work vs. Capacity"');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.resourceWorkVsCapacity);
         await ElementHelper.clickUsingJs(CommonPage.ribbonItems.resourceWorkVsCapacity);
-        await PageHelper.switchToDefaultContent();
 
         StepLogger.step('Verify Reporting Services page will be displayed with below fields');
         StepLogger.step('Verify "Resources"');
