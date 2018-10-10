@@ -28,24 +28,26 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
                 try
                 {
 
-                    SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(WebApplicationSelector1.CurrentItem.Id));
-                    cn.Open();
-
-                    SqlCommand cmd = new SqlCommand("select subject,body from emailtemplates where emailid = @emailid", cn);
-                    cmd.CommandType = CommandType.Text;
-                    cmd.Parameters.AddWithValue("@emailid", gvEmails.Rows[e.NewEditIndex].Cells[0].Text);
-                    SqlDataReader dr = cmd.ExecuteReader();
-
-                    hdnId.Value = gvEmails.Rows[e.NewEditIndex].Cells[0].Text;
-
-                    if(dr.Read())
+                    using (var connection = new SqlConnection(CoreFunctions.getConnectionString(WebApplicationSelector1.CurrentItem.Id)))
                     {
-                        txtSubject.Text = dr.GetString(0);
-                        txtBody.Text = dr.GetString(1);
-                    }
-                    dr.Close();
+                        connection.Open();
 
-                    cn.Close();
+                        using (var cmd = new SqlCommand("select subject,body from emailtemplates where emailid = @emailid", connection))
+                        {
+                            cmd.CommandType = CommandType.Text;
+                            cmd.Parameters.AddWithValue("@emailid", gvEmails.Rows[e.NewEditIndex].Cells[0].Text);
+                            SqlDataReader dr = cmd.ExecuteReader();
+
+                            hdnId.Value = gvEmails.Rows[e.NewEditIndex].Cells[0].Text;
+
+                            if (dr.Read())
+                            {
+                                txtSubject.Text = dr.GetString(0);
+                                txtBody.Text = dr.GetString(1);
+                            }
+                            dr.Close();
+                        }
+                    }
                 }
                 catch(Exception ex)
                 {
@@ -61,19 +63,21 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
                 try
                 {
 
-                    SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(WebApplicationSelector1.CurrentItem.Id));
-                    cn.Open();
+                    using (var connection = new SqlConnection(CoreFunctions.getConnectionString(WebApplicationSelector1.CurrentItem.Id)))
+                    {
+                        connection.Open();
 
 
-                    SqlCommand cmd = new SqlCommand("update emailtemplates set subject=@subject, body=@body where emailid=@emailid", cn);
-                    cmd.CommandType = CommandType.Text;
-                    cmd.Parameters.AddWithValue("@subject", txtSubject.Text);
-                    cmd.Parameters.AddWithValue("@body", txtBody.Text);
-                    cmd.Parameters.AddWithValue("@emailid", hdnId.Value);
+                        using (var cmd = new SqlCommand("update emailtemplates set subject=@subject, body=@body where emailid=@emailid", connection))
+                        {
+                            cmd.CommandType = CommandType.Text;
+                            cmd.Parameters.AddWithValue("@subject", txtSubject.Text);
+                            cmd.Parameters.AddWithValue("@body", txtBody.Text);
+                            cmd.Parameters.AddWithValue("@emailid", hdnId.Value);
 
-                    cmd.ExecuteNonQuery();
-
-                    cn.Close();
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
 
                     Response.Redirect("emailmanager.aspx");
                 }
@@ -102,24 +106,24 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
                 try
                 {
 
-                    SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(WebApplicationSelector1.CurrentItem.Id));
-                    cn.Open();
+                    using (var connection = new SqlConnection(CoreFunctions.getConnectionString(WebApplicationSelector1.CurrentItem.Id)))
+                    {
+                        connection.Open();
 
-                    DataSet ds;
-                    SqlCommand cmdGetSites;
-                    SqlDataAdapter da;
+                        using (var cmdGetSites = new SqlCommand("select emailid,title,subject from emailtemplates order by emailid", connection))
+                        {
+                            cmdGetSites.CommandType = CommandType.Text;
 
-                    cmdGetSites = new SqlCommand("select emailid,title,subject from emailtemplates order by emailid", cn);
-                    cmdGetSites.CommandType = CommandType.Text;
+                            using (var adapter = new SqlDataAdapter(cmdGetSites))
+                            {
+                                var dataSet = new DataSet();
+                                adapter.Fill(dataSet);
 
-                    da = new SqlDataAdapter(cmdGetSites);
-                    ds = new DataSet();
-                    da.Fill(ds);
-
-                    gvEmails.DataSource = ds.Tables[0];
-                    gvEmails.DataBind();
-
-                    cn.Close();
+                                gvEmails.DataSource = dataSet.Tables[0];
+                                gvEmails.DataBind();
+                            }
+                        }
+                    }
                 }
                 catch(Exception ex)
                 {
