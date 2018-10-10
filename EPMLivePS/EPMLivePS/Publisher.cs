@@ -8,6 +8,7 @@ using System.Text;
 using System.Web;
 using System.Web.Services.Protocols;
 using EPMLiveCore;
+using EPMLiveCore.Helpers;
 using EPMLiveEnterprise.WebSvcCustomFields;
 using EPMLiveEnterprise.WebSvcLookupTables;
 using EPMLiveEnterprise.WebSvcProject;
@@ -22,6 +23,23 @@ namespace EPMLiveEnterprise
 {
     internal class Publisher : IDisposable
     {
+        private const string ResourceNames = "ResourceNames";
+        private const string TaskCenter = "Task Center";
+        private const string TransUid = "transuid";
+        private const string TaskHierarchy = "TaskHierarchy";
+        private const string IsAssignment = "IsAssignment";
+        private const string Title = "Title";
+        private const string TaskUid = "taskuid";
+        private const string TaskOrder = "taskorder";
+        private const string Summary = "Summary";
+        private const string Notes = "Notes";
+        private const string LastPublished = "LastPublished";
+        private const string Wbs = "WBS";
+        private const string AssignedTo = "AssignedTo";
+        private const string ProjectText = "Project";
+        private const int PubTypeOne = 1;
+        private const int PubTypeTwo = 2;
+        private const int PubTypeThree = 3;
         private EventLog myLog = new EventLog("EPM Live", ".", "EPM Live Publisher");
         private Guid taskEntity = new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId);
         private bool _disposed;
@@ -482,191 +500,280 @@ namespace EPMLiveEnterprise
 
         private void publishTasks(int projectId, int pubType, Guid newTransUid, Guid lastTransUid)
         {
-            
             try
             {
-                WebSvcProject.ProjectDataSet pDs = null;
+                ProjectDataSet projectDataSet = null;
+                SPSecurity.RunWithElevatedPrivileges(() => projectDataSet = pService.ReadProject(projectGuid, DataStoreEnum.PublishedStore));
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
-                {
-                    pDs = pService.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.PublishedStore);
-                });
-
-                int counter = 0;
-                StringBuilder sbBatch = new StringBuilder();
-
-                ArrayList arrProcessedTasks = new ArrayList();
-
-                SPList taskCenter = mySiteToPublish.Lists["Task Center"];
-
-                double taskCount = pDs.Task.Count;
                 double taskDoneCount = 0;
+                double taskCount = projectDataSet.Task.Count;
+                var taskCenter = mySiteToPublish.Lists[TaskCenter];
 
-                if (pubType == 1)
+                taskCount = PublishTasksPubTypeOne(projectId, pubType, taskCount, projectDataSet, taskCenter, ref taskDoneCount);
+                ProcessProjectDataSetTask(projectId, pubType, newTransUid, lastTransUid, projectDataSet, taskCenter, taskDoneCount, taskCount);
+
+                foreach (DictionaryEntry dictionaryEntry in hshCurTasks)
                 {
-                    taskCount += pDs.Assignment.Count;
+                    var itemByUniqueId = taskCenter.GetItemByUniqueId(new Guid(dictionaryEntry.Value.ToString()));
+                    itemByUniqueId.Delete();
+                }
 
-                    foreach (WebSvcProject.ProjectDataSet.AssignmentRow assn in pDs.Assignment)
+                foreach (Guid guid in arrDelNewTasks)
+                {
+                    var listItem = taskCenter.GetItemByUniqueId(guid);
+                    listItem.Delete();
+                }
+            }
+            catch (Exception exception)
+            {
+                myLog.WriteEntry(
+                    $"Error in publishTasks(): {exception.Message}{exception.StackTrace}{exception.InnerException}",
+                    EventLogEntryType.Error,
+                    315);
+            }
+        }
+
+        private void ProcessProjectDataSetTask(
+            int projectId,
+            int pubType,
+            Guid newTransUid,
+            Guid lastTransUid,
+            ProjectDataSet projectDataSet,
+            SPList taskCenter,
+            double taskDoneCount,
+            double taskCount)
+        {
+            Guard.ArgumentIsNotNull(taskCenter, nameof(taskCenter));
+            Guard.ArgumentIsNotNull(projectDataSet, nameof(projectDataSet));
+
+            foreach (ProjectDataSet.TaskRow taskRow in projectDataSet.Task)
+            {
+                if (taskRow.TASK_ID != 0 && !taskRow.IsTASK_NAMENull() && !taskRow.TASK_IS_SUBPROJ)
+                {
+                    try
                     {
-                        counter++;
-
-                        arrProcessedTasks.Add(assn.TASK_UID.ToString());
                         SPListItem listItem;
-                        if (!IsAssignedTaskSaved(assn.ASSN_UID))
+
+                        if (hshCurTasks.Contains(taskRow.TASK_UID.ToString().ToUpper()))
                         {
-                            if (hshCurTasks.Contains(assn.TASK_UID.ToString().ToUpper() + "." + assn.ASSN_UID.ToString().ToUpper()))
-                            {
-                                Guid LIUid = (Guid)hshCurTasks[assn.TASK_UID.ToString().ToUpper() + "." + assn.ASSN_UID.ToString().ToUpper()];
-                                listItem = taskCenter.GetItemByUniqueId(LIUid);
+                            var hshCurTask = (Guid)hshCurTasks[taskRow.TASK_UID.ToString().ToUpper()];
+                            listItem = taskCenter.GetItemByUniqueId(hshCurTask);
 
-                                hshCurTasks.Remove(assn.TASK_UID.ToString().ToUpper() + "." + assn.ASSN_UID.ToString().ToUpper());
-                            }
-                            else
-                            {
-                                listItem = taskCenter.Items.Add();
-                            }
-
-                            listItem[listItem.Fields.GetFieldByInternalName("IsAssignment").Id] = "1";
-                            listItem["Project"] = projectId;
-
-                            processAssignment(assn, pDs, listItem);
+                            hshCurTasks.Remove(taskRow.TASK_UID.ToString().ToUpper());
                         }
                         else
                         {
-                            hshCurTasks.Remove(assn.TASK_UID.ToString().ToUpper() + "." + assn.ASSN_UID.ToString().ToUpper());
+                            listItem = taskCenter.Items.Add();
                         }
-                        taskDoneCount++;
-                        setPubPercent(taskCount, taskDoneCount);
+
+                        listItem[ProjectText] = projectId;
+
+                        PopulateResources(pubType, projectDataSet, listItem, taskRow);
+                        PopulateListItem(pubType, newTransUid, lastTransUid, projectDataSet, taskCenter, listItem, taskRow);
+                    }
+                    catch (Exception exception)
+                    {
+                        myLog.WriteEntry(
+                            $"Error in publishTasks({taskRow.TASK_NAME}) updating list item: {exception.Message}{exception.StackTrace}{exception.InnerException}",
+                            EventLogEntryType.Error,
+                            315);
                     }
                 }
 
-                foreach (WebSvcProject.ProjectDataSet.TaskRow tr in pDs.Task)
+                taskDoneCount++;
+                setPubPercent(taskCount, taskDoneCount);
+            }
+        }
+
+        private void PopulateListItem(
+            int pubType,
+            Guid newTransUid,
+            Guid lastTransUid,
+            ProjectDataSet projectDataSet,
+            SPList taskCenter,
+            SPListItem listItem,
+            ProjectDataSet.TaskRow taskRow)
+        {
+            Guard.ArgumentIsNotNull(taskRow, nameof(taskRow));
+            Guard.ArgumentIsNotNull(listItem, nameof(listItem));
+            Guard.ArgumentIsNotNull(taskCenter, nameof(taskCenter));
+            Guard.ArgumentIsNotNull(projectDataSet, nameof(projectDataSet));
+
+            var canProcess = true;
+
+            try
+            {
+                if (pubType == PubTypeTwo || pubType == PubTypeThree && lastTransUid != new Guid())
                 {
-                    if (tr.TASK_ID != 0 && !tr.IsTASK_NAMENull() && !tr.TASK_IS_SUBPROJ)
+                    if (listItem[TransUid].ToString() != lastTransUid.ToString())
                     {
-                        //if (!arrProcessedTasks.Contains(tr.TASK_UID.ToString()) || pubType == 1)
-                        {
-                            try
-                            {
-                                SPListItem listItem;
-
-                                if (hshCurTasks.Contains(tr.TASK_UID.ToString().ToUpper()))
-                                {
-                                    Guid LIUid = (Guid)hshCurTasks[tr.TASK_UID.ToString().ToUpper()];
-                                    listItem = taskCenter.GetItemByUniqueId(LIUid);
-
-                                    hshCurTasks.Remove(tr.TASK_UID.ToString().ToUpper());
-                                }
-                                else
-                                {
-                                    //sbBatch.Append("<Method ID='" + counter + "' Cmd='New'>");
-                                    listItem = taskCenter.Items.Add();
-                                }
-                                
-
-                                listItem["Project"] = projectId;
-                                if (pubType == 1)
-                                {
-                                    listItem["AssignedTo"] = "";
-                                    if (listItem.ParentList.Fields.ContainsField("ResourceNames"))
-                                    {
-                                        string resources = "";
-                                        foreach (WebSvcProject.ProjectDataSet.AssignmentRow assn in pDs.Assignment.Select("TASK_UID='" + tr.TASK_UID + "'"))
-                                        {
-                                            resources += ", " + getResourceName(assn.RES_UID, pDs);
-                                        }
-
-                                        if (resources.Length > 2)
-                                            resources = resources.Substring(2);
-                                        listItem[listItem.ParentList.Fields.GetFieldByInternalName("ResourceNames").Id] = resources;
-                                    }
-                                }
-                                if (pubType == 2)//Task Based Publishing With Assignments
-                                {
-                                    string assns = "";
-                                    string resources = "";
-                                    foreach (WebSvcProject.ProjectDataSet.AssignmentRow assn in pDs.Assignment.Select("TASK_UID='" + tr.TASK_UID + "'"))
-                                    {
-                                        resources += ", " + getResourceName(assn.RES_UID, pDs);
-                                        int resId = getResourceWssId(assn.RES_UID_OWNER);
-                                        if(resId != 0)
-                                            assns = assns + ";#" + resId + ";#" + getResourceName(assn.RES_UID_OWNER, pDs);
-                                    }
-                                    if (assns.Length > 2)
-                                        assns = assns.Substring(2);
-
-                                    if (resources.Length > 2)
-                                        resources = resources.Substring(2);
-
-                                    listItem["AssignedTo"] = assns;
-                                    if (listItem.ParentList.Fields.ContainsField("ResourceNames"))
-                                        listItem[listItem.ParentList.Fields.GetFieldByInternalName("ResourceNames").Id] = resources;
-                                }
-                                else if (pubType == 3)//Task Based Publishing Without Assignments
-                                {
-                                    int assn = workspaceSynch.getResourceIdForTask(tr.TASK_UID, pDs);
-                                    if (assn != 0)
-                                        listItem["AssignedTo"] = assn;
-                                    else
-                                        listItem["AssignedTo"] = "";
-                                }
-                                
-                                bool process = true;
-
-                                try
-                                {
-                                    if (pubType == 2 || pubType == 3 && lastTransUid != new Guid())
-                                        if (listItem["transuid"].ToString() != lastTransUid.ToString())
-                                            process = false;
-                                }
-                                catch { }
-
-                                if (process)
-                                {
-                                    listItem[listItem.Fields.GetFieldByInternalName("TaskHierarchy").Id] = getHierarchy(pDs, tr.TASK_PARENT_UID);
-                                    listItem[listItem.Fields.GetFieldByInternalName("IsAssignment").Id] = "0";
-                                    listItem["transuid"] = newTransUid.ToString();
-                                    listItem[taskCenter.Fields.GetFieldByInternalName("Title").Id] = tr.TASK_NAME;
-                                    if(!tr.IsTASK_WBSNull())
-                                        listItem[taskCenter.Fields.GetFieldByInternalName("WBS").Id] = tr.TASK_WBS;
-                                    listItem[taskCenter.Fields.GetFieldByInternalName("taskuid").Id] = tr.TASK_UID;
-                                    listItem[taskCenter.Fields.GetFieldByInternalName("taskorder").Id] = tr.TASK_ID;
-                                    listItem["Summary"] = tr.TASK_IS_SUMMARY.ToString();
-                                    if (!tr.IsTASK_NOTESNull())
-                                        listItem[taskCenter.Fields.GetFieldByInternalName("Notes").Id] = tr.TASK_NOTES;
-                                    listItem[taskCenter.Fields.GetFieldByInternalName("LastPublished").Id] = DateTime.Now; //lp.Year.ToString() + "-" + lp.Month.ToString() + "-" + lp.Day.ToString() + " " + lp.Hour.ToString() + ":" + lp.Minute.ToString() + ":" + lp.Second.ToString();
-                                    //listItem.Update();
-                                    //listItem = taskCenter.Items.GetItemById(listItem.ID);
-                                    processTask(tr, pDs, arrFieldsToPublish, listItem, hshTaskCenterFields, tr.TASK_UID.ToString(), pubType);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                myLog.WriteEntry("Error in publishTasks(" + tr.TASK_NAME + ") updating list item: " + ex.Message + ex.StackTrace + ex.InnerException, EventLogEntryType.Error, 315);
-                            }
-                        }
+                        canProcess = false;
                     }
+                }
+            }
+            catch (Exception exception)
+            {
+                Trace.WriteLine(exception);
+            }
+
+            if (canProcess)
+            {
+                listItem[listItem.Fields.GetFieldByInternalName(TaskHierarchy).Id] = getHierarchy(projectDataSet, taskRow.TASK_PARENT_UID);
+                const string AssignmentId = "0";
+                listItem[listItem.Fields.GetFieldByInternalName(IsAssignment).Id] = AssignmentId;
+                listItem[TransUid] = newTransUid.ToString();
+                listItem[taskCenter.Fields.GetFieldByInternalName(Title).Id] = taskRow.TASK_NAME;
+
+                if (!taskRow.IsTASK_WBSNull())
+                {
+                    listItem[taskCenter.Fields.GetFieldByInternalName(Wbs).Id] = taskRow.TASK_WBS;
+                }
+
+                listItem[taskCenter.Fields.GetFieldByInternalName(TaskUid).Id] = taskRow.TASK_UID;
+                listItem[taskCenter.Fields.GetFieldByInternalName(TaskOrder).Id] = taskRow.TASK_ID;
+                listItem[Summary] = taskRow.TASK_IS_SUMMARY.ToString();
+
+                if (!taskRow.IsTASK_NOTESNull())
+                {
+                    listItem[taskCenter.Fields.GetFieldByInternalName(Notes).Id] = taskRow.TASK_NOTES;
+                }
+
+                listItem[taskCenter.Fields.GetFieldByInternalName(LastPublished).Id] = DateTime.Now;
+                processTask(taskRow, projectDataSet, arrFieldsToPublish, listItem, hshTaskCenterFields, taskRow.TASK_UID.ToString(), pubType);
+            }
+        }
+
+        private void PopulateResources(int pubType, ProjectDataSet projectDataSet, SPListItem listItem, ProjectDataSet.TaskRow taskRow)
+        {
+            Guard.ArgumentIsNotNull(taskRow, nameof(taskRow));
+            Guard.ArgumentIsNotNull(listItem, nameof(listItem));
+            Guard.ArgumentIsNotNull(projectDataSet, nameof(projectDataSet));
+
+            const int PrefixLength = 2;
+            const int DefaultResourceId = 0;
+
+            if (pubType == PubTypeOne)
+            {
+                listItem[AssignedTo] = string.Empty;
+
+                if (listItem.ParentList.Fields.ContainsField(ResourceNames))
+                {
+                    var resourcesBuilder = new StringBuilder();
+
+                    foreach (ProjectDataSet.AssignmentRow assignmentRow in projectDataSet.Assignment.Select($"TASK_UID=\'{taskRow.TASK_UID}\'"))
+                    {
+                        resourcesBuilder.Append($", {getResourceName(assignmentRow.RES_UID, projectDataSet)}");
+                    }
+
+                    var resources = resourcesBuilder.ToString();
+
+                    if (resources.Length > PrefixLength)
+                    {
+                        resources = resources.Substring(PrefixLength);
+                    }
+
+                    listItem[listItem.ParentList.Fields.GetFieldByInternalName(ResourceNames).Id] = resources;
+                }
+            }
+
+            if (pubType == PubTypeTwo)
+            {
+                var tempString = string.Empty;
+                var resourcesBuilder = new StringBuilder();
+
+                foreach (ProjectDataSet.AssignmentRow assignmentRow in projectDataSet.Assignment.Select($"TASK_UID=\'{taskRow.TASK_UID}\'"))
+                {
+                    resourcesBuilder.Append($", {getResourceName(assignmentRow.RES_UID, projectDataSet)}");
+                    var resId = getResourceWssId(assignmentRow.RES_UID_OWNER);
+
+                    if (resId != DefaultResourceId)
+                    {
+                        tempString = $"{tempString};#{resId};#{getResourceName(assignmentRow.RES_UID_OWNER, projectDataSet)}";
+                    }
+                }
+
+                if (tempString.Length > PrefixLength)
+                {
+                    tempString = tempString.Substring(PrefixLength);
+                }
+
+                var resources = resourcesBuilder.ToString();
+
+                if (resources.Length > PrefixLength)
+                {
+                    resources = resources.Substring(PrefixLength);
+                }
+
+                listItem[AssignedTo] = tempString;
+
+                if (listItem.ParentList.Fields.ContainsField(ResourceNames))
+                {
+                    listItem[listItem.ParentList.Fields.GetFieldByInternalName(ResourceNames).Id] = resources;
+                }
+            }
+
+            if (pubType == PubTypeThree)
+            {
+                var resourceIdForTask = workspaceSynch.getResourceIdForTask(taskRow.TASK_UID, projectDataSet);
+
+                listItem[AssignedTo] = resourceIdForTask != DefaultResourceId
+                    ? (object)resourceIdForTask
+                    : string.Empty;
+            }
+        }
+
+        private double PublishTasksPubTypeOne(
+            int projectId,
+            int pubType,
+            double taskCount,
+            ProjectDataSet projectDataSet,
+            SPList taskCenter,
+            ref double taskDoneCount)
+        {
+            Guard.ArgumentIsNotNull(taskCenter, nameof(taskCenter));
+            Guard.ArgumentIsNotNull(projectDataSet, nameof(projectDataSet));
+
+            const string AssignmentId = "1";
+
+            if (pubType == PubTypeOne)
+            {
+                taskCount += projectDataSet.Assignment.Count;
+
+                foreach (ProjectDataSet.AssignmentRow assignmentRow in projectDataSet.Assignment)
+                {
+                    if (!IsAssignedTaskSaved(assignmentRow.ASSN_UID))
+                    {
+                        SPListItem listItem;
+
+                        if (hshCurTasks.Contains($"{assignmentRow.TASK_UID.ToString().ToUpper()}.{assignmentRow.ASSN_UID.ToString().ToUpper()}"))
+                        {
+                            var hshCurTask =
+                                (Guid)hshCurTasks[$"{assignmentRow.TASK_UID.ToString().ToUpper()}.{assignmentRow.ASSN_UID.ToString().ToUpper()}"];
+                            listItem = taskCenter.GetItemByUniqueId(hshCurTask);
+
+                            hshCurTasks.Remove($"{assignmentRow.TASK_UID.ToString().ToUpper()}.{assignmentRow.ASSN_UID.ToString().ToUpper()}");
+                        }
+                        else
+                        {
+                            listItem = taskCenter.Items.Add();
+                        }
+
+                        listItem[listItem.Fields.GetFieldByInternalName(IsAssignment).Id] = AssignmentId;
+                        listItem[ProjectText] = projectId;
+
+                        processAssignment(assignmentRow, projectDataSet, listItem);
+                    }
+                    else
+                    {
+                        hshCurTasks.Remove($"{assignmentRow.TASK_UID.ToString().ToUpper()}.{assignmentRow.ASSN_UID.ToString().ToUpper()}");
+                    }
+
                     taskDoneCount++;
                     setPubPercent(taskCount, taskDoneCount);
                 }
-
-                foreach (DictionaryEntry e in hshCurTasks)
-                {
-                    SPListItem li = taskCenter.GetItemByUniqueId(new Guid(e.Value.ToString()));
-                    li.Delete();
-                }
-
-                foreach (Guid liguid in arrDelNewTasks)
-                {
-                    SPListItem li = taskCenter.GetItemByUniqueId(liguid);
-                    li.Delete();
-                }
-
             }
-            catch (Exception ex)
-            {
-                myLog.WriteEntry("Error in publishTasks(): " + ex.Message + ex.StackTrace + ex.InnerException, EventLogEntryType.Error, 315);
-            }
+
+            return taskCount;
         }
 
         private int publishProjectCenter(WebSvcProject.ProjectDataSet pDs)
