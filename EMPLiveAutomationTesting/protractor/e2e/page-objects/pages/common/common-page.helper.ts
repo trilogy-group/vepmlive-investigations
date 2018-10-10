@@ -223,7 +223,6 @@ export class CommonPageHelper {
     ) {
         StepLogger.step('Select "Navigation" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.navigation);
-        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, );
         await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader);
     }
 
@@ -246,7 +245,7 @@ export class CommonPageHelper {
         StepLogger.step('Select "My Workplace" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.myWorkplace);
         StepLogger.stepId(2);
-        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, );
+        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader);
     }
 
     static async navigateToSubPage(pageName: string, linkOfThePage: ElementFinder, pageHeader: ElementFinder) {
@@ -459,8 +458,7 @@ export class CommonPageHelper {
         await PageHelper.click(item);
 
         StepLogger.step('Click on ITEMS on ribbon');
-        const itemsTitle = CommonPage.ribbonTitles.items;
-        await PageHelper.click(itemsTitle);
+        await PageHelper.click(CommonPage.ribbonTitles.items);
     }
 
     static async selectTwoRecordFromGrid() {
@@ -482,16 +480,15 @@ export class CommonPageHelper {
 
     static async selectTwoRecordsFromGrid() {
         StepLogger.stepId(2);
-        StepLogger.step('Select the check box for two record');
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.getNthRecord());
+        StepLogger.step('Select the check box for two records');
+        StepLogger.subStep('Select the first record');
         await ElementHelper.actionHoverOver(CommonPage.getNthRecord());
         await PageHelper.click(CommonPage.getNthRecord());
 
-     //  await PageHelper.click(item);
         await browser.sleep(PageHelper.timeout.xs);
+        StepLogger.subStep('Select the Second record');
         await ElementHelper.actionHoverOver(CommonPage.getNthRecord(3));
         await PageHelper.click(CommonPage.getNthRecord(3));
-    //    await PageHelper.click(CommonPage.secondRecord);
         await this.clickItemTab();
     }
 

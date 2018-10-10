@@ -29,6 +29,8 @@ export class ResourcesPage extends BasePage {
             department: this.getDropdownValue(dropdownLabel.department),
             departmentInput: element(By.css('.autoText:last-child')),
             disabled: CommonPageHelper.getElementByTitle(inputLabel.disabled),
+            resources: element(By.linkText(inputLabel.resources)),
+            firstName: CommonPageHelper.getElementByTitle(inputLabel.firstName),
         };
     }
 
@@ -43,6 +45,12 @@ export class ResourcesPage extends BasePage {
     static get gridDetails() {
         return {
             ellipses: element.all(By.css('.GMCell.GMAlignRight.HideCol0Title')),
+        };
+    }
+
+    static get resources() {
+        return {
+            resources: element.all(By.xpath('//*[contains(@class,"GMDataRow")]//td[contains(@class,"GMNoRight GMNoLeft")]')),
         };
     }
 
