@@ -43,7 +43,8 @@ namespace PortfolioEngineCore.Tests.Analyzers
         private IList<Guid> _projectGuids;
         private int _projectIdDb;
         private const string DummyString = "DummyString";
-        private const int DummyInt = 1;        
+        private const int DummyInt = 1;
+        private SqlConnection _sqlConnection = new SqlConnection();
 
         private string ProjectGuidsString => string.Join(",", _projectGuids);
 
@@ -108,6 +109,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
         public void TearDown()
         {
             _shimsContext.Dispose();
+            _sqlConnection?.Dispose();
         }
 
         [TestMethod]
@@ -604,7 +606,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
             ShimSqlDb.ReadDoubleValueObject = _ => DummyInt;
 
             // Act
-            PrivateObject.Invoke("ReadCatItems", new SqlConnection(), costData);
+            PrivateObject.Invoke("ReadCatItems", _sqlConnection, costData);
 
             // Assert
             costData.ShouldSatisfyAllConditions(
@@ -635,7 +637,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
             ShimSqlDb.ReadBoolValueObject = _ => true;
 
             // Act
-            PrivateObject.Invoke("ReadCustomFields", new SqlConnection(), costData);
+            PrivateObject.Invoke("ReadCustomFields", _sqlConnection, costData);
 
             // Assert
             costData.ShouldSatisfyAllConditions(
@@ -680,7 +682,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
                 };
 
             // Act
-            PrivateObject.Invoke("ReadExtraPifields", new SqlConnection(), costData);
+            PrivateObject.Invoke("ReadExtraPifields", _sqlConnection, costData);
 
             // Assert
             costData.ShouldSatisfyAllConditions(
@@ -716,7 +718,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
             var startFinishDate = DateTime.Now;
             var args = new object[]
             {
-                new SqlConnection(),
+                _sqlConnection,
                 costData,
                 startFinishDate,
                 startFinishDate,
@@ -832,7 +834,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
             };
             
             // Act
-            PrivateObject.Invoke("ReadCostCustomFieldsAndData", new SqlConnection(), costData);
+            PrivateObject.Invoke("ReadCostCustomFieldsAndData", _sqlConnection, costData);
 
             // Assert
             costData.ShouldSatisfyAllConditions(
@@ -893,7 +895,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
             };
 
             // Act
-            PrivateObject.Invoke("ReadBudgetBands", new SqlConnection(), costData);
+            PrivateObject.Invoke("ReadBudgetBands", _sqlConnection, costData);
 
             // Assert
             costData.ShouldSatisfyAllConditions(
@@ -1168,7 +1170,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
             // Arrange
             var reply = string.Empty;
             SetupShimsForSqlClient();
-            PrivateObject.SetField("_sqlConnection", new SqlConnection());
+            PrivateObject.SetField("_sqlConnection", _sqlConnection);
             ShimCStruct.Constructor = _ => { };
             ShimCStruct.AllInstances.InitializeString = (_, _2) => { };
             ShimCStruct.AllInstances.LoadXMLString = (_, _2) => true;
@@ -1190,7 +1192,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
             // Arrange
             var reply = string.Empty;
             SetupShimsForSqlClient();
-            PrivateObject.SetField("_sqlConnection", new SqlConnection());
+            PrivateObject.SetField("_sqlConnection", _sqlConnection);
             ShimCStruct.Constructor = _ => { };
             ShimCStruct.AllInstances.InitializeString = (_, _2) => { };
             ShimCStruct.AllInstances.LoadXMLString = (_, _2) => true;
@@ -1211,7 +1213,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
         {
             // Arrange
             SetupShimsForSqlClient();
-            PrivateObject.SetField("_sqlConnection", new SqlConnection());
+            PrivateObject.SetField("_sqlConnection", _sqlConnection);
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 0;
 
             // Act
@@ -1231,7 +1233,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
         {
             // Arrange
             SetupShimsForSqlClient();
-            PrivateObject.SetField("_sqlConnection", new SqlConnection());
+            PrivateObject.SetField("_sqlConnection", _sqlConnection);
 
             // Act
             var actualResult = TestEntity.DeleteCostAnalyzerViewXML(Guid.NewGuid());
@@ -1245,7 +1247,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
         {
             // Arrange
             SetupShimsForSqlClient();
-            PrivateObject.SetField("_sqlConnection", new SqlConnection());
+            PrivateObject.SetField("_sqlConnection", _sqlConnection);
             ShimCStruct.Constructor = _ => { };
             ShimCStruct.AllInstances.InitializeString = (_, _2) => { };
             ShimCStruct.AllInstances.SetStringAttrStringStringBoolean = (_, _2, _3, _4) => { };
@@ -1266,7 +1268,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
             // Arrange
             var executeNonQueryInvoked = false;
             SetupShimsForSqlClient();
-            PrivateObject.SetField("_sqlConnection", new SqlConnection());
+            PrivateObject.SetField("_sqlConnection", _sqlConnection);
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
             {
                 executeNonQueryInvoked = true;
@@ -1289,7 +1291,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
             var newTarget = true;
             var executeNonQueryInvoked = false;
             SetupShimsForSqlClient();
-            PrivateObject.SetField("_sqlConnection", new SqlConnection());
+            PrivateObject.SetField("_sqlConnection", _sqlConnection);
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
             {
                 executeNonQueryInvoked = true;
@@ -1377,7 +1379,7 @@ namespace PortfolioEngineCore.Tests.Analyzers
             var dateTimeNow = DateTime.Now;
             SetupShimsForSqlClient();
             PrivateObject.SetField("_userWResID", userWResID);
-            PrivateObject.SetField("_sqlConnection", new SqlConnection());
+            PrivateObject.SetField("_sqlConnection", _sqlConnection);
             PrivateObject.SetField("_dba", new DBAccess(DummyString));
             ShimSecurity.CheckUserGlobalPermissionDBAccessInt32GlobalPermissionsEnum = (_, _2, _3) => false;
             ShimCostAnalyzerData.GrabPidsFromTickectSqlConnectionStringStringOutBooleanOutInt32Out = (SqlConnection connection, string ticket,
