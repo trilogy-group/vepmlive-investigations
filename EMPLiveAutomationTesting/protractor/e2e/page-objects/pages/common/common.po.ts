@@ -591,15 +591,15 @@ export class CommonPage extends BasePage {
         return element(By.xpath(selector));
     }
 
-    static get firstRow() {
-        return element.all(By.css('tr.GMDataRow')).get(1) ;
+    static get dataRows() {
+        return element.all(By.css('tr.GMDataRow'));
     }
 
     static get itemsMenu() {
         return element(By.css(`li[title='Items'] a span`));
     }
 
-    static get firstRowSelect() {
-        return element.all(By.css('tr.GMDataRow td')).get(1) ;
+    static get rowsFirstColumn() {
+        return element.all(By.css('tr.GMDataRow td'));
     }
 }

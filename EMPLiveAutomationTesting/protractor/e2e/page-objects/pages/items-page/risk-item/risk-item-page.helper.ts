@@ -79,17 +79,17 @@ export class RiskItemPageHelper {
             RiskItemPageConstants.columnNames.status,
             RiskItemPageConstants.columnNames.priority]);
 
-        StepLogger.verification('Updated title of the Risk displayed in the list in "Risks" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
-            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
+        StepLogger.verification('Verify record by title');
+        const firstTableColumns = [titleValue];
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(firstTableColumns)))
+            .toBe(true,
+                ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
-        StepLogger.verification('Updated status of the Risk displayed in the list in "Risks" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(status)))
-            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(status));
-
-        StepLogger.verification('Updated priority of the Risk displayed in the list in "Risks" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(priority)))
-            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(priority));
+        StepLogger.verification('Verify by other properties');
+        const secondTableColumns = [status, priority];
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
+            .toBe(true,
+                ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     }
 
     static async unCheckColumns() {

@@ -183,7 +183,7 @@ export class CommonPageHelper {
         for (let index = 0; index < columnText.length; index++) {
             columnXpaths.push(`td[normalize-space(.)='${columnText[index]}']`);
         }
-        const xpath = `//tr[contains(@class,'GMClassSelected')][${columnXpaths.join(CommonPageConstants.and)}]`;
+        const xpath = `//tr[${columnXpaths.join(CommonPageConstants.and)}]`;
         return element(By.xpath(xpath));
     }
 
@@ -345,9 +345,9 @@ export class CommonPageHelper {
     static async editViaItems() {
         StepLogger.stepId(3);
         StepLogger.step('Select the check box for record');
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.firstRow);
-        await ElementHelper.actionHoverOver(CommonPage.firstRow);
-        await PageHelper.click(CommonPage.firstRowSelect);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dataRows.get(1));
+        await ElementHelper.actionHoverOver(CommonPage.dataRows.get(1));
+        await PageHelper.click(CommonPage.rowsFirstColumn.get(1));
 
         StepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.itemsMenu);
@@ -359,9 +359,9 @@ export class CommonPageHelper {
     static async viewViaItems() {
         StepLogger.stepId(2);
         StepLogger.step('Select the check box for record');
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.firstRow);
-        await ElementHelper.actionHoverOver(CommonPage.firstRow);
-        await PageHelper.click(CommonPage.firstRowSelect);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dataRows.get(1));
+        await ElementHelper.actionHoverOver(CommonPage.dataRows.get(1));
+        await PageHelper.click(CommonPage.rowsFirstColumn.get(1));
 
         StepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.itemsMenu);

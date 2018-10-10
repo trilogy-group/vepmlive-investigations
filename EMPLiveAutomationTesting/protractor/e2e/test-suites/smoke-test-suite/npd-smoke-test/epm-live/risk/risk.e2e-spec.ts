@@ -125,7 +125,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         );
 
         // Common functionality to edit any item
-        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.firstRow, CommonPage.contextMenuOptions.editItem);
+        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.dataRows.get(1), CommonPage.contextMenuOptions.editItem);
 
         // Common functionality to edit risk
         await RiskItemPageHelper.editRisk();
@@ -289,9 +289,9 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(3);
         StepLogger.step('Click on any column header e.g; Status');
-        await WaitHelper.waitForElementToBeDisplayed(RiskItemPage.titleHeaderColumn);
-        await ElementHelper.actionHoverOver(RiskItemPage.titleHeaderColumn);
-        await ElementHelper.clickUsingJsNoWait(RiskItemPage.titleHeaderColumn);
+        await WaitHelper.waitForElementToBeDisplayed(RiskItemPage.titleHeaderColumn.first());
+        await ElementHelper.actionHoverOver(RiskItemPage.titleHeaderColumn.first());
+        await ElementHelper.clickUsingJsNoWait(RiskItemPage.titleHeaderColumn.first());
 
         StepLogger.verification('The up arrow will appear against Status' +
             ' and the data in table appears sort by Status ascending from a-z');
@@ -300,8 +300,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(4);
         StepLogger.step('Click on same column header again');
-        await ElementHelper.actionHoverOver(RiskItemPage.titleHeaderColumn);
-        await ElementHelper.clickUsingJsNoWait(RiskItemPage.titleHeaderColumn);
+        await ElementHelper.actionHoverOver(RiskItemPage.titleHeaderColumn.first());
+        await ElementHelper.clickUsingJsNoWait(RiskItemPage.titleHeaderColumn.first());
 
         StepLogger.verification('The down arrow will appear against Status' +
             ' and the data in table appears sort by Status ascending from z-a');

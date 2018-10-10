@@ -69,7 +69,7 @@ export class RiskItemPage extends BasePage {
     }
 
     static get titleHeaderColumn() {
-        return element.all(By.css('tr.GMHeaderRow td[class*=Title]')).get(0);
+        return element.all(By.css('tr.GMHeaderRow td[class*=Title]'));
     }
 
 }
