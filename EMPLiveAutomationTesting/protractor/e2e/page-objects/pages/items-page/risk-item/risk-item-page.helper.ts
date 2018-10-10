@@ -21,12 +21,6 @@ export class RiskItemPageHelper {
     static async editRisk() {
         await this.verifyPage();
 
-        StepLogger.verification('Values selected/entered while creating the Risk are pre populated in respective fields');
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
-        await expect(await CommonPage.title.getText())
-            .toBe(RiskItemPageConstants.pagePrefix,
-                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
-
         StepLogger.stepId(4);
         StepLogger.step('Enter/Select required details in "Edit Risk" page as described below');
 
@@ -85,20 +79,17 @@ export class RiskItemPageHelper {
             RiskItemPageConstants.columnNames.status,
             RiskItemPageConstants.columnNames.priority]);
 
-        StepLogger.verification('Click on searched record');
-        await PageHelper.click(CommonPage.record);
+        StepLogger.verification('Updated title of the Risk displayed in the list in "Risks" page');
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
 
-        StepLogger.verification('Verify record by title');
-        const firstTableColumns = [titleValue];
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(firstTableColumns)))
-            .toBe(true,
-                ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
+        StepLogger.verification('Updated status of the Risk displayed in the list in "Risks" page');
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(status)))
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(status));
 
-        StepLogger.verification('Verify by other properties');
-        const secondTableColumns = [status, priority];
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
-            .toBe(true,
-                ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
+        StepLogger.verification('Updated priority of the Risk displayed in the list in "Risks" page');
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(priority)))
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(priority));
     }
 
     static async unCheckColumns() {

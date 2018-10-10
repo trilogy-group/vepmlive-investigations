@@ -590,4 +590,16 @@ export class CommonPage extends BasePage {
         const selector = `//ul[@id='epm-nav-sub-settings-user-management-links']//span[text()='${option}']`;
         return element(By.xpath(selector));
     }
+
+    static get firstRow() {
+        return element.all(By.css('tr.GMDataRow')).get(1) ;
+    }
+
+    static get itemsMenu() {
+        return element(By.css(`li[title='Items'] a span`));
+    }
+
+    static get firstRowSelect() {
+        return element.all(By.css('tr.GMDataRow td')).get(1) ;
+    }
 }
