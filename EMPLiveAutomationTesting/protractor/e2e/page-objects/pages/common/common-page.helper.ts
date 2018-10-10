@@ -224,6 +224,7 @@ export class CommonPageHelper {
         StepLogger.step('Select "Navigation" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.navigation);
         await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, );
+        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader);
     }
 
     static async searchByTitle(linkOfThePage: ElementFinder,
@@ -240,7 +241,7 @@ export class CommonPageHelper {
 
     static async navigateToItemPageUnderMyWorkplace(linkOfThePage: ElementFinder,
                                                     pageHeader: ElementFinder,
-                                                    pageName: string,
+                                                    pageName: string
     ) {
         StepLogger.step('Select "My Workplace" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.myWorkplace);
@@ -269,7 +270,7 @@ export class CommonPageHelper {
         await browser.sleep(PageHelper.timeout.m);
 
         StepLogger.step('Click on search');
-        await PageHelper.click(CommonPage.actionMenuIcons.search);
+        await PageHelper.click(CommonPage.actionMenuIcons.searchIcon);
 
         if (verifySearchControl === true) {
             StepLogger.verification('Search Component dropdown is available');
