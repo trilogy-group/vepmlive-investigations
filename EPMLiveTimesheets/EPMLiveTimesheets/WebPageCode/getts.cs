@@ -2,16 +2,18 @@ using System;
 using System.Collections;
 using System.Data;
 using System.Data.SqlClient;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using System.Web.UI;
 using System.Xml;
+using EPMLiveCore;
 using Microsoft.SharePoint;
 using SystemTrace = System.Diagnostics.Trace;
 
-
 namespace TimeSheets
 {
-    public partial class getts : System.Web.UI.Page
+    public partial class getts : Page
     {
         private const string True = "True";
         private const string TypeConst = "type";
@@ -32,88 +34,91 @@ namespace TimeSheets
         private const string Zero = "0";
         private const string Dot = ".";
         private const string Two = "2";
-        XmlDocument docXml = new XmlDocument();
-        XmlNode ndMainParent;
-        protected string data = "";
-        private string period = "";
-        private DateTime periodStart;
-        private DateTime periodEnd;
-        private DataSet dsTimesheets;
-        private DataSet dsTimesheetTotals;
-        private DataSet dsTimesheetTasks;
-        private DataSet dsTimesheetTaskHours;
-        private DataSet dsTimesheetTypes;
-        private DataSet dsTimesheetNotes;
-        private string[] dayDefs;
-        SPList list;
-        //SPView view;
-
-        private Hashtable hshLists = new Hashtable();
-        private Hashtable hshItemNodes = new Hashtable();
-        private Hashtable hshResNodes = new Hashtable();
-        protected SortedList arrItems = new SortedList();
-        protected Queue queueAllItems = new Queue();
-
-        XmlNode ndBeforeInit;
-
-        SqlConnection cn;
 
         protected string[] arrGroupFields;
+        protected SortedList arrItems = new SortedList();
+
+        private SqlConnection cn;
+        protected string data = string.Empty;
+        private string[] dayDefs;
+        private readonly XmlDocument docXml = new XmlDocument();
+        private DataSet dsTimesheetNotes;
+        private DataSet dsTimesheets;
+        private DataSet dsTimesheetTaskHours;
+        private DataSet dsTimesheetTasks;
+        private DataSet dsTimesheetTotals;
+        private DataSet dsTimesheetTypes;
+        private readonly Hashtable hshItemNodes = new Hashtable();
+
+        private Hashtable hshLists = new Hashtable();
+        private readonly Hashtable hshResNodes = new Hashtable();
+        private SPList list;
+
+        private XmlNode ndBeforeInit;
+        private XmlNode ndMainParent;
+        private string period = string.Empty;
+        private DateTime periodEnd;
+        private DateTime periodStart;
         private string Project;
+        protected Queue queueAllItems = new Queue();
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
             Response.Cache.SetCacheability(HttpCacheability.NoCache);
             Response.Expires = -1;
 
             Response.ContentType = "text/xml";
-            Response.ContentEncoding = System.Text.Encoding.UTF8;
+            Response.ContentEncoding = Encoding.UTF8;
 
             period = Request["period_id"];
 
             docXml.LoadXml("<rows></rows>");
             ndMainParent = docXml.ChildNodes[0];
 
-            SPWeb web = SPContext.Current.Web;
+            var web = SPContext.Current.Web;
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                SPSecurity.RunWithElevatedPrivileges(delegate
                 {
                     try
                     {
-                        cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+                        cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
                         cn.Open();
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        SystemTrace.WriteLine(ex.ToString());
+                    }
                 });
 
-
-
-                string resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL", true, false);
-                SPWeb resWeb = null;
-                if (resUrl != "")
+                var resUrl = CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL", true, false);
+                if (resUrl != string.Empty)
                 {
-                    if (resUrl.ToLower() != web.Url.ToLower())
+                    SPWeb resWeb;
+                    if (!string.Equals(resUrl, web.Url, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        SPSite tempSite = new SPSite(resUrl);
-
-                        resWeb = tempSite.OpenWeb();
-                        if (resWeb.Url.ToLower() != resUrl.ToLower())
+                        using (var tempSite = new SPSite(resUrl))
                         {
-                            resWeb = null;
+                            resWeb = tempSite.OpenWeb();
+                            if (resWeb.Url.ToLower() != resUrl.ToLower())
+                            {
+                                resWeb = null;
+                            }
                         }
-                        tempSite.Close();
                     }
                     else
+                    {
                         resWeb = web;
+                    }
                     if (resWeb != null)
                     {
                         list = resWeb.Lists["Resources"];
                         addHeader(web);
                         addGroups(resWeb);
                     }
-                    if (resWeb.ID != SPContext.Current.Web.ID)
-                        resWeb.Close();
+                    if (resWeb?.ID != SPContext.Current.Web.ID)
+                    {
+                        resWeb?.Close();
+                    }
                 }
                 cn.Close();
             }
@@ -121,437 +126,7 @@ namespace TimeSheets
             data = docXml.OuterXml;
         }
 
-        private void addHeader(SPWeb curWeb)
-        {
-            XmlNode ndHead = docXml.CreateNode(XmlNodeType.Element, "head", docXml.NamespaceURI);
-            docXml.ChildNodes[0].AppendChild(ndHead);
-            ndBeforeInit = docXml.CreateNode(XmlNodeType.Element, "beforeInit", docXml.NamespaceURI);
-            ndHead.AppendChild(ndBeforeInit);
-            XmlNode afterInitNode = docXml.CreateNode(XmlNodeType.Element, "afterInit", docXml.NamespaceURI);
-            ndHead.AppendChild(afterInitNode);
-
-            //XmlNode ndSettings = docXml.CreateNode(XmlNodeType.Element, "settings", docXml.NamespaceURI);
-            //XmlNode ndColwith = docXml.CreateNode(XmlNodeType.Element, "colwidth", docXml.NamespaceURI);
-            //ndColwith.InnerText = "%";
-            //ndSettings.AppendChild(ndColwith);
-            //ndHead.AppendChild(ndSettings);
-
-            XmlNode ndNewColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            ndNewColumn.InnerXml = "#master_checkbox";
-
-            XmlAttribute attrType = docXml.CreateAttribute(TypeConst);
-            attrType.Value = "ch";
-            XmlAttribute attrWidth = docXml.CreateAttribute("width");
-            attrWidth.Value = "20";
-            XmlAttribute attrAlign = docXml.CreateAttribute("align");
-            attrAlign.Value = "center";
-
-            ndNewColumn.Attributes.Append(attrType);
-            ndNewColumn.Attributes.Append(attrWidth);
-            ndNewColumn.Attributes.Append(attrAlign);
-            ndHead.AppendChild(ndNewColumn);
-
-            ndNewColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            ndNewColumn.InnerXml = "<![CDATA[Notes]]>";
-
-            attrType = docXml.CreateAttribute(TypeConst);
-            attrType.Value = "tsnotes";
-            attrWidth = docXml.CreateAttribute("width");
-            attrWidth.Value = "50";
-            attrAlign = docXml.CreateAttribute("align");
-            attrAlign.Value = "center";
-
-            ndNewColumn.Attributes.Append(attrType);
-            ndNewColumn.Attributes.Append(attrWidth);
-            ndNewColumn.Attributes.Append(attrAlign);
-            ndHead.AppendChild(ndNewColumn);
-
-
-            ndNewColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            ndNewColumn.InnerXml = "<![CDATA[Resource Name]]>";
-
-            attrType = docXml.CreateAttribute(TypeConst);
-            attrType.Value = "tree";
-            attrWidth = docXml.CreateAttribute("width");
-            attrWidth.Value = "*";
-            attrAlign = docXml.CreateAttribute("align");
-            attrAlign.Value = "left";
-
-            ndNewColumn.Attributes.Append(attrType);
-            ndNewColumn.Attributes.Append(attrWidth);
-            ndNewColumn.Attributes.Append(attrAlign);
-            ndHead.AppendChild(ndNewColumn);
-
-
-            ndNewColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            ndNewColumn.InnerXml = "<![CDATA[TM]]>";
-
-            attrType = docXml.CreateAttribute(TypeConst);
-            attrType.Value = Ro;
-            attrWidth = docXml.CreateAttribute("width");
-            attrWidth.Value = "35";
-            attrAlign = docXml.CreateAttribute("align");
-            attrAlign.Value = "center";
-
-            ndNewColumn.Attributes.Append(attrType);
-            ndNewColumn.Attributes.Append(attrWidth);
-            ndNewColumn.Attributes.Append(attrAlign);
-            ndHead.AppendChild(ndNewColumn);
-
-            ndNewColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            ndNewColumn.InnerXml = "<![CDATA[PM]]>";
-
-            attrType = docXml.CreateAttribute(TypeConst);
-            attrType.Value = Ro;
-            attrWidth = docXml.CreateAttribute("width");
-            attrWidth.Value = "35";
-            attrAlign = docXml.CreateAttribute("align");
-            attrAlign.Value = "center";
-
-            ndNewColumn.Attributes.Append(attrType);
-            ndNewColumn.Attributes.Append(attrWidth);
-            ndNewColumn.Attributes.Append(attrAlign);
-            ndHead.AppendChild(ndNewColumn);
-
-            SqlCommand cmd = new SqlCommand("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@period_id", period);
-            cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-            SqlDataReader dr = cmd.ExecuteReader();
-            //DataSet ds = new DataSet();
-            //SqlDataAdapter da = new SqlDataAdapter(cmd);
-            //da.Fill(ds);
-            if (dr.Read())
-            {
-                periodStart = dr.GetDateTime(0);
-                periodEnd = dr.GetDateTime(1);
-            }
-            dr.Close();
-
-            dayDefs = EPMLiveCore.CoreFunctions.getConfigSetting(curWeb.Site.RootWeb, "EPMLiveDaySettings").Split('|');
-
-            TimeSpan ts = periodEnd - periodStart;
-            for (int i = 0; i <= ts.Days; i++)
-            {
-                string showday = "";
-                try
-                {
-                    showday = dayDefs[((int)periodStart.AddDays(i).DayOfWeek) * 3];
-                }
-                catch { }
-                if (showday == True)
-                {
-                    XmlNode newCol = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-                    newCol.InnerXml = "<![CDATA[" + periodStart.AddDays(i).DayOfWeek.ToString().Substring(0, 3) + "<br>" + periodStart.AddDays(i).Day + "]]>";
-                    attrType = docXml.CreateAttribute(TypeConst);
-                    attrType.Value = "ro[=sum]";
-                    attrWidth = docXml.CreateAttribute("width");
-                    attrWidth.Value = "40";
-                    attrAlign = docXml.CreateAttribute("align");
-                    attrAlign.Value = "right";
-                    XmlAttribute attrId1 = docXml.CreateAttribute(Id);
-                    attrId1.Value = "_TsDate_" + periodStart.AddDays(i).ToShortDateString().Replace("/", "_"); ;
-
-                    newCol.Attributes.Append(attrType);
-                    newCol.Attributes.Append(attrWidth);
-                    newCol.Attributes.Append(attrAlign);
-                    newCol.Attributes.Append(attrId1);
-
-                    ndHead.AppendChild(newCol);
-                }
-            }
-
-            XmlNode newColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            newColumn.InnerXml = "Total";
-            attrType = docXml.CreateAttribute(TypeConst);
-            attrType.Value = "ro[=sum]";
-            attrWidth = docXml.CreateAttribute("width");
-            attrWidth.Value = "60";
-            attrAlign = docXml.CreateAttribute("align");
-            attrAlign.Value = "right";
-            XmlAttribute attrId = docXml.CreateAttribute(Id);
-            attrId.Value = "Total";
-
-            newColumn.Attributes.Append(attrType);
-            newColumn.Attributes.Append(attrWidth);
-            newColumn.Attributes.Append(attrAlign);
-            newColumn.Attributes.Append(attrId);
-
-            ndHead.AppendChild(newColumn);
-
-
-            cmd = new SqlCommand("select ts_uid,username,submitted,approval_status,approval_notes from TSTIMESHEET where period_id=@period_id and site_uid=@siteid", cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@period_id", period);
-            cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-            dsTimesheets = new DataSet();
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            da.Fill(dsTimesheets);
-
-            cmd = new SqlCommand("select hours,ts_item_date,ts_uid from vwTSTimesheetTotals where period_id=@period_id and site_uid=@siteid", cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@period_id", period);
-            cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-            dsTimesheetTotals = new DataSet();
-            da = new SqlDataAdapter(cmd);
-            da.Fill(dsTimesheetTotals);
-
-            cmd = new SqlCommand("select title,project,ts_uid,ts_item_uid,approval_status from vwTSTasks where period_id=@period_id and site_uid=@siteid order by project", cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@period_id", period);
-            cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-            dsTimesheetTasks = new DataSet();
-            da = new SqlDataAdapter(cmd);
-            da.Fill(dsTimesheetTasks);
-
-            cmd = new SqlCommand("select Hours,ts_item_date,ts_item_uid,ts_item_type_id from vwTSHoursByTask where period_id=@period_id and site_uid=@siteid", cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@period_id", period);
-            cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-            dsTimesheetTaskHours = new DataSet();
-            da = new SqlDataAdapter(cmd);
-            da.Fill(dsTimesheetTaskHours);
-
-            cmd = new SqlCommand("select tstype_id from TSTYPE where site_uid=@siteid", cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-            dsTimesheetTypes = new DataSet();
-            da = new SqlDataAdapter(cmd);
-            da.Fill(dsTimesheetTypes);
-
-            cmd = new SqlCommand("select ts_item_uid,ts_item_notes,ts_item_date from vwTSNotes where period_id=@period_id and site_uid=@siteid", cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@period_id", period);
-            cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-            dsTimesheetNotes = new DataSet();
-            da = new SqlDataAdapter(cmd);
-            da.Fill(dsTimesheetNotes);
-        }
-        private void addGroups(SPWeb curWeb)
-        {
-            var arrGTemp = new SortedList();
-
-            processList(curWeb, arrGTemp);
-
-            var timeSpan = periodEnd - periodStart;
-
-            foreach (DictionaryEntry entry in arrGTemp)
-            {
-                var newItem = entry.Key.ToString();
-                var parentInd = newItem.LastIndexOf("\n");
-                var parent = string.Empty;
-
-                if (parentInd >= 0)
-                {
-                    parent = newItem.Substring(0, parentInd);
-                    newItem = newItem.Substring(parentInd + 1);
-                }
-
-                if ((hshItemNodes.Contains(parent) && !hshItemNodes.Contains(entry.Key.ToString())) || 
-                    (parentInd == -1 && !hshItemNodes.Contains(entry.Key.ToString())))
-                {
-                    var parentNode = (parentInd == -1)
-                        ? ndMainParent
-                        : (XmlNode)hshItemNodes[parent];
-
-                    var newNode = docXml.CreateNode(XmlNodeType.Element, Row, docXml.NamespaceURI);
-                    AppendChilds(entry.Key.ToString(), newItem, parentNode, newNode);
-
-                    for (var i = 0; i <= timeSpan.Days; i++)
-                    {
-                        var showDay = string.Empty;
-                        try
-                        {
-                            showDay = dayDefs[((int)periodStart.AddDays(i).DayOfWeek) * 3];
-                        }
-                        catch (Exception ex)
-                        {
-                            SystemTrace.WriteLine(ex.ToString());
-                        }
-                        if (showDay == True)
-                        {
-                            AppendChild(newNode, string.Empty);
-                        }
-                    }
-
-                    hshItemNodes.Add(entry.Key.ToString(), newNode);
-                }
-            }
-
-            while (queueAllItems.Count > 0)
-            {
-                var listItem = (SPListItem)queueAllItems.Dequeue();
-                if (arrItems.Contains(listItem.ID.ToString()))
-                {
-                    ProcessListItem(curWeb, timeSpan, listItem);
-                }
-            }
-        }
-
-        private void AppendChilds(string entryKey, string newItem, XmlNode parentNode, XmlNode newNode)
-        {
-            if (parentNode == null)
-            {
-                throw new ArgumentNullException(nameof(parentNode));
-            }
-
-            if (newNode == null)
-            {
-                throw new ArgumentNullException(nameof(newNode));
-            }
-
-            var attrId = docXml.CreateAttribute(Id);
-
-            if (!string.IsNullOrWhiteSpace(entryKey))
-            {
-                attrId.Value = entryKey;
-            }
-            else
-            {
-                attrId.Value = Guid.NewGuid().ToString();
-            }
-
-            newNode.Attributes.Append(attrId);
-
-            AppendAttribute(newNode, "locked", One);
-
-            AppendAttribute(newNode, Open, One);
-            
-            parentNode.AppendChild(newNode);
-
-            AppendChild(newNode, TypeConst, Ro);
-            AppendChild(newNode, TypeConst, Ro);
-
-            var newCell = docXml.CreateNode(XmlNodeType.Element, Cell, docXml.NamespaceURI);
-            newCell.InnerText = string.IsNullOrWhiteSpace(newItem) ? "No Value" : newItem;
-            newNode.AppendChild(newCell);
-
-            AppendAttribute(newNode, Style, "font-weight:bold;background: #B6C8ED");
-            AppendChild(newNode, string.Empty);
-        }
-
-        private void ProcessListItem(SPWeb curWeb, TimeSpan timeSpan, SPListItem listItem)
-        {
-            if (listItem == null)
-            {
-                throw new ArgumentNullException(nameof(listItem));
-            }
-
-            var resName = listItem.Title;
-            var realName = string.Empty;
-            var loginName = string.Empty;
-            try
-            {
-                var userValue = new SPFieldUserValue(curWeb, listItem["SharePointAccount"].ToString());
-                loginName = userValue.User.LoginName;
-                realName = userValue.User.Name;
-            }
-            catch (Exception ex)
-            {
-                SystemTrace.WriteLine(ex.ToString());
-            }
-
-            var dataRows = dsTimesheets.Tables[0].Select("username like '" + loginName + "'");
-
-            if (!string.IsNullOrWhiteSpace(loginName) && dataRows.Length > 0)
-            {
-                var groupName = string.Empty;
-                if (arrItems[listItem.ID.ToString()] == null)
-                {
-                    groupName = loginName;
-                }
-                else
-                {
-                    groupName = arrItems[listItem.ID.ToString()] + "\n" + loginName;
-                }
-
-                var newItem = groupName;
-                var parentInd = newItem.LastIndexOf("\n");
-                var parent = string.Empty;
-
-                if (parentInd >= 0)
-                {
-                    parent = newItem.Substring(0, parentInd);
-                    newItem = newItem.Substring(parentInd + 1);
-                }
-
-                if ((hshItemNodes.Contains(parent) && !hshItemNodes.Contains(groupName)) || 
-                    (parentInd == -1 && !hshItemNodes.Contains(groupName)))
-                {
-                    ProcessNodes(
-                        timeSpan,
-                        listItem.ID.ToString(),
-                        resName,
-                        realName,
-                        loginName,
-                        dataRows,
-                        groupName,
-                        parentInd,
-                        parent);
-                }
-            }
-        }
-
-        private void ProcessNodes(
-            TimeSpan timeSpan,
-            string listItemId,
-            string resName,
-            string realName,
-            string loginName,
-            DataRow[] dataRows,
-            string groupName,
-            int parentInd,
-            string parent)
-        {
-            if (dataRows == null)
-            {
-                throw new ArgumentNullException(nameof(dataRows));
-            }
-
-            var parentNode = (parentInd == -1)
-                ? ndMainParent
-                : (XmlNode)hshItemNodes[parent];
-
-            var newNode = docXml.CreateNode(XmlNodeType.Element, Row, docXml.NamespaceURI);
-
-            AppendChilds(listItemId, resName, realName, dataRows, parentNode, newNode);
-
-            for (var days = 0; days <= timeSpan.Days; days++)
-            {
-                var showDay = string.Empty;
-                try
-                {
-                    showDay = dayDefs[((int)periodStart.AddDays(days).DayOfWeek) * 3];
-                }
-                catch (Exception ex)
-                {
-                    SystemTrace.WriteLine(ex.ToString());
-                }
-                if (showDay == True)
-                {
-                    AppendChild(newNode, string.Empty);
-                }
-            }
-
-            var drTasks = dsTimesheetTasks.Tables[0].Select("ts_uid = '" + dataRows[0][TsUid] + "'");
-            var regex = new Regex("[^0-9a-zA-Z]+", RegexOptions.Compiled);
-            foreach (DataRow drTask in drTasks)
-            {
-                ProcessTask(timeSpan, listItemId, newNode, regex, drTask);
-            }
-
-            if (!hshItemNodes.Contains(groupName))
-            {
-                hshItemNodes.Add(groupName, newNode);
-            }
-
-            if (!hshResNodes.Contains(loginName))
-            {
-                hshResNodes.Add(loginName, newNode);
-            }
-        }
-
-        private void AppendChilds(string listItemId, string resName, string realName, DataRow[] dataRows, XmlNode parentNode, XmlNode newNode)
+       private void AppendChilds(string listItemId, string resName, string realName, DataRow[] dataRows, XmlNode parentNode, XmlNode newNode)
         {
             if (newNode == null)
             {
@@ -582,7 +157,7 @@ namespace TimeSheets
             newCell = docXml.CreateNode(XmlNodeType.Element, Cell, docXml.NamespaceURI);
             newCell.InnerText = resName.Equals(realName, StringComparison.InvariantCultureIgnoreCase)
                 ? resName
-                : resName + " (" + realName + ")";
+                : $"{resName} ({realName})";
             newNode.AppendChild(newCell);
 
             var attrStyle = docXml.CreateAttribute(Style);
@@ -654,7 +229,8 @@ namespace TimeSheets
             AppendChild(taskNode, string.Empty);
 
             var newCell = docXml.CreateNode(XmlNodeType.Element, Cell, docXml.NamespaceURI);
-            switch (drTask["APPROVAL_STATUS"].ToString())
+            var status = drTask["APPROVAL_STATUS"].ToString();
+            switch (status)
             {
                 case Zero:
                     newCell.InnerXml = "<![CDATA[<img src=\"images/tsflagwhite.gif\" alt=\"Pending\">]]>";
@@ -665,7 +241,11 @@ namespace TimeSheets
                 case Two:
                     newCell.InnerXml = "<![CDATA[<img src=\"images/tsflagred.gif\" alt=\"Rejected\">]]>";
                     break;
-            };
+                default:
+                    SystemTrace.WriteLine($"ArgumentOutOfRangeException: {status}");
+                    break;
+            }
+            
             taskNode.AppendChild(newCell);
 
             double total = 0;
@@ -712,7 +292,7 @@ namespace TimeSheets
                 var showday = string.Empty;
                 try
                 {
-                    showday = dayDefs[((int)periodStart.AddDays(days).DayOfWeek) * 3];
+                    showday = dayDefs[(int)periodStart.AddDays(days).DayOfWeek * 3];
                 }
                 catch (Exception ex)
                 {
@@ -743,7 +323,7 @@ namespace TimeSheets
             var showDay = string.Empty;
             try
             {
-                showDay = dayDefs[((int)periodStart.AddDays(days).DayOfWeek) * 3];
+                showDay = dayDefs[(int)periodStart.AddDays(days).DayOfWeek * 3];
             }
             catch (Exception ex)
             {
@@ -812,7 +392,7 @@ namespace TimeSheets
             hours = hours.Substring(1);
             if (drTaskNotes.Length > 0)
             {
-                hours += "|N|" + drTaskNotes[0][TsItemNotes].ToString();
+                hours += "|N|" + drTaskNotes[0][TsItemNotes];
             }
         }
 
@@ -829,20 +409,20 @@ namespace TimeSheets
             }
 
             total = 0;
-            hours = drTaskTimes.Length > 0 
-                ? drTaskTimes[0][Hours].ToString() 
+            hours = drTaskTimes.Length > 0
+                ? drTaskTimes[0][Hours].ToString()
                 : Zero;
 
             if (!double.TryParse(hours, out total))
             {
                 SystemTrace.WriteLine($"Unable to parse double from string '{hours}'");
             }
-            
+
             if (drTaskNotes.Length > 0)
             {
                 AppendAttribute(newCell, TypeConst, TimeEditor);
 
-                hours = "0|" + hours + "|N|" + drTaskNotes[0][TsItemNotes].ToString();
+                hours = "0|" + hours + "|N|" + drTaskNotes[0][TsItemNotes];
             }
         }
 
@@ -883,89 +463,19 @@ namespace TimeSheets
             xmlNode.AppendChild(newCell);
         }
 
-       private void AppendChild(XmlNode xmlNode, string attrType, string attValue, string innerText)
+        private void AppendChild(XmlNode xmlNode, string attrType, string attValue, string innerText)
         {
-           if (xmlNode == null)
-           {
-               throw new ArgumentNullException(nameof(xmlNode));
-           }
+            if (xmlNode == null)
+            {
+                throw new ArgumentNullException(nameof(xmlNode));
+            }
 
-           var ndStatus = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
+            var ndStatus = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
             var attrName = docXml.CreateAttribute(attrType);
             attrName.Value = attValue;
             ndStatus.InnerText = innerText;
             ndStatus.Attributes.Append(attrName);
             xmlNode.AppendChild(ndStatus);
-        }
-
-        protected void processList(SPWeb web, SortedList arrGTemp)
-        {
-            try
-            {
-                SPQuery query = new SPQuery();
-                query.Query = "<OrderBy><FieldRef Name = 'FirstName' Ascending = 'True'/><FieldRef Name = 'LastName' Ascending = 'True'/></OrderBy>";
-                SPListItemCollection listItems = list.GetItems(query);
-                if (listItems != null && listItems.Count > 0)
-                {
-                    foreach (SPListItem li in listItems)
-                    {
-                        string group = null;
-                        if (arrGroupFields != null)
-                        {
-                            foreach (string groupby in arrGroupFields)
-                            {
-                                SPField field = list.Fields.GetFieldByInternalName(groupby);
-                                string newgroup = field.GetFieldValueAsText(li[field.Id].ToString());
-
-                                if (group == null)
-                                    group = newgroup;
-                                else
-                                    group += "\n" + newgroup;
-
-                                if (!arrGTemp.Contains(group))
-                                {
-                                    arrGTemp.Add(group, "");
-                                }
-                            }
-                        }
-
-                        arrItems.Add(li.ID.ToString(), group);
-                        queueAllItems.Enqueue(li);
-                    }
-                }
-            }
-            catch { }
-        }
-
-        private SPField getRealField(SPField field)
-        {
-            try
-            {
-                if (field.Type == SPFieldType.Computed)
-                {
-                    {
-                        XmlDocument fieldXml = new XmlDocument();
-                        fieldXml.LoadXml(field.SchemaXml);
-
-                        string parentField = "";
-                        try
-                        {
-                            parentField = fieldXml.FirstChild.Attributes["DisplayNameSrcField"].Value;
-                        }
-                        catch { }
-                        if (parentField != "")
-                        {
-                            try
-                            {
-                                field = field.ParentList.Fields.GetFieldByInternalName(parentField);
-                            }
-                            catch { }
-                        }
-                    }
-                }
-            }
-            catch { }
-            return field;
         }
     }
 }

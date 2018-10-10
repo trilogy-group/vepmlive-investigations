@@ -99,6 +99,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="API\DataManager.cs" />
     <Compile Include="API\Errors.cs" />
     <Compile Include="API\ReportManager.cs" />
+    <Compile Include="DataScrubber.BulkInsert.cs" />
     <Compile Include="DataScrubber.cs" />
     <Compile Include="EPMLiveReportLibraryEventReceiver\EPMLiveReportLibraryEventReceiver.cs" />
     <Compile Include="epmlive\ReportDatabases.aspx.cs">
