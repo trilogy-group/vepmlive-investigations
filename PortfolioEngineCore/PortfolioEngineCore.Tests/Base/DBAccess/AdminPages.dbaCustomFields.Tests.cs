@@ -1347,6 +1347,22 @@ namespace PortfolioEngineCore.Tests.Base
                 () => CommandText.ShouldBe(ExpectedCommand));
         }
 
+        [TestMethod]
+        public void ValidateAndSaveCustomFieldFormula_EmptyFormulaSaveOnSucces_ExecutesCorrectly()
+        {
+            // Arrange
+            var formula = string.Empty;
+            ShimSqlDb.AllInstances.DeleteDataByIdStringInt32StatusEnumInt32Out = DeleteDataByIdSuccess;
+
+            // Act
+            var result = dbaCustomFields.ValidateAndSaveCustomFieldFormula(dbAccess, 2, ref formula, true);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBeEmpty());
+        }
+
         /// <summary>
         /// This is a fake method. All the parameters are required, even though not all of them are used
         /// </summary>
