@@ -36,16 +36,16 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
                         {
                             cmd.CommandType = CommandType.Text;
                             cmd.Parameters.AddWithValue("@emailid", gvEmails.Rows[e.NewEditIndex].Cells[0].Text);
-                            SqlDataReader dr = cmd.ExecuteReader();
-
-                            hdnId.Value = gvEmails.Rows[e.NewEditIndex].Cells[0].Text;
-
-                            if (dr.Read())
+                            using (var dataReader = cmd.ExecuteReader())
                             {
-                                txtSubject.Text = dr.GetString(0);
-                                txtBody.Text = dr.GetString(1);
+                                hdnId.Value = gvEmails.Rows[e.NewEditIndex].Cells[0].Text;
+
+                                if (dataReader.Read())
+                                {
+                                    txtSubject.Text = dataReader.GetString(0);
+                                    txtBody.Text = dataReader.GetString(1);
+                                }
                             }
-                            dr.Close();
                         }
                     }
                 }
