@@ -1,12 +1,9 @@
 ﻿using System;
+using System.Data.SqlClient;
+using System.Web;
+using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Data.SqlClient;
-using System.Collections;
-using Microsoft.Win32;
 namespace EPMLiveCore
 {
     public partial class websettings : LayoutsPageBase
@@ -14,7 +11,7 @@ namespace EPMLiveCore
         protected string strSiteUrl;
         protected string strCurrentTemplate;
 
-        
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -160,22 +157,24 @@ namespace EPMLiveCore
                         txtVersion.Text = "v " + web.Properties["TemplateVersion"];
                     }
 
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                        cn.Open();
-
-                        SqlCommand cmd = new SqlCommand("SELECT * FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid", cn);
-                        cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                        cmd.Parameters.AddWithValue("@webid", web.ID);
-                        SqlDataReader dr = cmd.ExecuteReader();
-                        if(dr.Read())
+                        using (var connection = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
                         {
-                            chkArchive.Checked = true;
-                        }
-                        dr.Close();
+                            connection.Open();
 
-                        cn.Close();
+                            using (var cmd = new SqlCommand("SELECT * FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid", connection))
+                            {
+                                cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
+                                cmd.Parameters.AddWithValue("@webid", web.ID);
+                                var dr = cmd.ExecuteReader();
+                                if (dr.Read())
+                                {
+                                    chkArchive.Checked = true;
+                                }
+                                dr.Close();
+                            }
+                        }
                     });
 
                     string disableMyWorkspaces = CoreFunctions.getConfigSetting(web, "EPMLiveDisableMyWorkspaces");
@@ -203,9 +202,9 @@ namespace EPMLiveCore
             {
                 lblSPVersion.Text = Convert.ToString(web.Site.WebApplication.Farm.BuildVersion);
             }
-            catch 
+            catch
             { }
- 
+
             #endregion
 
             #region EPMLive Database
@@ -223,7 +222,7 @@ namespace EPMLiveCore
                         lblEPMLDBServer.Text = string.Format("Server: {0}", conn.DataSource);
                     }
                 }
-                else 
+                else
                 {
                     lblEMPLDB.Text = errMsg;
                 }
@@ -231,11 +230,11 @@ namespace EPMLiveCore
             catch
             {
                 lblEMPLDB.Text = errMsg;
-            } 
+            }
             #endregion
 
             #region Reporting Database
-            
+
             errMsg = "Cannot get Reporting database information.";
             if (!string.IsNullOrEmpty(epmliveConnection))
             {
@@ -346,41 +345,44 @@ namespace EPMLiveCore
             web.MasterUrl = ddlMasterPages.SelectedValue.ToString();
             web.Update();
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
-                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                cn.Open();
-
-                if(chkArchive.Checked)
+                using (var connection = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
                 {
-                    SqlCommand cmd = new SqlCommand("SELECT * FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid", cn);
-                    cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                    cmd.Parameters.AddWithValue("@webid", web.ID);
-                    SqlDataReader dr = cmd.ExecuteReader();
+                    connection.Open();
 
-                    if(dr.Read())
+                    if (chkArchive.Checked)
                     {
-                        dr.Close();
+                        var recordExists = true;
+                        using (var cmd = new SqlCommand("SELECT * FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid", connection))
+                        {
+                            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
+                            cmd.Parameters.AddWithValue("@webid", web.ID);
+                            var dr = cmd.ExecuteReader();
+                            recordExists = dr.Read();
+                            dr.Close();
+                        }
+                        if (!recordExists)
+                        {
+                            using (var cmd = new SqlCommand("INSERT INTO PERSONALIZATIONS ([Key],SiteId,webid) Values ('webarchived', @siteId, @webid)", connection))
+                            {
+                                cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
+                                cmd.Parameters.AddWithValue("@webid", web.ID);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
                     }
                     else
                     {
-                        dr.Close();
-                        cmd = new SqlCommand("INSERT INTO PERSONALIZATIONS ([Key],SiteId,webid) Values ('webarchived', @siteId, @webid)", cn);
-                        cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                        cmd.Parameters.AddWithValue("@webid", web.ID);
-                        cmd.ExecuteNonQuery();
+                        using (var cmd = new SqlCommand("DELETE FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid", connection))
+                        {
+                            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
+                            cmd.Parameters.AddWithValue("@webid", web.ID);
+                            cmd.ExecuteNonQuery();
+                        }
                     }
-
                 }
-                else
-                {
-                    SqlCommand cmd = new SqlCommand("DELETE FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid", cn);
-                    cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                    cmd.Parameters.AddWithValue("@webid", web.ID);
-                    cmd.ExecuteNonQuery();
-                }
-
-                cn.Close();
             });
 
             if(!String.IsNullOrEmpty(Request["Source"]))
