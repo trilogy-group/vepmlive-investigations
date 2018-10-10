@@ -33,8 +33,10 @@ namespace EPMLiveEnterprise
                 //        myLog.WriteEntry("Too many users activated for the Enterprise feature.", EventLogEntryType.Warning, 500);
                 //        return;
                 //};
-                Publisher pub = new Publisher(contextInfo, e);
-                pub.doPublish();
+                using (var pub = new Publisher(contextInfo, e))
+                {
+                    pub.doPublish();
+                }
             }
             else
             {
