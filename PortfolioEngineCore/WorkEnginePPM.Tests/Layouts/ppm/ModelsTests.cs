@@ -48,8 +48,6 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
             ShimWebAdmin.BuildBaseInfoHttpContext = _ => DummyString;
             ShimSqlDb.ReadIntValueObject = _ => DummyInt;
             ShimSqlDb.ReadStringValueObject = _ => DummyString;
-
-
         }
 
         [TestCleanup]
@@ -415,10 +413,10 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         {
             // Arrange
             const string RequestContext = "ReadModelInfo";
-            var expectedModelContextValue = $"<Model MODEL_UID=\"0\" MODEL_NAME=\"New Model\" MODEL_DESC=\"\" MODEL_CB_ID=\"-1\">";
-            var expectedCalendarsValue = $"<calendars><item id=\"-1\" name=\"[None]\" /></calendars>";
-            var expectedCostTypesValue = $"<costtypes />";
-            var expectedFlagCustomFieldsValue = $"<flagcustomfields><item id=\"-1\" name=\"[None]\" /></flagcustomfields>";
+            const string ExpectedModelContextValue = "<Model MODEL_UID=\"0\" MODEL_NAME=\"New Model\" MODEL_DESC=\"\" MODEL_CB_ID=\"-1\">";
+            const string ExpectedCalendarsValue = "<calendars><item id=\"-1\" name=\"[None]\" /></calendars>";
+            const string ExpectedCostTypesValue = "<costtypes />";
+            const string ExpectedFlagCustomFieldsValue = "<flagcustomfields><item id=\"-1\" name=\"[None]\" /></flagcustomfields>";
             var context = new ShimHttpContext();
             var data = new ShimCStruct
             {
@@ -444,10 +442,10 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
             // Assert
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNull(),
-                () => result.ShouldContain(expectedModelContextValue),
-                () => result.ShouldContain(expectedCalendarsValue),
-                () => result.ShouldContain(expectedCostTypesValue),
-                () => result.ShouldContain(expectedFlagCustomFieldsValue));
+                () => result.ShouldContain(ExpectedModelContextValue),
+                () => result.ShouldContain(ExpectedCalendarsValue),
+                () => result.ShouldContain(ExpectedCostTypesValue),
+                () => result.ShouldContain(ExpectedFlagCustomFieldsValue));
         }
 
         [TestMethod]
