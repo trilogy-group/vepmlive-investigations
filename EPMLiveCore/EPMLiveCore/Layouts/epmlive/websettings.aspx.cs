@@ -4,13 +4,13 @@ using System.Web;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+
 namespace EPMLiveCore
 {
     public partial class websettings : LayoutsPageBase
     {
         protected string strSiteUrl;
         protected string strCurrentTemplate;
-
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -203,9 +203,9 @@ namespace EPMLiveCore
             {
                 lblSPVersion.Text = Convert.ToString(web.Site.WebApplication.Farm.BuildVersion);
             }
-            catch
+            catch 
             { }
-
+ 
             #endregion
 
             #region EPMLive Database
@@ -223,7 +223,7 @@ namespace EPMLiveCore
                         lblEPMLDBServer.Text = string.Format("Server: {0}", conn.DataSource);
                     }
                 }
-                else
+                else 
                 {
                     lblEMPLDB.Text = errMsg;
                 }
@@ -231,11 +231,11 @@ namespace EPMLiveCore
             catch
             {
                 lblEMPLDB.Text = errMsg;
-            }
+            } 
             #endregion
 
             #region Reporting Database
-
+            
             errMsg = "Cannot get Reporting database information.";
             if (!string.IsNullOrEmpty(epmliveConnection))
             {
