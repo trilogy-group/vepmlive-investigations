@@ -167,12 +167,13 @@ namespace EPMLiveCore
                             {
                                 cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
                                 cmd.Parameters.AddWithValue("@webid", web.ID);
-                                var dr = cmd.ExecuteReader();
-                                if (dr.Read())
+                                using (var dataReader = cmd.ExecuteReader())
                                 {
-                                    chkArchive.Checked = true;
+                                    if (dataReader.Read())
+                                    {
+                                        chkArchive.Checked = true;
+                                    }
                                 }
-                                dr.Close();
                             }
                         }
                     });
@@ -358,9 +359,10 @@ namespace EPMLiveCore
                         {
                             cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
                             cmd.Parameters.AddWithValue("@webid", web.ID);
-                            var dr = cmd.ExecuteReader();
-                            recordExists = dr.Read();
-                            dr.Close();
+                            using (var dataReader = cmd.ExecuteReader())
+                            {
+                                recordExists = dataReader.Read();
+                            }
                         }
                         if (!recordExists)
                         {
