@@ -741,17 +741,19 @@ namespace EPMLiveEnterprise
 
                 foreach (ProjectDataSet.AssignmentRow assignmentRow in projectDataSet.Assignment)
                 {
+                    var currentTaskKey = $"{assignmentRow.TASK_UID.ToString().ToUpper()}.{assignmentRow.ASSN_UID.ToString().ToUpper()}";
+
                     if (!IsAssignedTaskSaved(assignmentRow.ASSN_UID))
                     {
                         SPListItem listItem;
 
-                        if (hshCurTasks.Contains($"{assignmentRow.TASK_UID.ToString().ToUpper()}.{assignmentRow.ASSN_UID.ToString().ToUpper()}"))
+                        if (hshCurTasks.Contains(currentTaskKey))
                         {
                             var hshCurTask =
-                                (Guid)hshCurTasks[$"{assignmentRow.TASK_UID.ToString().ToUpper()}.{assignmentRow.ASSN_UID.ToString().ToUpper()}"];
+                                (Guid)hshCurTasks[currentTaskKey];
                             listItem = taskCenter.GetItemByUniqueId(hshCurTask);
 
-                            hshCurTasks.Remove($"{assignmentRow.TASK_UID.ToString().ToUpper()}.{assignmentRow.ASSN_UID.ToString().ToUpper()}");
+                            hshCurTasks.Remove(currentTaskKey);
                         }
                         else
                         {
@@ -765,7 +767,7 @@ namespace EPMLiveEnterprise
                     }
                     else
                     {
-                        hshCurTasks.Remove($"{assignmentRow.TASK_UID.ToString().ToUpper()}.{assignmentRow.ASSN_UID.ToString().ToUpper()}");
+                        hshCurTasks.Remove(currentTaskKey);
                     }
 
                     taskDoneCount++;
