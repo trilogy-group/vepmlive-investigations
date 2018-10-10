@@ -165,7 +165,7 @@ namespace EPMLive.TestFakes.Utility
                 DataReadersCreated.Add(instance, result.Instance);
                 CommandsExecuted.Add(instance);
 
-                ExecuteReaderCalled(instance, result.Instance);
+                ExecuteReaderCalled?.Invoke(instance, result.Instance);
 
                 return result;
             };
