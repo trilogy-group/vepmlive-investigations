@@ -54,7 +54,16 @@ namespace PortfolioEngineCore.Tests.Base
             const string ExpectedErrorMessage = "Please enter a Model Name";
 
             // Act
-            var result = dbaModels.UpdateModelInfo(dbAccess, ref modelId, string.Empty, DummyString, 1, 1, DummyString, tableVersions, out reply);
+            var result = dbaModels.UpdateModelInfo(
+                dbAccess, 
+                ref modelId, 
+                string.Empty, 
+                DummyString, 
+                1, 
+                1, 
+                DummyString, 
+                tableVersions, 
+                out reply);
 
             // Assert
             result.ShouldSatisfyAllConditions(
@@ -82,7 +91,16 @@ namespace PortfolioEngineCore.Tests.Base
             };
 
             // Act
-            var result = dbaModels.UpdateModelInfo(dbAccess, ref modelId, DummyString, DummyString, 1, 1, DummyString, tableVersions, out reply);
+            var result = dbaModels.UpdateModelInfo(
+                dbAccess, 
+                ref modelId, 
+                DummyString, 
+                DummyString, 
+                1, 
+                1, 
+                DummyString, 
+                tableVersions, 
+                out reply);
 
             // Assert
             result.ShouldSatisfyAllConditions(
@@ -117,8 +135,18 @@ namespace PortfolioEngineCore.Tests.Base
                 return 1;
             };
             ShimSqlDb.AllInstances.GetLastIdentityValueInt32Out = GetLastIdentityValue;
+
             // Act
-            var result = dbaModels.UpdateModelInfo(dbAccess, ref modelId, DummyString, DummyString, 1, 1, DummyString, tableVersions, out reply);
+            var result = dbaModels.UpdateModelInfo(
+                dbAccess, 
+                ref modelId, 
+                DummyString, 
+                DummyString, 
+                1, 
+                1, 
+                DummyString, 
+                tableVersions, 
+                out reply);
 
             // Assert
             result.ShouldSatisfyAllConditions(
