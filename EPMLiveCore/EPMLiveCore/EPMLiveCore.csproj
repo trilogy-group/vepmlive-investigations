@@ -190,6 +190,7 @@
     <Compile Include="API\MyWork\ListItem.cs" />
     <Compile Include="API\MyWork\MyPersonalization.cs" />
     <Compile Include="API\MyWork\MyWork.cs" />
+    <Compile Include="API\MyWork\MyWork.GetMyWorkParams.cs" />
     <Compile Include="API\MyWork\MyWorkField.cs" />
     <Compile Include="API\MyWork\MyWorkGridView.cs" />
     <Compile Include="API\MyWork\Utils.cs" />
@@ -1327,6 +1328,8 @@
     <Compile Include="ListDisplayUtils.cs" />
     <Compile Include="ListFieldIteratorExtensions.cs" />
     <Compile Include="MultiAppCustomSiteMapProvider.cs" />
+    <Compile Include="API\MyWork\MyWork.Fields.cs" />
+    <Compile Include="API\MyWork\MyWork.GetMyWork.cs" />
     <Compile Include="NotificationCounter.cs" />
     <Compile Include="NotificationCounterV2.cs" />
     <Compile Include="NotificationEvent.cs" />

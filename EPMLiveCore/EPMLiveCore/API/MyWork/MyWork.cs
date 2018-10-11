@@ -77,11 +77,10 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore.API
 {
-    public class MyWork
+    public partial class MyWork
     {
         #region Fields (35)
 
-        private const string ASSIGNED_TO_FIELD = "AssignedTo";
         private const string COMMENT_COL_WIDTH = "36";
         private const string COMMENT_COUNT_FIELD = "CommentCount";
         private const string COMMENTERS_FIELD = "Commenters";
@@ -584,9 +583,8 @@ namespace EPMLiveCore.API
         /// <param name="spWeb">The sp web.</param>
         /// <param name="selectedFields">The selected fields.</param>
         /// <param name="selectedLists">The selected lists.</param>
-        private static void GetDataFromLists(XDocument result, Dictionary<string, SPField> fieldTypes, string query,
-            SPSite spSite, SPWeb spWeb,
-            List<string> selectedFields, List<string> selectedLists)
+        private static void GetDataFromLists(XDocument result, string query,
+            SPSite spSite, SPWeb spWeb)
         {
             foreach (Guid theWebId in from webId in spWeb.ToTreeList()
                                       let archivedWebs = GetArchivedWebs(spSite.ID)
@@ -616,7 +614,7 @@ namespace EPMLiveCore.API
                         }
                     }
 
-                    foreach (string selectedList in selectedLists.Distinct().OrderBy(l => l))
+                    foreach (string selectedList in GetMyWorkParams.SelectedLists.Distinct().OrderBy(l => l))
                     {
                         SPList spList = web.Lists.TryGetList(selectedList);
 
@@ -626,14 +624,14 @@ namespace EPMLiveCore.API
 
                         var spQuery = new SPQuery { QueryThrottleMode = SPQueryThrottleOption.Override };
 
-                        foreach (string selectedField in selectedFields)
+                        foreach (string selectedField in GetMyWorkParams.SelectedFields)
                         {
                             spQuery.ViewFields +=
                                 string.Format(@"<FieldRef Name='{0}' Nullable='TRUE'/>",
                                     selectedField);
                         }
 
-                        if (!selectedFields.Exists(f => f.Equals(COMPLETED_FIELD)))
+                        if (!GetMyWorkParams.SelectedFields.Exists(f => f.Equals(COMPLETED_FIELD)))
                             spQuery.ViewFields +=
                                 string.Format("<FieldRef Name='{0}' Nullable='TRUE'/>",
                                     COMPLETED_FIELD);
@@ -647,7 +645,7 @@ namespace EPMLiveCore.API
 
                         if (!spListItemCollection.HasItems()) continue;
 
-                        bool listContainsField = selectedFields.Any(selectedField =>
+                        bool listContainsField = GetMyWorkParams.SelectedFields.Any(selectedField =>
                             spListItemCollection.Fields.
                                 ContainsField(selectedField));
 
@@ -664,7 +662,7 @@ namespace EPMLiveCore.API
 
                             var fieldsElement = new XElement("Fields");
 
-                            foreach (string selectedField in selectedFields.Where(
+                            foreach (string selectedField in GetMyWorkParams.SelectedFields.Where(
                                 selectedField =>
                                     theListItem.Fields.ContainsFieldWithInternalName(selectedField)))
                             {
@@ -674,7 +672,7 @@ namespace EPMLiveCore.API
                                 string type;
                                 string format;
 
-                                GetTypeAndFormat(fieldTypes, selectedField, out type, out format);
+                                GetTypeAndFormat(GetMyWorkParams.FieldTypes, selectedField, out type, out format);
 
                                 var fieldElement = new XElement("Field", new XCData(value));
                                 fieldElement.Add(new XAttribute("Name", selectedField));
@@ -730,10 +728,7 @@ namespace EPMLiveCore.API
         /// <param name="selectedLists">The selected lists.</param>
         /// <param name="data">The data.</param>
         /// <returns></returns>
-        private static IEnumerable<DataTable> GetDataFromReportingDB(Dictionary<string, string> workTypes,
-            IEnumerable<string> selectedFields,
-            List<Guid> archivedWebs, SPWeb spWeb,
-            List<string> selectedLists, string data)
+        private static IEnumerable<DataTable> GetDataFromReportingDb(SPWeb spWeb, string data)
         {
             const string dateFormat = "yyyy-MM-dd HH:mm:ss";
             Guid listIdQuery = Guid.Empty;
@@ -800,17 +795,17 @@ namespace EPMLiveCore.API
 
                 string archivedWebIds = string.Empty;
 
-                if (archivedWebs.Any())
+                if (GetMyWorkParams.ArchivedWebs.Any())
                 {
                     string @join = string.Join(",",
-                        archivedWebs.Distinct().Select(
+                        GetMyWorkParams.ArchivedWebs.Distinct().Select(
                             w => string.Format(@"N'{0}'", w)).
                             ToArray());
                     archivedWebIds = string.Format(@"AND (WebId NOT IN ({0}))", @join);
                 }
 
                 string queryLists = string.Join(",",
-                    selectedLists.Select(
+                    GetMyWorkParams.SelectedLists.Select(
                         l => string.Format(@"N'{0}'", l)).
                         ToArray());
 
@@ -891,9 +886,9 @@ namespace EPMLiveCore.API
 
                     string uniqueId = (listId + r["WebId"] + r["SiteId"]).Md5();
 
-                    if (!workTypes.ContainsKey(uniqueId))
+                    if (!GetMyWorkParams.WorkTypes.ContainsKey(uniqueId))
                     {
-                        workTypes.Add(uniqueId, r["WorkType"].ToString());
+                        GetMyWorkParams.WorkTypes.Add(uniqueId, r["WorkType"].ToString());
                     }
                 }
 
@@ -921,7 +916,7 @@ namespace EPMLiveCore.API
             List<string> myWorkFields =
                 (from r in fieldsTableRows select r["InternalName"].ToString()).Distinct().ToList();
 
-            foreach (string selectedField in selectedFields.Where(f => !myWorkFields.Contains(f)))
+            foreach (string selectedField in GetMyWorkParams.SelectedFields.Where(f => !myWorkFields.Contains(f)))
             {
                 myWorkFields.Add(selectedField);
             }
@@ -945,7 +940,7 @@ namespace EPMLiveCore.API
                 workingOnDict[key].Add(dataRow["ItemId"].ToString());
             }
 
-            foreach (string selectedList in selectedLists)
+            foreach (string selectedList in GetMyWorkParams.SelectedLists)
             {
                 var dataTable = new DataTable();
 
@@ -1008,9 +1003,8 @@ namespace EPMLiveCore.API
         /// <param name="archivedWebs">The archived webs.</param>
         /// <param name="selectedLists">The selected lists.</param>
         /// <returns></returns>
-        private static IEnumerable<DataTable> GetDataFromSP(List<string> selectedListIds, SPSiteDataQuery dataQuery,
-            SPWeb spWeb, SPSite spSite,
-            List<Guid> archivedWebs, IEnumerable<string> selectedLists)
+        private static IEnumerable<DataTable> GetDataFromSp(List<string> selectedListIds, SPSiteDataQuery dataQuery,
+            SPWeb spWeb, SPSite spSite)
         {
             var locker = new object();
             var eventWaitHandles = new List<EventWaitHandle>();
@@ -1018,13 +1012,13 @@ namespace EPMLiveCore.API
             var dataTables = new List<DataTable>();
             bool spExceptionOccured = false;
 
-            foreach (string selectedList in selectedLists.Distinct().OrderBy(l => l))
+            foreach (string selectedList in GetMyWorkParams.SelectedLists.Distinct().OrderBy(l => l))
             {
                 string theSelectedList = selectedList;
                 string listIds = string.Empty;
 
                 foreach (
-                    string listId in GetListIdsFromDb(selectedList, spWeb, archivedWebs)
+                    string listId in GetListIdsFromDb(selectedList, spWeb, GetMyWorkParams.ArchivedWebs)
                         .Where(listId => !selectedListIds.Contains(listId)))
                 {
                     selectedListIds.Add(listId);
@@ -1597,8 +1591,7 @@ namespace EPMLiveCore.API
         /// <param name="noListsSelected">
         ///     if set to <c>true</c> [no lists selected].
         /// </param>
-        private static void GetSettings(string data, ref List<string> selectedFields, ref List<string> selectedLists,
-            ref List<string> siteUrls, ref bool performanceMode, ref bool noListsSelected)
+        private static void GetSettings(string data)
         {
             try
             {
@@ -1617,7 +1610,7 @@ namespace EPMLiveCore.API
                             xDocument.Element("MyWork").Descendants().ToList().Exists(
                                 e => e.Name.LocalName.Equals("Lists")))
                         {
-                            selectedLists.AddRange(xDocument.Element("MyWork").Element("Lists").Value.Split(new[] { ',' })
+                            GetMyWorkParams.SelectedLists.AddRange(xDocument.Element("MyWork").Element("Lists").Value.Split(new[] { ',' })
                                 .Where(list => !string.IsNullOrEmpty(list)));
 
                             listsSupplied = true;
@@ -1627,7 +1620,7 @@ namespace EPMLiveCore.API
                             xDocument.Element("MyWork").Descendants().ToList().Exists(
                                 e => e.Name.LocalName.Equals("MyWorkLists")))
                         {
-                            selectedLists.AddRange(xDocument.Element("MyWork").Element("MyWorkLists").Value.Split(
+                            GetMyWorkParams.SelectedLists.AddRange(xDocument.Element("MyWork").Element("MyWorkLists").Value.Split(
                                 new[] { ',' })
                                 .Where(list => !string.IsNullOrEmpty(list)));
 
@@ -1638,7 +1631,7 @@ namespace EPMLiveCore.API
                             xDocument.Element("MyWork").Descendants().ToList().Exists(
                                 e => e.Name.LocalName.Equals("Fields")))
                         {
-                            selectedFields.AddRange(xDocument.Element("MyWork").Element("Fields").Value.Split(new[] { ',' })
+                            GetMyWorkParams.SelectedFields.AddRange(xDocument.Element("MyWork").Element("Fields").Value.Split(new[] { ',' })
                                 .Where(field => !string.IsNullOrEmpty(field)));
 
                             fieldsSupplied = true;
@@ -1650,7 +1643,7 @@ namespace EPMLiveCore.API
                         {
                             if (!string.IsNullOrEmpty(xDocument.Element("MyWork").Element("CrossSiteUrls").Value))
                             {
-                                siteUrls.AddRange(xDocument.Element("MyWork").Element("CrossSiteUrls").Value.Split(
+                                GetMyWorkParams.SiteUrls.AddRange(xDocument.Element("MyWork").Element("CrossSiteUrls").Value.Split(
                                     new[] { ',' })
                                     .Where(crossSite => !string.IsNullOrEmpty(crossSite)));
 
@@ -1662,7 +1655,7 @@ namespace EPMLiveCore.API
                             xDocument.Element("MyWork").Descendants().ToList().Exists(
                                 e => e.Name.LocalName.Equals("PerformanceMode")))
                         {
-                            performanceMode = xDocument.Element("MyWork").Element("PerformanceMode").Value.Equals("on");
+                            GetMyWorkParams.PerformanceMode = xDocument.Element("MyWork").Element("PerformanceMode").Value.Equals("on");
                             performanceModeSupplied = true;
                         }
                     }
@@ -1673,17 +1666,17 @@ namespace EPMLiveCore.API
                 using (SPWeb configWeb = Utils.GetConfigWeb(theWeb, lockedWeb))
                 {
                     if (!listsSupplied)
-                        selectedLists.AddRange(
+                        GetMyWorkParams.SelectedLists.AddRange(
                             CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_SELECTED_LISTS)
                                 .Split(new[] { ',' }));
 
                     if (!myWorkListsSupplied)
-                        selectedLists.AddRange(
+                        GetMyWorkParams.SelectedLists.AddRange(
                             CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_SELECTED_MY_WORK_LISTS)
                                 .Split(new[] { ',' }));
 
                     if (!fieldsSupplied)
-                        selectedFields.AddRange(
+                        GetMyWorkParams.SelectedFields.AddRange(
                             CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_SELECTED_FIELDS).Split(new[] { ',' }).Distinct());
 
                     if (!siteUrlsSupplied)
@@ -1692,26 +1685,26 @@ namespace EPMLiveCore.API
                             !string.IsNullOrEmpty(CoreFunctions.getConfigSetting(configWeb,
                                 GENERAL_SETTINGS_CROSS_SITE_URLS)))
                         {
-                            siteUrls.AddRange(CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_CROSS_SITE_URLS)
+                            GetMyWorkParams.SiteUrls.AddRange(CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_CROSS_SITE_URLS)
                                 .Split(new[] { '|' }));
                         }
-                        else siteUrls.Add(SPContext.Current.Web.Url);
+                        else GetMyWorkParams.SiteUrls.Add(SPContext.Current.Web.Url);
                     }
 
                     if (!performanceModeSupplied)
-                        performanceMode = CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_PERFORMANCE_MODE)
+                        GetMyWorkParams.PerformanceMode = CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_PERFORMANCE_MODE)
                             .Equals("on");
                 }
 
-                selectedLists.RemoveAll(string.IsNullOrEmpty);
-                noListsSelected = selectedLists.Count == 0;
+                GetMyWorkParams.SelectedLists.RemoveAll(string.IsNullOrEmpty);
+                GetMyWorkParams.NoListsSelected = GetMyWorkParams.SelectedLists.Count == 0;
 
-                selectedFields.RemoveAll(string.IsNullOrEmpty);
+                GetMyWorkParams.SelectedFields.RemoveAll(string.IsNullOrEmpty);
 
                 var fieldsToRemove = new[] { WORK_TYPE_FIELD, LIST_ID_FIELD, WEB_ID_FIELD, SITE_ID_FIELD, SITE_URL_FIELD };
                 foreach (string field in fieldsToRemove)
                 {
-                    selectedFields.RemoveAll(f => f.ToLower().Equals(field.ToLower()));
+                    GetMyWorkParams.SelectedFields.RemoveAll(f => f.ToLower().Equals(field.ToLower()));
                 }
 
                 var fixedFields = new[]
@@ -1726,7 +1719,7 @@ namespace EPMLiveCore.API
                 foreach (string fixedField in fixedFields)
                 {
                     string field = fixedField;
-                    if (!selectedFields.Exists(f => f.Equals(field))) selectedFields.Add(field);
+                    if (!GetMyWorkParams.SelectedFields.Exists(f => f.Equals(field))) GetMyWorkParams.SelectedFields.Add(field);
                 }
             }
             catch (APIException)
@@ -1909,8 +1902,6 @@ namespace EPMLiveCore.API
         /// <param name="workspaces">The workspaces.</param>
         /// <param name="result">The result.</param>
         private static void ProcessMyWork(DataTable dataTable, SPSite spSite, SPWeb spWeb,
-            IEnumerable<string> selectedFields, Dictionary<string, SPField> fieldTypes,
-            Dictionary<string, string> workTypes, Dictionary<string, string> workspaces,
             ref XDocument result)
         {
             try
@@ -1927,7 +1918,7 @@ namespace EPMLiveCore.API
 
                     var fieldsElement = new XElement("Fields");
 
-                    foreach (string selectedField in selectedFields)
+                    foreach (string selectedField in GetMyWorkParams.SelectedFields)
                     {
                         string value = row[selectedField] == null || row[selectedField] == DBNull.Value
                             ? string.Empty
@@ -1948,7 +1939,7 @@ namespace EPMLiveCore.API
                         string type;
                         string format;
 
-                        GetTypeAndFormat(fieldTypes, selectedField, out type, out format);
+                        GetTypeAndFormat(GetMyWorkParams.FieldTypes, selectedField, out type, out format);
 
                         if (type == "Boolean")
                         {
@@ -1972,13 +1963,13 @@ namespace EPMLiveCore.API
                     itemElement.Add(new XAttribute("SiteID", siteId.ToString().ToUpper()));
                     itemElement.Add(new XAttribute("SiteURL", siteUrl));
 
-                    if (!workTypes.ContainsKey(uniqueId))
-                        workTypes.Add(uniqueId, GetListNameFromDb(new Guid(listId), new Guid(webId), spWeb));
-                    itemElement.Add(new XAttribute(WORK_TYPE_FIELD, workTypes[uniqueId]));
+                    if (!GetMyWorkParams.WorkTypes.ContainsKey(uniqueId))
+                        GetMyWorkParams.WorkTypes.Add(uniqueId, GetListNameFromDb(new Guid(listId), new Guid(webId), spWeb));
+                    itemElement.Add(new XAttribute(WORK_TYPE_FIELD, GetMyWorkParams.WorkTypes[uniqueId]));
 
-                    if (!workspaces.ContainsKey(uniqueId))
-                        workspaces.Add(uniqueId, GetWorkspaceNameFromDb(new Guid(webId), siteUrl));
-                    itemElement.Add(new XAttribute("Workspace", workspaces[uniqueId]));
+                    if (!GetMyWorkParams.WorkSpaces.ContainsKey(uniqueId))
+                        GetMyWorkParams.WorkSpaces.Add(uniqueId, GetWorkspaceNameFromDb(new Guid(webId), siteUrl));
+                    itemElement.Add(new XAttribute("Workspace", GetMyWorkParams.WorkSpaces[uniqueId]));
 
                     itemElement.Add(fieldsElement);
 
@@ -2300,150 +2291,6 @@ namespace EPMLiveCore.API
         }
 
         /// <summary>
-        ///     Gets my work.
-        /// </summary>
-        /// <param name="data">The data.</param>
-        /// <returns></returns>
-        internal static string GetMyWork(string data)
-        {
-            try
-            {
-                var result = new XDocument();
-                result.Add(new XElement("MyWork"));
-
-                string theQuery = GetQuery(data);
-                string query = !string.IsNullOrEmpty(theQuery)
-                    ? string.Format(
-                        @"<Where><And>{0}<Eq><FieldRef Name='{1}'/><Value Type='Integer'><UserID/></Value></Eq></And></Where>",
-                        theQuery, ASSIGNED_TO_FIELD)
-                    : string.Format(
-                        @"<Where><Eq><FieldRef Name='{0}'/><Value Type='Integer'><UserID/></Value></Eq></Where>",
-                        ASSIGNED_TO_FIELD);
-
-                var selectedLists = new List<string>();
-                var selectedFields = new List<string>();
-                var siteUrls = new List<string>();
-                bool performanceMode = true;
-                bool noListsSelected = true;
-
-                GetSettings(data, ref selectedFields, ref selectedLists, ref siteUrls, ref performanceMode,
-                    ref noListsSelected);
-
-                bool processFlag = false;
-
-                foreach (string siteUrl in siteUrls)
-                {
-                    using (var spSite = new SPSite(siteUrl))
-                    {
-                        using (SPWeb spWeb = spSite.OpenWeb())
-                        {
-                            Dictionary<string, SPField> fieldTypes = Utils.GetFieldTypes();
-
-                            var workTypes = new Dictionary<string, string>();
-                            var workSpaces = new Dictionary<string, string>();
-
-                            List<Guid> archivedWebs = GetArchivedWebs(spWeb.Site.ID);
-
-                            if (!performanceMode)
-                            {
-                                GetDataFromLists(result, fieldTypes, query, spSite, spWeb, selectedFields,
-                                    selectedLists);
-                            }
-                            else
-                            {
-                                if (ShouldUseReportingDb(spWeb))
-                                {
-                                    IEnumerable<DataTable> dataTables = GetDataFromReportingDB(workTypes,
-                                        selectedFields,
-                                        archivedWebs,
-                                        spWeb, selectedLists,
-                                        data);
-
-                                    if (dataTables != null)
-                                    {
-                                        foreach (DataTable dataTable in dataTables)
-                                        {
-                                            ProcessMyWork(dataTable, spSite, spWeb, selectedFields, fieldTypes,
-                                                workTypes, workSpaces, ref result);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        var dataQuery = new SPSiteDataQuery
-                                        {
-                                            Webs = @"<Webs Scope='Recursive'>",
-                                            Query = query,
-                                            QueryThrottleMode = SPQueryThrottleOption.Override
-                                        };
-
-                                        foreach (string selectedField in selectedFields)
-                                        {
-                                            dataQuery.ViewFields += string.Format(
-                                                @"<FieldRef Name='{0}' Nullable='TRUE'/>", selectedField);
-                                        }
-
-                                        foreach (string field in new[] { COMPLETED_FIELD, WORKING_ON_FIELD }
-                                            .Where(field => !selectedFields.Exists(f => f.Equals(field))))
-                                        {
-                                            dataQuery.ViewFields +=
-                                                string.Format("<FieldRef Name='{0}' Nullable='TRUE'/>", field);
-                                        }
-
-                                        var selectedListIds = new List<string>();
-
-                                        if (!noListsSelected)
-                                        {
-                                            processFlag = true;
-                                            IEnumerable<DataTable> dataTables = GetDataFromSP(selectedListIds,
-                                                dataQuery,
-                                                spWeb, spSite,
-                                                archivedWebs,
-                                                selectedLists);
-
-                                            if (dataTables != null)
-                                            {
-                                                foreach (DataTable dataTable in dataTables)
-                                                {
-                                                    ProcessMyWork(dataTable, spSite, spWeb, selectedFields,
-                                                        fieldTypes,
-                                                        workTypes, workSpaces, ref result);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    catch (APIException)
-                                    {
-                                        throw;
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        throw new APIException(2014,
-                                            "Unable to retrieve My Work data from My Work lists.");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                result.Root.Add(new XElement("Params", new XElement("ProcessFlag", processFlag)));
-
-                return result.ToString();
-            }
-            catch (APIException)
-            {
-                throw;
-            }
-            catch (Exception e)
-            {
-                throw new APIException(2000, e.Message);
-            }
-        }
-
-        /// <summary>
         ///     Gets the type of my work field.
         /// </summary>
         /// <param name="myWorkField">My work field.</param>
@@ -2559,15 +2406,8 @@ namespace EPMLiveCore.API
                 result.Add(new XElement("Grid"));
 
                 XElement grid = result.Element("Grid");
-
-                var selectedLists = new List<string>();
-                var selectedFields = new List<string>();
-                var siteUrls = new List<string>();
-                bool performanceMode = true;
-                bool noListSelected = true;
-
-                GetSettings(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data)), ref selectedFields, ref selectedLists,
-                    ref siteUrls, ref performanceMode, ref noListSelected);
+                
+                GetSettings(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data)));
 
                 grid.Add(new XElement("Body"));
                 grid.Element("Body").Add(new XElement("B"));
@@ -2780,22 +2620,15 @@ namespace EPMLiveCore.API
             {
                 SPWeb spWeb = SPContext.Current.Web;
 
-                var selectedLists = new List<string>();
-                var selectedFields = new List<string>();
-                var siteUrls = new List<string>();
-                bool performanceMode = true;
-                bool noListSelected = true;
-
                 data = HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data));
 
-                GetSettings(data, ref selectedFields, ref selectedLists, ref siteUrls, ref performanceMode,
-                    ref noListSelected);
+                GetSettings(data);
 
                 var fields = new List<MyWorkField>();
 
-                foreach (string field in selectedFields.Where(field => !fields.Exists(f => f.Name.Equals(field))))
+                foreach (string field in GetMyWorkParams.SelectedFields.Where(field => !fields.Exists(f => f.Name.Equals(field))))
                 {
-                    fields.Add(new MyWorkField { Name = field, DisplayName = field.ToPrettierName(selectedLists, spWeb) });
+                    fields.Add(new MyWorkField { Name = field, DisplayName = field.ToPrettierName(GetMyWorkParams.SelectedLists, spWeb) });
                 }
 
                 XDocument result = XDocument.Parse(Resources.MyWorkGridLayout);

@@ -535,12 +535,12 @@ namespace EPMLiveCore.Tests.API.MyWork
 
             var inputElement = new XDocument();
             inputElement.Add(new XElement(myWorkString));
-            var selectedFields = new List<string>()
+            GetMyWorkParams.SelectedFields = new List<string>()
             {
                 selectedField
             };
-            var workTypes = new Dictionary<string, string>();
-            var workspaces = new Dictionary<string, string>();
+            GetMyWorkParams.WorkTypes = new Dictionary<string, string>();
+            GetMyWorkParams.WorkSpaces = new Dictionary<string, string>();
             var actual = new XElement(selectedField);
             var actualCount = 0;
 
@@ -585,7 +585,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             privateObj.Invoke(
                 ProcessMyWorkMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
-                new object[] { dTable, spSite.Instance, spWeb.Instance, selectedFields, null, workTypes, workspaces, inputElement });
+                new object[] { dTable, spSite.Instance, spWeb.Instance, inputElement });
 
             // Assert
             actual.ShouldSatisfyAllConditions(
@@ -906,20 +906,22 @@ namespace EPMLiveCore.Tests.API.MyWork
             var archivedWebs = new List<Guid>();
             var fieldTypes = new Dictionary<string, SPField>();
             var methodEntered = false;
+            GetMyWorkParams.SiteUrls = new List<string>();
+            GetMyWorkParams.PerformanceMode = true;
 
             ShimUtils.GetFieldTypes = () => fieldTypes;
             ShimMyWork.GetArchivedWebsGuid = _ => archivedWebs;
             ShimMyWork.GetQueryString = _ => string.Empty;
-            ShimMyWork.GetDataFromListsXDocumentDictionaryOfStringSPFieldStringSPSiteSPWebListOfStringListOfString = (_, _1, _2, _3, _4, _5, _6) =>
+            ShimMyWork.GetDataFromListsXDocumentStringSPSiteSPWeb = (_, _1, _2, _3) =>
             {
                 methodEntered = true;
             };
-            ShimMyWork.GetSettingsStringListOfStringRefListOfStringRefListOfStringRefBooleanRefBooleanRef =
-                (string data, ref List<string> selectedFields, ref List<string> selectedLists,
-                ref List<string> siteUrls, ref bool performanceMode, ref bool noListsSelected) =>
+
+            ShimMyWork.GetSettingsString =
+                (string data) =>
                 {
-                    siteUrls.Add(siteUrl);
-                    performanceMode = false;
+                    GetMyWorkParams.SiteUrls.Add(siteUrl);
+                    GetMyWorkParams.PerformanceMode = false;
                 };
 
             // Act
@@ -943,30 +945,30 @@ namespace EPMLiveCore.Tests.API.MyWork
             var archivedWebs = new List<Guid>();
             var fieldTypes = new Dictionary<string, SPField>();
             var methodEntered = false;
+            GetMyWorkParams.SiteUrls = new List<string>();
+            GetMyWorkParams.PerformanceMode = true;
 
             ShimUtils.GetFieldTypes = () => fieldTypes;
             ShimMyWork.GetArchivedWebsGuid = _ => archivedWebs;
             ShimMyWork.GetQueryString = _ => string.Empty;
             ShimMyWork.ShouldUseReportingDbSPWeb = _ => true;
-            ShimMyWork.GetDataFromReportingDBDictionaryOfStringStringIEnumerableOfStringListOfGuidSPWebListOfStringString =
-                (_, _1, _2, _3, _4, _5) => new List<DataTable>()
+            ShimMyWork.GetDataFromReportingDbSPWebString =
+                (_, _1) => new List<DataTable>()
                 {
                     new DataTable()
                 };
-            ShimMyWork.ProcessMyWorkDataTableSPSiteSPWebIEnumerableOfStringDictionaryOfStringSPFieldDictionaryOfStringStringDictionaryOfStringStringXDocumentRef =
+            ShimMyWork.ProcessMyWorkDataTableSPSiteSPWebXDocumentRef =
                 (DataTable dataTable, SPSite spSite, SPWeb spWeb,
-                IEnumerable<string> selectedFields, Dictionary<string,
-                SPField> fieldTypesParam, Dictionary<string, string> workTypes,
-                Dictionary<string, string> workspaces, ref XDocument result) =>
+                 ref XDocument result) =>
                 {
                     methodEntered = true;
                 };
-            ShimMyWork.GetSettingsStringListOfStringRefListOfStringRefListOfStringRefBooleanRefBooleanRef =
-                (string data, ref List<string> selectedFields, ref List<string> selectedLists,
-                ref List<string> siteUrls, ref bool performanceMode, ref bool noListsSelected) =>
+            
+            ShimMyWork.GetSettingsString =
+                (string data) =>
                 {
-                    siteUrls.Add(siteUrl);
-                    performanceMode = true;
+                    GetMyWorkParams.SiteUrls.Add(siteUrl);
+                    GetMyWorkParams.PerformanceMode = true;
                 };
 
             // Act
@@ -990,32 +992,36 @@ namespace EPMLiveCore.Tests.API.MyWork
             var archivedWebs = new List<Guid>();
             var fieldTypes = new Dictionary<string, SPField>();
             var methodEntered = false;
+            GetMyWorkParams.SiteUrls = new List<string>();
+            GetMyWorkParams.PerformanceMode = true;
+            GetMyWorkParams.NoListsSelected = true;
+            GetMyWorkParams.SelectedFields = new List<string>();
 
             ShimUtils.GetFieldTypes = () => fieldTypes;
             ShimMyWork.GetArchivedWebsGuid = _ => archivedWebs;
             ShimMyWork.GetQueryString = _ => string.Empty;
             ShimMyWork.ShouldUseReportingDbSPWeb = _ => false;
-            ShimMyWork.GetDataFromSPListOfStringSPSiteDataQuerySPWebSPSiteListOfGuidIEnumerableOfString =
-                (_, _1, _2, _3, _4, _5) => new List<DataTable>()
+            ShimMyWork.GetDataFromSpListOfStringSPSiteDataQuerySPWebSPSite =
+                (_, _1, _2, _3) => new List<DataTable>()
                 {
                     new DataTable()
                 };
-            ShimMyWork.ProcessMyWorkDataTableSPSiteSPWebIEnumerableOfStringDictionaryOfStringSPFieldDictionaryOfStringStringDictionaryOfStringStringXDocumentRef =
+
+
+
+            ShimMyWork.ProcessMyWorkDataTableSPSiteSPWebXDocumentRef =
                 (DataTable dataTable, SPSite spSite, SPWeb spWeb,
-                IEnumerable<string> selectedFields, Dictionary<string,
-                SPField> fieldTypesParam, Dictionary<string, string> workTypes,
-                Dictionary<string, string> workspaces, ref XDocument result) =>
+                ref XDocument result) =>
                 {
                     methodEntered = true;
                 };
-            ShimMyWork.GetSettingsStringListOfStringRefListOfStringRefListOfStringRefBooleanRefBooleanRef =
-                (string data, ref List<string> selectedFields, ref List<string> selectedLists,
-                ref List<string> siteUrls, ref bool performanceMode, ref bool noListsSelected) =>
+            ShimMyWork.GetSettingsString =
+                (string data) =>
                 {
-                    siteUrls.Add(siteUrl);
-                    performanceMode = true;
-                    noListsSelected = false;
-                    selectedFields.Add(ListIdColumn);
+                    GetMyWorkParams.SiteUrls.Add(siteUrl);
+                    GetMyWorkParams.PerformanceMode = true;
+                    GetMyWorkParams.NoListsSelected = false;
+                    GetMyWorkParams.SelectedFields.Add(ListIdColumn);
                 };
 
             // Act
