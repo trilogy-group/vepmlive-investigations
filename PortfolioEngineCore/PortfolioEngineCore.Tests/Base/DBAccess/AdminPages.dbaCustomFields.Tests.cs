@@ -960,6 +960,7 @@ namespace PortfolioEngineCore.Tests.Base
             };
             CustomReply = string.Empty;
             ShimEPKClass01.GetTableAndFieldInt32Int32StringOutStringOut = GetTableAndFieldTrue;
+
             // Act
             var result = dbaCustomFields.DeleteCustomField(dbAccess, 1, out reply);
 
@@ -1001,6 +1002,7 @@ namespace PortfolioEngineCore.Tests.Base
             };
             CustomReply = string.Empty;
             ShimEPKClass01.GetTableAndFieldInt32Int32StringOutStringOut = GetTableAndFieldTrue;
+
             // Act
             var result = dbaCustomFields.DeleteCustomField(dbAccess, 1, out reply);
 
@@ -1042,6 +1044,7 @@ namespace PortfolioEngineCore.Tests.Base
             };
             CustomReply = string.Empty;
             ShimEPKClass01.GetTableAndFieldInt32Int32StringOutStringOut = GetTableAndFieldTrue;
+
             // Act
             var result = dbaCustomFields.DeleteCustomField(dbAccess, 1, out reply);
 
@@ -1174,6 +1177,7 @@ namespace PortfolioEngineCore.Tests.Base
             // Arrange
             var reply = string.Empty;
             var fieldId = 0;
+            var count = 0;
             const string ExpectedCommand = "INSERT Into EPGC_FIELD_ATTRIBS " + 
                 " (FA_NAME,FA_DESC,FA_FORMAT,FA_TABLE_ID,FA_FIELD_IN_TABLE)" + 
                 " Values(@pNAME,@pDESC,@pFORMAT,@pTABLE,@pFIELD)";
@@ -1203,7 +1207,6 @@ namespace PortfolioEngineCore.Tests.Base
                 CommandText = command.CommandText;
                 return 1;
             };
-            var count = 0;
             ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
             {
                 Read = () => ++count <= 1,
