@@ -183,7 +183,7 @@ export class CommonPageHelper {
         for (let index = 0; index < columnText.length; index++) {
             columnXpaths.push(`td[normalize-space(.)='${columnText[index]}']`);
         }
-        const xpath = `//tr[contains(@class,'GMClassSelected')][${columnXpaths.join(CommonPageConstants.and)}]`;
+        const xpath = `//tr[${columnXpaths.join(CommonPageConstants.and)}]`;
         return element(By.xpath(xpath));
     }
 
@@ -340,6 +340,34 @@ export class CommonPageHelper {
         StepLogger.step('Select "Edit Item" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editItem);
 
+    }
+
+    static async editViaItems() {
+        StepLogger.stepId(3);
+        StepLogger.step('Select the check box for record');
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dataRows.get(1));
+        await ElementHelper.actionHoverOver(CommonPage.dataRows.get(1));
+        await PageHelper.click(CommonPage.rowsFirstColumn.get(1));
+
+        StepLogger.step('Click on ITEMS on ribbon');
+        await PageHelper.click(CommonPage.itemsMenu);
+
+        StepLogger.step('Select "Edit Item" from the options displayed');
+        await PageHelper.click(CommonPage.ribbonItems.editItem);
+    }
+
+    static async viewViaItems() {
+        StepLogger.stepId(2);
+        StepLogger.step('Select the check box for record');
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dataRows.get(1));
+        await ElementHelper.actionHoverOver(CommonPage.dataRows.get(1));
+        await PageHelper.click(CommonPage.rowsFirstColumn.get(1));
+
+        StepLogger.step('Click on ITEMS on ribbon');
+        await PageHelper.click(CommonPage.itemsMenu);
+
+        StepLogger.step('Select "Edit Item" from the options displayed');
+        await PageHelper.click(CommonPage.ribbonItems.viewItem);
     }
 
     static async editCostViaRibbon(item = CommonPage.record) {
@@ -588,9 +616,6 @@ export class CommonPageHelper {
 
         StepLogger.step('Click on OK');
         await PageHelper.click(CommonPage.formButtons.okWithSmallK);
-
-        await PageHelper.switchToDefaultContent();
-
         return newFile;
     }
 
@@ -671,7 +696,7 @@ export class CommonPageHelper {
     }
 
     static getCreateNewPublicViewOfDropDown(publicViewTitle: string) {
-        return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)));
+        return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.span, publicViewTitle, false)));
     }
 
     static async clickLhsSideBarMenuIcon(icon: ElementFinder) {

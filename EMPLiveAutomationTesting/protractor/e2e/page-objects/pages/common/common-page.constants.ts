@@ -351,7 +351,8 @@ export class CommonPageConstants {
 
     static get columnHeader() {
         return {
-            status: 'Status'
+            status: 'Status',
+            title: 'Title'
         };
     }
 
