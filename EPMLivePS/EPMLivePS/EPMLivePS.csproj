@@ -213,9 +213,11 @@
     <Compile Include="Publisher.cs" />
     <Compile Include="Publisher.DoPublish.cs" />
     <Compile Include="Publisher.Fields.cs" />
+    <Compile Include="Publisher.GetMethods.cs" />
     <Compile Include="Publisher.LoadFields.cs" />
     <Compile Include="Publisher.ProcessAssignment.cs" />
     <Compile Include="Publisher.ProcessTask.cs" />
+    <Compile Include="Publisher.PublishProject.cs" />
     <Compile Include="Publisher.PublishTasks.cs" />
     <Compile Include="PublisherEventInstaller.cs" />
     <Compile Include="ResourceEvents.cs" />
