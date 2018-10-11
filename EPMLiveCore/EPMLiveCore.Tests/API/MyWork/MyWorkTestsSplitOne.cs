@@ -658,7 +658,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             ShimMyWork.MapCompleteFieldSPWebMyWorkReportData = (_, __) => { };
             ShimMyWork.GenerateColDictionaryDataTableIEnumerableOfString = (_, __) => columnDictionary;
             ShimMyWork.GetWorkingOnSPWeb = _ => workingTable;
-            ShimMyWork.GetMyWorkFieldValueStringDataRowDictionaryOfStringInt32EnumerableRowCollectionOfDataRowDataTable =
+            ShimMyWork.GetMyWorkFieldValueStringDataRowIDictionaryOfStringInt32EnumerableRowCollectionOfDataRowDataTable =
                 (_, _1, _2, _3, _4) => DummyString;
             ShimMyWorkReportData.AllInstances.ExecuteSqlString = (_, query) =>
             {
