@@ -151,7 +151,7 @@ export class CommonPageHelper {
     }
 
     static getFirstAutoCompleteByLabel(title: string) {
-        return this.getInputByLabel('*[contains(@class,"autocomplete")]//*', title);
+        return this.getInputByLabel('*[contains(@class,"autocomplete")]//*[contains(@class,"autoText")][1]', title);
     }
 
     static getSelectByLabel(title: string) {
