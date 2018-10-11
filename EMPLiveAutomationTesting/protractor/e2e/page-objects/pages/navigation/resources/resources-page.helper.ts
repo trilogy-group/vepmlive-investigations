@@ -175,7 +175,7 @@ export class ResourcesPageHelper {
 
     static async clickOnEllipsis() {
         StepLogger.step('Click on Ellipsis');
-        await WaitHelper.waitForElementToBeDisplayed(ResourcesPage.gridDetails.ellipses.get(0));
+      //  await WaitHelper.waitForElementToBeDisplayed(ResourcesPage.gridDetails.ellipses.get(0));
         await ElementHelper.actionHoverOverAndClick(ResourcesPage.gridDetails.ellipses.get(0),
         ResourcesPage.gridDetails.ellipses.get(0));
     }

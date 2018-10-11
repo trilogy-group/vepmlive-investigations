@@ -487,8 +487,8 @@ export class CommonPageHelper {
 
         await browser.sleep(PageHelper.timeout.xs);
         StepLogger.subStep('Select the Second record');
-        await ElementHelper.actionHoverOver(CommonPage.getNthRecord(3));
-        await PageHelper.click(CommonPage.getNthRecord(3));
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord(2));
+        await PageHelper.click(CommonPage.getNthRecord(2));
         await this.clickItemTab();
     }
 
