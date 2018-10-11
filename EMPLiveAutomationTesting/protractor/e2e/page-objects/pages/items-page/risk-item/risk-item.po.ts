@@ -61,7 +61,15 @@ export class RiskItemPage extends BasePage {
                 ascending: CommonPageHelper.getAscendingColumnSelector(columnHeader.status),
                 descending: CommonPageHelper.getDescendingColumnSelector(columnHeader.status)
             },
+            title: {
+                ascending: CommonPageHelper.getAscendingColumnSelector(columnHeader.title),
+                descending: CommonPageHelper.getDescendingColumnSelector(columnHeader.title)
+            }
         };
+    }
+
+    static get titleHeaderColumn() {
+        return element.all(By.css('tr.GMHeaderRow td[class*=Title]'));
     }
 
 }

@@ -90,8 +90,6 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(RiskItemPageConstants.pageName));
 
-        await PageHelper.switchToDefaultContent();
-
         StepLogger.verification('Notification about New Risks created [Ex: New Risk Item 1] displayed on the Home Page');
 
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getNotificationByText(titleValue)))
@@ -127,7 +125,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         );
 
         // Common functionality to edit any item
-        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.record, CommonPage.contextMenuOptions.editItem);
+        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.dataRows.get(1), CommonPage.contextMenuOptions.editItem);
 
         // Common functionality to edit risk
         await RiskItemPageHelper.editRisk();
@@ -144,7 +142,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.risks,
         );
 
-        await CommonPageHelper.editOptionViaRibbon();
+        await CommonPageHelper.editViaItems();
 
         await RiskItemPageHelper.editRisk();
     });
@@ -168,14 +166,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             RiskItemPageConstants.columnNames.title,
         );
 
-        StepLogger.verification('Click on searched record');
-        await PageHelper.click(CommonPage.record);
-
-        StepLogger.verification('Verify record by title');
-        const firstTableColumns = [titleValue];
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(firstTableColumns)))
-            .toBe(true,
-                ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
+        StepLogger.verification('title of the Risk displayed in the list in "Risks" page');
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
 
         StepLogger.verification('Verify that there should be only one record');
         await expect(await RiskItemPage.riskItems.count())
@@ -198,7 +191,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.waitForElementToBeDisplayed(RiskItemPage.riskItem);
 
         const titleValue = await RiskItemPage.riskItem.getText();
-        await CommonPageHelper.viewOptionViaRibbon();
+        await CommonPageHelper.viewViaItems();
 
         StepLogger.verification('Verify that item is available in View page mode');
         await expect(await CommonPage.contentTitleInViewMode.getText())
@@ -218,7 +211,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         );
 
         // Common functionality to edit any item
-        await CommonPageHelper.viewOptionViaRibbon();
+        await CommonPageHelper.viewViaItems();
 
         // Common functionality to attach file
         const newFile = await CommonPageHelper.attachFile(RiskItemPage.attachmentButton, CommonPage.fileUploadControl);
@@ -296,7 +289,9 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(3);
         StepLogger.step('Click on any column header e.g; Status');
-        await PageHelper.click(RiskItemPage.columnHeaderSelector.status);
+        await WaitHelper.waitForElementToBeDisplayed(RiskItemPage.titleHeaderColumn.first());
+        await ElementHelper.actionHoverOver(RiskItemPage.titleHeaderColumn.first());
+        await ElementHelper.clickUsingJsNoWait(RiskItemPage.titleHeaderColumn.first());
 
         StepLogger.verification('The up arrow will appear against Status' +
             ' and the data in table appears sort by Status ascending from a-z');
@@ -305,7 +300,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(4);
         StepLogger.step('Click on same column header again');
-        await PageHelper.click(RiskItemPage.columnHeaderSelector.status);
+        await ElementHelper.actionHoverOver(RiskItemPage.titleHeaderColumn.first());
+        await ElementHelper.clickUsingJsNoWait(RiskItemPage.titleHeaderColumn.first());
 
         StepLogger.verification('The down arrow will appear against Status' +
             ' and the data in table appears sort by Status ascending from z-a');
