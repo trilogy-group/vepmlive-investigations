@@ -125,6 +125,7 @@
     <Compile Include="Base\DBAccess\CostsTests.cs" />
     <Compile Include="Base\DBAccess\CostValuesTests.cs" />
     <Compile Include="Base\DBAccess\CostTypesTests.cs" />
+    <Compile Include="Base\DBAccess\ModelsTests.cs" />
     <Compile Include="Base\DBAccess\LookupsTests.cs" />
     <Compile Include="Base\dbaCCVTests.cs" />
     <Compile Include="Base\dbaUsersTests.cs" />
