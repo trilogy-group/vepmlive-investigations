@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -40,6 +41,26 @@ namespace EPMLiveEnterprise
         private const int PubTypeOne = 1;
         private const int PubTypeTwo = 2;
         private const int PubTypeThree = 3;
+        private const string DateTimeText = "DATETIME";
+        private const string Duration = "DURATION";
+        private const string NumberText = "NUMBER";
+        private const string DateValue = "DATE_VALUE";
+        private const string DurationValue = "DUR_VALUE";
+        private const string NumberValue = "NUM_VALUE";
+        private const string Currency = "CURRENCY";
+        private const string BooleanText = "BOOLEAN";
+        private const string FlagValue = "FLAG_VALUE";
+        private const string TextId = "TEXT";
+        private const string TextValue = "TEXT_VALUE";
+        private const string Choice = "CHOICE";
+        private const string CodeValue = "CODE_VALUE";
+        private const string FieldCategoryThree = "3";
+        private const string FieldCategoryTwo = "2";
+        private const string FieldCategoryOne = "1";
+        private const string TimeSheetId = "Timesheet";
+        private const string LinkType = "LINK_TYPE";
+        private const string TaskPredecessors = "TASK_PREDECESSORS";
+        private const string TaskResnames = "TASK_RESNAMES";
         private EventLog myLog = new EventLog("EPM Live", ".", "EPM Live Publisher");
         private Guid taskEntity = new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId);
         private bool _disposed;
@@ -974,86 +995,14 @@ namespace EPMLiveEnterprise
                                 DataRow[] drAssn = pDs.AssignmentCustomFields.Select("ASSN_UID='" + assn.ASSN_UID.ToString() + "' AND MD_PROP_UID='" + assnFieldName + "'");
                                 if (drAssn.Length >= 1)
                                 {
-                                    switch (fieldType)
-                                    {
-                                        case "DATETIME":
-                                            fieldData = drAssn[0]["DATE_VALUE"].ToString();
-                                            //fieldData = DateTime.Parse(fieldData).Year.ToString() + "-" + DateTime.Parse(fieldData).Month.ToString() + "-" + DateTime.Parse(fieldData).Day.ToString() + " " + DateTime.Parse(fieldData).Hour.ToString() + ":" + DateTime.Parse(fieldData).Minute.ToString() + ":" + DateTime.Parse(fieldData).Second.ToString();
-                                            break;
-                                        case "DURATION":
-                                            fieldData = drAssn[0]["DUR_VALUE"].ToString();
-                                            try
-                                            {
-                                                fieldData = (float.Parse(fieldData) / 4800.0).ToString();
-                                            }
-                                            catch { }
-                                            break;
-                                        case "NUMBER":
-                                            fieldData = drAssn[0]["NUM_VALUE"].ToString();
-                                            break;
-                                        case "CURRENCY":
-                                            fieldData = drAssn[0]["NUM_VALUE"].ToString();
-                                            try
-                                            {
-                                                fieldData = (float.Parse(fieldData) / 100).ToString();
-                                            }
-                                            catch { }
-                                            break;
-                                        case "BOOLEAN":
-                                            fieldData = drAssn[0]["FLAG_VALUE"].ToString();
-                                            break;
-                                        case "TEXT":
-                                            fieldData = drAssn[0]["TEXT_VALUE"].ToString();
-                                            break;
-                                        case "CHOICE":
-                                            fieldData = drAssn[0]["CODE_VALUE"].ToString();
-                                            fieldData = getLookupValue(fieldName, fieldData);
-                                            break;
-                                    }
-
-                                    //sb.Append("<Field Name='" + wssFieldName + "'>" + fieldData + "</Field>");
+                                    fieldData = GetFieldData(fieldType, drAssn, fieldName);
                                 }
                                 else if (rolldown == "true")
                                 {
                                     DataRow[] drTask = pDs.TaskCustomFields.Select("TASK_UID='" + taskRow.TASK_UID.ToString() + "' AND MD_PROP_ID='" + fieldName + "'");
                                     if (drTask.Length >= 1)
                                     {
-                                        switch (fieldType)
-                                        {
-                                            case "DATETIME":
-                                                fieldData = drTask[0]["DATE_VALUE"].ToString();
-                                                //fieldData = DateTime.Parse(fieldData).Year.ToString() + "-" + DateTime.Parse(fieldData).Month.ToString() + "-" + DateTime.Parse(fieldData).Day.ToString() + " " + DateTime.Parse(fieldData).Hour.ToString() + ":" + DateTime.Parse(fieldData).Minute.ToString() + ":" + DateTime.Parse(fieldData).Second.ToString();
-                                                break;
-                                            case "DURATION":
-                                                fieldData = drTask[0]["DUR_VALUE"].ToString();
-                                                try
-                                                {
-                                                    fieldData = (float.Parse(fieldData) / 4800.0).ToString();
-                                                }
-                                                catch { }
-                                                break;
-                                            case "NUMBER":
-                                                fieldData = drTask[0]["NUM_VALUE"].ToString();
-                                                break;
-                                            case "CURRENCY":
-                                                fieldData = drTask[0]["NUM_VALUE"].ToString();
-                                                try
-                                                {
-                                                    fieldData = (float.Parse(fieldData) / 100).ToString();
-                                                }
-                                                catch { }
-                                                break;
-                                            case "BOOLEAN":
-                                                fieldData = drTask[0]["FLAG_VALUE"].ToString();
-                                                break;
-                                            case "TEXT":
-                                                fieldData = drTask[0]["TEXT_VALUE"].ToString();
-                                                break;
-                                            case "CHOICE":
-                                                fieldData = drTask[0]["CODE_VALUE"].ToString();
-                                                fieldData = getLookupValue(fieldName, fieldData);
-                                                break;
-                                        }
+                                        fieldData = GetFieldData(fieldType, drTask, fieldName);
                                     }
                                 }
                                 listItem[listItem.Fields.GetFieldByInternalName(wssFieldName).Id] = fieldData;
@@ -1063,44 +1012,7 @@ namespace EPMLiveEnterprise
                                 DataRow[] drAssn = pDs.AssignmentCustomFields.Select("ASSN_UID='" + assn.ASSN_UID.ToString() + "' AND MD_PROP_ID='" + assnFieldName + "'");
                                 if (drAssn.Length >= 1)
                                 {
-
-                                    string fieldData = "";
-                                    switch (fieldType)
-                                    {
-                                        case "DATETIME":
-                                            fieldData = drAssn[0]["DATE_VALUE"].ToString();
-                                            //fieldData = DateTime.Parse(fieldData).Year.ToString() + "-" + DateTime.Parse(fieldData).Month.ToString() + "-" + DateTime.Parse(fieldData).Day.ToString() + " " + DateTime.Parse(fieldData).Hour.ToString() + ":" + DateTime.Parse(fieldData).Minute.ToString() + ":" + DateTime.Parse(fieldData).Second.ToString();
-                                            break;
-                                        case "DURATION":
-                                            fieldData = drAssn[0]["DUR_VALUE"].ToString();
-                                            try
-                                            {
-                                                fieldData = (float.Parse(fieldData) / 4800.0).ToString();
-                                            }
-                                            catch { }
-                                            break;
-                                        case "NUMBER":
-                                            fieldData = drAssn[0]["NUM_VALUE"].ToString();
-                                            break;
-                                        case "CURRENCY":
-                                            fieldData = drAssn[0]["NUM_VALUE"].ToString();
-                                            try
-                                            {
-                                                fieldData = (float.Parse(fieldData) / 100).ToString();
-                                            }
-                                            catch { }
-                                            break;
-                                        case "BOOLEAN":
-                                            fieldData = drAssn[0]["FLAG_VALUE"].ToString();
-                                            break;
-                                        case "TEXT":
-                                            fieldData = drAssn[0]["TEXT_VALUE"].ToString();
-                                            break;
-                                        case "CHOICE":
-                                            fieldData = drAssn[0]["CODE_VALUE"].ToString();
-                                            fieldData = getLookupValue(fieldName, fieldData);
-                                            break;
-                                    }
+                                    var fieldData = GetFieldData(fieldType, drAssn, fieldName);
                                     listItem[listItem.Fields.GetFieldByInternalName(wssFieldName).Id] = fieldData;
                                     //sb.Append("<Field Name='" + wssFieldName + "'>" + fieldData + "</Field>");
                                 }
@@ -1109,31 +1021,7 @@ namespace EPMLiveEnterprise
                             {
                                 if (fieldName == "TASK_PREDECESSORS")
                                 {
-                                    string preds = "";
-                                    DataRow[] drPreds = pDs.Dependency.Select("LINK_SUCC_UID='" + taskRow.TASK_UID.ToString() + "'");
-                                    foreach (DataRow drPred in drPreds)
-                                    {
-                                        WebSvcProject.ProjectDataSet.TaskRow[] drTask = (WebSvcProject.ProjectDataSet.TaskRow[])pDs.Task.Select("TASK_UID='" + drPred["LINK_PRED_UID"] + "'");
-                                        if (drTask.Length > 0)
-                                        {
-                                            preds += "," + drTask[0].TASK_ID;
-                                            switch (drPred["LINK_TYPE"].ToString())
-                                            {
-                                                case "0":
-                                                    preds += "FF";
-                                                    break;
-                                                case "2":
-                                                    preds += "SF";
-                                                    break;
-                                                case "3":
-                                                    preds += "SS";
-                                                    break;
-                                            };
-                                        }
-                                    }
-                                    if (preds.Length > 1)
-                                        preds = preds.Substring(1);
-                                    listItem[listItem.Fields.GetFieldByInternalName(wssFieldName).Id] = preds;
+                                    ProcessTaskPredecessors(taskRow, pDs, listItem, wssFieldName);
                                 }
                                 else
                                 {
@@ -1209,44 +1097,7 @@ namespace EPMLiveEnterprise
                         DataRow[] drAssn = pDs.ProjectCustomFields.Select("MD_PROP_ID='" + fieldName + "'");
                         if (drAssn.Length >= 1)
                         {
-
-                            string fieldData = "";
-                            switch (fieldType)
-                            {
-                                case "DATETIME":
-                                    fieldData = drAssn[0]["DATE_VALUE"].ToString();
-                                    fieldData = DateTime.Parse(fieldData).Year.ToString() + "-" + DateTime.Parse(fieldData).Month.ToString() + "-" + DateTime.Parse(fieldData).Day.ToString() + " " + DateTime.Parse(fieldData).Hour.ToString() + ":" + DateTime.Parse(fieldData).Minute.ToString() + ":" + DateTime.Parse(fieldData).Second.ToString();
-                                    break;
-                                case "DURATION":
-                                    fieldData = drAssn[0]["DUR_VALUE"].ToString();
-                                    try
-                                    {
-                                        fieldData = (float.Parse(fieldData) / 4800.0).ToString();
-                                    }
-                                    catch { }
-                                    break;
-                                case "NUMBER":
-                                    fieldData = drAssn[0]["NUM_VALUE"].ToString();
-                                    break;
-                                case "CURRENCY":
-                                    fieldData = drAssn[0]["NUM_VALUE"].ToString();
-                                    try
-                                    {
-                                        fieldData = (float.Parse(fieldData) / 100).ToString();
-                                    }
-                                    catch { }
-                                    break;
-                                case "BOOLEAN":
-                                    fieldData = drAssn[0]["FLAG_VALUE"].ToString();
-                                    break;
-                                case "TEXT":
-                                    fieldData = drAssn[0]["TEXT_VALUE"].ToString();
-                                    break;
-                                case "CHOICE":
-                                    fieldData = drAssn[0]["CODE_VALUE"].ToString();
-                                    fieldData = getLookupValue(fieldName, fieldData);
-                                    break;
-                            }
+                            var fieldData = GetFieldData(fieldType, drAssn, fieldName, true);
                             listItem[listItem.Fields.GetFieldByInternalName(wssFieldName).Id] = fieldData;
                             // sb.Append("<Field Name='" + wssFieldName + "'>" + fieldData + "</Field>");
                         }
@@ -1276,224 +1127,6 @@ namespace EPMLiveEnterprise
             hshTaskHierarchy.Add(taskRow.TASK_UID, hierarchy);
 
             return hierarchy;
-        }
-
-        private void processTask(WebSvcProject.ProjectDataSet.TaskRow taskRow, WebSvcProject.ProjectDataSet pDs, ArrayList arrFToPublish, SPListItem listItem, Hashtable hshFields1, string taskuid, int pubType)
-        {
-            StringBuilder sb = new StringBuilder();
-            try
-            {
-                foreach (string sField in arrFToPublish)
-                {
-                    string[] sFieldSplit = sField.Split('#');
-                    string fieldName = sFieldSplit[0];
-                    string wssFieldName = sFieldSplit[1];
-                    string fieldCategory = sFieldSplit[3];
-                    string fieldType = sFieldSplit[4];
-                    string multiplier = sFieldSplit[5];
-                    string fieldData = null;
-
-                    try
-                    {
-                        if (fieldCategory == "3")
-                        {
-                            DataRow[] drAssn = pDs.TaskCustomFields.Select("TASK_UID='" + taskRow.TASK_UID.ToString() + "' AND MD_PROP_ID='" + fieldName + "'");
-                            if (drAssn.Length >= 1)
-                            {
-                                switch (fieldType)
-                                {
-                                    case "DATETIME":
-                                        fieldData = drAssn[0]["DATE_VALUE"].ToString();
-                                        //fieldData = DateTime.Parse(fieldData).Year.ToString() + "-" + DateTime.Parse(fieldData).Month.ToString() + "-" + DateTime.Parse(fieldData).Day.ToString() + " " + DateTime.Parse(fieldData).Hour.ToString() + ":" + DateTime.Parse(fieldData).Minute.ToString() + ":" + DateTime.Parse(fieldData).Second.ToString();
-                                        break;
-                                    case "DURATION":
-                                        fieldData = drAssn[0]["DUR_VALUE"].ToString();
-                                        try
-                                        {
-                                            fieldData = (float.Parse(fieldData) / 4800.0).ToString();
-                                        }
-                                        catch { }
-                                        break;
-                                    case "NUMBER":
-                                        fieldData = drAssn[0]["NUM_VALUE"].ToString();
-                                        break;
-                                    case "CURRENCY":
-                                        fieldData = drAssn[0]["NUM_VALUE"].ToString();
-                                        try
-                                        {
-                                            fieldData = (float.Parse(fieldData) / 100).ToString();
-                                        }
-                                        catch { }
-                                        break;
-                                    case "BOOLEAN":
-                                        fieldData = drAssn[0]["FLAG_VALUE"].ToString();
-                                        break;
-                                    case "TEXT":
-                                        fieldData = drAssn[0]["TEXT_VALUE"].ToString();
-                                        break;
-                                    case "CHOICE":
-                                        fieldData = drAssn[0]["CODE_VALUE"].ToString();
-                                        fieldData = getLookupValue(fieldName, fieldData);
-                                        break;
-                                }
-                                //listItem[listItem.Fields.GetFieldByInternalName(wssFieldName).Id] = fieldData;
-                                //sb.Append("<Field Name='" + wssFieldName + "'>" + fieldData + "</Field>");
-                            }
-                            listItem[listItem.Fields.GetFieldByInternalName(wssFieldName).Id] = fieldData;
-                        }
-                        else if (fieldCategory == "2")
-                        {
-                            DataRow[] drAssn = pDs.TaskCustomFields.Select("TASK_UID='" + taskRow.TASK_UID.ToString() + "' AND MD_PROP_ID='" + fieldName + "'");
-                            if (drAssn.Length >= 1)
-                            {
-
-                                switch (fieldType)
-                                {
-                                    case "DATETIME":
-                                        fieldData = drAssn[0]["DATE_VALUE"].ToString();
-                                        fieldData = DateTime.Parse(fieldData).Year.ToString() + "-" + DateTime.Parse(fieldData).Month.ToString() + "-" + DateTime.Parse(fieldData).Day.ToString() + " " + DateTime.Parse(fieldData).Hour.ToString() + ":" + DateTime.Parse(fieldData).Minute.ToString() + ":" + DateTime.Parse(fieldData).Second.ToString();
-                                        break;
-                                    case "DURATION":
-                                        fieldData = drAssn[0]["DUR_VALUE"].ToString();
-                                        try
-                                        {
-                                            fieldData = (float.Parse(fieldData) / 4800.0).ToString();
-                                        }
-                                        catch { }
-                                        break;
-                                    case "NUMBER":
-                                        fieldData = drAssn[0]["NUM_VALUE"].ToString();
-                                        break;
-                                    case "CURRENCY":
-                                        fieldData = drAssn[0]["NUM_VALUE"].ToString();
-                                        try
-                                        {
-                                            fieldData = (float.Parse(fieldData) / 100).ToString();
-                                        }
-                                        catch { }
-                                        break;
-                                    case "BOOLEAN":
-                                        fieldData = drAssn[0]["FLAG_VALUE"].ToString();
-                                        break;
-                                    case "TEXT":
-                                        fieldData = drAssn[0]["TEXT_VALUE"].ToString();
-                                        break;
-                                    case "CHOICE":
-                                        fieldData = drAssn[0]["CODE_VALUE"].ToString();
-                                        fieldData = getLookupValue(fieldName, fieldData);
-                                        break;
-                                }
-                                listItem[listItem.Fields.GetFieldByInternalName(wssFieldName).Id] = fieldData;
-                                //sb.Append("<Field Name='" + wssFieldName + "'>" + fieldData + "</Field>");
-                            }
-                        }
-                        else if (fieldCategory == "1")
-                        {
-                            if (fieldName == "TASK_RESNAMES")
-                            {
-
-                            }
-                            else if (fieldName == "TASK_PREDECESSORS")
-                            {
-                                string preds = "";
-                                DataRow[] drPreds = pDs.Dependency.Select("LINK_SUCC_UID='" + taskRow.TASK_UID.ToString() + "'");
-                                foreach (DataRow drPred in drPreds)
-                                {
-                                    WebSvcProject.ProjectDataSet.TaskRow[] drTask = (WebSvcProject.ProjectDataSet.TaskRow[])pDs.Task.Select("TASK_UID='" + drPred["LINK_PRED_UID"] + "'");
-                                    if (drTask.Length > 0)
-                                    {
-                                        preds += "," + drTask[0].TASK_ID;
-
-                                        switch (drPred["LINK_TYPE"].ToString())
-                                        {
-                                            case "0":
-                                                preds += "FF";
-                                                break;
-                                            case "2":
-                                                preds += "SF";
-                                                break;
-                                            case "3":
-                                                preds += "SS";
-                                                break;
-                                        };
-                                    }
-                                }
-                                if (preds.Length > 1)
-                                    preds = preds.Substring(1);
-                                listItem[listItem.Fields.GetFieldByInternalName(wssFieldName).Id] = preds;
-                            }
-                            else
-                            {
-                                try
-                                {
-                                    fieldData = taskRow[fieldName].ToString();
-                                }
-                                catch
-                                {
-
-                                }
-                                if (fieldType == "DATETIME")
-                                {
-                                    if (fieldData.Trim() != "")
-                                    {
-                                        //fieldData = .ToString("Z");
-
-                                        listItem[listItem.Fields.GetFieldByInternalName(wssFieldName).Id] = DateTime.Parse(fieldData);
-                                    }
-                                    else
-                                        listItem[listItem.Fields.GetFieldByInternalName(wssFieldName).Id] = null;
-                                    //sb.Append("<Field Name='" + wssFieldName + "'>" + DateTime.Parse(fieldData).Year.ToString() + "-" + DateTime.Parse(fieldData).Month.ToString() + "-" + DateTime.Parse(fieldData).Day.ToString() + " " + DateTime.Parse(fieldData).Hour.ToString() + ":" + DateTime.Parse(fieldData).Minute.ToString() + ":" + DateTime.Parse(fieldData).Second.ToString() + "</Field>");
-                                }
-                                else
-                                {
-                                    if (multiplier != "1")
-                                    {
-                                        fieldData = multiplyField(fieldData, multiplier);
-                                    }
-                                    listItem[listItem.Fields.GetFieldByInternalName(wssFieldName).Id] = fieldData;
-                                    //sb.Append("<Field Name='" + wssFieldName + "'>" + fieldData + "</Field>");
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        myLog.WriteEntry("Error setting field (" + fieldName + ") fieldValue (" + fieldData + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 335);
-                    }
-                }
-                if (taskuid != "")
-                    listItem["taskuid"] = taskuid;
-
-                if (strTimesheetField != "")
-                {
-                    if (listItem.Fields.ContainsField("Timesheet"))
-                    {
-                        if (pubType == 1)
-                        {
-                            listItem["Timesheet"] = 0;
-                        }
-                        else
-                        {
-                            DataRow[] drAssn = pDs.TaskCustomFields.Select("TASK_UID='" + taskRow.TASK_UID.ToString() + "' AND MD_PROP_UID='" + strTimesheetField + "'");
-                            if (drAssn.Length > 0)
-                                listItem["Timesheet"] = drAssn[0]["FLAG_VALUE"].ToString();
-                            else
-                                listItem["Timesheet"] = 0;
-                        }
-                    }
-                }
-                listItem.Update();
-            }
-            catch (SPException ex1)
-            {
-                myLog.WriteEntry("SPException: Error processing Task (" + taskRow.TASK_NAME + "): " + ex1.Message + ex1.StackTrace, EventLogEntryType.Error, 331);
-            }
-            catch (Exception ex)
-            {
-                myLog.WriteEntry("Error processing Task (" + taskRow.TASK_NAME + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 330);
-            }
-            
-            //return sb.ToString();
         }
 
         private int getResourceWssId(Guid RES_GUID)
