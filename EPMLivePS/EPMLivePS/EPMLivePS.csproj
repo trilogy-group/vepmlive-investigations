@@ -211,6 +211,8 @@
     <Compile Include="OnPublish.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Publisher.cs" />
+    <Compile Include="Publisher.DoPublish.cs" />
+    <Compile Include="Publisher.Fields.cs" />
     <Compile Include="Publisher.LoadFields.cs" />
     <Compile Include="Publisher.ProcessAssignment.cs" />
     <Compile Include="Publisher.ProcessTask.cs" />
