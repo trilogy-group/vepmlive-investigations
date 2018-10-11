@@ -61,6 +61,8 @@ namespace EPMLiveEnterprise
         private const string LinkType = "LINK_TYPE";
         private const string TaskPredecessors = "TASK_PREDECESSORS";
         private const string TaskResnames = "TASK_RESNAMES";
+        private const string TaskPctComp = "TASK_PCT_COMP";
+        private const string PercentComplete = "PercentComplete";
         private EventLog myLog = new EventLog("EPM Live", ".", "EPM Live Publisher");
         private Guid taskEntity = new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId);
         private bool _disposed;
@@ -935,146 +937,6 @@ namespace EPMLiveEnterprise
             }
             catch { }
             return fieldVal;
-        }
-
-        private void processAssignment(WebSvcProject.ProjectDataSet.AssignmentRow assn, WebSvcProject.ProjectDataSet pDs, SPListItem listItem)
-        {
-            
-
-            //StringBuilder sb = new StringBuilder();
-            WebSvcProject.ProjectDataSet.TaskRow taskRow = (WebSvcProject.ProjectDataSet.TaskRow)pDs.Task.Select("TASK_UID='" + assn.TASK_UID + "'")[0];
-
-            try
-            {
-
-                DateTime lp = DateTime.Now;
-                listItem[listItem.Fields.GetFieldByInternalName("TaskHierarchy").Id] = getHierarchy(pDs, taskRow.TASK_PARENT_UID);
-                listItem[listItem.Fields.GetFieldByInternalName("IsAssignment").Id] = "1";
-                listItem[listItem.Fields.GetFieldByInternalName("Title").Id] = taskRow.TASK_NAME;
-                listItem[listItem.Fields.GetFieldByInternalName("WBS").Id] = taskRow.TASK_WBS;
-                listItem[listItem.Fields.GetFieldByInternalName("taskuid").Id] = taskRow.TASK_UID + "." + assn.ASSN_UID;
-                listItem[listItem.Fields.GetFieldByInternalName("taskorder").Id] = taskRow.TASK_ID;
-                if (!assn.IsASSN_NOTESNull())
-                    listItem[listItem.Fields.GetFieldByInternalName("Notes").Id] = assn.ASSN_NOTES;
-                listItem[listItem.Fields.GetFieldByInternalName("LastPublished").Id] = DateTime.Now; //lp.Year.ToString() + "-" + lp.Month.ToString() + "-" + lp.Day.ToString() + " " + lp.Hour.ToString() + ":" + lp.Minute.ToString() + ":" + lp.Second.ToString();
-                int resId = getResourceWssId(assn.RES_UID_OWNER);
-                if (resId != 0)
-                    listItem[listItem.Fields.GetFieldByInternalName("AssignedTo").Id] = resId;
-                listItem["Summary"] = taskRow.TASK_IS_SUMMARY.ToString();
-
-                foreach (string sField in arrFieldsToPublish)
-                {
-                    
-                        string[] sFieldSplit = sField.Split('#');
-                        string fieldName = sFieldSplit[0];
-                        string wssFieldName = sFieldSplit[1];
-                        string assnFieldName = sFieldSplit[2];
-                        string fieldCategory = sFieldSplit[3];
-                        string fieldType = sFieldSplit[4];
-                        string multiplier = sFieldSplit[5];
-                        string rolldown = sFieldSplit[7];
-                    try
-                    {
-                        if (fieldName == "TASK_RESNAMES")
-                        {
-                            listItem[listItem.Fields.GetFieldByInternalName("ResourceNames").Id] = getResourceName(assn.RES_UID, pDs);
-                        }
-                        else if (fieldName == "TASK_PCT_COMP")
-                        {
-
-                            float pct = assn.ASSN_PCT_WORK_COMPLETE;
-                            pct = pct / (float)100.00;
-                            listItem[listItem.Fields.GetFieldByInternalName("PercentComplete").Id] = pct;
-                            //sb.Append("<Field Name='" + wssFieldName + "'>" + pct + "</Field>");
-                        }
-                        else
-                        {
-                            if (fieldCategory == "3")
-                            {
-                                string fieldData = null;
-                                DataRow[] drAssn = pDs.AssignmentCustomFields.Select("ASSN_UID='" + assn.ASSN_UID.ToString() + "' AND MD_PROP_UID='" + assnFieldName + "'");
-                                if (drAssn.Length >= 1)
-                                {
-                                    fieldData = GetFieldData(fieldType, drAssn, fieldName);
-                                }
-                                else if (rolldown == "true")
-                                {
-                                    DataRow[] drTask = pDs.TaskCustomFields.Select("TASK_UID='" + taskRow.TASK_UID.ToString() + "' AND MD_PROP_ID='" + fieldName + "'");
-                                    if (drTask.Length >= 1)
-                                    {
-                                        fieldData = GetFieldData(fieldType, drTask, fieldName);
-                                    }
-                                }
-                                listItem[listItem.Fields.GetFieldByInternalName(wssFieldName).Id] = fieldData;
-                            }
-                            else if (fieldCategory == "2")
-                            {
-                                DataRow[] drAssn = pDs.AssignmentCustomFields.Select("ASSN_UID='" + assn.ASSN_UID.ToString() + "' AND MD_PROP_ID='" + assnFieldName + "'");
-                                if (drAssn.Length >= 1)
-                                {
-                                    var fieldData = GetFieldData(fieldType, drAssn, fieldName);
-                                    listItem[listItem.Fields.GetFieldByInternalName(wssFieldName).Id] = fieldData;
-                                    //sb.Append("<Field Name='" + wssFieldName + "'>" + fieldData + "</Field>");
-                                }
-                            }
-                            else if (fieldCategory == "1")
-                            {
-                                if (fieldName == "TASK_PREDECESSORS")
-                                {
-                                    ProcessTaskPredecessors(taskRow, pDs, listItem, wssFieldName);
-                                }
-                                else
-                                {
-                                    string fieldData = "";
-                                    try
-                                    {
-                                        fieldData = assn[assnFieldName].ToString();
-                                    }
-                                    catch
-                                    {
-                                        fieldData = taskRow[fieldName].ToString();
-                                    }
-                                    if (fieldType == "DATETIME")
-                                    {
-                                        if (fieldData.Trim() != "")
-                                            listItem[listItem.Fields.GetFieldByInternalName(wssFieldName).Id] = fieldData;
-                                    }
-                                    else
-                                    {
-                                        if (multiplier != "1")
-                                        {
-                                            fieldData = multiplyField(fieldData, multiplier);
-                                        }
-                                        listItem[listItem.Fields.GetFieldByInternalName(wssFieldName).Id] = fieldData;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        myLog.WriteEntry("Error processing Assignment (" + taskRow.TASK_NAME + ") Field (" + fieldName + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 330);
-                    }
-                }
-                if (strTimesheetField != "")
-                {
-                    if (listItem.Fields.ContainsField("Timesheet"))
-                    {
-                        DataRow[] drAssn = pDs.TaskCustomFields.Select("TASK_UID='" + taskRow.TASK_UID.ToString() + "' AND MD_PROP_UID='" + strTimesheetField + "'");
-                        if (drAssn.Length > 0)
-                            listItem["Timesheet"] = drAssn[0]["FLAG_VALUE"].ToString();
-                        else
-                            listItem["Timesheet"] = 0;
-                    }
-                }
-                listItem.Update();
-            }
-            catch (Exception ex)
-            {
-                myLog.WriteEntry("Error processing Assignment (" + taskRow.TASK_NAME + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 330);
-
-            }
-            //return sb.ToString();
         }
 
         private void processProjectCenterFields(WebSvcProject.ProjectDataSet pDs, ArrayList arrFToPublish, ref SPListItem listItem)
