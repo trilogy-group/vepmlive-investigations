@@ -50,7 +50,7 @@ export class ResourcesPage extends BasePage {
 
     static get resources() {
         return {
-            resources: element.all(By.xpath('//*[contains(@class,"GMDataRow")]//td[contains(@class,"GMNoRight GMNoLeft")]')),
+            resources: element.all(By.css('.GMDataRow .GMNoRight.GMNoLeft')),
         };
     }
 
