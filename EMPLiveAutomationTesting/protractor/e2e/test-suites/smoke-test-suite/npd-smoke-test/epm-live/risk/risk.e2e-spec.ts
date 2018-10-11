@@ -295,8 +295,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.verification('The up arrow will appear against Status' +
             ' and the data in table appears sort by Status ascending from a-z');
-        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.title.descending)).toBe(
-            true, ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.sortingOrder.descending));
+        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.status.descending))
+        .toBe(true, ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.sortingOrder.descending));
 
         StepLogger.stepId(4);
         StepLogger.step('Click on same column header again');
@@ -305,7 +305,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.verification('The down arrow will appear against Status' +
             ' and the data in table appears sort by Status ascending from z-a');
-        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.title.ascending)).toBe(
-            true, ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.sortingOrder.ascending));
+        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.status.ascending))
+        .toBe(true, ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.sortingOrder.ascending));
     });
 });

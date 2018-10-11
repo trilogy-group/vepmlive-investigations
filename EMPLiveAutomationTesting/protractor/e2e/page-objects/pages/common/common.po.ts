@@ -1,13 +1,13 @@
-import {browser, By, element} from 'protractor';
-import {BasePage} from '../base-page';
-import {CommonPageConstants} from './common-page.constants';
-import {CommonPageHelper} from './common-page.helper';
-import {ButtonHelper} from '../../../components/html/button-helper';
-import {HtmlHelper} from '../../../components/misc-utils/html-helper';
-import {AnchorHelper} from '../../../components/html/anchor-helper';
-import {RiskItemPageConstants} from '../items-page/risk-item/risk-item-page.constants';
-import {TextComponentSelectors} from '../../../components/component-types/text-component/text-component-selectors';
-import {ElementHelper} from '../../../components/html/element-helper';
+import { browser, By, element } from 'protractor';
+import { BasePage } from '../base-page';
+import { CommonPageConstants } from './common-page.constants';
+import { CommonPageHelper } from './common-page.helper';
+import { ButtonHelper } from '../../../components/html/button-helper';
+import { HtmlHelper } from '../../../components/misc-utils/html-helper';
+import { AnchorHelper } from '../../../components/html/anchor-helper';
+import { RiskItemPageConstants } from '../items-page/risk-item/risk-item-page.constants';
+import { TextComponentSelectors } from '../../../components/component-types/text-component/text-component-selectors';
+import { ElementHelper } from '../../../components/html/element-helper';
 
 export class CommonPage extends BasePage {
 
@@ -571,7 +571,7 @@ export class CommonPage extends BasePage {
 
     static periodEndOptionValue(name: string) {
         return element(By.xpath(`(${this.getDropDownByParameterNameXpath
-        (name)})[2]//option[last()]`));
+            (name)})[2]//option[last()]`));
     }
 
     static getNthProject(index = 1) {
@@ -579,7 +579,7 @@ export class CommonPage extends BasePage {
     }
 
     static getNthRecord(index = 1) {
-        return element.all(By.xpath(`(${this.selectorForRecordsWithoutGreenTick}//td[contains(@class,'GMCellPanel')])`)).get(index);
+        return element.all(By.xpath(`(${this.selectorForRecordsWithoutGreenTick})//td[contains(@class,'GMCellPanel')]`)).get(index);
     }
 
     static getGridRowByTitle(titleName: string) {

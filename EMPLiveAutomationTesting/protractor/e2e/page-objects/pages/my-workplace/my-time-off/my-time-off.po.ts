@@ -9,11 +9,14 @@ export class MyTimeOffPage {
         const labels = MyTimeOffPageConstants.inputLabels;
         return {
             title: CommonPageHelper.getTextBoxByLabel(labels.title),
-            timeOffType: CommonPageHelper.getFirstAutoCompleteByLabel(labels.timeOffType),
             requestor: this.getInputByLabel(labels.requestor),
             start: CommonPageHelper.getTextBoxByLabel(labels.start),
             finish: CommonPageHelper.getTextBoxByLabel(labels.finish),
         };
+    }
+
+    static timeOffTypeValues(value: string) {
+        return element(By.xpath(`//div[text()='${value}']`));
     }
 
     static get dateEditBox() {

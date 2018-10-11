@@ -168,7 +168,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const inputLabels = MyWorkPageConstants.inputLabels;
         const titleValue = `${inputLabels.title} ${uniqueId}`;
         // step#5 is inside this function
-        await MyWorkPageHelper.fillTimeOffFormAndSave(titleValue);
+        await MyWorkPageHelper.fillTimeOffFormAndSave(titleValue, );
 
         StepLogger.stepId(6);
         StepLogger.verification('"Navigate to My Time Off page');

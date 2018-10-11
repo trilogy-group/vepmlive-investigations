@@ -233,8 +233,9 @@ export class CommonPageHelper {
         await this.navigateToItemPageUnderNavigation(
             linkOfThePage,
             pageHeader,
-            pageName);
-        await this.searchItemByTitle(titleValue, columnName);
+            pageName,
+        );
+        await this.searchItemByTitle(titleValue, columnName, );
     }
 
     static async navigateToItemPageUnderMyWorkplace(linkOfThePage: ElementFinder,
@@ -319,7 +320,7 @@ export class CommonPageHelper {
     }
 
     static getMenuItemFromRibbonContainer(title: string) {
-        return element(By.css(`#RibbonContainer li[title="${title}"]`));
+        return element(By.css(`#RibbonContainer li[title="${title}"] span`));
     }
 
     static async refreshPageIfRibbonElementIsDisable(targetElement: ElementFinder, item = CommonPage.record) {
@@ -481,6 +482,7 @@ export class CommonPageHelper {
         StepLogger.stepId(2);
         StepLogger.step('Select the check box for record');
         await WaitHelper.waitForElementToBeDisplayed(item);
+        await ElementHelper.actionHoverOver(item);
         await PageHelper.click(item);
 
         StepLogger.step('Click on ITEMS on ribbon');
@@ -504,13 +506,17 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
 
-    static async selectTwoRecordsFromGrid(item = CommonPage.record) {
+    static async selectTwoRecordsFromGrid() {
         StepLogger.stepId(2);
-        StepLogger.step('Select the check box for two record');
-        await WaitHelper.waitForElementToBeDisplayed(item);
-        await PageHelper.click(item);
+        StepLogger.step('Select the check box for two records');
+        StepLogger.subStep('Select the first record');
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord());
+        await PageHelper.click(CommonPage.getNthRecord());
+
         await browser.sleep(PageHelper.timeout.xs);
-        await PageHelper.click(CommonPage.secondRecord);
+        StepLogger.subStep('Select the Second record');
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord(2));
+        await PageHelper.click(CommonPage.getNthRecord(2));
         await this.clickItemTab();
     }
 
@@ -864,6 +870,7 @@ export class CommonPageHelper {
         await PageHelper.click(this.getOptimizerButton());
         // Takes time to load the iframe
         await browser.sleep(PageHelper.timeout.m);
+        StepLogger.step('switch To First Content Frame');
         await CommonPageHelper.switchToFirstContentFrame();
     }
 
@@ -884,7 +891,7 @@ export class CommonPageHelper {
     }
 
     static async verifyItemDisabled(targetElement: ElementFinder) {
-        await ExpectationHelper.verifyAttributeValue(targetElement, 'aria-disabled', 'true');
+        await ExpectationHelper.verifyAttributeValue(targetElement, 'aria-disabled', 'true', );
     }
 
     static async clickIconEllipsisHorizontal() {

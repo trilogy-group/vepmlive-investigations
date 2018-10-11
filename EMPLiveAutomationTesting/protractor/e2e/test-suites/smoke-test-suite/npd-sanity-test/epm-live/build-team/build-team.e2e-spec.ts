@@ -293,7 +293,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             ' Generic Resource 1]');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects, CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,);
+            CommonPageConstants.pageHeaders.projects.projectCenter, );
         await PageHelper.click(CommonPage.projectCheckbox);
         await PageHelper.click(CommonPage.ribbonTitles.items);
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);

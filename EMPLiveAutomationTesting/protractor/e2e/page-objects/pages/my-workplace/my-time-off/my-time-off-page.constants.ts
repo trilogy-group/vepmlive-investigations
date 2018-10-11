@@ -17,7 +17,7 @@ export class MyTimeOffPageConstants {
 
     static get inputValues() {
         return {
-            requestorValue: 'NonAdmin User',
+            requestorValue: 'admint01',
             startDate: '1/1/2019',
             finishDate: '2/1/2019'
         };
