@@ -1331,9 +1331,16 @@ namespace PortfolioEngineCore
             return true;
         }
 
-        private static void WriteToDatabaseThisPI(DBAccess dbAccess, int projectId, int calId, int ctId,
-                                                    bool allPIs, ref bool firstTimeThrough,
-                                                    double[,] quantity, double[,] cost, IDictionary<int, PfECostCategory> costcategories)
+        private static void WriteToDatabaseThisPI(
+            DBAccess dbAccess, 
+            int projectId, 
+            int calId, 
+            int ctId,
+            bool allPIs, 
+            ref bool firstTimeThrough,
+            double[,] quantity, 
+            double[,] cost, 
+            IDictionary<int, PfECostCategory> costcategories)
         {
             dbAccess.BeginTransaction();
 
