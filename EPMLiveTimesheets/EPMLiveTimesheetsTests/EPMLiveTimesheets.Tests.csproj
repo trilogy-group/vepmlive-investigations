@@ -44,6 +44,10 @@
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
     </Reference>
+	    <Reference Include="EPMLiveWebParts.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPMLiveWebParts.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
@@ -131,7 +135,9 @@
     <Compile Include="API\TimesheetAPI.UnSubmitTimesheet.Tests.cs" />
     <Compile Include="API\TimesheetAPITests.cs" />
     <Compile Include="GetTsTests.addGroups.cs" />
+    <Compile Include="GetTsTests.PageLoad.cs" />
     <Compile Include="GetTsTests.cs" />
+    <Compile Include="Jobs\SaveJobTests.cs" />
     <Compile Include="MyTimesheetTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -172,7 +178,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="EPMLiveTimesheets.Tests.snk" />
+    <Compile Include="GetTsTests.addHeader.cs" />
     <None Include="packages.config" />
+    <Compile Include="WebPageCode\GetTsApprovalsTests.getParams.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

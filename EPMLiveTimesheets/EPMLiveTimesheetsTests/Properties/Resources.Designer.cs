@@ -140,5 +140,14 @@ namespace EPMLiveTimesheets.Tests.Properties {
                 return ResourceManager.GetString("addGroups_When_Rejected_And_RowCount", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;rows&gt;&lt;head&gt;&lt;beforeInit /&gt;&lt;afterInit /&gt;&lt;column type=&quot;ch&quot; width=&quot;20&quot; align=&quot;center&quot;&gt;#master_checkbox&lt;/column&gt;&lt;column type=&quot;tsnotes&quot; width=&quot;50&quot; align=&quot;center&quot;&gt;&lt;![CDATA[Notes]]&gt;&lt;/column&gt;&lt;column type=&quot;tree&quot; width=&quot;*&quot; align=&quot;left&quot;&gt;&lt;![CDATA[Resource Name]]&gt;&lt;/column&gt;&lt;column type=&quot;ro&quot; width=&quot;35&quot; align=&quot;center&quot;&gt;&lt;![CDATA[TM]]&gt;&lt;/column&gt;&lt;column type=&quot;ro&quot; width=&quot;35&quot; align=&quot;center&quot;&gt;&lt;![CDATA[PM]]&gt;&lt;/column&gt;&lt;column type=&quot;ro[=sum]&quot; width=&quot;40&quot; align=&quot;right&quot; id=&quot;_TsDate_1_1_0001&quot;&gt;&lt;![CDATA[Mon&lt;br&gt;1]]&gt;&lt;/column&gt;&lt;column type=&quot;ro[= [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string addHeader {
+            get {
+                return ResourceManager.GetString("addHeader", resourceCulture);
+            }
+        }
     }
 }
