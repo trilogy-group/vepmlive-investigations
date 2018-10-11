@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Generic.Fakes;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Fakes;
 using System.Data.SqlClient.Fakes;
@@ -43,6 +44,8 @@ namespace EPMLiveCore.Tests.API.Publish
         private DataTable dTable;
         private DataTable dTableTeam;
         private List<SPFieldUserValue> userList;
+        private List<string> parameterList;
+        private List<string> commandsList;
         private const string GetProjectInfoFromNameMethodName = "GetProjectInfoFromName";
         private const string GetPublisherSettingsMethodName = "GetPublisherSettings";
         private const string GetPublisherItemInfoMethodName = "GetPublisherItemInfo";
@@ -221,6 +224,9 @@ namespace EPMLiveCore.Tests.API.Publish
                 GetStringInt32 = index => GetStringOutput,
                 GetDateTimeInt32 = index => now
             };
+
+            parameterList = new List<string>();
+            commandsList = new List<string>();
         }
 
         private void SetupShims()
@@ -300,9 +306,15 @@ namespace EPMLiveCore.Tests.API.Publish
             };
             ShimSqlCommand.AllInstances.ExecuteReader = _ => dataReader;
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
+            ShimSqlCommand.ConstructorStringSqlConnection = (_, commandString, connection) => commandsList.Add(commandString);
             ShimSqlConnection.ConstructorString = (_, __) => new ShimSqlConnection();
             ShimSqlConnection.AllInstances.Open = _ => { };
             ShimSqlConnection.AllInstances.Close = _ => { };
+            ShimSqlParameterCollection.AllInstances.AddWithValueStringObject = (_, parameterName, parameterObject) => 
+            {
+                parameterList.Add(parameterName);
+                return null;
+            };
         }
 
         [TestMethod]
@@ -381,6 +393,35 @@ namespace EPMLiveCore.Tests.API.Publish
         }
 
         [TestMethod]
+        public void Publish_ReadFalse_AddParametersAndCommands()
+        {
+            // Arrange
+            ReadOnlyCollection<string> expectedParameterList = new List<string>
+            {
+                "@siteguid", "@webguid", "@listguid", "@itemid", "@key",
+                "@siteguid", "@webguid", "@listguid", "@itemid", "@jobdata", "@timerjobuid", "@jobname", "@key"
+            }.AsReadOnly() ;
+
+            ReadOnlyCollection<string> expectedCommandList = new List<string>
+            {
+                "select timerjobuid,status from vwQueueTimerLog where siteguid=@siteguid and webguid=@webguid and listguid=@listguid and itemid=@itemid and jobtype=9 and [key] = @key",
+                "INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname,  scheduletype, webguid, listguid, itemid, jobdata, [key]) VALUES (@timerjobuid, @siteguid, 9, @jobname, 9, @webguid, @listguid, @itemid, @jobdata, @key)"
+            }.AsReadOnly();
+
+            dataReader.Read = () => false;
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                PublishMethodName,
+                BindingFlags.Static | BindingFlags.Public,
+                new object[] { PublishXml });
+
+            // Assert
+            parameterList.ShouldBe(expectedParameterList);
+            commandsList.ShouldBe(expectedCommandList);
+        }
+
+        [TestMethod]
         public void Publish_ReadTrue_ReturnsString()
         {
             // Arrange
@@ -396,6 +437,50 @@ namespace EPMLiveCore.Tests.API.Publish
 
             // Assert
             actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void Publish_ReadTrue_AddParametersAndCommands()
+        {
+            // Arrange
+            ReadOnlyCollection<string> expectedParameterList = new List<string>
+            {
+                "@siteguid", "@webguid", "@listguid", "@itemid", "@key",
+                "@jobdata", "@timerjobuid"
+            }.AsReadOnly();
+
+            ReadOnlyCollection<string> expectedCommandList = new List<string>
+            {
+                "select timerjobuid,status from vwQueueTimerLog where siteguid=@siteguid and webguid=@webguid and listguid=@listguid and itemid=@itemid and jobtype=9 and [key] = @key",
+                "update timerjobs set jobdata=@jobdata where timerjobuid=@timerjobuid"
+            }.AsReadOnly();
+
+            dataReader.Read = () => true;
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                PublishMethodName,
+                BindingFlags.Static | BindingFlags.Public,
+                new object[] { PublishXml });
+
+            // Assert
+            parameterList.ShouldBe(expectedParameterList);
+            commandsList.ShouldBe(expectedCommandList);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(APIException), "Item Already Queued")]
+        public void Publish_StatusDoesNotEqualTwo_ThrowAPIException()
+        {
+            // Arrange
+            dataReader.Read = () => true;
+            dataReader.GetInt32Int32 = _ => 0;
+
+            // Act
+            var actual = (string)privateObj.Invoke(
+                PublishMethodName,
+                BindingFlags.Static | BindingFlags.Public,
+                new object[] { PublishXml });            
         }
 
         [TestMethod]
