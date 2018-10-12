@@ -18,6 +18,11 @@ namespace EPMLiveCore.ReportHelper
             out bool error,
             out string errMsg)
         {
+            Guard.ArgumentIsNotNull(defaultColumns, nameof(defaultColumns));
+            Guard.ArgumentIsNotNull(sListName, nameof(sListName));
+            Guard.ArgumentIsNotNull(spWeb, nameof(spWeb));
+            Guard.ArgumentIsNotNull(sTableName, nameof(sTableName));
+
             error = false;
             errMsg = string.Empty;
 
