@@ -207,14 +207,6 @@ export class ResourcesPageHelper {
         }
     }
 
-    static async selectEnabled() {
-        StepLogger.step('Scroll down and check the checkbox for "Enabled"');
-        const isDisabled = await PageHelper.isElementSelected(ResourcesPage.inputs.disabled);
-        if (isDisabled) {
-            await PageHelper.click(ResourcesPage.inputs.disabled);
-        }
-    }
-
     static async verifyDisabledChecked() {
         await ExpectationHelper.verifyCheckboxIsChecked(
             ResourcesPage.inputs.disabled,
