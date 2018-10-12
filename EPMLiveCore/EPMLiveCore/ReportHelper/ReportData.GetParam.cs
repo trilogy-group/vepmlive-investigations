@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using EPMLiveCore.Helpers;
 using Microsoft.SharePoint;
 
 namespace EPMLiveCore.ReportHelper
@@ -42,6 +43,8 @@ namespace EPMLiveCore.ReportHelper
 
         public static SqlParameter GetParam(SPField field, string sColumnName)
         {
+            Guard.ArgumentIsNotNull(field, nameof(field));
+
             var param = new SqlParameter();
             var fieldType = field.Type;
             var typeString = field.TypeAsString.ToLower();
@@ -88,6 +91,9 @@ namespace EPMLiveCore.ReportHelper
 
         private static void GetParamCalculated(SPField field, SqlParameter param)
         {
+            Guard.ArgumentIsNotNull(param, nameof(param));
+            Guard.ArgumentIsNotNull(field, nameof(field));
+
             var resultType = field.GetProperty(ResultType);
 
             if (resultType.Equals(Currency, StringComparison.OrdinalIgnoreCase) ||
@@ -118,6 +124,11 @@ namespace EPMLiveCore.ReportHelper
 
         private static void SetParamLookUpOrUserOrMultiChoice(string columnName, string typeString, SqlParameter sqlParam, string typeExclude, int size)
         {
+            Guard.ArgumentIsNotNull(typeExclude, nameof(typeExclude));
+            Guard.ArgumentIsNotNull(sqlParam, nameof(sqlParam));
+            Guard.ArgumentIsNotNull(typeString, nameof(typeString));
+            Guard.ArgumentIsNotNull(columnName, nameof(columnName));
+
             if (columnName.ToLower().EndsWith(IdText) && typeString != typeExclude)
             {
                 sqlParam.SqlDbType = SqlDbType.Int;
