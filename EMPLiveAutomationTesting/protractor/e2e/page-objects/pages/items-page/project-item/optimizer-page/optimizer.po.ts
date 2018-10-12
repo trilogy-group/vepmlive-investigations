@@ -142,6 +142,10 @@ export class OptimizerPage extends BasePage {
         };
     }
 
+    static get okOnPopUp() {
+        return this.getButtonOnPopup(OptimizerPageConstants.deleteViewPopup.ok);
+    }
+
     static get getRenameStrategyPopup() {
         const label = OptimizerPageConstants.renameStrategyPopup;
         return {

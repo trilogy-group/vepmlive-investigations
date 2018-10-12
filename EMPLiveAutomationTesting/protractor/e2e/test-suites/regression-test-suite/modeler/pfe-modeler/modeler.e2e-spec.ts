@@ -7,7 +7,8 @@ import {HomePage} from '../../../../page-objects/pages/homepage/home.po';
 import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
 import {ModelerPageHelper} from '../../../../page-objects/pages/items-page/project-item/modeler-page/modeler-page.helper';
-import { browser } from 'protractor';
+import { WaitHelper } from '../../../../components/html/wait-helper';
+import { ModelerPage } from '../../../../page-objects/pages/items-page/project-item/modeler-page/modeler.po';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
@@ -119,7 +120,7 @@ describe(SuiteNames.regressionTestSuite, () => {
 
         StepLogger.stepId(3);
         await CommonPageHelper.gotoModeler();
-        await browser.sleep(PageHelper.timeout.s);
+        await WaitHelper.waitForElementToBeDisplayed(ModelerPage.selectModelAndVersionsPopup.title);
         await ModelerPageHelper.verifyModelerPopupDisplayed();
 
         StepLogger.stepId(4);

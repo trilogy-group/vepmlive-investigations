@@ -226,6 +226,11 @@ export class OptimizerPageHelper {
         await PageHelper.click(OptimizerPage.getDeleteViewPopup.ok);
     }
 
+    static async clickOKonSaveViewPopup() {
+        StepLogger.step('Click on Ok');
+        await PageHelper.click(OptimizerPage.okOnPopUp);
+    }
+
     static async verifyMessageOnConfiguration() {
         const expectedMessage = OptimizerPageConstants.optimizerConfiguration.message;
         await ExpectationHelper.verifyContainsText(OptimizerPage.getOptimizerConfiguration.message,

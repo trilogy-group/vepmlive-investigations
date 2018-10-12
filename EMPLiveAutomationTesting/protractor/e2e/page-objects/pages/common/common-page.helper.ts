@@ -524,7 +524,7 @@ export class CommonPageHelper {
         StepLogger.verification('Project Center opened ');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
-        await browser.sleep(PageHelper.timeout.s);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);
         }
 
     static getSpanByText(text: string) {

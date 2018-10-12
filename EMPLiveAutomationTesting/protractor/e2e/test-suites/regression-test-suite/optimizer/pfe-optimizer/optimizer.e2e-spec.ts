@@ -199,7 +199,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyDeletedView(viewNameToDel);
         // post condition
         await OptimizerPageHelper.clickSaveView();
-        await OptimizerPageHelper.clickOKonDeleteViewPopup();
+        await OptimizerPageHelper.clickOKonSaveViewPopup();
     });
 
     it('Verify the message display on the bottom of the Optimizer configuration page. - [744360]', async () => {
