@@ -192,6 +192,7 @@
     <Compile Include="API\MyWork\MyWork.cs" />
     <Compile Include="API\MyWork\MyWork.GetDataFromReportingDb.cs" />
     <Compile Include="API\MyWork\MyWork.GetMyWorkGridData.cs" />
+    <Compile Include="API\MyWork\MyWork.GetMyWorkGridLayout.cs" />
     <Compile Include="API\MyWork\MyWork.GetMyWorkParams.cs" />
     <Compile Include="API\MyWork\MyWork.ProcessReportingDbDataTable.cs" />
     <Compile Include="API\MyWork\MyWorkField.cs" />

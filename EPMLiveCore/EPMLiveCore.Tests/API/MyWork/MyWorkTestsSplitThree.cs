@@ -280,7 +280,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => resultXml;
             ShimExtensionMethods.ToPrettierNameStringListOfStringSPWeb = (instance, _, _1) => instance;
             ShimMyWork.ShouldUseReportingDbSPWeb = _ => false;
-            ShimMyWork.GetMyWorkFieldTypeMyWorkFieldDictionaryOfStringSPFieldStringOut = (MyWorkField myWorkField, Dictionary<string, SPField> fieldTypes, out string format) =>
+            ShimMyWork.GetMyWorkFieldTypeMyWorkFieldIDictionaryOfStringSPFieldStringOut = (MyWorkField myWorkField, IDictionary<string, SPField> fieldTypes, out string format) =>
             {
                 format = "format";
                 return "Date";
