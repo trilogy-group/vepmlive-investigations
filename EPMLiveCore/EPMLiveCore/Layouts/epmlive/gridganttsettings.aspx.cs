@@ -1407,9 +1407,10 @@ namespace EPMLiveCore.Layouts.epmlive
 
                                 using (var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys"))
                                 {
-                                    myLog.MaximumKilobytes = 32768;
-                                    var eventId = 4001;
-                                    myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, eventId);
+                                    const int MaximumKilobytes = 32768;
+                                    myLog.MaximumKilobytes = MaximumKilobytes;
+                                    const int EventId = 4001;
+                                    myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, EventId);
                                 }
                             });
                         }
