@@ -129,6 +129,10 @@ describe(SuiteNames.regressionTestSuite, () => {
         StepLogger.stepId(5);
         await OptimizerPageHelper.clickOKonDeleteStrategyPopup();
         await OptimizerPageHelper.verifyDeletedStrategy(strategyNameToDel);
+        // postCondition
+        await OptimizerPageHelper.openSaveStrategyPopup();
+        await OptimizerPageHelper.clickOKonSaveStrategyPopup();
+
     });
 
     it('Verify the Minus Sign  - [744373]', async () => {
@@ -193,6 +197,9 @@ describe(SuiteNames.regressionTestSuite, () => {
         StepLogger.stepId(5);
         await OptimizerPageHelper.clickOKonDeleteViewPopup();
         await OptimizerPageHelper.verifyDeletedView(viewNameToDel);
+        // post condition
+        await OptimizerPageHelper.clickSaveView();
+        await OptimizerPageHelper.clickOKonDeleteViewPopup();
     });
 
     it('Verify the message display on the bottom of the Optimizer configuration page. - [744360]', async () => {

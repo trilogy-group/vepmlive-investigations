@@ -515,7 +515,7 @@ export class CommonPageHelper {
 
         await browser.sleep(PageHelper.timeout.xs);
         StepLogger.subStep('Select the Second record');
-        await ElementHelper.actionHoverOver(CommonPage.getNthRecord(2));
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord(3));
         await PageHelper.click(CommonPage.getNthRecord(2));
         await this.clickItemTab();
     }
@@ -524,7 +524,8 @@ export class CommonPageHelper {
         StepLogger.verification('Project Center opened ');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
-    }
+        await browser.sleep(PageHelper.timeout.s);
+        }
 
     static getSpanByText(text: string) {
         return element(By.xpath(`//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));

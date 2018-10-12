@@ -1,12 +1,13 @@
-import {browser} from 'protractor';
-import {OptimizerPage} from './optimizer.po';
-import {StepLogger} from '../../../../../../core/logger/step-logger';
-import {PageHelper} from '../../../../../components/html/page-helper';
-import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-import {OptimizerPageConstants} from './optimizer-page.constants';
-import {ExpectationHelper} from '../../../../../components/misc-utils/expectation-helper';
-import {CommonPageHelper} from '../../../common/common-page.helper';
-import {TextboxHelper} from '../../../../../components/html/textbox-helper';
+import { browser } from 'protractor';
+import { OptimizerPage } from './optimizer.po';
+import { StepLogger } from '../../../../../../core/logger/step-logger';
+import { PageHelper } from '../../../../../components/html/page-helper';
+import { ValidationsHelper } from '../../../../../components/misc-utils/validation-helper';
+import { OptimizerPageConstants } from './optimizer-page.constants';
+import { ExpectationHelper } from '../../../../../components/misc-utils/expectation-helper';
+import { CommonPageHelper } from '../../../common/common-page.helper';
+import { TextboxHelper } from '../../../../../components/html/textbox-helper';
+import { ElementHelper } from '../../../../../components/html/element-helper';
 
 export class OptimizerPageHelper {
 
@@ -46,36 +47,36 @@ export class OptimizerPageHelper {
         const label = OptimizerPage.getOptimizerConfiguration;
         StepLogger.verification('Verified the content of label name "Which fields will be used as filters?"');
         await ExpectationHelper.verifyDisplayedStatus(label.availableFields,
-            OptimizerPageConstants.optimizerConfiguration.availableFields, );
+            OptimizerPageConstants.optimizerConfiguration.availableFields);
         await ExpectationHelper.verifyDisplayedStatus(label.selectedFilelds,
-            OptimizerPageConstants.optimizerConfiguration.selectedFilelds, );
+            OptimizerPageConstants.optimizerConfiguration.selectedFilelds);
         await ExpectationHelper.verifyDisplayedStatus(label.availableFieldsSelect,
-            OptimizerPageConstants.availableFieldsSection, );
+            OptimizerPageConstants.availableFieldsSection);
         await ExpectationHelper.verifyDisplayedStatus(label.selectedFieldsSelect,
-            OptimizerPageConstants.selectedFieldsSection, );
-        await ExpectationHelper.verifyDisplayedStatus(label.upArrow, OptimizerPageConstants.upArrow, );
-        await ExpectationHelper.verifyDisplayedStatus(label.downArrow, OptimizerPageConstants.downArrow, );
-        await ExpectationHelper.verifyDisplayedStatus(label.add, OptimizerPageConstants.add, );
-        await ExpectationHelper.verifyDisplayedStatus(label.remove, OptimizerPageConstants.remove, );
+            OptimizerPageConstants.selectedFieldsSection);
+        await ExpectationHelper.verifyDisplayedStatus(label.upArrow, OptimizerPageConstants.upArrow);
+        await ExpectationHelper.verifyDisplayedStatus(label.downArrow, OptimizerPageConstants.downArrow);
+        await ExpectationHelper.verifyDisplayedStatus(label.add, OptimizerPageConstants.add);
+        await ExpectationHelper.verifyDisplayedStatus(label.remove, OptimizerPageConstants.remove);
     }
 
     static async verifyDeleteStrategyPopup() {
         const label = OptimizerPage.getDeleteStrategyPopup;
         const optimizerConstLabel = OptimizerPageConstants.deleteStrategyPopup;
         await ExpectationHelper.verifyText(label.message,
-            optimizerConstLabel.message, optimizerConstLabel.message, );
-        await ExpectationHelper.verifyDisplayedStatus(label.ok, OptimizerPageConstants.ok, );
-        await ExpectationHelper.verifyDisplayedStatus(label.cancel, OptimizerPageConstants.cancel, );
+            optimizerConstLabel.message, optimizerConstLabel.message);
+        await ExpectationHelper.verifyDisplayedStatus(label.ok, OptimizerPageConstants.ok);
+        await ExpectationHelper.verifyDisplayedStatus(label.cancel, OptimizerPageConstants.cancel);
     }
 
     static async verifyOptimizerWindowClosed() {
         await browser.sleep(PageHelper.timeout.xs);
-        await ExpectationHelper.verifyNotDisplayedStatus(OptimizerPage.getConfigure, 'optimizer tab', );
+        await ExpectationHelper.verifyNotDisplayedStatus(OptimizerPage.getConfigure, 'optimizer tab');
     }
 
     static async verifyAlertMessageForSingleProjectSelection() {
         const alertText = await PageHelper.getAlertText();
-        await ExpectationHelper.verifyStringEqualTo(alertText, OptimizerPageConstants.oneItemConfigureAlertMsg, );
+        await ExpectationHelper.verifyStringEqualTo(alertText, OptimizerPageConstants.oneItemConfigureAlertMsg);
         await PageHelper.acceptAlert();
     }
 
@@ -83,11 +84,11 @@ export class OptimizerPageHelper {
         StepLogger.step('Verify the Current Strategy drop down.');
         await browser.sleep(PageHelper.timeout.xs);
         await ExpectationHelper.verifyText(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdown,
-            OptimizerPageConstants.currentStrategy, strategyName, );
+            OptimizerPageConstants.currentStrategy, strategyName);
     }
 
     static async verifyOptimizerPageOpened() {
-        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getConfigure, 'Optimizer page', );
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getConfigure, 'Optimizer page');
     }
 
     static async closeOptimizerWindowFromOptimizerTab() {
@@ -107,7 +108,7 @@ export class OptimizerPageHelper {
 
     static async verifySaveStrtegyPopupDisplayed() {
         await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getOptimierSaveStrategyPopup.strategyName,
-            'Save Strategy popup', );
+            'Save Strategy popup');
     }
 
     static async enterNewStrategyNameAndSubmit() {
@@ -151,17 +152,22 @@ export class OptimizerPageHelper {
         await PageHelper.click(OptimizerPage.getDeleteStrategyPopup.ok);
     }
 
+    static async clickOKonSaveStrategyPopup() {
+        StepLogger.step('Click on Ok');
+        await PageHelper.click(OptimizerPage.getOptimierSaveStrategyPopup.ok);
+    }
+
     static async verifyDeletedStrategy(deletedStrategyName: string) {
         await browser.sleep(PageHelper.timeout.xs);
         await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdownSpan);
         await browser.sleep(PageHelper.timeout.xs);
         await ExpectationHelper.verifyNotDisplayedStatus(OptimizerPage.getCurrentStrategyByName(deletedStrategyName),
-            deletedStrategyName, );
+            deletedStrategyName);
     }
 
     static async verifyRibbonCollapsed() {
         await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getOptimizerRibbon.collapseView,
-            OptimizerPageConstants.collapsed, );
+            OptimizerPageConstants.collapsed);
     }
 
     static async clickDeleteView() {
@@ -172,22 +178,28 @@ export class OptimizerPageHelper {
         return viewName;
     }
 
+    static async clickSaveView() {
+        StepLogger.step('Click on Save View button.');
+        await PageHelper.click(OptimizerPage.viewManagementOptions.saveView);
+        await browser.sleep(PageHelper.timeout.s);
+    }
+
     static async verifyDeleteViewPopup() {
         const label = OptimizerPage.getDeleteViewPopup;
         const actualDelMessage = await PageHelper.getText(label.deleteViewMessage);
         const expectedDelMessage = OptimizerPageConstants.deleteViewPopup.deleteViewMessage;
-        await ExpectationHelper.verifyStringEqualTo(actualDelMessage, expectedDelMessage, );
-        await ExpectationHelper.verifyDisplayedStatus(label.ok, OptimizerPageConstants.ok, );
-        await ExpectationHelper.verifyDisplayedStatus(label.cancel, OptimizerPageConstants.cancel, );
+        await ExpectationHelper.verifyStringEqualTo(actualDelMessage, expectedDelMessage);
+        await ExpectationHelper.verifyDisplayedStatus(label.ok, OptimizerPageConstants.ok);
+        await ExpectationHelper.verifyDisplayedStatus(label.cancel, OptimizerPageConstants.cancel);
     }
 
     static async verifyDeletedView(deletedViewName: string) {
         StepLogger.verification('Deleted the view in the current view dropdown');
         await browser.sleep(PageHelper.timeout.xs);
-        await PageHelper.click(OptimizerPage.viewManagementOptions.currentViewDropdown);
+        await PageHelper.clickIfDisplayed(OptimizerPage.viewManagementOptions.currentViewDropdown);
         await browser.sleep(PageHelper.timeout.s);
         await ExpectationHelper.verifyNotDisplayedStatus(OptimizerPage.getCurrentViewByName(deletedViewName),
-            deletedViewName, );
+            deletedViewName);
     }
 
     static async clickMinusSign() {
@@ -201,7 +213,7 @@ export class OptimizerPageHelper {
     }
 
     static async verifyViewPageOpened() {
-        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.viewManagementOptions.saveView, 'View page', );
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.viewManagementOptions.saveView, 'View page');
     }
 
     static async closeOptimizerWindowFromViewTab() {
@@ -217,12 +229,12 @@ export class OptimizerPageHelper {
     static async verifyMessageOnConfiguration() {
         const expectedMessage = OptimizerPageConstants.optimizerConfiguration.message;
         await ExpectationHelper.verifyContainsText(OptimizerPage.getOptimizerConfiguration.message,
-            OptimizerPageConstants.configure, expectedMessage, );
+            OptimizerPageConstants.configure, expectedMessage);
     }
 
     static async verfyCurrentStrategyDropdown() {
         await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdown,
-            OptimizerPageConstants.currentStrategy, );
+            OptimizerPageConstants.currentStrategy);
     }
 
     static async clickSelectColumns() {
@@ -233,13 +245,13 @@ export class OptimizerPageHelper {
     static async verifySelectColumnsPopup() {
         const label = OptimizerPage.getSelectColumnsPopup;
         const optConst = OptimizerPageConstants.selectColumnsPopup;
-        await ExpectationHelper.verifyText(label.heading,
-            OptimizerPageConstants.selectColumns, optConst.header, );
-        await ExpectationHelper.verifyDisplayedStatus(label.eachColumn, 'Column names', );
-        await ExpectationHelper.verifyDisplayedStatus(label.eachSelectedColumn, 'Column checkbox', );
-        await ExpectationHelper.verifyDisplayedStatus(label.hideAll, optConst.hideAll, );
-        await ExpectationHelper.verifyDisplayedStatus(label.ok, OptimizerPageConstants.ok, );
-        await ExpectationHelper.verifyDisplayedStatus(label.cancel, OptimizerPageConstants.cancel, );
+        await ExpectationHelper.verifyTextContains(label.heading,
+            OptimizerPageConstants.selectColumns, optConst.header);
+        await ExpectationHelper.verifyDisplayedStatus(label.eachColumn, 'Column names');
+        await ExpectationHelper.verifyDisplayedStatus(label.eachSelectedColumn, 'Column checkbox');
+        await ExpectationHelper.verifyDisplayedStatus(label.hideAll, optConst.hideAll);
+        await ExpectationHelper.verifyDisplayedStatus(label.ok, OptimizerPageConstants.ok);
+        await ExpectationHelper.verifyDisplayedStatus(label.cancel, OptimizerPageConstants.cancel);
     }
 
     static async clickHideAll() {
@@ -250,7 +262,7 @@ export class OptimizerPageHelper {
     static async verifyNoColumnSelected() {
         const label = OptimizerPage.getSelectColumnsPopup;
         await browser.sleep(PageHelper.timeout.xs);
-        await ExpectationHelper.verifyNotDisplayedStatus(label.eachSelectedColumn, 'Checkbox selected', );
+        await ExpectationHelper.verifyNotDisplayedStatus(label.eachSelectedColumn, 'Checkbox selected');
     }
 
     static async clickShowAll() {
@@ -261,7 +273,7 @@ export class OptimizerPageHelper {
     static async verifyAllColumnSelected() {
         const label = OptimizerPage.getSelectColumnsPopup;
         await browser.sleep(PageHelper.timeout.xs);
-        await ExpectationHelper.verifyNotDisplayedStatus(label.unchecked, 'Checkbox unselected', );
+        await ExpectationHelper.verifyNotDisplayedStatus(label.unchecked, 'Checkbox unselected');
     }
 
     static async clickOKonSelectColumnPopup() {
@@ -271,33 +283,33 @@ export class OptimizerPageHelper {
 
     static async verifyOptimizerTabOptions() {
         const tabLabel = OptimizerPage.getTabOptions;
-        await ExpectationHelper.verifyDisplayedStatus(tabLabel.optimizer, 'Optimizer tab', );
-        await ExpectationHelper.verifyDisplayedStatus(tabLabel.view, 'View tab', );
+        await ExpectationHelper.verifyDisplayedStatus(tabLabel.optimizer, 'Optimizer tab');
+        await ExpectationHelper.verifyDisplayedStatus(tabLabel.view, 'View tab');
     }
 
     static async verifyOptimizerTabContents() {
         const actionsLabel = OptimizerPage.getOptimizerStrategyActions;
-        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getCloseOptimizerWindow, 'Close', );
-        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getConfigure, 'Configure', );
-        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.saveStrategy, 'Save Strategy', );
-        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.renameStrategy, 'Rename Strategy', );
-        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.deleteStrategy, 'Delete Strategy', );
-        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.commitStrategy, 'Commit Strategy', );
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getCloseOptimizerWindow, 'Close');
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getConfigure, 'Configure');
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.saveStrategy, 'Save Strategy');
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.renameStrategy, 'Rename Strategy');
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.deleteStrategy, 'Delete Strategy');
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.commitStrategy, 'Commit Strategy');
         await ExpectationHelper.verifyDisplayedStatus(actionsLabel.currentStrategyDropdown,
-            OptimizerPageConstants.currentStrategy, );
+            OptimizerPageConstants.currentStrategy);
     }
 
     static async verifyConfigureScreen() {
         const configLabel = OptimizerPage.getOptimizerConfiguration;
         const configConst = OptimizerPageConstants.optimizerConfiguration;
         await ExpectationHelper.verifyContainsText(configLabel.enterValueLabel,
-            OptimizerPageConstants.configure, configConst.enterValueLabel, );
+            OptimizerPageConstants.configure, configConst.enterValueLabel);
         await ExpectationHelper.verifyContainsText(configLabel.titleComparisonLabel,
-            OptimizerPageConstants.configure, configConst.titleComparisonLabel, );
+            OptimizerPageConstants.configure, configConst.titleComparisonLabel);
         await ExpectationHelper.verifyContainsText(configLabel.thirdQuestion,
-            OptimizerPageConstants.configure, configConst.thirdQuestion, );
-        await ExpectationHelper.verifyDisplayedStatus(configLabel.ok, OptimizerPageConstants.ok, );
-        await ExpectationHelper.verifyDisplayedStatus(configLabel.cancel, OptimizerPageConstants.cancel, );
+            OptimizerPageConstants.configure, configConst.thirdQuestion);
+        await ExpectationHelper.verifyDisplayedStatus(configLabel.ok, OptimizerPageConstants.ok);
+        await ExpectationHelper.verifyDisplayedStatus(configLabel.cancel, OptimizerPageConstants.cancel);
     }
 
     static async clickConfigure() {
@@ -308,22 +320,22 @@ export class OptimizerPageHelper {
 
     static async verifyOptimizerConfigurationPopupOpened() {
         await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getOptimizerConfiguration.heading,
-            OptimizerPageConstants.configure, );
+            OptimizerPageConstants.configure);
     }
 
     static async selectAvailableFieldAndAdd() {
         const configLabel = OptimizerPage.getOptimizerConfiguration;
         StepLogger.step('Select Value from the Available Fields selection box. Click on Add button.');
-        await PageHelper.click(configLabel.firstAvailableField);
+        await ElementHelper.actionHoverOverAndClick(configLabel.firstAvailableField, configLabel.firstAvailableField);
         const fieldName = await PageHelper.getText(configLabel.firstAvailableField);
-        await PageHelper.click(configLabel.add);
+        await ElementHelper.actionDoubleClick(configLabel.add);
         return fieldName;
     }
 
     static async verifyAddedFieldInSelectedFields(fieldName: string) {
         const configLabel = OptimizerPage.getOptimizerConfiguration;
         await ExpectationHelper.verifyText(configLabel.firstSelectedField,
-            OptimizerPageConstants.selectedFieldsSection, fieldName, );
+            OptimizerPageConstants.selectedFieldsSection, fieldName);
     }
 
     static async selectSelectedFieldAndRemove() {
@@ -340,19 +352,19 @@ export class OptimizerPageHelper {
 
     static async verifyRemovedFieldInAvailableFields(fieldName: string) {
         await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getAvailableFieldByName(fieldName),
-            `${fieldName} in ${OptimizerPageConstants.selectedFieldsSection}`, );
+            `${fieldName} in ${OptimizerPageConstants.selectedFieldsSection}`);
     }
 
     static async verifySaveStrategyPopup() {
         const saveStategyLabel = OptimizerPage.getOptimierSaveStrategyPopup;
         await ExpectationHelper.verifyDisplayedStatus(saveStategyLabel.strategyName,
-            `Strategy Name in ${OptimizerPageConstants.saveStrategy}`, );
+            `Strategy Name in ${OptimizerPageConstants.saveStrategy}`);
         await ExpectationHelper.verifyDisplayedStatus(saveStategyLabel.personalStrategyCheckBox,
-            `Personal strategy checkbox`, );
+            `Personal strategy checkbox`);
         await ExpectationHelper.verifyDisplayedStatus(saveStategyLabel.ok,
-            OptimizerPageConstants.ok, );
+            OptimizerPageConstants.ok);
         await ExpectationHelper.verifyDisplayedStatus(saveStategyLabel.cancel,
-            OptimizerPageConstants.cancel, );
+            OptimizerPageConstants.cancel);
     }
 
     static async clickRenameStrategy() {
@@ -363,11 +375,11 @@ export class OptimizerPageHelper {
     static async verifyRenameStrategyPopup() {
         const renameStategyLabel = OptimizerPage.getRenameStrategyPopup;
         await ExpectationHelper.verifyDisplayedStatus(renameStategyLabel.strategyName,
-            `Strategy Name in ${OptimizerPageConstants.renameStrategy}`, );
+            `Strategy Name in ${OptimizerPageConstants.renameStrategy}`);
         await ExpectationHelper.verifyDisplayedStatus(renameStategyLabel.ok,
-            OptimizerPageConstants.ok, );
+            OptimizerPageConstants.ok);
         await ExpectationHelper.verifyDisplayedStatus(renameStategyLabel.cancel,
-            OptimizerPageConstants.cancel, );
+            OptimizerPageConstants.cancel);
     }
 
     static async selectStrategyFromCurrentStrategy() {
@@ -382,17 +394,17 @@ export class OptimizerPageHelper {
 
     static async verifyViewTabContent() {
         const viewTabLabel = OptimizerPage.viewManagementOptions;
-        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.saveView, 'Save view', );
-        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.renameView, 'Rename view', );
-        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.deleteView, 'Delete view', );
-        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.clearSorting, 'Clear sorting', );
-        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.selectColumns, 'Select columns', );
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.saveView, 'Save view');
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.renameView, 'Rename view');
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.deleteView, 'Delete view');
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.clearSorting, 'Clear sorting');
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.selectColumns, 'Select columns');
         await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.currentViewDropdown,
-            OptimizerPageConstants.currentView, );
+            OptimizerPageConstants.currentView);
     }
 
     static async verifyCurrentViewDropdown() {
         await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.viewManagementOptions.currentViewDropdown,
-            'Current View Dropdown', );
+            'Current View Dropdown');
     }
 }
