@@ -38,10 +38,19 @@ namespace EPMLiveCore.Tests.API.Reporting
             _context?.Dispose();
         }
 
-        [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void ProcessIzendaReportsFromList_DisposesConnections(bool shouldThrow)
+        [TestMethod]
+        public void ProcessIzendaReportsFromList_WhenTrue_DisposesConnections()
+        {
+            ProcessIzendaReportsFromListDisposesConnectionsTest(true);
+        }
+
+        [TestMethod]
+        public void ProcessIzendaReportsFromList_WhenFalse_DisposesConnections()
+        {
+            ProcessIzendaReportsFromListDisposesConnectionsTest(true);
+        }
+
+        private void ProcessIzendaReportsFromListDisposesConnectionsTest(bool shouldThrow)
         {
             using (TestCheck.OpenCloseConnections)
             {
@@ -69,10 +78,19 @@ namespace EPMLiveCore.Tests.API.Reporting
             }
         }
 
-        [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void AddIzendaReport_DisposesConnections(bool shouldThrow)
+        [TestMethod]
+        public void AddIzendaReport_WhenTrue_DisposesConnections()
+        {
+            AddIzendaReportDisposesConnectionsTest(true);
+        }
+
+        [TestMethod]
+        public void AddIzendaReport_WhenFalse_DisposesConnections()
+        {
+            AddIzendaReportDisposesConnectionsTest(false);
+        }
+
+        private void AddIzendaReportDisposesConnectionsTest(bool shouldThrow)
         {
             using (TestCheck.OpenCloseConnections)
             {
@@ -130,18 +148,31 @@ namespace EPMLiveCore.Tests.API.Reporting
             ShimCoreFunctions.getConnectionStringGuid = _ => "DummyString";
         }
 
-        [DataTestMethod]
-        [DataRow(true, 1, "SiteTitle", "This is a Xml only not really", "001", false)]
-        [DataRow(true, 1, "SiteTitle", "This is a Xml only not really", "001", true)]
-        [DataRow(false, 1, "SiteTitle", "This is a Xml only not really", "001", false)]
-        [DataRow(false, 1, "SiteTitle", "This is a Xml only not really", "001", true)]
-        public void IAddIzendaReport_DisposeConnections(
-            bool shouldRead,
-            int queryReturn,
-            string title,
-            string xml,
-            string siteId,
-            bool shouldReaderThrow)
+        [TestMethod]
+        public void IAddIzendaReport_ReadsNotThrows_DisposeConnections()
+        {
+            IAddIzendaReportDisposeConnectionsTest(true, 1, "SiteTitle", "This is a Xml only not really", "001", false);
+        }
+
+        [TestMethod]
+        public void IAddIzendaReport_ReadsThrows_DisposeConnections()
+        {
+            IAddIzendaReportDisposeConnectionsTest(true, 1, "SiteTitle", "This is a Xml only not really", "001", true);
+        }
+
+        [TestMethod]
+        public void IAddIzendaReport_NotReadsNotThrows_DisposeConnections()
+        {
+            IAddIzendaReportDisposeConnectionsTest(false, 1, "SiteTitle", "This is a Xml only not really", "001", false);
+        }
+
+        [TestMethod]
+        public void IAddIzendaReport_NotReadsThrows_DisposeConnections()
+        {
+            IAddIzendaReportDisposeConnectionsTest(false, 1, "SiteTitle", "This is a Xml only not really", "001", true);
+        }
+
+        private void IAddIzendaReportDisposeConnectionsTest(bool shouldRead, int queryReturn, string title, string xml, string siteId, bool shouldReaderThrow)
         {
             using (TestCheck.OpenCloseConnections)
             {
@@ -189,8 +220,7 @@ namespace EPMLiveCore.Tests.API.Reporting
                     },
                     () =>
                     {
-                        if (!shouldReaderThrow
-                            && !shouldRead)
+                        if (!shouldReaderThrow && !shouldRead)
                         {
                             parameters["@name"].ShouldBe(title);
                             parameters["@siteid"].ShouldBe(siteId);
