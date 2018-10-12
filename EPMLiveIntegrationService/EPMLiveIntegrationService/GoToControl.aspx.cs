@@ -6,6 +6,7 @@ using EPMLiveCore;
 using EPMLiveCore.API.Integration;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
+using SystemDiagnostics = System.Diagnostics;
 
 namespace EPMLiveIntegrationService
 {
@@ -63,7 +64,7 @@ namespace EPMLiveIntegrationService
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Trace.TraceError("Exception suppressed {0}", ex);
+                        SystemDiagnostics.Trace.TraceError("Exception suppressed {0}", ex);
                         lblMessage.Text = "Configuration Error: " + ex.Message;
                     }
                 }

@@ -36,7 +36,7 @@ namespace EPMLiveIntegrationService.Tests
         private const string ResponseField = "_response";
         private const string SpListItemId = "0147852369874125452102121450214";
 
-        private readonly Guid[] _guids = {
+        private static readonly Guid[] Guids = {
             new Guid("14203147854102365498741023654781"),
             new Guid("54175203164578961402365410258410"),
             new Guid("06748745745745201649785203147852"),
@@ -156,8 +156,8 @@ namespace EPMLiveIntegrationService.Tests
                 () => _parametersAdded.Values.ShouldContain(DummyIntegrationId),
                 () => _parametersAdded.Values.ShouldContain(DummyControl),
                 () => redirectUrl.ShouldContain(SpListItemId),
-                () => redirectUrl.ShouldContain(_guids[0].ToString()),
-                () => redirectUrl.ShouldContain(_guids[3].ToString()),
+                () => redirectUrl.ShouldContain(Guids[0].ToString()),
+                () => redirectUrl.ShouldContain(Guids[3].ToString()),
                 () => redirectUrl.ShouldContain(DummyControl));
         }
 
@@ -180,8 +180,8 @@ namespace EPMLiveIntegrationService.Tests
                 () => _parametersAdded.Values.ShouldContain(DummyIntegrationId),
                 () => _parametersAdded.Values.ShouldContain(DummyControl),
                 () => redirectUrl.ShouldNotContain(SpListItemId),
-                () => redirectUrl.ShouldContain(_guids[0].ToString()),
-                () => redirectUrl.ShouldContain(_guids[3].ToString()),
+                () => redirectUrl.ShouldContain(Guids[0].ToString()),
+                () => redirectUrl.ShouldContain(Guids[3].ToString()),
                 () => redirectUrl.ShouldContain(DummyControl));
         }
 
@@ -240,7 +240,7 @@ namespace EPMLiveIntegrationService.Tests
             };
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code => code();
 
-            ShimSqlDataReader.AllInstances.GetGuidInt32 = (_, i) => _guids[i];
+            ShimSqlDataReader.AllInstances.GetGuidInt32 = (_, index) => Guids[index];
             var firstCall = true;
             ShimSqlDataReader.AllInstances.Read = _ =>
             {
@@ -263,7 +263,6 @@ namespace EPMLiveIntegrationService.Tests
             ShimSPListItemCollection.AllInstances.CountGet = _ => shouldSPListItemCollectionBeEmpty ? 0 : 1;
             ShimSPListItemCollection.AllInstances.ItemGetInt32 = (_1, _2) => new ShimSPListItem();
             ShimSPListItem.AllInstances.ItemGetString = (_1, _2) => SpListItemId;
-
 
             _parametersAdded = new Dictionary<string, object>();
             ShimSqlCommand.AllInstances.ParametersGet = _ => new ShimSqlParameterCollection();
