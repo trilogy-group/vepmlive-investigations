@@ -28,5 +28,11 @@
         private const string ColumnType = "ColumnType";
         private const string User = "user";
         private const string SemiColonHash = ";#";
+        private const string SingleQuote = "'";
+        private const string InsertAction = "insert";
+        private const string UpdateAction = "update";
+        private const string EpmLiveId = "EPM Live";
+        private const string EpmLiveReportingGetColumnValue = "EPMLive Reporting GetColumnValue";
+        private const string Id = "id";
     }
 }
