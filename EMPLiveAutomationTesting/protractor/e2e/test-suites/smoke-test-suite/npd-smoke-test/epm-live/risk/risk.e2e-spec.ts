@@ -288,14 +288,14 @@ describe(SuiteNames.smokeTestSuite, () => {
         );
 
         StepLogger.stepId(3);
-        StepLogger.step('Click on any column header e.g; Status');
+        StepLogger.step('Click on any column header e.g; title');
         await WaitHelper.waitForElementToBeDisplayed(RiskItemPage.titleHeaderColumn.first());
         await ElementHelper.actionHoverOver(RiskItemPage.titleHeaderColumn.first());
         await ElementHelper.clickUsingJsNoWait(RiskItemPage.titleHeaderColumn.first());
 
-        StepLogger.verification('The up arrow will appear against Status' +
-            ' and the data in table appears sort by Status ascending from a-z');
-        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.status.descending))
+        StepLogger.verification('The up arrow will appear against Title' +
+            ' and the data in table appears sort by Title ascending from a-z');
+        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.title.descending))
         .toBe(true, ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.sortingOrder.descending));
 
         StepLogger.stepId(4);
@@ -303,9 +303,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ElementHelper.actionHoverOver(RiskItemPage.titleHeaderColumn.first());
         await ElementHelper.clickUsingJsNoWait(RiskItemPage.titleHeaderColumn.first());
 
-        StepLogger.verification('The down arrow will appear against Status' +
-            ' and the data in table appears sort by Status ascending from z-a');
-        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.status.ascending))
+        StepLogger.verification('The down arrow will appear against Title' +
+            ' and the data in table appears sort by Title ascending from z-a');
+        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.title.ascending))
         .toBe(true, ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.sortingOrder.ascending));
     });
 });
