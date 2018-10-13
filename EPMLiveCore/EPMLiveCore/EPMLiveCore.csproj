@@ -65,6 +65,7 @@
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -1388,6 +1389,8 @@
     <Compile Include="SocialEngine\Core\SocialEngineException.cs" />
     <Compile Include="SocialEngine\Core\StreamManager.cs" />
     <Compile Include="SocialEngine\Core\ThreadManager.cs" />
+    <Compile Include="SocialEngine\Core\ThreadManager.Fields.cs" />
+    <Compile Include="SocialEngine\Core\ThreadManager.ProcessThreads.cs" />
     <Compile Include="SocialEngine\Core\Transaction.cs" />
     <Compile Include="SocialEngine\Core\TransactionManager.cs" />
     <Compile Include="SocialEngine\Core\Utilities.cs" />

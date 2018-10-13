@@ -1,39 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
+using EPMLiveCore.Helpers;
 using EPMLiveCore.SocialEngine.Entities;
 
 namespace EPMLiveCore.SocialEngine.Core
 {
-    internal class ThreadManager : BaseManager
+    internal partial class ThreadManager : BaseManager
     {
-        #region Constructors (1) 
-
         public ThreadManager(DBConnectionManager dbConnectionManager) : base(dbConnectionManager) { }
-
-        #endregion Constructors 
-
-        #region Methods (22) 
-
-        // Public Methods (16) 
 
         public void AssociateStreams(Thread thread, Guid[] streamIds)
         {
-            foreach (Guid streamId in streamIds)
+            Guard.ArgumentIsNotNull(streamIds, nameof(streamIds));
+            Guard.ArgumentIsNotNull(thread, nameof(thread));
+
+            foreach (var streamId in streamIds)
             {
-                const string SQL = @"
+                const string Sql = @"
                     IF NOT EXISTS (SELECT StreamId FROM SS_Streams_Threads WHERE StreamId = @StreamId AND ThreadId = @ThreadId)
                     BEGIN
                         INSERT INTO SS_Streams_Threads (StreamId, ThreadId) VALUES (@StreamId, @ThreadId)
                     END";
 
-                using (SqlCommand sqlCommand = GetSqlCommand(SQL))
+                using (var sqlCommand = GetSqlCommand(Sql))
                 {
-                    sqlCommand.Parameters.AddWithValue("@StreamId", streamId);
-                    sqlCommand.Parameters.AddWithValue("@ThreadId", thread.Id);
-
+                    sqlCommand.Parameters.AddWithValue(StreamIdText, streamId);
+                    sqlCommand.Parameters.AddWithValue(ThreadIdText, thread.Id);
                     sqlCommand.ExecuteNonQuery();
                 }
             }
@@ -41,146 +36,36 @@ namespace EPMLiveCore.SocialEngine.Core
 
         public void CleanupCommenters(Thread thread, IEnumerable<int> validCommenters)
         {
-            int[] commenters = validCommenters.ToArray();
+            Guard.ArgumentIsNotNull(validCommenters, nameof(validCommenters));
+            Guard.ArgumentIsNotNull(thread, nameof(thread));
 
-            const string SQL = @"SELECT UserId, Role FROM SS_ThreadUsers WHERE ThreadId = @ThreadId";
+            var commenters = validCommenters.ToArray();
+            const string Sql = @"SELECT UserId, Role FROM SS_ThreadUsers WHERE ThreadId = @ThreadId";
 
-            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
+            using (var sqlCommand = GetSqlCommand(Sql))
             {
-                sqlCommand.Parameters.AddWithValue("@ThreadId", thread.Id);
+                sqlCommand.Parameters.AddWithValue(ThreadIdText, thread.Id);
 
                 var dt = new DataTable();
                 dt.Load(sqlCommand.ExecuteReader());
 
-                EnumerableRowCollection<DataRow> userRoles = dt.AsEnumerable();
+                var userRoles = dt.AsEnumerable();
 
-                foreach (DataRow r in userRoles)
+                foreach (var dataRow in userRoles)
                 {
-                    var userId = (int) r["UserId"];
+                    var userId = (int)dataRow[UserId];
 
-                    if (commenters.Contains(userId)) continue;
+                    if (commenters.Contains(userId))
+                    {
+                        continue;
+                    }
 
-                    var role = (UserRole) Enum.Parse(typeof (UserRole), r["Role"].ToString(), false);
+                    var role = (UserRole)Enum.Parse(typeof(UserRole), dataRow[Role].ToString(), false);
 
                     if (role.Has(UserRole.Commenter))
                     {
                         UpdateUserRole(thread.Id, userId, role.Remove(UserRole.Commenter), true);
                     }
-                }
-            }
-        }
-
-        public void DeleteThread(Thread thread)
-        {
-            const string SQL = @"UPDATE SS_Threads SET Deleted = 1 WHERE Id = @Id";
-
-            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
-            {
-                sqlCommand.Parameters.AddWithValue("@Id", thread.Id);
-                sqlCommand.ExecuteNonQuery();
-            }
-        }
-
-        public void DeleteThreads(IEnumerable<Guid> threadIds)
-        {
-            string[] ids = threadIds.Select(threadId => string.Format(@"'{0}'", threadId)).Distinct().ToArray();
-
-            string sql = @"UPDATE SS_Threads SET Deleted = 1 WHERE Id IN (" + string.Join(",", ids) + ")";
-
-            using (SqlCommand sqlCommand = GetSqlCommand(sql))
-            {
-                sqlCommand.ExecuteNonQuery();
-            }
-        }
-
-        public Thread GetThread(Guid webId, string[] properties = null, bool bringDeleted = false)
-        {
-            return GetThread(webId, null, null, properties, bringDeleted);
-        }
-
-        public Thread GetThread(Guid webId, Guid? listId, string[] properties = null, bool bringDeleted = false)
-        {
-            return GetThread(webId, listId, null, properties, bringDeleted);
-        }
-
-        public Thread GetThread(Guid webId, Guid? listId, int? itemId, string[] properties = null,
-            bool bringDeleted = false)
-        {
-            var columns = new List<string> {"Id"};
-
-            if (properties != null)
-            {
-                columns.AddRange(properties);
-            }
-
-            string sql =
-                string.Format(
-                    @"SELECT TOP 1 {0} FROM SS_Threads WHERE WebId = @WebId AND ListId = @ListId AND ItemId = @ItemId AND Deleted = @Deleted",
-                    string.Join(",", columns.Distinct()));
-
-            if (!listId.HasValue) sql = sql.Replace("= @ListId", "IS NULL");
-            if (!itemId.HasValue) sql = sql.Replace("= @ItemId", "IS NULL");
-
-            using (SqlCommand sqlCommand = GetSqlCommand(sql))
-            {
-                sqlCommand.Parameters.AddWithValue("@WebId", webId);
-                sqlCommand.Parameters.AddWithValue("@ListId", listId.HasValue ? (object) listId : DBNull.Value);
-                sqlCommand.Parameters.AddWithValue("@ItemId", itemId.HasValue ? (object) itemId : DBNull.Value);
-                sqlCommand.Parameters.AddWithValue("@Deleted", bringDeleted ? 1 : 0);
-
-                using (SqlDataReader reader = sqlCommand.ExecuteReader())
-                {
-                    var dataTable = new DataTable();
-                    dataTable.Load(reader);
-
-                    if (dataTable.Rows.Count <= 0) return null;
-
-                    var thread = new Thread();
-
-                    DataRow row = dataTable.Rows[0];
-                    foreach (DataColumn column in dataTable.Columns)
-                    {
-                        object value = row[column.ColumnName];
-
-                        switch (column.ColumnName)
-                        {
-                            case "Id":
-                                thread.Id = (Guid) value;
-                                break;
-                            case "Title":
-                                thread.Title = value as string;
-                                break;
-                            case "URL":
-                                thread.Url = value as string;
-                                break;
-                            case "Kind":
-                                thread.Kind = (ObjectKind) value;
-                                break;
-                            case "LastActivityDateTime":
-                                if (value != null && value != DBNull.Value)
-                                    thread.LastActivityDateTime = (DateTime) value;
-                                break;
-                            case "FirstActivityDateTime":
-                                thread.FirstActivityDateTime = (DateTime) value;
-                                break;
-                            case "WebId":
-                                thread.WebId = (Guid?) value;
-                                break;
-                            case "ListId":
-                                if (value != null && value != DBNull.Value) thread.ListId = (Guid?) value;
-                                break;
-                            case "ItemId":
-                                if (value != null && value != DBNull.Value) thread.ItemId = (int?) value;
-                                break;
-                            case "Deleted":
-                                if ((int) value == 1) thread.Deleted = true;
-                                break;
-                        }
-
-                        reader.Close();
-                    }
-
-                    return thread;
                 }
             }
         }
@@ -202,22 +87,43 @@ namespace EPMLiveCore.SocialEngine.Core
 
         public IEnumerable<Guid> GetThreadIds(Guid webId, Guid? listId, int? itemId, ObjectKind? objectKind)
         {
-            string sql =
-                @"SELECT Id FROM SS_Threads WHERE WebId = @WebId AND ListId = @ListId AND ItemId = @ItemId AND Kind = @Kind";
+            var sql = @"SELECT Id FROM SS_Threads WHERE WebId = @WebId AND ListId = @ListId AND ItemId = @ItemId AND Kind = @Kind";
 
-            if (!listId.HasValue) sql = sql.Replace("= @ListId", "IS NULL");
-            if (!itemId.HasValue) sql = sql.Replace("= @ItemId", "IS NULL");
-            if (!objectKind.HasValue) sql = sql.Replace(" AND Kind = @Kind", string.Empty);
-
-            using (SqlCommand sqlCommand = GetSqlCommand(sql))
+            if (!listId.HasValue)
             {
-                sqlCommand.Parameters.AddWithValue("@WebId", webId);
-                sqlCommand.Parameters.AddWithValue("@ListId", listId.HasValue ? (object) listId.Value : DBNull.Value);
-                sqlCommand.Parameters.AddWithValue("@ItemId", itemId.HasValue ? (object) itemId.Value : DBNull.Value);
-                sqlCommand.Parameters.AddWithValue("@Kind",
-                    objectKind.HasValue ? (object) objectKind.Value : DBNull.Value);
+                sql = sql.Replace("= @ListId", IsNullText);
+            }
 
-                using (SqlDataReader reader = sqlCommand.ExecuteReader())
+            if (!itemId.HasValue)
+            {
+                sql = sql.Replace("= @ItemId", IsNullText);
+            }
+
+            if (!objectKind.HasValue)
+            {
+                sql = sql.Replace(" AND Kind = @Kind", string.Empty);
+            }
+
+            using (var sqlCommand = GetSqlCommand(sql))
+            {
+                sqlCommand.Parameters.AddWithValue(WebIdText, webId);
+                sqlCommand.Parameters.AddWithValue(
+                    ListIdText,
+                    listId.HasValue
+                        ? (object)listId.Value
+                        : DBNull.Value);
+                sqlCommand.Parameters.AddWithValue(
+                    ItemIdText,
+                    itemId.HasValue
+                        ? (object)itemId.Value
+                        : DBNull.Value);
+                sqlCommand.Parameters.AddWithValue(
+                    KindText,
+                    objectKind.HasValue
+                        ? (object)objectKind.Value
+                        : DBNull.Value);
+
+                using (var reader = sqlCommand.ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -229,29 +135,30 @@ namespace EPMLiveCore.SocialEngine.Core
             }
         }
 
-        public void RemoveUserRoles(Guid threadId, Dictionary<int, UserRole> rolesToRemove)
+        public void RemoveUserRoles(Guid threadId, IDictionary<int, UserRole> rolesToRemove)
         {
+            Guard.ArgumentIsNotNull(rolesToRemove, nameof(rolesToRemove));
+
             foreach (var user in rolesToRemove)
             {
-                int userId = user.Key;
+                var userId = user.Key;
+                var existingRole = GetUserRole(threadId, userId);
 
-                UserRole? existingRole = GetUserRole(threadId, userId);
+                if (existingRole?.Has(user.Value) != true)
+                {
+                    continue;
+                }
 
-                if (!existingRole.HasValue || !existingRole.Value.Has(user.Value)) continue;
-
-                UserRole role = existingRole.Value.Remove(user.Value);
+                var role = existingRole.Value.Remove(user.Value);
                 UpdateUserRole(threadId, userId, role, true);
             }
         }
 
-        public Thread SaveThread(Thread thread)
+        public void UpdateAssociatedThreads(Guid threadId, IDictionary<Guid, int> associatedListItems)
         {
-            return thread.Id != Guid.Empty ? UpdateThread(thread) : CreateThread(thread);
-        }
+            Guard.ArgumentIsNotNull(associatedListItems, nameof(associatedListItems));
 
-        public void UpdateAssociatedThreads(Guid threadId, Dictionary<Guid, int> associatedListItems)
-        {
-            const string SQL = @"
+            const string Sql = @"
                 IF NOT EXISTS (SELECT Id FROM SS_AssociatedThreads WHERE ThreadId = @ThreadId AND ListId = @ListId)
                 BEGIN
                     INSERT INTO SS_AssociatedThreads (ThreadId, ListId, ItemId) VALUES (@ThreadId, @ListId, @ItemId)
@@ -264,12 +171,11 @@ namespace EPMLiveCore.SocialEngine.Core
 
             foreach (var pair in associatedListItems)
             {
-                using (SqlCommand sqlCommand = GetSqlCommand(SQL))
+                using (var sqlCommand = GetSqlCommand(Sql))
                 {
-                    sqlCommand.Parameters.AddWithValue("@ThreadId", threadId);
-                    sqlCommand.Parameters.AddWithValue("@ListId", pair.Key);
-                    sqlCommand.Parameters.AddWithValue("@ItemId", pair.Value);
-
+                    sqlCommand.Parameters.AddWithValue(ThreadIdText, threadId);
+                    sqlCommand.Parameters.AddWithValue(ListIdText, pair.Key);
+                    sqlCommand.Parameters.AddWithValue(ItemIdText, pair.Value);
                     sqlCommand.ExecuteNonQuery();
                 }
             }
@@ -277,68 +183,83 @@ namespace EPMLiveCore.SocialEngine.Core
 
         public void UpdateCommenters(Thread thread)
         {
+            Guard.ArgumentIsNotNull(thread, nameof(thread));
+
             var commenters = new List<int>();
 
-            foreach (User user in thread.Users)
+            foreach (var user in thread.Users)
             {
-                if (user.Role.Has(UserRole.Commenter)) commenters.Add(user.Id);
+                if (user.Role.Has(UserRole.Commenter))
+                {
+                    commenters.Add(user.Id);
+                }
 
-                UserRole? existingRole = GetUserRole(thread.Id, user.Id);
+                var existingRole = GetUserRole(thread.Id, user.Id);
+                var userExists = existingRole.HasValue;
 
-                bool userExists = existingRole.HasValue;
+                if (userExists && existingRole.Value.Has(user.Role))
+                {
+                    continue;
+                }
 
-                if (userExists && existingRole.Value.Has(user.Role)) continue;
-
-                user.Role = !userExists ? user.Role : existingRole.Value | user.Role;
+                user.Role = !userExists
+                    ? user.Role
+                    : existingRole.Value | user.Role;
                 UpdateUserRole(thread.Id, user.Id, user.Role, userExists);
             }
         }
 
         public void UpdateUsers(Thread thread)
         {
+            Guard.ArgumentIsNotNull(thread, nameof(thread));
+
             var assignees = new List<int>();
 
-            foreach (User user in thread.Users)
+            foreach (var user in thread.Users)
             {
-                if (user.Role.Has(UserRole.Assignee)) assignees.Add(user.Id);
+                if (user.Role.Has(UserRole.Assignee))
+                {
+                    assignees.Add(user.Id);
+                }
 
-                UserRole? existingRole = GetUserRole(thread.Id, user.Id);
+                var existingRole = GetUserRole(thread.Id, user.Id);
+                var userExists = existingRole.HasValue;
 
-                bool userExists = existingRole.HasValue;
+                if (userExists && existingRole.Value.Has(user.Role))
+                {
+                    continue;
+                }
 
-                if (userExists && existingRole.Value.Has(user.Role)) continue;
-
-                user.Role = !userExists ? user.Role : existingRole.Value | user.Role;
+                user.Role = !userExists
+                    ? user.Role
+                    : existingRole.Value | user.Role;
                 UpdateUserRole(thread.Id, user.Id, user.Role, userExists);
             }
 
             CleanupAssignees(thread.Id, assignees);
         }
 
-        // Private Methods (6) 
-
-        private void CleanupAssignees(Guid threadId, List<int> assignees)
+        private void CleanupAssignees(Guid threadId, IList<int> assignees)
         {
+            Guard.ArgumentIsNotNull(assignees, nameof(assignees));
+
             var rolesToRemove = new Dictionary<int, UserRole>();
-
-            const string SQL = @"SELECT Role, UserId FROM SS_ThreadUsers WHERE ThreadId = @ThreadId AND Role >= @Role";
-
+            const string Sql = @"SELECT Role, UserId FROM SS_ThreadUsers WHERE ThreadId = @ThreadId AND Role >= @Role";
             var dt = new DataTable();
 
-            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
+            using (var sqlCommand = GetSqlCommand(Sql))
             {
-                sqlCommand.Parameters.AddWithValue("@ThreadId", threadId);
-                sqlCommand.Parameters.AddWithValue("@Role", UserRole.Assignee);
-
+                sqlCommand.Parameters.AddWithValue(ThreadIdText, threadId);
+                sqlCommand.Parameters.AddWithValue(RoleText, UserRole.Assignee);
                 dt.Load(sqlCommand.ExecuteReader());
             }
 
-            EnumerableRowCollection<DataRow> roles = dt.AsEnumerable();
+            var roles = dt.AsEnumerable();
 
-            foreach (int userId in from r in roles
-                let role = (UserRole) Enum.Parse(typeof (UserRole), r["Role"].ToString(), false)
+            foreach (var userId in from r in roles
+                let role = (UserRole)Enum.Parse(typeof(UserRole), r[Role].ToString(), false)
                 where role.Has(UserRole.Assignee)
-                select (int) r["UserId"]
+                select (int)r[UserId]
                 into userId
                 where !assignees.Contains(userId)
                 where !rolesToRemove.ContainsKey(userId)
@@ -347,92 +268,30 @@ namespace EPMLiveCore.SocialEngine.Core
                 rolesToRemove.Add(userId, UserRole.Assignee);
             }
 
-            if (rolesToRemove.Count > 0) RemoveUserRoles(threadId, rolesToRemove);
-        }
-
-        private Thread CreateThread(Thread thread)
-        {
-            thread.Id = Guid.NewGuid();
-
-            var sql = @"INSERT INTO SS_Threads (Id, Title, URL, Kind, FirstActivityDateTime, WebId, ListId, ItemId) 
-                        VALUES (@Id, @Title, @URL, @Kind, @FirstActivityDateTime, @WebId, @ListId, @ItemId)";
-
-            if (string.IsNullOrEmpty(thread.Url))
+            if (rolesToRemove.Any())
             {
-                sql = sql.Replace(", URL", string.Empty).Replace("@URL, ", string.Empty);
+                RemoveUserRoles(threadId, rolesToRemove);
             }
-
-            using (SqlCommand sqlCommand = GetSqlCommand(sql))
-            {
-                sqlCommand.Parameters.AddWithValue("@Id", thread.Id);
-                sqlCommand.Parameters.AddWithValue("@Title", thread.Title);
-                sqlCommand.Parameters.AddWithValue("@Kind", thread.Kind);
-                sqlCommand.Parameters.AddWithValue("@FirstActivityDateTime", thread.FirstActivityDateTime);
-                sqlCommand.Parameters.AddWithValue("@WebId", thread.WebId);
-                if (!string.IsNullOrEmpty(thread.Url)) sqlCommand.Parameters.AddWithValue("@URL", thread.Url);
-                sqlCommand.Parameters.AddWithValue("@ListId",
-                    thread.ListId.HasValue ? (object) thread.ListId : DBNull.Value);
-                sqlCommand.Parameters.AddWithValue("@ItemId",
-                    thread.ItemId.HasValue ? (object) thread.ItemId : DBNull.Value);
-
-                sqlCommand.ExecuteNonQuery();
-            }
-
-            return thread;
         }
 
         private UserRole? GetUserRole(Guid threadId, int userId)
         {
-            const string SQL =
-                @"SELECT TOP (1) Role FROM SS_ThreadUsers WHERE ThreadId = @ThreadId AND UserId = @UserId";
+            const string Sql = @"SELECT TOP (1) Role FROM SS_ThreadUsers WHERE ThreadId = @ThreadId AND UserId = @UserId";
 
-            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
+            using (var sqlCommand = GetSqlCommand(Sql))
             {
-                sqlCommand.Parameters.AddWithValue("@ThreadId", threadId);
-                sqlCommand.Parameters.AddWithValue("@UserId", userId);
+                sqlCommand.Parameters.AddWithValue(ThreadIdText, threadId);
+                sqlCommand.Parameters.AddWithValue(UserIdText, userId);
 
-                object er = sqlCommand.ExecuteScalar();
-                if (er != null && er != DBNull.Value)
+                var executeScalar = sqlCommand.ExecuteScalar();
+
+                if (executeScalar != null && executeScalar != DBNull.Value)
                 {
-                    return (UserRole) Enum.Parse(typeof (UserRole), er.ToString(), false);
+                    return (UserRole)Enum.Parse(typeof(UserRole), executeScalar.ToString(), false);
                 }
             }
 
             return null;
-        }
-
-        private void RemoveThreadUser(Guid threadId, int userId)
-        {
-            const string SQL = @"DELETE FROM SS_ThreadUsers WHERE ThreadId = @ThreadId AND UserId = @UserId";
-
-            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
-            {
-                sqlCommand.Parameters.AddWithValue("@ThreadId", threadId);
-                sqlCommand.Parameters.AddWithValue("@UserId", userId);
-
-                sqlCommand.ExecuteNonQuery();
-            }
-        }
-
-        private Thread UpdateThread(Thread thread)
-        {
-            var sql = @"UPDATE SS_Threads SET Title = @Title, URL = @URL WHERE Id = @Id";
-
-            if (string.IsNullOrEmpty(sql))
-            {
-                sql = sql.Replace(", URL = @URL", string.Empty);
-            }
-
-            using (SqlCommand sqlCommand = GetSqlCommand(sql))
-            {
-                sqlCommand.Parameters.AddWithValue("@Id", thread.Id);
-                sqlCommand.Parameters.AddWithValue("@Title", thread.Title);
-                if (!string.IsNullOrEmpty(thread.Url)) sqlCommand.Parameters.AddWithValue("@URL", thread.Url);
-
-                sqlCommand.ExecuteNonQuery();
-            }
-
-            return thread;
         }
 
         private void UpdateUserRole(Guid threadId, int userId, UserRole role, bool userExists)
@@ -443,20 +302,17 @@ namespace EPMLiveCore.SocialEngine.Core
                 return;
             }
 
-            string sql = !userExists
+            var sql = !userExists
                 ? @"INSERT INTO SS_ThreadUsers (ThreadId, UserId, Role) VALUES (@ThreadId, @UserId, @Role)"
                 : @"UPDATE SS_ThreadUsers SET Role = @Role WHERE ThreadId = @ThreadId AND UserId = @UserId";
 
-            using (SqlCommand sqlCommand = GetSqlCommand(sql))
+            using (var sqlCommand = GetSqlCommand(sql))
             {
-                sqlCommand.Parameters.AddWithValue("@ThreadId", threadId);
-                sqlCommand.Parameters.AddWithValue("@UserId", userId);
-                sqlCommand.Parameters.AddWithValue("@Role", role);
-
+                sqlCommand.Parameters.AddWithValue(ThreadIdText, threadId);
+                sqlCommand.Parameters.AddWithValue(UserIdText, userId);
+                sqlCommand.Parameters.AddWithValue(RoleText, role);
                 sqlCommand.ExecuteNonQuery();
             }
         }
-
-        #endregion Methods 
     }
 }
