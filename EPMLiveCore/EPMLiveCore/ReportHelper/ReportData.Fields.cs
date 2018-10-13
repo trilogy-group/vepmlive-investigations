@@ -33,6 +33,10 @@
         private const string UpdateAction = "update";
         private const string EpmLiveId = "EPM Live";
         private const string EpmLiveReportingGetColumnValue = "EPMLive Reporting GetColumnValue";
-        private const string Id = "id";
+        private const string AssignedTo = "AssignedTo";
+        private const string Work = "Work";
+        private const string WorkTypeText = "WorkType";
+        private const string DataSourceText = "DataSource";
+        private const string AssignedToText = "assignedtotext";
     }
 }

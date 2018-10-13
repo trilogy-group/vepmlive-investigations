@@ -188,7 +188,7 @@ namespace EPMLiveCore.ReportHelper
                     else
                     {
                         param.Value = lookupVal != null
-                            ? (object)AddLookUpFieldValues(lookupVal.ToString(), Id)
+                            ? (object)AddLookUpFieldValues(lookupVal.ToString(), IdText)
                             : DBNull.Value;
                     }
                 }
