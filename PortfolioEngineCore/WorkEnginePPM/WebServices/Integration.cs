@@ -13,7 +13,9 @@ using System.Xml;
 using System.Threading;
 using System.ComponentModel;
 using System.DirectoryServices;
+using System.Globalization;
 using System.Text;
+using EPMLiveCore;
 
 namespace WorkEnginePPM
 {
@@ -408,117 +410,213 @@ namespace WorkEnginePPM
             return message;
         }
 
-        private string buildTasks(DataTable dt, Hashtable hshTaskCenterFields, SPList oTaskCenter)
+        private string buildTasks(DataTable dataTable, Hashtable hshTaskCenterFields, SPList taskCenter)
         {
-            string strDisplay = ConfigFunctions.getListSetting(oTaskCenter, "DisplaySettings");
-            Dictionary<string, Dictionary<string, string>> fieldProperties = ListDisplayUtils.ConvertFromString(strDisplay);
+            var strDisplay = ConfigFunctions.getListSetting(taskCenter, "DisplaySettings");
+            var fieldProperties = ListDisplayUtils.ConvertFromString(strDisplay);
 
-            StringBuilder sb = new StringBuilder();
+            var stringBuilder = new StringBuilder();
 
-            foreach (DataRow dr in dt.Rows)
+            foreach (DataRow dr in dataTable.Rows)
             {
-                SPListItem li = null;
+                SPListItem listItem = null;
                 try
                 {
-                    li = oTaskCenter.GetItemById(int.Parse(dr["ID"].ToString()));
-                }catch{}
-
-                if(li != null)
+                    listItem = taskCenter.GetItemById(int.Parse(dr["ID"].ToString()));
+                }
+                catch(Exception ex)
                 {
-                    string id = "";
-                    string uid = "";
-                    try
-                    {
-                        id = li["taskorder"].ToString();
-                    }
-                    catch { }
-                    try
-                    {
-                        uid = li["taskuid"].ToString();
-                    }
-                    catch { }
-                    sb.Append("<Task ID=\"" + id + "\" UID=\"" + uid + "\" ItemID=\"" + li.ID + "\">");
-                    sb.Append("<Title><![CDATA[" + li.Title + "]]></Title>");
-                    try
-                    {
-                        SPFieldUserValue uv = new SPFieldUserValue(oTaskCenter.ParentWeb, li["Editor"].ToString());
-                        sb.Append("<Field Name=\"Editor\"><![CDATA[" + uv.LookupValue + "]]></Field>");
-                    }
-                    catch { }
-                    try
-                    {
-                        if(li["IsAssignment"].ToString() == "True")
-                            sb.Append("<Field Name=\"IsAssignment\"><![CDATA[1]]></Field>");
-                        else
-                            sb.Append("<Field Name=\"IsAssignment\"><![CDATA[0]]></Field>");
-                    }
-                    catch { }
-                    try
-                    {
-                        sb.Append("<Field Name=\"TaskHierarchy\"><![CDATA[" + li["TaskHierarchy"] + "]]></Field>");
-                    }
-                    catch { }
-                    
-                    foreach (SPField oField in oTaskCenter.Fields)
-                    {
-                        if (oField.ShowInEditForm != null && oField.ShowInEditForm.Value && isEditable(li, oField, fieldProperties) && oField.Type != SPFieldType.Calculated)
-                        {
-                            XmlDocument doc = new XmlDocument();
-                            doc.LoadXml(oField.SchemaXml);
+                    Trace.TraceError("Exeption Suppressed {0}", ex);
+                }
 
-                            string val = "";
-                            try
-                            {
-                                val = oTaskCenter.Fields[oField.Id].GetFieldValue(li[oField.Id].ToString()).ToString();
-                            }
-                            catch { }
-                            if (oField.Type == SPFieldType.Number || oField.Type == SPFieldType.Currency)
-                            {
-                                try
-                                {
-                                    System.Globalization.NumberFormatInfo providerEn = new System.Globalization.NumberFormatInfo();
-                                    providerEn.NumberDecimalSeparator = ".";
-                                    providerEn.NumberGroupSeparator = ",";
-                                    providerEn.NumberGroupSizes = new int[] { 3 };
-
-                                    val = Convert.ToDouble(li[oField.Id].ToString()).ToString(providerEn);
-                                }
-                                catch { }
-                            }
-                            else if (oField.Type == SPFieldType.DateTime)
-                            {
-                                try
-                                {
-                                    val = DateTime.Parse(li[oField.Id].ToString()).ToString("s");
-                                }
-                                catch { }
-                            }
-                            else if (oField.Type == SPFieldType.User)
-                            {
-                                try
-                                {
-                                    val = "";
-                                    SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(oTaskCenter.ParentWeb, li[oField.Id].ToString());
-                                    foreach (SPFieldUserValue uv in uvc)
-                                    {
-                                        val += "," + EPMLiveCore.CoreFunctions.GetRealUserName(uv.User.LoginName);
-                                    }
-                                    val = val.Trim(',');
-                                }
-                                catch { }
-                            }
-                            if (hshTaskCenterFields.Contains(oField.InternalName))
-                                sb.Append("<Field Name=\"" + hshTaskCenterFields[oField.InternalName].ToString() + "\"><![CDATA[" + val + "]]></Field>");
-                            else
-                                sb.Append("<Field Name=\"" + oField.InternalName + "\"><![CDATA[" + val + "]]></Field>");
-                        }
-                    }
-
-                    sb.Append("</Task>");
+                if (listItem != null)
+                {
+                    WriteIds(listItem, stringBuilder);
+                    WriteTitle(stringBuilder, listItem);
+                    WriteLookupValue(taskCenter, listItem, stringBuilder);
+                    WriteIsAssignment(stringBuilder, listItem);
+                    WriteTaskHierarchy(stringBuilder, listItem);
+                    WriteFieldValues(hshTaskCenterFields, taskCenter, listItem, fieldProperties,stringBuilder);
+                    stringBuilder.Append("</Task>");
                 }
             }
 
-            return sb.ToString();
+            return stringBuilder.ToString();
+        }
+
+        private void WriteFieldValues(
+            Hashtable hshTaskCenterFields,
+            SPList taskCenter,
+            SPListItem listItem,
+            Dictionary<string, Dictionary<string, string>> fieldProperties,
+            StringBuilder stringBuilder)
+        {
+            foreach (SPField spField in taskCenter.Fields)
+            {
+                if (spField.ShowInEditForm != null
+                    && spField.ShowInEditForm.Value
+                    && isEditable(listItem, spField, fieldProperties)
+                    && spField.Type != SPFieldType.Calculated)
+                {
+                    var doc = new XmlDocument();
+                    doc.LoadXml(spField.SchemaXml);
+
+                    var stringValue = GetGenericFieldValue(taskCenter, spField, listItem);
+                    if (spField.Type == SPFieldType.Number
+                        || spField.Type == SPFieldType.Currency)
+                    {
+                        GetNumberFieldValue(ref stringValue, listItem, spField);
+                    }
+                    else if (spField.Type == SPFieldType.DateTime)
+                    {
+                        GetDateFieldValue(ref stringValue, listItem, spField);
+                    }
+                    else if (spField.Type == SPFieldType.User)
+                    {
+                        GetUserFieldValue(taskCenter, listItem, spField, ref stringValue);
+                    }
+                    stringBuilder.Append(
+                        hshTaskCenterFields.Contains(spField.InternalName)
+                            ? $"<Field Name=\"{hshTaskCenterFields[spField.InternalName]}\"><![CDATA[{stringValue}]]></Field>"
+                            : $"<Field Name=\"{spField.InternalName}\"><![CDATA[{stringValue}]]></Field>");
+                }
+            }
+        }
+
+        private static void GetUserFieldValue(SPList oTaskCenter, SPListItem li, SPField oField, ref string stringValue)
+        {
+            try
+            {
+                var valueStringBuilder = new StringBuilder();
+                var userValueCollection = new SPFieldUserValueCollection(oTaskCenter.ParentWeb, li[oField.Id].ToString());
+                foreach (var userValue in userValueCollection)
+                {
+                    valueStringBuilder.Append($",{CoreFunctions.GetRealUserName(userValue.User.LoginName)}");
+                }
+                stringValue = valueStringBuilder.ToString().Trim(',');
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exeption Suppressed {0}", ex);
+            }
+        }
+
+        private static void GetDateFieldValue(ref string stringValue, SPListItem li, SPField oField)
+        {
+            try
+            {
+                stringValue = DateTime.Parse(li[oField.Id].ToString()).ToString("s");
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exeption Suppressed {0}", ex);
+            }
+        }
+
+        private static void GetNumberFieldValue(ref string stringValue, SPListItem li, SPField oField)
+        {
+            try
+            {
+                var providerEn = new NumberFormatInfo
+                {
+                    NumberDecimalSeparator = ".",
+                    NumberGroupSeparator = ",",
+                    NumberGroupSizes = new[]
+                    {
+                        3
+                    }
+                };
+
+                stringValue = Convert.ToDouble(li[oField.Id].ToString()).ToString(providerEn);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exeption Suppressed {0}", ex);
+            }
+        }
+
+        private static string GetGenericFieldValue(SPList oTaskCenter, SPField oField, SPListItem li)
+        {
+            var stringValue = string.Empty;
+            try
+            {
+                stringValue = oTaskCenter.Fields[oField.Id].GetFieldValue(li[oField.Id].ToString()).ToString();
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exeption Suppressed {0}", ex);
+            }
+            return stringValue;
+        }
+
+        private static void WriteTitle(StringBuilder stringBuilder, SPListItem li)
+        {
+            stringBuilder.Append("<Title><![CDATA[" + li.Title + "]]></Title>");
+        }
+
+        private static void WriteIds(SPListItem li, StringBuilder stringBuilder)
+        {
+            var id = string.Empty;
+            var uid = string.Empty;
+            try
+            {
+                id = li["taskorder"].ToString();
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exeption Suppressed {0}", ex);
+            }
+            try
+            {
+                uid = li["taskuid"].ToString();
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exeption Suppressed {0}", ex);
+            }
+            stringBuilder.Append("<Task ID=\"" + id + "\" UID=\"" + uid + "\" ItemID=\"" + li.ID + "\">");
+        }
+
+        private static void WriteLookupValue(SPList oTaskCenter, SPListItem li, StringBuilder stringBuilder)
+        {
+            try
+            {
+                var uv = new SPFieldUserValue(
+                    oTaskCenter.ParentWeb,
+                    li["Editor"]
+                        .ToString());
+                stringBuilder.Append("<Field Name=\"Editor\"><![CDATA[" + uv.LookupValue + "]]></Field>");
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exeption Suppressed {0}", ex);
+            }
+        }
+
+        private static void WriteIsAssignment(StringBuilder stringBuilder, SPListItem li)
+        {
+            try
+            {
+                stringBuilder.Append(li["IsAssignment"].ToString() == "True"
+                        ? "<Field Name=\"IsAssignment\"><![CDATA[1]]></Field>"
+                        : "<Field Name=\"IsAssignment\"><![CDATA[0]]></Field>");
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exeption Suppressed {0}", ex);
+            }
+        }
+
+        private static void WriteTaskHierarchy(StringBuilder stringBuilder, SPListItem li)
+        {
+            try
+            {
+                stringBuilder.Append("<Field Name=\"TaskHierarchy\"><![CDATA[" + li["TaskHierarchy"] + "]]></Field>");
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exeption Suppressed {0}", ex);
+            }
         }
 
         private bool isEditable(SPListItem li, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
@@ -1187,134 +1285,200 @@ namespace WorkEnginePPM
         #region UpdateItems
         private string UpdateItems(string xml)
         {
-            DataSet ds = new DataSet();
-            string message = "";
-            bool errors = false;
-            string key = "";
+            var dataSet = new DataSet();
+            var message = string.Empty;
+            var messageStringBuilder = new StringBuilder();
+            var errors = false;
 
-            string sSource = "EPM Live";
-            string sLog = "Application";
+            var source = "EPM Live";
+            var log = "Application";
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                if (!EventLog.SourceExists(sSource))
-                    EventLog.CreateEventSource(sSource, sLog);
-            });
+            CreateLogEventSource(source, log);
 
             try
             {
-                StringReader sr = new StringReader(xml);
-                ds.ReadXml(sr, XmlReadMode.Auto);
+                var stringReader = new StringReader(xml);
+                dataSet.ReadXml(stringReader, XmlReadMode.Auto);
 
-                //XmlDocument doc = new XmlDocument();
-                //doc.LoadXml(xml);
+                var siteId = SPContext.Current.Site.ID;
+                var webId = SPContext.Current.Web.ID;
 
-                Guid siteid = SPContext.Current.Site.ID;
-                Guid webid = SPContext.Current.Web.ID;
-
-                SPSecurity.RunWithElevatedPrivileges(delegate()
-                {
-                    EventLog.WriteEntry(sSource, "Inside UpdateItems", EventLogEntryType.Information);
-
-                    using (SPSite site = new SPSite(siteid))
-                    {
-                        using(SPWeb web = site.OpenWeb(webid))
-                        {
-                            DataView dv = ds.Tables[1].DefaultView;
-                            dv.Sort = "itemid";
-
-                            Guid webGuid = Guid.Empty;
-                            SPWeb iWeb = null;
-                            Guid listGuid = Guid.Empty;
-                            SPList iList = null;
-
-                            foreach(DataRow dr in dv.Table.Rows)
-                            {
-                                bool e = false;
-
-                                string[] itemid = dr["itemid"].ToString().Split('.');
-
-                                Guid wGuid = new Guid(itemid[0]);
-                                Guid lGuid = new Guid(itemid[1]);
-
-                                if(webGuid != wGuid)
-                                {
-                                    if(iWeb != null)
-                                    {
-                                        try
-                                        {
-                                            iWeb.Close();
-                                            iWeb = null;
-                                        }
-                                        catch { }
-                                        try
-                                        {
-                                            iWeb = web.Site.OpenWeb(wGuid);
-                                        }
-                                        catch { }
-                                    }
-                                    else
-                                    {
-                                        try
-                                        {
-                                            iWeb = web.Site.OpenWeb(wGuid);
-                                        }
-                                        catch { }
-                                    }
-                                    if(iWeb != null)
-                                        webGuid = iWeb.ID;
-                                }
-                                if(iWeb != null)
-                                {
-                                    if(listGuid != lGuid)
-                                    {
-                                        try
-                                        {
-                                            iList = iWeb.Lists[lGuid];
-                                        }
-                                        catch
-                                        {
-                                            EventLog.WriteEntry(sSource, "In UpdateItems: list not found in the SP site: " + lGuid, EventLogEntryType.Information);
-                                            continue;
-                                        }
-                                        listGuid = iList.ID;
-                                    }
-                                }
-                                if(iWeb != null)
-                                    message += HelperFunctions.processPortfolioItem(iWeb, iList, itemid[2], ds.Tables[2].Select("portfolioitem_id=" + dr["portfolioitem_id"].ToString()), "1", out e);
-
-                                if(e)
-                                    errors = true;
-                            }
-                        }
-                    }
-                });
+                errors = ProcessItems(source, siteId, webId, dataSet, messageStringBuilder);
+                message = messageStringBuilder.ToString();
             }
             catch (Exception ex)
             {
                 errors = true;
-                message = "<Error ID=\"100\"><![CDATA[" + ex.Message + "]]></Error>";
+                message = $"<Error ID=\"100\"><![CDATA[{ex.Message}]]></Error>";
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
-                {
-                    EventLog.WriteEntry(sSource, "In UpdateItems CATCH block: Error message: " + ex.Message, EventLogEntryType.Error);
-                    EventLog.WriteEntry(sSource, "In UpdateItems CATCH block: Stack Trace:\r\n" + ex.StackTrace.ToString(), EventLogEntryType.Error);
-                });
+                SPSecurity.RunWithElevatedPrivileges(
+                    delegate
+                    {
+                        EventLog.WriteEntry(source, $"In UpdateItems CATCH block: Error message: {ex.Message}", EventLogEntryType.Error);
+                        EventLog.WriteEntry(source, $"In UpdateItems CATCH block: Stack Trace:\r\n{ex.StackTrace}", EventLogEntryType.Error);
+                    });
             }
 
-            if (errors)
-                message = "<Result Status=\"1\">" + message + "</Result>";
-            else
-                message = "<Result Status=\"0\">" + message + "</Result>";
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                EventLog.WriteEntry(sSource, "End of Method UpdateItems, errors:" + errors.ToString(), EventLogEntryType.Information);
-            });
+            ProcessErrorMessage(ref message, errors, source);
 
             return message;
 
         }
+
+        private static bool ProcessItems(string source, Guid siteId, Guid webId, DataSet dataSet,
+            StringBuilder messageStringBuilder)
+        {
+            bool errors = false;
+            SPSecurity.RunWithElevatedPrivileges(
+                delegate
+                {
+                    EventLog.WriteEntry(source, "Inside UpdateItems", EventLogEntryType.Information);
+
+                    using (var site = new SPSite(siteId))
+                    {
+                        using (var web = site.OpenWeb(webId))
+                        {
+                            var dataView = dataSet.Tables[1].DefaultView;
+                            dataView.Sort = "itemid";
+
+                            var webGuid = Guid.Empty;
+                            SPWeb iWeb = null;
+                            var listGuid = Guid.Empty;
+                            SPList iList = null;
+
+                            foreach (DataRow dataRow in dataView.Table.Rows)
+                            {
+                                var error = false;
+
+                                var itemid = dataRow["itemid"].ToString().Split('.');
+
+                                var wGuid = new Guid(itemid[0]);
+                                var lGuid = new Guid(itemid[1]);
+
+                                if (webGuid != wGuid)
+                                {
+                                    if (iWeb != null)
+                                    {
+                                        ReopenWeb(ref iWeb, web, wGuid);
+                                    }
+                                    else
+                                    {
+                                        OpenWeb(ref iWeb, web, wGuid);
+                                    }
+                                    if (iWeb != null)
+                                    {
+                                        webGuid = iWeb.ID;
+                                    }
+                                }
+                                if (iWeb != null && listGuid != lGuid)
+                                {
+                                    try
+                                    {
+                                        iList = iWeb.Lists[lGuid];
+                                    }
+                                    catch(Exception ex)
+                                    {
+                                        Trace.TraceError("Exception Suppressed {0}", ex);
+                                        EventLog.WriteEntry(
+                                            source,
+                                            $"In UpdateItems: list not found in the SP site: {lGuid}",
+                                            EventLogEntryType.Information);
+                                        continue;
+                                    }
+                                    listGuid = iList.ID;
+                                }
+                                error = ProcessPortfolioItem(dataSet, messageStringBuilder, iWeb, iList, itemid, dataRow);
+
+                                if (error)
+                                {
+                                    errors = true;
+                                }
+                            }
+                        }
+                    }
+                });
+            return errors;
+        }
+
+        private static bool ProcessPortfolioItem(
+            DataSet dataSet,
+            StringBuilder messageStringBuilder,
+            SPWeb iWeb,
+            SPList iList,
+            string[] itemid,
+            DataRow dataRow)
+        {
+            bool error = false;
+            if (iWeb != null)
+            {
+                messageStringBuilder.Append(
+                    HelperFunctions.processPortfolioItem(
+                        iWeb,
+                        iList,
+                        itemid[2],
+                        dataSet.Tables[2]
+                               .Select($"portfolioitem_id={dataRow["portfolioitem_id"]}"),
+                        "1",
+                        out error));
+            }
+            return error;
+        }
+
+        private static void OpenWeb(ref SPWeb iWeb, SPWeb web, Guid wGuid)
+        {
+            try
+            {
+                iWeb = web.Site.OpenWeb(wGuid);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private static void ReopenWeb(ref SPWeb iWeb, SPWeb web, Guid wGuid)
+        {
+            try
+            {
+                iWeb.Close();
+                iWeb = null;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+            try
+            {
+                iWeb = web.Site.OpenWeb(wGuid);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private static void ProcessErrorMessage(ref string message, bool errors, string source)
+        {
+            message = errors
+                ? $"<Result Status=\"1\">{message}</Result>"
+                : $"<Result Status=\"0\">{message}</Result>";
+
+            SPSecurity.RunWithElevatedPrivileges(
+                delegate { EventLog.WriteEntry(source, $"End of Method UpdateItems, errors:{errors}", EventLogEntryType.Information); });
+        }
+
+        private static void CreateLogEventSource(string source, string log)
+        {
+            SPSecurity.RunWithElevatedPrivileges(
+                delegate
+                {
+                    if (!EventLog.SourceExists(source))
+                    {
+                        EventLog.CreateEventSource(source, log);
+                    }
+                });
+        }
+
         #endregion
 
         #region Settings
@@ -2026,92 +2190,24 @@ namespace WorkEnginePPM
 
         private string GetMissingEventHandlers(string xml)
         {
-            string message = "";
-            bool errors = false;
+            return HandleEvents(xml, GetMissinEventHandlerAction);
+        }
 
-            SortedList arrFields = new SortedList();
+        private static string HandleEvents(string xml, ProcessEventAction processEventAction)
+        {
+            var message = string.Empty;
+            var errors = false;
 
-            string key = "";
-            string eventclass = "";
+            var key = string.Empty;
+            var eventClass = string.Empty;
 
             try
             {
+                LoadDataFromXml(xml, ref key, ref eventClass);
 
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(xml);
-
-                try
+                if (key != string.Empty && eventClass != string.Empty)
                 {
-                    key = doc.FirstChild.Attributes["Key"].Value;
-                }
-                catch { }
-                try
-                {
-                    eventclass = doc.FirstChild.Attributes["EventClass"].Value;
-                }
-                catch { }
-                if (key != "" && eventclass != "")
-                {
-
-
-                    using (SPSite site = SPContext.Current.Site)
-                    {
-                        string slists = ConfigFunctions.getConfigSetting(site.RootWeb, key + "Lists");
-
-                        if (slists != "")
-                        {
-                            string[] arrLists = slists.Split(',');
-
-                            var spWebCollection = site.AllWebs;
-                            for (int i = 0; i < spWebCollection.Count; i++)
-                            {
-                                using (var web = spWebCollection[i])
-                                {
-                                    string badLists = "";
-
-                                    foreach (string sList in arrLists)
-                                    {
-                                        int eventCount = 0;
-
-                                        try
-                                        {
-
-                                            SPList list = web.Lists[sList];
-
-                                            foreach (SPEventReceiverDefinition spEventDef in list.EventReceivers)
-                                            {
-                                                if (spEventDef.Type == SPEventReceiverType.ItemAdded && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                    eventCount++;
-
-                                                if (spEventDef.Type == SPEventReceiverType.ItemUpdating && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                    eventCount++;
-
-                                                if (spEventDef.Type == SPEventReceiverType.ItemDeleting && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                    eventCount++;
-                                            }
-
-                                            if (eventCount != 3)
-                                            {
-                                                badLists += "," + sList;
-                                            }
-                                        }
-                                        catch { }
-                                    }
-                                    if (badLists != "")
-                                    {
-                                        badLists = badLists.Trim(',');
-
-                                        message += "<Web><URL><![CDATA[" + web.ServerRelativeUrl + "]]></URL><Title><![CDATA[" + web.Title + "]]></Title><Lists><![CDATA[" + badLists + "]]></Lists></Web>";
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            errors = true;
-                            message = "<Error ID=\"102\"><![CDATA[No Lists Defined]]></Error>";
-                        }
-                    }
+                    processEventAction?.Invoke(key, eventClass, ref message, ref errors);
                 }
                 else
                 {
@@ -2121,131 +2217,157 @@ namespace WorkEnginePPM
             }
             catch (Exception ex)
             {
+                Trace.TraceError("Exception Suppressed {0}", ex);
                 errors = true;
-                message = "<Error ID=\"100\"><![CDATA[" + ex.Message + "]]></Error>";
+                message = $"<Error ID=\"100\"><![CDATA[{ex.Message}]]></Error>";
             }
 
-            if (errors)
-                message = "<Result Status=\"1\">" + message + "</Result>";
-            else
-                message = "<Result Status=\"0\">" + message + "</Result>";
+            message = errors
+                ? $"<Result Status=\"1\">{message}</Result>"
+                : $"<Result Status=\"0\">{message}</Result>";
 
             return message;
+        }
+
+        private delegate void ProcessEventAction(string key, string eventClass, ref string message, ref bool errors);
+
+        private static void GetMissinEventHandlerAction(string key, string eventClass, ref string message, ref bool errors)
+        {
+            using (var site = SPContext.Current.Site)
+            {
+                var listsString = ConfigFunctions.getConfigSetting(site.RootWeb, key + "Lists");
+
+                if (!string.IsNullOrWhiteSpace(listsString))
+                {
+                    var lists = listsString.Split(',');
+
+                    var spWebCollection = site.AllWebs;
+                    for (var index = 0; index < spWebCollection.Count; index++)
+                    {
+                        using (var web = spWebCollection[index])
+                        {
+                            var badLists = string.Empty;
+
+                            foreach (var list in lists)
+                            {
+                                var eventCount = 0;
+
+                                try
+                                {
+                                    var spList = web.Lists[list];
+
+                                    foreach (SPEventReceiverDefinition spEventDef in spList.EventReceivers)
+                                    {
+                                        if (spEventDef.Type == SPEventReceiverType.ItemAdded
+                                            && string.Equals(spEventDef.Class, eventClass, StringComparison.CurrentCultureIgnoreCase))
+                                        {
+                                            eventCount++;
+                                        }
+
+                                        if (spEventDef.Type == SPEventReceiverType.ItemUpdating
+                                            && string.Equals(spEventDef.Class, eventClass, StringComparison.CurrentCultureIgnoreCase))
+                                        {
+                                            eventCount++;
+                                        }
+
+                                        if (spEventDef.Type == SPEventReceiverType.ItemDeleting
+                                            && string.Equals(spEventDef.Class, eventClass, StringComparison.CurrentCultureIgnoreCase))
+                                        {
+                                            eventCount++;
+                                        }
+                                    }
+
+                                    if (eventCount != 3)
+                                    {
+                                        badLists += $",{list}";
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Trace.TraceError("Exception Suppressed {0}", ex);
+                                }
+                            }
+                            if (badLists != string.Empty)
+                            {
+                                badLists = badLists.Trim(',');
+
+                                message += string.Format(
+                                    "<Web><URL><![CDATA[{0}]]></URL><Title><![CDATA[{1}]]></Title><Lists><![CDATA[{2}]]></Lists></Web>",
+                                    web.ServerRelativeUrl,
+                                    web.Title,
+                                    badLists);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    errors = true;
+                    message = "<Error ID=\"102\"><![CDATA[No Lists Defined]]></Error>";
+                }
+            }
+        }
+
+        private static void LoadDataFromXml(string xml, ref string key, ref string eventClass)
+        {
+            var doc = new XmlDocument();
+            doc.LoadXml(xml);
+
+            try
+            {
+                key = doc.FirstChild.Attributes["Key"].Value;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+            try
+            {
+                eventClass = doc.FirstChild.Attributes["EventClass"].Value;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
         }
 
         private string EnableEvents(string xml)
         {
-            string message = "";
-            bool errors = false;
+            var message = string.Empty;
+            var errors = false;
 
-            SortedList arrFields = new SortedList();
+            new SortedList();
 
-            string key = "";
-            string eventclass = "";
+            var key = string.Empty;
+            var eventclass = string.Empty;
 
             try
             {
-
-                XmlDocument doc = new XmlDocument();
+                var doc = new XmlDocument();
                 doc.LoadXml(xml);
 
                 try
                 {
                     key = doc.FirstChild.Attributes["Key"].Value;
                 }
-                catch { }
+                catch(Exception ex)
+                {
+                    Trace.TraceError("Exception Supressed {0}", ex);
+                }
                 try
                 {
                     eventclass = doc.FirstChild.Attributes["EventClass"].Value;
                 }
-                catch { }
-                if (key != "" && eventclass != "")
+                catch(Exception ex)
                 {
-
-
-                    using (SPSite site = SPContext.Current.Site)
+                    Trace.TraceError("Exception Supressed {0}", ex);
+                }
+                if (key != string.Empty
+                    && eventclass != string.Empty)
+                {
+                    using (var site = SPContext.Current.Site)
                     {
-                        string slists = ConfigFunctions.getConfigSetting(site.RootWeb, key + "Lists");
-
-                        if (slists != "")
-                        {
-                            string[] arrLists = slists.Split(',');
-
-                            //foreach (SPWeb web in site.AllWebs)
-                            SPWeb web = site.RootWeb;
-                            {
-                                string badLists = "";
-                                string lerrors = "";
-
-                                foreach (string sList in arrLists)
-                                {
-                                    try
-                                    {
-                                        SPList list = web.Lists[sList];
-
-                                        bool added = false;
-                                        bool updating = false;
-                                        bool deleting = false;
-                                        Guid adding = Guid.Empty;
-                                        foreach (SPEventReceiverDefinition spEventDef in list.EventReceivers)
-                                        {
-                                            if (spEventDef.Type == SPEventReceiverType.ItemAdding && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                adding = spEventDef.Id;
-
-                                            if (spEventDef.Type == SPEventReceiverType.ItemAdded && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                added = true;
-
-                                            if (spEventDef.Type == SPEventReceiverType.ItemUpdating && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                updating = true;
-
-                                            if (spEventDef.Type == SPEventReceiverType.ItemDeleting && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                deleting = true;
-                                        }
-
-
-                                        if (!added || !updating || !deleting)
-                                        {
-                                            badLists += "," + sList;
-                                        }
-
-                                        try
-                                        {
-                                            if (adding != Guid.Empty)
-                                                list.EventReceivers[adding].Delete();
-                                            if (!added)
-                                                list.EventReceivers.Add(SPEventReceiverType.ItemAdded, "WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5", eventclass);
-                                            if (!updating)
-                                                list.EventReceivers.Add(SPEventReceiverType.ItemUpdating, "WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5", eventclass);
-                                            if (!deleting)
-                                                list.EventReceivers.Add(SPEventReceiverType.ItemDeleting, "WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5", eventclass);
-                                            if (!added || !updating || !deleting || adding != Guid.Empty)
-                                            {
-                                                list.Update();
-                                            }
-                                        }
-                                        catch(Exception ex)
-                                        {
-                                            lerrors += ex.Message + "  ";
-                                        }
-                                        
-                                    }
-                                    catch { }
-                                }
-                                if (badLists != "")
-                                {
-                                    badLists = badLists.Trim(',');
-                                    if (lerrors != "")
-                                        errors = true;
-
-                                    message += "<Web Status=\"" + ((lerrors != "")?"1":"0") + "\"><Error>" + lerrors + "</Error><URL><![CDATA[" + web.ServerRelativeUrl + "]]></URL><Title><![CDATA[" + web.Title + "]]></Title><Lists><![CDATA[" + badLists + "]]></Lists></Web>";
-                                }
-                            }
-                        }
-                        else
-                        {
-                            errors = true;
-                            message = "<Error ID=\"102\"><![CDATA[No Lists Defined]]></Error>";
-                        }
+                        ProcessEvents(key, site, eventclass, ref errors, ref message);
                     }
                 }
                 else
@@ -2256,132 +2378,267 @@ namespace WorkEnginePPM
             }
             catch (Exception ex)
             {
+                Trace.TraceError("Exception Suppressed {0}", ex);
                 errors = true;
                 message = "<Error ID=\"100\"><![CDATA[" + ex.Message + "]]></Error>";
             }
 
             if (errors)
+            {
                 message = "<Result Status=\"1\">" + message + "</Result>";
+            }
             else
+            {
                 message = "<Result Status=\"0\">" + message + "</Result>";
+            }
 
             return message;
         }
 
-        private string DisableEvents(string xml)
+        private static void ProcessEvents(
+            string key,
+            SPSite site,
+            string eventClass,
+            ref bool errors,
+            ref string message)
         {
-            string message = "";
-            bool errors = false;
+            var slists = ConfigFunctions.getConfigSetting(site.RootWeb, key + "Lists");
 
-            SortedList arrFields = new SortedList();
-
-            string key = "";
-            string eventclass = "";
-
-            try
+            if (slists != string.Empty)
             {
+                var arrLists = slists.Split(',');
+                var web = site.RootWeb;
+                var badLists = string.Empty;
+                var labelErrors = string.Empty;
+                var badListsStringBuilder = new StringBuilder();
+                var labelErrorsStringBuilder = new StringBuilder();
 
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(xml);
-
-                try
+                foreach (var sList in arrLists)
                 {
-                    key = doc.FirstChild.Attributes["Key"].Value;
-                }
-                catch { }
-                try
-                {
-                    eventclass = doc.FirstChild.Attributes["EventClass"].Value;
-                }
-                catch { }
-                if (key != "" && eventclass != "")
-                {
-                    using (SPSite site = SPContext.Current.Site)
+                    try
                     {
-                        string slists = ConfigFunctions.getConfigSetting(site.RootWeb, key + "Lists");
+                        var list = web.Lists[sList];
 
-                        if (slists != "")
+                        var added = false;
+                        var updating = false;
+                        var deleting = false;
+                        var adding = Guid.Empty;
+                        foreach (SPEventReceiverDefinition spEventDef in list.EventReceivers)
                         {
-                            string[] arrLists = slists.Split(',');
-
-                            var spWebCollection = site.AllWebs;
-                            for (int i = 0; i < spWebCollection.Count; i++)
+                            if (spEventDef.Type == SPEventReceiverType.ItemAdding
+                                && string.Equals(spEventDef.Class, eventClass, StringComparison.OrdinalIgnoreCase))
                             {
-                                using (var web = spWebCollection[i])
-                                {
-                                    string badLists = "";
-                                    string lerrors = "";
+                                adding = spEventDef.Id;
+                            }
 
-                                    foreach (string sList in arrLists)
-                                    {
-                                        try
-                                        {
-                                            SPList list = web.Lists[sList];
+                            if (spEventDef.Type == SPEventReceiverType.ItemAdded
+                                && string.Equals(spEventDef.Class, eventClass, StringComparison.OrdinalIgnoreCase))
+                            {
+                                added = true;
+                            }
 
-                                            ArrayList arrEvents = new ArrayList();
-                                            foreach (SPEventReceiverDefinition spEventDef in list.EventReceivers)
-                                            {
-                                                if (spEventDef.Type == SPEventReceiverType.ItemAdding && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                    arrEvents.Add(spEventDef.Id);
+                            if (spEventDef.Type == SPEventReceiverType.ItemUpdating
+                                && string.Equals(spEventDef.Class, eventClass, StringComparison.OrdinalIgnoreCase))
+                            {
+                                updating = true;
+                            }
 
-                                                if (spEventDef.Type == SPEventReceiverType.ItemAdded && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                    arrEvents.Add(spEventDef.Id);
-
-                                                if (spEventDef.Type == SPEventReceiverType.ItemUpdating && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                    arrEvents.Add(spEventDef.Id);
-
-                                                if (spEventDef.Type == SPEventReceiverType.ItemDeleting && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                    arrEvents.Add(spEventDef.Id);
-                                            }
-
-                                            try
-                                            {
-                                                foreach (Guid id in arrEvents)
-                                                {
-                                                    list.EventReceivers[id].Delete();
-                                                }
-                                                list.Update();
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                lerrors += ex.Message + "  ";
-                                            }
-                                            if (arrEvents.Count > 0)
-                                                badLists += "," + sList;
-                                        }
-                                        catch { }
-                                    }
-                                    if (badLists != "")
-                                    {
-                                        badLists = badLists.Trim(',');
-                                        if (lerrors != "")
-                                            errors = true;
-
-                                        message += "<Web Status=\"" + ((lerrors != "") ? "1" : "0") + "\"><Error>" + lerrors + "</Error><URL><![CDATA[" + web.ServerRelativeUrl + "]]></URL><Title><![CDATA[" + web.Title + "]]></Title><Lists><![CDATA[" + badLists + "]]></Lists></Web>";
-                                    }
-                                }
+                            if (spEventDef.Type == SPEventReceiverType.ItemDeleting
+                                && string.Equals(spEventDef.Class, eventClass, StringComparison.OrdinalIgnoreCase))
+                            {
+                                deleting = true;
                             }
                         }
+
+                        if (!added
+                            || !updating
+                            || !deleting)
+                        {
+                            badListsStringBuilder.Append($",{sList}");
+                        }
+
+                        AddEvents(eventClass, adding, list, added, updating, deleting, labelErrorsStringBuilder);
                     }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("Exception Supressed {0}", ex);
+                    }
+                    badLists = badListsStringBuilder.ToString();
+                    labelErrors = labelErrorsStringBuilder.ToString();
                 }
-                else
+                ProcessNonEmptyBadList(ref errors, ref message, badLists, labelErrors, web);
+            }
+            else
+            {
+                errors = true;
+                message = "<Error ID=\"102\"><![CDATA[No Lists Defined]]></Error>";
+            }
+        }
+
+        private static void AddEvents(
+            string eventClass,
+            Guid adding,
+            SPList list,
+            bool added,
+            bool updating,
+            bool deleting,
+            StringBuilder labelErrors)
+        {
+            try
+            {
+                if (adding != Guid.Empty)
                 {
-                    errors = true;
-                    message = "<Error ID=\"101\"><![CDATA[Invalid Key or Event Class Value]]></Error>";
+                    list.EventReceivers[adding]
+                        .Delete();
+                }
+                if (!added)
+                {
+                    list.EventReceivers.Add(
+                        SPEventReceiverType.ItemAdded,
+                        "WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5",
+                        eventClass);
+                }
+                if (!updating)
+                {
+                    list.EventReceivers.Add(
+                        SPEventReceiverType.ItemUpdating,
+                        "WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5",
+                        eventClass);
+                }
+                if (!deleting)
+                {
+                    list.EventReceivers.Add(
+                        SPEventReceiverType.ItemDeleting,
+                        "WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5",
+                        eventClass);
+                }
+                if (!added
+                    || !updating
+                    || !deleting
+                    || adding != Guid.Empty)
+                {
+                    list.Update();
                 }
             }
             catch (Exception ex)
             {
-                errors = true;
-                message = "<Error ID=\"100\"><![CDATA[" + ex.Message + "]]></Error>";
+                Trace.TraceError("Exception Supressed {0}", ex);
+                labelErrors.Append($"{ex.Message}  ");
             }
+        }
 
-            if (errors)
-                message = "<Result Status=\"1\">" + message + "</Result>";
-            else
-                message = "<Result Status=\"0\">" + message + "</Result>";
+        private static void ProcessNonEmptyBadList(ref bool errors, ref string message, string badLists, string labelErrors, SPWeb web)
+        {
+            if (badLists != string.Empty)
+            {
+                badLists = badLists.Trim(',');
+                if (labelErrors != string.Empty)
+                {
+                    errors = true;
+                }
 
-            return message;
+                message += string.Format(
+                    "<Web Status=\"{0}\"><Error>{1}</Error><URL><![CDATA[{2}]]></URL><Title><![CDATA[{3}]]></Title><Lists><![CDATA[{4}]]></Lists></Web>",
+                    labelErrors != ""
+                        ? "1"
+                        : "0",
+                    labelErrors,
+                    web.ServerRelativeUrl,
+                    web.Title,
+                    badLists);
+            }
+        }
+
+        private string DisableEvents(string xml)
+        {
+            return HandleEvents(xml, DisableEventsAction);
+        }
+
+        private static void DisableEventsAction(string key, string eventClass, ref string message, ref bool errors)
+        {
+            using (var site = SPContext.Current.Site)
+            {
+                var listsString = ConfigFunctions.getConfigSetting(site.RootWeb, key + "Lists");
+
+                if (!string.IsNullOrWhiteSpace(listsString))
+                {
+                    var lists = listsString.Split(',');
+
+                    var spWebCollection = site.AllWebs;
+                    for (var index = 0; index < spWebCollection.Count; index++)
+                    {
+                        using (var web = spWebCollection[index])
+                        {
+                            var badLists = string.Empty;
+                            var labelErrors = string.Empty;
+
+                            foreach (var list in lists)
+                            {
+                                try
+                                {
+                                    var spList = web.Lists[list];
+
+                                    var events = new ArrayList();
+                                    foreach (SPEventReceiverDefinition spEventDef in spList.EventReceivers)
+                                    {
+                                        if ((spEventDef.Type == SPEventReceiverType.ItemAdding
+                                                && string.Equals(spEventDef.Class, eventClass, StringComparison.CurrentCultureIgnoreCase))
+                                            || (spEventDef.Type == SPEventReceiverType.ItemAdded
+                                                && string.Equals(spEventDef.Class, eventClass, StringComparison.CurrentCultureIgnoreCase))
+                                            || (spEventDef.Type == SPEventReceiverType.ItemUpdating
+                                                && string.Equals(spEventDef.Class, eventClass, StringComparison.CurrentCultureIgnoreCase))
+                                            || (spEventDef.Type == SPEventReceiverType.ItemDeleting
+                                                && string.Equals(spEventDef.Class, eventClass, StringComparison.CurrentCultureIgnoreCase)))
+                                        {
+                                            events.Add(spEventDef.Id);
+                                        }
+                                    }
+
+                                    try
+                                    {
+                                        foreach (Guid id in events)
+                                        {
+                                            spList.EventReceivers[id].Delete();
+                                        }
+                                        spList.Update();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Trace.TraceError("Exception Suppressed {0}", ex);
+                                        labelErrors += ex.Message + "  ";
+                                    }
+                                    if (events.Count > 0)
+                                    {
+                                        badLists += "," + list;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Trace.TraceError("Exception Suppressed {0}", ex);
+                                }
+                            }
+                            if (!string.IsNullOrWhiteSpace(badLists))
+                            {
+                                badLists = badLists.Trim(',');
+                                if (!string.IsNullOrWhiteSpace(labelErrors))
+                                {
+                                    errors = true;
+                                }
+
+                                message += string.Format(
+                                    "<Web Status=\"{0}\"><Error>{1}</Error><URL><![CDATA[{2}]]></URL><Title><![CDATA[{3}]]></Title><Lists><![CDATA[{4}]]></Lists></Web>",
+                                    labelErrors != ""
+                                        ? "1"
+                                        : "0",
+                                    labelErrors,
+                                    web.ServerRelativeUrl,
+                                    web.Title,
+                                    badLists);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private string DisableAllListsEvents(string xml)
