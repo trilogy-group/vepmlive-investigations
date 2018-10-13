@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using EPMLiveCore.Helpers;
-using EPMLiveCore.SocialEngine.Entities;
+using Thread = EPMLiveCore.SocialEngine.Entities.Thread;
 
 namespace EPMLiveCore.SocialEngine.Core
 {
@@ -129,8 +128,6 @@ namespace EPMLiveCore.SocialEngine.Core
                     {
                         yield return reader.GetGuid(0);
                     }
-
-                    reader.Close();
                 }
             }
         }
