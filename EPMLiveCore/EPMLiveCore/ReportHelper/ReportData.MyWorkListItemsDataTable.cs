@@ -226,7 +226,7 @@ namespace EPMLiveCore.ReportHelper
 
             foreach (DataRow column in dtColumns.Rows)
             {
-                var internalName = column[InternalName].ToString();
+                var internalName = column[InternalNameLower].ToString();
                 var columnName = column[ColumnName].ToString();
 
                 if (spList.Fields.ContainsField(internalName) &&
@@ -236,7 +236,7 @@ namespace EPMLiveCore.ReportHelper
                 {
                     var sharepointColumn = column[SharePointType].ToString();
 
-                    if (sharepointColumn.Equals(Lookup, StringComparison.OrdinalIgnoreCase) ||
+                    if (sharepointColumn.Equals(LookupLower, StringComparison.OrdinalIgnoreCase) ||
                         sharepointColumn.Equals(User, StringComparison.OrdinalIgnoreCase))
                     {
                         ProcessSharePointColumn(item, itemRow, allUsers, columnName, internalName);
@@ -348,7 +348,7 @@ namespace EPMLiveCore.ReportHelper
 
             foreach (DataRow column in dtColumns.Rows)
             {
-                var internalName = column[InternalName].ToString();
+                var internalName = column[InternalNameLower].ToString();
                 var columnName = column[ColumnName].ToString();
 
                 errColumnName = column[ColumnName].ToString();
@@ -398,7 +398,7 @@ namespace EPMLiveCore.ReportHelper
             Guard.ArgumentIsNotNull(allUsers, nameof(allUsers));
             Guard.ArgumentIsNotNull(defaultColumns, nameof(defaultColumns));
 
-            if (column[SharePointType].ToString().Equals(Lookup, StringComparison.OrdinalIgnoreCase) ||
+            if (column[SharePointType].ToString().Equals(LookupLower, StringComparison.OrdinalIgnoreCase) ||
                 column[SharePointType].ToString().Equals(User, StringComparison.OrdinalIgnoreCase))
             {
                 if (columnName.Equals(AssignedToText, StringComparison.OrdinalIgnoreCase))

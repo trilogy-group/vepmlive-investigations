@@ -42,7 +42,7 @@ namespace EPMLiveCore.ReportHelper
                 foreach (DataRow row in dtColumns.Rows)
                 {
                     columnName = row[ColumnName].ToString().Replace(SingleQuote, string.Empty);
-                    internalName = row[InternalName].ToString().Replace(SingleQuote, string.Empty);
+                    internalName = row[InternalNameLower].ToString().Replace(SingleQuote, string.Empty);
                     var columnNameLower = columnName.ToLower();
 
                     if (defaultColumns.Contains(columnNameLower))
@@ -97,14 +97,16 @@ namespace EPMLiveCore.ReportHelper
                         EventLog.CreateEventSource(EpmLiveReportingGetColumnValue, EpmLiveId);
                     }
 
-                    var myLog = new EventLog(EpmLiveId, ".", EpmLiveReportingGetColumnValue)
+                    using (var myLog = new EventLog(EpmLiveId, ".", EpmLiveReportingGetColumnValue)
                     {
                         MaximumKilobytes = 32768
-                    };
-                    myLog.WriteEntry(
-                        $"Name: {_siteName} Url: {_siteUrl} ID: {_siteId} : {exception.Message} ColumnName: {columnName} InternalName: {internalName}",
-                        EventLogEntryType.Error,
-                        9000);
+                    })
+                    {
+                        myLog.WriteEntry(
+                            $"Name: {_siteName} Url: {_siteUrl} ID: {_siteId} : {exception.Message} ColumnName: {columnName} InternalName: {internalName}",
+                            EventLogEntryType.Error,
+                            9000);
+                    }
                 });
         }
 
@@ -262,6 +264,17 @@ namespace EPMLiveCore.ReportHelper
             }
 
             return param;
+        }
+
+        protected virtual string AddColumnValues(
+            SPListItem listItem,
+            DataTable dtColumns,
+            ArrayList defaultColumns,
+            ArrayList mandatoryHiddenFields,
+            string sAction,
+            string sAssignedToText)
+        {
+            throw new NotImplementedException();
         }
     }
 }

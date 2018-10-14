@@ -1,51 +1,31 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Web;
-using EPMLiveCore;
-using EPMLiveCore.Properties;
 using Microsoft.SharePoint;
 
 namespace EPMLiveCore.ReportHelper
 {
     public partial class ReportData : IDisposable
     {
-        protected readonly string _epmLiveCs;
-        protected readonly Guid _siteId;
-        protected readonly Guid _webId;
-        protected string webTitle = string.Empty;
-        protected EPMData _DAO;
-        protected SqlCommand _cmdWithParams;
-        protected bool _isReportingV2Enabled = false;
-        protected bool _isRootWeb = true;
-        protected SqlParameterCollection _params;
-        protected string _siteName;
-        protected string _siteUrl;
-        private string _sqlError;
-
         public ReportData(bool tmp, Guid siteId, Guid webId)
         {
-            SPWeb web = null;
             _siteId = siteId;
-            DataRow SAccountInfo = null;
+            DataRow sAccountInfo;
 
             using (var site = new SPSite(siteId))
             {
+                SPWeb web;
+
                 if (SPContext.Current != null)
                 {
-                    if (SPContext.Current.Web.IsRootWeb)
-                        web = site.OpenWeb();
-                    else
-                        web = site.OpenWeb(webId);
+                    web = SPContext.Current.Web.IsRootWeb
+                        ? site.OpenWeb()
+                        : site.OpenWeb(webId);
                 }
                 else
+                {
                     web = site.OpenWeb(webId);
+                }
 
                 _webId = web.ID;
                 _isRootWeb = web.IsRootWeb;
@@ -53,47 +33,48 @@ namespace EPMLiveCore.ReportHelper
 
                 try
                 {
-                    _isReportingV2Enabled =
-                        Convert.ToBoolean(CoreFunctions.getConfigSetting(site.RootWeb, "reportingV2"));
+                    _isReportingV2Enabled = Convert.ToBoolean(CoreFunctions.getConfigSetting(site.RootWeb, ReportingV2));
                 }
-                catch (Exception)
+                catch (Exception exception)
                 {
+                    Trace.WriteLine(exception);
                     _isReportingV2Enabled = false;
                     SPContext.Current.Site.RootWeb.AllowUnsafeUpdates = true;
-                    CoreFunctions.setConfigSetting(site.RootWeb, "reportingV2", "false");
+                    CoreFunctions.setConfigSetting(site.RootWeb, ReportingV2, "false");
                 }
 
                 _epmLiveCs = CoreFunctions.getConnectionString(site.WebApplication.Id);
-                SAccountInfo = EPMData.SAccountInfo(siteId, site.WebApplication.Id);
-                //if(string.IsNullOrEmpty(_epmLiveCs))
-                //_epmLiveCs = ConfigurationManager.ConnectionStrings["epmlive"].ConnectionString.ToString();
+                sAccountInfo = EPMData.SAccountInfo(siteId, site.WebApplication.Id);
             }
 
-            if (SAccountInfo != null)
+            if (sAccountInfo != null)
             {
                 try
                 {
-                    bool useSA = false;
-                    useSA = (bool)SAccountInfo["SAccount"];
-                    if (useSA) //Use SQL Account
+                    var useSa = (bool)sAccountInfo[SAccount];
+
+                    if (useSa)
                     {
-                        _DAO = new EPMData(_siteId, SAccountInfo["DatabaseName"].ToString().Replace("'", ""),
-                            SAccountInfo["DatabaseServer"].ToString().Replace("'", ""), true,
-                            SAccountInfo["Username"].ToString().Replace("'", ""),
-                            EPMData.Decrypt(SAccountInfo["Password"].ToString()).Replace("'", ""));
-                        // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        _DAO = new EPMData(
+                            _siteId,
+                            sAccountInfo[DatabaseName].ToString().Replace(SingleQuote, string.Empty),
+                            sAccountInfo["DatabaseServer"].ToString().Replace(SingleQuote, string.Empty),
+                            true,
+                            sAccountInfo["Username"].ToString().Replace(SingleQuote, string.Empty),
+                            EPMData.Decrypt(sAccountInfo["Password"].ToString()).Replace(SingleQuote, string.Empty));
                         _siteName = _DAO.SiteName;
                         _siteUrl = _DAO.SiteUrl;
                     }
-                    else //Use System Account
+                    else
                     {
                         _DAO = new EPMData(_siteId);
                         _siteName = _DAO.SiteName;
                         _siteUrl = _DAO.SiteUrl;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
+                    Trace.WriteLine(exception);
                     _DAO = new EPMData(_siteId);
                     _siteName = _DAO.SiteName;
                     _siteUrl = _DAO.SiteUrl;
@@ -110,35 +91,38 @@ namespace EPMLiveCore.ReportHelper
         public ReportData(Guid siteId, Guid webAppId)
         {
             _siteId = siteId;
-            DataRow SAccountInfo = null;
             _epmLiveCs = CoreFunctions.getConnectionString(webAppId);
-            SAccountInfo = EPMData.SAccountInfo(siteId, webAppId);
+            var sAccountInfo = EPMData.SAccountInfo(siteId, webAppId);
 
-            if (SAccountInfo != null)
+            if (sAccountInfo != null)
             {
                 try
                 {
-                    bool useSA = false;
-                    useSA = (bool)SAccountInfo["SAccount"];
-                    if (useSA) //Use SQL Account
+                    var useSa = (bool)sAccountInfo[SAccount];
+
+                    if (useSa)
                     {
-                        _DAO = new EPMData(_siteId, SAccountInfo["DatabaseName"].ToString().Replace("'", ""),
-                            SAccountInfo["DatabaseServer"].ToString().Replace("'", ""), true,
-                            SAccountInfo["Username"].ToString().Replace("'", ""),
-                            EPMData.Decrypt(SAccountInfo["Password"].ToString()).Replace("'", ""));
-                        // - CAT.NET false-positive: All single quotes are   escaped/removed.
+                        _DAO = new EPMData(
+                            _siteId,
+                            sAccountInfo[DatabaseName].ToString().Replace(SingleQuote, string.Empty),
+                            sAccountInfo["DatabaseServer"].ToString().Replace(SingleQuote, string.Empty),
+                            true,
+                            sAccountInfo["Username"].ToString().Replace(SingleQuote, string.Empty),
+                            EPMData.Decrypt(sAccountInfo["Password"].ToString()).Replace(SingleQuote, string.Empty));
+
                         _siteName = _DAO.SiteName;
                         _siteUrl = _DAO.SiteUrl;
                     }
-                    else //Use System Account
+                    else
                     {
                         _DAO = new EPMData(_siteId, webAppId, true);
                         _siteName = _DAO.SiteName;
                         _siteUrl = _DAO.SiteUrl;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
+                    Trace.WriteLine(exception);
                     _DAO = new EPMData(_siteId, webAppId, true);
                     _siteName = _DAO.SiteName;
                     _siteUrl = _DAO.SiteUrl;
@@ -154,21 +138,16 @@ namespace EPMLiveCore.ReportHelper
 
         public ReportData(Guid siteId)
         {
-            SPWeb web = null;
             _siteId = siteId;
-            DataRow SAccountInfo = null;
+            DataRow sAccountInfo;
 
             using (var site = new SPSite(siteId))
             {
-                if (SPContext.Current != null)
-                {
-                    if (SPContext.Current.Web.IsRootWeb)
-                        web = site.OpenWeb();
-                    else
-                        web = site.OpenWeb(SPContext.Current.Web.ID);
-                }
-                else
-                    web = site.OpenWeb();
+                var web = SPContext.Current != null
+                    ? SPContext.Current.Web.IsRootWeb
+                        ? site.OpenWeb()
+                        : site.OpenWeb(SPContext.Current.Web.ID)
+                    : site.OpenWeb();
 
                 _webId = web.ID;
                 _isRootWeb = web.IsRootWeb;
@@ -176,47 +155,49 @@ namespace EPMLiveCore.ReportHelper
 
                 try
                 {
-                    _isReportingV2Enabled =
-                        Convert.ToBoolean(CoreFunctions.getConfigSetting(site.RootWeb, "reportingV2"));
+                    _isReportingV2Enabled = Convert.ToBoolean(CoreFunctions.getConfigSetting(site.RootWeb, ReportingV2));
                 }
-                catch (Exception)
+                catch (Exception exception)
                 {
+                    Trace.WriteLine(exception);
                     _isReportingV2Enabled = false;
                     SPContext.Current.Site.RootWeb.AllowUnsafeUpdates = true;
-                    CoreFunctions.setConfigSetting(site.RootWeb, "reportingV2", "false");
+                    CoreFunctions.setConfigSetting(site.RootWeb, ReportingV2, "false");
                 }
 
                 _epmLiveCs = CoreFunctions.getConnectionString(site.WebApplication.Id);
-                SAccountInfo = EPMData.SAccountInfo(siteId, site.WebApplication.Id);
-                //if(string.IsNullOrEmpty(_epmLiveCs))
-                //_epmLiveCs = ConfigurationManager.ConnectionStrings["epmlive"].ConnectionString.ToString();
+                sAccountInfo = EPMData.SAccountInfo(siteId, site.WebApplication.Id);
             }
 
-            if (SAccountInfo != null)
+            if (sAccountInfo != null)
             {
                 try
                 {
-                    bool useSA = false;
-                    useSA = (bool)SAccountInfo["SAccount"];
-                    if (useSA) //Use SQL Account
+                    var useSa = (bool)sAccountInfo[SAccount];
+
+                    if (useSa)
                     {
-                        _DAO = new EPMData(_siteId, SAccountInfo["DatabaseName"].ToString().Replace("'", ""),
-                            SAccountInfo["DatabaseServer"].ToString().Replace("'", ""), true,
-                            SAccountInfo["Username"].ToString().Replace("'", ""),
-                            EPMData.Decrypt(SAccountInfo["Password"].ToString()).Replace("'", ""));
-                        // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        _DAO = new EPMData(
+                            _siteId,
+                            sAccountInfo[DatabaseName].ToString().Replace(SingleQuote, string.Empty),
+                            sAccountInfo["DatabaseServer"].ToString().Replace(SingleQuote, string.Empty),
+                            true,
+                            sAccountInfo["Username"].ToString().Replace(SingleQuote, string.Empty),
+                            EPMData.Decrypt(sAccountInfo["Password"].ToString()).Replace(SingleQuote, string.Empty));
+
                         _siteName = _DAO.SiteName;
                         _siteUrl = _DAO.SiteUrl;
                     }
-                    else //Use System Account
+                    else
                     {
                         _DAO = new EPMData(_siteId);
                         _siteName = _DAO.SiteName;
                         _siteUrl = _DAO.SiteUrl;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
+                    Trace.WriteLine(exception);
                     _DAO = new EPMData(_siteId);
                     _siteName = _DAO.SiteName;
                     _siteUrl = _DAO.SiteUrl;
@@ -236,1581 +217,17 @@ namespace EPMLiveCore.ReportHelper
             _DAO = new EPMData(_siteId, name, server, useSAccount, username, password);
         }
 
-        public string SiteName
+        public void Dispose()
         {
-            get { return _siteName; }
-        }
-
-        public bool EPMLiveConOpen
-        {
-            get { return _DAO.EPMLiveConOpen; }
-        }
-
-        public string UserName
-        {
-            get { return _DAO.UserName; }
-            set { _DAO.UserName = value; }
-        }
-
-        public string Password
-        {
-            get { return _DAO.Password; }
-            set { _DAO.Password = value; }
-        }
-
-        public bool UseSqlAccount
-        {
-            get { return _DAO.UseSqlAccount; }
-            set { _DAO.UseSqlAccount = value; }
-        }
-
-        public string SiteUrl
-        {
-            get { return _siteUrl; }
-        }
-
-        public string Command
-        {
-            get { return _DAO.Command; }
-            set { _DAO.Command = value; }
-        }
-
-        public void CreateTextFile(string sPath)
-        {
-            _DAO.CreateTextFile(sPath);
-        }
-
-        public void WriteToFile(string sText)
-        {
-            _DAO.WriteToFile(sText);
-        }
-
-        public bool DeleteExistingTSData()
-        {
-            return _DAO.DeleteExistingTSData();
-        }
-
-        public DataRow GetSite()
-        {
-            DataTable dt;
-            _DAO.Command = string.Format("select * from [{0}] where siteid = @SiteId",
-                Resources.ReportingDatabaseTable.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "select * from [@tableName] where siteid = @SiteId";
-            //_DAO.AddParam("@tableName", Resources.ReportingDatabaseTable);
-            _DAO.AddParam("@SiteId", _siteId);
-            dt = _DAO.GetTable(_DAO.GetEPMLiveConnection);
-            if (dt.Rows.Count == 0)
-                return null;
-            return dt.Rows[0];
-        }
-
-        public bool ExecuteNonQuery(SqlConnection con)
-        {
-            return _DAO.ExecuteNonQuery(con);
-        }
-
-        public bool CheckServerConnection()
-        {
-            bool passed = false;
-            passed = _DAO.GetMasterDbConnection.State == ConnectionState.Open;
-            _sqlError = _DAO.SqlError;
-            return passed;
-        }
-
-        public bool DatabaseExists()
-        {
-            _DAO.Command = string.Format("select db_id('{0}')", _DAO.remoteDbName.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "select db_id(@dbName)";
-            //_DAO.AddParam("@dbName", _DAO.remoteDbName);
-            return (_DAO.ExecuteScalar(_DAO.GetMasterDbConnection) != DBNull.Value);
-        }
-
-        public bool IsReportingDB()
-        {
-            string sql =
-                string.Format(
-                    "IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' AND TABLE_NAME='{0}') SELECT 'tablename exists' ELSE SELECT 'tablename does not exist'",
-                    Resources.ReportingSettingsTable.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //string sql = "IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' AND TABLE_NAME=@tableName) SELECT 'tablename exists' ELSE SELECT 'tablename does not exist'";
-            _DAO.Command = sql;
-            //_DAO.AddParam("@tableName", Resources.ReportingSettingsTable);
-            string exists = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection).ToString();
-            if (exists.ToLower() == "tablename exists")
+            if (_disposed)
             {
-                return true;
-            }
-            return false;
-        }
-
-        public bool TableExists(string tableName)
-        {
-            _DAO.Command = string.Format("select object_id('{0}', 'U')", tableName.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "select object_id(@tableName, 'U')";
-            //_DAO.AddParam("@tableName", tableName);
-            return (_DAO.ExecuteScalar(_DAO.GetClientReportingConnection) != DBNull.Value);
-        }
-
-        public bool ColumnExists(string tableName, string columnname)
-        {
-            _DAO.Command = string.Format("select count(*) from sys.columns where object_id=object_id('{0}', 'U') and name='{1}'", tableName.Replace("'", ""), columnname);
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "select object_id(@tableName, 'U')";
-            //_DAO.AddParam("@tableName", tableName);
-            object o = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
-            return ((int)o > 0);
-        }
-
-        public bool ProcedureExists(string procName)
-        {
-            _DAO.Command = string.Format("select object_id('{0}', 'P')", procName.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "select object_id(@spName, 'P')";
-            //_DAO.AddParam("@spName", procName);
-            return (_DAO.ExecuteScalar(_DAO.GetClientReportingConnection) != DBNull.Value);
-        }
-
-        public string GetError()
-        {
-            return _sqlError;
-        }
-
-        public bool CreateDatabase()
-        {
-            _DAO.Command = string.Format("create database {0}", _DAO.remoteDbName.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "create database @dbName";
-            //_DAO.AddParam("@dbName", _DAO.remoteDbName);
-            if (_DAO.SqlErrorOccurred)
-            {
-                _sqlError = _DAO.SqlError;
-            }
-            return _DAO.ExecuteNonQuery(_DAO.GetMasterDbConnection);
-        }
-
-        //public bool DeleteDatabase()
-        //{
-        //    _DAO.Command = string.Format(@"IF  EXISTS (SELECT name FROM sys.databases WHERE name = N'{0}') DROP DATABASE [{0}]", _DAO.ToString().Replace("'","")); //- CAT.NET
-        //    //_DAO.Command = "IF EXISTS (SELECT name FROM sys.databases WHERE name = @db) DROP DATABASE [@db]";
-        //    //_DAO.AddParam("@db", _DAO);
-        //    return _DAO.ExecuteNonQuery(_DAO.GetMasterDbConnection);
-        //}
-
-        public DataTable GetTableNames(string tableNameRoot)
-        {
-            _DAO.Command =
-                string.Format(
-                    "select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME like '{0}%' order by TABLE_NAME desc ",
-                    tableNameRoot.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME like '[@tableName]%' order by TABLE_NAME desc ";
-            //_DAO.AddParam("@tableName", tableNameRoot);
-            return _DAO.GetTable(_DAO.GetClientReportingConnection);
-        }
-
-        public string GetSafeTableName(string tableName)
-        {
-            string tblName = string.Empty;
-            int iTableCount = GetTableCount();
-            if (iTableCount == 0)
-            {
-                if (_isReportingV2Enabled && !_isRootWeb)
-                {
-                    tblName = webTitle + "_" + tableName + "_" + _webId.ToString().Replace("-", "");
-                    tableName = tblName;
-                }
-            }
-            else
-            {
-                if (_isReportingV2Enabled && !_isRootWeb)
-                {
-                    tblName = webTitle + "_" + tableName + iTableCount + "_" + _webId.ToString().Replace("-", "");
-                    tableName = tblName;
-                }
-                else
-                {
-                    return tableName + iTableCount;
-                }
-            }
-            return tableName;
-        }
-
-        public int GetTableCount()
-        {
-            int iTableCount = 0;
-            //_DAO.Command = "SELECT TableCount FROM RPTSettings WHERE SiteID='" + _siteId.ToString() + "'"; - CAT.NET
-            _DAO.Command = "SELECT TableCount FROM RPTSettings WHERE SiteID=@siteId";
-            _DAO.AddParam("@siteId", _siteId);
-            iTableCount = (int)_DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
-            return iTableCount;
-        }
-
-        public bool CreateTable(string name, List<ColumnDef> columnDefs)
-        {
-            string message;
-            return CreateTable(name, columnDefs, false, out message);
-        }
-
-        public bool DeleteTable(string name)
-        {
-            _DAO.Command =
-                string.Format(
-                    @"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}]') AND type in (N'U')) DROP TABLE [{0}] ",
-                    name.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[@tableName]') AND type in (N'U')) DROP TABLE [@tableName] ";
-            //_DAO.AddParam("@tableName", name);
-            return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-        }
-
-        public bool AddColumns(string table, List<ColumnDef> columns)
-        {
-            //ALTER TABLE dbo.LSTActions ADD
-            //    NewColumn nvarchar(50) NULL,
-            //    NewColumn2 int NULL
-
-            if (columns.Count == 0)
-                return true;
-
-            //var epmData = new EPMData(_remoteCs);
-            string addcols = "";
-            foreach (ColumnDef columnDef in columns)
-            {
-                if (addcols.Length > 0)
-                    addcols += ", ";
-                addcols += columnDef.ToString();
-            }
-            //epmData.Command = string.Format(@"ALTER TABLE [{0}] ADD {1}", table, addcols);
-            _DAO.Command = string.Format(@"ALTER TABLE [{0}] ADD {1}", table.Replace("'", ""), addcols.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "ALTER TABLE [@table] ADD {@cols}";
-            //_DAO.AddParam("@tableName", table);
-            //_DAO.AddParam("@cols", addcols);
-
-            return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-        }
-
-        public bool UpdateColumns(string table, List<ColumnDef> columns)
-        {
-            if (columns.Count == 0)
-                return true;
-
-            bool success = false;
-            // Delete column from the table.
-            success = DeleteColumns(table, columns);
-            if (success)
-            {
-                // Add column with changed data type.
-                success = AddColumns(table, columns);
+                return;
             }
 
-            return success;
-        }
-
-        public bool DeleteColumns(string table, List<ColumnDef> columns)
-        {
-            if (columns.Count == 0)
-                return true;
-
-            //var epmData = new EPMData(_remoteCs);
-            string addcols = "";
-            foreach (ColumnDef columnDef in columns)
-            {
-                //if (!columnDef.IsLookup)
-                //{
-                if (addcols.Length > 0)
-                    addcols += ", ";
-                addcols += "[" + columnDef.SqlColumnName + "]";
-                //}
-                //else
-                //{
-                //    if (addcols.Length > 0)
-                //        addcols += ", ";
-                //    addcols += ("[" + columnDef.SqlColumnName + "ID], [" + columnDef.SqlColumnName + "Text]");
-                //}
-            }
-
-            _DAO.Command = string.Format(@"ALTER TABLE [{0}] DROP COLUMN {1}", table.Replace("'", ""),
-                addcols.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "ALTER TABLE [@tableName] DROP COLUMN @cols";
-            //_DAO.AddParam("@tableName", table);
-            //_DAO.AddParam("@cols", addcols);
-            return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-        }
-
-        public bool InsertDbEntry()
-        {
-            string url;
-            Guid webApplicationId;
-            using (var site = new SPSite(_siteId))
-            {
-                url = site.Url;
-                webApplicationId = site.WebApplication.Id;
-            }
-
-            _DAO.AddParam("@SiteId", _siteId);
-            _DAO.AddParam("@WebApplicationId", webApplicationId);
-            _DAO.AddParam("@Url", url);
-            _DAO.AddParam("@Server", _DAO.remoteServerName);
-            _DAO.AddParam("@Database", _DAO.remoteDbName);
-            _DAO.AddParam("@useSAccount", _DAO.UseSqlAccount);
-
-            if (!_DAO.UseSqlAccount)
-            {
-                _DAO.Command = string.Format(
-                    @"insert into [{0}]([SiteId],[WebApplicationId],[Url],[DatabaseServer],[DatabaseName], [SAccount]) 
-                                      values(@SiteId,@WebApplicationId,@Url,@Server,@Database,@useSAccount)",
-                    Resources.ReportingDatabaseTable.Replace("'", ""));
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
-            }
-            else
-            {
-                _DAO.AddParam("@username", _DAO.UserName);
-                _DAO.AddParam("@password", _DAO.Password);
-                _DAO.Command = string.Format(
-                    @"insert into [{0}]([SiteId],[WebApplicationId],[Url],[DatabaseServer],[DatabaseName], [SAccount], [UserName], [Password]) 
-                                      values(@SiteId,@WebApplicationId,@Url,@Server,@Database,@useSAccount,@username,@password)",
-                    Resources.ReportingDatabaseTable.Replace("'", ""));
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
-            }
-
-            return _DAO.ExecuteNonQuery(_DAO.GetEPMLiveConnection);
-        }
-
-        public bool DeleteDbEntry()
-        {
-            _DAO.Command = string.Format("delete from [{0}] where SiteId = @SiteId",
-                Resources.ReportingDatabaseTable.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            _DAO.AddParam("@SiteId", _siteId);
-            return _DAO.ExecuteNonQuery(_DAO.GetEPMLiveConnection);
-        }
-
-
-        //Module Added On: 3/20/2011
-        public string GetDbVersion(Guid siteId)
-        {
-            string version = string.Empty;
-            SqlConnection con = _DAO.GetSpecificReportingDbConnection(siteId);
-
-            if (con != null && con.State == ConnectionState.Open)
-            {
-                _DAO.Command = "SELECT Version, [Installed On] FROM Version";
-                DataTable dt = _DAO.GetTable(con);
-
-                if (dt != null && dt.Rows.Count > 0)
-                {
-                    dt.DefaultView.Sort = "[Installed On] ASC";
-                    version = dt.Rows[0]["Version"].ToString();
-                }
-                else
-                {
-                    version = "Unable to get version. Table may not exist.";
-                }
-                con.Close();
-                con.Dispose();
-            }
-            else
-            {
-                version = "Unable to connect to database.";
-            }
-            return version;
-        }
-
-        public DataTable GetDbMappings()
-        {
-            _DAO.Command = string.Format("select distinct * from [{0}]", Resources.ReportingDatabaseTable.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            return _DAO.GetTable(_DAO.GetEPMLiveConnection);
-        }
-
-        public int GetExistingDbCount()
-        {
-            _DAO.Command =
-                string.Format(
-                    @"select COUNT(r1.SiteId) from [{0}] r1 inner join [{0}] r2 on r1.DatabaseName = r2.DatabaseName and r1.DatabaseServer = r2.DatabaseServer where r2.SiteId = @SiteId",
-                    Resources.ReportingDatabaseTable.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            _DAO.AddParam("@SiteId", _siteId);
-            return (int)_DAO.ExecuteScalar(_DAO.GetEPMLiveConnection);
-        }
-
-        public DataTable GetDistinctDbMappings()
-        {
-            _DAO.Command = string.Format("select distinct databaseserver, databasename from [{0}]",
-                Resources.ReportingDatabaseTable.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.   
-            return _DAO.GetTable(_DAO.GetEPMLiveConnection);
-        }
-
-        public DataTable GetListMappings()
-        {
-            _DAO.Command = string.Format("select * from [{0}] where siteId = @SiteId",
-                Resources.ReportingListSummaryView.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "select * from [@viewName] where siteId = @SiteId";
-            //_DAO.AddParam("@viewName", Resources.ReportingListSummaryView);
-            _DAO.AddParam("@SiteId", _siteId);
-            return _DAO.GetTable(_DAO.GetClientReportingConnection);
-        }
-
-        public DataTable GetListMappings(string listIds)
-        {
-            _DAO.Command = string.Format("select * from [{0}] where RPTListID IN (" + listIds + ")",
-                Resources.ReportingListSummaryView.Replace("'", ""));
-            return _DAO.GetTable(_DAO.GetClientReportingConnection);
-        }
-
-        public DataRow GetListMapping(Guid listId)
-        {
-            _DAO.Command = "select * from [" + Resources.ReportingListSummaryView.Replace("'", "") +
-                           "] where siteId = @SiteId and rptlistId = @rptListId";
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            _DAO.AddParam("@SiteId", _siteId);
-            _DAO.AddParam("@rptListId", listId);
-            return _DAO.GetRow(_DAO.GetClientReportingConnection);
-        }
-
-        public bool InitializeDatabase()
-        {
-            bool success = false;
-            //string sVersion = "''" +  System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "''";
-            //string sVersion = "''" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "''";
-            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
-            string sVersion = "''" + fvi.FileVersion + "''";
-
-            //_DAO.AddParam("@version", sVersion);
-            _DAO.Command = Resources.ReportingInitDatabaseCreateTables.Replace("@version", sVersion);
-            success = _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-
-            if (success) //IF success -- Creating DB tables
-            {
-                _DAO.Command = Resources.ReportingInitDatabaseCreateProcedures;
-
-                if (_DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection)) //IF success -- Creating stored procs
-                {
-                    success = true;
-                }
-                else
-                {
-                    _sqlError = _DAO.SqlError;
-                    success = false;
-                }
-            }
-            else
-            {
-                _sqlError = _DAO.SqlError;
-                success = false;
-            }
-            return success;
-        }
-
-        public bool InsertList(Guid listId, string tableName, string tableNameSnapshot, bool resourceList)
-        {
-            //SPList list = null;
-            //SPSite spSite = new SPSite(_siteId);
-
-            //using (var web = spSite.RootWeb)
-            //{
-            //    list = web.Lists[listId];
-            //}
-
-            SPList list = null;
-            using (var site = new SPSite(_siteId))
-            {
-                foreach (SPWeb web in site.AllWebs)
-                {
-                    try
-                    {
-                        list = web.Lists[listId];
-                    }
-                    catch { }
-                    finally
-                    {
-                        if (web != null)
-                        {
-                            web.Dispose();
-                        }
-                    }
-
-                    if (list != null)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            _DAO.Command = string.Format(@"
-                            IF NOT EXISTS (SELECT 1 FROM RPTList WHERE [RPTListId] = @RPTListId)
-                            BEGIN
-                                INSERT INTO [{0}]
-                                   ([RPTListId]
-                                   ,[ListName]
-                                   ,[SiteId]
-                                   ,[TableName]
-                                   ,[TableNameSnapshot]
-                                   ,[System]
-                                   ,[ResourceList])
-                                VALUES
-                                   (@RPTListId, 
-                                    @ListName,
-                                    @SiteId,
-                                    @TableName,
-                                    @TableNameSnapshot,
-                                    @System,
-                                    @ResourceList)
-                           END
-                            ", Resources.ReportingListTable);
-
-            _DAO.AddParam("@RPTListId", list.ID);
-            _DAO.AddParam("@ListName", list.Title);
-            _DAO.AddParam("@SiteId", _siteId);
-            _DAO.AddParam("@TableName", tableName);
-            _DAO.AddParam("@TableNameSnapshot", tableNameSnapshot);
-            _DAO.AddParam("@System", 0); //false
-            _DAO.AddParam("@ResourceList", Convert.ToBoolean(resourceList));
-
-            return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-        }
-
-        public bool UpdateList(Guid listId, bool resourceList)
-        {
-            SPList list;
-            Guid siteId;
-            SPWeb web = null;
-            try
-            {
-                if (_isReportingV2Enabled)
-                    web = SPContext.Current.Site.OpenWeb();
-                else
-                    web = SPContext.Current.Site.RootWeb;
-            }
-            catch { }
-
-            if (web != null)
-            {
-                siteId = web.Site.ID;
-                list = web.Lists[listId];
-            }
-            else
-            {
-                using (var s = new SPSite(_siteId))
-                {
-                    using (SPWeb w = s.OpenWeb())
-                    {
-                        list = w.Lists[listId];
-                    }
-                }
-            }
-
-            _DAO.AddParam("@RPTListId", list.ID);
-            _DAO.AddParam("@ResourceList", resourceList);
-            _DAO.Command = string.Format(@"
-                                UPDATE [{0}]
-                                       SET [ResourceList] = @ResourceList
-                                WHERE 
-                                       RPTListId = @RPTListId
-                            ", Resources.ReportingListTable.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            if (web != null)
-            {
-                web.Close();
-                web.Dispose();
-            }
-
-            return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-        }
-
-        public bool DeleteList(Guid listId)
-        {
-            _DAO.Command = string.Format("delete from [{0}] where [RPTListId] = @RPTListId ",
-                Resources.ReportingListTable.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "delete from [@tableName] where [RPTListId] = @RPTListId ";
-            _DAO.AddParam("@RPTListId", listId);
-            //_DAO.AddParam("@tableName", Resources.ReportingListTable);
-            return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-        }
-
-        public bool DeleteAllListColumns(Guid listId)
-        {
-            //_DAO.Command = string.Format("delete from [{0}] where [RPTListId] = @RPTListId ", Resources.ReportingColumnTable); - CAT.NET
-            //_DAO.AddParam("@tableName", Resources.ReportingColumnTable);
-            _DAO.Command = string.Format("delete from [@tableName] where [RPTListId] = @RPTListId ",
-                Resources.ReportingColumnTable.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            _DAO.AddParam("@RPTListId", listId);
-            return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-        }
-
-        public bool DeleteListColumns(Guid listId, List<ColumnDef> columns)
-        {
-            bool success = true;
-            foreach (ColumnDef column in columns)
-            {
-                //if (column.ColumnType == SPFieldType.Lookup || column.ColumnType == SPFieldType.User)
-                //{
-                //    _DAO.Command = string.Format("delete from [{0}] where [RPTListId] = @RPTListId and ColumnName = @ColumnName ", Resources.ReportingColumnTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.               
-                //    _DAO.AddParam("@RPTListId", listId);
-                //    _DAO.AddParam("@ColumnName", column.SqlColumnName + "ID");
-                //    success = success && _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-
-                //    _DAO.Command = string.Format("delete from [{0}] where [RPTListId] = @RPTListId and ColumnName = @ColumnName ", Resources.ReportingColumnTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.               
-                //    _DAO.AddParam("@RPTListId", listId);
-                //    _DAO.AddParam("@ColumnName", column.SqlColumnName + "Text");
-                //    success = success && _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-                //}
-                //else
-                //{
-                _DAO.Command =
-                    string.Format("delete from [{0}] where [RPTListId] = @RPTListId and ColumnName = @ColumnName ",
-                        Resources.ReportingColumnTable.Replace("'", ""));
-                // - CAT.NET false-positive: All single quotes are escaped/removed.               
-                _DAO.AddParam("@RPTListId", listId);
-                _DAO.AddParam("@ColumnName", column.SqlColumnName);
-                success = success && _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-                //_DAO.AddParam("@tableName", Resources.ReportingColumnTable);
-                //_DAO.Command = "delete from [@tableName] where [RPTListId] = @RPTListId and ColumnName = @ColumnName ";
-                //}
-            }
-            return success;
-        }
-
-        public bool DeleteWork(Guid listid, int itemid)
-        {
-            //List specific
-            return _DAO.DeleteWork(listid, itemid);
-        }
-
-        public bool DeleteWork(Guid listId)
-        {
-            _DAO.Command = string.Format("delete from [{0}] where [ListId] = @ListId ",
-                Resources.ReportingWorkTable.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "delete from [@tableName] where [ListId] = @ListId ";
-            _DAO.AddParam("@ListId", listId);
-            return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-        }
-
-        public bool DeleteMyWork(Guid listid)
-        {
-            _DAO.Command = "Delete from [LSTMyWork] where [SiteId] = @SiteId AND [ListId] = @ListId";
-            _DAO.AddParam("@ListId", listid);
-            _DAO.AddParam("@SiteId", _siteId);
-            return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-        }
-
-        public bool InsertListColumns(Guid listId, List<ColumnDef> columns)
-        {
-            bool success = true;
-            foreach (ColumnDef column in columns)
-            {
-                _DAO.AddParam("@RPTListId", listId);
-                _DAO.AddParam("@ColumnName", column.SqlColumnName);
-                _DAO.AddParam("@ColumnType", column.SqlColumnType.ToString());
-                _DAO.AddParam("@ColumnSize", column.SqlColumnSize);
-                _DAO.AddParam("@SharePointSize", column.ColumnType.ToString());
-                _DAO.AddParam("@InternalName", column.InternalName);
-                _DAO.AddParam("@DisplayName", column.DisplayName);
-                _DAO.Command = string.Format(
-                    @"
-                        insert into [{0}]
-                               ([RPTListId]
-                               ,[ColumnName]
-                               ,[ColumnType]
-                               ,[ColumnSize]
-                               ,[SharePointType]
-                               ,[InternalName]
-                               ,[DisplayName]
-                                )
-                         values
-                               ( @RPTListId, @ColumnName, @ColumnType, @ColumnSize, @SharePointSize, @InternalName, @DisplayName )
-                    ", Resources.ReportingColumnTable);
-                success = success && _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-            }
-            return success;
-        }
-
-        public bool UpdateListColumns(Guid listId, List<ColumnDef> columns)
-        {
-            bool success = true;
-            foreach (ColumnDef column in columns)
-            {
-                _DAO.AddParam("@RPTListId", listId);
-                _DAO.AddParam("@ColumnName", column.SqlColumnName);
-                _DAO.AddParam("@ColumnType", column.SqlColumnType.ToString());
-                _DAO.AddParam("@ColumnSize", column.SqlColumnSize);
-                _DAO.AddParam("@SharePointType", column.ColumnType.ToString());
-                _DAO.AddParam("@InternalName", column.InternalName);
-                _DAO.AddParam("@DisplayName", column.DisplayName);
-
-                _DAO.Command = string.Format(
-                    @"Update [{0}]
-                               Set [ColumnType] = @ColumnType
-                               ,[ColumnSize] = @ColumnSize
-                               ,[SharePointType] = @SharePointType
-                               ,[InternalName] = @InternalName
-                               ,[DisplayName] = @DisplayName
-                                where [RPTListId] = @RPTListId and [ColumnName] = @ColumnName", Resources.ReportingColumnTable.Replace("'", ""));
-
-                success = success && _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-            }
-            return success;
-        }
-
-        public bool InsertLog(Guid listId, string listName, string ShortMessage, string LongMessage, int type)
-        {
-            return _DAO.LogStatus(listId.ToString(), listName, ShortMessage, LongMessage, type, 1, string.Empty);
-        }
-
-        public DataTable GetLog(Guid listId, int minimumLevel)
-        {
-            _DAO.Command =
-                string.Format(
-                    "select * from [{0}] where [Type] >= @Level and [RPTListId] = @RPTListId order by TimeStamp desc ",
-                    Resources.ReportingLogTable.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "select * from [@tableName] where [Type] >= @Level and [RPTListId] = @RPTListId order by TimeStamp desc ";
-            //_DAO.AddParam("@tableName", Resources.ReportingLogTable);
-            _DAO.AddParam("@RPTListId", listId);
-            _DAO.AddParam("@Level", minimumLevel);
-            return _DAO.GetTable(_DAO.GetClientReportingConnection);
-        }
-
-        public int GetMaximumLogLevel(Guid listId)
-        {
-            _DAO.Command = string.Format("select * from [{0}] where [RPTListId] = @RPTListId ",
-                Resources.ReportingListSummaryView.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "select * from [@viewName] where [RPTListId] = @RPTListId ";
-            //_DAO.AddParam("@viewName", Resources.ReportingListSummaryView);
-            _DAO.AddParam("@RPTListId", listId);
-            return (int)_DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
-        }
-
-        public bool DeleteLog(Guid listId)
-        {
-            _DAO.Command = string.Format("delete from [{0}] where [RPTListId] = @RPTListId ",
-                Resources.ReportingLogTable.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "delete from [@tableName] where [RPTListId] = @RPTListId ";
-            //_DAO.AddParam("@tableName", Resources.ReportingLogTable);
-            _DAO.AddParam("@RPTListId", listId);
-            return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-        }
-
-        public bool DeleteLog(Guid listId, int logType)
-        {
-            _DAO.Command = string.Format("delete from [{0}] where [RPTListId] = @RPTListId and [Type] = @LogType",
-                Resources.ReportingLogTable.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "delete from [@tableName] where [RPTListId] = @RPTListId and [Type] = @LogType";
-            _DAO.AddParam("@RPTListId", listId);
-            _DAO.AddParam("@LogType", logType);
-            //_DAO.AddParam("@tableName", Resources.ReportingLogTable);
-            return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-        }
-
-        public string GetTableNameSnapshot(Guid listId)
-        {
-            object objTableName = null;
-            _DAO.Command = string.Format("SELECT TableNameSnapshot FROM [{0}] WHERE RPTListId= @RPTListId",
-                Resources.ReportingListTable.Replace("'", ""));
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "SELECT TableNameSnapshot FROM [@tableName] WHERE RPTListId= @RPTListId";
-            _DAO.AddParam("@RPTListId", listId);
-            //_DAO.AddParam("@tableName", Resources.ReportingListTable);
-            objTableName = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
-            return objTableName.ToString();
-        }
-
-        public DataTable GetTSAllDataWithSchema()
-        {
-            _DAO.AddParam("@siteuid", _siteId);
-            _DAO.Command = "spTSAllData";
-            _DAO.CommandType = CommandType.StoredProcedure;
-            return _DAO.GetTable(_DAO.GetEPMLiveConnection, true);
-        }
-
-        public bool InsertTSAllData(DataTable table, out string message)
-        {
-            var ds = new DataSet();
-            table.TableName = Resources.ReportingTimesheetTable;
-            ds.Tables.Add(table);
-            _DAO.BulkInsert(ds, false, out message);
-            if (string.IsNullOrEmpty(message))
-                return true;
-            return false;
-        }
-
-        public void RefreshTimeSheet(Guid siteid, string webtitile, Guid jobid)
-        {
-            string desttablename = GetSafeTableName("RPTTSData");
-            _DAO.Command = "spRefreshTimesheet_V2";
-            _DAO.CommandType = CommandType.StoredProcedure;
-            _DAO.AddParam("@dbname", _DAO.GetEPMLiveConnection.Database);
-            _DAO.AddParam("@RPTTSData", desttablename);
-            _DAO.AddParam("@siteuid", siteid);
-            _DAO.AddParam("@WebTitle", webtitile);
-            _DAO.AddParam("@jobUid", jobid);
-
-            _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-        }
-
-        //Modules created by XJH -- START
-        public string GetTableName(Guid listId)
-        {
-            object objTableName = null;
-            _DAO.Command = "SELECT TableName FROM " + Resources.ReportingListTable.Replace("'", "") +
-                           " WHERE RPTListId=@RPTListId AND SiteId=@siteId";
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            _DAO.AddParam("@RPTListId", listId);
-            _DAO.AddParam("@siteId", _siteId);
-            objTableName = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
-            return (objTableName != null) ? objTableName.ToString() : string.Empty;
-        }
-
-        //Modules created by XJH -- START
-        public string GetTableName(string listName)
-        {
-            object objTableName = null;
-            _DAO.Command = "SELECT TableName FROM " + Resources.ReportingListTable.Replace("'", "") +
-                           " WHERE ListName=@listName AND SiteId=@siteId";
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            _DAO.AddParam("@listName", listName);
-            _DAO.AddParam("@siteId", _siteId);
-            objTableName = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
-            return (objTableName != null) ? objTableName.ToString() : string.Empty;
-        }
-
-        public virtual string InsertSQL(string sTableName, DataTable dtColumns, SPListItem li,
-            ArrayList arrayList_defaultColumns, ArrayList mandatoryHiddenFlds)
-        {
-            string sSQL = "INSERT INTO " + sTableName.Replace("'", "") + AddColums(li, dtColumns).Replace("'", "") +
-                          AddColumnValues(li, dtColumns, arrayList_defaultColumns, mandatoryHiddenFlds, "insert")
-                              .Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
-            return sSQL;
-        }
-
-        public virtual string UpdateSQL(string sTableName, DataTable dtColumns, SPListItem li,
-            ArrayList arrayList_defaultColumns, ArrayList mandatoryHiddenFlds)
-        {
-            string sSQL = "UPDATE " + sTableName.Replace("'", "") + " SET " +
-                          AddColumnValues(li, dtColumns, arrayList_defaultColumns, mandatoryHiddenFlds, "update")
-                              .Replace("'", "") + " WHERE listid='" + li.ParentList.ID.ToString().Replace("'", "") +
-                          "' AND itemid=" + li.ID.ToString().Replace("'", "") + " " +
-                          "IF @@ROWCOUNT = 0 " +
-                          "INSERT INTO " + sTableName.Replace("'", "") + AddColums(li, dtColumns).Replace("'", "") +
-                          AddColumnValues(li, dtColumns, arrayList_defaultColumns, mandatoryHiddenFlds, "insert")
-                              .Replace("'", "");
-
-            //string sSQL = "IF EXISTS (SELECT * FROM " + sTableName.Replace("'", "") + "WHERE listid='" + li.ParentList.ID.ToString().Replace("'", "") + "' AND itemid=" + li.ID.ToString().Replace("'", "") + ")" +
-            //                "UPDATE " + sTableName.Replace("'", "") + " SET " + AddColumnValues(li, dtColumns, arrayList_defaultColumns, "update").Replace("'", "") + " WHERE listid='" + li.ParentList.ID.ToString().Replace("'", "") + "' AND itemid=" + li.ID.ToString().Replace("'", "") + // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //              "ELSE" +
-            //                "INSERT INTO " + sTableName.Replace("'", "") + AddColums(dtColumns).Replace("'", "") + AddColumnValues(li, dtColumns, arrayList_defaultColumns, "insert").Replace("'", "");
-
-            return sSQL;
-        }
-
-        public string DeleteSQL(string sTableName, Guid listid, int itemid)
-        {
-            string sSQL = "DELETE FROM " + sTableName.Replace("'", "") + " WHERE listid='" +
-                          listid.ToString().Replace("'", "") + "' AND itemid=" + itemid.ToString().Replace("'", "");
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            return sSQL;
-        }
-
-        public DataTable GetListColumns(string sListName)
-        {
-            string sSQL =
-                "SELECT DISTINCT dbo.RPTColumn.*, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND dbo.RPTList.SiteId=@siteId";
-            _DAO.Command = sSQL;
-            _DAO.AddParam("@listName", sListName);
-            _DAO.AddParam("@siteId", _siteId);
-            DataTable dtColumns = _DAO.GetTable(_DAO.GetClientReportingConnection);
-            return dtColumns;
-        }
-
-        public void VerifyListColumns(DataTable columns, string tableName)
-        {
-            bool colExists = true;
-            foreach (DataRow col in columns.Rows)
-            {
-                string colName = col["ColumnName"].ToString();
-                string sSQL = "IF (COL_LENGTH ('" + tableName + "', '" + colName +
-                              "') IS NOT NULL) BEGIN SELECT 'True' AS [Result] END ELSE BEGIN SELECT 'False' AS [Result] END";
-                _DAO.Command = sSQL;
-                colExists = bool.Parse(_DAO.ExecuteScalar(_DAO.GetClientReportingConnection).ToString());
-
-                if (!colExists)
-                {
-                    throw new Exception("Column mismatch error: Column " + colName +
-                                        " exists in RPTColumns table but not in " + tableName + ".");
-                }
-            }
-        }
-
-        public DataTable GetListColumns(Guid listuid)
-        {
-            //string sSQL = "SELECT dbo.RPTColumn.*, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.RPTListId = '" + listuid.ToString() + "')"; - CAT.NET
-            string sSQL =
-                "SELECT DISTINCT dbo.RPTColumn.*, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.RPTListId = @listId)";
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            _DAO.Command = sSQL;
-            _DAO.AddParam("@listId", listuid);
-            DataTable dtColumns = _DAO.GetTable(_DAO.GetClientReportingConnection);
-            return dtColumns;
-        }
-
-        public bool ListReportsWork(string sTableName)
-        {
-            _DAO.Command = "SELECT ResourceList FROM " + Resources.ReportingListTable.Replace("'", "") + " WHERE TableName='" +
-                           sTableName.Replace("'", "") + "'";
-            // - CAT.NET false-positive: All single quotes are escaped/removed.
-            return (bool)_DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
-        }
-
-		public void Dispose()
-		{
-			_DAO.Dispose();
-			if (_cmdWithParams != null)
-				_cmdWithParams.Dispose();
-		}
-
-        public bool BulkInsert(DataSet dsLists, Guid timerjobguid)
-        {
-            return _DAO.BulkInsert(dsLists, timerjobguid);
-        }
-
-        public void ReportError(Guid listid, string sListName, string sErrMsg, string sSection, int iErrType)
-        {
-            string sql = "INSERT INTO " + Resources.ReportingLogTable.Replace("'", "") +
-                         " VALUES(@RPTListID,@ListName,@ShortMsg,@LongMsg,@ErrorType,@Level,@TimeStamp,@timerjobguid)";
-            _DAO.Command = sql;
-
-            _DAO.AddParam("@RPTListID", listid);
-            _DAO.AddParam("@ListName", sListName);
-            _DAO.AddParam("@ShortMsg", sSection + "--" + sErrMsg);
-            if (_DAO.SqlError != null)
-            {
-                _DAO.AddParam("@LongMsg", _DAO.SqlError);
-            }
-            else
-            {
-                _DAO.AddParam("@LongMsg", DBNull.Value);
-            }
-            _DAO.AddParam("@ErrorType", iErrType);
-            _DAO.AddParam("@Level", 1);
-            _DAO.AddParam("@TimeStamp", DateTime.Now);
-            _DAO.AddParam("@timerjobguid", DBNull.Value);
-            _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-        }
-
-        public void GetMappedFields()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool LogStatus(string RPTListID, string sListName, string sShortMsg, string sLongMsg, int iLevel,
-            int iType)
-        {
-            return _DAO.LogStatus(RPTListID, sListName, sShortMsg, sLongMsg, iLevel, iType, string.Empty);
-        }
-
-        public bool ProcessAssignments(string sWork, string sAssignedTo, object StartDate, object DueDate, Guid ListID,
-            Guid SiteID, int ItemID, string sListName)
-        {
-            bool blnProcess = true;
-            object objResults = null;
-
-            _DAO.Command = "spRPTProcessAssignments";
-            _DAO.CommandType = CommandType.StoredProcedure;
-
-            if (sWork != string.Empty)
-            {
-                _DAO.AddParam("@Work", sWork);
-            }
-            else
-            {
-                _DAO.AddParam("@Work", DBNull.Value);
-            }
-
-            if (sAssignedTo != string.Empty)
-            {
-                _DAO.AddParam("@AssignedTo", sAssignedTo);
-            }
-            else
-            {
-                _DAO.AddParam("@AssignedTo", DBNull.Value);
-            }
-
-            _DAO.AddParam("@Start", StartDate);
-            _DAO.AddParam("@Finish", DueDate);
-            _DAO.AddParam("@ListID", ListID);
-            _DAO.AddParam("@SiteID", SiteID);
-            _DAO.AddParam("@ItemID", ItemID);
-
-            //Need to implement further. Need to check result for status/errors
-            objResults = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
-
-            if (_DAO.SqlErrorOccurred)
-            {
-                _sqlError = _DAO.SqlError;
-            }
-
-            return blnProcess;
-        }
-
-        public bool InsertListItem(string sSQL)
-        {
-            bool passed = false;
-            _cmdWithParams.CommandText = sSQL;
-            passed = _DAO.ExecuteNonQuery(_cmdWithParams, _params, _DAO.GetClientReportingConnection);
-            if (_DAO.SqlErrorOccurred)
-            {
-                _sqlError = _DAO.SqlError;
-            }
-            return passed;
-        }
-
-        public bool UpdateListItem(string sSQL)
-        {
-            bool passed = false;
-            _cmdWithParams.CommandText = sSQL;
-            passed = _DAO.ExecuteNonQuery(_cmdWithParams, _params, _DAO.GetClientReportingConnection);
-            if (_DAO.SqlErrorOccurred)
-            {
-                _sqlError = _DAO.SqlError;
-            }
-            return passed;
-        }
-
-        public bool DeleteListItem(string sSQL)
-        {
-            _DAO.Command = sSQL;
-            return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-        }
-
-        protected string AddColums(DataTable dt)
-        {
-            string sColums = " (";
-
-            foreach (DataRow row in dt.Rows)
-            {
-                if (row["SharePointType"] != "Lookup")
-                {
-                    sColums = sColums + "[" + row["ColumnName"].ToString().Replace("'", "") + "],";
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
-                }
-                else
-                {
-                    sColums = sColums + "[" + row["ColumnName"].ToString().Replace("'", "") + "ID], [" +
-                              row["ColumnName"].ToString().Replace("'", "") + "Text],";
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
-                }
-            }
-
-            sColums = sColums.Remove(sColums.Length - 1);
-            sColums = sColums + ") ";
-            return sColums;
-        }
-
-        protected string AddColums(SPListItem item, DataTable dt)
-        {
-            string sColums = " (";
-            string sColumnName = string.Empty;
-            string sInternalName = string.Empty;
-
-            foreach (DataRow row in dt.Rows)
-            {
-                sColumnName = row["ColumnName"].ToString().Replace("'", "");
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
-                sInternalName = row["InternalName"].ToString().Replace("'", "");
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
-
-                if (item.Fields.ContainsField(sInternalName) ||
-                    sColumnName == "SiteId" ||
-                    sColumnName == "WebId" ||
-                    sColumnName == "ListId" ||
-                    sColumnName == "ItemId" ||
-                    sColumnName == "WebUrl" ||
-                    sColumnName == "Commenters" ||
-                    sColumnName == "CommentersRead" ||
-                    sColumnName == "CommentCount" ||
-                    sColumnName == "WorkspaceUrl")
-                {
-                    if (row["SharePointType"] != "Lookup")
-                    {
-                        sColums = sColums + "[" + row["ColumnName"].ToString().Replace("'", "") + "],";
-                        // - CAT.NET false-positive: All single quotes are escaped/removed.
-                    }
-                    else
-                    {
-                        sColums = sColums + "[" + row["ColumnName"].ToString().Replace("'", "") + "ID], [" +
-                                  row["ColumnName"].ToString().Replace("'", "") + "Text],";
-                        // - CAT.NET false-positive: All single quotes are escaped/removed.
-                    }
-                }
-            }
-
-            sColums = sColums.Remove(sColums.Length - 1);
-            sColums = sColums + ") ";
-            return sColums;
-        }
-
-
-        protected virtual bool IsLookUpField(string sListName, string sColumnName)
-        {
-            object objType = null;
-            bool blnLookup = false;
-            //string sSQL = "SELECT dbo.RPTColumn.SharePointType, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = '" + sListName + "') AND (ColumnName='" + sColumnName + "')"; - CAT.NET
-            string sSQL =
-                "SELECT dbo.RPTColumn.SharePointType, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND (ColumnName=@colName)";
-            _DAO.AddParam("@listName", sListName);
-            _DAO.AddParam("@colName", sColumnName);
-            _DAO.Command = sSQL;
-            objType = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
-            if (objType.ToString().ToLower() == "lookup" || objType.ToString().ToLower() == "user" ||
-                objType.ToString().ToLower() == "flookup")
-            {
-                blnLookup = true;
-            }
-            return blnLookup;
-        }
-
-        public static string AddLookUpFieldValues(string sValue, string sValueType)
-        {
-            string sReturnValue = string.Empty;
-            sValue = HttpUtility.HtmlDecode(sValue);
-            var lvc = new SPFieldLookupValueCollection(sValue);
-            foreach (SPFieldLookupValue lv in lvc)
-            {
-                switch (sValueType)
-                {
-                    case "id":
-                        sReturnValue += lv.LookupId + ",";
-                        break;
-                    case "text":
-                        sReturnValue += lv.LookupValue + ",";
-                        break;
-                }
-                ;
-            }
-
-            if (sReturnValue == string.Empty && sValueType.ToLower() == "text") //Means lvc conversion failed.
-            {
-                try
-                {
-                    if (sValue.Contains(";#"))
-                    {
-                        char[] splitter = ",".ToCharArray();
-                        sValue = sValue.Replace(";#", ",");
-                        string[] arrVals = sValue.Split(splitter);
-
-                        foreach (string val in arrVals)
-                        {
-                            if (val != string.Empty)
-                            {
-                                sReturnValue = sReturnValue + val + ",";
-                            }
-                        }
-
-                        if (sReturnValue.IndexOf(",") == 0)
-                        {
-                            sReturnValue.Remove(0, 1);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    SPSecurity.RunWithElevatedPrivileges(delegate
-                    {
-                        if (!EventLog.SourceExists("EPMLive Reporting AddLookUpFieldValue"))
-                            EventLog.CreateEventSource("EPMLive Reporting AddLookUpFieldValue", "EPM Live");
-
-                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting AddLookUpFieldValue");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry(ex.Message + " -- Stack: " + ex.StackTrace, EventLogEntryType.Error, 9000);
-                    });
-                }
-            }
-
-            //Remove last ","
-            if (sReturnValue.Contains(","))
-            {
-                sReturnValue = sReturnValue.Remove(sReturnValue.LastIndexOf(","));
-            }
-            return sReturnValue;
-        }
-
-        public static string AddMultiChoiceValues(string sValue, string sValueType)
-        {
-            string sReturnValue = string.Empty;
-
-            try
-            {
-                var mcv = new SPFieldMultiChoiceValue(sValue);
-                for (int i = 0; i < mcv.Count; i++)
-                {
-                    switch (sValueType)
-                    {
-                        case "text":
-                            sReturnValue += mcv[i] + ",";
-                            break;
-                    }
-                    ;
-                }
-            }
-            catch (Exception ex)
-            {
-                SPSecurity.RunWithElevatedPrivileges(delegate
-                {
-                    if (!EventLog.SourceExists("EPMLive Reporting AddMultiChoiceValues"))
-                        EventLog.CreateEventSource("EPMLive Reporting AddMultiChoiceValues", "EPM Live");
-
-                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting AddMultiChoiceValues");
-                    myLog.MaximumKilobytes = 32768;
-                    myLog.WriteEntry(ex.Message + " -- Stack: " + ex.StackTrace, EventLogEntryType.Error, 9000);
-                });
-            }
-
-            //Remove last ","
-            if (sReturnValue.Contains(","))
-            {
-                sReturnValue = sReturnValue.Remove(sReturnValue.LastIndexOf(","));
-            }
-            return sReturnValue;
-        }
-
-        protected virtual string AddColumnValues(SPListItem li, DataTable dtColumns, ArrayList arrayList_defaultColumns,
-            ArrayList mandatoryHiddenFlds, string sAction, string sAssignedToText)
-        {
-            throw new Exception("Not Implemented");
-        }
-
-        public string RemoveTags(string sValue, SPField field)
-        {
-            string sVal = field.GetFieldValueAsText(sValue);
-            return sVal;
-        }
-
-        public Guid GetListId(string sListName)
-        {
-            //_DAO.Command = "SELECT RPTListID FROM RPTList WHERE ListName='" + sListName + "' AND siteId='" + _siteId + "'"; - CAT.NET
-            _DAO.Command = "SELECT RPTListID FROM RPTList WHERE ListName=@listName AND siteId=@siteId";
-            _DAO.AddParam("@listName", sListName);
-            _DAO.AddParam("@siteId", _siteId);
-            object val = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
-            return (val != null) ? (Guid)val : Guid.Empty;
-        }
-
-        protected virtual SqlParameter PopulateDefaultColumnValue(string sColumn, SPListItem li)
-        {
-            var param = new SqlParameter();
-            switch (sColumn)
-            {
-                case "siteid":
-                    param.Direction = ParameterDirection.Input;
-                    param.SqlDbType = SqlDbType.UniqueIdentifier;
-                    param.ParameterName = "@siteid";
-                    param.Value = li.ParentList.ParentWeb.Site.ID;
-                    break;
+            _DAO.Dispose();
+            _cmdWithParams?.Dispose();
 
-                case "webid":
-                    param.Direction = ParameterDirection.Input;
-                    param.SqlDbType = SqlDbType.UniqueIdentifier;
-                    param.ParameterName = "@webid";
-                    param.Value = li.ParentList.ParentWeb.ID;
-                    break;
-
-                case "listid":
-                    param.Direction = ParameterDirection.Input;
-                    param.SqlDbType = SqlDbType.UniqueIdentifier;
-                    param.ParameterName = "@rptlistid";
-                    param.Value = li.ParentList.ID;
-                    break;
-
-                case "itemid":
-                    param.Direction = ParameterDirection.Input;
-                    param.SqlDbType = SqlDbType.Int;
-                    param.ParameterName = "@itemid";
-                    param.Value = li.ID;
-                    break;
-
-                case "weburl":
-                    param.Direction = ParameterDirection.Input;
-                    param.SqlDbType = SqlDbType.NVarChar;
-                    param.Size = 256;
-                    param.ParameterName = "@weburl";
-                    param.Value = li.ParentList.ParentWeb.ServerRelativeUrl;
-                    break;
-            }
-            return param;
-        }
-
-        protected virtual SqlParameter PopulateMandatoryHiddenFldsColumnValue(string sColumn, SPListItem li)
-        {
-            var param = new SqlParameter();
-            string val = string.Empty;
-
-            switch (sColumn)
-            {
-                case "commenters":
-                    param.Direction = ParameterDirection.Input;
-                    param.SqlDbType = SqlDbType.NVarChar;
-                    param.Size = 8001;
-                    param.ParameterName = "@commenters";
-                    try
-                    {
-                        val = li["Commenters"].ToString();
-                        param.Value = val;
-                    }
-                    catch
-                    {
-                        param.Value = DBNull.Value;
-                    }
-                    break;
-
-                case "commentcount":
-                    param.Direction = ParameterDirection.Input;
-                    param.SqlDbType = SqlDbType.Int;
-                    param.ParameterName = "@commentcount";
-                    try
-                    {
-                        val = li["CommentCount"].ToString();
-                        param.Value = Convert.ToInt32(val);
-                    }
-                    catch
-                    {
-                        param.Value = DBNull.Value;
-                    }
-                    break;
-
-                case "commentersread":
-                    param.Direction = ParameterDirection.Input;
-                    param.SqlDbType = SqlDbType.NVarChar;
-                    param.Size = 8001;
-                    param.ParameterName = "@commentersread";
-                    try
-                    {
-                        val = li["CommentersRead"].ToString();
-                        param.Value = val;
-                    }
-                    catch
-                    {
-                        param.Value = DBNull.Value;
-                    }
-                    break;
-
-                case "workspaceurl":
-                    param.Direction = ParameterDirection.Input;
-                    param.SqlDbType = SqlDbType.NVarChar;
-                    param.Size = 8001;
-                    param.ParameterName = "@workspaceurl";
-                    try
-                    {
-                        val = li["WorkspaceUrl"].ToString();
-                        param.Value = val;
-                    }
-                    catch
-                    {
-                        param.Value = DBNull.Value;
-                    }
-                    break;
-            }
-            return param;
-        }
-
-        public bool InsertAllItemsDB(DataSet dsLists, Guid timerjobguid)
-        {
-            bool blnPassed = _DAO.BulkInsert(dsLists, timerjobguid);
-            return blnPassed;
-        }
-
-        public SqlConnection GetClientReportingConnection()
-        {
-            return _DAO.GetClientReportingConnection;
-        }
-
-        protected object GetDefaultColumnValue(string sColumn, SPListItem li, out bool blnGuid)
-        {
-            object oValue = null;
-            blnGuid = false;
-
-            switch (sColumn)
-            {
-                case "siteid":
-                    oValue = li.ParentList.ParentWeb.Site.ID;
-                    blnGuid = true;
-                    break;
-
-                case "webid":
-                    oValue = li.ParentList.ParentWeb.ID;
-                    blnGuid = true;
-                    break;
-
-                case "rptlistid":
-                    oValue = li.ParentList.ID;
-                    blnGuid = true;
-                    break;
-                //Old implementation will be removed.
-                case "listid":
-                    oValue = li.ParentList.ID;
-                    blnGuid = true;
-                    break;
-
-                case "itemid":
-                    oValue = li.ID;
-                    break;
-
-                case "weburl":
-                    oValue = li.ParentList.ParentWeb.ServerRelativeUrl;
-                    break;
-            }
-            return oValue;
-        }
-
-        private DataTable AddMetaInfoCols(DataTable dt)
-        {
-            DataTable result = dt;
-            if (result != null)
-            {
-                string listId = dt.Rows[0]["RPTListId"].ToString();
-
-                List<DataRow> dataSourceRows = (from DataRow r in dt.Rows
-                                                where r["ColumnName"].ToString() == "DataSource"
-                                                select r).ToList<DataRow>();
-
-                if (dataSourceRows.Count == 0)
-                {
-                    result.Rows.Add(listId, "DataSource", "NVarChar", "8001", "Integer", "DataSource", "DataSource");
-                }
-
-                List<DataRow> worktypeRows = (from DataRow r in dt.Rows
-                                              where r["ColumnName"].ToString() == "WorkType"
-                                              select r).ToList<DataRow>();
-
-                if (worktypeRows.Count == 0)
-                {
-                    result.Rows.Add(listId, "WorkType", "NVarChar", "256", "Text", "WorkType", "WorkType");
-                }
-
-                List<DataRow> commentersRows = (from DataRow r in dt.Rows
-                                                where r["ColumnName"].ToString() == "Commenters"
-                                                select r).ToList<DataRow>();
-
-                if (commentersRows.Count == 0)
-                {
-                    result.Rows.Add(listId, "Commenters", "NVarChar", "8001", "Text", "Commenters", "Commenters");
-                }
-
-                List<DataRow> commentersReadRows = (from DataRow r in dt.Rows
-                                                    where r["ColumnName"].ToString() == "CommentersRead"
-                                                    select r).ToList<DataRow>();
-
-                if (commentersRows.Count == 0)
-                {
-                    result.Rows.Add(listId, "CommentersRead", "NVarChar", "8001", "Text", "CommentersRead",
-                        "CommentersRead");
-                }
-
-                List<DataRow> commentersCountRows = (from DataRow r in dt.Rows
-                                                     where r["ColumnName"].ToString() == "CommentCount"
-                                                     select r).ToList<DataRow>();
-
-                if (commentersRows.Count == 0)
-                {
-                    result.Rows.Add(listId, "CommentCount", "NVarChar", "0", "Integer", "CommentCount", "CommentCount");
-                }
-            }
-
-            return result;
-        }
-
-        public bool SnapshotLists(string listName)
-        {
-            _DAO.AddParam("@SiteId", _siteId);
-            _DAO.AddParam("@Listnames", listName);
-            _DAO.AddParam("@Enabled", true);
-            _DAO.Command = "spRPTLists";
-            _DAO.CommandType = CommandType.StoredProcedure;
-            return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-        }
-
-        public void InitializeStatusLog()
-        {
-            _DAO.InitializeStatusLog();
-        }
-
-        public bool LogStatus(Guid RPTListID, string sListName, string sShortMsg, string sLongMsg, int iLevel, int iType)
-        {
-            return _DAO.LogStatus(RPTListID.ToString(), sListName, sShortMsg, sLongMsg, iLevel, iType, string.Empty);
-        }
-
-        public bool LogStatus(string RPTListID, string sListName, string sShortMsg, string sLongMsg, int iLevel,
-            int iType, string timerjobguid)
-        {
-            return _DAO.LogStatus(RPTListID, sListName, sShortMsg, sLongMsg, iLevel, iType, timerjobguid);
-        }
-
-        public DataTable GetStatusLog()
-        {
-            return _DAO.GetStatusLog();
-        }
-
-        private bool ItemHasValue(SPListItem item, string colName)
-        {
-            string test = string.Empty;
-            try
-            {
-                test = Convert.ToString(item[colName]);
-            }
-            catch { }
-
-            return !string.IsNullOrEmpty(test);
-        }
-
-        private string GetFieldType(SPListItem item, string colInternalName)
-        {
-            SPField lookupField = null;
-            string fieldType = string.Empty;
-            try
-            {
-                lookupField = item.Fields.GetFieldByInternalName(colInternalName);
-                if (lookupField != null)
-                {
-                    fieldType = lookupField.TypeAsString;
-                }
-            }
-            catch
-            { }
-            return fieldType;
-        }
-
-        public void UpdateItem(Guid listId, SPListItem item, string tableName)
-        {
-            string sSQL = string.Empty;
-            ArrayList _arrayList_defaultColumns = new ArrayList();
-            _arrayList_defaultColumns = new ArrayList();
-            _arrayList_defaultColumns.Add("siteid");
-            _arrayList_defaultColumns.Add("webid");
-            _arrayList_defaultColumns.Add("listid");
-            _arrayList_defaultColumns.Add("itemid");
-            _arrayList_defaultColumns.Add("weburl");
-
-            ArrayList _mandatoryHiddenFlds = new ArrayList();
-            _mandatoryHiddenFlds.Add("commenters");
-            _mandatoryHiddenFlds.Add("commentersread");
-            _mandatoryHiddenFlds.Add("commentcount");
-            _mandatoryHiddenFlds.Add("workspaceurl");
-
-            sSQL = UpdateSQL(tableName.Replace("'", ""), GetListColumns(listId), item, _arrayList_defaultColumns,
-                        _mandatoryHiddenFlds);
-
-            UpdateListItem(sSQL);
+            _disposed = false;
         }
-
-        // -- END
     }
 }

@@ -1355,11 +1355,17 @@
     <Compile Include="ReportHelper\MyWorkReportData.cs" />
     <Compile Include="ReportHelper\ReportBiz.cs" />
     <Compile Include="ReportHelper\ReportData.AddColumnValues.cs" />
+    <Compile Include="ReportHelper\ReportData.Commands.cs" />
     <Compile Include="ReportHelper\ReportData.CreateTable.cs" />
     <Compile Include="ReportHelper\ReportData.cs" />
+    <Compile Include="ReportHelper\ReportData.ListItem.cs" />
+    <Compile Include="ReportHelper\ReportData.Main.cs" />
+    <Compile Include="ReportHelper\ReportData.PopulateColumnValues.cs" />
+    <Compile Include="ReportHelper\ReportData.SimpleCommands.cs" />
     <Compile Include="ReportHelper\ReportData.Fields.cs" />
     <Compile Include="ReportHelper\ReportData.GetParam.cs" />
     <Compile Include="ReportHelper\ReportData.ListItemsDataTable.cs" />
+    <Compile Include="ReportHelper\ReportData.Logs.cs" />
     <Compile Include="ReportHelper\ReportData.MyWorkListItemsDataTable.cs" />
     <Compile Include="ReportHelper\ReportingScope.cs" />
     <Compile Include="ReportHelper\UpgradeReportingDBHelper.cs" />
