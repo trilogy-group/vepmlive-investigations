@@ -74,13 +74,13 @@ namespace EPMLiveCore.API
             ref bool siteUrlsSupplied,
             ref bool performanceModeSupplied)
         {
-            Action<List<XElement>, XDocument, string, Action> addRangeSelectedList = (descendants, xDocument, elementName, setFlag) =>
+            Action<List<XElement>, XDocument, string, List<string>, Action> addRangeSelectedList = (descendants, xDocument, elementName, listsSelected, setFlag) =>
             {
                 if (descendants.Exists(
                     e => e.Name.LocalName.Equals(Lists)))
                 {
-                    GetMyWorkParams.SelectedLists.AddRange(
-                        xDocument.Element(MyWork1)
+                    listsSelected.AddRange(
+                        xDocument.Element(nameof(MyWork))
                            .Element(elementName)
                            .Value.Split(CharComma)
                            .Where(field => !string.IsNullOrWhiteSpace(field)));
@@ -91,19 +91,19 @@ namespace EPMLiveCore.API
             if (!string.IsNullOrWhiteSpace(data))
             {
                 var xDocument = XDocument.Parse(data);
-                var descendants = xDocument.Element(MyWork1)
+                var descendants = xDocument.Element(nameof(MyWork))
                    .Descendants()
                    .ToList();
 
-                if (xDocument.Descendants().ToList().Exists(e => e.Name.LocalName.Equals(MyWork1)))
+                if (xDocument.Descendants().ToList().Exists(e => e.Name.LocalName.Equals(nameof(MyWork))))
                 {
                     var tempListsSupplied = listsSupplied;
                     var tempMyWorkListsSupplied = myWorkListsSupplied;
                     var tempFieldsSupplied = fieldsSupplied;
 
-                    addRangeSelectedList(descendants, xDocument, Lists, () => tempListsSupplied = true);
-                    addRangeSelectedList(descendants, xDocument, MyWorkLists, () => tempMyWorkListsSupplied = true);
-                    addRangeSelectedList(descendants, xDocument, Fields, () => tempFieldsSupplied = true);
+                    addRangeSelectedList(descendants, xDocument, Lists, GetMyWorkParams.SelectedLists, () => tempListsSupplied = true);
+                    addRangeSelectedList(descendants, xDocument, MyWorkLists, GetMyWorkParams.SelectedLists, () => tempMyWorkListsSupplied = true);
+                    addRangeSelectedList(descendants, xDocument, Fields, GetMyWorkParams.SelectedFields, () => tempFieldsSupplied = true);
 
                     listsSupplied = tempListsSupplied;
                     myWorkListsSupplied = tempMyWorkListsSupplied;
@@ -112,10 +112,10 @@ namespace EPMLiveCore.API
                     if (descendants.Exists(
                         e => e.Name.LocalName.Equals(CrossSiteUrls)))
                     {
-                        if (!string.IsNullOrWhiteSpace(xDocument.Element(MyWork1).Element(CrossSiteUrls).Value))
+                        if (!string.IsNullOrWhiteSpace(xDocument.Element(nameof(MyWork)).Element(CrossSiteUrls).Value))
                         {
                             GetMyWorkParams.SiteUrls.AddRange(
-                                xDocument.Element(MyWork1)
+                                xDocument.Element(nameof(MyWork))
                                    .Element(CrossSiteUrls)
                                    .Value.Split(
                                         CharComma)
@@ -125,13 +125,13 @@ namespace EPMLiveCore.API
                         }
                     }
 
-                    if (xDocument.Element(MyWork1)
+                    if (xDocument.Element(nameof(MyWork))
                        .Descendants()
                        .ToList()
                        .Exists(
                             e => e.Name.LocalName.Equals(PerformanceMode)))
                     {
-                        GetMyWorkParams.PerformanceMode = xDocument.Element(MyWork1).Element(PerformanceMode).Value.Equals(On);
+                        GetMyWorkParams.PerformanceMode = xDocument.Element(nameof(MyWork)).Element(PerformanceMode).Value.Equals(On);
                         performanceModeSupplied = true;
                     }
                 }
@@ -198,14 +198,11 @@ namespace EPMLiveCore.API
 
                 if (!siteUrlsSupplied)
                 {
-                    if (!string.IsNullOrWhiteSpace(
-                        CoreFunctions.getConfigSetting(
-                            configWeb,
-                            GeneralSettingsCrossSiteUrls)))
+                    var siteUrls = CoreFunctions.getConfigSetting(configWeb, GeneralSettingsCrossSiteUrls);
+
+                    if (!string.IsNullOrWhiteSpace(siteUrls))
                     {
-                        GetMyWorkParams.SiteUrls.AddRange(
-                            CoreFunctions.getConfigSetting(configWeb, GeneralSettingsCrossSiteUrls)
-                               .Split(CharVerticalBar));
+                        GetMyWorkParams.SiteUrls.AddRange(siteUrls.Split(CharVerticalBar));
                     }
                     else
                     {
