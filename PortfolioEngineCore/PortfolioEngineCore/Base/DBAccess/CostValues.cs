@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-
 using PortfolioEngineCore.Base.DBAccess;
 
 namespace PortfolioEngineCore
@@ -246,194 +246,274 @@ namespace PortfolioEngineCore
         //   If the target CT has CCs at a higher level then need to rollup through the CC structure - tough when there are Cost Details
         //     we could say - can only copy when available CCs are the same?
         //////////////////////////////////////////////////////////////////////////////
-        private static bool CopyCostValues(DBAccess dba, int nCB_ID, int nCT_ID, int nInputCalendar, List<int> PIs, List<PfEPeriod> periods, out string sReply)
+        private static bool CopyCostValues(
+            DBAccess dbAccess, 
+            int calId, 
+            int ctId, 
+            int inputCalendar, 
+            List<int> projectIds, 
+            List<PfEPeriod> periods, 
+            out string reply)
         {
-            if (nCB_ID < 0 || nCT_ID <= 0 || nInputCalendar < 0)
+            if (calId < 0 || ctId <= 0 || inputCalendar < 0)
             {
-                sReply = "Calendars and Cost Type must be specified";
+                reply = "Calendars and Cost Type must be specified";
                 return false;
             }
 
             try
             {
-                sReply = "";
-
-                SqlCommand oCommand;
-                SqlDataReader reader;
-                string cmdText;
-
-                foreach (int ProjectID in PIs)
+                reply = string.Empty;
+                var whereClause = " WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
+                foreach (var projectId in projectIds)
                 {
-                    dba.BeginTransaction();
-
-                    var discountPercentValue = ProjectDiscountRates.GetProjectDiscountRate(dba, ProjectID);
-
-                    // clear existing COST VALUES
-                    cmdText = "DELETE FROM  EPGP_COST_VALUES WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                    oCommand.CommandType = CommandType.Text;
-                    oCommand.ExecuteNonQuery();
-
-                    cmdText = "DELETE FROM  EPGP_DETAIL_VALUES WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                    oCommand.CommandType = CommandType.Text;
-                    oCommand.ExecuteNonQuery();
-
-                    cmdText = "DELETE FROM  EPGP_COST_DETAILS WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                    oCommand.CommandType = CommandType.Text;
-                    oCommand.ExecuteNonQuery();
-
-                    cmdText = "DELETE FROM  EPGP_PROJECT_CT_STATUS WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                    oCommand.CommandType = CommandType.Text;
-                    oCommand.ExecuteNonQuery();
+                    dbAccess.BeginTransaction();
+                    var discountPercentValue = ProjectDiscountRates.GetProjectDiscountRate(dbAccess, projectId);
+                    ClearExistingCostValues(dbAccess, calId, ctId, whereClause, projectId);
 
                     // Create new values - first just copy CT_STATUS
-                    cmdText = "Insert Into EPGP_PROJECT_CT_STATUS (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_STATUS)"
-                            + " Select " + nCB_ID.ToString() + ",CT_ID,PROJECT_ID,BC_UID,BC_STATUS FROM  EPGP_PROJECT_CT_STATUS WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nInputCalendar);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                    oCommand.CommandType = CommandType.Text;
-                    oCommand.ExecuteNonQuery();
+                    var cmdText = "Insert Into EPGP_PROJECT_CT_STATUS (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_STATUS)" +
+                        " Select " + calId.ToString() + ",CT_ID,PROJECT_ID,BC_UID,BC_STATUS FROM  EPGP_PROJECT_CT_STATUS" +
+                        " WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
+                    ExcuteInsertInto(dbAccess, ctId, inputCalendar, cmdText, projectId);
 
-                    //  straight copy for COST_DETAILS then read in the CB/CT info from DETAIL_VALUES, convert to new period and write out for new calendar
+                    // straight copy for COST_DETAILS then read in the CB/CT info from DETAIL_VALUES, convert to new period and write out for new calendar
                     cmdText = "INSERT INTO EPGP_COST_DETAILS (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_SEQ,OC_01,OC_02,OC_03,OC_04,OC_05,TEXT_01,TEXT_02,TEXT_03,TEXT_04,TEXT_05)"
-                            + " Select " + nCB_ID.ToString() + ",CT_ID,PROJECT_ID,BC_UID,BC_SEQ,OC_01,OC_02,OC_03,OC_04,OC_05,TEXT_01,TEXT_02,TEXT_03,TEXT_04,TEXT_05"
+                            + " Select " + calId.ToString() + ",CT_ID,PROJECT_ID,BC_UID,BC_SEQ,OC_01,OC_02,OC_03,OC_04,OC_05,TEXT_01,TEXT_02,TEXT_03,TEXT_04,TEXT_05"
                             + " FROM  EPGP_COST_DETAILS WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nInputCalendar);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                    oCommand.CommandType = CommandType.Text;
-                    oCommand.ExecuteNonQuery();
+                    ExcuteInsertInto(dbAccess, ctId, inputCalendar, cmdText, projectId);
 
-                    cmdText = "Select BC_UID,BC_SEQ,BD_PERIOD,PRD_START_DATE,BD_VALUE,BD_COST From EPGP_DETAIL_VALUES cv"
-                                + " Inner Join EPG_PERIODS p On cv.CB_ID = p.CB_ID And cv.BD_PERIOD = p.PRD_ID"
-                                + " Where cv.CB_ID = @CalID And CT_ID = @CTID And PROJECT_ID=@ProjectID Order by BC_UID,BC_SEQ,BD_PERIOD";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nInputCalendar);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                    DataTable dt = new DataTable();
-                    dt.Load(oCommand.ExecuteReader());
+                    var dataTable = LoadDataTable(dbAccess, ctId, inputCalendar, projectId);
 
                     // set up the INSERT I need to add new records
-                    cmdText = "INSERT INTO EPGP_DETAIL_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_SEQ,BD_PERIOD,BD_VALUE,BD_COST,BD_DISCOUNT_RATE,BD_DISCOUNT_VALUE) VALUES(@CalID,@CTID,@ProjectID,@BC_UID,@BC_SEQ,@BD_PERIOD,@BD_VALUE,@BD_COST,@BD_DISCOUNT_RATE,@BD_DISCOUNT_VALUE)";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-
-                    SqlParameter pBC_UID = oCommand.Parameters.Add("@BC_UID", SqlDbType.Int);
-                    SqlParameter pBC_SEQ = oCommand.Parameters.Add("@BC_SEQ", SqlDbType.Int);
-                    SqlParameter pBD_PERIOD = oCommand.Parameters.Add("@BD_PERIOD", SqlDbType.Int);
-                    SqlParameter pBD_VALUE = oCommand.Parameters.Add("@BD_VALUE", SqlDbType.Decimal);
-                    SqlParameter pBD_COST = oCommand.Parameters.Add("@BD_COST", SqlDbType.Decimal);
-                    var discountRateParameter = oCommand.Parameters.Add(DetailValuesDiscountRateParameter, SqlDbType.Decimal);
-                    var discountValueParameter = oCommand.Parameters.Add(DetailValuesDiscountValueParameter, SqlDbType.Decimal);
-                    pBD_VALUE.Precision = 25;
-                    pBD_VALUE.Scale = 6;
-                    pBD_COST.Precision = 25;
-                    pBD_COST.Scale = 6;
-                    discountValueParameter.Precision = 25;
-                    discountValueParameter.Scale = 6;
-                    discountRateParameter.Precision = 6;
-                    discountRateParameter.Scale = 5;
-
-                    int lCat; int lSeq; int lPeriodID; int lNewPeriodID=0;
-                    int lPrevCat=0; int lPrevSeq=0; int lPrevNewPeriodID=0;
-                    DateTime dtStartDate;
-                    double dHours; double dCost;
-                    double dTotalHours=0; double dTotalCost=0;
-                    var discountValueTotal = 0m;
-                    var discountValue = 0m;
-
-                    if (dt != null)
-                    {
-                        foreach (DataRow row in dt.Rows)
-                        {
-                            PfEPeriod period = new PfEPeriod();
-                            lPeriodID = DBAccess.ReadIntValue(row["BD_PERIOD"]);
-                            dtStartDate = DBAccess.ReadDateValue(row["PRD_START_DATE"]);
-                            lCat = DBAccess.ReadIntValue(row["BC_UID"]);
-                            lSeq = DBAccess.ReadIntValue(row["BC_SEQ"]);
-                            dHours = DBAccess.ReadDoubleValue(row["BD_VALUE"]);
-                            dCost = DBAccess.ReadDoubleValue(row["BD_COST"]);
-                            discountValue = SqlDb.ReadDecimalValue(row[DetailValuesDiscountValueColumn]);
-
-                            lNewPeriodID = MapToPeriod(dtStartDate, periods);
-                                
-                            if (lPrevNewPeriodID != lNewPeriodID || lPrevCat != lCat || lPrevSeq != lSeq)
-                            {
-                                if (lPrevCat >= 0 && lPrevNewPeriodID > 0 && (dTotalHours != 0 || dTotalCost != 0 || discountValueTotal != 0))
-                                {
-                                    // write out the record for this cat/seq for this period
-                                    pBC_UID.Value = lPrevCat;
-                                    pBC_SEQ.Value = lPrevSeq;
-                                    pBD_PERIOD.Value = lPrevNewPeriodID;
-                                    pBD_VALUE.Value = dTotalHours;
-                                    pBD_COST.Value = dTotalCost;
-                                    discountValueParameter.Value = discountValueTotal;
-                                    discountRateParameter.Value = discountPercentValue;
-                                    oCommand.ExecuteNonQuery();
-                                }
-                                dTotalHours = 0;
-                                dTotalCost = 0;
-                                discountValueTotal = 0;
-                            }
-        
-                            dTotalHours = dTotalHours + dHours;
-                            dTotalCost = dTotalCost + dCost;
-                            discountValueTotal = discountValueTotal + discountValue;
-                            lPrevNewPeriodID = lNewPeriodID;
-                            lPrevCat = lCat;
-                            lPrevSeq = lSeq;                   
-                        }
-                    }
-                    if (lPrevCat >= 0 && lPrevNewPeriodID > 0 && (dTotalHours != 0 || dTotalCost != 0 || discountValueTotal != 0))
-                    {
-                        // write out possible final record
-                        pBC_UID.Value = lPrevCat;
-                        pBC_SEQ.Value = lPrevSeq;
-                        pBD_PERIOD.Value = lPrevNewPeriodID;
-                        pBD_VALUE.Value = dTotalHours;
-                        pBD_COST.Value = dTotalCost;
-                        discountValueParameter.Value = discountValueTotal;
-                        discountRateParameter.Value = discountPercentValue;
-                        oCommand.ExecuteNonQuery();
-                    }
-                    dba.CommitTransaction();
+                    InsertDetailValues(dbAccess, calId, ctId, periods, projectId, discountPercentValue, dataTable);
+                    dbAccess.CommitTransaction();
 
                     // use CalculateCostValues (as used in Cost Planner) to create COST_VALUES from COST DETAILS
                     string sResult;
-                    if (dbaCCV.CalculateCostValues(dba, nCT_ID, nCB_ID, ProjectID, out sResult) != StatusEnum.rsSuccess)
-                    { 
-                        sReply = sResult;
+                    if (dbaCCV.CalculateCostValues(dbAccess, ctId, calId, projectId, out sResult) != StatusEnum.rsSuccess)
+                    {
+                        reply = sResult;
                         return false;
                     }
                 }
             }
             catch (Exception exception)
             {
-                sReply = "CostValues.CopyCostValues, Exception: " + exception.Message;
+                Trace.WriteLine(exception.ToString());
+                reply = "CostValues.CopyCostValues, Exception: " + exception.Message;
                 return false;
             }
+
             return true;
+        }
+
+        private static void ClearExistingCostValues(DBAccess dbAccess, int calId, int ctId, string whereClause, int projectId)
+        {
+            DeleteFromTable("EPGP_COST_VALUES", dbAccess, projectId, calId, ctId, whereClause);
+            DeleteFromTable("EPGP_DETAIL_VALUES", dbAccess, projectId, calId, ctId, whereClause);
+            DeleteFromTable("EPGP_COST_DETAILS", dbAccess, projectId, calId, ctId, whereClause);
+            DeleteFromTable("EPGP_PROJECT_CT_STATUS", dbAccess, projectId, calId, ctId, whereClause);
+        }
+
+        private static void InsertDetailValues(
+            DBAccess dbAccess, 
+            int calId, 
+            int ctId, 
+            List<PfEPeriod> periods, 
+            int projectId, 
+            decimal discountPercentValue, 
+            DataTable dataTable)
+        {
+            var cmdText = "INSERT INTO EPGP_DETAIL_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_SEQ,BD_PERIOD,BD_VALUE,BD_COST,BD_DISCOUNT_RATE,BD_DISCOUNT_VALUE) VALUES(@CalID,@CTID,@ProjectID,@BC_UID,@BC_SEQ,@BD_PERIOD,@BD_VALUE,@BD_COST,@BD_DISCOUNT_RATE,@BD_DISCOUNT_VALUE)";
+            using (var command = new SqlCommand(cmdText, dbAccess.Connection, dbAccess.Transaction))
+            {
+                command.Parameters.AddWithValue("@CalID", calId);
+                command.Parameters.AddWithValue("@CTID", ctId);
+                command.Parameters.AddWithValue("@ProjectID", projectId);
+
+                var uidParameter = command.Parameters.Add("@BC_UID", SqlDbType.Int);
+                var seqParameter = command.Parameters.Add("@BC_SEQ", SqlDbType.Int);
+                var periodParameter = command.Parameters.Add("@BD_PERIOD", SqlDbType.Int);
+                var valueParameter = command.Parameters.Add("@BD_VALUE", SqlDbType.Decimal);
+                var costParameter = command.Parameters.Add("@BD_COST", SqlDbType.Decimal);
+                var discountRateParameter = command.Parameters.Add(DetailValuesDiscountRateParameter, SqlDbType.Decimal);
+                var discountValueParameter = command.Parameters.Add(DetailValuesDiscountValueParameter, SqlDbType.Decimal);
+                SetPrecisionAndScale(valueParameter, costParameter, discountRateParameter, discountValueParameter);
+
+                int catId;
+                int seqId;
+                int periodId;
+                var newPeriodId = 0;
+                var prevCat = 0;
+                var prevSeq = 0;
+                var prevNewPeriodId = 0;
+                DateTime dtStartDate;
+                double hours;
+                double cost;
+                var totalHours = 0.0;
+                var totalCost = 0.0;
+                var discountValueTotal = 0m;
+                var discountValue = 0m;
+
+                if (dataTable != null)
+                {
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        ReadValues(
+                            periods, 
+                            out catId, 
+                            out seqId, 
+                            out periodId, 
+                            out newPeriodId, 
+                            out dtStartDate, 
+                            out hours, 
+                            out cost, 
+                            out discountValue, 
+                            row);
+
+                        if (prevNewPeriodId != newPeriodId || prevCat != catId || prevSeq != seqId)
+                        {
+                            WriteRecordForPeriod(
+                                discountPercentValue, 
+                                command, 
+                                uidParameter, 
+                                seqParameter, 
+                                periodParameter, 
+                                valueParameter, 
+                                costParameter, 
+                                discountRateParameter, 
+                                discountValueParameter, 
+                                prevCat, 
+                                prevSeq, 
+                                prevNewPeriodId, 
+                                totalHours, 
+                                totalCost, 
+                                discountValueTotal);
+
+                            totalHours = 0;
+                            totalCost = 0;
+                            discountValueTotal = 0;
+                        }
+
+                        totalHours = totalHours + hours;
+                        totalCost = totalCost + cost;
+                        discountValueTotal = discountValueTotal + discountValue;
+                        prevNewPeriodId = newPeriodId;
+                        prevCat = catId;
+                        prevSeq = seqId;
+                    }
+                }
+
+                WriteRecordForPeriod(
+                    discountPercentValue, 
+                    command, 
+                    uidParameter, 
+                    seqParameter, 
+                    periodParameter, 
+                    valueParameter, 
+                    costParameter, 
+                    discountRateParameter, 
+                    discountValueParameter, 
+                    prevCat, 
+                    prevSeq, 
+                    prevNewPeriodId, 
+                    totalHours, 
+                    totalCost, 
+                    discountValueTotal);
+            }
+        }
+
+        private static void ReadValues(
+            List<PfEPeriod> periods, 
+            out int catId, 
+            out int seqId, 
+            out int periodId, 
+            out int newPeriodId, 
+            out DateTime dtStartDate, 
+            out double hours, 
+            out double cost, 
+            out decimal discountValue, 
+            DataRow row)
+        {
+            periodId = DBAccess.ReadIntValue(row["BD_PERIOD"]);
+            dtStartDate = DBAccess.ReadDateValue(row["PRD_START_DATE"]);
+            catId = DBAccess.ReadIntValue(row["BC_UID"]);
+            seqId = DBAccess.ReadIntValue(row["BC_SEQ"]);
+            hours = DBAccess.ReadDoubleValue(row["BD_VALUE"]);
+            cost = DBAccess.ReadDoubleValue(row["BD_COST"]);
+            discountValue = SqlDb.ReadDecimalValue(row[DetailValuesDiscountValueColumn]);
+            newPeriodId = MapToPeriod(dtStartDate, periods);
+        }
+
+        private static void SetPrecisionAndScale(
+            SqlParameter valueParameter, 
+            SqlParameter costParameter, 
+            SqlParameter discountRateParameter, 
+            SqlParameter discountValueParameter)
+        {
+            const int precision = 25;
+            const int scale = 6;
+            valueParameter.Precision = precision;
+            valueParameter.Scale = scale;
+            costParameter.Precision = precision;
+            costParameter.Scale = scale;
+            discountValueParameter.Precision = precision;
+            discountValueParameter.Scale = scale;
+
+            const int discountRatePrecision = 6;
+            const int discountRateScale = 5;
+            discountRateParameter.Precision = discountRatePrecision;
+            discountRateParameter.Scale = discountRateScale;
+        }
+
+        private static void WriteRecordForPeriod(
+            decimal discountPercentValue, 
+            SqlCommand command, 
+            SqlParameter uidParameter, 
+            SqlParameter seqParameter, 
+            SqlParameter periodParameter, 
+            SqlParameter valueParameter, 
+            SqlParameter costParameter, 
+            SqlParameter discountRateParameter, 
+            SqlParameter discountValueParameter, 
+            int prevCat, 
+            int prevSeq, 
+            int prevNewPeriodId, 
+            double totalHours, 
+            double totalCost, 
+            decimal discountValueTotal)
+        {
+            if (prevCat >= 0 
+                && prevNewPeriodId > 0 
+                && (totalHours != 0 || totalCost != 0 || discountValueTotal != 0))
+            {
+                uidParameter.Value = prevCat;
+                seqParameter.Value = prevSeq;
+                periodParameter.Value = prevNewPeriodId;
+                valueParameter.Value = totalHours;
+                costParameter.Value = totalCost;
+                discountValueParameter.Value = discountValueTotal;
+                discountRateParameter.Value = discountPercentValue;
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private static DataTable LoadDataTable(DBAccess dbAccess, int ctId, int inputCalendar, int projectId)
+        {
+            var cmdText = @"Select BC_UID,BC_SEQ,BD_PERIOD,PRD_START_DATE,BD_VALUE,BD_COST From EPGP_DETAIL_VALUES cv
+                          Inner Join EPG_PERIODS p On cv.CB_ID = p.CB_ID And cv.BD_PERIOD = p.PRD_ID
+                          Where cv.CB_ID = @CalID And CT_ID = @CTID And PROJECT_ID=@ProjectID Order by BC_UID,BC_SEQ,BD_PERIOD";
+
+            using (var command = new SqlCommand(cmdText, dbAccess.Connection, dbAccess.Transaction))
+            {
+                command.Parameters.AddWithValue("@CalID", inputCalendar);
+                command.Parameters.AddWithValue("@CTID", ctId);
+                command.Parameters.AddWithValue("@ProjectID", projectId);
+                var dataTable = new DataTable();
+                dataTable.Load(command.ExecuteReader());
+                return dataTable;
+            }
         }
 
         //////////////////////////////////////////////////////////////////////////////
@@ -1481,6 +1561,18 @@ namespace PortfolioEngineCore
                 {
                     command.Parameters.AddWithValue("@ProjectID", projectId);
                 }
+                command.CommandType = CommandType.Text;
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private static void ExcuteInsertInto(DBAccess dbAccess, int ctId, int inputCalendar, string cmdText, int projectId)
+        {
+            using (var command = new SqlCommand(cmdText, dbAccess.Connection, dbAccess.Transaction))
+            {
+                command.Parameters.AddWithValue("@CalID", inputCalendar);
+                command.Parameters.AddWithValue("@CTID", ctId);
+                command.Parameters.AddWithValue("@ProjectID", projectId);
                 command.CommandType = CommandType.Text;
                 command.ExecuteNonQuery();
             }
