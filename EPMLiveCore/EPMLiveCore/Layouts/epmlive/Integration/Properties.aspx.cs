@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Text;
+using System.Web.UI.WebControls;
+using System.Xml;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
-using System.Collections;
-using System.Xml;
-using System.Data;
-using System.Data.SqlClient;
-using System.Web.UI.WebControls;
-using System.Collections.Generic;
-using System.Text;
 
 namespace EPMLiveCore.Layouts.epmlive.Integration
 {
@@ -161,34 +161,36 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                          SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id));
                          cn.Open();
 
-                         SqlCommand cmd = new SqlCommand("SELECT scheduletype, runtime, days from TIMERJOBS where listguid=@listguid and jobtype=70 and [key]=@key", cn);
-                         cmd.Parameters.AddWithValue("@listguid", Request["List"]);
-                         cmd.Parameters.AddWithValue("@key", Request["intlistid"]);
-                         SqlDataReader dr = cmd.ExecuteReader();
-                         if(dr.Read())
+                         using (var command = new SqlCommand("SELECT scheduletype, runtime, days from TIMERJOBS where listguid=@listguid and jobtype=70 and [key]=@key", cn))
                          {
-
-                             ddlScheduleType.SelectedValue = dr.GetInt32(0).ToString();
-                             if(ddlScheduleType.SelectedValue == "2")
+                             command.Parameters.AddWithValue("@listguid", Request["List"]);
+                             command.Parameters.AddWithValue("@key", Request["intlistid"]);
+                             using (var dataReader = command.ExecuteReader())
                              {
-                                 ddlHour.SelectedValue = dr.GetInt32(1).ToString();
-
-                                 ArrayList arr = new ArrayList(dr.GetString(2).Split(','));
-                                 foreach(ListItem li in chkDayOfWeek.Items)
+                                 if (dataReader.Read())
                                  {
-                                     if(arr.Contains(li.Value))
+                                     ddlScheduleType.SelectedValue = dataReader.GetInt32(0).ToString();
+                                     if (ddlScheduleType.SelectedValue == "2")
                                      {
-                                         li.Selected = true;
+                                         ddlHour.SelectedValue = dataReader.GetInt32(1).ToString();
+
+                                         var arrayList = new ArrayList(dataReader.GetString(2).Split(','));
+                                         foreach (ListItem listItem in chkDayOfWeek.Items)
+                                         {
+                                             if (arrayList.Contains(listItem.Value))
+                                             {
+                                                 listItem.Selected = true;
+                                             }
+                                         }
+
+                                     }
+                                     else if (ddlScheduleType.SelectedValue == "3")
+                                     {
+                                         ddlDayOfMonth.SelectedValue = dataReader.GetInt32(1).ToString();
                                      }
                                  }
-
-                             }
-                             else if(ddlScheduleType.SelectedValue == "3")
-                             {
-                                 ddlDayOfMonth.SelectedValue = dr.GetInt32(1).ToString();
                              }
                          }
-                         dr.Close();
                          cn.Close();
                      }
                  }
