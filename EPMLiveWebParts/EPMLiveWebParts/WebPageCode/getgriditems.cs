@@ -3807,47 +3807,7 @@ namespace EPMLiveWebParts
                                 catch { }
                                 if (newgroup == "")
                                     newgroup = " No " + field.Title;
-                                if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice || field.Type == SPFieldType.Lookup || field.TypeAsString == "FilteredLookup")
-                                {
-                                    string[] sGroups = newgroup.Split('\n');
-                                    string[] tmpGroups = new string[group.Length * sGroups.Length];
-
-                                    //group = new string[sGroups.Length];
-                                    int tmpCounter = 0;
-                                    foreach (string g in group)
-                                    {
-                                        foreach (string sGroup in sGroups)
-                                        {
-                                            if (g == null)
-                                                tmpGroups[tmpCounter] = sGroup.Trim();
-                                            else
-                                                tmpGroups[tmpCounter] = g + "\n" + sGroup.Trim();
-
-                                            if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
-                                            {
-                                                arrGTemp.Add(tmpGroups[tmpCounter], "");
-                                            }
-                                            tmpCounter++;
-                                        }
-                                    }
-                                    group = tmpGroups;
-                                }
-                                else
-                                {
-                                    for (int i = 0; i < group.Length; i++)
-                                    {
-                                        if (group[i] == null)
-                                            group[i] = newgroup;
-                                        else
-                                            group[i] += "\n" + newgroup;
-                                        if (!arrGTemp.Contains(group[i]))
-                                        {
-                                            arrGTemp.Add(group[i], "");
-                                        }
-                                    }
-                                }
-                                //}
-
+                                SetGroupsStrings(arrGTemp, field, newgroup, ref @group);
                             }
                         }
                         arrItems.Add(web.ID + "." + li.ParentList.ID + "." + li.ID, group);
@@ -3969,45 +3929,7 @@ namespace EPMLiveWebParts
                                 catch { }
                                 if (newgroup == "")
                                     newgroup = " No " + field.Title;
-                                if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice || field.Type == SPFieldType.Lookup || field.TypeAsString == "FilteredLookup")
-                                {
-                                    string[] sGroups = newgroup.Split('\n');
-                                    string[] tmpGroups = new string[group.Length * sGroups.Length];
-
-                                    //group = new string[sGroups.Length];
-                                    int tmpCounter = 0;
-                                    foreach (string g in group)
-                                    {
-                                        foreach (string sGroup in sGroups)
-                                        {
-                                            if (g == null)
-                                                tmpGroups[tmpCounter] = sGroup.Trim();
-                                            else
-                                                tmpGroups[tmpCounter] = g + "\n" + sGroup.Trim();
-
-                                            if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
-                                            {
-                                                arrGTemp.Add(tmpGroups[tmpCounter], "");
-                                            }
-                                            tmpCounter++;
-                                        }
-                                    }
-                                    group = tmpGroups;
-                                }
-                                else
-                                {
-                                    for (int i = 0; i < group.Length; i++)
-                                    {
-                                        if (group[i] == null)
-                                            group[i] = newgroup;
-                                        else
-                                            group[i] += "\n" + newgroup;
-                                        if (!arrGTemp.Contains(group[i]))
-                                        {
-                                            arrGTemp.Add(group[i], "");
-                                        }
-                                    }
-                                }
+                                SetGroupsStrings(arrGTemp, field, newgroup, ref @group);
                                 //}
                             }
                         }
@@ -4020,6 +3942,60 @@ namespace EPMLiveWebParts
 
         }
 
+        private void SetGroupsStrings(SortedList tempGroups, SPField field, string newgroup, ref string[] groups)
+        {
+            if (field.Type == SPFieldType.User
+                || field.Type == SPFieldType.MultiChoice
+                || field.Type == SPFieldType.Lookup
+                || field.TypeAsString == "FilteredLookup")
+            {
+                var newGroupAttributes = newgroup.Split('\n');
+                var tmpGroups = new string[groups.Length * newGroupAttributes.Length];
+
+                var tmpCounter = 0;
+                foreach (var groupString in groups)
+                {
+                    foreach (var groupAttribute in newGroupAttributes)
+                    {
+                        if (groupString == null)
+                        {
+                            tmpGroups[tmpCounter] = groupAttribute.Trim();
+                        }
+                        else
+                        {
+                            tmpGroups[tmpCounter] = $"{groupString}\n{groupAttribute.Trim()}";
+                        }
+
+                        if (!tempGroups.Contains(tmpGroups[tmpCounter]))
+                        {
+                            tempGroups.Add(tmpGroups[tmpCounter], string.Empty);
+                        }
+                        tmpCounter++;
+                    }
+                }
+                groups = tmpGroups;
+            }
+            else
+            {
+                for (var i = 0; i < groups.Length; i++)
+                {
+                    if (groups[i] == null)
+                    {
+                        groups[i] = newgroup;
+                    }
+                    else
+                    {
+                        var stringBuilder = new StringBuilder(groups[i]);
+                        stringBuilder.Append($"\n{newgroup}");
+                        groups[i] = stringBuilder.ToString();
+                    }
+                    if (!tempGroups.Contains(groups[i]))
+                    {
+                        tempGroups.Add(groups[i], string.Empty);
+                    }
+                }
+            }
+        }
 
         public virtual string getQuery()
         {
