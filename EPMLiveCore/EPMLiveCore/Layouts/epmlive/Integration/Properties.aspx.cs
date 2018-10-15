@@ -229,11 +229,12 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                      SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id));
                      cn.Open();
 
-                     SqlCommand cmd = new SqlCommand("DELETE FROM TIMERJOBS WHERE listguid=@listid and jobtype=70 and [key]=@data",cn);
-                     cmd.Parameters.AddWithValue("@listid", Request["LIST"]);
-                     cmd.Parameters.AddWithValue("@data", Request["intlistid"]);
-                     cmd.ExecuteNonQuery();
-                     
+                     using (var command = new SqlCommand("DELETE FROM TIMERJOBS WHERE listguid=@listid and jobtype=70 and [key]=@data", cn))
+                     {
+                         command.Parameters.AddWithValue("@listid", Request["LIST"]);
+                         command.Parameters.AddWithValue("@data", Request["intlistid"]);
+                         command.ExecuteNonQuery();
+                     }                     
 
                      if(ddlTimed.SelectedValue != "")
                      {
@@ -256,17 +257,17 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                              days = days.Trim(',');
                          }
 
-                         using (cmd = new SqlCommand("INSERT INTO TIMERJOBS (jobname, siteguid, webguid, listguid, jobtype, runtime, scheduletype, days, [key]) VALUES ('Integration', @siteguid, @webguid, @listguid, 70, @runtime, @scheduletype, @days, @key)", cn))
+                         using (var command = new SqlCommand("INSERT INTO TIMERJOBS (jobname, siteguid, webguid, listguid, jobtype, runtime, scheduletype, days, [key]) VALUES ('Integration', @siteguid, @webguid, @listguid, 70, @runtime, @scheduletype, @days, @key)", cn))
                          {
-                             cmd.Parameters.AddWithValue("@siteguid", Web.Site.ID);
-                             cmd.Parameters.AddWithValue("@webguid", Web.ID);
-                             cmd.Parameters.AddWithValue("@listguid", Request["LIST"]);
-                             cmd.Parameters.AddWithValue("@runtime", runtime);
-                             cmd.Parameters.AddWithValue("@scheduletype", ddlScheduleType.SelectedValue);
-                             cmd.Parameters.AddWithValue("@days", days);
-                             cmd.Parameters.AddWithValue("@key", Request["intlistid"]);
+                             command.Parameters.AddWithValue("@siteguid", Web.Site.ID);
+                             command.Parameters.AddWithValue("@webguid", Web.ID);
+                             command.Parameters.AddWithValue("@listguid", Request["LIST"]);
+                             command.Parameters.AddWithValue("@runtime", runtime);
+                             command.Parameters.AddWithValue("@scheduletype", ddlScheduleType.SelectedValue);
+                             command.Parameters.AddWithValue("@days", days);
+                             command.Parameters.AddWithValue("@key", Request["intlistid"]);
 
-                             cmd.ExecuteNonQuery();
+                             command.ExecuteNonQuery();
                          }
 
                          //API.Timer.AddTimerJob(Web.Site.ID, Web.ID, new Guid(Request["LIST"]), "Integration", 70, "", Request["intlistid"], runtime, int.Parse(ddlScheduleType.SelectedValue), days);  
