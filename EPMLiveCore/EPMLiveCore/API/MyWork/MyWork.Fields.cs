@@ -10,8 +10,7 @@
         private const string ItemId = "ItemId";
         private const string ListId = "ListId";
         private const string MyWorkText = "My Work";
-        private const string MyWork1 = "MyWork";
-        private const string Params = "Params";
+        private const string ParamsText = "Params";
         private const string ProcessFlag = "ProcessFlag";
         private const string SiteId = "SiteId";
         private const string To = "To";

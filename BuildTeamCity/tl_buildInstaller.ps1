@@ -241,12 +241,17 @@ foreach($projectToBeBuildAsEXE in $projectsToBeBuildAsEXE){
 
     Log-SubSection "Building '$projectToBeBuildAsEXE'..."
 	Log-SubSection "projectPath: '$projectPath'...."
-    
+	$buildPlatform = "x64"
+    if ($projectToBeBuildAsEXE -eq "EPK_QueueMgr")
+	{
+		$buildPlatform = "x86"
+	}
+	
    & $MSBuildExec $projectPath `
    /t:build `
    /p:OutputPath="$BinariesDirectory" `
    /p:Configuration="$ConfigurationToBuild" `
-   /p:Platform="x64" `
+   /p:Platform=$buildPlatform `
     /p:langversion="$langversion" `
    /p:GenerateSerializationAssemblies="Off" `
    /p:ReferencePath=$referencePath `
