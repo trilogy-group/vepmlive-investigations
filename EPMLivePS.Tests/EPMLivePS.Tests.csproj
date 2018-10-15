@@ -139,6 +139,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="EPMLivePublisherTests.cs" />
+    <Compile Include="HelperClasses\ProjectWorkspaceSynchTest.cs" />
     <Compile Include="HelperClasses\ProjectWorkspaceSynchTests.cs" />
     <Compile Include="Layouts\epmlive\EconfigTest.cs" />
     <Compile Include="Layouts\epmlive\RunEnterpriseSynchTest.cs" />

@@ -26,10 +26,9 @@
         private const string MaxHeight = "MaxHeight";
         private const string MyWorkText = "My Work";
         private const string MyPersonalizationText = "MyPersonalization";
-        private const string MyWork1 = "MyWork";
         private const string Name = "Name";
-        private const string Params = "Params";
         private const string PersonalizationsField = "Personalizations";
+        private const string ParamsText = "Params";
         private const string ProcessFlag = "ProcessFlag";
         private const string SiteIdText = "SiteID";
         private const string SiteId = "SiteId";

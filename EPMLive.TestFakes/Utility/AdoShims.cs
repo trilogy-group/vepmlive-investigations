@@ -14,6 +14,9 @@ namespace EPMLive.TestFakes.Utility
 {
     public class AdoShims
     {
+        public delegate void ExecuteReaderHandler(SqlCommand sqlCommand, SqlDataReader dataReader);
+        public event ExecuteReaderHandler ExecuteReaderCalled;
+
         public ShimSqlConnection ConnectionShim { get; private set; }
 
         public IList<SqlConnection> ConnectionsCreated { get; private set; }
@@ -161,6 +164,9 @@ namespace EPMLive.TestFakes.Utility
 
                 DataReadersCreated.Add(instance, result.Instance);
                 CommandsExecuted.Add(instance);
+
+                ExecuteReaderCalled?.Invoke(instance, result.Instance);
+
                 return result;
             };
             ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
