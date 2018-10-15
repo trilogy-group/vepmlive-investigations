@@ -20,7 +20,7 @@ namespace EPMLiveCore.API
             try
             {
                 var result = new XDocument();
-                result.Add(new XElement(MyWork1));
+                result.Add(new XElement(nameof(MyWork)));
 
                 var theQuery = GetQuery(data);
                 var query = !string.IsNullOrWhiteSpace(theQuery)
@@ -58,7 +58,7 @@ namespace EPMLiveCore.API
                     }
                 }
 
-                result.Root.Add(new XElement(Params, new XElement(ProcessFlag, processFlag)));
+                result.Root.Add(new XElement(ParamsText, new XElement(ProcessFlag, processFlag)));
 
                 return result.ToString();
             }

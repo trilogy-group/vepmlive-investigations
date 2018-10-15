@@ -52,12 +52,11 @@
         private const string ModifiedBy = "Modified By";
         private const string MyWorkText = "My Work";
         private const string MyPersonalizationText = "MyPersonalization";
-        private const string MyWork1 = "MyWork";
         private const string MyWorkLists = "MyWorkLists";
         private const string Name = "Name";
-        private const string Params = "Params";
         private const string PerformanceMode = "PerformanceMode";
         private const string PersonalizationsField = "Personalizations";
+        private const string ParamsText = "Params";
         private const string ProcessFlag = "ProcessFlag";
         private const string Right = "Right";
         private const string RightCols = "RightCols";

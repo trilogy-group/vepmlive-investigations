@@ -25,6 +25,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
     {
         private ListItem testObj;
         private PrivateObject privateObj;
+        private PrivateType privateTypeValidator;
         private IDisposable shimsContext;
         private SPWeb spWeb;
         private Guid guid;
@@ -81,6 +82,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             SetUpShims();
             testObj = new ListItem();
             privateObj = new PrivateObject(testObj);
+            privateTypeValidator = new PrivateType(typeof(ListItemValidator));
         }
 
         [TestCleanup]
@@ -292,9 +294,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Updated, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
-            var actual = (bool)privateObj.Invoke(EnsureNotIgnoredListMethod,
-               BindingFlags.Static | BindingFlags.NonPublic,
-               new object[] { args, data });
+            var actual = privateTypeValidator.InvokeStatic(EnsureNotIgnoredListMethod, args, data);
 
             // Assert
             actual.ShouldBe(expected);
@@ -320,10 +320,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             var args = new ProcessActivityEventArgs(ObjectKind.List, ActivityKind.Updated, data, spWeb, streamManager, threadManager, activityManager);
 
             // Act
-            var actual = (bool)privateObj.Invoke(
-                EnsureNotIgnoredListMethod,
-                BindingFlags.Static | BindingFlags.NonPublic,
-                new object[] { args, data });
+            var actual = privateTypeValidator.InvokeStatic(EnsureNotIgnoredListMethod, args, data);
 
             // Assert
             actual.ShouldBe(expected);
@@ -739,10 +736,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             // Act
             try
             {
-                privateObj.Invoke(
-                    ValidateCommentCreationActivityMethod,
-                    BindingFlags.Instance | BindingFlags.NonPublic,
-                    new object[] { args });
+                privateTypeValidator.InvokeStatic(ValidateCommentCreationActivityMethod, args);
             }
             catch (SocialEngineException exception)
             {
@@ -788,10 +782,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             // Act
             try
             {
-                privateObj.Invoke(
-                    ValidateCommentCreationActivityMethod,
-                    BindingFlags.Instance | BindingFlags.NonPublic,
-                    new object[] { args });
+                args.ValidateCommentCreationActivity();
             }
             catch (SocialEngineException exception)
             {
@@ -825,10 +816,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             // Act
             try
             {
-                privateObj.Invoke(
-                    ValidateCommentDeletionActivityMethod,
-                    BindingFlags.Instance | BindingFlags.NonPublic,
-                    new object[] { args });
+                privateTypeValidator.InvokeStatic(ValidateCommentDeletionActivityMethod, args);
             }
             catch (SocialEngineException exception)
             {
@@ -864,10 +852,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             // Act
             try
             {
-                privateObj.Invoke(
-                    ValidateCommentDeletionActivityMethod,
-                    BindingFlags.Instance | BindingFlags.NonPublic,
-                    new object[] { args });
+                privateTypeValidator.InvokeStatic(ValidateCommentDeletionActivityMethod, args);
             }
             catch (SocialEngineException exception)
             {
@@ -904,10 +889,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
             // Act
             try
             {
-                privateObj.Invoke(
-                    ValidateCommentUpdationActivityMethod,
-                    BindingFlags.Instance | BindingFlags.NonPublic,
-                    new object[] { args });
+                privateTypeValidator.InvokeStatic(ValidateCommentUpdationActivityMethod, args);
             }
             catch (SocialEngineException exception)
             {

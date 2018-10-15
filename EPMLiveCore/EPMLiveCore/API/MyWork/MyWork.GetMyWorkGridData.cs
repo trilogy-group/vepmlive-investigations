@@ -26,6 +26,7 @@ namespace EPMLiveCore.API
                 }
                 catch (APIException apiException)
                 {
+                    Trace.WriteLine(apiException);
                     return $@"<Grid><IO Result=""-{apiException.ExceptionNumber}"" Message=""{apiException.Message}"" /></Grid>";
                 }
 
@@ -61,9 +62,9 @@ namespace EPMLiveCore.API
             var body = grid.Element(Body).Element(BField);
             var myWorkDocument = XDocument.Parse(getMyWork);
             bool processFlag;
-            bool.TryParse(myWorkDocument.Root.Element(Params).Element(ProcessFlag).Value, out processFlag);
+            bool.TryParse(myWorkDocument.Root.Element(ParamsText).Element(ProcessFlag).Value, out processFlag);
 
-            foreach (var item in myWorkDocument.Element(MyWork1).Elements(Item))
+            foreach (var item in myWorkDocument.Element(nameof(MyWork)).Elements(Item))
             {
                 string itemId;
                 string listId;

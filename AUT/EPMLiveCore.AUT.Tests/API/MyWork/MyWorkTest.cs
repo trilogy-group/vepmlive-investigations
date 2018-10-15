@@ -48,8 +48,8 @@ namespace EPMLiveCore.API
         private const string MethodDeletePersonalView = "DeletePersonalView";
         private const string MethodGenerateColDictionary = "GenerateColDictionary";
         private const string MethodGetDataFromLists = "GetDataFromLists";
-        private const string MethodGetDataFromReportingDB = "GetDataFromReportingDB";
-        private const string MethodGetDataFromSP = "GetDataFromSP";
+        private const string MethodGetDataFromReportingDB = "GetDataFromReportingDb";
+        private const string MethodGetDataFromSP = "GetDataFromSp";
         private const string MethodGetExampleDateFormat = "GetExampleDateFormat";
         private const string MethodGetGridSafeValue = "GetGridSafeValue";
         private const string MethodGetLeftCols = "GetLeftCols";
@@ -88,7 +88,7 @@ namespace EPMLiveCore.API
         private const string MethodRenameMyWorkGridView = "RenameMyWorkGridView";
         private const string MethodSaveMyWorkGridView = "SaveMyWorkGridView";
         private const string MethodUpdateMyWorkItem = "UpdateMyWorkItem";
-        private const string FieldASSIGNED_TO_FIELD = "ASSIGNED_TO_FIELD";
+        private const string FieldASSIGNED_TO_FIELD = "AssignedToField";
         private const string FieldCOMMENT_COL_WIDTH = "COMMENT_COL_WIDTH";
         private const string FieldCOMMENT_COUNT_FIELD = "COMMENT_COUNT_FIELD";
         private const string FieldCOMMENTERS_FIELD = "COMMENTERS_FIELD";
@@ -2226,18 +2226,15 @@ namespace EPMLiveCore.API
         [Test]
         [Timeout(TestsTimeOut)]
         [Category("AUT MethodCallTest")]
-        public void AUT_MyWork_GetDataFromLists_Static_Method_Call_Void_With_7_Parameters_Throw_Exception_Thrown_Test()
+        public void AUT_MyWork_GetDataFromLists_Static_Method_Call_Void_With_4_Parameters_Throw_Exception_Thrown_Test()
         {
             // Arrange
             var result = CreateType<XDocument>();
-            var fieldTypes = CreateType<Dictionary<string, SPField>>();
             var query = CreateType<string>();
             var spSite = CreateType<SPSite>();
             var spWeb = CreateType<SPWeb>();
-            var selectedFields = CreateType<List<string>>();
-            var selectedLists = CreateType<List<string>>();
-            var methodGetDataFromListsPrametersTypes = new Type[] { typeof(XDocument), typeof(Dictionary<string, SPField>), typeof(string), typeof(SPSite), typeof(SPWeb), typeof(List<string>), typeof(List<string>) };
-            object[] parametersOfGetDataFromLists = { result, fieldTypes, query, spSite, spWeb, selectedFields, selectedLists };
+            var methodGetDataFromListsPrametersTypes = new Type[] { typeof(XDocument), typeof(string), typeof(SPSite), typeof(SPWeb) };
+            object[] parametersOfGetDataFromLists = { result, query, spSite, spWeb };
             Exception exception = null;
             var methodInfo = GetMethodInfo(MethodGetDataFromLists, methodGetDataFromListsPrametersTypes, out exception);
 
@@ -2248,8 +2245,8 @@ namespace EPMLiveCore.API
             methodInfo.ShouldNotBeNull();
             exception.ShouldBeNull();
             parametersOfGetDataFromLists.ShouldNotBeNull();
-            parametersOfGetDataFromLists.Length.ShouldBe(7);
-            methodGetDataFromListsPrametersTypes.Length.ShouldBe(7);
+            parametersOfGetDataFromLists.Length.ShouldBe(4);
+            methodGetDataFromListsPrametersTypes.Length.ShouldBe(4);
             Should.Throw<Exception>(currentAction);
         }
 
@@ -2260,26 +2257,23 @@ namespace EPMLiveCore.API
         [Test]
         [Timeout(TestsTimeOut)]
         [Category("AUT MethodCallTest")]
-        public void AUT_MyWork_GetDataFromLists_Static_Method_Call_Void_With_7_Parameters_No_Exception_Thrown_With_Encapsulation_Test()
+        public void AUT_MyWork_GetDataFromLists_Static_Method_Call_Void_With_4_Parameters_No_Exception_Thrown_With_Encapsulation_Test()
         {
             // Arrange
             var result = CreateType<XDocument>();
-            var fieldTypes = CreateType<Dictionary<string, SPField>>();
             var query = CreateType<string>();
             var spSite = CreateType<SPSite>();
             var spWeb = CreateType<SPWeb>();
-            var selectedFields = CreateType<List<string>>();
-            var selectedLists = CreateType<List<string>>();
-            var methodGetDataFromListsPrametersTypes = new Type[] { typeof(XDocument), typeof(Dictionary<string, SPField>), typeof(string), typeof(SPSite), typeof(SPWeb), typeof(List<string>), typeof(List<string>) };
-            object[] parametersOfGetDataFromLists = { result, fieldTypes, query, spSite, spWeb, selectedFields, selectedLists };
+            var methodGetDataFromListsPrametersTypes = new Type[] { typeof(XDocument), typeof(string), typeof(SPSite), typeof(SPWeb) };
+            object[] parametersOfGetDataFromLists = { result, query, spSite, spWeb};
 
             // Act
             Action currentAction = () => ReflectionAnalyzer.InvokeVoidStaticMethod(_myWorkInstanceFixture, _myWorkInstanceType, MethodGetDataFromLists, parametersOfGetDataFromLists, methodGetDataFromListsPrametersTypes);
 
             // Assert
             parametersOfGetDataFromLists.ShouldNotBeNull();
-            parametersOfGetDataFromLists.Length.ShouldBe(7);
-            methodGetDataFromListsPrametersTypes.Length.ShouldBe(7);
+            parametersOfGetDataFromLists.Length.ShouldBe(4);
+            methodGetDataFromListsPrametersTypes.Length.ShouldBe(4);
             Should.NotThrow(currentAction);
         }
 
@@ -2294,7 +2288,7 @@ namespace EPMLiveCore.API
         {
             // Arrange
             var methodInfo = GetMethodInfo(MethodGetDataFromLists, 0);
-            const int parametersCount = 7;
+            const int parametersCount = 4;
 
             // Act
             var parameters = methodInfo.GetParameters();
@@ -2491,7 +2485,7 @@ namespace EPMLiveCore.API
         {
             // Arrange
             var methodInfo = GetMethodInfo(MethodGetDataFromReportingDB, 0);
-            const int parametersCount = 6;
+            const int parametersCount = 2;
 
             // Act
             var parameters = methodInfo.GetParameters();
@@ -2647,7 +2641,7 @@ namespace EPMLiveCore.API
         {
             // Arrange
             var methodInfo = GetMethodInfo(MethodGetDataFromSP, 0);
-            const int parametersCount = 6;
+            const int parametersCount = 4;
 
             // Act
             var parameters = methodInfo.GetParameters();
@@ -4218,7 +4212,7 @@ namespace EPMLiveCore.API
         {
             // Arrange
             var methodInfo = GetMethodInfo(MethodGetSettings, 0);
-            const int parametersCount = 6;
+            const int parametersCount = 1;
 
             // Act
             var parameters = methodInfo.GetParameters();
@@ -4982,19 +4976,15 @@ namespace EPMLiveCore.API
         [Test]
         [Timeout(TestsTimeOut)]
         [Category("AUT MethodCallTest")]
-        public void AUT_MyWork_ProcessMyWork_Static_Method_Call_Void_With_8_Parameters_No_Exception_Thrown_Test()
+        public void AUT_MyWork_ProcessMyWork_Static_Method_Call_Void_With_4_Parameters_No_Exception_Thrown_Test()
         {
             // Arrange
             var dataTable = CreateType<DataTable>();
             var spSite = CreateType<SPSite>();
             var spWeb = CreateType<SPWeb>();
-            var selectedFields = CreateType<IEnumerable<string>>();
-            var fieldTypes = CreateType<Dictionary<string, SPField>>();
-            var workTypes = CreateType<Dictionary<string, string>>();
-            var workspaces = CreateType<Dictionary<string, string>>();
             var result = CreateType<XDocument>();
-            var methodProcessMyWorkPrametersTypes = new Type[] { typeof(DataTable), typeof(SPSite), typeof(SPWeb), typeof(IEnumerable<string>), typeof(Dictionary<string, SPField>), typeof(Dictionary<string, string>), typeof(Dictionary<string, string>), typeof(XDocument) };
-            object[] parametersOfProcessMyWork = { dataTable, spSite, spWeb, selectedFields, fieldTypes, workTypes, workspaces, result };
+            var methodProcessMyWorkPrametersTypes = new Type[] { typeof(DataTable), typeof(SPSite), typeof(SPWeb), typeof(XDocument) };
+            object[] parametersOfProcessMyWork = { dataTable, spSite, spWeb, result };
             Exception exception = null;
             var methodInfo = GetMethodInfo(MethodProcessMyWork, methodProcessMyWorkPrametersTypes, out exception);
 
@@ -5005,8 +4995,8 @@ namespace EPMLiveCore.API
             methodInfo.ShouldNotBeNull();
             exception.ShouldBeNull();
             parametersOfProcessMyWork.ShouldNotBeNull();
-            parametersOfProcessMyWork.Length.ShouldBe(8);
-            methodProcessMyWorkPrametersTypes.Length.ShouldBe(8);
+            parametersOfProcessMyWork.Length.ShouldBe(4);
+            methodProcessMyWorkPrametersTypes.Length.ShouldBe(4);
             Should.NotThrow(currentAction);
         }
 
@@ -5017,27 +5007,23 @@ namespace EPMLiveCore.API
         [Test]
         [Timeout(TestsTimeOut)]
         [Category("AUT MethodCallTest")]
-        public void AUT_MyWork_ProcessMyWork_Static_Method_Call_Void_With_8_Parameters_No_Exception_Thrown_With_Encapsulation_Test()
+        public void AUT_MyWork_ProcessMyWork_Static_Method_Call_Void_With_4_Parameters_No_Exception_Thrown_With_Encapsulation_Test()
         {
             // Arrange
             var dataTable = CreateType<DataTable>();
             var spSite = CreateType<SPSite>();
             var spWeb = CreateType<SPWeb>();
-            var selectedFields = CreateType<IEnumerable<string>>();
-            var fieldTypes = CreateType<Dictionary<string, SPField>>();
-            var workTypes = CreateType<Dictionary<string, string>>();
-            var workspaces = CreateType<Dictionary<string, string>>();
             var result = CreateType<XDocument>();
-            var methodProcessMyWorkPrametersTypes = new Type[] { typeof(DataTable), typeof(SPSite), typeof(SPWeb), typeof(IEnumerable<string>), typeof(Dictionary<string, SPField>), typeof(Dictionary<string, string>), typeof(Dictionary<string, string>), typeof(XDocument) };
-            object[] parametersOfProcessMyWork = { dataTable, spSite, spWeb, selectedFields, fieldTypes, workTypes, workspaces, result };
+            var methodProcessMyWorkPrametersTypes = new Type[] { typeof(DataTable), typeof(SPSite), typeof(SPWeb), typeof(XDocument) };
+            object[] parametersOfProcessMyWork = { dataTable, spSite, spWeb, result };
 
             // Act
             Action currentAction = () => ReflectionAnalyzer.InvokeVoidStaticMethod(_myWorkInstanceFixture, _myWorkInstanceType, MethodProcessMyWork, parametersOfProcessMyWork, methodProcessMyWorkPrametersTypes);
 
             // Assert
             parametersOfProcessMyWork.ShouldNotBeNull();
-            parametersOfProcessMyWork.Length.ShouldBe(8);
-            methodProcessMyWorkPrametersTypes.Length.ShouldBe(8);
+            parametersOfProcessMyWork.Length.ShouldBe(4);
+            methodProcessMyWorkPrametersTypes.Length.ShouldBe(4);
             Should.NotThrow(currentAction);
         }
 
@@ -5052,7 +5038,7 @@ namespace EPMLiveCore.API
         {
             // Arrange
             var methodInfo = GetMethodInfo(MethodProcessMyWork, 0);
-            const int parametersCount = 8;
+            const int parametersCount = 4;
 
             // Act
             var parameters = methodInfo.GetParameters();
