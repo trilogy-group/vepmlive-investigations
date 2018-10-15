@@ -183,7 +183,6 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                                                      listItem.Selected = true;
                                                  }
                                              }
-
                                          }
                                          else if (ddlScheduleType.SelectedValue == "3")
                                          {
