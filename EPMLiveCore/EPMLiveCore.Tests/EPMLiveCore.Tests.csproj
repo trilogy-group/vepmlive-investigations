@@ -275,6 +275,7 @@
     </Compile>
     <Compile Include="TestCheck.cs" />
     <Compile Include="WebPageCode\AdminConnsTest.cs" />
+    <Compile Include="WebPageCode\AdminQueueTests.cs" />
     <Compile Include="WebPageCode\CreateDatabaseTest.cs" />
     <Compile Include="WebPageCode\ListDisplayPageTests.cs" />
   </ItemGroup>
