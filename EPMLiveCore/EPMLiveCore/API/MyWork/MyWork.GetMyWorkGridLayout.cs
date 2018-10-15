@@ -98,7 +98,7 @@ namespace EPMLiveCore.API
                 new XAttribute(
                     Id,
                     XDocument.Parse(data)
-                       .Element(MyWork1)
+                       .Element(nameof(MyWork))
                        .Element(WebPart)
                        .Attribute(IdText)
                        .Value));
@@ -220,13 +220,13 @@ namespace EPMLiveCore.API
 
             var xDocument = XDocument.Parse(data);
 
-            if (xDocument.Element(MyWork1)
+            if (xDocument.Element(nameof(MyWork))
                .Descendants()
                .ToList()
                .Exists(
                     e => e.Name.LocalName.Equals(CompleteItemsQuery)))
             {
-                if (!bool.Parse(xDocument.Element(MyWork1).Element(CompleteItemsQuery).Value))
+                if (!bool.Parse(xDocument.Element(nameof(MyWork)).Element(CompleteItemsQuery).Value))
                 {
                     result.Element(Grid)
                        .Element(LeftCols)
