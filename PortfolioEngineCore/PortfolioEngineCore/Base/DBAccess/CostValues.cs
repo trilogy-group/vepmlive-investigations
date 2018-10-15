@@ -251,8 +251,8 @@ namespace PortfolioEngineCore
             int calId, 
             int ctId, 
             int inputCalendar, 
-            List<int> projectIds, 
-            List<PfEPeriod> periods, 
+            IList<int> projectIds, 
+            IList<PfEPeriod> periods, 
             out string reply)
         {
             if (calId < 0 || ctId <= 0 || inputCalendar < 0)
@@ -320,7 +320,7 @@ namespace PortfolioEngineCore
             DBAccess dbAccess, 
             int calId, 
             int ctId, 
-            List<PfEPeriod> periods, 
+            IList<PfEPeriod> periods, 
             int projectId, 
             decimal discountPercentValue, 
             DataTable dataTable)
@@ -425,7 +425,7 @@ namespace PortfolioEngineCore
         }
 
         private static void ReadValues(
-            List<PfEPeriod> periods, 
+            IList<PfEPeriod> periods, 
             out int catId, 
             out int seqId, 
             out int periodId, 
@@ -791,7 +791,7 @@ namespace PortfolioEngineCore
             }
         }
 
-        private static int MapToPeriod(DateTime dtDate, List<PfEPeriod> periods)
+        private static int MapToPeriod(DateTime dtDate, IList<PfEPeriod> periods)
         {
             int nPeriod = 0;
 
