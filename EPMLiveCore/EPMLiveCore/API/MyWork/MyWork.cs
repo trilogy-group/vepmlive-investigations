@@ -61,7 +61,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -83,38 +82,19 @@ namespace EPMLiveCore.API
 
         private const string COMMENT_COL_WIDTH = "36";
         private const string COMMENT_COUNT_FIELD = "CommentCount";
-        private const string COMMENTERS_FIELD = "Commenters";
-        private const string COMMENTERS_READ_FIELD = "CommentersRead";
         private const string COMPLETE_COL_WIDTH = "25";
         private const string COMPLETED_FIELD = "Complete";
-        private const string CREATED_BY_FIELD = "Author";
-        private const string CREATED_FIELD = "Created";
         private const string DUE_DATE_COL_WIDTH = "100";
         private const string DUE_DATE_FIELD = "DueDate";
         private const string DUE_DAY_COL_WIDTH = "150";
         private const string DUE_DAY_FIELD = "DueDay";
         private const string FLAG_COL_WIDTH = "40";
-        private const string FLAG_FIELD = "Flag";
-        private const string GENERAL_SETTINGS_CROSS_SITE_URLS = "EPMLive_MyWork_GeneralSettings_CrossSiteUrls";
-        private const string GENERAL_SETTINGS_PERFORMANCE_MODE = "EPMLive_MyWork_GeneralSettings_PerformanceMode";
-        private const string GENERAL_SETTINGS_SELECTED_FIELDS = "EPMLive_MyWork_GeneralSettings_SelectedFields";
-        private const string GENERAL_SETTINGS_SELECTED_LISTS = "EPMLive_MyWork_GeneralSettings_SelectedLists";
-
-        private const string GENERAL_SETTINGS_SELECTED_MY_WORK_LISTS =
-            "EPMLive_MyWork_GeneralSettings_SelectedMyWorkLists";
-
         private const string LIST_ID_FIELD = "ListId";
-        private const string MODIFIED_BY_FIELD = "Editor";
-        private const string MODIFIED_FIELD = "Modified";
         private const string MY_WORK_GRID_GLOBAL_VIEWS = "EPMLive_MyWork_Grid_GlobalViews";
         private const string MY_WORK_GRID_PERSONAL_VIEWS = "EPMLive_MyWork_Grid_PersonalViews";
         private const int MY_WORK_LIST_SERVER_TEMPLATE_ID = 10115;
         private const string PRIORITY_COL_WIDTH = "25";
-        private const string PRIORITY_FIELD = "Priority";
-        private const string SITE_ID_FIELD = "SiteId";
-        private const string SITE_URL_FIELD = "SiteUrl";
         private const string TITLE_COL_WIDTH = "0";
-        private const string TITLE_FIELD = "Title";
         private const string WEB_ID_FIELD = "WebId";
         private const string WORK_TYPE_FIELD = "Work0000Type";
         private const string WORKING_ON_FIELD = "WorkingOn";
@@ -1301,160 +1281,6 @@ namespace EPMLiveCore.API
                 }
             }
             return string.Empty;
-        }
-
-        /// <summary>
-        ///     Gets the settings.
-        /// </summary>
-        /// <param name="data">The data.</param>
-        /// <param name="selectedFields">The selected fields.</param>
-        /// <param name="selectedLists">The selected lists.</param>
-        /// <param name="siteUrls">The site urls.</param>
-        /// <param name="performanceMode">
-        ///     if set to <c>true</c> [performance mode].
-        /// </param>
-        /// <param name="noListsSelected">
-        ///     if set to <c>true</c> [no lists selected].
-        /// </param>
-        private static void GetSettings(string data)
-        {
-            try
-            {
-                bool fieldsSupplied = false;
-                bool myWorkListsSupplied = false;
-                bool listsSupplied = false;
-                bool siteUrlsSupplied = false;
-                bool performanceModeSupplied = false;
-
-                if (!string.IsNullOrEmpty(data))
-                {
-                    XDocument xDocument = XDocument.Parse(data);
-                    if (xDocument.Descendants().ToList().Exists(e => e.Name.LocalName.Equals("MyWork")))
-                    {
-                        if (
-                            xDocument.Element("MyWork").Descendants().ToList().Exists(
-                                e => e.Name.LocalName.Equals("Lists")))
-                        {
-                            GetMyWorkParams.SelectedLists.AddRange(xDocument.Element("MyWork").Element("Lists").Value.Split(new[] { ',' })
-                                .Where(list => !string.IsNullOrEmpty(list)));
-
-                            listsSupplied = true;
-                        }
-
-                        if (
-                            xDocument.Element("MyWork").Descendants().ToList().Exists(
-                                e => e.Name.LocalName.Equals("MyWorkLists")))
-                        {
-                            GetMyWorkParams.SelectedLists.AddRange(xDocument.Element("MyWork").Element("MyWorkLists").Value.Split(
-                                new[] { ',' })
-                                .Where(list => !string.IsNullOrEmpty(list)));
-
-                            myWorkListsSupplied = true;
-                        }
-
-                        if (
-                            xDocument.Element("MyWork").Descendants().ToList().Exists(
-                                e => e.Name.LocalName.Equals("Fields")))
-                        {
-                            GetMyWorkParams.SelectedFields.AddRange(xDocument.Element("MyWork").Element("Fields").Value.Split(new[] { ',' })
-                                .Where(field => !string.IsNullOrEmpty(field)));
-
-                            fieldsSupplied = true;
-                        }
-
-                        if (
-                            xDocument.Element("MyWork").Descendants().ToList().Exists(
-                                e => e.Name.LocalName.Equals("CrossSiteUrls")))
-                        {
-                            if (!string.IsNullOrEmpty(xDocument.Element("MyWork").Element("CrossSiteUrls").Value))
-                            {
-                                GetMyWorkParams.SiteUrls.AddRange(xDocument.Element("MyWork").Element("CrossSiteUrls").Value.Split(
-                                    new[] { ',' })
-                                    .Where(crossSite => !string.IsNullOrEmpty(crossSite)));
-
-                                siteUrlsSupplied = true;
-                            }
-                        }
-
-                        if (
-                            xDocument.Element("MyWork").Descendants().ToList().Exists(
-                                e => e.Name.LocalName.Equals("PerformanceMode")))
-                        {
-                            GetMyWorkParams.PerformanceMode = xDocument.Element("MyWork").Element("PerformanceMode").Value.Equals("on");
-                            performanceModeSupplied = true;
-                        }
-                    }
-                }
-
-                SPWeb theWeb = SPContext.Current.Web;
-                Guid lockedWeb = CoreFunctions.getLockedWeb(theWeb);
-                using (SPWeb configWeb = Utils.GetConfigWeb(theWeb, lockedWeb))
-                {
-                    if (!listsSupplied)
-                        GetMyWorkParams.SelectedLists.AddRange(
-                            CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_SELECTED_LISTS)
-                                .Split(new[] { ',' }));
-
-                    if (!myWorkListsSupplied)
-                        GetMyWorkParams.SelectedLists.AddRange(
-                            CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_SELECTED_MY_WORK_LISTS)
-                                .Split(new[] { ',' }));
-
-                    if (!fieldsSupplied)
-                        GetMyWorkParams.SelectedFields.AddRange(
-                            CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_SELECTED_FIELDS).Split(new[] { ',' }).Distinct());
-
-                    if (!siteUrlsSupplied)
-                    {
-                        if (
-                            !string.IsNullOrEmpty(CoreFunctions.getConfigSetting(configWeb,
-                                GENERAL_SETTINGS_CROSS_SITE_URLS)))
-                        {
-                            GetMyWorkParams.SiteUrls.AddRange(CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_CROSS_SITE_URLS)
-                                .Split(new[] { '|' }));
-                        }
-                        else GetMyWorkParams.SiteUrls.Add(SPContext.Current.Web.Url);
-                    }
-
-                    if (!performanceModeSupplied)
-                        GetMyWorkParams.PerformanceMode = CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_PERFORMANCE_MODE)
-                            .Equals("on");
-                }
-
-                GetMyWorkParams.SelectedLists.RemoveAll(string.IsNullOrEmpty);
-                GetMyWorkParams.NoListsSelected = GetMyWorkParams.SelectedLists.Count == 0;
-
-                GetMyWorkParams.SelectedFields.RemoveAll(string.IsNullOrEmpty);
-
-                var fieldsToRemove = new[] { WORK_TYPE_FIELD, LIST_ID_FIELD, WEB_ID_FIELD, SITE_ID_FIELD, SITE_URL_FIELD };
-                foreach (string field in fieldsToRemove)
-                {
-                    GetMyWorkParams.SelectedFields.RemoveAll(f => f.ToLower().Equals(field.ToLower()));
-                }
-
-                var fixedFields = new[]
-                {
-                    COMPLETED_FIELD, COMMENT_COUNT_FIELD, PRIORITY_FIELD, FLAG_FIELD, TITLE_FIELD,
-                    DUE_DATE_FIELD,
-                    CREATED_FIELD, CREATED_BY_FIELD, MODIFIED_FIELD, MODIFIED_BY_FIELD,
-                    COMMENTERS_FIELD,
-                    COMMENTERS_READ_FIELD
-                };
-
-                foreach (string fixedField in fixedFields)
-                {
-                    string field = fixedField;
-                    if (!GetMyWorkParams.SelectedFields.Exists(f => f.Equals(field))) GetMyWorkParams.SelectedFields.Add(field);
-                }
-            }
-            catch (APIException)
-            {
-                throw;
-            }
-            catch (Exception e)
-            {
-                throw new APIException(2007, e.Message);
-            }
         }
 
         /// <summary>

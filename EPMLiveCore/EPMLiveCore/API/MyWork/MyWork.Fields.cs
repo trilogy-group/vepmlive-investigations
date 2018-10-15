@@ -20,6 +20,7 @@
         private const string Complete = "Complete";
         private const string CompleteItemsQuery = "CompleteItemsQuery";
         private const string CreatedBy = "Created By";
+        private const string CrossSiteUrls = "CrossSiteUrls";
         private const string Date = "Date";
         private const string DateRange = "DateRange";
         private const string Edit = "Edit";
@@ -45,14 +46,17 @@
         private const string LeftCols = "LeftCols";
         private const string ListIdText = "ListID";
         private const string ListId = "ListId";
+        private const string Lists = "Lists";
         private const string MarkComplete = "Mark Complete";
         private const string MaxHeight = "MaxHeight";
         private const string ModifiedBy = "Modified By";
         private const string MyWorkText = "My Work";
         private const string MyPersonalizationText = "MyPersonalization";
         private const string MyWork1 = "MyWork";
+        private const string MyWorkLists = "MyWorkLists";
         private const string Name = "Name";
         private const string Params = "Params";
+        private const string PerformanceMode = "PerformanceMode";
         private const string PersonalizationsField = "Personalizations";
         private const string ProcessFlag = "ProcessFlag";
         private const string Right = "Right";
@@ -71,6 +75,7 @@
         private const string WorkType = "WorkType";
         private const string Workspace = "Workspace";
         private const string Id = "id";
+        private const string On = "on";
         private const string Comma = ",";
         private const string OpenCurlyBrace = "{";
         private const string ClosedCurlyBrace = "}";
@@ -78,12 +83,33 @@
         private const string EqualSign = "=";
         private const string InEquality = "<>";
         private const string Percent = "%";
+        private const char CharComma = ',';
+        private const char CharVerticalBar = '|';
         private const string UnableToRetrieveMyWorkDataList = "Unable to retrieve My Work data from My Work lists.";
         private const string AssignedToField = "AssignedTo";
+        private const string CommentCountField = "CommentCount";
+        private const string CommentersField = "Commenters";
+        private const string CommentersReadField = "CommentersRead";
         private const string CompletedField = "Complete";
+        private const string CreatedByField = "Author";
+        private const string CreatedField = "Created";
         private const string DueDateField = "DueDate";
         private const string DueDayField = "DueDay";
         private const string FlagField = "Flag";
+        private const string GeneralSettingsCrossSiteUrls = "EPMLive_MyWork_GeneralSettings_CrossSiteUrls";
+        private const string GeneralSettingsPerformanceMode = "EPMLive_MyWork_GeneralSettings_PerformanceMode";
+        private const string GeneralSettingsSelectedFields = "EPMLive_MyWork_GeneralSettings_SelectedFields";
+        private const string GeneralSettingsSelectedLists = "EPMLive_MyWork_GeneralSettings_SelectedLists";
+        private const string GeneralSettingsSelectedMyWorkLists =
+            "EPMLive_MyWork_GeneralSettings_SelectedMyWorkLists";
+        private const string ListIdField = "ListId";
+        private const string ModifiedByField = "Editor";
+        private const string ModifiedField = "Modified";
+        private const string PriorityField = "Priority";
+        private const string SiteIdField = "SiteId";
+        private const string SiteUrlField = "SiteUrl";
+        private const string TitleField = "Title";
+        private const string WebIdField = "WebId";
         private const string WorkTypeField = "Work0000Type";
         private const string WorkingOnField = "WorkingOn";
     }

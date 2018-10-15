@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using System.Xml.Linq;
 using EPMLiveCore.Helpers;
-using EPMLiveCore.Properties;
-using Microsoft.SharePoint;
 
 namespace EPMLiveCore.API
 {
