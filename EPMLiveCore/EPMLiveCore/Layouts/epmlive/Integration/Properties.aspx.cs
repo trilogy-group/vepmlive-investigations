@@ -256,16 +256,18 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                              days = days.Trim(',');
                          }
 
-                         cmd = new SqlCommand("INSERT INTO TIMERJOBS (jobname, siteguid, webguid, listguid, jobtype, runtime, scheduletype, days, [key]) VALUES ('Integration', @siteguid, @webguid, @listguid, 70, @runtime, @scheduletype, @days, @key)", cn);
-                         cmd.Parameters.AddWithValue("@siteguid", Web.Site.ID);
-                         cmd.Parameters.AddWithValue("@webguid", Web.ID);
-                         cmd.Parameters.AddWithValue("@listguid", Request["LIST"]);
-                         cmd.Parameters.AddWithValue("@runtime", runtime);
-                         cmd.Parameters.AddWithValue("@scheduletype", ddlScheduleType.SelectedValue);
-                         cmd.Parameters.AddWithValue("@days", days);
-                         cmd.Parameters.AddWithValue("@key", Request["intlistid"]);
+                         using (cmd = new SqlCommand("INSERT INTO TIMERJOBS (jobname, siteguid, webguid, listguid, jobtype, runtime, scheduletype, days, [key]) VALUES ('Integration', @siteguid, @webguid, @listguid, 70, @runtime, @scheduletype, @days, @key)", cn))
+                         {
+                             cmd.Parameters.AddWithValue("@siteguid", Web.Site.ID);
+                             cmd.Parameters.AddWithValue("@webguid", Web.ID);
+                             cmd.Parameters.AddWithValue("@listguid", Request["LIST"]);
+                             cmd.Parameters.AddWithValue("@runtime", runtime);
+                             cmd.Parameters.AddWithValue("@scheduletype", ddlScheduleType.SelectedValue);
+                             cmd.Parameters.AddWithValue("@days", days);
+                             cmd.Parameters.AddWithValue("@key", Request["intlistid"]);
 
-                         cmd.ExecuteNonQuery();
+                             cmd.ExecuteNonQuery();
+                         }
 
                          //API.Timer.AddTimerJob(Web.Site.ID, Web.ID, new Guid(Request["LIST"]), "Integration", 70, "", Request["intlistid"], runtime, int.Parse(ddlScheduleType.SelectedValue), days);  
                      }
