@@ -23,6 +23,27 @@ namespace EPMLiveCore.Layouts.epmlive.Admin
 
         // Protected Methods (5) 
 
+        /// <inheritdoc />
+        public sealed override void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                ErrorPanel?.Dispose();
+                ErrorMessage?.Dispose();
+                MainPanel?.Dispose();
+                ServerName?.Dispose();
+                MemoryAllocation?.Dispose();
+                RadAjaxManager?.Dispose();
+                CacheGrid?.Dispose();
+            }
+        }
+
         protected void CacheGrid_OnDeleteCommand(object sender, GridCommandEventArgs e)
         {
             var item = e.Item as GridDataItem;
