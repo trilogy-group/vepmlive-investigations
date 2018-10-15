@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Web.UI.WebControls;
 using System.Collections.Generic;
+using System.Text;
 
 namespace EPMLiveCore.Layouts.epmlive.Integration
 {
@@ -226,54 +227,54 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                      intadmin.UpdateIntegration(intlistid, lblKey.Text, chkLout.Checked, chkLin.Checked, ddlTimed.SelectedValue == "out", ddlTimed.SelectedValue == "in");
                      intadmin.SaveProperties(hshProps);
 
-                     SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id));
-                     cn.Open();
-
-                     using (var command = new SqlCommand("DELETE FROM TIMERJOBS WHERE listguid=@listid and jobtype=70 and [key]=@data", cn))
+                     using (var connection = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id)))
                      {
-                         command.Parameters.AddWithValue("@listid", Request["LIST"]);
-                         command.Parameters.AddWithValue("@data", Request["intlistid"]);
-                         command.ExecuteNonQuery();
-                     }                     
+                         connection.Open();
 
-                     if(ddlTimed.SelectedValue != "")
-                     {
-                         string days = "";
-                         int runtime = 0;
-                         if(ddlScheduleType.SelectedValue == "3")
+                         using (var command = new SqlCommand("DELETE FROM TIMERJOBS WHERE listguid=@listid and jobtype=70 and [key]=@data", connection))
                          {
-                             runtime = int.Parse(ddlDayOfMonth.SelectedValue);
-                         }
-                         else if(ddlScheduleType.SelectedValue == "2")
-                         {
-                             runtime = int.Parse(ddlHour.SelectedValue);
-                             foreach(ListItem li in chkDayOfWeek.Items)
-                             {
-                                 if(li.Selected)
-                                 {
-                                     days += "," + li.Value;
-                                 }
-                             }
-                             days = days.Trim(',');
-                         }
-
-                         using (var command = new SqlCommand("INSERT INTO TIMERJOBS (jobname, siteguid, webguid, listguid, jobtype, runtime, scheduletype, days, [key]) VALUES ('Integration', @siteguid, @webguid, @listguid, 70, @runtime, @scheduletype, @days, @key)", cn))
-                         {
-                             command.Parameters.AddWithValue("@siteguid", Web.Site.ID);
-                             command.Parameters.AddWithValue("@webguid", Web.ID);
-                             command.Parameters.AddWithValue("@listguid", Request["LIST"]);
-                             command.Parameters.AddWithValue("@runtime", runtime);
-                             command.Parameters.AddWithValue("@scheduletype", ddlScheduleType.SelectedValue);
-                             command.Parameters.AddWithValue("@days", days);
-                             command.Parameters.AddWithValue("@key", Request["intlistid"]);
-
+                             command.Parameters.AddWithValue("@listid", Request["LIST"]);
+                             command.Parameters.AddWithValue("@data", Request["intlistid"]);
                              command.ExecuteNonQuery();
                          }
 
-                         //API.Timer.AddTimerJob(Web.Site.ID, Web.ID, new Guid(Request["LIST"]), "Integration", 70, "", Request["intlistid"], runtime, int.Parse(ddlScheduleType.SelectedValue), days);  
-                     }
+                         if (!string.IsNullOrWhiteSpace(ddlTimed.SelectedValue))
+                         {
+                             var days = string.Empty;
+                             var stringBuilder = new StringBuilder();
+                             var runtime = 0;
+                             if (ddlScheduleType.SelectedValue == "3")
+                             {
+                                 runtime = int.Parse(ddlDayOfMonth.SelectedValue);
+                             }
+                             else if (ddlScheduleType.SelectedValue == "2")
+                             {
+                                 runtime = int.Parse(ddlHour.SelectedValue);
+                                 foreach (ListItem listItem in chkDayOfWeek.Items)
+                                 {
+                                     if (listItem.Selected)
+                                     {
+                                         stringBuilder.Append(",")
+                                            .Append(listItem.Value);
+                                     }
+                                 }
+                                 days = stringBuilder.ToString().Trim(',');
+                             }
 
-                     cn.Close();
+                             using (var command = new SqlCommand("INSERT INTO TIMERJOBS (jobname, siteguid, webguid, listguid, jobtype, runtime, scheduletype, days, [key]) VALUES ('Integration', @siteguid, @webguid, @listguid, 70, @runtime, @scheduletype, @days, @key)", connection))
+                             {
+                                 command.Parameters.AddWithValue("@siteguid", Web.Site.ID);
+                                 command.Parameters.AddWithValue("@webguid", Web.ID);
+                                 command.Parameters.AddWithValue("@listguid", Request["LIST"]);
+                                 command.Parameters.AddWithValue("@runtime", runtime);
+                                 command.Parameters.AddWithValue("@scheduletype", ddlScheduleType.SelectedValue);
+                                 command.Parameters.AddWithValue("@days", days);
+                                 command.Parameters.AddWithValue("@key", Request["intlistid"]);
+
+                                 command.ExecuteNonQuery();
+                             }                             
+                         }
+                     }
 
                      if(Request["wizard"] == "1")
                      {
