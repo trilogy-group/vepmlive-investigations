@@ -29,6 +29,7 @@ namespace EPMLiveCore.API
                 }
                 catch (APIException apiException)
                 {
+                    Trace.WriteLine(apiException);
                     return $@"<Grid><IO Result=""-{apiException.ExceptionNumber}"" Message=""{apiException.Message}"" /></Grid>";
                 }
 
