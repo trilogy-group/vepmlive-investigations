@@ -158,40 +158,41 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                  {
                      if(ddlTimed.SelectedValue != "")
                      {
-                         SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id));
-                         cn.Open();
-
-                         using (var command = new SqlCommand("SELECT scheduletype, runtime, days from TIMERJOBS where listguid=@listguid and jobtype=70 and [key]=@key", cn))
+                         using (var connection = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id)))
                          {
-                             command.Parameters.AddWithValue("@listguid", Request["List"]);
-                             command.Parameters.AddWithValue("@key", Request["intlistid"]);
-                             using (var dataReader = command.ExecuteReader())
+                             connection.Open();
+
+                             using (var command = new SqlCommand("SELECT scheduletype, runtime, days from TIMERJOBS where listguid=@listguid and jobtype=70 and [key]=@key", connection))
                              {
-                                 if (dataReader.Read())
+                                 command.Parameters.AddWithValue("@listguid", Request["List"]);
+                                 command.Parameters.AddWithValue("@key", Request["intlistid"]);
+                                 using (var dataReader = command.ExecuteReader())
                                  {
-                                     ddlScheduleType.SelectedValue = dataReader.GetInt32(0).ToString();
-                                     if (ddlScheduleType.SelectedValue == "2")
+                                     if (dataReader.Read())
                                      {
-                                         ddlHour.SelectedValue = dataReader.GetInt32(1).ToString();
-
-                                         var arrayList = new ArrayList(dataReader.GetString(2).Split(','));
-                                         foreach (ListItem listItem in chkDayOfWeek.Items)
+                                         ddlScheduleType.SelectedValue = dataReader.GetInt32(0).ToString();
+                                         if (ddlScheduleType.SelectedValue == "2")
                                          {
-                                             if (arrayList.Contains(listItem.Value))
-                                             {
-                                                 listItem.Selected = true;
-                                             }
-                                         }
+                                             ddlHour.SelectedValue = dataReader.GetInt32(1).ToString();
 
-                                     }
-                                     else if (ddlScheduleType.SelectedValue == "3")
-                                     {
-                                         ddlDayOfMonth.SelectedValue = dataReader.GetInt32(1).ToString();
+                                             var arrayList = new ArrayList(dataReader.GetString(2).Split(','));
+                                             foreach (ListItem listItem in chkDayOfWeek.Items)
+                                             {
+                                                 if (arrayList.Contains(listItem.Value))
+                                                 {
+                                                     listItem.Selected = true;
+                                                 }
+                                             }
+
+                                         }
+                                         else if (ddlScheduleType.SelectedValue == "3")
+                                         {
+                                             ddlDayOfMonth.SelectedValue = dataReader.GetInt32(1).ToString();
+                                         }
                                      }
                                  }
                              }
                          }
-                         cn.Close();
                      }
                  }
 
