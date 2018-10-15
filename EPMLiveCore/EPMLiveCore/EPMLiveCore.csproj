@@ -1404,6 +1404,7 @@
     <Compile Include="SocialEngine\Modules\GlobalValidator.cs" />
     <Compile Include="SocialEngine\Modules\List.cs" />
     <Compile Include="SocialEngine\Modules\ListItem.cs" />
+    <Compile Include="SocialEngine\Modules\ListItemValidator.cs" />
     <Compile Include="SocialEngine\Modules\StatusUpdate.cs" />
     <Compile Include="SocialEngine\Modules\Workspace.cs" />
     <Compile Include="SocialEngine\SocialEngine.cs" />
