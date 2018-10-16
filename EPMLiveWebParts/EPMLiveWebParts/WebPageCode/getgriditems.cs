@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using EPMLiveCore;
 using EPMLiveCore.Infrastructure;
+using Diagnostics = System.Diagnostics;
 
 namespace EPMLiveWebParts
 {
@@ -1779,71 +1780,7 @@ namespace EPMLiveWebParts
                                         ndNewCell.Attributes.Append(attrType);
                                         break;
                                     default:
-                                        switch (field.TypeAsString)
-                                        {
-                                            case "FilteredLookup":
-
-                                                if (inEditMode)
-                                                {
-
-                                                    Guid lookuplist = new Guid(fieldXml.ChildNodes[0].Attributes["List"].Value);
-                                                    Guid lookupfield = new Guid(fieldXml.ChildNodes[0].Attributes["ShowField"].Value);
-                                                    Guid lookupweb = new Guid(fieldXml.ChildNodes[0].Attributes["WebId"].Value);
-
-                                                    XmlNode nd = fieldXml.ChildNodes[0].SelectSingleNode("Customization").SelectSingleNode("ArrayOfProperty");
-
-                                                    string query = nd.SelectSingleNode("Property[Name='QueryFilterAsString']").SelectSingleNode("Value").InnerText;
-                                                    string listview = nd.SelectSingleNode("Property[Name='ListViewFilter']").SelectSingleNode("Value").InnerText;
-                                                    string multi = nd.SelectSingleNode("Property[Name='SupportsMultipleValues']").SelectSingleNode("Value").InnerText;
-                                                    string recurse = nd.SelectSingleNode("Property[Name='IsFilterRecursive']").SelectSingleNode("Value").InnerText;
-
-                                                    string strType = "choice";
-                                                    if (multi.ToLower() == "true")
-                                                    {
-                                                        strType = "mchoice";
-                                                        SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(val);
-                                                        foreach (SPFieldLookupValue lv in lvc)
-                                                        {
-                                                            displayValue += "\n" + lv.ToString();
-                                                        }
-                                                        if (displayValue.Length > 1)
-                                                            displayValue = displayValue.Substring(1);
-                                                    }
-                                                    else
-                                                    {
-                                                        displayValue = val;
-                                                    }
-
-                                                    attrType = docXml.CreateAttribute("type");
-                                                    attrType.Value = strType;
-                                                    ndNewCell.Attributes.Append(attrType);
-
-                                                    if (!hshComboCells.Contains(field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()))
-                                                    {
-                                                        string choices = "";
-                                                        if (lookupweb == list.ParentWeb.ID)
-                                                        {
-                                                            choices = getLookupList(list.ParentWeb, lookuplist, lookupfield, query, listview);
-                                                        }
-                                                        else
-                                                        {
-                                                            try
-                                                            {
-                                                                using (SPWeb w = list.ParentWeb.Site.OpenWeb(lookupweb))
-                                                                {
-                                                                    choices = getLookupList(w, lookuplist, lookupfield, query, listview);
-                                                                }
-                                                            }
-                                                            catch { }
-                                                        }
-                                                        hshComboCells[field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()] = choices;
-                                                    }
-                                                    displayValue += "\t" + hshComboCells[field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()].ToString();
-
-                                                }
-
-                                                break;
-                                        }
+                                        HandleFilteredLookupCase(field, fieldXml, val, ndNewCell, ref displayValue);
                                         break;
                                 };
 
@@ -2062,6 +1999,79 @@ namespace EPMLiveWebParts
                         hshWBS.Add(groupname + "\n" + wbs, ndCloned);
                 }
                 counter++;
+            }
+        }
+
+        private void HandleFilteredLookupCase(SPField field, XmlDocument fieldXml, string val, XmlNode ndNewCell, ref string displayValue)
+        {
+            switch (field.TypeAsString)
+            {
+                case "FilteredLookup":
+
+                    if (inEditMode)
+                    {
+                        var lookuplist = new Guid(fieldXml.ChildNodes[0].Attributes["List"].Value);
+                        var lookupfield = new Guid(fieldXml.ChildNodes[0].Attributes["ShowField"].Value);
+                        var lookupweb = new Guid(fieldXml.ChildNodes[0].Attributes["WebId"].Value);
+
+                        var node = fieldXml.ChildNodes[0].SelectSingleNode("Customization").SelectSingleNode("ArrayOfProperty");
+
+                        var query = node.SelectSingleNode("Property[Name='QueryFilterAsString']").SelectSingleNode("Value").InnerText;
+                        var listview = node.SelectSingleNode("Property[Name='ListViewFilter']").SelectSingleNode("Value").InnerText;
+                        var multi = node.SelectSingleNode("Property[Name='SupportsMultipleValues']").SelectSingleNode("Value").InnerText;
+                        var recurse = node.SelectSingleNode("Property[Name='IsFilterRecursive']").SelectSingleNode("Value").InnerText;
+
+                        var type = "choice";
+                        if (multi.ToLower() == "true")
+                        {
+                            type = "mchoice";
+                            var lvc = new SPFieldLookupValueCollection(val);
+                            foreach (var lv in lvc)
+                            {
+                                displayValue += "\n" + lv;
+                            }
+                            if (displayValue.Length > 1)
+                            {
+                                displayValue = displayValue.Substring(1);
+                            }
+                        }
+                        else
+                        {
+                            displayValue = val;
+                        }
+
+                        var attrType = docXml.CreateAttribute("type");
+                        attrType.Value = type;
+                        ndNewCell.Attributes.Append(attrType);
+
+                        if (!hshComboCells.Contains($"{field.InternalName}-{list.ID}-{list.ParentWeb.ID}"))
+                        {
+                            var choices = string.Empty;
+                            if (lookupweb == list.ParentWeb.ID)
+                            {
+                                choices = getLookupList(list.ParentWeb, lookuplist, lookupfield, query, listview);
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    using (var w = list.ParentWeb.Site.OpenWeb(lookupweb))
+                                    {
+                                        choices = getLookupList(w, lookuplist, lookupfield, query, listview);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                                }
+                            }
+                            hshComboCells[$"{field.InternalName}-{list.ID}-{list.ParentWeb.ID}"] = choices;
+                        }
+                        displayValue += $"\t{hshComboCells[field.InternalName + "-" + list.ID + "-" + list.ParentWeb.ID]}";
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -2854,71 +2864,7 @@ namespace EPMLiveWebParts
                                         ndNewCell.Attributes.Append(attrType);
                                         break;
                                     default:
-                                        switch (field.TypeAsString)
-                                        {
-                                            case "FilteredLookup":
-
-                                                if (inEditMode)
-                                                {
-
-                                                    Guid lookuplist = new Guid(fieldXml.ChildNodes[0].Attributes["List"].Value);
-                                                    Guid lookupfield = new Guid(fieldXml.ChildNodes[0].Attributes["ShowField"].Value);
-                                                    Guid lookupweb = new Guid(fieldXml.ChildNodes[0].Attributes["WebId"].Value);
-
-                                                    XmlNode nd = fieldXml.ChildNodes[0].SelectSingleNode("Customization").SelectSingleNode("ArrayOfProperty");
-
-                                                    string query = nd.SelectSingleNode("Property[Name='QueryFilterAsString']").SelectSingleNode("Value").InnerText;
-                                                    string listview = nd.SelectSingleNode("Property[Name='ListViewFilter']").SelectSingleNode("Value").InnerText;
-                                                    string multi = nd.SelectSingleNode("Property[Name='SupportsMultipleValues']").SelectSingleNode("Value").InnerText;
-                                                    string recurse = nd.SelectSingleNode("Property[Name='IsFilterRecursive']").SelectSingleNode("Value").InnerText;
-
-                                                    string strType = "choice";
-                                                    if (multi.ToLower() == "true")
-                                                    {
-                                                        strType = "mchoice";
-                                                        SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(val);
-                                                        foreach (SPFieldLookupValue lv in lvc)
-                                                        {
-                                                            displayValue += "\n" + lv.ToString();
-                                                        }
-                                                        if (displayValue.Length > 1)
-                                                            displayValue = displayValue.Substring(1);
-                                                    }
-                                                    else
-                                                    {
-                                                        displayValue = val;
-                                                    }
-
-                                                    attrType = docXml.CreateAttribute("type");
-                                                    attrType.Value = strType;
-                                                    ndNewCell.Attributes.Append(attrType);
-
-                                                    if (!hshComboCells.Contains(field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()))
-                                                    {
-                                                        string choices = "";
-                                                        if (lookupweb == list.ParentWeb.ID)
-                                                        {
-                                                            choices = getLookupList(list.ParentWeb, lookuplist, lookupfield, query, listview);
-                                                        }
-                                                        else
-                                                        {
-                                                            try
-                                                            {
-                                                                using (SPWeb w = list.ParentWeb.Site.OpenWeb(lookupweb))
-                                                                {
-                                                                    choices = getLookupList(w, lookuplist, lookupfield, query, listview);
-                                                                }
-                                                            }
-                                                            catch { }
-                                                        }
-                                                        hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()] = choices;
-                                                    }
-                                                    displayValue += "\t" + hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()].ToString();
-
-                                                }
-
-                                                break;
-                                        }
+                                        HandleFilteredLookupCase(field, fieldXml, val, ndNewCell, ref displayValue);
                                         break;
                                 };
                             }
