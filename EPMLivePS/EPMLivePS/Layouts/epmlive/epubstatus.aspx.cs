@@ -6,11 +6,13 @@ using System.Web;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Data.SqlClient;
+using DiagTrace = System.Diagnostics.Trace;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using Microsoft.SharePoint;
 using PSLibrary = Microsoft.Office.Project.Server.Library;
-using System.Data.SqlClient;
+using EPMLiveCore;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Administration;
 
@@ -50,45 +52,59 @@ namespace EPMLiveEnterprise.Layouts.epmlive
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
 
-                    SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
-                    cn.Open();
-                    SqlCommand cmd;
-                    if (action != null && action != "")
+                    using (var connection =
+                        new SqlConnection(CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
                     {
-                        switch (action)
+                        connection.Open();
+                        if (!string.IsNullOrWhiteSpace(action))
                         {
-                            case "delete":
-                                cmd = new SqlCommand("DELETE FROM publishercheck where projectguid=@projectguid", cn);
-                                cmd.Parameters.AddWithValue("@projectguid", Request["projectid"]);
-                                cmd.ExecuteNonQuery();
-                                break;
-                            case "unlink":
-                                cmd = new SqlCommand("UPDATE publishercheck set weburl='',webguid=NULL where projectguid=@projectguid", cn);
-                                cmd.Parameters.AddWithValue("@projectguid", Request["projectid"]);
-                                cmd.ExecuteNonQuery();
-                                break;
-                        };
+                            switch (action)
+                            {
+                                case "delete":
+                                    using (var command = new SqlCommand(
+                                        "DELETE FROM publishercheck where projectguid=@projectguid",
+                                        connection))
+                                    {
+                                        command.Parameters.AddWithValue("@projectguid", Request["projectid"]);
+                                        command.ExecuteNonQuery();
+                                    }
+                                    break;
+                                case "unlink":
+                                    using (var command = new SqlCommand(
+                                        "UPDATE publishercheck set weburl='',webguid=NULL where projectguid=@projectguid",
+                                        connection))
+                                    {
+                                        command.Parameters.AddWithValue("@projectguid", Request["projectid"]);
+                                        command.ExecuteNonQuery();
+                                    }
+                                    break;
+                                default:
+                                    DiagTrace.TraceError($"Unexpected action '{action}'.");
+                                    break;
+                            }
 
-                        cn.Close();
-                        Response.Redirect(SPContext.Current.Web.Url + "/_layouts/epmlive/epubstatus.aspx");
+                            Response.Redirect($"{SPContext.Current.Web.Url}/_layouts/epmlive/epubstatus.aspx");
+                        }
+
+                        var dataSet = new DataSet();
+                        using (var command =
+                            new SqlCommand("select * from vwGetProjectStatus order by projectname", connection))
+                        {
+                            using (var adapter = new SqlDataAdapter(command))
+                            {
+                                adapter.Fill(dataSet);
+                            }
+                        }
+
+                        GvItems.DataSource = dataSet;
+                        GvItems.DataBind();
                     }
-
-                    cmd = new SqlCommand("select * from vwGetProjectStatus order by projectname", cn);
-
-                    SqlDataAdapter da = new SqlDataAdapter(cmd);
-                    DataSet ds = new DataSet();
-                    da.Fill(ds);
-
-                    GvItems.DataSource = ds;
-                    GvItems.DataBind();
-
-                    cn.Close();
-
                 });
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Response.Write("Error: " + ex.Message);
+                DiagTrace.TraceError(exception.ToString());
+                Response.Write($"Error: {exception.Message}");
             }
         }
 
