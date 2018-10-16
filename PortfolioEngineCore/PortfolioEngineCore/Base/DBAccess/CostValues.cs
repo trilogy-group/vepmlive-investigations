@@ -264,23 +264,22 @@ namespace PortfolioEngineCore
             try
             {
                 reply = string.Empty;
-                var whereClause = " WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
                 foreach (var projectId in projectIds)
                 {
                     dbAccess.BeginTransaction();
                     var discountPercentValue = ProjectDiscountRates.GetProjectDiscountRate(dbAccess, projectId);
-                    ClearExistingCostValues(dbAccess, calId, ctId, whereClause, projectId);
+                    ClearExistingCostValues(dbAccess, calId, ctId, projectId);
 
                     // Create new values - first just copy CT_STATUS
-                    var cmdText = "Insert Into EPGP_PROJECT_CT_STATUS (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_STATUS)" +
-                        " Select " + calId.ToString() + ",CT_ID,PROJECT_ID,BC_UID,BC_STATUS FROM  EPGP_PROJECT_CT_STATUS" +
-                        " WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
+                    var cmdText = $@"Insert Into EPGP_PROJECT_CT_STATUS (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_STATUS)
+                         Select {calId},CT_ID,PROJECT_ID,BC_UID,BC_STATUS FROM  EPGP_PROJECT_CT_STATUS
+                         WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
                     ExcuteInsertInto(dbAccess, ctId, inputCalendar, cmdText, projectId);
 
                     // straight copy for COST_DETAILS then read in the CB/CT info from DETAIL_VALUES, convert to new period and write out for new calendar
-                    cmdText = "INSERT INTO EPGP_COST_DETAILS (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_SEQ,OC_01,OC_02,OC_03,OC_04,OC_05,TEXT_01,TEXT_02,TEXT_03,TEXT_04,TEXT_05)"
-                            + " Select " + calId.ToString() + ",CT_ID,PROJECT_ID,BC_UID,BC_SEQ,OC_01,OC_02,OC_03,OC_04,OC_05,TEXT_01,TEXT_02,TEXT_03,TEXT_04,TEXT_05"
-                            + " FROM  EPGP_COST_DETAILS WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
+                    cmdText = $@"INSERT INTO EPGP_COST_DETAILS (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_SEQ,OC_01,OC_02,OC_03,OC_04,OC_05,TEXT_01,TEXT_02,TEXT_03,TEXT_04,TEXT_05)
+                             Select {calId},CT_ID,PROJECT_ID,BC_UID,BC_SEQ,OC_01,OC_02,OC_03,OC_04,OC_05,TEXT_01,TEXT_02,TEXT_03,TEXT_04,TEXT_05
+                             FROM  EPGP_COST_DETAILS WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
                     ExcuteInsertInto(dbAccess, ctId, inputCalendar, cmdText, projectId);
 
                     var dataTable = LoadDataTable(dbAccess, ctId, inputCalendar, projectId);
@@ -308,8 +307,10 @@ namespace PortfolioEngineCore
             return true;
         }
 
-        private static void ClearExistingCostValues(DBAccess dbAccess, int calId, int ctId, string whereClause, int projectId)
+        private static void ClearExistingCostValues(DBAccess dbAccess, int calId, int ctId, int projectId)
         {
+            const string whereClause = " WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
+
             DeleteFromTable("EPGP_COST_VALUES", dbAccess, projectId, calId, ctId, whereClause);
             DeleteFromTable("EPGP_DETAIL_VALUES", dbAccess, projectId, calId, ctId, whereClause);
             DeleteFromTable("EPGP_COST_DETAILS", dbAccess, projectId, calId, ctId, whereClause);
