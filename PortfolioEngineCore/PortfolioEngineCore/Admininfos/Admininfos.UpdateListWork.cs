@@ -54,7 +54,10 @@ namespace PortfolioEngineCore
                 dataTable1.Dispose();
                 dataTable2.Dispose();
 
-                GetGroups(out var workHourGroups, out var holidayGroups);
+                IDictionary<int, int> workHourGroups;
+                IDictionary<int, int> holidayGroups;
+
+                GetGroups(out workHourGroups, out holidayGroups);
 
                 var canUpdate = ProcessProjects(cStruct, holidayGroups, workHourGroups, workHours, tempResult);
 
