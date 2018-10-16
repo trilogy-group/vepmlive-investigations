@@ -220,6 +220,7 @@
     <Compile Include="Infrastructure\ResourceManagment\ResourcePoolManagerTests.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
     <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
+    <Compile Include="Integrations\Salesforce\SfServiceTests.cs" />
     <Compile Include="ISAPI\WorkEngineAPITests.cs" />
     <Compile Include="ISAPI\WorkEngineAPITests.RemainingMethods.cs" />
     <Compile Include="Jobs\NotificationsTests.cs" />
