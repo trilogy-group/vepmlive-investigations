@@ -56,7 +56,6 @@ namespace TimeSheets
                 foreach (var groupBy in arrGroupFields)
                 {
                     var field = list.Fields.GetFieldByInternalName(groupBy);
-                    /////////TODO
                     var newGroup = string.Empty;
 
                     try

@@ -22,13 +22,13 @@ namespace TimeSheets
                 {
                     XmlDocumentNodeCreate(arrayList, strColumns, xmlNode, ndListId, ndItemId);
 
-                    var ro = false;
+                    var appendRo = false;
 
                     try
                     {
                         if (xmlNode.SelectSingleNode("userdata[@name='tsdisabled']").InnerText == "1")
                         {
-                            ro = true;
+                            appendRo = true;
                         }
                     }
                     catch (Exception exception)
@@ -44,7 +44,7 @@ namespace TimeSheets
                         }
                         else
                         {
-                            XmlNodeAttributes(ndListId, ndItemId, dateTime, ro, xmlNode);
+                            XmlNodeAttributes(ndListId, ndItemId, dateTime, appendRo, xmlNode);
                         }
                     }
 
@@ -95,14 +95,7 @@ namespace TimeSheets
             if (timeNotes)
             {
                 var dataRows = dsTSHours.Tables[1]
-                   .Select(
-                        "list_uid='" +
-                        ndListId.InnerText +
-                        "' and item_id=" +
-                        ndItemId.InnerText +
-                        " and TS_ITEM_DATE=#" +
-                        dateTime.ToString("MM/dd/yyy") +
-                        "#");
+                   .Select($"list_uid=\'{ndListId.InnerText}\' and item_id={ndItemId.InnerText} and TS_ITEM_DATE=#{dateTime:MM/dd/yyy}#");
 
                 colInnerTextBuilder.Append(
                     dataRows.Length > 0
@@ -120,25 +113,18 @@ namespace TimeSheets
             xmlNode.AppendChild(newCol);
         }
 
-        private void XmlNodeAttributes(XmlNode ndListId, XmlNode ndItemId, DateTime dateTime, bool ro, XmlNode xmlNode)
+        private void XmlNodeAttributes(XmlNode ndListId, XmlNode ndItemId, DateTime dateTime, bool appendRo, XmlNode xmlNode)
         {
             var newCol = docXml.CreateNode(XmlNodeType.Element, CellText, docXml.NamespaceURI);
 
             var dataRows = dsTSHours.Tables[0]
-               .Select(
-                    "list_uid='" +
-                    ndListId.InnerText +
-                    "' and item_id=" +
-                    ndItemId.InnerText +
-                    " and TS_ITEM_DATE=#" +
-                    dateTime.ToString("MM/dd/yyyy") +
-                    "#");
+               .Select($"list_uid=\'{ndListId.InnerText}\' and item_id={ndItemId.InnerText} and TS_ITEM_DATE=#{dateTime:MM/dd/yyyy}#");
 
             newCol.InnerText = dataRows.Length > 0
                 ? dataRows[0]["TS_ITEM_HOURS"].ToString()
                 : Zero;
 
-            if (ro)
+            if (appendRo)
             {
                 var attrType = docXml.CreateAttribute(TypeText);
                 attrType.Value = RoText;
@@ -161,15 +147,7 @@ namespace TimeSheets
             {
                 var dataRows = dsTSHours.Tables[0]
                    .Select(
-                        "list_uid='" +
-                        ndListId.InnerText +
-                        "' and item_id=" +
-                        ndItemId.InnerText +
-                        " and TS_ITEM_DATE=#" +
-                        dateTime.ToString("MM/dd/yyyy") +
-                        "# and tstype_id='" +
-                        strWorkType +
-                        "'");
+                        $"list_uid=\'{ndListId.InnerText}\' and item_id={ndItemId.InnerText} and TS_ITEM_DATE=#{dateTime:MM/dd/yyyy}# and tstype_id=\'{strWorkType}\'");
 
                 colInnerTextBuilder.Append(
                     dataRows.Length > 0

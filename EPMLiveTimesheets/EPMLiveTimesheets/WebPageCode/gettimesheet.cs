@@ -36,11 +36,11 @@ namespace TimeSheets
                 delegate
                 {
                     var requestedUser = Page.Request["duser"];
-                    var resName = string.Empty;
+                    var resourceName = string.Empty;
 
                     if (!string.IsNullOrWhiteSpace(requestedUser))
                     {
-                        if (SharedFunctions.canUserImpersonate(username, requestedUser, site.RootWeb, out resName))
+                        if (SharedFunctions.canUserImpersonate(username, requestedUser, site.RootWeb, out resourceName))
                         {
                             username = requestedUser;
                         }
@@ -230,6 +230,10 @@ namespace TimeSheets
                 catch (Exception exception)
                 {
                     DiagTrace.WriteLine(exception);
+                }
+                finally
+                {
+                    iWeb.Close();
                 }
 
                 if (!found && !newTimeSheet)

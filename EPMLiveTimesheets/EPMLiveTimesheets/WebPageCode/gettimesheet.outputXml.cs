@@ -43,13 +43,13 @@ namespace TimeSheets
             {
                 var strColumnsBuilder = new StringBuilder(strColumns);
 
-                foreach (XmlNode nd in ndHead.SelectNodes(ColumnText))
+                foreach (XmlNode xmlNode in ndHead.SelectNodes(ColumnText))
                 {
                     var value = string.Empty;
 
                     try
                     {
-                        value = nd.Attributes[IdText].Value;
+                        value = xmlNode.Attributes[IdText].Value;
                     }
                     catch (Exception exception)
                     {
@@ -214,57 +214,68 @@ namespace TimeSheets
 
             docXml.SelectSingleNode(SingleNodePath).InsertBefore(newCol, ndCols[0]);
 
-            var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id));
-            sqlConnection.Open();
-            var sqlCommand = new SqlCommand("select TSTYPE_ID from TSTYPE where site_uid=@siteid", sqlConnection);
-            sqlCommand.Parameters.AddWithValue(IdSite, site.ID);
-            var dataReader = sqlCommand.ExecuteReader();
-            var workBuilder = new StringBuilder(workTypes);
-
-            while (dataReader.Read())
+            using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
             {
-                timeEditor = true;
-                workBuilder.Append($"|{dataReader.GetInt32(0)}");
+                sqlConnection.Open();
+
+                using (var sqlCommand = new SqlCommand("select TSTYPE_ID from TSTYPE where site_uid=@siteid", sqlConnection))
+                {
+                    sqlCommand.Parameters.AddWithValue(IdSite, site.ID);
+
+                    using (var dataReader = sqlCommand.ExecuteReader())
+                    {
+                        var workBuilder = new StringBuilder(workTypes);
+
+                        while (dataReader.Read())
+                        {
+                            timeEditor = true;
+                            workBuilder.Append($"|{dataReader.GetInt32(0)}");
+                        }
+
+                        workTypes = workBuilder.ToString();
+                        workTypes = !string.IsNullOrWhiteSpace(workTypes)
+                            ? workTypes.Substring(1)
+                            : Zero;
+                    }
+                }
+
+                if (CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSAllowNotes").Equals("true", StringComparison.OrdinalIgnoreCase))
+                {
+                    timeNotes = true;
+                    timeEditor = true;
+                }
+
+                var dayDefs = CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveDaySettings").Split('|');
+
+                using (var sqlCommand = new SqlCommand(
+                    "select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid",
+                    sqlConnection)
+                {
+                    CommandType = CommandType.Text
+                })
+                {
+                    sqlCommand.Parameters.AddWithValue(IdPeriod, period);
+                    sqlCommand.Parameters.AddWithValue(IdSite, site.ID);
+
+                    using (var dataReader = sqlCommand.ExecuteReader())
+                    {
+                        var footer = ",Totals:";
+
+                        if (dataReader.Read())
+                        {
+                            var dtStart = dataReader.GetDateTime(0);
+                            var dtEnd = dataReader.GetDateTime(1);
+                            var timeSpan = dtEnd - dtStart;
+                            var colBase = docXml.SelectSingleNode(SingleNodePath).SelectNodes(ColumnText).Count;
+                            var colCount = 0;
+
+                            filterHead = FilterHead(timeSpan, dayDefs, dtStart, filterHead, arrayList, timeEditor, ref colCount);
+                            XmlDocumentAppend(footer, colBase, colCount, timeEditor);
+                        }
+                    }
+                }
             }
 
-            workTypes = workBuilder.ToString();
-            workTypes = !string.IsNullOrWhiteSpace(workTypes)
-                ? workTypes.Substring(1)
-                : Zero;
-
-            dataReader.Close();
-
-            if (CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSAllowNotes").Equals("true", StringComparison.OrdinalIgnoreCase))
-            {
-                timeNotes = true;
-                timeEditor = true;
-            }
-
-            var dayDefs = CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveDaySettings").Split('|');
-
-            sqlCommand = new SqlCommand("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", sqlConnection)
-            {
-                CommandType = CommandType.Text
-            };
-            sqlCommand.Parameters.AddWithValue(IdPeriod, period);
-            sqlCommand.Parameters.AddWithValue(IdSite, site.ID);
-            dataReader = sqlCommand.ExecuteReader();
-
-            var footer = ",Totals:";
-
-            if (dataReader.Read())
-            {
-                var dtStart = dataReader.GetDateTime(0);
-                var dtEnd = dataReader.GetDateTime(1);
-                var timeSpan = dtEnd - dtStart;
-                var colBase = docXml.SelectSingleNode(SingleNodePath).SelectNodes(ColumnText).Count;
-                var colCount = 0;
-
-                filterHead = FilterHead(timeSpan, dayDefs, dtStart, filterHead, arrayList, timeEditor, ref colCount);
-                XmlDocumentAppend(footer, colBase, colCount, timeEditor);
-            }
-
-            dataReader.Close();
             return timeNotes;
         }
 
@@ -334,6 +345,8 @@ namespace TimeSheets
             Guard.ArgumentIsNotNull(filterHead, nameof(filterHead));
             Guard.ArgumentIsNotNull(dayDefs, nameof(dayDefs));
 
+            var filterHeadBuilder = new StringBuilder(filterHead);
+
             for (var i = 0; i <= timeSpan.Days; i++)
             {
                 var showDay = string.Empty;
@@ -349,7 +362,7 @@ namespace TimeSheets
 
                 if (showDay == TrueText)
                 {
-                    filterHead += ",&nbsp;";
+                    filterHeadBuilder.Append(",&nbsp;");
                     colCount++;
                     arrayList.Add(dtStart.AddDays(i));
                     var newCol = docXml.CreateNode(XmlNodeType.Element, ColumnText, docXml.NamespaceURI);
@@ -376,7 +389,7 @@ namespace TimeSheets
                 }
             }
 
-            return filterHead;
+            return filterHeadBuilder.ToString();
         }
     }
 }
