@@ -49,8 +49,6 @@ namespace PortfolioEngineCore
                 }
 
                 UpdateDeleteResourceTimeoff(canUpdate, resource, cStruct, resourceId);
-
-                _sqlConnection.Close();
                 result = cStruct.XML();
                 return canUpdate;
             }
@@ -58,6 +56,10 @@ namespace PortfolioEngineCore
             {
                 System.Diagnostics.Trace.WriteLine(exception);
                 throw new PFEException((int)PFEError.DeleteResourceTimeoff, exception.GetBaseMessage());
+            }
+            finally
+            {
+                _sqlConnection.Close();
             }
         }
 
