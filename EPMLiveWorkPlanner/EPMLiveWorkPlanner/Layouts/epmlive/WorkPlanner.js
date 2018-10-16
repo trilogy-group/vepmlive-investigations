@@ -1396,7 +1396,6 @@ function DeleteTasks() {
                             Grids.WorkPlannerGrid.MoveRow(row, row.parentNode.parentNode, row.parentNode.nextSibling, 1);
                         } catch (e) { }
                         grid.DeleteRow(row, 2);
-                        grid.RemoveRow(row);
                     } catch (e) { }
                 }
                 grid.ActionCorrectAllDependencies();
