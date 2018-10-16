@@ -34,8 +34,10 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
                 cmd.Parameters.AddWithValue("@siteid", Convert.ToString(Web.ID));
 
                 DataSet ds = new DataSet();
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(ds);
+                using (var dataReader = new SqlDataAdapter(cmd))
+                {
+                    dataReader.Fill(ds);
+                }
 
                 ds.Tables[0].Columns.Add("Category");
                 ds.Tables[0].Columns.Add("ShortName");
