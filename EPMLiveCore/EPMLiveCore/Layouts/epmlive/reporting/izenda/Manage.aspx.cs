@@ -30,41 +30,42 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
                 SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id));
                 cn.Open();
 
-                SqlCommand cmd = new SqlCommand("SELECT * FROM IzendaAdHocReports where TenantID=@siteid order by Name", cn);
-                cmd.Parameters.AddWithValue("@siteid", Convert.ToString(Web.ID));
-
-                DataSet ds = new DataSet();
-                using (var dataReader = new SqlDataAdapter(cmd))
+                using (var command = new SqlCommand("SELECT * FROM IzendaAdHocReports where TenantID=@siteid order by Name", cn))
                 {
-                    dataReader.Fill(ds);
-                }
+                    command.Parameters.AddWithValue("@siteid", Convert.ToString(Web.ID));
 
-                ds.Tables[0].Columns.Add("Category");
-                ds.Tables[0].Columns.Add("ShortName");
-
-                foreach (DataRow dr in ds.Tables[0].Rows)
-                {
-                    if (dr["Name"].ToString().Contains("\\"))
+                    DataSet ds = new DataSet();
+                    using (var dataReader = new SqlDataAdapter(command))
                     {
-                        string[] sName = dr["Name"].ToString().Split('\\');
-                        dr["ShortName"] = sName[1];
-                        dr["Category"] = sName[0];
-                    }
-                    else
-                    {
-                        dr["ShortName"] = dr["Name"];
-                        dr["Category"] = "Uncategorized";
-                    }
+                        dataReader.Fill(ds);
 
-                    dr["Name"] = System.Web.HttpUtility.UrlEncode(dr["Name"].ToString());
+                        ds.Tables[0].Columns.Add("Category");
+                        ds.Tables[0].Columns.Add("ShortName");
+
+                        foreach (DataRow dr in ds.Tables[0].Rows)
+                        {
+                            if (dr["Name"].ToString().Contains("\\"))
+                            {
+                                string[] sName = dr["Name"].ToString().Split('\\');
+                                dr["ShortName"] = sName[1];
+                                dr["Category"] = sName[0];
+                            }
+                            else
+                            {
+                                dr["ShortName"] = dr["Name"];
+                                dr["Category"] = "Uncategorized";
+                            }
+
+                            dr["Name"] = System.Web.HttpUtility.UrlEncode(dr["Name"].ToString());
+                        }
+
+                        DataTable dt = ds.Tables[0];
+                        dt = dt.AsEnumerable().GroupBy(x => x["Category"]).SelectMany(g => g.OrderBy(v => v["ShortName"])).CopyToDataTable();
+
+                        gvReports.DataSource = dt;
+                        gvReports.DataBind();
+                    }
                 }
-
-                DataTable dt = ds.Tables[0];                
-                dt = dt.AsEnumerable().GroupBy(x => x["Category"]).SelectMany(g => g.OrderBy(v => v["ShortName"])).CopyToDataTable();
-                
-                gvReports.DataSource = dt;
-                gvReports.DataBind();
-
                 cn.Close();
             });
         }
