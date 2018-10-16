@@ -90,7 +90,9 @@ namespace TimeSheets
             Guard.ArgumentIsNotNull(ndListId, nameof(ndListId));
             Guard.ArgumentIsNotNull(strWorkTypes, nameof(strWorkTypes));
 
-            var newCol = XmlNode(strWorkTypes, ndListId, ndItemId, dateTime, out var colInnerTextBuilder);
+            StringBuilder colInnerTextBuilder;
+
+            var newCol = XmlNode(strWorkTypes, ndListId, ndItemId, dateTime, out colInnerTextBuilder);
 
             if (timeNotes)
             {

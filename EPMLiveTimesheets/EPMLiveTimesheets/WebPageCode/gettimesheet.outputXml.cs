@@ -62,7 +62,10 @@ namespace TimeSheets
                 strColumns = strColumnsBuilder.ToString().Substring(1);
             }
 
-            var fullWidth = FullWidth(ndHead, workTypes, arrayList, strColumns, timeEditor, timeNotes, filterHead, columnCount, out var ndNewCols, out var start);
+            XmlNodeList xmlNodeList;
+            int start;
+
+            var fullWidth = FullWidth(ndHead, workTypes, arrayList, strColumns, timeEditor, timeNotes, filterHead, columnCount, out xmlNodeList, out start);
 
             for (var i = start; i <= columnCount; i++)
             {
@@ -70,7 +73,7 @@ namespace TimeSheets
 
                 try
                 {
-                    value = ndNewCols[i].Attributes[TypeText].Value;
+                    value = xmlNodeList[i].Attributes[TypeText].Value;
                 }
                 catch (Exception exception)
                 {
@@ -79,12 +82,12 @@ namespace TimeSheets
 
                 if (value == "tree")
                 {
-                    ndNewCols[i].Attributes[WidthText].Value = (fullWidth * 2 - 10).ToString("#");
+                    xmlNodeList[i].Attributes[WidthText].Value = (fullWidth * 2 - 10).ToString("#");
                 }
                 else
                 {
-                    ndNewCols[i].Attributes[WidthText].Value = fullWidth.ToString("#");
-                    ndNewCols[i].Attributes[TypeText].Value = RoText;
+                    xmlNodeList[i].Attributes[WidthText].Value = fullWidth.ToString("#");
+                    xmlNodeList[i].Attributes[TypeText].Value = RoText;
                 }
             }
 
@@ -92,7 +95,7 @@ namespace TimeSheets
         }
 
         private double FullWidth(
-            XmlNode ndHead,
+            XmlNode nodeHead,
             string workTypes,
             ArrayList arrayList,
             string strColumns,
@@ -100,14 +103,14 @@ namespace TimeSheets
             bool timeNotes,
             string filterHead,
             int columnCount,
-            out XmlNodeList ndNewCols,
+            out XmlNodeList xmlNodeList,
             out int start)
         {
             Guard.ArgumentIsNotNull(filterHead, nameof(filterHead));
             Guard.ArgumentIsNotNull(strColumns, nameof(strColumns));
             Guard.ArgumentIsNotNull(arrayList, nameof(arrayList));
             Guard.ArgumentIsNotNull(workTypes, nameof(workTypes));
-            Guard.ArgumentIsNotNull(ndHead, nameof(ndHead));
+            Guard.ArgumentIsNotNull(nodeHead, nameof(nodeHead));
 
             var newColWork = docXml.CreateNode(XmlNodeType.Element, ColumnText, docXml.NamespaceURI);
             newColWork.InnerXml = "<![CDATA[% Work Spent]]>";
@@ -128,22 +131,22 @@ namespace TimeSheets
             newColWork.Attributes.Append(attrColorWork);
             newColWork.Attributes.Append(attrIdWork);
 
-            ndHead.AppendChild(newColWork);
-            ndHead.RemoveChild(ndHead.SelectSingleNode("settings") ?? throw new InvalidOperationException());
+            nodeHead.AppendChild(newColWork);
+            nodeHead.RemoveChild(nodeHead.SelectSingleNode("settings") ?? throw new InvalidOperationException());
 
             var strWorkTypes = workTypes.Split('|');
 
             ProcessXmlNode(arrayList, strColumns, timeEditor, strWorkTypes, timeNotes, filterHead);
 
             var fullWidth = double.Parse(Request[WidthText].Split('.')[0]);
-            ndNewCols = docXml.SelectNodes(ColumnHead);
+            xmlNodeList = docXml.SelectNodes(ColumnHead);
             double reservedWidth = 0;
 
-            for (var i = columnCount + 1; i < ndNewCols.Count; i++)
+            for (var i = columnCount + 1; i < xmlNodeList.Count; i++)
             {
                 try
                 {
-                    var value = ndNewCols[i].Attributes[WidthText].Value;
+                    var value = xmlNodeList[i].Attributes[WidthText].Value;
                     reservedWidth += double.Parse(value);
                 }
                 catch (Exception exception)
