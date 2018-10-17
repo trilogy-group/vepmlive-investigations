@@ -16,7 +16,7 @@ namespace EPMLivePS.Tests.Layouts.epmlive
     [TestFixture]
     public class PsSubSettingsButton1ClickTest
     {
-        private MethodInfo _buttoClick1Method;
+        private MethodInfo _buttonClick1Method;
         private pspubsettings _pspubsettings;
         private EventArgs _args;
         private IDisposable _shimsContext;
@@ -27,7 +27,7 @@ namespace EPMLivePS.Tests.Layouts.epmlive
         public void SetUp()
         {
             _shimsContext = ShimsContext.Create();
-            _buttoClick1Method = typeof(pspubsettings).GetMethod("Button1_Click", BindingFlags.Instance | BindingFlags.NonPublic);
+            _buttonClick1Method = typeof(pspubsettings).GetMethod("Button1_Click", BindingFlags.Instance | BindingFlags.NonPublic);
             _pspubsettings = new pspubsettings();
             _args = new EventArgs();
             _adoShims = AdoShims.ShimAdoNetCalls();
@@ -47,7 +47,7 @@ namespace EPMLivePS.Tests.Layouts.epmlive
             SetupShims(true, _pspubsettings);
 
             // Act
-            _buttoClick1Method.Invoke(_pspubsettings, new object[] {null, _args});
+            _buttonClick1Method.Invoke(_pspubsettings, new object[] {null, _args});
 
             // Assert
             Assert.IsTrue(_adoShims.ConnectionsDisposed.Any());
@@ -68,7 +68,7 @@ namespace EPMLivePS.Tests.Layouts.epmlive
             SetupShims(false, _pspubsettings);
 
             // Act
-            _buttoClick1Method.Invoke(_pspubsettings, new object[] { null, _args });
+            _buttonClick1Method.Invoke(_pspubsettings, new object[] { null, _args });
 
             // Assert
             Assert.IsTrue(_adoShims.ConnectionsDisposed.Any());
