@@ -1,54 +1,41 @@
 ﻿using System.Web.UI;
+using PPM;
 
 namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
 {
     public class ControlBase : UserControl
     {
         private string m_sURL = string.Empty;
-        private string m_sWEPID = string.Empty;
-        private string m_sTicket = string.Empty;
-        private string m_sViewID = string.Empty;
         public string FileVersion
         {
-            get
-            {
-                return PPM.PfEAssemblyInfo.FileVersion();
-            }
+            get { return PfEAssemblyInfo.FileVersion(); }
         }
         public string URL
         {
             get
             {
-                if (m_sURL == string.Empty)
+                if (string.IsNullOrWhiteSpace(m_sURL))
+                {
                     m_sURL = "/";
+                }
                 return m_sURL;
             }
             set
             {
                 m_sURL = value.Trim();
-                if (m_sURL.EndsWith("/") == false)
+                if (!m_sURL.EndsWith("/"))
+                {
                     m_sURL += "/";
+                }
             }
         }
-        public string WEPID
-        {
-            get { return m_sWEPID; }
-            set { m_sWEPID = value; }
-        }
-        public string TicketVal
-        {
-            get { return m_sTicket; }
-            set { m_sTicket = value; }
-        }
-        public string ViewIDVal
-        {
-            get { return m_sViewID; }
-            set { m_sViewID = value; }
-        }
+        public string WEPID { get; set; } = string.Empty;
+        public string TicketVal { get; set; } = string.Empty;
+        public string ViewIDVal { get; set; } = string.Empty;
         public string ViewNameVal
         {
-            get { return m_sViewID; }
-            set { m_sViewID = value; }
+            get { return ViewIDVal; }
+            set { ViewIDVal = value; }
         }
     }
 }
