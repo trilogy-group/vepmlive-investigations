@@ -31,18 +31,21 @@ namespace EPMLiveCore
                     cn.Open();
                 });
 
-                SqlCommand cmd = new SqlCommand("select (case when resulttext is null then 'No Errors' else resulttext end) as resulttext from vwQueueTImerLog where jobtype=@log_type and siteguid = @siteguid and listguid is null", cn);
-                cmd.Parameters.AddWithValue("@log_type", Request["type"]);
-                cmd.Parameters.AddWithValue("@siteguid", site.ID);
-                SqlDataReader dr = cmd.ExecuteReader();
-
-                if (dr.Read())
+                using (var command = new SqlCommand("select (case when resulttext is null then 'No Errors' else resulttext end) as resulttext from vwQueueTImerLog where jobtype=@log_type and siteguid = @siteguid and listguid is null", cn))
                 {
-                    output = dr.GetString(0);
-                }
-                dr.Close();
+                    command.Parameters.AddWithValue("@log_type", Request["type"]);
+                    command.Parameters.AddWithValue("@siteguid", site.ID);
 
-                cn.Close();
+                    var dataReader = command.ExecuteReader();
+
+                    if (dataReader.Read())
+                    {
+                        output = dataReader.GetString(0);
+                    }
+                    dataReader.Close();
+
+                    cn.Close();
+                }
 
                 switch (Request["type"])
                 {
