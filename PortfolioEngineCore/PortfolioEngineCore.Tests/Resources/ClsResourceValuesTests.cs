@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ResourceValues;
 using Shouldly;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace PortfolioEngineCore.Tests.Resources
 {
+    using ResourceValues;
+
     [TestClass]
     public class ClsResourceValuesTests
     {
@@ -105,7 +101,7 @@ namespace PortfolioEngineCore.Tests.Resources
                 RoleName = DummyString
             };
             var expectedCostCategoriesValue = "<CostCategories>" +
-            "<Cat UID=\"3\" MC=\"3\" CC=\"3\" ID=\"3\" LVL=\"3\" Role=\"3\" PID=\"3\" Name=\"DummyStirng\" FName=\"DummyStirng\" RName=\"DummyStirng\" />" + 
+            "<Cat UID=\"3\" MC=\"3\" CC=\"3\" ID=\"3\" LVL=\"3\" Role=\"3\" PID=\"3\" Name=\"DummyStirng\" FName=\"DummyStirng\" RName=\"DummyStirng\" />" +
             "</CostCategories>";
             var expecteRatesValue = "<Rates>" +
             "<Rate UID=\"3\" ID=\"3\" LVL=\"3\" PID=\"3\" Name=\"DummyStirng\" FName=\"DummyStirng\" />" +
@@ -130,20 +126,21 @@ namespace PortfolioEngineCore.Tests.Resources
         }
 
         [TestMethod]
-        public void XML()
+        public void XML_PeriodsAndDepartmentsAndPIs_ShouldRederCorrectly()
         {
             // Arrange
-            clsResourceValues.CostCategories = new Dictionary<int, clsCatItem>
+            const string ExpectedPeriodsValue = "<Periods><PD ID=\"0\" St=\"0001-01-01T00:00:00\" End=\"0001-01-01T00:00:00\" Name=\"\" /></Periods>";
+            const string ExpectedDepartamentsValue = "<Depts><Dept ID=\"0\" Name=\"\" Desc=\"\" /></Depts>";
+            var expectedPIsValue = @"    <PIs>
+                <PI ProjID=""0"" WProjID=""0"" Name="""" LP="""" IM="""" SO="""" Stage="""" WSS="""" IMID=""0"" Pri=""0"" St=""0001-01-01T00:00:00"" Fin=""0001-01-01T00:00:00"">
+                    <CFs>
+                        <CF Fld=""DummyStirng"" />
+                    </CFs>
+                </PI>
+            </PIs>";
+            clsResourceValues.Periods = new Dictionary<int, CPeriod>
             {
-                [1] = new clsCatItem()
-            };
-            clsResourceValues.Rates = new Dictionary<int, clsCatItem>
-            {
-                [1] = new clsCatItem()
-            };
-            clsResourceValues.Periods = new Dictionary<int, ResourceValues.CPeriod>
-            {
-                [1] = new ResourceValues.CPeriod()
+                [1] = new CPeriod()
             };
             clsResourceValues.Departments = new Dictionary<int, clsEPKItem>
             {
@@ -156,17 +153,66 @@ namespace PortfolioEngineCore.Tests.Resources
                     CustomFields = new List<string> { DummyString }
                 }
             };
+
+            // Act
+            var result = clsResourceValues.XML();
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldContainWithoutWhitespace(ExpectedPeriodsValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedDepartamentsValue),
+                () => result.ShouldContainWithoutWhitespace(expectedPIsValue));
+        }
+
+        [TestMethod]
+        public void XML_ResourcesAndRoles_ShouldRederCorrectly()
+        {
+            // Arrange
+            const string ExpectedResourceValue = "<Res ID=\"1\" Name=\"DummyStirng\" DeptUID=\"1\" RoleUID=\"1\" RTUID=\"1\" BC_Role=\"1\" BC_CC=\"1\">";
+            const string ExpectedCustomFieldValue = "<CFs><CF Fld=\"DummyStirng\" /></CFs>";
+            const string ExpectedRoleValue = "<Role ID=\"1\" Name=\"DummyStirng\" />";
             clsResourceValues.Resources = new Dictionary<int, clsResCap>
             {
                 [1] = new clsResCap
                 {
+                    ID = 1,
+                    Name = DummyString,
+                    DeptUID = 1,
+                    RoleUID = 1,
+                    RT_UID = 1,
+                    BC_UID_Role = 1,
+                    BC_UID_CC = 1,
                     CustomFields = new List<string> { DummyString }
                 }
             };
             clsResourceValues.Roles = new Dictionary<int, clsListItem>
             {
-                [1] = new clsListItem()
+                [1] = new clsListItem
+                {
+                    ID = 1,
+                    Name = DummyString
+                }
             };
+
+            // Act
+            var result = clsResourceValues.XML();
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldContainWithoutWhitespace(ExpectedResourceValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedCustomFieldValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedRoleValue));
+        }
+
+        [TestMethod]
+        public void XML_Commitments_ShouldRederCorrectly()
+        {
+            // Arrange
+            const string ExpectedResourceValue = "<Cmts><Cmt UID=\"0\" ID=\"0\" ProjID=\"0\" WresID=\"0\" BC_Role=\"0\"";
+            const string ExpectedCustomFieldValue = "<CFs><CF Fld=\"DummyStirng\" /></CFs>";
+            const string ExpectedCommitmentHourValue = "<CHs><CH UID=\"0\" PD=\"0\" FTES=\"0\" Hrs=\"0\" /></CHs>";
             clsResourceValues.Commitments = new Dictionary<int, clsCommitment>
             {
                 [1] = new clsCommitment
@@ -174,6 +220,29 @@ namespace PortfolioEngineCore.Tests.Resources
                     CustomFields = new List<string> { DummyString }
                 }
             };
+            clsResourceValues.CommitmentHours = new List<clsCommitmentHours>
+            {
+                new clsCommitmentHours()
+            };
+
+            // Act
+            var result = clsResourceValues.XML();
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldContainWithoutWhitespace(ExpectedResourceValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedCustomFieldValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedCommitmentHourValue));
+        }
+
+        [TestMethod]
+        public void XML_OpenReqs_ShouldRederCorrectly()
+        {
+            // Arrange
+            const string ExpectedOpenReqValue = "<OReqts><OReqt UID=\"0\" ID=\"0\" ProjID=\"0\" WresID=\"0\"";
+            const string ExpectedCustomFieldValue = "<CFs><CF Fld=\"DummyStirng\" /></CFs>";
+            const string ExpectedOpenReqHourValue = "<ORs><OR UID=\"0\" PD=\"0\" FTES=\"0\" Hrs=\"0\" /></ORs>";
             clsResourceValues.OpenReqs = new Dictionary<int, clsCommitment>
             {
                 [1] = new clsCommitment
@@ -185,6 +254,24 @@ namespace PortfolioEngineCore.Tests.Resources
             {
                 new clsCommitmentHours()
             };
+
+            // Act
+            var result = clsResourceValues.XML();
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldContainWithoutWhitespace(ExpectedOpenReqValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedCustomFieldValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedOpenReqHourValue));
+        }
+
+        [TestMethod]
+        public void XML_WorkHours_ShouldRederCorrectly()
+        {
+            // Arrange
+            const string ExpectedScheduledHoursValue = "<SWs><SW ProjID=\"0\" WresID=\"0\" PD=\"0\" MC=\"\" FTES=\"0\" Hrs=\"0\" /></SWs>";
+            const string ExpectedActualWorkHoursValue = "<ActWs><ActW ProjID=\"0\" WresID=\"0\" PD=\"0\" MC=\"\" FTES=\"0\" Hrs=\"0\" /></ActWs>";
             clsResourceValues.SchedWorkHours = new List<clsSchedWork>
             {
                 new clsSchedWork()
@@ -193,10 +280,24 @@ namespace PortfolioEngineCore.Tests.Resources
             {
                 new clsSchedWork()
             };
-            clsResourceValues.ActualWorkHours = new List<clsSchedWork>
-            {
-                new clsSchedWork()
-            };
+
+            // Act
+            var result = clsResourceValues.XML();
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldContainWithoutWhitespace(ExpectedScheduledHoursValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedActualWorkHoursValue));
+        }
+
+        [TestMethod]
+        public void XML_NWItems_ShouldRederCorrectly()
+        {
+            // Arrange
+            const string ExpectedNWItemValue = "<NWs><NW ID=\"0\" Name=\"\" /></NWs>";
+            const string ExpectedResNWValueValue = "<NWHs><NWH UID=\"0\" WresID=\"0\" PD=\"0\" FTES=\"0\" Hrs=\"0\" /></NWHs>";
+            const string ExpectedResVailItemValue = "<RAVs><RAV WresID=\"0\" PD=\"0\" FTES=\"0\" Hrs=\"0\" /></RAVs>";
             clsResourceValues.NWItems = new Dictionary<int, clsEPKItem>
             {
                 [1] = new clsEPKItem()
@@ -209,14 +310,56 @@ namespace PortfolioEngineCore.Tests.Resources
             {
                 new clsResAvail()
             };
+
+            // Act
+            var result = clsResourceValues.XML();
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldContainWithoutWhitespace(ExpectedNWItemValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedResNWValueValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedResVailItemValue));
+        }
+
+        [TestMethod]
+        public void XML_CapacityTargets_ShouldRederCorrectly()
+        {
+            // Arrange
+            const string ExpectedCapacityTargetValue = "<Tgts><Tgt UID=\"0\" ID=\"0\" Flag=\"0\" Name=\"\" /></Tgts>";
+            const string ExpectedCapacityValue = "<TgtVs><TgtV ID=\"0\" PD=\"0\" DeptUID=\"0\" RoleUID=\"0\" FTES=\"0\" Hrs=\"0\" /></TgtVs>";
+            const string ExpectedTargetColorValue = "<TgtCs><TgtC ID=\"0\" LV=\"0\" HV=\"0\" RGB=\"0\" Desc=\"\" /></TgtCs>";
             clsResourceValues.CapacityTargets = new Dictionary<int, clsEPKItem>
             {
                 [1] = new clsEPKItem()
+            };
+            clsResourceValues.CapacityTargetValues= new List<clsCapacityValue>
+            {
+                new clsCapacityValue()
             };
             clsResourceValues.TargetColors = new Dictionary<int, clsViewTargetColours>
             {
                 [1] = new clsViewTargetColours()
             };
+
+            // Act
+            var result = clsResourceValues.XML();
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldContainWithoutWhitespace(ExpectedCapacityTargetValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedCapacityValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedTargetColorValue));
+        }
+
+        [TestMethod]
+        public void XML_Fields_ShouldRederCorrectly()
+        {
+            // Arrange
+            const string ExpectedPlnaFieldValue = "<RPFlds><RPFld ID=\"0\" Type=\"0\" Name=\"\" GivenName=\"\" /></RPFlds>";
+            const string ExpectedPIFieldValue = "<PIFlds><PIFld ID=\"0\" Type=\"0\" Name=\"\" GivenName=\"\" /></PIFlds>";
+            const string ExpectedResFieldValue = "<ResFlds><ResFld ID=\"0\" Type=\"0\" Name=\"\" GivenName=\"\" /></ResFlds>";
             clsResourceValues.PlanFields = new List<clsPortField>
             {
                 new clsPortField()
@@ -229,9 +372,28 @@ namespace PortfolioEngineCore.Tests.Resources
             {
                 new clsPortField()
             };
+
+            // Act
+            var result = clsResourceValues.XML();
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldContainWithoutWhitespace(ExpectedPlnaFieldValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedPIFieldValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedResFieldValue));
+        }
+
+        [TestMethod]
+        public void XML_Lookups_ShouldRederCorrectly()
+        {
+            // Arrange
+            const string ExpectedLookupItemValue = "<LIs><LI UID=\"0\" ID=\"0\" Level=\"0\" Inactive=\"0\" Name=\"\" /></LIs>";
+            const string ExpectedFTEConvValue = "<FTEConvs><FTEConv CAT_ID=\"0\" Period_ID=\"0\" FTE=\"0\" /></FTEConvs>";
+            const string ExpectedUserDepartamentValue = "<UserDepts><Dept DEPT_UID=\"1\" /></UserDepts>";
             clsResourceValues.Lookups = new Dictionary<int, clsLookupList>
             {
-                [1] = new clsLookupList
+                [1] = new clsLookupList()
                 {
                     ListItems = new Dictionary<int, clsListItem>
                     {
@@ -243,31 +405,148 @@ namespace PortfolioEngineCore.Tests.Resources
             {
                 new clsFTEConv()
             };
-            clsResourceValues.UserDepartments = new List<int>
-            {
-                1
-            };
+            clsResourceValues.UserDepartments = new List<int> { 1 };
 
             // Act
             var result = clsResourceValues.XML();
 
-
             // Assert
-            result.ShouldNotBeNullOrEmpty();
-
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldContainWithoutWhitespace(ExpectedLookupItemValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedFTEConvValue),
+                () => result.ShouldContainWithoutWhitespace(ExpectedUserDepartamentValue));
         }
 
         [TestMethod]
-        public void LoadFromXML()
+        public void LoadFromXML_Should_ExecuteCorrectly()
         {
             // Arrange
             var xmlcontent = GetXmlContent();
 
             // Act
-            clsResourceValues.LoadFromXML(xmlcontent);
+            var result = clsResourceValues.LoadFromXML(xmlcontent);
 
             // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBeTrue(),
+                () => ValidateResourceValuesFields());
+        }
 
+        [TestMethod]
+        public void SetFullNamesListItem_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            var listItems = new Dictionary<int, clsListItem>
+            {
+                [1] = new clsListItem
+                {
+                    Level = 1,
+                    Name = "Dummy",
+                    FullName = "DummyString"
+                },
+                [2] = new clsListItem
+                {
+                    Level = 4,
+                    Name = "Name",
+                    FullName = "FullDummyContentLong"
+                }
+            };
+
+            // Act
+            clsResourceValues.SetFullNames(listItems, 4);
+
+            // Assert
+            listItems.ShouldSatisfyAllConditions(
+                () => listItems.ShouldNotBeNull(),
+                () => listItems[1].ShouldNotBeNull(),
+                () => listItems[1].Name.ShouldBe(listItems[1].FullName),
+                () => listItems[2].ShouldNotBeNull(),
+                () => listItems[2].FullName.ShouldContain(listItems[1].Name));
+        }
+
+        [TestMethod]
+        public void SetFullNames_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            var listItems = new Dictionary<int, clsCatItem>
+            {
+                [1] = new clsCatItem
+                {
+                    Level = 1,
+                    Name = "Dummy",
+                    FullName = "DummyString"
+                },
+                [2] = new clsCatItem
+                {
+                    Level = 4,
+                    Name = "Name",
+                    FullName = "FullName"
+                }
+            };
+
+            // Act
+            clsResourceValues.SetFullNames(listItems, 4);
+
+            // Assert
+            listItems.ShouldSatisfyAllConditions(
+                () => listItems.ShouldNotBeNull(),
+                () => listItems[1].ShouldNotBeNull(),
+                () => listItems[1].Name.ShouldBe(listItems[1].FullName),
+                () => listItems[2].ShouldNotBeNull(),
+                () => listItems[2].FullName.ShouldContain(listItems[1].Name));
+        }
+
+        private void ValidateResourceValuesFields()
+        {
+            clsResourceValues.CostCategories.ShouldNotBeNull();
+            clsResourceValues.CostCategories.ShouldNotBeEmpty();
+            clsResourceValues.Rates.ShouldNotBeNull();
+            clsResourceValues.Rates.ShouldNotBeEmpty();
+            clsResourceValues.Periods.ShouldNotBeNull();
+            clsResourceValues.Periods.ShouldNotBeEmpty();
+            clsResourceValues.Departments.ShouldNotBeNull();
+            clsResourceValues.Departments.ShouldNotBeEmpty();
+            clsResourceValues.PIs.ShouldNotBeNull();
+            clsResourceValues.PIs.ShouldNotBeEmpty();
+            clsResourceValues.Resources.ShouldNotBeNull();
+            clsResourceValues.Resources.ShouldNotBeEmpty();
+            clsResourceValues.Roles.ShouldNotBeNull();
+            clsResourceValues.Roles.ShouldNotBeEmpty();
+            clsResourceValues.Commitments.ShouldNotBeNull();
+            clsResourceValues.Commitments.ShouldNotBeEmpty();
+            clsResourceValues.CommitmentHours.ShouldNotBeNull();
+            clsResourceValues.CommitmentHours.ShouldNotBeEmpty();
+            clsResourceValues.OpenReqs.ShouldNotBeNull();
+            clsResourceValues.OpenReqs.ShouldNotBeEmpty();
+            clsResourceValues.OpenReqHours.ShouldNotBeNull();
+            clsResourceValues.OpenReqHours.ShouldNotBeEmpty();
+            clsResourceValues.SchedWorkHours.ShouldNotBeNull();
+            clsResourceValues.SchedWorkHours.ShouldNotBeEmpty();
+            clsResourceValues.ActualWorkHours.ShouldNotBeNull();
+            clsResourceValues.ActualWorkHours.ShouldNotBeEmpty();
+            clsResourceValues.NWItems.ShouldNotBeNull();
+            clsResourceValues.NWItems.ShouldNotBeEmpty();
+            clsResourceValues.ResNWValues.ShouldNotBeNull();
+            clsResourceValues.ResNWValues.ShouldNotBeEmpty();
+            clsResourceValues.CapacityTargets.ShouldNotBeNull();
+            clsResourceValues.CapacityTargets.ShouldNotBeEmpty();
+            clsResourceValues.CapacityTargetValues.ShouldNotBeNull();
+            clsResourceValues.CapacityTargetValues.ShouldNotBeEmpty();
+            clsResourceValues.TargetColors.ShouldNotBeNull();
+            clsResourceValues.TargetColors.ShouldNotBeEmpty();
+            clsResourceValues.PlanFields.ShouldNotBeNull();
+            clsResourceValues.PlanFields.ShouldNotBeEmpty();
+            clsResourceValues.PIFields.ShouldNotBeNull();
+            clsResourceValues.PIFields.ShouldNotBeEmpty();
+            clsResourceValues.ResFields.ShouldNotBeNull();
+            clsResourceValues.ResFields.ShouldNotBeEmpty();
+            clsResourceValues.Lookups.ShouldNotBeNull();
+            clsResourceValues.Lookups.ShouldNotBeEmpty();
+            clsResourceValues.FTEConvData.ShouldNotBeNull();
+            clsResourceValues.FTEConvData.ShouldNotBeEmpty();
+            clsResourceValues.UserDepartments.ShouldNotBeNull();
+            clsResourceValues.UserDepartments.ShouldNotBeEmpty();
         }
 
         private string GetXmlContent()
@@ -384,74 +663,5 @@ namespace PortfolioEngineCore.Tests.Resources
 
             return content;
         }
-
-        [TestMethod]
-        public void SetFullNamesListItem_Should_ExecuteCorrectly()
-        {
-            // Arrange
-            var listItems = new Dictionary<int, clsListItem>
-            {
-                [1] = new clsListItem
-                {
-                    Level = 1,
-                    Name = "Dummy",
-                    FullName = "DummyString"
-                },
-                [2] = new clsListItem
-                {
-                    Level = 4,
-                    Name = "Name",
-                    FullName = "FullDummyContentLong"
-                }
-            };
-
-            // Act
-            clsResourceValues.SetFullNames(listItems, 4);
-
-            // Assert
-            listItems.ShouldSatisfyAllConditions(
-                () => listItems.ShouldNotBeNull(),
-                () => listItems[1].ShouldNotBeNull(),
-                () => listItems[1].Name.ShouldBe(listItems[1].FullName),
-                () => listItems[2].ShouldNotBeNull(),
-                () => listItems[2].FullName.ShouldContain(listItems[1].Name));
-        }
-
-        [TestMethod]
-        public void SetFullNames_Should_ExecuteCorrectly()
-        {
-            // Arrange
-            var listItems = new Dictionary<int, clsCatItem>
-            {
-                [1] = new clsCatItem
-                {
-                    Level = 1,
-                    Name = "Dummy",
-                    FullName = "DummyString"
-                },
-                [2] = new clsCatItem
-                {
-                    Level = 4,
-                    Name = "Name",
-                    FullName = "FullName"
-                }
-            };
-
-            // Act
-            clsResourceValues.SetFullNames(listItems, 4);
-
-            // Assert
-            listItems.ShouldSatisfyAllConditions(
-                () => listItems.ShouldNotBeNull(),
-                () => listItems[1].ShouldNotBeNull(),
-                () => listItems[1].Name.ShouldBe(listItems[1].FullName),
-                () => listItems[2].ShouldNotBeNull(),
-                () => listItems[2].FullName.ShouldContain(listItems[1].Name));
-        }
-
-
-
-
-
     }
 }
