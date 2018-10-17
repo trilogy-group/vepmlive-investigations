@@ -111,5 +111,6 @@
     <Add FullName="EPMLiveCore.API.ApplicationDef!"/>
     <Add FullName="EPMLiveCore.API.ApplicationInstaller!"/>
     <Add FullName="EPMLiveCore.ApplicationStore.AppStore!"/>
+    <Add FullName="EPMLiveCore.API.Reporting!"/>
   </ShimGeneration>
 </Fakes>

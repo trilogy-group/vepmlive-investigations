@@ -1271,6 +1271,8 @@ namespace EPMLiveEnterprise
             }
 
             cn?.Dispose();
+
+            _disposed = true;
         }
     }
 }
