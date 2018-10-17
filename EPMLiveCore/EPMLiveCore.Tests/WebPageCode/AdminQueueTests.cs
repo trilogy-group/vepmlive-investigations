@@ -53,7 +53,7 @@ namespace EPMLiveCore.Tests.WebPageCode
         [TestCleanup]
         public void TearDown()
         {
-            _context = ShimsContext.Create();
+            _context?.Dispose();
         }
 
         [TestMethod]
@@ -294,18 +294,18 @@ namespace EPMLiveCore.Tests.WebPageCode
                 dataReadCallCount++;
                 return shouldRead;
             };
-            ShimSqlDataReader.AllInstances.GetInt32Int32 = (_, i) =>
+            ShimSqlDataReader.AllInstances.GetInt32Int32 = (_, idx) =>
             {
                 if (dataReadCallCount == 1)
                 {
-                    if (i == 0)
+                    if (idx == 0)
                     {
                         return DummyLength;
                     }
                 }
                 else
                 {
-                    switch (i)
+                    switch (idx)
                     {
                         case 0:
                             return DummyJobTime;
@@ -353,7 +353,7 @@ namespace EPMLiveCore.Tests.WebPageCode
 
         public string RunShowTime(int input)
         {
-            return (string)_privateObject.Invoke("showtime",input);
+            return (string)_privateObject.Invoke("showtime", input);
         }
     }
 }

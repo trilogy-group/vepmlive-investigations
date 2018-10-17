@@ -139,8 +139,9 @@ namespace EPMLiveCore
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Trace.TraceError("Exception suppressed: {0}", ex); 
             }
         }
 
