@@ -141,18 +141,20 @@ namespace EPMLiveCore
         {
             try
             {
-                var Buffer = new byte[0];
-                var Key = "EPMLIVE";
-                var DES = new TripleDESCryptoServiceProvider();
-                using (var hashMD5 = new MD5CryptoServiceProvider())
+                var buffer = new byte[0];
+                var key = "EPMLIVE";
+                using (var desProvider = new TripleDESCryptoServiceProvider())
                 {
-                    DES.Key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(Key));
-                    DES.Mode = CipherMode.ECB;
-                    var DESDecrypt = DES.CreateDecryptor();
-                    Buffer = Convert.FromBase64String(base64Text);
+                    using (var hashMD5 = new MD5CryptoServiceProvider())
+                    {
+                        desProvider.Key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(key));
+                        desProvider.Mode = CipherMode.ECB;
+                        var DESDecrypt = desProvider.CreateDecryptor();
+                        buffer = Convert.FromBase64String(base64Text);
 
-                    var DecTripleDES = ASCII.GetString(DESDecrypt.TransformFinalBlock(Buffer, 0, Buffer.Length));
-                    return DecTripleDES;
+                        var decTripleDES = ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(buffer, 0, buffer.Length));
+                        return decTripleDES;
+                    }
                 }
             }
             catch (Exception ex)
