@@ -21,6 +21,7 @@ using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Logging;
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 using Microsoft.SharePoint.Administration;
+using static EPMLiveCore.Layouts.epmlive.LayoutsHelper;
 
 namespace EPMLiveCore.Layouts.epmlive
 {
@@ -108,36 +109,13 @@ namespace EPMLiveCore.Layouts.epmlive
 
         protected void btnGrpPermAdd_OnClick(object sender, EventArgs e)
         {
-
-            if (ViewState["dtGroupsPermissions"] != null)
-            {
-                dtGroupsPermissions = (DataTable)ViewState["dtGroupsPermissions"];
-                DataRow dr = dtGroupsPermissions.NewRow();
-                dr["GroupsText"] = ddlGroups.Items[ddlGroups.SelectedIndex].Text;
-                dr["GroupsID"] = ddlGroups.Items[ddlGroups.SelectedIndex].Value;
-                dr["PermissionsText"] = ddlSPPermissions.Items[ddlSPPermissions.SelectedIndex].Text;
-                dr["PermissionsID"] = ddlSPPermissions.Items[ddlSPPermissions.SelectedIndex].Value;
-
-                bool blnRecordExists = false;
-                foreach (DataRow dr2 in dtGroupsPermissions.Rows)
-                {
-                    if ((dr2["GroupsID"] + ";" + dr2["PermissionsID"]) == ddlGroups.Items[ddlGroups.SelectedIndex].Value + ";" + ddlSPPermissions.Items[ddlSPPermissions.SelectedIndex].Value)
-                    {
-                        blnRecordExists = true;
-                        break;
-                    }
-                }
-
-                if (!blnRecordExists)
-                {
-                    dtGroupsPermissions.Rows.Add(dr);
-                    GvGroupsPermissions.DataSource = dtGroupsPermissions;
-                    GvGroupsPermissions.DataBind();
-                    ViewState["dtGroupsPermissions"] = dtGroupsPermissions;
-                }
-            }
-
-            Button1.Focus();
+            HandleGridPermanentAddClickEvent(
+                ViewState,
+                ref dtGroupsPermissions,
+                ddlGroups,
+                ddlSPPermissions,
+                GvGroupsPermissions,
+                Button1);
         }
         protected override void OnPreLoad(EventArgs e)
         {
