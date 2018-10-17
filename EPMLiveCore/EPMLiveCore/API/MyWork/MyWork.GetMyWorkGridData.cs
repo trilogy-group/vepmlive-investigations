@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using System.Xml.Linq;
 using EPMLiveCore.Helpers;
-using EPMLiveCore.Properties;
-using Microsoft.SharePoint;
 
 namespace EPMLiveCore.API
 {
@@ -34,8 +31,8 @@ namespace EPMLiveCore.API
                 }
 
                 var result = new XDocument();
-                result.Add(new XElement(Grid));
-                var grid = result.Element(Grid);
+                result.Add(new XElement(GridText));
+                var grid = result.Element(GridText);
 
                 GetSettings(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data)));
 

@@ -92,7 +92,7 @@ namespace EPMLiveCore.API
             }
 
             var dateRange = requestXml.Root?.Element(DateRange);
-            var fromAttribute = dateRange?.Attribute(From);
+            var fromAttribute = dateRange?.Attribute(FromText);
 
             if (fromAttribute != null)
             {
@@ -104,7 +104,7 @@ namespace EPMLiveCore.API
                 }
             }
 
-            var toAttribute = dateRange?.Attribute(To);
+            var toAttribute = dateRange?.Attribute(ToText);
 
             if (toAttribute != null)
             {
@@ -229,7 +229,7 @@ namespace EPMLiveCore.API
                     lists.Add(lstId);
                 }
 
-                var uniqueId = (listId + dataRow[WebId] + dataRow[SiteId]).Md5();
+                var uniqueId = (listId + dataRow[WebIdText] + dataRow[SiteId]).Md5();
 
                 if (!GetMyWorkParams.WorkTypes.ContainsKey(uniqueId))
                 {
@@ -256,7 +256,7 @@ namespace EPMLiveCore.API
 
             foreach (var dataRow in dataRows)
             {
-                var key = $"{dataRow[SiteId]}{dataRow[WebId]}{dataRow[ListId]}{dataRow[ItemId]}{dataRow[AssignedToId]}";
+                var key = $"{dataRow[SiteId]}{dataRow[WebIdText]}{dataRow[ListId]}{dataRow[ItemId]}{dataRow[AssignedToId]}";
                 key = key.Replace(OpenCurlyBrace, string.Empty).Replace(ClosedCurlyBrace, string.Empty).ToUpper();
 
                 if (list.Contains(key))

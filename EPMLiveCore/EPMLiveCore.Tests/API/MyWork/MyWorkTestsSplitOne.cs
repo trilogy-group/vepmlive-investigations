@@ -379,7 +379,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             const string expectedType = "expectedType";
             const string expectedFormat = "expectedFormat";
 
-            ShimMyWork.GetTypeAndFormatDictionaryOfStringSPFieldStringStringOutStringOut = (Dictionary<string, SPField> fieldTypes, string selectedField, out string type, out string format) =>
+            ShimMyWork.GetTypeAndFormatIDictionaryOfStringSPFieldStringStringOutStringOut = (IDictionary<string, SPField> fieldTypes, string selectedField, out string type, out string format) =>
             {
                 type = expectedType;
                 format = expectedFormat;
@@ -558,7 +558,7 @@ namespace EPMLiveCore.Tests.API.MyWork
                Guid.NewGuid()
            };
             ShimMyWork.GetWorkingOnSPWeb = _ => dTable;
-            ShimMyWork.GetTypeAndFormatDictionaryOfStringSPFieldStringStringOutStringOut = (Dictionary<string, SPField> fieldTypesParam, string selectedField, out string type, out string format) =>
+            ShimMyWork.GetTypeAndFormatIDictionaryOfStringSPFieldStringStringOutStringOut = (IDictionary<string, SPField> fieldTypesParam, string selectedField, out string type, out string format) =>
             {
                 type = expectedType;
                 format = expectedFormat;
