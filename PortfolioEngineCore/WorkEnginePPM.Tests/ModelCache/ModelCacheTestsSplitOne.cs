@@ -40,6 +40,13 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         private const string ReadCostTypeNamesMethodName = "ReadCostTypeNames";
         private const string CheckVersionSecurityMethodName = "CheckVersionSecurity";
         private const string ReadModelNamesMethodName = "ReadModelNames";
+        private const string ReadStagesMethodName = "ReadStages";
+        private const string ReadExtraPifieldsMethodName = "ReadExtraPifields";
+        private const string StripNumMethodName = "StripNum";
+        private const string MyFormatMethodName = "MyFormat";
+        private const string ReadPILevelDataMethodName = "ReadPILevelData";
+        private const string ReadCostCustomFieldsAndDataMethodName = "ReadCostCustomFieldsAndData";
+        private const string ReadBudgetBandsMethodName = "ReadBudgetBands";
 
         [TestInitialize]
         public void Setup()
@@ -611,6 +618,519 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
                 () => optlist.Count.ShouldBe(4),
                 () => scenario.ShouldBeNull(),
                 () => validations.ShouldBe(12));
+        }
+
+        [TestMethod]
+        public void ReadStages_WhenCalled_PopulatesStages()
+        {
+            // Arrange
+            const int readMaxHit = 3;
+            var validations = 0;
+            var readHit = 0;
+            var sqlConnection = new SqlConnection();
+            var optlist = new List<ItemDefn>();
+            var now = DateTime.Now;
+
+            dataReader.Read = () =>
+            {
+                readHit += 1;
+                validations += 1;
+                if (readHit <= readMaxHit)
+                {
+                    return true;
+                }
+                else
+                {
+                    readHit = 0;
+                }
+                return false;
+            };
+
+            ShimSqlDb.ReadStringValueObject = _ => $"{DummyString}{readHit}";
+            ShimSqlDb.ReadDoubleValueObject = _ => 1;
+            ShimSqlDb.ReadIntValueObject = _ => readHit;
+            ShimSqlDb.ReadDateValueObject = _ => now;
+            ShimSqlDb.ReadBoolValueObject = _ => true;
+
+            // Act
+            privateObject.Invoke(ReadStagesMethodName, nonPublicInstance, new object[] { sqlConnection });
+            var scenario = (Dictionary<int, DataItem>)privateObject.GetFieldOrProperty("m_stages", nonPublicInstance);
+
+            // Assert
+            validations.ShouldSatisfyAllConditions(
+                () => scenario.Count.ShouldBe(3),
+                () => scenario[3].Name.ShouldBe($"{DummyString}3"),
+                () => validations.ShouldBe(4));
+        }
+
+        [TestMethod]
+        public void ReadExtraPifields_WhenCalled_SetsFields()
+        {
+            // Arrange
+            const int readMaxHit = 3;
+            var validations = 0;
+            var readHit = 0;
+            var sqlConnection = new SqlConnection();
+            var optlist = new List<ItemDefn>();
+            var now = DateTime.Now;
+            var fids = new int[10];
+            var fieldNames = new string[10];
+            var fieldTypes = new int[10];
+            var extra = new string[10];
+
+            dataReader.Read = () =>
+            {
+                readHit += 1;
+                validations += 1;
+                if (readHit <= readMaxHit)
+                {
+                    return true;
+                }
+                else
+                {
+                    readHit = 0;
+                }
+                return false;
+            };
+
+            ShimSqlDb.ReadStringValueObject = key =>
+            {
+                if (key.Equals("FIELD_NAME_SQL"))
+                {
+                    return string.Empty;
+                }
+                return $"{DummyString}{readHit}";
+            };
+            ShimSqlDb.ReadDoubleValueObject = _ => 1;
+            ShimSqlDb.ReadIntValueObject = _ => readHit;
+            ShimSqlDb.ReadDateValueObject = _ => now;
+            ShimSqlDb.ReadBoolValueObject = _ => true;
+            ShimModelCache.AllInstances.GetCFFieldNameInt32Int32StringOutStringOut = (ModelCache instance, int lTableID, int lFieldID, out string sTable, out string sField) =>
+            {
+                validations += 1;
+                sTable = DummyString;
+                sField = DummyString;
+            };
+
+            privateObject.SetFieldOrProperty("m_fidextra", nonPublicInstance, fids);
+            privateObject.SetFieldOrProperty("m_PI_Group", nonPublicInstance, 2);
+            privateObject.SetFieldOrProperty("m_PI_Seq", nonPublicInstance, 3);
+            privateObject.SetFieldOrProperty("m_ExtraFieldNames", nonPublicInstance, fieldNames);
+            privateObject.SetFieldOrProperty("m_ExtraFieldTypes", nonPublicInstance, fieldTypes);
+            privateObject.SetFieldOrProperty("m_sextra", nonPublicInstance, extra);
+
+            // Act
+            var actual = privateObject.Invoke(ReadExtraPifieldsMethodName, nonPublicInstance, new object[] { sqlConnection });
+            var groupFid = (int)privateObject.GetFieldOrProperty("m_PI_Group_fid", nonPublicInstance);
+            var seqFid = (int)privateObject.GetFieldOrProperty("m_PI_Seq_fid", nonPublicInstance);
+            extra = (string[])privateObject.GetFieldOrProperty("m_ExtraFieldNames", nonPublicInstance);
+
+            // Assert
+            validations.ShouldSatisfyAllConditions(
+                () => groupFid.ShouldBe(5),
+                () => seqFid.ShouldBe(6),
+                () => extra[6].ShouldBe($"{DummyString}3"),
+                () => validations.ShouldBe(11));
+        }
+
+        [TestMethod]
+        public void StripNum_NoDelimiter_ReturnsInteger()
+        {
+            // Arrange
+            const string input = "1001";
+
+            // Act
+            var actual = (int)privateObject.Invoke(StripNumMethodName, nonPublicInstance, new object[] { input });
+
+            // Assert
+            actual.ShouldBe(1001);
+        }
+
+        [TestMethod]
+        public void StripNum_WithDelimiter_ReturnsInteger()
+        {
+            // Arrange
+            const string input = "1001 sometext";
+
+            // Act
+            var actual = (int)privateObject.Invoke(StripNumMethodName, nonPublicInstance, new object[] { input });
+
+            // Assert
+            actual.ShouldBe(1001);
+        }
+
+        [TestMethod]
+        public void MyFormat_EPK_FTYPE_DATE_ReturnsString()
+        {
+            // Arrange
+            var scode = string.Empty;
+            var sres = string.Empty;
+            var now = DateTime.Now;
+            var expected = now.ToString("yyyyMMddHHmm");
+            var type = 1;
+
+            ShimSqlDb.ReadStringValueObject = _ => DummyString;
+            ShimSqlDb.ReadDoubleValueObject = _ => 1;
+            ShimSqlDb.ReadDecimalValueObject = _ => 1;
+            ShimSqlDb.ReadIntValueObject = _ => DummyInt;
+            ShimSqlDb.ReadDateValueObject = _ => now;
+            ShimSqlDb.ReadBoolValueObject = _ => true;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                MyFormatMethodName,
+                nonPublicInstance,
+                new object[] { new object(), type, scode, sres });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void MyFormat_EPK_FTYPE_DURATION_ReturnsString()
+        {
+            // Arrange
+            var scode = string.Empty;
+            var sres = string.Empty;
+            var now = DateTime.Now;
+            var expected = 1.ToString();
+            var type = 23;
+
+            ShimSqlDb.ReadStringValueObject = _ => DummyString;
+            ShimSqlDb.ReadDoubleValueObject = _ => 1;
+            ShimSqlDb.ReadDecimalValueObject = _ => 1;
+            ShimSqlDb.ReadIntValueObject = _ => DummyInt;
+            ShimSqlDb.ReadDateValueObject = _ => now;
+            ShimSqlDb.ReadBoolValueObject = _ => true;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                MyFormatMethodName,
+                nonPublicInstance,
+                new object[] { new object(), type, scode, sres });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void MyFormat_EPK_FTYPE_RTF_ReturnsString()
+        {
+            // Arrange
+            var scode = string.Empty;
+            var sres = string.Empty;
+            var now = DateTime.Now;
+            var expected = DummyString;
+            var type = 19;
+
+            ShimSqlDb.ReadStringValueObject = _ => DummyString;
+            ShimSqlDb.ReadDoubleValueObject = _ => 1;
+            ShimSqlDb.ReadDecimalValueObject = _ => 1;
+            ShimSqlDb.ReadIntValueObject = _ => DummyInt;
+            ShimSqlDb.ReadDateValueObject = _ => now;
+            ShimSqlDb.ReadBoolValueObject = _ => true;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                MyFormatMethodName,
+                nonPublicInstance,
+                new object[] { new object(), type, scode, sres });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void MyFormat_EPK_FTYPE_CODE_ReturnsString()
+        {
+            // Arrange
+            var scode = string.Empty;
+            var sres = string.Empty;
+            var now = DateTime.Now;
+            var expected = DummyInt.ToString();
+            var type = 4;
+
+            ShimSqlDb.ReadStringValueObject = _ => DummyString;
+            ShimSqlDb.ReadDoubleValueObject = _ => 1;
+            ShimSqlDb.ReadDecimalValueObject = _ => 1;
+            ShimSqlDb.ReadIntValueObject = _ => DummyInt;
+            ShimSqlDb.ReadDateValueObject = _ => now;
+            ShimSqlDb.ReadBoolValueObject = _ => true;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                MyFormatMethodName,
+                nonPublicInstance,
+                new object[] { new object(), type, scode, sres });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void MyFormat_EPK_FTYPE_RES_ReturnsString()
+        {
+            // Arrange
+            var scode = string.Empty;
+            var sres = string.Empty;
+            var now = DateTime.Now;
+            var expected = DummyInt.ToString();
+            var type = 7;
+
+            ShimSqlDb.ReadStringValueObject = _ => DummyString;
+            ShimSqlDb.ReadDoubleValueObject = _ => 1;
+            ShimSqlDb.ReadDecimalValueObject = _ => 1;
+            ShimSqlDb.ReadIntValueObject = _ => DummyInt;
+            ShimSqlDb.ReadDateValueObject = _ => now;
+            ShimSqlDb.ReadBoolValueObject = _ => true;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                MyFormatMethodName,
+                nonPublicInstance,
+                new object[] { new object(), type, scode, sres });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void ReadPILevelData_WhenCalled_SetsFields()
+        {
+            // Arrange
+            var validations = 0;
+            var readHit = 0;
+            var sqlConnection = new SqlConnection();
+            var now = DateTime.Now;
+            var extra = new string[]
+            {
+                DummyString,
+                DummyString,
+                DummyString,
+                DummyString
+            };
+            var fidExtra = new int[]
+            {
+                9911,
+                9911,
+                9911,
+                DummyInt
+            };
+            var stages = new Dictionary<int, DataItem>()
+            {
+                [5] = new DataItem()
+                {
+                    UID = 5
+                }
+            };
+
+            dataReader.ItemGetInt32 = input => input;
+            dataReader.Read = () =>
+            {
+                readHit += 1;
+                validations += 1;
+                if (readHit <= 3)
+                {
+                    return true;
+                }
+                else
+                {
+                    readHit = 0;
+                }
+                return false;
+            };
+
+            ShimSqlDb.ReadStringValueObject = _ => $"{DummyString}{readHit}";
+            ShimSqlDb.ReadDoubleValueObject = _ => 1;
+            ShimSqlDb.ReadDecimalValueObject = _ => 1;
+            ShimSqlDb.ReadIntValueObject = _ => readHit;
+            ShimSqlDb.ReadDateValueObject = key =>
+            {
+                if (key.Equals("PROJECT_START_DATE"))
+                {
+                    return now.AddDays(-(readHit));
+                }
+                return now.AddDays(readHit);
+            };
+            ShimSqlDb.ReadBoolValueObject = _ => true;
+            ShimModelCache.AllInstances.MyFormatObjectInt32StringRefStringRef = (ModelCache instance, object obj, int lt, ref string sCodes, ref string sRes) =>
+            {
+                sCodes = DummyString;
+                sRes = DummyString;
+                validations += 1;
+                return DummyString;
+            };
+
+            privateObject.SetFieldOrProperty("m_SelFID", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_Select_FieldName", nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty("m_Use_extra", nonPublicInstance, 3);
+            privateObject.SetFieldOrProperty("m_sextra", nonPublicInstance, extra);
+            privateObject.SetFieldOrProperty("m_fidextra", nonPublicInstance, fidExtra);
+            privateObject.SetFieldOrProperty("m_dtMin", nonPublicInstance, now);
+            privateObject.SetFieldOrProperty("m_dtMax", nonPublicInstance, now);
+            privateObject.SetFieldOrProperty("m_stages", nonPublicInstance, stages);
+
+
+            // Act
+            privateObject.Invoke(
+                ReadPILevelDataMethodName,
+                nonPublicInstance,
+                new object[] { sqlConnection, now, now });
+            var piData = (Dictionary<string, PIData>)privateObject.GetFieldOrProperty("m_PIs", nonPublicInstance);
+            var codes = (Dictionary<int, DataItem>)privateObject.GetFieldOrProperty("m_codes", nonPublicInstance);
+            var reses = (Dictionary<int, DataItem>)privateObject.GetFieldOrProperty("m_reses", nonPublicInstance);
+
+            // Assert
+            validations.ShouldSatisfyAllConditions(
+                () => piData.Count.ShouldBe(3),
+                () => piData.ElementAt(0).Value.m_PI_Extra_data[1].ShouldBe(5.ToString()),
+                () => piData.ElementAt(0).Value.m_PI_Extra_data[2].ShouldBe(string.Empty),
+                () => piData.ElementAt(0).Value.m_PI_Extra_data[3].ShouldBe(DummyString),
+                () => codes.Count.ShouldBe(3),
+                () => reses.Count.ShouldBe(3),
+                () => validations.ShouldBe(15));
+        }
+
+        [TestMethod]
+        public void ReadCostCustomFieldsAndData_WhenCalled_PopulatesData()
+        {
+            // Arrange
+            var validations = 0;
+            var readHit = 0;
+            var readIntHit = 1;
+            var stripNumHit = 0;
+            var sqlConnection = new SqlConnection();
+            var now = DateTime.Now;
+            var periodIndicator = new int[100];
+            var piData = new PIData(10)
+            {
+                PI_Name = DummyString
+            };
+            var dataItem = new DataItem()
+            {
+                Name = DummyString
+            };
+            var catItemData = new CatItemData(10)
+            {
+                Name = DummyString,
+                FullName = DummyString,
+                MC_Val = DummyString,
+                Role_Name = DummyString,
+                Category = 1
+            };
+            var pids = new Dictionary<string, PIData>()
+            {
+                [$"{1} -1"] = piData
+            };
+            var costTypes = new Dictionary<int, DataItem>()
+            {
+                [1] = dataItem
+            };
+            var costCat = new Dictionary<int, CatItemData>()
+            {
+                [1] = catItemData
+            };
+
+            dataReader.ItemGetInt32 = input => input;
+            dataReader.Read = () =>
+            {
+                readHit += 1;
+                readIntHit += 1;
+                validations += 1;
+                if (readHit <= 3)
+                {
+                    return true;
+                }
+                else
+                {
+                    readHit = 0;
+                }
+                return false;
+            };
+
+            ShimSqlDb.ReadStringValueObject = _ => $"{DummyString}{readHit}";
+            ShimSqlDb.ReadDoubleValueObject = _ => 1;
+            ShimSqlDb.ReadDecimalValueObject = _ => 1;
+            ShimSqlDb.ReadIntValueObject = _ => readIntHit;
+            ShimSqlDb.ReadDateValueObject = _ => now;
+            ShimSqlDb.ReadBoolValueObject = _ => true;
+            ShimModelCache.AllInstances.StripNumStringRef = (ModelCache instance, ref string sin) =>
+            {
+                validations += 1;
+                if (string.IsNullOrEmpty(sin))
+                {
+                    stripNumHit += 1;
+                    return stripNumHit - 1;
+                }
+                else
+                {
+                    sin = string.Empty;
+                    return stripNumHit;
+                }
+            };
+
+            privateObject.SetFieldOrProperty("m_sCostTypes", nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty("m_sCalcCostTypes", nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty("m_sOtherCostTypes", nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, 10);
+            privateObject.SetFieldOrProperty("m_PIs", nonPublicInstance, pids);
+            privateObject.SetFieldOrProperty("m_CostTypes", nonPublicInstance, costTypes);
+            privateObject.SetFieldOrProperty("m_Scenario", nonPublicInstance, costTypes);
+            privateObject.SetFieldOrProperty("m_CostCat", nonPublicInstance, costCat);
+            privateObject.SetFieldOrProperty("perind", nonPublicInstance, periodIndicator);
+
+            // Act
+            privateObject.Invoke(ReadCostCustomFieldsAndDataMethodName, nonPublicInstance, new object[] { sqlConnection });
+            var detailData = (Dictionary<string, DetailRowData>)privateObject.GetFieldOrProperty("m_detaildata", nonPublicInstance);
+
+            // Assert
+            validations.ShouldSatisfyAllConditions(
+                () => detailData.Count.ShouldBe(27),
+                () => validations.ShouldBe(46));
+        }
+
+        [TestMethod]
+        public void ReadBudgetBands_WhenCalled_PopulatesTargetColours()
+        {
+            // Arrange
+            var validations = 0;
+            var readHit = 0;
+            var readIntHit = 1;
+            var sqlConnection = new SqlConnection();
+            var now = DateTime.Now;
+
+            dataReader.ItemGetInt32 = input => input;
+            dataReader.Read = () =>
+            {
+                readHit += 1;
+                readIntHit += 1;
+                validations += 1;
+                if (readHit <= 3)
+                {
+                    return true;
+                }
+                else
+                {
+                    readHit = 0;
+                }
+                return false;
+            };
+
+            ShimSqlDb.ReadStringValueObject = _ => $"{DummyString}{readIntHit}";
+            ShimSqlDb.ReadDoubleValueObject = _ => readIntHit;
+            ShimSqlDb.ReadDecimalValueObject = _ => readIntHit;
+            ShimSqlDb.ReadIntValueObject = _ => readIntHit;
+            ShimSqlDb.ReadDateValueObject = _ => now;
+            ShimSqlDb.ReadBoolValueObject = _ => true;
+
+            // Act
+            privateObject.Invoke(ReadBudgetBandsMethodName, nonPublicInstance, new object[] { sqlConnection });
+            var targetColours = (List<TargetColours>)privateObject.GetFieldOrProperty("m_TargetColours", nonPublicInstance);
+
+            // Assert
+            validations.ShouldSatisfyAllConditions(
+                () => targetColours.Count.ShouldBe(3),
+                () => validations.ShouldBe(4));
         }
     }
 }
