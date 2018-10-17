@@ -38,7 +38,7 @@ namespace PortfolioEngineCore.Tests.Resources
             const int ToPeriodID = 1;
             const int GpPMOAdmin = 98;
             const int CommitmentsOpMode = 9;
-            const int lRequestNo = 64;
+            const int RequestNo = 64;
             const int RoleFieldID = 5;
             const int MajorCategoryFieldID = 100;
 
@@ -48,7 +48,7 @@ namespace PortfolioEngineCore.Tests.Resources
             var expectedToPeriod = $"<ToPeriodID>{ToPeriodID}</ToPeriodID>";
             var expectedPMOAdmin = $"<gpPMOAdmin>{GpPMOAdmin}</gpPMOAdmin>";
             var expectedCommitment = $"<CommitmentsOpMode>{CommitmentsOpMode}</CommitmentsOpMode>";
-            var expectedRequest = $"<RequestNo>{lRequestNo}</RequestNo>";
+            var expectedRequest = $"<RequestNo>{RequestNo}</RequestNo>";
             var expectedRoleField = $"<RoleFieldID>{RoleFieldID}</RoleFieldID>";
             var expectedMajorCategory = $"<MajorCategoryFieldID>{MajorCategoryFieldID}</MajorCategoryFieldID>";
             var expectedCalendarName = $"<CalendarName>{DummyString}</CalendarName>";
@@ -59,7 +59,7 @@ namespace PortfolioEngineCore.Tests.Resources
             clsResourceValues.ToPeriodID = ToPeriodID;
             clsResourceValues.gpPMOAdmin = GpPMOAdmin;
             clsResourceValues.CommitmentsOpMode = CommitmentsOpMode;
-            clsResourceValues.lRequestNo = lRequestNo;
+            clsResourceValues.lRequestNo = RequestNo;
             clsResourceValues.RoleFieldID = RoleFieldID;
             clsResourceValues.MajorCategoryFieldID = MajorCategoryFieldID;
             clsResourceValues.CalendarName = DummyString;
@@ -101,11 +101,11 @@ namespace PortfolioEngineCore.Tests.Resources
                 RoleName = DummyString
             };
             var expectedCostCategoriesValue = "<CostCategories>" +
-            "<Cat UID=\"3\" MC=\"3\" CC=\"3\" ID=\"3\" LVL=\"3\" Role=\"3\" PID=\"3\" Name=\"DummyStirng\" FName=\"DummyStirng\" RName=\"DummyStirng\" />" +
-            "</CostCategories>";
+                "<Cat UID=\"3\" MC=\"3\" CC=\"3\" ID=\"3\" LVL=\"3\" Role=\"3\" PID=\"3\" Name=\"DummyStirng\" FName=\"DummyStirng\" RName=\"DummyStirng\" />" +
+                "</CostCategories>";
             var expecteRatesValue = "<Rates>" +
-            "<Rate UID=\"3\" ID=\"3\" LVL=\"3\" PID=\"3\" Name=\"DummyStirng\" FName=\"DummyStirng\" />" +
-            "</Rates>";
+                "<Rate UID=\"3\" ID=\"3\" LVL=\"3\" PID=\"3\" Name=\"DummyStirng\" FName=\"DummyStirng\" />" +
+                "</Rates>";
             clsResourceValues.CostCategories = new Dictionary<int, clsCatItem>
             {
                 [1] = catItem
