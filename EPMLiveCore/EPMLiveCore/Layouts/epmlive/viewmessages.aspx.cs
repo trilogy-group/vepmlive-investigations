@@ -24,27 +24,26 @@ namespace EPMLiveCore
         {
             SPSite site = SPContext.Current.Site;
             {
-                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id));
-
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                using (var connection = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
                 {
-                    cn.Open();
-                });
-
-                using (var command = new SqlCommand("select (case when resulttext is null then 'No Errors' else resulttext end) as resulttext from vwQueueTImerLog where jobtype=@log_type and siteguid = @siteguid and listguid is null", cn))
-                {
-                    command.Parameters.AddWithValue("@log_type", Request["type"]);
-                    command.Parameters.AddWithValue("@siteguid", site.ID);
-
-                    var dataReader = command.ExecuteReader();
-
-                    if (dataReader.Read())
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        output = dataReader.GetString(0);
-                    }
-                    dataReader.Close();
+                        connection.Open();
+                    });
 
-                    cn.Close();
+                    using (var command = new SqlCommand("select (case when resulttext is null then 'No Errors' else resulttext end) as resulttext from vwQueueTImerLog where jobtype=@log_type and siteguid = @siteguid and listguid is null", connection))
+                    {
+                        command.Parameters.AddWithValue("@log_type", Request["type"]);
+                        command.Parameters.AddWithValue("@siteguid", site.ID);
+
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            if (dataReader.Read())
+                            {
+                                output = dataReader.GetString(0);
+                            }
+                        }
+                    }
                 }
 
                 switch (Request["type"])
