@@ -39,28 +39,6 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             _adoShims = AdoShims.ShimAdoNetCalls();
             _sharepointShims = SharepointShims.ShimSharepointCalls();
 
-            //Shimgetgantttasks.Constructor = tasks =>
-            //{
-            //    var shimPage = new ShimPage(tasks)
-            //    {
-            //        RequestGet = () =>
-            //        {
-            //            var shimHttpRequest = new ShimHttpRequest()
-            //            {
-            //                ItemGetString = key =>
-            //                {
-            //                    if (key == "ignorelistid")
-            //                    {
-            //                        return "1";
-            //                    }
-            //                    return "2";
-            //                }
-            //            };
-            //            return shimHttpRequest;
-            //        }
-            //    };
-            //};
-
             _getGanttTasks = new getgantttasks();
             _getGanttTasksPrivate = new PrivateObject(_getGanttTasks);
         }
@@ -86,6 +64,17 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         public void ProcessList_FieldsProvided_CollectionsField(SPFieldType fieldType)
         {
             // Arrange
+            ShimPage.AllInstances.RequestGet = _ => new ShimHttpRequest()
+            {
+                ItemGetString = key =>
+                {
+                    if (key == "ignorelistid")
+                    {
+                        return "1";
+                    }
+                    return "2";
+                }
+            };
             var webId = new Guid("E31FAB68-A8BA-4C68-9DCA-41DD17ABF474");
             var listId = new Guid("4D593B64-51CF-49F0-B566-CDAE35FCDDE0");
             var fieldId = new Guid("CA4AA59C-17EB-4BF1-94B7-960970D07802");
