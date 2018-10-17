@@ -681,7 +681,8 @@ namespace EPMLiveCore.API
 
             var error = AttemptCreateSite(web, cESite, cEWeb, parentWeb, siteOwnerName, uniquePermission, isStandAlone, siteTitle, siteDescription, siteUrl, templateName, inheritTopLink);
 
-            if (error.Substring(0, 1) == "1")
+            const string FeatureErrorPrefix = "1";
+            if (error.Substring(0, 1) == FeatureErrorPrefix)
             {
                 if (error.Substring(2).StartsWith("The site template requires that the Feature")
                     && error.EndsWith("be activated in the site collection."))
@@ -709,7 +710,7 @@ namespace EPMLiveCore.API
                             ref tries);
                     }
 
-                    if (error.Substring(0, 1) == "1")
+                    if (error.Substring(0, 1) == FeatureErrorPrefix)
                     {
                         throw new Exception(error.Substring(2));
                     }
@@ -723,7 +724,7 @@ namespace EPMLiveCore.API
             {
                 const int defaultCreatorId = 1073741823;
                 var creatorId = CreatorId == defaultCreatorId
-                    ? "1"
+                    ? FeatureErrorPrefix
                     : Convert.ToString(CreatorId);
                 SaveToDb(web, parentWeb, creatorId, siteDescription);
             }
