@@ -194,8 +194,9 @@ namespace EPMLiveEnterprise
                 {
                     fieldData = assignmentRow[assnFieldName].ToString();
                 }
-                catch
+                catch (Exception exception)
                 {
+                    Trace.WriteLine(exception);
                     fieldData = taskRow[fieldName].ToString();
                 }
 
