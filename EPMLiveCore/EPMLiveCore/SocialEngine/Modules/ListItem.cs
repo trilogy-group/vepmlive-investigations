@@ -13,17 +13,6 @@ namespace EPMLiveCore.SocialEngine.Modules
 {
     internal class ListItem : ISocialEngineModule
     {
-        #region Fields (1) 
-
-        private const string ALREADY_CREATED_EXCEPTION_MESSAGE =
-            "Cannot register more than one created activity on the same list item.";
-
-        #endregion Fields 
-
-        #region Methods (24) 
-
-        // Private Methods (24) 
-
         private void AddAssociatedThreads(string associatedListItems, Thread thread, ThreadManager threadManager)
         {
             var dictionary = new Dictionary<Guid, int>();
@@ -40,42 +29,6 @@ namespace EPMLiveCore.SocialEngine.Modules
             }
 
             threadManager.UpdateAssociatedThreads(thread.Id, dictionary);
-        }
-
-        private static bool EnsureNotIgnoredList(ProcessActivityEventArgs args, Dictionary<string, object> data)
-        {
-            var listTitle = (string) data["ListTitle"];
-
-            if (!Core.Utilities.IsIgnoredList(listTitle, args.ContextWeb)) return false;
-
-            args.Cancel = true;
-            args.CancellationMessage = listTitle + " is part of ignored Social Stream lists.";
-
-            return true;
-        }
-
-        private static void EnsureValideData(Dictionary<string, object> data)
-        {
-            new DataValidator(data).Validate(new Dictionary<string, DataType>
-            {
-                {"Id", DataType.Int},
-                {"Title", DataType.String},
-                {"URL", DataType.String},
-                {"ListTitle", DataType.String},
-                {"ListId", DataType.Guid},
-                {"WebId", DataType.Guid},
-                {"SiteId", DataType.Guid},
-                {"UserId", DataType.Int},
-                {"ActivityTime", DataType.DateTime}
-            });
-
-            var oriUrl = data["URL"].ToString();
-            var url = oriUrl.ToLower();
-
-            if (url.StartsWith("lists/") && !url.Contains("id="))
-            {
-                throw new SocialEngineException(oriUrl + " is not a valid URL.");
-            }
         }
 
         private TimeSpan GetRelatedActivityInterval(SPWeb contextWeb)
@@ -213,22 +166,22 @@ namespace EPMLiveCore.SocialEngine.Modules
             switch (args.ActivityKind)
             {
                 case ActivityKind.Created:
-                    ValidateCreationActivity(args);
+                    args.ValidateCommentCreationActivity();
                     break;
                 case ActivityKind.Updated:
-                    ValidateUpdationActivity(args);
+                    args.ValidateUpdationActivity();
                     break;
                 case ActivityKind.Deleted:
-                    ValidateDeletionActivity(args);
+                    args.ValidateDeletionActivity();
                     break;
                 case ActivityKind.CommentAdded:
-                    ValidateCommentCreationActivity(args);
+                    args.ValidateCommentCreationActivity();
                     break;
                 case ActivityKind.CommentUpdated:
-                    ValidateCommentUpdationActivity(args);
+                    args.ValidateCommentUpdationActivity();
                     break;
                 case ActivityKind.CommentRemoved:
-                    ValidateCommentDeletionActivity(args);
+                    args.ValidateCommentDeletionActivity();
                     break;
                 default:
                     throw new SocialEngineException("This activity cannot be performed on a list item.", LogKind.Info);
@@ -539,114 +492,6 @@ namespace EPMLiveCore.SocialEngine.Modules
             args.ThreadManager.UpdateUsers(thread);
         }
 
-        private void ValidateCommentCreationActivity(ProcessActivityEventArgs args)
-        {
-            ValidateCreationActivity(args);
-
-            Dictionary<string, object> data = args.Data;
-
-            if (EnsureNotIgnoredList(args, data)) return;
-
-            new DataValidator(data).Validate(new Dictionary<string, DataType>
-            {
-                {"CommentId", DataType.Guid},
-                {"Comment", DataType.String}
-            });
-
-            if (args.ActivityManager.ActivityExists(ObjectKind.ListItem, args.ActivityKind,
-                (Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"], data["CommentId"].ToString()))
-            {
-                throw new SocialEngineException("Cannot register creation activity on the same comment more than once",
-                    LogKind.Info);
-            }
-        }
-
-        private void ValidateCommentDeletionActivity(ProcessActivityEventArgs args)
-        {
-            ValidateDeletionActivity(args);
-
-            Dictionary<string, object> data = args.Data;
-
-            if (EnsureNotIgnoredList(args, data)) return;
-
-            new DataValidator(data).Validate(new Dictionary<string, DataType>
-            {
-                {"CommentId", DataType.Guid}
-            });
-
-            if (!args.ActivityManager.ActivityExists(ObjectKind.ListItem, ActivityKind.CommentAdded,
-                (Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"], data["CommentId"].ToString().ToUpper()))
-            {
-                throw new SocialEngineException("Cannot delete a comment that has not been registerd", LogKind.Info);
-            }
-        }
-
-        private void ValidateCommentUpdationActivity(ProcessActivityEventArgs args)
-        {
-            ValidateUpdationActivity(args);
-
-            Dictionary<string, object> data = args.Data;
-
-            if (EnsureNotIgnoredList(args, data)) return;
-
-            new DataValidator(data).Validate(new Dictionary<string, DataType>
-            {
-                {"CommentId", DataType.Guid},
-                {"Comment", DataType.String}
-            });
-
-            if (!args.ActivityManager.ActivityExists(ObjectKind.ListItem, ActivityKind.CommentAdded,
-                (Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"], data["CommentId"].ToString().ToUpper()))
-            {
-                throw new SocialEngineException("Cannot update a comment that has not been registerd", LogKind.Info);
-            }
-        }
-
-        private void ValidateCreationActivity(ProcessActivityEventArgs args)
-        {
-            Dictionary<string, object> data = args.Data;
-
-            EnsureValideData(data);
-            if (EnsureNotIgnoredList(args, data)) return;
-
-            if (args.ActivityKind != ActivityKind.Created) return;
-
-            if (args.ActivityManager.ActivityExists(ObjectKind.ListItem, ActivityKind.Created,
-                (Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"]))
-            {
-                throw new SocialEngineException(ALREADY_CREATED_EXCEPTION_MESSAGE, LogKind.Info);
-            }
-        }
-
-        private void ValidateDeletionActivity(ProcessActivityEventArgs args)
-        {
-            Dictionary<string, object> data = args.Data;
-
-            EnsureValideData(data);
-            if (EnsureNotIgnoredList(args, data)) return;
-
-            if (args.ActivityKind != ActivityKind.Deleted) return;
-
-            if (args.ActivityManager.ActivityExists(ObjectKind.List, ActivityKind.Deleted, (Guid) data["WebId"],
-                (Guid) data["ListId"], (int) data["Id"]))
-            {
-                throw new SocialEngineException(
-                    "Cannot register more than one deleted activity on the same item.", LogKind.Info);
-            }
-        }
-
-        private void ValidateUpdationActivity(ProcessActivityEventArgs args)
-        {
-            Dictionary<string, object> data = args.Data;
-
-            EnsureValideData(data);
-            EnsureNotIgnoredList(args, data);
-        }
-
-        #endregion Methods 
-
-        #region Implementation of ISocialEngineModule
-
         public void Initialize(SocialEngineEvents events)
         {
             events.OnValidateActivity += OnValidateActivity;
@@ -654,7 +499,5 @@ namespace EPMLiveCore.SocialEngine.Modules
             events.OnActivityRegistration += OnActivityRegistration;
             events.OnPostActivityRegistration += OnPostActivityRegistration;
         }
-
-        #endregion
     }
 }

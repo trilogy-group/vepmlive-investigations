@@ -1611,12 +1611,12 @@ namespace RPADataCache
 
                     if (bUseHeatmap)
                     {
-                        m_xHeader1.CreateStringAttr("X" + sId + "C" + cnt.ToString(), " ");
-                        m_xHeader2.CreateStringAttr("X" + sId + "C" + cnt.ToString(), sName + ot.Name + "HeatMap");
+                        m_xHeader1.CreateStringAttr("X" + sId + "C" + cnt.ToString(), sName + " " + ot.Name + " HeatMap");
+                        m_xHeader2.CreateStringAttr("X" + sId + "C" + cnt.ToString(), ot.Name);
 
 
-                        m_xHeader1.CreateStringAttr("Y" + sId + "C" + cnt.ToString(), " ");
-                        m_xHeader2.CreateStringAttr("Y" + sId + "C" + cnt.ToString(), sName + ot.Name + "HeatMap");
+                        m_xHeader1.CreateStringAttr("Y" + sId + "C" + cnt.ToString(), sName + " " + ot.Name + " HeatMap");
+                        m_xHeader2.CreateStringAttr("Y" + sId + "C" + cnt.ToString(), ot.Name);
 
 
                         xC = m_xPeriodCols.CreateSubStruct("C");
