@@ -16,6 +16,7 @@
     <Add FullName="EPMLiveCore.UserManager"/>
     <Add FullName="EPMLiveCore.ListDisplayUtils!"/>
     <Add FullName="EPMLiveCore.ReportingProxy.QueryExecutor!"/>
+    <Add FullName="EPMLiveCore.CreateNewAjaxDataHost!"/>
     <Add FullName="EPMLiveCore.CoreFunctions!"/>
     <Add FullName="EPMLiveCore.Infrastructure.Logging.LoggingService!"/>
     <Add FullName="EPMLiveCore.FeatureActivationSvc.Service!"/>
