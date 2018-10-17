@@ -280,7 +280,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => resultXml;
             ShimExtensionMethods.ToPrettierNameStringListOfStringSPWeb = (instance, _, _1) => instance;
             ShimMyWork.ShouldUseReportingDbSPWeb = _ => false;
-            ShimMyWork.GetMyWorkFieldTypeMyWorkFieldDictionaryOfStringSPFieldStringOut = (MyWorkField myWorkField, Dictionary<string, SPField> fieldTypes, out string format) =>
+            ShimMyWork.GetMyWorkFieldTypeMyWorkFieldIDictionaryOfStringSPFieldStringOut = (MyWorkField myWorkField, IDictionary<string, SPField> fieldTypes, out string format) =>
             {
                 format = "format";
                 return "Date";
@@ -675,7 +675,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             ShimUtils.GetFieldTypes = () => myFieldTypes;
             ShimMyWork.GetWorkingOnString = _ => dataTable;
             ShimMyWork.GetGridSafeValueXElement = input => input.Value;
-            ShimMyWork.BuildFieldElementDictionaryOfStringSPFieldStringString = (_, value, name) => new XElement(name, value);
+            ShimMyWork.BuildFieldElementIDictionaryOfStringSPFieldStringString = (_, value, name) => new XElement(name, value);
 
             // Act
             var actual = XDocument.Parse((string)privateObj.Invoke(

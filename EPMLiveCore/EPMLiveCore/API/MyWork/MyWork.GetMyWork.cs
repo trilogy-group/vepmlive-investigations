@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 using EPMLiveCore.Helpers;
 using Microsoft.SharePoint;
@@ -155,17 +156,19 @@ namespace EPMLiveCore.API
                 QueryThrottleMode = SPQueryThrottleOption.Override
             };
 
+            var viewFieldsBuilder = new StringBuilder(dataQuery.ViewFields);
+
             foreach (var selectedField in selectedFields)
             {
-                dataQuery.ViewFields += $@"<FieldRef Name='{selectedField}' Nullable='TRUE'/>";
+                viewFieldsBuilder.Append($@"<FieldRef Name='{selectedField}' Nullable='TRUE'/>");
             }
 
-            foreach (var field in new[] {CompletedField, WorkingOnField}
-               .Where(field => !selectedFields.Exists(f => f.Equals(field))))
+            foreach (var field in new[] { CompletedField, WorkingOnField }.Where(field => !selectedFields.Exists(f => f.Equals(field))))
             {
-                dataQuery.ViewFields +=
-                    $"<FieldRef Name='{field}' Nullable='TRUE'/>";
+                viewFieldsBuilder.Append($"<FieldRef Name='{field}' Nullable='TRUE'/>");
             }
+
+            dataQuery.ViewFields = viewFieldsBuilder.ToString();
 
             return dataQuery;
         }
