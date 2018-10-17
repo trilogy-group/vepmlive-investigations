@@ -180,10 +180,13 @@ namespace EPMLiveCore
         /// <returns></returns>
         public static string Sha1(this string value)
         {
-            byte[] data = Encoding.ASCII.GetBytes(value);
-            byte[] hashData = new SHA1Managed().ComputeHash(data);
+            var data = Encoding.ASCII.GetBytes(value);
+            using (var sha1Managed = new SHA1Managed())
+            {
+                var hashData = sha1Managed.ComputeHash(data);
 
-            return hashData.Aggregate(String.Empty, (current, b) => current + b.ToString("X2"));
+                return hashData.Aggregate(string.Empty, (current, b) => current + b.ToString("X2"));
+            }
         }
 
         /// <summary>
