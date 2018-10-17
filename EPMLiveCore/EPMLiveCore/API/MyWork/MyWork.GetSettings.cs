@@ -77,7 +77,7 @@ namespace EPMLiveCore.API
             Action<List<XElement>, XDocument, string, List<string>, Action> addRangeSelectedList = (descendants, xDocument, elementName, listsSelected, setFlag) =>
             {
                 if (descendants.Exists(
-                    e => e.Name.LocalName.Equals(Lists)))
+                    e => e.Name.LocalName.Equals(ListsText)))
                 {
                     listsSelected.AddRange(
                         xDocument.Element(nameof(MyWork))
@@ -101,7 +101,7 @@ namespace EPMLiveCore.API
                     var tempMyWorkListsSupplied = myWorkListsSupplied;
                     var tempFieldsSupplied = fieldsSupplied;
 
-                    addRangeSelectedList(descendants, xDocument, Lists, GetMyWorkParams.SelectedLists, () => tempListsSupplied = true);
+                    addRangeSelectedList(descendants, xDocument, ListsText, GetMyWorkParams.SelectedLists, () => tempListsSupplied = true);
                     addRangeSelectedList(descendants, xDocument, MyWorkLists, GetMyWorkParams.SelectedLists, () => tempMyWorkListsSupplied = true);
                     addRangeSelectedList(descendants, xDocument, Fields, GetMyWorkParams.SelectedFields, () => tempFieldsSupplied = true);
 

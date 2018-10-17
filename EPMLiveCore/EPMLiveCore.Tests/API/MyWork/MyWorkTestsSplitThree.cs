@@ -675,7 +675,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             ShimUtils.GetFieldTypes = () => myFieldTypes;
             ShimMyWork.GetWorkingOnString = _ => dataTable;
             ShimMyWork.GetGridSafeValueXElement = input => input.Value;
-            ShimMyWork.BuildFieldElementDictionaryOfStringSPFieldStringString = (_, value, name) => new XElement(name, value);
+            ShimMyWork.BuildFieldElementIDictionaryOfStringSPFieldStringString = (_, value, name) => new XElement(name, value);
 
             // Act
             var actual = XDocument.Parse((string)privateObj.Invoke(

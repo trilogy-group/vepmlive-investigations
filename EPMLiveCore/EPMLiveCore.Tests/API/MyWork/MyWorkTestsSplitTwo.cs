@@ -587,7 +587,7 @@ namespace EPMLiveCore.Tests.API.MyWork
 
             ShimMyWork.GetListNameFromDbGuidGuidSPWeb = (_, _1, _2) => expectedUniqueIdValue;
             ShimMyWork.GetWorkspaceNameFromDbGuidString = (_, _1) => expectedUniqueIdValue;
-            ShimMyWork.GetTypeAndFormatDictionaryOfStringSPFieldStringStringOutStringOut = (Dictionary<string, SPField> fieldTypesParam, string selectedFieldParam, out string type, out string format) =>
+            ShimMyWork.GetTypeAndFormatIDictionaryOfStringSPFieldStringStringOutStringOut = (IDictionary<string, SPField> fieldTypesParam, string selectedFieldParam, out string type, out string format) =>
             {
                 type = expectedType;
                 format = expectedFormat;
@@ -1028,7 +1028,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             ShimMyWork.GetArchivedWebsGuid = _ => archivedWebs;
             ShimMyWork.GetQueryString = _ => string.Empty;
             ShimMyWork.ShouldUseReportingDbSPWeb = _ => false;
-            ShimMyWork.GetDataFromSpListOfStringSPSiteDataQuerySPWebSPSite =
+            ShimMyWork.GetDataFromSpIListOfStringSPSiteDataQuerySPWebSPSite  =
                 (_, _1, _2, _3) => new List<DataTable>()
                 {
                     new DataTable()

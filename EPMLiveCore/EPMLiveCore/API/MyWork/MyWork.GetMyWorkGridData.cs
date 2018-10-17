@@ -31,8 +31,8 @@ namespace EPMLiveCore.API
                 }
 
                 var result = new XDocument();
-                result.Add(new XElement(Grid));
-                var grid = result.Element(Grid);
+                result.Add(new XElement(GridText));
+                var grid = result.Element(GridText);
 
                 GetSettings(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data)));
 

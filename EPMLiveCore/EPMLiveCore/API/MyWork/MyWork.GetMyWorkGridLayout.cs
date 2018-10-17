@@ -44,7 +44,7 @@ namespace EPMLiveCore.API
                 var workTypeCol = new XElement(CField);
                 workTypeCol.Add(new XAttribute(Name, WorkTypeField));
                 workTypeCol.Add(new XAttribute(Type, Html));
-                workTypeCol.Add(new XAttribute(Visible, 0));
+                workTypeCol.Add(new XAttribute(VisibleText, 0));
 
                 cols.Add(workTypeCol);
 
@@ -91,7 +91,7 @@ namespace EPMLiveCore.API
             }
 
             result = XDocument.Parse(Resources.MyWorkGridLayout);
-            grid = result.Element(Grid);
+            grid = result.Element(GridText);
             var cfgElement = new XElement(Cfg);
 
             cfgElement.Add(
@@ -151,12 +151,12 @@ namespace EPMLiveCore.API
                     }
                 }
 
-                if (type.Equals(Icon))
+                if (type.Equals(IconText))
                 {
                     element.Add(new XAttribute(IconAlign, Center));
                 }
 
-                element.Add(new XAttribute(Visible, 0));
+                element.Add(new XAttribute(VisibleText, 0));
 
                 if (internalName.Equals(DueDateField))
                 {
@@ -228,7 +228,7 @@ namespace EPMLiveCore.API
             {
                 if (!bool.Parse(xDocument.Element(nameof(MyWork)).Element(CompleteItemsQuery).Value))
                 {
-                    result.Element(Grid)
+                    result.Element(GridText)
                        .Element(LeftCols)
                        .Elements(CField)
                        .FirstOrDefault(e => e.Attribute(Name).Value.Equals(Complete))
