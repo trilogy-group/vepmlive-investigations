@@ -12,28 +12,34 @@ namespace EPMLiveCore.API
     {
         public static void ProcessIzendaReportsFromList(SPList list, out string sError)
         {
-            string iError = "";
-            sError = "";
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(list.ParentWeb.Site.WebApplication.Id));
-                cn.Open();
-                try
+            var iError = string.Empty;
+            sError = string.Empty;
+            SPSecurity.RunWithElevatedPrivileges(
+                delegate
                 {
-                    foreach (SPListItem li in list.Items)
+                    var connectionString = CoreFunctions.getConnectionString(list.ParentWeb.Site.WebApplication.Id);
+                    using (var sqlConnection = new SqlConnection(connectionString))
                     {
-
-                        iAddIzendaReport(li.Title, li["Xml"].ToString(), cn, list.ParentWeb.ID.ToString().ToLower());
-
+                        sqlConnection.Open();
+                        try
+                        {
+                            foreach (SPListItem listItem in list.Items)
+                            {
+                                iAddIzendaReport(
+                                    listItem.Title,
+                                    listItem["Xml"]
+                                        .ToString(),
+                                    sqlConnection,
+                                    list.ParentWeb.ID.ToString()
+                                        .ToLower());
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            iError = ex.Message;
+                        }
                     }
-                    
-                }
-                catch (Exception ex)
-                {
-                    iError = ex.Message;
-                }
-                cn.Close();
-            });
+                });
             sError = iError;
             
 
@@ -41,50 +47,58 @@ namespace EPMLiveCore.API
 
         public static void AddIzendaReport(SPWeb web, string title, string xml, out string sError)
         {
-            string iError = "";
-            sError = "";
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                cn.Open();
-                try
+            var iError = string.Empty;
+            sError = string.Empty;
+            SPSecurity.RunWithElevatedPrivileges(
+                delegate
                 {
-                    iAddIzendaReport(title, xml, cn, web.ID.ToString().ToLower());
-                }
-                catch (Exception ex)
-                {
-                    iError = ex.Message;
-                }
-                cn.Close();
-            });
+                    using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
+                    {
+                        sqlConnection.Open();
+                        try
+                        {
+                            iAddIzendaReport(
+                                title,
+                                xml,
+                                sqlConnection,
+                                web.ID.ToString()
+                                   .ToLower());
+                        }
+                        catch (Exception ex)
+                        {
+                            iError = ex.Message;
+                        }
+                    }
+                });
             sError = iError;
         }
 
         private static void iAddIzendaReport(string title, string xml, SqlConnection cn, string siteid)
         {
+            using (var selectCommand = new SqlCommand("select * from IzendaAdHocReports where Name=@name and TenantID=@siteid", cn))
+            {
+                selectCommand.Parameters.AddWithValue("@name", title);
+                selectCommand.Parameters.AddWithValue("@siteid", siteid);
+                bool bFound;
+                using (var dataReader = selectCommand.ExecuteReader())
+                {
+                    bFound = dataReader.Read();
+                }
 
-            SqlCommand cmd = new SqlCommand("select * from IzendaAdHocReports where Name=@name and TenantID=@siteid", cn);
-            cmd.Parameters.AddWithValue("@name", title);
-            cmd.Parameters.AddWithValue("@siteid", siteid);
-            SqlDataReader dr = cmd.ExecuteReader();
-            bool bFound = false;
-            if (dr.Read())
-            {
-                bFound = true;
-            }
-            dr.Close();
-
-            if (!bFound)
-            {
-                cmd = new SqlCommand("INSERT INTO IzendaAdHocReports (Name,Xml,CreatedDate,ModifiedDate,TenantID) VALUES (@name,@xml,GETDATE(),GETDATE(),@siteid)", cn);
-                cmd.Parameters.AddWithValue("@name", title);
-                cmd.Parameters.AddWithValue("@siteid", siteid);
-                cmd.Parameters.AddWithValue("@xml", xml);
-                cmd.ExecuteNonQuery();
-            }
-            else
-            {
-                throw new Exception("Report Already Exists");
+                if (!bFound)
+                {
+                    var insertCommand = new SqlCommand(
+                        "INSERT INTO IzendaAdHocReports (Name,Xml,CreatedDate,ModifiedDate,TenantID) VALUES (@name,@xml,GETDATE(),GETDATE(),@siteid)",
+                        cn);
+                    insertCommand.Parameters.AddWithValue("@name", title);
+                    insertCommand.Parameters.AddWithValue("@siteid", siteid);
+                    insertCommand.Parameters.AddWithValue("@xml", xml);
+                    insertCommand.ExecuteNonQuery();
+                }
+                else
+                {
+                    throw new Exception("Report Already Exists");
+                }
             }
         }
 
