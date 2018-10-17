@@ -667,19 +667,84 @@ namespace EPMLiveCore.API
             web.AllowUnsafeUpdates = true;
             web.Site.AllowUnsafeUpdates = true;
 
-            string siteTitle = _xmlDataMgr.GetPropVal("SiteTitle");
-            string siteDescription = _xmlDataMgr.GetPropVal("SiteDescription");
+            var siteTitle = _xmlDataMgr.GetPropVal("SiteTitle");
+            var siteDescription = _xmlDataMgr.GetPropVal("SiteDescription");
 
             siteTitle = GetSafeTitle(siteTitle);
             siteDescription = GetSafeTitle(siteDescription);
-            string siteUrl = siteTitle;
-            string templateName = _xmlDataMgr.GetPropVal("TemplateName");
-            bool isStandAlone = bool.Parse(_xmlDataMgr.GetPropVal("IsStandAlone"));
-            string siteOwnerName = web.AllUsers.GetByID(CreatorId).LoginName;
-            bool uniquePermission = bool.Parse(_xmlDataMgr.GetPropVal("UniquePermission"));
-            bool inheritTopLink = false;
+            var siteUrl = siteTitle;
+            var templateName = _xmlDataMgr.GetPropVal("TemplateName");
+            var isStandAlone = bool.Parse(_xmlDataMgr.GetPropVal("IsStandAlone"));
+            var siteOwnerName = web.AllUsers.GetByID(CreatorId).LoginName;
+            var uniquePermission = bool.Parse(_xmlDataMgr.GetPropVal("UniquePermission"));
+            var inheritTopLink = false;
 
-            string err = string.Empty;
+            var error = AttemptCreateSite(web, cESite, cEWeb, parentWeb, siteOwnerName, uniquePermission, isStandAlone, siteTitle, siteDescription, siteUrl, templateName, inheritTopLink);
+
+            if (error.Substring(0, 1) == "1")
+            {
+                if (error.Substring(2).StartsWith("The site template requires that the Feature")
+                    && error.EndsWith("be activated in the site collection."))
+                {
+                    var tries = 0;
+
+                    while (error.Substring(2).StartsWith("The site template requires that the Feature")
+                        && error.EndsWith("be activated in the site collection.")
+                        && tries < 5)
+                    {
+                        RetryWorkspaceCreation(
+                            web,
+                            cESite,
+                            cEWeb,
+                            parentWeb,
+                            siteOwnerName,
+                            uniquePermission,
+                            isStandAlone,
+                            siteTitle,
+                            siteDescription,
+                            siteUrl,
+                            templateName,
+                            inheritTopLink,
+                            ref error,
+                            ref tries);
+                    }
+
+                    if (error.Substring(0, 1) == "1")
+                    {
+                        throw new Exception(error.Substring(2));
+                    }
+                }
+                else
+                {
+                    throw new Exception(error.Substring(2));
+                }
+            }
+            else
+            {
+                const int defaultCreatorId = 1073741823;
+                var creatorId = CreatorId == defaultCreatorId
+                    ? "1"
+                    : Convert.ToString(CreatorId);
+                SaveToDb(web, parentWeb, creatorId, siteDescription);
+            }
+            DisposeParentWeb(web, parentWeb);
+        }
+
+        private string AttemptCreateSite(
+            SPWeb web,
+            SPSite cESite,
+            SPWeb cEWeb,
+            SPWeb parentWeb,
+            string siteOwnerName,
+            bool uniquePermission,
+            bool isStandAlone,
+            string siteTitle,
+            string siteDescription,
+            string siteUrl,
+            string templateName,
+            bool inheritTopLink)
+        {
+            string error;
             if (parentWeb.DoesUserHavePermissions(siteOwnerName, SPBasePermissions.ManageSubwebs))
             {
                 if (parentWeb.ID.Equals(web.ID))
@@ -688,228 +753,600 @@ namespace EPMLiveCore.API
                     cESite.RootWeb.AllowUnsafeUpdates = true;
                     cEWeb.AllowUnsafeUpdates = true;
                     cEWeb.Update();
-                    // assuming uniquepermission means we are creating from an item,
-                    // we must pass in item
+
+                    error = uniquePermission
+                        ? FirstAttemptCreateSiteFromUniquePermission(
+                            web,
+                            cEWeb,
+                            siteOwnerName,
+                            isStandAlone,
+                            siteTitle,
+                            siteDescription,
+                            siteUrl,
+                            templateName,
+                            inheritTopLink)
+                        : FirstAttemptCreateSiteNonUniquePosition(
+                            web,
+                            cEWeb,
+                            siteOwnerName,
+                            isStandAlone,
+                            siteTitle,
+                            siteDescription,
+                            siteUrl,
+                            templateName,
+                            inheritTopLink);
+                }
+                else
+                {
+                    using (var eParentWeb = cESite.OpenWeb(parentWeb.ID))
+                    {
+                        eParentWeb.AllowUnsafeUpdates = true;
+                        cESite.RootWeb.AllowUnsafeUpdates = true;
+                        eParentWeb.Update();
+                        error = uniquePermission
+                            ? FirstAttemptCreateSiteDifferentParentUniquePermission(
+                                web,
+                                cEWeb,
+                                siteOwnerName,
+                                isStandAlone,
+                                siteTitle,
+                                siteDescription,
+                                siteUrl,
+                                templateName,
+                                inheritTopLink,
+                                eParentWeb)
+                            : FirstAttemptCreateSiteDifferentParentNonUniquePermission(
+                                web,
+                                siteOwnerName,
+                                siteTitle,
+                                siteDescription,
+                                siteUrl,
+                                templateName,
+                                inheritTopLink,
+                                eParentWeb);
+                    }
+                }
+            }
+            else
+            {
+                error = "1:You do not have have permission to create subsite on the parent web selected.";
+            }
+            return error;
+        }
+
+        private string FirstAttemptCreateSiteDifferentParentNonUniquePermission(
+            SPWeb web,
+            string siteOwnerName,
+            string siteTitle,
+            string siteDescription,
+            string siteUrl,
+            string templateName,
+            bool inheritTopLink,
+            SPWeb eParentWeb)
+        {
+            string error;
+            if (!_isStandAlone)
+            {
+                error = CoreFunctions.CreateSiteFromItem(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    false,
+                    inheritTopLink,
+                    eParentWeb,
+                    web,
+                    AttachedItemListId,
+                    AttachedItemId,
+                    out _createdWebId,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebUrl,
+                    out _createdWebTitle);
+            }
+            else
+            {
+                error = CoreFunctions.createSite(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    false,
+                    inheritTopLink,
+                    eParentWeb,
+                    out _createdWebId,
+                    out _createdWebUrl,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebTitle);
+            }
+            return error;
+        }
+
+        private string FirstAttemptCreateSiteDifferentParentUniquePermission(
+            SPWeb web,
+            SPWeb cEWeb,
+            string siteOwnerName,
+            bool isStandAlone,
+            string siteTitle,
+            string siteDescription,
+            string siteUrl,
+            string templateName,
+            bool inheritTopLink,
+            SPWeb eParentWeb)
+        {
+            string error;
+            if (!isStandAlone)
+            {
+                error = CoreFunctions.CreateSiteFromItem(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    true,
+                    inheritTopLink,
+                    eParentWeb,
+                    web,
+                    AttachedItemListId,
+                    AttachedItemId,
+                    out _createdWebId,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebUrl,
+                    out _createdWebTitle);
+            }
+            else
+            {
+                error = CoreFunctions.createSite(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    true,
+                    inheritTopLink,
+                    cEWeb,
+                    out _createdWebId,
+                    out _createdWebUrl,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebTitle);
+            }
+            return error;
+        }
+
+        private string FirstAttemptCreateSiteNonUniquePosition(
+            SPWeb web,
+            SPWeb cEWeb,
+            string siteOwnerName,
+            bool isStandAlone,
+            string siteTitle,
+            string siteDescription,
+            string siteUrl,
+            string templateName,
+            bool inheritTopLink)
+        {
+            string error;
+            if (!isStandAlone)
+            {
+                error = CoreFunctions.CreateSiteFromItem(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    false,
+                    inheritTopLink,
+                    cEWeb,
+                    web,
+                    AttachedItemListId,
+                    AttachedItemId,
+                    out _createdWebId,
+                    out _createdWebUrl,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebTitle);
+            }
+            else
+            {
+                error = CoreFunctions.createSite(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    false,
+                    inheritTopLink,
+                    cEWeb,
+                    out _createdWebId,
+                    out _createdWebUrl,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebTitle);
+            }
+            return error;
+        }
+
+        private string FirstAttemptCreateSiteFromUniquePermission(
+            SPWeb web,
+            SPWeb cEWeb,
+            string siteOwnerName,
+            bool isStandAlone,
+            string siteTitle,
+            string siteDescription,
+            string siteUrl,
+            string templateName,
+            bool inheritTopLink)
+        {
+            string error;
+            if (!isStandAlone)
+            {
+                error = CoreFunctions.CreateSiteFromItem(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    true,
+                    inheritTopLink,
+                    cEWeb,
+                    web,
+                    AttachedItemListId,
+                    AttachedItemId,
+                    out _createdWebId,
+                    out _createdWebUrl,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebTitle);
+            }
+            else
+            {
+                error = CoreFunctions.createSite(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    true,
+                    inheritTopLink,
+                    cEWeb,
+                    out _createdWebId,
+                    out _createdWebUrl,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebTitle);
+            }
+            return error;
+        }
+
+        private void RetryWorkspaceCreation(
+            SPWeb web,
+            SPSite cESite,
+            SPWeb cEWeb,
+            SPWeb parentWeb,
+            string siteOwnerName,
+            bool uniquePermission,
+            bool isStandAlone,
+            string siteTitle,
+            string siteDescription,
+            string siteUrl,
+            string templateName,
+            bool inheritTopLink,
+            ref string err,
+            ref int tries)
+        {
+            var neededFeatureId = new Guid(err.Substring(err.IndexOf("{") + 1).Split('}')[0]);
+            cESite.Features.Add(neededFeatureId, true);
+            if (parentWeb.DoesUserHavePermissions(siteOwnerName, SPBasePermissions.ManageSubwebs))
+            {
+                if (parentWeb.ID.Equals(web.ID))
+                {
+                    cESite.AllowUnsafeUpdates = true;
+                    cESite.RootWeb.AllowUnsafeUpdates = true;
+                    cEWeb.AllowUnsafeUpdates = true;
+                    cEWeb.Update();
+
                     if (uniquePermission)
                     {
-                        if (!isStandAlone)
-                        {
-                            err = CoreFunctions.CreateSiteFromItem(siteTitle, siteDescription,siteUrl, templateName, siteOwnerName, true,
-                                inheritTopLink,
-                                cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebServerRelativeUrl,
-                                out _createdWebTitle);
-                        }
-                        else
-                        {
-                            err = CoreFunctions.createSite(siteTitle,siteDescription, siteUrl, templateName, siteOwnerName, true,
-                                inheritTopLink, cEWeb, out _createdWebId, out _createdWebUrl, out _createdWebServerRelativeUrl, out _createdWebTitle);
-                        }
+                        CreateSiteWithUniquePermission(
+                            web,
+                            cEWeb,
+                            siteOwnerName,
+                            isStandAlone,
+                            siteTitle,
+                            siteDescription,
+                            siteUrl,
+                            templateName,
+                            inheritTopLink,
+                            out err);
                     }
                     else
                     {
-                        if (!isStandAlone)
-                        {
-                            err = CoreFunctions.CreateSiteFromItem(siteTitle,siteDescription, siteUrl, templateName, siteOwnerName,
-                                false, inheritTopLink,
-                                cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebServerRelativeUrl,
-                                out _createdWebTitle);
-                        }
-                        else
-                        {
-                            err = CoreFunctions.createSite(siteTitle,siteDescription, siteUrl, templateName, siteOwnerName, false,
-                                inheritTopLink, cEWeb, out _createdWebId, out _createdWebUrl, out _createdWebServerRelativeUrl, out _createdWebTitle);
-                        }
+                        CreateSiteWithoutUniquePermission(
+                            web,
+                            cEWeb,
+                            siteOwnerName,
+                            isStandAlone,
+                            siteTitle,
+                            siteDescription,
+                            siteUrl,
+                            templateName,
+                            inheritTopLink,
+                            out err);
                     }
                 }
                 else
                 {
-                    using (SPWeb eParentWeb = cESite.OpenWeb(parentWeb.ID))
+                    using (var eParentWeb = cESite.OpenWeb(parentWeb.ID))
                     {
                         eParentWeb.AllowUnsafeUpdates = true;
                         cESite.RootWeb.AllowUnsafeUpdates = true;
                         eParentWeb.Update();
                         if (uniquePermission)
                         {
-                            if (!isStandAlone)
-                            {
-                                //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                err = CoreFunctions.CreateSiteFromItem(siteTitle,siteDescription, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
-                                    eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
-                                    out _createdWebUrl, out _createdWebTitle);
-                            }
-                            else
-                            {
-                                err = CoreFunctions.createSite(siteTitle,siteDescription, siteUrl, templateName, siteOwnerName, true,
-                                    inheritTopLink, cEWeb, out _createdWebId, out _createdWebUrl, out _createdWebServerRelativeUrl, out _createdWebTitle);
-                            }
+                            CreateSiteNewParentUniquePermission(
+                                web,
+                                cEWeb,
+                                siteOwnerName,
+                                isStandAlone,
+                                siteTitle,
+                                siteDescription,
+                                siteUrl,
+                                templateName,
+                                inheritTopLink,
+                                out err,
+                                eParentWeb);
                         }
                         else
                         {
-                            if (!_isStandAlone)
-                            {
-                                err = CoreFunctions.CreateSiteFromItem(siteTitle,siteDescription, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
-                                    eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
-                                    out _createdWebUrl, out _createdWebTitle);
-                            }
-                            else
-                            {
-                                //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                err = CoreFunctions.createSite(siteTitle,siteDescription, siteUrl, templateName, siteOwnerName, false,
-                                    inheritTopLink, eParentWeb, out _createdWebId, out _createdWebUrl, out _createdWebServerRelativeUrl,
-                                    out _createdWebTitle);
-                            }
+                            CreateSiteNewParentNonUniquePermission(
+                                web,
+                                siteOwnerName,
+                                siteTitle,
+                                siteDescription,
+                                siteUrl,
+                                templateName,
+                                inheritTopLink,
+                                out err,
+                                eParentWeb);
                         }
                     }
                 }
             }
             else
             {
-                err = "1:You do not have have permission to create subsite on the parent web selected.";
+                throw new Exception("You do have have permission to create subsite on the parent web selected.");
             }
 
-            // try to recreate if error says we need to activate features
-            if (err.Substring(0, 1) == "1")
+            tries++;
+        }
+
+        private void CreateSiteNewParentNonUniquePermission(
+            SPWeb web,
+            string siteOwnerName,
+            string siteTitle,
+            string siteDescription,
+            string siteUrl,
+            string templateName,
+            bool inheritTopLink,
+            out string error,
+            SPWeb eParentWeb)
+        {
+            if (!_isStandAlone)
             {
-                if (err.Substring(2).StartsWith("The site template requires that the Feature") &&
-                    err.EndsWith("be activated in the site collection."))
-                {
-                    int trys = 0;
-
-                    while (err.Substring(2).StartsWith("The site template requires that the Feature") &&
-                           err.EndsWith("be activated in the site collection.") && (trys < 5))
-                    {
-                        #region retry workspace creation
-
-                        var neededFeatureId = new Guid(err.Substring(err.IndexOf("{") + 1).Split('}')[0]);
-                        cESite.Features.Add(neededFeatureId, true);
-                        if (parentWeb.DoesUserHavePermissions(siteOwnerName, SPBasePermissions.ManageSubwebs))
-                        {
-                            if (parentWeb.ID.Equals(web.ID))
-                            {
-                                cESite.AllowUnsafeUpdates = true;
-                                cESite.RootWeb.AllowUnsafeUpdates = true;
-                                cEWeb.AllowUnsafeUpdates = true;
-                                cEWeb.Update();
-                                // assuming uniquepermission means we are creating from an item,
-                                // we must pass in item
-                                if (uniquePermission)
-                                {
-                                    if (!isStandAlone)
-                                    {
-                                        //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                        err = CoreFunctions.CreateSiteFromItem(siteTitle,siteDescription, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
-                                            cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
-                                            out _createdWebUrl, out _createdWebTitle);
-                                    }
-                                    else
-                                    {
-                                        err = CoreFunctions.CreateSiteFromItem(siteTitle,siteDescription, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
-                                            cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
-                                            out _createdWebUrl, out _createdWebTitle);
-                                    }
-                                }
-                                else
-                                {
-                                    if (!isStandAlone)
-                                    {
-                                        err = CoreFunctions.CreateSiteFromItem(siteTitle,siteDescription, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
-                                            cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
-                                            out _createdWebUrl, out _createdWebTitle);
-                                    }
-                                    else
-                                    {
-                                        //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                        err = CoreFunctions.createSite(siteTitle,siteDescription, siteUrl, templateName, siteOwnerName,
-                                            false, inheritTopLink, cEWeb, out _createdWebId, out _createdWebUrl, out _createdWebServerRelativeUrl,
-                                            out _createdWebTitle);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                using (SPWeb eParentWeb = cESite.OpenWeb(parentWeb.ID))
-                                {
-                                    eParentWeb.AllowUnsafeUpdates = true;
-                                    cESite.RootWeb.AllowUnsafeUpdates = true;
-                                    eParentWeb.Update();
-                                    if (uniquePermission)
-                                    {
-                                        if (!isStandAlone)
-                                        {
-                                            //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                            err = CoreFunctions.CreateSiteFromItem(siteTitle,siteDescription, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
-                                                eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
-                                                out _createdWebUrl, out _createdWebTitle);
-                                        }
-                                        else
-                                        {
-                                            err = CoreFunctions.createSite(siteTitle,siteDescription, siteUrl, templateName,
-                                                siteOwnerName, true, inheritTopLink, cEWeb, out _createdWebId,
-                                                out _createdWebUrl, out _createdWebServerRelativeUrl, out _createdWebTitle);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (!_isStandAlone)
-                                        {
-                                            err = CoreFunctions.CreateSiteFromItem(siteTitle,siteDescription, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
-                                                eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
-                                                out _createdWebUrl, out _createdWebTitle);
-                                        }
-                                        else
-                                        {
-                                            //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                            err = CoreFunctions.createSite(siteTitle,siteDescription, siteUrl, templateName,
-                                                siteOwnerName, false, inheritTopLink, eParentWeb, out _createdWebId,
-                                                out _createdWebUrl, out _createdWebServerRelativeUrl, out _createdWebTitle);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            throw new Exception(
-                                "You do have have permission to create subsite on the parent web selected.");
-                        }
-
-                        trys++;
-
-                        #endregion
-                    }
-
-                    if (err.Substring(0, 1) == "1")
-                    {
-                        throw new Exception(err.Substring(2));
-                    }
-                }
-                else
-                {
-                    throw new Exception(err.Substring(2));
-                }
+                error = CoreFunctions.CreateSiteFromItem(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    false,
+                    inheritTopLink,
+                    eParentWeb,
+                    web,
+                    AttachedItemListId,
+                    AttachedItemId,
+                    out _createdWebId,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebUrl,
+                    out _createdWebTitle);
             }
             else
             {
-                string creatorId;
-                if (CreatorId == 1073741823)
-                {
-                    creatorId = "1";
-                }
-                else
-                {
-                    creatorId = Convert.ToString(CreatorId);
-                }
-                if (AttachedItemId != -1)
-                {
-                    WorkspaceData.SendCompletedSignalsToDB(SiteId, web, parentWeb, AttachedItemListId, AttachedItemId,
-                        _createdWebId, _createdWebServerRelativeUrl, _createdWebTitle, creatorId, siteDescription);
-                }
-                else
-                {
-                    WorkspaceData.SendCompletedSignalsToDB(SiteId, parentWeb, _createdWebId, _createdWebServerRelativeUrl, _createdWebTitle, creatorId, siteDescription);
-                }
+                error = CoreFunctions.createSite(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    false,
+                    inheritTopLink,
+                    eParentWeb,
+                    out _createdWebId,
+                    out _createdWebUrl,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebTitle);
             }
-            if (parentWeb != null && !parentWeb.ID.Equals(web.ID))
+        }
+
+        private void CreateSiteNewParentUniquePermission(
+            SPWeb web,
+            SPWeb cEWeb,
+            string siteOwnerName,
+            bool isStandAlone,
+            string siteTitle,
+            string siteDescription,
+            string siteUrl,
+            string templateName,
+            bool inheritTopLink,
+            out string err,
+            SPWeb eParentWeb)
+        {
+            if (!isStandAlone)
+            {
+                err = CoreFunctions.CreateSiteFromItem(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    true,
+                    inheritTopLink,
+                    eParentWeb,
+                    web,
+                    AttachedItemListId,
+                    AttachedItemId,
+                    out _createdWebId,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebUrl,
+                    out _createdWebTitle);
+            }
+            else
+            {
+                err = CoreFunctions.createSite(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    true,
+                    inheritTopLink,
+                    cEWeb,
+                    out _createdWebId,
+                    out _createdWebUrl,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebTitle);
+            }
+        }
+
+        private void CreateSiteWithoutUniquePermission(
+            SPWeb web,
+            SPWeb cEWeb,
+            string siteOwnerName,
+            bool isStandAlone,
+            string siteTitle,
+            string siteDescription,
+            string siteUrl,
+            string templateName,
+            bool inheritTopLink,
+            out string err)
+        {
+            if (!isStandAlone)
+            {
+                err = CoreFunctions.CreateSiteFromItem(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    false,
+                    inheritTopLink,
+                    cEWeb,
+                    web,
+                    AttachedItemListId,
+                    AttachedItemId,
+                    out _createdWebId,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebUrl,
+                    out _createdWebTitle);
+            }
+            else
+            {
+                err = CoreFunctions.createSite(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    false,
+                    inheritTopLink,
+                    cEWeb,
+                    out _createdWebId,
+                    out _createdWebUrl,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebTitle);
+            }
+        }
+
+        private void CreateSiteWithUniquePermission(
+            SPWeb web,
+            SPWeb cEWeb,
+            string siteOwnerName,
+            bool isStandAlone,
+            string siteTitle,
+            string siteDescription,
+            string siteUrl,
+            string templateName,
+            bool inheritTopLink,
+            out string error)
+        {
+            if (!isStandAlone)
+            {
+                error = CoreFunctions.CreateSiteFromItem(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    true,
+                    inheritTopLink,
+                    cEWeb,
+                    web,
+                    AttachedItemListId,
+                    AttachedItemId,
+                    out _createdWebId,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebUrl,
+                    out _createdWebTitle);
+            }
+            else
+            {
+                error = CoreFunctions.CreateSiteFromItem(
+                    siteTitle,
+                    siteDescription,
+                    siteUrl,
+                    templateName,
+                    siteOwnerName,
+                    true,
+                    inheritTopLink,
+                    cEWeb,
+                    web,
+                    AttachedItemListId,
+                    AttachedItemId,
+                    out _createdWebId,
+                    out _createdWebServerRelativeUrl,
+                    out _createdWebUrl,
+                    out _createdWebTitle);
+            }
+        }
+
+        private void SaveToDb(SPWeb web, SPWeb parentWeb, string creatorId, string siteDescription)
+        {
+            if (AttachedItemId != -1)
+            {
+                WorkspaceData.SendCompletedSignalsToDB(
+                    SiteId,
+                    web,
+                    parentWeb,
+                    AttachedItemListId,
+                    AttachedItemId,
+                    _createdWebId,
+                    _createdWebServerRelativeUrl,
+                    _createdWebTitle,
+                    creatorId,
+                    siteDescription);
+            }
+            else
+            {
+                WorkspaceData.SendCompletedSignalsToDB(
+                    SiteId,
+                    parentWeb,
+                    _createdWebId,
+                    _createdWebServerRelativeUrl,
+                    _createdWebTitle,
+                    creatorId,
+                    siteDescription);
+            }
+        }
+
+        private static void DisposeParentWeb(SPWeb web, SPWeb parentWeb)
+        {
+            if (parentWeb?.ID.Equals(web.ID) == false)
             {
                 parentWeb.Dispose();
             }
