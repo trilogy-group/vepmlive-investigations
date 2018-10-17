@@ -1,25 +1,30 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.SharePoint;
-using PSLibrary = Microsoft.Office.Project.Server.Library;
-using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Collections;
 using System.Data;
-using System.Xml;
-using System.IO;
-using System.Resources;
-using Microsoft.Win32;
-using System.Web.Configuration;
+using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using System.Web;
+using System.Web.Services.Protocols;
+using EPMLiveCore;
+using EPMLiveEnterprise.WebSvcCustomFields;
+using EPMLiveEnterprise.WebSvcLookupTables;
+using EPMLiveEnterprise.WebSvcProject;
+using EPMLiveEnterprise.WebSvcResource;
+using EPMLiveEnterprise.WebSvcStatusing;
+using EPMLiveEnterprise.WebSvcWssInterop;
+using Microsoft.SharePoint;
+using ProjectDataSet = EPMLiveEnterprise.WebSvcProject.ProjectDataSet;
+using PSLibrary = Microsoft.Office.Project.Server.Library;
 
 namespace EPMLiveEnterprise
 {
-    class Publisher
+    internal class Publisher : IDisposable
     {
         private EventLog myLog = new EventLog("EPM Live", ".", "EPM Live Publisher");
         private Guid taskEntity = new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId);
+        private bool _disposed;
 
         private WebSvcCustomFields.CustomFields pCf;
         private WebSvcResource.Resource pResource;
@@ -83,8 +88,7 @@ namespace EPMLiveEnterprise
         {
             try
             {
-                DateTime dtStart = DateTime.Now;
-
+                var dtStart = DateTime.Now;
                 arrFieldsToPublish = new ArrayList();
                 arrPJFieldsToPublish = new ArrayList();
                 hshCurTasks = new Hashtable();
@@ -92,218 +96,293 @@ namespace EPMLiveEnterprise
                 hshTaskCenterFields = new Hashtable();
                 hshProjectCenterFields = new Hashtable();
                 arrDelNewTasks = new ArrayList();
-
                 mySite = new SPSite(mySiteGuid);
 
-                cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(mySite.WebApplication.Id));
+                cn = new SqlConnection(CoreFunctions.getConnectionString(mySite.WebApplication.Id));
                 cn.Open();
 
-                SqlCommand cmd = new SqlCommand("UPDATE publishercheck set percentcomplete=2,laststatusdate=getdate() where projectguid=@projectguid", cn);
-                cmd.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
-                cmd.ExecuteNonQuery();
-
-                cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='TimesheetField'", cn);
-                SqlDataReader dReader = cmd.ExecuteReader();
-                if (dReader.Read())
+                using (var sqlCommand = new SqlCommand(
+                    "UPDATE publishercheck set percentcomplete=2,laststatusdate=getdate() where projectguid=@projectguid",
+                    cn))
                 {
-                    strTimesheetField = dReader.GetString(0);
+                    sqlCommand.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
+                    sqlCommand.ExecuteNonQuery();
                 }
-                dReader.Close();
 
-                cmd = new SqlCommand("select pubType,weburl,transuid from publishercheck where projectguid=@projectguid", cn);
-                cmd.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (!dr.Read())
+                using (var sqlCommand = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='TimesheetField'", cn))
                 {
-                    dr.Close();
-
-                    string pubtype = EPMLiveCore.CoreFunctions.getConfigSetting(mySite.RootWeb, "EPMLivePub-Type");
-
-                    if (pubtype != "")
+                    using (var dReader = sqlCommand.ExecuteReader())
                     {
-                        string wssUrl = getProjectWss(mySite.Url, eventArgs.ProjectGuid);
-
-                        if (wssUrl != "")
+                        if (dReader.Read())
                         {
-                            cmd = new SqlCommand("INSERT INTO publishercheck (projectguid,checkbit,pubType,weburl, projectname,percentcomplete,status,laststatusdate) VALUES (@projectguid,1,@pubtype,@weburl,@projectname,2,1,GETDATE())", cn);
-                            cmd.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
-                            cmd.Parameters.AddWithValue("@pubtype", pubtype);
-                            cmd.Parameters.AddWithValue("@weburl", wssUrl);
-                            cmd.Parameters.AddWithValue("@projectname", eventArgs.ProjectName);
-                            cmd.ExecuteNonQuery();
+                            strTimesheetField = dReader.GetString(0);
                         }
                     }
                 }
-                else
-                {
-                    dr.Close();
-                }
 
-                cmd = new SqlCommand("select pubType,weburl,transuid from publishercheck where projectguid=@projectguid", cn);
-                cmd.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
-                dr = cmd.ExecuteReader();
+                PopulatePublisherCheck();
 
-                if (dr.Read())
-                {
-                    int pubType = dr.GetInt32(0);
-                    publishSiteUrl = System.Web.HttpUtility.UrlDecode(dr.GetString(1));
+                UpdatePublisherCheck(dtStart);
 
-                    
-                    if(!dr.IsDBNull(2))
-                        lastTransUid = dr.GetGuid(2);
-
-                    dr.Close();
-
-                    if (publishSiteUrl == "")
-                    {
-                        publishSiteUrl = getProjectWss(mySite.Url, eventArgs.ProjectGuid);
-
-                        cmd = new SqlCommand("UPDATE publishercheck set weburl=@weburl where projectguid=@projectguid", cn);
-                        cmd.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
-                        cmd.Parameters.AddWithValue("@weburl", publishSiteUrl);
-                        cmd.ExecuteNonQuery();
-                    }
-
-                    projectServerUrl = mySite.Url;
-                    projectGuid = eventArgs.ProjectGuid;
-
-                    hshCurTasks = new Hashtable();
-                    hshTaskHierarchy = new Hashtable();
-                    //int indSlash = publishSiteUrl.IndexOf("/", 9);
-                    //publishSiteUrl = publishSiteUrl.Substring(indSlash);
-                    //mySiteToPublish = mySite.OpenWeb(publishSiteUrl);
-                    using (SPSite pubSite = new SPSite(publishSiteUrl))
-                    {
-                        mySiteToPublish = pubSite.OpenWeb();
-
-                        //System.Web.HttpUtility.UrlDecode(publishSiteUrl).ToLower().Replace(System.Web.HttpUtility.UrlDecode(mySite.Url.ToLower()), "").Substring(1));
-
-                        pCf = new WebSvcCustomFields.CustomFields();
-                        pCf.Url = mySite.Url + "/_vti_bin/psi/customfields.asmx";
-                        pCf.UseDefaultCredentials = true;
-                        cfDs = new WebSvcCustomFields.CustomFieldDataSet();
-
-                        psiLookupTable = new WebSvcLookupTables.LookupTable();
-                        psiLookupTable.Url = mySite.Url + "/_vti_bin/psi/lookuptable.asmx";
-                        psiLookupTable.UseDefaultCredentials = true;
-
-                        pResource = new WebSvcResource.Resource();
-                        pResource.Url = mySite.Url + "/_vti_bin/psi/resource.asmx";
-                        pResource.UseDefaultCredentials = true;
-
-                        pService = new WebSvcProject.Project();
-                        pService.Url = mySite.Url + "/_vti_bin/psi/project.asmx";
-                        pService.UseDefaultCredentials = true;
-
-                        Statusing = new WebSvcStatusing.Statusing();
-                        Statusing.Url = mySite.Url + "/_vti_bin/psi/statusing.asmx";
-                        Statusing.UseDefaultCredentials = true;
-
-                        pWssInterop = new WebSvcWssInterop.WssInterop();
-                        pWssInterop.Url = mySite.Url + "/_vti_bin/psi/wssinterop.asmx";
-                        pWssInterop.UseDefaultCredentials = true;
-
-                        linkProjectWss();
-
-                        Guid trackingGuid = Guid.NewGuid();
-                        string lcid = "1033";
-                        StatusingDerived.SetImpersonationContext(true, contextInfo.UserName, contextInfo.UserGuid, trackingGuid, contextInfo.SiteGuid, lcid);
-
-                        workspaceSynch = new EPMLiveEnterprise.ProjectWorkspaceSynch(mySiteGuid, publishSiteUrl, projectGuid, contextInfo.UserName);
-                        workspaceSynch.setUpGroups();
-                        workspaceSynch.processTaskCenter();
-                        workspaceSynch.processProjectCenter();
-                        workspaceSynch.processResources();
-
-                        cmd = new SqlCommand("UPDATE publishercheck set percentcomplete=5,laststatusdate=getdate() where projectguid=@projectguid", cn);
-                        cmd.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
-                        cmd.ExecuteNonQuery();
-
-                        loadFields();
-
-                        if (loadCurrentTasks(eventArgs.ProjectName))
-                        {
-                            Guid newTransUid = Guid.NewGuid();
-
-                            cmd = new SqlCommand("SELECT * from CUSTOMFIELDS where visible=1", cn);
-                            SqlDataAdapter da = new SqlDataAdapter(cmd);
-                            DataSet ds = new DataSet();
-                            da.Fill(ds);
-                            dtFieldsToPublish = ds.Tables[0];
-
-                            WebSvcProject.ProjectDataSet pDs = new WebSvcProject.ProjectDataSet();
-                            SPSecurity.RunWithElevatedPrivileges(delegate()
-                            {
-                                pDs = pService.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.PublishedStore);
-                                rDs = pResource.ReadResources("", false);
-                                dsFields = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
-                                dsLt = psiLookupTable.ReadLookupTables("", false, 0);
-                            });
-
-                            //SPUser user = mySiteToPublish.AllUsers[getResourceUsername(pDs.Project[0].ProjectOwnerID)];
-                            //SPUserToken token = user.UserToken;
-
-                            //mySite = new SPSite(mySite.ID, token);
-                            int projectId = publishProjectCenter(pDs);
-                            if (projectId != 0)
-                            {
-                                publishTasks(projectId, pubType, newTransUid, lastTransUid);
-                                AssignGroupsToTasks(projectId, pubType, pDs);
-                            }
-
-                            ProcessPFEWork(projectId);
-
-                            int status = 2;
-
-                            DateTime dtFinish = DateTime.Now;
-                            TimeSpan ts = dtFinish - dtStart;
-
-                            if (sbErrors.ToString() != "")
-                            {
-                                status = 3;
-                                sbErrors.Append("<br><br>");
-                            }
-
-                            sbErrors.Append("Publishing Time: " + ts.TotalSeconds.ToString("#.0") + " seconds.");
-
-                            cmd = new SqlCommand("update publishercheck set webguid=@webguid,logtext=@logtext, checkbit=0,transuid=@transuid,status=@status,percentcomplete=0,laststatusdate=getdate() where projectguid=@projectguid", cn);
-                            cmd.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
-                            cmd.Parameters.AddWithValue("@webguid", mySiteToPublish.ID);
-                            cmd.Parameters.AddWithValue("@transuid", newTransUid);
-                            cmd.Parameters.AddWithValue("@status", status);
-                            cmd.Parameters.AddWithValue("@logtext", sbErrors.ToString());
-
-                            cmd.ExecuteNonQuery();
-                            mySiteToPublish.Close();
-                        }
-                    }
-                }
-                else
-                    dr.Close();
                 cn.Close();
             }
-            catch (System.Web.Services.Protocols.SoapException ex1)
+            catch (SoapException soapException)
             {
-                myLog.WriteEntry("Soap Error: " + ex1.Message + ex1.Detail, EventLogEntryType.Error, 302);
-                if (cn != null && cn.State == ConnectionState.Open)
+                myLog.WriteEntry($"Soap Error: {soapException.Message}{soapException.Detail}", EventLogEntryType.Error, 302);
+                HandleException(soapException, "Soap Error: ");
+            }
+            catch (Exception exception)
+            {
+                myLog.WriteEntry($"Error: {exception.Message}{exception.StackTrace}", EventLogEntryType.Error, 300);
+                HandleException(exception, "Error: ");
+            }
+        }
+
+        private void HandleException(Exception exception, string errorText)
+        {
+            if (exception == null)
+            {
+                throw new ArgumentNullException(nameof(exception));
+            }
+
+            if (cn != null && cn.State == ConnectionState.Open)
+            {
+                using (var cmd = new SqlCommand(
+                    "update publishercheck set logtext=@logtext, checkbit=0,status=4,percentcomplete=0,laststatusdate=getdate() where projectguid=@projectguid",
+                    cn))
                 {
-                    SqlCommand cmd = new SqlCommand("update publishercheck set logtext=@logtext, checkbit=0,status=4,percentcomplete=0,laststatusdate=getdate() where projectguid=@projectguid", cn);
                     cmd.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
-                    cmd.Parameters.AddWithValue("@logtext", "Soap Error: " + ex1.Message + ex1.StackTrace);
+                    cmd.Parameters.AddWithValue("@logtext", $"{errorText}{exception.Message}{exception.StackTrace}");
                     cmd.ExecuteNonQuery();
                 }
             }
-            catch (Exception ex)
-            {
-                myLog.WriteEntry("Error: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 300);
-                if (cn != null && cn.State == ConnectionState.Open)
-                {
-                    SqlCommand cmd = new SqlCommand("update publishercheck set logtext=@logtext, checkbit=0,status=4,percentcomplete=0,laststatusdate=getdate() where projectguid=@projectguid", cn);
-                    cmd.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
-                    cmd.Parameters.AddWithValue("@logtext", "Error: " + ex.Message + ex.StackTrace);
+        }
 
-                    cmd.ExecuteNonQuery();
+        private void UpdatePublisherCheck(DateTime dtStart)
+        {
+            if (dtStart == null)
+            {
+                throw new ArgumentNullException(nameof(dtStart));
+            }
+
+            using (var sqlCommand = new SqlCommand("select pubType,weburl,transuid from publishercheck where projectguid=@projectguid", cn))
+            {
+                sqlCommand.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
+
+                using (var dr = sqlCommand.ExecuteReader())
+                {
+                    if (dr.Read())
+                    {
+                        var pubType = dr.GetInt32(0);
+                        publishSiteUrl = HttpUtility.UrlDecode(dr.GetString(1));
+
+                        if (!dr.IsDBNull(2))
+                        {
+                            lastTransUid = dr.GetGuid(2);
+                        }
+
+                        if (string.IsNullOrWhiteSpace(publishSiteUrl))
+                        {
+                            publishSiteUrl = getProjectWss(mySite.Url, eventArgs.ProjectGuid);
+
+                            using (var sqlCommand1 = new SqlCommand("UPDATE publishercheck set weburl=@weburl where projectguid=@projectguid", cn))
+                            {
+                                sqlCommand1.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
+                                sqlCommand1.Parameters.AddWithValue("@weburl", publishSiteUrl);
+                                sqlCommand1.ExecuteNonQuery();
+                            }
+                        }
+
+                        projectServerUrl = mySite.Url;
+                        projectGuid = eventArgs.ProjectGuid;
+
+                        hshCurTasks = new Hashtable();
+                        hshTaskHierarchy = new Hashtable();
+
+                        UpdatePublisherCheckPercentCompleteFive(pubType, dtStart);
+                    }
                 }
+            }
+        }
+
+        private void UpdatePublisherCheckPercentCompleteFive(int pubType, DateTime dtStart)
+        {
+            if (dtStart == null)
+            {
+                throw new ArgumentNullException(nameof(dtStart));
+            }
+
+            using (var pubSite = new SPSite(publishSiteUrl))
+            {
+                mySiteToPublish = pubSite.OpenWeb();
+
+                pCf = new CustomFields
+                {
+                    Url = $"{mySite.Url}/_vti_bin/psi/customfields.asmx",
+                    UseDefaultCredentials = true
+                };
+                cfDs = new CustomFieldDataSet();
+
+                psiLookupTable = new LookupTable
+                {
+                    Url = $"{mySite.Url}/_vti_bin/psi/lookuptable.asmx",
+                    UseDefaultCredentials = true
+                };
+
+                pResource = new Resource
+                {
+                    Url = $"{mySite.Url}/_vti_bin/psi/resource.asmx",
+                    UseDefaultCredentials = true
+                };
+
+                pService = new Project
+                {
+                    Url = $"{mySite.Url}/_vti_bin/psi/project.asmx",
+                    UseDefaultCredentials = true
+                };
+
+                Statusing = new Statusing
+                {
+                    Url = $"{mySite.Url}/_vti_bin/psi/statusing.asmx",
+                    UseDefaultCredentials = true
+                };
+
+                pWssInterop = new WssInterop
+                {
+                    Url = $"{mySite.Url}/_vti_bin/psi/wssinterop.asmx",
+                    UseDefaultCredentials = true
+                };
+
+                linkProjectWss();
+
+                var trackingGuid = Guid.NewGuid();
+                const string Lcid = "1033";
+                StatusingDerived.SetImpersonationContext(true, contextInfo.UserName, contextInfo.UserGuid, trackingGuid, contextInfo.SiteGuid, Lcid);
+
+                workspaceSynch = new ProjectWorkspaceSynch(mySiteGuid, publishSiteUrl, projectGuid, contextInfo.UserName);
+                workspaceSynch.setUpGroups();
+                workspaceSynch.processTaskCenter();
+                workspaceSynch.processProjectCenter();
+                workspaceSynch.processResources();
+
+                using (var sqlCommand1 = new SqlCommand(
+                    "UPDATE publishercheck set percentcomplete=5,laststatusdate=getdate() where projectguid=@projectguid",
+                    cn))
+                {
+                    sqlCommand1.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
+                    sqlCommand1.ExecuteNonQuery();
+                }
+
+                loadFields();
+
+                LoadCurrentTasks(pubType, dtStart);
+            }
+        }
+
+        private void PopulatePublisherCheck()
+        {
+            using (var sqlCommand = new SqlCommand("select pubType,weburl,transuid from publishercheck where projectguid=@projectguid", cn))
+            {
+                sqlCommand.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
+
+                using (var dataReader = sqlCommand.ExecuteReader())
+                {
+                    if (!dataReader.Read())
+                    {
+                        var pubType = CoreFunctions.getConfigSetting(mySite.RootWeb, "EPMLivePub-Type");
+
+                        if (!string.IsNullOrWhiteSpace(pubType))
+                        {
+                            var wssUrl = getProjectWss(mySite.Url, eventArgs.ProjectGuid);
+
+                            if (!string.IsNullOrWhiteSpace(wssUrl))
+                            {
+                                using (var sqlCommand1 = new SqlCommand(
+                                    "INSERT INTO publishercheck (projectguid,checkbit,pubType,weburl, projectname,percentcomplete,status,laststatusdate) VALUES (@projectguid,1,@pubtype,@weburl,@projectname,2,1,GETDATE())",
+                                    cn))
+                                {
+                                    sqlCommand1.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
+                                    sqlCommand1.Parameters.AddWithValue("@pubtype", pubType);
+                                    sqlCommand1.Parameters.AddWithValue("@weburl", wssUrl);
+                                    sqlCommand1.Parameters.AddWithValue("@projectname", eventArgs.ProjectName);
+                                    sqlCommand1.ExecuteNonQuery();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void LoadCurrentTasks(int pubType, DateTime dtStart)
+        {
+            if (dtStart == null)
+            {
+                throw new ArgumentNullException(nameof(dtStart));
+            }
+
+            if (loadCurrentTasks(eventArgs.ProjectName))
+            {
+                var newTransUid = Guid.NewGuid();
+
+                using (var sqlCommand1 = new SqlCommand("SELECT * from CUSTOMFIELDS where visible=1", cn))
+                {
+                    using (var sqlDataAdapter = new SqlDataAdapter(sqlCommand1))
+                    {
+                        using (var dataSet = new DataSet())
+                        {
+                            sqlDataAdapter.Fill(dataSet);
+                            dtFieldsToPublish = dataSet.Tables[0];
+                        }
+                    }
+                }
+
+                var projectDataSet = new ProjectDataSet();
+                SPSecurity.RunWithElevatedPrivileges(
+                    delegate
+                    {
+                        projectDataSet = pService.ReadProject(projectGuid, DataStoreEnum.PublishedStore);
+                        rDs = pResource.ReadResources(string.Empty, false);
+                        dsFields = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                        dsLt = psiLookupTable.ReadLookupTables(string.Empty, false, 0);
+                    });
+
+                var projectId = publishProjectCenter(projectDataSet);
+
+                if (projectId != 0)
+                {
+                    publishTasks(projectId, pubType, newTransUid, lastTransUid);
+                    AssignGroupsToTasks(projectId, pubType, projectDataSet);
+                }
+
+                ProcessPFEWork(projectId);
+
+                var status = 2;
+
+                var dtFinish = DateTime.Now;
+                var timeSpan = dtFinish - dtStart;
+
+                if (!string.IsNullOrWhiteSpace(sbErrors.ToString()))
+                {
+                    status = 3;
+                    sbErrors.Append("<br><br>");
+                }
+
+                sbErrors.Append($"Publishing Time: {timeSpan.TotalSeconds:#.0} seconds.");
+
+                using (var sqlCommand1 = new SqlCommand(
+                    "update publishercheck set webguid=@webguid,logtext=@logtext, checkbit=0,transuid=@transuid,status=@status,percentcomplete=0,laststatusdate=getdate() where projectguid=@projectguid",
+                    cn))
+                {
+                    sqlCommand1.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
+                    sqlCommand1.Parameters.AddWithValue("@webguid", mySiteToPublish.ID);
+                    sqlCommand1.Parameters.AddWithValue("@transuid", newTransUid);
+                    sqlCommand1.Parameters.AddWithValue("@status", status);
+                    sqlCommand1.Parameters.AddWithValue("@logtext", sbErrors.ToString());
+                    sqlCommand1.ExecuteNonQuery();
+                }
+
+                mySiteToPublish.Close();
             }
         }
 
@@ -1720,6 +1799,18 @@ namespace EPMLiveEnterprise
             {
                 return false;
             }
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            cn?.Dispose();
+
+            _disposed = true;
         }
     }
 }
