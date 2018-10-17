@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using EPMLiveCore.Helpers;
 using EPMLiveEnterprise.WebSvcProject;
@@ -59,6 +60,12 @@ namespace EPMLiveEnterprise
             foreach (string field in fieldsToPublish)
             {
                 var fieldSplit = field.Split(FieldSplitChar);
+
+                if (fieldSplit.Length < 6)
+                {
+                    throw new InvalidOperationException("Invalid fieldSplit count.");
+                }
+
                 var fieldName = fieldSplit[0];
                 var wssFieldName = fieldSplit[1];
                 var fieldCategory = fieldSplit[3];
