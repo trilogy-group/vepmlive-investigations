@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Web.Fakes;
 using System.Web.UI.Fakes;
 using System.Xml;
@@ -37,27 +39,27 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             _adoShims = AdoShims.ShimAdoNetCalls();
             _sharepointShims = SharepointShims.ShimSharepointCalls();
 
-            Shimgetgantttasks.Constructor = tasks =>
-            {
-                var shimPage = new ShimPage(tasks)
-                {
-                    RequestGet = () =>
-                    {
-                        var shimHttpRequest = new ShimHttpRequest()
-                        {
-                            ItemGetString = key =>
-                            {
-                                if (key == "ignorelistid")
-                                {
-                                    return "1";
-                                }
-                                return "2";
-                            }
-                        };
-                        return shimHttpRequest;
-                    }
-                };
-            };
+            //Shimgetgantttasks.Constructor = tasks =>
+            //{
+            //    var shimPage = new ShimPage(tasks)
+            //    {
+            //        RequestGet = () =>
+            //        {
+            //            var shimHttpRequest = new ShimHttpRequest()
+            //            {
+            //                ItemGetString = key =>
+            //                {
+            //                    if (key == "ignorelistid")
+            //                    {
+            //                        return "1";
+            //                    }
+            //                    return "2";
+            //                }
+            //            };
+            //            return shimHttpRequest;
+            //        }
+            //    };
+            //};
 
             _getGanttTasks = new getgantttasks();
             _getGanttTasksPrivate = new PrivateObject(_getGanttTasks);
@@ -272,6 +274,159 @@ namespace EPMLiveWebParts.Tests.WebPageCode
                 () => documentCompleted.ShouldNotBeNull(),
                 () => nodeList.ShouldNotBeEmpty(),
                 () => xmlData.ShouldNotBeNullOrEmpty());
+        }
+
+        [TestMethod]
+        public void GetParams_WithValidParameters_ShouldExecuteCorrectly()
+        {
+            // Arrange
+            var web = new ShimSPWeb
+            {
+                ListsGet = () => new ShimSPListCollection
+                {
+                    ItemGetGuid = guid => new ShimSPList
+                    {
+                        ViewsGet = () => new ShimSPViewCollection
+                        {
+                            ItemGetString = name => new ShimSPView()
+                        }
+                    }
+                }
+            };
+            var parameters = new Dictionary<string, string>
+            {
+                ["List"] = DummyString,
+                ["View"] = DummyString,
+                ["Executive"] = DummyString,
+                ["LType"] = DummyString,
+                ["Start"] = DummyString,
+                ["Finish"] = DummyString,
+                ["Percent"] = DummyString,
+                ["WBS"] = DummyString,
+                ["Milestone"] = DummyString,
+                ["Info"] = DummyString,
+                ["RLists"] = $"{DummyString}|{DummyString}",
+                ["RSites"] = $"{DummyString},{DummyString}",
+                ["FilterField"] = DummyString,
+                ["FilterValue"] = DummyString,
+                ["AGroups"] = DummyString,
+                ["UsePerf"] = bool.TrueString,
+                ["UsePopup"] = bool.TrueString
+            };
+            ShimPage.AllInstances.RequestGet = _ => new ShimHttpRequest
+            {
+                ItemGetString = name =>
+                {
+                    var stringParameters = ConvertDictionaryToStringParams(parameters);
+                    var encoded = ASCIIEncoding.ASCII.GetBytes(stringParameters);
+                    return Convert.ToBase64String(encoded);
+                }
+            };
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code => code();
+            ShimSPSite.ConstructorString = (_, url) => { };
+            ShimSPSite.AllInstances.OpenWeb = _ => new ShimSPWeb
+            {
+                GetListFromUrlString = url => new ShimSPList()
+            };
+
+            // Act
+            _getGanttTasks.getParams(web);
+            var list = _getGanttTasksPrivate.GetFieldOrProperty("strlist") as string;
+            var view = _getGanttTasksPrivate.GetFieldOrProperty("strview") as string;
+            var linktype = _getGanttTasksPrivate.GetFieldOrProperty("linktype") as string;
+            var start = _getGanttTasksPrivate.GetFieldOrProperty("start") as string;
+            var hshLists = _getGanttTasksPrivate.GetFieldOrProperty("hshLists") as Hashtable;
+            var usePerformance = _getGanttTasksPrivate.GetFieldOrProperty("usePerformance") as bool?;
+            var usePopup = _getGanttTasksPrivate.GetFieldOrProperty("usePopup") as bool?;
+
+            // Assert
+            _getGanttTasks.ShouldSatisfyAllConditions(
+                () => list.ShouldNotBeNullOrEmpty(),
+                () => list.ShouldBe(DummyString),
+                () => view.ShouldNotBeNullOrEmpty(),
+                () => view.ShouldBe(DummyString),
+                () => linktype.ShouldNotBeNullOrEmpty(),
+                () => linktype.ShouldBe(DummyString),
+                () => start.ShouldNotBeNullOrEmpty(),
+                () => start.ShouldBe(DummyString),
+                () => hshLists.ShouldNotBeNull(),
+                () => hshLists.Count.ShouldBeGreaterThanOrEqualTo(1),
+                () => usePerformance.GetValueOrDefault().ShouldBeTrue(),
+                () => usePopup.GetValueOrDefault().ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void GetParams_WithNullParameters_ShouldExecuteCorrectly()
+        {
+            // Arrange
+            var web = new ShimSPWeb
+            {
+                ListsGet = () => new ShimSPListCollection
+                {
+                    ItemGetGuid = guid => new ShimSPList
+                    {
+                        ViewsGet = () => new ShimSPViewCollection
+                        {
+                            ItemGetString = name => new ShimSPView()
+                        }
+                    }
+                }
+            };
+            var parameters = new Dictionary<string, string>
+            {
+                ["List"] = DummyString,
+                ["View"] = DummyString,
+                ["FilterField"] = DummyString,
+                ["FilterValue"] = DummyString,
+            };
+            ShimPage.AllInstances.RequestGet = _ => new ShimHttpRequest
+            {
+                ItemGetString = name =>
+                {
+                    var stringParameters = ConvertDictionaryToStringParams(parameters);
+                    var encoded = ASCIIEncoding.ASCII.GetBytes(stringParameters);
+                    return Convert.ToBase64String(encoded);
+                }
+            };
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code => code();
+            ShimSPSite.ConstructorString = (_, url) => { };
+            ShimSPSite.AllInstances.OpenWeb = _ => new ShimSPWeb
+            {
+                GetListFromUrlString = url => new ShimSPList()
+            };
+
+            // Act
+            _getGanttTasks.getParams(web);
+            var linktype = _getGanttTasksPrivate.GetFieldOrProperty("linktype") as string;
+            var start = _getGanttTasksPrivate.GetFieldOrProperty("start") as string;
+            var lists = _getGanttTasksPrivate.GetFieldOrProperty("hshLists") as Hashtable;
+            var rollupsites = _getGanttTasksPrivate.GetFieldOrProperty("rollupsites") as string[];
+            var usePerformance = _getGanttTasksPrivate.GetFieldOrProperty("usePerformance") as bool?;
+            var usePopup = _getGanttTasksPrivate.GetFieldOrProperty("usePopup") as bool?;
+
+            // Assert
+            _getGanttTasks.ShouldSatisfyAllConditions(
+                () => linktype.ShouldBeNull(),
+                () => start.ShouldBeNull(),
+                () => lists.ShouldNotBeNull(),
+                () => lists.Count.ShouldBe(0),
+                () => rollupsites.ShouldBeNull(),
+                () => usePerformance.GetValueOrDefault().ShouldBeFalse(),
+                () => usePopup.GetValueOrDefault().ShouldBeFalse());
+        }
+
+        private string ConvertDictionaryToStringParams(IDictionary<string, string> dict)
+        {
+            var sb = new StringBuilder();
+            foreach (var item in dict)
+            {
+                sb.Append($"{item.Key}\t{item.Value}");
+                if (item.Key != dict.Keys.LastOrDefault())
+                {
+                    sb.Append("\n");
+                }
+            }
+            return sb.ToString();
         }
     }
 }
