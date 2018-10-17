@@ -16,8 +16,11 @@ namespace EPMLiveEnterprise
     {
         public Publisher(PSLibrary.PSContextInfo psContextInfo, ProjectPostPublishEventArgs projectPostPublishEventArgs)
         {
-            contextInfo = psContextInfo ?? throw new ArgumentNullException(nameof(psContextInfo));
-            eventArgs = projectPostPublishEventArgs ?? throw new ArgumentNullException(nameof(projectPostPublishEventArgs));
+            Guard.ArgumentIsNotNull(projectPostPublishEventArgs, nameof(projectPostPublishEventArgs));
+            Guard.ArgumentIsNotNull(psContextInfo, nameof(psContextInfo));
+
+            contextInfo = psContextInfo;
+            eventArgs = projectPostPublishEventArgs;
             mySiteGuid = contextInfo.SiteGuid;
             myLog.EntryWritten += myLog_EntryWritten;
         }
