@@ -869,7 +869,8 @@ namespace EPMLiveWebParts.Tests
             using (ShimsContext.Create())
             {
                 // Arrange
-                var privateObject = ArrangeHandleFilteredLookupCase(true, true, true, true, out var parameters);
+                object[] parameters;
+                var privateObject = ArrangeHandleFilteredLookupCase(true, true, true, true, out parameters);
 
                 // Act
                 privateObject.Invoke("HandleFilteredLookupCase", parameters);
@@ -891,7 +892,8 @@ namespace EPMLiveWebParts.Tests
             using (ShimsContext.Create())
             {
                 // Arrange
-                var privateObject = ArrangeHandleFilteredLookupCase(true, true, true, false, out var parameters);
+                object[] parameters;
+                var privateObject = ArrangeHandleFilteredLookupCase(true, true, true, false, out parameters);
 
                 // Act
                 privateObject.Invoke("HandleFilteredLookupCase", parameters);
@@ -913,7 +915,8 @@ namespace EPMLiveWebParts.Tests
             using (ShimsContext.Create())
             {
                 // Arrange
-                var privateObject = ArrangeHandleFilteredLookupCase(true, false, true, true, out var parameters);
+                object[] parameters;
+                var privateObject = ArrangeHandleFilteredLookupCase(true, false, true, true, out parameters);
 
                 // Act
                 privateObject.Invoke("HandleFilteredLookupCase", parameters);
@@ -935,7 +938,8 @@ namespace EPMLiveWebParts.Tests
             using (ShimsContext.Create())
             {
                 // Arrange
-                var privateObject = ArrangeHandleFilteredLookupCase(true, false, true, false, out var parameters);
+                object[] parameters;
+                var privateObject = ArrangeHandleFilteredLookupCase(true, false, true, false, out parameters);
 
                 // Act
                 privateObject.Invoke("HandleFilteredLookupCase", parameters);

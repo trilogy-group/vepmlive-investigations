@@ -2022,14 +2022,17 @@ namespace EPMLiveWebParts
                         var recurse = node.SelectSingleNode("Property[Name='IsFilterRecursive']").SelectSingleNode("Value").InnerText;
 
                         var type = "choice";
-                        if (multi.ToLower() == "true")
+                        if (string.Equals(multi, "true", StringComparison.OrdinalIgnoreCase))
                         {
                             type = "mchoice";
-                            var lvc = new SPFieldLookupValueCollection(val);
-                            foreach (var lv in lvc)
+                            var lookupValueCollection = new SPFieldLookupValueCollection(val);
+                            var displayValueBuilder = new StringBuilder(displayValue);
+                            foreach (var lookupValue in lookupValueCollection)
                             {
-                                displayValue += "\n" + lv;
+                                displayValueBuilder.Append($"\n{lookupValue}");
                             }
+                            displayValue = displayValueBuilder.ToString();
+
                             if (displayValue.Length > 1)
                             {
                                 displayValue = displayValue.Substring(1);
