@@ -15,7 +15,7 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
-            var bFound = false;
+            var found = false;
             SPSecurity.RunWithElevatedPrivileges(
                 delegate
                 {
@@ -38,12 +38,12 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
                             {
                                 if (dataReader.Read())
                                 {
-                                    bFound = true;
+                                    found = true;
                                 }
                             }
                         }
 
-                        if (!bFound)
+                        if (!found)
                         {
                             using (var sqlCommand = new SqlCommand(
                                 "INSERT INTO IzendaAdHocReports (Name,TenantID,CreatedDate,ModifiedDate,Xml) VALUES (@name,@siteid,GETDATE(),GETDATE(),@xml)",
@@ -58,7 +58,7 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
                     }
                 });
 
-            if (!bFound)
+            if (!found)
             {
                 SPUtility.Redirect("epmlive/reporting/izenda/manage.aspx", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
             }

@@ -51,7 +51,6 @@ namespace EPMLiveCore.Tests.Layouts.Reporting
         public void BtnSaveClick_Invoke_VerifyMemoryLeak()
         {
             // Arrange
-
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code => code();
             _privateEditObject.SetField(TxtNameFieldName, new TextBox());
             _privateEditObject.SetField(TxtCategoryFieldName, new TextBox());
