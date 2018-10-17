@@ -246,7 +246,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="ChildParentSync.cs" />
+    <Compile Include="Helpers\Guard.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\700Steps.cs" />
+    <Compile Include="Layouts\epmlive\LayoutsHelper.cs" />
     <Compile Include="ListDisplaySettingIterator.OnInit.cs" />
     <Compile Include="ListDisplaySettingIterator.RenderControl.cs" />
     <Compile Include="ListDisplaySettingIterator.IsFieldExcluded.cs" />
@@ -1400,6 +1402,7 @@
     <Compile Include="SocialEngine\Modules\GlobalValidator.cs" />
     <Compile Include="SocialEngine\Modules\List.cs" />
     <Compile Include="SocialEngine\Modules\ListItem.cs" />
+    <Compile Include="SocialEngine\Modules\ListItemValidator.cs" />
     <Compile Include="SocialEngine\Modules\StatusUpdate.cs" />
     <Compile Include="SocialEngine\Modules\Workspace.cs" />
     <Compile Include="SocialEngine\SocialEngine.cs" />

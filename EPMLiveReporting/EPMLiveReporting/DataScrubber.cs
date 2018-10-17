@@ -1,451 +1,311 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
-using Microsoft.SharePoint;
+using System.Text;
 using EPMLiveCore;
+using EPMLiveCore.Helpers;
 using EPMLiveCore.ReportHelper;
+using Microsoft.SharePoint;
 
 namespace EPMLiveReportsAdmin
 {
-    public static class DataScrubber
+    public static partial class DataScrubber
     {
-        public static void CleanTables(SPSite site, EPMData epmdata)
+        private const int OwnerId = 1073741823;
+
+        public static void CleanTables(SPSite site, EPMData epmData)
         {
-            #region WIPE DATA FROM ReportListIds, RPTWeb, and RPTWEBGROUPS, epmlive.Webs TABLE
+            Guard.ArgumentIsNotNull(site, nameof(site));
+            Guard.ArgumentIsNotNull(epmData, nameof(epmData));
 
-            SqlCommand cmd;
-            cmd = new SqlCommand("DELETE FROM ReportListIds", epmdata.GetClientReportingConnection);
-
-            cmd.ExecuteNonQuery();
-            epmdata.LogStatus("", "", "Reporting Refresh WIPE DATA FROM ReportListIds, RPTWeb, and RPTWEBGROUPS, epmlive.Webs TABLE", string.Format("DELETE FROM ReportListIds"), 2, 3, "");
-            cmd = new SqlCommand("DELETE FROM RPTWeb", epmdata.GetClientReportingConnection);
-            cmd.ExecuteNonQuery();
-            epmdata.LogStatus("", "", "Reporting Refresh WIPE DATA FROM ReportListIds, RPTWeb, and RPTWEBGROUPS, epmlive.Webs TABLE", string.Format("DELETE FROM RPTWeb"), 2, 3, "");
-
-            cmd = new SqlCommand("DELETE FROM RPTWEBGROUPS", epmdata.GetClientReportingConnection);
-            cmd.ExecuteNonQuery();
-            epmdata.LogStatus("", "", "Reporting Refresh WIPE DATA FROM ReportListIds, RPTWeb, and RPTWEBGROUPS, epmlive.Webs TABLE", string.Format("DELETE FROM RPTWEBGROUPS"), 2, 3, "");
-            #endregion
-
-            #region REPOPULATE ReportListIds, RPTWeb, RPTWEBGROUPS, epmlive.Webs AND FRF-Recent TABLES
+            WipeData(DeleteReportListIds, WipeDataId, epmData);
+            WipeData(DeleteRptWeb, WipeDataId, epmData);
+            WipeData(DeleteRptWebGroups, WipeDataId, epmData);
 
             var listNames = new DataTable();
-
             var listIds = new DataTable();
-            listIds.Columns.Add(new DataColumn("Id", typeof(Guid)));
-            listIds.Columns.Add(new DataColumn("ListIcon", typeof(String)));
+            listIds.Columns.Add(new DataColumn(Id, typeof(Guid)));
+            listIds.Columns.Add(new DataColumn(ListIcon, typeof(string)));
 
-            var rptWeb = new DataTable();
-            rptWeb.Columns.Add(new DataColumn("SiteId", typeof(Guid)));
-            rptWeb.Columns.Add(new DataColumn("ItemWebId", typeof(Guid)));
-            rptWeb.Columns.Add(new DataColumn("ItemListId", typeof(Guid)));
-            rptWeb.Columns.Add(new DataColumn("ItemId", typeof(int)));
-            rptWeb.Columns.Add(new DataColumn("ParentWebId", typeof(Guid)));
-            rptWeb.Columns.Add(new DataColumn("WebId", typeof(Guid)));
-            rptWeb.Columns.Add(new DataColumn("WebUrl", typeof(string)));
-            rptWeb.Columns.Add(new DataColumn("WebTitle", typeof(string)));
-            rptWeb.Columns.Add(new DataColumn("WebDescription", typeof(string)));
-            rptWeb.Columns.Add(new DataColumn("WebOwnerId", typeof(int)));
-
+            var rptWeb = GetRptWebDataTable();
             var listIdsTest = new DataTable();
             var rptWebTest = new DataTable();
+            var errMsg = new StringBuilder();
+            bool hasError;
+            SPSecurity.RunWithElevatedPrivileges(
+                delegate
+                {
+                    using (var sqlCommand = new SqlCommand(SelectListTableRptList, epmData.GetClientReportingConnection))
+                    {
+                        using (var adapter = new SqlDataAdapter(sqlCommand))
+                        {
+                            adapter.Fill(listNames);
+                        }
 
-            string errMsg = string.Empty;
-            bool hasError = false;
-            string sDelSql = string.Empty;
-            SPSecurity.RunWithElevatedPrivileges(delegate
+                        LogStatusLevel2Type3(RepopulateId, SelectListTableRptList, epmData);
+                    }
+
+                    using (var spSite = new SPSite(site.ID))
+                    {
+                        foreach (SPWeb spWeb in spSite.AllWebs)
+                        {
+                            GatherWebInfo(spWeb, rptWeb, spSite);
+                            hasError = PopulateRptWebGroups(epmData, spWeb, spSite, errMsg);
+                            hasError = GatherValidLists(listNames, spWeb, listIds, hasError, errMsg);
+                            spWeb?.Dispose();
+                        }
+
+                        hasError = BulkInsertReportListIds(epmData, listIds, errMsg);
+                        BulkInsertRptWeb(epmData, rptWeb, ref hasError, errMsg);
+                    }
+
+                    if (!CleanLstTables(epmData, listIdsTest, listNames, hasError, errMsg))
+                    {
+                        return;
+                    }
+
+                    var finalRecent = GetValidFrfRecentItems(epmData, errMsg, listIdsTest, rptWebTest);
+                    BulkInsertFrfRecentItems(epmData, finalRecent, rptWeb, errMsg);
+                });
+        }
+
+        private static DataTable GetRptWebDataTable()
+        {
+            var rptWeb = new DataTable();
+            rptWeb.Columns.Add(new DataColumn(SiteId, typeof(Guid)));
+            rptWeb.Columns.Add(new DataColumn(ItemWebId, typeof(Guid)));
+            rptWeb.Columns.Add(new DataColumn(ItemListId, typeof(Guid)));
+            rptWeb.Columns.Add(new DataColumn(ItemId, typeof(int)));
+            rptWeb.Columns.Add(new DataColumn(ParentWebId, typeof(Guid)));
+            rptWeb.Columns.Add(new DataColumn(WebId, typeof(Guid)));
+            rptWeb.Columns.Add(new DataColumn(WebUrl, typeof(string)));
+            rptWeb.Columns.Add(new DataColumn(WebTitle, typeof(string)));
+            rptWeb.Columns.Add(new DataColumn(WebDescription, typeof(string)));
+            rptWeb.Columns.Add(new DataColumn(WebOwnerId, typeof(int)));
+            return rptWeb;
+        }
+
+        private static bool PopulateRptWebGroups(EPMData epmData, SPWeb spWeb, SPSite spSite, StringBuilder errMsg)
+        {
+            Guard.ArgumentIsNotNull(epmData, nameof(epmData));
+            Guard.ArgumentIsNotNull(spWeb, nameof(spWeb));
+            Guard.ArgumentIsNotNull(spSite, nameof(spSite));
+            Guard.ArgumentIsNotNull(errMsg, nameof(errMsg));
+
+            var hasError = false;
+
+            try
             {
-                cmd = new SqlCommand("SELECT [ListName], [TableName] FROM RPTList");
-                cmd.Connection = epmdata.GetClientReportingConnection;
-                var adapter = new SqlDataAdapter();
-                adapter.SelectCommand = cmd;
-                adapter.Fill(listNames);
-                epmdata.LogStatus("", "", "Reporting Refresh REPOPULATE ReportListIds, RPTWeb, RPTWEBGROUPS, epmlive.Webs AND FRF-Recent TABLES", string.Format("SELECT [ListName], [TableName] FROM RPTList"), 2, 3, "");
-                using (var es = new SPSite(site.ID))
+                LogStatusLevel2Type3(PopulateRptWebGroupsId, StartBulkInsertRptWebGroups, epmData);
+
+                var dataTable = new DataTable();
+                var dataColumn = new DataColumn(RptWebGroups) { DataType = typeof(Guid) };
+                dataTable.Columns.Add(dataColumn);
+                dataColumn = new DataColumn(SiteId.ToUpper()) { DataType = typeof(Guid) };
+                dataTable.Columns.Add(dataColumn);
+                dataColumn = new DataColumn(WebId.ToUpper()) { DataType = typeof(Guid) };
+                dataTable.Columns.Add(dataColumn);
+                dataColumn = new DataColumn(GroupId) { DataType = typeof(int) };
+                dataTable.Columns.Add(dataColumn);
+                dataColumn = new DataColumn(SecType) { DataType = typeof(int) };
+                dataTable.Columns.Add(dataColumn);
+
+                foreach (SPRoleAssignment spRoleAssignment in spWeb.RoleAssignments)
                 {
-                    foreach (SPWeb w in es.AllWebs)
+                    var type = spRoleAssignment.Member is SPGroup
+                        ? 1
+                        : 0;
+
+                    var found = spRoleAssignment.RoleDefinitionBindings.Cast<SPRoleDefinition>()
+                       .Any(def => (def.BasePermissions & SPBasePermissions.ViewListItems) == SPBasePermissions.ViewListItems);
+
+                    if (found)
                     {
-                        #region GATHER WEB INFO
-
-                        string sParentItem = string.Empty;
-                        try
-                        {
-                            sParentItem = w.AllProperties["ParentItem"].ToString();
-                        }
-                        catch { }
-
-                        DataRow r = rptWeb.Rows.Add();
-                        if (!string.IsNullOrEmpty(sParentItem))
-                        {
-                            string[] sa = sParentItem.Split(new[] { "^^" }, StringSplitOptions.RemoveEmptyEntries);
-                            string sItemWebId = sa[0];
-                            string sItemListId = sa[1];
-                            string sItemId = sa[2];
-
-                            r["SiteId"] = es.ID;
-                            r["ItemWebId"] = !string.IsNullOrEmpty(sItemWebId) ? new Guid(sItemWebId) : Guid.Empty;
-                            r["ItemListId"] = !string.IsNullOrEmpty(sItemListId) ? new Guid(sItemListId) : Guid.Empty;
-                            r["ItemId"] = !string.IsNullOrEmpty(sItemId) ? int.Parse(sItemId) : -1;
-                            r["ParentWebId"] = w.ParentWeb != null ? w.ParentWeb.ID : Guid.Empty;
-                            r["WebId"] = w.ID;
-                            r["WebUrl"] = w.ServerRelativeUrl;
-                            r["WebTitle"] = w.Title;
-                        }
-                        else
-                        {
-                            r["SiteId"] = es.ID;
-                            r["ItemWebId"] = Guid.Empty;
-                            r["ItemListId"] = Guid.Empty;
-                            r["ItemId"] = -1;
-                            r["ParentWebId"] = w.ParentWeb != null ? w.ParentWeb.ID : Guid.Empty;
-                            r["WebId"] = w.ID;
-                            r["WebUrl"] = w.ServerRelativeUrl;
-                            r["WebTitle"] = w.Title;
-                        }
-                        r["WebDescription"] = w.Description;
-
-                        try
-                        {
-                            if (w.Author.ID == 1073741823)
-                            {
-                                r["WebOwnerId"] = 1;
-                            }
-                            else
-                            {
-                                r["WebOwnerId"] = w.Author.ID;
-                            }
-                        }
-                        catch
-                        {
-                            r["WebOwnerId"] = 1;
-                        }
-
-                        #endregion
-
-                        #region  POPULATE RPTWEBGROUPS
-
-                        try
-                        {
-                            epmdata.LogStatus("", "", "Reporting Refresh POPULATE RPTWEBGROUPS", string.Format("Started bulk insert dbo.RPTWEBGROUPS"), 2, 3, "");
-                            var dt = new DataTable();
-                            var dc = new DataColumn("RPTWEBGROUPS") { DataType = Type.GetType("System.Guid") };
-                            dt.Columns.Add(dc);
-                            dc = new DataColumn("SITEID") { DataType = Type.GetType("System.Guid") };
-                            dt.Columns.Add(dc);
-                            dc = new DataColumn("WEBID") { DataType = Type.GetType("System.Guid") };
-                            dt.Columns.Add(dc);
-                            dc = new DataColumn("GROUPID") { DataType = Type.GetType("System.Int32") };
-                            dt.Columns.Add(dc);
-                            dc = new DataColumn("SECTYPE") { DataType = Type.GetType("System.Int32") };
-                            dt.Columns.Add(dc);
-
-                            foreach (SPRoleAssignment ra in w.RoleAssignments)
-                            {
-                                int type = 0;
-                                if (ra.Member is SPGroup)
-                                {
-                                    type = 1;
-                                }
-                                bool found =
-                                    ra.RoleDefinitionBindings.Cast<SPRoleDefinition>()
-                                        .Any(
-                                            def =>
-                                                (def.BasePermissions & SPBasePermissions.ViewListItems) ==
-                                                SPBasePermissions.ViewListItems);
-                                if (found)
-                                {
-                                    dt.Rows.Add(new object[] { Guid.NewGuid(), es.ID, w.ID, ra.Member.ID, type });
-                                }
-                            }
-
-                            dt.Rows.Add(new object[] { Guid.NewGuid(), es.ID, w.ID, 999999, 1 });
-
-                            using (var bulkCopy = new SqlBulkCopy(epmdata.GetClientReportingConnection))
-                            {
-                                bulkCopy.DestinationTableName =
-                                    "dbo.RPTWEBGROUPS";
-
-                                bulkCopy.WriteToServer(dt);
-                            }
-                            epmdata.LogStatus("", "", "Reporting Refresh POPULATE RPTWEBGROUPS", string.Format("Completed bulk insert dbo.RPTWEBGROUPS"), 2, 3, "");
-                        }
-                        catch (Exception e)
-                        {
-                            hasError = true;
-                            errMsg += e.Message;
-                            epmdata.LogStatus("", "", "Reporting Refresh POPULATE RPTWEBGROUPS", string.Format("Error while Bulk insert dbo.RPTWEBGROUPS Error : {0}", e.Message), 2, 3, "");
-                        }
-
-                        #endregion
-
-                        #region GATHER VALID LISTS
-
-                        // IGNORE SPDispose 130, Web is being disposed
-                        try
-                        {
-                            if (listNames.Rows.Count > 0)
-                            {
-                                string sName = string.Empty;
-
-                                foreach (DataRow row in listNames.Rows)
-                                {
-                                    try
-                                    {
-                                        sName = row["ListName"].ToString();
-                                    }
-                                    catch { }
-
-                                    if (!string.IsNullOrEmpty(sName))
-                                    {
-                                        SPList tempList = w.Lists.TryGetList(sName);
-                                        if (tempList != null)
-                                        {
-                                            var gSettings = new GridGanttSettings(tempList);
-                                            DataRow dr = listIds.Rows.Add();
-                                            dr["Id"] = tempList.ID;
-                                            dr["ListIcon"] = gSettings.ListIcon;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        catch (Exception e1)
-                        {
-                            hasError = true;
-                            errMsg += e1.Message;
-                        }
-
-                        #endregion
-
-                        if (w != null)
-                        {
-                            w.Dispose();
-                        }
-                    }
-
-                    #region BULK INSERT ReportListIds TABLE
-                    if (listIds.Rows.Count > 0)
-                    {
-                        epmdata.LogStatus("", "", "Reporting Refresh BULK INSERT ReportListIds TABLE", string.Format("BULK INSERT ReportListIds TABLE"), 2, 3, "");
-                        SqlTransaction tx = epmdata.GetClientReportingConnection.BeginTransaction();
-                        using (
-                            var sbc = new SqlBulkCopy(epmdata.GetClientReportingConnection, new SqlBulkCopyOptions(),
-                                tx))
-                        {
-                            try
-                            {
-                                sbc.DestinationTableName = "ReportListIds";
-                                sbc.ColumnMappings.Add("Id", "Id");
-                                sbc.ColumnMappings.Add("ListIcon", "ListIcon");
-                                sbc.WriteToServer(listIds);
-                                sbc.Close();
-                                tx.Commit();
-                                tx.Dispose();
-                            }
-                            catch (Exception e2)
-                            {
-                                hasError = true;
-                                errMsg += e2.Message;
-                                epmdata.LogStatus("", "", "Reporting Refresh BULK INSERT ReportListIds TABLE", string.Format("Error while bulk insert into ReportListIds. error {0}", e2.Message), 2, 3, "");
-                            }
-                        }
-                    }
-
-                    #endregion
-
-                    #region BULK INSERT RPTWeb and epmlive.Webs TABLE
-
-                    if (rptWeb.Rows.Count > 0)
-                    {
-                        epmdata.LogStatus("", "", "Reporting Refresh  BULK INSERT RPTWeb and epmlive.Webs TABLE", string.Format("Started BULK INSERT RPTWeb and epmlive.Webs TABLE"), 2, 3, "");
-                        SqlTransaction tx = epmdata.GetClientReportingConnection.BeginTransaction();
-                        using (
-                            var sbc = new SqlBulkCopy(epmdata.GetClientReportingConnection, new SqlBulkCopyOptions(),
-                                tx))
-                        {
-                            try
-                            {
-                                sbc.DestinationTableName = "RPTWeb";
-                                sbc.ColumnMappings.Add("SiteId", "SiteId");
-                                sbc.ColumnMappings.Add("ItemWebId", "ItemWebId");
-                                sbc.ColumnMappings.Add("ItemListId", "ItemListId");
-                                sbc.ColumnMappings.Add("ItemId", "ItemId");
-                                sbc.ColumnMappings.Add("ParentWebId", "ParentWebId");
-                                sbc.ColumnMappings.Add("WebId", "WebId");
-                                sbc.ColumnMappings.Add("WebUrl", "WebUrl");
-                                sbc.ColumnMappings.Add("WebTitle", "WebTitle");
-                                sbc.ColumnMappings.Add("WebDescription", "WebDescription");
-                                sbc.ColumnMappings.Add("WebOwnerId", "WebOwnerId");
-                                sbc.WriteToServer(rptWeb);
-                                sbc.Close();
-                                tx.Commit();
-                                tx.Dispose();
-                                epmdata.LogStatus("", "", "Reporting Refresh  BULK INSERT RPTWeb and epmlive.Webs TABLE", string.Format("Completed BULK INSERT RPTWeb and epmlive.Webs TABLE"), 2, 3, "");
-                            }
-                            catch (Exception e3)
-                            {
-                                hasError = true;
-                                errMsg += e3.Message;
-                                epmdata.LogStatus("", "", "Reporting Refresh  BULK INSERT RPTWeb and epmlive.Webs TABLE", string.Format("Error while  BULK INSERT RPTWeb and epmlive.Webs TABLE. error {0}", e3.Message), 2, 3, "");
-                            }
-                        }
-                    }
-
-                    #endregion
-                }
-
-                #region CLEAN LST TABLES - DELETE ENTRIES WITH NONEXISTENT LISTIDS
-                epmdata.LogStatus("", "", "Reporting Refresh  CLEAN LST TABLES - DELETE ENTRIES WITH NONEXISTENT LISTIDS", string.Format("SELECT [Id] FROM ReportListIds"), 2, 3, "");
-                cmd = new SqlCommand("SELECT [Id] FROM ReportListIds");
-
-                cmd.Connection = epmdata.GetClientReportingConnection;
-                var ad = new SqlDataAdapter();
-                ad.SelectCommand = cmd;
-                ad.Fill(listIdsTest);
-
-                if (listIdsTest.Rows.Count == 0)
-                {
-                    epmdata.LogStatus("",
-                        "Data cleaning in Refresh process.",
-                        "Cleaning has been cancelled.",
-                        "No ids in ReportListIds table.",
-                        0, 1, "");
-                    //no report ids found, 
-                    //something might be wrong so we cancel
-                    return;
-                }
-
-                foreach (DataRow r in listNames.Rows)
-                {
-                    string tableName = string.Empty;
-                    try
-                    {
-                        tableName = r["TableName"].ToString();
-                    }
-                    catch { }
-
-                    if (!string.IsNullOrEmpty(tableName))
-                    {
-                        sDelSql += "DELETE FROM [" + tableName +
-                                   "] WHERE [ListID] NOT IN (SELECT Id FROM ReportListIds) ";
+                        dataTable.Rows.Add(Guid.NewGuid(), spSite.ID, spWeb.ID, spRoleAssignment.Member.ID, type);
                     }
                 }
 
-                if (!string.IsNullOrEmpty(sDelSql) && !hasError)
+                dataTable.Rows.Add(Guid.NewGuid(), spSite.ID, spWeb.ID, 999999, 1);
+
+                using (var bulkCopy = new SqlBulkCopy(epmData.GetClientReportingConnection))
                 {
-                    try
-                    {
-                        cmd = new SqlCommand(sDelSql);
-                        cmd.Connection = epmdata.GetClientReportingConnection;
-                        cmd.ExecuteNonQuery();
-                        epmdata.LogStatus("",
-                            "Data cleaning in Refresh process.",
-                            "Success.",
-                            "Success.",
-                            0, 1, "");
-                    }
-                    catch (Exception e)
-                    {
-                        epmdata.LogStatus("",
-                            "Data cleaning in Refresh process.",
-                            "Error cleaning lst tables. Error: " + e.Message,
-                            errMsg,
-                            0, 1, "");
-                    }
-                }
-                else
-                {
-                    epmdata.LogStatus("",
-                        "Data cleaning in Refresh process.",
-                        "Cleaning has been cancelled.",
-                        "Error: " + errMsg,
-                        0, 1, "");
+                    bulkCopy.DestinationTableName = DboRptWebGroups;
+                    bulkCopy.WriteToServer(dataTable);
                 }
 
-                #endregion
+                LogStatusLevel2Type3(PopulateRptWebGroupsId, CompleteBulkInsertRptWebGroups, epmData);
+            }
+            catch (Exception exception)
+            {
+                hasError = true;
+                errMsg.Append(exception.Message);
+                LogStatusLevel2Type3(PopulateRptWebGroupsId, $"Error while Bulk insert dbo.RPTWEBGROUPS Error : {exception.Message}", epmData);
+                Trace.WriteLine(exception);
+            }
 
-                #region  GET VALID FRF - Recent items
+            return hasError;
+        }
 
-                var recent = new DataTable();
-                try
+        private static bool GatherValidLists(DataTable listNames, SPWeb spWeb, DataTable listIds, bool hasError, StringBuilder errMsg)
+        {
+            Guard.ArgumentIsNotNull(listNames, nameof(listNames));
+            Guard.ArgumentIsNotNull(spWeb, nameof(spWeb));
+            Guard.ArgumentIsNotNull(listIds, nameof(listIds));
+            Guard.ArgumentIsNotNull(errMsg, nameof(errMsg));
+
+            try
+            {
+                if (listNames.Rows.Count > 0)
                 {
-                    cmd = new SqlCommand("SELECT * FROM FRF WHERE [Type]=2");
-                    cmd.Connection = epmdata.GetEPMLiveConnection;
-                    adapter.SelectCommand = cmd;
-                    adapter.Fill(recent);
-                }
-                catch (Exception e)
-                {
-                    epmdata.LogStatus("",
-                        "Data cleaning in Refresh process.",
-                        "Error cleaning lst tables. Error: " + e.Message,
-                        errMsg,
-                        0, 1, "");
-                }
+                    var listName = string.Empty;
 
-                List<string> lsListIds = (from id in listIdsTest.AsEnumerable() select id["Id"].ToString()).ToList();
-                List<string> lsWebIds =
-                    (from webid in rptWebTest.AsEnumerable() select webid["WebId"].ToString()).ToList();
-
-                List<DataRow> results = (from r in recent.AsEnumerable()
-                                         where lsListIds.Contains(r["LIST_ID"].ToString()) && lsWebIds.Contains(r["WEB_ID"].ToString())
-                                         select r).ToList<DataRow>();
-
-                var finalRecent = new DataTable();
-
-                foreach (DataRow row in results)
-                {
-                    finalRecent.Rows.Add(row);
-                }
-
-                #endregion
-
-                #region BULK INSERT FRF - Recent items
-
-                if (finalRecent.Rows.Count > 0)
-                {
-                    epmdata.LogStatus("", "", "Reporting Refresh  BULK INSERT FRF - Recent items", string.Format("Started BULK INSERT FRF - Recent items"), 2, 3, "");
-                    SqlTransaction tx = epmdata.GetEPMLiveConnection.BeginTransaction();
-                    using (var sbc = new SqlBulkCopy(epmdata.GetEPMLiveConnection, new SqlBulkCopyOptions(), tx))
+                    foreach (DataRow dataRow in listNames.Rows)
                     {
                         try
                         {
-                            sbc.DestinationTableName = "FRF";
-                            sbc.ColumnMappings.Add("FRF_ID", "FRF_ID");
-                            sbc.ColumnMappings.Add("SITE_ID", "SITE_ID");
-                            sbc.ColumnMappings.Add("WEB_ID", "WEB_ID");
-                            sbc.ColumnMappings.Add("LIST_ID", "LIST_ID");
-                            sbc.ColumnMappings.Add("ITEM_ID", "ITEM_ID");
-                            sbc.ColumnMappings.Add("USER_ID", "USER_ID");
-                            sbc.ColumnMappings.Add("Title", "Title");
-                            sbc.ColumnMappings.Add("Icon", "Icon");
-                            sbc.ColumnMappings.Add("Type", "Type");
-                            sbc.ColumnMappings.Add("F_String", "F_String");
-                            sbc.ColumnMappings.Add("F_Date", "F_Date");
-                            sbc.ColumnMappings.Add("F_Int", "F_Int");
-                            sbc.WriteToServer(rptWeb);
-                            sbc.Close();
-                            tx.Commit();
-                            tx.Dispose();
-                            epmdata.LogStatus("", "", "Reporting Refresh  BULK INSERT FRF - Recent items", string.Format("Completed BULK INSERT FRF - Recent items"), 2, 3, "");
+                            listName = dataRow[ListName].ToString();
                         }
-                        catch (Exception e3)
+                        catch (Exception exception)
                         {
-                            epmdata.LogStatus("",
-                                "Data cleaning in Refresh process.",
-                                "Error cleaning lst tables. Error: " + e3.Message,
-                                errMsg,
-                                0, 1, "");
+                            Trace.WriteLine(exception);
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(listName))
+                        {
+                            var tempList = spWeb.Lists.TryGetList(listName);
+
+                            if (tempList != null)
+                            {
+                                var gSettings = new GridGanttSettings(tempList);
+                                var tempDataRow = listIds.Rows.Add();
+                                tempDataRow[Id] = tempList.ID;
+                                tempDataRow[ListIcon] = gSettings.ListIcon;
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception exception)
+            {
+                hasError = true;
+                errMsg.Append(exception.Message);
+                Trace.WriteLine(exception);
+            }
 
-                #endregion
-            });
+            return hasError;
+        }
 
-            #endregion
+        private static void GatherWebInfo(SPWeb spWeb, DataTable rptWeb, SPSite spSite)
+        {
+            Guard.ArgumentIsNotNull(spWeb, nameof(spWeb));
+            Guard.ArgumentIsNotNull(rptWeb, nameof(rptWeb));
+            Guard.ArgumentIsNotNull(spSite, nameof(spSite));
+
+            var parentItem = string.Empty;
+
+            try
+            {
+                parentItem = spWeb.AllProperties[ParentItem].ToString();
+            }
+            catch (Exception exception)
+            {
+                Trace.WriteLine(exception);
+            }
+
+            var dataRow = rptWeb.Rows.Add();
+
+            if (!string.IsNullOrWhiteSpace(parentItem))
+            {
+                var parentItemTokens = parentItem.Split(new[] {"^^"}, StringSplitOptions.RemoveEmptyEntries);
+                var itemWebId = parentItemTokens[0];
+                var itemListId = parentItemTokens[1];
+                var itemId = parentItemTokens[2];
+
+                dataRow[SiteId] = spSite.ID;
+                dataRow[ItemWebId] = !string.IsNullOrWhiteSpace(itemWebId)
+                    ? new Guid(itemWebId)
+                    : Guid.Empty;
+                dataRow[ItemListId] = !string.IsNullOrWhiteSpace(itemListId)
+                    ? new Guid(itemListId)
+                    : Guid.Empty;
+                dataRow[ItemId] = !string.IsNullOrWhiteSpace(itemId)
+                    ? int.Parse(itemId)
+                    : -1;
+                dataRow[ParentWebId] = spWeb.ParentWeb?.ID ?? Guid.Empty;
+                dataRow[WebId] = spWeb.ID;
+                dataRow[WebUrl] = spWeb.ServerRelativeUrl;
+                dataRow[WebTitle] = spWeb.Title;
+            }
+            else
+            {
+                dataRow[SiteId] = spSite.ID;
+                dataRow[ItemWebId] = Guid.Empty;
+                dataRow[ItemListId] = Guid.Empty;
+                dataRow[ItemId] = -1;
+                dataRow[ParentWebId] = spWeb.ParentWeb?.ID ?? Guid.Empty;
+                dataRow[WebId] = spWeb.ID;
+                dataRow[WebUrl] = spWeb.ServerRelativeUrl;
+                dataRow[WebTitle] = spWeb.Title;
+            }
+
+            dataRow[WebDescription] = spWeb.Description;
+
+            try
+            {
+                dataRow[WebOwnerId] = spWeb.Author.ID == OwnerId
+                    ? 1
+                    : (object)spWeb.Author.ID;
+            }
+            catch
+            {
+                dataRow[WebOwnerId] = 1;
+            }
+        }
+
+        private static DataTable GetValidFrfRecentItems(EPMData epmData, StringBuilder errMsg, DataTable listIdsTest, DataTable rptWebTest)
+        {
+            Guard.ArgumentIsNotNull(epmData, nameof(epmData));
+            Guard.ArgumentIsNotNull(errMsg, nameof(errMsg));
+            Guard.ArgumentIsNotNull(listIdsTest, nameof(listIdsTest));
+            Guard.ArgumentIsNotNull(rptWebTest, nameof(rptWebTest));
+
+            var recent = new DataTable();
+
+            try
+            {
+                using (var cmd = new SqlCommand(SelectFrfType2, epmData.GetEPMLiveConnection))
+                {
+                    using (var adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(recent);
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                LogStatusDataCleaning($"Error cleaning lst tables. Error: {exception.Message}", errMsg.ToString(), epmData);
+                Trace.WriteLine(exception);
+            }
+
+            var lsListIds = (from id in listIdsTest.AsEnumerable()
+                select id[Id].ToString()).ToList();
+            var lsWebIds = (from webid in rptWebTest.AsEnumerable()
+                select webid[WebId].ToString()).ToList();
+
+            var results = (from dataRow in recent.AsEnumerable()
+                where lsListIds.Contains(dataRow[ListId].ToString()) && lsWebIds.Contains(dataRow[WebId1].ToString())
+                select dataRow).ToList();
+
+            var finalRecent = new DataTable();
+
+            foreach (var row in results)
+            {
+                finalRecent.Rows.Add(row);
+            }
+
+            return finalRecent;
         }
     }
 }
