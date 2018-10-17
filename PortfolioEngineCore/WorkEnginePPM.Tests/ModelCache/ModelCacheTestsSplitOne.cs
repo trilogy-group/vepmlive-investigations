@@ -5,8 +5,6 @@ using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ModelDataCache;
@@ -14,7 +12,7 @@ using ModelDataCache.Fakes;
 using PortfolioEngineCore.Fakes;
 using Shouldly;
 
-namespace WorkEnginePPM.Tests.ModelCache
+namespace WorkEnginePPM.Tests.ModelCacheTests
 {
     [TestClass]
     [ExcludeFromCodeCoverage]
