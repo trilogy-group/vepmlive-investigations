@@ -54,6 +54,33 @@ namespace EPMLiveCore.Tests.API.MyWork
                       Filters=""Filters"" Grouping=""Grouping""
                       Sorting=""Sorting"" HasPermission=""True""></View>
               </MyWork>";
+        private const string GetSettingsXml = @"
+            <MyWork>
+                <View ID=""ID"" Name=""Name"" Default=""True""
+                      Personal=""True"" LeftCols=""LeftCols""
+                      Cols=""Cols"" RightCols=""RightCols""
+                      Filters=""Filters"" Grouping=""Grouping""
+                      Sorting=""Sorting"" HasPermission=""True""></View>
+                <Lists>
+                    Lists1,Lists2
+                </Lists>
+                <MyWorkLists>
+                    MyWorkLists1,MyWorkLists2
+                </MyWorkLists>
+                <Fields>
+                    Fields1,Fields2
+                </Fields>
+                <CrossSiteUrls>
+                    CrossSiteUrls1,CrossSiteUrls2
+                </CrossSiteUrls>
+                <PerformanceMode>on</PerformanceMode>
+              </MyWork>";
+        private const string GetSettings = "GetSettings";
+        private const string GeneralSettingsCrossSiteUrls = "EPMLive_MyWork_GeneralSettings_CrossSiteUrls";
+        private const string GeneralSettingsPerformanceMode = "EPMLive_MyWork_GeneralSettings_PerformanceMode";
+        private const string GeneralSettingsSelectedFields = "EPMLive_MyWork_GeneralSettings_SelectedFields";
+        private const string GeneralSettingsSelectedLists = "EPMLive_MyWork_GeneralSettings_SelectedLists";
+        private const string GeneralSettingsSelectedMyWorkLists = "EPMLive_MyWork_GeneralSettings_SelectedMyWorkLists";
 
         private void SetupShimsSplitTwo()
         {
@@ -560,7 +587,7 @@ namespace EPMLiveCore.Tests.API.MyWork
 
             ShimMyWork.GetListNameFromDbGuidGuidSPWeb = (_, _1, _2) => expectedUniqueIdValue;
             ShimMyWork.GetWorkspaceNameFromDbGuidString = (_, _1) => expectedUniqueIdValue;
-            ShimMyWork.GetTypeAndFormatDictionaryOfStringSPFieldStringStringOutStringOut = (Dictionary<string, SPField> fieldTypesParam, string selectedFieldParam, out string type, out string format) =>
+            ShimMyWork.GetTypeAndFormatIDictionaryOfStringSPFieldStringStringOutStringOut = (IDictionary<string, SPField> fieldTypesParam, string selectedFieldParam, out string type, out string format) =>
             {
                 type = expectedType;
                 format = expectedFormat;
@@ -1001,7 +1028,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             ShimMyWork.GetArchivedWebsGuid = _ => archivedWebs;
             ShimMyWork.GetQueryString = _ => string.Empty;
             ShimMyWork.ShouldUseReportingDbSPWeb = _ => false;
-            ShimMyWork.GetDataFromSpListOfStringSPSiteDataQuerySPWebSPSite =
+            ShimMyWork.GetDataFromSpIListOfStringSPSiteDataQuerySPWebSPSite  =
                 (_, _1, _2, _3) => new List<DataTable>()
                 {
                     new DataTable()
@@ -1034,6 +1061,76 @@ namespace EPMLiveCore.Tests.API.MyWork
             actual.ShouldSatisfyAllConditions(
                 () => actual.Element("MyWork").Element("Params").Element("ProcessFlag").Value.ToLower().ShouldBe("true"),
                 () => methodEntered.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void GetSettings_ElementsAvailable_UpdatesSettings()
+        {
+            // Arrange
+            GetMyWorkParams.SelectedLists.Clear();
+            GetMyWorkParams.SelectedFields.Clear();
+            GetMyWorkParams.SiteUrls.Clear();
+            GetMyWorkParams.PerformanceMode = false;
+
+            // Act
+            privateObj.Invoke(GetSettings, BindingFlags.Static | BindingFlags.NonPublic, GetSettingsXml);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => GetMyWorkParams.SelectedLists.Count.ShouldBe(4),
+                () => GetMyWorkParams.SelectedFields.Count.ShouldBe(14),
+                () => GetMyWorkParams.SiteUrls.Count.ShouldBe(2),
+                () => GetMyWorkParams.PerformanceMode.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void GetSettings_ElementsNotAvailable_UsesConfigSettings()
+        {
+            // Arrange
+            GetMyWorkParams.SelectedLists.Clear();
+            GetMyWorkParams.SelectedFields.Clear();
+            GetMyWorkParams.SiteUrls.Clear();
+            GetMyWorkParams.PerformanceMode = false;
+            var configSettingsInvokeCount = 0;
+
+            ShimCoreFunctions.getConfigSettingSPWebString = (web, settingName) =>
+            {
+                configSettingsInvokeCount++;
+
+                if (settingName.Equals(GeneralSettingsSelectedLists))
+                {
+                    return "Lists1, Lists2";
+                }
+                else if (settingName.Equals(GeneralSettingsSelectedFields))
+                {
+                    return "Fields1, Fields2";
+                }
+                else if (settingName.Equals(GeneralSettingsCrossSiteUrls))
+                {
+                    return "CrossSiteUrls1|CrossSiteUrls2";
+                }
+                else if (settingName.Equals(GeneralSettingsPerformanceMode))
+                {
+                    return "on";
+                }
+                else if (settingName.Equals(GeneralSettingsSelectedMyWorkLists))
+                {
+                    return "MyWorkLists1,MyWorkLists2";
+                }
+
+                return string.Empty;
+            };
+
+            // Act
+            privateObj.Invoke(GetSettings, BindingFlags.Static | BindingFlags.NonPublic, MyWorkGridViewXml);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => GetMyWorkParams.SelectedLists.Count.ShouldBe(4),
+                () => GetMyWorkParams.SelectedFields.Count.ShouldBe(14),
+                () => GetMyWorkParams.SiteUrls.Count.ShouldBe(2),
+                () => GetMyWorkParams.PerformanceMode.ShouldBeTrue(),
+                () => configSettingsInvokeCount.ShouldBe(5));
         }
     }
 }
