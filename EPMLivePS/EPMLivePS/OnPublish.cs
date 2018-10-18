@@ -40,16 +40,16 @@ namespace EPMLiveEnterprise
             }
             else
             {
-                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(mySite.WebApplication.Id));
-
-                using (var command = new SqlCommand("update publishercheck set webguid=@webguid,logtext=@logtext, checkbit=0,status=@status,percentcomplete=0,laststatusdate=getdate() where projectguid=@projectguid", cn))
+                using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(mySite.WebApplication.Id)))
                 {
-                    command.Parameters.AddWithValue("@projectguid", e.ProjectGuid);
-                    command.Parameters.AddWithValue("@webguid", mySite.OpenWeb().ID);
-                    command.Parameters.AddWithValue("@status", 3);
-                    command.Parameters.AddWithValue("@logtext", $"Activation Error: {act.translateStatus(iAct)}");
+                    using (var command = new SqlCommand("update publishercheck set webguid=@webguid,logtext=@logtext, checkbit=0,status=@status,percentcomplete=0,laststatusdate=getdate() where projectguid=@projectguid", connection))
+                    {
+                        command.Parameters.AddWithValue("@projectguid", e.ProjectGuid);
+                        command.Parameters.AddWithValue("@webguid", mySite.OpenWeb().ID);
+                        command.Parameters.AddWithValue("@status", 3);
+                        command.Parameters.AddWithValue("@logtext", $"Activation Error: {act.translateStatus(iAct)}");
+                    }
                 }
-                cn.Close();
             }
         }
 
