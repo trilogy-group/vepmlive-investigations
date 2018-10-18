@@ -71,14 +71,14 @@ namespace EPMLiveWebParts
                 return;
             }
 
-            foreach (WebPart wp in WebPartManager.WebParts)
+            foreach (WebPart webPart in WebPartManager.WebParts)
             {
                 try
                 {
-                    if (wp.ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" ||
-                        wp.ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart")
+                    if (webPart.ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" ||
+                        webPart.ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart")
                     {
-                        wp.Visible = false;
+                        webPart.Visible = false;
                     }
                 }
                 catch (Exception exception)

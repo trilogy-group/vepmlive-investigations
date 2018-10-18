@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using EPMLiveCore;
+using EPMLiveCore.Helpers;
 using EPMLiveWebParts.Properties;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
@@ -29,15 +30,15 @@ namespace EPMLiveWebParts
                 arrListRes.AddRange(arrRes);
                 var resourceBuilder = new StringBuilder();
 
-                foreach (SPListItem li in reslist.Items)
+                foreach (SPListItem spListItem in reslist.Items)
                 {
-                    if (arrListRes.Contains(li.ID.ToString()))
+                    if (arrListRes.Contains(spListItem.ID.ToString()))
                     {
                         try
                         {
-                            if (li["SharePointAccount"] != null)
+                            if (spListItem["SharePointAccount"] != null)
                             {
-                                var fieldUserValue = new SPFieldUserValue(li.Web, li["SharePointAccount"].ToString());
+                                var fieldUserValue = new SPFieldUserValue(spListItem.Web, spListItem["SharePointAccount"].ToString());
                                 resourceBuilder.Append($";#{HttpUtility.UrlEncode(fieldUserValue.LookupValue)}");
                             }
                         }
@@ -67,6 +68,11 @@ namespace EPMLiveWebParts
 
         public void processControls(Control parentControl, string ZoneIndex, string viewUrl, SPWeb curWeb)
         {
+            Guard.ArgumentIsNotNull(curWeb, nameof(curWeb));
+            Guard.ArgumentIsNotNull(viewUrl, nameof(viewUrl));
+            Guard.ArgumentIsNotNull(ZoneIndex, nameof(ZoneIndex));
+            Guard.ArgumentIsNotNull(parentControl, nameof(parentControl));
+
             foreach (Control childControl in parentControl.Controls)
             {
                 if (childControl.ToString() == "System.Web.UI.WebControls.HyperLink")
@@ -187,11 +193,12 @@ namespace EPMLiveWebParts
 
         private void renderGrid(HtmlTextWriter output)
         {
+            Guard.ArgumentIsNotNull(output, nameof(output));
+
             AppendCssLibraries(output);
             AppendJsLibraries(output);
 
             output.Write($"<div id=\"grid{ID}\" style=\"width:100%;display:none;\" ></div>\r\n\r\n");
-
             output.Write($"<div  width=\"100%\" id=\"loadinggrid{ID}\" align=\"center\">");
             output.Write("<img src=\"/_layouts/images/GEARS_ANv4.GIF\" style=\"vertical-align: middle;\"/> Loading Resources...");
             output.Write("</div>");
@@ -254,6 +261,8 @@ namespace EPMLiveWebParts
 
         private void AppendFilteringScripts(HtmlTextWriter output)
         {
+            Guard.ArgumentIsNotNull(output, nameof(output));
+
             var zoneIdentifier = string.Concat(ZoneIndex, ZoneID);
             var requestUrl = HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString());
 
@@ -297,6 +306,8 @@ namespace EPMLiveWebParts
 
         private void AppendJsLibraries(HtmlTextWriter output)
         {
+            Guard.ArgumentIsNotNull(output, nameof(output));
+
             output.Write("<script>_css_prefix=\"/_layouts/epmlive/DHTML/xgrid/\"; _js_prefix=\"/_layouts/epmlive/DHTML/xgrid/\"; </script>");
             output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/dhtmlxcommon.js\"></script>");
             output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/dhtmlxgrid.js\"></script>");
@@ -317,6 +328,8 @@ namespace EPMLiveWebParts
 
         private void AppendCssLibraries(HtmlTextWriter output)
         {
+            Guard.ArgumentIsNotNull(output, nameof(output));
+
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid.css\"/>");
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid_skins.css\"/>");
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/calendar/dhtmlxcalendar.css\"/>");

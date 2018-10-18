@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -25,7 +23,7 @@ namespace EPMLiveWebParts
     {
         private void AddContextualTab()
         {
-            var web = SPContext.Current.Web;
+            var currentWeb = SPContext.Current.Web;
             var ribbon = SPRibbon.GetCurrent(Page);
 
             if (ribbon != null)
@@ -40,7 +38,7 @@ namespace EPMLiveWebParts
                 }
             }
 
-            var language = web.Language.ToString();
+            var language = currentWeb.Language.ToString();
 
             Ribbon ribbon1 = SPRibbon.GetCurrent(Page);
 
@@ -238,14 +236,14 @@ namespace EPMLiveWebParts
                                 resview = reslist.DefaultView;
                                 var viewListBuilder = new StringBuilder();
 
-                                foreach (SPView vw in resview.Views)
+                                foreach (SPView spView in resview.Views)
                                 {
-                                    if (!vw.Hidden)
+                                    if (!spView.Hidden)
                                     {
                                         viewListBuilder.Append(
-                                            vw.DefaultView
-                                                ? $"<option selected value=\"{vw.Title.Replace(" ", "%20")}\">{vw.Title}</option>"
-                                                : $"<option value=\"{vw.Title.Replace(" ", "%20")}\">{vw.Title}</option>");
+                                            spView.DefaultView
+                                                ? $"<option selected value=\"{spView.Title.Replace(" ", "%20")}\">{spView.Title}</option>"
+                                                : $"<option value=\"{spView.Title.Replace(" ", "%20")}\">{spView.Title}</option>");
                                     }
                                 }
 
