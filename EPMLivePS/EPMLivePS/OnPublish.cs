@@ -16,7 +16,7 @@ namespace EPMLiveEnterprise
             myLog.MaximumKilobytes = 32768;
 
             SPSite mySite = new SPSite(contextInfo.SiteGuid);
-
+            
             EPMLiveCore.Act act = new EPMLiveCore.Act(mySite.RootWeb);
             int iAct = act.CheckFeatureLicense(EPMLiveCore.ActFeature.ProjectServer);
             if(iAct == 0)
@@ -42,12 +42,13 @@ namespace EPMLiveEnterprise
             {
                 SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(mySite.WebApplication.Id));
 
-                SqlCommand cmd = new SqlCommand("update publishercheck set webguid=@webguid,logtext=@logtext, checkbit=0,status=@status,percentcomplete=0,laststatusdate=getdate() where projectguid=@projectguid", cn);
-                cmd.Parameters.AddWithValue("@projectguid", e.ProjectGuid);
-                cmd.Parameters.AddWithValue("@webguid", mySite.OpenWeb().ID);
-                cmd.Parameters.AddWithValue("@status", 3);
-                cmd.Parameters.AddWithValue("@logtext", "Activation Error: " + act.translateStatus(iAct));
-
+                using (var command = new SqlCommand("update publishercheck set webguid=@webguid,logtext=@logtext, checkbit=0,status=@status,percentcomplete=0,laststatusdate=getdate() where projectguid=@projectguid", cn))
+                {
+                    command.Parameters.AddWithValue("@projectguid", e.ProjectGuid);
+                    command.Parameters.AddWithValue("@webguid", mySite.OpenWeb().ID);
+                    command.Parameters.AddWithValue("@status", 3);
+                    command.Parameters.AddWithValue("@logtext", $"Activation Error: {act.translateStatus(iAct)}");
+                }
                 cn.Close();
             }
         }
