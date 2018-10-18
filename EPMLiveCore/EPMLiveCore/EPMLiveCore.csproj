@@ -1377,6 +1377,8 @@
     <Compile Include="ReportHelper\MyWorkReportData.cs" />
     <Compile Include="ReportHelper\ReportBiz.cs" />
     <Compile Include="ReportHelper\ReportData.cs" />
+    <Compile Include="ReportHelper\ReportData.Fields.cs" />
+    <Compile Include="ReportHelper\ReportData.GetParam.cs" />
     <Compile Include="ReportHelper\ReportingScope.cs" />
     <Compile Include="ReportHelper\UpgradeReportingDBHelper.cs" />
     <Compile Include="ReportingData.cs" />
