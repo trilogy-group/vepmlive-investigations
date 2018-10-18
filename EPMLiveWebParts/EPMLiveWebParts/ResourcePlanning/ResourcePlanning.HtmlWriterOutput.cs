@@ -58,24 +58,25 @@ namespace EPMLiveWebParts
             }
 
             var data =
-                $"Lists/Resource Center/DispForm.aspx\n{SPContext.Current.ViewContext.View.Title}\nStartDate\nDueDate\nPercentComplete\n\n\nTrue\n\n\n{strRollupLists}\n{Page.Request["FilterField1"]}\n{Page.Request["FilterValue1"]}\n{strRollupSites}\n{resources}";
-            data += $"\n{gSettings.UsePopup}";
+                $"Lists/Resource Center/DispForm.aspx\n{SPContext.Current.ViewContext.View.Title}\nStartDate\nDueDate\nPercentComplete\n\n\nTrue\n\n\n{strRollupLists}\n{Page.Request["FilterField1"]}\n{Page.Request["FilterValue1"]}\n{strRollupSites}\n{resources}\n{gSettings.UsePopup}";
 
             var toEncodeAsBytes = Encoding.ASCII.GetBytes(data);
 
             return Convert.ToBase64String(toEncodeAsBytes);
         }
 
-        public void processControls(Control parentControl, string ZoneIndex, string viewUrl, SPWeb curWeb)
+        public void processControls(Control parentControl, string zoneIndex, string viewUrl, SPWeb curWeb)
         {
             Guard.ArgumentIsNotNull(curWeb, nameof(curWeb));
             Guard.ArgumentIsNotNull(viewUrl, nameof(viewUrl));
-            Guard.ArgumentIsNotNull(ZoneIndex, nameof(ZoneIndex));
+            Guard.ArgumentIsNotNull(zoneIndex, nameof(zoneIndex));
             Guard.ArgumentIsNotNull(parentControl, nameof(parentControl));
 
             foreach (Control childControl in parentControl.Controls)
             {
-                if (childControl.ToString() == "System.Web.UI.WebControls.HyperLink")
+                var childControlString = childControl.ToString();
+
+                if (childControlString == "System.Web.UI.WebControls.HyperLink")
                 {
                     if (childControl.ID == "hlGanttScrollTo")
                     {
@@ -84,7 +85,7 @@ namespace EPMLiveWebParts
                     }
                 }
 
-                if (childControl.ToString() == "System.Web.UI.WebControls.Label")
+                if (childControlString == "System.Web.UI.WebControls.Label")
                 {
                     if (childControl.ID == "lblFilter")
                     {
@@ -92,7 +93,7 @@ namespace EPMLiveWebParts
                         {
                             var lblFilterText = (Label)parentControl.FindControl("lblFilterText");
                             var lblLink = (Label)childControl;
-                            lblLink.Text = $"<a href=\"Javascript:switchFilter{ZoneIndex}(\'{lblFilterText.ClientID}\');\">";
+                            lblLink.Text = $"<a href=\"Javascript:switchFilter{zoneIndex}(\'{lblFilterText.ClientID}\');\">";
                         }
                         catch (Exception exception)
                         {
@@ -101,12 +102,12 @@ namespace EPMLiveWebParts
                     }
                 }
 
-                if (childControl.ToString().Equals("MICROSOFT.SHAREPOINT.WEBCONTROLS.NEWMENU", StringComparison.OrdinalIgnoreCase))
+                if (childControlString.Equals("MICROSOFT.SHAREPOINT.WEBCONTROLS.NEWMENU", StringComparison.OrdinalIgnoreCase))
                 {
                     childControl.Visible = false;
                 }
 
-                if (childControl.ToString().Equals("MICROSOFT.SHAREPOINT.WEBCONTROLS.ACTIONSMENU", StringComparison.OrdinalIgnoreCase))
+                if (childControlString.Equals("MICROSOFT.SHAREPOINT.WEBCONTROLS.ACTIONSMENU", StringComparison.OrdinalIgnoreCase))
                 {
                     var menu = (ActionsMenu)childControl;
 
@@ -187,7 +188,7 @@ namespace EPMLiveWebParts
                         $"printGantt{this.ZoneIndex}{ZoneID}()");
                 }
 
-                processControls(childControl, ZoneIndex, viewUrl, curWeb);
+                processControls(childControl, zoneIndex, viewUrl, curWeb);
             }
         }
 
