@@ -4,9 +4,6 @@ using System.Data;
 using System.Data.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortfolioEngineCore.Fakes;
@@ -28,16 +25,21 @@ namespace PortfolioEngineCore.Tests.Base
         {
             shimsContext = ShimsContext.Create();
             dbAccess = new ShimDBAccess();
-            ShimSqlDb.AllInstances.HandleExceptionStringStatusEnumExceptionBoolean =
-                (_, function, status, exception, log) => StatusEnum.rsRequestCannotBeCompleted;
-            ShimSqlDb.AllInstances.HandleStatusErrorSeverityEnumStringStatusEnumStringBoolean = 
-                (_, severity, function, enumStatus, text, log) => StatusEnum.rsRequestCannotBeCompleted;
+            SetupShims();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
             shimsContext?.Dispose();
+        }
+
+        private void SetupShims()
+        {
+            ShimSqlDb.AllInstances.HandleExceptionStringStatusEnumExceptionBoolean =
+                (_, function, status, exception, log) => StatusEnum.rsRequestCannotBeCompleted;
+            ShimSqlDb.AllInstances.HandleStatusErrorSeverityEnumStringStatusEnumStringBoolean =
+                (_, severity, function, enumStatus, text, log) => StatusEnum.rsRequestCannotBeCompleted;
         }
 
         [TestMethod]
@@ -499,7 +501,6 @@ namespace PortfolioEngineCore.Tests.Base
                 () => projectId.ShouldBe(0));
         }
 
-
         [TestMethod]
         public void GetPortfolioFieldsAndValues_OnSuccess_ShouldExecuteCorrectly()
         {
@@ -547,6 +548,79 @@ namespace PortfolioEngineCore.Tests.Base
                 () => projectId.ShouldNotBeNull());
         }
 
+        [TestMethod]
+        public void GetCostCategoryRoles_OnSuccess_ShouldExecuteCorrectly()
+        {
+            // Arrange
+            var count = 0;
+            var categoryRoles = new Dictionary<string, CStruct>();
+            categoryRoles = null;
+            var readerValues = new Dictionary<string, Func<object>>
+            {
+                ["BC_ROLE"] = () => 1,
+                ["BC_UID"] = () => count + 1,
+                ["BC_LEVEL"] = () => 6,
+                ["RoleName"] = () => string.Empty,
+                ["BC_NAME"] = () => DummyString,
+                ["CostCategoryUID"] = () => count + 2,
+                ["PeriodID"] = () => 2,
+                ["FTE"] = () => 1,
+            };
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () =>
+                {
+                    if (++count <= 2)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        count = 0;
+                        return false;
+                    }
+                },
+                ItemGetString = name =>
+                {
+                    Func<object> value;
+                    readerValues.TryGetValue(name, out value);
+                    return value();
+                }
+            };
+
+            // Act
+            var result = DBCommon.GetCostCategoryRoles(dbAccess, 1, 1, out categoryRoles, true);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsSuccess),
+                () => categoryRoles.ShouldNotBeNull(),
+                () => categoryRoles.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void GetCostCategoryRoles_OnException_ReturnsRequestCannotBeCompleted()
+        {
+            // Arrange
+            var categoryRoles = new Dictionary<string, CStruct>();
+            categoryRoles = null;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () =>
+                {
+                    throw new Exception();
+                }
+            };
+
+            // Act
+            var result = DBCommon.GetCostCategoryRoles(dbAccess, 1, 1, out categoryRoles, true);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsRequestCannotBeCompleted),
+                () => categoryRoles.ShouldNotBeNull(),
+                () => categoryRoles.ShouldBeEmpty());
+        }
 
         /// <summary>
         /// This is a fake method. All the parameters are required, even though not all of them are used
