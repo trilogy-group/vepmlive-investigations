@@ -250,6 +250,25 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
             }
         }
 
+        private bool _disposed = false;
+
+        public override void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            foreach (var message in _messages)
+            {
+                message.Dispose();
+            }
+
+            base.Dispose();
+
+            _disposed = true;
+        }
+
         #endregion Methods 
     }
 }
