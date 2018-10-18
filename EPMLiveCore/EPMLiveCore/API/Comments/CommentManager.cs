@@ -1,19 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using EPMLiveCore.Layouts.epmlive;
+using System.Web;
 using EPMLiveCore.SocialEngine;
 using EPMLiveCore.SocialEngine.Core;
 using Microsoft.SharePoint;
-using System.Net.Mail;
-using EPMLiveCore.Properties;
-using System.Collections;
-using System.Web;
-using Microsoft.SharePoint.Client;
-using Microsoft.SharePoint.Utilities;
-using Telerik.Web;
 
 namespace EPMLiveCore.API
 {
@@ -134,50 +127,7 @@ namespace EPMLiveCore.API
                             {
                                 EnsureMetaCols(originList);
 
-                                string sCommenters = originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] != null ? originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id].ToString() : string.Empty;
-                                foreach (string s in sCommenters.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                                {
-                                    if (!string.IsNullOrEmpty(s.Trim()))
-                                    {
-                                        laCommenters.Add(int.Parse(s));
-                                    }
-                                }
-                                // get user object 
-                                SPFieldUser author = (SPFieldUser)originListItem.Fields[SPBuiltInFieldId.Author];
-                                SPFieldUserValue userVal = (SPFieldUserValue)author.GetFieldValue(originListItem[SPBuiltInFieldId.Author].ToString());
-                                SPUser authorObj = userVal.User;
-
-                                // if user is not in commenters, and not creater or one of the assigned to users
-                                if (!laCommenters.Contains(originalUser.ID) &&
-                                    (authorObj != null && !originalUser.ID.Equals(authorObj.ID)) &&
-                                    !UserIsAssigned(originalUser.ID, originListItem))
-                                {
-                                    laCommenters.Add(originalUser.ID);
-                                    StringBuilder sbNewCommenters = new StringBuilder();
-                                    foreach (int id in laCommenters)
-                                    {
-                                        sbNewCommenters.Append(id.ToString() + ",");
-                                    }
-
-                                    sCommenters = sbNewCommenters.ToString();
-                                    sCommenters = sCommenters.Remove(sCommenters.LastIndexOf(','));
-
-                                    originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] = sCommenters;
-                                }
-
-                                // set commentersread to blank
-                                originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = string.Empty;
-                                // add current user to list
-                                originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = originalUser.ID.ToString();
-                                SetSocialEngineTransaction(originListItem);
-                                originListItem.SystemUpdate();
-                                List<int> emailSentIDs = new List<int>();
-                                // send email to author
-                                if (authorObj != null && originalUser.ID != authorObj.ID)
-                                {
-                                    emailSentIDs.Add(authorObj.ID);
-                                    SendEmailNotification(authorObj.ID, listId, itemId, comment, "created");
-                                }
+                                var emailSentIDs = GenerateEmailSentIds(originListItem, originList, laCommenters, originalUser, listId, itemId, comment);
 
                                 // send email to assigned to people
                                 try
@@ -276,6 +226,64 @@ namespace EPMLiveCore.API
             allLists.Add(list.ID.ToString());
 
             CoreFunctions.setConfigSetting(list.ParentWeb, "EPM_Commentable_Lists", string.Join(",", allLists.ToArray()));
+        }
+
+        private static List<int> GenerateEmailSentIds(
+            SPListItem originListItem,
+            SPList originList,
+            List<int> laCommenters,
+            SPUser originalUser,
+            string listId,
+            string itemId,
+            string comment)
+        {
+            var item = originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id];
+            var commenters = item != null ? item.ToString() : string.Empty;
+            foreach (var commenter in commenters.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (!string.IsNullOrEmpty(commenter.Trim()))
+                {
+                    laCommenters.Add(int.Parse(commenter));
+                }
+            }
+            // get user object 
+            var author = (SPFieldUser)originListItem.Fields[SPBuiltInFieldId.Author];
+            var userVal = (SPFieldUserValue)author.GetFieldValue(originListItem[SPBuiltInFieldId.Author].ToString());
+            var authorObj = userVal.User;
+
+            // if user is not in commenters, and not creater or one of the assigned to users
+            if (!laCommenters.Contains(originalUser.ID) &&
+                (authorObj != null && !originalUser.ID.Equals(authorObj.ID)) &&
+                !UserIsAssigned(originalUser.ID, originListItem))
+            {
+                laCommenters.Add(originalUser.ID);
+                var newCommenters = new StringBuilder();
+                foreach (var id in laCommenters)
+                {
+                    newCommenters.Append(id.ToString() + ",");
+                }
+
+                commenters = newCommenters.ToString();
+                commenters = commenters.Remove(commenters.LastIndexOf(','));
+
+                originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] = commenters;
+            }
+
+            // set commentersread to blank
+            originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = string.Empty;
+            // add current user to list
+            originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = originalUser.ID.ToString();
+            SetSocialEngineTransaction(originListItem);
+            originListItem.SystemUpdate();
+
+            var emailSentIds = new List<int>();
+            // send email to author
+            if (authorObj != null && originalUser.ID != authorObj.ID)
+            {
+                emailSentIds.Add(authorObj.ID);
+                SendEmailNotification(authorObj.ID, listId, itemId, comment, "created");
+            }
+            return emailSentIds;
         }
 
         private static void SyncToSocialStream(Guid id, string comment, Guid listId, int itemId, string itemTitle,
@@ -416,50 +424,7 @@ namespace EPMLiveCore.API
 
                             if (originListItem != null)
                             {
-                                string sCommenters = originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] != null ? originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id].ToString() : string.Empty;
-                                foreach (string s in sCommenters.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                                {
-                                    if (!string.IsNullOrEmpty(s.Trim()))
-                                    {
-                                        laCommenters.Add(int.Parse(s));
-                                    }
-                                }
-                                // get user object 
-                                SPFieldUser author = (SPFieldUser)originListItem.Fields[SPBuiltInFieldId.Author];
-                                SPFieldUserValue userVal = (SPFieldUserValue)author.GetFieldValue(originListItem[SPBuiltInFieldId.Author].ToString());
-                                SPUser authorObj = userVal.User;
-
-                                // if user is not in commenters, and not creater or one of the assigned to users
-                                if (!laCommenters.Contains(originalUser.ID) &&
-                                    (authorObj != null && !originalUser.ID.Equals(authorObj.ID)) &&
-                                    !UserIsAssigned(originalUser.ID, originListItem))
-                                {
-                                    laCommenters.Add(originalUser.ID);
-                                    StringBuilder sbNewCommenters = new StringBuilder();
-                                    foreach (int id in laCommenters)
-                                    {
-                                        sbNewCommenters.Append(id.ToString() + ",");
-                                    }
-
-                                    sCommenters = sbNewCommenters.ToString();
-                                    sCommenters = sCommenters.Remove(sCommenters.LastIndexOf(','));
-
-                                    originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] = sCommenters;
-                                }
-
-                                // set commentersread to blank
-                                originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = string.Empty;
-                                // add current user to list
-                                originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = originalUser.ID.ToString();
-                                SetSocialEngineTransaction(originListItem);
-                                originListItem.SystemUpdate();
-                                List<int> emailSentIDs = new List<int>();
-                                // send email to author
-                                if (authorObj != null && originalUser.ID != authorObj.ID)
-                                {
-                                    emailSentIDs.Add(authorObj.ID);
-                                    SendEmailNotification(authorObj.ID, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), comment, "created");
-                                }
+                                var emailSentIDs = GenerateEmailSentIds(originListItem, originList, laCommenters, originalUser, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), comment);
 
                                 // send email to assigned to people
                                 try
