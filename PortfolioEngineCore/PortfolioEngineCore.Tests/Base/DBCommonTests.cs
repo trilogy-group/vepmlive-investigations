@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortfolioEngineCore.Fakes;
@@ -12,6 +13,7 @@ using Shouldly;
 namespace PortfolioEngineCore.Tests.Base
 {
     [TestClass]
+    [ExcludeFromCodeCoverage]
     public class DBCommonTests
     {
         private IDisposable shimsContext;
