@@ -232,6 +232,7 @@
     <Compile Include="Layouts\epmlive\CommentsTests.cs" />
     <Compile Include="Layouts\epmlive\GenericQueryControlTests.cs" />
     <Compile Include="Layouts\epmlive\GridGanttSettingsTest.cs" />
+    <Compile Include="Layouts\epmlive\Integration\ManageTests.cs" />
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
     <Compile Include="Layouts\epmlive\SolutionStoreProxyTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsRemTests.cs" />
