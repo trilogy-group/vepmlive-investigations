@@ -1410,6 +1410,8 @@
     <Compile Include="SocialEngine\Core\SocialEngineException.cs" />
     <Compile Include="SocialEngine\Core\StreamManager.cs" />
     <Compile Include="SocialEngine\Core\ThreadManager.cs" />
+    <Compile Include="SocialEngine\Core\ThreadManager.Fields.cs" />
+    <Compile Include="SocialEngine\Core\ThreadManager.ProcessThreads.cs" />
     <Compile Include="SocialEngine\Core\Transaction.cs" />
     <Compile Include="SocialEngine\Core\TransactionManager.cs" />
     <Compile Include="SocialEngine\Core\Utilities.cs" />
