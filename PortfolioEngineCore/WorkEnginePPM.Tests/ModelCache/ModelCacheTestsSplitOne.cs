@@ -47,6 +47,8 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         private const string ReadPILevelDataMethodName = "ReadPILevelData";
         private const string ReadCostCustomFieldsAndDataMethodName = "ReadCostCustomFieldsAndData";
         private const string ReadBudgetBandsMethodName = "ReadBudgetBands";
+        private const string ReadModelTargetsMethodName = "ReadModelTargets";
+        private const string ReadRateTableMethodName = "ReadRateTable";
 
         [TestInitialize]
         public void Setup()
@@ -1131,6 +1133,109 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             validations.ShouldSatisfyAllConditions(
                 () => targetColours.Count.ShouldBe(3),
                 () => validations.ShouldBe(4));
+        }
+
+        [TestMethod]
+        public void ReadModelTargets_WhenCalled_PopulatesTargetAndAssignableCts()
+        {
+            // Arrange
+            var validations = 0;
+            var readHit = 0;
+            var readIntHit = 1;
+            var sqlConnection = new SqlConnection();
+            var now = DateTime.Now;
+
+            dataReader.ItemGetInt32 = input => input;
+            dataReader.Read = () =>
+            {
+                readHit += 1;
+                readIntHit += 1;
+                validations += 1;
+                if (readHit <= 3)
+                {
+                    return true;
+                }
+                else
+                {
+                    readHit = 0;
+                }
+                return false;
+            };
+
+            ShimSqlDb.ReadStringValueObject = _ => $"{DummyString}{readIntHit}";
+            ShimSqlDb.ReadDoubleValueObject = _ => readIntHit;
+            ShimSqlDb.ReadDecimalValueObject = _ => readIntHit;
+            ShimSqlDb.ReadIntValueObject = _ => readIntHit;
+            ShimSqlDb.ReadDateValueObject = _ => now;
+            ShimSqlDb.ReadBoolValueObject = _ => true;
+
+            // Act
+            privateObject.Invoke(
+                ReadModelTargetsMethodName,
+                nonPublicInstance,
+                new object[] { sqlConnection, DummyString });
+            var target = (List<DataItem>)privateObject.GetFieldOrProperty("m_Target", nonPublicInstance);
+            var assignableCts = (List<DataItem>)privateObject.GetFieldOrProperty("m_AssignableCTS", nonPublicInstance);
+
+            // Assert
+            validations.ShouldSatisfyAllConditions(
+                () => target.Count.ShouldBe(3),
+                () => assignableCts.Count.ShouldBe(3),
+                () => validations.ShouldBe(8));
+        }
+
+        [TestMethod]
+        public void ReadRateTable_WhenCalled_PopulatesRates()
+        {
+            // Arrange
+            var validations = 0;
+            var readHit = 0;
+            var readIntHit = 1;
+            var sqlConnection = new SqlConnection();
+            var now = DateTime.Now;
+            var periodData = new Dictionary<int, PeriodData>()
+            {
+                [DummyInt] = new PeriodData()
+                {
+                    StartDate = now.AddDays(1)
+                }
+            };
+
+            dataReader.ItemGetInt32 = input => input;
+            dataReader.Read = () =>
+            {
+                readHit += 1;
+                readIntHit += 1;
+                validations += 1;
+                if (readHit <= 3)
+                {
+                    return true;
+                }
+                else
+                {
+                    readHit = 0;
+                }
+                return false;
+            };
+
+            ShimSqlDb.ReadStringValueObject = _ => $"{DummyString}{readIntHit}";
+            ShimSqlDb.ReadDoubleValueObject = _ => readIntHit;
+            ShimSqlDb.ReadDecimalValueObject = _ => readIntHit;
+            ShimSqlDb.ReadIntValueObject = _ => readIntHit;
+            ShimSqlDb.ReadDateValueObject = _ => now;
+            ShimSqlDb.ReadBoolValueObject = _ => true;
+
+            privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, 10);
+            privateObject.SetFieldOrProperty("m_Periods", nonPublicInstance, periodData);
+
+            // Act
+            privateObject.Invoke(ReadRateTableMethodName, nonPublicInstance, new object[] { sqlConnection });
+            var rates = (Dictionary<int, RateTable>)privateObject.GetFieldOrProperty("m_Rates", nonPublicInstance);
+
+            // Assert
+            validations.ShouldSatisfyAllConditions(
+                () => rates.Count.ShouldBe(6),
+                () => validations.ShouldBe(12));
         }
     }
 }
