@@ -230,6 +230,7 @@
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePoolTests.cs" />
     <Compile Include="Layouts\epmlive\CreateNewWorkspaceTest.cs" />
     <Compile Include="Layouts\epmlive\CommentsTests.cs" />
+    <Compile Include="Layouts\epmlive\CustomEditNavTests.cs" />
     <Compile Include="Layouts\epmlive\GenericQueryControlTests.cs" />
     <Compile Include="Layouts\epmlive\GridGanttSettingsTest.cs" />
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
