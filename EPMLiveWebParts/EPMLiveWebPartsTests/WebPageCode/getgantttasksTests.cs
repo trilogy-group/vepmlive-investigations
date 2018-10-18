@@ -30,6 +30,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         private PrivateObject _getGanttTasksPrivate;
         private const string DummyString = "DummyString";
         private const string PageLoadMethodName = "Page_Load";
+        private const string IgnoreListId = "ignorelistid";
 
         [TestInitialize]
         public void Setup()
@@ -68,7 +69,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             {
                 ItemGetString = key =>
                 {
-                    if (key == "ignorelistid")
+                    if (key == IgnoreListId)
                     {
                         return "1";
                     }
