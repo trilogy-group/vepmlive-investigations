@@ -6,8 +6,12 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
-using EPMLiveCore.Layouts.epmlive;
+using EPMLiveCore.API;
+using static System.Diagnostics.Trace;
+using static EPMLiveCore.Layouts.epmlive.LayoutsHelper;
+using ListItem = System.Web.UI.WebControls.ListItem;
 
 namespace EPMLiveCore
 {
@@ -44,7 +48,7 @@ namespace EPMLiveCore
 
         protected void btnGrpPermAdd_OnClick(object sender, EventArgs e)
         {
-            LayoutsHelper.HandleGridPermanentAddClickEvent(
+            HandleGridPermanentAddClickEvent(
                 ViewState,
                 ref dtGroupsPermissions,
                 ddlGroups,
@@ -82,195 +86,168 @@ namespace EPMLiveCore
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            //if (Request["tp"] == "true")
-            //    tpIF.Visible = true;
-
             ddlPermissions.Attributes.Add("onchange", "javascript:showhideperms(this.value);");
-            if (!IsPostBack)
+
+            if (IsPostBack)
             {
-
-                SPWeb web = SPContext.Current.Web;
-                {
-
-                    web.Site.CatchAccessDeniedException = false;
-                    web.AllowUnsafeUpdates = true;
-
-                    SPRoleDefinitionCollection oRoleDefinitions = web.Site.RootWeb.RoleDefinitions;
-
-                    foreach (SPRoleDefinition oRoleDefinition in oRoleDefinitions)
-                    {
-                        ddlSPPermissions.Items.Add(new ListItem(oRoleDefinition.Name, oRoleDefinition.Id.ToString()));
-                    }
-
-                    SPGroupCollection collGroups = web.Site.RootWeb.SiteGroups;
-                    foreach (SPGroup oGroup in collGroups)
-                    {
-                        ddlGroups.Items.Add(new ListItem(oGroup.Name, oGroup.ID.ToString()));
-                        ddlRoleOwners.Items.Add(new ListItem(oGroup.Name, oGroup.ID.ToString()));
-                        ddlRoleMembers.Items.Add(new ListItem(oGroup.Name, oGroup.ID.ToString()));
-                        ddlRoleVisitors.Items.Add(new ListItem(oGroup.Name, oGroup.ID.ToString()));
-                    }
-
-                    dtGroupsPermissions.Columns.Add("GroupsText");
-                    dtGroupsPermissions.Columns.Add("GroupsID");
-                    dtGroupsPermissions.Columns.Add("PermissionsText");
-                    dtGroupsPermissions.Columns.Add("PermissionsID");
-
-                    string strEPMLiveGroupsPermAssignments = CoreFunctions.getConfigSetting(web, "EPMLiveGroupsPermAssignments");
-                    if (strEPMLiveGroupsPermAssignments.Length > 1)
-                    {
-
-                        string[] strOuter = strEPMLiveGroupsPermAssignments.Split(new string[] { "|~|" }, StringSplitOptions.None);
-                        foreach (string strInner in strOuter)
-                        {
-                            string[] strInnerMost = strInner.Split('~');
-                            DataRow dr = dtGroupsPermissions.NewRow();
-                            SPGroup g = null;
-                            SPRoleDefinition r = null;
-
-                            try
-                            {
-                                g = web.SiteGroups.GetByID(Convert.ToInt32(strInnerMost[0]));
-                                r = web.RoleDefinitions.GetById(Convert.ToInt32(strInnerMost[1]));
-                            }catch{}
-                            if (g != null && r != null)
-                            {
-                                dr["GroupsText"] = g.Name;
-                                dr["GroupsID"] = strInnerMost[0];
-                                dr["PermissionsText"] = r.Name;
-                                dr["PermissionsID"] = strInnerMost[1];
-                                dtGroupsPermissions.Rows.Add(dr);
-                            }
-                        }
-                    }
-
-                    GvGroupsPermissions.DataSource = dtGroupsPermissions;
-                    GvGroupsPermissions.DataBind();
-
-                    if (ViewState["dtGroupsPermissions"] == null)
-                        ViewState.Add("dtGroupsPermissions", dtGroupsPermissions);
-
-                    url = web.Site.Url;
-
-                    txtGalleryUrl.Text = CoreFunctions.getConfigSetting(web, "EPMLiveTemplateGalleryURL", false, false);
-                    txtResourceURL.Text = CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL", false, false);
-                    //txtMasterURL.Text = CoreFunctions.getConfigSetting(web, "EPMLiveTimePhasedURL", false, false);
-                    txtProjectServer.Text = CoreFunctions.getConfigSetting(web, "EPMLiveProjectServerURL", false, false);
-                    txtResToolReportURL.Text = CoreFunctions.getConfigSetting(web, "ResToolsReportURL");
-
-                    ddlWorkspaceType.SelectedValue = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectWorkspaceType");
-                    ddlNavigation.SelectedValue = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectNavigation");
-                    ddlPermissions.SelectedValue = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectPermissions");
-
-                    ddlRoleOwners.SelectedValue = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectRoleOwners");
-                    ddlRoleMembers.SelectedValue = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectRoleMembers");
-                    ddlRoleVisitors.SelectedValue = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectRoleVisitors");
-
-                    try
-                    {
-                        chkUsePE.Checked = bool.Parse(CoreFunctions.getConfigSetting(web, "EPMLiveUseWEPeoplePicker"));
-                    }
-                    catch { }
-                    try
-                    {
-                        chkLiveTemplates.Checked = bool.Parse(CoreFunctions.getConfigSetting(web, "EPMLiveUseLiveTemplates"));
-                    }
-                    catch { }
-                    
-
-
-                    SPList templates = web.Lists.TryGetList("Template Gallery");
-
-                    if(templates == null)
-                    {
-                        loadTemplates(CoreFunctions.getConfigSetting(web, "EPMLiveValidTemplates"));
-                        InputFormSectionCreateOptions.Visible = false;
-                        InputFormSectionGalleryUrl.Visible = false;
-                        InputFormSectionGalleryLive.Visible = false;
-                    }
-                    else
-                    {
-                        InputFormSection6.Visible = false;
-                        InputFormSectionGalleryUrl.Visible = true;
-                        InputFormSectionGalleryLive.Visible = true;
-                        API.PropertyHash props = new API.PropertyHash(CoreFunctions.getConfigSetting(web, "EPMLiveCreateNewSettings"), ";#",'|','^');
-                        try
-                        {
-                            ddlDefaultCreate.SelectedValue = props[0]["Default"].ToString();
-                            chkCreateOptions.Items[0].Selected = bool.Parse(props[1]["Online"].ToString());
-                            chkCreateOptions.Items[1].Selected = bool.Parse(props[1]["Local"].ToString());
-                            chkCreateOptions.Items[2].Selected = bool.Parse(props[1]["Existing"].ToString());
-                        }
-                        catch { }
-                    }
-                    
-                    //SPList oList;
-                    //oList = web.Lists["Master Page Gallery"] as SPList;
-                    //if (oList != null)
-                    //{
-                    //    string sFullFileNameAndPath = "";
-                    //    string sFileName = "";
-                    //    foreach (SPListItem liMP in oList.Items)
-                    //    {
-                    //        SPField fldFullFileNameAndPath = liMP.Fields.GetFieldByInternalName("FileRef");
-                    //        if (liMP[fldFullFileNameAndPath.Id] != null)
-                    //        {
-                    //            sFullFileNameAndPath = liMP[fldFullFileNameAndPath.Id].ToString();
-                    //        }
-
-                    //        SPField fldFileName = liMP.Fields.GetFieldByInternalName("FilenameNoLink");
-                    //        if (liMP[fldFileName.Id] != null)
-                    //        {
-                    //            sFileName = liMP[fldFileName.Id].ToString();
-                    //        }
-
-                    //        if (sFileName.ToUpper().Contains(".master") || sFileName.ToUpper().Contains(".MASTER"))
-                    //        {
-                    //            ListItem li = new ListItem(sFileName.Replace(".master", "").Replace(".MASTER", ""), sFullFileNameAndPath);
-                    //            ddlMasterPages.Items.Add(li);
-                    //        }
-                    //    }
-                    //    ddlMasterPages.SelectedValue = web.MasterUrl;
-                    //}
-
-                    //if (CoreFunctions.getConfigSetting(web, "EPMLiveDisablePublishing") == "True")
-                    //    chkDisablePublishing.Checked = true;
-                    //else
-                    //    chkDisablePublishing.Checked = false;
-
-                    //try
-                    //{
-                    //    SPList list = web.Lists["EPMLiveTimePhased"];
-                    //}
-                    //catch
-                    //{
-                    //    pnlTimePhased.Visible = true;
-                    //}
-
-                    //if (!web.CurrentUser.IsSiteAdmin)
-                    //{
-                    //    pnlAllowSynch.Visible = false;
-                    //}
-                    //else
-                    //{
-                    //    if (CoreFunctions.getConfigSetting(web, "EPMLiveAllowListSynch") == "True")
-                    //        chkAllowSynch.Checked = true;
-                    //    else
-                    //        chkAllowSynch.Checked = false;
-                    //}
-
-                    if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] != null)
-                    {
-                        pnlEnterprise.Visible = true;
-
-                    }
-
-                    checkLocks(web);
-                }
-                
-                
+                return;
             }
-            
+
+            var web = SPContext.Current.Web;
+            {
+                web.Site.CatchAccessDeniedException = false;
+                web.AllowUnsafeUpdates = true;
+
+                PopulatePermissionsDropDown(web);
+                PopulateRoleDropDowns(web);
+                PopulateDataTables(web);
+                PopulateGridViews();
+                PopulateViewState();
+                PopulateTextBoxes(web);
+                PopulateDropDownLists(web);
+                PopulateCheckboxes(web);
+                PopulateInputForms(web);
+                SetEnterpriseVisibility(web);
+                checkLocks(web);
+            }
+
+        }
+
+        private void PopulatePermissionsDropDown(SPWeb web)
+        {
+            var oRoleDefinitions = web.Site.RootWeb.RoleDefinitions;
+
+            foreach (SPRoleDefinition oRoleDefinition in oRoleDefinitions)
+            {
+                ddlSPPermissions.Items.Add(new ListItem(oRoleDefinition.Name, oRoleDefinition.Id.ToString()));
+            }
+        }
+
+        private void PopulateRoleDropDowns(SPWeb web)
+        {
+            var collGroups = web.Site.RootWeb.SiteGroups;
+            foreach (SPGroup oGroup in collGroups)
+            {
+                ddlGroups.Items.Add(new ListItem(oGroup.Name, oGroup.ID.ToString()));
+                ddlRoleOwners.Items.Add(new ListItem(oGroup.Name, oGroup.ID.ToString()));
+                ddlRoleMembers.Items.Add(new ListItem(oGroup.Name, oGroup.ID.ToString()));
+                ddlRoleVisitors.Items.Add(new ListItem(oGroup.Name, oGroup.ID.ToString()));
+            }
+        }
+
+        private void PopulateDataTables(SPWeb web)
+        {
+            dtGroupsPermissions.Columns.Add("GroupsText");
+            dtGroupsPermissions.Columns.Add("GroupsID");
+            dtGroupsPermissions.Columns.Add("PermissionsText");
+            dtGroupsPermissions.Columns.Add("PermissionsID");
+
+            var strEpmLiveGroupsPermAssignments = CoreFunctions.getConfigSetting(web, "EPMLiveGroupsPermAssignments");
+            if (strEpmLiveGroupsPermAssignments.Length > 1)
+            {
+                var strOuter = strEpmLiveGroupsPermAssignments.Split(
+                    new[]
+                    {
+                        "|~|"
+                    },
+                    StringSplitOptions.None);
+                ProcessPermissionStrings(web, strOuter, dtGroupsPermissions);
+            }
+        }
+
+        private void PopulateGridViews()
+        {
+            GvGroupsPermissions.DataSource = dtGroupsPermissions;
+            GvGroupsPermissions.DataBind();
+        }
+
+        private void PopulateViewState()
+        {
+            if (ViewState["dtGroupsPermissions"] == null)
+            {
+                ViewState.Add("dtGroupsPermissions", dtGroupsPermissions);
+            }
+        }
+
+        private void PopulateTextBoxes(SPWeb web)
+        {
+            url = web.Site.Url;
+
+            txtGalleryUrl.Text = CoreFunctions.getConfigSetting(web, "EPMLiveTemplateGalleryURL", false, false);
+            txtResourceURL.Text = CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL", false, false);
+
+            txtProjectServer.Text = CoreFunctions.getConfigSetting(web, "EPMLiveProjectServerURL", false, false);
+            txtResToolReportURL.Text = CoreFunctions.getConfigSetting(web, "ResToolsReportURL");
+        }
+
+        private void PopulateDropDownLists(SPWeb web)
+        {
+            ddlWorkspaceType.SelectedValue = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectWorkspaceType");
+            ddlNavigation.SelectedValue = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectNavigation");
+            ddlPermissions.SelectedValue = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectPermissions");
+
+            ddlRoleOwners.SelectedValue = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectRoleOwners");
+            ddlRoleMembers.SelectedValue = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectRoleMembers");
+            ddlRoleVisitors.SelectedValue = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectRoleVisitors");
+        }
+
+        private void PopulateCheckboxes(SPWeb web)
+        {
+            try
+            {
+                chkUsePE.Checked = bool.Parse(CoreFunctions.getConfigSetting(web, "EPMLiveUseWEPeoplePicker"));
+            }
+            catch (Exception ex)
+            {
+                TraceError("Exception Suppressed {0}", ex);
+            }
+            try
+            {
+                chkLiveTemplates.Checked = bool.Parse(CoreFunctions.getConfigSetting(web, "EPMLiveUseLiveTemplates"));
+            }
+            catch (Exception ex)
+            {
+                TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private void PopulateInputForms(SPWeb web)
+        {
+            var templates = web.Lists.TryGetList("Template Gallery");
+
+            if (templates == null)
+            {
+                loadTemplates(CoreFunctions.getConfigSetting(web, "EPMLiveValidTemplates"));
+                InputFormSectionCreateOptions.Visible = false;
+                InputFormSectionGalleryUrl.Visible = false;
+                InputFormSectionGalleryLive.Visible = false;
+            }
+            else
+            {
+                InputFormSection6.Visible = false;
+                InputFormSectionGalleryUrl.Visible = true;
+                InputFormSectionGalleryLive.Visible = true;
+                var props = new PropertyHash(CoreFunctions.getConfigSetting(web, "EPMLiveCreateNewSettings"), ";#", '|', '^');
+                try
+                {
+                    ddlDefaultCreate.SelectedValue = props[0]["Default"].ToString();
+                    chkCreateOptions.Items[0].Selected = bool.Parse(props[1]["Online"].ToString());
+                    chkCreateOptions.Items[1].Selected = bool.Parse(props[1]["Local"].ToString());
+                    chkCreateOptions.Items[2].Selected = bool.Parse(props[1]["Existing"].ToString());
+                }
+                catch (Exception ex)
+                {
+                    TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+        }
+
+        private void SetEnterpriseVisibility(SPWeb web)
+        {
+            if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] != null)
+            {
+                pnlEnterprise.Visible = true;
+            }
         }
 
         protected void btnAdd_Click(object sender, EventArgs e)

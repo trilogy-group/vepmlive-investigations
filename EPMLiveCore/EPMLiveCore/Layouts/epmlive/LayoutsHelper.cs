@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
@@ -145,6 +146,48 @@ namespace EPMLiveCore.Layouts.epmlive
                 if (currentSpNavigationNode != null)
                 {
                     dropDownList.SelectedValue = currentSpNavigationNode.ParentId.ToString();
+                }
+            }
+        }
+
+        public static void ProcessPermissionStrings(SPWeb web, IEnumerable<string> strOuter, DataTable groupsPermissions)
+        {
+            if (web == null)
+            {
+                throw new ArgumentNullException(nameof(web));
+            }
+            if (strOuter == null)
+            {
+                throw new ArgumentNullException(nameof(strOuter));
+            }
+            if (groupsPermissions == null)
+            {
+                throw new ArgumentNullException(nameof(groupsPermissions));
+            }
+
+            foreach (var strInner in strOuter)
+            {
+                var strInnerMost = strInner.Split('~');
+                var dataRow = groupsPermissions.NewRow();
+                SPGroup spGroup = null;
+                SPRoleDefinition roleDefinition = null;
+
+                try
+                {
+                    spGroup = web.SiteGroups.GetByID(Convert.ToInt32(strInnerMost[0]));
+                    roleDefinition = web.RoleDefinitions.GetById(Convert.ToInt32(strInnerMost[1]));
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
+                if (spGroup != null && roleDefinition != null)
+                {
+                    dataRow["GroupsText"] = spGroup.Name;
+                    dataRow["GroupsID"] = strInnerMost[0];
+                    dataRow["PermissionsText"] = roleDefinition.Name;
+                    dataRow["PermissionsID"] = strInnerMost[1];
+                    groupsPermissions.Rows.Add(dataRow);
                 }
             }
         }
