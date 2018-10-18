@@ -127,6 +127,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLivePS.Tests", "EPMLiveP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveIntegrationService.Tests", "EPMLiveIntegrationService\EPMLiveIntegrationService.Tests\EPMLiveIntegrationService.Tests.csproj", "{7B333D41-BB2D-4E86-91A2-E282860973B5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveDashboards.Tests", "EPMLiveDashboard.Tests\EPMLiveDashboards.Tests.csproj", "{668B2326-1463-4375-92B4-C5B18F94380A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -545,6 +547,18 @@ Global
 		{7B333D41-BB2D-4E86-91A2-E282860973B5}.Release|x64.Build.0 = Release|Any CPU
 		{7B333D41-BB2D-4E86-91A2-E282860973B5}.Release|x86.ActiveCfg = Release|Any CPU
 		{7B333D41-BB2D-4E86-91A2-E282860973B5}.Release|x86.Build.0 = Release|Any CPU
+		{668B2326-1463-4375-92B4-C5B18F94380A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{668B2326-1463-4375-92B4-C5B18F94380A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{668B2326-1463-4375-92B4-C5B18F94380A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{668B2326-1463-4375-92B4-C5B18F94380A}.Debug|x64.Build.0 = Debug|Any CPU
+		{668B2326-1463-4375-92B4-C5B18F94380A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{668B2326-1463-4375-92B4-C5B18F94380A}.Debug|x86.Build.0 = Debug|Any CPU
+		{668B2326-1463-4375-92B4-C5B18F94380A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{668B2326-1463-4375-92B4-C5B18F94380A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{668B2326-1463-4375-92B4-C5B18F94380A}.Release|x64.ActiveCfg = Release|Any CPU
+		{668B2326-1463-4375-92B4-C5B18F94380A}.Release|x64.Build.0 = Release|Any CPU
+		{668B2326-1463-4375-92B4-C5B18F94380A}.Release|x86.ActiveCfg = Release|Any CPU
+		{668B2326-1463-4375-92B4-C5B18F94380A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -563,5 +577,9 @@ Global
 		{8C3026CE-FFCF-44C3-A198-5C55E26EF40C} = {3DC0042A-7620-4CFC-BEB4-379EC7F86D2B}
 		{4760E5D2-6B1B-4474-BCB2-22ACF603EE39} = {3DC0042A-7620-4CFC-BEB4-379EC7F86D2B}
 		{7B333D41-BB2D-4E86-91A2-E282860973B5} = {3DC0042A-7620-4CFC-BEB4-379EC7F86D2B}
+		{668B2326-1463-4375-92B4-C5B18F94380A} = {3DC0042A-7620-4CFC-BEB4-379EC7F86D2B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {718BC7BE-B760-4491-BA44-4BE1F6EFDD8A}
 	EndGlobalSection
 EndGlobal
