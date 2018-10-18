@@ -564,365 +564,431 @@ namespace EPMLiveCore.Layouts.epmlive
 
             var spUserToken = list.ParentWeb.CurrentUser.UserToken;
 
-            Task.Factory.StartNew(() =>
-            {
-                using (var spSite = new SPSite(siteId, spUserToken))
+            Task.Factory.StartNew(
+                () =>
                 {
-                    using (var spWeb = spSite.OpenWeb(webId))
+                    using (var spSite = new SPSite(siteId, spUserToken))
                     {
-                        string fieldName = string.Empty;
-
-                        try
+                        using (var spWeb = spSite.OpenWeb(webId))
                         {
-                            list = spWeb.Lists.GetList(listId, true);
+                            var fieldName = string.Empty;
 
-                            // add startdate field
-                            if (!FieldExistsInList(list, "StartDate"))
+                            try
                             {
-                                fieldName = "StartDate";
+                                list = spWeb.Lists.GetList(listId, true);
+                                AddFields(list, ref fieldName);
+                                list.Update();
 
-                                string fldSDIntName = list.Fields.Add("StartDate", SPFieldType.DateTime, false);
-                                SPFieldDateTime fldSD =
-                                    list.Fields.GetFieldByInternalName(fldSDIntName) as SPFieldDateTime;
-                                fldSD.Title = "Start Date";
-                                fldSD.DisplayFormat = SPDateTimeFieldFormatType.DateOnly;
-                                fldSD.Sealed = false;
-                                fldSD.AllowDeletion = false;
-                                fldSD.Description = "Enter the estimated start date for this item.";
-                                fldSD.Update();
+                                FixLookupFields(list);
                             }
-
-                            // add DueDate field
-                            if (!FieldExistsInList(list, "DueDate"))
+                            catch (Exception exception)
                             {
-                                fieldName = "DueDate";
-
-                                string fldDDIntName = list.Fields.Add("DueDate", SPFieldType.DateTime, false);
-                                SPFieldDateTime fldDD =
-                                    list.Fields.GetFieldByInternalName(fldDDIntName) as SPFieldDateTime;
-                                fldDD.Title = "Due Date";
-                                fldDD.DisplayFormat = SPDateTimeFieldFormatType.DateOnly;
-                                fldDD.Sealed = false;
-                                fldDD.AllowDeletion = false;
-                                fldDD.Description = "Enter the estimated due date for this item.";
-                                fldDD.Update();
+                                System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", exception);
+                                var logger = new ReportingLogger(list.ParentWeb);
+                                logger.Log(
+                                    list,
+                                    "Problem adding one or more field or fixing a lookup field when enabling work features for the list.",
+                                    string.Format("Field: {0}, Exception: {1}", fieldName, exception.Message),
+                                    2,
+                                    1,
+                                    string.Empty);
                             }
-
-                            // add AssignedTo field
-                            if (!FieldExistsInList(list, "AssignedTo"))
-                            {
-                                fieldName = "AssignedTo";
-
-                                string fldATIntName = list.Fields.Add("AssignedTo", SPFieldType.User, false);
-                                SPFieldUser fldAT = list.Fields.GetFieldByInternalName(fldATIntName) as SPFieldUser;
-                                fldAT.Title = "Assigned To";
-                                fldAT.AllowMultipleValues = true;
-                                fldAT.Sealed = false;
-                                fldAT.AllowDeletion = false;
-                                fldAT.Description =
-                                    "Enter the resource(s) assigned to this item.  You can enter their email address, username, or use the address book.";
-                                fldAT.Update();
-                            }
-
-                            // add Priority field
-                            if (!FieldExistsInList(list, "Priority"))
-                            {
-                                fieldName = "Priority";
-
-                                StringCollection choices = new StringCollection();
-                                choices.AddRange(new string[] { "(1) High", "(2) Normal", "(3) Low" });
-                                string fldPIntName = list.Fields.Add("Priority", SPFieldType.Choice, false, false,
-                                    choices);
-                                SPFieldChoice fldP = list.Fields.GetFieldByInternalName(fldPIntName) as SPFieldChoice;
-                                fldP.Title = "Priority";
-                                fldP.DefaultValue = "(1) High";
-                                fldP.Sealed = false;
-                                fldP.AllowDeletion = false;
-                                fldP.Update();
-                            }
-
-                            // add status field
-                            if (!FieldExistsInList(list, "Status"))
-                            {
-                                fieldName = "Status";
-
-                                StringCollection choices = new StringCollection();
-                                choices.AddRange(new string[] { "Not Started", "In Progress", "Completed", "Deferred", "Waiting on someone else" });
-                                string fldStatusIntName = list.Fields.Add("Status", SPFieldType.Choice, false, false,
-                                    choices);
-                                SPFieldChoice fldStatus =
-                                    list.Fields.GetFieldByInternalName(fldStatusIntName) as SPFieldChoice;
-                                fldStatus.DefaultValue = "Not Started";
-                                fldStatus.Sealed = true;
-                                fldStatus.AllowDeletion = false;
-                                fldStatus.ReadOnlyField = true;
-                                fldStatus.Update();
-                            }
-
-                            // add Work field
-                            if (!FieldExistsInList(list, "Work"))
-                            {
-                                fieldName = "Work";
-
-                                string fldWIntName = list.Fields.Add("Work", SPFieldType.Number, false);
-                                SPFieldNumber fldW = list.Fields.GetFieldByInternalName(fldWIntName) as SPFieldNumber;
-                                fldW.Title = "Work";
-                                fldW.DisplayFormat = SPNumberFormatTypes.TwoDecimals;
-                                fldW.Description = "Enter the estimated work (in hours) for this item.";
-                                fldW.Update();
-                            }
-
-                            // add percent complete field
-                            if (!FieldExistsInList(list, "PercentComplete"))
-                            {
-                                fieldName = "PercentComplete";
-
-                                string fldPCIntName = list.Fields.Add("PercentComplete", SPFieldType.Number, false);
-                                SPFieldNumber fldPC = list.Fields.GetFieldByInternalName(fldPCIntName) as SPFieldNumber;
-                                fldPC.Title = "% Complete";
-                                fldPC.ShowAsPercentage = true;
-                                fldPC.DisplayFormat = SPNumberFormatTypes.NoDecimal;
-                                fldPC.MinimumValue = 0;
-                                fldPC.MaximumValue = 1;
-                                fldPC.Sealed = false;
-                                fldPC.AllowDeletion = false;
-                                fldPC.Update();
-                            }
-
-                            // add body field
-                            if (!FieldExistsInList(list, "Body"))
-                            {
-                                fieldName = "Body";
-
-                                string fldBIntName = list.Fields.Add("Body", SPFieldType.Note, false);
-                                SPFieldMultiLineText fldB =
-                                    list.Fields.GetFieldByInternalName(fldBIntName) as SPFieldMultiLineText;
-                                fldB.Title = "Description";
-                                fldB.RichText = true;
-                                fldB.Sealed = false;
-                                fldB.AllowDeletion = false;
-                                fldB.Update();
-                            }
-
-                            // add commentcount field
-                            if (!FieldExistsInList(list, "CommentCount"))
-                            {
-                                fieldName = "CommentCount";
-
-                                string fldCCIntName = list.Fields.Add("CommentCount", SPFieldType.Number, false);
-                                SPFieldNumber fldCC = list.Fields.GetFieldByInternalName(fldCCIntName) as SPFieldNumber;
-                                fldCC.MinimumValue = 0;
-                                fldCC.Sealed = false;
-                                fldCC.AllowDeletion = false;
-                                fldCC.Hidden = true;
-                                fldCC.Update();
-                            }
-
-                            // add complete field
-                            if (!FieldExistsInList(list, "Complete"))
-                            {
-                                fieldName = "Complete";
-
-                                string fldCompleteIntName = list.Fields.Add("Complete", SPFieldType.Boolean, false);
-                                SPFieldBoolean fldComplete =
-                                    list.Fields.GetFieldByInternalName(fldCompleteIntName) as SPFieldBoolean;
-                                fldComplete.Sealed = false;
-                                fldComplete.ShowInEditForm = true;
-                                fldComplete.ShowInNewForm = false;
-                                fldComplete.AllowDeletion = false;
-                                fldComplete.DefaultValue = "0";
-                                fldComplete.Update();
-                            }
-
-                            // add DaysOverdue field
-                            if (!FieldExistsInList(list, "DaysOverdue"))
-                            {
-                                fieldName = "DaysOverdue";
-
-                                string fldDOIntName = list.Fields.Add("DaysOverdue", SPFieldType.Calculated, false);
-                                SPFieldCalculated fldDO =
-                                    list.Fields.GetFieldByInternalName(fldDOIntName) as SPFieldCalculated;
-                                fldDO.OutputType = SPFieldType.Number;
-                                fldDO.Title = "Days Overdue";
-                                fldDO.Sealed = false;
-                                fldDO.ShowInEditForm = false;
-                                fldDO.AllowDeletion = false;
-                                fldDO.Formula =
-                                    "=IF([Due Date]<>\"\",IF(Status<>\"Completed\",IF([Due Date]<Today,Today-[Due Date],0),0),0)";
-                                fldDO.Update();
-                            }
-
-                            // add ScheduleStatus field
-                            if (!FieldExistsInList(list, "ScheduleStatus"))
-                            {
-                                fieldName = "ScheduleStatus";
-
-                                string fldSSIntName = list.Fields.Add("ScheduleStatus", SPFieldType.Calculated, false);
-                                SPFieldCalculated fldSS =
-                                    list.Fields.GetFieldByInternalName(fldSSIntName) as SPFieldCalculated;
-                                fldSS.Title = "Schedule Status";
-                                fldSS.OutputType = SPFieldType.Text;
-                                fldSS.Sealed = false;
-                                fldSS.ShowInEditForm = false;
-                                fldSS.ShowInNewForm = false;
-                                fldSS.AllowDeletion = false;
-                                fldSS.Formula =
-                                    "=IF(Status=\"Completed\",\"checkmark.GIF\",IF([Days Overdue]>=30,\"RED.GIF\",IF([Days Overdue]>0,\"YELLOW.GIF\",\"GREEN.GIF\")))";
-                                fldSS.Update();
-                            }
-
-                            // add TodayYear field
-                            if (!FieldExistsInList(list, "TodayYear"))
-                            {
-                                fieldName = "TodayYear";
-
-                                string fldTYIntName = list.Fields.Add("TodayYear", SPFieldType.Calculated, false);
-                                SPFieldCalculated fldTY =
-                                    list.Fields.GetFieldByInternalName(fldTYIntName) as SPFieldCalculated;
-                                fldTY.Title = "Today Year";
-                                fldTY.OutputType = SPFieldType.Number;
-                                fldTY.Sealed = false;
-                                fldTY.ShowInEditForm = false;
-                                fldTY.ShowInNewForm = false;
-                                fldTY.ShowInDisplayForm = false;
-                                fldTY.AllowDeletion = false;
-                                fldTY.Formula = "=YEAR(Today)";
-                                fldTY.Update();
-                            }
-
-                            // add TodayWeek field
-                            if (!FieldExistsInList(list, "TodayWeek"))
-                            {
-                                fieldName = "TodayWeek";
-
-                                string fldTWIntName = list.Fields.Add("TodayWeek", SPFieldType.Calculated, false);
-                                SPFieldCalculated fldTW =
-                                    list.Fields.GetFieldByInternalName(fldTWIntName) as SPFieldCalculated;
-                                fldTW.Title = "Today Week";
-                                fldTW.OutputType = SPFieldType.Number;
-                                fldTW.Sealed = false;
-                                fldTW.ShowInEditForm = false;
-                                fldTW.ShowInNewForm = false;
-                                fldTW.ShowInDisplayForm = false;
-                                fldTW.AllowDeletion = false;
-                                fldTW.Formula =
-                                    "=IF(Today<>\"\",INT((Today-DATE(YEAR(Today),1,1)+(TEXT(WEEKDAY(DATE(YEAR(Today),1,1)),\"d\")))/7)+1,0)";
-                                fldTW.Update();
-                            }
-
-                            // add Year field
-                            if (!FieldExistsInList(list, "Year"))
-                            {
-                                fieldName = "Year";
-
-                                string fldYIntName = list.Fields.Add("Year", SPFieldType.Calculated, false);
-                                SPFieldCalculated fldY =
-                                    list.Fields.GetFieldByInternalName(fldYIntName) as SPFieldCalculated;
-                                fldY.Title = "Year";
-                                fldY.OutputType = SPFieldType.Number;
-                                fldY.Sealed = false;
-                                fldY.ShowInEditForm = false;
-                                fldY.ShowInNewForm = false;
-                                fldY.ShowInDisplayForm = false;
-                                fldY.AllowDeletion = false;
-                                fldY.Formula = "=IF([Due Date]<>\"\",YEAR([Due Date]))";
-                                fldY.Update();
-                            }
-
-                            // add Week field
-                            if (!FieldExistsInList(list, "Week"))
-                            {
-                                fieldName = "Week";
-
-                                string fldWIntName = list.Fields.Add("Week", SPFieldType.Calculated, false);
-                                SPFieldCalculated fldW =
-                                    list.Fields.GetFieldByInternalName(fldWIntName) as SPFieldCalculated;
-                                fldW.Title = "Week";
-                                fldW.OutputType = SPFieldType.Number;
-                                fldW.Sealed = false;
-                                fldW.ShowInEditForm = false;
-                                fldW.ShowInNewForm = false;
-                                fldW.ShowInDisplayForm = false;
-                                fldW.AllowDeletion = false;
-                                fldW.Formula =
-                                    "=IF([Due Date]<>\"\",INT(([Due Date]-DATE(YEAR([Due Date]),1,1)+(TEXT(WEEKDAY(DATE(YEAR([Due Date]),1,1)),\"d\")))/7)+1,0)";
-                                fldW.Update();
-                            }
-
-                            // add Due field
-                            if (!FieldExistsInList(list, "Due"))
-                            {
-                                fieldName = "Due";
-
-                                string fldDIntName = list.Fields.Add("Due", SPFieldType.Calculated, false);
-                                SPFieldCalculated fldD =
-                                    list.Fields.GetFieldByInternalName(fldDIntName) as SPFieldCalculated;
-                                fldD.Title = "Due";
-                                fldD.OutputType = SPFieldType.Text;
-                                fldD.Sealed = false;
-                                fldD.ShowInEditForm = false;
-                                fldD.ShowInNewForm = false;
-                                fldD.AllowDeletion = false;
-                                fldD.Formula =
-                                    "=IF([Status]=\"Completed\",\"NA\",IF([Due Date]=\"\",\"No Due Date\",IF([Due Date]<Today,\"(1) Overdue\",IF([Due Date]=Today,\"(2) Due Today\",IF([Due Date]=Today+1,\"(3) Due Tomorrow\",IF(Week=[Today Week],IF(Year=[Today Year],\"(4) Due This Week\",\"(7) Future\"),IF(Week=[Today Week]+1,IF(Year=[Today Year],\"(5) Due Next Week\",\"(7) Future\"),IF(MONTH([Due Date])=MONTH(Today),IF(Year=[Today Year],\"(6) Due This Month\",\"(7) Future\"),\"(7) Future\"))))))))";
-                                fldD.Update();
-                            }
-
-                            // add Commenters field
-                            if (!FieldExistsInList(list, "Commenters"))
-                            {
-                                fieldName = "Commenters";
-
-                                string fldCIntName = list.Fields.Add("Commenters", SPFieldType.Note, false);
-                                SPFieldMultiLineText fldC =
-                                    list.Fields.GetFieldByInternalName(fldCIntName) as SPFieldMultiLineText;
-                                fldC.Title = "Commenters";
-                                fldC.Hidden = true;
-                                fldC.Sealed = false;
-                                fldC.AllowDeletion = false;
-                                fldC.Update();
-                            }
-
-                            // add CommentersRead field
-                            if (!FieldExistsInList(list, "CommentersRead"))
-                            {
-                                fieldName = "CommentersRead";
-
-                                string fldCRIntName = list.Fields.Add("CommentersRead", SPFieldType.Note, false);
-                                SPFieldMultiLineText fldCR =
-                                    list.Fields.GetFieldByInternalName(fldCRIntName) as SPFieldMultiLineText;
-                                fldCR.Title = "Commenters Read";
-                                fldCR.Hidden = true;
-                                fldCR.Sealed = false;
-                                fldCR.AllowDeletion = false;
-                                fldCR.Update();
-                            }
-
-                            // remove Today field
-                            if (FieldExistsInList(list, "Today"))
-                            {
-                                try
-                                {
-                                    list.Fields.Delete("Today");
-                                }
-                                catch { }
-                            }
-
-                            list.Update();
-
-                            FixLookupFields(list);
-                        }
-                        catch (Exception exception)
-                        {
-                            var logger = new ReportingLogger(list.ParentWeb);
-                            logger.Log(list,
-                                "Problem adding one or more field or fixing a lookup field when enabling work features for the list.",
-                                string.Format("Field: {0}, Exception: {1}", fieldName, exception.Message), 2, 1,
-                                string.Empty);
                         }
                     }
+                });
+        }
+
+        private void AddFields(SPList list, ref string fieldName)
+        {
+            AddStartDateField(list, ref fieldName);
+            AddDueDateField(list, ref fieldName);
+            AddAssignedToField(list, ref fieldName);
+            AddPriorityField(list, ref fieldName);
+            AddStatusField(list, ref fieldName);
+            AddWorkField(list, ref fieldName);
+            AddPercentCompleteField(list, ref fieldName);
+            AddBodyField(list, ref fieldName);
+            AddCommentCountField(list, ref fieldName);
+            AddCompleteField(list, ref fieldName);
+            AddDaysOverdueField(list, ref fieldName);
+            AddScheduleStatusField(list, ref fieldName);
+            AddTodayYearField(list, ref fieldName);
+            AddTodayWeekField(list, ref fieldName);
+            AddYearField(list, ref fieldName);
+            AddWeekField(list, ref fieldName);
+            AddDueField(list, ref fieldName);
+            AddCommentersField(list, ref fieldName);
+            AddCommentersReadField(list, ref fieldName);
+            RemoveTodayField(list);
+        }
+
+        private void AddStartDateField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "StartDate"))
+            {
+                fieldName = "StartDate";
+
+                var fldSDIntName = list.Fields.Add("StartDate", SPFieldType.DateTime, false);
+                var fldSD = list.Fields.GetFieldByInternalName(fldSDIntName) as SPFieldDateTime;
+                fldSD.Title = "Start Date";
+                fldSD.DisplayFormat = SPDateTimeFieldFormatType.DateOnly;
+                fldSD.Sealed = false;
+                fldSD.AllowDeletion = false;
+                fldSD.Description = "Enter the estimated start date for this item.";
+                fldSD.Update();
+            }
+        }
+
+        private void AddDueDateField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "DueDate"))
+            {
+                fieldName = "DueDate";
+
+                var fldDDIntName = list.Fields.Add("DueDate", SPFieldType.DateTime, false);
+                var fldDD = list.Fields.GetFieldByInternalName(fldDDIntName) as SPFieldDateTime;
+                fldDD.Title = "Due Date";
+                fldDD.DisplayFormat = SPDateTimeFieldFormatType.DateOnly;
+                fldDD.Sealed = false;
+                fldDD.AllowDeletion = false;
+                fldDD.Description = "Enter the estimated due date for this item.";
+                fldDD.Update();
+            }
+        }
+
+        private void AddAssignedToField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "AssignedTo"))
+            {
+                fieldName = "AssignedTo";
+
+                var fldATIntName = list.Fields.Add("AssignedTo", SPFieldType.User, false);
+                var fldAT = list.Fields.GetFieldByInternalName(fldATIntName) as SPFieldUser;
+                fldAT.Title = "Assigned To";
+                fldAT.AllowMultipleValues = true;
+                fldAT.Sealed = false;
+                fldAT.AllowDeletion = false;
+                fldAT.Description = "Enter the resource(s) assigned to this item.  You can enter their email address, username, or use the address book.";
+                fldAT.Update();
+            }
+        }
+
+        private void AddPriorityField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Priority"))
+            {
+                fieldName = "Priority";
+
+                var choices = new StringCollection();
+                choices.AddRange(
+                    new[]
+                    {
+                        "(1) High",
+                        "(2) Normal",
+                        "(3) Low"
+                    });
+                var fldPIntName = list.Fields.Add("Priority", SPFieldType.Choice, false, false, choices);
+                var fldP = list.Fields.GetFieldByInternalName(fldPIntName) as SPFieldChoice;
+                fldP.Title = "Priority";
+                fldP.DefaultValue = "(1) High";
+                fldP.Sealed = false;
+                fldP.AllowDeletion = false;
+                fldP.Update();
+            }
+        }
+
+        private void AddStatusField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Status"))
+            {
+                fieldName = "Status";
+
+                var choices = new StringCollection();
+                choices.AddRange(
+                    new[]
+                    {
+                        "Not Started",
+                        "In Progress",
+                        "Completed",
+                        "Deferred",
+                        "Waiting on someone else"
+                    });
+                var fldStatusIntName = list.Fields.Add("Status", SPFieldType.Choice, false, false, choices);
+                var fldStatus = list.Fields.GetFieldByInternalName(fldStatusIntName) as SPFieldChoice;
+                fldStatus.DefaultValue = "Not Started";
+                fldStatus.Sealed = true;
+                fldStatus.AllowDeletion = false;
+                fldStatus.ReadOnlyField = true;
+                fldStatus.Update();
+            }
+        }
+
+        private void AddWorkField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Work"))
+            {
+                fieldName = "Work";
+
+                var fldWIntName = list.Fields.Add("Work", SPFieldType.Number, false);
+                var fldW = list.Fields.GetFieldByInternalName(fldWIntName) as SPFieldNumber;
+                fldW.Title = "Work";
+                fldW.DisplayFormat = SPNumberFormatTypes.TwoDecimals;
+                fldW.Description = "Enter the estimated work (in hours) for this item.";
+                fldW.Update();
+            }
+        }
+
+        private void AddPercentCompleteField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "PercentComplete"))
+            {
+                fieldName = "PercentComplete";
+
+                var fldPCIntName = list.Fields.Add("PercentComplete", SPFieldType.Number, false);
+                var fldPC = list.Fields.GetFieldByInternalName(fldPCIntName) as SPFieldNumber;
+                fldPC.Title = "% Complete";
+                fldPC.ShowAsPercentage = true;
+                fldPC.DisplayFormat = SPNumberFormatTypes.NoDecimal;
+                fldPC.MinimumValue = 0;
+                fldPC.MaximumValue = 1;
+                fldPC.Sealed = false;
+                fldPC.AllowDeletion = false;
+                fldPC.Update();
+            }
+        }
+
+        private void AddBodyField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Body"))
+            {
+                fieldName = "Body";
+
+                var fldBIntName = list.Fields.Add("Body", SPFieldType.Note, false);
+                var fldB = list.Fields.GetFieldByInternalName(fldBIntName) as SPFieldMultiLineText;
+                fldB.Title = "Description";
+                fldB.RichText = true;
+                fldB.Sealed = false;
+                fldB.AllowDeletion = false;
+                fldB.Update();
+            }
+        }
+
+        private void AddCommentCountField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "CommentCount"))
+            {
+                fieldName = "CommentCount";
+
+                var fldCCIntName = list.Fields.Add("CommentCount", SPFieldType.Number, false);
+                var fldCC = list.Fields.GetFieldByInternalName(fldCCIntName) as SPFieldNumber;
+                fldCC.MinimumValue = 0;
+                fldCC.Sealed = false;
+                fldCC.AllowDeletion = false;
+                fldCC.Hidden = true;
+                fldCC.Update();
+            }
+        }
+
+        private void AddCompleteField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Complete"))
+            {
+                fieldName = "Complete";
+
+                var fldCompleteIntName = list.Fields.Add("Complete", SPFieldType.Boolean, false);
+                var fldComplete = list.Fields.GetFieldByInternalName(fldCompleteIntName) as SPFieldBoolean;
+                fldComplete.Sealed = false;
+                fldComplete.ShowInEditForm = true;
+                fldComplete.ShowInNewForm = false;
+                fldComplete.AllowDeletion = false;
+                fldComplete.DefaultValue = "0";
+                fldComplete.Update();
+            }
+        }
+
+        private void AddDaysOverdueField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "DaysOverdue"))
+            {
+                fieldName = "DaysOverdue";
+
+                var fldDOIntName = list.Fields.Add("DaysOverdue", SPFieldType.Calculated, false);
+                var fldDO = list.Fields.GetFieldByInternalName(fldDOIntName) as SPFieldCalculated;
+                fldDO.OutputType = SPFieldType.Number;
+                fldDO.Title = "Days Overdue";
+                fldDO.Sealed = false;
+                fldDO.ShowInEditForm = false;
+                fldDO.AllowDeletion = false;
+                fldDO.Formula = "=IF([Due Date]<>\"\",IF(Status<>\"Completed\",IF([Due Date]<Today,Today-[Due Date],0),0),0)";
+                fldDO.Update();
+            }
+        }
+
+        private void AddScheduleStatusField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "ScheduleStatus"))
+            {
+                fieldName = "ScheduleStatus";
+
+                var fldSSIntName = list.Fields.Add("ScheduleStatus", SPFieldType.Calculated, false);
+                var fldSS = list.Fields.GetFieldByInternalName(fldSSIntName) as SPFieldCalculated;
+                fldSS.Title = "Schedule Status";
+                fldSS.OutputType = SPFieldType.Text;
+                fldSS.Sealed = false;
+                fldSS.ShowInEditForm = false;
+                fldSS.ShowInNewForm = false;
+                fldSS.AllowDeletion = false;
+                fldSS.Formula =
+                    "=IF(Status=\"Completed\",\"checkmark.GIF\",IF([Days Overdue]>=30,\"RED.GIF\",IF([Days Overdue]>0,\"YELLOW.GIF\",\"GREEN.GIF\")))";
+                fldSS.Update();
+            }
+        }
+
+        private void AddTodayYearField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "TodayYear"))
+            {
+                fieldName = "TodayYear";
+
+                var fldTYIntName = list.Fields.Add("TodayYear", SPFieldType.Calculated, false);
+                var fldTY = list.Fields.GetFieldByInternalName(fldTYIntName) as SPFieldCalculated;
+                fldTY.Title = "Today Year";
+                fldTY.OutputType = SPFieldType.Number;
+                fldTY.Sealed = false;
+                fldTY.ShowInEditForm = false;
+                fldTY.ShowInNewForm = false;
+                fldTY.ShowInDisplayForm = false;
+                fldTY.AllowDeletion = false;
+                fldTY.Formula = "=YEAR(Today)";
+                fldTY.Update();
+            }
+        }
+
+        private void AddTodayWeekField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "TodayWeek"))
+            {
+                fieldName = "TodayWeek";
+
+                var fldTWIntName = list.Fields.Add("TodayWeek", SPFieldType.Calculated, false);
+                var fldTW = list.Fields.GetFieldByInternalName(fldTWIntName) as SPFieldCalculated;
+                fldTW.Title = "Today Week";
+                fldTW.OutputType = SPFieldType.Number;
+                fldTW.Sealed = false;
+                fldTW.ShowInEditForm = false;
+                fldTW.ShowInNewForm = false;
+                fldTW.ShowInDisplayForm = false;
+                fldTW.AllowDeletion = false;
+                fldTW.Formula = "=IF(Today<>\"\",INT((Today-DATE(YEAR(Today),1,1)+(TEXT(WEEKDAY(DATE(YEAR(Today),1,1)),\"d\")))/7)+1,0)";
+                fldTW.Update();
+            }
+        }
+
+        private void AddYearField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Year"))
+            {
+                fieldName = "Year";
+
+                var fldYIntName = list.Fields.Add("Year", SPFieldType.Calculated, false);
+                var fldY = list.Fields.GetFieldByInternalName(fldYIntName) as SPFieldCalculated;
+                fldY.Title = "Year";
+                fldY.OutputType = SPFieldType.Number;
+                fldY.Sealed = false;
+                fldY.ShowInEditForm = false;
+                fldY.ShowInNewForm = false;
+                fldY.ShowInDisplayForm = false;
+                fldY.AllowDeletion = false;
+                fldY.Formula = "=IF([Due Date]<>\"\",YEAR([Due Date]))";
+                fldY.Update();
+            }
+        }
+
+        private void AddWeekField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Week"))
+            {
+                fieldName = "Week";
+
+                var fldWIntName = list.Fields.Add("Week", SPFieldType.Calculated, false);
+                var fldW = list.Fields.GetFieldByInternalName(fldWIntName) as SPFieldCalculated;
+                fldW.Title = "Week";
+                fldW.OutputType = SPFieldType.Number;
+                fldW.Sealed = false;
+                fldW.ShowInEditForm = false;
+                fldW.ShowInNewForm = false;
+                fldW.ShowInDisplayForm = false;
+                fldW.AllowDeletion = false;
+                fldW.Formula = "=IF([Due Date]<>\"\",INT(([Due Date]-DATE(YEAR([Due Date]),1,1)+(TEXT(WEEKDAY(DATE(YEAR([Due Date]),1,1)),\"d\")))/7)+1,0)";
+                fldW.Update();
+            }
+        }
+
+        private void AddDueField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Due"))
+            {
+                fieldName = "Due";
+
+                var fldDIntName = list.Fields.Add("Due", SPFieldType.Calculated, false);
+                var fldD = list.Fields.GetFieldByInternalName(fldDIntName) as SPFieldCalculated;
+                fldD.Title = "Due";
+                fldD.OutputType = SPFieldType.Text;
+                fldD.Sealed = false;
+                fldD.ShowInEditForm = false;
+                fldD.ShowInNewForm = false;
+                fldD.AllowDeletion = false;
+                fldD.Formula =
+                    "=IF([Status]=\"Completed\",\"NA\",IF([Due Date]=\"\",\"No Due Date\",IF([Due Date]<Today,\"(1) Overdue\",IF([Due Date]=Today,\"(2) Due Today\",IF([Due Date]=Today+1,\"(3) Due Tomorrow\",IF(Week=[Today Week],IF(Year=[Today Year],\"(4) Due This Week\",\"(7) Future\"),IF(Week=[Today Week]+1,IF(Year=[Today Year],\"(5) Due Next Week\",\"(7) Future\"),IF(MONTH([Due Date])=MONTH(Today),IF(Year=[Today Year],\"(6) Due This Month\",\"(7) Future\"),\"(7) Future\"))))))))";
+                fldD.Update();
+            }
+        }
+
+        private void AddCommentersField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Commenters"))
+            {
+                fieldName = "Commenters";
+
+                var fldCIntName = list.Fields.Add("Commenters", SPFieldType.Note, false);
+                var fldC = list.Fields.GetFieldByInternalName(fldCIntName) as SPFieldMultiLineText;
+                fldC.Title = "Commenters";
+                fldC.Hidden = true;
+                fldC.Sealed = false;
+                fldC.AllowDeletion = false;
+                fldC.Update();
+            }
+        }
+
+        private void AddCommentersReadField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "CommentersRead"))
+            {
+                fieldName = "CommentersRead";
+
+                var fldCRIntName = list.Fields.Add("CommentersRead", SPFieldType.Note, false);
+                var fldCR = list.Fields.GetFieldByInternalName(fldCRIntName) as SPFieldMultiLineText;
+                fldCR.Title = "Commenters Read";
+                fldCR.Hidden = true;
+                fldCR.Sealed = false;
+                fldCR.AllowDeletion = false;
+                fldCR.Update();
+            }
+        }
+
+        private void RemoveTodayField(SPList list)
+        {
+            if (FieldExistsInList(list, "Today"))
+            {
+                try
+                {
+                    list.Fields.Delete("Today");
                 }
-            });
+                catch (Exception exception)
+                {
+                    System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", exception);
+                }
+            }
         }
 
         private void AddEventHandlers()
