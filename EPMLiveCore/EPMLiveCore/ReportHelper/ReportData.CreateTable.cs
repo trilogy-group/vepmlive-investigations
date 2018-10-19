@@ -14,6 +14,8 @@ namespace EPMLiveCore.ReportHelper
 
         public bool CreateTable(string name, List<ColumnDef> columnDefs, bool dropIfExists, out string message)
         {
+            Guard.ArgumentIsNotNull(columnDefs, nameof(columnDefs));
+
             if (!dropIfExists && TableExists(name))
             {
                 message = "Table already exists.";
