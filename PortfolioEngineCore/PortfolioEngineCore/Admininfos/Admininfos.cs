@@ -7,7 +7,7 @@ using PortfolioEngineCore.Infrastructure.Entities;
 
 namespace PortfolioEngineCore
 {
-    public class Admininfos : PFEBase
+    public partial class Admininfos : PFEBase
     {
         private const string MaxIdColumn = "MaxId";
         private const string WresIdColumn = "WRES_ID";
@@ -1081,101 +1081,6 @@ namespace PortfolioEngineCore
             catch (Exception exception)
             {
                 throw new PFEException((int)PFEError.DeletePIListWork, exception.GetBaseMessage());
-            }
-        }
-
-        /// <summary>
-        /// Deletes Non Work entries for Personal Items for a resource.
-        /// </summary>
-        /// <param name="data">xml defn of the resources, Categories, and items.</param>
-        /// <returns></returns>
-        public bool DeleteResourceTimeoff(string data, out string sResult)
-        {
-            try
-            {
-                _dba.WriteImmTrace("DataSynch", "DeleteResourceTimeoff", "Input", data);
-
-                CStruct xResource = new CStruct();
-                xResource.LoadXML(data);
-
-                int WresId = xResource.GetIntAttr("Id");
-                string ExtId = xResource.GetStringAttr("ExtId");
-                string DataId = xResource.GetStringAttr("DataId");
-
-                SqlCommand SqlCommand;
-                SqlDataReader SqlReader;
-                string sCommand;
-
-                bool bupdateOK = true;
-                CStruct xResult = new CStruct();
-                xResult.Initialize("Resource");
-                xResult.CreateIntAttr("Id", WresId);
-                xResult.CreateStringAttr("DataId", DataId);
-                xResult.CreateStringAttr("ExtId", ExtId);
-
-                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
-                _sqlConnection.Open();
-
-                // check if the resource exists and pick up the WresId if necessary
-                var sErrorMessage = CheckIfResourceExists(ExtId, ref WresId);
-
-                if (sErrorMessage.Length > 0)
-                {
-                    bupdateOK = false;
-                    CStruct xStatus = xResult.CreateSubStruct("Result");
-                    xStatus.CreateIntAttr("Status", 1);
-                    xStatus.CreateCDataSection(sErrorMessage);
-                }
-
-                if (bupdateOK)
-                {
-                    List<CStruct> listcats = xResource.GetList("Category");
-                    foreach (CStruct xSelCat in listcats)
-                    {
-                        int CatId = xSelCat.GetIntAttr("Id");
-                        string CatExtId = xSelCat.GetStringAttr("ExtId");
-
-                        CStruct xCatResult = xResult.CreateSubStruct("Category");
-                        xCatResult.CreateIntAttr("Id", CatId);
-                        xCatResult.CreateStringAttr("ExtId", CatExtId);
-
-                        bool bCatUpdateOK = true;
-                        List<CStruct> listItems = xSelCat.GetList("Item");
-                        int nTotalRows = 0;
-                        foreach (CStruct xSelItem in listItems)
-                        {
-                            string sHol = xSelItem.GetStringAttr("Date");
-                            DateTime dHol = DateTime.Parse(sHol);
-
-                            sCommand = "DELETE FROM EPG_NONWORK_HOURS Where NWI_ID=@NWI_uid And WRES_ID=@WresId And NWH_DATE=@date";
-                            SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            SqlCommand.Parameters.AddWithValue("@NWI_uid", CatId);
-                            SqlCommand.Parameters.AddWithValue("@WresId", WresId);
-                            SqlCommand.Parameters.AddWithValue("@date", dHol);
-                            int nrows = SqlCommand.ExecuteNonQuery();
-                            nTotalRows += nrows;
-                            if (nrows == 0) bCatUpdateOK = false;
-                        }
-                        CStruct xStatus = xCatResult.CreateSubStruct("Result");
-                        if (bCatUpdateOK)
-                        {
-                            xStatus.CreateIntAttr("Status", 0);
-                        }
-                        else
-                        {
-                            xStatus.CreateIntAttr("Status", 1);
-                            xStatus.CreateCDataSection(string.Format("Rows deleted for this category = {0:0}", nTotalRows));
-                        }
-                    }
-                }
-                _sqlConnection.Close();
-
-                sResult = xResult.XML();
-                return bupdateOK;
-            }
-            catch (Exception exception)
-            {
-                throw new PFEException((int)PFEError.DeleteResourceTimeoff, exception.GetBaseMessage());
             }
         }
 

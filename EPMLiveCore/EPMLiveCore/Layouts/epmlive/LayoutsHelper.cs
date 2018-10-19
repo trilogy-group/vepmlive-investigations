@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Navigation;
 using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveCore.Layouts.epmlive
@@ -68,6 +71,82 @@ namespace EPMLiveCore.Layouts.epmlive
             }
 
             button.Focus();
+        }
+
+        public static void LoadHeadingDropDownListHelper(
+            bool checkCondition,
+            string nodeType,
+            SPWeb spWeb,
+            int appId,
+            AppSettingsHelper appSettingsHelper,
+            DropDownList dropDownList,
+            SPNavigationNode currentSpNavigationNode)
+        {
+            if (spWeb == null)
+            {
+                throw new ArgumentNullException(nameof(spWeb));
+            }
+            if (appSettingsHelper == null)
+            {
+                throw new ArgumentNullException(nameof(appSettingsHelper));
+            }
+            if (dropDownList == null)
+            {
+                throw new ArgumentNullException(nameof(dropDownList));
+            }
+
+            if (checkCondition)
+            {
+                SPNavigationNodeCollection coll = null;
+
+                const string TopNavNodeType = "topnav";
+                const string QuickLaunchNodeType = "quiklnch";
+
+                switch (nodeType)
+                {
+                    case TopNavNodeType:
+                        coll = spWeb.Navigation.TopNavigationBar;
+                        break;
+                    case QuickLaunchNodeType:
+                        coll = spWeb.Navigation.QuickLaunch;
+                        break;
+                }
+
+                var navIds = new List<int>();
+
+                if (appId != -1)
+                {
+                    switch (nodeType)
+                    {
+                        case TopNavNodeType:
+                            navIds = appSettingsHelper.TryGetTopNavIdsByAppId(appId);
+                            break;
+                        case QuickLaunchNodeType:
+                            navIds = appSettingsHelper.TryGetQuickLaunchIdsByAppId(appId);
+                            break;
+                    }
+                }
+
+                foreach (SPNavigationNode node in coll)
+                {
+                    if (navIds.Count > 0)
+                    {
+                        if (navIds.Contains(node.Id))
+                        {
+                            dropDownList.Items.Add(new ListItem(node.Title, node.Id.ToString()));
+                        }
+                    }
+                    else
+                    {
+                        dropDownList.Items.Add(new ListItem(node.Title, node.Id.ToString()));
+                    }
+                }
+
+                if (currentSpNavigationNode != null)
+                {
+                    dropDownList.SelectedValue = currentSpNavigationNode.ParentId.ToString();
+                }
+            }
         }
     }
 }
