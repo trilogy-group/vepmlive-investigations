@@ -106,7 +106,7 @@ namespace EPMLiveEnterprise
         private ResourceDataSet rDs;
         private CustomFieldDataSet dsFields;
         private LookupTableDataSet dsLt;
-        private string strTimesheetField = "";
+        private string strTimesheetField = string.Empty;
         private StringBuilder sbErrors = new StringBuilder();
         private double pctComplete;
     }

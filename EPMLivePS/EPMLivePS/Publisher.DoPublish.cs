@@ -58,8 +58,6 @@ namespace EPMLiveEnterprise
                 PopulatePublisherCheck();
 
                 UpdatePublisherCheck(dtStart);
-
-                cn.Close();
             }
             catch (SoapException soapException)
             {
@@ -70,6 +68,10 @@ namespace EPMLiveEnterprise
             {
                 myLog.WriteEntry($"Error: {exception.Message}{exception.StackTrace}", EventLogEntryType.Error, 300);
                 HandleException(exception, "Error: ");
+            }
+            finally
+            {
+                cn.Close();
             }
         }
 
@@ -104,16 +106,16 @@ namespace EPMLiveEnterprise
             {
                 sqlCommand.Parameters.AddWithValue("@projectguid", eventArgs.ProjectGuid);
 
-                using (var dr = sqlCommand.ExecuteReader())
+                using (var dataReader = sqlCommand.ExecuteReader())
                 {
-                    if (dr.Read())
+                    if (dataReader.Read())
                     {
-                        var pubType = dr.GetInt32(0);
-                        publishSiteUrl = HttpUtility.UrlDecode(dr.GetString(1));
+                        var pubType = dataReader.GetInt32(0);
+                        publishSiteUrl = HttpUtility.UrlDecode(dataReader.GetString(1));
 
-                        if (!dr.IsDBNull(2))
+                        if (!dataReader.IsDBNull(2))
                         {
-                            lastTransUid = dr.GetGuid(2);
+                            lastTransUid = dataReader.GetGuid(2);
                         }
 
                         if (string.IsNullOrWhiteSpace(publishSiteUrl))

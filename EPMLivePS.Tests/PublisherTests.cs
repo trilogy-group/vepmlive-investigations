@@ -456,7 +456,8 @@ namespace EPMLivePS.Tests
                             validation = validation + 1;
                             return guid;
                         }
-                    }
+                    },
+                    CountGet = () => 1
                 }
             };
 
@@ -1197,7 +1198,8 @@ namespace EPMLivePS.Tests
                     ItemGetInt32 = __ => new ShimWssAdminRow()
                     {
                         WADMIN_CURRENT_STS_SERVER_UIDGet = () => guid
-                    }
+                    },
+                    CountGet = () => 1
                 }
             };
             ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => DummyString;
