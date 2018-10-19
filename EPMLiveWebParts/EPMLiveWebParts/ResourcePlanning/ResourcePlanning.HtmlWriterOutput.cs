@@ -67,7 +67,6 @@ namespace EPMLiveWebParts
 
         public void processControls(Control parentControl, string zoneIndex, string viewUrl, SPWeb curWeb)
         {
-            Guard.ArgumentIsNotNull(curWeb, nameof(curWeb));
             Guard.ArgumentIsNotNull(viewUrl, nameof(viewUrl));
             Guard.ArgumentIsNotNull(zoneIndex, nameof(zoneIndex));
             Guard.ArgumentIsNotNull(parentControl, nameof(parentControl));
