@@ -68,63 +68,81 @@ namespace EPMLiveCore
         {
             try
             {
-                SPWeb web = SPContext.Current.Web;
+                var web = SPContext.Current.Web;
                 {
-                    SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(WebApplicationSelector1.CurrentItem.Id));
-
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(WebApplicationSelector1.CurrentItem.Id)))
                     {
-                        cn.Open();
-                    });
+                        SPSecurity.RunWithElevatedPrivileges(delegate { sqlConnection.Open(); });
 
+                        using (var selectCountCommand = new SqlCommand("select count(*) from queue where status = 0", sqlConnection))
+                        {
+                            using (var dataReader = selectCountCommand.ExecuteReader())
+                            {
+                                lblLength.Text = "0";
+                                if (dataReader.Read())
+                                {
+                                    lblLength.Text = dataReader.GetInt32(0).ToString();
+                                }
+                            }
+                        }
 
-                    SqlCommand cmd = new SqlCommand("select count(*) from queue where status = 0", cn);
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    lblLength.Text = "0";
-                    if(dr.Read())
-                    {
-                        lblLength.Text = dr.GetInt32(0).ToString();
+                        using (var selectQueueStatsCommand = new SqlCommand("select * from vwQueueStats", sqlConnection))
+                        {
+                            using (var dataReader = selectQueueStatsCommand.ExecuteReader())
+                            {
+                                lblWait.Text = string.Empty;
+                                lblJobTime.Text = string.Empty;
+                                lblMaxQueue.Text = string.Empty;
+                                lblMaxJob.Text = string.Empty;
+                                lblTotalJobs.Text = string.Empty;
+
+                                if (dataReader.Read())
+                                {
+                                    if (!dataReader.IsDBNull(0))
+                                    {
+                                        lblJobTime.Text = showtime(dataReader.GetInt32(0));
+                                    }
+                                    if (!dataReader.IsDBNull(1))
+                                    {
+                                        lblWait.Text = showtime(dataReader.GetInt32(1));
+                                    }
+                                    if (!dataReader.IsDBNull(2))
+                                    {
+                                        lblMaxJob.Text = showtime(dataReader.GetInt32(2));
+                                    }
+                                    if (!dataReader.IsDBNull(3))
+                                    {
+                                        lblMaxQueue.Text = showtime(dataReader.GetInt32(3));
+                                    }
+                                    if (!dataReader.IsDBNull(4))
+                                    {
+                                        lblTotalJobs.Text = dataReader.GetInt32(4).ToString();
+                                    }
+                                }
+                            }
+                        }
+
+                        using (var selectQueueStatusOrderedCommand = new SqlCommand(
+                            "select * from vwQueueItems order by status, dtfinished desc",
+                            sqlConnection))
+                        {
+                            using (var dataAdapter = new SqlDataAdapter(selectQueueStatusOrderedCommand))
+                            {
+                                using (var dataSet = new DataSet())
+                                {
+                                    dataAdapter.Fill(dataSet);
+                                    GvItems.DataSource = dataSet.Tables[0];
+                                }
+                            }
+                        }
+                        GvItems.DataBind();
                     }
-                    dr.Close();
-
-
-                    cmd = new SqlCommand("select * from vwQueueStats", cn);
-                    dr = cmd.ExecuteReader();
-                    lblWait.Text = "";
-                    lblJobTime.Text = "";
-                    lblMaxQueue.Text = "";
-                    lblMaxJob.Text = "";
-                    lblTotalJobs.Text = "";
-
-                    if(dr.Read())
-                    {
-                        if(!dr.IsDBNull(0))
-                            lblJobTime.Text = showtime(dr.GetInt32(0));//.ToString() + " seconds";
-                        if(!dr.IsDBNull(1))
-                            lblWait.Text = showtime(dr.GetInt32(1));
-                        if(!dr.IsDBNull(2))
-                            lblMaxJob.Text = showtime(dr.GetInt32(2));
-                        if(!dr.IsDBNull(3))
-                            lblMaxQueue.Text = showtime(dr.GetInt32(3));
-                        if(!dr.IsDBNull(4))
-                            lblTotalJobs.Text = dr.GetInt32(4).ToString();
-
-                    }
-                    dr.Close();
-
-                    cmd = new SqlCommand("select * from vwQueueItems order by status, dtfinished desc", cn);
-                    SqlDataAdapter da = new SqlDataAdapter(cmd);
-                    DataSet ds = new DataSet();
-                    da.Fill(ds);
-
-                    GvItems.DataSource = ds.Tables[0];
-                    GvItems.DataBind();
-
-                    cn.Close();
                 }
-                
             }
-            catch { }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("Exception suppressed: {0}", ex); 
+            }
         }
 
         protected void Button1_OnClick(object sender, EventArgs e)

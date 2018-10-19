@@ -951,22 +951,10 @@ namespace EPMLiveCore
                                         catch { }
                                     }
 
-                                    if(goodFeatureExp)
+                                    var allAvailableLevels = AddOrUpdateFeatures(goodFeatureExp, features, slLevels);
+                                    if (allAvailableLevels != null)
                                     {
-                                        string[] featureNames = features[3].Split(',');
-                                        foreach(string featureName in featureNames)
-                                        {
-                                            string[] sFeatureName = featureName.Split(':');
-
-                                            int featureId = int.Parse(sFeatureName[0]);
-                                            int userCount = int.Parse(sFeatureName[1]);
-
-                                            if(slLevels.Contains(featureId))
-                                                slLevels[featureId] = (int)slLevels[featureId] + userCount;
-                                            else
-                                                slLevels.Add(featureId, userCount);
-                                        }
-                                        return slLevels;
+                                        return allAvailableLevels;
                                     }
                                     
                                 }
@@ -994,24 +982,11 @@ namespace EPMLiveCore
                                         catch { }
                                     }
 
-                                    if(goodFeatureExp)
+                                    var allAvailableLevels = AddOrUpdateFeatures(goodFeatureExp, features, slLevels);
+                                    if (allAvailableLevels != null)
                                     {
-                                        string[] featureNames = features[3].Split(',');
-                                        foreach(string featureName in featureNames)
-                                        {
-                                            string[] sFeatureName = featureName.Split(':');
-
-                                            int featureId = int.Parse(sFeatureName[0]);
-                                            int userCount = int.Parse(sFeatureName[1]);
-
-                                            if(slLevels.Contains(featureId))
-                                                slLevels[featureId] = (int)slLevels[featureId] + userCount;
-                                            else
-                                                slLevels.Add(featureId, userCount);
-                                        }
-                                        return slLevels;
+                                        return allAvailableLevels;
                                     }
-                                    
                                 }
                                 
                             }
@@ -1064,6 +1039,35 @@ namespace EPMLiveCore
             
             return slLevels;
 
+        }
+
+        private static SortedList AddOrUpdateFeatures(bool goodFeatureExp, string[] features, SortedList levels)
+        {
+            if (goodFeatureExp && features.Length > 3)
+            {
+                var featureNames = features[3].Split(',');
+                foreach (var featureName in featureNames)
+                {
+                    var cutFeatureNames = featureName.Split(':');
+
+                    if (cutFeatureNames.Length > 1)
+                    {
+                        var featureId = int.Parse(cutFeatureNames[0]);
+                        var userCount = int.Parse(cutFeatureNames[1]);
+
+                        if (levels.Contains(featureId))
+                        {
+                            levels[featureId] = (int)levels[featureId] + userCount;
+                        }
+                        else
+                        {
+                            levels.Add(featureId, userCount);
+                        }
+                    }
+                }
+                return levels;
+            }
+            return null;
         }
 
         private static string farmEncode(string code)

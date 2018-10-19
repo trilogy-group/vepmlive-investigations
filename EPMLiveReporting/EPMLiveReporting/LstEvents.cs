@@ -11,6 +11,8 @@ namespace EPMLiveReportsAdmin
 {
     public class LstEvents : SPListEventReceiver
     {
+        private const int MaximumLogKilobytes = 32768;
+        private const int ErrorEventId = 4001;
         private HttpContext currentContext;
         static HttpContext _stCurrentContext;
 
@@ -169,14 +171,21 @@ namespace EPMLiveReportsAdmin
                         if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
                             EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
 
-                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 4001);
+                        LogEntry(ex, "EPMLive Reporting - UpdateForeignKeys");
                     });
                 }
             }
 
             return isSuccessful;
+        }
+
+        private void LogEntry(Exception ex, string source)
+        {
+            using (var myLog = new EventLog("EPM Live", ".", source))
+            {
+                myLog.MaximumKilobytes = MaximumLogKilobytes;
+                myLog.WriteEntry($"{ex.Message}{ex.StackTrace}", EventLogEntryType.Error, ErrorEventId);
+            }
         }
 
         private bool AddField(SPListEventProperties properties)
@@ -229,9 +238,7 @@ namespace EPMLiveReportsAdmin
                         if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
                             EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
 
-                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 4001);
+                        LogEntry(ex, "EPMLive Reporting - UpdateForeignKeys");
                     });
                 }
             }
@@ -314,9 +321,7 @@ namespace EPMLiveReportsAdmin
                         if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
                             EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
 
-                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 4001);
+                        LogEntry(ex, "EPMLive Reporting - UpdateForeignKeys");
                     });
                 }
                 #endregion
@@ -337,9 +342,7 @@ namespace EPMLiveReportsAdmin
                         if (!EventLog.SourceExists("EPMLive Reporting - CleanupListAfterFieldUpdate"))
                             EventLog.CreateEventSource("EPMLive Reporting - CleanupListAfterFieldUpdate", "EPM Live");
 
-                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - CleanupListAfterFieldUpdate");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 4001);
+                        LogEntry(ex, "EPMLive Reporting - CleanupListAfterFieldUpdate");
                     });
                 }
                 #endregion
