@@ -15,6 +15,7 @@ using Shouldly;
 namespace PortfolioEngineCore.Tests.Resources
 {
     using System.Globalization;
+    using Infrastructure.Fields.Fakes;
     using PortfolioEngineCore.Fakes;
 
     [TestClass]
@@ -25,6 +26,26 @@ namespace PortfolioEngineCore.Tests.Resources
         private ResourceRepository resourceRepository;
         private PrivateObject privateObject;
         private PrivateType privateType;
+        private static bool GetCustomFieldValuesWasCalled = false;
+        private static bool GetMultipleValueFieldValuesWasCalled = false;
+        private const string CalculateTableFieldNameMethodName = "CalculateTableFieldName";
+        private const string AddPermission = "AddPermission";
+        private const string DeletePermission = "DeletePermission";
+        private const string GenerateNewResourceId = "GenerateNewResourceId";
+        private string GetAvailableCustomFields = "GetAvailableCustomFields";
+        private string GetGeneralInformationMethodName = "GetGeneralInformation";
+        private const string DummyString = "DummyString";
+        private string GetLookupValuesMethodName = "GetLookupValues";
+        private string GetQueryFieldsMethodName = "GetQueryFields";
+        private string GetResourceCustomFieldValuesMethodName = "GetResourceCustomFieldValues";
+        private string GetUnboxedValueMethodName = "GetUnboxedValue";
+        private string InsertBasicResourceInformationMethodName = "InsertBasicResourceInformation";
+        private string UpdateCostCategoryMethodName = "UpdateCostCategory";
+        private string ValidateResourceMethodName = "ValidateResource";
+        private string GetCustomFieldsMethodName = "GetCustomFields";
+        private string UpdateGeneralInformationMethodName = "UpdateGeneralInformation";
+        private string GetMultiValueCustomFieldValuesMethodName = "GetMultiValueCustomFieldValues";
+        private string IsResourceInUseMethodName = "IsResourceInUse";
 
         [TestInitialize]
         public void Initialize()
@@ -100,8 +121,6 @@ namespace PortfolioEngineCore.Tests.Resources
                 () => commandExecuted.ShouldBe(ExpectedCommand));
         }
 
-        private const string AddPermission = "AddPermission";
-
         [TestMethod]
         public void AddPermission_Should_ExecuteCorrectly()
         {
@@ -124,8 +143,6 @@ namespace PortfolioEngineCore.Tests.Resources
                 () => commandExecuted.ShouldNotBeNullOrEmpty(),
                 () => commandExecuted.ShouldBe(ExpectedCommand));
         }
-
-        private const string CalculateTableFieldNameMethodName = "CalculateTableFieldName";
 
         [TestMethod]
         public void CalculateTableFieldName_ResourceINT_ExecutesCorrectly()
@@ -276,8 +293,6 @@ namespace PortfolioEngineCore.Tests.Resources
                 () => fieldName.ShouldBe(expecteFieldName));
         }
 
-        private const string DeletePermission = "DeletePermission";
-
         [TestMethod]
         public void DeletePermission_Should_ExecuteCorrectly()
         {
@@ -300,10 +315,6 @@ namespace PortfolioEngineCore.Tests.Resources
                 () => commandExecuted.ShouldNotBeNullOrEmpty(),
                 () => commandExecuted.ShouldBe(ExpectedCommand));
         }
-
-        private const string GenerateNewResourceId = "GenerateNewResourceId";
-        private string GetAvailableCustomFields = "GetAvailableCustomFields";
-        private string GetGeneralInformationMethodName = "GetGeneralInformation";
 
         [TestMethod]
         public void GenerateNewResourceId_Should_ExecuteCorrectly()
@@ -329,7 +340,6 @@ namespace PortfolioEngineCore.Tests.Resources
                 () => result.ShouldNotBeNull(),
                 () => result.Value.ShouldBe(1));
         }
-
 
         [TestMethod]
         public void GetAvailableCustomFields_Should_ExecuteCorrectly()
@@ -403,14 +413,6 @@ namespace PortfolioEngineCore.Tests.Resources
             // Assert
             action.ShouldThrow<PFEException>();
         }
-
-        private const string DummyString = "DummyString";
-        private string GetLookupValuesMethodName = "GetLookupValues";
-        private string GetQueryFieldsMethodName = "GetQueryFields";
-        private string GetResourceCustomFieldValuesMethodName = "GetResourceCustomFieldValues";
-        private string GetUnboxedValueMethodName = "GetUnboxedValue";
-        private string InsertBasicResourceInformationMethodName = "InsertBasicResourceInformation";
-        private string UpdateCostCategoryMethodName = "UpdateCostCategory";
 
         [TestMethod]
         public void GetLookupValues_Should_ExecuteCorrectly()
@@ -493,7 +495,7 @@ namespace PortfolioEngineCore.Tests.Resources
                 DummyString,
                 DummyString
             };
-            
+
             // Act
             privateObject.Invoke(GetResourceCustomFieldValuesMethodName, args);
 
@@ -503,7 +505,6 @@ namespace PortfolioEngineCore.Tests.Resources
                 () => dictionary.ShouldNotBeEmpty(),
                 () => dictionary.Values.First().ShouldNotBeEmpty());
         }
-
 
         [TestMethod]
         public void GetUnboxedValue_Byte0_ReturnsExpectedValue()
@@ -534,7 +535,6 @@ namespace PortfolioEngineCore.Tests.Resources
             intResult.ShouldNotBeNull();
             intResult.Value.ToString().ShouldBe("1");
         }
-
 
         [TestMethod]
         public void GetUnboxedValue_DefaultType_ReturnsExpectedValue()
@@ -644,6 +644,363 @@ namespace PortfolioEngineCore.Tests.Resources
 
             // Assert
             result.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void Add_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            var updateWasCalled = false;
+            var insertBasicResourceInformationWasCalled = false;
+            ShimResourceRepository.AllInstances.ValidateResourceResource = (_, resource) => { };
+            ShimResourceRepository.AllInstances.GenerateNewResourceId = _ => 1;
+            ShimResourceRepository.AllInstances.InsertBasicResourceInformationResource = (_, resource) =>
+            {
+                insertBasicResourceInformationWasCalled = true;
+            };
+            ShimResourceRepository.AllInstances.UpdateResource = (_, resource) =>
+            {
+                updateWasCalled = true;
+            };
+            ShimResource.AllInstances.IdGet = _ => 1;
+
+            // Act
+            var result = resourceRepository.Add(new Resource());
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(1),
+                () => insertBasicResourceInformationWasCalled.ShouldBeTrue(),
+                () => updateWasCalled.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void ValidateResource_WithValidResource_NotThrowException()
+        {
+            // Arrange
+            var resource = new ShimResource
+            {
+                ValidateIListOfStringOut = ValidateResource,
+                IsGenericGet = () => 0,
+                EmailGet = () => DummyString,
+                IdGet = () => 1
+            }.Instance;
+            ShimResourceRepository.AllInstances.FindIdByStringObject = (_, key, value) => 1;
+
+            // Act
+            Action action = () => privateObject.Invoke(ValidateResourceMethodName, resource);
+
+            // Assert
+            action.ShouldNotThrow();
+        }
+
+        [TestMethod]
+        public void ValidateResource_WithInvalidResource_ShouldThrowException()
+        {
+            // Arrange
+            var resource = new ShimResource
+            {
+                ValidateIListOfStringOut = ValidateResource,
+                IsGenericGet = () => 0,
+                EmailGet = () => DummyString,
+                IdGet = () => 1
+            }.Instance;
+            ShimResourceRepository.AllInstances.FindIdByStringObject = (_, key, value) => 2;
+
+            // Act
+            Action action = () => privateObject.Invoke(ValidateResourceMethodName, resource);
+
+            // Assert
+            action.ShouldThrow<PFEException>();
+        }
+
+        [TestMethod]
+        public void Update_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            var updateCustomFieldsWasCalled = false;
+            var updateGroupsWasCalled = false;
+            var updateCostCategoryWasCalled = false;
+            var resource = new Resource
+            {
+                IsGeneric = 0
+            };
+            ShimResourceRepository.AllInstances.GetChangedPropertiesResource = (_, res) => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    CountGet = () => 1
+                },
+                SelectString = query => new DataRow[]
+                {
+                    new ShimDataRow
+                    {
+                        ItemGetString = name => null
+                    },
+                    new ShimDataRow
+                    {
+                        ItemGetString = name => 1
+                    }
+                }
+            };
+            ShimResourceRepository.AllInstances.ValidateResourceResource = (_, source) => { };
+            ShimResourceRepository.AllInstances.UpdateGeneralInformationInt32DataTable = (_, id, properties) => { };
+            ShimResourceRepository.AllInstances.UpdateCostCategoryResourceInt32 = (_, res, id) =>
+            {
+                updateCostCategoryWasCalled = true;
+            };
+            ShimResourceRepository.AllInstances.UpdateGroupsResourceDataRow = (_, res, row) =>
+            {
+                updateGroupsWasCalled = true;
+            };
+            ShimResourceRepository.AllInstances.UpdateCustomFieldsResourceDataRowArray = (_, source, fields) =>
+            {
+                updateCustomFieldsWasCalled = true;
+            };
+
+            // Act
+            resourceRepository.Update(resource);
+
+            // Assert
+            resourceRepository.ShouldSatisfyAllConditions(
+                () => updateCustomFieldsWasCalled.ShouldBeTrue(),
+                () => updateGroupsWasCalled.ShouldBeTrue(),
+                () => updateCostCategoryWasCalled.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void Update_ChangedPropertiesEmpty_NoActionTaken()
+        {
+            // Arrange
+            var updateCustomFieldsWasCalled = false;
+            var updateGroupsWasCalled = false;
+            var updateCostCategoryWasCalled = false;
+            var resource = new Resource
+            {
+                IsGeneric = 1
+            };
+            ShimResourceRepository.AllInstances.GetChangedPropertiesResource = (_, res) => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    CountGet = () => 0
+                }
+            };
+            ShimResourceRepository.AllInstances.ValidateResourceResource = (_, source) => { };
+            ShimResourceRepository.AllInstances.UpdateGeneralInformationInt32DataTable = (_, id, properties) => { };
+            ShimResourceRepository.AllInstances.UpdateCostCategoryResourceInt32 = (_, res, id) =>
+            {
+                updateCostCategoryWasCalled = true;
+            };
+            ShimResourceRepository.AllInstances.UpdateGroupsResourceDataRow = (_, res, row) =>
+            {
+                updateGroupsWasCalled = true;
+            };
+            ShimResourceRepository.AllInstances.UpdateCustomFieldsResourceDataRowArray = (_, source, fields) =>
+            {
+                updateCustomFieldsWasCalled = true;
+            };
+
+            // Act
+            resourceRepository.Update(resource);
+
+            // Assert
+            resourceRepository.ShouldSatisfyAllConditions(
+                () => updateCustomFieldsWasCalled.ShouldBeFalse(),
+                () => updateGroupsWasCalled.ShouldBeFalse(),
+                () => updateCostCategoryWasCalled.ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void GetCustomFields_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            var resource = new Resource();
+            ShimResourceRepository.AllInstances.GetAvailableCustomFields = _ => new DataTable();
+            ShimResourceRepository.AllInstances.GetQueryFieldsListOfStringRefListOfStringRefDataTableRef = GetQueryFields;
+            ShimResourceRepository.AllInstances.GetCustomFieldValuesInt32ListOfStringDataTableResourceRef = GetCustomFieldValues;
+            ShimResourceRepository.AllInstances.GetMultiValueCustomFieldValuesInt32DataTableResourceRef = GetMultipleValueFieldValues;
+
+            // Act
+            privateObject.Invoke(GetCustomFieldsMethodName, 1, resource);
+
+            // Assert
+            resourceRepository.ShouldSatisfyAllConditions(
+                () => GetCustomFieldValuesWasCalled.ShouldBeTrue(),
+                () => GetMultipleValueFieldValuesWasCalled.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void GetResourceId_ResourceNotFound_ThrowsException()
+        {
+            // Arrange
+            ShimResourceRepository.AllInstances.FindIdByStringObject = (_, key, value) => null;
+
+            // Act
+            Action action = () => resourceRepository.GetResourceId(1, DummyString, DummyString);
+
+            // Assert
+            action.ShouldThrow<PFEException>();
+        }
+
+        [TestMethod]
+        public void GetResourceId_ResourceFound_ReturnsResourceId()
+        {
+            // Arrange
+            const string ExpectedKey = "WRES_NT_ACCOUNT";
+            const int ResourceId = 3;
+            ShimResourceRepository.AllInstances.FindIdByStringObject = (_, key, value) =>
+            {
+                return key == ExpectedKey ? ResourceId : (int?)null;
+            };
+
+            // Act
+            var result = resourceRepository.GetResourceId(1, DummyString, DummyString);
+
+            // Assert
+            result.ShouldBe(ResourceId);
+        }
+
+        [TestMethod]
+        public void UpdateGeneralInformation_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            const string ExpectedCommand = "UPDATE dbo.EPG_RESOURCES SET";
+            var commandExecuted = string.Empty;
+            var changedProperties = new ShimDataTable
+            {
+                SelectString = query => new DataRow[]
+                {
+                    new ShimDataRow
+                    {
+                        ItemGetString = name => DummyString
+                    }
+                }
+            }.Instance;
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = command =>
+            {
+                commandExecuted = command.CommandText;
+                return 1;
+            };
+
+            // Act
+            privateObject.Invoke(UpdateGeneralInformationMethodName, 1, changedProperties);
+
+            // Assert
+            commandExecuted.ShouldSatisfyAllConditions(
+                () => commandExecuted.ShouldNotBeNullOrEmpty(),
+                () => commandExecuted.ShouldContain(ExpectedCommand));
+        }
+
+        [TestMethod]
+        public void GetMultiValueCustomFieldValues()
+        {
+            // Arrange
+            var dataTable = new DataTable();
+            var resource = new Resource();
+            var count = 0;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () => ++count <= 1,
+                GetOrdinalString = name => 1,
+                GetInt32Int32 = index => 1
+            };
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                GetEnumerator = () => new List<DataRow>
+                {
+                    new ShimDataRow
+                    {
+                        ItemGetString = name =>
+                        {
+                            if (name == "FA_FIELD_ID")
+                            {
+                                return 1;
+                            }
+                            else
+                            {
+                                return DummyString;
+                            }
+                        }
+                    }
+                }.GetEnumerator()
+            };
+            ShimFieldFactory.AllInstances.MakeInt32StringInt32 = (_, id, name, type) => new StubIField
+            {
+                SetValueObject = value => { }
+            };
+
+            // Act
+            privateObject.Invoke(GetMultiValueCustomFieldValuesMethodName, 1, dataTable, resource);
+
+            // Assert
+            resource.ShouldSatisfyAllConditions(
+                () => resource.CustomFields.ShouldNotBeNull(),
+                () => resource.CustomFields.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void IsResourceInUse_Should_ReturnExpectedResult()
+        {
+            // Arrange
+            const string ExpectedMessage = "This resource cannot be deleted. It is used as follows";
+            var resource = new Resource();
+            var stringBuilder = new StringBuilder();
+            var count = 0;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                HasRowsGet = () => true,
+                Read = () => ++count <= 1,
+                GetOrdinalString = name => 1,
+                GetStringInt32 = index => $"{DummyString}.{DummyString}"
+            };
+            
+            // Act
+            privateObject.Invoke(IsResourceInUseMethodName, resource, stringBuilder, 1);
+            var result = stringBuilder.ToString();
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldContain(ExpectedMessage),
+                () => result.ShouldContain(DummyString));
+
+
+        }
+
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
+        private void GetMultipleValueFieldValues(ResourceRepository repository, int id, DataTable dataTable, ref Resource resource)
+        {
+            GetMultipleValueFieldValuesWasCalled = true;
+        }
+
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
+        private void GetCustomFieldValues(ResourceRepository repository, int id, List<string> queryFields, DataTable dataTable, ref Resource resource)
+        {
+            GetCustomFieldValuesWasCalled = true;
+        }
+
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
+        private void GetQueryFields(
+            ResourceRepository resourceRepo,
+            ref List<string> singleValueQueryFields,
+            ref List<string> multiValueQueryFields, ref DataTable dataTable)
+        {
+            singleValueQueryFields = new List<string> { DummyString };
+            multiValueQueryFields = new List<string> { DummyString };
+        }
+
+        private bool ValidateResource(out IList<string> errorMessages)
+        {
+            errorMessages = new List<string>();
+            return true;
         }
 
         /// <summary>
