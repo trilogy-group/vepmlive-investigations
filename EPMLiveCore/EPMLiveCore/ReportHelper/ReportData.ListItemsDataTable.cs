@@ -155,7 +155,9 @@ namespace EPMLiveCore.ReportHelper
                         }
                         else
                         {
-                            if (int.TryParse(addLookUpFieldValues, out _))
+                            int temp;
+
+                            if (int.TryParse(addLookUpFieldValues, out temp))
                             {
                                 itemRow[column[ColumnName].ToString()] = addLookUpFieldValues;
                             }
