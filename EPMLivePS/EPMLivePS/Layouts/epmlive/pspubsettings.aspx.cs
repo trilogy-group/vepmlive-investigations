@@ -1,18 +1,7 @@
 ﻿using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
+using System.Data.SqlClient;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using PSLibrary = Microsoft.Office.Project.Server.Library;
-using System.Data.SqlClient;
-using System.Diagnostics;
 
 namespace EPMLiveEnterprise.Layouts.epmlive
 {
@@ -26,25 +15,24 @@ namespace EPMLiveEnterprise.Layouts.epmlive
                 SPSite site = SPContext.Current.Site;
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
-                    cn.Open();
-
-                    SqlCommand cmd = new SqlCommand("select pubType,weburl from publishercheck where projectguid=@projectguid", cn);
-                    cmd.Parameters.AddWithValue("@projectguid", Request["ProjectUid"]);
-                    SqlDataReader dr = cmd.ExecuteReader();
-
-                    if (dr.Read())
+                    using (var connection = new SqlConnection(
+                        EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
                     {
-                        ddlPubType.SelectedValue = dr.GetInt32(0).ToString();
-                    }
-                    else
-                    {
-                        ddlPubType.SelectedValue = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLivePub-Type");
-                    }
+                        connection.Open();
 
-                    dr.Close();
-
-                    cn.Close();
+                        using (var command = new SqlCommand(
+                            "select pubType,weburl from publishercheck where projectguid=@projectguid",
+                            connection))
+                        {
+                            command.Parameters.AddWithValue("@projectguid", Request["ProjectUid"]);
+                            using (var reader = command.ExecuteReader())
+                            {
+                                ddlPubType.SelectedValue = reader.Read()
+                                    ? reader.GetInt32(0).ToString()
+                                    : EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLivePub-Type");
+                            }
+                        }
+                    }
 
                     try
                     {
@@ -70,34 +58,49 @@ namespace EPMLiveEnterprise.Layouts.epmlive
         {
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
-                cn.Open();
-
-                SqlCommand cmd = new SqlCommand("select pubType,weburl from publishercheck where projectguid=@projectguid", cn);
-                cmd.Parameters.AddWithValue("@projectguid", Request["ProjectUid"]);
-                SqlDataReader dr = cmd.ExecuteReader();
-
-                if (dr.Read())
+                using (var connection =
+                    new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
                 {
-                    dr.Close();
+                    connection.Open();
 
-                    cmd = new SqlCommand("UPDATE publishercheck set pubtype=@pubtype where projectguid=@projectguid", cn);
-                    cmd.Parameters.AddWithValue("@projectguid", Request["ProjectUid"]);
-                    cmd.Parameters.AddWithValue("@pubtype", ddlPubType.SelectedValue);
-                    cmd.ExecuteNonQuery();
-                }
-                else
-                {
-                    dr.Close();
-                    cmd = new SqlCommand("INSERT INTO publishercheck (projectguid,checkbit,pubType,weburl, projectname) VALUES (@projectguid,1,@pubtype,@weburl,@projectname)", cn);
-                    cmd.Parameters.AddWithValue("@projectguid", Request["ProjectUid"]);
-                    cmd.Parameters.AddWithValue("@pubtype", ddlPubType.SelectedValue);
-                    cmd.Parameters.AddWithValue("@weburl", "");
-                    cmd.Parameters.AddWithValue("@projectname", Request["ProjName"]);
-                    cmd.ExecuteNonQuery();
-                }
+                    bool read;
+                    using (var command = new SqlCommand(
+                            "select pubType,weburl from publishercheck where projectguid=@projectguid",
+                            connection))
+                    {
+                        command.Parameters.AddWithValue("@projectguid", Request["ProjectUid"]);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            read = reader.Read();
+                        }
+                    }
 
-                cn.Close();
+                    if (read)
+                    {
+                        using (var command = new SqlCommand(
+                            "UPDATE publishercheck set pubtype=@pubtype where projectguid=@projectguid",
+                            connection))
+                        {
+                            command.Parameters.AddWithValue("@projectguid", Request["ProjectUid"]);
+                            command.Parameters.AddWithValue("@pubtype", ddlPubType.SelectedValue);
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                    else
+                    {
+                        using (var command = new SqlCommand(
+                            "INSERT INTO publishercheck (projectguid,checkbit,pubType,weburl, projectname) " +
+                            "VALUES (@projectguid,1,@pubtype,@weburl,@projectname)",
+                            connection))
+                        {
+                            command.Parameters.AddWithValue("@projectguid", Request["ProjectUid"]);
+                            command.Parameters.AddWithValue("@pubtype", ddlPubType.SelectedValue);
+                            command.Parameters.AddWithValue("@weburl", "");
+                            command.Parameters.AddWithValue("@projectname", Request["ProjName"]);
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                }
             });
 
             btnCancel_Click(sender, e);
