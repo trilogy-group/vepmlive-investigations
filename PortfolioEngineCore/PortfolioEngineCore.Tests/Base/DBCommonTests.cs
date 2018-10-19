@@ -357,7 +357,6 @@ namespace PortfolioEngineCore.Tests.Base
 
             // Act
             var result = privateType.InvokeStatic(CopyRSToRPFieldDefinition, args) as StatusEnum?;
-            fieldDefinition = args[2] as CTSFieldDefinition;
 
             // Assert
             result.ShouldSatisfyAllConditions(
