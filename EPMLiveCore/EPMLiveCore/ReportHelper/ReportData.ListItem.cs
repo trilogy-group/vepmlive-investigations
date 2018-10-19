@@ -83,7 +83,9 @@ namespace EPMLiveCore.ReportHelper
 
         public bool InsertListItem(string sqlString)
         {
-            _cmdWithParams.CommandText = sqlString ?? throw new ArgumentNullException(nameof(sqlString));
+            Guard.ArgumentIsNotNull(sqlString, nameof(sqlString));
+
+            _cmdWithParams.CommandText = sqlString;
             var passed = _DAO.ExecuteNonQuery(_cmdWithParams, _params, _DAO.GetClientReportingConnection);
 
             if (_DAO.SqlErrorOccurred)
@@ -96,7 +98,9 @@ namespace EPMLiveCore.ReportHelper
 
         public bool UpdateListItem(string sqlString)
         {
-            _cmdWithParams.CommandText = sqlString ?? throw new ArgumentNullException(nameof(sqlString));
+            Guard.ArgumentIsNotNull(sqlString, nameof(sqlString));
+
+            _cmdWithParams.CommandText = sqlString;
             var passed = _DAO.ExecuteNonQuery(_cmdWithParams, _params, _DAO.GetClientReportingConnection);
 
             if (_DAO.SqlErrorOccurred)
