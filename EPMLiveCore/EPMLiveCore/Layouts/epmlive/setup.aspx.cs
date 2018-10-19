@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using System.Data;
 using System.Collections;
 using System.Text;
+using EPMLiveCore.Layouts.epmlive;
 
 namespace EPMLiveCore
 {
@@ -43,36 +44,13 @@ namespace EPMLiveCore
 
         protected void btnGrpPermAdd_OnClick(object sender, EventArgs e)
         {
-
-            if (ViewState["dtGroupsPermissions"] != null)
-            {
-                dtGroupsPermissions = (DataTable)ViewState["dtGroupsPermissions"];
-                DataRow dr = dtGroupsPermissions.NewRow();
-                dr["GroupsText"] = ddlGroups.Items[ddlGroups.SelectedIndex].Text;
-                dr["GroupsID"] = ddlGroups.Items[ddlGroups.SelectedIndex].Value;
-                dr["PermissionsText"] = ddlSPPermissions.Items[ddlSPPermissions.SelectedIndex].Text;
-                dr["PermissionsID"] = ddlSPPermissions.Items[ddlSPPermissions.SelectedIndex].Value;
-
-                bool blnRecordExists = false;
-                foreach (DataRow dr2 in dtGroupsPermissions.Rows)
-                {
-                    if ((dr2["GroupsID"] + ";" + dr2["PermissionsID"]) == ddlGroups.Items[ddlGroups.SelectedIndex].Value + ";" + ddlSPPermissions.Items[ddlSPPermissions.SelectedIndex].Value)
-                    {
-                        blnRecordExists = true;
-                        break;
-                    }
-                }
-
-                if (!blnRecordExists)
-                {
-                    dtGroupsPermissions.Rows.Add(dr);
-                    GvGroupsPermissions.DataSource = dtGroupsPermissions;
-                    GvGroupsPermissions.DataBind();
-                    ViewState["dtGroupsPermissions"] = dtGroupsPermissions;
-                }
-            }
-
-            Button1.Focus();
+            LayoutsHelper.HandleGridPermanentAddClickEvent(
+                ViewState,
+                ref dtGroupsPermissions,
+                ddlGroups,
+                ddlSPPermissions,
+                GvGroupsPermissions,
+                Button1);
         }
 
         protected void lnkGrpPermDelete_OnClick(object sender, EventArgs e)
