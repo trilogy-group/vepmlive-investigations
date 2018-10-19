@@ -15,6 +15,7 @@ using Shouldly;
 namespace PortfolioEngineCore.Tests.Resources
 {
     using System.Globalization;
+    using Infrastructure.Fields;
     using Infrastructure.Fields.Fakes;
     using PortfolioEngineCore.Fakes;
 
@@ -46,6 +47,12 @@ namespace PortfolioEngineCore.Tests.Resources
         private string UpdateGeneralInformationMethodName = "UpdateGeneralInformation";
         private string GetMultiValueCustomFieldValuesMethodName = "GetMultiValueCustomFieldValues";
         private string IsResourceInUseMethodName = "IsResourceInUse";
+        private string GetGroupsMethodName = "GetGroups";
+        private string GetCustomFieldValuesMethodName = "GetCustomFieldValues";
+        private const string FieldName = "FieldName";
+        private const string FAName = "FA_NAME";
+        private string UpdateGroupsMethodName = "UpdateGroups";
+        private string GetCustomFieldMethodName = "GetCustomField";
 
         [TestInitialize]
         public void Initialize()
@@ -270,7 +277,10 @@ namespace PortfolioEngineCore.Tests.Resources
             CalculateTableFieldName(CustomFieldTable.TaskWIDEC, "EPGP_PI_WORKITEMS", "WORKITEM_NUMBER{0:0}");
         }
 
-        private void CalculateTableFieldName(CustomFieldTable customFieldTable, string expectedTableName, string format)
+        private void CalculateTableFieldName(
+            CustomFieldTable customFieldTable, 
+            string expectedTableName, 
+            string format)
         {
             // Arrange
             const int FieldId = 1;
@@ -955,7 +965,7 @@ namespace PortfolioEngineCore.Tests.Resources
                 GetOrdinalString = name => 1,
                 GetStringInt32 = index => $"{DummyString}.{DummyString}"
             };
-            
+
             // Act
             privateObject.Invoke(IsResourceInUseMethodName, resource, stringBuilder, 1);
             var result = stringBuilder.ToString();
@@ -967,6 +977,458 @@ namespace PortfolioEngineCore.Tests.Resources
                 () => result.ShouldContain(DummyString));
 
 
+        }
+
+        [TestMethod]
+        public void GetGroups_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            var resource = new Resource();
+            var count = 0;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () => ++count <= 13
+            };
+            ShimUtilities.GetInt32SafelySqlDataReaderString = (reader, name) => count;
+            ShimUtilities.GetStringSafelySqlDataReaderString = (reader, name) => DummyString;
+
+            // Act
+            privateObject.Invoke(GetGroupsMethodName, 1, resource);
+
+            // Assert
+            resource.ShouldSatisfyAllConditions(
+                () => resource.ShouldNotBeNull(),
+                () => resource.PermissionsDictionary.ShouldNotBeEmpty(),
+                () => resource.WorkingHoursListName.ShouldBe(DummyString),
+                () => resource.HolidaysListName.ShouldBe(DummyString),
+                () => resource.TimesheetListName.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void GetCustomFieldValues_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            var queryFields = new List<string>();
+            var dataTable = new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => 104
+                        },
+                        new ShimDataRow
+                        {
+                            ItemGetString = GetCustomFieldValue(fieldName: DummyString, defaultValue: 1),
+                        },
+                        new ShimDataRow
+                        {
+                            ItemGetString = GetCustomFieldValue(fieldName: DummyString, defaultValue: 4),
+                        }
+                    }.GetEnumerator()
+                }
+            }.Instance;
+            var resource = new Resource();
+            var count = 0;
+            ShimResourceRepository.AllInstances.GetLookupValues = _ => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => 4
+                        }
+                    }.GetEnumerator()
+                }
+            };
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () => ++count <= 1,
+                ItemGetString = name => 4
+            };
+            ShimFieldFactory.AllInstances.MakeInt32StringInt32 = (_, id, name, type) => new ShimCodeField
+            {
+                SetCodeInt32 = code => { }
+            }.Instance;
+
+            // Act
+            privateObject.Invoke(GetCustomFieldValuesMethodName, 1, queryFields, dataTable, resource);
+
+            // Assert
+            resource.ShouldSatisfyAllConditions(
+                () => resource.ShouldNotBeNull(),
+                () => resource.CustomFields.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void UpdateGroups_PermissionsProperty_ExecutesCorrectly()
+        {
+            // Arrange
+            var deletePermissionWasCalled = false;
+            var addPermissionWasCalled = false;
+            var resource = new ShimResource
+            {
+                PermissionsDictionaryGet = () => new Dictionary<int, string>
+                {
+                    [1] = "ADD",
+                    [2] = "UPDATE"
+                }
+            }.Instance;
+            var dataRow = new ShimDataRow
+            {
+                ItemGetString = name => "Permissions"
+            }.Instance;
+            ShimResourceRepository.AllInstances.DeletePermissionResourceKeyValuePairOfInt32String =
+                (_, source, keyValuePair) => deletePermissionWasCalled = true;
+            ShimResourceRepository.AllInstances.AddPermissionResourceKeyValuePairOfInt32String = 
+                (_, source, keyValuePair) => addPermissionWasCalled = true;
+
+            //Act
+            privateObject.Invoke(UpdateGroupsMethodName, resource, dataRow);
+
+            // Assert
+            resource.ShouldSatisfyAllConditions(
+                () => deletePermissionWasCalled.ShouldBeTrue(),
+                () => addPermissionWasCalled.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void UpdateGroups_HolidaysListIdProperty_ExecutesCorrectly()
+        {
+            UpdateGroups_SpecificProperty_ExecutesCorrectly("HolidaysListId");
+        }
+
+        [TestMethod]
+        public void UpdateGroups_WorkingHoursListIdProperty_ExecutesCorrectly()
+        {
+            UpdateGroups_SpecificProperty_ExecutesCorrectly("WorkingHoursListId");
+        }
+
+        [TestMethod]
+        public void UpdateGroups_TimesheetListIdProperty_ExecutesCorrectly()
+        {
+            UpdateGroups_SpecificProperty_ExecutesCorrectly("TimesheetListId");
+        }
+
+        public void UpdateGroups_SpecificProperty_ExecutesCorrectly(string propertyName)
+        {
+            // Arrange
+            var resource = new Resource();
+            var dataRow = new ShimDataRow
+            {
+                ItemGetString = name => propertyName
+            }.Instance;
+            var expectedCommands = new List<string>
+            {
+                "DELETE FROM dbo.EPG_GROUP_MEMBERS WHERE MEMBER_UID = @ResourceId AND GROUP_ID In (SELECT GROUP_ID FROM dbo.EPG_GROUPS WHERE GROUP_ENTITY = @GroupEntityId)",
+                "INSERT INTO dbo.EPG_GROUP_MEMBERS (MEMBER_UID, GROUP_ID) VALUES(@ResourceId, @GroupId)"
+            };
+            var commandsExecuted = new List<string>();
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = command =>
+            {
+                commandsExecuted.Add(command.CommandText);
+                return 1;
+            };
+            //Act
+            privateObject.Invoke(UpdateGroupsMethodName, resource, dataRow);
+
+            // Assert
+            resource.ShouldSatisfyAllConditions(
+                () => expectedCommands.All(p => commandsExecuted.Contains(p)).ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void GetCustomField_UnkwonFieldType_ExecutesCorrectly()
+        {
+            // Arrange
+            const int FieldId = 3;
+            var fieldObject = new object();
+            ShimResourceRepository.AllInstances.GetAvailableCustomFields = _ => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => FieldId
+                        }
+                    }.GetEnumerator()
+                }
+            };
+            ShimResourceRepository.AllInstances.GetLookupValues = _ => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection()
+            };
+            ShimFieldFactory.AllInstances.MakeInt32StringInt32 = (_, id, name, type) => new StubIField
+            {
+                SetValueObject = value => fieldObject = value
+            };
+
+            // Act
+            var result = privateObject.Invoke(GetCustomFieldMethodName, FieldId, DummyString, DummyString) as IField;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => fieldObject.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void GetCustomField_MultiValueCodeFieldType_ExecutesCorrectly()
+        {
+            // Arrange
+            const int FieldId = 40;
+            var fieldObject = new object();
+            ShimResourceRepository.AllInstances.GetAvailableCustomFields = _ => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => FieldId
+                        }
+                    }.GetEnumerator()
+                }
+            };
+            ShimResourceRepository.AllInstances.GetLookupValues = _ => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => FieldId
+                        }
+                    }.GetEnumerator()
+                }
+            };
+            ShimFieldFactory.AllInstances.MakeInt32StringInt32 = (_, id, name, type) => new StubIField
+            {
+                SetValueObject = value => fieldObject = value
+            };
+
+            // Act
+            var result = privateObject.Invoke(GetCustomFieldMethodName, FieldId, DummyString, "40") as IField;
+            var dictionary = fieldObject as Dictionary<int, string>;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => dictionary.ShouldNotBeNull(),
+                () => dictionary.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void GetCustomField_MultiValueCodeFieldTypeAndValueNull_ExecutesCorrectly()
+        {
+            // Arrange
+            const int FieldId = 40;
+            var fieldObject = new object();
+            ShimResourceRepository.AllInstances.GetAvailableCustomFields = _ => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => FieldId
+                        }
+                    }.GetEnumerator()
+                }
+            };
+            ShimResourceRepository.AllInstances.GetLookupValues = _ => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => FieldId
+                        }
+                    }.GetEnumerator()
+                }
+            };
+            ShimFieldFactory.AllInstances.MakeInt32StringInt32 = (_, id, name, type) => new ShimMultiValueCodeField
+            {
+                SetValueObject = value => fieldObject = value
+            }.Instance;
+
+            // Act
+            var result = privateObject.Invoke(GetCustomFieldMethodName, FieldId, DummyString, null) as IField;
+            var dictionary = fieldObject as Dictionary<int, string>;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => dictionary.ShouldNotBeNull(),
+                () => dictionary.ShouldBeEmpty());
+        }
+
+        [TestMethod]
+        public void GetCustomField_CodeFieldType_ExecutesCorrectly()
+        {
+            // Arrange
+            const int FieldId = 4;
+            var fieldObject = new object();
+            ShimResourceRepository.AllInstances.GetAvailableCustomFields = _ => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => FieldId
+                        }
+                    }.GetEnumerator()
+                }
+            };
+            ShimResourceRepository.AllInstances.GetLookupValues = _ => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => FieldId
+                        }
+                    }.GetEnumerator()
+                }
+            };
+            ShimFieldFactory.AllInstances.MakeInt32StringInt32 = (_, id, name, type) => new ShimCodeField
+            {
+                SetValueObject = value => fieldObject = value,
+                SetCodeInt32 = code => { }
+            }.Instance;
+
+            // Act
+            var result = privateObject.Invoke(GetCustomFieldMethodName, FieldId, DummyString, "4") as IField;
+            var intValue = fieldObject as int?;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => intValue.ShouldNotBeNull(),
+                () => intValue.Value.ShouldBe(FieldId));
+        }
+
+        [TestMethod]
+        public void GetCustomField_CodeFieldTypeAndValueNull_ExecutesCorrectly()
+        {
+            // Arrange
+            const int FieldId = 4;
+            var fieldObject = new object();
+            ShimResourceRepository.AllInstances.GetAvailableCustomFields = _ => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => FieldId
+                        }
+                    }.GetEnumerator()
+                }
+            };
+            ShimResourceRepository.AllInstances.GetLookupValues = _ => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => FieldId
+                        }
+                    }.GetEnumerator()
+                }
+            };
+            ShimFieldFactory.AllInstances.MakeInt32StringInt32 = (_, id, name, type) => new ShimCodeField
+            {
+                SetCodeInt32 = value => fieldObject = value
+            }.Instance;
+
+            // Act
+            var result = privateObject.Invoke(GetCustomFieldMethodName, FieldId, DummyString, null) as IField;
+            var intValue = fieldObject as int?;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => intValue.ShouldNotBeNull(),
+                () => intValue.Value.ShouldBe(-1));
+        }
+
+        [TestMethod]
+        public void GetCustomField_AvailableCustomFieldsEmpty_ThrowsException()
+        {
+            // Arrange
+            const int FieldId = 4;
+            var fieldObject = new object();
+            ShimResourceRepository.AllInstances.GetAvailableCustomFields = _ => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    GetEnumerator = () => new List<DataRow>().GetEnumerator()
+                }
+            };
+
+            // Act
+            Action action = () => privateObject.Invoke(GetCustomFieldMethodName, FieldId, DummyString, "4");
+
+            // Assert
+            action.ShouldThrow<PFEException>();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // methods 
+
+        private FakesDelegates.Func<string, object> GetCustomFieldValue(string fieldName, object defaultValue)
+        {
+            return name =>
+            {
+                if (name == FieldName || name == FAName)
+                {
+                    return fieldName;
+                }
+                else
+                {
+                    return defaultValue;
+                }
+            };
         }
 
         /// <summary>
