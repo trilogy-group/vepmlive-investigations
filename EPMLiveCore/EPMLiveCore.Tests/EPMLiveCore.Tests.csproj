@@ -230,12 +230,15 @@
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePoolTests.cs" />
     <Compile Include="Layouts\epmlive\CreateNewWorkspaceTest.cs" />
     <Compile Include="Layouts\epmlive\CommentsTests.cs" />
+    <Compile Include="Layouts\epmlive\CustomEditNavTests.cs" />
     <Compile Include="Layouts\epmlive\GenericQueryControlTests.cs" />
     <Compile Include="Layouts\epmlive\GridGanttSettingsTest.cs" />
+    <Compile Include="Layouts\epmlive\Integration\ManageTests.cs" />
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
     <Compile Include="Layouts\epmlive\SolutionStoreProxyTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsRemTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsTests.cs" />
+    <Compile Include="Layouts\epmlive\Upgraders\WE432UpgraderTests.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
     <Compile Include="Layouts\Reporting\IZenda\AddTests.cs" />
     <Compile Include="Layouts\Reporting\EditTests.cs" />
@@ -276,6 +279,7 @@
     </Compile>
     <Compile Include="TestCheck.cs" />
     <Compile Include="WebPageCode\AdminConnsTest.cs" />
+    <Compile Include="WebPageCode\AdminQueueTests.cs" />
     <Compile Include="WebPageCode\CreateDatabaseTest.cs" />
     <Compile Include="WebPageCode\ListDisplayPageTests.cs" />
   </ItemGroup>

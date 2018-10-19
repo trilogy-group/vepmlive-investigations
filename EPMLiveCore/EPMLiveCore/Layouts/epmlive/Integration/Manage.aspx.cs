@@ -67,19 +67,28 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id));
-                cn.Open();
+                var dataSet = new DataSet();
 
-                SqlCommand cmd = new SqlCommand(@"SELECT     dbo.INT_MODULES.Title, dbo.INT_MODULES.Description, dbo.INT_MODULES.Icon, dbo.INT_LISTS.INT_LIST_ID, dbo.INT_LISTS.LIST_ID, dbo.INT_LISTS.ACTIVE
+                using (var connection = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id)))
+                {
+                    connection.Open();
+
+                    using (var sqlCommand = new SqlCommand(
+                        @"SELECT     dbo.INT_MODULES.Title, dbo.INT_MODULES.Description, dbo.INT_MODULES.Icon, dbo.INT_LISTS.INT_LIST_ID, dbo.INT_LISTS.LIST_ID, dbo.INT_LISTS.ACTIVE
                     FROM         dbo.INT_MODULES INNER JOIN
-                      dbo.INT_LISTS ON dbo.INT_MODULES.MODULE_ID = dbo.INT_LISTS.MODULE_ID where SITE_ID=@siteid", cn);
-                cmd.Parameters.AddWithValue("@siteid", Web.Site.ID);
+                      dbo.INT_LISTS ON dbo.INT_MODULES.MODULE_ID = dbo.INT_LISTS.MODULE_ID where SITE_ID=@siteid",
+                        connection))
+                    {
+                        sqlCommand.Parameters.AddWithValue("@siteid", Web.Site.ID);
 
-                DataSet ds = new DataSet();
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(ds);
+                        using (var sqlDataAdapter = new SqlDataAdapter(sqlCommand))
+                        {
+                            sqlDataAdapter.Fill(dataSet);
+                        }
+                    }
+                }
 
-                DataTable dt = ds.Tables[0];
+                DataTable dt = dataSet.Tables[0];
                 dt.Columns.Add("ListName");
 
                 Hashtable hshLists = new Hashtable();
@@ -127,10 +136,8 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                     }
                 }
 
-                gvIntegrations.DataSource = ds;
+                gvIntegrations.DataSource = dataSet;
                 gvIntegrations.DataBind();
-
-                cn.Close();
             });
         }
 
