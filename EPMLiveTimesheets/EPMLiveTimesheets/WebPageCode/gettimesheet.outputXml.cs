@@ -132,7 +132,10 @@ namespace TimeSheets
             newColWork.Attributes.Append(attrIdWork);
 
             nodeHead.AppendChild(newColWork);
-            nodeHead.RemoveChild(nodeHead.SelectSingleNode("settings") ?? throw new InvalidOperationException());
+            var tempNode = nodeHead.SelectSingleNode("settings");
+            Guard.ArgumentIsNotNull(tempNode, nameof(tempNode));
+
+            nodeHead.RemoveChild(tempNode);
 
             var strWorkTypes = workTypes.Split('|');
 
