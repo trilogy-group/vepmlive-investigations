@@ -200,7 +200,6 @@ namespace PortfolioEngineCore
             ref bool canUpdate)
         {
             Utilities.ArgumentIsNotNull(warningMessage, nameof(warningMessage));
-            Utilities.ArgumentIsNotNull(transaction, nameof(transaction));
             Utilities.ArgumentIsNotNull(project, nameof(project));
             Utilities.ArgumentIsNotNull(errorMessage, nameof(errorMessage));
             Utilities.ArgumentIsNotNull(extId, nameof(extId));
