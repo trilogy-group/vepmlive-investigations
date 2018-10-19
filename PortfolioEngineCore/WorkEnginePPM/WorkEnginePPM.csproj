@@ -192,6 +192,9 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\ClientPrioritization.ascx.designer.cs">
       <DependentUpon>ClientPrioritization.ascx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\ControlBase.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Layouts\ppm\CostAnalyzer.ascx.cs">
       <DependentUpon>CostAnalyzer.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
