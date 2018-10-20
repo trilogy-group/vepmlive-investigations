@@ -176,7 +176,7 @@ namespace EPMLiveCore
                 control?.Dispose();
             }
 
-            _disposed = false;
+            _disposed = true;
         }
     }
 }
