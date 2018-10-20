@@ -228,6 +228,7 @@
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AddListDataTests.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePoolTests.cs" />
+    <Compile Include="Layouts\epmlive\AddUsersTests.cs" />
     <Compile Include="Layouts\epmlive\CreateNewWorkspaceTest.cs" />
     <Compile Include="Layouts\epmlive\CommentsTests.cs" />
     <Compile Include="Layouts\epmlive\CustomEditNavTests.cs" />

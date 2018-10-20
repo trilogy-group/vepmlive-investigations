@@ -161,5 +161,22 @@ namespace EPMLiveCore
         }
 
         #endregion
+
+        private bool _disposed = false;
+
+        public override void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            foreach (Control control in phToolbar.Controls)
+            {
+                control?.Dispose();
+            }
+
+            _disposed = false;
+        }
     }
 }
