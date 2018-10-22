@@ -406,6 +406,10 @@
     <Compile Include="ReportWebPartBase.cs" />
     <Compile Include="ResourceGrid\ResourceGrid.cs" />
     <Compile Include="ResourcePlanning\ResourcePlanning.cs" />
+    <Compile Include="ResourcePlanning\ResourcePlanning.Fields.cs" />
+    <Compile Include="ResourcePlanning\ResourcePlanning.HtmlWriterOutput.cs" />
+    <Compile Include="ResourcePlanning\ResourcePlanning.renderGantt.cs" />
+    <Compile Include="ResourcePlanning\ResourcePlanning.RenderWebPart.cs" />
     <Compile Include="RollupSummary\RollupSummary.cs" />
     <Compile Include="RollupSummary\SummaryRollupToolpart.cs" />
     <Compile Include="SiteCollectionSetupWizard\SiteCollectionSetupWizard.cs" />
