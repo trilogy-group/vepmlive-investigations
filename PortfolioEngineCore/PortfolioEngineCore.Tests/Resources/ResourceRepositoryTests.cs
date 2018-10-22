@@ -55,7 +55,7 @@ namespace PortfolioEngineCore.Tests.Resources
         private const string GetCustomFieldMethodName = "GetCustomField";
         private const string CanDeleteMethodName = "CanDelete";
         private const string GetChangedPropertiesMethodName = "GetChangedProperties";
-        private string UpdateCustomFieldsMethodName = "UpdateCustomFields";
+        private const string UpdateCustomFieldsMethodName = "UpdateCustomFields";
 
         [TestInitialize]
         public void Initialize()
