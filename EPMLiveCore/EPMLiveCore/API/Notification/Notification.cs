@@ -425,36 +425,49 @@ namespace EPMLiveCore.API
         /// <param name="epmNotification">The epm notification.</param>
         /// <param name="sqlConnection">The SQL connection.</param>
         /// <param name="user">The user.</param>
-        private static void SetNotificationFlag(EPMNotification epmNotification, SqlConnection sqlConnection,
-                                                SPUser user)
+        private static void SetNotificationFlag(EPMNotification epmNotification, SqlConnection sqlConnection, SPUser user)
         {
-            var sqlCommand = new SqlCommand("spNSetBit", sqlConnection) { CommandType = CommandType.StoredProcedure };
-
-            SqlParameter notificationId = sqlCommand.Parameters.Add("@FK", SqlDbType.UniqueIdentifier);
-            SqlParameter userId = sqlCommand.Parameters.Add("@userid", SqlDbType.VarChar);
-            SqlParameter index = sqlCommand.Parameters.Add("@index", SqlDbType.Int);
-            SqlParameter bit = sqlCommand.Parameters.Add("@val", SqlDbType.Bit);
-
-            notificationId.Value = epmNotification.Id;
-            userId.Value = epmNotification.Type > 1 ? user.ID.ToString() : user.LoginName;
-            index.Value = epmNotification.FlagToSet;
-            bit.Value = true;
-
-            try
+            if (sqlConnection == null)
             {
-                SPSecurity.RunWithElevatedPrivileges(() =>
-                                                         {
-                                                             sqlConnection.Open();
-                                                             sqlCommand.ExecuteNonQuery();
-                                                         });
+                throw new ArgumentNullException(nameof(sqlConnection));
             }
-            catch (SqlException sqlException)
+
+            if (user == null)
             {
-                throw new APIException(10509, sqlException.Message);
+                throw new ArgumentNullException(nameof(user));
             }
-            finally
+
+            using (var sqlCommand = new SqlCommand("spNSetBit", sqlConnection))
             {
-                sqlConnection.Close();
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+
+                var notificationId = sqlCommand.Parameters.Add("@FK", SqlDbType.UniqueIdentifier);
+                var userId = sqlCommand.Parameters.Add("@userid", SqlDbType.VarChar);
+                var index = sqlCommand.Parameters.Add("@index", SqlDbType.Int);
+                var bit = sqlCommand.Parameters.Add("@val", SqlDbType.Bit);
+
+                notificationId.Value = epmNotification.Id;
+                userId.Value = epmNotification.Type > 1 ? user.ID.ToString() : user.LoginName;
+                index.Value = epmNotification.FlagToSet;
+                bit.Value = true;
+
+                try
+                {
+                    SPSecurity.RunWithElevatedPrivileges(() =>
+                    {
+                        sqlConnection.Open();
+                        sqlCommand.ExecuteNonQuery();
+                    });
+                }
+                catch (SqlException sqlException)
+                {
+                    Trace.WriteLine(sqlException.ToString());
+                    throw new APIException(10509, sqlException.Message);
+                }
+                finally
+                {
+                    sqlConnection.Close();
+                }
             }
         }
 
