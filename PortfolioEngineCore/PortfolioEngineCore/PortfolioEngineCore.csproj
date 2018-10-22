@@ -77,6 +77,9 @@
     </Compile>
     <Compile Include="Admininfos\AdminFunctions.cs" />
     <Compile Include="Admininfos\Admininfos.cs" />
+    <Compile Include="Admininfos\Admininfos.DeleteResourceTimeoff.cs" />
+    <Compile Include="Admininfos\Admininfos.UpdateHolidaySchedule.cs" />
+    <Compile Include="Admininfos\Admininfos.UpdateListWork.cs" />
     <Compile Include="Admininfos\AllWorkhours.cs" />
     <Compile Include="Admininfos\PFELookup.cs" />
     <Compile Include="Admininfos\Workhours.cs" />
