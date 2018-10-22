@@ -36,6 +36,7 @@ namespace EPMLiveCore
         private const string FeaturesColumn = "Features";
         private const string UserCountColumn = "UserCount";
         private const string QuantityColumn = "quantity";
+        private const string NotAvailableString = "NA";
         private SPWeb _web;
         private bool _bIsOnline = false;
         public string OwnerUsername = "";
@@ -967,7 +968,7 @@ namespace EPMLiveCore
 
             var expiration = features[4];
             var goodFeatureExp = false;
-            if (expiration == "NA")
+            if (expiration == NotAvailableString)
             {
                 goodFeatureExp = true;
             }
@@ -988,15 +989,21 @@ namespace EPMLiveCore
                 }
             }
 
+            var allAvailableLevels = AddOrUpdateFeatures(goodFeatureExp, features, levels);
+            return allAvailableLevels;
+        }
+
+        private static SortedList AddOrUpdateFeatures(bool goodFeatureExp, string[] features, SortedList levels)
+        {
             if (goodFeatureExp)
             {
                 var featureNames = features[3].Split(',');
                 foreach (var featureName in featureNames)
                 {
-                    var sFeatureName = featureName.Split(':');
+                    var nameParts = featureName.Split(':');
 
-                    var featureId = int.Parse(sFeatureName[0]);
-                    var userCount = int.Parse(sFeatureName[1]);
+                    var featureId = int.Parse(nameParts[0]);
+                    var userCount = int.Parse(nameParts[1]);
 
                     if (levels.Contains(featureId))
                     {
@@ -1039,28 +1046,8 @@ namespace EPMLiveCore
                 }
             }
 
-            if (goodFeatureExp)
-            {
-                var featureNames = features[3].Split(',');
-                foreach (var featureName in featureNames)
-                {
-                    var sFeatureName = featureName.Split(':');
-
-                    var featureId = int.Parse(sFeatureName[0]);
-                    var userCount = int.Parse(sFeatureName[1]);
-
-                    if (levels.Contains(featureId))
-                    {
-                        levels[featureId] = (int)levels[featureId] + userCount;
-                    }
-                    else
-                    {
-                        levels.Add(featureId, userCount);
-                    }
-                }
-                return levels;
-            }
-            return null;
+            var allAvailableLevels = AddOrUpdateFeatures(goodFeatureExp, features, levels);
+            return allAvailableLevels;
         }
 
         private static void AddFeatureActivationType1(out int ActivationType, string[] features, SortedList levels)
