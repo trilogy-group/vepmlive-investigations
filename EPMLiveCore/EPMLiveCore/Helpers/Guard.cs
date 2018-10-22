@@ -11,5 +11,13 @@ namespace EPMLiveCore.Helpers
                 throw new ArgumentNullException(argument);
             }
         }
+
+        public static void ValueIsNotNull(object objValue, string argument)
+        {
+            if (objValue == null)
+            {
+                throw new InvalidOperationException($"{argument} cannot be null");
+            }
+        }
     }
 }
