@@ -55,6 +55,7 @@ namespace PortfolioEngineCore.Tests.Resources
         private const string GetCustomFieldMethodName = "GetCustomField";
         private const string CanDeleteMethodName = "CanDelete";
         private const string GetChangedPropertiesMethodName = "GetChangedProperties";
+        private string UpdateCustomFieldsMethodName = "UpdateCustomFields";
 
         [TestInitialize]
         public void Initialize()
@@ -1396,6 +1397,291 @@ namespace PortfolioEngineCore.Tests.Resources
                 () => result.PermissionsDictionary.Count.ShouldBeGreaterThan(0),
                 () => result.CustomFields.ShouldNotBeNull(),
                 () => result.CustomFields.ShouldNotBeEmpty());
+        }
+
+        [TestMethod]
+        public void GetUnboxedValue_DateTimeType_ReturnsExpectedValue()
+        {
+            // Arrange
+            const string DateValue = "2018-10-22 10:50:22";
+            var value = (object)DateValue;
+
+            // Act
+            var result = privateObject.Invoke(GetUnboxedValueMethodName, value, typeof(DateTime)) as DateTime?;
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.Value.ToString("yyyy-MM-dd HH:mm:ss").ShouldBe(DateValue);
+        }
+
+        [TestMethod]
+        public void UpdateCustomFields_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            var resource = new Resource();
+            var changedCustomFields = new DataRow[]
+            {
+                new ShimDataRow
+                {
+                    ItemGetString = name => 101
+                },
+                new ShimDataRow
+                {
+                    ItemGetString = name =>
+                    {
+                        if (name == "NewValue")
+                        {
+                            return new Dictionary<int, string>
+                            {
+                                [1] = DummyString
+                            };
+                        }
+                        else
+                        {
+                            return 151;
+                        }
+                    }
+                }
+            };
+            var args = new object[] { resource, changedCustomFields };
+            var expectedSqlCommands = new List<string>
+            {
+                "INSERT INTO dbo.EPGC_RESOURCE_MV_VALUES (WRES_ID, MVR_FIELD_ID, MVR_UID) VALUES(@ResourceId, @FieldId, @ValueId)",
+                "DELETE FROM dbo.EPGC_RESOURCE_MV_VALUES WHERE WRES_ID = @ResourceId AND MVR_FIELD_ID = @FieldId",
+                "UPDATE dbo.EPGC_RESOURCE_INT_VALUES SET [RI_101] = @RI_101 WHERE WRES_ID = @ResourceId",
+                "INSERT INTO dbo.EPGC_RESOURCE_INT_VALUES (WRES_ID) VALUES(@ResourceId)",
+                "SELECT COUNT(WRES_ID) FROM dbo.EPGC_RESOURCE_INT_VALUES WHERE WRES_ID = @ResourceId"
+            };
+            var executedCommands = new List<string>();
+            ShimResourceRepository.AllInstances.GetAvailableCustomFields = _ => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => 101
+                        },
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => 151
+                        }
+                    }.GetEnumerator()
+                }
+            };
+            ShimSqlCommand.AllInstances.ExecuteScalar = command =>
+            {
+                executedCommands.Add(command.CommandText);
+                return 0;
+            };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = command =>
+            {
+                executedCommands.Add(command.CommandText);
+                return 0;
+            };
+
+            // Act
+            privateObject.Invoke(UpdateCustomFieldsMethodName, args);
+
+            // Assert
+            expectedSqlCommands.All(p => executedCommands.Contains(p)).ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void Delete_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            const string ExpectedCommand = "EPG_SP_DeleteResource";
+            var commandExecuted = string.Empty;
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = command =>
+            {
+                commandExecuted = command.CommandText;
+                return 1;
+            };
+
+            // Act
+            resourceRepository.Delete(new Resource(), 1);
+
+            // Assert
+            resourceRepository.ShouldSatisfyAllConditions(
+                () => commandExecuted.ShouldNotBeNullOrEmpty(),
+                () => commandExecuted.ShouldBe(ExpectedCommand));
+        }
+
+        [TestMethod]
+        public void AddPermission_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            const string ExpectedCommand = "INSERT INTO dbo.EPG_GROUP_MEMBERS (MEMBER_UID, GROUP_ID) VALUES(@ResourceId, @GroupId)";
+            var commandExecuted = string.Empty;
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = command =>
+            {
+                commandExecuted = command.CommandText;
+                return 1;
+            };
+            var permissionGroup = new KeyValuePair<int, string>();
+            var resource = new Resource();
+
+            // Act
+            privateObject.Invoke(AddPermission, resource, permissionGroup);
+
+            // Assert
+            resourceRepository.ShouldSatisfyAllConditions(
+                () => commandExecuted.ShouldNotBeNullOrEmpty(),
+                () => commandExecuted.ShouldBe(ExpectedCommand));
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_ResourceINT_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.ResourceINT, "EPGC_RESOURCE_INT_VALUES", "RI_{0:000}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_ResourceTEXT_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.ResourceTEXT, "EPGC_RESOURCE_TEXT_VALUES", "RT_{0:000}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_ResourceDEC_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.ResourceDEC, "EPGC_RESOURCE_DEC_VALUES", "RC_{0:000}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_ResourceNTEXT_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.ResourceNTEXT, "EPGC_RESOURCE_NTEXT_VALUES", "RN_{0:000}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_ResourceDATE_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.ResourceDATE, "EPGC_RESOURCE_DATE_VALUES", "RD_{0:000}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_ResourceMV_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.ResourceMV, "EPGC_RESOURCE_MV_VALUES", "MVR_UID");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_PortfolioINT_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.PortfolioINT, "EPGP_PROJECT_INT_VALUES", "PI_{0:000}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_PortfolioTEXT_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.PortfolioTEXT, "EPGP_PROJECT_TEXT_VALUES", "PT_{0:000}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_PortfolioDEC_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.PortfolioDEC, "EPGP_PROJECT_DEC_VALUES", "PC_{0:000}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_PortfolioNTEXT_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.PortfolioNTEXT, "EPGP_PROJECT_NTEXT_VALUES", "PN_{0:000}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_PortfolioDATE_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.PortfolioDATE, "EPGP_PROJECT_DATE_VALUES", "PD_{0:000}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_Program_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.Program, "EPGP_PI_PROGS", "PROG_UID");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_ProjectINT_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.ProjectINT, "EPGX_PROJ_INT_VALUES", "XI_{0:000}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_ProjectTEXT_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.ProjectTEXT, "EPGX_PROJ_TEXT_VALUES", "XT_{0:000}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_ProjectDEC_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.ProjectDEC, "EPGX_PROJ_DEC_VALUES", "XC_{0:000}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_ProjectNTEXT_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.ProjectNTEXT, "EPGX_PROJ_NTEXT_VALUES", "XN_{0:000}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_ProjectDATE_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.ProjectDATE, "EPGX_PROJ_DATE_VALUES", "XD_{0:000}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_ProgramText_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.ProgramText, "EPGP_PI_PROGS", "PROG_PI_TEXT{0:0}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_TaskWIINT_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.TaskWIINT, "EPGP_PI_WORKITEMS", "WORKITEM_FLAG{0:0}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_TaskWITEXT_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.TaskWITEXT, "EPGP_PI_WORKITEMS", "WORKITEM_CTEXT{0:0}");
+        }
+
+        [TestMethod]
+        public void CalculateTableFieldName_TaskWIDEC_ExecutesCorrectly()
+        {
+            CalculateTableFieldName(CustomFieldTable.TaskWIDEC, "EPGP_PI_WORKITEMS", "WORKITEM_NUMBER{0:0}");
+        }
+
+        private void CalculateTableFieldName(
+            CustomFieldTable customFieldTable,
+            string expectedTableName,
+            string format)
+        {
+            // Arrange
+            const int FieldId = 1;
+            var expecteFieldName = string.Format(format, FieldId);
+            var tableId = (int)customFieldTable;
+            var tableName = string.Empty;
+            var fieldName = string.Empty;
+            var args = new object[] { FieldId, tableId, tableName, fieldName };
+
+            // Act
+            privateType.InvokeStatic(CalculateTableFieldNameMethodName, args);
+            tableName = args[2] as string;
+            fieldName = args[3] as string;
+
+            // Assert
+            privateType.ShouldSatisfyAllConditions(
+                () => tableName.ShouldNotBeNullOrEmpty(),
+                () => tableName.ShouldBe(expectedTableName),
+                () => fieldName.ShouldNotBeNullOrEmpty(),
+                () => fieldName.ShouldBe(expecteFieldName));
         }
 
         private FakesDelegates.Func<string, object> GetCustomFieldValue(string fieldName, object defaultValue)
