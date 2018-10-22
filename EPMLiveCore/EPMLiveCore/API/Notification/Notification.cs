@@ -13,6 +13,9 @@ namespace EPMLiveCore.API
 {
     internal class Notification
     {
+        private const int SqlExceptionId1 = 10509;
+        private const int SqlExceptionId2 = 10508;
+
         #region Fields (1)
 
         private static readonly Dictionary<string, string[]> ValidInputs = new Dictionary<string, string[]>
@@ -462,7 +465,7 @@ namespace EPMLiveCore.API
                 catch (SqlException sqlException)
                 {
                     Trace.WriteLine(sqlException.ToString());
-                    throw new APIException(10509, sqlException.Message);
+                    throw new APIException(SqlExceptionId1, sqlException.Message);
                 }
                 finally
                 {
@@ -554,7 +557,7 @@ namespace EPMLiveCore.API
                 catch (SqlException sqlException)
                 {
                     Trace.WriteLine(sqlException.ToString());
-                    throw new APIException(10508, sqlException.Message);
+                    throw new APIException(SqlExceptionId2, sqlException.Message);
                 }
                 finally
                 {
