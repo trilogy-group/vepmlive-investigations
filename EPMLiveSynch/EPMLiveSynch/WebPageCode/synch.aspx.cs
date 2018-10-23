@@ -65,11 +65,14 @@ namespace EPMLiveSynch
                             tJob = Guid.NewGuid();
                             dr.Close();
                             cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname,  scheduletype, webguid, listguid) VALUES (@timerjobuid, @siteguid, 4, 'Enterprise List Synch', 9, @webguid, @listguid)", cn);
-                            cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
-                            cmd.Parameters.AddWithValue("@webguid", web.ID.ToString());
-                            cmd.Parameters.AddWithValue("@listguid", new Guid(Request["listorurl"]));
-                            cmd.Parameters.AddWithValue("@timerjobuid", tJob);
-                            cmd.ExecuteNonQuery();
+                            using (cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname,  scheduletype, webguid, listguid) VALUES (@timerjobuid, @siteguid, 4, 'Enterprise List Synch', 9, @webguid, @listguid)", cn))
+                            {
+                                cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
+                                cmd.Parameters.AddWithValue("@webguid", web.ID.ToString());
+                                cmd.Parameters.AddWithValue("@listguid", new Guid(Request["listorurl"]));
+                                cmd.Parameters.AddWithValue("@timerjobuid", tJob);
+                                cmd.ExecuteNonQuery();
+                            }
                         }
                         else
                         {
