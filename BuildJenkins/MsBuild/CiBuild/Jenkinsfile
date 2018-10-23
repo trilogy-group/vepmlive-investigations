@@ -1,7 +1,7 @@
 pipeline {
     agent {
         node {
-            label 'skyvera-non-docker-jenkins-win-build'
+            label 'skyvera-jenkins-win-build'
             customWorkspace "c:\\jenkins\\build"
         }
     }
