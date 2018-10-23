@@ -1,7 +1,6 @@
 function GetAssembliesToCover()
 {
     return @(
-        "BuildTeamCity/EPMLive.Installer.UserNameChecker/bin/debug/UserNameChecker.dll",
 		"BuildTeamCity/UserNameChecker/bin/debug/UserNameChecker.dll",
         "EPK_QueueMgr/EPK_QueueMgr/bin/debug/WE_QueueMgr.dll",
         "EPMLiveCore/EPMLive.Data/bin/debug/EPMLive.Data.dll",
