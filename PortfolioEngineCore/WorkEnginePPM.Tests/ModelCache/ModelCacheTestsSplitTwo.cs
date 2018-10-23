@@ -1756,7 +1756,14 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         {
             // Arrange
             var max = 500;
-            var colRoot = new List<SortFieldDefn>();
+            var colRoot = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn()
+                {
+                    name = DummyString,
+                    fid = 150
+                }
+            };
             var periods = new Dictionary<int, PeriodData>()
             {
                 [1] = new PeriodData()
@@ -1802,7 +1809,14 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         {
             // Arrange
             var max = 500;
-            var colRoot = new List<SortFieldDefn>();
+            var colRoot = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn()
+                {
+                    name = DummyString,
+                    fid = 150
+                }
+            };
             var periods = new Dictionary<int, PeriodData>()
             {
                 [1] = new PeriodData()
@@ -1831,7 +1845,14 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         {
             // Arrange
             var max = 500;
-            var colRoot = new List<SortFieldDefn>();
+            var colRoot = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn()
+                {
+                    name = DummyString,
+                    fid = 150
+                }
+            };
             var periods = new Dictionary<int, PeriodData>()
             {
                 [1] = new PeriodData()
