@@ -38,7 +38,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Executing build...'
-                powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/build.ps1 ${env.BUILD_VERSION} \"${env.WORKSPACE}\""
+                powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/CiBuild/build.ps1 ${env.BUILD_VERSION} \"${env.WORKSPACE}\""
             }
         }
 		stage('Unit tests') {
