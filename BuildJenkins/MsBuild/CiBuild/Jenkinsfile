@@ -55,7 +55,6 @@ pipeline {
     post {
         always {
             echo 'Publishing unit tests results...'
-			step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: true, keepLongStdio: true])
 			
 			echo 'Publishing coverage report...'
 			publishHTML (
