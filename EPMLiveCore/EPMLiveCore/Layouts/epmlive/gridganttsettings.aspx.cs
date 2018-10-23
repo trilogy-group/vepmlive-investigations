@@ -54,6 +54,7 @@ namespace EPMLiveCore.Layouts.epmlive
         protected DataTable dtGroupsPermissions = new DataTable();
 
         const string REPORT_CHECK_URL = "/_layouts/epmlive/ReportCheckActions.aspx";
+        private const char Separator = '|';
         public override string PageToRedirectOnCancel
         {
             get
@@ -1227,7 +1228,7 @@ namespace EPMLiveCore.Layouts.epmlive
         {
             if (chkEnableTeam.Checked || chkEnableTeamSecurity.Checked && list.BaseTemplate == SPListTemplateType.DocumentLibrary)
             {
-                //EPML-4257 : In  document library if you have enable team and enable team security on the library will not load
+                // EPML-4257 : In  document library if you have enable team and enable team security on the library will not load
                 ListCommands.EnableTeamFeatures(list);
 
                 var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
@@ -1323,7 +1324,7 @@ namespace EPMLiveCore.Layouts.epmlive
             var lookups = gSettings.Lookups;
             if (!string.IsNullOrWhiteSpace(lookups))
             {
-                var settings = lookups.Split('|');
+                var settings = lookups.Split(Separator);
                 foreach (var setting in settings)
                 {
                     if (!string.IsNullOrWhiteSpace(setting))
