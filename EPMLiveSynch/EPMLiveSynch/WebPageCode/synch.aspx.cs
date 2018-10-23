@@ -55,34 +55,38 @@ namespace EPMLiveSynch
                         });
 
                         SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where listguid=@listguid and jobtype=4", cn);
-                        cmd.Parameters.AddWithValue("@listguid", new Guid(Request["listorurl"]));
-                        SqlDataReader dr = cmd.ExecuteReader();
-
-                        Guid tJob = Guid.Empty;
-
-                        if (!dr.Read())
+                        using (var cmdSelect = new SqlCommand("select timerjobuid from timerjobs where listguid=@listguid and jobtype=4", cn))
                         {
-                            tJob = Guid.NewGuid();
-                            dr.Close();
-                            cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname,  scheduletype, webguid, listguid) VALUES (@timerjobuid, @siteguid, 4, 'Enterprise List Synch', 9, @webguid, @listguid)", cn);
-                            using (cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname,  scheduletype, webguid, listguid) VALUES (@timerjobuid, @siteguid, 4, 'Enterprise List Synch', 9, @webguid, @listguid)", cn))
+                            cmdSelect.Parameters.AddWithValue("@listguid", new Guid(Request["listorurl"]));
+
+                            using (var dataReader = cmdSelect.ExecuteReader())
                             {
-                                cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
-                                cmd.Parameters.AddWithValue("@webguid", web.ID.ToString());
-                                cmd.Parameters.AddWithValue("@listguid", new Guid(Request["listorurl"]));
-                                cmd.Parameters.AddWithValue("@timerjobuid", tJob);
-                                cmd.ExecuteNonQuery();
-                            }
-                        }
-                        else
-                        {
-                            tJob = dr.GetGuid(0);
-                            dr.Close();
-                        }
+                                var timerJobId = Guid.Empty;
 
-                        if (tJob != Guid.Empty)
-                        {
-                            EPMLiveCore.CoreFunctions.enqueue(tJob, 0);
+                                if (!dataReader.Read())
+                                {
+                                    timerJobId = Guid.NewGuid();
+                                    dataReader.Close();
+                                    using (var cmdInsert = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname,  scheduletype, webguid, listguid) VALUES (@timerjobuid, @siteguid, 4, 'Enterprise List Synch', 9, @webguid, @listguid)", cn))
+                                    {
+                                        cmdInsert.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
+                                        cmdInsert.Parameters.AddWithValue("@webguid", web.ID.ToString());
+                                        cmdInsert.Parameters.AddWithValue("@listguid", new Guid(Request["listorurl"]));
+                                        cmdInsert.Parameters.AddWithValue("@timerjobuid", timerJobId);
+                                        cmdInsert.ExecuteNonQuery();
+                                    }
+                                }
+                                else
+                                {
+                                    timerJobId = dataReader.GetGuid(0);
+                                    dataReader.Close();
+                                }
+
+                                if (timerJobId != Guid.Empty)
+                                {
+                                    EPMLiveCore.CoreFunctions.enqueue(timerJobId, 0);
+                                }
+                            }
                         }
 
                         cn.Close();
