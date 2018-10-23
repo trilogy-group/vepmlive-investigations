@@ -16,73 +16,78 @@ namespace EPMLiveCore.Layouts.epmlive
             {
                 SPSite oSite = SPContext.Current.Site;
                 {
-                    SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(oSite.WebApplication.Id));
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(oSite.WebApplication.Id)))
                     {
-                        cn.Open();
-                    });
+                        SPSecurity.RunWithElevatedPrivileges(() => sqlConnection.Open());
 
-                    SqlCommand cmd = new SqlCommand("select jobname as [Job Name],timerjobuid,percentComplete as [% Complete],status as [Job Status],dtcreated as [Created Date],dtstarted as [Started Date],dtfinished as [Finished Date],result as [Status], case result when 'Errors' then resulttext else '' end as [Error Description] from vwQueueTimerLog where DATEDIFF(DAY,[dtcreated],GETDATE()) <= 7 and siteguid=@siteId order by dtcreated desc", cn);
-                    cmd.Parameters.AddWithValue("@siteId", oSite.ID);
+                        var dataTable = new DataTable();
 
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    DataTable dataTable = new DataTable();
-                    dataTable.Load(dr);
-                    dr.Close();
+                        using (var sqlCommand = new SqlCommand(
+                            "select jobname as [Job Name],timerjobuid,percentComplete as [% Complete],status as [Job Status],dtcreated as [Created Date],dtstarted as [Started Date],dtfinished as [Finished Date],result as [Status], case result when 'Errors' then resulttext else '' end as [Error Description] from vwQueueTimerLog where DATEDIFF(DAY,[dtcreated],GETDATE()) <= 7 and siteguid=@siteId order by dtcreated desc",
+                            sqlConnection))
+                        {
+                            sqlCommand.Parameters.AddWithValue("@siteId", oSite.ID);
 
-                    StringBuilder html = new StringBuilder();
+                            using (var dataReader = sqlCommand.ExecuteReader())
+                            {
+                                dataTable.Load(dataReader);
+                            }
+                        }
 
-                    html.Append("<div class='row-fluid' id='jobqueuedetailslog-wrap'>");
-                    html.Append("<table class='table-bordered' id='jobqueuedetailslog'>");
-                    html.Append("<thead>");
-                    html.Append("<tr>");
+                        var html = new StringBuilder("<div class='row-fluid' id='jobqueuedetailslog-wrap'>")
+                           .Append("<table class='table-bordered' id='jobqueuedetailslog'>")
+                           .Append("<thead>")
+                           .Append("<tr>");
 
-                    foreach (DataColumn column in dataTable.Columns)
-                    {
-                        html.Append("<th>");
-                        html.Append(column.ColumnName);
-                        html.Append("</th>");
-                    }
-                    html.Append("</tr>");
-                    html.Append("</thead>");
-
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        html.Append("<tr>");
                         foreach (DataColumn column in dataTable.Columns)
                         {
-                            html.Append("<td>");
-
-                            if (column.ColumnName.Equals("Job Status"))
-                            {
-                                switch (row[column.ColumnName].ToString())
-                                {
-                                    case "0":
-                                        html.Append("Queued");
-                                        break;
-                                    case "1":
-                                        html.Append("Processing");
-                                        break;
-                                    case "2":
-                                        html.Append("Complete");
-                                        break;
-                                };
-                            }
-                            else
-                            {
-                                html.Append(row[column.ColumnName]);
-                            }
-                            html.Append("</td>");
+                            html.Append("<th>")
+                               .Append(column.ColumnName)
+                               .Append("</th>");
                         }
-                        html.Append("</tr>");
+
+                        html.Append("</tr>")
+                           .Append("</thead>");
+
+                        foreach (DataRow row in dataTable.Rows)
+                        {
+                            html.Append("<tr>");
+
+                            foreach (DataColumn column in dataTable.Columns)
+                            {
+                                html.Append("<td>");
+
+                                if (column.ColumnName.Equals("Job Status"))
+                                {
+                                    if (row[column.ColumnName].ToString() == "0")
+                                    {
+                                        html.Append("Queued");
+                                    }
+                                    else if (row[column.ColumnName].ToString() == "1")
+                                    {
+                                        html.Append("Processing");
+                                    }
+                                    else if (row[column.ColumnName].ToString() == "2")
+                                    {
+                                        html.Append("Complete");
+                                    }
+                                }
+                                else
+                                {
+                                    html.Append(row[column.ColumnName]);
+                                }
+
+                                html.Append("</td>");
+                            }
+
+                            html.Append("</tr>");
+                        }
+
+                        html.Append("</table>")
+                           .Append("</div>");
+
+                        queuejobsPlaceHolder.Controls.Add(new Literal { Text = html.ToString() });
                     }
-
-                    html.Append("</table>");
-                    html.Append("</div>");
-
-                    queuejobsPlaceHolder.Controls.Add(new Literal { Text = html.ToString() });
-
-                    cn.Close();
                 }
             }
             catch (Exception ex)
