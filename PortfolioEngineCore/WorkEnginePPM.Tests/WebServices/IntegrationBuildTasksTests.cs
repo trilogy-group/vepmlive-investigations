@@ -33,7 +33,7 @@ namespace WorkEnginePPM.Tests.WebServices
         private const float SPFieldValueNumber = 4.0f;
 
         private ShimHashtable _shimHashtable;
-        private readonly DateTime _dateTime = new DateTime(2010, 10, 10, 10, 10, 10);
+        private static readonly DateTime _dateTime = new DateTime(2010, 10, 10, 10, 10, 10);
 
         [TestMethod]
         public void BuildTasks_CalculatedTypeHashTableContainIsAssignment_ExecutesCorrectly()
@@ -159,66 +159,39 @@ namespace WorkEnginePPM.Tests.WebServices
                     action.ShouldNotThrow();
                     XmlDocument = XDocument.Parse(Result);
                 },
-                () => (XmlDocument.Descendants("Task")
-                                   .First()
-                                   .Attribute("ID")
-                                   .Value
-                       == OrderId).ShouldBeTrue(),
-                () => (XmlDocument.Descendants("Task")
-                                   .First()
-                                   .Attribute("UID")
-                                   .Value
-                       == OrderUId).ShouldBeTrue(),
-                () => (int.Parse(
-                           XmlDocument.Descendants("Task")
-                                       .First()
-                                       .Attribute("ItemID")
-                                       .Value)
-                       == ItemId).ShouldBeTrue(),
-                () => XmlDocument.Descendants("Title")
-                                  .First()
-                                  .Value.Contains(DummyTitle)
-                                  .ShouldBeTrue(),
+                () => XmlDocument.Descendants("Task").First().Attribute("ID").Value.ShouldBe(OrderId),
+                () => XmlDocument.Descendants("Task").First().Attribute("UID").Value.ShouldBe(OrderUId),
+                () => int.Parse(XmlDocument.Descendants("Task").First().Attribute("ItemID").Value).ShouldBe(ItemId),
+                () => XmlDocument.Descendants("Title").First().Value.ShouldContain(DummyTitle),
+                () => XmlDocument.Descendants("Field").First().Value.ShouldContain(LookupValue),
                 () => XmlDocument.Descendants("Field")
-                                  .First()
-                                  .Value.Contains(LookupValue)
-                                  .ShouldBeTrue(),
+                    .Single(element => element.Attributes().Any(attribute => attribute.Name == "Name" && attribute.Value == "IsAssignment"))
+                    .Value.ShouldContain(
+                        isAssignment
+                            ? "1"
+                            : "0"),
                 () => XmlDocument.Descendants("Field")
-                                  .Single(
-                                      element => element.Attributes()
-                                                        .Any(attribute => attribute.Name == "Name" && attribute.Value == "IsAssignment"))
-                                  .Value.Contains(
-                                      isAssignment
-                                          ? "1"
-                                          : "0")
-                                  .ShouldBeTrue(),
-                () => XmlDocument.Descendants("Field")
-                                  .Single(
-                                      element => element.Attributes()
-                                                        .Any(attribute => attribute.Name == "Name" && attribute.Value == "TaskHierarchy"))
-                                  .Value.Contains(TaskString)
-                                  .ShouldBeTrue(),
+                    .Single(element => element.Attributes().Any(attribute => attribute.Name == "Name" && attribute.Value == "TaskHierarchy"))
+                    .Value.ShouldContain(TaskString),
                 () =>
                 {
                     var xElement = XmlDocument.Descendants("Field")
-                                               .SingleOrDefault(
-                                                   element => element.Attributes()
-                                                                     .Any(
-                                                                         attribute => attribute.Name == "Name"
-                                                                                      && attribute.Value
-                                                                                      == (hashtableShouldContain
-                                                                                          ? DummyInternalName
-                                                                                          : DummyString)));
+                        .SingleOrDefault(
+                            element => element.Attributes()
+                                .Any(
+                                    attribute => attribute.Name == "Name"
+                                        && attribute.Value
+                                        == (hashtableShouldContain
+                                            ? DummyInternalName
+                                            : DummyString)));
                     switch (spFieldType)
                     {
                         case SPFieldType.Currency:
                         case SPFieldType.Number:
-                            xElement.Value.Contains(SPFieldValueNumber.ToString())
-                                    .ShouldBeTrue();
+                            xElement.Value.ShouldContain(SPFieldValueNumber.ToString());
                             break;
                         case SPFieldType.DateTime:
-                            xElement.Value.Contains(_dateTime.ToString("s"))
-                                    .ShouldBeTrue();
+                            xElement.Value.ShouldContain(_dateTime.ToString("s"));
                             break;
                         default:
                             xElement.ShouldBeNull();

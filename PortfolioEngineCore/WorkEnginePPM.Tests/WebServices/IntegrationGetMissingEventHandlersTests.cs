@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Fakes;
 using System.Xml.Linq;
-using System.Xml.Linq.Fakes;
 using EPMLive.TestFakes.Utility;
-using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -22,9 +18,9 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string Xml = @"<FirstChild Key=""001"" EventClass=""Class01""/>";
         private const string BorkedXml = @"<FirstChild Key="""" EventClass=""""/>";
         private const string SettingsString = "DummySetting1,DummySetting2,DummySetting3,DummySetting4";
+        private AdoShims _adoShims;
 
         private SharepointShims _sharepointShims;
-        private AdoShims _adoShims;
 
         [TestInitialize]
         public override void Setup()
@@ -50,10 +46,7 @@ namespace WorkEnginePPM.Tests.WebServices
                     action.ShouldNotThrow();
                     XmlDocument = XDocument.Parse(Result);
                 },
-                () => XmlDocument.Descendants("Result")
-                                .First()
-                                .Attribute("Status")
-                                .Value.ShouldBe("0"));
+                () => XmlDocument.Descendants("Result").First().Attribute("Status").Value.ShouldBe("0"));
         }
 
         [TestMethod]
@@ -72,17 +65,9 @@ namespace WorkEnginePPM.Tests.WebServices
                     action.ShouldNotThrow();
                     XmlDocument = XDocument.Parse(Result);
                 },
-                () => XmlDocument.Descendants("Result")
-                                .First()
-                                .Attribute("Status")
-                                .Value.ShouldBe("1"),
-                () => XmlDocument.Descendants("Error")
-                                .First()
-                                .Value.ShouldContain("No Lists Defined"),
-                () => XmlDocument.Descendants("Error")
-                                .First()
-                                .Attribute("ID")
-                                .Value.ShouldContain("102"));
+                () => XmlDocument.Descendants("Result").First().Attribute("Status").Value.ShouldBe("1"),
+                () => XmlDocument.Descendants("Error").First().Value.ShouldContain("No Lists Defined"),
+                () => XmlDocument.Descendants("Error").First().Attribute("ID").Value.ShouldContain("102"));
         }
 
         [TestMethod]
@@ -101,17 +86,9 @@ namespace WorkEnginePPM.Tests.WebServices
                     action.ShouldNotThrow();
                     XmlDocument = XDocument.Parse(Result);
                 },
-                () => XmlDocument.Descendants("Result")
-                                .First()
-                                .Attribute("Status")
-                                .Value.ShouldBe("1"),
-                () => XmlDocument.Descendants("Error")
-                                .First()
-                                .Value.ShouldContain("Invalid Key or Event Class Value"),
-                () => XmlDocument.Descendants("Error")
-                                .First()
-                                .Attribute("ID")
-                                .Value.ShouldContain("101"));
+                () => XmlDocument.Descendants("Result").First().Attribute("Status").Value.ShouldBe("1"),
+                () => XmlDocument.Descendants("Error").First().Value.ShouldContain("Invalid Key or Event Class Value"),
+                () => XmlDocument.Descendants("Error").First().Attribute("ID").Value.ShouldContain("101"));
         }
 
         [TestMethod]
@@ -130,17 +107,9 @@ namespace WorkEnginePPM.Tests.WebServices
                     action.ShouldNotThrow();
                     XmlDocument = XDocument.Parse(Result);
                 },
-                () => XmlDocument.Descendants("Result")
-                                .First()
-                                .Attribute("Status")
-                                .Value.ShouldBe("1"),
-                () => XmlDocument.Descendants("Error")
-                                .First()
-                                .Value.ShouldContain("Exception Handled"),
-                () => XmlDocument.Descendants("Error")
-                                .First()
-                                .Attribute("ID")
-                                .Value.ShouldContain("100"));
+                () => XmlDocument.Descendants("Result").First().Attribute("Status").Value.ShouldBe("1"),
+                () => XmlDocument.Descendants("Error").First().Value.ShouldContain("Exception Handled"),
+                () => XmlDocument.Descendants("Error").First().Attribute("ID").Value.ShouldContain("100"));
         }
 
         [TestMethod]
@@ -159,16 +128,8 @@ namespace WorkEnginePPM.Tests.WebServices
                     action.ShouldNotThrow();
                     XmlDocument = XDocument.Parse(Result);
                 },
-                () => XmlDocument.Descendants("Result")
-                                .First()
-                                .Attribute("Status")
-                                .Value.ShouldBe("0"),
-                () =>
-                {
-                    XmlDocument.Descendants("Lists")
-                              .First()
-                              .Value.ShouldContain(SettingsString.Trim(','));
-                });
+                () => XmlDocument.Descendants("Result").First().Attribute("Status").Value.ShouldBe("0"),
+                () => { XmlDocument.Descendants("Lists").First().Value.ShouldContain(SettingsString.Trim(',')); });
         }
 
         private void ArrangeGetMissingEventHandlers(
@@ -213,10 +174,7 @@ namespace WorkEnginePPM.Tests.WebServices
 
             if (docLoadShouldThrow)
             {
-                ShimXmlDocument.AllInstances.LoadXmlString = (_1, _2) =>
-                {
-                    throw new InvalidOperationException("Exception Handled");
-                };
+                ShimXmlDocument.AllInstances.LoadXmlString = (_1, _2) => { throw new InvalidOperationException("Exception Handled"); };
             }
         }
     }
