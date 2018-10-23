@@ -290,12 +290,12 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>%25WINDIR%25\syswow64\regsvr32.exe /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_RSVP.dll"
-%25WINDIR%25\syswow64\regsvr32.exe /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_PDSExt.dll"
-%25WINDIR%25\syswow64\regsvr32.exe /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_DBASvr.dll"
-%25WINDIR%25\syswow64\regsvr32.exe /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_RSVP.dll"
-%25WINDIR%25\syswow64\regsvr32.exe /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_PDSExt.dll"
-%25WINDIR%25\syswow64\regsvr32.exe /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_DBASvr.dll"
+    <PreBuildEvent>C:\Windows\syswow64\regsvr32.exe /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_RSVP.dll"
+C:\Windows\syswow64\regsvr32.exe /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_PDSExt.dll"
+C:\Windows\syswow64\regsvr32.exe /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_DBASvr.dll"
+C:\Windows\syswow64\regsvr32.exe /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_RSVP.dll"
+C:\Windows\syswow64\regsvr32.exe /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_PDSExt.dll"
+C:\Windows\syswow64\regsvr32.exe /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_DBASvr.dll"
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
