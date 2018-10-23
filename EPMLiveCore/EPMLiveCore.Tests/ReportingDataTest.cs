@@ -231,7 +231,6 @@ namespace EPMLiveCore.Tests
             // Act
             var result = _privateType.InvokeStatic(GetReportQueryNodeMethodName, args) as string;
 
-
             // Assert
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNullOrEmpty(),
@@ -564,7 +563,7 @@ namespace EPMLiveCore.Tests
                 }
             }.Instance;
             ShimSPField.AllInstances.TypeGet = _ => SPFieldType.AllDayEvent;
-            ShimXmlDocument.AllInstances.NameGet = _ => "";
+            ShimXmlDocument.AllInstances.NameGet = _ => string.Empty;
             ShimXmlNode.AllInstances.SelectSingleNodeString = (_, nodeName) =>
             {
                 if (nodeName == ValuesNodeName || nodeName == UserIdNodeName)
@@ -606,7 +605,7 @@ namespace EPMLiveCore.Tests
                 }
             }.Instance;
             ShimSPField.AllInstances.TypeGet = _ => SPFieldType.DateTime;
-            ShimXmlDocument.AllInstances.NameGet = _ => "";
+            ShimXmlDocument.AllInstances.NameGet = _ => string.Empty;
             ShimXmlNode.AllInstances.SelectSingleNodeString = (_, nodeName) =>
             {
                 if (nodeName == ValuesNodeName || nodeName == UserIdNodeName)
