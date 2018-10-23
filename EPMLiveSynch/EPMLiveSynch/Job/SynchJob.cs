@@ -18,6 +18,8 @@ namespace EPMLiveSynch
 {
     public class SynchJob : EPMLiveCore.API.BaseJob
     {
+        private const string EPMLiveAllowListSynchKey = "EPMLiveAllowListSynch";
+
         private SPWeb oFromWeb;
         private SPList oFromList;
 
@@ -134,9 +136,9 @@ namespace EPMLiveSynch
                                     {
                                         using (SPWeb subWeb = web.Site.OpenWeb(new Guid(dataRow[0].ToString())))
                                         {
-                                            if (subWeb.Properties.ContainsKey("EPMLiveAllowListSynch"))
+                                            if (subWeb.Properties.ContainsKey(EPMLiveAllowListSynchKey))
                                             {
-                                                var bAllowListSynch = bool.Parse(subWeb.Properties["EPMLiveAllowListSynch"]);
+                                                var bAllowListSynch = bool.Parse(subWeb.Properties[EPMLiveAllowListSynchKey]);
                                                 if (bAllowListSynch)
                                                 {
                                                     sErrors += $"Web: {subWeb.Title} ({subWeb.ServerRelativeUrl}) - {DateTime.Now.ToLongTimeString()}<br>";
