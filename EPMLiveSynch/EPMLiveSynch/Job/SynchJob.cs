@@ -12,6 +12,8 @@ using System.Web.UI.WebControls.WebParts;
 
 using System.Data.SqlClient;
 
+using SystemTrace = System.Diagnostics.Trace;
+
 namespace EPMLiveSynch
 {
     public class SynchJob : EPMLiveCore.API.BaseJob
@@ -110,63 +112,69 @@ namespace EPMLiveSynch
 
                 SqlCommand cmd = new SqlCommand(query, cnWss);
 
-                DataSet ds = new DataSet();
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(ds);
-
-                cnWss.Close();
-
-
-                totalCount = ds.Tables[0].Rows.Count;
-                float webCount = 0;
-
-                foreach (DataRow dr in ds.Tables[0].Rows)
+                using (var dataSet = new DataSet())
                 {
-                    try
+                    using (var dataAdapter = new SqlDataAdapter(cmd))
                     {
-                        using (SPWeb subWeb = web.Site.OpenWeb(new Guid(dr[0].ToString())))
+                        dataAdapter.Fill(dataSet);
+
+                        cnWss.Close();
+
+                        totalCount = dataSet.Tables[0].Rows.Count;
+                        float webCount = 0;
+
+                        foreach (DataRow dataRow in dataSet.Tables[0].Rows)
                         {
-                            if (subWeb.Properties.ContainsKey("EPMLiveAllowListSynch"))
+                            try
                             {
-                                bool bAllowListSynch = bool.Parse(subWeb.Properties["EPMLiveAllowListSynch"]);
-                                if (bAllowListSynch)
+                                using (SPWeb subWeb = web.Site.OpenWeb(new Guid(dataRow[0].ToString())))
                                 {
-                                    sErrors += "Web: " + subWeb.Title + " (" + subWeb.ServerRelativeUrl + ") - " + DateTime.Now.ToLongTimeString() + "<br>";
+                                    if (subWeb.Properties.ContainsKey("EPMLiveAllowListSynch"))
+                                    {
+                                        var bAllowListSynch = bool.Parse(subWeb.Properties["EPMLiveAllowListSynch"]);
+                                        if (bAllowListSynch)
+                                        {
+                                            sErrors += "Web: " + subWeb.Title + " (" + subWeb.ServerRelativeUrl + ") - " + DateTime.Now.ToLongTimeString() + "<br>";
 
-                                    subWeb.AllowUnsafeUpdates = true;
+                                            subWeb.AllowUnsafeUpdates = true;
 
-                                    oListSyncher.Results = "";
-                                    
-                                    oListSyncher.ToWeb = subWeb;
-                                    subWeb.AllowUnsafeUpdates = true;
-                                    uint LCID = subWeb.RegionalSettings.LocaleId;
-                                    subWeb.RegionalSettings.LocaleId = web.RegionalSettings.LocaleId;
-                                    subWeb.Update();
-                                    
-                                    oListSyncher.Sync();
+                                            oListSyncher.Results = string.Empty;
 
-                                    subWeb.AllowUnsafeUpdates = true;
-                                    subWeb.RegionalSettings.LocaleId = LCID;
-                                    subWeb.Update();
+                                            oListSyncher.ToWeb = subWeb;
+                                            subWeb.AllowUnsafeUpdates = true;
+                                            uint LCID = subWeb.RegionalSettings.LocaleId;
+                                            subWeb.RegionalSettings.LocaleId = web.RegionalSettings.LocaleId;
+                                            subWeb.Update();
 
-                                    sErrors += oListSyncher.Results;
+                                            oListSyncher.Sync();
 
-                                    if(oListSyncher.bErrors)
-                                        this.bErrors = true;
+                                            subWeb.AllowUnsafeUpdates = true;
+                                            subWeb.RegionalSettings.LocaleId = LCID;
+                                            subWeb.Update();
+
+                                            sErrors += oListSyncher.Results;
+
+                                            if (oListSyncher.bErrors)
+                                            {
+                                                bErrors = true;
+                                            }
+                                        }
+                                    }
+                                    subWeb.Close();
+                                    subWeb.Dispose();
+                                    GC.Collect();
+                                    GC.WaitForPendingFinalizers();
                                 }
                             }
-                            subWeb.Close();
-                            subWeb.Dispose();
-                            GC.Collect();
-                            GC.WaitForPendingFinalizers();
+                            catch (Exception exc)
+                            {
+                                SystemTrace.WriteLine(exc.ToString());
+                                bErrors = true;
+                                sErrors += "<br><br>General Error: " + exc.Message;
+                            }
+                            updateProgress(webCount++);
                         }
                     }
-                    catch (Exception exc)
-                    {
-                        bErrors = true;
-                        sErrors += "<br><br>General Error: " + exc.Message;
-                    }
-                    updateProgress(webCount++);
                 }
             }
             catch (Exception ex)
