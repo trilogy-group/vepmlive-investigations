@@ -309,28 +309,7 @@ namespace EPMLiveCore.Layouts.epmlive
                     {
 
                         string[] strOuter = gSettings.BuildTeamPermissions.Split(new string[] { "|~|" }, StringSplitOptions.None);
-                        foreach (string strInner in strOuter)
-                        {
-                            string[] strInnerMost = strInner.Split('~');
-                            DataRow dr = dtGroupsPermissions.NewRow();
-                            SPGroup g = null;
-                            SPRoleDefinition r = null;
-
-                            try
-                            {
-                                g = web.SiteGroups.GetByID(Convert.ToInt32(strInnerMost[0]));
-                                r = web.RoleDefinitions.GetById(Convert.ToInt32(strInnerMost[1]));
-                            }
-                            catch { }
-                            if (g != null && r != null)
-                            {
-                                dr["GroupsText"] = g.Name;
-                                dr["GroupsID"] = strInnerMost[0];
-                                dr["PermissionsText"] = r.Name;
-                                dr["PermissionsID"] = strInnerMost[1];
-                                dtGroupsPermissions.Rows.Add(dr);
-                            }
-                        }
+                        ProcessPermissionStrings(web, strOuter, dtGroupsPermissions);
                     }
 
                     GvGroupsPermissions.DataSource = dtGroupsPermissions;
