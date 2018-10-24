@@ -170,7 +170,12 @@
     <Compile Include="API\BaseJob.cs" />
     <Compile Include="API\ChartWizard\ChartWizardDataHelper.cs" />
     <Compile Include="API\Comments\CommentManager.Create.cs" />
+    <Compile Include="API\Comments\CommentManager.Create.Public.cs" />
     <Compile Include="API\Comments\CommentManager.cs" />
+    <Compile Include="API\Comments\CommentManager.Delete.cs" />
+    <Compile Include="API\Comments\CommentManager.List.cs" />
+    <Compile Include="API\Comments\CommentManager.Update.cs" />
+    <Compile Include="API\Comments\CommentManager.Utils.cs" />
     <Compile Include="API\Comments\XmlDataManager.cs" />
     <Compile Include="API\CreateWorkspace\DAL.cs" />
     <Compile Include="API\CreateWorkspace\WorkspaceController.cs" />

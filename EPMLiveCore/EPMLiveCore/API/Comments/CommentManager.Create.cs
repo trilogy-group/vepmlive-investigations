@@ -21,23 +21,21 @@ namespace EPMLiveCore.API
         public static string CreateComment(string data)
         {
             var returnValue = string.Empty;
-            var web = SPContext.Current.Web;
-            var site = SPContext.Current.Site;
             var dataMgr = new XMLDataManager(data);
-            var commentsList = web.Lists.TryGetList(COMMENTS_LIST_NAME);
+            var commentsList = SPContext.Current.Web.Lists.TryGetList(COMMENTS_LIST_NAME);
 
             var result = new StringBuilder();
             result.Append(XML_RESPONSE_COMMENT_HEADER);
 
             if (commentsList != null)
             {
-                web.AllowUnsafeUpdates = true;
+                SPContext.Current.Web.AllowUnsafeUpdates = true;
                 var currentItem = commentsList.Items.Add();
                 var time = GetCurrentLocalTime();
                 bool statusUpdate;
                 bool.TryParse(dataMgr.GetPropVal("StatusUpdate"), out statusUpdate);
                 var statusUpdateId = dataMgr.GetPropVal("StatusUpdateId");
-                var genericTitle = $"{web.CurrentUser.Name} made a new comment at {time.ToString()}";
+                var genericTitle = $"{SPContext.Current.Web.CurrentUser.Name} made a new comment at {time.ToString()}";
                 var listId = dataMgr.GetPropVal("ListId");
                 var itemId = dataMgr.GetPropVal("ItemId");
                 var comment = HttpUtility.HtmlDecode(dataMgr.GetPropVal("Comment") ?? string.Empty);
@@ -45,7 +43,7 @@ namespace EPMLiveCore.API
                 SPListItem originListItem = null;
 
                 UpdateCurrentItem(currentItem, commentsList, genericTitle, listId, itemId, comment);
-                AppendResponseComment(result, currentItem, comment, web);
+                AppendResponseComment(result, currentItem, comment);
 
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
@@ -69,7 +67,7 @@ namespace EPMLiveCore.API
                     }
                 });
 
-                SyncWithSocialStream(comment, originListItem, statusUpdate, currentItem, laCommenters, time, web, statusUpdateId);
+                SyncWithSocialStream(comment, originListItem, statusUpdate, currentItem, laCommenters, time, statusUpdateId);
             }
             else
             {
@@ -78,13 +76,7 @@ namespace EPMLiveCore.API
             return returnValue;
         }
 
-        private static void UpdateCurrentItem(
-            SPListItem currentItem,
-            SPList commentsList,
-            string genericTitle,
-            string listId,
-            string itemId,
-            string comment)
+        private static void UpdateCurrentItem(SPListItem currentItem, SPList commentsList, string genericTitle, string listId, string itemId, string comment)
         {
             currentItem[commentsList.Fields.GetFieldByInternalName("Title").Id] = genericTitle;
             currentItem[commentsList.Fields.GetFieldByInternalName("ListId").Id] = listId;
@@ -95,7 +87,7 @@ namespace EPMLiveCore.API
             currentItem.Update();
         }
 
-        private static void AppendResponseComment(StringBuilder result, SPListItem currentItem, string comment, SPWeb web)
+        private static void AppendResponseComment(StringBuilder result, SPListItem currentItem, string comment)
         {
             result.Append(XML_RESPONSE_COMMENT_SECTION_HEADER
                 .Replace("##listId##", currentItem.ParentList.ID.ToString())
@@ -105,20 +97,14 @@ namespace EPMLiveCore.API
                 .Replace("##listName##", currentItem.ParentList.Title)
                 .Replace("##itemId##", currentItem.ID.ToString())
                 .Replace("##itemTitle##", currentItem.Title)
-                .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime(web))
+                .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime(SPContext.Current.Web))
                 .Replace("##comment##", GetXMLSafeVersion(comment)));
             result.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE)
                 .Append(XML_RESPONSE_COMMENT_SECTION_FOOTER)
                 .Append(XML_RESPONSE_COMMENT_FOOTER);
         }
 
-        private static void SendNotificationEmails(
-            SPList originList,
-            SPListItem originListItem,
-            List<int> laCommenters,
-            string listId,
-            string itemId,
-            string comment)
+        private static void SendNotificationEmails(SPList originList, SPListItem originListItem, List<int> laCommenters, string listId, string itemId, string comment)
         {
             var originalUser = SPContext.Current.Web.CurrentUser;
 
@@ -156,15 +142,7 @@ namespace EPMLiveCore.API
             }
         }
 
-        private static void SyncWithSocialStream(
-            string comment,
-            SPListItem originListItem,
-            bool isStatusUpdate,
-            SPListItem currentItem,
-            List<int> laCommenters,
-            DateTime time,
-            SPWeb web,
-            string statusUpdateId)
+        private static void SyncWithSocialStream(string comment, SPListItem originListItem, bool isStatusUpdate, SPListItem currentItem, List<int> laCommenters, DateTime time, string statusUpdateId)
         {
             if (!string.IsNullOrWhiteSpace(comment) && originListItem != null)
             {
@@ -172,19 +150,7 @@ namespace EPMLiveCore.API
                 {
                     if (!isStatusUpdate)
                     {
-                        SyncToSocialStream(
-                            currentItem.UniqueId,
-                            comment,
-                            originListItem.ParentList.ID,
-                            originListItem.ID,
-                            originListItem.Title,
-                            originListItem.ParentList.Title,
-                            $"{originListItem.ParentList.DefaultDisplayFormUrl}?ID={originListItem.ID}",
-                            laCommenters,
-                            time,
-                            web,
-                            "ADD"
-                        );
+                        SyncToSocialStream(currentItem.UniqueId, comment, originListItem.ParentList.ID, originListItem.ID, originListItem.Title, originListItem.ParentList.Title, $"{originListItem.ParentList.DefaultDisplayFormUrl}?ID={originListItem.ID}", laCommenters, time, SPContext.Current.Web, "ADD");
                     }
                     else
                     {
@@ -192,17 +158,7 @@ namespace EPMLiveCore.API
 
                         var statusItem = currentItem.ParentList.GetItemByUniqueId(sId);
 
-                        SyncStatusUpdateToSocialStream(
-                            sId,
-                            comment,
-                            new Guid(currentItem["ListId"].ToString()),
-                            int.Parse(currentItem["ItemId"].ToString()),
-                            (DateTime)statusItem["Created"],
-                            web,
-                            "COMMENT",
-                            (DateTime?)currentItem["Created"],
-                            currentItem.UniqueId
-                        );
+                        SyncStatusUpdateToSocialStream(sId, comment, new Guid(currentItem["ListId"].ToString()), int.Parse(currentItem["ItemId"].ToString()), (DateTime)statusItem["Created"], SPContext.Current.Web, "COMMENT", (DateTime?)currentItem["Created"], currentItem.UniqueId);
                     }
                 }
                 catch (Exception e)
@@ -221,7 +177,7 @@ namespace EPMLiveCore.API
                                   where !list.Fields.ContainsFieldWithInternalName(col)
                                   select list.Fields.Add(col, SPFieldType.Note, false)
                                       into fieldName
-                                      select list.Fields.GetFieldByInternalName(fieldName) as SPFieldMultiLineText)
+                                  select list.Fields.GetFieldByInternalName(fieldName) as SPFieldMultiLineText)
             {
                 field.Sealed = false;
                 field.Hidden = true;
@@ -241,14 +197,7 @@ namespace EPMLiveCore.API
             CoreFunctions.setConfigSetting(list.ParentWeb, "EPM_Commentable_Lists", string.Join(",", allLists.ToArray()));
         }
 
-        private static List<int> GenerateEmailSentIds(
-            SPListItem originListItem,
-            SPList originList,
-            List<int> laCommenters,
-            SPUser originalUser,
-            string listId,
-            string itemId,
-            string comment)
+        private static List<int> GenerateEmailSentIds(SPListItem originListItem, SPList originList, List<int> laCommenters, SPUser originalUser, string listId, string itemId, string comment)
         {
             var item = originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id];
             var commenters = item != null ? item.ToString() : string.Empty;
@@ -335,11 +284,22 @@ namespace EPMLiveCore.API
 
             ActivityKind activityKind;
 
-            if (operation.Equals("ADD")) activityKind = ActivityKind.Created;
-            else if (operation.Equals("UPDATE")) activityKind = ActivityKind.Updated;
-            else if (operation.Equals("COMMENT")) activityKind = ActivityKind.CommentAdded;
-            else return;
-
+            if (operation.Equals("ADD"))
+            {
+                activityKind = ActivityKind.Created;
+            }
+            else if (operation.Equals("UPDATE"))
+            {
+                activityKind = ActivityKind.Updated;
+            }
+            else if (operation.Equals("COMMENT"))
+            {
+                activityKind = ActivityKind.CommentAdded;
+            }
+            else
+            {
+                return;
+            }
             SocialEngine.SocialEngine.Current.ProcessActivity(ObjectKind.StatusUpdate, activityKind,
                 new Dictionary<string, object>
                 {

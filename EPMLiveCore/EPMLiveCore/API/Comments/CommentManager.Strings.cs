@@ -21,7 +21,7 @@
                                                 "<UserProfileUrl><![CDATA[##userprofile##]]></UserProfileUrl>" +
                                                 "<UserPic><![CDATA[##userpic##]]></UserPic>" +
                                                 "<UserEmail><![CDATA[##useremail##]]></UserEmail>" +
-                                             "</UserInfo>";
+                                                "</UserInfo>";
         private const string XML_RESPONSE_COMMENT_ITEM_CLOSE = "</Comment>";
         private const string XML_RESPONSE_COMMENT_SECTION_FOOTER = "</CommentItem>";
         private const string XML_RESPONSE_COMMENT_FOOTER = "</Comments>";
