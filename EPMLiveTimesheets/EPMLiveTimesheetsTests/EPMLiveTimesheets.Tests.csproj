@@ -93,9 +93,8 @@
     <Reference Include="System.XML.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
-    <Reference Include="TimeSheets.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\EPMLive.TestFakes\bin\Debug\TimeSheets.Fakes.dll</HintPath>
+    <Reference Include="TimeSheets.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\TimeSheets.Fakes.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Choose>

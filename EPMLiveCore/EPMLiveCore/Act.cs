@@ -3,6 +3,7 @@ using System.Collections;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Microsoft.SharePoint;
@@ -35,6 +36,7 @@ namespace EPMLiveCore
         private const string FeaturesColumn = "Features";
         private const string UserCountColumn = "UserCount";
         private const string QuantityColumn = "quantity";
+        private const string NotAvailableString = "NA";
         private SPWeb _web;
         private bool _bIsOnline = false;
         public string OwnerUsername = "";
@@ -900,174 +902,208 @@ namespace EPMLiveCore
 
         public static SortedList GetAllAvailableLevels(out int ActivationType)
         {
-            SortedList slLevels = new SortedList();
+            var levels = new SortedList();
 
             ActivationType = 0;
 
-            string keys = "";
+            var keysString = string.Empty;
 
             try
             {
-                keys = SPFarm.Local.Properties["EPMLiveKeys"].ToString();
+                keysString = SPFarm.Local.Properties["EPMLiveKeys"].ToString();
             }
-            catch { }
-            if(keys != "")
+            catch (Exception ex)
             {
-                string[] arrKeys = keys.Split('\t');
-                for(int i = 0; i < arrKeys.Length; i = i + 2)
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+            if (keysString != string.Empty)
+            {
+                var keys = keysString.Split('\t');
+                for (var i = 0; i < keys.Length; i = i + 2)
                 {
-                    if(arrKeys[i] != "")
+                    if (keys[i] != string.Empty)
                     {
-                        string val = arrKeys[i];
-                        string s = arrKeys[i + 1];
-                        if(farmEncode(val) == s)
+                        var keyValue = keys[i];
+                        var keyChar = keys[i + 1];
+                        if (farmEncode(keyValue) == keyChar)
                         {
-                            string feature = CoreFunctions.Decrypt(val, "jLHKJH5416FL>1dcv3#I");
-                            string[] features = feature.Split('\n');
-                            if(features[0][0] == '*')
+                            const string PassPhrase = "jLHKJH5416FL>1dcv3#I";
+                            var feature = CoreFunctions.Decrypt(keyValue, PassPhrase);
+                            var features = feature.Split('\n');
+                            if (features[0][0] == '*')
                             {
-
-                                if(features[0][1] == '2' && (ActivationType == 2 || ActivationType == 0))
+                                if (features[0][1] == '2' && (ActivationType == 2 || ActivationType == 0))
                                 {
-                                    ActivationType = 2;
-
-                                    string expiration = features[4];
-                                    bool goodFeatureExp = false;
-                                    if(expiration == "NA")
+                                    var sortedList = AddFeaturesActivationType2(out ActivationType, features, levels);
+                                    if (sortedList != null)
                                     {
-                                        goodFeatureExp = true;
+                                        return sortedList;
                                     }
-                                    else
-                                    {
-                                        try
-                                        {
-                                            System.Globalization.CultureInfo eng = new System.Globalization.CultureInfo(1033);
-                                            DateTime dtEng = DateTime.Parse(expiration, eng);
-                                            if(new DateTime(dtEng.Year, dtEng.Month, dtEng.Day) > DateTime.Now)
-                                            {
-                                                goodFeatureExp = true;
-                                            }
-                                        }
-                                        catch { }
-                                    }
-
-                                    var allAvailableLevels = AddOrUpdateFeatures(goodFeatureExp, features, slLevels);
-                                    if (allAvailableLevels != null)
-                                    {
-                                        return allAvailableLevels;
-                                    }
-                                    
                                 }
-                                else if(features[0][1] == '3' && (ActivationType == 3 || ActivationType == 0))
+                                else if (features[0][1] == '3' && (ActivationType == 3 || ActivationType == 0))
                                 {
-                                    ActivationType = 3;
-
-                                    string expiration = features[4];
-                                    bool goodFeatureExp = false;
-                                    if(expiration == "NA")
-                                    {
-                                        goodFeatureExp = true;
-                                    }
-                                    else
-                                    {
-                                        try
-                                        {
-                                            System.Globalization.CultureInfo eng = new System.Globalization.CultureInfo(1033);
-                                            DateTime dtEng = DateTime.Parse(expiration, eng);
-                                            if(new DateTime(dtEng.Year, dtEng.Month, dtEng.Day) > DateTime.Now)
-                                            {
-                                                goodFeatureExp = true;
-                                            }
-                                        }
-                                        catch { }
-                                    }
-
-                                    var allAvailableLevels = AddOrUpdateFeatures(goodFeatureExp, features, slLevels);
+                                    var allAvailableLevels = AddFeatureActivationType3(out ActivationType, features, levels);
                                     if (allAvailableLevels != null)
                                     {
                                         return allAvailableLevels;
                                     }
                                 }
-                                
                             }
-                            else if(ActivationType == 1 || ActivationType == 0)
+                            else if (ActivationType == 1 || ActivationType == 0)
                             {
-                                ActivationType = 1;
-
-                                string expiration = features[4];
-                                bool goodFeatureExp = false;
-                                if(expiration == "NA")
-                                {
-                                    goodFeatureExp = true;
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        System.Globalization.CultureInfo eng = new System.Globalization.CultureInfo(1033);
-                                        DateTime dtEng = DateTime.Parse(expiration, eng);
-                                        if(new DateTime(dtEng.Year, dtEng.Month, dtEng.Day) > DateTime.Now)
-                                        {
-                                            goodFeatureExp = true;
-                                        }
-                                    }
-                                    catch { }
-                                }
-                                
-                                int userCount = int.Parse(features[2]);
-
-                                if(goodFeatureExp)
-                                {
-                                    string[] featureNames = features[1].Split(',');
-                                    foreach(string featureName in featureNames)
-                                    {
-                                        int featureId = int.Parse(featureName);
-
-                                        if(slLevels.Contains(featureId))
-                                            slLevels[featureId] = (int)slLevels[featureId] + userCount;
-                                        else
-                                            slLevels.Add(featureId, userCount);
-                                    }
-                                }
+                                AddFeatureActivationType1(out ActivationType, features, levels);
                             }
-
-
                         }
                     }
                 }
             }
-            
-            return slLevels;
 
+            return levels;
+
+        }
+
+        private static SortedList AddFeaturesActivationType2(out int ActivationType, string[] features, SortedList levels)
+        {
+            ActivationType = 2;
+
+            var expiration = features[4];
+            var goodFeatureExp = false;
+            if (expiration == NotAvailableString)
+            {
+                goodFeatureExp = true;
+            }
+            else
+            {
+                try
+                {
+                    var engCulture = new CultureInfo(1033);
+                    var dateTime = DateTime.Parse(expiration, engCulture);
+                    if (new DateTime(dateTime.Year, dateTime.Month, dateTime.Day) > DateTime.Now)
+                    {
+                        goodFeatureExp = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+
+            var allAvailableLevels = AddOrUpdateFeatures(goodFeatureExp, features, levels);
+            return allAvailableLevels;
         }
 
         private static SortedList AddOrUpdateFeatures(bool goodFeatureExp, string[] features, SortedList levels)
         {
-            if (goodFeatureExp && features.Length > 3)
+            if (goodFeatureExp)
             {
                 var featureNames = features[3].Split(',');
                 foreach (var featureName in featureNames)
                 {
-                    var cutFeatureNames = featureName.Split(':');
+                    var nameParts = featureName.Split(':');
 
-                    if (cutFeatureNames.Length > 1)
+                    var featureId = int.Parse(nameParts[0]);
+                    var userCount = int.Parse(nameParts[1]);
+
+                    if (levels.Contains(featureId))
                     {
-                        var featureId = int.Parse(cutFeatureNames[0]);
-                        var userCount = int.Parse(cutFeatureNames[1]);
-
-                        if (levels.Contains(featureId))
-                        {
-                            levels[featureId] = (int)levels[featureId] + userCount;
-                        }
-                        else
-                        {
-                            levels.Add(featureId, userCount);
-                        }
+                        levels[featureId] = (int)levels[featureId] + userCount;
+                    }
+                    else
+                    {
+                        levels.Add(featureId, userCount);
                     }
                 }
                 return levels;
             }
             return null;
+        }
+
+        private static SortedList AddFeatureActivationType3(out int ActivationType, string[] features, SortedList levels)
+        {
+            ActivationType = 3;
+
+            var expiration = features[4];
+            var goodFeatureExp = false;
+            if (expiration == "NA")
+            {
+                goodFeatureExp = true;
+            }
+            else
+            {
+                try
+                {
+                    var engCulture = new CultureInfo(1033);
+                    var dateTime = DateTime.Parse(expiration, engCulture);
+                    if (new DateTime(dateTime.Year, dateTime.Month, dateTime.Day) > DateTime.Now)
+                    {
+                        goodFeatureExp = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+
+            var allAvailableLevels = AddOrUpdateFeatures(goodFeatureExp, features, levels);
+            return allAvailableLevels;
+        }
+
+        private static void AddFeatureActivationType1(out int ActivationType, string[] features, SortedList levels)
+        {
+            ActivationType = 1;
+
+            var goodFeatureExp = GetIsGoodFeatureExp(features);
+            var userCount = int.Parse(features[2]);
+
+            AddGoodFeature(goodFeatureExp, features, levels, userCount);
+        }
+
+        private static bool GetIsGoodFeatureExp(string[] features)
+        {
+            var expiration = features[4];
+            var goodFeatureExp = false;
+            if (expiration == "NA")
+            {
+                goodFeatureExp = true;
+            }
+            else
+            {
+                try
+                {
+                    var engCulture = new CultureInfo(1033);
+                    var dateTime = DateTime.Parse(expiration, engCulture);
+                    if (new DateTime(dateTime.Year, dateTime.Month, dateTime.Day) > DateTime.Now)
+                    {
+                        goodFeatureExp = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+            return goodFeatureExp;
+        }
+
+        private static void AddGoodFeature(bool goodFeatureExp, string[] features, SortedList levels, int userCount)
+        {
+            if (goodFeatureExp)
+            {
+                var featureNames = features[1].Split(',');
+                foreach (var featureId in featureNames.Select(featureName => int.Parse(featureName)))
+                {
+                    if (levels.Contains(featureId))
+                    {
+                        levels[featureId] = (int)levels[featureId] + userCount;
+                    }
+                    else
+                    {
+                        levels.Add(featureId, userCount);
+                    }
+                }
+            }
         }
 
         private static string farmEncode(string code)

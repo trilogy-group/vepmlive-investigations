@@ -129,6 +129,7 @@
     <Compile Include="Base\DBAccess\LookupsTests.cs" />
     <Compile Include="Base\dbaCCVTests.cs" />
     <Compile Include="Base\dbaUsersTests.cs" />
+    <Compile Include="Base\DBCommonTests.cs" />
     <Compile Include="Layouts\CustomFieldFormTests\CanDeleteCustomFieldTests.cs" />
     <Compile Include="Layouts\CustomFieldFormTests\CheckDeleteCustomFieldTests.cs" />
     <Compile Include="Layouts\CustomFieldFormTests\PageLoadTests.cs" />
@@ -142,6 +143,8 @@
     <Compile Include="Analyzers\BaseDetailRowDataTest.cs" />
     <Compile Include="PfeJobTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\ClsResourceValuesTests.cs" />
+    <Compile Include="Resources\ResourceRepositoryTests.cs" />
     <Compile Include="Resources\RPEditorDataTests.cs" />
     <Compile Include="Setup\SetupSiteTests.cs" />
     <Compile Include="Testables\BaseDetailRowDataTestable.cs" />
@@ -164,7 +167,6 @@
     <None Include="packages.config" />
     <None Include="PortfolioEngineCore.Tests.snk" />
   </ItemGroup>
-  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

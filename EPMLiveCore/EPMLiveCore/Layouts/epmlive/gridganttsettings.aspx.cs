@@ -21,6 +21,7 @@ using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Logging;
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 using Microsoft.SharePoint.Administration;
+using static System.Diagnostics.Trace;
 using static EPMLiveCore.Layouts.epmlive.LayoutsHelper;
 
 namespace EPMLiveCore.Layouts.epmlive
@@ -134,276 +135,322 @@ namespace EPMLiveCore.Layouts.epmlive
                 strReportActionUrl = SPContext.Current.Web.Url + REPORT_CHECK_URL;
                 chkTimesheet.InputAttributes.Add("onclick", "CheckTimesheet();");
 
-                SPWeb web = SPContext.Current.Web;
+                var web = SPContext.Current.Web;
+                PopulatePermissionControls(web);
+                var arrLookups = new ArrayList();
+                var list = web.Lists[new Guid(Request["List"])];
+                strListName = list.Title;
+                PopulateListItemDropDowns();
+                PopulateLinkDropDowns(web, list);
+                PopulateInformationControls(list);
+                PopulateGridGanttSettings(list, web);
+                PopulateViewState();
+                var rootWeb = web.Site.RootWeb;
+                PopulateTimeSheetCheckBox(rootWeb, list);
+                LoadReportControls(rootWeb, list);
+            }
+        }
+
+        private void PopulatePermissionControls(SPWeb web)
+        {
+            var oRoleDefinitions = web.Site.RootWeb.RoleDefinitions;
+
+            foreach (SPRoleDefinition oRoleDefinition in oRoleDefinitions)
+            {
+                ddlSPPermissions.Items.Add(new ListItem(oRoleDefinition.Name, oRoleDefinition.Id.ToString()));
+            }
+
+            var collGroups = web.Site.RootWeb.SiteGroups;
+            foreach (SPGroup oGroup in collGroups)
+            {
+                ddlGroups.Items.Add(new ListItem(oGroup.Name, oGroup.ID.ToString()));
+            }
+
+            dtGroupsPermissions.Columns.Add("GroupsText");
+            dtGroupsPermissions.Columns.Add("GroupsID");
+            dtGroupsPermissions.Columns.Add("PermissionsText");
+            dtGroupsPermissions.Columns.Add("PermissionsID");
+        }
+
+        private void PopulateListItemDropDowns()
+        {
+            ddlStartDate.Items.Add(new ListItem("< Select Field >", string.Empty));
+            ddlDueDate.Items.Add(new ListItem("< Select Field >", string.Empty));
+            ddlProgressBar.Items.Add(new ListItem("< Select Field >", string.Empty));
+            ddlMilestone.Items.Add(new ListItem("< Select Field >", string.Empty));
+            ddlInformation.Items.Add(new ListItem("< Select Field >", string.Empty));
+            ddlWBS.Items.Add(new ListItem("< Select Field >", ""));
+        }
+
+        private void PopulateLinkDropDowns(SPWeb web, SPList list)
+        {
+            if (list.Title == CoreFunctions.getConfigSetting(web, "EPMLiveProjectCenter") || list.Title == "Project Center Rollup")
+            {
+                ddlItemLink.Items.Add(new ListItem("Edit Work Plan", "workplan"));
+                ddlItemLink.Items.Add(new ListItem("Task Center", "tasks"));
+            }
+
+            SPSecurity.RunWithElevatedPrivileges(
+                delegate
                 {
-
-                    SPRoleDefinitionCollection oRoleDefinitions = web.Site.RootWeb.RoleDefinitions;
-
-                    foreach (SPRoleDefinition oRoleDefinition in oRoleDefinitions)
+                    using (var site = new SPSite(web.Site.ID))
                     {
-                        ddlSPPermissions.Items.Add(new ListItem(oRoleDefinition.Name, oRoleDefinition.Id.ToString()));
-                    }
-
-                    SPGroupCollection collGroups = web.Site.RootWeb.SiteGroups;
-                    foreach (SPGroup oGroup in collGroups)
-                    {
-                        ddlGroups.Items.Add(new ListItem(oGroup.Name, oGroup.ID.ToString()));
-                    }
-
-                    dtGroupsPermissions.Columns.Add("GroupsText");
-                    dtGroupsPermissions.Columns.Add("GroupsID");
-                    dtGroupsPermissions.Columns.Add("PermissionsText");
-                    dtGroupsPermissions.Columns.Add("PermissionsID");
-
-                    ArrayList arrLookups = new ArrayList();
-                    SPList list = web.Lists[new Guid(Request["List"])];
-                    strListName = list.Title;
-
-                    ddlStartDate.Items.Add(new ListItem("< Select Field >", ""));
-                    ddlDueDate.Items.Add(new ListItem("< Select Field >", ""));
-                    ddlProgressBar.Items.Add(new ListItem("< Select Field >", ""));
-                    ddlMilestone.Items.Add(new ListItem("< Select Field >", ""));
-                    ddlInformation.Items.Add(new ListItem("< Select Field >", ""));
-                    ddlWBS.Items.Add(new ListItem("< Select Field >", ""));
-
-                    if (list.Title == CoreFunctions.getConfigSetting(web, "EPMLiveProjectCenter") || list.Title == "Project Center Rollup")
-                    {
-                        ddlItemLink.Items.Add(new ListItem("Edit Work Plan", "workplan"));
-                        ddlItemLink.Items.Add(new ListItem("Task Center", "tasks"));
-                    }
-
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                    {
-                        using (SPSite site = new SPSite(web.Site.ID))
+                        using (var spWeb = site.OpenWeb(web.ID))
                         {
-                            using (SPWeb w = site.OpenWeb(web.ID))
+                            var planners = CoreFunctions.getLockConfigSetting(spWeb, "EPMLivePlannerPlanners", false);
+
+                            var anyFound = planners.Split(',')
+                                .Where(planner => !string.IsNullOrWhiteSpace(planner))
+                                .Select(planner => planner.Split('|'))
+                                .Select(
+                                    sPlanner => CoreFunctions.getLockConfigSetting(
+                                        spWeb,
+                                        string.Format("EPMLivePlanner{0}ProjectCenter", sPlanner[0]),
+                                        false)).Any(projectCenter => projectCenter == list.Title);
+
+                            if (anyFound)
                             {
-                                string planners = CoreFunctions.getLockConfigSetting(w, "EPMLivePlannerPlanners", false);
-
-                                foreach (string planner in planners.Split(','))
-                                {
-                                    if (!String.IsNullOrEmpty(planner))
-                                    {
-                                        string[] sPlanner = planner.Split('|');
-                                        string pc = CoreFunctions.getLockConfigSetting(w, "EPMLivePlanner" + sPlanner[0] + "ProjectCenter", false);
-
-                                        if (pc == list.Title)
-                                        {
-                                            ddlItemLink.Items.Add(new ListItem("Planner", "planner"));
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    foreach (SPField field in list.Fields)
-                    {
-                        if (!field.Hidden && field.Type != SPFieldType.Computed)
-                        {
-                            switch (field.Type)
-                            {
-                                case SPFieldType.DateTime:
-                                    ddlStartDate.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    ddlDueDate.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    break;
-                                case SPFieldType.Number:
-                                    ddlProgressBar.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    break;
-                                case SPFieldType.Text:
-                                    ddlWBS.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    break;
-                                case SPFieldType.Boolean:
-                                    ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    ddlMilestone.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    break;
-                                default:
-                                    ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    break;
-                            };
-                        }
-                    }
-
-                    var gSettings = new GridGanttSettings(list);
-
-                    ddlStartDate.SelectedValue = gSettings.StartDate;
-                    ddlDueDate.SelectedValue = gSettings.DueDate;
-                    ddlProgressBar.SelectedValue = gSettings.Progress;
-                    ddlWBS.SelectedValue = gSettings.WBS;
-                    ddlMilestone.SelectedValue = gSettings.Milestone;
-                    chkExecutive.Checked = gSettings.Executive;
-                    ddlInformation.SelectedValue = gSettings.Information;
-                    ddlItemLink.SelectedValue = gSettings.ItemLink;
-                    txtRollupLists.Text = gSettings.RollupLists.Replace(",", "\r\n").Replace("|", ",");
-                    txtRollupSites.Text = gSettings.RollupSites.Replace(",", "\r\n");
-                    chkShowViewToolbar.Checked = gSettings.ShowViewToolbar;
-                    chkHideNewButton.Checked = gSettings.HideNewButton;
-                    chkPerformance.Checked = gSettings.Performance;
-                    chkAllowEdit.Checked = gSettings.AllowEdit;
-                    chkEditDefault.Checked = gSettings.EditDefault;
-                    chkShowInsert.Checked = gSettings.ShowInsert;
-                    chkDisableNewRollup.Checked = gSettings.DisableNewItemMod;
-                    chkUseNewMenu.Checked = gSettings.UseNewMenu;
-                    txtNewMenuName.Text = gSettings.NewMenuName;
-                    chkUsePopup.Checked = gSettings.UsePopup;
-                    chkEnableRequests.Checked = gSettings.EnableRequests;
-
-                    var defaultTemps = GetAvailableDefaultTemps();
-                    bool showAutoCreate = defaultTemps.Count > 1;
-
-                    chkAutoCreate.Checked = gSettings.EnableAutoCreation;
-                    ifcAutoCreate.Visible = showAutoCreate;
-
-                    ddlAutoCreateTemplate.DataSource = defaultTemps;
-                    ddlAutoCreateTemplate.DataTextField = "Key";
-                    ddlAutoCreateTemplate.DataValueField = "Value";
-                    ddlAutoCreateTemplate.DataBind();
-                    ddlAutoCreateTemplate.SelectedValue = gSettings.AutoCreationTemplateId;
-                    ifcAutoCreateTemplate.Visible = showAutoCreate;
-                    ddlAutoCreateTemplate.Enabled = (showAutoCreate && chkAutoCreate.Checked);
-
-                    //fill parentsitelookup ddl
-                    ddlParentSiteLookup.DataSource = GetAvailableParentSiteLookups(list, gSettings);
-                    ddlParentSiteLookup.DataTextField = "Key";
-                    ddlParentSiteLookup.DataValueField = "Value";
-                    ddlParentSiteLookup.DataBind();
-                    ddlParentSiteLookup.SelectedValue = gSettings.WorkspaceParentSiteLookup;
-
-                    //load list icon
-                    spnListIcon.CssClass = string.IsNullOrEmpty(gSettings.ListIcon) ? "icon-square" : gSettings.ListIcon;
-                    hdnListIcon.Value = string.IsNullOrEmpty(gSettings.ListIcon) ? "icon-square" : gSettings.ListIcon;
-
-                    chkWorkListFeat.Checked = gSettings.EnableWorkList;
-                    chkFancyForms.Checked = gSettings.EnableFancyForms;
-                    chkEmails.Checked = gSettings.SendEmails;
-                    chkDeleteRequest.Checked = gSettings.DeleteRequest;
-                    txtRequestList.Text = gSettings.RequestList;
-                    chkUseParent.Checked = gSettings.UseParent;
-                    chkSearch.Checked = gSettings.Search;
-                    chkLockSearch.Checked = gSettings.LockSearch;
-                    chkAssociatedItems.Checked = gSettings.AssociatedItems;
-                    chkEnableTeam.Checked = gSettings.BuildTeam;
-                    chkContentReporting.Checked = gSettings.EnableContentReporting;
-                    chkResTools.Checked = gSettings.EnableResourcePlan;
-                    chkDisplayRedirect.Checked = gSettings.DisplayFormRedirect;
-                    ddlRibbonBehavior.SelectedValue = gSettings.RibbonBehavior;
-                    chkDisableThumbnails.Checked = gSettings.DisableThumbnails;
-                    //if ((uint)list.BaseTemplate == 10115 || (uint)list.BaseTemplate == 10702 || (uint)list.BaseTemplate == 10701)
-                    {
-                        SectionEmail.Visible = true;
-                        //try
-                        //{
-                        //    chkEmails.Checked = bool.Parse(CoreFunctions.getListSetting(list, "AssignedToEmail"));
-                        //}
-                        //catch { }
-                        //chkEmails.Checked = list.EnableAssignToEmail;
-                    }
-
-                    chkEnableTeamSecurity.Checked = gSettings.BuildTeamSecurity;
-
-                    if (gSettings.BuildTeamPermissions.Length > 1)
-                    {
-
-                        string[] strOuter = gSettings.BuildTeamPermissions.Split(new string[] { "|~|" }, StringSplitOptions.None);
-                        foreach (string strInner in strOuter)
-                        {
-                            string[] strInnerMost = strInner.Split('~');
-                            DataRow dr = dtGroupsPermissions.NewRow();
-                            SPGroup g = null;
-                            SPRoleDefinition r = null;
-
-                            try
-                            {
-                                g = web.SiteGroups.GetByID(Convert.ToInt32(strInnerMost[0]));
-                                r = web.RoleDefinitions.GetById(Convert.ToInt32(strInnerMost[1]));
-                            }
-                            catch { }
-                            if (g != null && r != null)
-                            {
-                                dr["GroupsText"] = g.Name;
-                                dr["GroupsID"] = strInnerMost[0];
-                                dr["PermissionsText"] = r.Name;
-                                dr["PermissionsID"] = strInnerMost[1];
-                                dtGroupsPermissions.Rows.Add(dr);
+                                ddlItemLink.Items.Add(new ListItem("Planner", "planner"));
                             }
                         }
                     }
+                });
+        }
 
-                    GvGroupsPermissions.DataSource = dtGroupsPermissions;
-                    GvGroupsPermissions.DataBind();
-
-                    if (ViewState["dtGroupsPermissions"] == null)
-                        ViewState.Add("dtGroupsPermissions", dtGroupsPermissions);
-
-                    SPWeb rootWeb = web.Site.RootWeb;
-
-                    ArrayList lists = new ArrayList(CoreFunctions.getConfigSetting(rootWeb, "EPMLiveTSLists").Replace("\r\n", "\n").Split('\n')); ;
-
-                    if (lists.Contains(list.Title))
+        private void PopulateInformationControls(SPList list)
+        {
+            foreach (SPField field in list.Fields)
+            {
+                if (!field.Hidden && field.Type != SPFieldType.Computed)
+                {
+                    switch (field.Type)
                     {
-                        chkTimesheet.Checked = true;
-                    }
-
-                    bool isReportingV2Enabled = false;
-                    try
-                    {
-                        isReportingV2Enabled = Convert.ToBoolean(CoreFunctions.getConfigSetting(rootWeb, "ReportingV2"));
-                    }
-                    catch { }
-
-                    // display reporting section dynamically
-                    ReportBiz reportBiz = new ReportBiz(SPContext.Current.Site.ID, SPContext.Current.Web.ID, isReportingV2Enabled);
-                    if (reportBiz.SiteExists())
-                    {
-                        ifsEnableReporting.Visible = true;
-                        Collection<string> mappedLists = reportBiz.GetMappedLists();
-                        Collection<string> mappedListIds = reportBiz.GetMappedListsIds();
-                        bool isMapped = mappedLists.Contains(list.Title);
-                        bool isMaster = mappedListIds.Contains(list.ID.ToString().ToLower());
-
-                        if (!isReportingV2Enabled)
-                        {
-                            cbEnableReporting.Checked = isMapped;
-                            cbEnableReporting.Enabled = (isMaster || !isMapped);
-                        }
-                        else
-                        {
-                            if (isMapped)
-                            {
-                                if (isMaster)
-                                {
-                                    cbEnableReporting.Checked = true;
-                                    cbEnableReporting.Enabled = false;
-                                }
-                                else
-                                {
-                                    cbEnableReporting.Checked = false;
-                                    cbEnableReporting.Enabled = true;
-                                }
-                            }
-                            else
-                            {
-                                cbEnableReporting.Checked = false;
-                                cbEnableReporting.Enabled = true;
-                            }
-                        }
-
-                        List<SPEventReceiverDefinition> evts = GetListEvents(list,
-                                                                            "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
-                                                                            "EPMLiveReportsAdmin.ListEvents",
-                                                                            new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
-                                                                                                            SPEventReceiverType.ItemUpdated,
-                                                                                                            SPEventReceiverType.ItemDeleting });
-
-                        bool hasEvents = (evts.Count > 0);
-                        btnAddEvt.Visible = (isMapped && !hasEvents);
+                        case SPFieldType.DateTime:
+                            ddlStartDate.Items.Add(new ListItem(field.Title, field.InternalName));
+                            ddlDueDate.Items.Add(new ListItem(field.Title, field.InternalName));
+                            ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
+                            break;
+                        case SPFieldType.Number:
+                            ddlProgressBar.Items.Add(new ListItem(field.Title, field.InternalName));
+                            ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
+                            break;
+                        case SPFieldType.Text:
+                            ddlWBS.Items.Add(new ListItem(field.Title, field.InternalName));
+                            ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
+                            break;
+                        case SPFieldType.Boolean:
+                            ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
+                            ddlMilestone.Items.Add(new ListItem(field.Title, field.InternalName));
+                            break;
+                        default:
+                            ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
+                            break;
                     }
                 }
             }
+        }
+
+        private void PopulateGridGanttSettings(SPList list, SPWeb web)
+        {
+            var gSettings = new GridGanttSettings(list);
+
+            PopulateTextBox(gSettings);
+
+            var defaultTemps = GetAvailableDefaultTemps();
+            var showAutoCreate = defaultTemps.Count > 1;
+
+            chkAutoCreate.Checked = gSettings.EnableAutoCreation;
+            ifcAutoCreate.Visible = showAutoCreate;
+
+            PopulateDropDownLists(defaultTemps, gSettings, showAutoCreate, list);
+            PopulateListIcon(gSettings);
+            PopulateCheckBoxes(gSettings);
+            PopulatePermissionControls(gSettings, web);
+        }
+
+        private void PopulateTextBox(GridGanttSettings gSettings)
+        {
+            txtRollupLists.Text = gSettings.RollupLists.Replace(",", "\r\n").Replace("|", ",");
+            txtRollupSites.Text = gSettings.RollupSites.Replace(",", "\r\n");
+            txtNewMenuName.Text = gSettings.NewMenuName;
+            txtRequestList.Text = gSettings.RequestList;
+        }
+
+        private void PopulateDropDownLists(Dictionary<string, int> defaultTemps, GridGanttSettings gSettings, bool showAutoCreate, SPList list)
+        {
+            ddlStartDate.SelectedValue = gSettings.StartDate;
+            ddlDueDate.SelectedValue = gSettings.DueDate;
+            ddlProgressBar.SelectedValue = gSettings.Progress;
+            ddlWBS.SelectedValue = gSettings.WBS;
+            ddlMilestone.SelectedValue = gSettings.Milestone;
+            ddlInformation.SelectedValue = gSettings.Information;
+            ddlItemLink.SelectedValue = gSettings.ItemLink;
+            ddlRibbonBehavior.SelectedValue = gSettings.RibbonBehavior;
+            ddlAutoCreateTemplate.DataSource = defaultTemps;
+            ddlAutoCreateTemplate.DataTextField = "Key";
+            ddlAutoCreateTemplate.DataValueField = "Value";
+            ddlAutoCreateTemplate.DataBind();
+            ddlAutoCreateTemplate.SelectedValue = gSettings.AutoCreationTemplateId;
+            ifcAutoCreateTemplate.Visible = showAutoCreate;
+            ddlAutoCreateTemplate.Enabled = showAutoCreate && chkAutoCreate.Checked;
+
+            PopulateParentSiteLookupDropDown(list, gSettings);
+        }
+
+        private void PopulateParentSiteLookupDropDown(SPList list, GridGanttSettings gSettings)
+        {
+            ddlParentSiteLookup.DataSource = GetAvailableParentSiteLookups(list, gSettings);
+            ddlParentSiteLookup.DataTextField = "Key";
+            ddlParentSiteLookup.DataValueField = "Value";
+            ddlParentSiteLookup.DataBind();
+            ddlParentSiteLookup.SelectedValue = gSettings.WorkspaceParentSiteLookup;
+        }
+
+        private void PopulateListIcon(GridGanttSettings gSettings)
+        {
+            spnListIcon.CssClass = string.IsNullOrEmpty(gSettings.ListIcon)
+                ? "icon-square"
+                : gSettings.ListIcon;
+            hdnListIcon.Value = string.IsNullOrEmpty(gSettings.ListIcon)
+                ? "icon-square"
+                : gSettings.ListIcon;
+        }
+
+        private void PopulateCheckBoxes(GridGanttSettings gSettings)
+        {
+            chkExecutive.Checked = gSettings.Executive;
+            chkUsePopup.Checked = gSettings.UsePopup;
+            chkShowViewToolbar.Checked = gSettings.ShowViewToolbar;
+            chkHideNewButton.Checked = gSettings.HideNewButton;
+            chkPerformance.Checked = gSettings.Performance;
+            chkAllowEdit.Checked = gSettings.AllowEdit;
+            chkEditDefault.Checked = gSettings.EditDefault;
+            chkShowInsert.Checked = gSettings.ShowInsert;
+            chkDisableNewRollup.Checked = gSettings.DisableNewItemMod;
+            chkUseNewMenu.Checked = gSettings.UseNewMenu;
+            chkEnableRequests.Checked = gSettings.EnableRequests;
+            chkWorkListFeat.Checked = gSettings.EnableWorkList;
+            chkFancyForms.Checked = gSettings.EnableFancyForms;
+            chkEmails.Checked = gSettings.SendEmails;
+            chkDeleteRequest.Checked = gSettings.DeleteRequest;
+            chkUseParent.Checked = gSettings.UseParent;
+            chkSearch.Checked = gSettings.Search;
+            chkLockSearch.Checked = gSettings.LockSearch;
+            chkAssociatedItems.Checked = gSettings.AssociatedItems;
+            chkEnableTeam.Checked = gSettings.BuildTeam;
+            chkContentReporting.Checked = gSettings.EnableContentReporting;
+            chkResTools.Checked = gSettings.EnableResourcePlan;
+            chkDisplayRedirect.Checked = gSettings.DisplayFormRedirect;
+            chkDisableThumbnails.Checked = gSettings.DisableThumbnails;
+
+            SectionEmail.Visible = true;
+
+            chkEnableTeamSecurity.Checked = gSettings.BuildTeamSecurity;
+        }
+
+        private void PopulatePermissionControls(GridGanttSettings gSettings, SPWeb web)
+        {
+            if (gSettings.BuildTeamPermissions.Length > 1)
+            {
+                var strOuter = gSettings.BuildTeamPermissions.Split(
+                    new[]
+                    {
+                        "|~|"
+                    },
+                    StringSplitOptions.None);
+                ProcessPermissionStrings(web, strOuter, dtGroupsPermissions);
+            }
+
+            GvGroupsPermissions.DataSource = dtGroupsPermissions;
+            GvGroupsPermissions.DataBind();
+        }
+
+        private void PopulateViewState()
+        {
+            if (ViewState["dtGroupsPermissions"] == null)
+            {
+                ViewState.Add("dtGroupsPermissions", dtGroupsPermissions);
+            }
+        }
+
+        private void PopulateTimeSheetCheckBox(SPWeb rootWeb, SPList list)
+        {
+            var lists = new ArrayList(CoreFunctions.getConfigSetting(rootWeb, "EPMLiveTSLists").Replace("\r\n", "\n").Split('\n'));
+
+            if (lists.Contains(list.Title))
+            {
+                chkTimesheet.Checked = true;
+            }
+        }
+
+        private void LoadReportControls(SPWeb rootWeb, SPList list)
+        {
+            var isReportingV2Enabled = false;
+            try
+            {
+                isReportingV2Enabled = Convert.ToBoolean(CoreFunctions.getConfigSetting(rootWeb, "ReportingV2"));
+            }
+            catch (Exception ex)
+            {
+                TraceError("Exception Suppressed {0}", ex);
+            }
+
+            var reportBiz = new ReportBiz(SPContext.Current.Site.ID, SPContext.Current.Web.ID, isReportingV2Enabled);
+            if (reportBiz.SiteExists())
+            {
+                ifsEnableReporting.Visible = true;
+
+                var mappedLists = reportBiz.GetMappedLists();
+                var mappedListIds = reportBiz.GetMappedListsIds();
+                var isMapped = mappedLists.Contains(list.Title);
+                var isMaster = mappedListIds.Contains(list.ID.ToString().ToLower());
+
+                if (!isReportingV2Enabled)
+                {
+                    cbEnableReporting.Checked = isMapped;
+                    cbEnableReporting.Enabled = isMaster || !isMapped;
+                }
+                else
+                {
+                    if (isMapped)
+                    {
+                        if (isMaster)
+                        {
+                            cbEnableReporting.Checked = true;
+                            cbEnableReporting.Enabled = false;
+                        }
+                        else
+                        {
+                            cbEnableReporting.Checked = false;
+                            cbEnableReporting.Enabled = true;
+                        }
+                    }
+                    else
+                    {
+                        cbEnableReporting.Checked = false;
+                        cbEnableReporting.Enabled = true;
+                    }
+                }
+
+                SetButtonEventsVisibility(list, isMapped);
+            }
+        }
+
+        private void SetButtonEventsVisibility(SPList list, bool isMapped)
+        {
+            var events = GetListEvents(
+                list,
+                "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
+                "EPMLiveReportsAdmin.ListEvents",
+                new List<SPEventReceiverType>
+                {
+                    SPEventReceiverType.ItemAdded,
+                    SPEventReceiverType.ItemUpdated,
+                    SPEventReceiverType.ItemDeleting
+                });
+
+            var hasEvents = events.Count > 0;
+            btnAddEvt.Visible = isMapped && !hasEvents;
         }
 
         private Dictionary<string, int> GetAvailableDefaultTemps()
@@ -1383,9 +1430,13 @@ namespace EPMLiveCore.Layouts.epmlive
                                 if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
                                     EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
 
-                                EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys");
-                                myLog.MaximumKilobytes = 32768;
-                                myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 4001);
+                                using (var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys"))
+                                {
+                                    const int MaximumKilobytes = 32768;
+                                    myLog.MaximumKilobytes = MaximumKilobytes;
+                                    const int EventId = 4001;
+                                    myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, EventId);
+                                }
                             });
                         }
                     }

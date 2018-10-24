@@ -15,12 +15,20 @@ using System.Web.Fakes;
 using Microsoft.SharePoint.Administration;
 using EPMLiveWebParts.Fakes;
 using System.Xml.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
+using Shouldly;
 
 namespace EPMLiveWebParts.Tests
 {
     [TestClass()]
     public class getgriditemsTests
     {
+        private const string NewGroupString = "Group1\nAtt1\nAtt2";
+        private const string Group0 = "Group0\nAtt1";
+
+        private string _groups;
+        private SortedList _sortedList;
+
         [TestMethod()]
         public void addItemTest_WhenFieldType_FilterLookUp()
         {
@@ -754,6 +762,102 @@ namespace EPMLiveWebParts.Tests
                 
             }
 
+        }
+
+        [TestMethod]
+        public void SetGroupsStrings_SPFieldTypeUser_Success()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                object[] parameters;
+                var privateObject = ArrangeSetGroupsStrings(SPFieldType.User, out parameters);
+
+                // Act
+                privateObject.Invoke("SetGroupsStrings", parameters);
+
+                // Assert
+                this.ShouldSatisfyAllConditions(
+                    () => ((string[])parameters[3])[0].ShouldBe("Group0\nAtt1\nGroup1"),
+                    () => ((string[])parameters[3])[1].ShouldBe("Group0\nAtt1\nAtt1"),
+                    () => ((string[])parameters[3])[2].ShouldBe("Group0\nAtt1\nAtt2"));
+            }
+        }
+
+        [TestMethod]
+        public void SetGroupsStrings_SPFieldTypeMultiChoice_Success()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                object[] parameters;
+                var privateObject = ArrangeSetGroupsStrings(SPFieldType.MultiChoice, out parameters);
+
+                // Act
+                privateObject.Invoke("SetGroupsStrings", parameters);
+
+                // Assert
+                this.ShouldSatisfyAllConditions(
+                    () => ((string[])parameters[3])[0].ShouldBe("Group0\nAtt1\nGroup1"),
+                    () => ((string[])parameters[3])[1].ShouldBe("Group0\nAtt1\nAtt1"),
+                    () => ((string[])parameters[3])[2].ShouldBe("Group0\nAtt1\nAtt2"));
+            }
+        }
+
+        [TestMethod]
+        public void SetGroupsStrings_SPFieldTypeOther_Success()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                object[] parameters;
+                var privateObject = ArrangeSetGroupsStrings(SPFieldType.Calculated, out parameters);
+
+                // Act
+                privateObject.Invoke("SetGroupsStrings", parameters);
+
+                // Assert
+                this.ShouldSatisfyAllConditions(() => ((string[])parameters[3])[0].ShouldBe(string.Format("{0}\n{1}", Group0, NewGroupString)));
+            }
+        }
+
+        [TestMethod]
+        public void SetGroupsStrings_SPFieldTypeLookup_Success()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                object[] parameters;
+                var privateObject = ArrangeSetGroupsStrings(SPFieldType.Lookup, out parameters);
+
+                // Act
+                privateObject.Invoke("SetGroupsStrings", parameters);
+
+                // Assert
+                this.ShouldSatisfyAllConditions(
+                    () => ((string[])parameters[3])[0].ShouldBe("Group0\nAtt1\nGroup1"),
+                    () => ((string[])parameters[3])[1].ShouldBe("Group0\nAtt1\nAtt1"),
+                    () => ((string[])parameters[3])[2].ShouldBe("Group0\nAtt1\nAtt2"));
+            }
+        }
+
+        private PrivateObject ArrangeSetGroupsStrings(SPFieldType spFieldType, out object[] parameters)
+        {
+            var privateObject = new PrivateObject(new getgriditems());
+            _sortedList = new SortedList();
+            ShimSPField.AllInstances.TypeGet = _ => spFieldType;
+            string[] groups =
+            {
+                Group0
+            };
+            parameters = new object[]
+            {
+                _sortedList,
+                (SPField)new ShimSPField(),
+                NewGroupString,
+                groups
+            };
+            return privateObject;
         }
     }
 
