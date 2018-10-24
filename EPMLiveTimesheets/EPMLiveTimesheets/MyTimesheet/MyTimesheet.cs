@@ -69,17 +69,17 @@ namespace TimeSheets
                 {
                     typeof(ListTitleViewSelectorMenu).GetField("m_wpSingleInit", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(Page.FindControl("ctl00$PlaceHolderPageTitleInTitleArea$ctl01$ctl00").Controls[1], true);
                 }
-                catch
+                catch (Exception e)
                 {
-                    Trace.TraceWarning("Could not set value of ListTitleViewSelectorMenu.m_wpSingleInit field");
+                    Trace.TraceWarning("Could not set value of ListTitleViewSelectorMenu.m_wpSingleInit field: {0}", e);
                 }
                 try
                 {
                     typeof(ListTitleViewSelectorMenu).GetField("m_wpSingle", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(Page.FindControl("ctl00$PlaceHolderPageTitleInTitleArea$ctl01$ctl00").Controls[1], true);
                 }
-                catch
+                catch (Exception e)
                 {
-                    Trace.TraceWarning("Could not set value of ListTitleViewSelectorMenu.m_wpSingle field");
+                    Trace.TraceWarning("Could not set value of ListTitleViewSelectorMenu.m_wpSingle field: {0}", e);
                 }
             }
         }
@@ -90,17 +90,17 @@ namespace TimeSheets
             {
                 properties.PeriodId = Page.Request["NewPeriod"].ToString();
             }
-            catch
+            catch (Exception e)
             {
-                Trace.TraceWarning("Could not get value of NewPeriod parameter");
+                Trace.TraceWarning("Could not get value of NewPeriod parameter: {0}", e);
             }
             try
             {
                 properties.DelegateId = Page.Request["Delegate"].ToString();
             }
-            catch
+            catch (Exception e)
             {
-                Trace.TraceWarning("Could not get value of Delegate parameter");
+                Trace.TraceWarning("Could not get value of Delegate parameter: {0}", e);
             }
             properties.UserId = GetUserId();
         }
@@ -136,9 +136,9 @@ namespace TimeSheets
                                         properties.IsCurrentTimesheetPeriod = true;
                                     }
                                 }
-                                catch
+                                catch (Exception e)
                                 {
-                                    Trace.TraceWarning("Could not get value of curPeriod");
+                                    Trace.TraceWarning("Could not get value of curPeriod: {0}", e);
                                 }
                             }
                             else
@@ -377,9 +377,9 @@ namespace TimeSheets
                         part.Visible = false;
                     }
                 }
-                catch
+                catch (Exception e)
                 {
-                    Trace.TraceWarning("Could not read part type");
+                    Trace.TraceWarning("Could not read part type: {0}", e);
                 }
             }
         }
@@ -393,16 +393,16 @@ namespace TimeSheets
             {
                 try
                 {
-                    if (key.Value["Default"].ToLower() == "true")
+                    if (key.Value["Default"].Equals("true", StringComparison.OrdinalIgnoreCase))
                     {
                         properties.CurrentView = key.Key;
                         properties.CurrentViewId = "V" + counter;
                         IsDefaultAvailable = true;
                     }
                 }
-                catch
+                catch (Exception e)
                 {
-                    Trace.TraceWarning("Could not read Default value");
+                    Trace.TraceWarning("Could not read Default value: {0}", e);
                 }
                 counter++;
             }
@@ -430,7 +430,8 @@ namespace TimeSheets
             var currentUrlBuilder = new StringBuilder(currentUrl);
             foreach (string key in Page.Request.QueryString.AllKeys)
             {
-                if (key.ToString().ToLower() != "newperiod" && key.ToString().ToLower() != "delegate")
+                if (!key.ToString().Equals("newperiod", StringComparison.OrdinalIgnoreCase) &&
+                    !key.ToString().Equals("delegate", StringComparison.OrdinalIgnoreCase))
                 {
                     currentUrlBuilder.Append($"{key}={Page.Request.QueryString[key]}&");
                 }
