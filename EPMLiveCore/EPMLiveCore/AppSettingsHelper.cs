@@ -10,6 +10,7 @@ using System.Data.SqlClient;
 using EPMLiveCore.GlobalResources;
 using Microsoft.SharePoint.Navigation;
 using System.Collections;
+using System.Diagnostics;
 using Microsoft.SharePoint.Utilities;
 
 namespace EPMLiveCore
@@ -600,53 +601,7 @@ namespace EPMLiveCore
 
         public List<int> TryGetMyAppTopNavIds()
         {
-            int appId = CurrentAppId;
-            List<int> result = null;
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                using (SPSite es = new SPSite(SPContext.Current.Site.ID))
-                {
-                    using (SPWeb ew = es.OpenWeb(SPContext.Current.Web.ID))
-                    {
-                        SPList listApps = ew.Lists.TryGetList(MultiAppNavigationResources.INSTALLED_APP_LIST_NAME);
-                        if (listApps != null)
-                        {
-                            string sTopNav = string.Empty;
-                            SPListItem item = null;
-                            try
-                            {
-                                item = listApps.GetItemById(appId);
-                            }
-                            catch { }
-
-                            if (item != null)
-                            {
-                                object fv = null;
-                                try
-                                {
-                                    fv = item["TopNav"];
-                                }
-                                catch { }
-
-                                if (fv != null)
-                                {
-                                    sTopNav = fv.ToString().Trim();
-                                }
-
-                                if (!string.IsNullOrEmpty(sTopNav))
-                                {
-                                    int[] topNavIds = Array.ConvertAll(sTopNav.Split(',').Select(s => s.Trim()).ToArray(), s => int.Parse(s.Split(':')[0]));
-                                    result = new List<int>(topNavIds);
-                                }
-                            }
-                        }
-
-                    }
-                }
-            });
-
-            return result;
+            return TryGetTopNavIdsByAppId(CurrentAppId);
         }
 
         public List<SPNavigationNode> TryGetTopNavNodeCollectionById(int appId)
@@ -849,51 +804,7 @@ namespace EPMLiveCore
 
         public List<int> TryGetMyAppQuickLaunchIds()
         {
-            int appId = CurrentAppId;
-            List<int> result = null;
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                using (SPSite es = new SPSite(SPContext.Current.Site.ID))
-                {
-                    using (SPWeb ew = es.OpenWeb(SPContext.Current.Web.ID))
-                    {
-                        SPList listApps = ew.Lists.TryGetList(MultiAppNavigationResources.INSTALLED_APP_LIST_NAME);
-                        if (listApps != null)
-                        {
-                            string sQuickLaunch = "";
-                            SPListItem item = null;
-                            try
-                            {
-                                item = listApps.GetItemById(appId);
-                            }
-                            catch { }
-
-                            if (item != null)
-                            {
-                                object fv = null;
-                                try
-                                {
-                                    fv = item["QuickLaunch"];
-                                }
-                                catch { }
-
-                                if (fv != null)
-                                {
-                                    sQuickLaunch = fv.ToString().Trim();
-                                }
-
-                                if (!string.IsNullOrEmpty(sQuickLaunch))
-                                {
-                                    int[] quickLaunchIds = Array.ConvertAll(sQuickLaunch.Split(',').Select(s => s.Trim()).ToArray(), s => int.Parse(s.Split(':')[0]));
-                                    result = new List<int>(quickLaunchIds);
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            return result;
+            return TryGetQuickLaunchIdsByAppId(CurrentAppId);
         }
 
         /// <summary>
