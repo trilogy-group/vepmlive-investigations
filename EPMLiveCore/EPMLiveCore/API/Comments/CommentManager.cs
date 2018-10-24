@@ -150,9 +150,9 @@ namespace EPMLiveCore.API
                 .Replace("##itemTitle##", currentItem.Title)
                 .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime(web))
                 .Replace("##comment##", GetXMLSafeVersion(comment)));
-            result.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
-            result.Append(XML_RESPONSE_COMMENT_SECTION_FOOTER);
-            result.Append(XML_RESPONSE_COMMENT_FOOTER);
+            result.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE)
+                .Append(XML_RESPONSE_COMMENT_SECTION_FOOTER)
+                .Append(XML_RESPONSE_COMMENT_FOOTER);
         }
 
         private static void SendNotificationEmails(
@@ -185,7 +185,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                Trace.TraceWarning("Unable to sent email notifications: {0}", e.Message);
+                Trace.TraceWarning("Unable to sent email notifications: {0}", e);
             }
 
             // send email to each person in thread
@@ -250,7 +250,7 @@ namespace EPMLiveCore.API
                 }
                 catch (Exception e)
                 {
-                    Trace.TraceWarning("Unable to sync with social stream: {0}", e.Message);
+                    Trace.TraceWarning("Unable to sync with social stream: {0}", e);
                 }
             }
         }
@@ -447,17 +447,17 @@ namespace EPMLiveCore.API
                 SetSocialEngineTransaction(currentItem);
                 currentItem.Update();
 
-                sbResult.Append(XML_RESPONSE_PUBLIC_COMMENT_ITEM.Replace("##pubComListId##", dataMgr.GetPropVal("ListId")).Replace("##pubComItemId##", dataMgr.GetPropVal("ItemId")));
-                sbResult.Append(XML_RESPONSE_COMMENT_SECTION_HEADER.Replace("##listId##", currentItem.ParentList.ID.ToString()).Replace("##itemId##", currentItem.ID.ToString()));
-                sbResult.Append(XML_RESPONSE_COMMENT_ITEM.Replace("##listId##", currentItem.ParentList.ID.ToString())
+                sbResult.Append(XML_RESPONSE_PUBLIC_COMMENT_ITEM.Replace("##pubComListId##", dataMgr.GetPropVal("ListId")).Replace("##pubComItemId##", dataMgr.GetPropVal("ItemId")))
+                    .Append(XML_RESPONSE_COMMENT_SECTION_HEADER.Replace("##listId##", currentItem.ParentList.ID.ToString()).Replace("##itemId##", currentItem.ID.ToString()))
+                    .Append(XML_RESPONSE_COMMENT_ITEM.Replace("##listId##", currentItem.ParentList.ID.ToString())
                                                          .Replace("##listName##", currentItem.ParentList.Title)
                                                          .Replace("##itemId##", currentItem.ID.ToString())
                                                          .Replace("##itemTitle##", currentItem.Title)
                                                          .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime(cWeb))
                                                          .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(comment ?? string.Empty)))));
-                sbResult.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
-                sbResult.Append(XML_RESPONSE_COMMENT_SECTION_FOOTER);
-                sbResult.Append(XML_RESPONSE_COMMENT_FOOTER);
+                sbResult.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE)
+                    .Append(XML_RESPONSE_COMMENT_SECTION_FOOTER)
+                    .Append(XML_RESPONSE_COMMENT_FOOTER);
                 // save current user
                 SPUser originalUser = SPContext.Current.Web.CurrentUser;
 
@@ -1531,8 +1531,8 @@ namespace EPMLiveCore.API
                     }
                 }
                 loadedIds = loadedIds.Trim(',');
-                sbResult.Append(XML_RESPONSE_COMMENT_LOADEDIDS.Replace("##loadedids##", loadedIds));
-                sbResult.Append(XML_RESPONSE_COMMENT_FOOTER);
+                sbResult.Append(XML_RESPONSE_COMMENT_LOADEDIDS.Replace("##loadedids##", loadedIds))
+                    .Append(XML_RESPONSE_COMMENT_FOOTER);
                 retVal = sbResult.ToString();
             }
             return retVal;
