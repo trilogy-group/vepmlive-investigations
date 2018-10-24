@@ -17,12 +17,15 @@ using Microsoft.SharePoint.WebPartPages;
 using EPMLiveCore.ReportHelper;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using EPMLiveCore.API;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Logging;
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 using Microsoft.SharePoint.Administration;
+using Microsoft.SharePoint.Utilities;
 using static System.Diagnostics.Trace;
 using static EPMLiveCore.Layouts.epmlive.LayoutsHelper;
+using ListItem = System.Web.UI.WebControls.ListItem;
 
 namespace EPMLiveCore.Layouts.epmlive
 {
@@ -51,6 +54,7 @@ namespace EPMLiveCore.Layouts.epmlive
         protected DataTable dtGroupsPermissions = new DataTable();
 
         const string REPORT_CHECK_URL = "/_layouts/epmlive/ReportCheckActions.aspx";
+        private const char Separator = '|';
         public override string PageToRedirectOnCancel
         {
             get
@@ -1174,290 +1178,346 @@ namespace EPMLiveCore.Layouts.epmlive
 
         protected void Button1_Click(object sender, EventArgs e)
         {
-            SPWeb web = SPContext.Current.Web;
-            SPList list = web.Lists[new Guid(Request["List"])];
-            var gSettings = new GridGanttSettings(list);
+            var web = SPContext.Current.Web;
+            var list = web.Lists[new Guid(Request["List"])];
+            var gSettings = GetGridGanttSettings(list);
 
-            gSettings.StartDate = ddlStartDate.SelectedValue;
-            gSettings.DueDate = ddlDueDate.SelectedValue;
-            gSettings.Progress = ddlProgressBar.SelectedValue;
-            gSettings.WBS = ddlWBS.SelectedValue;
-            gSettings.Milestone = ddlMilestone.SelectedValue;
-            gSettings.Executive = chkExecutive.Checked;
-            gSettings.Information = ddlInformation.SelectedValue;
-            gSettings.ItemLink = ddlItemLink.SelectedValue;
-            gSettings.RibbonBehavior = ddlRibbonBehavior.SelectedValue;
-            gSettings.RollupLists = txtRollupLists.Text.Replace(",", "|").Replace("\r\n", ",");
-            gSettings.RollupSites = txtRollupSites.Text.Replace("\r\n", ",");
-            gSettings.ShowViewToolbar = chkShowViewToolbar.Checked;
-            gSettings.HideNewButton = chkHideNewButton.Checked;
-            gSettings.Performance = chkPerformance.Checked;
-            gSettings.AllowEdit = chkAllowEdit.Checked;
-            gSettings.EditDefault = chkEditDefault.Checked;
-            gSettings.ShowInsert = chkShowInsert.Checked;
-            gSettings.DisableNewItemMod = chkDisableNewRollup.Checked;
-            gSettings.UseNewMenu = chkUseNewMenu.Checked;
-            gSettings.NewMenuName = txtNewMenuName.Text;
-            gSettings.UsePopup = chkUsePopup.Checked;
-            gSettings.EnableRequests = chkEnableRequests.Checked;
-            gSettings.EnableAutoCreation = chkAutoCreate.Checked;
-            gSettings.AutoCreationTemplateId = ddlAutoCreateTemplate.SelectedValue;
-            gSettings.WorkspaceParentSiteLookup = ddlParentSiteLookup.SelectedValue;
-            gSettings.ListIcon = hdnListIcon.Value;
-            gSettings.EnableWorkList = chkWorkListFeat.Checked;
-            gSettings.EnableFancyForms = chkFancyForms.Checked;
-            gSettings.SendEmails = chkEmails.Checked;
-            gSettings.DeleteRequest = chkDeleteRequest.Checked;
-            gSettings.RequestList = txtRequestList.Text;
-            gSettings.UseParent = chkUseParent.Checked;
-            gSettings.Search = chkSearch.Checked;
-            gSettings.LockSearch = chkLockSearch.Checked;
-            gSettings.AssociatedItems = chkAssociatedItems.Checked;
-            gSettings.DisplayFormRedirect = chkDisplayRedirect.Checked;
-            gSettings.EnableResourcePlan = chkResTools.Checked;
-            gSettings.BuildTeam = chkEnableTeam.Checked;
-            gSettings.BuildTeamSecurity = chkEnableTeamSecurity.Checked;
-            gSettings.BuildTeamPermissions = GetGroupsPermissionsAssignment();
-            gSettings.EnableContentReporting = chkContentReporting.Checked;
-            gSettings.DisableThumbnails = chkDisableThumbnails.Checked;
             gSettings.SaveSettings(list);
+            
+            UpdateEmaiInstalls(list);
+            UpdateListEvents(gSettings, list);
+            ProcessTimeSheets(list, web);
+            ProcessFancyForms(list);
+            ProcessGridGanttViews(list);
+            ProcessWorkEngineFeatures(list);
+            UpdateReportBiz(list);
+            SetListIcon(gSettings.ListIcon);
 
-            //if ((uint)list.BaseTemplate == 10115 || (uint)list.BaseTemplate == 10701 || (uint)list.BaseTemplate == 10702)
+            CacheStore.Current.RemoveCategory("GridSettings-" + list.ID);
+
+            SPUtility.Redirect("listedit.aspx?List=" + Request["List"], SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+        }
+
+        private void UpdateEmaiInstalls(SPList list)
+        {
+            if (chkEmails.Checked)
             {
-                if (chkEmails.Checked)
-                    API.APIEmail.InstallAssignedToEvent(list);
-                else
-                    API.APIEmail.UnInstallAssignedToEvent(list);
-                //list.EnableAssignToEmail = chkEmails.Checked;
-                //list.Update();
-                //CoreFunctions.setListSetting(list, "AssignedToEmail", chkEmails.Checked.ToString());
+                APIEmail.InstallAssignedToEvent(list);
+            }
+            else
+            {
+                APIEmail.UnInstallAssignedToEvent(list);
+            }
+        }
+
+        private void UpdateListEvents(GridGanttSettings gSettings, SPList list)
+        {
+            UpdateItemSecurityEvents(gSettings, list);
+
+            UpdateItemEnableTeamEvents(list);
+
+            UpdateItemWorkspaceEvents(list);
+        }
+
+        private void UpdateItemWorkspaceEvents(SPList list)
+        {
+            if (chkAutoCreate.Checked)
+            {
+                UpdateAutoCreateItemWorkspaceEvents(list);
+            }
+            else
+            {
+                UpdateNoAutoCreateItemWorkspaceEvents(list);
+            }
+        }
+
+        private static void UpdateNoAutoCreateItemWorkspaceEvents(SPList list)
+        {
+            var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+            var className = "EPMLiveCore.ItemWorkspaceEventReceiver";
+
+            var listEvents = CoreFunctions.GetListEvents(
+                list,
+                assemblyName,
+                className,
+                new List<SPEventReceiverType>
+                {
+                    SPEventReceiverType.ItemAdded
+                });
+            foreach (var listEvent in listEvents)
+            {
+                listEvent.Delete();
             }
 
-            if (gSettings.BuildTeamSecurity)
+            list.Update();
+        }
+
+        private static void UpdateAutoCreateItemWorkspaceEvents(SPList list)
+        {
+            var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+            var className = "EPMLiveCore.ItemWorkspaceEventReceiver";
+
+            var listEvents = CoreFunctions.GetListEvents(
+                list,
+                assemblyName,
+                className,
+                new[]
+                {
+                    SPEventReceiverType.ItemAdded
+                });
+            foreach (var listEvent in listEvents)
             {
-                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
-                string className = "EPMLiveCore.ItemSecurityEventReceiver";
+                listEvent.Delete();
+            }
 
-                var evts = CoreFunctions.GetListEvents(
+            var evtAdded = list.EventReceivers.Add();
+            evtAdded.Type = SPEventReceiverType.ItemAdded;
+            evtAdded.Assembly = assemblyName;
+            evtAdded.Class = className;
+            evtAdded.Update();
+            list.Update();
+        }
+
+        private void UpdateItemEnableTeamEvents(SPList list)
+        {
+            if (chkEnableTeam.Checked && !chkEnableTeamSecurity.Checked)
+            {
+                UpdateItemEnableTeamEventsWithSecurity(list);
+            }
+            else
+            {
+                UpdateItemEnableTeamEventsWithNoSecurity(list);
+            }
+        }
+
+        private void UpdateItemEnableTeamEventsWithNoSecurity(SPList list)
+        {
+            if (chkEnableTeam.Checked || chkEnableTeamSecurity.Checked && list.BaseTemplate == SPListTemplateType.DocumentLibrary)
+            {
+                // EPML-4257 : In  document library if you have enable team and enable team security on the library will not load
+                ListCommands.EnableTeamFeatures(list);
+
+                var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+                var className = "EPMLiveCore.ItemEnableTeamEvent";
+
+                var listEvents = CoreFunctions.GetListEvents(
                     list,
                     assemblyName,
                     className,
-                    new [] {
-                        SPEventReceiverType.ItemAdded,
-                        SPEventReceiverType.ItemUpdated,
-                        SPEventReceiverType.ItemDeleting
+                    new[]
+                    {
+                        SPEventReceiverType.ItemAdded
                     });
-
-                foreach (SPEventReceiverDefinition evt in evts)
+                foreach (var listEvent in listEvents)
                 {
-                    evt.Delete();
+                    listEvent.Delete();
                 }
 
-                list.EventReceivers.Add(SPEventReceiverType.ItemAdded, assemblyName, className);
-                list.EventReceivers.Add(SPEventReceiverType.ItemUpdated, assemblyName, className);
-                list.EventReceivers.Add(SPEventReceiverType.ItemDeleting, assemblyName, className);
-
-                var newEvts = CoreFunctions.GetListEvents(
-                    list,
-                    assemblyName,
-                    className,
-                    new [] {
-                        SPEventReceiverType.ItemAdded,
-                        SPEventReceiverType.ItemUpdated,
-                        SPEventReceiverType.ItemDeleting
-                    });
-
-                foreach (SPEventReceiverDefinition evt in newEvts)
-                {
-                    evt.SequenceNumber = 11000;
-                    evt.Update();
-                }
-
+                var evtAdded = list.EventReceivers.Add();
+                evtAdded.Type = SPEventReceiverType.ItemAdded;
+                evtAdded.Assembly = assemblyName;
+                evtAdded.Class = className;
+                evtAdded.SequenceNumber = 11000;
+                evtAdded.Update();
                 list.Update();
             }
             else
             {
-                bool hasSecFld = false;
-                string lookups = gSettings.Lookups;
-                if (!string.IsNullOrEmpty(lookups))
-                {
-                    string[] settings = lookups.Split('|');
-                    foreach (string s in settings)
-                    {
-                        if (!string.IsNullOrEmpty(s))
-                        {
-                            string[] vals = s.Split('^');
+                var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+                var className = "EPMLiveCore.ItemEnableTeamEvent";
 
-                            bool isSec = false;
-                            try
-                            {
-                                isSec = bool.Parse(vals[4]);
-                            }
-                            catch { }
-                            if (isSec)
-                            {
-                                hasSecFld = true;
-                                break;
-                            }
+                var listEvents = CoreFunctions.GetListEvents(
+                    list,
+                    assemblyName,
+                    className,
+                    new[]
+                    {
+                        SPEventReceiverType.ItemAdded
+                    });
+                foreach (var listEvent in listEvents)
+                {
+                    listEvent.Delete();
+                }
+
+                list.Update();
+            }
+        }
+
+        private static void UpdateItemEnableTeamEventsWithSecurity(SPList list)
+        {
+            ListCommands.EnableTeamFeatures(list);
+
+            var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+            var className = "EPMLiveCore.ItemEnableTeamEvent";
+
+            var listEvents = CoreFunctions.GetListEvents(
+                list,
+                assemblyName,
+                className,
+                new[]
+                {
+                    SPEventReceiverType.ItemAdded
+                });
+            foreach (var listEvent in listEvents)
+            {
+                listEvent.Delete();
+            }
+
+            var evtAdded = list.EventReceivers.Add();
+            evtAdded.Type = SPEventReceiverType.ItemAdded;
+            evtAdded.Assembly = assemblyName;
+            evtAdded.Class = className;
+            evtAdded.SequenceNumber = 11000;
+            evtAdded.Update();
+            list.Update();
+        }
+
+        private static void UpdateItemSecurityEvents(GridGanttSettings gSettings, SPList list)
+        {
+            if (gSettings.BuildTeamSecurity)
+            {
+                UpdateItemSecurityEventsWithSecurity(list);
+            }
+            else
+            {
+                UpdateItemSecurityEventsWithNoSecurity(gSettings, list);
+            }
+        }
+
+        private static void UpdateItemSecurityEventsWithNoSecurity(GridGanttSettings gSettings, SPList list)
+        {
+            var hasSecFld = false;
+            var lookups = gSettings.Lookups;
+            if (!string.IsNullOrWhiteSpace(lookups))
+            {
+                var settings = lookups.Split(Separator);
+                foreach (var setting in settings)
+                {
+                    if (!string.IsNullOrWhiteSpace(setting))
+                    {
+                        var values = setting.Split('^');
+
+                        var isSec = false;
+                        try
+                        {
+                            isSec = bool.Parse(values[4]);
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                        }
+                        if (isSec)
+                        {
+                            hasSecFld = true;
+                            break;
                         }
                     }
                 }
+            }
 
-                if (!hasSecFld)
-                {
-                    string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
-                    string className = "EPMLiveCore.ItemSecurityEventReceiver";
+            if (!hasSecFld)
+            {
+                var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+                var className = "EPMLiveCore.ItemSecurityEventReceiver";
 
-                    var evts = CoreFunctions.GetListEvents(
-                        list,
-                        assemblyName,
-                        className,
-                        new [] {
-                            SPEventReceiverType.ItemAdded,
-                            SPEventReceiverType.ItemUpdated,
-                            SPEventReceiverType.ItemDeleting
-                        });
-
-                    foreach (SPEventReceiverDefinition evt in evts)
+                var listEvents = CoreFunctions.GetListEvents(
+                    list,
+                    assemblyName,
+                    className,
+                    new[]
                     {
-                        evt.Delete();
-                    }
-                    list.Update();
-                }
-            }
+                        SPEventReceiverType.ItemAdded,
+                        SPEventReceiverType.ItemUpdated,
+                        SPEventReceiverType.ItemDeleting
+                    });
 
-
-
-            if (chkEnableTeam.Checked && !chkEnableTeamSecurity.Checked)
-            {
-                API.ListCommands.EnableTeamFeatures(list);
-
-                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
-                string className = "EPMLiveCore.ItemEnableTeamEvent";
-
-                var evts = CoreFunctions.GetListEvents(
-                    list,
-                    assemblyName,
-                    className,
-                    new [] { SPEventReceiverType.ItemAdded }
-                );
-                foreach (SPEventReceiverDefinition evt in evts)
+                foreach (var listEvent in listEvents)
                 {
-                    evt.Delete();
+                    listEvent.Delete();
                 }
-
-                SPEventReceiverDefinition evtAdded = list.EventReceivers.Add();
-                evtAdded.Type = SPEventReceiverType.ItemAdded;
-                evtAdded.Assembly = assemblyName;
-                evtAdded.Class = className;
-                evtAdded.SequenceNumber = 11000;
-                evtAdded.Update();
                 list.Update();
             }
-            else if (chkEnableTeam.Checked || chkEnableTeamSecurity.Checked && list.BaseTemplate == SPListTemplateType.DocumentLibrary)
-            {
-                //EPML-4257 : In  document library if you have enable team and enable team security on the library will not load
-                API.ListCommands.EnableTeamFeatures(list);
+        }
 
-                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
-                string className = "EPMLiveCore.ItemEnableTeamEvent";
+        private static void UpdateItemSecurityEventsWithSecurity(SPList list)
+        {
+            var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+            var className = "EPMLiveCore.ItemSecurityEventReceiver";
 
-                var evts = CoreFunctions.GetListEvents(
-                    list,
-                    assemblyName,
-                    className,
-                    new [] { SPEventReceiverType.ItemAdded }
-                );
-                foreach (SPEventReceiverDefinition evt in evts)
+            var listEvents = CoreFunctions.GetListEvents(
+                list,
+                assemblyName,
+                className,
+                new[]
                 {
-                    evt.Delete();
-                }
+                    SPEventReceiverType.ItemAdded,
+                    SPEventReceiverType.ItemUpdated,
+                    SPEventReceiverType.ItemDeleting
+                });
 
-                SPEventReceiverDefinition evtAdded = list.EventReceivers.Add();
-                evtAdded.Type = SPEventReceiverType.ItemAdded;
-                evtAdded.Assembly = assemblyName;
-                evtAdded.Class = className;
-                evtAdded.SequenceNumber = 11000;
-                evtAdded.Update();
-                list.Update();
-            }
-            else
+            foreach (var listEvent in listEvents)
             {
-                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
-                string className = "EPMLiveCore.ItemEnableTeamEvent";
-
-                var evts = CoreFunctions.GetListEvents(
-                    list,
-                    assemblyName,
-                    className,
-                    new [] { SPEventReceiverType.ItemAdded }
-                );
-                foreach (SPEventReceiverDefinition evt in evts)
-                {
-                    evt.Delete();
-                }
-
-                list.Update();
+                listEvent.Delete();
             }
 
-            // attached workspace auto creation event
-            if (chkAutoCreate.Checked)
-            {
-                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
-                string className = "EPMLiveCore.ItemWorkspaceEventReceiver";
+            list.EventReceivers.Add(SPEventReceiverType.ItemAdded, assemblyName, className);
+            list.EventReceivers.Add(SPEventReceiverType.ItemUpdated, assemblyName, className);
+            list.EventReceivers.Add(SPEventReceiverType.ItemDeleting, assemblyName, className);
 
-                var evts = CoreFunctions.GetListEvents(
-                    list,
-                    assemblyName,
-                    className,
-                    new [] { SPEventReceiverType.ItemAdded }
-                );
-                foreach (SPEventReceiverDefinition evt in evts)
+            var newEvents = CoreFunctions.GetListEvents(
+                list,
+                assemblyName,
+                className,
+                new[]
                 {
-                    evt.Delete();
-                }
+                    SPEventReceiverType.ItemAdded,
+                    SPEventReceiverType.ItemUpdated,
+                    SPEventReceiverType.ItemDeleting
+                });
 
-                SPEventReceiverDefinition evtAdded = list.EventReceivers.Add();
-                evtAdded.Type = SPEventReceiverType.ItemAdded;
-                evtAdded.Assembly = assemblyName;
-                evtAdded.Class = className;
-                evtAdded.Update();
-                list.Update();
-            }
-            else
+            foreach (var newEvent in newEvents)
             {
-                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
-                string className = "EPMLiveCore.ItemWorkspaceEventReceiver";
-
-                var evts = CoreFunctions.GetListEvents(
-                    list,
-                    assemblyName,
-                    className,
-                    new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded }
-                );
-                foreach (SPEventReceiverDefinition evt in evts)
-                {
-                    evt.Delete();
-                }
-
-                list.Update();
+                newEvent.SequenceNumber = 11000;
+                newEvent.Update();
             }
 
+            list.Update();
+        }
+
+        private void ProcessTimeSheets(SPList list, SPWeb web)
+        {
             if (chkTimesheet.Checked)
-                API.ListCommands.EnableTimesheets(list, web);
+            {
+                ListCommands.EnableTimesheets(list, web);
+            }
             else
-                API.ListCommands.DisableTimesheets(list, web);
+            {
+                ListCommands.DisableTimesheets(list, web);
+            }
+        }
 
+        private void ProcessFancyForms(SPList list)
+        {
             if (chkFancyForms.Checked)
+            {
                 EnableFancyForms(list);
+            }
             else
+            {
                 DisableFancyForms(list);
+            }
+        }
 
+        private void ProcessGridGanttViews(SPList list)
+        {
             if (chkAssociatedItems.Checked)
             {
                 AddGridGanttToViews(list);
             }
+        }
 
+        private void ProcessWorkEngineFeatures(SPList list)
+        {
             if (chkWorkListFeat.Checked)
             {
                 EnableWorkengineListFeatures(list);
@@ -1466,84 +1526,136 @@ namespace EPMLiveCore.Layouts.epmlive
             {
                 RemoveWorkengineListFeatures();
             }
+        }
 
-            if (ifsEnableReporting.Visible && cbEnableReporting.Checked)
+        private void UpdateReportBiz(SPList list)
+        {
+            if (ifsEnableReporting.Visible)
             {
-                ReportBiz reportBiz = new ReportBiz(SPContext.Current.Site.ID);
-                if (reportBiz.SiteExists())
+                if (cbEnableReporting.Checked)
                 {
-                    Collection<string> mappedLists = reportBiz.GetMappedListsIds();
-                    if (!mappedLists.Contains(list.ID.ToString().ToLower()))
+                    var reportBiz = new ReportBiz(SPContext.Current.Site.ID);
+                    if (reportBiz.SiteExists())
                     {
-                        var fields = new ListItemCollection();
-                        fields = GetListFields(list);
-                        reportBiz.CreateListBiz(list.ID, SPContext.Current.Web.ID, fields);
+                        var mappedLists = reportBiz.GetMappedListsIds();
+                        if (!mappedLists.Contains(list.ID.ToString().ToLower()))
+                        {
+                            var fields = GetListFields(list);
+                            reportBiz.CreateListBiz(list.ID, SPContext.Current.Web.ID, fields);
 
-                        //reportBiz.CreateListBiz(list.ID);
+                            try
+                            {
+                                using (var epmData = new EPMData(SPContext.Current.Site.ID))
+                                {
+                                    reportBiz.UpdateForeignKeys(epmData);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                SPSecurity.RunWithElevatedPrivileges(
+                                    delegate
+                                    {
+                                        if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
+                                        {
+                                            EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
+                                        }
 
+                                        using (var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys"))
+                                        {
+                                            const int MaximumKilobytes = 32768;
+                                            myLog.MaximumKilobytes = MaximumKilobytes;
+                                            const int EventId = 4001;
+                                            myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, EventId);
+                                        }
+                                    });
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    var reportBiz = new ReportBiz(SPContext.Current.Site.ID);
+                    var listId = new Guid(Request["List"]);
+                    using (var epmData = new EPMData(SPContext.Current.Site.ID))
+                    {
+                        epmData.Command = "SELECT TableName FROM RPTList WHERE RPTListID=@RPTListID";
+                        epmData.AddParam("@RPTListID", Request["List"]);
+                        var sTableName = string.Empty;
                         try
                         {
-                            //FOREIGN IMPLEMENTATION -- START
-                            EPMData DAO = new EPMData(SPContext.Current.Site.ID);
-                            reportBiz.UpdateForeignKeys(DAO);
-                            DAO.Dispose();
-                            // -- END
+                            sTableName = epmData.ExecuteScalar(epmData.GetClientReportingConnection).ToString();
                         }
                         catch (Exception ex)
                         {
-                            SPSecurity.RunWithElevatedPrivileges(delegate ()
-                            {
-                                if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
-                                    EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
+                            System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                        }
+                        var refTables = new DataTable();
 
-                                using (var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys"))
-                                {
-                                    const int MaximumKilobytes = 32768;
-                                    myLog.MaximumKilobytes = MaximumKilobytes;
-                                    const int EventId = 4001;
-                                    myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, EventId);
-                                }
-                            });
+                        if (!string.IsNullOrWhiteSpace(sTableName))
+                        {
+                            refTables = reportBiz.GetReferencingTables(epmData, sTableName);
+                            if (refTables.Rows.Count == 0)
+                            {
+                                reportBiz.GetListBiz(new Guid(Request["List"])).Delete();
+                            }
+                            else
+                            {
+                                ShowAlert();
+                            }
                         }
                     }
                 }
             }
-            else if (ifsEnableReporting.Visible && !cbEnableReporting.Checked)
+        }
+
+        private GridGanttSettings GetGridGanttSettings(SPList list)
+        {
+            var gSettings = new GridGanttSettings(list)
             {
-
-                var reportBiz = new ReportBiz(SPContext.Current.Site.ID);
-                Guid listId = new Guid(Request["List"]);
-                EPMData _DAO = new EPMData(SPContext.Current.Site.ID);
-                _DAO.Command = "SELECT TableName FROM RPTList WHERE RPTListID=@RPTListID";
-                _DAO.AddParam("@RPTListID", Request["List"]);
-                string sTableName = string.Empty;
-                try
-                {
-                    sTableName = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection).ToString();
-                }
-                catch { }
-                DataTable refTables = new DataTable();
-
-                if (!string.IsNullOrEmpty(sTableName))
-                {
-                    refTables = reportBiz.GetReferencingTables(_DAO, sTableName);
-                    if (refTables.Rows.Count == 0)
-                    {
-                        reportBiz.GetListBiz(new Guid(Request["List"])).Delete();
-                    }
-                    else
-                    {
-                        //SPUtility.Redirect("epmlive/ListMappings.aspx?delete=true&id=" + param + "&name=" + sTableName, SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-                        ShowAlert();
-                    }
-                }
-            }
-
-            SetListIcon(gSettings.ListIcon);
-
-            Infrastructure.CacheStore.Current.RemoveCategory("GridSettings-" + list.ID);
-
-            Microsoft.SharePoint.Utilities.SPUtility.Redirect("listedit.aspx?List=" + Request["List"], Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+                StartDate = ddlStartDate.SelectedValue,
+                DueDate = ddlDueDate.SelectedValue,
+                Progress = ddlProgressBar.SelectedValue,
+                WBS = ddlWBS.SelectedValue,
+                Milestone = ddlMilestone.SelectedValue,
+                Executive = chkExecutive.Checked,
+                Information = ddlInformation.SelectedValue,
+                ItemLink = ddlItemLink.SelectedValue,
+                RibbonBehavior = ddlRibbonBehavior.SelectedValue,
+                RollupLists = txtRollupLists.Text.Replace(",", "|").Replace("\r\n", ","),
+                RollupSites = txtRollupSites.Text.Replace("\r\n", ","),
+                ShowViewToolbar = chkShowViewToolbar.Checked,
+                HideNewButton = chkHideNewButton.Checked,
+                Performance = chkPerformance.Checked,
+                AllowEdit = chkAllowEdit.Checked,
+                EditDefault = chkEditDefault.Checked,
+                ShowInsert = chkShowInsert.Checked,
+                DisableNewItemMod = chkDisableNewRollup.Checked,
+                UseNewMenu = chkUseNewMenu.Checked,
+                NewMenuName = txtNewMenuName.Text,
+                UsePopup = chkUsePopup.Checked,
+                EnableRequests = chkEnableRequests.Checked,
+                EnableAutoCreation = chkAutoCreate.Checked,
+                AutoCreationTemplateId = ddlAutoCreateTemplate.SelectedValue,
+                WorkspaceParentSiteLookup = ddlParentSiteLookup.SelectedValue,
+                ListIcon = hdnListIcon.Value,
+                EnableWorkList = chkWorkListFeat.Checked,
+                EnableFancyForms = chkFancyForms.Checked,
+                SendEmails = chkEmails.Checked,
+                DeleteRequest = chkDeleteRequest.Checked,
+                RequestList = txtRequestList.Text,
+                UseParent = chkUseParent.Checked,
+                Search = chkSearch.Checked,
+                LockSearch = chkLockSearch.Checked,
+                AssociatedItems = chkAssociatedItems.Checked,
+                DisplayFormRedirect = chkDisplayRedirect.Checked,
+                EnableResourcePlan = chkResTools.Checked,
+                BuildTeam = chkEnableTeam.Checked,
+                BuildTeamSecurity = chkEnableTeamSecurity.Checked,
+                BuildTeamPermissions = GetGroupsPermissionsAssignment(),
+                EnableContentReporting = chkContentReporting.Checked,
+                DisableThumbnails = chkDisableThumbnails.Checked
+            };
+            return gSettings;
         }
 
         private void SetListIcon(string icon)
