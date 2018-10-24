@@ -169,6 +169,7 @@
     <Compile Include="API\AssociatedListItems\AssociatedListItems.cs" />
     <Compile Include="API\BaseJob.cs" />
     <Compile Include="API\ChartWizard\ChartWizardDataHelper.cs" />
+    <Compile Include="API\Comments\CommentManager.Create.cs" />
     <Compile Include="API\Comments\CommentManager.cs" />
     <Compile Include="API\Comments\XmlDataManager.cs" />
     <Compile Include="API\CreateWorkspace\DAL.cs" />
@@ -1690,6 +1691,7 @@
     <Compile Include="XmlDataManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\Comments\CommentManager.Strings.cs" />
     <None Include="app.config" />
     <None Include="AppsListEvents\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{a0b8e287-cd4e-45c4-b77c-6ec4dfe05a4a}</SharePointProjectItemId>
