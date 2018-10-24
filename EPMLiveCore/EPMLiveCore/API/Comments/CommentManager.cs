@@ -725,7 +725,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                Trace.TraceWarning("Unable to send emails: {0}", e.Message);
+                Trace.TraceWarning("Unable to send emails: {0}", e);
             }
 
             // send email to commenters
@@ -790,7 +790,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                Trace.TraceWarning("Could not sync with social stream: {0}", e.Message);
+                Trace.TraceWarning("Could not sync with social stream: {0}", e);
             }
         }
 
