@@ -1755,8 +1755,16 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         public void GetTopGrid_WhenCalled_ReturnsString()
         {
             // Arrange
-            var max = 500;
-            var colRoot = new List<SortFieldDefn>();
+            const int max = 500;
+            const int fidValue = 150;
+            var colRoot = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn()
+                {
+                    name = DummyString,
+                    fid = fidValue
+                }
+            };
             var periods = new Dictionary<int, PeriodData>()
             {
                 [1] = new PeriodData()
@@ -1801,8 +1809,16 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         public void GetTopGridLayout_WhenCalled_ReturnsString()
         {
             // Arrange
-            var max = 500;
-            var colRoot = new List<SortFieldDefn>();
+            const int max = 500;
+            const int fidValue = 150;
+            var colRoot = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn()
+                {
+                    name = DummyString,
+                    fid = fidValue
+                }
+            };
             var periods = new Dictionary<int, PeriodData>()
             {
                 [1] = new PeriodData()
@@ -1830,8 +1846,16 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         public void GetTopGridData_WhenCalled_ReturnsString()
         {
             // Arrange
-            var max = 500;
-            var colRoot = new List<SortFieldDefn>();
+            const int max = 500;
+            const int fidValue = 150;
+            var colRoot = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn()
+                {
+                    name = DummyString,
+                    fid = fidValue
+                }
+            };
             var periods = new Dictionary<int, PeriodData>()
             {
                 [1] = new PeriodData()
