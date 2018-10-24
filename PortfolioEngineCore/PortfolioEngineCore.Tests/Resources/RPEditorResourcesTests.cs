@@ -5,11 +5,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PortfolioEngineCore.Tests.Resources
 {
+    using System.Diagnostics.CodeAnalysis;
     using Fakes;
     using PortfolioEngineCore;
     using Shouldly;
 
     [TestClass]
+    [ExcludeFromCodeCoverage]
     public class RPEditorResourcesTests
     {
         private IDisposable shimsContext;
@@ -29,8 +31,8 @@ namespace PortfolioEngineCore.Tests.Resources
         }
 
         private CStruct CreateShimCStruct(
-            string stringAttribute, 
-            int intAttribute, 
+            string stringAttribute,
+            int intAttribute,
             bool booleanAttribute)
         {
             return new ShimCStruct
@@ -90,7 +92,7 @@ namespace PortfolioEngineCore.Tests.Resources
                     },
                     GetSubStructString = structName => new ShimCStruct
                     {
-                        GetListString = attr => 
+                        GetListString = attr =>
                         {
                             return new List<CStruct>
                             {
