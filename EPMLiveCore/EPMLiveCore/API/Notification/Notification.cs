@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,6 +13,9 @@ namespace EPMLiveCore.API
 {
     internal class Notification
     {
+        private const int SqlExceptionId1 = 10509;
+        private const int SqlExceptionId2 = 10508;
+
         #region Fields (1)
 
         private static readonly Dictionary<string, string[]> ValidInputs = new Dictionary<string, string[]>
@@ -424,36 +428,49 @@ namespace EPMLiveCore.API
         /// <param name="epmNotification">The epm notification.</param>
         /// <param name="sqlConnection">The SQL connection.</param>
         /// <param name="user">The user.</param>
-        private static void SetNotificationFlag(EPMNotification epmNotification, SqlConnection sqlConnection,
-                                                SPUser user)
+        private static void SetNotificationFlag(EPMNotification epmNotification, SqlConnection sqlConnection, SPUser user)
         {
-            var sqlCommand = new SqlCommand("spNSetBit", sqlConnection) { CommandType = CommandType.StoredProcedure };
-
-            SqlParameter notificationId = sqlCommand.Parameters.Add("@FK", SqlDbType.UniqueIdentifier);
-            SqlParameter userId = sqlCommand.Parameters.Add("@userid", SqlDbType.VarChar);
-            SqlParameter index = sqlCommand.Parameters.Add("@index", SqlDbType.Int);
-            SqlParameter bit = sqlCommand.Parameters.Add("@val", SqlDbType.Bit);
-
-            notificationId.Value = epmNotification.Id;
-            userId.Value = epmNotification.Type > 1 ? user.ID.ToString() : user.LoginName;
-            index.Value = epmNotification.FlagToSet;
-            bit.Value = true;
-
-            try
+            if (sqlConnection == null)
             {
-                SPSecurity.RunWithElevatedPrivileges(() =>
-                                                         {
-                                                             sqlConnection.Open();
-                                                             sqlCommand.ExecuteNonQuery();
-                                                         });
+                throw new ArgumentNullException(nameof(sqlConnection));
             }
-            catch (SqlException sqlException)
+
+            if (user == null)
             {
-                throw new APIException(10509, sqlException.Message);
+                throw new ArgumentNullException(nameof(user));
             }
-            finally
+
+            using (var sqlCommand = new SqlCommand("spNSetBit", sqlConnection))
             {
-                sqlConnection.Close();
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+
+                var notificationId = sqlCommand.Parameters.Add("@FK", SqlDbType.UniqueIdentifier);
+                var userId = sqlCommand.Parameters.Add("@userid", SqlDbType.VarChar);
+                var index = sqlCommand.Parameters.Add("@index", SqlDbType.Int);
+                var bit = sqlCommand.Parameters.Add("@val", SqlDbType.Bit);
+
+                notificationId.Value = epmNotification.Id;
+                userId.Value = epmNotification.Type > 1 ? user.ID.ToString() : user.LoginName;
+                index.Value = epmNotification.FlagToSet;
+                bit.Value = true;
+
+                try
+                {
+                    SPSecurity.RunWithElevatedPrivileges(() =>
+                    {
+                        sqlConnection.Open();
+                        sqlCommand.ExecuteNonQuery();
+                    });
+                }
+                catch (SqlException sqlException)
+                {
+                    Trace.WriteLine(sqlException.ToString());
+                    throw new APIException(SqlExceptionId1, sqlException.Message);
+                }
+                finally
+                {
+                    sqlConnection.Close();
+                }
             }
         }
 
@@ -505,34 +522,47 @@ namespace EPMLiveCore.API
         /// <param name="epmNotification">The epm notification.</param>
         /// <param name="sqlConnection">The SQL connection.</param>
         /// <param name="user">The user.</param>
-        private static void TranslateNotificationToPersonalization(EPMNotification epmNotification,
-                                                                   SqlConnection sqlConnection, SPUser user)
+        private static void TranslateNotificationToPersonalization(EPMNotification epmNotification, SqlConnection sqlConnection, SPUser user)
         {
-            var sqlCommand = new SqlCommand("spNTranslateNotificationToPersonalization", sqlConnection) { CommandType = CommandType.StoredProcedure };
-
-            SqlParameter notificationId = sqlCommand.Parameters.Add("@NotificationId", SqlDbType.UniqueIdentifier);
-            SqlParameter userName = sqlCommand.Parameters.Add("@UserName", SqlDbType.NVarChar);
-            SqlParameter userId = sqlCommand.Parameters.Add("@UserId", SqlDbType.NVarChar);
-
-            notificationId.Value = epmNotification.Id;
-            userName.Value = user.LoginName;
-            userId.Value = user.ID;
-
-            try
+            if (sqlConnection == null)
             {
-                SPSecurity.RunWithElevatedPrivileges(() =>
-                                                         {
-                                                             sqlConnection.Open();
-                                                             sqlCommand.ExecuteNonQuery();
-                                                         });
+                throw new ArgumentNullException(nameof(sqlConnection));
             }
-            catch (SqlException sqlException)
+
+            if (user == null)
             {
-                throw new APIException(10508, sqlException.Message);
+                throw new ArgumentNullException(nameof(user));
             }
-            finally
+
+            using (var sqlCommand = new SqlCommand("spNTranslateNotificationToPersonalization", sqlConnection))
             {
-                sqlConnection.Close();
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+
+                var notificationId = sqlCommand.Parameters.Add("@NotificationId", SqlDbType.UniqueIdentifier);
+                var userName = sqlCommand.Parameters.Add("@UserName", SqlDbType.NVarChar);
+                var userId = sqlCommand.Parameters.Add("@UserId", SqlDbType.NVarChar);
+
+                notificationId.Value = epmNotification.Id;
+                userName.Value = user.LoginName;
+                userId.Value = user.ID;
+
+                try
+                {
+                    SPSecurity.RunWithElevatedPrivileges(() =>
+                    {
+                        sqlConnection.Open();
+                        sqlCommand.ExecuteNonQuery();
+                    });
+                }
+                catch (SqlException sqlException)
+                {
+                    Trace.WriteLine(sqlException.ToString());
+                    throw new APIException(SqlExceptionId2, sqlException.Message);
+                }
+                finally
+                {
+                    sqlConnection.Close();
+                }
             }
         }
 
