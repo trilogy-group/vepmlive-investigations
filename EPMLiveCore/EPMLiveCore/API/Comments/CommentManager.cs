@@ -26,14 +26,13 @@ namespace EPMLiveCore.API
             // load data into XML manager
             XMLDataManager dataMgr = new XMLDataManager(data);
             SPList commentsList = currentWeb.Lists.TryGetList(COMMENTS_LIST_NAME);
-            //SPUser user = currentWeb.AllUsers.GetByID(Convert.ToInt32(dataMgr.GetPropVal("UserId")));
 
             if (commentsList != null)
             {
                 string listId = dataMgr.GetPropVal("ListId");
                 string itemId = dataMgr.GetPropVal("ItemId");
                 SPQuery query = new SPQuery();
-                query.Query = "<Where><And><Eq><FieldRef Name=\"ListId\" /><Value Type=\"Text\">" + listId + "</Value></Eq><Eq><FieldRef Name=\"ItemId\" /><Value Type=\"Text\">" + itemId + "</Value></Eq></And></Where><OrderBy><FieldRef Name=\"Created\" Ascending=\"False\" /></OrderBy>";
+                query.Query = $"<Where><And><Eq><FieldRef Name=\"ListId\" /><Value Type=\"Text\">{listId}</Value></Eq><Eq><FieldRef Name=\"ItemId\" /><Value Type=\"Text\">{itemId}</Value></Eq></And></Where><OrderBy><FieldRef Name=\"Created\" Ascending=\"False\" /></OrderBy>";
                 SPListItemCollection itemColl = commentsList.GetItems(query);
 
                 if (itemColl.Count > 0)
