@@ -24,13 +24,14 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         public void GetBottomGrid_WhenCalled_Returns()
         {
             // Arrange
-            var max = 500;
+            const int max = 500;
+            const int fidValue = 150;
             var colRoot = new List<SortFieldDefn>()
             {
                 new SortFieldDefn()
                 {
                     name = DummyString,
-                    fid = 150
+                    fid = fidValue
                 }
             };
             var periods = new Dictionary<int, PeriodData>()
@@ -109,13 +110,14 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         public void GetBottomGridData_WhenCalled_ReturnsString()
         {
             // Arrange
-            var max = 500;
+            const int max = 500;
+            const int fidValue = 150;
             var colRoot = new List<SortFieldDefn>()
             {
                 new SortFieldDefn()
                 {
                     name = DummyString,
-                    fid = 150
+                    fid = fidValue
                 }
             };
             var periods = new Dictionary<int, PeriodData>()
