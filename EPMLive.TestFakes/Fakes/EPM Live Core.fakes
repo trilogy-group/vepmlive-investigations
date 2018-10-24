@@ -113,6 +113,7 @@
     <Add FullName="EPMLiveCore.ApplicationStore.AppStore!"/>
     <Add FullName="EPMLiveCore.API.Reporting!"/>
     <Add FullName="EPMLiveCore.addusers!"/>
+    <Add FullName="EPMLiveCore.SocialEngine.Entities.Activity!"/>
     <Add Namespace="EPMLiveCore.Integrations.Salesforce!"/>
   </ShimGeneration>
 </Fakes>
