@@ -146,6 +146,7 @@
     <Compile Include="Resources\ClsResourceValuesTests.cs" />
     <Compile Include="Resources\ResourceRepositoryTests.cs" />
     <Compile Include="Resources\RPEditorDataTests.cs" />
+    <Compile Include="Resources\RPEditorResourcesTests.cs" />
     <Compile Include="Setup\SetupSiteTests.cs" />
     <Compile Include="Testables\BaseDetailRowDataTestable.cs" />
   </ItemGroup>
