@@ -158,14 +158,14 @@ namespace EPMLiveCore
 
                 if (field != null)
                 {
-                    //Lookups and User type of columns were created in database as ID and Text fields hence direct returning (column name is null) will not work. Fixed this.
+                    // Lookups and User type of columns were created in database as ID and Text fields hence direct returning (column name is null) will not work. Fixed this.
                     if (nd.Name == "IsNull" && field.Type != SPFieldType.Lookup && field.Type != SPFieldType.User)
                     {
                         return string.Format("{0} is null", fieldName);
                     }
 
                     string values;
-                    if (GetValues(nd, field, fieldNameStringBuilder, fieldName, out values))
+                    if (GetValues(nd, field, fieldNameStringBuilder, ref fieldName, out values))
                     {
                         return values;
                     }
@@ -211,7 +211,8 @@ namespace EPMLiveCore
             }
             var sign = GetNodeSign(nd.Name);
 
-            if (lookup && sign == "=")
+            const string equalSign = "=";
+            if (lookup && sign == equalSign)
             {
                 return string.Format("',' + CAST({0} as varchar(MAX)) + ',' LIKE '%,{1},%'", fieldName, nodeValue);
             }
@@ -268,7 +269,7 @@ namespace EPMLiveCore
             return nodeValue;
         }
 
-        private static bool GetValues(XmlNode nd, SPField field, StringBuilder fieldNameStringBuilder, string fieldName, out string result)
+        private static bool GetValues(XmlNode nd, SPField field, StringBuilder fieldNameStringBuilder, ref string fieldName, out string result)
         {
             result = string.Empty;
 
@@ -282,6 +283,7 @@ namespace EPMLiveCore
                 {
                     fieldNameStringBuilder.Append("Text");
                 }
+                fieldName = fieldNameStringBuilder.ToString();
 
                 if (valuesNodes.SelectNodes("Value").Count > 0)
                 {
