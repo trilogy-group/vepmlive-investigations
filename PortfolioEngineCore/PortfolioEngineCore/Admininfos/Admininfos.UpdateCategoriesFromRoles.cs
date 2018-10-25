@@ -10,6 +10,12 @@ namespace PortfolioEngineCore
 {
     public partial class Admininfos
     {
+        private const string SelectAdmMcLookUpFromEpgAdmin = "Select ADM_MC_LOOKUP From EPG_ADMIN";
+        private const string InsertIntoEpgpCategories = "INSERT Into EPGP_CATEGORIES (CA_UID,CA_NAME,CA_ID,CA_LEVEL,CA_ROLE,CA_UOM) Values (@UId,@Name,@ID,1,0,@UOM)";
+        private const string SelectFromEpgpCategories = "Select CA_UID,CA_ID,CA_UOM,CA_LEVEL From EPGP_CATEGORIES Where (CA_ROLE=0 Or CA_ROLE=NULL) And LEN(CA_UOM)>0";
+        private const string SelectFromEpgpCategoriesOrderByCaId = "SELECT CA_UID,CA_ID,CA_LEVEL From EPGP_CATEGORIES Order By CA_ID";
+        private const string CountCategoriesEpgpCategories = "Select COUNT(*) as CountCategories From EPGP_CATEGORIES Where (CA_ROLE=0 Or CA_ROLE=NULL) And LEN(CA_UOM)>0";
+
         public bool UpdateCategoriesFromRoles()
         {
             try
@@ -22,14 +28,16 @@ namespace PortfolioEngineCore
                 _sqlConnection.Open();
 
                 var majorCategoryLookup = 0;
-                var commandText = "Select ADM_MC_LOOKUP From EPG_ADMIN";
-                var sqlCommand = new SqlCommand(commandText, _sqlConnection);
+                var commandText = SelectAdmMcLookUpFromEpgAdmin;
 
-                using (var sqlReader = sqlCommand.ExecuteReader())
+                using (var sqlCommand = new SqlCommand(commandText, _sqlConnection))
                 {
-                    if (sqlReader.Read())
+                    using (var sqlReader = sqlCommand.ExecuteReader())
                     {
-                        majorCategoryLookup = SqlDb.ReadIntValue(sqlReader["ADM_MC_LOOKUP"]);
+                        if (sqlReader.Read())
+                        {
+                            majorCategoryLookup = SqlDb.ReadIntValue(sqlReader["ADM_MC_LOOKUP"]);
+                        }
                     }
                 }
 
@@ -54,13 +62,17 @@ namespace PortfolioEngineCore
                     lNextUid++;
                     var lCaId = 1;
                     sUom = "hrs";
-                    commandText = "INSERT Into EPGP_CATEGORIES (CA_UID,CA_NAME,CA_ID,CA_LEVEL,CA_ROLE,CA_UOM) Values (@UId,@Name,@ID,1,0,@UOM)";
-                    sqlCommand = new SqlCommand(commandText, _sqlConnection);
-                    sqlCommand.Parameters.AddWithValue("@UId", lCaUid);
-                    sqlCommand.Parameters.AddWithValue("@Name", "Labor");
-                    sqlCommand.Parameters.AddWithValue("@ID", lCaId);
-                    sqlCommand.Parameters.AddWithValue("@UOM", sUom);
-                    sqlCommand.ExecuteNonQuery();
+                    commandText = InsertIntoEpgpCategories;
+
+                    using (var sqlCommand = new SqlCommand(commandText, _sqlConnection))
+                    {
+                        sqlCommand.Parameters.AddWithValue("@UId", lCaUid);
+                        sqlCommand.Parameters.AddWithValue("@Name", "Labor");
+                        sqlCommand.Parameters.AddWithValue("@ID", lCaId);
+                        sqlCommand.Parameters.AddWithValue("@UOM", sUom);
+                        sqlCommand.ExecuteNonQuery();
+                    }
+
                     lInsertAfter = 1;
                 }
                 else
@@ -97,23 +109,25 @@ namespace PortfolioEngineCore
         private void AddNewCcs(ref int lCaUid, ref string sUom)
         {
             var nLevel = 0;
-            var commandText = "Select CA_UID,CA_ID,CA_UOM,CA_LEVEL From EPGP_CATEGORIES Where (CA_ROLE=0 Or CA_ROLE=NULL) And LEN(CA_UOM)>0";
-            var sqlCommand = new SqlCommand(commandText, _sqlConnection);
+            var commandText = SelectFromEpgpCategories;
 
-            using (var sqlReader = sqlCommand.ExecuteReader())
+            using (var sqlCommand = new SqlCommand(commandText, _sqlConnection))
             {
-                while (sqlReader.Read())
+                using (var sqlReader = sqlCommand.ExecuteReader())
                 {
-                    var ltCaUid = SqlDb.ReadIntValue(sqlReader["CA_UID"]);
-                    SqlDb.ReadIntValue(sqlReader["CA_ID"]);
-                    var stUom = SqlDb.ReadStringValue(sqlReader["CA_UOM"]);
-                    var ltLevel = SqlDb.ReadIntValue(sqlReader["CA_LEVEL"]);
-
-                    if (ltLevel > nLevel)
+                    while (sqlReader.Read())
                     {
-                        nLevel = ltLevel;
-                        lCaUid = ltCaUid;
-                        sUom = stUom;
+                        var ltCaUid = SqlDb.ReadIntValue(sqlReader["CA_UID"]);
+                        SqlDb.ReadIntValue(sqlReader["CA_ID"]);
+                        var stUom = SqlDb.ReadStringValue(sqlReader["CA_UOM"]);
+                        var ltLevel = SqlDb.ReadIntValue(sqlReader["CA_LEVEL"]);
+
+                        if (ltLevel > nLevel)
+                        {
+                            nLevel = ltLevel;
+                            lCaUid = ltCaUid;
+                            sUom = stUom;
+                        }
                     }
                 }
             }
@@ -121,46 +135,50 @@ namespace PortfolioEngineCore
 
         private void InsertIdSequence(int lCaUid, ref int foundLevel, ref int lInsertAfter)
         {
-            var commandText = "SELECT CA_UID,CA_ID,CA_LEVEL From EPGP_CATEGORIES Order By CA_ID";
-            var sqlCommand = new SqlCommand(commandText, _sqlConnection);
+            var commandText = SelectFromEpgpCategoriesOrderByCaId;
 
-            using (var sqlReader = sqlCommand.ExecuteReader())
+            using (var sqlCommand = new SqlCommand(commandText, _sqlConnection))
             {
-                var found = false;
-
-                while (sqlReader.Read())
+                using (var sqlReader = sqlCommand.ExecuteReader())
                 {
-                    var readIntValue = SqlDb.ReadIntValue(sqlReader["CA_UID"]);
-                    var intValue = SqlDb.ReadIntValue(sqlReader["CA_ID"]);
-                    var value = SqlDb.ReadIntValue(sqlReader["CA_LEVEL"]);
+                    var found = false;
 
-                    if (found && value <= foundLevel)
+                    while (sqlReader.Read())
                     {
-                        break;
-                    }
+                        var caUid = SqlDb.ReadIntValue(sqlReader["CA_UID"]);
+                        var caId = SqlDb.ReadIntValue(sqlReader["CA_ID"]);
+                        var caLevel = SqlDb.ReadIntValue(sqlReader["CA_LEVEL"]);
 
-                    if (readIntValue == lCaUid)
-                    {
-                        found = true;
-                        foundLevel = value;
-                    }
+                        if (found && caLevel <= foundLevel)
+                        {
+                            break;
+                        }
 
-                    lInsertAfter = intValue;
+                        if (caUid == lCaUid)
+                        {
+                            found = true;
+                            foundLevel = caLevel;
+                        }
+
+                        lInsertAfter = caId;
+                    }
                 }
             }
         }
 
         private int CountCategories()
         {
-            var commandText = "Select COUNT(*) as CountCategories From EPGP_CATEGORIES Where (CA_ROLE=0 Or CA_ROLE=NULL) And LEN(CA_UOM)>0";
-            var sqlCommand = new SqlCommand(commandText, _sqlConnection);
+            var commandText = CountCategoriesEpgpCategories;
 
-            using (var sqlReader = sqlCommand.ExecuteReader())
+            using (var sqlCommand = new SqlCommand(commandText, _sqlConnection))
             {
-                var numberCategoriesWithUom = sqlReader.Read()
-                    ? SqlDb.ReadIntValue(sqlReader["CountCategories"])
-                    : 0;
-                return numberCategoriesWithUom;
+                using (var sqlReader = sqlCommand.ExecuteReader())
+                {
+                    var numberCategoriesWithUom = sqlReader.Read()
+                        ? SqlDb.ReadIntValue(sqlReader["CountCategories"])
+                        : 0;
+                    return numberCategoriesWithUom;
+                }
             }
         }
 
@@ -168,37 +186,41 @@ namespace PortfolioEngineCore
         {
             sUom = string.Empty;
 
-            var commandText = "Select MAX(BC_UID) as Max_UID From EPGP_COST_CATEGORIES";
-            var sqlCommand = new SqlCommand(commandText, _sqlConnection);
+            const string commandText = "Select MAX(BC_UID) as Max_UID From EPGP_COST_CATEGORIES";
 
-            using (var sqlReader = sqlCommand.ExecuteReader())
+            using (var sqlCommand = new SqlCommand(commandText, _sqlConnection))
             {
-                lNextUid = sqlReader.Read()
-                    ? SqlDb.ReadIntValue(sqlReader["Max_UID"]) + 1
-                    : 1;
+                using (var sqlReader = sqlCommand.ExecuteReader())
+                {
+                    lNextUid = sqlReader.Read()
+                        ? SqlDb.ReadIntValue(sqlReader["Max_UID"]) + 1
+                        : 1;
+                }
             }
         }
 
         private IList<PfECategory> EpGpLookupValues()
         {
-            var commandText = "Select LV_UID,LV_VALUE From EPGP_LOOKUP_VALUES Where LOOKUP_UID=(Select ADM_ROLE_CODE From EPG_ADMIN) And LV_UID Not In (Select DISTINCT CA_ROLE From EPGP_CATEGORIES) ORDER BY LV_ID";
-            var sqlCommand = new SqlCommand(commandText, _sqlConnection);
+            const string commandText = "Select LV_UID,LV_VALUE From EPGP_LOOKUP_VALUES Where LOOKUP_UID=(Select ADM_ROLE_CODE From EPG_ADMIN) And LV_UID Not In (Select DISTINCT CA_ROLE From EPGP_CATEGORIES) ORDER BY LV_ID";
 
-            using (var sqlReader = sqlCommand.ExecuteReader())
+            using (var sqlCommand = new SqlCommand(commandText, _sqlConnection))
             {
-                var roles = new List<PfECategory>();
-
-                while (sqlReader.Read())
+                using (var sqlReader = sqlCommand.ExecuteReader())
                 {
-                    var role = new PfECategory
-                    {
-                        Uid = SqlDb.ReadIntValue(sqlReader["LV_UID"]),
-                        Name = SqlDb.ReadStringValue(sqlReader["LV_VALUE"])
-                    };
-                    roles.Add(role);
-                }
+                    var roles = new List<PfECategory>();
 
-                return roles;
+                    while (sqlReader.Read())
+                    {
+                        var role = new PfECategory
+                        {
+                            Uid = SqlDb.ReadIntValue(sqlReader["LV_UID"]),
+                            Name = SqlDb.ReadStringValue(sqlReader["LV_VALUE"])
+                        };
+                        roles.Add(role);
+                    }
+
+                    return roles;
+                }
             }
         }
 
@@ -214,65 +236,80 @@ namespace PortfolioEngineCore
 
             var transaction = _sqlConnection.BeginTransaction();
             var commandText = "Update EPGP_CATEGORIES Set CA_ID = CA_ID + @Incr Where CA_ID > @Insertafter";
-            var sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction);
-            sqlCommand.Parameters.AddWithValue("@Insertafter", lInsertAfter);
-            sqlCommand.Parameters.AddWithValue("@Incr", roles.Count);
-            sqlCommand.ExecuteNonQuery();
+
+            using (var sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction))
+            {
+                sqlCommand.Parameters.AddWithValue("@Insertafter", lInsertAfter);
+                sqlCommand.Parameters.AddWithValue("@Incr", roles.Count);
+                sqlCommand.ExecuteNonQuery();
+            }
 
             var lNewId = lInsertAfter + 1;
             commandText = "INSERT Into EPGP_CATEGORIES (CA_UID,CA_NAME,CA_ID,CA_LEVEL,CA_ROLE,CA_UOM) Values (@UId,@Name,@ID,@Level,@Role,@UOM)";
-            sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction);
-            var paraUid = sqlCommand.Parameters.Add("@UId", SqlDbType.Int);
-            var paraName = sqlCommand.Parameters.Add("@Name", SqlDbType.VarChar);
-            var paraId = sqlCommand.Parameters.Add("@ID", SqlDbType.Int);
-            var paraLevel = sqlCommand.Parameters.Add("@Level", SqlDbType.Int);
-            var paraRole = sqlCommand.Parameters.Add("@Role", SqlDbType.Int);
-            var paraUom = sqlCommand.Parameters.Add("@UOM", SqlDbType.VarChar);
 
-            foreach (var role in roles)
+            using (var sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction))
             {
-                paraUid.Value = lNextUid;
-                lNextUid++;
-                paraName.Value = role.Name;
-                paraLevel.Value = foundLevel + 1;
-                paraId.Value = lNewId;
-                lNewId++;
-                paraRole.Value = role.Uid;
-                paraUom.Value = sUom;
-                sqlCommand.ExecuteNonQuery();
+                var paraUid = sqlCommand.Parameters.Add("@UId", SqlDbType.Int);
+                var paraName = sqlCommand.Parameters.Add("@Name", SqlDbType.VarChar);
+                var paraId = sqlCommand.Parameters.Add("@ID", SqlDbType.Int);
+                var paraLevel = sqlCommand.Parameters.Add("@Level", SqlDbType.Int);
+                var paraRole = sqlCommand.Parameters.Add("@Role", SqlDbType.Int);
+                var paraUom = sqlCommand.Parameters.Add("@UOM", SqlDbType.VarChar);
+
+                foreach (var role in roles)
+                {
+                    paraUid.Value = lNextUid;
+                    lNextUid++;
+                    paraName.Value = role.Name;
+                    paraLevel.Value = foundLevel + 1;
+                    paraId.Value = lNewId;
+                    lNewId++;
+                    paraRole.Value = role.Uid;
+                    paraUom.Value = sUom;
+                    sqlCommand.ExecuteNonQuery();
+                }
             }
 
             if (majorCategoryLookup <= 0)
             {
                 commandText = "Delete From EPGP_COST_CATEGORIES";
-                sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction);
-                sqlCommand.ExecuteNonQuery();
+
+                using (var sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction))
+                {
+                    sqlCommand.ExecuteNonQuery();
+                }
 
                 commandText =
                     "Insert Into EPGP_COST_CATEGORIES (BC_UID,BC_NAME,BC_ID,BC_LEVEL,BC_ROLE,BC_UOM,MC_UID,CA_UID) Select CA_UID,CA_NAME,CA_ID,CA_LEVEL,CA_ROLE,CA_UOM,0,CA_UID as CC From EPGP_CATEGORIES";
-                sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction);
-                sqlCommand.ExecuteNonQuery();
+
+                using (var sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction))
+                {
+                    sqlCommand.ExecuteNonQuery();
+                }
             }
             else
             {
                 var lMaxUid = 0;
                 var pfECategories = DeleteEpGpCostCategories(transaction, ref lMaxUid);
-
-                commandText = "Select LV_UID,LV_VALUE From EPGP_LOOKUP_VALUES Where LOOKUP_UID=@MCUID ORDER BY LV_ID";
-                sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction);
-                sqlCommand.Parameters.AddWithValue("@MCUID", majorCategoryLookup);
                 var eCategories = new List<PfECategory>();
 
-                using (var sqlReader = sqlCommand.ExecuteReader())
+                commandText = "Select LV_UID,LV_VALUE From EPGP_LOOKUP_VALUES Where LOOKUP_UID=@MCUID ORDER BY LV_ID";
+
+                using (var sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction))
                 {
-                    while (sqlReader.Read())
+                    sqlCommand.Parameters.AddWithValue("@MCUID", majorCategoryLookup);
+
+                    using (var sqlReader = sqlCommand.ExecuteReader())
                     {
-                        var category = new PfECategory
+                        while (sqlReader.Read())
                         {
-                            Uid = SqlDb.ReadIntValue(sqlReader["LV_UID"]),
-                            Name = SqlDb.ReadStringValue(sqlReader["LV_VALUE"])
-                        };
-                        eCategories.Add(category);
+                            var category = new PfECategory
+                            {
+                                Uid = SqlDb.ReadIntValue(sqlReader["LV_UID"]),
+                                Name = SqlDb.ReadStringValue(sqlReader["LV_VALUE"])
+                            };
+                            eCategories.Add(category);
+                        }
                     }
                 }
 
@@ -289,29 +326,31 @@ namespace PortfolioEngineCore
             out IList<PfECategory> categories,
             ref int lMaxUid)
         {
-            var commandText = "Select CA_UID,CA_NAME,CA_ID,CA_LEVEL,CA_ROLE,CA_UOM From EPGP_CATEGORIES ORDER BY CA_ID";
-            var sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction);
+            const string commandText = "Select CA_UID,CA_NAME,CA_ID,CA_LEVEL,CA_ROLE,CA_UOM From EPGP_CATEGORIES ORDER BY CA_ID";
 
-            using (var sqlReader = sqlCommand.ExecuteReader())
+            using (var sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction))
             {
-                categories = new List<PfECategory>();
-
-                while (sqlReader.Read())
+                using (var sqlReader = sqlCommand.ExecuteReader())
                 {
-                    var category = new PfECategory
-                    {
-                        Uid = SqlDb.ReadIntValue(sqlReader["CA_UID"]),
-                        ID = SqlDb.ReadIntValue(sqlReader["CA_ID"]),
-                        Level = SqlDb.ReadIntValue(sqlReader["CA_LEVEL"]),
-                        Role = SqlDb.ReadIntValue(sqlReader["CA_ROLE"]),
-                        Name = SqlDb.ReadStringValue(sqlReader["CA_NAME"]),
-                        UOM = SqlDb.ReadStringValue(sqlReader["CA_UOM"])
-                    };
-                    categories.Add(category);
+                    categories = new List<PfECategory>();
 
-                    if (category.Uid > lMaxUid)
+                    while (sqlReader.Read())
                     {
-                        lMaxUid = category.Uid;
+                        var category = new PfECategory
+                        {
+                            Uid = SqlDb.ReadIntValue(sqlReader["CA_UID"]),
+                            ID = SqlDb.ReadIntValue(sqlReader["CA_ID"]),
+                            Level = SqlDb.ReadIntValue(sqlReader["CA_LEVEL"]),
+                            Role = SqlDb.ReadIntValue(sqlReader["CA_ROLE"]),
+                            Name = SqlDb.ReadStringValue(sqlReader["CA_NAME"]),
+                            UOM = SqlDb.ReadStringValue(sqlReader["CA_UOM"])
+                        };
+                        categories.Add(category);
+
+                        if (category.Uid > lMaxUid)
+                        {
+                            lMaxUid = category.Uid;
+                        }
                     }
                 }
             }
@@ -321,37 +360,42 @@ namespace PortfolioEngineCore
             SqlTransaction transaction,
             ref int lMaxUid)
         {
-            var commandText = "Select BC_UID,BC_NAME,MC_UID,CA_UID From EPGP_COST_CATEGORIES ORDER BY BC_ID";
-            var sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction);
             var pfECategories = new List<PfECategory>();
+            var commandText = "Select BC_UID,BC_NAME,MC_UID,CA_UID From EPGP_COST_CATEGORIES ORDER BY BC_ID";
 
-            using (var sqlReader = sqlCommand.ExecuteReader())
+            using (var sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction))
             {
-                while (sqlReader.Read())
+                using (var sqlReader = sqlCommand.ExecuteReader())
                 {
-                    var category = new PfECategory
+                    while (sqlReader.Read())
                     {
-                        Uid = SqlDb.ReadIntValue(sqlReader["BC_UID"]),
-                        mc_Uid = SqlDb.ReadIntValue(sqlReader["MC_UID"]),
-                        ID = SqlDb.ReadIntValue(sqlReader["CA_UID"]),
-                        Name = SqlDb.ReadStringValue(sqlReader["BC_NAME"])
-                    };
+                        var category = new PfECategory
+                        {
+                            Uid = SqlDb.ReadIntValue(sqlReader["BC_UID"]),
+                            mc_Uid = SqlDb.ReadIntValue(sqlReader["MC_UID"]),
+                            ID = SqlDb.ReadIntValue(sqlReader["CA_UID"]),
+                            Name = SqlDb.ReadStringValue(sqlReader["BC_NAME"])
+                        };
 
-                    pfECategories.Add(category);
+                        pfECategories.Add(category);
 
-                    if (category.Uid > lMaxUid)
-                    {
-                        lMaxUid = category.Uid;
+                        if (category.Uid > lMaxUid)
+                        {
+                            lMaxUid = category.Uid;
+                        }
                     }
                 }
             }
 
             commandText = "Delete From EPGP_COST_CATEGORIES";
-            sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction)
+
+            using (var sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction)
             {
                 CommandType = CommandType.Text
-            };
-            sqlCommand.ExecuteNonQuery();
+            })
+            {
+                sqlCommand.ExecuteNonQuery();
+            }
 
             return pfECategories;
         }
@@ -369,57 +413,60 @@ namespace PortfolioEngineCore
             var lMasterCount = categories.Count + 1;
             var commandText =
                 "Insert Into EPGP_COST_CATEGORIES (BC_UID,BC_NAME,BC_ID,BC_LEVEL,BC_ROLE,BC_UOM,MC_UID,CA_UID) Values (@UID,@NAME,@ID,@LEVEL,@ROLE,@UOM,@MCUID,@CAUID)";
-            var sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction);
-            var addUid = sqlCommand.Parameters.Add("@UID", SqlDbType.Int);
-            var addName = sqlCommand.Parameters.Add("@NAME", SqlDbType.NVarChar, 255);
-            var addId = sqlCommand.Parameters.Add("@ID", SqlDbType.Int);
-            var addLevel = sqlCommand.Parameters.Add("@LEVEL", SqlDbType.Int);
-            var addRole = sqlCommand.Parameters.Add("@ROLE", SqlDbType.Int);
-            var addUom = sqlCommand.Parameters.Add("@UOM", SqlDbType.NVarChar, 255);
-            var addMcUid = sqlCommand.Parameters.Add("@MCUID", SqlDbType.Int);
-            var addCaUid = sqlCommand.Parameters.Add("@CAUID", SqlDbType.Int);
 
-            foreach (var category in categories)
+            using (var sqlCommand = new SqlCommand(commandText, _sqlConnection, transaction))
             {
-                addUid.Value = category.Uid;
-                addName.Value = category.Name;
-                addId.Value = category.ID;
-                addLevel.Value = category.Level;
-                addRole.Value = category.Role;
-                addUom.Value = category.UOM;
-                addMcUid.Value = 0;
-                addCaUid.Value = category.Uid;
-                sqlCommand.ExecuteNonQuery();
-            }
-
-            var lMajorIndex = 1;
-
-            foreach (var pfECategory in pfECategoryList)
-            {
-                addUid.Value = GetUID(pfECategories.ToList(), pfECategory.Uid, 0, ref lMaxUid);
-                addName.Value = pfECategory.Name;
-                addId.Value = lMajorIndex * lMasterCount;
-                addLevel.Value = 1;
-                addRole.Value = 0;
-                addUom.Value = string.Empty;
-                addMcUid.Value = pfECategory.Uid;
-                addCaUid.Value = 0;
-                sqlCommand.ExecuteNonQuery();
+                var addUid = sqlCommand.Parameters.Add("@UID", SqlDbType.Int);
+                var addName = sqlCommand.Parameters.Add("@NAME", SqlDbType.NVarChar, 255);
+                var addId = sqlCommand.Parameters.Add("@ID", SqlDbType.Int);
+                var addLevel = sqlCommand.Parameters.Add("@LEVEL", SqlDbType.Int);
+                var addRole = sqlCommand.Parameters.Add("@ROLE", SqlDbType.Int);
+                var addUom = sqlCommand.Parameters.Add("@UOM", SqlDbType.NVarChar, 255);
+                var addMcUid = sqlCommand.Parameters.Add("@MCUID", SqlDbType.Int);
+                var addCaUid = sqlCommand.Parameters.Add("@CAUID", SqlDbType.Int);
 
                 foreach (var category in categories)
                 {
-                    addUid.Value = GetUID(pfECategories.ToList(), pfECategory.Uid, category.Uid, ref lMaxUid);
+                    addUid.Value = category.Uid;
                     addName.Value = category.Name;
-                    addId.Value = lMajorIndex * lMasterCount + category.ID;
-                    addLevel.Value = category.Level + 1;
+                    addId.Value = category.ID;
+                    addLevel.Value = category.Level;
                     addRole.Value = category.Role;
                     addUom.Value = category.UOM;
-                    addMcUid.Value = pfECategory.Uid;
+                    addMcUid.Value = 0;
                     addCaUid.Value = category.Uid;
                     sqlCommand.ExecuteNonQuery();
                 }
 
-                lMajorIndex++;
+                var lMajorIndex = 1;
+
+                foreach (var pfECategory in pfECategoryList)
+                {
+                    addUid.Value = GetUID(pfECategories.ToList(), pfECategory.Uid, 0, ref lMaxUid);
+                    addName.Value = pfECategory.Name;
+                    addId.Value = lMajorIndex * lMasterCount;
+                    addLevel.Value = 1;
+                    addRole.Value = 0;
+                    addUom.Value = string.Empty;
+                    addMcUid.Value = pfECategory.Uid;
+                    addCaUid.Value = 0;
+                    sqlCommand.ExecuteNonQuery();
+
+                    foreach (var category in categories)
+                    {
+                        addUid.Value = GetUID(pfECategories.ToList(), pfECategory.Uid, category.Uid, ref lMaxUid);
+                        addName.Value = category.Name;
+                        addId.Value = lMajorIndex * lMasterCount + category.ID;
+                        addLevel.Value = category.Level + 1;
+                        addRole.Value = category.Role;
+                        addUom.Value = category.UOM;
+                        addMcUid.Value = pfECategory.Uid;
+                        addCaUid.Value = category.Uid;
+                        sqlCommand.ExecuteNonQuery();
+                    }
+
+                    lMajorIndex++;
+                }
             }
         }
     }
