@@ -220,6 +220,7 @@
     <Compile Include="Infrastructure\ResourceManagment\ResourcePoolManagerTests.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
     <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
+    <Compile Include="Integrations\Salesforce\SfServiceTests.cs" />
     <Compile Include="ISAPI\WorkEngineAPITests.cs" />
     <Compile Include="ISAPI\WorkEngineAPITests.RemainingMethods.cs" />
     <Compile Include="Jobs\NotificationsTests.cs" />
@@ -228,12 +229,14 @@
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AddListDataTests.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePoolTests.cs" />
+    <Compile Include="Layouts\epmlive\AddUsersTests.cs" />
     <Compile Include="Layouts\epmlive\CreateNewWorkspaceTest.cs" />
     <Compile Include="Layouts\epmlive\CommentsTests.cs" />
     <Compile Include="Layouts\epmlive\CustomEditNavTests.cs" />
     <Compile Include="Layouts\epmlive\GenericQueryControlTests.cs" />
     <Compile Include="Layouts\epmlive\GridGanttSettingsTest.cs" />
     <Compile Include="Layouts\epmlive\Integration\ManageTests.cs" />
+    <Compile Include="Layouts\epmlive\QueueJobsTests.cs" />
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
     <Compile Include="Layouts\epmlive\SolutionStoreProxyTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsRemTests.cs" />

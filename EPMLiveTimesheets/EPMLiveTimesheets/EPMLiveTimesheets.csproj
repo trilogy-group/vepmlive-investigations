@@ -152,6 +152,18 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="WebPageCode\DataSetUtils.cs" />
+    <Compile Include="WebPageCode\gettimesheet.AddItem.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\gettimesheet.Fields.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\gettimesheet.outputXml.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\gettimesheet.ProcessXmlNode.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="WebPageCode\getts.addGroups.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

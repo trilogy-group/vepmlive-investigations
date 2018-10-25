@@ -545,12 +545,8 @@ BEGIN
 			
 		end
 
-		set @sql = ''from '' + @table + '' where cast(listid as varchar(40)) + cast(itemid as varchar(20)) in (
-		SELECT     CAST(dbo.RPTITEMGROUPS.LISTID AS varchar(40)) + CAST(dbo.RPTITEMGROUPS.ITEMID AS varchar(20)) AS Expr1
-		FROM         dbo.RPTITEMGROUPS INNER JOIN
-                      #Groups as gps ON gps.GROUPID = rptitemgroups.GROUPID
-		
-		) '' + @query
+		set @sql = ''from '' + @table + '' tbl inner join RPTITEMGROUPS g on tbl.listid = g.listid and tbl.itemid = g.itemid
+			INNER JOIN #Groups as gps ON gps.GROUPID = g.GROUPID '' + @query
 
 		if @pagesize <> 0 
 		begin
@@ -576,7 +572,7 @@ BEGIN
 			
 			insert into #groups (groupid, sectype) VALUES ('''''' + convert(varchar(10), @userid) + '''''', 0)
 			
-			select * INTO #tmp '' + @sql + '';
+			select distinct tbl.* INTO #tmp '' + @sql + '';
 			
 			'' + @sca + ''
 			
@@ -599,7 +595,7 @@ BEGIN
 			
 			'' + @sca + ''
 			
-			select * '' + @sql;
+			select distinct tbl.* '' + @sql;
 		
 			if @orderby <> '''' begin
 			
@@ -615,6 +611,7 @@ BEGIN
 	
 
 ENd
+
 ')
 
 
