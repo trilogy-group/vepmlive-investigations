@@ -42,6 +42,15 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         private const string SetTotalDataMethodName = "SetTotalData";
         private const string GetSortAndGroupMethodName = "GetSortAndGroup";
         private const string SetSortAndGroupMethodName = "SetSortAndGroup";
+        private const string FormatWorkMethodName = "FormatWork";
+        private const string FormatDurationMethodName = "FormatDuration";
+        private const string GetColumnGridDataMethodName = "GetColumnGridData";
+        private const string SetColumnOrderDataMethodName = "SetColumnOrderData";
+        private const string GetVersionsPIListsMethodName = "GetVersionsPILists";
+        private const string GetSaveVersionsMethodName = "GetSaveVersions";
+        private const string GetTargetsMethodName = "GetTargets";
+        private const string SaveVersionMethodName = "SaveVersion";
+        private const string GetPeriodsandVersionsMethodName = "GetPeriodsandVersions";
 
         [TestMethod]
         public void GetBottomGrid_WhenCalled_Returns()
@@ -1090,6 +1099,378 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
                 () => groups[0, 2].ShouldBe(value1),
                 () => groups[1, 2].ShouldBe(value2),
                 () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void FormatWork_HoursZero_ReturnsEmptyString()
+        {
+            // Arrange
+            const double hours = 0d;
+
+            // Act
+            var actual = (string)privateObject.Invoke(FormatWorkMethodName, nonPublicInstance, new object[] { hours });
+
+            // Assert
+            actual.ShouldBe(string.Empty);
+        }
+
+        [TestMethod]
+        public void FormatDuration_HoursZero_ReturnsEmptyString()
+        {
+            // Arrange
+            const double minutes = 0;
+
+            // Act
+            var actual = (string)privateObject.Invoke(FormatDurationMethodName, nonPublicInstance, new object[] { minutes });
+
+            // Assert
+            actual.ShouldBe(string.Empty);
+        }
+
+        [TestMethod]
+        public void GetColumnGridData_WhenCalled_ReturnsString()
+        {
+            // Arrange and Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetColumnGridDataMethodName, publicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Element("Grid").Element("Cfg").Attribute("FilterEmpty").Value.ShouldBe("1"),
+                () => actual.Element("Grid").Element("Body").Element("I").Elements("I").Count(x => x.Attribute("Filtering").Value.Equals(string.Empty)).ShouldBe(50));
+        }
+
+        [TestMethod]
+        public void GetColumnData_DetFieldsNull_SetsGroupDefinition()
+        {
+            // Arrange
+            var groupDefinition = new SortGroupDefn();
+            var detFields = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn()
+            };
+            var totalFields = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn(),
+                new SortFieldDefn()
+            };
+
+            privateObject.SetFieldOrProperty("m_DetFreeze", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_TotFreeze", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_TotColRoot", nonPublicInstance, totalFields);
+            privateObject.SetFieldOrProperty("m_DetColRoot", nonPublicInstance, detFields);
+
+            // Act
+            testObject.GetColumnData(ref groupDefinition);
+
+            // Assert
+            groupDefinition.ShouldSatisfyAllConditions(
+                () => groupDefinition.DetFreeze.ShouldBe(DummyInt),
+                () => groupDefinition.TotFreeze.ShouldBe(DummyInt),
+                () => groupDefinition.DetFields.Length.ShouldBe(1),
+                () => groupDefinition.TotFields.Length.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void SetColumnOrderData_DetFieldsNull_SetsGroupDefinition()
+        {
+            // Arrange
+            var detFields = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn()
+            };
+            var totalFields = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn(),
+                new SortFieldDefn()
+            };
+            var groupDefinition = new SortGroupDefn()
+            {
+                DetFields = detFields.ToArray(),
+                TotFields = totalFields.ToArray(),
+                DetFreeze = DummyInt,
+                TotFreeze = DummyInt
+            };
+
+            privateObject.SetFieldOrProperty("bottomgridlayoutcache", nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty("m_TotColRoot", nonPublicInstance, totalFields);
+            privateObject.SetFieldOrProperty("m_DetColRoot", nonPublicInstance, detFields);
+
+            // Act
+            privateObject.Invoke(SetColumnOrderDataMethodName, publicInstance, new object[] { groupDefinition });
+            var detRoot = (List<SortFieldDefn>)privateObject.GetFieldOrProperty("m_DetColRoot", nonPublicInstance);
+            var totalRoot = (List<SortFieldDefn>)privateObject.GetFieldOrProperty("m_TotColRoot", nonPublicInstance);
+            var layoutCache = (string)privateObject.GetFieldOrProperty("bottomgridlayoutcache", nonPublicInstance);
+            var detFreeze = (int)privateObject.GetFieldOrProperty("m_DetFreeze", nonPublicInstance);
+            var totFreeze = (int)privateObject.GetFieldOrProperty("m_TotFreeze", nonPublicInstance);
+
+            // Assert
+            detRoot.ShouldSatisfyAllConditions(
+                () => layoutCache.ShouldBe(string.Empty),
+                () => detFreeze.ShouldBe(DummyInt),
+                () => totFreeze.ShouldBe(DummyInt),
+                () => totalRoot.Count.ShouldBe(2),
+                () => detRoot.Count.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetVersionsPILists_FromVersionEqualsToVersionTrue_Returns()
+        {
+            // Arrange
+            const int fromVersion = 0;
+            const int toVersion = 0;
+            var groupDefinition = new SortGroupDefn();
+
+            // Act
+            testObject.GetVersionsPILists(ref groupDefinition, fromVersion, toVersion);
+
+            // Assert
+            groupDefinition.ShouldSatisfyAllConditions(
+                () => groupDefinition.DetFields.Length.ShouldBe(0),
+                () => groupDefinition.TotFields.Length.ShouldBe(0));
+        }
+
+        [TestMethod]
+        public void GetVersionsPILists_FromVersionEqualsToVersionFalse_Returns()
+        {
+            // Arrange
+            const int fromVersionZero = 0;
+            const int fromVersion = -1;
+            const int toVersion = 1;
+            const string expectedDetField = "expectedDetField";
+            const string expectedTotField = "expectedTotField";
+            var groupDefinition = new SortGroupDefn();
+            var pids = new Dictionary<string, PIData>()
+            {
+                ["1"] = new PIData(50)
+                {
+                    ScenarioID = fromVersion,
+                    PI_ID = DummyInt,
+                    PI_Name = expectedTotField
+                },
+                ["2"] = new PIData(50)
+                {
+                    ScenarioID = toVersion,
+                    PI_ID = DummyInt,
+                    PI_Name = DummyString
+                },
+                ["3"] = new PIData(50)
+                {
+                    ScenarioID = fromVersion,
+                    PI_ID = DummyInt + 1,
+                    PI_Name = expectedDetField
+                }
+            };
+
+            privateObject.SetFieldOrProperty("m_PIs", nonPublicInstance, pids);
+
+            // Act
+            testObject.GetVersionsPILists(ref groupDefinition, fromVersionZero, toVersion);
+
+            // Assert
+            groupDefinition.ShouldSatisfyAllConditions(
+                () => groupDefinition.DetFields.Length.ShouldBe(1),
+                () => groupDefinition.TotFields.Length.ShouldBe(1),
+                () => groupDefinition.DetFields[0].name.ShouldBe(expectedDetField),
+                () => groupDefinition.TotFields[0].name.ShouldBe(expectedTotField));
+        }
+
+        [TestMethod]
+        public void GetSaveVersions_WhenCalled_AddsVersions()
+        {
+            // Arrange
+            var versions = new List<ItemDefn>();
+            var scenario = new Dictionary<int, DataItem>()
+            {
+                [1] = new DataItem()
+                {
+                    bLoaded = true,
+                    UID = DummyInt,
+                    Name = DummyString
+                },
+                [2] = new DataItem()
+                {
+                    bLoaded = false,
+                    UID = DummyInt,
+                    Name = DummyString
+                },
+                [3] = new DataItem()
+                {
+                    bLoaded = true,
+                    UID = 0,
+                    Name = DummyString
+                }
+            };
+
+            privateObject.SetFieldOrProperty("m_Scenario", nonPublicInstance, scenario);
+
+            // Act
+            testObject.GetSaveVersions(ref versions);
+
+            // Assert
+            versions.ShouldSatisfyAllConditions(
+                () => versions.Count.ShouldBe(1),
+                () => versions[0].Name.ShouldBe(DummyString),
+                () => versions[0].Id.ShouldBe(DummyInt));
+        }
+
+        [TestMethod]
+        public void GetTargets_WhenCalled_AddsTargets()
+        {
+            // Arrange
+            var targets = new List<ItemDefn>();
+            var target = new List<DataItem>()
+            {
+                new DataItem()
+                {
+                    bLoaded = true,
+                    UID = DummyInt,
+                    Name = DummyString
+                },
+                new DataItem()
+                {
+                    bLoaded = false,
+                    UID = DummyInt,
+                    Name = DummyString
+                },
+                new DataItem()
+                {
+                    bLoaded = true,
+                    UID = 0,
+                    Name = DummyString
+                }
+            };
+
+            privateObject.SetFieldOrProperty("m_Target", nonPublicInstance, target);
+
+            // Act
+            testObject.GetTargets(ref targets);
+
+            // Assert
+            targets.ShouldSatisfyAllConditions(
+                () => targets.Count.ShouldBe(3),
+                () => targets.Count(x => x.Name.Equals(DummyString)).ShouldBe(3),
+                () => targets.Count(x => x.Id.Equals(DummyInt)).ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void SaveVersion_WhenCalled_ReturnsInteger()
+        {
+            // Arrange
+            const string version = "1";
+            const int max = 500;
+            var validations = 0;
+            var sqlConnection = new SqlConnection();
+            var now = DateTime.Now;
+            var pids = new Dictionary<string, PIData>()
+            {
+                ["1"] = new PIData(max)
+                {
+                    ScenarioID = -1,
+                    PI_ID = DummyInt
+                },
+                ["2"] = new PIData(max)
+                {
+                    ScenarioID = -1,
+                    PI_ID = DummyInt
+                },
+                ["3"] = new PIData(max)
+                {
+                    ScenarioID = 1,
+                    PI_ID = DummyInt,
+                    StartDate = DateTime.MinValue,
+                    FinishDate = DateTime.MinValue
+                },
+                ["4"] = new PIData(50)
+                {
+                    ScenarioID = 1,
+                    PI_ID = DummyInt,
+                    StartDate = now,
+                    FinishDate = now
+                }
+            };
+            var costType = new Dictionary<int, DataItem>()
+            {
+                [1] = new DataItem()
+                {
+                    UID = DummyInt
+                },
+                [2] = new DataItem()
+                {
+                    UID = DummyInt
+                }
+            };
+            var detailData = new Dictionary<string, DetailRowData>()
+            {
+                ["1"] = new DetailRowData(max)
+                {
+                    Scenario_ID = 1,
+                    zCost = (new object[max + 1]).Select(x => 10d).ToArray(),
+                    zValue = (new object[max + 1]).Select(x => 10d).ToArray()
+                }
+            };
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            {
+                validations += 1;
+                return 1;
+            };
+
+            privateObject.SetFieldOrProperty("m_PIs", nonPublicInstance, pids);
+            privateObject.SetFieldOrProperty("m_CostTypes", nonPublicInstance, costType);
+            privateObject.SetFieldOrProperty("m_detaildata", nonPublicInstance, detailData);
+            privateObject.SetFieldOrProperty("m_sModel", nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, max);
+
+            // Act
+            var actual = (int)privateObject.Invoke(SaveVersionMethodName, publicInstance, new object[] { sqlConnection, version });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(0),
+                () => validations.ShouldBe(506));
+        }
+
+        [TestMethod]
+        public void GetPeriodsandVersions_WhenCalled_SetsPeriodsAndOptions()
+        {
+            // Arrange
+            var periodsAndOptions = new PeriodsAndOptions();
+            var periodData = new PeriodData()
+            {
+                PeriodID = DummyInt,
+                PeriodName = DummyString
+            };
+            var periods = new Dictionary<int, PeriodData>()
+            {
+                [1] = periodData,
+                [2] = periodData,
+                [3] = periodData
+            };
+
+            privateObject.SetFieldOrProperty("m_Periods", nonPublicInstance, periods);
+            privateObject.SetFieldOrProperty("m_display_minp", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_display_maxp", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_drag_minp", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_drag_maxp", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("bShowFTEs", nonPublicInstance, true);
+            privateObject.SetFieldOrProperty("bUseQTY", nonPublicInstance, true);
+            privateObject.SetFieldOrProperty("bUseCosts", nonPublicInstance, true);
+            privateObject.SetFieldOrProperty("m_show_rhs_dec_costs", nonPublicInstance, true);
+
+            // Act
+            testObject.GetPeriodsandVersions(ref periodsAndOptions);
+
+            // Assert
+            periodsAndOptions.ShouldSatisfyAllConditions(
+                () => periodsAndOptions.displayStart.ShouldBe(DummyInt),
+                () => periodsAndOptions.displayFinish.ShouldBe(DummyInt),
+                () => periodsAndOptions.dragStart.ShouldBe(DummyInt),
+                () => periodsAndOptions.dragFinish.ShouldBe(DummyInt),
+                () => periodsAndOptions.showWhichQTY.ShouldBe(1),
+                () => periodsAndOptions.showQTY.ShouldBe(1),
+                () => periodsAndOptions.showCosts.ShouldBe(1),
+                () => periodsAndOptions.showRHSDecCosts.ShouldBe(1),
+                () => periodsAndOptions.Periods.Count(x => x.Id.Equals(DummyInt) && x.Name.Equals(DummyString)).ShouldBe(3));
         }
     }
 }
