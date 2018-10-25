@@ -37,7 +37,7 @@ namespace EPMLiveCore.API
 
                 if (itemColl.Count > 0)
                 {
-                    int commentItemId = Convert.ToInt32(dataMgr.GetPropVal("CommentItemId"));
+                    var commentItemId = Convert.ToInt32(dataMgr.GetPropVal("CommentItemId"));
 
                     foreach (SPListItem item in itemColl)
                     {
