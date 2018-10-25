@@ -1,15 +1,16 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.SharePoint;
-using System.IO;
 using System.Diagnostics;
+using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveEnterprise
 {
     class PublisherEventInstaller : SPFeatureReceiver
     {
+        private const int SuccessfullyUninstalledEPMLivePublishingEventHandler = 601;
+        private const int SuccessfullyUninstalledEPMLiveStatusingEventHandler = 611;
+        private const int ErrorUninstallingEnterpriseEventHandlerCode = 652;
+
         public override void FeatureActivated(SPFeatureReceiverProperties properties)
         {
             if (!EventLog.SourceExists("EPM Live Feature Activation"))
@@ -101,73 +102,81 @@ namespace EPMLiveEnterprise
 
         public override void FeatureDeactivating(SPFeatureReceiverProperties properties)
         {
-            EventLog myLog = new EventLog("EPM Live", ".", "EPM Live Feature Deactivation");
-            myLog.MaximumKilobytes = 32768;
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            using (var myLog = new EventLog("EPM Live", ".", "EPM Live Feature Deactivation"))
             {
-                try
+                myLog.MaximumKilobytes = 32768;
+
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    WebSvcEvents.Events events = new EPMLiveEnterprise.WebSvcEvents.Events();
-                    events.Url = SPContext.Current.Site.Url + "/_vti_bin/psi/events.asmx";
-                    events.UseDefaultCredentials = true;
-
                     try
                     {
-                        events.DeleteEventHandlerAssociations(new Guid[] { new Guid("73DBE692-F21D-4129-8E2B-8B1ED4FA00F5") });
-                        myLog.WriteEntry("Successfully uninstalled EPM Live Publishing EventHandler (Project.Published)", EventLogEntryType.Information, 601);
+                        var events = new WebSvcEvents.Events();
+                        events.Url = SPContext.Current.Site.Url + "/_vti_bin/psi/events.asmx";
+                        events.UseDefaultCredentials = true;
+
+                        try
+                        {
+                            events.DeleteEventHandlerAssociations(new Guid[] { new Guid("73DBE692-F21D-4129-8E2B-8B1ED4FA00F5") });
+                            myLog.WriteEntry("Successfully uninstalled EPM Live Publishing EventHandler (Project.Published)", EventLogEntryType.Information, SuccessfullyUninstalledEPMLivePublishingEventHandler);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine(ex.ToString());
+                            myLog.WriteEntry("Error Uninstalling Enterprise Event Handler (Project.Published):\r\n " + ex.Message, EventLogEntryType.Error, ErrorUninstallingEnterpriseEventHandlerCode);
+                        }
+
+                        try
+                        {
+                            events.DeleteEventHandlerAssociations(new Guid[] { new Guid("8BBBBC25-7E9D-440b-BE1C-78ED667D5D0B") });
+                            myLog.WriteEntry("Successfully uninstalled EPM Live Statusing EventHandler (Statusing.Applied)", EventLogEntryType.Information, SuccessfullyUninstalledEPMLiveStatusingEventHandler);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine(ex.ToString());
+                            myLog.WriteEntry("Error Uninstalling Enterprise Event Handler (Statusing.Applied):\r\n " + ex.Message, EventLogEntryType.Error, ErrorUninstallingEnterpriseEventHandlerCode);
+                        }
+
+                        try
+                        {
+                            events.DeleteEventHandlerAssociations(new Guid[] { new Guid("B0C1D09C-F1F6-4a6b-858C-529E22B7688C") });
+                            myLog.WriteEntry("Successfully uninstalled EPM Live Resource EventHandler (Resource.Updated)", EventLogEntryType.Information, SuccessfullyUninstalledEPMLiveStatusingEventHandler);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine(ex.ToString());
+                            myLog.WriteEntry("Error Uninstalling Enterprise Event Handler (Resource.Updated):\r\n " + ex.Message, EventLogEntryType.Error, ErrorUninstallingEnterpriseEventHandlerCode);
+                        }
+
+                        try
+                        {
+                            events.DeleteEventHandlerAssociations(new Guid[] { new Guid("286DE0F8-2042-4c8b-A8F7-3E276150CD9C") });
+                            myLog.WriteEntry("Successfully uninstalled EPM Live Statusing EventHandler (Resource.Created)", EventLogEntryType.Information, SuccessfullyUninstalledEPMLiveStatusingEventHandler);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine(ex.ToString());
+                            myLog.WriteEntry("Error Uninstalling Enterprise Event Handler (Resource.Created):\r\n " + ex.Message, EventLogEntryType.Error, ErrorUninstallingEnterpriseEventHandlerCode);
+                        }
+
+                        try
+                        {
+                            events.DeleteEventHandlerAssociations(new Guid[] { new Guid("074BCE6F-CF3B-4a94-BCC4-A262B32AE41E") });
+                            myLog.WriteEntry("Successfully uninstalled EPM Live Statusing EventHandler (Resource.Deleting)", EventLogEntryType.Information, SuccessfullyUninstalledEPMLiveStatusingEventHandler);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine(ex.ToString());
+                            myLog.WriteEntry("Error Uninstalling Enterprise Event Handler (Resource.Deleted):\r\n " + ex.Message, EventLogEntryType.Error, ErrorUninstallingEnterpriseEventHandlerCode);
+                        }
                     }
                     catch (Exception ex)
                     {
-                        myLog.WriteEntry("Error Uninstalling Enterprise Event Handler (Project.Published):\r\n " + ex.Message, EventLogEntryType.Error, 652);
+                        Trace.WriteLine(ex.ToString());
+                        myLog.WriteEntry("Error Uninstalling Enterprise Event Handler(s):\r\n " + ex.Message + ex.StackTrace + ex.InnerException, EventLogEntryType.Error, ErrorUninstallingEnterpriseEventHandlerCode);
                     }
-
-                    try
-                    {
-                        events.DeleteEventHandlerAssociations(new Guid[] { new Guid("8BBBBC25-7E9D-440b-BE1C-78ED667D5D0B") });
-                        myLog.WriteEntry("Successfully uninstalled EPM Live Statusing EventHandler (Statusing.Applied)", EventLogEntryType.Information, 611);
-                    }
-                    catch (Exception ex)
-                    {
-                        myLog.WriteEntry("Error Uninstalling Enterprise Event Handler (Statusing.Applied):\r\n " + ex.Message, EventLogEntryType.Error, 652);
-                    }
-
-                    try
-                    {
-                        events.DeleteEventHandlerAssociations(new Guid[] { new Guid("B0C1D09C-F1F6-4a6b-858C-529E22B7688C") });
-                        myLog.WriteEntry("Successfully uninstalled EPM Live Resource EventHandler (Resource.Updated)", EventLogEntryType.Information, 611);
-                    }
-                    catch (Exception ex)
-                    {
-                        myLog.WriteEntry("Error Uninstalling Enterprise Event Handler (Resource.Updated):\r\n " + ex.Message, EventLogEntryType.Error, 652);
-                    }
-
-                    try
-                    {
-                        events.DeleteEventHandlerAssociations(new Guid[] { new Guid("286DE0F8-2042-4c8b-A8F7-3E276150CD9C") });
-                        myLog.WriteEntry("Successfully uninstalled EPM Live Statusing EventHandler (Resource.Created)", EventLogEntryType.Information, 611);
-                    }
-                    catch (Exception ex)
-                    {
-                        myLog.WriteEntry("Error Uninstalling Enterprise Event Handler (Resource.Created):\r\n " + ex.Message, EventLogEntryType.Error, 652);
-                    }
-
-                    try
-                    {
-                        events.DeleteEventHandlerAssociations(new Guid[] { new Guid("074BCE6F-CF3B-4a94-BCC4-A262B32AE41E") });
-                        myLog.WriteEntry("Successfully uninstalled EPM Live Statusing EventHandler (Resource.Deleting)", EventLogEntryType.Information, 611);
-                    }
-                    catch (Exception ex)
-                    {
-                        myLog.WriteEntry("Error Uninstalling Enterprise Event Handler (Resource.Deleted):\r\n " + ex.Message, EventLogEntryType.Error, 652);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    myLog.WriteEntry("Error Uninstalling Enterprise Event Handler(s):\r\n " + ex.Message + ex.StackTrace + ex.InnerException, EventLogEntryType.Error, 652);
-                }
-            });
-            myLog.Close();
+                });
+                myLog.Close();
+            }
         }
 
         public override void FeatureInstalled(SPFeatureReceiverProperties properties)
