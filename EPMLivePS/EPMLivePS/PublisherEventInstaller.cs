@@ -148,7 +148,7 @@ namespace EPMLiveEnterprise
                 var newDataSet = new EventHandlersDataSet();
                 newDataSet.EventHandlers.AddEventHandlersRow(new Guid("B0C1D09C-F1F6-4a6b-858C-529E22B7688C"), "EPMLiveResUpdated", "EPMLiveEnterprise, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5", "EPMLiveEnterprise.ResourceEvents", 95, "", 10);
                 events.CreateEventHandlerAssociations(newDataSet);
-                myLog.WriteEntry("Successfully started install of EPM Live Resource EventHandler (Resource.Updated)", EventLogEntryType.Information, 610);
+                myLog.WriteEntry("Successfully started install of EPM Live Resource EventHandler (Resource.Updated)", EventLogEntryType.Information, SuccessfullyStartedInstallOfEPMLiveResourceEventHandlerCode);
             }
         }
 
@@ -214,7 +214,7 @@ namespace EPMLiveEnterprise
                 {
                     try
                     {
-                        var events = new WebSvcEvents.Events();
+                        var events = new Events();
                         events.Url = SPContext.Current.Site.Url + "/_vti_bin/psi/events.asmx";
                         events.UseDefaultCredentials = true;
 
