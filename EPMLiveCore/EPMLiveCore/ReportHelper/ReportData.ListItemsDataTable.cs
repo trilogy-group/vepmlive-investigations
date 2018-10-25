@@ -100,7 +100,7 @@ namespace EPMLiveCore.ReportHelper
             {
                 errColumnName = column[ColumnName].ToString();
 
-                if (spList.Fields.ContainsField(column[InternalNameLower].ToString()))
+                if (spList.Fields.ContainsField(column[InternalName].ToString()))
                 {
                     ProcessInternalName(defaultColumns, item, column, itemRow);
                 }
@@ -131,22 +131,22 @@ namespace EPMLiveCore.ReportHelper
             Guard.ArgumentIsNotNull(item, nameof(item));
             Guard.ArgumentIsNotNull(defaultColumns, nameof(defaultColumns));
 
-            if (column[SharePointType].ToString().Equals(LookupLower, StringComparison.OrdinalIgnoreCase) ||
+            if (column[SharePointType].ToString().Equals(Lookup, StringComparison.OrdinalIgnoreCase) ||
                 column[SharePointType].ToString().Equals(User, StringComparison.OrdinalIgnoreCase))
             {
                 if (column[ColumnName].ToString().EndsWith(TextId, StringComparison.OrdinalIgnoreCase))
                 {
-                    itemRow[column[ColumnName].ToString()] = ItemHasValue(item, column[InternalNameLower].ToString())
-                        ? (object)AddLookUpFieldValues(item[column[InternalNameLower].ToString()].ToString(), TextId)
+                    itemRow[column[ColumnName].ToString()] = ItemHasValue(item, column[InternalName].ToString())
+                        ? (object)AddLookUpFieldValues(item[column[InternalName].ToString()].ToString(), TextId)
                         : DBNull.Value;
                 }
                 else if (column[ColumnName].ToString().EndsWith(IdText, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (ItemHasValue(item, column[InternalNameLower].ToString()))
+                    if (ItemHasValue(item, column[InternalName].ToString()))
                     {
-                        var fieldType = GetFieldType(item, column[InternalNameLower].ToString());
+                        var fieldType = GetFieldType(item, column[InternalName].ToString());
 
-                        var addLookUpFieldValues = AddLookUpFieldValues(item[column[InternalNameLower].ToString()].ToString(), IdText);
+                        var addLookUpFieldValues = AddLookUpFieldValues(item[column[InternalName].ToString()].ToString(), IdText);
 
                         if (fieldType.Equals(LookupMulti, StringComparison.InvariantCultureIgnoreCase) ||
                             fieldType.Equals(UserMulti, StringComparison.InvariantCultureIgnoreCase))
