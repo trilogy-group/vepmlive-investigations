@@ -115,5 +115,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         {
             _DAO.Dispose();
         }
+
+        public override void Dispose()
+        {
+            pnl_results?.Dispose();
+            base.Dispose();
+        }
     }
 }
