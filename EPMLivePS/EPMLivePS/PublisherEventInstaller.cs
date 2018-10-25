@@ -69,8 +69,6 @@ namespace EPMLiveEnterprise
                     Trace.WriteLine(ex.ToString());
                     myLog.WriteEntry("Error Updating Project Workspace Provisioning Settings :\r\n " + ex.Message + ex.StackTrace + ex.InnerException, EventLogEntryType.Error, 651);
                 }
-
-                myLog.Close();
             }
         }
 
@@ -279,7 +277,6 @@ namespace EPMLiveEnterprise
                         myLog.WriteEntry("Error Uninstalling Enterprise Event Handler(s):\r\n " + ex.Message + ex.StackTrace + ex.InnerException, EventLogEntryType.Error, ErrorUninstallingEnterpriseEventHandlerCode);
                     }
                 });
-                myLog.Close();
             }
         }
 
