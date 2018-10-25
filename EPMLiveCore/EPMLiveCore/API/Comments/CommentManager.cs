@@ -1130,331 +1130,388 @@ namespace EPMLiveCore.API
             return isAssigned;
         }
 
+        // Data should look like the following:
+        // ===============================
+        // <Data>
+        // <Param key="ItemIds"><listid>.<itemid>,<listid>.<itemid></Param>
+        // <Parem key="Created"></Parem>
+        // </Data>
         public static string GetMyCommentsByDate(string data)
         {
-            string retVal = string.Empty;
-            StringBuilder sbResult = new StringBuilder();
-            SPWeb cWeb = SPContext.Current.Web;
+            var returnValue = string.Empty;
+            var result = new StringBuilder();
+            var web = SPContext.Current.Web;
+            var aggregatedCommentItems = new List<string[]>();
+            var loadedItems = new List<string>();
+            var dataMgr = new XMLDataManager(data);
 
-            SPListItemCollection userCreatedItems = null;
-            List<string[]> notifiedCommentItems = new List<string[]>();
-            List<string[]> aggregatedCommentItems = new List<string[]>();
-            List<string[]> targetComments = new List<string[]>();
-            List<string> saLoadedItems = new List<string>();
+            PopulateAggregatedComments(dataMgr.GetPropVal("ItemIds"), aggregatedCommentItems);
 
-            // Data should look like the following:
-            // ===============================
-            // <Data>
-            // <Param key="ItemIds"><listid>.<itemid>,<listid>.<itemid></Param>
-            // <Parem key="Created"></Parem>
-            // </Data>
-
-            // load data into XML manager
-            XMLDataManager dataMgr = new XMLDataManager(data);
-
-            string sItemIds = dataMgr.GetPropVal("ItemIds");
-            if (!string.IsNullOrEmpty(sItemIds))
+            var commentsList = web.Lists.TryGetList(COMMENTS_LIST_NAME);
+            if (commentsList != null)
             {
-                string[] pairs = sItemIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string s in pairs)
+                var comments = commentsList.Items;
+                var allCommentsCol = new List<SPListItem>();
+                GetCommentsCreatedByCurrentUser(web, commentsList, aggregatedCommentItems, loadedItems, comments, allCommentsCol);
+
+                // sort aggregatedcommentitems by created date again
+                aggregatedCommentItems.Clear();
+                allCommentsCol = allCommentsCol.OrderByDescending(x => (DateTime)x["Created"]).ToList();
+                AddToAggregatedComments(allCommentsCol, aggregatedCommentItems);
+
+                // Construct response XML
+                // =====================================
+                result.Append(XML_RESPONSE_COMMENT_HEADER);
+                var loadedIds = new StringBuilder();
+
+                // get item ids that's been loaded before
+                var loadedItemIds = dataMgr.GetPropVal("LoadedItemIds");
+                AddIdsToLoadedItems(loadedItemIds, loadedItems);
+
+                var numThreads = int.Parse(dataMgr.GetPropVal("NumThreads"));
+                ProcessComments(aggregatedCommentItems, loadedItems, numThreads, web, comments, loadedIds, result);
+
+                result.Append(XML_RESPONSE_COMMENT_LOADEDIDS.Replace("##loadedids##", loadedIds.ToString().Trim(',')))
+                    .Append(XML_RESPONSE_COMMENT_FOOTER);
+                returnValue = result.ToString();
+            }
+            return returnValue;
+        }
+
+        private static void PopulateAggregatedComments(string itemIds, List<string[]> aggregatedCommentItems)
+        {
+            if (!string.IsNullOrWhiteSpace(itemIds))
+            {
+                var pairs = itemIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var pair in pairs)
                 {
-                    string[] vals = s.Split('.');
-                    string list = new Guid(vals[0]).ToString();
-                    string item = vals[1];
+                    var vals = pair.Split('.');
+                    var list = new Guid(vals[0]).ToString();
+                    var item = vals[1];
                     if (!ContainsItem(aggregatedCommentItems, new[] { list, item }))
                     {
                         aggregatedCommentItems.Add(new[] { list, item });
                     }
                 }
             }
+        }
 
-            SPList commentsList = cWeb.Lists.TryGetList(COMMENTS_LIST_NAME);
-            SPList publicCommentsList = cWeb.Lists.TryGetList("PublicComments");
-            SPListItemCollection comments = commentsList.Items;
-
-            if (commentsList != null)
+        private static void GetCommentsCreatedByCurrentUser(
+            SPWeb web,
+            SPList commentsList,
+            List<string[]> aggregatedCommentItems,
+            List<string> loadedItems,
+            SPListItemCollection comments,
+            List<SPListItem> allCommentsCol)
+        {
+            
+            var publicCommentsList = web.Lists.TryGetList("PublicComments");
+            SPQuery q = new SPQuery()
             {
-                // Get comments created by current user
-                // =================================================
-                SPQuery q = new SPQuery();
-                //q.Query = "<Where><And>" +
-                //              "<Eq><FieldRef Name=\"Author\" LookupId=\"true\" /><Value Type=\"User\">" + cWeb.CurrentUser.ID.ToString() + "</Value></Eq>" +
-                //              "<Geq><FieldRef Name=\"Created\" /><Value Type=\"DateTime\"><Today OffsetDays=\"" + dataMgr.GetPropVal("Created") + "\" /></Value></Geq>" +
-                //          "</And></Where><OrderBy><FieldRef Name=\"Created\" Ascending=\"False\" /></OrderBy>";
+                Query = $"<Where><Or><Eq><FieldRef Name=\"Author\" LookupId=\"true\" /><Value Type=\"User\">{web.CurrentUser.ID}</Value></Eq>" +
+                    $"<Eq><FieldRef Name=\"ListId\" /><Value Type=\"Text\">{publicCommentsList.ID}</Value></Eq></Or></Where><OrderBy><FieldRef Name=\"Created\" Ascending=\"False\" /></OrderBy>"
+            };
 
-                q.Query = "<Where><Or><Eq><FieldRef Name=\"Author\" LookupId=\"true\" /><Value Type=\"User\">" + cWeb.CurrentUser.ID.ToString() + "</Value></Eq>" +
-                    "<Eq><FieldRef Name=\"ListId\" /><Value Type=\"Text\">" + publicCommentsList.ID.ToString() + "</Value></Eq></Or></Where>" +
-                          "<OrderBy><FieldRef Name=\"Created\" Ascending=\"False\" /></OrderBy>";
+            AddToAggregatedComments(commentsList.GetItems(q), aggregatedCommentItems);
 
-                int numThreads = int.Parse(dataMgr.GetPropVal("NumThreads"));
-                userCreatedItems = commentsList.GetItems(q);
-                foreach (SPListItem item in userCreatedItems)
+            foreach (var pair in aggregatedCommentItems)
+            {
+                if (loadedItems.Count > 0 && loadedItems.Contains($"{pair[0]}^{pair[1]}"))
                 {
-                    string sListId = (string)(item["ListId"] ?? string.Empty);
-                    string sItemId = (string)(item["ItemId"] ?? string.Empty);
-                    string list = new Guid(sListId).ToString();
-
-                    if (!ContainsItem(aggregatedCommentItems, new[] { list, sItemId }))
-                    {
-                        aggregatedCommentItems.Add(new[] { list, sItemId });
-                    }
+                    continue;
                 }
-
-                List<SPListItem> allCommentsCol = new List<SPListItem>();
-
-                foreach (string[] pair in aggregatedCommentItems)
+                else
                 {
-                    if (saLoadedItems.Count > 0 && saLoadedItems.Contains(pair[0] + '^' + pair[1]))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        List<SPListItem> commentsCol = (from SPListItem i in comments
-                                                        where new Guid(pair[0]).ToString().Equals(new Guid((string)(i["ListId"] ?? string.Empty)).ToString()) &&
-                                                            pair[1].Equals((string)(i["ItemId"] ?? string.Empty))
-                                                        select i
-                                                       ).ToList();
-                        allCommentsCol.AddRange(commentsCol);
-                    }
-                }
-
-                // sort aggregatedcommentitems by created date again
-                aggregatedCommentItems.Clear();
-                allCommentsCol = allCommentsCol.OrderByDescending(x => (DateTime)x["Created"]).ToList();
-                foreach (SPListItem it in allCommentsCol)
-                {
-                    string sListId = (string)(it["ListId"] ?? string.Empty);
-                    string sItemId = (string)(it["ItemId"] ?? string.Empty);
-                    string list = new Guid(sListId).ToString();
-
-                    if (!ContainsItem(aggregatedCommentItems, new[] { list, sItemId }))
-                    {
-                        aggregatedCommentItems.Add(new[] { list, sItemId });
-                    }
-                }
-
-                // Construct response XML
-                // =====================================
-                sbResult.Append(XML_RESPONSE_COMMENT_HEADER);
-                int totalThreads = 0;
-                string loadedIds = string.Empty;
-
-                // get item ids that's been loaded before
-                string loadedItemIds = dataMgr.GetPropVal("LoadedItemIds");
-                if (!string.IsNullOrEmpty(loadedItemIds))
-                {
-                    string[] rawIds = loadedItemIds.Split(',');
-                    foreach (string s in rawIds)
-                    {
-                        if (!string.IsNullOrEmpty(s) && !saLoadedItems.Contains(s))
-                        {
-                            saLoadedItems.Add(s);
-                        }
-                    }
-                }
-
-                foreach (string[] pair in aggregatedCommentItems)
-                {
-                    if (saLoadedItems.Count > 0 && saLoadedItems.Contains(pair[0] + '^' + pair[1]))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        // return the top x number of threads
-                        if (!(totalThreads < numThreads))
-                        {
-                            break;
-                        }
-                    }
-
-                    sbResult.Append(XML_RESPONSE_COMMENT_SECTION_HEADER.Replace("##listId##", new Guid(pair[0]).ToString()).Replace("##itemId##", pair[1].ToString()));
-                    List<SPListItem> commentsDesc = new List<SPListItem>();
-                    Guid listId = new Guid(pair[0]);
-                    int itemId = int.Parse(pair[1]);
-
-                    SPListItem realItem = null;
-
-                    try
-                    {
-                        SPList realList = cWeb.Lists[listId];
-                        realItem = realList.GetItemById(itemId);
-                    }
-                    catch { }
-
-                    // get matching list of comments in descending order
-                    try
-                    {
-                        commentsDesc = (from SPListItem i in comments
-                                        where new Guid(pair[0]).ToString().Equals(new Guid((string)(i["ListId"] ?? string.Empty)).ToString()) &&
-                                            pair[1].Equals((string)(i["ItemId"] ?? string.Empty))
-                                        orderby (DateTime)i["Created"] ascending
-                                        select i
+                    var commentsCol = (from SPListItem i in comments
+                                       where new Guid(pair[0]).ToString().Equals(new Guid((string)(i["ListId"] ?? string.Empty)).ToString())
+                                       && pair[1].Equals((string)(i["ItemId"] ?? string.Empty))
+                                       select i
                                        ).ToList();
-                    }
-                    catch { }
+                    allCommentsCol.AddRange(commentsCol);
+                }
+            }
+        }
 
-                    if (realItem != null && commentsDesc.Count > 0)
+        private static void AddToAggregatedComments(IEnumerable items, List<string[]> aggregatedCommentItems)
+        {
+            foreach (SPListItem item in items)
+            {
+                var listId = (string)(item["ListId"] ?? string.Empty);
+                var itemId = (string)(item["ItemId"] ?? string.Empty);
+                var list = new Guid(listId).ToString();
+
+                if (!ContainsItem(aggregatedCommentItems, new[] { list, itemId }))
+                {
+                    aggregatedCommentItems.Add(new[] { list, itemId });
+                }
+            }
+        }
+
+        private static void AddIdsToLoadedItems(string loadedItemIds, List<string> loadedItems)
+        {
+            if (!string.IsNullOrWhiteSpace(loadedItemIds))
+            {
+                var rawIds = loadedItemIds.Split(',');
+                foreach (var id in rawIds)
+                {
+                    if (!string.IsNullOrWhiteSpace(id) && !loadedItems.Contains(id))
                     {
-
-                        // display original comment
-                        SPListItem originalComment = commentsDesc.OrderBy(x => (DateTime)x["Created"]).FirstOrDefault();
-                        string sListId = (string)(originalComment["ListId"] ?? string.Empty);
-                        string sItemId = (string)(originalComment["ItemId"] ?? string.Empty);
-                        DateTime dCreated = (DateTime)originalComment["Created"];
-
-                        string soriginComment = string.Empty;
-                        try
-                        {
-                            soriginComment = originalComment["Comment"].ToString();
-                        }
-                        catch { }
-
-                        sbResult.Append(XML_RESPONSE_COMMENT_ITEM.Replace("##listId##", new Guid(sListId).ToString())
-                                                                 .Replace("##listName##", realItem.ParentList.Title)
-                                                                 .Replace("##listDispUrl##", realItem.ParentList.DefaultDisplayFormUrl)
-                                                                 .Replace("##listUrl##", realItem.ParentList.DefaultViewUrl)
-                                                                 .Replace("##itemId##", sItemId.ToString())
-                                                                 .Replace("##itemTitle##", realItem.Title.Replace('\"', '\''))
-                                                                 .Replace("##createdDate##", dCreated.ToFriendlyDateAndTime(cWeb))
-                                                                 .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(soriginComment ?? string.Empty)))));
-                        // get user object 
-                        SPFieldUser author = (SPFieldUser)originalComment.Fields[SPBuiltInFieldId.Author];
-                        SPFieldUserValue user = (SPFieldUserValue)author.GetFieldValue(originalComment[SPBuiltInFieldId.Author].ToString());
-                        SPUser userObject = user.User;
-
-                        if (userObject == null)
-                        {
-                            continue;
-                        }
-
-                        //get user picture from user id
-                        SPList userInfoList = SPContext.Current.Web.SiteUserInfoList;
-                        SPListItem userItem = userInfoList.GetItemById(userObject.ID);
-                        string userPictureUrl = SPContext.Current.Site.MakeFullUrl(SPContext.Current.Web.ServerRelativeUrl) + "/_layouts/epmlive/images/O14_person_placeHolder_32.png";
-
-                        SPField fldPicture = null;
-                        try
-                        {
-                            fldPicture = userItem.Fields.GetFieldByInternalName("Picture");
-                        }
-                        catch (ArgumentException x)
-                        {
-                            fldPicture = null;
-                        }
-
-                        if (fldPicture != null)
-                        {
-                            try
-                            {
-                                string[] picUrls = userItem[userItem.Fields.GetFieldByInternalName("Picture").Id].ToString().Split(',');
-                                userPictureUrl = picUrls[0];
-                            }
-                            catch
-                            {
-                                userPictureUrl = SPContext.Current.Site.MakeFullUrl(SPContext.Current.Web.ServerRelativeUrl) + "/_layouts/epmlive/images/O14_person_placeHolder_32.png";
-                            }
-                        }
-
-                        sbResult.Append(XML_USER_INFO_SECTION.Replace("##username##", userObject.Name)
-                                                             .Replace("##useremail##", userObject.Email)
-                                                             .Replace("##userprofile##", _userProfileUrl.Replace("##userid##", userObject.ID.ToString()))
-                                                             .Replace("##userpic##", userPictureUrl));
-
-                        sbResult.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
-
-                        for (int i = 0; i < commentsDesc.Count; i++)
-                        {
-                            SPListItem comment = commentsDesc[i];
-                            if (comment.ID != originalComment.ID)
-                            {
-                                string sListId2 = (string)(comment["ListId"] ?? string.Empty);
-                                string sItemId2 = (string)(comment["ItemId"] ?? string.Empty);
-                                DateTime dCreated2 = (DateTime)comment["Created"];
-
-                                // get user object 
-                                author = (SPFieldUser)comment.Fields[SPBuiltInFieldId.Author];
-                                user = (SPFieldUserValue)author.GetFieldValue(comment[SPBuiltInFieldId.Author].ToString());
-                                userObject = user.User;
-
-                                if (userObject == null)
-                                {
-                                    continue;
-                                }
-
-                                //get user picture from user id
-                                userInfoList = SPContext.Current.Web.SiteUserInfoList;
-                                userItem = userInfoList.GetItemById(userObject.ID);
-                                userPictureUrl = SPContext.Current.Site.MakeFullUrl(SPContext.Current.Web.ServerRelativeUrl) + "/_layouts/epmlive/images/O14_person_placeHolder_32.png";
-
-                                try
-                                {
-                                    fldPicture = userItem.Fields.GetFieldByInternalName("Picture");
-                                }
-                                catch (ArgumentException x)
-                                {
-                                    fldPicture = null;
-                                }
-
-                                if (fldPicture != null)
-                                {
-                                    try
-                                    {
-                                        string[] picUrls = userItem[userItem.Fields.GetFieldByInternalName("Picture").Id].ToString().Split(',');
-                                        userPictureUrl = picUrls[0];
-                                    }
-                                    catch
-                                    {
-                                        userPictureUrl = SPContext.Current.Site.MakeFullUrl(SPContext.Current.Web.ServerRelativeUrl) + "/_layouts/epmlive/images/O14_person_placeHolder_32.png";
-                                    }
-                                }
-
-                                // 1. display first item ordered by asending date
-                                // 2. display rest ordered by desending date
-                                // 3. do not repeat items 
-
-                                string soriginComment2 = string.Empty;
-                                try
-                                {
-                                    soriginComment2 = comment["Comment"].ToString();
-                                }
-                                catch { }
-
-                                sbResult.Append(XML_RESPONSE_COMMENT_ITEM.Replace("##listId##", new Guid(sListId2).ToString())
-                                                                         .Replace("##listName##", realItem.ParentList.Title)
-                                                                         .Replace("##listDispUrl##", realItem.ParentList.DefaultDisplayFormUrl)
-                                                                         .Replace("##listUrl##", realItem.ParentList.DefaultViewUrl)
-                                                                         .Replace("##itemId##", sItemId2.ToString())
-                                                                         .Replace("##itemTitle##", realItem.Title.Replace('\"', '\''))
-                                                                         .Replace("##createdDate##", dCreated2.ToFriendlyDateAndTime(cWeb))
-                                                                         .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(soriginComment2 ?? string.Empty)))));
-
-                                sbResult.Append(XML_USER_INFO_SECTION.Replace("##username##", userObject.Name)
-                                                                     .Replace("##useremail##", userObject.Email)
-                                                                     .Replace("##userprofile##", _userProfileUrl.Replace("##userid##", userObject.ID.ToString()))
-                                                                     .Replace("##userpic##", userPictureUrl));
-
-                                sbResult.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
-                            }
-                        }
-
-                    }
-                    sbResult.Append(XML_RESPONSE_COMMENT_SECTION_FOOTER);
-                    totalThreads++;
-                    loadedIds += (pair[0] + '^' + pair[1] + ',');
-
-                    if (saLoadedItems.Count > 0 && !saLoadedItems.Contains(pair[0] + '^' + pair[1]))
-                    {
-                        break;
+                        loadedItems.Add(id);
                     }
                 }
-                loadedIds = loadedIds.Trim(',');
-                sbResult.Append(XML_RESPONSE_COMMENT_LOADEDIDS.Replace("##loadedids##", loadedIds));
-                sbResult.Append(XML_RESPONSE_COMMENT_FOOTER);
-                retVal = sbResult.ToString();
             }
-            return retVal;
+        }
+
+        private static void ProcessComments(
+            List<string[]> aggregatedCommentItems,
+            List<string> loadedItems,
+            int numThreads,
+            SPWeb web,
+            SPListItemCollection comments,
+            StringBuilder loadedIds,
+            StringBuilder result)
+        {
+            var totalThreads = 0;
+            foreach (var pair in aggregatedCommentItems)
+            {
+                var pairedItems = $"{pair[0]}^{pair[1]}";
+                if (loadedItems.Count > 0 && loadedItems.Contains(pairedItems))
+                {
+                    continue;
+                }
+                else if (!(totalThreads < numThreads))
+                {
+                    // return the top x number of threads
+                    break;
+                }
+
+                var listId = new Guid(pair[0]);
+                var itemId = int.Parse(pair[1]);
+                AppendCommentSectionHeader(listId.ToString(), pair[1], result);
+
+                var realItem = GetRealItem(web, listId, itemId);
+                var commentsDesc = GetMatchingComments(comments, listId.ToString(), pair[1]);
+                if (realItem != null && commentsDesc.Count > 0)
+                {
+                    var originalComment = commentsDesc.OrderBy(x => (DateTime)x["Created"]).FirstOrDefault();
+                    DisplayOriginalComment(commentsDesc, originalComment, realItem, web, result);
+
+                    var userObject = GetUserObject(originalComment);
+                    if (userObject == null)
+                    {
+                        continue;
+                    }
+
+                    const string pictureUrl = "/_layouts/epmlive/images/O14_person_placeHolder_32.png";
+                    var userItem = SPContext.Current.Web.SiteUserInfoList.GetItemById(userObject.ID);
+                    var userPictureUrl = $"{SPContext.Current.Site.MakeFullUrl(SPContext.Current.Web.ServerRelativeUrl)}{pictureUrl}";
+
+                    AppendUserDetails(result, userObject, userPictureUrl);
+                    AppendCommenters(commentsDesc, originalComment, userItem, realItem, web, pictureUrl, result);
+
+                }
+                result.Append(XML_RESPONSE_COMMENT_SECTION_FOOTER);
+                totalThreads++;
+                loadedIds.Append(pairedItems)
+                    .Append(',');
+
+                if (loadedItems.Count > 0 && !loadedItems.Contains(pairedItems))
+                {
+                    break;
+                }
+            }
+        }
+
+        private static void AppendCommentSectionHeader(string listId, string itemId, StringBuilder result)
+        {
+            result.Append(XML_RESPONSE_COMMENT_SECTION_HEADER
+                .Replace("##listId##", listId)
+                .Replace("##itemId##", itemId)
+            );
+        }
+
+        private static SPListItem GetRealItem(SPWeb web, Guid listId, int itemId)
+        {
+            try
+            {
+                return web.Lists[listId].GetItemById(itemId);
+            }
+            catch (Exception e)
+            {
+                Trace.TraceWarning("Could not retrieve value: {0}", e);
+                return null;
+            }
+        }
+
+        private static List<SPListItem> GetMatchingComments(SPListItemCollection comments, string listId, string itemId)
+        {
+            try
+            {
+                return (from SPListItem i in comments
+                        where listId.Equals(new Guid((string)(i["ListId"] ?? string.Empty)).ToString()) &&
+                        itemId.Equals((string)(i["ItemId"] ?? string.Empty))
+                        orderby (DateTime)i["Created"] ascending
+                        select i
+                        ).ToList();
+            }
+            catch (Exception e)
+            {
+                Trace.TraceWarning("Unable to read comments: {0}", e);
+                return new List<SPListItem>();
+            }
+        }
+
+        private static string GetOriginComment(SPListItem originalComment)
+        {
+            try
+            {
+                return originalComment["Comment"].ToString();
+            }
+            catch (Exception e)
+            {
+                Trace.TraceWarning("Unable to read comment: {0}", e);
+                return string.Empty;
+            }
+        }
+
+        private static void DisplayOriginalComment(List<SPListItem> commentsDesc, SPListItem originalComment, SPListItem realItem, SPWeb web, StringBuilder result)
+        {
+            var listId = (string)(originalComment["ListId"] ?? string.Empty);
+            var itemId = (string)(originalComment["ItemId"] ?? string.Empty);
+            var created = (DateTime)originalComment["Created"];
+            var originComment = GetOriginComment(originalComment);
+
+            result.Append(XML_RESPONSE_COMMENT_ITEM
+                .Replace("##listId##", new Guid(listId).ToString())
+                .Replace("##listName##", realItem.ParentList.Title)
+                .Replace("##listDispUrl##", realItem.ParentList.DefaultDisplayFormUrl)
+                .Replace("##listUrl##", realItem.ParentList.DefaultViewUrl)
+                .Replace("##itemId##", itemId.ToString())
+                .Replace("##itemTitle##", realItem.Title.Replace('\"', '\''))
+                .Replace("##createdDate##", created.ToFriendlyDateAndTime(web))
+                .Replace("##comment##", GetXMLSafeVersion(HttpUtility.HtmlDecode(originComment ?? string.Empty)))
+            );
+        }
+
+        private static SPUser GetUserObject(SPListItem comment)
+        {
+            var author = (SPFieldUser)comment.Fields[SPBuiltInFieldId.Author];
+            var user = (SPFieldUserValue)author.GetFieldValue(comment[SPBuiltInFieldId.Author].ToString());
+            return user.User;
+        }
+
+        private static void AppendUserDetails(StringBuilder result, SPUser user, string userPictureUrl)
+        {
+            result.Append(XML_USER_INFO_SECTION
+                .Replace("##username##", user.Name)
+                .Replace("##useremail##", user.Email)
+                .Replace("##userprofile##", _userProfileUrl.Replace("##userid##", user.ID.ToString()))
+                .Replace("##userpic##", userPictureUrl));
+            result.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
+        }
+
+        private static void AppendCommenters(
+            List<SPListItem> commentsDesc,
+            SPListItem originalComment,
+            SPListItem userItem,
+            SPListItem realItem,
+            SPWeb web,
+            string pictureUrl,
+            StringBuilder result)
+        {
+            for (var i = 0; i < commentsDesc.Count; i++)
+            {
+                var comment = commentsDesc[i];
+                if (comment.ID != originalComment.ID)
+                {
+                    var userObject = GetUserObject(comment);
+
+                    if (userObject == null)
+                    {
+                        continue;
+                    }
+                    AppendCommenterDetails(comment, userItem, realItem, userObject, web, pictureUrl, result);
+                }
+            }
+        }
+
+        private static void AppendCommenterDetails(
+            SPListItem comment,
+            SPListItem userItem,
+            SPListItem realItem,
+            SPUser userObject,
+            SPWeb web,
+            string pictureUrl,
+            StringBuilder result)
+        {
+            var listId = (string)(comment["ListId"] ?? string.Empty);
+            var itemId = (string)(comment["ItemId"] ?? string.Empty);
+            var created = (DateTime)comment["Created"];
+            var userPictureUrl = GetUserPicture(userItem, pictureUrl);
+
+            // 1. display first item ordered by asending date
+            // 2. display rest ordered by desending date
+            // 3. do not repeat items 
+            var originComment = string.Empty;
+            try
+            {
+                originComment = comment["Comment"].ToString();
+            }
+            catch (Exception e)
+            {
+                Trace.TraceWarning("Could not retrieve Comment: {0}", e);
+            }
+
+            result.Append(XML_RESPONSE_COMMENT_ITEM
+                .Replace("##listId##", new Guid(listId).ToString())
+                .Replace("##listName##", realItem.ParentList.Title)
+                .Replace("##listDispUrl##", realItem.ParentList.DefaultDisplayFormUrl)
+                .Replace("##listUrl##", realItem.ParentList.DefaultViewUrl)
+                .Replace("##itemId##", itemId.ToString())
+                .Replace("##itemTitle##", realItem.Title.Replace('\"', '\''))
+                .Replace("##createdDate##", created.ToFriendlyDateAndTime(web))
+                .Replace("##comment##", GetXMLSafeVersion(HttpUtility.HtmlDecode(originComment ?? string.Empty))));
+
+            result.Append(XML_USER_INFO_SECTION
+                .Replace("##username##", userObject.Name)
+                .Replace("##useremail##", userObject.Email)
+                .Replace("##userprofile##", _userProfileUrl.Replace("##userid##", userObject.ID.ToString()))
+                .Replace("##userpic##", userPictureUrl));
+
+            result.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
+        }
+
+        private static string GetUserPicture(SPListItem userItem, string pictureUrl)
+        {
+            SPField pictureField;
+            if (TryGetPictureField(userItem, out pictureField))
+            {
+                try
+                {
+                    var picUrls = userItem[pictureField.Id].ToString().Split(',');
+                    return picUrls[0];
+                }
+                catch (Exception e)
+                {
+                    Trace.TraceWarning("Could not get user picture: {0}", e);
+                }
+            }
+            return $"{SPContext.Current.Site.MakeFullUrl(SPContext.Current.Web.ServerRelativeUrl)}{pictureUrl}";
+        }
+
+        private static bool TryGetPictureField(SPListItem item, out SPField pictureField)
+        {
+            try
+            {
+                pictureField = item.Fields.GetFieldByInternalName("Picture");
+                return true;
+            }
+            catch (ArgumentException e)
+            {
+                Trace.TraceWarning("Could not get Picture field: {0}", e);
+                pictureField = null;
+                return false;
+            }
         }
 
         private static bool ContainsItem(List<string[]> items, string[] item)
