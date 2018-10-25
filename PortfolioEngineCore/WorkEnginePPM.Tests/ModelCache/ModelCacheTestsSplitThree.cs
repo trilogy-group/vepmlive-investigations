@@ -37,6 +37,11 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         private const string GetTotalGridLayoutMethodName = "GetTotalGridLayout";
         private const string GetCTCmpGridDataMethodName = "GetCTCmpGridData";
         private const string SetCTCmpDataMethodName = "SetCTCmpData";
+        private const string GetTotalGridDataMethodName = "GetTotalGridData";
+        private const string SetTotColsbasedonTotalingMethodName = "SetTotColsbasedonTotaling";
+        private const string SetTotalDataMethodName = "SetTotalData";
+        private const string GetSortAndGroupMethodName = "GetSortAndGroup";
+        private const string SetSortAndGroupMethodName = "SetSortAndGroup";
 
         [TestMethod]
         public void GetBottomGrid_WhenCalled_Returns()
@@ -779,21 +784,12 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         public void SetCTCmpData_WhenCalled_Returns()
         {
             // Arrange
-            var cmpData = "1 0 1";
+            const string cmpData = "1 0 1";
             var dataItemList = new List<DataItem>()
             {
-                new DataItem()
-                {
-                    bSelected = false
-                },
-                new DataItem()
-                {
-                    bSelected = false
-                },
-                new DataItem()
-                {
-                    bSelected = false
-                }
+                new DataItem(),
+                new DataItem(),
+                new DataItem(),
             };
 
             privateObject.SetFieldOrProperty("m_CTARoot", nonPublicInstance, dataItemList);
@@ -807,6 +803,293 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
                 () => actual.Count.ShouldBe(3),
                 () => actual.Count(x => x.bSelected).ShouldBe(2),
                 () => actual.Count(x => !x.bSelected).ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetTotalGridData_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            var filteredList = new List<DataItem>()
+            {
+                new DataItem()
+                {
+                    level = DummyInt,
+                    Name = DummyString,
+                    bSelected = true
+                },
+                new DataItem()
+                {
+                    level = DummyInt,
+                    Name = DummyString,
+                    bSelected = true
+                },
+                new DataItem()
+                {
+                    level = DummyInt,
+                    Name = DummyString,
+                    bSelected = true
+                }
+            };
+
+            privateObject.SetFieldOrProperty("m_TotalRoot", nonPublicInstance, filteredList);
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetTotalGridDataMethodName, publicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Element("Grid").Element("Cfg").Attribute("FilterEmpty").Value.ShouldBe("1"),
+                () => actual.Element("Grid").Element("Body").Element("I").Elements("I").Count(x => x.Attribute("Filtering").Value.Equals(DummyString)).ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void SetTotColsbasedonTotaling_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            var filteredList = new List<DataItem>()
+            {
+                new DataItem()
+                {
+                    level = DummyInt,
+                    Name = DummyString,
+                    bSelected = true,
+                    UID = DummyInt
+                }
+            };
+            var colRoot = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn()
+                {
+                    fid = DummyInt
+                }
+            };
+
+            privateObject.SetFieldOrProperty("m_TotalRoot", nonPublicInstance, filteredList);
+            privateObject.SetFieldOrProperty("m_TotColRoot", nonPublicInstance, colRoot);
+            privateObject.SetFieldOrProperty("bottomgridlayoutcache", nonPublicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(SetTotColsbasedonTotalingMethodName, nonPublicInstance, new object[] { });
+            var actualcolRoot = (List<SortFieldDefn>)privateObject.GetFieldOrProperty("m_TotColRoot", nonPublicInstance);
+            var actualLayoutCache = (string)privateObject.GetFieldOrProperty("bottomgridlayoutcache", nonPublicInstance);
+
+            // Assert
+            actualcolRoot.ShouldSatisfyAllConditions(
+                () => actualcolRoot.Count.ShouldBe(1),
+                () => actualcolRoot[0].selected.ShouldBe(1),
+                () => actualLayoutCache.ShouldBe(string.Empty));
+        }
+
+        [TestMethod]
+        public void SetTotalData_WhenCalled_SetSelectionsBoolean()
+        {
+            // Arrange
+            var validations = 0;
+            const string data = "1 0 1";
+            var dataItemList = new List<DataItem>()
+            {
+                new DataItem(),
+                new DataItem(),
+                new DataItem(),
+            };
+
+            ShimModelCache.AllInstances.SetTotColsbasedonTotaling = _ =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty("m_TotalRoot", nonPublicInstance, dataItemList);
+
+            // Act
+            privateObject.Invoke(SetTotalDataMethodName, publicInstance, new object[] { data });
+            var actualcolRoot = (List<DataItem>)privateObject.GetFieldOrProperty("m_TotalRoot", nonPublicInstance);
+
+            // Assert
+            actualcolRoot.ShouldSatisfyAllConditions(
+                () => actualcolRoot.Count.ShouldBe(3),
+                () => actualcolRoot.Count(x => x.bSelected).ShouldBe(2),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetSortAndGroup_DetFieldsNull_SetsGroupDefinition()
+        {
+            // Arrange
+            var groupDefinition = new SortGroupDefn();
+            var detFields = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn()
+            };
+            var totalFields = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn(),
+                new SortFieldDefn()
+            };
+            var customIntArray = new int[2, 3]
+            {
+                { 1, 1, 1 },
+                { 4, 4, 4 }
+            };
+
+            privateObject.SetFieldOrProperty("m_initial_zoom", nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty("m_loadmsg", nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty("m_loaddatareturn", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_lowlevelDataCount", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_PI_Count", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_GotAllPIs", nonPublicInstance, false);
+            privateObject.SetFieldOrProperty("m_apply_target", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_detShowToLevel", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_totShowToLevel", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_SnGFids", nonPublicInstance, customIntArray);
+            privateObject.SetFieldOrProperty("m_SnGAsc", nonPublicInstance, customIntArray);
+            privateObject.SetFieldOrProperty("m_SnGGrp", nonPublicInstance, customIntArray);
+            privateObject.SetFieldOrProperty("m_TotFields", nonPublicInstance, totalFields);
+            privateObject.SetFieldOrProperty("m_DetFields", nonPublicInstance, null);
+
+            // Act
+            testObject.GetSortAndGroup(ref groupDefinition);
+
+            // Assert
+            groupDefinition.ShouldSatisfyAllConditions(
+                () => groupDefinition.ViewZoomTo.ShouldBe(DummyString),
+                () => groupDefinition.errMsg.ShouldBe(DummyString),
+                () => groupDefinition.LoadReturnCode.ShouldBe(DummyInt),
+                () => groupDefinition.HaveLowlevelData.ShouldBe(DummyInt),
+                () => groupDefinition.NumPIs.ShouldBe(DummyInt),
+                () => groupDefinition.MissingPIs.ShouldBe(1),
+                () => groupDefinition.TotalsCmp.ShouldBe(1),
+                () => groupDefinition.DetFields.Length.ShouldBe(0),
+                () => groupDefinition.TotFields.Length.ShouldBe(0),
+                () => groupDefinition.DetRows.Count(x => x == null).ShouldBe(3),
+                () => groupDefinition.TotRows.Count(x => x == null).ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void GetSortAndGroup_DetFieldsNotNull_SetsGroupDefinition()
+        {
+            // Arrange
+            var groupDefinition = new SortGroupDefn();
+            var detFields = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn()
+            };
+            var totalFields = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn(),
+                new SortFieldDefn()
+            };
+            var customIntArray = new int[2, 3]
+            {
+                { 1, 1, 1 },
+                { 4, 4, 4 }
+            };
+
+            privateObject.SetFieldOrProperty("m_initial_zoom", nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty("m_loadmsg", nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty("m_loaddatareturn", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_lowlevelDataCount", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_PI_Count", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_GotAllPIs", nonPublicInstance, false);
+            privateObject.SetFieldOrProperty("m_apply_target", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_detShowToLevel", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_totShowToLevel", nonPublicInstance, DummyInt);
+            privateObject.SetFieldOrProperty("m_SnGFids", nonPublicInstance, customIntArray);
+            privateObject.SetFieldOrProperty("m_SnGAsc", nonPublicInstance, customIntArray);
+            privateObject.SetFieldOrProperty("m_SnGGrp", nonPublicInstance, customIntArray);
+            privateObject.SetFieldOrProperty("m_TotFields", nonPublicInstance, totalFields);
+            privateObject.SetFieldOrProperty("m_DetFields", nonPublicInstance, detFields);
+
+            // Act
+            testObject.GetSortAndGroup(ref groupDefinition);
+
+            // Assert
+            groupDefinition.ShouldSatisfyAllConditions(
+                () => groupDefinition.ViewZoomTo.ShouldBe(DummyString),
+                () => groupDefinition.errMsg.ShouldBe(DummyString),
+                () => groupDefinition.LoadReturnCode.ShouldBe(DummyInt),
+                () => groupDefinition.HaveLowlevelData.ShouldBe(DummyInt),
+                () => groupDefinition.NumPIs.ShouldBe(DummyInt),
+                () => groupDefinition.MissingPIs.ShouldBe(1),
+                () => groupDefinition.TotalsCmp.ShouldBe(1),
+                () => groupDefinition.DetFields.Length.ShouldBe(1),
+                () => groupDefinition.TotFields.Length.ShouldBe(2),
+                () => groupDefinition.DetRows.Count(x => x.fid.Equals(1)).ShouldBe(3),
+                () => groupDefinition.TotRows.Count(x => x.fid.Equals(4)).ShouldBe(3),
+                () => groupDefinition.DetRows.Count(x => x.decf.Equals(1)).ShouldBe(3),
+                () => groupDefinition.TotRows.Count(x => x.decf.Equals(4)).ShouldBe(3),
+                () => groupDefinition.DetRows.Count(x => x.grpf.Equals(1)).ShouldBe(3),
+                () => groupDefinition.TotRows.Count(x => x.grpf.Equals(4)).ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void SetSortAndGroup_WhenCalled_Returns()
+        {
+            // Arrange
+            const int value1 = 4;
+            const int value2 = 10;
+            var validations = 0;
+            var detRowDefn = new SortRowDefn()
+            {
+                fid = value1,
+                decf = value1,
+                grpf = value1
+            };
+            var totRowDefn = new SortRowDefn()
+            {
+                fid = value2,
+                decf = value2,
+                grpf = value2
+            };
+            var groupDefinition = new SortGroupDefn()
+            {
+                DetShowToLevel = DummyInt,
+                TotShowToLevel = DummyInt,
+                DetRows = new SortRowDefn[3]
+                {
+                    detRowDefn,
+                    detRowDefn,
+                    detRowDefn,
+                },
+                TotRows = new SortRowDefn[3]
+                {
+                    totRowDefn,
+                    totRowDefn,
+                    totRowDefn,
+                }
+            };
+            var customIntArray = new int[2, 3];
+
+            ShimModelCache.AllInstances.ProcessAndCreateDistplayLists = _ =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty("bottomgridlayoutcache", nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty("m_SnGFids", nonPublicInstance, customIntArray);
+            privateObject.SetFieldOrProperty("m_SnGAsc", nonPublicInstance, customIntArray);
+            privateObject.SetFieldOrProperty("m_SnGGrp", nonPublicInstance, customIntArray);
+
+            // Act
+            privateObject.Invoke(SetSortAndGroupMethodName, publicInstance, new object[] { groupDefinition });
+            var detShowToLevel = (int)privateObject.GetFieldOrProperty("m_detShowToLevel", nonPublicInstance);
+            var totShowToLevel = (int)privateObject.GetFieldOrProperty("m_totShowToLevel", nonPublicInstance);
+            var layoutCache = (string)privateObject.GetFieldOrProperty("bottomgridlayoutcache", nonPublicInstance);
+            var fids = (int[,])privateObject.GetFieldOrProperty("m_SnGFids", nonPublicInstance);
+            var ascs = (int[,])privateObject.GetFieldOrProperty("m_SnGAsc", nonPublicInstance);
+            var groups = (int[,])privateObject.GetFieldOrProperty("m_SnGGrp", nonPublicInstance);
+
+            // Assert
+            detShowToLevel.ShouldSatisfyAllConditions(
+                () => detShowToLevel.ShouldBe(DummyInt),
+                () => totShowToLevel.ShouldBe(DummyInt),
+                () => layoutCache.ShouldBe(string.Empty),
+                () => fids[0, 2].ShouldBe(value1),
+                () => fids[1, 2].ShouldBe(value2),
+                () => ascs[0, 2].ShouldBe(value1),
+                () => ascs[1, 2].ShouldBe(value2),
+                () => groups[0, 2].ShouldBe(value1),
+                () => groups[1, 2].ShouldBe(value2),
+                () => validations.ShouldBe(1));
         }
     }
 }
