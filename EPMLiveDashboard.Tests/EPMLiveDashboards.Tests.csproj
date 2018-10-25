@@ -71,6 +71,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
+      <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
+      <Name>EPMLive.TestFakes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
       <Project>{C773AE44-F066-446A-9CBD-D24AFA794E34}</Project>
       <Name>EPMLiveCore</Name>
