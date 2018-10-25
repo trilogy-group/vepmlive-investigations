@@ -712,7 +712,6 @@ namespace EPMLiveCore.Tests.API
 
             // Assert
             result.ShouldNotBeNullOrEmpty();
-
         }
 
         [TestMethod]
@@ -974,7 +973,6 @@ namespace EPMLiveCore.Tests.API
                     };
                 }
             };
-            
 
             // Act
             Action action = () => privateType.InvokeStatic(ValidateSetNotificationFlagsInputDataMethodName, xDocument);
