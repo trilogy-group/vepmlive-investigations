@@ -34,6 +34,8 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         private const string GetFilterGridDataMethodName = "GetFilterGridData";
         private const string SetFilterDataMethodName = "SetFilterData";
         private const string IsFilteredMethodName = "IsFiltered";
+        private const string GetTotalGridLayoutMethodName = "GetTotalGridLayout";
+        private const string GetCTCmpGridDataMethodName = "GetCTCmpGridData";
 
         [TestMethod]
         public void GetBottomGrid_WhenCalled_Returns()
@@ -718,6 +720,58 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void GetTotalGridLayout_WhenCalled_ReturnsString()
+        {
+            // Arrange and Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetTotalGridLayoutMethodName, publicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Element("Grid").Element("Toolbar").Attribute("Visible").Value.ShouldBe("0"),
+                () => actual.Element("Grid").Element("Panel").Attribute("Visible").Value.ShouldBe("1"),
+                () => actual.Element("Grid").Element("Cfg").Attribute("MainCol").Value.ShouldBe("Filtering"),
+                () => actual.Element("Grid").Element("LeftCols").Elements("C").Count(x => x.Attribute("Name").Value.Equals("Filtering")).ShouldBe(1),
+                () => actual.Element("Grid").Element("Header").Attribute("Filtering").Value.ShouldBe("Filter"));
+        }
+
+        [TestMethod]
+        public void GetCTCmpGridData_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            var filteredList = new List<DataItem>()
+            {
+                new DataItem()
+                {
+                    level = DummyInt,
+                    Name = DummyString,
+                    bSelected = true
+                },
+                new DataItem()
+                {
+                    level = DummyInt,
+                    Name = DummyString,
+                    bSelected = true
+                },
+                new DataItem()
+                {
+                    level = DummyInt,
+                    Name = DummyString,
+                    bSelected = true
+                }
+            };
+
+            privateObject.SetFieldOrProperty("m_CTARoot", nonPublicInstance, filteredList);
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetCTCmpGridDataMethodName, publicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Element("Grid").Element("Cfg").Attribute("FilterEmpty").Value.ShouldBe("1"),
+                () => actual.Element("Grid").Element("Body").Element("I").Elements("I").Count(x => x.Attribute("Filtering").Value.Equals(DummyString)).ShouldBe(3));
         }
     }
 }
