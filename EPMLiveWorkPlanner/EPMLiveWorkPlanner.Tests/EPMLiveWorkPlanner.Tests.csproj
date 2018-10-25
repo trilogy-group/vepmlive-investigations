@@ -76,6 +76,10 @@
     <Compile Include="WorkPlannerAPITests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
+      <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
+      <Name>EPMLive.TestFakes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveWorkPlanner\EPMLiveWorkPlanner.csproj">
       <Project>{FCF0C151-0A3F-4B9F-9327-3BBBF109D776}</Project>
       <Name>EPMLiveWorkPlanner</Name>
