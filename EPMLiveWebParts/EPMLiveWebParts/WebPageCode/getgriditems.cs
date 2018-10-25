@@ -869,13 +869,16 @@ namespace EPMLiveWebParts
             {
                 try
                 {
-                    var HasComments = GetCommentsString(dr, "1", "2", "1", string.Empty);
+                    const string oneString = "1";
+                    const string twoString = "2";
+
+                    var hasComments = GetCommentsString(dr, oneString, twoString, oneString, string.Empty);
 
                     XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
                     XmlAttribute attrName = docXml.CreateAttribute("name");
                     attrName.Value = "HasComments";
                     ndSiteUrl.Attributes.Append(attrName);
-                    ndSiteUrl.InnerText = HasComments;
+                    ndSiteUrl.InnerText = hasComments;
                     ndNewItem.AppendChild(ndSiteUrl);
                 }
                 catch { }
@@ -1915,16 +1918,18 @@ namespace EPMLiveWebParts
                     {
                         commenters = new ArrayList(dataRow["Commenters"].ToString().Split(','));
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
                     }
                     try
                     {
                         var userValue = new SPFieldUserValue(list.ParentWeb, dataRow["Author"].ToString());
                         authorid = userValue.LookupId;
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
                     }
                     var isAssigned = false;
                     try
@@ -1939,8 +1944,9 @@ namespace EPMLiveWebParts
                             }
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
                     }
                     if (commenters.Contains(list.ParentWeb.CurrentUser.ID.ToString()) || authorid == list.ParentWeb.CurrentUser.ID || isAssigned)
                     {
@@ -1949,8 +1955,9 @@ namespace EPMLiveWebParts
                         {
                             commentersread = new ArrayList(dataRow["CommentersRead"].ToString().Split(','));
                         }
-                        catch
+                        catch (Exception ex)
                         {
+                            System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
                         }
                         if (commentersread.Contains(list.ParentWeb.CurrentUser.ID.ToString()))
                         {
