@@ -36,12 +36,13 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         private const string IsFilteredMethodName = "IsFiltered";
         private const string GetTotalGridLayoutMethodName = "GetTotalGridLayout";
         private const string GetCTCmpGridDataMethodName = "GetCTCmpGridData";
+        private const string SetCTCmpDataMethodName = "SetCTCmpData";
 
         [TestMethod]
         public void GetBottomGrid_WhenCalled_Returns()
         {
             // Arrange
-            var max = 500;
+            const int max = 500;
             var colRoot = new List<SortFieldDefn>()
             {
                 new SortFieldDefn()
@@ -95,7 +96,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         public void GetBottomGridLayout_WhenCalled_ReturnsString()
         {
             // Arrange
-            var max = 500;
+            const int max = 500;
             var colRoot = new List<SortFieldDefn>();
             var periods = new Dictionary<int, PeriodData>()
             {
@@ -126,7 +127,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         public void GetBottomGridData_WhenCalled_ReturnsString()
         {
             // Arrange
-            var max = 500;
+            const int max = 500;
             var colRoot = new List<SortFieldDefn>()
             {
                 new SortFieldDefn()
@@ -462,9 +463,9 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         public void DoCopyVersion_WhenCalled_CopiesFields()
         {
             // Arrange
-            const int from = DummyInt;
-            const int to = 2;
-            const int pi = -10;
+            const int fromValue = DummyInt;
+            const int toValue = 2;
+            const int piValue = -10;
             const int max = 500;
             var validations = 0;
             var now = DateTime.Now;
@@ -474,32 +475,32 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             };
             var scenario = new Dictionary<int, DataItem>()
             {
-                [to] = dataItem
+                [toValue] = dataItem
             };
             var detailData = new Dictionary<string, DetailRowData>()
             {
                 ["1"] = new DetailRowData(max)
                 {
-                    Scenario_ID = from,
+                    Scenario_ID = fromValue,
                     CT_ID = DummyInt,
-                    PROJECT_ID = pi,
+                    PROJECT_ID = piValue,
                     BC_UID = DummyInt,
                     BC_SEQ = DummyInt
                 }
             };
             var piData = new PIData(max)
             {
-                ScenarioID = from,
+                ScenarioID = fromValue,
                 PI_Name = DummyString,
                 oStartDate = now,
                 oFinishDate = now,
                 StartDate = now,
                 FinishDate = now,
-                PI_ID = pi
+                PI_ID = piValue
             };
             var pids = new Dictionary<string, PIData>()
             {
-                [$"{pi} {from}"] = piData
+                [$"{piValue} {fromValue}"] = piData
             };
 
             ShimModelCache.AllInstances.SetHighlevelFilterFlag = _ =>
@@ -517,7 +518,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, max);
 
             // Act
-            privateObject.Invoke(DoCopyVersionMethodName, publicInstance, new object[] { from.ToString(), to.ToString(), pi.ToString() });
+            privateObject.Invoke(DoCopyVersionMethodName, publicInstance, new object[] { fromValue.ToString(), toValue.ToString(), piValue.ToString() });
             var actualPids = (Dictionary<string, PIData>)privateObject.GetFieldOrProperty("m_PIs", nonPublicInstance);
             var actualDetails = (Dictionary<string, DetailRowData>)privateObject.GetFieldOrProperty("m_detaildata", nonPublicInstance);
 
@@ -772,6 +773,40 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             actual.ShouldSatisfyAllConditions(
                 () => actual.Element("Grid").Element("Cfg").Attribute("FilterEmpty").Value.ShouldBe("1"),
                 () => actual.Element("Grid").Element("Body").Element("I").Elements("I").Count(x => x.Attribute("Filtering").Value.Equals(DummyString)).ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void SetCTCmpData_WhenCalled_Returns()
+        {
+            // Arrange
+            var cmpData = "1 0 1";
+            var dataItemList = new List<DataItem>()
+            {
+                new DataItem()
+                {
+                    bSelected = false
+                },
+                new DataItem()
+                {
+                    bSelected = false
+                },
+                new DataItem()
+                {
+                    bSelected = false
+                }
+            };
+
+            privateObject.SetFieldOrProperty("m_CTARoot", nonPublicInstance, dataItemList);
+
+            // Act
+            privateObject.Invoke(SetCTCmpDataMethodName, publicInstance, new object[] { cmpData });
+            var actual = (List<DataItem>)privateObject.GetFieldOrProperty("m_CTARoot", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Count.ShouldBe(3),
+                () => actual.Count(x => x.bSelected).ShouldBe(2),
+                () => actual.Count(x => !x.bSelected).ShouldBe(1));
         }
     }
 }
