@@ -91,6 +91,7 @@
     <Compile Include="EventAuditTests.cs" />
     <Compile Include="DataScrubberTests.cs" />
     <Compile Include="ListRefreshTests.cs" />
+    <Compile Include="ProcessSecurityTests.cs" />
     <Compile Include="LstEventsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
