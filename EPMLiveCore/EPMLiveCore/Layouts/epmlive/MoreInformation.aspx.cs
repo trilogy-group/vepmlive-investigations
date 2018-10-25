@@ -177,6 +177,7 @@ namespace EPMLiveCore
 
             //IEnumerable<XElement> temps = dataXml.Root.Descendants("
         }
+
         public override void Dispose()
         {
             DisposePanelContentChilds();
