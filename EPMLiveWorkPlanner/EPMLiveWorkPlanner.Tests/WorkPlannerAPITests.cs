@@ -2,12 +2,36 @@
 using System.Xml;
 using System.Collections;
 using System.Data;
+using System;
+using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.SharePoint.Fakes;
+using EPMLiveWorkPlanner.Fakes;
+using Microsoft.SharePoint;
+using EPMLiveCore.Fakes;
+using System.Collections.Generic;
+using EPMLiveCore.API.Fakes;
+using System.Data.Fakes;
 
 namespace EPMLiveWorkPlanner.Tests
 {
     [TestClass()]
     public class WorkPlannerAPITests
     {
+        private IDisposable shimsContext;
+
+        [TestInitialize()]
+        public void Initialize()
+        {
+            shimsContext = ShimsContext.Create();
+            SetupShims();
+        }
+
+        [TestCleanup()]
+        public void Cleanup()
+        {
+            shimsContext?.Dispose();
+        }
+
         [TestMethod()]
         public void processTasksTest_Execute_Catch_Block()
         {
@@ -67,7 +91,7 @@ namespace EPMLiveWorkPlanner.Tests
             ndImportTask = doc.FirstChild;
             ndParent = doc.FirstChild;
             #endregion
-            
+
             //Act
             PrivateType objToTestPrivateMethod = new PrivateType(typeof(WorkPlannerAPI));
             objToTestPrivateMethod.InvokeStatic("processTasks", new object[] { ndImportTask, docRet, ndParent, docPlan, sUID, arrCols, bAllowDuplicates, curtaskuid, sResField, dsResources, sTaskType });
@@ -218,5 +242,109 @@ namespace EPMLiveWorkPlanner.Tests
             Assert.AreEqual(docRet.FirstChild.Attributes["id"].Value, "1");
             Assert.AreEqual(docRet.FirstChild.Attributes["Def"].Value, "");
         }
+
+
+        [TestMethod]
+        public void GetExternalTasks()
+        {
+            // Arrange
+            var xmlDocument = new XmlDocument();
+            var web = new ShimSPWeb
+            {
+                ListsGet = () => new ShimSPListCollection
+                {
+                    TryGetListString = name => new ShimSPList
+                    {
+                        FieldsGet = () =>
+                        {
+                            var list = new List<SPField>
+                            {
+                                new ShimSPField
+                                {
+                                    TypeGet = () => SPFieldType.User,
+                                    InternalNameGet = () => "Dummy"
+                                },
+                                new ShimSPField
+                                {
+                                    TypeGet = () => SPFieldType.Text,
+                                    HiddenGet = () => false,
+                                    InternalNameGet = () => "WBS",
+                                    ReorderableGet = () => true
+                                },
+                                new ShimSPField(new ShimSPFieldNumber() {  ShowAsPercentageGet = () => true })
+                                {
+                                    TypeGet = () => SPFieldType.Number,
+                                    HiddenGet = () => false,
+                                    InternalNameGet = () => "PercentField",
+                                    ReorderableGet = () => true
+                                },
+                                new ShimSPField(new ShimSPFieldNumber() {  ShowAsPercentageGet = () => false })
+                                {
+                                    TypeGet = () => SPFieldType.Number,
+                                    HiddenGet = () => false,
+                                    InternalNameGet = () => "NumberField",
+                                    ReorderableGet = () => true
+                                },
+                                new ShimSPField()
+                                {
+                                    TypeGet = () => SPFieldType.Boolean,
+                                    HiddenGet = () => false,
+                                    InternalNameGet = () => "BoolField",
+                                    ReorderableGet = () => true
+                                },
+                                new ShimSPField
+                                {
+                                    TypeGet = () => SPFieldType.Text,
+                                    HiddenGet = () => false,
+                                    InternalNameGet = () => "DummyID",
+                                    ReorderableGet = () => true
+                                }
+                            };
+                            return new ShimSPFieldCollection().Bind(list);
+                        }
+                    }
+                }
+            };
+            ShimReportingData.GetReportingDataSPWebStringBooleanStringString = (spWeb, list, rollup, query, orderBy) => new ShimDataTable
+            {
+                RowsGet = () => new ShimDataRowCollection
+                {
+                    GetEnumerator = () => new List<DataRow>
+                    {
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => "Dummy.Dummy"
+                        },
+                        new ShimDataRow
+                        {
+                            ItemGetString = name => "Dummy"
+                        }
+                    }.GetEnumerator()
+                }
+            };
+
+            // Act
+            var result = WorkPlannerAPI.GetExternalTasks(xmlDocument, web);
+
+            // Assert
+            //result.should
+
+        }
+
+        private void SetupShims()
+        {
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code => code();
+            ShimSPSite.ConstructorGuid = (_, guid) => { };
+            ShimSPSite.AllInstances.OpenWebGuid = (_, guid) => new ShimSPWeb();
+            ShimSPWeb.AllInstances.SiteGet = _ => new ShimSPSite();
+            ShimCoreFunctions.getLockedWebSPWeb = _ => Guid.NewGuid();
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, name) => "Dummy";
+            ShimWorkPlannerAPI.getAttributeXmlNodeString = (node, name) => "Dummy";
+            ShimWorkPlannerAPI.iGetGeneralLayoutSPWebStringXmlDocumentBoolean = (spWeb, plannerXml, data, agileLayout) => plannerXml;
+            ShimAPITeam.GetResourcePoolStringSPWeb = (xml, spWeb) => new DataTable();
+
+        }
+
+
     }
 }
