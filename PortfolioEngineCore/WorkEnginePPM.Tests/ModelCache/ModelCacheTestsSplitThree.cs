@@ -1,8 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Data.SqlClient.Fakes;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Linq;
+using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ModelDataCache;
+using ModelDataCache.Fakes;
+using PortfolioEngineCore.Fakes;
 using Shouldly;
 
 namespace WorkEnginePPM.Tests.ModelCacheTests
@@ -19,19 +29,23 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         private const string ProcessTotalsMethodName = "ProcessTotals";
         private const string CreatePsuedoTargetMethodName = "CreatePsuedoTarget";
         private const string ProcessTargetsMethodName = "ProcessTargets";
+        private const string DoCopyVersionMethodName = "DoCopyVersion";
+        private const string GetFilterGridLayoutMethodName = "GetFilterGridLayout";
+        private const string GetFilterGridDataMethodName = "GetFilterGridData";
+        private const string SetFilterDataMethodName = "SetFilterData";
+        private const string IsFilteredMethodName = "IsFiltered";
 
         [TestMethod]
         public void GetBottomGrid_WhenCalled_Returns()
         {
             // Arrange
-            const int max = 500;
-            const int fidValue = 150;
+            var max = 500;
             var colRoot = new List<SortFieldDefn>()
             {
                 new SortFieldDefn()
                 {
                     name = DummyString,
-                    fid = fidValue
+                    fid = 150
                 }
             };
             var periods = new Dictionary<int, PeriodData>()
@@ -110,14 +124,13 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         public void GetBottomGridData_WhenCalled_ReturnsString()
         {
             // Arrange
-            const int max = 500;
-            const int fidValue = 150;
+            var max = 500;
             var colRoot = new List<SortFieldDefn>()
             {
                 new SortFieldDefn()
                 {
                     name = DummyString,
-                    fid = fidValue
+                    fid = 150
                 }
             };
             var periods = new Dictionary<int, PeriodData>()
@@ -441,6 +454,270 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
                 () => actual[key].zCost.Sum().ShouldBe(500d),
                 () => actual[key].zValue.Sum().ShouldBe(5000d),
                 () => actual[key].zFTE.Sum().ShouldBe(50000d));
+        }
+
+        [TestMethod]
+        public void DoCopyVersion_WhenCalled_CopiesFields()
+        {
+            // Arrange
+            const int from = DummyInt;
+            const int to = 2;
+            const int pi = -10;
+            const int max = 500;
+            var validations = 0;
+            var now = DateTime.Now;
+            var dataItem = new DataItem()
+            {
+                Name = DummyString
+            };
+            var scenario = new Dictionary<int, DataItem>()
+            {
+                [to] = dataItem
+            };
+            var detailData = new Dictionary<string, DetailRowData>()
+            {
+                ["1"] = new DetailRowData(max)
+                {
+                    Scenario_ID = from,
+                    CT_ID = DummyInt,
+                    PROJECT_ID = pi,
+                    BC_UID = DummyInt,
+                    BC_SEQ = DummyInt
+                }
+            };
+            var piData = new PIData(max)
+            {
+                ScenarioID = from,
+                PI_Name = DummyString,
+                oStartDate = now,
+                oFinishDate = now,
+                StartDate = now,
+                FinishDate = now,
+                PI_ID = pi
+            };
+            var pids = new Dictionary<string, PIData>()
+            {
+                [$"{pi} {from}"] = piData
+            };
+
+            ShimModelCache.AllInstances.SetHighlevelFilterFlag = _ =>
+            {
+                validations += 1;
+            };
+            ShimModelCache.AllInstances.ProcessAndCreateDistplayLists = _ =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty("m_detaildata", nonPublicInstance, detailData);
+            privateObject.SetFieldOrProperty("m_PIs", nonPublicInstance, pids);
+            privateObject.SetFieldOrProperty("m_Scenario", nonPublicInstance, scenario);
+            privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, max);
+
+            // Act
+            privateObject.Invoke(DoCopyVersionMethodName, publicInstance, new object[] { from.ToString(), to.ToString(), pi.ToString() });
+            var actualPids = (Dictionary<string, PIData>)privateObject.GetFieldOrProperty("m_PIs", nonPublicInstance);
+            var actualDetails = (Dictionary<string, DetailRowData>)privateObject.GetFieldOrProperty("m_detaildata", nonPublicInstance);
+
+            // Assert
+            actualPids.ShouldSatisfyAllConditions(
+                () => actualPids.Count.ShouldBe(2),
+                () => actualDetails.Count.ShouldBe(2),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetFilterGridLayout_WhenCalled_ReturnsString()
+        {
+            // Arrange and Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetFilterGridLayoutMethodName, publicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Element("Grid").Element("Toolbar").Attribute("Visible").Value.ShouldBe("0"),
+                () => actual.Element("Grid").Element("Panel").Attribute("Visible").Value.ShouldBe("1"),
+                () => actual.Element("Grid").Element("Cfg").Attribute("MainCol").Value.ShouldBe("Filtering"),
+                () => actual.Element("Grid").Element("LeftCols").Elements("C").Count(x => x.Attribute("Name").Value.Equals("Filtering")).ShouldBe(1),
+                () => actual.Element("Grid").Element("Header").Attribute("Filtering").Value.ShouldBe("Filter"));
+        }
+
+        [TestMethod]
+        public void GetFilterGridData_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            var filteredList = new List<DataItem>()
+            {
+                new DataItem()
+                {
+                    level = DummyInt,
+                    Name = DummyString,
+                    bSelected = true
+                },
+                new DataItem()
+                {
+                    level = DummyInt,
+                    Name = DummyString,
+                    bSelected = true
+                },
+                new DataItem()
+                {
+                    level = DummyInt,
+                    Name = DummyString,
+                    bSelected = true
+                }
+            };
+
+            privateObject.SetFieldOrProperty("m_filterList", nonPublicInstance, filteredList);
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetFilterGridDataMethodName, publicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Element("Grid").Element("Cfg").Attribute("FilterEmpty").Value.ShouldBe("1"),
+                () => actual.Element("Grid").Element("Body").Element("I").Elements("I").Count(x => x.Attribute("Filtering").Value.Equals(DummyString)).ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void SetFilterData_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            var validations = 0;
+            var filteredData = "1 0 1";
+            var dataItem = new DataItem()
+            {
+                level = DummyInt,
+                Name = DummyString,
+                bSelected = true,
+                UID = DummyInt
+            };
+            var filteredList = new List<DataItem>()
+            {
+                dataItem,
+                dataItem,
+                dataItem
+            };
+            var scenario = new Dictionary<int, DataItem>()
+            {
+                [1] = dataItem,
+                [2] = dataItem,
+                [3] = dataItem,
+            };
+
+            ShimModelCache.AllInstances.SetHighlevelFilterFlag = _ =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty("m_filterList", nonPublicInstance, filteredList);
+            privateObject.SetFieldOrProperty("m_Scenario", nonPublicInstance, scenario);
+
+            // Act
+            var actual = (string)privateObject.Invoke(SetFilterDataMethodName, publicInstance, new object[] { filteredData });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe($"{DummyInt},{DummyInt},{DummyInt}"),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void IsFiltered_GroupCondition1_Returns()
+        {
+            // Arrange
+            var filteredList = new List<DataItem>()
+            {
+                new DataItem()
+                {
+                    level = DummyInt,
+                    Name = DummyString,
+                    bSelected = true,
+                    bAllSelected = false,
+                    UID = DummyInt,
+                    group = 1
+                }
+            };
+            var rowData = new DetailRowData(50)
+            {
+                PROJECT_ID = 1,
+                TXVal = (new object[50]).Select(x => DummyString).ToArray()
+            };
+
+            privateObject.SetFieldOrProperty("m_filterRoot", nonPublicInstance, filteredList);
+            privateObject.SetFieldOrProperty("m_selcln", nonPublicInstance, new Dictionary<string, DataItem>());
+
+            // Act
+            var actual = (bool)privateObject.Invoke(IsFilteredMethodName, nonPublicInstance, new object[] { rowData });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void IsFiltered_GroupCondition2_Returns()
+        {
+            // Arrange
+            var filteredList = new List<DataItem>()
+            {
+                new DataItem()
+                {
+                    level = DummyInt,
+                    Name = DummyString,
+                    bSelected = true,
+                    bAllSelected = false,
+                    UID = DummyInt,
+                    group = 11811
+                }
+            };
+            var rowData = new DetailRowData(50)
+            {
+                PROJECT_ID = 1,
+                TXVal = (new object[50]).Select(x => DummyString).ToArray()
+            };
+
+            privateObject.SetFieldOrProperty("m_filterRoot", nonPublicInstance, filteredList);
+            privateObject.SetFieldOrProperty("m_selcln", nonPublicInstance, new Dictionary<string, DataItem>());
+
+            // Act
+            var actual = (bool)privateObject.Invoke(IsFilteredMethodName, nonPublicInstance, new object[] { rowData });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void IsFiltered_SelectedTrue_ReturnsTrue()
+        {
+            // Arrange
+            var filteredList = new List<DataItem>()
+            {
+                new DataItem()
+                {
+                    level = DummyInt,
+                    Name = DummyString,
+                    bSelected = true,
+                    bAllSelected = true,
+                    UID = DummyInt,
+                    group = 1
+                }
+            };
+            var rowData = new DetailRowData(50)
+            {
+                PROJECT_ID = 1,
+                TXVal = (new object[50]).Select(x => DummyString).ToArray()
+            };
+
+            privateObject.SetFieldOrProperty("m_filterRoot", nonPublicInstance, filteredList);
+            privateObject.SetFieldOrProperty("m_selcln", nonPublicInstance, new Dictionary<string, DataItem>());
+
+            // Act
+            var actual = (bool)privateObject.Invoke(IsFilteredMethodName, nonPublicInstance, new object[] { rowData });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBeTrue());
         }
     }
 }
