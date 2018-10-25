@@ -1,16 +1,17 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Xml;
+﻿using System;
 using System.Collections;
-using System.Data;
-using System;
-using Microsoft.QualityTools.Testing.Fakes;
-using Microsoft.SharePoint.Fakes;
-using EPMLiveWorkPlanner.Fakes;
-using Microsoft.SharePoint;
-using EPMLiveCore.Fakes;
 using System.Collections.Generic;
-using EPMLiveCore.API.Fakes;
+using System.Data;
 using System.Data.Fakes;
+using System.Xml;
+using EPMLiveCore.API.Fakes;
+using EPMLiveCore.Fakes;
+using EPMLiveWorkPlanner.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Fakes;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Shouldly;
 
 namespace EPMLiveWorkPlanner.Tests
 {
@@ -23,7 +24,6 @@ namespace EPMLiveWorkPlanner.Tests
         public void Initialize()
         {
             shimsContext = ShimsContext.Create();
-            SetupShims();
         }
 
         [TestCleanup()]
@@ -243,11 +243,14 @@ namespace EPMLiveWorkPlanner.Tests
             Assert.AreEqual(docRet.FirstChild.Attributes["Def"].Value, "");
         }
 
-
         [TestMethod]
-        public void GetExternalTasks()
+        public void GetExternalTasks_Should_ExecuteCorrectly()
         {
             // Arrange
+            SetupShims();
+            const string DummyString = "Dummy";
+            const string PercentField = "PercentField";
+            const string NumberField = "NumberField";
             var xmlDocument = new XmlDocument();
             var web = new ShimSPWeb
             {
@@ -262,7 +265,7 @@ namespace EPMLiveWorkPlanner.Tests
                                 new ShimSPField
                                 {
                                     TypeGet = () => SPFieldType.User,
-                                    InternalNameGet = () => "Dummy"
+                                    InternalNameGet = () => DummyString
                                 },
                                 new ShimSPField
                                 {
@@ -275,14 +278,14 @@ namespace EPMLiveWorkPlanner.Tests
                                 {
                                     TypeGet = () => SPFieldType.Number,
                                     HiddenGet = () => false,
-                                    InternalNameGet = () => "PercentField",
+                                    InternalNameGet = () => PercentField,
                                     ReorderableGet = () => true
                                 },
                                 new ShimSPField(new ShimSPFieldNumber() {  ShowAsPercentageGet = () => false })
                                 {
                                     TypeGet = () => SPFieldType.Number,
                                     HiddenGet = () => false,
-                                    InternalNameGet = () => "NumberField",
+                                    InternalNameGet = () => NumberField,
                                     ReorderableGet = () => true
                                 },
                                 new ShimSPField()
@@ -296,7 +299,7 @@ namespace EPMLiveWorkPlanner.Tests
                                 {
                                     TypeGet = () => SPFieldType.Text,
                                     HiddenGet = () => false,
-                                    InternalNameGet = () => "DummyID",
+                                    InternalNameGet = () => $"{DummyString}ID",
                                     ReorderableGet = () => true
                                 }
                             };
@@ -313,22 +316,30 @@ namespace EPMLiveWorkPlanner.Tests
                     {
                         new ShimDataRow
                         {
-                            ItemGetString = name => "Dummy.Dummy"
+                            ItemGetString = name => $"{DummyString}.{DummyString}"
                         },
                         new ShimDataRow
                         {
-                            ItemGetString = name => "Dummy"
+                            ItemGetString = name => DummyString
                         }
                     }.GetEnumerator()
                 }
+            };
+            var expectedContent = new List<string>
+            {
+                "<Actions OnClickCell=\"ClearSelection,SelectRow\" />",
+                $"<I Def=\"Task\" PercentField=\"\" Dummy=\"\" WBS=\"{DummyString}\" " +
+                $"NumberField=\"{DummyString}\" BoolField=\"0\" id=\"{DummyString}\" />",
+                "<Cfg id=\"WorkPlannerGrid\" SuppressCfg=\"1\" DateStrings=\"2\" ConstWidth=\"0\" ConstHeight=\"1\" Editing=\"0\" Dragging=\"0\" />"
             };
 
             // Act
             var result = WorkPlannerAPI.GetExternalTasks(xmlDocument, web);
 
             // Assert
-            //result.should
-
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => expectedContent.ForEach(p => result.ShouldContainWithoutWhitespace(p)));
         }
 
         private void SetupShims()
@@ -342,9 +353,6 @@ namespace EPMLiveWorkPlanner.Tests
             ShimWorkPlannerAPI.getAttributeXmlNodeString = (node, name) => "Dummy";
             ShimWorkPlannerAPI.iGetGeneralLayoutSPWebStringXmlDocumentBoolean = (spWeb, plannerXml, data, agileLayout) => plannerXml;
             ShimAPITeam.GetResourcePoolStringSPWeb = (xml, spWeb) => new DataTable();
-
         }
-
-
     }
 }
