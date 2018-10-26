@@ -13373,17 +13373,14 @@ namespace EPMLiveCore.ReportHelper
         public void AUT_ReportData_AddColumnValues_Method_Call_Parameters_Count_Verification_Test()
         {
             // Arrange
-            var methodInfo = new[] { GetMethodInfo(MethodAddColumnValues, 0), GetMethodInfo(MethodAddColumnValues, 1) };
-            const int parametersCount = 5;
-            const int parametersCount1 = 6;
+            var methodInfo = GetMethodInfo(MethodAddColumnValues, 0);
+            const int parametersCount = 6;
 
             // Act
-            var parameters = new[] { methodInfo[0].GetParameters().Length, methodInfo[1].GetParameters().Length };
+            var parameters = methodInfo.GetParameters();
 
             // Assert
-            this.ShouldSatisfyAllConditions(
-                () => parameters.ShouldContain(parametersCount),
-                () => parameters.ShouldContain(parametersCount1));
+            parameters.Length.ShouldBe(parametersCount);
         }
 
         #endregion
@@ -13519,6 +13516,26 @@ namespace EPMLiveCore.ReportHelper
             // Assert
             methodInfo.ShouldNotBeNull();
             result.ShouldBeNull();
+        }
+
+        #endregion
+
+        #region Method Call : (AddColumnValues) (Return Type : string) Parameters Count verify
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_ReportData_AddColumnValues_Method_Call_Overloading_Of_1_Parameters_Count_Verification_Test()
+        {
+            // Arrange
+            var methodInfo = GetMethodInfo(MethodAddColumnValues, 1);
+            const int parametersCount = 5;
+
+            // Act
+            var parameters = methodInfo.GetParameters();
+
+            // Assert
+            parameters.Length.ShouldBe(parametersCount);
         }
 
         #endregion
