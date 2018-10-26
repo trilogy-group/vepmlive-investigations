@@ -73,5 +73,17 @@ namespace EPMLiveCore.API
                 return false;
             }
         }
+
+        private static bool AlreadyDisplayed(List<string[]> items, string[] item)
+        {
+            foreach (var pair in items)
+            {
+                if (pair[0].Equals(item[0]) && pair[1].Equals(item[1]))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

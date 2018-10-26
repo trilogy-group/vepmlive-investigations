@@ -23,6 +23,7 @@ namespace EPMLiveCore.Tests.API.Comments
         private PrivateType _privateType;
         private PrivateObject _privateObject;
         private const string GetXMLSafeVersionMethodName = "GetXMLSafeVersion";
+        private const string AlreadyDisplayedMethodName = "AlreadyDisplayed";
         private const string ContainsItemMethodName = "ContainsItem";
         private const string SendEmailNotificationMethodName = "SendEmailNotification";
         private const string SetSocialEngineTransactionMethodName = "SetSocialEngineTransaction";
@@ -1107,6 +1108,26 @@ namespace EPMLiveCore.Tests.API.Comments
 
             // Act
             var result = _privateType.InvokeStatic(ContainsItemMethodName, items, item) as bool?;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Value.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void AlreadyDisplayed_WithExpectedValue_ReturnsTrue()
+        {
+            // Arrange
+            var items = new List<string[]>
+            {
+                new string[]{ "1", "2" },
+                new string[]{ "2", "1" }
+            };
+            var item = new string[] { "2", "1" };
+
+            // Act
+            var result = _privateType.InvokeStatic(AlreadyDisplayedMethodName, items, item) as bool?;
 
             // Assert
             result.ShouldSatisfyAllConditions(
