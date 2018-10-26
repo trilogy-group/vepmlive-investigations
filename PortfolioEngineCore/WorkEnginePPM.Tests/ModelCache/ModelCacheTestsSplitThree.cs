@@ -63,10 +63,23 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         private const string BuildCustFieldJSonMethodName = "BuildCustFieldJSon";
         private const string RatesAndCategoryMethodName = "RatesAndCategory";
         private const string PrepareTargetDataMethodName = "PrepareTargetData";
+        private const string LoadVersionTargetDataMethodName = "LoadVersionTargetData";
+        private const string GetTargetGridLayoutMethodName = "GetTargetGridLayout";
+        private const string GetTargetGridDataMethodName = "GetTargetGridData";
 
         private void SetupListsAndDictionaries()
         {
-            periods = new Dictionary<int, PeriodData>();
+            periods = new Dictionary<int, PeriodData>()
+            {
+                [One] = new PeriodData()
+                {
+                    PeriodName = DummyString
+                },
+                [Two] = new PeriodData()
+                {
+                    PeriodName = DummyString
+                }
+            };
             costCat = new Dictionary<int, CatItemData>()
             {
                 [One] = new CatItemData(Max)
@@ -83,7 +96,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
                     MC_Val = DummyString,
                     Role_Name = DummyString,
                 },
-                [2] = new CatItemData(Max)
+                [Two] = new CatItemData(Max)
                 {
                     ID = Two,
                     UID = Two,
@@ -163,6 +176,8 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
                     BC_UID = One,
                     CT_ID = One,
                     m_rt = One,
+                    Text_OCVal = (new object[6]).Select(x => DummyString).ToArray(),
+                    TXVal = (new object[6]).Select(x => DummyString).ToArray()
                 },
                 [Two.ToString()] = new DetailRowData(Max)
                 {
@@ -170,6 +185,8 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
                     BC_UID = Two,
                     CT_ID = Two,
                     m_rt = Two,
+                    Text_OCVal = (new object[6]).Select(x => DummyString).ToArray(),
+                    TXVal = (new object[6]).Select(x => DummyString).ToArray()
                 }
             };
             rates = new Dictionary<int, RateTable>()
@@ -2000,6 +2017,101 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
                 () => csTargetData.targetRows.Length.ShouldBe(1),
                 () => csTargetData.targetRows[0].BC_UID.ShouldBe(One),
                 () => validations.ShouldBe(6));
+        }
+
+        [TestMethod]
+        public void LoadVersionTargetData_WhenCalled_SetsCsTargetData()
+        {
+            // Arrange
+            var validations = 0;
+            var sqlConnection = default(SqlConnection);
+            var csTargetData = new CSTargetData();
+
+            dataItemDictionary[One].bLoaded = false;
+
+            ShimModelCache.AllInstances.LoadScenariosSqlConnectionStringBooleanBoolean = (_, _1, _2, _3, _4) =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty("m_Scenario", nonPublicInstance, dataItemDictionary);
+            privateObject.SetFieldOrProperty("m_detaildata", nonPublicInstance, targetData);
+
+            // Act
+            testObject.LoadVersionTargetData(sqlConnection, One, ref csTargetData);
+
+            // Assert
+            csTargetData.ShouldSatisfyAllConditions(
+                () => csTargetData.targetRows.Length.ShouldBe(1),
+                () => csTargetData.targetRows[0].CT_ID.ShouldBe(One),
+                () => csTargetData.targetRows[0].BC_UID.ShouldBe(One),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetTargetGridLayout_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            var filter = (new object[10]).Select(x => dataItemDictionary).ToArray();
+
+            privateObject.SetFieldOrProperty("m_filter_sel", nonPublicInstance, filter);
+            privateObject.SetFieldOrProperty("m_Periods", nonPublicInstance, periods);
+            privateObject.SetFieldOrProperty("m_CustFields", nonPublicInstance, customFields);
+            privateObject.SetFieldOrProperty("m_Rates", nonPublicInstance, rates);
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetTargetGridLayoutMethodName, publicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("Grid")
+                    .Element("Toolbar")
+                    .Attribute("Visible")
+                    .Value
+                    .ShouldBe("0"),
+                () => actual
+                    .Element("Grid")
+                    .Element("LeftCols")
+                    .Elements("C")
+                    .Where(x => x.Attribute("Name") != null)
+                    .Count(x => x.Attribute("Name").Value.Equals($"z{DummyString}"))
+                    .ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetTargetGridData_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            var targetList = targetData.Values.ToList();
+
+            customFields[One].FieldID = 11801;
+            customFields[Two].FieldID = 11811;
+
+            privateObject.SetFieldOrProperty("m_editTargetList", nonPublicInstance, targetList);
+            privateObject.SetFieldOrProperty("m_Periods", nonPublicInstance, periods);
+            privateObject.SetFieldOrProperty("m_CustFields", nonPublicInstance, customFields);
+            privateObject.SetFieldOrProperty("m_Rates", nonPublicInstance, rates);
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetTargetGridDataMethodName, publicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("Grid")
+                    .Element("Cfg")
+                    .Attribute("FilterEmpty")
+                    .Value
+                    .ShouldBe("1"),
+                () => actual
+                    .Element("Grid")
+                    .Element("Body")
+                    .Element("I")
+                    .Elements("I")
+                    .Where(x => x.Attribute($"z{DummyString}") != null)
+                    .Count(x => x.Attribute($"z{DummyString}").Value.Equals(DummyString))
+                    .ShouldBe(2));
         }
     }
 }
