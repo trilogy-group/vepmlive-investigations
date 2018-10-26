@@ -74,7 +74,7 @@ namespace PortfolioEngineCore
         {
             editMode = -1;
             inputCalendar = -1;
-            var cmdText = "SELECT CT_NAME,CT_EDIT_MODE,CT_CB_ID FROM EPGP_COST_TYPES Where CT_ID=@CTID";
+            const string cmdText = "SELECT CT_NAME,CT_EDIT_MODE,CT_CB_ID FROM EPGP_COST_TYPES Where CT_ID=@CTID";
             using (var sqlCommand = new SqlCommand(cmdText, dba.Connection))
             {
                 sqlCommand.Parameters.AddWithValue("@CTID", ctId);
@@ -161,7 +161,7 @@ namespace PortfolioEngineCore
             if (!toBeProcessedPIs.Any())
             {
                 allPIs = true;
-                var cmdText = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE PROJECT_MARKED_DELETION = 0";
+                const string cmdText = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE PROJECT_MARKED_DELETION = 0";
                 using (var sqlCommand = new SqlCommand(cmdText, dba.Connection))
                 {
                     SqlDataReader reader;
