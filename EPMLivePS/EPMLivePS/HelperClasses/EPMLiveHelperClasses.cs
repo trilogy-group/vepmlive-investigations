@@ -74,9 +74,13 @@ namespace EPMLiveEnterprise
             }
             catch (Exception ex)
             {
-                EventLog myLog = new EventLog("EPM Live", ".", "EPM Live Helper");
-                myLog.WriteEntry("Error at GetResourceGuidByWindowsAccount: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 401);
-                return new Guid();
+                Trace.WriteLine(ex.ToString());
+
+                using (var myLog = new EventLog("EPM Live", ".", "EPM Live Helper"))
+                {
+                    myLog.WriteEntry("Error at GetResourceGuidByWindowsAccount: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 401);
+                    return new Guid();
+                }
             }
         }
 
