@@ -216,11 +216,13 @@ namespace EPMLiveCore.API.Integration
                         prov.GenerateCodeFromNamespace(nameSpace, stringWriter, new CodeGeneratorOptions());
 
                         var assemblyReferences = new string[2] { "System.Web.Services.dll", "System.Xml.dll" };
-                        var param = new CompilerParameters(assemblyReferences);
-                        param.GenerateExecutable = false;
-                        param.GenerateInMemory = true;
-                        param.TreatWarningsAsErrors = false;
-                        param.WarningLevel = 4;
+                        var param = new CompilerParameters(assemblyReferences)
+                        {
+                            GenerateExecutable = false,
+                            GenerateInMemory = true,
+                            TreatWarningsAsErrors = false,
+                            WarningLevel = 4,
+                        };
 
                         var results = new CompilerResults(new TempFileCollection());
                         results = prov.CompileAssemblyFromDom(param, codeCompileUnit);
