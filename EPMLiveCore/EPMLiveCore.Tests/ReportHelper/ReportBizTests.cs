@@ -813,8 +813,8 @@ namespace EPMLiveCore.Tests.ReportHelper
                 ItemGetGuid = guid =>
                 {
                     return guid == lookupId
-                            ? new ShimSPList()
-                            : null;
+                        ? new ShimSPList()
+                        : null;
                 }
             };
             ShimSPSite.AllInstances.AllWebsGet = _ =>
@@ -902,8 +902,8 @@ namespace EPMLiveCore.Tests.ReportHelper
                 ItemGetGuid = guid =>
                 {
                     return guid == lookupId
-                            ? new ShimSPList()
-                            : null;
+                        ? new ShimSPList()
+                        : null;
                 }
             };
             ShimSPSite.AllInstances.AllWebsGet = _ =>
