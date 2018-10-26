@@ -2,13 +2,8 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
-using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ModelDataCache;
 using ModelDataCache.Fakes;
@@ -19,6 +14,16 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
 {
     public partial class ModelCacheTests
     {
+        private Dictionary<int, CatItemData> costCat;
+        private Dictionary<int, DataItem> dataItemDictionary;
+        private Dictionary<int, ListItemData> listItems;
+        private Dictionary<int, CustomFieldData> customFields;
+        private Dictionary<int, PeriodData> periods;
+        private Dictionary<string, DetailRowData> targetData;
+        private Dictionary<int, RateTable> rates;
+        private const int max = 500;
+        private const int one = 1;
+        private const int two = 2;
         private const string GetBottomGridMethodName = "GetBottomGrid";
         private const string GetBottomGridLayoutMethodName = "GetBottomGridLayout";
         private const string GetBottomGridDataMethodName = "GetBottomGridData";
@@ -51,12 +56,139 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         private const string GetTargetsMethodName = "GetTargets";
         private const string SaveVersionMethodName = "SaveVersion";
         private const string GetPeriodsandVersionsMethodName = "GetPeriodsandVersions";
+        private const string SetPeriodsandVersionsMethodName = "SetPeriodsandVersions";
+        private const string DeleteTargetMethodName = "DeleteTarget";
+        private const string CreateTargetMethodName = "CreateTarget";
+        private const string BuildCatJSonMethodName = "BuildCatJSon";
+        private const string BuildCustFieldJSonMethodName = "BuildCustFieldJSon";
+        private const string RatesAndCategoryMethodName = "RatesAndCategory";
+        private const string PrepareTargetDataMethodName = "PrepareTargetData";
+
+        private void SetupListsAndDictionaries()
+        {
+            periods = new Dictionary<int, PeriodData>();
+            costCat = new Dictionary<int, CatItemData>()
+            {
+                [one] = new CatItemData(max)
+                {
+                    ID = one,
+                    UID = one,
+                    Level = one,
+                    Role_UID = one,
+                    MC_UID = one,
+                    Category = one,
+                    Name = DummyString,
+                    UoM = DummyString,
+                    FullName = DummyString,
+                    MC_Val = DummyString,
+                    Role_Name = DummyString,
+                },
+                [2] = new CatItemData(max)
+                {
+                    ID = two,
+                    UID = two,
+                    Level = two,
+                    Role_UID = two,
+                    MC_UID = two,
+                    Category = two,
+                    Name = DummyString,
+                    UoM = DummyString,
+                    FullName = DummyString,
+                    MC_Val = DummyString,
+                    Role_Name = DummyString,
+                }
+            };
+            dataItemDictionary = new Dictionary<int, DataItem>()
+            {
+                [one] = new DataItem()
+                {
+                    UID = one,
+                    Name = DummyString
+                },
+                [two] = new DataItem()
+                {
+                    UID = two,
+                    Name = DummyString
+                }
+            };
+            listItems = new Dictionary<int, ListItemData>()
+            {
+                [one] = new ListItemData()
+                {
+                    ID = one,
+                    UID = one,
+                    Level = one,
+                    Name = DummyString,
+                    FullName = DummyString,
+                    InActive = true
+                },
+                [two] = new ListItemData()
+                {
+                    ID = two,
+                    UID = two,
+                    Level = two,
+                    Name = DummyString,
+                    FullName = DummyString,
+                    InActive = true
+                }
+            };
+            customFields = new Dictionary<int, CustomFieldData>()
+            {
+                [one] = new CustomFieldData()
+                {
+                    FieldID = one,
+                    LookupOnly = one,
+                    LookupID = one,
+                    LeafOnly = one,
+                    UseFullName = one,
+                    Name = DummyString,
+                    ListItems = listItems
+                },
+                [two] = new CustomFieldData()
+                {
+                    FieldID = two,
+                    LookupOnly = two,
+                    LookupID = two,
+                    LeafOnly = two,
+                    UseFullName = two,
+                    Name = DummyString,
+                    ListItems = listItems
+                }
+            };
+            targetData = new Dictionary<string, DetailRowData>()
+            {
+                [one.ToString()] = new DetailRowData(max)
+                {
+                    Scenario_ID = one,
+                    BC_UID = one,
+                    CT_ID = one,
+                    m_rt = one,
+                },
+                [two.ToString()] = new DetailRowData(max)
+                {
+                    Scenario_ID = two,
+                    BC_UID = two,
+                    CT_ID = two,
+                    m_rt = two,
+                }
+            };
+            rates = new Dictionary<int, RateTable>()
+            {
+                [one] = new RateTable(max)
+                {
+                    Name = DummyString
+                },
+                [two] = new RateTable(max)
+                {
+                    Name = DummyString
+                }
+            };
+        }
 
         [TestMethod]
         public void GetBottomGrid_WhenCalled_Returns()
         {
             // Arrange
-            const int max = 500;
             var colRoot = new List<SortFieldDefn>()
             {
                 new SortFieldDefn()
@@ -110,7 +242,6 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         public void GetBottomGridLayout_WhenCalled_ReturnsString()
         {
             // Arrange
-            const int max = 500;
             var colRoot = new List<SortFieldDefn>();
             var periods = new Dictionary<int, PeriodData>()
             {
@@ -141,7 +272,6 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         public void GetBottomGridData_WhenCalled_ReturnsString()
         {
             // Arrange
-            const int max = 500;
             var colRoot = new List<SortFieldDefn>()
             {
                 new SortFieldDefn()
@@ -343,7 +473,6 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         public void ProcessTotals_WhenCalled_ProcessesTotals()
         {
             // Arrange
-            const int max = 500;
             var totalDetails = new Dictionary<string, DetailRowData>()
             {
                 [DummyString] = new DetailRowData(max)
@@ -384,7 +513,6 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         public void CreatePsuedoTarget_WhenCalled_SetsTarget()
         {
             // Arrange
-            const int max = 500;
             var ctaRoot = new List<DataItem>()
             {
                 new DataItem()
@@ -423,7 +551,6 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         public void ProcessTargets_WhenCalled_SetsTargets()
         {
             // Arrange
-            const int max = 500;
             const string key = "K 1";
             var totalDetails = new Dictionary<string, DetailRowData>()
             {
@@ -480,7 +607,6 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             const int fromValue = DummyInt;
             const int toValue = 2;
             const int piValue = -10;
-            const int max = 500;
             var validations = 0;
             var now = DateTime.Now;
             var dataItem = new DataItem()
@@ -1357,7 +1483,6 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         {
             // Arrange
             const string version = "1";
-            const int max = 500;
             var validations = 0;
             var sqlConnection = new SqlConnection();
             var now = DateTime.Now;
@@ -1471,6 +1596,285 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
                 () => periodsAndOptions.showCosts.ShouldBe(1),
                 () => periodsAndOptions.showRHSDecCosts.ShouldBe(1),
                 () => periodsAndOptions.Periods.Count(x => x.Id.Equals(DummyInt) && x.Name.Equals(DummyString)).ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void SetPeriodsandVersions_WhenCalled_SetsFields()
+        {
+            // Arrange
+            var validations = 0;
+            var periodsAndOptions = new PeriodsAndOptions()
+            {
+                displayStart = DummyInt,
+                displayFinish = DummyInt,
+                dragStart = DummyInt,
+                dragFinish = DummyInt,
+                showWhichQTY = 1,
+                showQTY = 1,
+                showCosts = 1,
+                showRHSDecCosts = 1,
+            };
+
+            ShimModelCache.AllInstances.ApplyUserOptions = _ =>
+            {
+                validations += 1;
+            };
+
+            // Act
+            privateObject.Invoke(SetPeriodsandVersionsMethodName, publicInstance, new object[] { periodsAndOptions });
+            var minDisplay = (int)privateObject.GetFieldOrProperty("m_display_minp", nonPublicInstance);
+            var maxDisplay = (int)privateObject.GetFieldOrProperty("m_display_maxp", nonPublicInstance);
+            var minDrag = (int)privateObject.GetFieldOrProperty("m_drag_minp", nonPublicInstance);
+            var maxDrag = (int)privateObject.GetFieldOrProperty("m_drag_maxp", nonPublicInstance);
+            var showFte = (bool)privateObject.GetFieldOrProperty("bShowFTEs", nonPublicInstance);
+            var useQty = (bool)privateObject.GetFieldOrProperty("bUseQTY", nonPublicInstance);
+            var useCosts = (bool)privateObject.GetFieldOrProperty("bUseCosts", nonPublicInstance);
+            var decCosts = (bool)privateObject.GetFieldOrProperty("m_show_rhs_dec_costs", nonPublicInstance);
+            var layoutCache = (string)privateObject.GetFieldOrProperty("bottomgridlayoutcache", nonPublicInstance);
+
+            // Assert
+            layoutCache.ShouldSatisfyAllConditions(
+                () => layoutCache.ShouldBe(string.Empty),
+                () => minDisplay.ShouldBe(DummyInt),
+                () => maxDisplay.ShouldBe(DummyInt),
+                () => minDrag.ShouldBe(DummyInt),
+                () => maxDrag.ShouldBe(DummyInt),
+                () => showFte.ShouldBeTrue(),
+                () => useQty.ShouldBeTrue(),
+                () => useCosts.ShouldBeTrue(),
+                () => decCosts.ShouldBeTrue(),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void DeleteTarget_WhenCalled_SetsTarget()
+        {
+            // Arrange
+            const string targetString = "1";
+            const int otherId = 10;
+            var validations = 0;
+            var sqlConnection = new SqlConnection();
+            var dataItem = new DataItem()
+            {
+                UID = otherId
+            };
+            var targetBefore = new List<DataItem>()
+            {
+                dataItem,
+                dataItem,
+                dataItem
+            };
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            {
+                validations += 1;
+                return 1;
+            };
+
+            privateObject.SetFieldOrProperty("m_Target", nonPublicInstance, targetBefore);
+
+            // Act
+            privateObject.Invoke(DeleteTargetMethodName, publicInstance, new object[] { sqlConnection, targetString });
+            var targetAfter = (List<DataItem>)privateObject.GetFieldOrProperty("m_Target", nonPublicInstance);
+
+            // Assert
+            targetAfter.ShouldSatisfyAllConditions(
+                () => targetAfter.Count(x => x.UID.Equals(otherId)).ShouldBe(3),
+                () => validations.ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void CreateTarget_WhenCalled_ReturnsInteger()
+        {
+            // Arrange
+            var validations = 0;
+            var readHit = 0;
+            var sqlConnection = new SqlConnection();
+            var targetBefore = new List<DataItem>();
+
+            dataReader.ItemGetInt32 = input => input;
+            dataReader.Read = () =>
+            {
+                readHit += 1;
+                validations += 1;
+                if (readHit <= 3)
+                {
+                    return true;
+                }
+                else
+                {
+                    readHit = 0;
+                }
+                return false;
+            };
+
+            ShimSqlDb.ReadIntValueObject = _ => 0;
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            {
+                validations += 1;
+                return 1;
+            };
+
+            privateObject.SetFieldOrProperty("m_Target", nonPublicInstance, targetBefore);
+
+            // Act
+            var actual = (int)privateObject.Invoke(CreateTargetMethodName, publicInstance, new object[] { sqlConnection, DummyString, DummyString, DummyInt, DummyInt });
+            var targetAfter = (List<DataItem>)privateObject.GetFieldOrProperty("m_Target", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(1),
+                () => targetAfter.Count.ShouldBe(1),
+                () => targetAfter[0].UID.ShouldBe(1),
+                () => targetAfter[0].Name.ShouldBe(DummyString),
+                () => targetAfter[0].Desc.ShouldBe(DummyString),
+                () => validations.ShouldBe(11));
+        }
+
+        [TestMethod]
+        public void BuildCatJSon_WhenCalled_Returns()
+        {
+            // Arrange
+            const int index = 0;
+            const int maxValue = 1;
+            var expected = "{Name:'1',Text:'DummyString',Value:'1'},{Name:'Level1',Expanded:-1,Level:1, Items:[ {Name:'2',Text:'DummyString',Value:'2'}]}";
+            var ratesCategrory = new CSRatesAndCategory()
+            {
+                Categories = new CSCategoryEntry[]
+                {
+                    new CSCategoryEntry()
+                    {
+                        Level = 1,
+                        ID = 1,
+                        UID = 1,
+                        Name = DummyString
+                    },
+                    new CSCategoryEntry()
+                    {
+                        Level = 2,
+                        ID = 2,
+                        UID = 2,
+                        Name = DummyString
+                    },
+                }
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(BuildCatJSonMethodName, nonPublicInstance, new object[] { ratesCategrory, index, maxValue });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void BuildCustFieldJSon_WhenCalled_Returns()
+        {
+            // Arrange
+            const int index = 0;
+            const int maxValue = 1;
+            var expected = "{Name:'1',Text:'DummyString',Value:'1'},{Name:'Level1',Expanded:-1,Level:1, Items:[ {Name:'2',Text:'DummyString',Value:'2'}]}";
+            var customFieldData = new CustomFieldData()
+            {
+                UseFullName = 1,
+                ListItems = new Dictionary<int, ListItemData>()
+                {
+                    [1] = new ListItemData()
+                    {
+                        Level = 1,
+                        ID = 1,
+                        UID = 1,
+                        Name = DummyString,
+                        FullName = DummyString,
+                    },
+                    [2] = new ListItemData()
+                    {
+                        Level = 2,
+                        ID = 2,
+                        UID = 2,
+                        Name = DummyString,
+                        FullName = DummyString
+                    },
+                }
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(BuildCustFieldJSonMethodName, nonPublicInstance, new object[] { customFieldData, index, maxValue });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void RatesAndCategory_WhenCalled_Returns()
+        {
+            // Arrange
+            const string expectedCostCatJson = "{Items:[DummyString]}";
+            const string expectedCostTypeJson = "{Items:[{Name:'0',Text:'No Cost Type',Value:'0'},{Name:'1',Text:'DummyString',Value:'1'},{Name:'2',Text:'DummyString',Value:'2'}]}";
+            var validations = 0;
+            var ratesAndCategory = new CSRatesAndCategory();
+
+            ShimModelCache.AllInstances.BuildCatJSonCSRatesAndCategoryInt32Int32 = (_, _1, _2, _3) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            privateObject.SetFieldOrProperty("m_Periods", nonPublicInstance, periods);
+            privateObject.SetFieldOrProperty("m_CostCat", nonPublicInstance, costCat);
+            privateObject.SetFieldOrProperty("m_Scenario", nonPublicInstance, dataItemDictionary);
+            privateObject.SetFieldOrProperty("m_CostTypes", nonPublicInstance, dataItemDictionary);
+            privateObject.SetFieldOrProperty("m_CustFields", nonPublicInstance, customFields);
+
+            // Act
+            testObject.RatesAndCategory(ref ratesAndCategory);
+            var costCatJson = (string)privateObject.GetFieldOrProperty("m_CostCatjsonMenu", nonPublicInstance);
+            var costTypeJson = (string)privateObject.GetFieldOrProperty("m_CostTypejsonMenu", nonPublicInstance);
+
+            // Assert
+            ratesAndCategory.ShouldSatisfyAllConditions(
+                () => costCatJson.ShouldBe(expectedCostCatJson),
+                () => costTypeJson.ShouldBe(expectedCostTypeJson),
+                () => ratesAndCategory.NamedRates.Length.ShouldBe(0),
+                () => ratesAndCategory.Categories.Count(x => x.Name.Equals(DummyString)).ShouldBe(2),
+                () => ratesAndCategory.Versions.Count(x => x.Name.Equals(DummyString)).ShouldBe(2),
+                () => ratesAndCategory.CostTypes.Count(x => x.Name.Equals(DummyString)).ShouldBe(2),
+                () => ratesAndCategory.CustomFields.Count(x => x.Name.Equals($"z{DummyString}")).ShouldBe(2),
+                () => ratesAndCategory.CustomFields[0].LookUp.Count(x => x.Name.Equals(DummyString)).ShouldBe(2),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void PrepareTargetData_WhenCalled_Returns()
+        {
+            // Arrange
+            var validations = 0;
+            var sqlConnection = new SqlConnection();
+            var csTargetData = new CSTargetData();
+
+            ShimModelCache.AllInstances.LoadTargetsSqlConnectionString = (_, _1, _2) =>
+            {
+                validations += 1;
+                return DummyInt;
+            };
+            ShimModelCache.AllInstances.GetLookUpStringInt32Int32Ref = (ModelCache instance, int index, ref int lUID) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            privateObject.SetFieldOrProperty("m_targetdata", nonPublicInstance, targetData);
+            privateObject.SetFieldOrProperty("m_CostCat", nonPublicInstance, costCat);
+            privateObject.SetFieldOrProperty("m_CostTypes", nonPublicInstance, dataItemDictionary);
+            privateObject.SetFieldOrProperty("m_Rates", nonPublicInstance, rates);
+
+            // Act
+            testObject.PrepareTargetData(sqlConnection, one, ref csTargetData);
+
+            // Assert
+            csTargetData.ShouldSatisfyAllConditions(
+                () => csTargetData.targetRows.Length.ShouldBe(1),
+                () => csTargetData.targetRows[0].BC_UID.ShouldBe(one),
+                () => validations.ShouldBe(6));
         }
     }
 }
