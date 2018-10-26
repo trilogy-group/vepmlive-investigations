@@ -195,6 +195,7 @@
     <Compile Include="API\NavigationServiceTests.cs" />
     <Compile Include="API\Notification\APIEmailTests.cs" />
     <Compile Include="API\Applications\ApplicationUninstallerTests.cs" />
+    <Compile Include="API\Notification\NotificationTests.cs" />
     <Compile Include="API\Publish\APIPublishTests.cs" />
     <Compile Include="API\Reporting\ReportingTest.cs" />
     <Compile Include="API\ResourceGrid\ResourceExporterTests.cs" />
@@ -214,6 +215,7 @@
     <Compile Include="CoreFunctionsRemTestsSplitTwo.cs" />
     <Compile Include="CoreFunctionsTest.cs" />
     <Compile Include="EditableFieldDisplayTests.cs" />
+    <Compile Include="EditInTests.cs" />
     <Compile Include="ExtensionMethodsTest.cs" />
     <Compile Include="FilteredLookup\FilteredLookupFieldEditorTests.cs" />
     <Compile Include="Infrastructure\BaseClasses\SPListItemManagerTests.cs" />
@@ -229,6 +231,7 @@
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AddListDataTests.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePoolTests.cs" />
+    <Compile Include="Layouts\epmlive\CreateNewAjaxDataHostTests.cs" />
     <Compile Include="Layouts\epmlive\AddUsersTests.cs" />
     <Compile Include="Layouts\epmlive\CreateNewWorkspaceTest.cs" />
     <Compile Include="Layouts\epmlive\CommentsTests.cs" />

@@ -104,7 +104,6 @@ namespace EPMLiveCore
         [Timeout(TestsTimeOut)]
         [Category("AUT Initializer")]
         [TestCase(Field_requestUrl)]
-        [TestCase(FieldLIST_ITEM_HTML)]
         public void AUT_CreateNewAjaxDataHost_All_Fields_Explore_Verify_By_Name_Test(string name)
         {
             // Arrange
