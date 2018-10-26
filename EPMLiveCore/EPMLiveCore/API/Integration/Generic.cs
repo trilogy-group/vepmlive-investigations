@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using EPMLiveIntegration;
-using System.Data;
+using System.CodeDom;
+using System.CodeDom.Compiler;
 using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
+using System.IO;
 using System.Net;
-using System.Web.Services;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Web.Services.Description;
 using System.Xml.Serialization;
-using System.Reflection;
-using System.CodeDom;
-using System.IO;
-using System.CodeDom.Compiler;
-using System.Text.RegularExpressions;
+using EPMLiveIntegration;
+using Microsoft.CSharp;
 
 namespace EPMLiveCore.API.Integration
 {
@@ -211,9 +210,11 @@ namespace EPMLiveCore.API.Integration
 
                 if (warnings == 0)
                 {
-                    StringWriter stringWriter = new StringWriter(System.Globalization.CultureInfo.CurrentCulture);
-                    Microsoft.CSharp.CSharpCodeProvider prov = new Microsoft.CSharp.CSharpCodeProvider();
-                    prov.GenerateCodeFromNamespace(nameSpace, stringWriter, new CodeGeneratorOptions());
+                    using (var stringWriter = new StringWriter(CultureInfo.CurrentCulture))
+                    {
+                        var prov = new CSharpCodeProvider();
+                        prov.GenerateCodeFromNamespace(nameSpace, stringWriter, new CodeGeneratorOptions());
+                    }
 
                     string[] assemblyReferences = new string[2] { "System.Web.Services.dll", "System.Xml.dll" };
                     CompilerParameters param = new CompilerParameters(assemblyReferences);
