@@ -214,21 +214,21 @@ namespace EPMLiveCore.API.Integration
                     {
                         var prov = new CSharpCodeProvider();
                         prov.GenerateCodeFromNamespace(nameSpace, stringWriter, new CodeGeneratorOptions());
+
+                        var assemblyReferences = new string[2] { "System.Web.Services.dll", "System.Xml.dll" };
+                        var param = new CompilerParameters(assemblyReferences);
+                        param.GenerateExecutable = false;
+                        param.GenerateInMemory = true;
+                        param.TreatWarningsAsErrors = false;
+                        param.WarningLevel = 4;
+
+                        var results = new CompilerResults(new TempFileCollection());
+                        results = prov.CompileAssemblyFromDom(param, codeCompileUnit);
+                        var assembly = results.CompiledAssembly;
+                        service = assembly.GetType(sdName);
+
+                        methodInfo = service.GetMethods();
                     }
-
-                    string[] assemblyReferences = new string[2] { "System.Web.Services.dll", "System.Xml.dll" };
-                    CompilerParameters param = new CompilerParameters(assemblyReferences);
-                    param.GenerateExecutable = false;
-                    param.GenerateInMemory = true;
-                    param.TreatWarningsAsErrors = false;
-                    param.WarningLevel = 4;
-
-                    CompilerResults results = new CompilerResults(new TempFileCollection());
-                    results = prov.CompileAssemblyFromDom(param, codeCompileUnit);
-                    Assembly assembly = results.CompiledAssembly;
-                    service = assembly.GetType(sdName);
-
-                    methodInfo = service.GetMethods();
                 }
 
                 return true;
