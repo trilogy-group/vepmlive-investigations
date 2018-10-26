@@ -21,9 +21,9 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         private Dictionary<int, PeriodData> periods;
         private Dictionary<string, DetailRowData> targetData;
         private Dictionary<int, RateTable> rates;
-        private const int max = 500;
-        private const int one = 1;
-        private const int two = 2;
+        private const int Max = 500;
+        private const int One = 1;
+        private const int Two = 2;
         private const string GetBottomGridMethodName = "GetBottomGrid";
         private const string GetBottomGridLayoutMethodName = "GetBottomGridLayout";
         private const string GetBottomGridDataMethodName = "GetBottomGridData";
@@ -69,28 +69,28 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             periods = new Dictionary<int, PeriodData>();
             costCat = new Dictionary<int, CatItemData>()
             {
-                [one] = new CatItemData(max)
+                [One] = new CatItemData(Max)
                 {
-                    ID = one,
-                    UID = one,
-                    Level = one,
-                    Role_UID = one,
-                    MC_UID = one,
-                    Category = one,
+                    ID = One,
+                    UID = One,
+                    Level = One,
+                    Role_UID = One,
+                    MC_UID = One,
+                    Category = One,
                     Name = DummyString,
                     UoM = DummyString,
                     FullName = DummyString,
                     MC_Val = DummyString,
                     Role_Name = DummyString,
                 },
-                [2] = new CatItemData(max)
+                [2] = new CatItemData(Max)
                 {
-                    ID = two,
-                    UID = two,
-                    Level = two,
-                    Role_UID = two,
-                    MC_UID = two,
-                    Category = two,
+                    ID = Two,
+                    UID = Two,
+                    Level = Two,
+                    Role_UID = Two,
+                    MC_UID = Two,
+                    Category = Two,
                     Name = DummyString,
                     UoM = DummyString,
                     FullName = DummyString,
@@ -100,33 +100,33 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             };
             dataItemDictionary = new Dictionary<int, DataItem>()
             {
-                [one] = new DataItem()
+                [One] = new DataItem()
                 {
-                    UID = one,
+                    UID = One,
                     Name = DummyString
                 },
-                [two] = new DataItem()
+                [Two] = new DataItem()
                 {
-                    UID = two,
+                    UID = Two,
                     Name = DummyString
                 }
             };
             listItems = new Dictionary<int, ListItemData>()
             {
-                [one] = new ListItemData()
+                [One] = new ListItemData()
                 {
-                    ID = one,
-                    UID = one,
-                    Level = one,
+                    ID = One,
+                    UID = One,
+                    Level = One,
                     Name = DummyString,
                     FullName = DummyString,
                     InActive = true
                 },
-                [two] = new ListItemData()
+                [Two] = new ListItemData()
                 {
-                    ID = two,
-                    UID = two,
-                    Level = two,
+                    ID = Two,
+                    UID = Two,
+                    Level = Two,
                     Name = DummyString,
                     FullName = DummyString,
                     InActive = true
@@ -134,51 +134,51 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             };
             customFields = new Dictionary<int, CustomFieldData>()
             {
-                [one] = new CustomFieldData()
+                [One] = new CustomFieldData()
                 {
-                    FieldID = one,
-                    LookupOnly = one,
-                    LookupID = one,
-                    LeafOnly = one,
-                    UseFullName = one,
+                    FieldID = One,
+                    LookupOnly = One,
+                    LookupID = One,
+                    LeafOnly = One,
+                    UseFullName = One,
                     Name = DummyString,
                     ListItems = listItems
                 },
-                [two] = new CustomFieldData()
+                [Two] = new CustomFieldData()
                 {
-                    FieldID = two,
-                    LookupOnly = two,
-                    LookupID = two,
-                    LeafOnly = two,
-                    UseFullName = two,
+                    FieldID = Two,
+                    LookupOnly = Two,
+                    LookupID = Two,
+                    LeafOnly = Two,
+                    UseFullName = Two,
                     Name = DummyString,
                     ListItems = listItems
                 }
             };
             targetData = new Dictionary<string, DetailRowData>()
             {
-                [one.ToString()] = new DetailRowData(max)
+                [One.ToString()] = new DetailRowData(Max)
                 {
-                    Scenario_ID = one,
-                    BC_UID = one,
-                    CT_ID = one,
-                    m_rt = one,
+                    Scenario_ID = One,
+                    BC_UID = One,
+                    CT_ID = One,
+                    m_rt = One,
                 },
-                [two.ToString()] = new DetailRowData(max)
+                [Two.ToString()] = new DetailRowData(Max)
                 {
-                    Scenario_ID = two,
-                    BC_UID = two,
-                    CT_ID = two,
-                    m_rt = two,
+                    Scenario_ID = Two,
+                    BC_UID = Two,
+                    CT_ID = Two,
+                    m_rt = Two,
                 }
             };
             rates = new Dictionary<int, RateTable>()
             {
-                [one] = new RateTable(max)
+                [One] = new RateTable(Max)
                 {
                     Name = DummyString
                 },
-                [two] = new RateTable(max)
+                [Two] = new RateTable(Max)
                 {
                     Name = DummyString
                 }
@@ -206,13 +206,13 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             };
             var sortedGrid = new List<DetailRowData>()
             {
-                new DetailRowData(max)
+                new DetailRowData(Max)
                 {
                     bRealone = false,
                     bGotChildren = true,
                     m_lev = 1
                 },
-                new DetailRowData(max)
+                new DetailRowData(Max)
                 {
                     bRealone = true,
                     bGotChildren = true,
@@ -224,7 +224,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             privateObject.SetFieldOrProperty("m_TotColRoot", nonPublicInstance, colRoot);
             privateObject.SetFieldOrProperty("m_Periods", nonPublicInstance, periods);
             privateObject.SetFieldOrProperty("m_display_minp", nonPublicInstance, 0);
-            privateObject.SetFieldOrProperty("m_display_maxp", nonPublicInstance, max);
+            privateObject.SetFieldOrProperty("m_display_maxp", nonPublicInstance, Max);
             privateObject.SetFieldOrProperty("m_bgrid_sorted", nonPublicInstance, sortedGrid);
             privateObject.SetFieldOrProperty("m_target_sorted", nonPublicInstance, sortedGrid);
             privateObject.SetFieldOrProperty("m_apply_target", nonPublicInstance, 1);
@@ -265,7 +265,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             privateObject.SetFieldOrProperty("m_DetColRoot", nonPublicInstance, colRoot);
             privateObject.SetFieldOrProperty("m_TotColRoot", nonPublicInstance, colRoot);
             privateObject.SetFieldOrProperty("m_display_minp", nonPublicInstance, 0);
-            privateObject.SetFieldOrProperty("m_display_maxp", nonPublicInstance, max);
+            privateObject.SetFieldOrProperty("m_display_maxp", nonPublicInstance, Max);
             privateObject.SetFieldOrProperty("bShowGantt", nonPublicInstance, false);
             privateObject.SetFieldOrProperty("m_Periods", nonPublicInstance, periods);
             privateObject.SetFieldOrProperty("bottomgridlayoutcache", nonPublicInstance, string.Empty);
@@ -311,13 +311,13 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             };
             var sortedGrid = new List<DetailRowData>()
             {
-                new DetailRowData(max)
+                new DetailRowData(Max)
                 {
                     bRealone = false,
                     bGotChildren = true,
                     m_lev = 1
                 },
-                new DetailRowData(max)
+                new DetailRowData(Max)
                 {
                     bRealone = true,
                     bGotChildren = true,
@@ -329,7 +329,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             privateObject.SetFieldOrProperty("m_TotColRoot", nonPublicInstance, colRoot);
             privateObject.SetFieldOrProperty("m_Periods", nonPublicInstance, periods);
             privateObject.SetFieldOrProperty("m_display_minp", nonPublicInstance, 0);
-            privateObject.SetFieldOrProperty("m_display_maxp", nonPublicInstance, max);
+            privateObject.SetFieldOrProperty("m_display_maxp", nonPublicInstance, Max);
             privateObject.SetFieldOrProperty("m_bgrid_sorted", nonPublicInstance, sortedGrid);
             privateObject.SetFieldOrProperty("m_target_sorted", nonPublicInstance, sortedGrid);
             privateObject.SetFieldOrProperty("m_apply_target", nonPublicInstance, 1);
@@ -506,26 +506,26 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             // Arrange
             var totalDetails = new Dictionary<string, DetailRowData>()
             {
-                [DummyString] = new DetailRowData(max)
+                [DummyString] = new DetailRowData(Max)
                 {
                     g1 = 11
                 }
             };
             var filterSource = new List<DetailRowData>()
             {
-                new DetailRowData(max)
+                new DetailRowData(Max)
                 {
                     bSelected = true,
                     m_total_to = 1,
-                    zCost = (new object[max +1]).Select(x => 1d).ToArray(),
-                    zValue = (new object[max +1]).Select(x => 10d).ToArray(),
-                    zFTE = (new object[max +1]).Select(x => 100d).ToArray()
+                    zCost = (new object[Max +1]).Select(x => 1d).ToArray(),
+                    zValue = (new object[Max +1]).Select(x => 10d).ToArray(),
+                    zFTE = (new object[Max +1]).Select(x => 100d).ToArray()
                 }
             };
 
             privateObject.SetFieldOrProperty("m_total_dets", nonPublicInstance, totalDetails);
             privateObject.SetFieldOrProperty("m_filtersource", nonPublicInstance, filterSource);
-            privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, max);
+            privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, Max);
 
             // Act
             privateObject.Invoke(ProcessTotalsMethodName, nonPublicInstance, new object[] { });
@@ -555,7 +555,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             };
             var detailData = new Dictionary<string, DetailRowData>()
             {
-                [DummyString] = new DetailRowData(max)
+                [DummyString] = new DetailRowData(Max)
                 {
                     Scenario_ID = -1,
                     CT_ID = DummyInt
@@ -564,7 +564,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
 
             privateObject.SetFieldOrProperty("m_CTARoot", nonPublicInstance, ctaRoot);
             privateObject.SetFieldOrProperty("m_detaildata", nonPublicInstance, detailData);
-            privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, max);
+            privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, Max);
 
             // Act
             privateObject.Invoke(CreatePsuedoTargetMethodName, nonPublicInstance, new object[] { });
@@ -585,22 +585,22 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             const string key = "K 1";
             var totalDetails = new Dictionary<string, DetailRowData>()
             {
-                [key] = new DetailRowData(max)
+                [key] = new DetailRowData(Max)
                 {
                     g1 = 11
                 }
             };
             var targetData = new Dictionary<string, DetailRowData>()
             {
-                [DummyString] = new DetailRowData(max)
+                [DummyString] = new DetailRowData(Max)
                 {
                     Scenario_ID = -1,
                     PROJECT_ID = 1,
                     bSelected = true,
                     m_total_to = 1,
-                    zCost = (new object[max + 1]).Select(x => 1d).ToArray(),
-                    zValue = (new object[max + 1]).Select(x => 10d).ToArray(),
-                    zFTE = (new object[max + 1]).Select(x => 100d).ToArray()
+                    zCost = (new object[Max + 1]).Select(x => 1d).ToArray(),
+                    zValue = (new object[Max + 1]).Select(x => 10d).ToArray(),
+                    zFTE = (new object[Max + 1]).Select(x => 100d).ToArray()
                 }
             };
             var totalRoot = new List<DataItem>()
@@ -615,7 +615,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             privateObject.SetFieldOrProperty("m_target_dets", nonPublicInstance, totalDetails);
             privateObject.SetFieldOrProperty("m_targetdata", nonPublicInstance, targetData);
             privateObject.SetFieldOrProperty("m_TotalRoot", nonPublicInstance, totalRoot);
-            privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, max);
+            privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, Max);
             privateObject.SetFieldOrProperty("m_apply_target", nonPublicInstance, -1);
 
             // Act
@@ -650,7 +650,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             };
             var detailData = new Dictionary<string, DetailRowData>()
             {
-                ["1"] = new DetailRowData(max)
+                ["1"] = new DetailRowData(Max)
                 {
                     Scenario_ID = fromValue,
                     CT_ID = DummyInt,
@@ -659,7 +659,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
                     BC_SEQ = DummyInt
                 }
             };
-            var piData = new PIData(max)
+            var piData = new PIData(Max)
             {
                 ScenarioID = fromValue,
                 PI_Name = DummyString,
@@ -686,7 +686,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             privateObject.SetFieldOrProperty("m_detaildata", nonPublicInstance, detailData);
             privateObject.SetFieldOrProperty("m_PIs", nonPublicInstance, pids);
             privateObject.SetFieldOrProperty("m_Scenario", nonPublicInstance, scenario);
-            privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, max);
+            privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, Max);
 
             // Act
             privateObject.Invoke(DoCopyVersionMethodName, publicInstance, new object[] { fromValue.ToString(), toValue.ToString(), piValue.ToString() });
@@ -1609,21 +1609,21 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             // Arrange
             const string version = "1";
             var validations = 0;
-            var sqlConnection = new SqlConnection();
+            var sqlConnection = default(SqlConnection);
             var now = DateTime.Now;
             var pids = new Dictionary<string, PIData>()
             {
-                ["1"] = new PIData(max)
+                ["1"] = new PIData(Max)
                 {
                     ScenarioID = -1,
                     PI_ID = DummyInt
                 },
-                ["2"] = new PIData(max)
+                ["2"] = new PIData(Max)
                 {
                     ScenarioID = -1,
                     PI_ID = DummyInt
                 },
-                ["3"] = new PIData(max)
+                ["3"] = new PIData(Max)
                 {
                     ScenarioID = 1,
                     PI_ID = DummyInt,
@@ -1651,11 +1651,11 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             };
             var detailData = new Dictionary<string, DetailRowData>()
             {
-                ["1"] = new DetailRowData(max)
+                ["1"] = new DetailRowData(Max)
                 {
                     Scenario_ID = 1,
-                    zCost = (new object[max + 1]).Select(x => 10d).ToArray(),
-                    zValue = (new object[max + 1]).Select(x => 10d).ToArray()
+                    zCost = (new object[Max + 1]).Select(x => 10d).ToArray(),
+                    zValue = (new object[Max + 1]).Select(x => 10d).ToArray()
                 }
             };
 
@@ -1669,7 +1669,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             privateObject.SetFieldOrProperty("m_CostTypes", nonPublicInstance, costType);
             privateObject.SetFieldOrProperty("m_detaildata", nonPublicInstance, detailData);
             privateObject.SetFieldOrProperty("m_sModel", nonPublicInstance, DummyString);
-            privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, max);
+            privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, Max);
 
             // Act
             var actual = (int)privateObject.Invoke(SaveVersionMethodName, publicInstance, new object[] { sqlConnection, version });
@@ -1778,7 +1778,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             const string targetString = "1";
             const int otherId = 10;
             var validations = 0;
-            var sqlConnection = new SqlConnection();
+            var sqlConnection = default(SqlConnection);
             var dataItem = new DataItem()
             {
                 UID = otherId
@@ -1814,7 +1814,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             // Arrange
             var validations = 0;
             var readHit = 0;
-            var sqlConnection = new SqlConnection();
+            var sqlConnection = default(SqlConnection);
             var targetBefore = new List<DataItem>();
 
             dataReader.ItemGetInt32 = input => input;
@@ -1973,7 +1973,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         {
             // Arrange
             var validations = 0;
-            var sqlConnection = new SqlConnection();
+            var sqlConnection = default(SqlConnection);
             var csTargetData = new CSTargetData();
 
             ShimModelCache.AllInstances.LoadTargetsSqlConnectionString = (_, _1, _2) =>
@@ -1993,12 +1993,12 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             privateObject.SetFieldOrProperty("m_Rates", nonPublicInstance, rates);
 
             // Act
-            testObject.PrepareTargetData(sqlConnection, one, ref csTargetData);
+            testObject.PrepareTargetData(sqlConnection, One, ref csTargetData);
 
             // Assert
             csTargetData.ShouldSatisfyAllConditions(
                 () => csTargetData.targetRows.Length.ShouldBe(1),
-                () => csTargetData.targetRows[0].BC_UID.ShouldBe(one),
+                () => csTargetData.targetRows[0].BC_UID.ShouldBe(One),
                 () => validations.ShouldBe(6));
         }
     }
