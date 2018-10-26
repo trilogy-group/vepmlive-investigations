@@ -186,7 +186,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         }
 
         [TestMethod]
-        public void GetBottomGrid_WhenCalled_Returns()
+        public void GetBottomGrid_WhenCalled_ReturnsString()
         {
             // Arrange
             var colRoot = new List<SortFieldDefn>()
@@ -234,8 +234,19 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
 
             // Assert
             actual.ShouldSatisfyAllConditions(
-                () => actual.Element("Grid").Element("Toolbar").Attribute("Visible").Value.ShouldBe("0"),
-                () => actual.Element("Grid").Element("Body").Element("I").Elements("I").Count().ShouldBe(2));
+                () => actual
+                    .Element("Grid")
+                    .Element("Toolbar")
+                    .Attribute("Visible")
+                    .Value
+                    .ShouldBe("0"),
+                () => actual
+                    .Element("Grid")
+                    .Element("Body")
+                    .Element("I")
+                    .Elements("I")
+                    .Count()
+                    .ShouldBe(2));
         }
 
         [TestMethod]
@@ -264,8 +275,19 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
 
             // Assert
             actual.ShouldSatisfyAllConditions(
-                () => actual.Element("Grid").Element("Toolbar").Attribute("Visible").Value.ShouldBe("0"),
-                () => actual.Element("Grid").Element("Head").Elements("Header").Where(x => x.Attribute("P0C") != null).Count(x => x.Attribute("P0C").Value.Equals(DummyString)).ShouldBe(1));
+                () => actual
+                    .Element("Grid")
+                    .Element("Toolbar")
+                    .Attribute("Visible")
+                    .Value
+                    .ShouldBe("0"),
+                () => actual
+                    .Element("Grid")
+                    .Element("Head")
+                    .Elements("Header")
+                    .Where(x => x.Attribute("P0C") != null)
+                    .Count(x => x.Attribute("P0C").Value.Equals(DummyString))
+                    .ShouldBe(1));
         }
 
         [TestMethod]
@@ -317,8 +339,17 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
 
             // Assert
             actual.ShouldSatisfyAllConditions(
-                () => actual.Element("Grid").Element("Cfg").ShouldNotBeNull(),
-                () => actual.Element("Grid").Element("Body").Element("I").Elements("I").Count().ShouldBe(2));
+                () => actual
+                    .Element("Grid")
+                    .Element("Cfg")
+                    .ShouldNotBeNull(),
+                () => actual
+                    .Element("Grid")
+                    .Element("Body")
+                    .Element("I")
+                    .Elements("I")
+                    .Count()
+                    .ShouldBe(2));
         }
 
         [TestMethod]
@@ -677,11 +708,36 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
 
             // Assert
             actual.ShouldSatisfyAllConditions(
-                () => actual.Element("Grid").Element("Toolbar").Attribute("Visible").Value.ShouldBe("0"),
-                () => actual.Element("Grid").Element("Panel").Attribute("Visible").Value.ShouldBe("1"),
-                () => actual.Element("Grid").Element("Cfg").Attribute("MainCol").Value.ShouldBe("Filtering"),
-                () => actual.Element("Grid").Element("LeftCols").Elements("C").Count(x => x.Attribute("Name").Value.Equals("Filtering")).ShouldBe(1),
-                () => actual.Element("Grid").Element("Header").Attribute("Filtering").Value.ShouldBe("Filter"));
+                () => actual
+                    .Element("Grid")
+                    .Element("Toolbar")
+                    .Attribute("Visible")
+                    .Value
+                    .ShouldBe("0"),
+                () => actual
+                    .Element("Grid")
+                    .Element("Panel")
+                    .Attribute("Visible")
+                    .Value
+                    .ShouldBe("1"),
+                () => actual
+                    .Element("Grid")
+                    .Element("Cfg")
+                    .Attribute("MainCol")
+                    .Value
+                    .ShouldBe("Filtering"),
+                () => actual
+                    .Element("Grid")
+                    .Element("LeftCols")
+                    .Elements("C")
+                    .Count(x => x.Attribute("Name").Value.Equals("Filtering"))
+                    .ShouldBe(1),
+                () => actual
+                    .Element("Grid")
+                    .Element("Header")
+                    .Attribute("Filtering")
+                    .Value
+                    .ShouldBe("Filter"));
         }
 
         [TestMethod]
@@ -717,8 +773,19 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
 
             // Assert
             actual.ShouldSatisfyAllConditions(
-                () => actual.Element("Grid").Element("Cfg").Attribute("FilterEmpty").Value.ShouldBe("1"),
-                () => actual.Element("Grid").Element("Body").Element("I").Elements("I").Count(x => x.Attribute("Filtering").Value.Equals(DummyString)).ShouldBe(3));
+                () => actual
+                    .Element("Grid")
+                    .Element("Cfg")
+                    .Attribute("FilterEmpty")
+                    .Value
+                    .ShouldBe("1"),
+                () => actual
+                    .Element("Grid")
+                    .Element("Body")
+                    .Element("I")
+                    .Elements("I")
+                    .Count(x => x.Attribute("Filtering").Value.Equals(DummyString))
+                    .ShouldBe(3));
         }
 
         [TestMethod]
@@ -765,7 +832,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         }
 
         [TestMethod]
-        public void IsFiltered_GroupCondition1_Returns()
+        public void IsFiltered_GroupCondition1_ReturnsBoolean()
         {
             // Arrange
             var filteredList = new List<DataItem>()
@@ -798,7 +865,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         }
 
         [TestMethod]
-        public void IsFiltered_GroupCondition2_Returns()
+        public void IsFiltered_GroupCondition2_ReturnsBoolean()
         {
             // Arrange
             var filteredList = new List<DataItem>()
@@ -871,11 +938,36 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
 
             // Assert
             actual.ShouldSatisfyAllConditions(
-                () => actual.Element("Grid").Element("Toolbar").Attribute("Visible").Value.ShouldBe("0"),
-                () => actual.Element("Grid").Element("Panel").Attribute("Visible").Value.ShouldBe("1"),
-                () => actual.Element("Grid").Element("Cfg").Attribute("MainCol").Value.ShouldBe("Filtering"),
-                () => actual.Element("Grid").Element("LeftCols").Elements("C").Count(x => x.Attribute("Name").Value.Equals("Filtering")).ShouldBe(1),
-                () => actual.Element("Grid").Element("Header").Attribute("Filtering").Value.ShouldBe("Filter"));
+                () => actual
+                    .Element("Grid")
+                    .Element("Toolbar")
+                    .Attribute("Visible")
+                    .Value
+                    .ShouldBe("0"),
+                () => actual
+                    .Element("Grid")
+                    .Element("Panel")
+                    .Attribute("Visible")
+                    .Value
+                    .ShouldBe("1"),
+                () => actual
+                    .Element("Grid")
+                    .Element("Cfg")
+                    .Attribute("MainCol")
+                    .Value
+                    .ShouldBe("Filtering"),
+                () => actual
+                    .Element("Grid")
+                    .Element("LeftCols")
+                    .Elements("C")
+                    .Count(x => x.Attribute("Name").Value.Equals("Filtering"))
+                    .ShouldBe(1),
+                () => actual
+                    .Element("Grid")
+                    .Element("Header")
+                    .Attribute("Filtering")
+                    .Value
+                    .ShouldBe("Filter"));
         }
 
         [TestMethod]
@@ -911,12 +1003,23 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
 
             // Assert
             actual.ShouldSatisfyAllConditions(
-                () => actual.Element("Grid").Element("Cfg").Attribute("FilterEmpty").Value.ShouldBe("1"),
-                () => actual.Element("Grid").Element("Body").Element("I").Elements("I").Count(x => x.Attribute("Filtering").Value.Equals(DummyString)).ShouldBe(3));
+                () => actual
+                    .Element("Grid")
+                    .Element("Cfg")
+                    .Attribute("FilterEmpty")
+                    .Value
+                    .ShouldBe("1"),
+                () => actual
+                    .Element("Grid")
+                    .Element("Body")
+                    .Element("I")
+                    .Elements("I")
+                    .Count(x => x.Attribute("Filtering").Value.Equals(DummyString))
+                    .ShouldBe(3));
         }
 
         [TestMethod]
-        public void SetCTCmpData_WhenCalled_Returns()
+        public void SetCTCmpData_WhenCalled_ReturnsDataItemList()
         {
             // Arrange
             const string cmpData = "1 0 1";
@@ -973,8 +1076,19 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
 
             // Assert
             actual.ShouldSatisfyAllConditions(
-                () => actual.Element("Grid").Element("Cfg").Attribute("FilterEmpty").Value.ShouldBe("1"),
-                () => actual.Element("Grid").Element("Body").Element("I").Elements("I").Count(x => x.Attribute("Filtering").Value.Equals(DummyString)).ShouldBe(3));
+                () => actual
+                    .Element("Grid")
+                    .Element("Cfg")
+                    .Attribute("FilterEmpty")
+                    .Value
+                    .ShouldBe("1"),
+                () => actual
+                    .Element("Grid")
+                    .Element("Body")
+                    .Element("I")
+                    .Elements("I")
+                    .Count(x => x.Attribute("Filtering").Value.Equals(DummyString))
+                    .ShouldBe(3));
         }
 
         [TestMethod]
@@ -1157,7 +1271,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         }
 
         [TestMethod]
-        public void SetSortAndGroup_WhenCalled_Returns()
+        public void SetSortAndGroup_WhenCalled_SetsFields()
         {
             // Arrange
             const int value1 = 4;
@@ -1261,8 +1375,19 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
 
             // Assert
             actual.ShouldSatisfyAllConditions(
-                () => actual.Element("Grid").Element("Cfg").Attribute("FilterEmpty").Value.ShouldBe("1"),
-                () => actual.Element("Grid").Element("Body").Element("I").Elements("I").Count(x => x.Attribute("Filtering").Value.Equals(string.Empty)).ShouldBe(50));
+                () => actual
+                    .Element("Grid")
+                    .Element("Cfg")
+                    .Attribute("FilterEmpty")
+                    .Value
+                    .ShouldBe("1"),
+                () => actual
+                    .Element("Grid")
+                    .Element("Body")
+                    .Element("I")
+                    .Elements("I")
+                    .Count(x => x.Attribute("Filtering").Value.Equals(string.Empty))
+                    .ShouldBe(50));
         }
 
         [TestMethod]
@@ -1339,7 +1464,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         }
 
         [TestMethod]
-        public void GetVersionsPILists_FromVersionEqualsToVersionTrue_Returns()
+        public void GetVersionsPILists_FromVersionEqualsToVersionTrue_SetsGroupDefinition()
         {
             // Arrange
             const int fromVersion = 0;
@@ -1356,7 +1481,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         }
 
         [TestMethod]
-        public void GetVersionsPILists_FromVersionEqualsToVersionFalse_Returns()
+        public void GetVersionsPILists_FromVersionEqualsToVersionFalse_SetsGroupDefinition()
         {
             // Arrange
             const int fromVersionZero = 0;
@@ -1732,7 +1857,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         }
 
         [TestMethod]
-        public void BuildCatJSon_WhenCalled_Returns()
+        public void BuildCatJSon_WhenCalled_ReturnsString()
         {
             // Arrange
             const int index = 0;
@@ -1767,7 +1892,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         }
 
         [TestMethod]
-        public void BuildCustFieldJSon_WhenCalled_Returns()
+        public void BuildCustFieldJSon_WhenCalled_ReturnsString()
         {
             // Arrange
             const int index = 0;
@@ -1805,7 +1930,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         }
 
         [TestMethod]
-        public void RatesAndCategory_WhenCalled_Returns()
+        public void RatesAndCategory_WhenCalled_SetsRatesAndCategories()
         {
             // Arrange
             const string expectedCostCatJson = "{Items:[DummyString]}";
@@ -1844,7 +1969,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         }
 
         [TestMethod]
-        public void PrepareTargetData_WhenCalled_Returns()
+        public void PrepareTargetData_WhenCalled_SetsTargetData()
         {
             // Arrange
             var validations = 0;
