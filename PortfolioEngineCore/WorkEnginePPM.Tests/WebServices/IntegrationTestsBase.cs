@@ -28,6 +28,7 @@ namespace WorkEnginePPM.Tests.WebServices
             _context = ShimsContext.Create();
             _integration = new Integration();
             PrivateObject = new PrivateObject(_integration);
+            ShimSPContext.AllInstances.SiteGet = _ => new ShimSPSite();
         }
 
         [TestCleanup]
@@ -74,7 +75,6 @@ namespace WorkEnginePPM.Tests.WebServices
         {
             ShimSPContext.CurrentGet = () => new ShimSPContext();
             ShimSPContext.AllInstances.SiteGet = _ => new ShimSPSite();
-            ShimSPContext.AllInstances.WebGet = _ => new ShimSPWeb();
         }
     }
 }

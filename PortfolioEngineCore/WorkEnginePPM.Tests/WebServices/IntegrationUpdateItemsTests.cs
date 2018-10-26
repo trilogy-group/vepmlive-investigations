@@ -77,6 +77,8 @@ namespace WorkEnginePPM.Tests.WebServices
             ArrangeDataTable();
             ShimDataRow.AllInstances.ItemGetString = (_1, _2) => ItemsGuids;
             ArrangeSPContext();
+            ShimSPContext.AllInstances.WebGet = _ => new ShimSPWeb();
+            ShimSPWeb.AllInstances.IDGet = _ => new Guid("41052063041052063041052063041010");
             ArrangeSPSite();
             ArrangeSPWeb();
 
