@@ -48,12 +48,11 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void SelectCostCategories_OnSuccess_ReturnsStatusEnumStuccess()
+        public void SelectCostCategories_OnSuccess_ReturnsStatusEnumSuccess()
         {
             // Arrange
             const string ExpectedCommandText = "SELECT * FROM EPGP_CATEGORIES ORDER BY CA_ID";
-            var dataTable = new DataTable();
-            dataTable = null;
+            DataTable dataTable = null;
             ShimSqlDb.AllInstances.SelectDataStringStatusEnumDataTableOut = SelectData;
             StatusEnumReturn = StatusEnum.rsSuccess;
 
@@ -71,8 +70,7 @@ namespace PortfolioEngineCore.Tests.Base
         public void ReadCostCategoryRates_OnSuccess_ReturnsStatusEnumSuccess()
         {
             // Arrange
-            var dataTable = new DataTable();
-            dataTable = null;
+            DataTable dataTable = null;
             var baseRate = 0M;
             ShimSqlDb.AllInstances.SelectDataByIdStringInt32StatusEnumDataTableOut = SelectDataById;
             StatusEnumReturn = StatusEnum.rsSuccess;
@@ -99,8 +97,7 @@ namespace PortfolioEngineCore.Tests.Base
         public void ReadCostCategoryRates_OnError_ReturnsRequestCannotBeCompleted()
         {
             // Arrange
-            var dataTable = new DataTable();
-            dataTable = null;
+            DataTable dataTable = null;
             var baseRate = 0M;
             ShimSqlDb.AllInstances.SelectDataByIdStringInt32StatusEnumDataTableOut = SelectDataById;
             StatusEnumReturn = StatusEnum.rsRequestCannotBeCompleted;
@@ -116,7 +113,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void CanDeleteCostCategory_Should_ReturnsStautsSuccess()
+        public void CanDeleteCostCategory_Should_ReturnsStatusSuccess()
         {
             // Arrange
             const string BcuIds = "1";
