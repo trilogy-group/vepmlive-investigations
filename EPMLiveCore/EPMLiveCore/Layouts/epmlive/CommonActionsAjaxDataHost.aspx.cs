@@ -1,10 +1,9 @@
 ﻿using System;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
 using System.Text;
-using Microsoft.SharePoint.Utilities;
 using System.Web;
-using System.Collections.Generic;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Utilities;
+using static EPMLiveCore.Layouts.epmlive.LayoutsHelper;
 
 namespace EPMLiveCore
 {
@@ -25,36 +24,9 @@ namespace EPMLiveCore
         // {4} - link Url
         // {5} - target property of the link
 
-        private const string LIST_ITEM_HTML =
-            "<li id=\"{0}\" class=\"ms-core-menu-item\" type=\"option\" menugroupid=\"100\" description=\"{1}\" text=\"{2}\"" +
-                        "iconsrc=\"{3}\" type=\"option\" enabled=\"true\" checked=\"false\"" +
-                        "text_original=\"{2}\" description_original=\"{1}\">" +
-                        "<a class=\"ms-core-menu-link\" href=\"{4}\" onclick=\"{5}\" >" +
-                            "<div class=\"ms-hide\">" +
-                                "<img id=\"mp1_0_0_ICON\" title=\"\" alt=\"\" src=\"/_layouts/15/images/menuprofile.gif?rev=23\" width=\"32\" height=\"32\">" +
-                            "</div>" +
-                            "<div id=\"zz2_ID_PersonalInformation\" class=\"ms-core-menu-label\">" +
-                                "<span class=\"ms-core-menu-title\">{2}</span>" +
-                                "<span></span>" +
-                            "</div>" +
-                            "<span class=\"ms-accessible\"></span>" +
-                            "<div></div>" +
-                        "</a>" +
-                    "</li>";
-
         protected void Page_Load(object sender, EventArgs e)
         {
-            Response.Cache.SetCacheability(HttpCacheability.NoCache);
-            Response.Expires = -1;
-            Response.ContentEncoding = System.Text.Encoding.UTF8;
-            
-            if (!string.IsNullOrEmpty(Request["requesturl"]))
-            {
-                _requestUrl = Request["requesturl"];
-            }
-
-            string retVal = BuildListItemHTML();
-            Response.Output.WriteLine(!string.IsNullOrEmpty(retVal) ? retVal : string.Empty);
+            SimplePageLoad(Response, Request, ref _requestUrl, BuildListItemHTML());
         }
 
         private string BuildListItemHTML()

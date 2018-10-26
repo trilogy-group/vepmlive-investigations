@@ -78,6 +78,7 @@
     <Compile Include="Admininfos\AdminFunctions.cs" />
     <Compile Include="Admininfos\Admininfos.cs" />
     <Compile Include="Admininfos\Admininfos.DeleteResourceTimeoff.cs" />
+    <Compile Include="Admininfos\Admininfos.UpdateCategoriesFromRoles.cs" />
     <Compile Include="Admininfos\Admininfos.UpdateDepartments.cs" />
     <Compile Include="Admininfos\Admininfos.UpdateHolidaySchedule.cs" />
     <Compile Include="Admininfos\Admininfos.UpdateListWork.cs" />
@@ -291,6 +292,12 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
+      <Project>{C773AE44-F066-446A-9CBD-D24AFA794E34}</Project>
+      <Name>EPMLiveCore</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

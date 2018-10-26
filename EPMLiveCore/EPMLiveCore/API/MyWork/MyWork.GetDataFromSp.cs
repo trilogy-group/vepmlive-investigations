@@ -63,6 +63,11 @@ namespace EPMLiveCore.API
 
             WaitHandle.WaitAll(eventWaitHandles.ToArray());
 
+            foreach (var eventWaitHandle in eventWaitHandles)
+            {
+                eventWaitHandle?.Dispose();
+            }
+
             if (spExceptionOccured)
             {
                 throw new APIException(2016, CannotRunSpDataQuery);

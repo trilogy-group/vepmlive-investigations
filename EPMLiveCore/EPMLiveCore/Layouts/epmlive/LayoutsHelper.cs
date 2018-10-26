@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Text;
+using System.Web;
+using System.Diagnostics;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
@@ -147,6 +150,95 @@ namespace EPMLiveCore.Layouts.epmlive
                     dropDownList.SelectedValue = currentSpNavigationNode.ParentId.ToString();
                 }
             }
+        }
+
+        public static void ProcessPermissionStrings(SPWeb web, IEnumerable<string> strOuter, DataTable groupsPermissions)
+        {
+            if (web == null)
+            {
+                throw new ArgumentNullException(nameof(web));
+            }
+            if (strOuter == null)
+            {
+                throw new ArgumentNullException(nameof(strOuter));
+            }
+            if (groupsPermissions == null)
+            {
+                throw new ArgumentNullException(nameof(groupsPermissions));
+            }
+
+            foreach (var strInner in strOuter)
+            {
+                var strInnerMost = strInner.Split('~');
+                var dataRow = groupsPermissions.NewRow();
+                SPGroup spGroup = null;
+                SPRoleDefinition roleDefinition = null;
+
+                try
+                {
+                    spGroup = web.SiteGroups.GetByID(Convert.ToInt32(strInnerMost[0]));
+                    roleDefinition = web.RoleDefinitions.GetById(Convert.ToInt32(strInnerMost[1]));
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
+                if (spGroup != null && roleDefinition != null)
+                {
+                    dataRow["GroupsText"] = spGroup.Name;
+                    dataRow["GroupsID"] = strInnerMost[0];
+                    dataRow["PermissionsText"] = roleDefinition.Name;
+                    dataRow["PermissionsID"] = strInnerMost[1];
+                    groupsPermissions.Rows.Add(dataRow);
+                }
+            }
+        }
+
+        public static readonly string LIST_ITEM_HTML =
+            "<li id=\"{0}\" class=\"ms-core-menu-item\" type=\"option\" menugroupid=\"100\" description=\"{1}\" text=\"{2}\""
+            + "iconsrc=\"{3}\" type=\"option\" enabled=\"true\" checked=\"false\""
+            + "text_original=\"{2}\" description_original=\"{1}\">"
+            + "<a class=\"ms-core-menu-link\" href=\"{4}\" onclick=\"{5}\" >"
+            + "<div class=\"ms-hide\">"
+            + "<img id=\"mp1_0_0_ICON\" title=\"\" alt=\"\" src=\"/_layouts/15/images/menuprofile.gif?rev=23\" width=\"32\" height=\"32\">"
+            + "</div>"
+            + "<div id=\"zz2_ID_PersonalInformation\" class=\"ms-core-menu-label\">"
+            + "<span class=\"ms-core-menu-title\">{2}</span>"
+            + "<span></span>"
+            + "</div>"
+            + "<span class=\"ms-accessible\"></span>"
+            + "<div></div>"
+            + "</a>"
+            + "</li>";
+
+        public static void SimplePageLoad(HttpResponse httpResponse, HttpRequest httpRequest, ref string requestUrl, string buildListItemHtml)
+        {
+            if (httpResponse == null)
+            {
+                throw new ArgumentNullException(nameof(httpResponse));
+            }
+            if (httpRequest == null)
+            {
+                throw new ArgumentNullException(nameof(httpRequest));
+            }
+
+            httpResponse.Cache.SetCacheability(HttpCacheability.NoCache);
+            httpResponse.Expires = -1;
+            httpResponse.ContentEncoding = Encoding.UTF8;
+
+            const string RequestUrl = "requesturl";
+
+            if (!string.IsNullOrWhiteSpace(httpRequest[RequestUrl]))
+            {
+                requestUrl = httpRequest[RequestUrl];
+            }
+
+            var retVal = buildListItemHtml;
+
+            httpResponse.Output.WriteLine(
+                !string.IsNullOrWhiteSpace(retVal)
+                    ? retVal
+                    : string.Empty);
         }
     }
 }
