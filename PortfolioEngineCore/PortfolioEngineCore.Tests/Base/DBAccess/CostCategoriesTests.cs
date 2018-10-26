@@ -5,8 +5,6 @@ using System.Data.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortfolioEngineCore.Fakes;
@@ -526,9 +524,143 @@ namespace PortfolioEngineCore.Tests.Base
                 () => expectedCommands.All(e => executedCommands.Contains(e)).ShouldBeTrue());
         }
 
+        [TestMethod]
+        public void UpdateCostCategoryRates_OnException_ReturnsRequestCannotBeCompleted()
+        {
+            // Arrange
+            const string ErrorMessage = "Dummy Exception";
+            var reply = string.Empty;
+            var dataTable = new ShimDataTable
+            {
+                RowsGet = () => 
+                {
+                    throw new Exception(ErrorMessage);
+                }
+            };
+            
+            // Act
+            var result = dbaCostCategories.UpdateCostCategoryRates(dbAccess, 1, 1, dataTable, out reply);
 
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsRequestCannotBeCompleted),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContain(ErrorMessage));
+        }
 
+        [TestMethod]
+        public void SaveCostCategories_OnSuccess_ReturnsStatusSuccess()
+        {
+            // Arrange
+            var reply = string.Empty;
+            ShimdbaGeneral.SelectAdminDBAccessDataTableOut = SelectAdmin;
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                CountGet = () => 1,
+                ItemGetInt32 = index => new ShimDataRow
+                {
+                    ItemGetString = name => 1
+                },
+                GetEnumerator = () => new List<DataRow>
+                {
+                    new ShimDataRow
+                    {
+                        ItemGetString = name => 1
+                    }
+                }.GetEnumerator()
+            };
+            var expectedCommands = new List<string>
+            {
+                "UPDATE EPG_ADMIN Set ADM_MC_LOOKUP=@Lookup,ADM_MC_DEFAULT=@Default",
+                "INSERT INTO EPGP_CATEGORIES (CA_UID,CA_NAME,CA_ID,CA_LEVEL,CA_ROLE,CA_UOM)" +
+                " VALUES(@CAUID,@CANAME,@CAID,@CALEVEL,@CAROLE,@CAUOM)"
+            };
+            var executedCommands = new List<string>();
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = command =>
+            {
+                executedCommands.Add(command.CommandText);
+                return 1;
+            };
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () => true,
+                ItemGetString = name => 1,
+                Close = () => { }
+            };
+            StatusEnumReturn = StatusEnum.rsSuccess;
+            ShimdbaCostCategories.CreateCostCategoriesDBAccessStringOut = CreateCostCategories;
 
+            // Act
+            var result = dbaCostCategories.SaveCostCategories(dbAccess, 2, 2, new DataTable(), out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsSuccess),
+                () => reply.ShouldBeNullOrEmpty(),
+                () => expectedCommands.All(p => executedCommands.Contains(p)).ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void SaveCostCategories_CreateCostCategoriesError_ReturnsRequestCannotBeCompleted()
+        {
+            // Arrange
+            var reply = string.Empty;
+            ShimdbaGeneral.SelectAdminDBAccessDataTableOut = SelectAdmin;
+            ShimDataTable.AllInstances.RowsGet = _ => new ShimDataRowCollection
+            {
+                CountGet = () => 1,
+                ItemGetInt32 = index => new ShimDataRow
+                {
+                    ItemGetString = name => 1
+                },
+                GetEnumerator = () => new List<DataRow>
+                {
+                    new ShimDataRow
+                    {
+                        ItemGetString = name => 0
+                    }
+                }.GetEnumerator()
+            };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = command => 1;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () => false,
+                ItemGetString = name => 1,
+                Close = () => { }
+            };
+            StatusEnumReturn = StatusEnum.rsServerError;
+            ShimdbaCostCategories.CreateCostCategoriesDBAccessStringOut = CreateCostCategories;
+
+            // Act
+            var result = dbaCostCategories.SaveCostCategories(dbAccess, 2, 2, new DataTable(), out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsRequestCannotBeCompleted),
+                () => reply.ShouldNotBeNullOrEmpty());
+        }
+
+        [TestMethod]
+        public void SaveCostCategories_OnException_ReturnsStatusSuccess()
+        {
+            // Arrange
+            var reply = string.Empty;
+            const string ErrorMessage = "Dummy Exception";
+            ShimdbaGeneral.SelectAdminDBAccessDataTableOut = SelectAdmin;
+            ShimDataTable.AllInstances.RowsGet = _ => 
+            {
+                throw new Exception(ErrorMessage);
+            };
+
+            // Act
+            var result = dbaCostCategories.SaveCostCategories(dbAccess, 2, 2, new DataTable(), out reply);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(StatusEnum.rsSuccess),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContain(ErrorMessage));
+        }
 
         private FakesDelegates.Func<string, object> GetItem(IDictionary<string, object> dictionary)
         {
@@ -546,26 +678,56 @@ namespace PortfolioEngineCore.Tests.Base
             };
         }
 
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
+        private StatusEnum CreateCostCategories(DBAccess db, out string reply)
+        {
+            reply = DummyString;
+            return StatusEnumReturn;
+        }
+
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum SelectCalendarPeriods(DBAccess db, int id, out DataTable dataTable)
         {
             dataTable = new DataTable();
             return StatusEnum.rsSuccess;
         }
 
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
         private StatusEnum SelectAdmin(DBAccess db, out DataTable dataTable)
         {
             dataTable = new DataTable();
             return StatusEnumReturn;
         }
 
-        private StatusEnum SelectDataById(SqlDb db, string command, int id, StatusEnum errorStatus, out DataTable dataTable)
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
+        private StatusEnum SelectDataById(
+            SqlDb db, 
+            string command, 
+            int id, 
+            StatusEnum errorStatus, 
+            out DataTable dataTable)
         {
             dataTable = new DataTable();
             CommandText = command;
             return StatusEnumReturn;
         }
 
-        private StatusEnum SelectData(SqlDb db, string command, StatusEnum errorStatus, out DataTable dataTable)
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
+        private StatusEnum SelectData(
+            SqlDb db, 
+            string command, 
+            StatusEnum errorStatus, 
+            out DataTable dataTable)
         {
             dataTable = new DataTable();
             CommandText = command;
