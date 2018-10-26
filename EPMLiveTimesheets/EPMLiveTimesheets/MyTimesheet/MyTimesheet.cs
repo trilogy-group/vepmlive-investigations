@@ -391,18 +391,19 @@ namespace TimeSheets
 
             foreach (var key in properties.Views.Views)
             {
-                try
+                var isDefault = false;
+                IsDefaultAvailable = bool.TryParse(key.Value["Default"], out isDefault);
+                if (IsDefaultAvailable)
                 {
-                    if (key.Value["Default"].Equals("true", StringComparison.OrdinalIgnoreCase))
+                    if (isDefault)
                     {
                         properties.CurrentView = key.Key;
                         properties.CurrentViewId = "V" + counter;
-                        IsDefaultAvailable = true;
                     }
                 }
-                catch (Exception e)
+                else
                 {
-                    Trace.TraceWarning("Could not read Default value: {0}", e);
+                    Trace.TraceWarning("Could not read Default value");
                 }
                 counter++;
             }
