@@ -51,9 +51,9 @@ namespace EPMLiveCore.API
 
         public static string CreateComment(string data)
         {
-            string retVal = string.Empty;
-            SPWeb cWeb = SPContext.Current.Web;
-            SPSite cSite = SPContext.Current.Site;
+            var returnValue = string.Empty;
+            var web = SPContext.Current.Web;
+            var site = SPContext.Current.Site;
             // Data should look like the following:
             // ===============================
             // <Data>
@@ -63,141 +63,196 @@ namespace EPMLiveCore.API
             // </Data>
 
             // load data into XML manager
-            XMLDataManager dataMgr = new XMLDataManager(data);
-            SPList commentsList = cWeb.Lists.TryGetList(COMMENTS_LIST_NAME);
+            var dataMgr = new XMLDataManager(data);
+            var commentsList = web.Lists.TryGetList(COMMENTS_LIST_NAME);
 
-            StringBuilder sbResult = new StringBuilder();
-            sbResult.Append(XML_RESPONSE_COMMENT_HEADER);
+            var result = new StringBuilder();
+            result.Append(XML_RESPONSE_COMMENT_HEADER);
 
             if (commentsList != null)
             {
-                cWeb.AllowUnsafeUpdates = true;
-                SPListItem currentItem = commentsList.Items.Add();
+                web.AllowUnsafeUpdates = true;
+                var currentItem = commentsList.Items.Add();
 
                 var time = GetCurrentLocalTime();
                 bool statusUpdate;
                 bool.TryParse(dataMgr.GetPropVal("StatusUpdate"), out statusUpdate);
                 var statusUpdateId = dataMgr.GetPropVal("StatusUpdateId");
 
-                string genericTitle = cWeb.CurrentUser.Name + " made a new comment at " + time.ToString();
-                currentItem[commentsList.Fields.GetFieldByInternalName("Title").Id] = genericTitle;
-
+                var genericTitle = $"{web.CurrentUser.Name} made a new comment at {time.ToString()}";
                 var listId = dataMgr.GetPropVal("ListId");
                 var itemId = dataMgr.GetPropVal("ItemId");
                 var comment = HttpUtility.HtmlDecode(dataMgr.GetPropVal("Comment") ?? string.Empty);
-                List<int> laCommenters = new List<int>();
+                var laCommenters = new List<int>();
                 SPListItem originListItem = null;
 
-                currentItem[commentsList.Fields.GetFieldByInternalName("ListId").Id] = listId;
-                currentItem[commentsList.Fields.GetFieldByInternalName("ItemId").Id] = itemId;
-                currentItem[commentsList.Fields.GetFieldByInternalName("Comment").Id] = comment;
-                //currentItem[commentsList.Fields.GetFieldByInternalName("Comment").Id] = Uri.UnescapeDataString(dataMgr.GetPropVal("Comment"));
+                UpdateCurrentItem(currentItem, commentsList, genericTitle, listId, itemId, comment);
+                AppendResponseComment(result, currentItem, comment, web);
 
-                SetSocialEngineTransaction(currentItem);
-                currentItem.Update();
-
-                sbResult.Append(XML_RESPONSE_COMMENT_SECTION_HEADER.Replace("##listId##", currentItem.ParentList.ID.ToString()).Replace("##itemId##", currentItem.ID.ToString()));
-                sbResult.Append(XML_RESPONSE_COMMENT_ITEM.Replace("##listId##", currentItem.ParentList.ID.ToString())
-                                                         .Replace("##listName##", currentItem.ParentList.Title)
-                                                         .Replace("##itemId##", currentItem.ID.ToString())
-                                                         .Replace("##itemTitle##", currentItem.Title)
-                                                         .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime(cWeb))
-                                                         .Replace("##comment##", GetXMLSafeVersion((string)(comment))));
-                sbResult.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
-                sbResult.Append(XML_RESPONSE_COMMENT_SECTION_FOOTER);
-                sbResult.Append(XML_RESPONSE_COMMENT_FOOTER);
-                // save current user
-                SPUser originalUser = SPContext.Current.Web.CurrentUser;
-
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    using (SPSite es = new SPSite(SPContext.Current.Site.ID))
+                    using (var currentSite = new SPSite(SPContext.Current.Site.ID))
                     {
-                        using (SPWeb ew = es.OpenWeb(SPContext.Current.Web.ServerRelativeUrl))
+                        using (var currentWeb = currentSite.OpenWeb(SPContext.Current.Web.ServerRelativeUrl))
                         {
-                            SPList originList = null;
-                            ew.AllowUnsafeUpdates = true;
-                            originList = ew.Lists[new Guid(listId)];
-
-                            if (originList != null)
-                            {
-                                originListItem = originList.GetItemById(int.Parse(itemId));
-                            }
+                            currentWeb.AllowUnsafeUpdates = true;
+                            var originList = currentWeb.Lists[new Guid(listId)];
+                            originListItem = originList?.GetItemById(int.Parse(itemId));
 
                             if (originListItem != null)
                             {
-                                EnsureMetaCols(originList);
-
-                                var emailSentIDs = GenerateEmailSentIds(originListItem, originList, laCommenters, originalUser, listId, itemId, comment);
-
-                                // send email to assigned to people
-                                try
-                                {
-                                    string[] vals = originListItem[originListItem.Fields.GetFieldByInternalName("AssignedTo").Id].ToString().Split(new string[] { ";#" }, StringSplitOptions.None);
-                                    foreach (string val in vals)
-                                    {
-                                        int id;
-                                        if (int.TryParse(val, out id) && !id.Equals(originalUser.ID) && !emailSentIDs.Contains(id))
-                                        {
-                                            emailSentIDs.Add(id);
-                                            SendEmailNotification(id, listId, itemId, comment, "created");
-                                        }
-                                    }
-                                }
-                                catch
-                                {
-                                }
-
-                                // send email to each person in thread
-                                foreach (int id in laCommenters)
-                                {
-                                    if ((id != originalUser.ID) && !emailSentIDs.Contains(id))
-                                    {
-                                        emailSentIDs.Add(id);
-                                        SendEmailNotification(id, listId, itemId, comment, "created");
-                                    }
-                                }
+                                SendNotificationEmails(originList, originListItem, laCommenters, listId, itemId, comment);
                             }
 
-                            string createdDate = currentItem["Created"].ToString();
-                            //retVal = currentItem.ID.ToString() + "," + createdDate;
-                            retVal = sbResult.ToString();
+                            var createdDate = currentItem["Created"].ToString();
+                            returnValue = result.ToString();
                             InsertCommentCount(listId, itemId);
                         }
                     }
                 });
 
-                if (!string.IsNullOrEmpty(comment) && originListItem != null)
-                {
-                    try
-                    {
-                        if (!statusUpdate)
-                        {
-                            SyncToSocialStream(currentItem.UniqueId, comment, originListItem.ParentList.ID,
-                                originListItem.ID, originListItem.Title,
-                                originListItem.ParentList.Title, originListItem.ParentList.DefaultDisplayFormUrl + "?ID=" + originListItem.ID, laCommenters, time, cWeb, "ADD");
-                        }
-                        else
-                        {
-                            var sId = new Guid(statusUpdateId);
-
-                            var statusItem = currentItem.ParentList.GetItemByUniqueId(sId);
-
-                            SyncStatusUpdateToSocialStream(sId, comment,
-                                new Guid(currentItem["ListId"].ToString()),
-                                int.Parse(currentItem["ItemId"].ToString()), (DateTime)statusItem["Created"], cWeb,
-                                "COMMENT", (DateTime?)currentItem["Created"], currentItem.UniqueId);
-                        }
-                    }
-                    catch { }
-                }
+                SyncWithSocialStream(comment, originListItem, statusUpdate, currentItem, laCommenters, time, web, statusUpdateId);
             }
             else
             {
                 throw new Exception("The 'Comments' list needs to be created to support this functionality.");
             }
 
-            return retVal;
+            return returnValue;
+        }
+
+        private static void UpdateCurrentItem(
+            SPListItem currentItem,
+            SPList commentsList,
+            string genericTitle,
+            string listId,
+            string itemId,
+            string comment)
+        {
+            currentItem[commentsList.Fields.GetFieldByInternalName("Title").Id] = genericTitle;
+            currentItem[commentsList.Fields.GetFieldByInternalName("ListId").Id] = listId;
+            currentItem[commentsList.Fields.GetFieldByInternalName("ItemId").Id] = itemId;
+            currentItem[commentsList.Fields.GetFieldByInternalName("Comment").Id] = comment;
+
+            SetSocialEngineTransaction(currentItem);
+            currentItem.Update();
+        }
+
+        private static void AppendResponseComment(StringBuilder result, SPListItem currentItem, string comment, SPWeb web)
+        {
+            result.Append(XML_RESPONSE_COMMENT_SECTION_HEADER
+                .Replace("##listId##", currentItem.ParentList.ID.ToString())
+                .Replace("##itemId##", currentItem.ID.ToString()));
+            result.Append(XML_RESPONSE_COMMENT_ITEM
+                .Replace("##listId##", currentItem.ParentList.ID.ToString())
+                .Replace("##listName##", currentItem.ParentList.Title)
+                .Replace("##itemId##", currentItem.ID.ToString())
+                .Replace("##itemTitle##", currentItem.Title)
+                .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime(web))
+                .Replace("##comment##", GetXMLSafeVersion(comment)));
+            result.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE)
+                .Append(XML_RESPONSE_COMMENT_SECTION_FOOTER)
+                .Append(XML_RESPONSE_COMMENT_FOOTER);
+        }
+
+        private static void SendNotificationEmails(
+            SPList originList,
+            SPListItem originListItem,
+            List<int> laCommenters,
+            string listId,
+            string itemId,
+            string comment)
+        {
+            var originalUser = SPContext.Current.Web.CurrentUser;
+
+            EnsureMetaCols(originList);
+
+            var emailSentIDs = GenerateEmailSentIds(originListItem, originList, laCommenters, originalUser, listId, itemId, comment);
+
+            // send email to assigned to people
+            try
+            {
+                var vals = originListItem[originListItem.Fields.GetFieldByInternalName("AssignedTo").Id].ToString().Split(new string[] { ";#" }, StringSplitOptions.None);
+                foreach (var val in vals)
+                {
+                    int id;
+                    if (int.TryParse(val, out id) && !id.Equals(originalUser.ID) && !emailSentIDs.Contains(id))
+                    {
+                        emailSentIDs.Add(id);
+                        SendEmailNotification(id, listId, itemId, comment, "created");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Trace.TraceWarning("Unable to sent email notifications: {0}", e);
+            }
+
+            // send email to each person in thread
+            foreach (var id in laCommenters)
+            {
+                if ((id != originalUser.ID) && !emailSentIDs.Contains(id))
+                {
+                    emailSentIDs.Add(id);
+                    SendEmailNotification(id, listId, itemId, comment, "created");
+                }
+            }
+        }
+
+        private static void SyncWithSocialStream(
+            string comment,
+            SPListItem originListItem,
+            bool isStatusUpdate,
+            SPListItem currentItem,
+            List<int> laCommenters,
+            DateTime time,
+            SPWeb web,
+            string statusUpdateId)
+        {
+            if (!string.IsNullOrWhiteSpace(comment) && originListItem != null)
+            {
+                try
+                {
+                    if (!isStatusUpdate)
+                    {
+                        SyncToSocialStream(
+                            currentItem.UniqueId,
+                            comment,
+                            originListItem.ParentList.ID,
+                            originListItem.ID,
+                            originListItem.Title,
+                            originListItem.ParentList.Title,
+                            $"{originListItem.ParentList.DefaultDisplayFormUrl}?ID={originListItem.ID}",
+                            laCommenters,
+                            time,
+                            web,
+                            "ADD"
+                        );
+                    }
+                    else
+                    {
+                        var sId = new Guid(statusUpdateId);
+
+                        var statusItem = currentItem.ParentList.GetItemByUniqueId(sId);
+
+                        SyncStatusUpdateToSocialStream(
+                            sId,
+                            comment,
+                            new Guid(currentItem["ListId"].ToString()),
+                            int.Parse(currentItem["ItemId"].ToString()),
+                            (DateTime)statusItem["Created"],
+                            web,
+                            "COMMENT",
+                            (DateTime?)currentItem["Created"],
+                            currentItem.UniqueId
+                        );
+                    }
+                }
+                catch (Exception e)
+                {
+                    Trace.TraceWarning("Unable to sync with social stream: {0}", e);
+                }
+            }
         }
 
         private static void EnsureMetaCols(SPList list)
@@ -392,17 +447,17 @@ namespace EPMLiveCore.API
                 SetSocialEngineTransaction(currentItem);
                 currentItem.Update();
 
-                sbResult.Append(XML_RESPONSE_PUBLIC_COMMENT_ITEM.Replace("##pubComListId##", dataMgr.GetPropVal("ListId")).Replace("##pubComItemId##", dataMgr.GetPropVal("ItemId")));
-                sbResult.Append(XML_RESPONSE_COMMENT_SECTION_HEADER.Replace("##listId##", currentItem.ParentList.ID.ToString()).Replace("##itemId##", currentItem.ID.ToString()));
-                sbResult.Append(XML_RESPONSE_COMMENT_ITEM.Replace("##listId##", currentItem.ParentList.ID.ToString())
+                sbResult.Append(XML_RESPONSE_PUBLIC_COMMENT_ITEM.Replace("##pubComListId##", dataMgr.GetPropVal("ListId")).Replace("##pubComItemId##", dataMgr.GetPropVal("ItemId")))
+                    .Append(XML_RESPONSE_COMMENT_SECTION_HEADER.Replace("##listId##", currentItem.ParentList.ID.ToString()).Replace("##itemId##", currentItem.ID.ToString()))
+                    .Append(XML_RESPONSE_COMMENT_ITEM.Replace("##listId##", currentItem.ParentList.ID.ToString())
                                                          .Replace("##listName##", currentItem.ParentList.Title)
                                                          .Replace("##itemId##", currentItem.ID.ToString())
                                                          .Replace("##itemTitle##", currentItem.Title)
                                                          .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime(cWeb))
                                                          .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(comment ?? string.Empty)))));
-                sbResult.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
-                sbResult.Append(XML_RESPONSE_COMMENT_SECTION_FOOTER);
-                sbResult.Append(XML_RESPONSE_COMMENT_FOOTER);
+                sbResult.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE)
+                    .Append(XML_RESPONSE_COMMENT_SECTION_FOOTER)
+                    .Append(XML_RESPONSE_COMMENT_FOOTER);
                 // save current user
                 SPUser originalUser = SPContext.Current.Web.CurrentUser;
 
@@ -582,135 +637,49 @@ namespace EPMLiveCore.API
             return retVal;
         }
 
+        // Data should look like the following:
+        // ===============================
+        // <Data>
+        // <Param key='ListId'>someguid</Param>
+        // <Param key='ItemId">12</Param>
+        // <Param key='Comment'>abcabac</Param>
+        // </Data>
         public static string UpdateComment(string data)
         {
-            string retVal = string.Empty;
-            SPWeb cWeb = SPContext.Current.Web;
-            SPSite cSite = SPContext.Current.Site;
-            SPUser originalUser = SPContext.Current.Web.CurrentUser;
-            // Data should look like the following:
-            // ===============================
-            // <Data>
-            // <Param key='ListId'>someguid</Param>
-            // <Param key='ItemId">12</Param>
-            // <Param key='Comment'>abcabac</Param>
-            // </Data>
-
-            // load data into XML manager
-            XMLDataManager dataMgr = new XMLDataManager(data);
-            SPList commentsList = cWeb.Lists.TryGetList(COMMENTS_LIST_NAME);
+            var returnValue = string.Empty;
+            var web = SPContext.Current.Web;
+            var site = SPContext.Current.Site;
+            var originalUser = SPContext.Current.Web.CurrentUser;
+            var dataMgr = new XMLDataManager(data);
+            var commentsList = web.Lists.TryGetList(COMMENTS_LIST_NAME);
 
             if (commentsList != null)
             {
-                string listId = dataMgr.GetPropVal("ListId");
-                string itemId = dataMgr.GetPropVal("ItemId");
-                int commentItemId = Convert.ToInt32(dataMgr.GetPropVal("CommentItemId"));
+                var listId = dataMgr.GetPropVal("ListId");
+                var itemId = dataMgr.GetPropVal("ItemId");
+                var commentItemId = Convert.ToInt32(dataMgr.GetPropVal("CommentItemId"));
                 var comment = HttpUtility.HtmlDecode(dataMgr.GetPropVal("Comment"));
-                List<int> laCommenters = new List<int>();
+                var laCommenters = new List<int>();
                 var time = GetCurrentLocalTime();
                 SPListItem originListItem = null;
                 SPListItem targetComment = null;
 
-                SPQuery query = new SPQuery();
-                query.Query = "<Where><And><Eq><FieldRef Name=\"ListId\" /><Value Type=\"Text\">" + listId + "</Value></Eq><Eq><FieldRef Name=\"ItemId\" /><Value Type=\"Text\">" + itemId + "</Value></Eq></And></Where>";
-                SPListItemCollection itemColl = commentsList.GetItems(query);
+                var query = new SPQuery();
+                query.Query = $"<Where><And><Eq><FieldRef Name=\"ListId\" /><Value Type=\"Text\">{listId}</Value></Eq><Eq><FieldRef Name=\"ItemId\" /><Value Type=\"Text\">{itemId}</Value></Eq></And></Where>";
+                var items = commentsList.GetItems(query);
 
-                if (itemColl.Count > 0)
+                if (items.Count > 0)
                 {
-                    foreach (SPListItem item in itemColl)
-                    {
-                        if (item.ID.Equals(commentItemId))
-                        {
-                            cWeb.AllowUnsafeUpdates = true;
-                            targetComment = item;
-                            string genericTitle = cWeb.CurrentUser.Name + " updated this comment at " + time.ToString();
-                            targetComment[commentsList.Fields.GetFieldByInternalName("Title").Id] = genericTitle;
-                            targetComment[commentsList.Fields.GetFieldByInternalName("Comment").Id] = comment;
-                            SetSocialEngineTransaction(targetComment);
-                            targetComment.Update();
+                    UpdateTargetComment(items, commentItemId, ref targetComment, web, commentsList, time, comment);
 
-                            break;
-                        }
-                    }
-
-                    SPList originList = null;
-
-                    cWeb.AllowUnsafeUpdates = true;
-                    originList = cWeb.Lists[new Guid(dataMgr.GetPropVal("ListId"))];
-
-                    if (originList != null)
-                    {
-                        originListItem = originList.GetItemById(int.Parse(dataMgr.GetPropVal("ItemId")));
-                    }
+                    web.AllowUnsafeUpdates = true;
+                    var originList = web.Lists[new Guid(listId)];
+                    originListItem = originList?.GetItemById(int.Parse(itemId));
 
                     if (originListItem != null)
                     {
-                        string sCommenters = originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] != null ? originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id].ToString() : string.Empty;
-                        foreach (string s in sCommenters.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                        {
-                            if (!string.IsNullOrEmpty(s.Trim()))
-                            {
-                                laCommenters.Add(int.Parse(s));
-                            }
-                        }
-
-                        // get user object 
-                        SPFieldUser author = (SPFieldUser)originListItem.Fields[SPBuiltInFieldId.Author];
-                        SPFieldUserValue userVal = (SPFieldUserValue)author.GetFieldValue(originListItem[SPBuiltInFieldId.Author].ToString());
-                        SPUser authorObj = userVal.User;
-                        List<int> emailSentIDs = new List<int>();
-
-                        // send email to author
-                        if ((authorObj != null) && (SPContext.Current.Web.CurrentUser.ID != authorObj.ID) && !emailSentIDs.Contains(authorObj.ID))
-                        {
-                            emailSentIDs.Add(authorObj.ID);
-                            SendEmailNotification(authorObj.ID, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "edited");
-                        }
-
-                        // send emails out to people in assignedto field if that field exists
-                        try
-                        {
-                            string[] vals = originListItem[originListItem.Fields.GetFieldByInternalName("AssignedTo").Id].ToString().Split(new string[] { ";#" }, StringSplitOptions.None);
-                            foreach (string val in vals)
-                            {
-                                int id;
-                                if (int.TryParse(val, out id) && !id.Equals(SPContext.Current.Web.CurrentUser.ID) && !emailSentIDs.Contains(id))
-                                {
-                                    emailSentIDs.Add(id);
-                                    SendEmailNotification(id, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "created");
-                                }
-                            }
-                        }
-                        catch
-                        {
-                        }
-
-                        // send email to commenters
-                        foreach (int id in laCommenters)
-                        {
-                            if ((id != SPContext.Current.Web.CurrentUser.ID) && !emailSentIDs.Contains(id))
-                            {
-                                emailSentIDs.Add(id);
-                                SendEmailNotification(id, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "edited");
-                            }
-                        }
-
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
-                        {
-                            using (SPSite es = new SPSite(cSite.ID))
-                            {
-                                using (SPWeb ew = es.OpenWeb(cWeb.ServerRelativeUrl))
-                                {
-                                    ew.AllowUnsafeUpdates = true;
-                                    SPList tempList = ew.Lists[originList.ID];
-                                    SPListItem tempItem = tempList.GetItemById(originListItem.ID);
-                                    tempItem[tempList.Fields.GetFieldByInternalName("CommentersRead").Id] = string.Empty;
-                                    tempItem[tempList.Fields.GetFieldByInternalName("CommentersRead").Id] = originalUser.ID.ToString();
-                                    SetSocialEngineTransaction(tempItem);
-                                    tempItem.SystemUpdate();
-                                }
-                            }
-                        });
+                        GetCommentersAndSendEmails(originListItem, originList, laCommenters, listId, itemId, comment);
+                        UpdateSocialEngineTransaction(site, web, originList, originListItem, originalUser);
 
                     }
                 }
@@ -719,25 +688,165 @@ namespace EPMLiveCore.API
                     throw new Exception(String.Format("No comment with ListId = {0} and ItemId = {1} exists.", listId, itemId));
                 }
 
-                InsertCommentCount(dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"));
+                InsertCommentCount(listId, itemId);
 
-                retVal = "success";
-
-                if (string.IsNullOrEmpty(comment) || originListItem == null) return retVal;
-
-                try
+                returnValue = "success";
+                if (string.IsNullOrWhiteSpace(comment) || originListItem == null)
                 {
-                    SyncToSocialStream(targetComment.UniqueId, comment, originListItem.ParentList.ID, originListItem.ID, originListItem.Title,
-                        originListItem.ParentList.Title, originListItem.ParentList.DefaultDisplayFormUrl + "?ID=" + originListItem.ID, laCommenters, time, cWeb, "UPDATE");
+                    return returnValue;
                 }
-                catch { }
+
+                SyncWithSocialStream(targetComment, comment, originListItem, laCommenters, time, web);
             }
             else
             {
                 throw new Exception("The 'Comments' list needs to be created to support this functionality.");
             }
 
-            return retVal;
+            return returnValue;
+        }
+
+        private static void UpdateTargetComment(
+            SPListItemCollection items,
+            int commentItemId,
+            ref SPListItem targetComment,
+            SPWeb web,
+            SPList commentsList,
+            DateTime time,
+            string comment)
+        {
+            foreach (SPListItem item in items)
+            {
+                if (item.ID.Equals(commentItemId))
+                {
+                    web.AllowUnsafeUpdates = true;
+                    targetComment = item;
+                    var genericTitle = $"{web.CurrentUser.Name} updated this comment at {time.ToString()}";
+                    targetComment[commentsList.Fields.GetFieldByInternalName("Title").Id] = genericTitle;
+                    targetComment[commentsList.Fields.GetFieldByInternalName("Comment").Id] = comment;
+                    SetSocialEngineTransaction(targetComment);
+                    targetComment.Update();
+
+                    break;
+                }
+            }
+        }
+
+        private static void GetCommentersAndSendEmails(
+            SPListItem originListItem,
+            SPList originList,
+            List<int> laCommenters,
+            string listId,
+            string itemId,
+            string comment)
+        {
+            var commenters = originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] != null
+                ? originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id].ToString()
+                : string.Empty;
+            foreach (var commenter in commenters.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (!string.IsNullOrWhiteSpace(commenter.Trim()))
+                {
+                    laCommenters.Add(int.Parse(commenter));
+                }
+            }
+
+            // get user object 
+            var author = (SPFieldUser)originListItem.Fields[SPBuiltInFieldId.Author];
+            var userVal = (SPFieldUserValue)author.GetFieldValue(originListItem[SPBuiltInFieldId.Author].ToString());
+            var authorObj = userVal.User;
+            var emailSentIDs = new List<int>();
+
+            // send email to author
+            if ((authorObj != null) && (SPContext.Current.Web.CurrentUser.ID != authorObj.ID) && !emailSentIDs.Contains(authorObj.ID))
+            {
+                emailSentIDs.Add(authorObj.ID);
+                SendEmailNotification(authorObj.ID, listId, itemId, comment, "edited");
+            }
+
+            // send emails out to people in assignedto field if that field exists
+            try
+            {
+                var vals = originListItem[originListItem.Fields.GetFieldByInternalName("AssignedTo").Id].ToString().Split(new string[] { ";#" }, StringSplitOptions.None);
+                foreach (var val in vals)
+                {
+                    int id;
+                    if (int.TryParse(val, out id) && !id.Equals(SPContext.Current.Web.CurrentUser.ID) && !emailSentIDs.Contains(id))
+                    {
+                        emailSentIDs.Add(id);
+                        SendEmailNotification(id, listId, itemId, comment, "created");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Trace.TraceWarning("Unable to send emails: {0}", e);
+            }
+
+            // send email to commenters
+            foreach (var id in laCommenters)
+            {
+                if ((id != SPContext.Current.Web.CurrentUser.ID) && !emailSentIDs.Contains(id))
+                {
+                    emailSentIDs.Add(id);
+                    SendEmailNotification(id, listId, itemId, comment, "edited");
+                }
+            }
+        }
+
+        private static void UpdateSocialEngineTransaction(
+            SPSite site,
+            SPWeb web,
+            SPList originList,
+            SPListItem originListItem,
+            SPUser originalUser)
+        {
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                using (var currentSite = new SPSite(site.ID))
+                {
+                    using (var currentWeb = currentSite.OpenWeb(web.ServerRelativeUrl))
+                    {
+                        currentWeb.AllowUnsafeUpdates = true;
+                        var tempList = currentWeb.Lists[originList.ID];
+                        var tempItem = tempList.GetItemById(originListItem.ID);
+                        tempItem[tempList.Fields.GetFieldByInternalName("CommentersRead").Id] = string.Empty;
+                        tempItem[tempList.Fields.GetFieldByInternalName("CommentersRead").Id] = originalUser.ID.ToString();
+                        SetSocialEngineTransaction(tempItem);
+                        tempItem.SystemUpdate();
+                    }
+                }
+            });
+        }
+
+        private static void SyncWithSocialStream(
+            SPListItem targetComment,
+            string comment,
+            SPListItem originListItem,
+            List<int> laCommenters,
+            DateTime time,
+            SPWeb web)
+        {
+            try
+            {
+                SyncToSocialStream(
+                    targetComment.UniqueId,
+                    comment,
+                    originListItem.ParentList.ID,
+                    originListItem.ID,
+                    originListItem.Title,
+                    originListItem.ParentList.Title,
+                    $"{originListItem.ParentList.DefaultDisplayFormUrl}?ID={originListItem.ID}",
+                    laCommenters,
+                    time,
+                    web,
+                    "UPDATE"
+                );
+            }
+            catch (Exception e)
+            {
+                Trace.TraceWarning("Could not sync with social stream: {0}", e);
+            }
         }
 
         private static DateTime GetCurrentLocalTime()
