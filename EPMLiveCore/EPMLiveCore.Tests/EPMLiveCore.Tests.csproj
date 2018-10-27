@@ -269,6 +269,7 @@
     <Compile Include="ResourcePoolEvent\ResourcePoolEventTest.cs" />
     <Compile Include="Shared\AssertException.cs" />
     <Compile Include="SocialEngine\Core\ThreadManagerTest.cs" />
+    <Compile Include="SocialEngine\Modules\ListTests.cs" />
     <Compile Include="SocialEngine\Modules\ListItemTests.cs" />
     <Compile Include="SPUtilities\SPListUtilityTest.cs" />
     <Compile Include="Testables\InputFormSectionTestable.cs">
