@@ -143,7 +143,18 @@ namespace EPMLiveCore
             }
             base.CreateChildControls();
         }
+
+        public override void Dispose()
+        {
+            if (Controls != null)
+            {
+                for (var i = Controls.Count - 1; i >= 0; i--)
+                {
+                    Controls[i]?.Dispose();
+                }
+            }
+
+            base.Dispose();
+        }
     }
-
-
 }
