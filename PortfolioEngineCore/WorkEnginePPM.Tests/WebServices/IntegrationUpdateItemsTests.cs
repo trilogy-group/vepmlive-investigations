@@ -54,7 +54,6 @@ namespace WorkEnginePPM.Tests.WebServices
                 () => _processPortfolioCalled.ShouldBeFalse(),
                 () => resultString.ShouldContain("error", Case.Insensitive),
                 () => resultString.ShouldContain("100"));
-
         }
 
         private void ArrangeUpdateItems(bool delegateShouldThrow)

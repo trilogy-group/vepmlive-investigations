@@ -33,7 +33,7 @@ namespace WorkEnginePPM.Tests.WebServices
         private const float SPFieldValueNumber = 4.0f;
 
         private ShimHashtable _shimHashtable;
-        private static readonly DateTime _dateTime = new DateTime(2010, 10, 10, 10, 10, 10);
+        private static readonly DateTime TestDateTime = new DateTime(2010, 10, 10, 10, 10, 10);
 
         [TestMethod]
         public void BuildTasks_CalculatedTypeHashTableContainIsAssignment_ExecutesCorrectly()
@@ -191,7 +191,7 @@ namespace WorkEnginePPM.Tests.WebServices
                             xElement.Value.ShouldContain(SPFieldValueNumber.ToString());
                             break;
                         case SPFieldType.DateTime:
-                            xElement.Value.ShouldContain(_dateTime.ToString("s"));
+                            xElement.Value.ShouldContain(TestDateTime.ToString("s"));
                             break;
                         default:
                             xElement.ShouldBeNull();
@@ -227,7 +227,7 @@ namespace WorkEnginePPM.Tests.WebServices
                     case SPFieldType.Number:
                         return SPFieldValueNumber;
                     case SPFieldType.DateTime:
-                        return _dateTime;
+                        return TestDateTime;
                     default:
                         return string.Empty;
                 }

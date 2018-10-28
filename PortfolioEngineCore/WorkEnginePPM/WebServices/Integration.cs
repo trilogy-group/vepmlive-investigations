@@ -549,9 +549,9 @@ namespace WorkEnginePPM
             return stringValue;
         }
 
-        private static void WriteTitle(StringBuilder stringBuilder, SPListItem li)
+        private static void WriteTitle(StringBuilder stringBuilder, SPListItem listItem)
         {
-            stringBuilder.Append("<Title><![CDATA[" + li.Title + "]]></Title>");
+            stringBuilder.AppendFormat("<Title><![CDATA[{0}]]></Title>", listItem.Title);
         }
 
         private static void WriteIds(SPListItem li, StringBuilder stringBuilder)
@@ -593,11 +593,11 @@ namespace WorkEnginePPM
             }
         }
 
-        private static void WriteIsAssignment(StringBuilder stringBuilder, SPListItem li)
+        private static void WriteIsAssignment(StringBuilder stringBuilder, SPListItem listItem)
         {
             try
             {
-                stringBuilder.Append(li["IsAssignment"].ToString() == "True"
+                stringBuilder.Append(listItem["IsAssignment"].ToString() == bool.TrueString
                         ? "<Field Name=\"IsAssignment\"><![CDATA[1]]></Field>"
                         : "<Field Name=\"IsAssignment\"><![CDATA[0]]></Field>");
             }
@@ -1325,10 +1325,9 @@ namespace WorkEnginePPM
 
         }
 
-        private static bool ProcessItems(string source, Guid siteId, Guid webId, DataSet dataSet,
-            StringBuilder messageStringBuilder)
+        private static bool ProcessItems(string source, Guid siteId, Guid webId, DataSet dataSet, StringBuilder messageStringBuilder)
         {
-            bool errors = false;
+            var errors = false;
             SPSecurity.RunWithElevatedPrivileges(
                 delegate
                 {
