@@ -8,6 +8,8 @@ namespace PortfolioEngineCore
 {
     internal class CalenderCleaner
     {
+        const int InvalidCalendarId = -1;
+
         public static StatusEnum DeleteCalendar(DBAccess dbAccess, int calendar, out string reply)
         {
             StatusEnum status = StatusEnum.rsSuccess;
@@ -175,11 +177,11 @@ namespace PortfolioEngineCore
             DBAccess dbAccess,
             string cmdText,
             Action<int, SqlCommand> addCalenderParameter = null,
-            int calendar = -1)
+            int calendar = InvalidCalendarId)
         {
             using (var command = new SqlCommand(cmdText, dbAccess.Connection))
             {
-                AddCalenderParameter(calendar, command);
+                addCalenderParameter?.Invoke(calendar, command);
                 command.ExecuteNonQuery();
             }
         }
