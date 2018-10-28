@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Script.Serialization;
 using EPMLiveCore;
@@ -41,32 +42,12 @@ namespace EPMLiveWebParts.Layouts.epmlive.Admin
 
         private void SetTimeZone(SPWeb web, SPContext context)
         {
-            CurrentUserTimeZone = "null";
-
-            try
+            var dictionaryReplace = new Dictionary<string, string>
             {
-                SPTimeZone spTimeZone = (web.CurrentUser.RegionalSettings ?? context.RegionalSettings).TimeZone;
-                string spTzName = spTimeZone.Description.Replace(" and ", " & ");
+                { " and ", " & " }
+            };
 
-                TimeZoneInfo timeZone = (from tz in TimeZoneInfo.GetSystemTimeZones()
-                    let tzName = tz.DisplayName.Replace(" and ", " & ")
-                    where tzName.Equals(spTzName)
-                    select tz).First();
-
-                var timeZoneInfo = new
-                {
-                    id = timeZone.Id,
-                    displayName = timeZone.DisplayName,
-                    olsonName = timeZone.OlsonName(),
-                    standardName = timeZone.StandardName,
-                    daylightName = timeZone.DaylightName,
-                    baseUtcOffset = timeZone.BaseUtcOffset,
-                    supportsDaylightSavingTime = timeZone.SupportsDaylightSavingTime
-                };
-
-                CurrentUserTimeZone = new JavaScriptSerializer().Serialize(timeZoneInfo);
-            }
-            catch { }
+            CurrentUserTimeZone = Utilities.Extensions.SetTimeZone(web, context, dictionaryReplace);
         }
 
         #endregion Methods 
