@@ -52,9 +52,16 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.4.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Data.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.4.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
@@ -73,12 +80,18 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebPageCode\UpdatetaskTests.cs" />
+    <Compile Include="WebPageCode\GettasksTests.cs" />
     <Compile Include="WorkPlannerAPITests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
       <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
       <Name>EPMLive.TestFakes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
+      <Project>{C773AE44-F066-446A-9CBD-D24AFA794E34}</Project>
+      <Name>EPMLiveCore</Name>
     </ProjectReference>
     <ProjectReference Include="..\EPMLiveWorkPlanner\EPMLiveWorkPlanner.csproj">
       <Project>{FCF0C151-0A3F-4B9F-9327-3BBBF109D776}</Project>
