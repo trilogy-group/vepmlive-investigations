@@ -22,6 +22,8 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
         private const string RenameUserViewDataMethodName = "RenameUserViewData";
         private const string SaveUserViewDataMethodName = "SaveUserViewData";
         private const string LoadUserViewsMethodName = "LoadUserViews";
+        private const string GetUserViewSlugMethodName = "GetUserViewSlug";
+        private const string SelectUserViewDataMethodName = "SelectUserViewData";
 
         [TestMethod]
         public void SaveTargetData_WhenCalled_InsertsDatabase()
@@ -270,6 +272,173 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
                 () => actual.Count.ShouldBe(3),
                 () => actual.Count(x => x.UID.Equals(4) || x.UID.Equals(5) || x.UID.Equals(6)).ShouldBe(3),
                 () => validations.ShouldBe(8));
+        }
+
+        [TestMethod]
+        public void GetUserViewSlug_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const int three = 3;
+            var dataItem3 = new DataItem()
+            {
+                ID = three,
+                UID = three,
+                level = three,
+                Name = DummyString,
+                bSelected = true
+            };
+
+            dataItemDictionary[One].group = One;
+            dataItemDictionary[One].bSelected = true;
+            dataItemDictionary[Two].bSelected = false;
+            dataItemDictionary.Add(three, dataItem3);
+
+            var filterList = dataItemDictionary.Values.ToList();
+            var totalRoot = dataItemDictionary.Values.ToList();
+            var ctaRoot = dataItemDictionary.Values.ToList();
+            var detColRoot = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn()
+                {
+                    fid = One
+                }
+            };
+            var intArray = new int[2, 3]
+            {
+                { One, Two, three },
+                { One, Two, three }
+            };
+
+            privateObject.SetFieldOrProperty("m_CTARoot", nonPublicInstance, ctaRoot);
+            privateObject.SetFieldOrProperty("m_filterList", nonPublicInstance, filterList);
+            privateObject.SetFieldOrProperty("m_TotalRoot", nonPublicInstance, totalRoot);
+            privateObject.SetFieldOrProperty("m_DetColRoot", nonPublicInstance, detColRoot);
+            privateObject.SetFieldOrProperty("m_TotColRoot", nonPublicInstance, detColRoot);
+            privateObject.SetFieldOrProperty("m_SnGFids", nonPublicInstance, intArray);
+            privateObject.SetFieldOrProperty("m_SnGAsc", nonPublicInstance, intArray);
+            privateObject.SetFieldOrProperty("m_SnGGrp", nonPublicInstance, intArray);
+            privateObject.SetFieldOrProperty("m_bCTAMode", nonPublicInstance, true);
+            privateObject.SetFieldOrProperty("m_apply_target", nonPublicInstance, One);
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetUserViewSlugMethodName, nonPublicInstance, new object[] { DummyString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("Slug")
+                    .Element("ZoomTo")
+                    .Value
+                    .ShouldBe(DummyString),
+                () => actual
+                    .Element("Slug")
+                    .Element("DR")
+                    .Value
+                    .ShouldBe("1 1 -1"),
+                () => actual
+                    .Element("Slug")
+                    .Element("SNG")
+                    .Value
+                    .ShouldBe("0 0 1 1 1 2 2 2 3 3 3 1 1 1 2 2 2 3 3 3")
+                );
+        }
+
+        [TestMethod]
+        public void SelectUserViewData_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const int viewID = 0;
+            const int three = 3;
+
+            dataItemDictionary[One].group = One;
+            dataItemDictionary[Two].group = Two;
+
+            var slug = $@"
+                <Slug>
+                  <ZoomTo>{DummyString}</ZoomTo>
+                  <FFID>1 0 1</FFID>
+                  <FFIDVal>1 3</FFIDVal>
+                  <QTY>0 1 0 0 0 0 0</QTY>
+                  <SHWDEC>0</SHWDEC>
+                  <LABDESC>0</LABDESC>
+                  <GWID>-1</GWID>
+                  <BGWID>-1</BGWID>
+                  <DR>1 1 -1</DR>
+                  <TR>1 1 -1</TR>
+                  <FRZ>0 0</FRZ>
+                  <SNG>0 0 1 1 1 2 2 2 3 3 3 1 1 1 2 2 2 3 3 3</SNG>
+                  <APVIEW>1</APVIEW>
+                  <DGRP>1</DGRP>
+                  <CTCmp>1</CTCmp>
+                  <CTCmp>3</CTCmp>
+                  <CTApCmp>1</CTApCmp>
+                </Slug>";
+            var validations = 0;
+            var sqlConnection = default(SqlConnection);
+            var dataItemList = dataItemDictionary.Values.ToList();
+            var ctViews = new List<DataItem>()
+            {
+                new DataItem()
+                {
+                    Desc = slug
+                }
+            };
+            var detColRoot = new List<SortFieldDefn>()
+            {
+                new SortFieldDefn()
+                {
+                    fid = One,
+                    touched = false
+                },
+                new SortFieldDefn()
+                {
+                    fid = Two,
+                    touched = false
+                }
+            };
+            var intArray = new int[2, 3]
+            {
+                { One, Two, three },
+                { One, Two, three }
+            };
+
+            ShimModelCache.AllInstances.LoadTargetsSqlConnectionString = (_, _1, _2) =>
+            {
+                validations += 1;
+                return One;
+            };
+            ShimModelCache.AllInstances.SetTotColsbasedonTotaling = _ =>
+            {
+                validations += 1;
+            };
+            ShimModelCache.AllInstances.ApplyUserOptions = _ =>
+            {
+                validations += 1;
+            };
+            ShimModelCache.AllInstances.SetHighlevelFilterFlag = _ =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty("m_CT_Views", nonPublicInstance, ctViews);
+            privateObject.SetFieldOrProperty("m_CTARoot", nonPublicInstance, dataItemList);
+            privateObject.SetFieldOrProperty("m_TotalRoot", nonPublicInstance, dataItemList);
+            privateObject.SetFieldOrProperty("m_filterList", nonPublicInstance, dataItemList);
+            privateObject.SetFieldOrProperty("m_DetColRoot", nonPublicInstance, detColRoot);
+            privateObject.SetFieldOrProperty("m_TotColRoot", nonPublicInstance, detColRoot);
+            privateObject.SetFieldOrProperty("m_max_period", nonPublicInstance, Max);
+            privateObject.SetFieldOrProperty("m_bCTAMode", nonPublicInstance, false);
+            privateObject.SetFieldOrProperty("m_SnGFids", nonPublicInstance, intArray);
+            privateObject.SetFieldOrProperty("m_SnGAsc", nonPublicInstance, intArray);
+            privateObject.SetFieldOrProperty("m_SnGGrp", nonPublicInstance, intArray);
+
+            // Act
+            var actual = (string)privateObject.Invoke(SelectUserViewDataMethodName, publicInstance, new object[] { sqlConnection, viewID });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(DummyString),
+                () => validations.ShouldBe(4));
         }
     }
 }
