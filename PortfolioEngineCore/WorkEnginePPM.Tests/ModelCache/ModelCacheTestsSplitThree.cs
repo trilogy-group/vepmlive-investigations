@@ -115,11 +115,13 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
             {
                 [One] = new DataItem()
                 {
+                    ID = One,
                     UID = One,
                     Name = DummyString
                 },
                 [Two] = new DataItem()
                 {
+                    ID = Two,
                     UID = Two,
                     Name = DummyString
                 }

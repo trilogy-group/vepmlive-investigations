@@ -121,6 +121,7 @@
     <Compile Include="Layouts\ppm\CostTypesTests.cs" />
     <Compile Include="Layouts\ppm\ModelsTests.cs" />
     <Compile Include="Layouts\ppm\CostCategoriesTests.cs" />
+    <Compile Include="ModelCache\ModelCacheTestsSplitFour.cs" />
     <Compile Include="ModelCache\ModelCacheTestsSplitOne.cs" />
     <Compile Include="ModelCache\ModelCacheTestsSplitThree.cs" />
     <Compile Include="ModelCache\ModelCacheTestsSplitTwo.cs" />
