@@ -396,7 +396,6 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\EPKRequest.ashx.cs">
       <DependentUpon>EPKRequest.ashx</DependentUpon>
     </Compile>
-    <Compile Include="Layouts\ppm\GenerateTicketResponse.cs" />
     <Compile Include="Layouts\ppm\gotopage.aspx.cs">
       <DependentUpon>gotopage.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1050,7 +1049,6 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\DHTML\xgrid\skins\dhtmlxgrid_dhx_dgrid.css" />
     <Content Include="Layouts\ppm\AddList.aspx" />
     <Content Include="Layouts\ppm\Admin\InstallDataSyncEvents.aspx" />
-    <Content Include="Layouts\ppm\AnalyzerHelper.js" />
     <Content Include="Layouts\ppm\CAB\WE_Client.CAB" />
     <Content Include="Layouts\ppm\calendarform.aspx" />
     <Content Include="Layouts\ppm\Calendars.aspx" />

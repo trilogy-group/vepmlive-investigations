@@ -10,6 +10,9 @@
         }
     }
 
+    //  General page settings
+
+
     CostAnalyzer.prototype.OnLoad = function (event) {
         try {
 
@@ -875,9 +878,6 @@
             try {
                 if (bDoRender == true)
                     grid.Render();
-                else {
-                    this.ApplyRowFilters(grid);
-                }
             }
             catch (e) { };
 
@@ -885,16 +885,6 @@
         }
         catch (e) {
             this.HandleException("ApplyGridView", e);
-        }
-    }
-
-    CostAnalyzer.prototype.ApplyRowFilters = function (grid) {
-        try {
-            var hideRowsWithAllZeros = this.viewTab.getButtonState("hideRowsWithAllZerosButton") ? 1 : 0;
-            this.analyzerHelper.ApplyRowFilters(grid, hideRowsWithAllZeros);
-        }
-        catch (e) {
-            this.HandleException("ApplyRowFilters", e);
         }
     }
 
@@ -1694,27 +1684,19 @@
             sbDataxml.append("'/>");
             sb.append(sbDataxml.toString());
 
-            sbDataxml = new StringBuilder();
-            sbDataxml.append("<HideRowsWithAllZeros Value='");
-            sbDataxml.append((this.viewTab.getButtonState("hideRowsWithAllZerosButton") ? "1" : "0"));
-            sbDataxml.append("'/>");
-            sb.append(sbDataxml.toString());
 
             sb.append("</ShowDetails>");
 
             this.ModeSettings = sb.toString();
 
-            if (issueServerRequest === false) {
-                return true;
-            }
+            if (issueServerRequest == false)
+                return;
 
             try {
                 this.stashgridsettings = this.BuildViewInf("guid", null, true);
             }
             catch (e) {
-                this.HandleException("SetSelectedMode", e);
             }
-
             WorkEnginePPM.CostAnalyzer.Execute("SetDisplayMode", sb.toString());
             this.ShowWorkingPopup("divLoading");
             RefreshBothGrids();
@@ -1985,8 +1967,7 @@
                             },
                            {
                                items: [
-                                    { type: "mediumtext", id: "chksDecCosts", name: "Show Decimal Places in Costs", tooltip: "Show Decimal Places in Costs", onclick: "dialogEvent('AnalyzerTab_SelMode_Changed4');" },
-                                    { type: "mediumtext", id: "hideRowsWithAllZerosButton", name: "Hide rows with all zeros", tooltip: "Hide rows with all zeros", onclick: "dialogEvent('HideRowsWithAllZerosButtonOnClick');" }
+                                    { type: "mediumtext", id: "chksDecCosts", name: "Show Decimal Places in Costs", tooltip: "Show Decimal Places in Costs", onclick: "dialogEvent('AnalyzerTab_SelMode_Changed4');" }
                                  ]
                            }
                          ]
@@ -2376,8 +2357,6 @@
 
         if (grid.id == "et_1")
             this.EditGrid = grid;
-
-        this.ApplyRowFilters(grid);
     }
 
 
@@ -2416,22 +2395,9 @@
                 this.viewTab.setButtonStateOn("chksDecCosts");
             else
                 this.viewTab.setButtonStateOff("chksDecCosts");
+
         }
         catch (e) { }
-
-        try {
-            if (this.ModeSettings &&
-                this.ModeSettings.HideRowsWithAllZeros &&
-                this.ModeSettings.HideRowsWithAllZeros.Value === "0") {
-                this.viewTab.setButtonStateOff("hideRowsWithAllZerosButton");
-            }
-            else {
-                // enable by default or when HideRowsWithAllZeros value is not 0
-                this.viewTab.setButtonStateOn("hideRowsWithAllZerosButton");
-            }
-        } catch (e) {
-            console.log(e);
-        }
     }
     CostAnalyzer.prototype.PopulateUI = function () {
 
@@ -5190,15 +5156,6 @@
                     this.SetSelectedMode(true);
                     break;
 
-                case "HideRowsWithAllZerosButtonOnClick":
-                    if (this.viewTab.getButtonState("hideRowsWithAllZerosButton") !== true)
-                        this.viewTab.setButtonStateOn("hideRowsWithAllZerosButton");
-                    else
-                        this.viewTab.setButtonStateOff("hideRowsWithAllZerosButton");
-
-                    this.SetSelectedMode(true);
-                    break;
-
                 case "AnalyzerTab_ExporttoExcel":
                     grid = Grids["g_1"];
                     grid.Source.Export.Type = "xls";
@@ -7168,9 +7125,6 @@
         }
 
     try {
-        // shared Cost and Resource analyzers functions
-        this.analyzerHelper = new AnalyzerHelper();
-
         // Initialised fields
         this.dlgShowGridEx = null;
         this.SelectEditDlg = null;

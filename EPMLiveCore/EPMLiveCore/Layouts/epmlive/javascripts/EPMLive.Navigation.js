@@ -1066,25 +1066,83 @@
                             remove(linkId, notifId);
                         });
                     };
-                                        
-                    if (command === 'createworkspace') {
-                        var loadWSCreationDialog = function () {
-                            if (window.CreateEPMLiveWorkspace) {
-                                window.CreateEPMLiveWorkspace(listId, itemId);
-                            } else {
-                                window.setTimeout(function () {
-                                    loadWSCreationDialog();
-                                }, 1);
+
+                    var url = window.epmLiveNavigation.currentWebUrl;
+                    var gaUrl = (url + '/_layouts/15/epmlive/gridaction.aspx?webid=' + webId + '&listid=' + listId + '&id=' + itemId + '&').replace(/\/\//g, '/');
+                    var rpUrl = (url + '/_layouts/15/epmlive/redirectionproxy.aspx?webid=' + webId + '&listid=' + listId + '&id=' + itemId + '&').replace(/\/\//g, '/');
+
+                    var redirectUrl = '';
+
+                    switch (command) {
+                        case 'nav:add':
+                            redirectUrl = rpUrl + 'action=new';
+                            break;
+                        case 'nav:team':
+                            var wId = '';
+                            var lId = '';
+                            var iId = '';
+
+                            if (itemId !== 'undefined') {
+                                try {
+                                    var info = window.epmLiveNavigation.wsTeamDict[webId].split('.');
+                                    if (info[2] !== '-1') {
+                                        wId = info[0];
+                                        lId = info[1];
+                                        iId = info[2];
+                                    }
+                                } catch (e) {
+                                }
                             }
-                        };
 
-                        loadWSCreationDialog();
+                            redirectUrl = (url + '/_layouts/15/epmlive/gridaction.aspx?').replace(/\/\//g, '/') + 'action=buildteam&webid=' + (wId || webId);
 
-                        return;
+                            if (iId) {
+                                redirectUrl = redirectUrl + '&listid=' + lId + '&id=' + iId;
+                            }
                     }
 
-                    var linkInfo = window.epmLiveNavigation.getContextualCommandLinkInfo(id, webId, listId, itemId, command, kind);
-                    var redirectUrl = linkInfo.dialogUrl;
+                    if (!redirectUrl && command) {
+                        if (command.indexOf('epkcommand:') !== -1) {
+                            redirectUrl = gaUrl + 'action=epkcommand&subaction=' + command.split(':')[1];
+                        } else if (command === 'createworkspace') {
+                            var loadWSCreationDialog = function () {
+                                if (window.CreateEPMLiveWorkspace) {
+                                    window.CreateEPMLiveWorkspace(listId, itemId);
+                                } else {
+                                    window.setTimeout(function () {
+                                        loadWSCreationDialog();
+                                    }, 1);
+                                }
+                            };
+
+                            loadWSCreationDialog();
+
+                            return;
+                        } else {
+                            redirectUrl = gaUrl + 'action=' + command;
+                        }
+                    }
+
+                    if (redirectUrl) {
+                        redirectUrl = redirectUrl.split('#')[0];
+                    }
+
+                    if (command === 'view' || command === 'edit' || command === 'gotoplanner' || command === 'GoToTaskPlanner') {
+                        var page = '';
+
+                        var wUrl = $$.currentWebUrl();
+                        var urlParts = window.location.href.split('?');
+
+                        if (wUrl === '/') {
+                            page = urlParts[0];
+                        } else {
+                            page = (wUrl + urlParts[0].split(escape(wUrl))[1]);
+                        }
+
+                        page = escape(page);
+
+                        redirectUrl += '&source=' + page;
+                    }
 
                     switch (kind + '') {
                         case '-1':
@@ -1128,10 +1186,10 @@
                             }
                             return true;
                         case '2':
-                            window.open(redirectUrl, '', 'height=100, width=200, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
+                            window.open(redirectUrl + '&IsDlg=1', '', 'height=100, width=200, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
                             return true;
                         case '3':
-                            window.open(redirectUrl, '', 'width=' + screen.width + ',height=' + screen.height + ',top=0,left=0, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
+                            window.open(redirectUrl + '&IsDlg=1', '', 'width=' + screen.width + ',height=' + screen.height + ',top=0,left=0, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
                             return true;
                         case '5':
                             if (callBackFunction != '')
@@ -1473,10 +1531,6 @@
 
                     window.epmLiveNavigation.handleContextualCommand = function (id, webId, listId, itemId, command, kind, callBackFunction) {
                         handleContextualCommand(id, webId, listId, itemId, command, kind, callBackFunction);
-                    };
-
-                    window.epmLiveNavigation.getContextualCommandLinkInfo = function (id, webId, listId, itemId, command, kind) {
-                        return getContextualCommandLinkInfo(id, webId, listId, itemId, command, kind);
                     };
 
                     $('td.epm-nav-node-root').click(function () {
@@ -2398,24 +2452,11 @@
                                     callbackfunction = callBackFunctions[cmd.command];
                                 }
 
-                                // create item and store in menuItem variable
-                                $menu.append($('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a style="width: 122px !important; display: inline-block;">' + cmd.title + '</a></li>').hide().fadeIn());
-                                var menuItem = $menu.find('a').last();
+                                $menu.append($('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + listId + '\',\'' + itemId + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\',\'' + callbackfunction + '\');" style="width: 122px !important; display: inline-block;">' + cmd.title + '</a></li>').hide().fadeIn());
 
-                                // get the link info and update menu item href and click event
-                                var linkInfo = window.epmLiveNavigation.getContextualCommandLinkInfo(liId, webId, listId, itemId, cmd.command, cmd.kind);
-                                if (linkInfo.webUrl) {
-                                    menuItem.attr('href', linkInfo.webUrl);
-                                } else if (linkInfo.errorUrl) {
-                                    menuItem.attr('href', linkInfo.errorUrl);
-                                }
-                                menuItem.click(function (a1,a2,a3,a4,a5,a6,a7) {
-                                    return function (handler) {
-                                        handler.preventDefault();
-                                        hideMenu();
-                                        window.epmLiveNavigation.handleContextualCommand(a1, a2, a3, a4, a5, a6, a7);
-                                    };
-                                }(liId, webId, listId, itemId, cmd.command, cmd.kind, callbackfunction));
+                                $menu.find('a').click(function () {
+                                    hideMenu();
+                                });
                             }
                         }
 
