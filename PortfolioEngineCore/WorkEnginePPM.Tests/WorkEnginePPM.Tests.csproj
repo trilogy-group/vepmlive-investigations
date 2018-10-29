@@ -145,6 +145,10 @@
       <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
       <Name>EPMLive.TestFakes</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
+      <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
+      <Name>EPMLiveCore</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PortfolioEngineCore\PortfolioEngineCore.csproj">
       <Project>{BB86B09C-CB35-4888-8639-C047A40A9C0C}</Project>
       <Name>PortfolioEngineCore</Name>
