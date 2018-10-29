@@ -125,7 +125,7 @@ const configSetup = {
             }
         }
     },
-    baseUrl: 'http://tenant01.epmldev.com/epm',
+    baseUrl: 'http://tenant02.epmldev.com/epm',
     framework: 'jasmine',
     jasmineNodeOpts: {
         showColors: true,
