@@ -76,6 +76,7 @@ namespace WorkEnginePPM.Tests.ModelCacheTests
 
         private void SetupVariables()
         {
+            SetupListsAndDictionaries();
             publicInstance = BindingFlags.Instance | BindingFlags.Public;
             nonPublicInstance = BindingFlags.Instance | BindingFlags.NonPublic;
             guid = Guid.Parse(GuidString);

@@ -1,17 +1,12 @@
 using System;
 using System.Net;
-using System.Collections.Generic;
-using System.Text;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using System.Web.SessionState;
-using System.Security.Authentication;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.SharePoint;
+using SystemTrace = System.Diagnostics.Trace;
 
 namespace EPMLiveCore
 {
@@ -123,38 +118,38 @@ namespace EPMLiveCore
         private void loadFile(SPDocumentLibrary oDocLib, string sDocTmpltURL, string sNewFileName)
         {
             ServicePointManager.ServerCertificateValidationCallback +=
-            delegate(
+            delegate (
                 object sender,
                 X509Certificate certificate,
                 X509Chain chain,
                 SslPolicyErrors sslPolicyErrors)
             {
                 return true;
-            };  
-            //try
+            };
+
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                using (var webClient = new WebClient())
                 {
-                    WebClient webClient = new WebClient();
                     webClient.UseDefaultCredentials = true;
 
                     webClient.Headers.Add(HttpRequestHeader.Cookie, Request.Headers["Cookie"]);
 
-                    byte[] fileBytes = webClient.DownloadData(sDocTmpltURL);
+                    var fileBytes = webClient.DownloadData(sDocTmpltURL);
 
                     newFile = oDocLib.RootFolder.Files.Add(sNewFileName + ".mpp", fileBytes);
                     try
                     {
                         newFile.ReleaseLock(newFile.LockId);
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        SystemTrace.WriteLine(ex.ToString());
+                    }
 
                     filePath = newFile.ServerRelativeUrl;
-                });
-            }
-            //catch
-            {
-            }
+                }
+            });
         }
 
         protected void btnOk_Click(object sender, EventArgs e)
