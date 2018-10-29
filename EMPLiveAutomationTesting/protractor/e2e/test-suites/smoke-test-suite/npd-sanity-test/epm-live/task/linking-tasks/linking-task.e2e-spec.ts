@@ -129,11 +129,15 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.verification('Selected Tasks are NOT linked [NO change in column values Work and Predecessors]');
         await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.two, ProjectItemPageConstants.newTaskFields.start).click();
-        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.predecessorsNull, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
+        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText())
+        .toBe(CommonPageConstants.predecessorsData.predecessorsNull,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
             CommonPageConstants.predecessorsData.predecessorsNull));
         await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.three,
             ProjectItemPageConstants.newTaskFields.start).click();
-        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.predecessorsNull, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
+        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText())
+        .toBe(CommonPageConstants.predecessorsData.predecessorsNull,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
             CommonPageConstants.predecessorsData.predecessorsNull));
     });
 });

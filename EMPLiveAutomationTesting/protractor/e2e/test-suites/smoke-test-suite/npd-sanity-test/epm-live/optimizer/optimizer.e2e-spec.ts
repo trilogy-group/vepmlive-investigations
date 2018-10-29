@@ -31,7 +31,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         const uniqueId = PageHelper.getUniqueId();
 
-        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId,);
+        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, );
 
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,

@@ -6,7 +6,6 @@ import {MyTimeOffPageConstants} from './my-time-off-page.constants';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {MyTimeOffPage} from './my-time-off.po';
 import {WaitHelper} from '../../../../components/html/wait-helper';
-import {CommonPageHelper} from '../../common/common-page.helper';
 import {StepLogger} from '../../../../../core/logger/step-logger';
 
 export class MyTimeOffPageHelper {
@@ -20,52 +19,41 @@ export class MyTimeOffPageHelper {
         await TextboxHelper.sendKeys(MyTimeOffPage.inputs.title, title);
 
         StepLogger.step(` Time Off Type: Select value if not selected already`);
-        await PageHelper.sendKeysToInputField(MyTimeOffPage.inputs.timeOffType, timeOffType);
-
-        StepLogger.step('Select any Time OFf type from the drop down');
         await PageHelper.click(MyTimeOffPage.timeOffTypeShowAllButton);
-        await WaitHelper.waitForElementToBeDisplayed(inputs.timeOffType);
-        const timeOffName = await inputs.timeOffType.getText();
-
-        StepLogger.verification('Required values selected in Time Off type Field');
-        await PageHelper.click(inputs.timeOffType);
-        await expect(await CommonPageHelper.getAutoCompleteItemByDescription(timeOffName).isPresent())
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.timeOffType, timeOffName));
+        await PageHelper.click(MyTimeOffPage.timeOffTypeValues(timeOffType));
 
         StepLogger.step(`Requestor: Enter logged in user name`);
-        await TextboxHelper.sendKeys(MyTimeOffPage.inputs.requestor, requestor);
+        await TextboxHelper.sendKeys(inputs.requestor, requestor);
 
         StepLogger.step(`Start: Select a Start date`);
-        await TextboxHelper.sendKeys(MyTimeOffPage.inputs.start, startDate);
+        await TextboxHelper.sendKeys(inputs.start, startDate);
 
         StepLogger.step(`Finish: Select a Finish date`);
-        await TextboxHelper.sendKeys(MyTimeOffPage.inputs.finish, finishDate);
+        await TextboxHelper.sendKeys(inputs.finish, finishDate);
 
         StepLogger.verification('Required values Entered/Selected in "Edit Time Off" Page');
         StepLogger.verification('Verify - Title *: Random New Time Off Item');
-        await expect(await TextboxHelper.hasValue(MyTimeOffPage.inputs.title, title))
+        await expect(await TextboxHelper.hasValue(inputs.title, title))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.title, title));
 
         StepLogger.verification('Verify - Requester: User name');
-        await expect(await TextboxHelper.hasValue(MyTimeOffPage.inputs.requestor, requestor))
+        await expect(await TextboxHelper.hasValue(inputs.requestor, requestor))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.requestor, requestor));
 
         StepLogger.verification('Verify - Start Date value');
-        await expect(await TextboxHelper.hasValue(MyTimeOffPage.inputs.start, startDate))
+        await expect(await TextboxHelper.hasValue(inputs.start, startDate))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.start, startDate));
 
         StepLogger.verification('Verify - Finish Date value');
-        await expect(await TextboxHelper.hasValue(MyTimeOffPage.inputs.finish, finishDate))
+        await expect(await TextboxHelper.hasValue(inputs.finish, finishDate))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.finish, finishDate));
 
         StepLogger.step('Click on save');
         await PageHelper.click(CommonPage.formButtons.save);
-
         // Wait for the page to close after clicking on save. This is to reduce window close synchronization issues
         await WaitHelper.staticWait(PageHelper.timeout.m);
 
@@ -75,7 +63,7 @@ export class MyTimeOffPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyTimeOffPageConstants.editPageName));
 
         StepLogger.step(`click on Close button`);
-        await PageHelper.click(MyTimeOffPage.closeButton);
+        await PageHelper.clickIfDisplayed(MyTimeOffPage.closeButton);
     }
 
     static getXpathForInputByLabel(type: string, title: string) {

@@ -358,7 +358,7 @@ export class PageHelper {
 
     static async switchToDefaultContent() {
         await browser.switchTo().defaultContent();
-        await browser.waitForAngularEnabled(true);
+        await browser.waitForAngularEnabled(false);
     }
 
     static async acceptAlert() {

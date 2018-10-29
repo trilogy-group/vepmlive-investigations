@@ -161,21 +161,23 @@ export class ResourcesPageHelper {
 
     static async hoverOnResource() {
         StepLogger.step('Hover over Resource');
-        const ellipses = ResourcesPage.gridDetails.ellipses.get(1);
+        const ellipses = ResourcesPage.gridDetails.ellipses;
         await browser.sleep(PageHelper.timeout.s);
-        await ElementHelper.actionHoverOver(ellipses);
+        await ElementHelper.actionHoverOver(ellipses.get(0));
     }
 
     static async verifyEllipsisDisplayed() {
         await ExpectationHelper.verifyDisplayedStatus(
-            ResourcesPage.gridDetails.ellipses.get(1),
+            ResourcesPage.gridDetails.ellipses.get(0),
             CommonPageConstants.ellipsisLabel,
         );
     }
 
     static async clickOnEllipsis() {
         StepLogger.step('Click on Ellipsis');
-        await PageHelper.click(ResourcesPage.gridDetails.ellipses.get(1));
+      //  await WaitHelper.waitForElementToBeDisplayed(ResourcesPage.gridDetails.ellipses.get(0));
+        await ElementHelper.actionHoverOverAndClick(ResourcesPage.gridDetails.ellipses.get(0),
+        ResourcesPage.gridDetails.ellipses.get(0));
     }
 
     static async verifyMenuItemDisplayed() {
@@ -192,7 +194,7 @@ export class ResourcesPageHelper {
 
     static async editResourcePageDisplayed() {
         await ExpectationHelper.verifyDisplayedStatus(
-            ResourcesPage.inputs.displayName,
+            ResourcesPage.inputs.resources,
             ResourcesPageConstants.editPageName,
         );
     }
@@ -214,7 +216,7 @@ export class ResourcesPageHelper {
 
     static async getDisplayNameInEditResourcePage() {
         StepLogger.step('Returns title of resource name');
-        const displayName = await PageHelper.getAttributeValue(ResourcesPage.inputs.displayName, HtmlHelper.attributes.value);
+        const displayName = await PageHelper.getAttributeValue(ResourcesPage.inputs.firstName, HtmlHelper.attributes.value);
         return displayName;
     }
 }

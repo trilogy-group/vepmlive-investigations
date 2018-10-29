@@ -183,7 +183,7 @@ export class CommonPageHelper {
         for (let index = 0; index < columnText.length; index++) {
             columnXpaths.push(`td[normalize-space(.)='${columnText[index]}']`);
         }
-        const xpath = `//tr[contains(@class,'GMClassSelected')][${columnXpaths.join(CommonPageConstants.and)}]`;
+        const xpath = `//tr[${columnXpaths.join(CommonPageConstants.and)}]`;
         return element(By.xpath(xpath));
     }
 
@@ -223,7 +223,7 @@ export class CommonPageHelper {
     ) {
         StepLogger.step('Select "Navigation" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.navigation);
-        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader,);
+        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader);
     }
 
     static async searchByTitle(linkOfThePage: ElementFinder,
@@ -235,17 +235,17 @@ export class CommonPageHelper {
             pageHeader,
             pageName,
         );
-        await this.searchItemByTitle(titleValue, columnName,);
+        await this.searchItemByTitle(titleValue, columnName, );
     }
 
     static async navigateToItemPageUnderMyWorkplace(linkOfThePage: ElementFinder,
                                                     pageHeader: ElementFinder,
-                                                    pageName: string,
+                                                    pageName: string
     ) {
         StepLogger.step('Select "My Workplace" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.myWorkplace);
         StepLogger.stepId(2);
-        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader,);
+        await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader);
     }
 
     static async navigateToSubPage(pageName: string, linkOfThePage: ElementFinder, pageHeader: ElementFinder) {
@@ -269,7 +269,7 @@ export class CommonPageHelper {
         await browser.sleep(PageHelper.timeout.m);
 
         StepLogger.step('Click on search');
-        await PageHelper.click(CommonPage.actionMenuIcons.search);
+        await PageHelper.click(CommonPage.actionMenuIcons.searchIcon);
 
         if (verifySearchControl === true) {
             StepLogger.verification('Search Component dropdown is available');
@@ -320,7 +320,7 @@ export class CommonPageHelper {
     }
 
     static getMenuItemFromRibbonContainer(title: string) {
-        return element(By.css(`#RibbonContainer li[title="${title}"]`));
+        return element(By.css(`#RibbonContainer li[title="${title}"] span`));
     }
 
     static async refreshPageIfRibbonElementIsDisable(targetElement: ElementFinder, item = CommonPage.record) {
@@ -341,6 +341,34 @@ export class CommonPageHelper {
         StepLogger.step('Select "Edit Item" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editItem);
 
+    }
+
+    static async editViaItems() {
+        StepLogger.stepId(3);
+        StepLogger.step('Select the check box for record');
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dataRows.get(1));
+        await ElementHelper.actionHoverOver(CommonPage.dataRows.get(1));
+        await PageHelper.click(CommonPage.rowsFirstColumn.get(1));
+
+        StepLogger.step('Click on ITEMS on ribbon');
+        await PageHelper.click(CommonPage.itemsMenu);
+
+        StepLogger.step('Select "Edit Item" from the options displayed');
+        await PageHelper.click(CommonPage.ribbonItems.editItem);
+    }
+
+    static async viewViaItems() {
+        StepLogger.stepId(2);
+        StepLogger.step('Select the check box for record');
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dataRows.get(1));
+        await ElementHelper.actionHoverOver(CommonPage.dataRows.get(1));
+        await PageHelper.click(CommonPage.rowsFirstColumn.get(1));
+
+        StepLogger.step('Click on ITEMS on ribbon');
+        await PageHelper.click(CommonPage.itemsMenu);
+
+        StepLogger.step('Select "Edit Item" from the options displayed');
+        await PageHelper.click(CommonPage.ribbonItems.viewItem);
     }
 
     static async editCostViaRibbon(item = CommonPage.record) {
@@ -454,6 +482,7 @@ export class CommonPageHelper {
         StepLogger.stepId(2);
         StepLogger.step('Select the check box for record');
         await WaitHelper.waitForElementToBeDisplayed(item);
+        await ElementHelper.actionHoverOver(item);
         await PageHelper.click(item);
 
         StepLogger.step('Click on ITEMS on ribbon');
@@ -477,13 +506,17 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
 
-    static async selectTwoRecordsFromGrid(item = CommonPage.record) {
+    static async selectTwoRecordsFromGrid() {
         StepLogger.stepId(2);
-        StepLogger.step('Select the check box for two record');
-        await WaitHelper.waitForElementToBeDisplayed(item);
-        await PageHelper.click(item);
+        StepLogger.step('Select the check box for two records');
+        StepLogger.subStep('Select the first record');
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord());
+        await PageHelper.click(CommonPage.getNthRecord());
+
         await browser.sleep(PageHelper.timeout.xs);
-        await PageHelper.click(CommonPage.secondRecord);
+        StepLogger.subStep('Select the Second record');
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord(3));
+        await PageHelper.click(CommonPage.getNthRecord(2));
         await this.clickItemTab();
     }
 
@@ -491,7 +524,8 @@ export class CommonPageHelper {
         StepLogger.verification('Project Center opened ');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
-    }
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);
+        }
 
     static getSpanByText(text: string) {
         return element(By.xpath(`//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));
@@ -589,9 +623,6 @@ export class CommonPageHelper {
 
         StepLogger.step('Click on OK');
         await PageHelper.click(CommonPage.formButtons.okWithSmallK);
-
-        await PageHelper.switchToDefaultContent();
-
         return newFile;
     }
 
@@ -672,7 +703,7 @@ export class CommonPageHelper {
     }
 
     static getCreateNewPublicViewOfDropDown(publicViewTitle: string) {
-        return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)));
+        return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.span, publicViewTitle, false)));
     }
 
     static async clickLhsSideBarMenuIcon(icon: ElementFinder) {
@@ -840,6 +871,7 @@ export class CommonPageHelper {
         await PageHelper.click(this.getOptimizerButton());
         // Takes time to load the iframe
         await browser.sleep(PageHelper.timeout.m);
+        StepLogger.step('switch To First Content Frame');
         await CommonPageHelper.switchToFirstContentFrame();
     }
 
@@ -860,7 +892,7 @@ export class CommonPageHelper {
     }
 
     static async verifyItemDisabled(targetElement: ElementFinder) {
-        await ExpectationHelper.verifyAttributeValue(targetElement, 'aria-disabled', 'true',);
+        await ExpectationHelper.verifyAttributeValue(targetElement, 'aria-disabled', 'true', );
     }
 
     static async clickIconEllipsisHorizontal() {

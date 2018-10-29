@@ -22,6 +22,8 @@ export class ResourcesPageConstants {
             generic: 'Generic',
             displayName: 'Display Name',
             disabled: 'Disabled',
+            resources: 'Resources',
+            firstName: 'First Name',
         };
     }
 

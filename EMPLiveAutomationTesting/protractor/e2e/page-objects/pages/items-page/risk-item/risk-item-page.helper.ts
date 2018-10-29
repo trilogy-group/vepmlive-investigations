@@ -21,12 +21,6 @@ export class RiskItemPageHelper {
     static async editRisk() {
         await this.verifyPage();
 
-        StepLogger.verification('Values selected/entered while creating the Risk are pre populated in respective fields');
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
-        await expect(await CommonPage.title.getText())
-            .toBe(RiskItemPageConstants.pagePrefix,
-                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
-
         StepLogger.stepId(4);
         StepLogger.step('Enter/Select required details in "Edit Risk" page as described below');
 
@@ -84,9 +78,6 @@ export class RiskItemPageHelper {
             RiskItemPageConstants.columnNames.title,
             RiskItemPageConstants.columnNames.status,
             RiskItemPageConstants.columnNames.priority]);
-
-        StepLogger.verification('Click on searched record');
-        await PageHelper.click(CommonPage.record);
 
         StepLogger.verification('Verify record by title');
         const firstTableColumns = [titleValue];
