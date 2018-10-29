@@ -145,12 +145,12 @@ namespace CADataCache
                     m_curr_period = oper.PeriodID;
             }
 
-            DateTime dt = DateTime.Now;
+            DateTime dt = DateTime.Today;
 
 
             foreach (clsPeriodData oper in clsda.m_Periods.Values)
             {
-                if (oper.StartDate <= dt && oper.FinishDate >= dt)
+                if (oper.StartDate.Date <= dt && oper.FinishDate.Date >= dt)
                 {
                     m_curr_period = oper.PeriodID;
                     break;

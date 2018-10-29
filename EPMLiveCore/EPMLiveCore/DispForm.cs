@@ -1,20 +1,28 @@
 ﻿using System;
-using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Xml;
+using EPMLiveCore.API.ProjectArchiver;
+using EPMLiveCore.ListDefinitions;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using System.Xml;
-using System.Reflection;
-using System.Collections;
 
 namespace EPMLiveCore
 {
     public class DispForm : WebControl
     {
+        private const string ListFormEditActionsGroupId = "Ribbon.ListForm.Edit.Actions";
+        private const string ArchiveProjectActionId = ListFormEditActionsGroupId + ".ArchiveProject";
+        private const string ArchiveProjectActionTitle = "Archive Project";
+        private const string RestoreProjectActionId = ListFormEditActionsGroupId + ".RestoreProject";
+        private const string RestoreProjectActionTitle = "Restore Project";
+        private const string ArchivedColumn = ProjectArchiverService.ArchivedColumn;
+
         protected override void Render(HtmlTextWriter writer)
         {
             base.Render(writer);
@@ -43,6 +51,52 @@ namespace EPMLiveCore
             writer.WriteLine("</script>");
         }
 
+        private void RegisterArchiveRestoreFormButtons(SPWeb web, SPList list, SPListItem item, SPRibbon ribbon)
+        {
+            var archiveRestoreFeatureIsEnabled = AllowArchiveRestoreProjectForList(list);
+            var archiveProjectButtonVisible = archiveRestoreFeatureIsEnabled
+                                              && (item[ArchivedColumn] == null || (bool)item[ArchivedColumn] == false);
+            var restoreProjectButtonVisible = archiveRestoreFeatureIsEnabled && !archiveProjectButtonVisible;
+            
+            var ribbonExtensions = new XmlDocument();
+
+            if (archiveProjectButtonVisible)
+            {
+                // add archive button if project is active 
+                ribbonExtensions.LoadXml($@"<Button
+                    Id=""{ArchiveProjectActionId}""
+                    Sequence=""900""
+                    Command=""{ArchiveProjectActionId}""
+                    Image16by16=""/_layouts/15/{web.Language}/images/formatmap16x16.png"" Image16by16Top=""-181"" Image16by16Left=""-181""
+                    Image32by32=""/_layouts/15/{web.Language}/images/formatmap32x32.png"" Image32by32Top=""-305"" Image32by32Left=""-203""
+                    LabelText=""{ArchiveProjectActionTitle}""
+                    TemplateAlias=""o2""/>");
+                ribbon.RegisterDataExtension(ribbonExtensions.FirstChild,
+                    $"{ListFormEditActionsGroupId}.Controls._children");
+            }
+            else if (restoreProjectButtonVisible)
+            {
+                // add restore button if project is archived
+                ribbonExtensions.LoadXml($@"<Button
+                    Id=""{RestoreProjectActionId}""
+                    Sequence=""900""
+                    Command=""{RestoreProjectActionId}""
+                    Image16by16=""/_layouts/15/{web.Language}/images/formatmap16x16.png"" Image16by16Top=""-181"" Image16by16Left=""-181""
+                    Image32by32=""/_layouts/15/{web.Language}/images/formatmap32x32.png"" Image32by32Top=""-65"" Image32by32Left=""-33""
+                    LabelText=""{RestoreProjectActionTitle}""
+                    TemplateAlias=""o2""/>");
+                ribbon.RegisterDataExtension(ribbonExtensions.FirstChild,
+                    $"{ListFormEditActionsGroupId}.Controls._children");
+            }
+        }
+
+        private bool AllowArchiveRestoreProjectForList(SPList list)
+        {
+            var isProjectCenter = (int)list.BaseTemplate == (int)EPMLiveLists.ProjectCenter;
+            var result = isProjectCenter && list.Fields.ContainsField(ArchivedColumn);
+            return result;
+        }
+
         protected override void OnPreRender(System.EventArgs e)
         {
             SPWeb Web = SPContext.Current.Web;
@@ -54,6 +108,8 @@ namespace EPMLiveCore
 
 
             SPRibbon ribbon = SPRibbon.GetCurrent(this.Page);
+
+            RegisterArchiveRestoreFormButtons(Web, List, ListItem, ribbon);
 
             ribbon.TrimById("Ribbon.ListForm.Display.Manage.EditItem");
 

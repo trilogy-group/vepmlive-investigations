@@ -1,28 +1,27 @@
 using System;
-using System.Data;
-using System.Configuration;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Reflection;
+using System.Text;
 using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
+using System.Xml;
 using EPMLiveCore;
+using EPMLiveCore.API;
+using EPMLiveCore.API.ProjectArchiver;
 using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
-using System.Text.RegularExpressions;
-using System.Xml;
-using System.Text;
-using System.Data.SqlClient;
-using EPMLiveCore.API;
-using System.Reflection;
 
 namespace EPMLiveWebParts
 {
     public partial class gridaction : System.Web.UI.Page
     {
+        private const string SuccessMessage = "Success";
+        private const string ArhiveRestoreListIdRequestParameter = "listid";
+        private const string ArchiveRestoreItemIdRequestParameter = "id";
+        private const string ArchiveProjectAction = "archiveproject";
+        private const string RestoreProjectAction = "restoreproject";
+
         protected string data;
         
 
@@ -812,6 +811,15 @@ namespace EPMLiveWebParts
                             }
                             catch { }
                             break;
+                        case ArchiveProjectAction:
+                            data = ArchiveRestoreProject(site, true);
+                            break;
+                        case RestoreProjectAction:
+                            data = ArchiveRestoreProject(site, false);
+                            break;
+                        case "errormessage":
+                            data = Request["message"];
+                            break;
                         default:
                             data = "Unknown Action";
                             break;
@@ -860,6 +868,30 @@ namespace EPMLiveWebParts
             {
 
             }
+        }
+
+        private string ArchiveRestoreProject(SPSite site, bool archive)
+        {
+            if (site == null)
+            {
+                throw new ArgumentNullException(nameof(site));
+            }
+
+            var web = GetWeb(site);
+            var list = web.Lists[new Guid(Request[ArhiveRestoreListIdRequestParameter])];
+            var listItem = list.GetItemById(int.Parse(Request[ArchiveRestoreItemIdRequestParameter]));
+            var service = new ProjectArchiverService();
+
+            if (archive)
+            {
+                service.ArchiveProject(listItem);
+            }
+            else
+            {
+                service.RestoreProject(listItem);
+            }
+
+            return SuccessMessage;
         }
     }
 }

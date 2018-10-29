@@ -446,12 +446,14 @@ namespace PortfolioEngineCore
 
             int lSPRequestNo = (int)lRequestNo;
 
+            var skipArchivedProjects = false;
 
             if (lRequestNo == ResourceValues.ResCenterRequest.ResourceValuesForDepts)
             // Resource Plans for one or more depts
             {
                 sPIList = "NONE";
                 sResourceList = "NONE";
+                skipArchivedProjects = true;
                 if (sDeptList.Length > 0) { bOKtoContinue = true; }
             }
             else if (lRequestNo == ResourceValues.ResCenterRequest.ResourceValuesForPIsinDept)
@@ -481,6 +483,7 @@ namespace PortfolioEngineCore
             {
                 sDeptList = "NONE";
                 sPIList = "NONE";
+                skipArchivedProjects = true;
                 if (sResourceList.Length > 0) { bOKtoContinue = true; }
             }
             else if (lRequestNo == ResourceValues.ResCenterRequest.CapacityValues)
@@ -488,6 +491,7 @@ namespace PortfolioEngineCore
                 sDeptList = "NONE";
                 sPIList = "NONE";
                 sResourceList = "NONE";
+                skipArchivedProjects = true;
                 bOKtoContinue = true;
             }
 
@@ -865,12 +869,14 @@ namespace PortfolioEngineCore
                 string sPlanRowListC = "", sPlanRowListP = "", sPlanRowListR = "";
                 ResourceValues.clsCommitment oCommitment;
 
-                cmdText = "Select cm.CMT_UID,cm.RP_GROUP,cm.PROJECT_ID,cm.CMT_DEPT,cm.CMT_ROLE,cm.CMT_START_DATE,cm.CMT_FINISH_DATE," +
-                        " cm.CMT_TOTAL_COST,cm.BC_UID,cm.PARENT_BC_UID,cm.WRES_ID,cm.WRES_ID_PENDING,cm.CMT_STATUS as Status,cm.RP_ACTIVE_COMMITMENT as Commitment," +
-                        " CMT_MAJORCATEGORY,CAT_CODE_1,CAT_CODE_2,CAT_CODE_3,CAT_CODE_4,CAT_CODE_5,CAT_TEXT_1,CAT_TEXT_2,CAT_TEXT_3,CAT_TEXT_4,CAT_TEXT_5" +
-                        " From EPG_RESOURCEPLANS cm" +
-                        " Inner Join EPGP_PROJECTS ex On ex.PROJECT_ID=cm.PROJECT_ID and ex.PROJECT_MARKED_DELETION = 0" +
-                        " Left Join EPGP_RP_CATEGORY_VALUES cv On cv.CAT_CMT_UID = cm.CMT_UID";
+                cmdText =
+                    "Select cm.CMT_UID,cm.RP_GROUP,cm.PROJECT_ID,cm.CMT_DEPT,cm.CMT_ROLE,cm.CMT_START_DATE,cm.CMT_FINISH_DATE,"
+                    + " cm.CMT_TOTAL_COST,cm.BC_UID,cm.PARENT_BC_UID,cm.WRES_ID,cm.WRES_ID_PENDING,cm.CMT_STATUS as Status,cm.RP_ACTIVE_COMMITMENT as Commitment,"
+                    + " CMT_MAJORCATEGORY,CAT_CODE_1,CAT_CODE_2,CAT_CODE_3,CAT_CODE_4,CAT_CODE_5,CAT_TEXT_1,CAT_TEXT_2,CAT_TEXT_3,CAT_TEXT_4,CAT_TEXT_5"
+                    + " From EPG_RESOURCEPLANS cm"
+                    + " Inner Join EPGP_PROJECTS ex On ex.PROJECT_ID=cm.PROJECT_ID and ex.PROJECT_MARKED_DELETION = 0"
+                    + (skipArchivedProjects ? " and (ex.PROJECT_ARCHIVED IS NULL OR ex.PROJECT_ARCHIVED = 0)" : string.Empty)
+                    + " Left Join EPGP_RP_CATEGORY_VALUES cv On cv.CAT_CMT_UID = cm.CMT_UID";
                 // joins based on mode of request
                 if (lRequestNo == ResourceValues.ResCenterRequest.ResourceValuesForDepts)
                 {

@@ -1200,7 +1200,9 @@ CREATE TABLE dbo.EPGP_PROJECTS
     PROJECT_CHECKEDOUT_BY int,
     PROJECT_CHECKEDOUT_DATE datetime,
     PROJECT_EXT_UID nvarchar(128) NULL,
-    PROJECT_LIST_ID nvarchar(400) NULL
+    PROJECT_LIST_ID nvarchar(400) NULL,
+    PROJECT_ARCHIVED tinyint NULL,
+    PROJECT_DISCOUNT_RATE decimal(5, 4) NULL
 )
 
                 end
@@ -1211,6 +1213,18 @@ else
                                 begin
                                                 Print '     Add Column PROJECT_LIST_ID'
                                                 ALTER TABLE EPGP_PROJECTS ADD PROJECT_LIST_ID nvarchar(400) NULL
+                                end
+
+								if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'EPGP_PROJECTS' and column_name = 'PROJECT_ARCHIVED')
+                                begin
+                                                Print '     Add Column PROJECT_ARCHIVED'
+                                                ALTER TABLE EPGP_PROJECTS ADD PROJECT_ARCHIVED tinyint NULL
+                                end
+
+								if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'EPGP_PROJECTS' and column_name = 'PROJECT_DISCOUNT_RATE')
+                                begin
+                                                Print '     Add Column PROJECT_DISCOUNT_RATE'
+                                                ALTER TABLE EPGP_PROJECTS ADD PROJECT_DISCOUNT_RATE decimal(5, 4) NULL
                                 end
                 end
 
@@ -2302,13 +2316,27 @@ CREATE TABLE dbo.EPGP_DETAIL_VALUES
 	BC_SEQ int NOT NULL,
 	BD_PERIOD int NOT NULL,
 	BD_VALUE decimal(25,6),
-	BD_COST decimal(25,6)
+	BD_COST decimal(25,6),
+	BD_DISCOUNT_RATE decimal(5, 4) NULL,
+	BD_DISCOUNT_VALUE decimal(25,6) NULL
 )
 
                 end
 else
                 begin
                                 Print 'Updating Table EPGP_DETAIL_VALUES'
+
+								if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'EPGP_DETAIL_VALUES' and column_name = 'BD_DISCOUNT_RATE')
+                                begin
+                                                Print '     Add Column BD_DISCOUNT_RATE'
+                                                ALTER TABLE EPGP_DETAIL_VALUES ADD BD_DISCOUNT_RATE decimal(5, 4) NULL
+                                end
+
+								if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'EPGP_DETAIL_VALUES' and column_name = 'BD_DISCOUNT_VALUE')
+                                begin
+                                                Print '     Add Column BD_DISCOUNT_VALUE'
+                                                ALTER TABLE EPGP_DETAIL_VALUES ADD BD_DISCOUNT_VALUE decimal(25, 6) NULL
+                                end
                 end
 
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPGP_COST_XREF')
@@ -5788,3 +5816,21 @@ else
                                 Print 'Updating Table EPG_DATASTASH'
                 end
                                                             
+if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPG_PROJECT_RATES')
+                begin
+                                print 'Creating Table EPG_PROJECT_RATES'
+
+CREATE TABLE dbo.EPG_PROJECT_RATES
+ (
+	ID int IDENTITY(1,1) NOT NULL,
+	PROJECT_ID int NOT NULL,
+	WRES_ID int NOT NULL,
+	PR_EFFECTIVE_DATE datetime NULL,
+	PR_RATE decimal(15, 6) NULL
+) 
+
+                end
+else
+                begin
+                                Print 'Updating Table EPG_PROJECT_RATES'
+                end

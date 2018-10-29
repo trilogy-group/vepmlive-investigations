@@ -1452,24 +1452,33 @@ namespace EPMLiveCore
         /// <param name="tree">The tree.</param>
         private static void GetWebTree(Guid id, string siteUrl, ref List<Guid> tree)
         {
-            tree.Add(id);
-
-            using (var spSite = new SPSite(siteUrl))
+            try
             {
-                using (SPWeb spWeb = spSite.OpenWeb(id))
-                {
-                    if (spWeb.Webs.Count == 0) return;
+                tree.Add(id);
 
-                    SPWebCollection spWebCollection = spWeb.Webs;
-                    for (int i = 0; i < spWebCollection.Count; i++)
+                using (var spSite = new SPSite(siteUrl))
+                {
+                    using (SPWeb spWeb = spSite.OpenWeb(id))
                     {
-                        using (SPWeb web = spWebCollection[i])
+                        if (spWeb.Webs.Count == 0) return;
+
+                        SPWebCollection spWebCollection = spWeb.Webs;
+                        for (int i = 0; i < spWebCollection.Count; i++)
                         {
-                            GetWebTree(web.ID, siteUrl, ref tree);
+                            using (SPWeb web = spWebCollection[i])
+                            {
+                                GetWebTree(web.ID, siteUrl, ref tree);
+                            }
                         }
                     }
                 }
             }
+            catch
+            {
+                // removing web id's which does not have added in current user permission
+                tree.Remove(id);
+            }
+
         }
 
         #endregion

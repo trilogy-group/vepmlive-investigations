@@ -3,8 +3,11 @@ using System.Web;
 using System.IO;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using PortfolioEngineCore;
+using PortfolioEngineCore.Base.DBAccess;
+using WorkEnginePPM.Layouts.ppm;
 
 namespace WorkEnginePPM
 {
@@ -83,8 +86,10 @@ namespace WorkEnginePPM
                             {
                                 CStruct xCostviews = new CStruct();
                                 xCostviews.Initialize("Costview");
-
+                                
                                 int nSelectedCalendar = -1;
+                                var autoAdjustPeriods = AutoAdjustPeriods.Default();
+
                                 if (dt.Rows.Count == 1)
                                 {
                                     DataRow row = dt.Rows[0];
@@ -95,6 +100,10 @@ namespace WorkEnginePPM
                                     xCostviews.CreateIntAttr("VIEW_COST_BREAKDOWN", nSelectedCalendar);
                                     xCostviews.CreateIntAttr("VIEW_FIRST_PERIOD", DBAccess.ReadIntValue(row["VIEW_FIRST_PERIOD"]));
                                     xCostviews.CreateIntAttr("VIEW_LAST_PERIOD", DBAccess.ReadIntValue(row["VIEW_LAST_PERIOD"]));
+
+                                    var id = DBAccess.ReadIntValue(row["VIEW_UID"]);
+                                    var viewDataXml = ViewData.GetViewXmlByName(dba, ViewDataContext.CostEditor, id.ToString()).FirstOrDefault();
+                                    autoAdjustPeriods.TryLoadFromXml(viewDataXml);
                                 }
                                 else
                                 {
@@ -106,6 +115,8 @@ namespace WorkEnginePPM
                                     xCostviews.CreateIntAttr("VIEW_LAST_PERIOD", 0);
                                 }
 
+                                autoAdjustPeriods.CreateAttributes(xCostviews);
+                                
                                 CStruct xCalendars = xCostviews.CreateSubStruct("calendars");
                                 CStruct xItem = xCalendars.CreateSubStruct("item");
                                 xItem.CreateIntAttr("id", -1);
@@ -237,6 +248,9 @@ namespace WorkEnginePPM
             string sVIEW_CTS = xData.GetStringAttr("VIEW_CTS");
             string sReply = "";
 
+            var autoAdjustPeriods = AutoAdjustPeriods.Default();
+            autoAdjustPeriods.TryLoadFromAttributes(xData);
+            
             string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
             DataAccess da = new DataAccess(sBaseInfo);
             DBAccess dba = da.dba;
@@ -244,12 +258,16 @@ namespace WorkEnginePPM
             {
                 try
                 {
+                    var viewDataXml = autoAdjustPeriods.GetXml("View");
+
                     if (dbaCostViews.UpdateCostViewInfo(dba, ref nVIEW_UID, sVIEW_NAME, sVIEW_DESC, nVIEW_COST_BREAKDOWN, nVIEW_FIRST_PERIOD, nVIEW_LAST_PERIOD, sVIEW_CTS, out sReply) != StatusEnum.rsSuccess)
                     {
                         if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "Costviews.UpdateCostviewsInfo2", dba.StatusText);
                     }
                     else
                     {
+                        ViewData.SaveViewXmlByName(dba, ViewDataContext.CostEditor, nVIEW_UID.ToString(), viewDataXml);
+
                         //  needed to update list after SAVE
                         CStruct xCostviews = new CStruct();
                         xCostviews.Initialize("Costview");
@@ -279,7 +297,11 @@ namespace WorkEnginePPM
                 int nVIEW_UID = xData.GetIntAttr("VIEW_UID");
                 try
                 {
-                    dbaCostViews.DeleteCostView(dba, nVIEW_UID, out sReply);
+                    var status = dbaCostViews.DeleteCostView(dba, nVIEW_UID, out sReply);
+                    if (status == StatusEnum.rsSuccess)
+                    {
+                        ViewData.DeleteViewByName(dba, ViewDataContext.CostEditor, nVIEW_UID.ToString());
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -1,4 +1,6 @@
 ﻿function ResPlanAnalyzer(thisID, params) {
+    // define global instance reference
+    var $this = this;
     // NB Constructor code at end of function
     var MakeDelegate = function (target, method) {
         if (method === null) {
@@ -397,59 +399,72 @@
         return obj;
     };
 
-    ResPlanAnalyzer.prototype.BuildViewInf = function (viewGUID, viewName, isViewDefault, isViewPersonal, bConvToJSON) {
-        if (isViewDefault == true) isViewDefault = 1; else if (isViewDefault == false) isViewDefault = 0;
-        if (isViewPersonal == true) isViewPersonal = 1; else if (isViewPersonal == false) isViewPersonal = 0;
+    ResPlanAnalyzer.prototype.BuildViewInf = function (viewGuid, viewName, isViewDefault, isViewPersonal, convertToJson) {
+        isViewDefault = isViewDefault ? "1" : "0";
+        isViewPersonal = isViewPersonal ? "1" : "0";
+        
+        var autoAdjustPeriodsConfig = AutoAdjustPeriods.EnsureValidInstance(this.autoAdjustPeriods);
+        
+        var topGridXml = this.BuildGridInf("g_1", this.AnalyzerFilterschecked, this.AnalyzeGroupingchecked, this.AnalyzerTabisCollapsed);
+        var bottomGridXml = this.BuildGridInf("bottomg_1", this.TotalFilterschecked, this.TotalGroupingchecked, this.TotalTabisCollapsed);
 
-        var sTopGrid = this.BuildGridInf("g_1", this.AnalyzerFilterschecked, this.AnalyzeGroupingchecked, this.AnalyzerTabisCollapsed);
+        var showBars = (this.AnalyzerShowBarschecked ? "1" : "0");
+        var hideDetails = (this.AnalyzerHideDetailschecked ? "1" : "0");
+        var showTotals = (this.showingTotDet ? "1" : "0");
 
-        var sBottomGrid = this.BuildGridInf("bottomg_1", this.TotalFilterschecked, this.TotalGroupingchecked, this.TotalTabisCollapsed);
+        var fromListControl = document.getElementById("idAnalyzerTab_FromPeriod");
+        var toListControl = document.getElementById("idAnalyzerTab_ToPeriod");
 
-
-        // need to get details xml, totals xml, mode settings 
-
-        var ssbf = (this.AnalyzerShowBarschecked ? "1" : "0");
-        var shdf = (this.AnalyzerHideDetailschecked ? "1" : "0");
-        var shbd = (this.showingTotDet ? "1" : "0");
-
-
-        var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
-        var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
-
-        var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
-        if (StartID == -1) {
-            StartID = this.UsingPeriods.CurrentPeriod.Value;
+        var startId = parseInt(fromListControl.options[fromListControl.selectedIndex].value);
+        if (startId === -1) {
+            startId = this.UsingPeriods.CurrentPeriod.Value;
         }
-        var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
 
-
-
-        var dataXml = '<View ViewGUID="' + XMLValue(viewGUID) + '" Name="' + XMLValue(viewName) + '" Default="'
+        var finishId = parseInt(toListControl.options[toListControl.selectedIndex].value);
+        var hideRowsWithAllZeros = this.viewTab.getButtonState("hideRowsWithAllZerosButton") ? 1 : 0;
+        var otherDataXml = '<OtherData>' +
+            this.TotalsColumnSettings +
+            this.DetailsSettings +
+            this.DisplayMode +
+            '</OtherData>';
+        var viewSettingsXml = this.BuildViewSettingsXml(showBars,
+            hideDetails,
+            showTotals,
+            hideRowsWithAllZeros,
+            autoAdjustPeriodsConfig,
+            startId,
+            finishId);
+        var dataXml = '<View ViewGUID="' + XMLValue(viewGuid) + '" Name="' + XMLValue(viewName) + '" Default="'
 				+ isViewDefault + '" Personal="' + isViewPersonal + '">'
-				+ sTopGrid
-				+ sBottomGrid
-				+ '<OtherData>'
-				+ this.TotalsColumnSettings
-				+ this.DetailsSettings
-				+ this.DisplayMode
-				+ '</OtherData>'
-				+ '<ViewSettings ShowBars="' + ssbf + '" HideDetails="' + shdf + '" ShowBotDet="' + shbd + '"';
+				+ topGridXml
+				+ bottomGridXml
+				+ otherDataXml
+				+ viewSettingsXml
+                + '</View>';
 
-
-        if (StartID == -1)
-            dataXml += ' PerInc = "0" FinishPeriod="' + FinishID + '" ';
-        else
-            dataXml += ' PerInc = "0" '
-
-
-        dataXml += '/>' + '</View>';
-
-        if (bConvToJSON != true)
+        if (convertToJson !== true) {
             return dataXml;
-
+        }
 
         return this.xmlStringToJson(dataXml);
+    }
 
+    ResPlanAnalyzer.prototype.BuildViewSettingsXml = function (showBars, hideDetails, showTotals, hideRowsWithAllZeros, autoAdjustPeriodsConfig, startId, finishId) {
+        var viewSettingXml = '<ViewSettings ShowBars="' + showBars + '" HideDetails="' + hideDetails + '" ShowBotDet="' + showTotals + '" HideRowsWithAllZeros="' + hideRowsWithAllZeros + '"';
+        if (autoAdjustPeriodsConfig.enabled) {
+            viewSettingXml += ' AutoAdjustPeriods="1" StartPeriodDelta="' + autoAdjustPeriodsConfig.startPeriodDelta +
+                '" FinishPeriodDelta="' + autoAdjustPeriodsConfig.finishPeriodDelta + '"';
+        } else {
+            viewSettingXml += ' AutoAdjustPeriods="0"';
+            if (startId === -1) {
+                viewSettingXml += ' PerInc="1" FinishPeriod="' + finishId + '"';
+            }
+            else {
+                viewSettingXml += ' PerInc="0"';
+            }
+        }
+        viewSettingXml += '/>';
+        return viewSettingXml;
     }
 
     ResPlanAnalyzer.prototype.BuildGridInf = function (gridId, showFilter, showGrouping, ribbonExpanded) {
@@ -1072,7 +1087,7 @@
                 else
                     select.disabled = false;
 
-                this.SetViewChanged(null);
+                this.SetViewChanged(null, true);
 
                 this.externalEvent('SaveView_Cancel');
 
@@ -5724,7 +5739,7 @@
     }
 
 
-    ResPlanAnalyzer.prototype.SetViewChanged = function (selindex) {
+    ResPlanAnalyzer.prototype.SetViewChanged = function (selindex, forceRefresh) {
 
         var selectView = document.getElementById("idAnalyzerTab_SelView");
 
@@ -5785,16 +5800,25 @@
             }
 
             try {
-                if (this.selectedView.ViewSettings.PerInc == "1") {
-                    //var perf = this.selectedView.ViewSettings.FinishPeriod;
+                if (this.selectedView.ViewSettings &&
+                    this.selectedView.ViewSettings.HideRowsWithAllZeros !== undefined) {
+                    hideRowsWithAllZeros = this.selectedView.ViewSettings.HideRowsWithAllZeros !== "0";
+                }
+            } catch (e) {
+                console.log(e);
+            }
+
+            this.autoAdjustPeriods = AutoAdjustPeriods.TryCreateFromConfig(this.selectedView.ViewSettings);
+
+            try {
+                if (this.autoAdjustPeriods.enabled) {
+                    // apply dynamic periods based on view config
+                    this.ExecuteAutoAdjustPeriods(this.autoAdjustPeriods);
+                }
+                else if (this.selectedView.ViewSettings.PerInc === "1") {
+                    // apply period always from current to the end of period
                     var perf = this.UsingPeriods.Period.length;
                     var pers = this.UsingPeriods.CurrentPeriod.Value;
-
-                    //It is used for selecting only one period
-                    //if (perf < pers)
-                    //    perf = pers;
-                    //else if (perf > this.UsingPeriods.Period.length)
-                    //perf = this.UsingPeriods.Period.length
 
                     this.PerStart = pers;
                     this.PerEnd = perf;
@@ -5805,7 +5829,6 @@
                     this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
                 }
                 else {
-
                     var periods = this.selectedView.g_1.RightCols.split(",");
                     var spVal = periods[0].substr(periods[0].indexOf('P') + 1, periods[0].indexOf('C') - 1);
                     var fpVal = periods[periods.length - 1].substr(periods[periods.length - 1].indexOf('P') + 1, periods[periods.length - 1].indexOf('C') - 1);
@@ -5856,12 +5879,12 @@
 
         }
 
-        if (oldguid == newguid && selindex == null)
+        if (oldguid === newguid && selindex === null && forceRefresh !== true) {
             return;
+        }
 
-        if (this.selectedView != null && this.selectedView.ViewSettings.PerInc == "1") {
+        if (this.selectedView != null && (this.selectedView.ViewSettings.PerInc === "1" || this.autoAdjustPeriods.enabled === true)) {
             this.FilterDifferent = false;
-
 
             this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
             var gridView = this.stashgridsettings.View.g_1;
@@ -5875,10 +5898,33 @@
 
             WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("ApplyResourceAnalyzerViewServerSideSettings", this.selectedView.ViewGUID, SetChangeViewCompleteDelegate);
         }
-
     }
 
+    ResPlanAnalyzer.prototype.ExecuteAutoAdjustPeriods = function (config) {
+        var current = parseInt(this.UsingPeriods.CurrentPeriod.Value);
+        var calculatedStart = current - config.startPeriodDelta;
+        var calculatedFinish = current + config.finishPeriodDelta;
+        var totalPeriods = this.UsingPeriods.Period.length;
 
+        if (calculatedStart <= 0) {
+            calculatedStart = 1;
+        }
+
+        if (calculatedFinish < calculatedStart) {
+            calculatedFinish = calculatedStart;
+        }
+        else if (calculatedFinish > totalPeriods) {
+            calculatedFinish = totalPeriods;
+        }
+
+        this.PerStart = calculatedStart;
+        this.PerEnd = calculatedFinish;
+
+        document.getElementById("idAnalyzerTab_FromPeriod").selectedIndex = calculatedStart;
+        document.getElementById("idAnalyzerTab_ToPeriod").selectedIndex = calculatedFinish - 1;
+        this.flashRibbonSelect('idAnalyzerTab_FromPeriod');
+        this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
+    }
 
     ResPlanAnalyzer.prototype.deferExternalEvent = function (event) {
         this.deferevent = event;
@@ -6501,6 +6547,10 @@
                     document.getElementById("id_SaveView_Name").value = "New View";
                     document.getElementById("id_SaveView_Default").checked = false;
                     document.getElementById("id_SaveView_Personal").checked = true;
+                    
+                    var autoAdjustPeriodsConfig = AutoAdjustPeriods.EnsureValidInstance(this.autoAdjustPeriods);
+                    autoAdjustPeriodsConfig.UpdateDialogValues(document);
+
                     var selectView = document.getElementById("idAnalyzerTab_SelView");
                     if (selectView != null && selectView.selectedIndex >= 0) {
                         var view = this.GetSelectedView();
@@ -6523,7 +6573,7 @@
                         this.AnalyzerViewDlg.enableAutoViewport(false);
                         this.AnalyzerViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
                         this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
-                        this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 280, 192);
+                        this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 350, 260);
                         this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
                         this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
                         //this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
@@ -6590,13 +6640,20 @@
                     else
                         guid.newGuid();
 
+                    var autoAdjustPeriodsConfig = AutoAdjustPeriods.CreateFromDocument(document);
+                    if (autoAdjustPeriodsConfig === null) {
+                        break;
+                    } else {
+                        this.autoAdjustPeriods = autoAdjustPeriodsConfig;
+                    }
+
                     var bDefault = document.getElementById("id_SaveView_Default").checked;
                     var bPersonal = document.getElementById("id_SaveView_Personal").checked;
 
-                    var s = this.BuildViewInf(guid.value, saveViewName, bDefault, bPersonal, false);
+                    var viewXml = this.BuildViewInf(guid.value, saveViewName, bDefault, bPersonal, false);
                     var sbd = new StringBuilder();
                     sbd.append('<Execute Function="SaveResourcePlanAnalyzerView">');
-                    sbd.append(s);
+                    sbd.append(viewXml);
                     sbd.append('</Execute>');
 
                     WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("SaveResourceAnalyzerView", sbd.toString(), SaveResourceAnalyzerViewCompleteDelegate);
@@ -7414,6 +7471,10 @@
                     this.dlgShowGridEx.window("winGridExDlg").hide();
                     this.dlgShowGridEx.window("winGridExDlg").detachObject();
                     this.dlgShowGridEx = null;
+                    break;
+
+                case "AutoAdjustPeriodsCheckBoxOnClick":
+                    AutoAdjustPeriods.DocumentAutoAdjustPeriodsCheckBoxOnClick(document);
                     break;
 
                 default:
@@ -8360,6 +8421,7 @@
         this.fiscalInfo = null;
         this.Views = null;
         this.selectedView = null;
+        this.autoAdjustPeriods = null;
 
         this.SetTotals = null
         this.TotalsLoading = false
