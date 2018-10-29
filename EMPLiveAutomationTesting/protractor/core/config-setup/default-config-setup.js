@@ -92,7 +92,7 @@ const configSetup = {
         },
         login: {
             admin: {
-                user: "AdminT01",
+                user: "farmadmin",
                 password: "Pass@word1"
             },
             projectManager: {
@@ -100,7 +100,7 @@ const configSetup = {
                 password: "Pass@word1"
             },
             teamMember: {
-                user: "User01T01",
+                user: "team.member",
                 password: "Pass@word1"
             },
             portfolioManager: {
@@ -125,7 +125,7 @@ const configSetup = {
             }
         }
     },
-    baseUrl: 'http://tenant01.social.com',
+    baseUrl: 'http://tenant01.epmldev.com/epm',
     framework: 'jasmine',
     jasmineNodeOpts: {
         showColors: true,
