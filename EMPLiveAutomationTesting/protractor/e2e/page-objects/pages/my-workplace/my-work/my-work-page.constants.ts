@@ -7,6 +7,7 @@ export class MyWorkPageConstants {
     static readonly edit = 'Edit.Edit';
     static readonly viewName = 'View';
     static readonly renameView = 'rView';
+    static readonly administrator = 'administrator';
     static readonly currentView = 'Current View';
     static readonly manage = 'Manage tab';
     static readonly newItemPopupLabel = 'New Item popup';
