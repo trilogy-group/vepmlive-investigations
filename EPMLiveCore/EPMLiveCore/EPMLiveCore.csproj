@@ -1617,7 +1617,6 @@
     <None Include="BuildTeam\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{9cf05ac6-0692-49fb-8c37-2ec1acb6a29c}</SharePointProjectItemId>
     </None>
-    <None Include="bundleconfig.json" />
     <None Include="CONFIG\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{ce3e15fd-6a5b-4e21-8c3d-b5d4df121ea3}</SharePointProjectItemId>
     </None>
@@ -1825,9 +1824,7 @@
     <None Include="Layouts\epmlive\javascripts\EPM.ts" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.Analytics.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.min.js.map" />
-    <None Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js.map">
-      <DependentUpon>EPMLive.Navigation.js</DependentUpon>
-    </None>
+    <None Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.min.js.map" />
@@ -3700,9 +3697,7 @@
     <Content Include="Layouts\epmlive\javascripts\EPMLive.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.js" />
-    <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js">
-      <DependentUpon>EPMLive.Navigation.js</DependentUpon>
-    </Content>
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.js" />

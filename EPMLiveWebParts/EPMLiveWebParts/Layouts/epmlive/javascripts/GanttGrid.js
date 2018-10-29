@@ -409,16 +409,8 @@ function GridOnGetHtmlValue(grid, row, col, val) {
     if (row.Def.Name == 'R') {
         if (col == "Title") {
             var gridid = GetGridId(grid);
-
-            // get the grid action url
-            var url = GetGridItemUrl(grid, row);
-            if (!url) {
-                url = 'javascript:;';
-            }
-
-            if (eval("mygrid" + gridid + ".LinkType")) {
-                val = "<a onclick=\"GridGoToItem('" + grid.id + "','" + row.id + "'); return false;\" href=\"" + url + "\">" + val + "</a>";
-            }
+            if (eval("mygrid" + gridid + ".LinkType") != "")
+                val = "<a href=\"javascript:GridGoToItem('" + grid.id + "','" + row.id + "');\">" + val + "</a>";
 
             if (grid.GetValue(row, "HasComments") == "1") {
                 val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');\"><img src=\"/_layouts/15/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
@@ -481,30 +473,21 @@ function GridCommentsCallBack() {
     GetRowData(CurrentGrid, CurrentRow);
 }
 
-function GetGridItemUrl(grid, row) {
-    var gridid = GetGridId(grid);
-    var linkType = eval("mygrid" + gridid + ".LinkType");
-
-    if (new RegExp(/%\d[\dA-F]/g).test(location.href)) {
-        var url = GetWebUrl() + "/_layouts/epmlive/gridaction.aspx?action=" + linkType + "&webid=" + row.webid + "&listid=" + row.listid + "&ID=" + row.itemid + "&Source=" + location.href;
-    }
-    else {
-        var url = GetWebUrl() + "/_layouts/epmlive/gridaction.aspx?action=" + linkType + "&webid=" + row.webid + "&listid=" + row.listid + "&ID=" + row.itemid + "&Source=" + escape(location.href);
-    }
-
-    return url;
-}
-
 function GridGoToItem(gridid, rowid) {
     var grid = Grids[gridid];
     var row = grid.GetRowById(rowid);
-
     CurrentGrid = grid;
     CurrentRow = row;
     gridid = GetGridId(grid);
 
-    // get the url for grid action
-    var url = GetGridItemUrl(grid, row);
+    var LinkType = eval("mygrid" + gridid + ".LinkType");
+
+    if (new RegExp(/%\d[\dA-F]/g).test(location.href)) {
+        var url = GetWebUrl() + "/_layouts/epmlive/gridaction.aspx?action=" + LinkType + "&webid=" + row.webid + "&listid=" + row.listid + "&ID=" + row.itemid + "&Source=" + location.href;
+    }
+    else {
+        var url = GetWebUrl() + "/_layouts/epmlive/gridaction.aspx?action=" + LinkType + "&webid=" + row.webid + "&listid=" + row.listid + "&ID=" + row.itemid + "&Source=" + escape(location.href);
+    }
 
     if (eval("mygrid" + gridid + "._usepopup")) {
 
