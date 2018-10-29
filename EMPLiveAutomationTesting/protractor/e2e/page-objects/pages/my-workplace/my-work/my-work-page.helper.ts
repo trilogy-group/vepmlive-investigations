@@ -113,7 +113,6 @@ export class MyWorkPageHelper {
         StepLogger.step(`click on "Edit Page" dropdown`);
         await PageHelper.click(MyWorkPage.editPageDropdown);
     }
-
     static  async verifyStopEditingOptionDisabled() {
         StepLogger.verification(`verify "Stop Editing" option is shown as disabled`);
         const stopEditingDisplayed = await PageHelper.isElementDisplayed(
@@ -129,7 +128,7 @@ export class MyWorkPageHelper {
         await expect(editPageDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             MyWorkPageConstants.editPageActions.editPage));
 
-        this.verifyStopEditingOptionDisabled();
+        await this.verifyStopEditingOptionDisabled();
     }
 
     static async clickOnEditPageMenuOption() {
@@ -144,14 +143,12 @@ export class MyWorkPageHelper {
         await expect(editPageDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             MyWorkPageConstants.editPageActions.editPage));
     }
-
     static async verifyPageTabIsSelected() {
         StepLogger.verification(`verify "PageTab" is shown as selected`);
         const tabDisplayed = await PageHelper.isElementDisplayed(MyWorkPage.selectedPageTab);
         await expect(tabDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             CommonPageConstants.ribbonMenuTitles.page));
     }
-
     static async fillAndSubmitSaveView() {
         const uniqueId = PageHelper.getUniqueId();
         const viewName = `${MyWorkPageConstants.viewName}${uniqueId}`;
@@ -167,7 +164,6 @@ export class MyWorkPageHelper {
         await PageHelper.click(viewsPopupItems.ok);
         return viewName;
     }
-
     static async fillAndSubmitRenameView() {
         const uniqueId = PageHelper.getUniqueId();
         const viewNewName = `${MyWorkPageConstants.renameView}${uniqueId}`;
@@ -182,7 +178,6 @@ export class MyWorkPageHelper {
         await ExpectationHelper.verifyStringEqualTo(renamePopUpText, expectedPopUpText);
         await PageHelper.acceptAlert();
     }
-
     static async navigateToMyWork() {
         const pageHeader = CommonPage.pageHeaders;
         const pageHeaderName = CommonPageConstants.pageHeaders.myWorkplace;
@@ -246,7 +241,7 @@ export class MyWorkPageHelper {
         const requestor = input.requestorValue;
         const startDate = input.startDate;
         const finishDate = input.finishDate;
-        MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate);
+        await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate);
         return title;
     }
 
@@ -328,7 +323,7 @@ export class MyWorkPageHelper {
         );
     }
 
-    static async fillToToDeatilsAndSave() {
+    static async fillToDoDeatilsAndSave() {
         const uniqueId = PageHelper.getUniqueId();
         const labels = ToDoPageConstants.inputLabels;
         const title = `${labels.title} ${uniqueId}`;
@@ -336,7 +331,6 @@ export class MyWorkPageHelper {
         const description = `${labels.description} ${uniqueId}`;
         // step#3 is inside this function
         await ToDoPageHelper.fillFormAndSave(title, status, description);
-
     }
 
     static async verifyTitleValidationMessage() {
