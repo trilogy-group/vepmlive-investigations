@@ -22,6 +22,7 @@ namespace WorkEnginePPM.Tests.WebServices
     using Core.PFEDataServiceManager.Fakes;
     using Fakes;
     using Core.DataSync.Fakes;
+    using System.Diagnostics.CodeAnalysis;
 
     [TestClass]
     [ExcludeFromCodeCoverage]
