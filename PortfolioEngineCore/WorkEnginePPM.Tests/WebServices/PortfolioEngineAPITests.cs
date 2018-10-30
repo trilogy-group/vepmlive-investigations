@@ -24,6 +24,7 @@ namespace WorkEnginePPM.Tests.WebServices
     using Core.DataSync.Fakes;
 
     [TestClass]
+    [ExcludeFromCodeCoverage]
     public class PortfolioEngineAPITests
     {
         private const string DummyString = "DummyString";
