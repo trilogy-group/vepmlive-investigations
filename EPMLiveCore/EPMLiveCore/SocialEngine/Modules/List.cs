@@ -92,17 +92,17 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Users = new[] {new User {Id = (int) data["UserId"], Role = UserRole.Author}}
             });
 
-            var activity = new Activity
+            using (var activity = new Activity
             {
                 Kind = args.ActivityKind,
-                UserId = (int) data["UserId"],
+                UserId = (int)data["UserId"],
                 Thread = thread,
                 Date = activityDateTime
-            };
-
-            activity.SetData(new {totalActivities = data["TotalActivities"]});
-
-            activityManager.RegisterActivity(activity);
+            })
+            {
+                activity.SetData(new { totalActivities = data["TotalActivities"] });
+                activityManager.RegisterActivity(activity);
+            }
 
             Guid streamId = streamManager.GetGlobalStreamId(webId);
 
@@ -132,13 +132,16 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Users = new[] {new User {Id = (int) data["UserId"], Role = UserRole.Author}}
             });
 
-            activityManager.RegisterActivity(new Activity
+            using (var activity = new Activity
             {
                 Kind = args.ActivityKind,
-                UserId = (int) data["UserId"],
+                UserId = (int)data["UserId"],
                 Thread = thread,
                 Date = activityDateTime
-            });
+            })
+            {
+                activityManager.RegisterActivity(activity);
+            }
 
             Guid streamId = streamManager.GetGlobalStreamId(webId);
 
@@ -175,13 +178,16 @@ namespace EPMLiveCore.SocialEngine.Modules
 
             threadManager.DeleteThread(thread);
 
-            args.ActivityManager.RegisterActivity(new Activity
+            using (var activity = new Activity
             {
                 Kind = ActivityKind.Deleted,
-                UserId = (int) data["UserId"],
+                UserId = (int)data["UserId"],
                 Thread = thread,
-                Date = (DateTime) data["ActivityTime"]
-            });
+                Date = (DateTime)data["ActivityTime"]
+            })
+            {
+                args.ActivityManager.RegisterActivity(activity);
+            }
         }
 
         private void ValidateBulkOperationActivity(ProcessActivityEventArgs args)

@@ -43,9 +43,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                         if (!EventLog.SourceExists("EPMLive Reporting - Page_Init"))
                             EventLog.CreateEventSource("EPMLive Reporting - Page_Init", "EPM Live");
 
-                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Page_Init");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 2060);
+                        using (var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Page_Init"))
+                        {
+                            myLog.MaximumKilobytes = 32768;
+                            myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 2060);
+                        }
                     });
                 }
             }

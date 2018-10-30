@@ -87,6 +87,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ViewLogDetailTests.cs" />
     <Compile Include="AllSnapshotsTests.cs" />
     <Compile Include="EventAuditTests.cs" />
     <Compile Include="DataScrubberTests.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="ProcessSecurityTests.cs" />
     <Compile Include="LstEventsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SnapshotTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">

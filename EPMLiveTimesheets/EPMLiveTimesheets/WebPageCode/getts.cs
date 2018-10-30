@@ -248,14 +248,16 @@ namespace TimeSheets
             
             taskNode.AppendChild(newCell);
 
+            double daystotal = 0;
             double total = 0;
 
             for (var i = 0; i <= timeSpan.Days; i++)
             {
                 ProcessDay(drTask, taskNode, out total, i);
+                daystotal += total;
             }
 
-            AppendChild(taskNode, total.ToString());
+            AppendChild(taskNode, daystotal.ToString());
 
             projectNode.AppendChild(taskNode);
         }

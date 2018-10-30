@@ -81,9 +81,10 @@ namespace EPMLiveCore.API
         {
             Guard.ArgumentIsNotNull(spWeb, nameof(spWeb));
 
+            SqlConnection sqlConnection = null;
+
             try
             {
-                SqlConnection sqlConnection = null;
                 SPSecurity.RunWithElevatedPrivileges(
                     () =>
                     {
@@ -96,11 +97,13 @@ namespace EPMLiveCore.API
             catch (APIException apiException)
             {
                 Trace.WriteLine(apiException);
+                sqlConnection?.Dispose();
                 throw;
             }
             catch (Exception exception)
             {
                 Trace.WriteLine(exception);
+                sqlConnection?.Dispose();
                 throw new APIException(2008, exception.Message);
             }
         }
