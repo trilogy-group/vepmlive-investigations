@@ -6,6 +6,7 @@ Param(
 	[string]$siteCollectionToUpgrade = '%epmlive.qa.UpgradeSiteCollection%',
 	[string]$buildNumber = '%build.number%'
 )
+Writ-Host "Connecting to $serverIP, $webAppName, $siteCollectionToUpgrade, $buildNumber"
 Set-Item WSMan:\localhost\Client\TrustedHosts -Value $serverIP  -Force
 $passwd = convertto-securestring -AsPlainText -Force -String $password
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $passwd
