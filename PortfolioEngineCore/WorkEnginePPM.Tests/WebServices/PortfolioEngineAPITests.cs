@@ -18,7 +18,10 @@ using WorkEnginePPM.Core.Fakes;
 
 namespace WorkEnginePPM.Tests.WebServices
 {
+    using System.Xml;
+    using System.Xml.Fakes;
     using Core.PFEDataServiceManager.Fakes;
+    using Fakes;
     using WorkEnginePPM.Core.DataSync.Fakes;
 
     [TestClass]
@@ -492,6 +495,113 @@ namespace WorkEnginePPM.Tests.WebServices
             // Assert
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNullOrEmpty());
+        }
+
+        [TestMethod]
+        public void DeleteWorkSchedule()
+        {
+            // Arrange, Act
+            var result = PortfolioEngineAPI.DeleteWorkSchedule(DummyString);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty());
+        }
+
+        [TestMethod]
+        public void DeleteDepartments()
+        {
+            // Arrange, Act
+            var result = PortfolioEngineAPI.DeleteDepartments(DummyString);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty());
+        }
+
+        [TestMethod]
+        public void Execute()
+        {
+            // Arrange
+            const string FunctionName = "DeleteDepartments";
+            ShimPortfolioEngineAPI.DeleteDepartmentsString = _ => DummyString;
+
+            // Act
+            var result = portfolioEngineAPI.Execute(FunctionName, DummyString);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void Execute_OnException()
+        {
+            // Arrange
+            const string ExpectedMessage = "Error executing function";
+            ShimPortfolioEngineAPI.DeleteDepartmentsString = _ => DummyString;
+
+            // Act
+            var result = portfolioEngineAPI.Execute(null, DummyString);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldContain(ExpectedMessage));
+        }
+
+        [TestMethod]
+        public void ExecuteJSON_OnSuccess_ExecutesCorrectly()
+        {
+            // Arrange
+            const string FunctionName = "DeleteDepartments";
+            ShimPortfolioEngineAPI.DeleteDepartmentsString = _ => "<dummy></dummy>";
+            ShimXmlDocument.AllInstances.LoadXmlString = (_, content) => { };
+            ShimJSONUtil.ConvertXmlToJsonStringString = (xml, isList) => DummyString;
+            ShimXmlNode.AllInstances.FirstChildGet = _ => new ShimXmlNode(new XmlDocument())
+            {
+                AttributesGet = () => new ShimXmlAttributeCollection
+                {
+                    ItemOfGetString = name => new ShimXmlAttribute
+                    {
+                        ValueGet = () => DummyString
+                    }
+                }
+            };
+
+            // Act
+            var result = portfolioEngineAPI.ExecuteJSON(FunctionName, DummyString);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void ExecuteJSON_OnException_ExecutesCorrectly()
+        {
+            // Arrange
+            const string FunctionName = "DeleteDepartments";
+            var expectedMessage = $"Error executing function: {DummyString}";
+            ShimPortfolioEngineAPI.DeleteDepartmentsString = _ => "<dummy></dummy>";
+            ShimXmlDocument.AllInstances.LoadXmlString = (_, content) => 
+            {
+                throw new Exception();
+            };
+            ShimJSONUtil.ConvertXmlToJsonStringString = (xml, isList) =>
+            {
+                throw new Exception(DummyString);
+            };
+
+            // Act
+            var result = portfolioEngineAPI.ExecuteJSON(FunctionName, DummyString);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldContain(expectedMessage));
         }
 
     }
