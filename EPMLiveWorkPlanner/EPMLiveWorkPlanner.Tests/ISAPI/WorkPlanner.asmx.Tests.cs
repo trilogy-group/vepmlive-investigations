@@ -47,6 +47,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private ShimSPFileCollection spFileCollection;
         private Guid guid;
         private int validations;
+        private const int DummyInt = 1;
         private const string SampleGuidString1 = "83e81819-0112-4c22-bb70-d8ba101e9e0c";
         private const string SampleGuidString2 = "83e81819-0104-4c22-bb70-d8ba101e9e0c";
         private const string DummyString = "DummyString";
@@ -62,6 +63,9 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private const string UpgradeProjectScheduleLibraryMethodName = "UpgradeProjectScheduleLibrary";
         private const string IApplyNewTemplateMethodName = "iApplyNewTemplate";
         private const string ApplyNewTemplateMethodName = "ApplyNewTemplate";
+        private const string IGetTemplatesMethodName = "iGetTemplates";
+        private const string ISaveTemplateMethodName = "iSaveTemplate";
+        private const string SaveTemplateMethodName = "SaveTemplate";
 
         [TestInitialize]
         public void Setup()
@@ -93,6 +97,8 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             ShimCoreFunctions.getLockedWebSPWeb = _ => guid;
             ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => DummyString;
             ShimCoreFunctions.getListSettingStringSPList = (_, __) => DummyString;
+            ShimSPList.AllInstances.RootFolderGet = _ => spFolder;
+            ShimSPList.AllInstances.GetItemsSPQuery = (_, __) => spListItemCollection;
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
         }
 
@@ -126,16 +132,19 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 IDGet = () => guid,
                 FieldsGet = () => spFieldCollection,
                 GetItemByIdInt32 = _ => spListItem,
-                GetItemsSPQuery = _ => spListItemCollection
+                GetItemsSPQuery = _ => spListItemCollection,
+                RootFolderGet = () => spFolder
             };
             spListItemCollection = new ShimSPListItemCollection()
             {
-                CountGet = () => 1,
+                CountGet = () => DummyInt,
                 ItemGetInt32 = _ => spListItem
             };
             spListItem = new ShimSPListItem()
             {
-                IDGet = () => 1,
+                IDGet = () => DummyInt,
+                TitleGet = () => DummyString,
+                ItemGetString = _ => DummyString,
                 ItemSetGuidObject = (_, __) => { },
                 Update = () => { },
                 FileGet = () => spFile
@@ -164,13 +173,16 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             };
             spFileCollection = new ShimSPFileCollection()
             {
+                CountGet = () => DummyInt,
                 AddStringByteArrayBoolean = (_1, _2, _3) => spFile,
                 AddStringStream = (_1, _2) => spFile,
             };
             spFile = new ShimSPFile()
             {
                 Delete = () => { },
-                OpenBinaryStream = () => null
+                OpenBinaryStream = () => null,
+                NameGet = () => DummyString,
+                GetListItemStringArray = _ => spListItem
             };
         }
 
@@ -1098,6 +1110,257 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
 
             // Assert
             validations.ShouldBe(4);
+        }
+
+        [TestMethod]
+        public void IGetTemplates_TypeOnline_ReturnsDataTable()
+        {
+            // Arrange
+            const string type = "Online";
+            const string fileName = "FileName";
+            const string extension = ".xml";
+            var fullName = $"{fileName}{extension}";
+
+            spListCollection.ItemGetString = _ => new ShimSPDocumentLibrary().Instance;
+            spFile.NameGet = () => fullName;
+            spListItem.TitleGet = () => fullName;
+            spListItemCollection.GetEnumerator = () => new List<SPListItem>()
+            {
+                spListItem
+            }.GetEnumerator();
+
+            // Act
+            var actual = (DataTable)privateObject.Invoke(IGetTemplatesMethodName, nonPublicStatic, new object[] { spWeb.Instance, DummyString, type });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Rows.Count.ShouldBe(2),
+                () => actual.Rows[0]["ID"].ShouldBe(DummyInt.ToString()),
+                () => actual.Rows[0]["Title"].ShouldBe(fullName),
+                () => actual.Rows[0]["Description"].ShouldBe(DummyString),
+                () => actual.Rows[1]["ID"].ShouldBe(DummyInt.ToString()),
+                () => actual.Rows[1]["Title"].ShouldBe(fileName),
+                () => actual.Rows[1]["Description"].ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void IGetTemplates_TypeProject_ReturnsDataTable()
+        {
+            // Arrange
+            const string type = "Project";
+            const string fileName = "FileName";
+            const string extension = ".mpp";
+            var fullName = $"{fileName}{extension}";
+
+            spListCollection.ItemGetString = _ => new ShimSPDocumentLibrary().Instance;
+            spFile.NameGet = () => fullName;
+            spListItem.TitleGet = () => fullName;
+            spListItemCollection.GetEnumerator = () => new List<SPListItem>()
+            {
+                spListItem
+            }.GetEnumerator();
+
+            // Act
+            var actual = (DataTable)privateObject.Invoke(IGetTemplatesMethodName, nonPublicStatic, new object[] { spWeb.Instance, DummyString, type });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Rows.Count.ShouldBe(3),
+                () => actual.Rows[0]["ID"].ShouldBe(DummyInt.ToString()),
+                () => actual.Rows[0]["Title"].ShouldBe(fullName),
+                () => actual.Rows[0]["Description"].ShouldBe(DummyString),
+                () => actual.Rows[1]["ID"].ShouldBe(DummyInt.ToString()),
+                () => actual.Rows[1]["Title"].ShouldBe(fileName),
+                () => actual.Rows[1]["Description"].ShouldBe(DummyString),
+                () => actual.Rows[2]["ID"].ShouldBe("-101"),
+                () => actual.Rows[2]["Title"].ShouldBe("Import Project"),
+                () => actual.Rows[2]["Description"].ShouldBe("Select this option to upload a project file."));
+        }
+
+        [TestMethod]
+        public void ISaveTemplate_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string expected = "<Result Status=\"0\"></Result>";
+            var itemGetHit = 0;
+            var data = new XmlDocument();
+
+            data.LoadXml(expected);
+
+            spFileCollection.CountGet = () => 0;
+            spFolderCollection.ItemGetString = _ =>
+            {
+                itemGetHit += 1;
+                if (itemGetHit.Equals(1))
+                {
+                    return null;
+                }
+                return spFolder;
+            };
+            spFolderCollection.AddString = _ =>
+            {
+                validations += 1;
+                return spFolder;
+            };
+            spFileCollection.AddStringByteArrayBoolean = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return spFile;
+            };
+            spListItem.ItemSetStringObject = (_, __) =>
+            {
+                validations += 1;
+            };
+            spListItem.Update = () =>
+            {
+                validations += 1;
+            };
+
+            ShimWorkPlannerAPI.StrToByteArrayString = _ => default(byte[]);
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                ISaveTemplateMethodName,
+                nonPublicStatic,
+                new object[] { DummyString, DummyString, DummyString, data, spWeb.Instance });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(expected),
+                () => itemGetHit.ShouldBe(2),
+                () => validations.ShouldBe(7));
+        }
+
+        [TestMethod]
+        public void SaveTemplate_PlannerIdEmpty_ReturnsString()
+        {
+            // Arrange
+            const string expected = "<Result Status=\"1\">Planner Not Specified</Result>";
+            var plannerId = string.Empty;
+            var templateName = string.Empty;
+            var dataXml = $@"<xmlcfg Planner=""{plannerId}"" TemplateName=""{templateName}"" Description=""Description""/>";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXml);
+
+            ShimCoreFunctions.getLockedWebSPWeb = _ => guid;
+            ShimSPSite.AllInstances.OpenWebGuid = (_, __) =>
+            {
+                validations += 1;
+                return spWeb;
+            };
+            ShimWorkPlannerAPI.iSaveTemplateStringStringStringXmlDocumentSPWeb = (_1, _2, _3, _4, _5) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(SaveTemplateMethodName, publicStatic, new object[] { data, spWeb.Instance });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(expected),
+                () => validations.ShouldBe(0));
+        }
+
+        [TestMethod]
+        public void SaveTemplate_TemplateNameEmpty_ReturnsString()
+        {
+            // Arrange
+            const string plannerId = "1";
+            const string expected = "<Result Status=\"1\">Template Name Not Specified</Result>";
+            var templateName = string.Empty;
+            var dataXml = $@"<xmlcfg Planner=""{plannerId}"" TemplateName=""{templateName}"" Description=""Description""/>";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXml);
+
+            ShimCoreFunctions.getLockedWebSPWeb = _ => guid;
+            ShimSPSite.AllInstances.OpenWebGuid = (_, __) =>
+            {
+                validations += 1;
+                return spWeb;
+            };
+            ShimWorkPlannerAPI.iSaveTemplateStringStringStringXmlDocumentSPWeb = (_1, _2, _3, _4, _5) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(SaveTemplateMethodName, publicStatic, new object[] { data, spWeb.Instance });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(expected),
+                () => validations.ShouldBe(0));
+        }
+
+        [TestMethod]
+        public void SaveTemplate_LockedWebEqualsSPWebTrue_ReturnsString()
+        {
+            // Arrange
+            const string plannerId = "1";
+            const string templateName = "TemplateName";
+
+            var dataXml = $@"<xmlcfg Planner=""{plannerId}"" TemplateName=""{templateName}"" Description=""Description""/>";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXml);
+
+            ShimCoreFunctions.getLockedWebSPWeb = _ => guid;
+            ShimSPSite.AllInstances.OpenWebGuid = (_, __) =>
+            {
+                validations += 1;
+                return spWeb;
+            };
+            ShimWorkPlannerAPI.iSaveTemplateStringStringStringXmlDocumentSPWeb = (_1, _2, _3, _4, _5) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(SaveTemplateMethodName, publicStatic, new object[] { data, spWeb.Instance });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void SaveTemplate_LockedWebEqualsSPWebFalse_ReturnsString()
+        {
+            // Arrange
+            const string plannerId = "1";
+            const string templateName = "TemplateName";
+
+            var dataXml = $@"<xmlcfg Planner=""{plannerId}"" TemplateName=""{templateName}"" Description=""Description""/>";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXml);
+
+            ShimCoreFunctions.getLockedWebSPWeb = _ => Guid.Empty;
+            ShimSPSite.AllInstances.OpenWebGuid = (_, __) =>
+            {
+                validations += 1;
+                return spWeb;
+            };
+            ShimWorkPlannerAPI.iSaveTemplateStringStringStringXmlDocumentSPWeb = (_1, _2, _3, _4, _5) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(SaveTemplateMethodName, publicStatic, new object[] { data, spWeb.Instance });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(DummyString),
+                () => validations.ShouldBe(2));
         }
     }
 }
