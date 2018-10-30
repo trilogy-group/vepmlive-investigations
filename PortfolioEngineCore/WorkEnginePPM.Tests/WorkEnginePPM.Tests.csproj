@@ -87,6 +87,8 @@
     <Reference Include="System.Web.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.XML" />
     <Reference Include="System.XML.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
@@ -117,10 +119,20 @@
     <Compile Include="ConfigFunctionsTest.cs" />
     <Compile Include="DataServiceModules\DSMCostPlannerTests.cs" />
     <Compile Include="Events\ResourceManagementEvent\ResourceManagementEventTests.cs" />
+    <Compile Include="WebServices\IntegrationBuildTasksTests.cs" />
+    <Compile Include="WebServices\IntegrationDisableEventsTests.cs" />
+    <Compile Include="WebServices\IntegrationEnableEventsTests.cs" />
+    <Compile Include="WebServices\IntegrationGetMissingEventHandlersTests.cs" />
+    <Compile Include="WebServices\IntegrationGetUpdatesTests.cs" />
+    <Compile Include="WebServices\IntegrationProcessUpdatesTests.cs" />
+    <Compile Include="WebServices\IntegrationUpdatesTestsBase.cs" />
+    <Compile Include="WebServices\IntegrationTestsBase.cs" />
+    <Compile Include="WebServices\IntegrationUpdateItemsTests.cs" />
     <Compile Include="Jobs\CleanupTests.cs" />
     <Compile Include="Layouts\ppm\CostTypesTests.cs" />
     <Compile Include="Layouts\ppm\ModelsTests.cs" />
     <Compile Include="Layouts\ppm\CostCategoriesTests.cs" />
+    <Compile Include="ModelCache\ModelCacheTestsSplitFour.cs" />
     <Compile Include="ModelCache\ModelCacheTestsSplitOne.cs" />
     <Compile Include="ModelCache\ModelCacheTestsSplitThree.cs" />
     <Compile Include="ModelCache\ModelCacheTestsSplitTwo.cs" />
