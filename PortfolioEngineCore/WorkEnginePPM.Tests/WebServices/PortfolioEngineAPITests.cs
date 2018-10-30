@@ -1,5 +1,12 @@
 ﻿using System;
+using System.Data;
+using System.Data.Fakes;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
+using System.Xml;
+using System.Xml.Fakes;
 using System.Xml.Linq.Fakes;
+using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.Infrastructure.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
@@ -10,19 +17,12 @@ using PortfolioEngineCore.Analyzers.Fakes;
 using PortfolioEngineCore.Fakes;
 using Shouldly;
 using WorkEnginePPM.Core.Fakes;
-using System.Data;
-using System.Data.Fakes;
-using System.Text.RegularExpressions;
-using System.Xml;
-using System.Xml.Fakes;
-using EPMLiveCore.API.Fakes;
 
 namespace WorkEnginePPM.Tests.WebServices
 {
+    using Core.DataSync.Fakes;
     using Core.PFEDataServiceManager.Fakes;
     using Fakes;
-    using Core.DataSync.Fakes;
-    using System.Diagnostics.CodeAnalysis;
 
     [TestClass]
     [ExcludeFromCodeCoverage]
