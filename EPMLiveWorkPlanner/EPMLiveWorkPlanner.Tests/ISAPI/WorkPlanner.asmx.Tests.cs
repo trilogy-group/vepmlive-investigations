@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Resources.Fakes;
@@ -36,12 +37,18 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private ShimSPSite spSite;
         private ShimSPListCollection spListCollection;
         private ShimSPList spList;
+        private ShimSPListItemCollection spListItemCollection;
         private ShimSPListItem spListItem;
         private ShimSPFieldCollection spFieldCollection;
         private ShimSPField spField;
+        private ShimSPFolder spFolder;
+        private ShimSPFolderCollection spFolderCollection;
+        private ShimSPFile spFile;
+        private ShimSPFileCollection spFileCollection;
         private Guid guid;
         private int validations;
-        private const string SampleGuidString = "83e81819-0112-4c22-bb70-d8ba101e9e0c";
+        private const string SampleGuidString1 = "83e81819-0112-4c22-bb70-d8ba101e9e0c";
+        private const string SampleGuidString2 = "83e81819-0104-4c22-bb70-d8ba101e9e0c";
         private const string DummyString = "DummyString";
         private const string GetExternalProjectsMethodName = "GetExternalProjects";
         private const string ImportTasksMethodName = "ImportTasks";
@@ -50,6 +57,11 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private const string GetUpdateDetailLayoutMethodName = "GetUpdateDetailLayout";
         private const string ImportTasksFixXmlStructureMethodName = "ImportTasksFixXmlStructure";
         private const string SaveProjectMethodName = "SaveProject";
+        private const string SaveAgilePlanMethodName = "SaveAgilePlan";
+        private const string SaveWorkPlanMethodName = "SaveWorkPlan";
+        private const string UpgradeProjectScheduleLibraryMethodName = "UpgradeProjectScheduleLibrary";
+        private const string iApplyNewTemplateMethodName = "iApplyNewTemplate";
+        private const string ApplyNewTemplateMethodName = "ApplyNewTemplate";
 
         [TestInitialize]
         public void Setup()
@@ -91,12 +103,14 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             publicInstance = BindingFlags.Instance | BindingFlags.Public;
             nonPublicInstance = BindingFlags.Instance | BindingFlags.NonPublic;
             nonPublicStatic = BindingFlags.Static | BindingFlags.NonPublic;
-            guid = Guid.Parse(SampleGuidString);
+            guid = Guid.Parse(SampleGuidString1);
             spWeb = new ShimSPWeb()
             {
                 IDGet = () => guid,
                 SiteGet = () => spSite,
-                ListsGet = () => spListCollection
+                ListsGet = () => spListCollection,
+                GetFolderString = _ => spFolder,
+                FoldersGet = () => spFolderCollection
             };
             spSite = new ShimSPSite()
             {
@@ -111,12 +125,20 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             {
                 IDGet = () => guid,
                 FieldsGet = () => spFieldCollection,
-                GetItemByIdInt32 = _ => spListItem
+                GetItemByIdInt32 = _ => spListItem,
+                GetItemsSPQuery = _ => spListItemCollection
+            };
+            spListItemCollection = new ShimSPListItemCollection()
+            {
+                CountGet = () => 1,
+                ItemGetInt32 = _ => spListItem
             };
             spListItem = new ShimSPListItem()
             {
+                IDGet = () => 1,
                 ItemSetGuidObject = (_, __) => { },
-                Update = () => { }
+                Update = () => { },
+                FileGet = () => spFile
             };
             spFieldCollection = new ShimSPFieldCollection()
             {
@@ -128,6 +150,27 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 TitleGet = () => DummyString,
                 ReadOnlyFieldGet = () => false,
                 TypeAsStringGet = () => DummyString
+            };
+            spFolderCollection = new ShimSPFolderCollection()
+            {
+                ItemGetString = _ => spFolder,
+                AddString = _ => spFolder
+            };
+            spFolder = new ShimSPFolder()
+            {
+                ExistsGet = () => false,
+                SubFoldersGet = () => spFolderCollection,
+                FilesGet = () => spFileCollection
+            };
+            spFileCollection = new ShimSPFileCollection()
+            {
+                AddStringByteArrayBoolean = (_1, _2, _3) => spFile,
+                AddStringStream = (_1, _2) => spFile,
+            };
+            spFile = new ShimSPFile()
+            {
+                Delete = () => { },
+                OpenBinaryStream = () => null
             };
         }
 
@@ -739,6 +782,322 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             actual.ShouldSatisfyAllConditions(
                 () => actual.ShouldBe(expected),
                 () => validations.ShouldBe(15));
+        }
+
+        [TestMethod]
+        public void SaveAgilePlan_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string expected = "<Grid><IO Result='0'/></Grid>";
+            const string dataXmlString = @"
+                <xmlcfg ID=""1"" Planner=""Planner"">
+                    <node1/>
+                    <node2/>
+                </xmlcfg>";
+            var data = new XmlDocument();
+            var actualXml = default(XDocument);
+
+            data.LoadXml(dataXmlString);
+
+            spListCollection.ItemGetString = _ => new ShimSPDocumentLibrary().Instance;
+            spWeb.AllowUnsafeUpdatesSetBoolean = _ =>
+            {
+                validations += 1;
+            };
+            spFolderCollection.AddString = _ =>
+            {
+                validations += 1;
+                return spFolder;
+            };
+            spFileCollection.AddStringByteArrayBoolean = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return spFile;
+            };
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_, __) =>
+            {
+                validations += 1;
+                return default(PlannerProps);
+            };
+            ShimWorkPlannerAPI.StrToByteArrayString = outerXml =>
+            {
+                validations += 1;
+                actualXml = XDocument.Parse(outerXml);
+                return default(byte[]);
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(SaveAgilePlanMethodName, publicStatic, new object[] { data, spWeb.Instance });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(expected),
+                () => actualXml.Element("xmlcfg").Elements().Count().ShouldBe(2),
+                () => actualXml.Element("xmlcfg").Attributes().Count().ShouldBe(0),
+                () => validations.ShouldBe(5));
+        }
+
+        [TestMethod]
+        public void SaveWorkPlan_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string expected = "<Grid><IO Result='0'/></Grid>";
+            const string dataXmlString = @"
+                <xmlcfg ID=""1"" Planner=""Planner"">
+                    <I id="""" Def=""Folder""/>
+                    <I id=""BacklogRow"" Def=""""/>
+                    <I id="""" Def="""" Detail=""""/>
+                </xmlcfg>";
+            var data = new XmlDocument();
+            var actualXml = default(XDocument);
+
+            data.LoadXml(dataXmlString);
+
+            spListCollection.ItemGetString = _ => new ShimSPDocumentLibrary().Instance;
+            spWeb.AllowUnsafeUpdatesSetBoolean = _ =>
+            {
+                validations += 1;
+            };
+            spFolderCollection.AddString = _ =>
+            {
+                validations += 1;
+                return spFolder;
+            };
+            spFileCollection.AddStringByteArrayBoolean = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return spFile;
+            };
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_, __) =>
+            {
+                validations += 1;
+                return default(PlannerProps);
+            };
+            ShimWorkPlannerAPI.StrToByteArrayString = outerXml =>
+            {
+                validations += 1;
+                actualXml = XDocument.Parse(outerXml);
+                return default(byte[]);
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(SaveWorkPlanMethodName, publicStatic, new object[] { data, spWeb.Instance });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .ShouldBe(expected),
+                () => actualXml
+                    .Element("xmlcfg")
+                    .Attributes()
+                    .Count()
+                    .ShouldBe(0),
+                () => actualXml
+                    .Element("xmlcfg")
+                    .Elements("I")
+                    .Count()
+                    .ShouldBe(3),
+                () => actualXml
+                    .Element("xmlcfg")
+                    .Elements("I")
+                    .Count(x => x.Attribute("Detail").Value.Equals("WorkPlannerGrid"))
+                    .ShouldBe(1),
+                () => actualXml
+                    .Element("xmlcfg")
+                    .Elements("I")
+                    .Count(x => x.Attribute("Detail").Value.Equals("AgileGrid"))
+                    .ShouldBe(1),
+                () => validations
+                    .ShouldBe(5));
+        }
+
+        [TestMethod]
+        public void UpgradeProjectScheduleLibrary_WhenCalled_UpgradesLibrary()
+        {
+            // Arrange
+            spWeb.AllowUnsafeUpdatesSetBoolean = _ =>
+            {
+                validations += 1;
+            };
+            spFolderCollection.AddString = _ =>
+            {
+                validations += 1;
+                return spFolder;
+            };
+            spFileCollection.AddStringStream = (_1, _2) =>
+            {
+                validations += 1;
+                return spFile;
+            };
+            spFile.OpenBinaryStream = () =>
+            {
+                validations += 1;
+                return default(Stream);
+            };
+            spFile.Delete = () =>
+            {
+                validations += 1;
+            };
+
+            // Act
+            privateObject.Invoke(UpgradeProjectScheduleLibraryMethodName, publicStatic, new object[] { spWeb.Instance, DummyString, DummyString, spFile.Instance });
+
+            // Assert
+            validations.ShouldBe(5);
+        }
+
+        [TestMethod]
+        public void IApplyNewTemplate_TemplateIdEmpty_AppliesTemplate()
+        {
+            // Arrange
+            const string itemId = "ItemId";
+            const string projectName = "ProjectName";
+            const string fileName = "filename.mpp";
+            const string extension = ".mpp";
+            var templateId = string.Empty;
+
+            spListItemCollection.CountGet = () => 0;
+            spFile.NameGet = () => fileName;
+            spList.GetItemsSPQuery = _ =>
+            {
+                validations += 1;
+                return spListItemCollection;
+            };
+            spWeb.AllowUnsafeUpdatesSetBoolean = _ =>
+            {
+                validations += 1;
+            };
+            spFolderCollection.AddString = _ =>
+            {
+                validations += 1;
+                return spFolder;
+            };
+            spFileCollection.AddStringStream = (actualFileName, stream) =>
+            {
+                validations += 1;
+                if (actualFileName.Equals($"{projectName}{extension}"))
+                {
+                    validations += 1;
+                }
+                return spFile;
+            };
+            spFile.OpenBinaryStream = () =>
+            {
+                validations += 1;
+                return default(Stream);
+            };
+
+            // Act
+            privateObject.Invoke(
+                iApplyNewTemplateMethodName,
+                nonPublicStatic,
+                new object[] { spWeb.Instance, spWeb.Instance, DummyString, templateId, itemId, DummyString, projectName });
+
+            // Assert
+            validations.ShouldBe(1);
+        }
+
+        [TestMethod]
+        public void IApplyNewTemplate_TemplateIdNotEmpty_AppliesTemplate()
+        {
+            // Arrange
+            const string itemId = "ItemId";
+            const string projectName = "ProjectName";
+            const string fileName = "filename.mpp";
+            const string extension = ".mpp";
+            const string templateId = "1";
+
+            spListItemCollection.CountGet = () => 0;
+            spFile.NameGet = () => fileName;
+            spList.GetItemsSPQuery = _ =>
+            {
+                validations += 1;
+                return spListItemCollection;
+            };
+            spWeb.AllowUnsafeUpdatesSetBoolean = _ =>
+            {
+                validations += 1;
+            };
+            spFolderCollection.AddString = _ =>
+            {
+                validations += 1;
+                return spFolder;
+            };
+            spFileCollection.AddStringStream = (actualFileName, stream) =>
+            {
+                validations += 1;
+                if (actualFileName.Equals($"{projectName}{extension}"))
+                {
+                    validations += 1;
+                }
+                return spFile;
+            };
+            spFile.OpenBinaryStream = () =>
+            {
+                validations += 1;
+                return default(Stream);
+            };
+
+            // Act
+            privateObject.Invoke(
+                iApplyNewTemplateMethodName,
+                nonPublicStatic,
+                new object[] { spWeb.Instance, spWeb.Instance, DummyString, templateId, itemId, DummyString, projectName });
+
+            // Assert
+            validations.ShouldBe(5);
+        }
+
+        [TestMethod]
+        public void ApplyNewTemplate_LockedWebEmpty_AppliesNewTemplate()
+        {
+            // Arrange
+            ShimCoreFunctions.getLockedWebSPWeb = _ =>
+            {
+                validations += 1;
+                return Guid.Empty;
+            };
+            ShimWorkPlannerAPI.iApplyNewTemplateSPWebSPWebStringStringStringStringString = (_1, _2, _3, _4, _5, _6, _7) =>
+            {
+                validations += 1;
+            };
+            ShimSPSite.AllInstances.OpenWebGuid = (_, __) =>
+            {
+                validations += 1;
+                return spWeb;
+            };
+
+            // Act
+            privateObject.Invoke(ApplyNewTemplateMethodName, publicStatic, new object[] { spWeb.Instance, DummyString, DummyString, DummyString, DummyString, DummyString });
+
+            // Assert
+            validations.ShouldBe(3);
+        }
+
+        [TestMethod]
+        public void ApplyNewTemplate_LockedWebNotEmpty_AppliesNewTemplate()
+        {
+            // Arrange
+            ShimCoreFunctions.getLockedWebSPWeb = _ =>
+            {
+                validations += 1;
+                return Guid.Parse(SampleGuidString2);
+            };
+            ShimWorkPlannerAPI.iApplyNewTemplateSPWebSPWebStringStringStringStringString = (_1, _2, _3, _4, _5, _6, _7) =>
+            {
+                validations += 1;
+            };
+            ShimSPSite.AllInstances.OpenWebGuid = (_, __) =>
+            {
+                validations += 1;
+                return spWeb;
+            };
+
+            // Act
+            privateObject.Invoke(ApplyNewTemplateMethodName, publicStatic, new object[] { spWeb.Instance, DummyString, DummyString, DummyString, DummyString, DummyString });
+
+            // Assert
+            validations.ShouldBe(4);
         }
     }
 }
