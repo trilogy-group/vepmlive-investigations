@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Web.UI.Fakes;
+using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.Fakes;
 using EPMLiveCore.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
@@ -45,7 +46,14 @@ namespace EPMLiveCore.Tests
             var controlsConstructorCount = 0;
             var dropDownListDisposeCount = 0;
             ShimDropDownList.Constructor = _ => controlsConstructorCount++;
-            ShimControl.AllInstances.Dispose = _ => dropDownListDisposeCount++;
+            ShimLabel.Constructor = _ => controlsConstructorCount++;
+            ShimControl.AllInstances.Dispose = control =>
+            {
+                if (control is DropDownList || control is Label)
+                {
+                    dropDownListDisposeCount++;
+                }
+            };
 
             // Act
             using (_testEntity = new ManageableLists())
@@ -56,8 +64,8 @@ namespace EPMLiveCore.Tests
 
             // Assert
             _testEntity.ShouldSatisfyAllConditions(
-                () => controlsConstructorCount.ShouldBe(1),
-                () => dropDownListDisposeCount.ShouldBe(1));
+                () => controlsConstructorCount.ShouldBe(2),
+                () => dropDownListDisposeCount.ShouldBe(2));
         }
 
         private void InitializeSharePoint()
