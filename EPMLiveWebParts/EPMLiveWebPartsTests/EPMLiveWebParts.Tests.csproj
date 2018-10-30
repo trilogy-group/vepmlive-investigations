@@ -126,6 +126,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="API\WPAPITest.cs" />
+    <Compile Include="ChartControl\ChartControlToolpartBaseTests.cs" />
     <Compile Include="ChartControl\EpmChartTests.cs" />
     <Compile Include="ChartControl\VfChartTests.cs" />
     <Compile Include="GridListView\GridListViewTests.AddContextualTab.cs" />
