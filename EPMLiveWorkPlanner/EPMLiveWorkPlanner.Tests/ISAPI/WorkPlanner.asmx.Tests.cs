@@ -60,7 +60,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private const string SaveAgilePlanMethodName = "SaveAgilePlan";
         private const string SaveWorkPlanMethodName = "SaveWorkPlan";
         private const string UpgradeProjectScheduleLibraryMethodName = "UpgradeProjectScheduleLibrary";
-        private const string iApplyNewTemplateMethodName = "iApplyNewTemplate";
+        private const string IApplyNewTemplateMethodName = "iApplyNewTemplate";
         private const string ApplyNewTemplateMethodName = "ApplyNewTemplate";
 
         [TestInitialize]
@@ -989,7 +989,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
 
             // Act
             privateObject.Invoke(
-                iApplyNewTemplateMethodName,
+                IApplyNewTemplateMethodName,
                 nonPublicStatic,
                 new object[] { spWeb.Instance, spWeb.Instance, DummyString, templateId, itemId, DummyString, projectName });
 
@@ -1040,7 +1040,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
 
             // Act
             privateObject.Invoke(
-                iApplyNewTemplateMethodName,
+                IApplyNewTemplateMethodName,
                 nonPublicStatic,
                 new object[] { spWeb.Instance, spWeb.Instance, DummyString, templateId, itemId, DummyString, projectName });
 
