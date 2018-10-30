@@ -17,7 +17,7 @@ Invoke-Command -Session $session {Write-Host 'Deleted old installer'}
 copy-item -path SilentInstaller.zip -Destination C:\SilentInstaller\. -ToSession $session
 Invoke-Command -Session $session {Write-Host 'Copied new installer'}
 Invoke-Command -Session $session {Add-Type -assembly "system.io.compression.filesystem"}
-Invoke-Command -Session $session {Remove-Item "C:\SilentInstaller\$buildNumber" -Force -Recurse -ErrorAction SilentlyContinue}
+Invoke-Command -Session $session {Remove-Item (Join-Path "C:\SilentInstaller" $buildNumber) -Force -Recurse -ErrorAction SilentlyContinue}
 Invoke-Command -Session $session {Write-Host 'Removed old folder'}
 Invoke-Command -Session $session {[io.compression.zipfile]::ExtractToDirectory("C:\SilentInstaller\SilentInstaller.zip", "C:\SilentInstaller\$buildNumber")}
 Invoke-Command -Session $session {Write-Host 'Extracted new folder'}
