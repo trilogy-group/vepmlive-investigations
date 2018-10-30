@@ -2080,9 +2080,9 @@ namespace EPMLiveWebParts
             }
         }
 
-        private bool isEditable(SPListItem li, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
+        private bool isEditable(SPListItem listItem, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
         {
-                return HelperFunctions.isEditable(li, field, fieldProperties);
+                return HelperFunctions.isEditable(listItem, field, fieldProperties);
         }
 
 

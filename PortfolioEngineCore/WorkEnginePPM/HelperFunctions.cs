@@ -10,6 +10,7 @@ using System.Xml;
 using System.Web;
 using System.Web.UI;
 using System.Runtime.Caching;
+using EPMLiveCore.Helpers;
 using CoreEditableFieldDisplay = EPMLiveCore.EditableFieldDisplay;
 
 namespace WorkEnginePPM
@@ -519,75 +520,73 @@ namespace WorkEnginePPM
 
         }
 
-        public static bool isEditable(SPListItem li, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
+        public static bool isEditable(SPListItem listItem, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
         {
+            Guard.ArgumentIsNotNull(fieldProperties, nameof(fieldProperties));
+            Guard.ArgumentIsNotNull(field, nameof(field));
+            Guard.ArgumentIsNotNull(listItem, nameof(listItem));
+
             try
             {
                 if (!fieldProperties[field.InternalName].ContainsKey("Edit"))
-                    return true;
-
-                string displaySettings = string.Empty;
-
-                displaySettings = fieldProperties[field.InternalName]["Edit"];
-
-                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
                 {
-                    string where = displaySettings.Split(";".ToCharArray())[1];
-                    string conditionField = "";
-                    string condition = "";
-                    string group = "";
-                    string valueCondition = "";
+                    return true;
+                }
 
-                    if (where.Equals("[Me]"))
-                    {
-                        condition = displaySettings.Split(";".ToCharArray())[2];
-                        group = displaySettings.Split(";".ToCharArray())[3];
-                    }
-                    else // [Field]
-                    {
-                        conditionField = displaySettings.Split(";".ToCharArray())[2];
-                        condition = displaySettings.Split(";".ToCharArray())[3];
-                        valueCondition = displaySettings.Split(";".ToCharArray())[4];
-                    }
+                var displaySettings = fieldProperties[field.InternalName]["Edit"];
+                var renderField = RenderField(listItem, field, displaySettings);
 
-                    bool e = CoreEditableFieldDisplay.RenderField(field, where, conditionField, condition, group, valueCondition, li);
-                    if (!e)
-                        return false;
+                if (!renderField)
+                {
+                    return false;
                 }
 
                 displaySettings = fieldProperties[field.InternalName]["Editable"];
-                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("never"))
-                    return false;
 
-                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
+                if (displaySettings.Split(";".ToCharArray())[0].Equals("never", StringComparison.OrdinalIgnoreCase))
                 {
-                    string where = displaySettings.Split(";".ToCharArray())[1];
-                    string conditionField = "";
-                    string condition = "";
-                    string group = "";
-                    string valueCondition = "";
-
-                    if (where.Equals("[Me]"))
-                    {
-                        condition = displaySettings.Split(";".ToCharArray())[2];
-                        group = displaySettings.Split(";".ToCharArray())[3];
-                    }
-                    else // [Field]
-                    {
-                        conditionField = displaySettings.Split(";".ToCharArray())[2];
-                        condition = displaySettings.Split(";".ToCharArray())[3];
-                        valueCondition = displaySettings.Split(";".ToCharArray())[4];
-                    }
-
-                    return CoreEditableFieldDisplay.RenderField(field, where, conditionField, condition, group, valueCondition, li);
+                    return false;
                 }
+
+                return RenderField(listItem, field, displaySettings);
             }
+
             catch (Exception exception)
             {
                 Trace.WriteLine(exception);
             }
+
             return true;
         }
 
+        private static bool RenderField(SPListItem listItem, SPField field, string displaySettings)
+        {
+            var renderField = true;
+
+            if (displaySettings.Split(";".ToCharArray())[0].Equals("where", StringComparison.OrdinalIgnoreCase))
+            {
+                var whereField = displaySettings.Split(";".ToCharArray())[1];
+                var conditionField = string.Empty;
+                string condition;
+                var groupField = string.Empty;
+                var valueCondition = string.Empty;
+
+                if (whereField.Equals("[Me]"))
+                {
+                    condition = displaySettings.Split(";".ToCharArray())[2];
+                    groupField = displaySettings.Split(";".ToCharArray())[3];
+                }
+                else
+                {
+                    conditionField = displaySettings.Split(";".ToCharArray())[2];
+                    condition = displaySettings.Split(";".ToCharArray())[3];
+                    valueCondition = displaySettings.Split(";".ToCharArray())[4];
+                }
+
+                renderField = CoreEditableFieldDisplay.RenderField(field, whereField, conditionField, condition, groupField, valueCondition, listItem);
+            }
+
+            return renderField;
+        }
     }
 }

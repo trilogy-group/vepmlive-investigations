@@ -169,6 +169,62 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
+        public void IsEditable_EditableFieldRenderFieldTrue()
+        {
+            // Arrange
+            var listItem = new ShimSPListItem();
+            var field = new ShimSPField
+            {
+                InternalNameGet = () => InternalName
+            };
+
+            var editKeyValue = new[]
+            {
+                "where",
+                "test",
+                "field1",
+                "equals",
+                "valueCondition1"
+            };
+
+            var fieldProperties = new Dictionary<string, Dictionary<string, string>>
+            {
+                [InternalName] = new Dictionary<string, string>
+                {
+                    [EditKey] = string.Join(";", editKeyValue),
+                    [EditableKey] = string.Join(";", editKeyValue)
+                }
+            };
+
+            var whereValue = string.Empty;
+            var conditionField = string.Empty;
+            var condition = string.Empty;
+            var groupValue = string.Empty;
+            var valueCondition = string.Empty;
+
+            ShimEditableFieldDisplay.RenderFieldSPFieldStringStringStringStringStringSPListItem = (paramField, paramWhere, paramConditionField, paramCondition, paramGroup, paramValueCondition, paramLi) =>
+            {
+                whereValue = paramWhere;
+                conditionField = paramConditionField;
+                condition = paramCondition;
+                groupValue = paramGroup;
+                valueCondition = paramValueCondition;
+                return true;
+            };
+
+            // Act
+            var result = (bool)_privateObj.Invoke(IsEditableMethod, listItem.Instance, field.Instance, fieldProperties);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldBeTrue(),
+                () => whereValue.ShouldBe(editKeyValue[1]),
+                () => conditionField.ShouldBe(editKeyValue[2]),
+                () => condition.ShouldBe(editKeyValue[3]),
+                () => valueCondition.ShouldBe(editKeyValue[4]));
+        }
+
+        [TestMethod]
         public void IsEditable_EditableNever_ReturnsFalse()
         {
             // Arrange
