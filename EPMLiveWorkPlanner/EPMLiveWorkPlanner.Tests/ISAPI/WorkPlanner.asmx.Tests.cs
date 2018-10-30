@@ -49,6 +49,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private const string GetPlannersByTaskListMethodName = "GetPlannersByTaskList";
         private const string GetUpdateDetailLayoutMethodName = "GetUpdateDetailLayout";
         private const string ImportTasksFixXmlStructureMethodName = "ImportTasksFixXmlStructure";
+        private const string SaveProjectMethodName = "SaveProject";
 
         [TestInitialize]
         public void Setup()
@@ -70,6 +71,8 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         {
             shimsContext = ShimsContext.Create();
 
+            ShimSPFieldLookupValueCollection.Constructor = _ => new ShimSPFieldLookupValueCollection();
+            ShimSPFieldLookupValue.ConstructorString = (_, __) => new ShimSPFieldLookupValue();
             ShimSPSite.ConstructorGuid = (_, __) => new ShimSPSite();
             ShimSPSite.AllInstances.OpenWeb = _ => spWeb;
             ShimSPSite.AllInstances.OpenWebGuid = (_, __) => spWeb;
@@ -101,21 +104,30 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             };
             spListCollection = new ShimSPListCollection()
             {
-                TryGetListString = _ => spList
+                TryGetListString = _ => spList,
+                ItemGetString = _ => spList
             };
             spList = new ShimSPList()
             {
                 IDGet = () => guid,
-                FieldsGet = () => spFieldCollection
+                FieldsGet = () => spFieldCollection,
+                GetItemByIdInt32 = _ => spListItem
             };
-            spListItem = new ShimSPListItem();
+            spListItem = new ShimSPListItem()
+            {
+                ItemSetGuidObject = (_, __) => { },
+                Update = () => { }
+            };
             spFieldCollection = new ShimSPFieldCollection()
             {
                 GetFieldByInternalNameString = _ => spField
             };
             spField = new ShimSPField()
             {
-                TitleGet = () => DummyString
+                IdGet = () => guid,
+                TitleGet = () => DummyString,
+                ReadOnlyFieldGet = () => false,
+                TypeAsStringGet = () => DummyString
             };
         }
 
@@ -629,6 +641,104 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                     .Elements("Item")
                     .Count()
                     .ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void SaveProject_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string expected = "<Result Status=\"0\"></Result>";
+
+            var now = DateTime.Now;
+            var data = new XmlDocument();
+            var dataXmlString = $@"
+                <xmlcfg ID=""1"" PlannerID=""1"">
+                    <Field Name=""{(int)SPFieldType.DateTime}""></Field>
+                    <Field Name=""{(int)SPFieldType.DateTime}"">{now}</Field>
+                    <Field Name=""{(int)SPFieldType.Currency}""></Field>
+                    <Field Name=""{(int)SPFieldType.Currency}"">{DummyString}</Field>
+                    <Field Name=""{(int)SPFieldType.Number}"">{100}</Field>
+                    <Field Name=""{(int)SPFieldType.Number}"">{100}</Field>
+                    <Field Name=""{(int)SPFieldType.User}""></Field>
+                    <Field Name=""{(int)SPFieldType.User}"">{DummyString}</Field>
+                    <Field Name=""{(int)SPFieldType.Lookup}""></Field>
+                    <Field Name=""{(int)SPFieldType.Lookup}"">{DummyString}</Field>
+                    <Field Name=""{(int)SPFieldType.Calculated}"">{DummyString}</Field>
+                </xmlcfg>";
+            var props = new PlannerProps()
+            {
+                sListProjectCenter = DummyString
+            };
+            var resourceDataSet = new DataSet();
+            var row = default(DataRow);
+            var methodHit = 0;
+
+            data.LoadXml(dataXmlString);
+            resourceDataSet.Tables.Add(new DataTable());
+            resourceDataSet.Tables.Add(new DataTable());
+            resourceDataSet.Tables.Add(new DataTable());
+            resourceDataSet.Tables[2].Columns.Add("ID");
+            resourceDataSet.Tables[2].Columns.Add("SPAccountInfo");
+            row = resourceDataSet.Tables[2].NewRow();
+            row["ID"] = DummyString;
+            row["SPAccountInfo"] = DummyString;
+
+            spWeb.AllowUnsafeUpdatesSetBoolean = _ =>
+            {
+                validations += 1;
+            };
+            spFieldCollection.GetFieldByInternalNameString = internalName =>
+            {
+                var fieldType = (SPFieldType)int.Parse(internalName);
+                if (fieldType.Equals(SPFieldType.Number))
+                {
+                    methodHit += 1;
+                    var fieldNumber = new ShimSPFieldNumber()
+                    {
+                        ShowAsPercentageGet = () => methodHit.Equals(1)
+                    };
+                    return fieldNumber.Instance;
+                }
+                else if (fieldType.Equals(SPFieldType.Lookup))
+                {
+                    var fieldLookup = new ShimSPFieldLookup()
+                    {
+                        AllowMultipleValuesGet = () => true
+                    };
+                    return fieldLookup.Instance;
+                }
+                spField.TypeGet = () => fieldType;
+                return spField;
+            };
+            spListItem.ItemSetGuidObject = (_, __) =>
+            {
+                validations += 1;
+            };
+            spListItem.Update = () =>
+            {
+                validations += 1;
+            };
+
+            ShimSPField.AllInstances.ReadOnlyFieldGet = _ => false;
+            ShimSPField.AllInstances.TypeAsStringGet = _ => DummyString;
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_1, _2) =>
+            {
+                validations += 1;
+                return props;
+            };
+            ShimWorkPlannerAPI.GetResourceTableWorkPlannerAPIPlannerPropsGuidStringSPWeb = (_1, _2, _3, _4) =>
+            {
+                validations += 1;
+                return resourceDataSet;
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(SaveProjectMethodName, publicStatic, new object[] { data, spWeb.Instance });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(expected),
+                () => validations.ShouldBe(15));
         }
     }
 }
