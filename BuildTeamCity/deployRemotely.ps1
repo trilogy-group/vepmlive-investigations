@@ -24,14 +24,14 @@ Invoke-Command -ComputerName $serverIP -ScriptBlock $scriptBlock -Credential $cr
 
 Write-Host "Connecting to $serverIP, $webAppName, $siteCollectionToUpgrade, $buildNumber"
 $session = New-PSSession -ComputerName $serverIP -Credential $cred
-Invoke-Command -Session $session {Write-Host 'Connected remotely'}
+Write-Host 'Connected remotely'
 Invoke-Command -Session $session {Remove-Item C:\SilentInstaller\SilentInstaller.zip -ErrorAction SilentlyContinue}
 Invoke-Command -Session $session {Remove-Item C:\SilentInstaller\deploy.ps1 -ErrorAction SilentlyContinue}
-Invoke-Command -Session $session {Write-Host 'Deleted old installer'}
+Write-Host 'Deleted old installer'
 copy-item -path SilentInstaller.zip -Destination C:\SilentInstaller\. -ToSession $session
 copy-item -path BuildTeamcity\deploy.ps1 -Destination C:\SilentInstaller\. -ToSession $session
-Invoke-Command -Session $session {Write-Host 'Copied new installer'}
+Write-Host 'Copied new installer'
 $scriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("C:\SilentInstaller\deploy.ps1 $username $password $webAppName $siteCollectionToUpgrade $buildNumber")
 Invoke-Command -Session $session -ScriptBlock $scriptBlock
-Invoke-Command -Session $session {Write-Host 'Run complete'}
+Write-Host 'Run complete'
 Remove-PSSession $session
