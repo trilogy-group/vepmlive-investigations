@@ -6,10 +6,23 @@ Param(
 	[string]$siteCollectionToUpgrade = '%epmlive.qa.UpgradeSiteCollection%',
 	[string]$buildNumber = '%build.number%'
 )
-Write-Host "Connecting to $serverIP, $webAppName, $siteCollectionToUpgrade, $buildNumber"
-Set-Item WSMan:\localhost\Client\TrustedHosts -Value $serverIP  -Force
+
+Write-Host 'Configuring PS Remote locally'
+winrm quickconfig -quiet
+enable-psremoting -force -Confirm:$false
+
+Write-Host 'Configuring WSMAN locally'
+Set-Item wsman:\localhost\Client\TrustedHosts -value * -Force
+
 $passwd = convertto-securestring -AsPlainText -Force -String $password
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $passwd
+
+Write-Host "Configuring WSMAN remotely: $serverIP"
+$scriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("Set-Item wsman:\localhost\Client\TrustedHosts -value * -Force");
+Invoke-Command -ComputerName $serverIP -ScriptBlock $scriptBlock -Credential $cred
+
+
+Write-Host "Connecting to $serverIP, $webAppName, $siteCollectionToUpgrade, $buildNumber"
 $session = New-PSSession -ComputerName $serverIP -Credential $cred
 Invoke-Command -Session $session {Write-Host 'Connected remotely'}
 Invoke-Command -Session $session {Remove-Item C:\SilentInstaller\SilentInstaller.zip -ErrorAction SilentlyContinue}
