@@ -33,5 +33,5 @@ copy-item -path BuildTeamcity\deploy.ps1 -Destination C:\SilentInstaller\. -ToSe
 Write-Host 'Copied new installer'
 $scriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("C:\SilentInstaller\deploy.ps1 $username $password $webAppName $siteCollectionToUpgrade $buildNumber")
 Invoke-Command -Session $session -ScriptBlock $scriptBlock
-Write-Host 'Run complete's
+Write-Host 'Run complete'
 Remove-PSSession $session
