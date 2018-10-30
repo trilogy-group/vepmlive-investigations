@@ -5,13 +5,12 @@ using System.Linq;
 using System.Text;
 using Microsoft.SharePoint;
 using System.Data;
+using System.Diagnostics;
 using System.Xml;
-using System.DirectoryServices;
 using System.Web;
 using System.Web.UI;
 using System.Runtime.Caching;
-//using Microsoft.SharePoint.Administration;
-//using Microsoft.SharePoint.Administration.Claims;
+using CoreEditableFieldDisplay = EPMLiveCore.EditableFieldDisplay;
 
 namespace WorkEnginePPM
 {
@@ -519,5 +518,76 @@ namespace WorkEnginePPM
             return memoryCache.Get("ResPoolDt_" + web.ID, null) as DataTable;
 
         }
+
+        public static bool isEditable(SPListItem li, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
+        {
+            try
+            {
+                if (!fieldProperties[field.InternalName].ContainsKey("Edit"))
+                    return true;
+
+                string displaySettings = string.Empty;
+
+                displaySettings = fieldProperties[field.InternalName]["Edit"];
+
+                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
+                {
+                    string where = displaySettings.Split(";".ToCharArray())[1];
+                    string conditionField = "";
+                    string condition = "";
+                    string group = "";
+                    string valueCondition = "";
+
+                    if (where.Equals("[Me]"))
+                    {
+                        condition = displaySettings.Split(";".ToCharArray())[2];
+                        group = displaySettings.Split(";".ToCharArray())[3];
+                    }
+                    else // [Field]
+                    {
+                        conditionField = displaySettings.Split(";".ToCharArray())[2];
+                        condition = displaySettings.Split(";".ToCharArray())[3];
+                        valueCondition = displaySettings.Split(";".ToCharArray())[4];
+                    }
+
+                    bool e = CoreEditableFieldDisplay.RenderField(field, where, conditionField, condition, group, valueCondition, li);
+                    if (!e)
+                        return false;
+                }
+
+                displaySettings = fieldProperties[field.InternalName]["Editable"];
+                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("never"))
+                    return false;
+
+                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
+                {
+                    string where = displaySettings.Split(";".ToCharArray())[1];
+                    string conditionField = "";
+                    string condition = "";
+                    string group = "";
+                    string valueCondition = "";
+
+                    if (where.Equals("[Me]"))
+                    {
+                        condition = displaySettings.Split(";".ToCharArray())[2];
+                        group = displaySettings.Split(";".ToCharArray())[3];
+                    }
+                    else // [Field]
+                    {
+                        conditionField = displaySettings.Split(";".ToCharArray())[2];
+                        condition = displaySettings.Split(";".ToCharArray())[3];
+                        valueCondition = displaySettings.Split(";".ToCharArray())[4];
+                    }
+
+                    return CoreEditableFieldDisplay.RenderField(field, where, conditionField, condition, group, valueCondition, li);
+                }
+            }
+            catch (Exception exception)
+            {
+                Trace.WriteLine(exception);
+            }
+            return true;
+        }
+
     }
 }
