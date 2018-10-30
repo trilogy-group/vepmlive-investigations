@@ -31,6 +31,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private BindingFlags publicStatic;
         private BindingFlags publicInstance;
         private BindingFlags nonPublicInstance;
+        private BindingFlags nonPublicStatic;
         private ShimSPWeb spWeb;
         private ShimSPSite spSite;
         private ShimSPListCollection spListCollection;
@@ -46,6 +47,8 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private const string ImportTasksMethodName = "ImportTasks";
         private const string GetPlannersByProjectListMethodName = "GetPlannersByProjectList";
         private const string GetPlannersByTaskListMethodName = "GetPlannersByTaskList";
+        private const string GetUpdateDetailLayoutMethodName = "GetUpdateDetailLayout";
+        private const string ImportTasksFixXmlStructureMethodName = "ImportTasksFixXmlStructure";
 
         [TestInitialize]
         public void Setup()
@@ -74,6 +77,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             ShimSPWeb.AllInstances.Dispose = _ => { };
             ShimCoreFunctions.getLockedWebSPWeb = _ => guid;
             ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => DummyString;
+            ShimCoreFunctions.getListSettingStringSPList = (_, __) => DummyString;
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
         }
 
@@ -83,6 +87,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             publicStatic = BindingFlags.Static | BindingFlags.Public;
             publicInstance = BindingFlags.Instance | BindingFlags.Public;
             nonPublicInstance = BindingFlags.Instance | BindingFlags.NonPublic;
+            nonPublicStatic = BindingFlags.Static | BindingFlags.NonPublic;
             guid = Guid.Parse(SampleGuidString);
             spWeb = new ShimSPWeb()
             {
@@ -229,7 +234,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             // Arrange
             const string expected = "<Result Status=\"1\">ID Not Specified</Result>";
 
-            var allowDuplicates = true.ToString();
+            var allowDuplicates = bool.TrueString;
             var dataXml = string.Format(@"
                 <xmlcfg Structure=""Structure"" ResourceField=""ResourceField"" UIDColumn=""{0}"" AllowDuplicateRows=""{1}"" Planner=""{2}"" ID=""{3}"">
                 </xmlcfg>", DummyString, true, DummyString, string.Empty);
@@ -456,12 +461,12 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                         returnValue = projectList;
                         break;
                     case 3:
-                        returnValue = false.ToString();
+                        returnValue = bool.FalseString;
                         break;
                 }
                 return returnValue;
             };
-            ShimCoreFunctions.getConfigSettingSPWebString = (_1, _2) => true.ToString();
+            ShimCoreFunctions.getConfigSettingSPWebString = (_1, _2) => bool.TrueString;
 
             // Act
             var actual = (SortedList)privateObject.Invoke(GetPlannersByProjectListMethodName, publicStatic, new object[] { projectList, spWeb.Instance });
@@ -484,7 +489,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             ShimCoreFunctions.getLockConfigSettingSPWebStringBoolean = (_1, _2, _3) =>
             {
                 methodHit += 1;
-                if(methodHit.Equals(1))
+                if (methodHit.Equals(1))
                 {
                     return planners;
                 }
@@ -499,6 +504,131 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 () => actual.Count.ShouldBe(2),
                 () => actual["planner11"].ShouldBe("planner12"),
                 () => actual["planner21"].ShouldBe("planner22"));
+        }
+
+        [TestMethod]
+        public void GetUpdateDetailLayout_WhenCalled_ReturnsXmlString()
+        {
+            // Arrange
+            const string dataXmlString = @"<xmlcfg Planner=""Planner""/>";
+            const string outXmlString = @"
+                <Body>
+                    <B/>
+                    <I id=""Title""/>
+                </Body>";
+
+            var data = new XmlDocument();
+            var fieldProperties = default(Dictionary<string, Dictionary<string, string>>);
+            var plannerProps = new PlannerProps()
+            {
+                sListTaskCenter = DummyString,
+                StatusFields = new SortedList()
+                {
+                    [DummyString] = DummyString
+                }
+            };
+
+            data.LoadXml(dataXmlString);
+
+            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => outXmlString;
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_1, _2) =>
+            {
+                validations += 1;
+                return plannerProps;
+            };
+            ShimListDisplayUtils.ConvertFromStringString = _ => fieldProperties;
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPField>()
+            {
+                new ShimSPField()
+                {
+                    TypeGet = () => SPFieldType.Calculated,
+                    InternalNameGet = () => DummyString,
+                    TitleGet = () => DummyString
+                },
+                new ShimSPField()
+                {
+                    TypeGet = () => SPFieldType.User,
+                    InternalNameGet = () => "User",
+                    TitleGet = () => DummyString,
+                    ShowInEditFormGet = () => true
+                }
+            }.GetEnumerator();
+            ShimEditableFieldDisplay.isEditableSPListSPFieldDictionaryOfStringDictionaryOfStringString = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return true;
+            };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetUpdateDetailLayoutMethodName, publicStatic, new object[] { data, spWeb.Instance }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("Body")
+                    .Elements("I")
+                    .Count()
+                    .ShouldBe(1),
+                () => actual
+                    .Element("Body")
+                    .Element("B")
+                    .Elements("I")
+                    .Count()
+                    .ShouldBe(2),
+                () => actual
+                    .Element("Body")
+                    .Elements("I")
+                    .FirstOrDefault(x => x.Attribute("id").Value.Equals("Title"))
+                    .Attribute("N")
+                    .Value
+                    .ShouldBe(DummyString),
+                () => actual
+                    .Element("Body")
+                    .Element("B")
+                    .Elements("I")
+                    .Count(x => x.Attribute("id").Value.Equals("User") && x.Attribute("N").Value.Equals(DummyString))
+                    .ShouldBe(1),
+                () => actual
+                    .Element("Body")
+                    .Element("B")
+                    .Elements("I")
+                    .Count(x => x.Attribute("id").Value.Equals(DummyString) && x.Attribute("N").Value.Equals(DummyString))
+                    .ShouldBe(1),
+                () => validations
+                    .ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void ImportTasksFixXmlStructure_WhenCalled_ApppendsChilds()
+        {
+            // Arrange
+            const string idString = "id";
+            const string nodeString1 = "node1";
+            const string nodeString2 = "node2";
+            const string nodeString3 = "node3";
+
+            var data = new XmlDocument();
+            var dataXmlString = $@"
+                <xmlcfg>
+                    <Item {idString}=""{nodeString1}""/>
+                    <Item {idString}=""{nodeString1}.{nodeString2}""/>
+                    <Item {idString}=""{nodeString1}.{nodeString3}""/>
+                </xmlcfg>";
+
+            data.LoadXml(dataXmlString);
+
+            // Act
+            privateObject.Invoke(ImportTasksFixXmlStructureMethodName, nonPublicStatic, new object[] { data, DummyString, idString });
+            var actual = XDocument.Parse(data.OuterXml).Elements("xmlcfg").Elements("Item").FirstOrDefault(x => x.Attribute(idString).Value.Equals(nodeString1));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .ShouldNotBeNull(),
+                () => actual
+                    .Elements("Item")
+                    .Count()
+                    .ShouldBe(2));
         }
     }
 }

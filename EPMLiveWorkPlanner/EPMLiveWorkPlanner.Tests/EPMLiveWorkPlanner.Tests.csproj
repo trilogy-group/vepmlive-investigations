@@ -86,6 +86,10 @@
       <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
       <Name>EPMLive.TestFakes</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
+      <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
+      <Name>EPMLiveCore</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveWorkPlanner\EPMLiveWorkPlanner.csproj">
       <Project>{FCF0C151-0A3F-4B9F-9327-3BBBF109D776}</Project>
       <Name>EPMLiveWorkPlanner</Name>
