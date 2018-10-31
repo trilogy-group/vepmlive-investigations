@@ -853,6 +853,34 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
+
+
+        public object ExecuteScalarAsync(SqlConnection con, string sqlCommand, CommandType commandType, List<SqlParameter> sqlParams)
+        {
+            try
+            {
+                object value;
+                using (var command = new SqlCommand { CommandType = commandType, CommandText = sqlCommand, Connection = con })
+                {
+                    command.CommandTimeout = 3600; // 1hour
+                    command.Parameters.AddRange(sqlParams.ToArray());
+                    value = command.ExecuteScalar();
+                }
+                return value;
+            }
+            catch (SqlException ex)
+            {
+                SPSecurity.RunWithElevatedPrivileges(() =>
+                {
+                    var eventMessage = CreateEventMessageWithParams(ex, Command, Params);
+                    LogWindowsEvents(EpmLiveKey, ExecuteScalarKey, eventMessage, false, ExecuteScalarEvent);
+                });
+                _sqlErrorOccurred = true;
+                _sqlError = ex.Message;
+                return false;
+            }
+
+        }
         public bool ExecuteNonQuery(SqlConnection con)
         {
             try
@@ -1998,6 +2026,63 @@ namespace EPMLiveCore.ReportHelper
             return blnWorkSaved;
         }
 
+
+        public Thread SaveWorkAsync(SPListItem item)
+        {
+            bool hasWork = false, hasAssignedTo = false, hasStartDate = false, hasDueDate = false;
+            try
+            {
+                if (ItemHasValue(item, "Work"))
+                {
+                    hasWork = true;
+                }
+
+                if (ItemHasValue(item, "AssignedTo"))
+                {
+                    hasAssignedTo = true;
+                }
+
+                if (ItemHasValue(item, "StartDate"))
+                {
+                    hasStartDate = true;
+                }
+
+                if (ItemHasValue(item, "DueDate"))
+                {
+                    hasDueDate = true;
+                }
+                if (hasWork && hasAssignedTo && hasStartDate && hasDueDate)
+                {
+                    Guid listId = item.ParentList.ID;
+                    string sWork = Convert.ToString(item["Work"]);
+                    string sAssignedTo = ReportData.AddLookUpFieldValues(Convert.ToString(item["AssignedTo"]), "id");
+                    object startDate = DateTime.Parse(Convert.ToString(item["StartDate"]));
+                    object dueDate = DateTime.Parse(Convert.ToString(item["DueDate"]));
+                    Thread saveThread = new Thread(() => {
+                        try
+                        {
+                            ProcessAssignmentsAsync(sWork, sAssignedTo, startDate, dueDate, listId, SiteId, item.ID,
+                                    item.ParentList.Title);
+                        }catch(Exception ex)
+                        {
+                            LogStatus(string.Empty, string.Empty, "SaveWork() failed.", ex.Message.Replace("'", ""), 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        }
+                    }
+                    );
+                    saveThread.Start();
+                    return saveThread;
+                }
+                // don't do anything if missing value
+                // NOTE: Discussed with JB and we are assumeing values are missing because user intended to NOT submit work
+            }
+            catch (Exception ex)
+            {
+                LogStatus(string.Empty, string.Empty, "SaveWork() failed.", ex.Message.Replace("'", ""), 2, 3,
+                    string.Empty); 
+            }
+            return null;
+        }
+
         public bool ProcessAssignments(string sWork, string sAssignedTo, object StartDate, object DueDate, Guid ListID,
             Guid SiteID, int ItemID, string sListName)
         {
@@ -2018,7 +2103,28 @@ namespace EPMLiveCore.ReportHelper
             objResults = ExecuteScalar(GetClientReportingConnection);
             return blnProcess;
         }
+        public object ProcessAssignmentsAsync(string sWork, string sAssignedTo, object StartDate, object DueDate, Guid ListID,
+            Guid SiteID, int ItemID, string sListName)
+        {
+            string command = "spRPTProcessAssignments";
+            CommandType = CommandType.StoredProcedure;
+            List<SqlParameter> sqlParams = new List<SqlParameter>();
+            sqlParams.Add(new SqlParameter("@Work", sWork));
+            sqlParams.Add(new SqlParameter("@AssignedTo", sAssignedTo));
+            sqlParams.Add(new SqlParameter("@Start", StartDate));
+            sqlParams.Add(new SqlParameter("@Finish", DueDate));
+            sqlParams.Add(new SqlParameter("@ListID", ListID));
+            sqlParams.Add(new SqlParameter("@SiteID", SiteID));
+            sqlParams.Add(new SqlParameter("@ItemID", ItemID));
 
+            //Need to implement further. Need to check result for status/errors
+            using (var connection = new SqlConnection(_remoteCs))
+            {
+                connection.Open();
+                return ExecuteScalarAsync(connection, command, CommandType.StoredProcedure, sqlParams);
+            }
+            
+        }
         private int GetDbVersion()
         {
             int version = 2005;
