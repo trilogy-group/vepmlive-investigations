@@ -2,19 +2,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common.Fakes;
+using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.IO.Fakes;
 using System.Linq;
 using System.Reflection;
 using System.Resources.Fakes;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using EPMLiveCore.Fakes;
 using EPMLiveWorkPlanner.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
@@ -30,8 +32,6 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private PrivateObject privateObject;
         private IDisposable shimsContext;
         private BindingFlags publicStatic;
-        private BindingFlags publicInstance;
-        private BindingFlags nonPublicInstance;
         private BindingFlags nonPublicStatic;
         private ShimSPWeb spWeb;
         private ShimSPSite spSite;
@@ -48,9 +48,27 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private Guid guid;
         private int validations;
         private const int DummyInt = 1;
+        private const int One = 1;
         private const string SampleGuidString1 = "83e81819-0112-4c22-bb70-d8ba101e9e0c";
         private const string SampleGuidString2 = "83e81819-0104-4c22-bb70-d8ba101e9e0c";
         private const string DummyString = "DummyString";
+        private const string TitleString = "Title";
+        private const string StartString = "Start";
+        private const string FinishString = "Finish";
+        private const string IDStringCaps = "ID";
+        private const string StatusString = "Status";
+        private const string ItemString = "Item";
+        private const string UserString = "User";
+        private const string AccountInfpString = "SPAccountInfo";
+        private const string TaskUidString = "taskuid";
+        private const string CommentCountString = "CommentCount";
+        private const string AttachmentsString = "Attachments";
+        private const string LinkedString = "Linked";
+        private const string SourceTaskIdString = "SourceTaskId";
+        private const string PredecessorsString = "Predecessors";
+        private const string SuccessorsString = "Successors";
+        private const string DestProjectIdString = "DestProjectId";
+        private const string DestTaskIdString = "DestTaskId";
         private const string GetExternalProjectsMethodName = "GetExternalProjects";
         private const string ImportTasksMethodName = "ImportTasks";
         private const string GetPlannersByProjectListMethodName = "GetPlannersByProjectList";
@@ -66,6 +84,13 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private const string IGetTemplatesMethodName = "iGetTemplates";
         private const string ISaveTemplateMethodName = "iSaveTemplate";
         private const string SaveTemplateMethodName = "SaveTemplate";
+        private const string GetTemplatesMethodName = "GetTemplates";
+        private const string GetTaskFileMethodName = "GetTaskFile";
+        private const string ProcessTaskXmlFromTaskCenterMethodName = "ProcessTaskXmlFromTaskCenter";
+        private const string GetTasksMethodName = "GetTasks";
+        private const string ProcessExternalMethodName = "ProcessExternal";
+        private const string GetExternalLinkLayoutMethodName = "GetExternalLinkLayout";
+        private const string AddCustomFooterMethodName = "AddCustomFooter";
 
         [TestInitialize]
         public void Setup()
@@ -87,6 +112,9 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         {
             shimsContext = ShimsContext.Create();
 
+            ShimSqlConnection.ConstructorString = (_, __) => new ShimSqlConnection();
+            ShimSqlConnection.AllInstances.Open = _ => { };
+            ShimSqlConnection.AllInstances.Close = _ => { };
             ShimSPFieldLookupValueCollection.Constructor = _ => new ShimSPFieldLookupValueCollection();
             ShimSPFieldLookupValue.ConstructorString = (_, __) => new ShimSPFieldLookupValue();
             ShimSPSite.ConstructorGuid = (_, __) => new ShimSPSite();
@@ -97,8 +125,10 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             ShimCoreFunctions.getLockedWebSPWeb = _ => guid;
             ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => DummyString;
             ShimCoreFunctions.getListSettingStringSPList = (_, __) => DummyString;
+            ShimCoreFunctions.getConnectionStringGuid = _ => DummyString;
             ShimSPList.AllInstances.RootFolderGet = _ => spFolder;
             ShimSPList.AllInstances.GetItemsSPQuery = (_, __) => spListItemCollection;
+            ShimSPPersistedObject.AllInstances.IdGet = _ => guid;
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
         }
 
@@ -106,8 +136,6 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         {
             validations = 0;
             publicStatic = BindingFlags.Static | BindingFlags.Public;
-            publicInstance = BindingFlags.Instance | BindingFlags.Public;
-            nonPublicInstance = BindingFlags.Instance | BindingFlags.NonPublic;
             nonPublicStatic = BindingFlags.Static | BindingFlags.NonPublic;
             guid = Guid.Parse(SampleGuidString1);
             spWeb = new ShimSPWeb()
@@ -116,11 +144,13 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 SiteGet = () => spSite,
                 ListsGet = () => spListCollection,
                 GetFolderString = _ => spFolder,
+                GetFileString = _ => spFile,
                 FoldersGet = () => spFolderCollection
             };
             spSite = new ShimSPSite()
             {
-                IDGet = () => guid
+                IDGet = () => guid,
+                WebApplicationGet = () => new ShimSPWebApplication()
             };
             spListCollection = new ShimSPListCollection()
             {
@@ -157,7 +187,10 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             {
                 IdGet = () => guid,
                 TitleGet = () => DummyString,
+                InternalNameGet = () => DummyString,
                 ReadOnlyFieldGet = () => false,
+                HiddenGet = () => false,
+                ReorderableGet = () => true,
                 TypeAsStringGet = () => DummyString
             };
             spFolderCollection = new ShimSPFolderCollection()
@@ -176,6 +209,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 CountGet = () => DummyInt,
                 AddStringByteArrayBoolean = (_1, _2, _3) => spFile,
                 AddStringStream = (_1, _2) => spFile,
+                ItemGetString = _ => spFile
             };
             spFile = new ShimSPFile()
             {
@@ -206,15 +240,15 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             var now = DateTime.Now;
 
             data.LoadXml(dataXml);
-            dataTable.Columns.Add("Title");
-            dataTable.Columns.Add("Start");
-            dataTable.Columns.Add("Finish");
-            dataTable.Columns.Add("ID");
+            dataTable.Columns.Add(TitleString);
+            dataTable.Columns.Add(StartString);
+            dataTable.Columns.Add(FinishString);
+            dataTable.Columns.Add(IDStringCaps);
             var row = dataTable.NewRow();
-            row["Title"] = DummyString;
-            row["Start"] = now;
-            row["Finish"] = now;
-            row["ID"] = DummyString;
+            row[TitleString] = DummyString;
+            row[StartString] = now;
+            row[FinishString] = now;
+            row[IDStringCaps] = DummyString;
             dataTable.Rows.Add(row);
 
             ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => xmlString;
@@ -280,7 +314,6 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         {
             // Arrange
             const string expected = "<Result Status=\"1\">UID Column not specified and allow duplicated is on. You must either specify UID column or you must allow duplicates.</Result>";
-
             var dataXml = string.Format(@"
                 <xmlcfg Structure=""Structure"" ResourceField=""ResourceField"" UIDColumn=""{0}"" AllowDuplicateRows=""{1}"" Planner=""Planner"" ID=""ID"">
                 </xmlcfg>", string.Empty, false);
@@ -300,7 +333,6 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         {
             // Arrange
             const string expected = "<Result Status=\"1\">ID Not Specified</Result>";
-
             var allowDuplicates = bool.TrueString;
             var dataXml = string.Format(@"
                 <xmlcfg Structure=""Structure"" ResourceField=""ResourceField"" UIDColumn=""{0}"" AllowDuplicateRows=""{1}"" Planner=""{2}"" ID=""{3}"">
@@ -321,7 +353,6 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         {
             // Arrange
             const string expected = "<Result Status=\"1\">Planner Not Specified</Result>";
-
             var dataXml = string.Format(@"
                 <xmlcfg Structure=""Structure"" ResourceField=""ResourceField"" UIDColumn=""{0}"" AllowDuplicateRows=""{1}"" Planner=""{2}"" ID=""ID"">
                 </xmlcfg>", DummyString, true, string.Empty);
@@ -391,8 +422,8 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 DataSet dsResources, string sTaskType) =>
                 {
                     validations += 1;
-                    var newNode = returnDocument.CreateNode(XmlNodeType.Element, "Item", returnDocument.NamespaceURI);
-                    var statusAttribute = returnDocument.CreateAttribute("Status");
+                    var newNode = returnDocument.CreateNode(XmlNodeType.Element, ItemString, returnDocument.NamespaceURI);
+                    var statusAttribute = returnDocument.CreateAttribute(StatusString);
 
                     statusAttribute.Value = "1";
                     newNode.Attributes.Append(statusAttribute);
@@ -475,10 +506,10 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 DataSet dsResources, string sTaskType) =>
                 {
                     validations += 1;
-                    var newNode = returnDocument.CreateNode(XmlNodeType.Element, "Item", returnDocument.NamespaceURI);
-                    var statusAttribute = returnDocument.CreateAttribute("Status");
+                    var newNode = returnDocument.CreateNode(XmlNodeType.Element, ItemString, returnDocument.NamespaceURI);
+                    var statusAttribute = returnDocument.CreateAttribute(StatusString);
 
-                    statusAttribute.Value = "1";
+                    statusAttribute.Value = One.ToString();
                     newNode.Attributes.Append(statusAttribute);
                     returnDocument.FirstChild.AppendChild(newNode);
 
@@ -615,7 +646,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 new ShimSPField()
                 {
                     TypeGet = () => SPFieldType.User,
-                    InternalNameGet = () => "User",
+                    InternalNameGet = () => UserString,
                     TitleGet = () => DummyString,
                     ShowInEditFormGet = () => true
                 }
@@ -645,7 +676,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 () => actual
                     .Element("Body")
                     .Elements("I")
-                    .FirstOrDefault(x => x.Attribute("id").Value.Equals("Title"))
+                    .FirstOrDefault(x => x.Attribute("id").Value.Equals(TitleString))
                     .Attribute("N")
                     .Value
                     .ShouldBe(DummyString),
@@ -653,7 +684,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                     .Element("Body")
                     .Element("B")
                     .Elements("I")
-                    .Count(x => x.Attribute("id").Value.Equals("User") && x.Attribute("N").Value.Equals(DummyString))
+                    .Count(x => x.Attribute("id").Value.Equals(UserString) && x.Attribute("N").Value.Equals(DummyString))
                     .ShouldBe(1),
                 () => actual
                     .Element("Body")
@@ -673,7 +704,6 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             const string nodeString1 = "node1";
             const string nodeString2 = "node2";
             const string nodeString3 = "node3";
-
             var data = new XmlDocument();
             var dataXmlString = $@"
                 <xmlcfg>
@@ -703,7 +733,6 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         {
             // Arrange
             const string expected = "<Result Status=\"0\"></Result>";
-
             var now = DateTime.Now;
             var data = new XmlDocument();
             var dataXmlString = $@"
@@ -732,11 +761,11 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             resourceDataSet.Tables.Add(new DataTable());
             resourceDataSet.Tables.Add(new DataTable());
             resourceDataSet.Tables.Add(new DataTable());
-            resourceDataSet.Tables[2].Columns.Add("ID");
-            resourceDataSet.Tables[2].Columns.Add("SPAccountInfo");
+            resourceDataSet.Tables[2].Columns.Add(IDStringCaps);
+            resourceDataSet.Tables[2].Columns.Add(AccountInfpString);
             row = resourceDataSet.Tables[2].NewRow();
-            row["ID"] = DummyString;
-            row["SPAccountInfo"] = DummyString;
+            row[IDStringCaps] = DummyString;
+            row[AccountInfpString] = DummyString;
 
             spWeb.AllowUnsafeUpdatesSetBoolean = _ =>
             {
@@ -1135,11 +1164,11 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual.Rows.Count.ShouldBe(2),
-                () => actual.Rows[0]["ID"].ShouldBe(DummyInt.ToString()),
-                () => actual.Rows[0]["Title"].ShouldBe(fullName),
+                () => actual.Rows[0][IDStringCaps].ShouldBe(DummyInt.ToString()),
+                () => actual.Rows[0][TitleString].ShouldBe(fullName),
                 () => actual.Rows[0]["Description"].ShouldBe(DummyString),
-                () => actual.Rows[1]["ID"].ShouldBe(DummyInt.ToString()),
-                () => actual.Rows[1]["Title"].ShouldBe(fileName),
+                () => actual.Rows[1][IDStringCaps].ShouldBe(DummyInt.ToString()),
+                () => actual.Rows[1][TitleString].ShouldBe(fileName),
                 () => actual.Rows[1]["Description"].ShouldBe(DummyString));
         }
 
@@ -1166,14 +1195,14 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual.Rows.Count.ShouldBe(3),
-                () => actual.Rows[0]["ID"].ShouldBe(DummyInt.ToString()),
-                () => actual.Rows[0]["Title"].ShouldBe(fullName),
+                () => actual.Rows[0][IDStringCaps].ShouldBe(DummyInt.ToString()),
+                () => actual.Rows[0][TitleString].ShouldBe(fullName),
                 () => actual.Rows[0]["Description"].ShouldBe(DummyString),
-                () => actual.Rows[1]["ID"].ShouldBe(DummyInt.ToString()),
-                () => actual.Rows[1]["Title"].ShouldBe(fileName),
+                () => actual.Rows[1][IDStringCaps].ShouldBe(DummyInt.ToString()),
+                () => actual.Rows[1][TitleString].ShouldBe(fileName),
                 () => actual.Rows[1]["Description"].ShouldBe(DummyString),
-                () => actual.Rows[2]["ID"].ShouldBe("-101"),
-                () => actual.Rows[2]["Title"].ShouldBe("Import Project"),
+                () => actual.Rows[2][IDStringCaps].ShouldBe("-101"),
+                () => actual.Rows[2][TitleString].ShouldBe("Import Project"),
                 () => actual.Rows[2]["Description"].ShouldBe("Select this option to upload a project file."));
         }
 
@@ -1303,7 +1332,6 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             // Arrange
             const string plannerId = "1";
             const string templateName = "TemplateName";
-
             var dataXml = $@"<xmlcfg Planner=""{plannerId}"" TemplateName=""{templateName}"" Description=""Description""/>";
             var data = new XmlDocument();
 
@@ -1336,7 +1364,6 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             // Arrange
             const string plannerId = "1";
             const string templateName = "TemplateName";
-
             var dataXml = $@"<xmlcfg Planner=""{plannerId}"" TemplateName=""{templateName}"" Description=""Description""/>";
             var data = new XmlDocument();
 
@@ -1361,6 +1388,455 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             actual.ShouldSatisfyAllConditions(
                 () => actual.ShouldBe(DummyString),
                 () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetTemplates_LockedWebEqualsSPWebTrue_ReturnsDataTable()
+        {
+            // Arrange
+            var dataTable = new DataTable();
+            var row = default(DataRow);
+
+            dataTable.Columns.Add(DummyString);
+            row = dataTable.NewRow();
+            row[DummyString] = DummyString;
+            dataTable.Rows.Add(row);
+
+            ShimCoreFunctions.getLockedWebSPWeb = _ => guid;
+            ShimSPSite.AllInstances.OpenWebGuid = (_, __) =>
+            {
+                validations += 1;
+                return spWeb;
+            };
+            ShimWorkPlannerAPI.iGetTemplatesSPWebStringString = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return dataTable;
+            };
+
+            // Act
+            var actual = (DataTable)privateObject.Invoke(GetTemplatesMethodName, publicStatic, new object[] { spWeb.Instance, DummyString, DummyString });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Rows.Count.ShouldBe(1),
+                () => actual.Rows[0][DummyString].ShouldBe(DummyString),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetTemplates_LockedWebEqualsSPWebFalse_ReturnsDataTable()
+        {
+            // Arrange
+            var dataTable = new DataTable();
+            var row = default(DataRow);
+
+            dataTable.Columns.Add(DummyString);
+            row = dataTable.NewRow();
+            row[DummyString] = DummyString;
+            dataTable.Rows.Add(row);
+
+            ShimCoreFunctions.getLockedWebSPWeb = _ => Guid.Parse(SampleGuidString2);
+            ShimSPSite.AllInstances.OpenWebGuid = (_, __) =>
+            {
+                validations += 1;
+                return spWeb;
+            };
+            ShimWorkPlannerAPI.iGetTemplatesSPWebStringString = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return dataTable;
+            };
+
+            // Act
+            var actual = (DataTable)privateObject.Invoke(GetTemplatesMethodName, publicStatic, new object[] { spWeb.Instance, DummyString, DummyString });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Rows.Count.ShouldBe(1),
+                () => actual.Rows[0][DummyString].ShouldBe(DummyString),
+                () => validations.ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void GetTaskFile_WhenCalled_ReturnsSPFile()
+        {
+            // Arrange
+            spFile.ExistsGet = () => true;
+            spListCollection.ItemGetString = _ => new ShimSPDocumentLibrary().Instance;
+
+            ShimWorkPlannerAPI.UpgradeProjectScheduleLibrarySPWebStringStringSPFile = (_1, _2, _3, _4) =>
+            {
+                validations += 1;
+            };
+
+            // Act
+            var actual = (SPFile)privateObject.Invoke(GetTaskFileMethodName, publicStatic, new object[] { spWeb.Instance, DummyString, DummyString });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldNotBeNull(),
+                () => actual.Exists.ShouldBeTrue(),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void ProcessTaskXmlFromTaskCenter_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string dataXml = @"
+                <xmlcfg>
+                    <I id=""1""/>
+                    <I id=""2""/>
+                </xmlcfg>";
+            var lastId = 0;
+            var data = new XmlDocument();
+            var dataTable = new DataTable();
+            var row = default(DataRow);
+            var props = new PlannerProps()
+            {
+                sListTaskCenter = DummyString
+            };
+
+            data.LoadXml(dataXml);
+            dataTable.Columns.Add(TaskUidString);
+            dataTable.Columns.Add(CommentCountString);
+            dataTable.Columns.Add(AttachmentsString);
+            row = dataTable.NewRow();
+            row[TaskUidString] = 1;
+            row[CommentCountString] = DummyString;
+            row[AttachmentsString] = 1;
+            dataTable.Rows.Add(row);
+            row = dataTable.NewRow();
+            row[TaskUidString] = 2;
+            row[CommentCountString] = DummyString;
+            row[AttachmentsString] = 0;
+            dataTable.Rows.Add(row);
+            spListItemCollection.GetDataTable = () => dataTable;
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(
+                ProcessTaskXmlFromTaskCenterMethodName,
+                nonPublicStatic,
+                new object[] { data, props, spWeb.Instance, DummyString, lastId }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("xmlcfg")
+                    .Elements("I")
+                    .FirstOrDefault(x => x.Attribute("id").Value.Equals("1"))
+                    .Attribute("CommentCount")
+                    .Value
+                    .ShouldBe(DummyString),
+                () => actual
+                    .Element("xmlcfg")
+                    .Elements("I")
+                    .FirstOrDefault(x => x.Attribute("id").Value.Equals("1"))
+                    .Attribute("Attachments")
+                    .Value
+                    .ShouldBe("True"),
+                () => actual
+                    .Element("xmlcfg")
+                    .Elements("I")
+                    .FirstOrDefault(x => x.Attribute("id").Value.Equals("2"))
+                    .Attribute("Attachments")
+                    .Value
+                    .ShouldBe(string.Empty));
+        }
+
+        [TestMethod]
+        public void GetTasks_AgileTrue_ReturnsString()
+        {
+            // Arrange
+            const string dataXml = @"<xmlcfg Planner=""Planner"" ID=""1"" />";
+            const string newXml = @"<xmlcfg/>";
+            var data = new XmlDocument();
+            var dataSet = new DataSet();
+            var props = new PlannerProps()
+            {
+                bAgile = true
+            };
+
+            data.LoadXml(dataXml);
+            spFile.OpenBinaryStream = () => new MemoryStream();
+            ShimStreamReader.AllInstances.ReadToEnd = _ =>
+            {
+                validations += 1;
+                return dataXml;
+            };
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_1, _2) =>
+            {
+                validations += 1;
+                return props;
+            };
+            ShimWorkPlannerAPI.GetTaskFileSPWebStringString = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return spFile;
+            };
+            ShimWorkPlannerAPI.GetResourceTableWorkPlannerAPIPlannerPropsGuidStringSPWeb = (_1, _2, _3, _4) =>
+            {
+                validations += 1;
+                return dataSet;
+            };
+            ShimWorkPlannerAPI.AppendNewAgileTasksSPWebWorkPlannerAPIPlannerPropsXmlDocumentStringDataSet = (_1, _2, _3, _4, _5) =>
+            {
+                validations += 1;
+                return newXml;
+            };
+            ShimWorkPlannerAPI.SaveWorkPlanXmlDocumentSPWeb = (_1, _2) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetTasksMethodName, publicStatic, new object[] { data, spWeb.Instance });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(newXml),
+                () => validations.ShouldBe(6));
+        }
+
+        [TestMethod]
+        public void GetTasks_AgileFalse_ReturnsString()
+        {
+            // Arrange
+            const string predecessors = PredecessorsString;
+            const string descendants = "Descendants";
+            const string dataXml = @"<xmlcfg Planner=""Planner"" ID=""1"" />";
+            var newXml = $@"
+                <xmlcfg>
+                    <I id=""{DummyInt}"" Predecessors=""{predecessors}"" Descendants=""{descendants}""/>
+                </xmlcfg>";
+            var data = new XmlDocument();
+            var dataSet = new DataSet();
+            var dataTable = new DataTable();
+            var row = default(DataRow);
+            var props = new PlannerProps()
+            {
+                bAgile = false
+            };
+
+            data.LoadXml(dataXml);
+            dataTable.Columns.Add(LinkedString);
+            dataTable.Columns.Add(SourceTaskIdString);
+            dataTable.Columns.Add(PredecessorsString);
+            dataTable.Columns.Add(SuccessorsString);
+            dataTable.Columns.Add(DestProjectIdString);
+            dataTable.Columns.Add(DestTaskIdString);
+            row = dataTable.NewRow();
+            row[LinkedString] = bool.TrueString;
+            row[SourceTaskIdString] = 1;
+            row[PredecessorsString] = PredecessorsString;
+            row[SuccessorsString] = SuccessorsString;
+            row[DestProjectIdString] = 1;
+            row[DestTaskIdString] = 1;
+            dataTable.Rows.Add(row);
+
+            spFile.OpenBinaryStream = () => new MemoryStream();
+            ShimStreamReader.AllInstances.ReadToEnd = _ =>
+            {
+                validations += 1;
+                return newXml;
+            };
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_1, _2) =>
+            {
+                validations += 1;
+                return props;
+            };
+            ShimWorkPlannerAPI.GetTaskFileSPWebStringString = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return spFile;
+            };
+            ShimWorkPlannerAPI.GetResourceTableWorkPlannerAPIPlannerPropsGuidStringSPWeb = (_1, _2, _3, _4) =>
+            {
+                validations += 1;
+                return dataSet;
+            };
+            ShimDbDataAdapter.AllInstances.FillDataSet = (instance, dataSetToFill) =>
+            {
+                dataSetToFill.Tables.Add(dataTable);
+                return DummyInt;
+            };
+            ShimWorkPlannerAPI.AddCustomFooterXmlDocumentStringString = (_1, _2, taskUpdates) =>
+            {
+                if (taskUpdates.Equals($"{DummyString}{DummyString}{DummyString}"))
+                {
+                    validations += 1;
+                }
+            };
+            ShimWorkPlannerAPI.ProcessTaskXmlFromTaskCenterXmlDocumentWorkPlannerAPIPlannerPropsSPWebStringInt32Out =
+                (XmlDocument doc, PlannerProps propsParameter, SPWeb web, string projectid, out int lastid) =>
+                {
+                    validations += 1;
+                    lastid = 1;
+                    return DummyString;
+                };
+            ShimWorkPlannerAPI.ProcessExternalXmlDocumentSPListStringStringStringBooleanDataSetXmlNodeBooleanStringInt32Ref =
+                (XmlDocument doc, SPList oListTaskCenter, string predsucc, string projectid, string plannerid, bool before, DataSet dsResources, XmlNode ndTaskLinkedTO, bool bLinked, string curtaskid, ref int lastid) =>
+                {
+                    validations += 1;
+                    return DummyString;
+                };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetTasksMethodName, publicStatic, new object[] { data, spWeb.Instance }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("I")
+                    .Attribute("Predecessors")
+                    .Value
+                    .ShouldBe($"Predecessors;myString"),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("I")
+                    .Attribute("Descendants")
+                    .Value
+                    .ShouldBe($"Descendants;myString"),
+                () => validations
+                    .ShouldBe(9));
+        }
+
+        [TestMethod]
+        public void ProcessExternal_TaskNodeNullFieldTypeDateTimeBeforeTrue_ReturnsString()
+        {
+            // Arrange
+            const bool linked = true;
+            const bool before = true;
+            const string taskId = "1";
+            const string dataXml = @"
+                <xmlcfg>
+                    <I />
+                </xmlcfg>";
+            var lastId = 0;
+            var now = DateTime.Now;
+            var data = new XmlDocument();
+            var node = default(XmlNode);
+
+            data.LoadXml(dataXml);
+            node = data.DocumentElement.FirstChild;
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            ShimWorkPlannerAPI.getFieldValueSPListItemSPFieldDataSet = (_1, _2, _3) => now.ToString();
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPField>()
+            {
+                spField
+            }.GetEnumerator();
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                ProcessExternalMethodName,
+                nonPublicStatic,
+                new object[] { data, spList.Instance, DummyString, DummyString, DummyString, before, default(DataSet), node, linked, taskId, lastId });
+
+            // Assert
+            actual.ShouldBe(",A:1");
+        }
+
+        [TestMethod]
+        public void ProcessExternal_TaskNodeNullFieldTypeNotDateTimeBeforeFalse_ReturnsString()
+        {
+            // Arrange
+            const bool linked = true;
+            const bool before = false;
+            const string dataXml = @"
+                <xmlcfg>
+                    <I />
+                </xmlcfg>";
+            var lastId = 0;
+            var data = new XmlDocument();
+            var node = default(XmlNode);
+
+            data.LoadXml(dataXml);
+            node = data.DocumentElement.FirstChild;
+
+            spField.TypeGet = () => SPFieldType.Calculated;
+            ShimWorkPlannerAPI.getFieldValueSPListItemSPFieldDataSet = (_1, _2, _3) => DummyString;
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPField>()
+            {
+                spField
+            }.GetEnumerator();
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                ProcessExternalMethodName,
+                nonPublicStatic,
+                new object[] { data, spList.Instance, DummyString, DummyString, DummyString, before, default(DataSet), node, linked, string.Empty, lastId });
+
+            // Assert
+            actual.ShouldBe(",A:1");
+        }
+
+        [TestMethod]
+        public void ProcessExternal_TaskNodeNotNull_ReturnsString()
+        {
+            // Arrange
+            const bool linked = true;
+            const bool before = false;
+            const string taskId = "1";
+            var now = DateTime.Now;
+            var dataXml = $@"
+                <xmlcfg>
+                    <I id=""{taskId}"" StartDate=""{now}"" DueDate=""{now.AddDays(1)}"" />
+                </xmlcfg>";
+            var lastId = 0;
+            var data = new XmlDocument();
+            var node = default(XmlNode);
+
+            data.LoadXml(dataXml);
+            node = data.DocumentElement.FirstChild;
+
+            spField.TypeGet = () => SPFieldType.Calculated;
+            ShimWorkPlannerAPI.getFieldValueSPListItemSPFieldDataSet = (_1, _2, _3) => DummyString;
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPField>()
+            {
+                spField
+            }.GetEnumerator();
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                ProcessExternalMethodName,
+                nonPublicStatic,
+                new object[] { data, spList.Instance, DummyString, DummyString, DummyString, before, default(DataSet), node, linked, taskId, lastId });
+
+            // Assert
+            actual.ShouldBe($",U:{taskId}");
+        }
+
+        [TestMethod]
+        public void GetExternalLinkLayout_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string dataXml = @"
+                <xmlcfg>
+                    <I />
+                    <I />
+                    <I />
+                    <Grid />
+                </xmlcfg>";
+            var data = new XmlDocument();
+            data.LoadXml(dataXml);
+
+            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => dataXml;
+
+            // Act
+            privateObject.Invoke(AddCustomFooterMethodName, nonPublicStatic, new object[] { data, DummyString, DummyString });
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetExternalLinkLayoutMethodName, publicStatic, new object[] { data, spWeb.Instance }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("xmlcfg")
+                    .Elements("I")
+                    .Count()
+                    .ShouldBe(3));
         }
     }
 }
