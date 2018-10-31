@@ -554,7 +554,6 @@ namespace WorkEnginePPM
 
                 return RenderField(listItem, field, displaySettings);
             }
-
             catch (Exception exception)
             {
                 Trace.WriteLine(exception);
@@ -588,7 +587,14 @@ namespace WorkEnginePPM
                     valueCondition = displaySettings.Split(SemiColon.ToCharArray())[4];
                 }
 
-                renderField = CoreEditableFieldDisplay.RenderField(field, whereField, conditionField, condition, groupField, valueCondition, listItem);
+                renderField = CoreEditableFieldDisplay.RenderField(
+                    field,
+                    whereField,
+                    conditionField,
+                    condition,
+                    groupField,
+                    valueCondition,
+                    listItem);
             }
 
             return renderField;
