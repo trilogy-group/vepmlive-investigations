@@ -196,6 +196,7 @@
     <Compile Include="API\Notification\APIEmailTests.cs" />
     <Compile Include="API\Applications\ApplicationUninstallerTests.cs" />
     <Compile Include="API\Notification\NotificationTests.cs" />
+    <Compile Include="API\PersonalizationManagerTests.cs" />
     <Compile Include="API\Publish\APIPublishTests.cs" />
     <Compile Include="API\Reporting\ReportingTest.cs" />
     <Compile Include="API\ResourceGrid\ResourceExporterTests.cs" />
