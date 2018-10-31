@@ -2082,7 +2082,7 @@ namespace EPMLiveWebParts
 
         private bool isEditable(SPListItem listItem, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
         {
-                return HelperFunctions.isEditable(listItem, field, fieldProperties);
+                return HelperFunctions.IsEditable(listItem, field, fieldProperties);
         }
 
 

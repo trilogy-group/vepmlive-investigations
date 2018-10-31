@@ -520,7 +520,7 @@ namespace WorkEnginePPM
 
         }
 
-        public static bool isEditable(SPListItem listItem, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
+        public static bool IsEditable(SPListItem listItem, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
         {
             Guard.ArgumentIsNotNull(fieldProperties, nameof(fieldProperties));
             Guard.ArgumentIsNotNull(field, nameof(field));
@@ -528,12 +528,16 @@ namespace WorkEnginePPM
 
             try
             {
-                if (!fieldProperties[field.InternalName].ContainsKey("Edit"))
+                const string EditKey = "Edit";
+                const string EditableKey = "Editable";
+                const string DisplaySettingsNever = "never";
+
+                if (!fieldProperties[field.InternalName].ContainsKey(EditKey))
                 {
                     return true;
                 }
 
-                var displaySettings = fieldProperties[field.InternalName]["Edit"];
+                var displaySettings = fieldProperties[field.InternalName][EditKey];
                 var renderField = RenderField(listItem, field, displaySettings);
 
                 if (!renderField)
@@ -541,9 +545,9 @@ namespace WorkEnginePPM
                     return false;
                 }
 
-                displaySettings = fieldProperties[field.InternalName]["Editable"];
+                displaySettings = fieldProperties[field.InternalName][EditableKey];
 
-                if (displaySettings.Split(";".ToCharArray())[0].Equals("never", StringComparison.OrdinalIgnoreCase))
+                if (displaySettings.Split(";".ToCharArray())[0].Equals(DisplaySettingsNever, StringComparison.OrdinalIgnoreCase))
                 {
                     return false;
                 }
@@ -561,11 +565,12 @@ namespace WorkEnginePPM
 
         private static bool RenderField(SPListItem listItem, SPField field, string displaySettings)
         {
+            const string SemiColon = ";";
             var renderField = true;
 
-            if (displaySettings.Split(";".ToCharArray())[0].Equals("where", StringComparison.OrdinalIgnoreCase))
+            if (displaySettings.Split(SemiColon.ToCharArray())[0].Equals("where", StringComparison.OrdinalIgnoreCase))
             {
-                var whereField = displaySettings.Split(";".ToCharArray())[1];
+                var whereField = displaySettings.Split(SemiColon.ToCharArray())[1];
                 var conditionField = string.Empty;
                 string condition;
                 var groupField = string.Empty;
@@ -573,14 +578,14 @@ namespace WorkEnginePPM
 
                 if (whereField.Equals("[Me]"))
                 {
-                    condition = displaySettings.Split(";".ToCharArray())[2];
-                    groupField = displaySettings.Split(";".ToCharArray())[3];
+                    condition = displaySettings.Split(SemiColon.ToCharArray())[2];
+                    groupField = displaySettings.Split(SemiColon.ToCharArray())[3];
                 }
                 else
                 {
-                    conditionField = displaySettings.Split(";".ToCharArray())[2];
-                    condition = displaySettings.Split(";".ToCharArray())[3];
-                    valueCondition = displaySettings.Split(";".ToCharArray())[4];
+                    conditionField = displaySettings.Split(SemiColon.ToCharArray())[2];
+                    condition = displaySettings.Split(SemiColon.ToCharArray())[3];
+                    valueCondition = displaySettings.Split(SemiColon.ToCharArray())[4];
                 }
 
                 renderField = CoreEditableFieldDisplay.RenderField(field, whereField, conditionField, condition, groupField, valueCondition, listItem);
