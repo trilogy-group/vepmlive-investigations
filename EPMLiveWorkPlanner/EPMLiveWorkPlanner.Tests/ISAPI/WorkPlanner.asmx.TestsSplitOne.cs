@@ -26,7 +26,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
 {
     [TestClass]
     [ExcludeFromCodeCoverage]
-    public class WorkPlannerAPITests
+    public partial class WorkPlannerAPITests
     {
         private WorkPlannerAPI testObject;
         private PrivateObject privateObject;
