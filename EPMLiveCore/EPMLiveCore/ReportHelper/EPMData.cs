@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 using EPMLiveCore.Properties;
 using Microsoft.SharePoint;
@@ -2027,7 +2028,7 @@ namespace EPMLiveCore.ReportHelper
         }
 
 
-        public Thread SaveWorkAsync(SPListItem item)
+        public Task SaveWorkAsync(SPListItem item)
         {
             bool hasWork = false, hasAssignedTo = false, hasStartDate = false, hasDueDate = false;
             try
@@ -2058,7 +2059,7 @@ namespace EPMLiveCore.ReportHelper
                     string sAssignedTo = ReportData.AddLookUpFieldValues(Convert.ToString(item["AssignedTo"]), "id");
                     object startDate = DateTime.Parse(Convert.ToString(item["StartDate"]));
                     object dueDate = DateTime.Parse(Convert.ToString(item["DueDate"]));
-                    Thread saveThread = new Thread(() => {
+                    Task saveTask = new Task(() => {
                         try
                         {
                             ProcessAssignmentsAsync(sWork, sAssignedTo, startDate, dueDate, listId, SiteId, item.ID,
@@ -2069,8 +2070,8 @@ namespace EPMLiveCore.ReportHelper
                         }
                     }
                     );
-                    saveThread.Start();
-                    return saveThread;
+					saveTask.Start();
+                    return saveTask;
                 }
                 // don't do anything if missing value
                 // NOTE: Discussed with JB and we are assumeing values are missing because user intended to NOT submit work

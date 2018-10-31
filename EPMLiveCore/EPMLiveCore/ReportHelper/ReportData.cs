@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using EPMLiveCore;
 using EPMLiveCore.Properties;
@@ -1913,7 +1913,7 @@ namespace EPMLiveCore.ReportHelper
 		public DataTable MyWorkListItemsDataTable(Guid timerjobguid, string sTableName, SPWeb spWeb, string sListName,
 					  ArrayList _arrayListDefaultColumns, Guid listId, out bool error, out string errMsg)
 		{
-			List<Thread> workThreads = new List<Thread>();
+			List<Task> workTasks = new List<Task>();
 			var dtItems = new DataTable();
 			DataTable dtColumns = GetListColumns("My Work");
 			dtColumns = AddMetaInfoCols(dtColumns);
@@ -2264,15 +2264,12 @@ namespace EPMLiveCore.ReportHelper
 
 						if (listReportsWork)
 						{
-							Thread workThread = _DAO.SaveWorkAsync(item);
-							workThreads.Add(workThread);
-							if (workThreads.Count == 20)
+							Task workTask = _DAO.SaveWorkAsync(item);
+							workTasks.Add(workTask);
+							if (workTasks.Count == 20)
 							{
-								foreach (var thread in workThreads)
-								{
-									thread?.Join();
-								}
-								workThreads.Clear();
+								Task.WaitAll(workTasks.Where(x=>x!=null).ToArray());
+								workTasks.Clear();
 							}
 						}
 						sw.Stop();
@@ -2302,10 +2299,9 @@ namespace EPMLiveCore.ReportHelper
 				errMsg = ex.Message + "[LOCATION INFO] - ItemTitle: " + errItemTitle + ", ItemId: " + errItemID +
 						 ", ColumnName: " + errColumnName + ".";
 			}
-			foreach (var thread in workThreads)
-			{
-				thread?.Join();
-			}
+
+            Task.WaitAll(workTasks.Where(x => x != null).ToArray());
+			workTasks.Clear();
 			return dtItems;
 		}
 
