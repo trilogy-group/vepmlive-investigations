@@ -56,6 +56,9 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.4.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Data.4.0.0.0.Fakes.dll</HintPath>
@@ -85,6 +88,8 @@
     <Compile Include="ISAPI\WorkPlanner.asmx.TestsSplitOne.cs" />
     <Compile Include="Layouts\epmlive\WorkPlanner.aspx.Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebPageCode\UpdatetaskTests.cs" />
+    <Compile Include="WebPageCode\GettasksTests.cs" />
     <Compile Include="WorkPlannerAPITests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -93,7 +98,7 @@
       <Name>EPMLive.TestFakes</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
-      <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
+      <Project>{C773AE44-F066-446A-9CBD-D24AFA794E34}</Project>
       <Name>EPMLiveCore</Name>
     </ProjectReference>
     <ProjectReference Include="..\EPMLiveWorkPlanner\EPMLiveWorkPlanner.csproj">
