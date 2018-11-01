@@ -472,6 +472,7 @@ AS
 BEGIN
 
 	declare @sql varchar(MAX)
+	declare @sql_groups_join varchar(MAX)
 	declare @table varchar(MAX)
 	set @table = null
 
@@ -545,8 +546,15 @@ BEGIN
 			
 		end
 
-		set @sql = ''from '' + @table + '' tbl inner join RPTITEMGROUPS g on tbl.listid = g.listid and tbl.itemid = g.itemid
-			INNER JOIN #Groups as gps ON gps.GROUPID = g.GROUPID '' + @query
+		set @sql_groups_join = ''
+		
+			CREATE TABLE #RPT_Groups (col1 varchar(60))
+
+			insert into #RPT_Groups (col1) SELECT distinct  CAST(dbo.RPTITEMGROUPS.LISTID AS varchar(40)) + CAST(dbo.RPTITEMGROUPS.ITEMID AS varchar(20))
+			FROM dbo.RPTITEMGROUPS INNER JOIN
+            #Groups as gps ON gps.GROUPID = rptitemgroups.GROUPID''
+
+		set @sql = '' from '' + @table + '' tbl left join #RPT_Groups on cast(listid as varchar(40)) + cast(itemid as varchar(20)) = col1'' + @query
 
 		if @pagesize <> 0 
 		begin
@@ -563,17 +571,18 @@ BEGIN
 			declare @topval int
 			set @topval = @page * @pagesize
 
-			
 
 			set @sql = ''
-			CREATE TABLE #Groups (GroupId INT, sectype int)
+			CREATE TABLE #Groups (GroupId INT, sectype int)			
 			
 			INSERT INTO #Groups (GroupId, sectype) SELECT GROUPID, 1 FROM dbo.RPTGROUPUSER WHERE (USERID = '''''' + convert(varchar(10), @userid) + '''''') AND (SITEID = '''''' + CAST(@siteid as varchar(255)) + '''''')
 			
-			insert into #groups (groupid, sectype) VALUES ('''''' + convert(varchar(10), @userid) + '''''', 0)
+			insert into #groups (groupid, sectype) VALUES ('''''' + convert(varchar(10), @userid) + '''''', 0)			
 			
-			select distinct tbl.* INTO #tmp '' + @sql + '';
+			 ''+ @sql_groups_join +'' select * INTO #tmp '' + @sql + '';
 			
+
+
 			'' + @sca + ''
 			
 			;WITH MyCTE AS (
@@ -591,11 +600,13 @@ BEGIN
 			
 			INSERT INTO #Groups (GroupId, sectype) SELECT GROUPID, 1 FROM dbo.RPTGROUPUSER WHERE (USERID = '''''' + convert(varchar(10), @userid) + '''''') AND (SITEID = '''''' + CAST(@siteid as varchar(255)) + '''''')
 			
-			insert into #groups (groupid, sectype) VALUES ('''''' + convert(varchar(10), @userid) + '''''', 0)
+			insert into #groups (groupid, sectype) VALUES ('''''' + convert(varchar(10), @userid) + '''''', 0)			
 			
-			'' + @sca + ''
+			'' + @sql_groups_join + @sca + ''
 			
-			select distinct tbl.* '' + @sql;
+			
+
+			select tbl.* '' + @sql;
 		
 			if @orderby <> '''' begin
 			
@@ -604,14 +615,14 @@ BEGIN
 			end
 		end
 		
-		print @sql
+		
+			print @sql
 		
 	exec(@sql)
 
 	
 
 ENd
-
 ')
 
 

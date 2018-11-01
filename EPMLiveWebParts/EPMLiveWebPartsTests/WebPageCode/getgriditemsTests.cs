@@ -25,7 +25,7 @@ using Shouldly;
 namespace EPMLiveWebParts.Tests
 {
     [TestClass()]
-    public class getgriditemsTests
+    public partial class getgriditemsTests
     {
         private const string NewGroupString = "Group1\nAtt1\nAtt2";
         private const string Group0 = "Group0\nAtt1";
