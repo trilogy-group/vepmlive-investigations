@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Data.Common.Fakes;
+using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -15,12 +16,14 @@ using System.Web.Fakes;
 using System.Web.UI;
 using System.Web.UI.Fakes;
 using System.Web.UI.HtmlControls;
+using System.Xml;
 using System.Xml.Fakes;
 using EPMLive.TestFakes;
 using EPMLiveCore;
 using EPMLiveCore.API;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
@@ -34,6 +37,7 @@ using TimeSheets;
 using MicrosoftShimRibbon = Microsoft.Web.CommandUI.Fakes.ShimRibbon;
 using SystemWebPart = System.Web.UI.WebControls.WebParts.WebPart;
 using SystemWebPartCollection = System.Web.UI.WebControls.WebParts.WebPartCollection;
+using SystemWebPartCollectionFakes = System.Web.UI.WebControls.WebParts.Fakes.ShimWebPartCollection;
 using SystemWebPartManagerFakes = System.Web.UI.WebControls.WebParts.Fakes.ShimWebPartManager;
 using SystemWebPartsFakes = System.Web.UI.WebControls.WebParts.Fakes.ShimWebPart;
 
@@ -94,7 +98,7 @@ namespace EPMLiveTimesheets.Tests
             PrivateObject.Invoke("OnInit", EventArgs.Empty);
 
             // Assert
-            Get<MyTimesheetProperties>("properties").GridType.ShouldBe(1);
+            Get<int>("GridType").ShouldBe(1);
         }
 
         [TestMethod]
@@ -108,18 +112,35 @@ namespace EPMLiveTimesheets.Tests
             PrivateObject.Invoke("OnLoad", EventArgs.Empty);
 
             // Assert
-            Get<MyTimesheetProperties>("properties").FullGridId.ShouldContain($"{DummyInt}{DummyString}");
+            Get<string>("sFullGridId").ShouldContain($"{DummyInt}{DummyString}");
+        }
+
+        [TestMethod]
+        public void RenderApprovalToolbar_OnValidCall_WriteToHtmlTextWriter()
+        {
+            // Arrange
+            var stringWriter = new StringWriter();
+            PrivateObject.SetField("sFullGridId", DummyString);
+
+            // Act
+            using (var htmlTextWriter = new HtmlTextWriter(stringWriter))
+            {
+                PrivateObject.Invoke("RenderApprovalToolbar", htmlTextWriter);
+            }
+            var actualResult = stringWriter.ToString();
+
+            // Assert
+            actualResult.ShouldSatisfyAllConditions(
+               () => actualResult.ShouldContain($"<div id=\"actionmenu{DummyString}\" style=\"width:100%\"></div>"),
+               () => actualResult.ShouldContain($"function loadMenu{DummyString}"),
+               () => actualResult.ShouldContain($"epmLiveGenericToolBar.generateToolBar('actionmenu{DummyString}"));
         }
 
         [TestMethod]
         public void GetViews_OnValidCall_ReturnString()
         {
             // Arrange
-            var properties = new MyTimesheetProperties()
-            {
-                Views = new ViewManager($"Default View")
-            };
-            PrivateObject.SetField("properties", properties);
+            PrivateObject.SetField("views", new ViewManager($"Default View"));
 
             // Act
             var actualResult = PrivateObject.Invoke("GetViews") as string;
@@ -132,11 +153,7 @@ namespace EPMLiveTimesheets.Tests
         public void GetViews_OnNotDefaultView_ReturnString()
         {
             // Arrange
-            var properties = new MyTimesheetProperties()
-            {
-                Views = new ViewManager($"{DummyString}^{DummyString}`{DummyString}^{DummyString};#")
-            };
-            PrivateObject.SetField("properties", properties);
+            PrivateObject.SetField("views", new ViewManager($"{DummyString}^{DummyString}`{DummyString}^{DummyString};#"));
 
             // Act
             var actualResult = PrivateObject.Invoke("GetViews") as string;
@@ -195,15 +212,11 @@ namespace EPMLiveTimesheets.Tests
             SetupShimsForSqlClient();
             SetupShimsForSharePoint();
             SetupShimsForHttpRequest();
-            PrivateObject.SetField("timeDebug", new TimeDebug(DummyString, bool.TrueString));
-            var properties = new MyTimesheetProperties()
-            {
-                GridType = 0,
-                HasPeriods = true,
-                Delegates = string.Empty,
-                CurrentDelegate = DummyString
-            };
-            PrivateObject.SetField("properties", properties);
+            PrivateObject.SetField("tb", new TimeDebug(DummyString, bool.TrueString));
+            PrivateObject.SetField("GridType", 0);
+            PrivateObject.SetField("bHasPeriods", true);
+            PrivateObject.SetField("sDelegates", string.Empty);
+            PrivateObject.SetField("sCurrentDelegate", DummyString);
             ShimSPRibbon.GetCurrentPage = _ => new ShimSPRibbon();
             MicrosoftShimRibbon.AllInstances.RegisterDataExtensionXmlNodeString = (_, _2, _3) => { registerScriptsInvoked = true; };
             MicrosoftShimRibbon.AllInstances.TrimByIdString = (_, __) => { };
@@ -239,11 +252,7 @@ namespace EPMLiveTimesheets.Tests
             // Arrange
             SetupShimsForSqlClient();
             SetupShimsForSharePoint();
-            var properties = new MyTimesheetProperties()
-            {
-                GridType = 0
-            };
-            PrivateObject.SetField("properties", properties);
+            PrivateObject.SetField("GridType", 0);
             ShimSPRibbon.GetWebPartPageComponentIdWebPart = _ => DummyString;
 
             // Act
@@ -267,9 +276,20 @@ namespace EPMLiveTimesheets.Tests
             SetupShimsForSqlClient();
             SetupShimsForSharePoint();
             SetupShimsForHttpRequest();
-            PrivateObject.SetField("timeDebug", new TimeDebug(DummyString, bool.TrueString));
+            PrivateObject.SetField("tb", new TimeDebug(DummyString, bool.TrueString));
+            PrivateObject.SetField("activation", activation);
+            PrivateObject.SetField("bHasPeriods", bHasPeriods);
+            PrivateObject.SetField("bTsLocked", true);
             _queryString.Add("Delegate", DummyInt.ToString());
             _queryString.Add(DummyString, DummyString);
+            PrivateObject.SetField("sFullGridId", DummyString);
+            PrivateObject.SetField("sPeriodName", DummyString);
+            PrivateObject.SetField("sDataParam", DummyString);
+            PrivateObject.SetField("sPeriodList", $"{DummyString}|{DummyString},{DummyString}|{DummyString}{DummyString}");
+            PrivateObject.SetField("GridType", gridType);
+            PrivateObject.SetField("iPreviousPeriod", previousPeriod);
+            PrivateObject.SetField("iNextPeriod", nextPeriod);
+            PrivateObject.SetField("act", new Act(new ShimSPWeb()));
             ShimWebPart.AllInstances.QualifierGet = _ => DummyString;
             SystemWebPartsFakes.AllInstances.WebPartManagerGet = _ => new ShimSPWebPartManager();
             ShimWebPart.AllInstances.WebPartManagerGet = _ => new ShimSPWebPartManager();
@@ -292,23 +312,8 @@ namespace EPMLiveTimesheets.Tests
                 }
                 return DummyString;
             };
-            var properties = new MyTimesheetProperties()
-            {
-                Activation = activation,
-                HasPeriods = bHasPeriods,
-                IsLocked = true,
-                FullGridId = DummyString,
-                PeriodName = DummyString,
-                DataParam = DummyString,
-                PeriodList = $"{DummyString}|{DummyString},{DummyString}|{DummyString}{DummyString}",
-                GridType = gridType,
-                PreviousPeriodId = previousPeriod,
-                NextPeriodId = nextPeriod,
-                Act = new Act(new ShimSPWeb()),
-                Views = viewManager,
-                Settings = new TimesheetSettings(new ShimSPWeb())
-            };
-            PrivateObject.SetField("properties", properties);
+            PrivateObject.SetField("views", viewManager);
+            PrivateObject.SetField("settings", new TimesheetSettings(new ShimSPWeb()));
 
             // Act
             using (var htmlTextWriter = new HtmlTextWriter(stringWriter))
@@ -343,12 +348,8 @@ namespace EPMLiveTimesheets.Tests
             SetupShimsForSharePoint();
             SetupShimsForSqlClient();
             SetupShimsForHttpRequest();
-            PrivateObject.SetField("timeDebug", new TimeDebug(DummyString, bool.TrueString));
-            var properties = new MyTimesheetProperties()
-            {
-                GridType = gridType
-            };
-            PrivateObject.SetField("properties", properties);
+            PrivateObject.SetField("tb", new TimeDebug(DummyString, bool.TrueString));
+            PrivateObject.SetField("GridType", gridType);
             ShimSPPersistedObject.AllInstances.PropertiesGet = _ => new Hashtable
             {
                 {"EPMLiveKeys", $"{DummyString}\t{DummyString}"}
@@ -413,12 +414,12 @@ namespace EPMLiveTimesheets.Tests
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => properties.Delegates.ShouldContain(DummyString),
-                () => properties.Views.ShouldNotBeNull(),
-                () => properties.DataParam.ShouldContain("UserId=\"1\"/>"),
-                () => properties.Columns.ShouldContain(bool.TrueString),
-                () => properties.DataColumns.ShouldContain(bool.TrueString),
-                () => properties.LayoutParam.ShouldContain("UserId=\"1\""));
+                () => Get<string>("sDelegates").ShouldContain(DummyString),
+                () => Get<ViewManager>("views").ShouldNotBeNull(),
+                () => Get<string>("sDataParam").ShouldContain("UserId=\"1\"/>"),
+                () => Get<string>("TSCols").ShouldContain(bool.TrueString),
+                () => Get<string>("TSDCols").ShouldContain(bool.TrueString),
+                () => Get<string>("sLayoutParam").ShouldContain("UserId=\"1\""));
         }
 
         private void SetupShimsForSharePoint()

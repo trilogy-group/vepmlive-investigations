@@ -1,16 +1,9 @@
 using System;
-using System.Data;
-using System.Configuration;
 using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using Microsoft.SharePoint;
 using System.Text;
+using System.Web;
 using System.Xml;
+using Microsoft.SharePoint;
 
 namespace EPMLiveWorkPlanner
 {
@@ -47,39 +40,14 @@ namespace EPMLiveWorkPlanner
 
             web = SPContext.Current.Web;
 
-            Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(web);
-            if (lockWeb == Guid.Empty || lockWeb == web.ID)
-            {
-                lstProjectCenter = web.Lists[EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveWPProjectCenter")];
-                lstTaskCenter = web.Lists[EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveWPTaskCenter")];
-                try
-                {
-                    useResourcePool = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveWPUseResPool"));
-                }
-                catch { }
-                sResourcePoolUrl = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL", true, false);
-                sResourceList = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourcePool");
-                wpFields = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveWorkPlannerFields");
-            }
-            else
-            {
-                SPSite site = SPContext.Current.Site;
-                {
-                    using (SPWeb w = site.OpenWeb(lockWeb))
-                    {
-                        lstProjectCenter = web.Lists[EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveWPProjectCenter")];
-                        lstTaskCenter = web.Lists[EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveWPTaskCenter")];
-                        try
-                        {
-                            useResourcePool = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveWPUseResPool"));
-                        }
-                        catch { }
-                        sResourcePoolUrl = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveResourceURL", true, false);
-                        sResourceList = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveResourcePool");
-                        wpFields = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveWorkPlannerFields");
-                    }
-                }
-            }
+            ConfigHelper.GetConfigSettings(
+                web,
+                ref lstProjectCenter,
+                ref lstTaskCenter,
+                ref useResourcePool,
+                ref sResourcePoolUrl,
+                ref sResourceList,
+                ref wpFields);
 
             SPListItem project = lstProjectCenter.GetItemById(int.Parse(Request["ID"].ToString()));
 
