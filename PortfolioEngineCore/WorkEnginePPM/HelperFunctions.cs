@@ -522,12 +522,11 @@ namespace WorkEnginePPM
 
         public static bool IsEditable(SPListItem listItem, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
         {
-            Guard.ArgumentIsNotNull(fieldProperties, nameof(fieldProperties));
-            Guard.ArgumentIsNotNull(field, nameof(field));
-            Guard.ArgumentIsNotNull(listItem, nameof(listItem));
-
             try
             {
+                Guard.ArgumentIsNotNull(fieldProperties, nameof(fieldProperties));
+                Guard.ArgumentIsNotNull(field, nameof(field));
+
                 const string EditKey = "Edit";
                 const string EditableKey = "Editable";
                 const string DisplaySettingsNever = "never";
