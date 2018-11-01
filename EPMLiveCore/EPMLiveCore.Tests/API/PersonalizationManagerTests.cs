@@ -240,7 +240,7 @@ namespace EPMLiveCore.Tests.API
         {
             // Arrange
             const string ExpectedQuery = "INSERT INTO dbo.PERSONALIZATIONS ([Value],[Dummy],[UserId]) VALUES (@Value,Dummy,@UserId)";
-            var executedQuery = "";
+            var executedQuery = string.Empty;
             const int DaysAgo = 2;
             const int DaysAfter = 3;
             var fromDate = DateTime.Now.Date.AddDays(-DaysAgo);
@@ -281,7 +281,7 @@ namespace EPMLiveCore.Tests.API
         {
             // Arrange
             const string ExpectedQuery = "UPDATE dbo.PERSONALIZATIONS SET Value = @Value WHERE Id = @Id";
-            var executedQuery = "";
+            var executedQuery = string.Empty;
             const int DaysAfter = 3;
             var fromDate = DateTime.Now.Date;
             var toDate = DateTime.Now.Date.AddDays(DaysAfter)
@@ -329,7 +329,7 @@ namespace EPMLiveCore.Tests.API
         {
             // Arrange
             const string ExpectedQuery = "UPDATE dbo.PERSONALIZATIONS SET Value = @Value WHERE Id = @Id";
-            var executedQuery = "";
+            var executedQuery = string.Empty;
             const int DaysAgo = 3;
             var fromDate = DateTime.Now.Date.AddDays(-DaysAgo);
             var toDate = DateTime.Now.Date;
