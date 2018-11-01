@@ -91,6 +91,9 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private const string ProcessExternalMethodName = "ProcessExternal";
         private const string GetExternalLinkLayoutMethodName = "GetExternalLinkLayout";
         private const string AddCustomFooterMethodName = "AddCustomFooter";
+        private const string GetUpdatesMethodName = "GetUpdates";
+        private const string GetFieldValueMethodName = "getFieldValue";
+        private const string AppendSpecialColumnsMethodName = "appendSpecialColumns";
 
         [TestInitialize]
         public void Setup()
@@ -1837,6 +1840,132 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                     .Elements("I")
                     .Count()
                     .ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void GetUpdates_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string dataXml = @"<xmlcfg ID=""1"" Planner=""1""/>";
+            const string docResXmlString = @"
+                <xmlcfg Status=""0"">
+                    <tables>
+                        <I task_id=""0"" uid=""0"" itemid=""0""/>
+                        <C Task_Id=""0"" Name=""CName"" field_text=""field_text""/>
+                    </tables>
+                </xmlcfg>";
+            const string docGridXmlString = @"
+                <xmlcfg Status=""0"">
+                    <Cols></Cols>
+                    <Header></Header>
+                    <B></B>
+                </xmlcfg>";
+            var data = new XmlDocument();
+            var props = new PlannerProps()
+            {
+                sListProjectCenter = DummyString
+            };
+
+            data.LoadXml(dataXml);
+
+            ShimWorkEngineAPI.GetUpdatesStringSPWeb = (_, __) =>
+            {
+                validations += 1;
+                return docResXmlString;
+            };
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_1, _2) =>
+            {
+                validations += 1;
+                return props;
+            };
+            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) =>
+            {
+                validations += 1;
+                return docGridXmlString;
+            };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetUpdatesMethodName, publicStatic, new object[] { data, spWeb.Instance }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("Cols")
+                    .Elements("C")
+                    .Count(x => x.Attribute("Name").Value.Equals("SPID"))
+                    .ShouldBe(1),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("Header")
+                    .Attribute("CName")
+                    .Value
+                    .ShouldBe(DummyString),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("Cols")
+                    .Elements("C")
+                    .Count(x => x.Attribute("Name").Value.Equals("CName"))
+                    .ShouldBe(1),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("B")
+                    .Elements("I")
+                    .Count(x => x.Attribute("id").Value.Equals("0") && x.Attribute("SPID").Value.Equals("0") && x.Attribute("CName").Value.Equals("field_text"))
+                    .ShouldBe(1),
+                () => validations
+                    .ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void GetFieldValue_PercentComplete_ReturnsString()
+        {
+            // Arrange
+            const string field = "PercentComplete";
+            const string value = "0.5";
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetFieldValueMethodName, nonPublicStatic, new object[] { field, value });
+
+            // Assert
+            actual.ShouldBe("50");
+        }
+
+        [TestMethod]
+        public void GetFieldValue_StartDate_ReturnsString()
+        {
+            // Arrange
+            const string field = "StartDate";
+            const string format = "dddd, dd MMMM yyyy";
+            var now = DateTime.Now;
+            var value = now.ToString();
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetFieldValueMethodName, nonPublicStatic, new object[] { field, value });
+
+            // Assert
+            actual.ShouldBe(now.ToString(format));
+        }
+
+        [TestMethod]
+        public void AppendSpecialColumns_WhenCalled_AddsColumns()
+        {
+            // Arrange
+            const string dataXmlString = @"
+                <xmlcfg>
+                    <Cols/>
+                </xmlcfg>";
+            var data = new XmlDocument();
+            var colsNode = default(XmlNode);
+
+            data.LoadXml(dataXmlString);
+            colsNode = data.FirstChild.SelectSingleNode("//Cols");
+
+            // Act
+            privateObject.Invoke(AppendSpecialColumnsMethodName, publicStatic, new object[] { data, colsNode });
+
+            // Assert
+            colsNode.ChildNodes.Count.ShouldBe(11);
         }
     }
 }
