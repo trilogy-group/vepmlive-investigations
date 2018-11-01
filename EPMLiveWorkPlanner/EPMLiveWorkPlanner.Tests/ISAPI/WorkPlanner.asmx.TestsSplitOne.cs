@@ -158,7 +158,8 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spListCollection = new ShimSPListCollection()
             {
                 TryGetListString = _ => spList,
-                ItemGetString = _ => spList
+                ItemGetString = _ => spList,
+                ItemGetGuid = _ => spList
             };
             spList = new ShimSPList()
             {
@@ -166,7 +167,8 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 FieldsGet = () => spFieldCollection,
                 GetItemByIdInt32 = _ => spListItem,
                 GetItemsSPQuery = _ => spListItemCollection,
-                RootFolderGet = () => spFolder
+                RootFolderGet = () => spFolder,
+                ParentWebGet = () => spWeb
             };
             spListItemCollection = new ShimSPListItemCollection()
             {
