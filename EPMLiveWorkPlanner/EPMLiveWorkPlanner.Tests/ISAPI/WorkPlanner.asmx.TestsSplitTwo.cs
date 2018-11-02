@@ -12,6 +12,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
+using static EPMLiveWorkPlanner.PlannerCore;
 using static EPMLiveWorkPlanner.WorkPlannerAPI;
 
 namespace EPMLiveWorkPlanner.Tests.ISAPI
@@ -26,6 +27,10 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private const string PublishProcessFoldersMethodName = "PublishProcessFolders";
         private const string PublishMethodName = "Publish";
         private const string IGetGeneralLayoutMethodName = "iGetGeneralLayout";
+        private const string IsNewValidTaskMethodName = "isNewValidTask";
+        private const string AppendNewAgileTasksMethodName = "AppendNewAgileTasks";
+        private const string GetAgileFolderFieldFormulaMethodName = "GetAgileFolderFieldFormula";
+        private const string AddCalculationsMethodName = "addCalculations";
 
         [TestMethod]
         public void PublishProcessTasks_WhenCalled_ProcessTasks()
@@ -905,6 +910,281 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                     .ShouldBe(5),
                 () => validations
                     .ShouldBe(11));
+        }
+
+        [TestMethod]
+        public void IsNewValidTask_SPIDPresent_ReturnsFalse()
+        {
+            // Arrange
+            var dataXmlString = $@"
+                <xmlcfg>
+                    <I SPID=""{DummyInt}""/>
+                    <I id=""{DummyString}""/>
+                </xmlcfg>";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+
+            // Act
+            var actual = (bool)privateObject.Invoke(IsNewValidTaskMethodName, nonPublicStatic, new object[] { spListItem.Instance, data });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void IsNewValidTask_SPIDNotPresentIDPresent_ReturnsFalse()
+        {
+            // Arrange
+            var dataXmlString = $@"
+                <xmlcfg>
+                    <I SPID=""Not{DummyInt}""/>
+                    <I id=""{DummyString}""/>
+                </xmlcfg>";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+
+            // Act
+            var actual = (bool)privateObject.Invoke(IsNewValidTaskMethodName, nonPublicStatic, new object[] { spListItem.Instance, data });
+
+            // Assert
+            actual.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void IsNewValidTask_SPIDNotPresentIDNotPresent_ReturnsFalse()
+        {
+            // Arrange
+            var dataXmlString = $@"
+                <xmlcfg>
+                    <I SPID=""Not{DummyInt}""/>
+                    <I id=""Not{DummyString}""/>
+                </xmlcfg>";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+
+            // Act
+            var actual = (bool)privateObject.Invoke(IsNewValidTaskMethodName, nonPublicStatic, new object[] { spListItem.Instance, data });
+
+            // Assert
+            actual.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void AppendNewAgileTasks_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string dummyString2 = "SomeRandomString";
+            const string dataXmlString = @"
+                <xmlcfg>
+                    <B>
+                        <I id=""0""/>
+                    </B>
+                </xmlcfg>";
+            var data = new XmlDocument();
+            var plannerProps = new PlannerProps()
+            {
+                sListTaskCenter = DummyString,
+                sIterationCT = DummyString
+            };
+            var spField2 = new ShimSPField()
+            {
+                TypeGet = () => SPFieldType.DateTime,
+                HiddenGet = () => false,
+                InternalNameGet = () => dummyString2,
+                ReorderableGet = () => true
+            };
+
+            data.LoadXml(dataXmlString);
+
+            spField.TypeGet = () => SPFieldType.Number;
+            spListItem.ItemSetStringObject = (_1, _2) =>
+            {
+                validations += 1;
+            };
+            spListItem.SystemUpdate = () =>
+            {
+                validations += 1;
+            };
+
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPField>()
+            {
+                spField,
+                spField2
+            }.GetEnumerator();
+            ShimSPListItemCollection.AllInstances.GetEnumerator = _ => new List<SPListItem>()
+            {
+                spListItem
+            }.GetEnumerator();
+            ShimWorkPlannerAPI.isNewValidTaskSPListItemXmlDocument = (_1, _2) =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimWorkPlannerAPI.isValidFieldStringBoolean = (_1, _2) =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimWorkPlannerAPI.getFieldValueSPListItemSPFieldDataSet = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(
+                AppendNewAgileTasksMethodName,
+                nonPublicStatic,
+                new object[] { spWeb.Instance, plannerProps, data, DummyString, default(DataSet) }));
+            var backLogNode = actual.Element("xmlcfg").Element("B").Element("I").Elements("I").FirstOrDefault(x => x.Attribute("id").Value.Equals("BacklogRow"));
+            var taskNode = backLogNode.Element("I");
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => backLogNode
+                    .ShouldNotBeNull(),
+                () => backLogNode
+                    .Attribute("Title")
+                    .Value
+                    .ShouldBe("Backlog"),
+                () => backLogNode
+                    .Attribute("Detail")
+                    .Value
+                    .ShouldBe("AgileGrid"),
+                () => taskNode
+                    .Attribute("SPID")
+                    .Value
+                    .ShouldBe($"{DummyInt}"),
+                () => taskNode
+                    .Attribute("Def")
+                    .Value
+                    .ShouldBe("Task"),
+                () => taskNode
+                    .Attribute(DummyString)
+                    .Value
+                    .ShouldBe(DummyString),
+                () => taskNode
+                    .Attribute(dummyString2)
+                    .Value
+                    .ShouldBe(DummyString),
+                () => validations
+                    .ShouldBe(7));
+        }
+
+        [TestMethod]
+        public void GetAgileFolderFieldFormula_StartDateField_ReturnsString()
+        {
+            // Arrange
+            const string field = "StartDate";
+            const string expected = "min()";
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetAgileFolderFieldFormulaMethodName, nonPublicStatic, new object[] { field });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetAgileFolderFieldFormula_DueDateField_ReturnsString()
+        {
+            // Arrange
+            const string field = "DueDate";
+            const string expected = "max()";
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetAgileFolderFieldFormulaMethodName, nonPublicStatic, new object[] { field });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetAgileFolderFieldFormula_ResourcePointsField_ReturnsString()
+        {
+            // Arrange
+            const string field = "ResourcePoints";
+            const string expected = "sum()";
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetAgileFolderFieldFormulaMethodName, nonPublicStatic, new object[] { field });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetAgileFolderFieldFormula_WorkCapacityField_ReturnsString()
+        {
+            // Arrange
+            const string field = "WorkCapacity";
+            const string expected = "sum()";
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetAgileFolderFieldFormulaMethodName, nonPublicStatic, new object[] { field });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetAgileFolderFieldFormula_OtherField_ReturnsString()
+        {
+            // Arrange
+            const string field = "Other";
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetAgileFolderFieldFormulaMethodName, nonPublicStatic, new object[] { field });
+
+            // Assert
+            actual.ShouldBe(string.Empty);
+        }
+
+        [TestMethod]
+        public void AddCalculations_WhenCalled_AddsAttributes()
+        {
+            // Arrange
+            const string expectedOrder = "StartDate,DueDate,Duration,PercentComplete,G,DummyString,ResourcePoints,RollDown,WorkCapacity";
+            const string expectedIterationOrder = "StartDate,DueDate,Duration,PercentComplete,G,DummyString,ResourcePoints,RollDown,WorkCapacity,Available,AvailableWork";
+            const string expectedStartDateFormula = "minimum(min('StartDate'),min('DueDate'))";
+            const string expectedDueDateFormula = "maximum(max('StartDate'),max('DueDate'))";
+            const string dataXmlString = @"
+                <xmlcfg>
+                    <Def/>
+                </xmlcfg>";
+            var data = new XmlDocument();
+            var defNode = default(XmlNode);
+            var plannerProps = new PlannerProps()
+            {
+                bAgile = true,
+                wpFields = new WorkPlannerProperties(string.Empty)
+            };
+
+            data.LoadXml(dataXmlString);
+            defNode = data.FirstChild.SelectSingleNode("//Def");
+            plannerProps.wpFields.set("PercentComplete", string.Empty);
+            plannerProps.wpFields.set("StartDate", string.Empty);
+            plannerProps.wpFields.set("DueDate", string.Empty);
+            plannerProps.wpFields.set(DummyString, DummyString);
+            plannerProps.wpFields.set("RollDown", "RollDown");
+
+            // Act
+            privateObject.Invoke(AddCalculationsMethodName, nonPublicStatic, new object[] { plannerProps, data, defNode, true });
+
+            // Assert
+            defNode.ShouldSatisfyAllConditions(
+                () => defNode.ChildNodes.Count.ShouldBe(14),
+                () => defNode.SelectSingleNode($"//D[@CalcOrder='{expectedOrder}']").ShouldNotBeNull(),
+                () => defNode.SelectSingleNode($"//D[@CalcOrder='{expectedIterationOrder}']").ShouldNotBeNull(),
+                () => defNode.SelectNodes("//D[@DummyStringFormula='dummystring()']").Count.ShouldBe(3),
+                () => defNode.SelectNodes($"//D[@StartDateFormula=\"{expectedStartDateFormula}\"]").Count.ShouldBe(2),
+                () => defNode.SelectNodes($"//D[@DueDateFormula=\"{expectedDueDateFormula}\"]").Count.ShouldBe(2),
+                () => defNode.SelectNodes("//D[@StartDateFormula='min()']").Count.ShouldBe(1),
+                () => defNode.SelectNodes("//D[@DueDateFormula='max()']").Count.ShouldBe(1),
+                () => defNode.SelectNodes("//D[@WorkCapacityFormula='sum()']").Count.ShouldBe(1));
         }
     }
 }
