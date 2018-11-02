@@ -31,6 +31,9 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private const string PublishGetFieldValueMethodName = "PublishGetFieldValue";
         private const string PublishProcessFoldersMethodName = "PublishProcessFolders";
         private const string PublishMethodName = "Publish";
+        private const string IGetGeneralLayoutMethodName = "iGetGeneralLayout";
+        private const string HoursString = "Hours";
+        private const string DateString = "Date";
 
         [TestMethod]
         public void PublishProcessTasks_WhenCalled_ProcessTasks()
@@ -576,6 +579,340 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             actual.ShouldSatisfyAllConditions(
                 () => actual.ShouldBe(DummyString),
                 () => validations.ShouldBe(8));
+        }
+
+        [TestMethod]
+        public void IGetGeneralLayout_SPFieldTypeNumber_ReturnsString()
+        {
+            // Arrange
+            const bool agileLayout = true;
+            const SPFieldType type = SPFieldType.Number;
+            const string dataXmlString = @"<xmlcfg Planner=""1"" View=""ViewName"" ID=""1""/>";
+            const string plannerXmlString = @"
+                <xmlcfg>
+                    <Head>
+                        <I Kind=""Filter"" Visible=""0""/>
+                    </Head>
+                    <Solid>
+                        <Group Visible=""0""/>
+                    </Solid>
+                    <Cols/>
+                    <Cfg/>
+                    <LeftCols/>
+                    <Header/>
+                    <Def>
+                        <D Name=""Assignment"" Visible=""0""/>
+                        <D Name=""Task"" Visible=""0""/>
+                    </Def>
+                    <RightCols>
+                        <C Name=""G"" GanttStrict=""0"" Visible=""0""/>
+                        <C GanttDataUnits=""28800000""/>
+                    </RightCols>
+                    <Resources/>
+                    <Foot/>
+                </xmlcfg>";
+            const string assignments = "True";
+            const string filterInfo = "True^FilterField^FilterFieldValue^FilterFieldType";
+            const string viewGroup = "1^viewGroup";
+            const string gantt = "1";
+            const string defaultView = "defaultView";
+            var viewList = $"{defaultView}|1|2|3|4|5|6|7|8|{assignments}`0|1|{filterInfo}|{viewGroup}|viewSort|{gantt}|6|7|8|9";
+            var schemaXml = $@"
+                <xmlcfg>
+                    <Default>{DummyString}</Default>
+                </xmlcfg>";
+            const string hours = "300";
+            var plannerProps = new PlannerProps()
+            {
+                bStartSoon = true,
+                bAgile = true,
+                sListProjectCenter = DummyString,
+                sListTaskCenter = DummyString,
+                iWorkHours = new int[]
+                {
+                    60, 120, 180, 240
+                },
+                sWorkDays = "0",
+                Holidays = new DataTable()
+            };
+            var dataSet = default(DataSet);
+            var row = default(DataRow);
+            var now = DateTime.Now;
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+            plannerProps.Holidays.Columns.Add(HoursString);
+            plannerProps.Holidays.Columns.Add(DateString);
+            row = plannerProps.Holidays.NewRow();
+            row[HoursString] = string.Empty;
+            row[DateString] = now;
+            plannerProps.Holidays.Rows.Add(row);
+            row = plannerProps.Holidays.NewRow();
+            row[HoursString] = hours;
+            row[DateString] = now;
+            plannerProps.Holidays.Rows.Add(row);
+
+            spField.TypeGet = () => type;
+            spField.SchemaXmlGet = () => schemaXml;
+            spViewFieldCollection.ExistsString = _ => true;
+            spListItem.ItemGetGuid = _ => now;
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            ShimCoreFunctions.getConfigSettingSPWebString = (_1, input) =>
+            {
+                if (input.EndsWith("ViewsDefault"))
+                {
+                    return defaultView;
+                }
+                return viewList;
+            };
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_1, _2) =>
+            {
+                validations += 1;
+                return plannerProps;
+            };
+            ShimWorkPlannerAPI.GetResourceTableWorkPlannerAPIPlannerPropsGuidStringSPWeb = (_1, _2, _3, _4) =>
+            {
+                validations += 1;
+                return dataSet;
+            };
+            ShimWorkPlannerAPI.getRealFieldSPField = _ =>
+            {
+                validations += 1;
+                return spField;
+            };
+            ShimWorkPlannerAPI.processFieldXmlDocumentRefSPFieldStringXmlNodeRefXmlNodeRefWorkPlannerAPIPlannerPropsSPWebDataSet = (ref XmlDocument docOut, SPField oField, string visible, ref XmlNode ndCols, ref XmlNode ndHeader, PlannerProps p, SPWeb web, DataSet dsResources) =>
+            {
+                validations += 1;
+            };
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPField>()
+            {
+                spField
+            }.GetEnumerator();
+            ShimWorkPlannerAPI.isValidFieldStringBoolean = (_1, _2) =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimWorkPlannerAPI.appendSpecialColumnsXmlDocumentRefXmlNodeRef = (ref XmlDocument docOut, ref XmlNode ndCols) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlannerAPI.addCalculationsWorkPlannerAPIPlannerPropsXmlDocumentRefXmlNodeRefBoolean = (PlannerProps p, ref XmlDocument docOut, ref XmlNode ndDef, bool bAgile) =>
+            {
+                validations += 1;
+            };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(
+                IGetGeneralLayoutMethodName,
+                nonPublicStatic,
+                new object[] { spWeb.Instance, plannerXmlString, data, agileLayout }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("Head")
+                    .Elements("I")
+                    .Count(x => x.Attribute("Visible").Value.Equals("1") && x.Attribute("FilterField").Value.Equals("FilterFieldValue") && x.Attribute("FilterFieldFilter").Value.Equals("FilterFieldType"))
+                    .ShouldBe(1),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("Solid")
+                    .Element("Group")
+                    .Attribute("Visible")
+                    .Value
+                    .ShouldBe("1"),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("Def")
+                    .Elements("D")
+                    .Count()
+                    .ShouldBe(4),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("Def")
+                    .Elements("D")
+                    .FirstOrDefault(x => x.Attribute("Name").Value.Equals("Assignment"))
+                    .Attribute("Visible")
+                    .Value
+                    .ShouldBe("1"),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("RightCols")
+                    .Elements("C")
+                    .Count()
+                    .ShouldBe(5),
+                () => validations
+                    .ShouldBe(11));
+        }
+
+        [TestMethod]
+        public void IGetGeneralLayout_SPFieldTypeBoolean_ReturnsString()
+        {
+            // Arrange
+            const bool agileLayout = true;
+            const SPFieldType type = SPFieldType.Boolean;
+            const string dataXmlString = @"<xmlcfg Planner=""1"" View=""ViewName"" ID=""1""/>";
+            const string plannerXmlString = @"
+                <xmlcfg>
+                    <Head>
+                        <I Kind=""Filter"" Visible=""0""/>
+                    </Head>
+                    <Solid>
+                        <Group Visible=""0""/>
+                    </Solid>
+                    <Cols/>
+                    <Cfg/>
+                    <LeftCols/>
+                    <Header/>
+                    <Def>
+                        <D Name=""Assignment"" Visible=""0""/>
+                        <D Name=""Task"" Visible=""0""/>
+                    </Def>
+                    <RightCols>
+                        <C Name=""G"" GanttStrict=""0"" Visible=""0""/>
+                        <C GanttDataUnits=""28800000""/>
+                    </RightCols>
+                    <Resources/>
+                    <Foot/>
+                </xmlcfg>";
+            const string assignments = "false";
+            const string filterInfo = "false^FilterField^FilterFieldValue^FilterFieldType";
+            const string viewGroup = "1^viewGroup";
+            const string gantt = "1";
+            const string defaultView = "defaultView";
+            var viewList = $"{defaultView}|1|2|3|4|5|6|7|8|{assignments}`0|1|{filterInfo}|{viewGroup}|viewSort|{gantt}|6|7|8|9";
+            var schemaXml = $@"
+                <xmlcfg>
+                    <Default>{DummyString}</Default>
+                </xmlcfg>";
+            const string hours = "300";
+            var plannerProps = new PlannerProps()
+            {
+                bStartSoon = true,
+                bAgile = true,
+                sListProjectCenter = DummyString,
+                sListTaskCenter = DummyString,
+                iWorkHours = new int[]
+                {
+                    240, 180, 120, 60
+                },
+                sWorkDays = "0",
+                Holidays = new DataTable()
+            };
+            var dataSet = default(DataSet);
+            var row = default(DataRow);
+            var now = DateTime.Now;
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+            plannerProps.Holidays.Columns.Add(HoursString);
+            plannerProps.Holidays.Columns.Add(DateString);
+            row = plannerProps.Holidays.NewRow();
+            row[HoursString] = string.Empty;
+            row[DateString] = now;
+            plannerProps.Holidays.Rows.Add(row);
+            row = plannerProps.Holidays.NewRow();
+            row[HoursString] = hours;
+            row[DateString] = now;
+            plannerProps.Holidays.Rows.Add(row);
+
+            spField.TypeGet = () => type;
+            spField.SchemaXmlGet = () => schemaXml;
+            spViewFieldCollection.ExistsString = _ => true;
+            spListItem.ItemGetGuid = _ => bool.TrueString;
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            ShimCoreFunctions.getConfigSettingSPWebString = (_1, input) =>
+            {
+                if (input.EndsWith("ViewsDefault"))
+                {
+                    return defaultView;
+                }
+                return viewList;
+            };
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_1, _2) =>
+            {
+                validations += 1;
+                return plannerProps;
+            };
+            ShimWorkPlannerAPI.GetResourceTableWorkPlannerAPIPlannerPropsGuidStringSPWeb = (_1, _2, _3, _4) =>
+            {
+                validations += 1;
+                return dataSet;
+            };
+            ShimWorkPlannerAPI.getRealFieldSPField = _ =>
+            {
+                validations += 1;
+                return spField;
+            };
+            ShimWorkPlannerAPI.processFieldXmlDocumentRefSPFieldStringXmlNodeRefXmlNodeRefWorkPlannerAPIPlannerPropsSPWebDataSet = (ref XmlDocument docOut, SPField oField, string visible, ref XmlNode ndCols, ref XmlNode ndHeader, PlannerProps p, SPWeb web, DataSet dsResources) =>
+            {
+                validations += 1;
+            };
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPField>()
+            {
+                spField
+            }.GetEnumerator();
+            ShimWorkPlannerAPI.isValidFieldStringBoolean = (_1, _2) =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimWorkPlannerAPI.appendSpecialColumnsXmlDocumentRefXmlNodeRef = (ref XmlDocument docOut, ref XmlNode ndCols) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlannerAPI.addCalculationsWorkPlannerAPIPlannerPropsXmlDocumentRefXmlNodeRefBoolean = (PlannerProps p, ref XmlDocument docOut, ref XmlNode ndDef, bool bAgile) =>
+            {
+                validations += 1;
+            };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(
+                IGetGeneralLayoutMethodName,
+                nonPublicStatic,
+                new object[] { spWeb.Instance, plannerXmlString, data, agileLayout }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("Head")
+                    .Elements("I")
+                    .Count(x => x.Attribute("Visible").Value.Equals("0") && x.Attribute("FilterField").Value.Equals("FilterFieldValue") && x.Attribute("FilterFieldFilter").Value.Equals("FilterFieldType"))
+                    .ShouldBe(1),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("Solid")
+                    .Element("Group")
+                    .Attribute("Visible")
+                    .Value
+                    .ShouldBe("1"),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("Def")
+                    .Elements("D")
+                    .Count()
+                    .ShouldBe(4),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("Def")
+                    .Elements("D")
+                    .FirstOrDefault(x => x.Attribute("Name").Value.Equals("Assignment"))
+                    .Attribute("Visible")
+                    .Value
+                    .ShouldBe("0"),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("RightCols")
+                    .Elements("C")
+                    .Count()
+                    .ShouldBe(5),
+                () => validations
+                    .ShouldBe(11));
         }
     }
 }
