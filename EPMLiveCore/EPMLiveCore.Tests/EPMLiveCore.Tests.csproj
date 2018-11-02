@@ -217,6 +217,7 @@
     <Compile Include="CoreFunctionsTest.cs" />
     <Compile Include="EditableFieldDisplayTests.cs" />
     <Compile Include="EditInTests.cs" />
+    <Compile Include="EPMLivePCForm\ManageableListsTests.cs" />
     <Compile Include="ExtensionMethodsTest.cs" />
     <Compile Include="FilteredLookup\FilteredLookupFieldEditorTests.cs" />
     <Compile Include="Infrastructure\BaseClasses\SPListItemManagerTests.cs" />

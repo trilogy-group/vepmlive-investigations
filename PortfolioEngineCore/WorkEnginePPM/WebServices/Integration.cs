@@ -619,65 +619,9 @@ namespace WorkEnginePPM
             }
         }
 
-        private bool isEditable(SPListItem li, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
+        private bool isEditable(SPListItem listItem, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
         {
-            try
-            {
-                if (!fieldProperties[field.InternalName].ContainsKey("Edit"))
-                    return true;
-
-                string displaySettings = string.Empty;
-
-                displaySettings = fieldProperties[field.InternalName]["Edit"];
-                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
-                {
-                    string where = displaySettings.Split(";".ToCharArray())[1];
-                    string conditionField = "";
-                    string condition = "";
-                    string group = "";
-                    string valueCondition = "";
-                    if (where.Equals("[Me]"))
-                    {
-                        condition = displaySettings.Split(";".ToCharArray())[2];
-                        group = displaySettings.Split(";".ToCharArray())[3];
-                    }
-                    else // [Field]
-                    {
-                        conditionField = displaySettings.Split(";".ToCharArray())[2];
-                        condition = displaySettings.Split(";".ToCharArray())[3];
-                        valueCondition = displaySettings.Split(";".ToCharArray())[4];
-                    }
-                    bool e = EditableFieldDisplay.RenderField(field, where, conditionField, condition, group, valueCondition, li);
-                    if (!e)
-                        return false;
-                }
-
-                displaySettings = fieldProperties[field.InternalName]["Editable"];
-                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("never"))
-                    return false;
-                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
-                {
-                    string where = displaySettings.Split(";".ToCharArray())[1];
-                    string conditionField = "";
-                    string condition = "";
-                    string group = "";
-                    string valueCondition = "";
-                    if (where.Equals("[Me]"))
-                    {
-                        condition = displaySettings.Split(";".ToCharArray())[2];
-                        group = displaySettings.Split(";".ToCharArray())[3];
-                    }
-                    else // [Field]
-                    {
-                        conditionField = displaySettings.Split(";".ToCharArray())[2];
-                        condition = displaySettings.Split(";".ToCharArray())[3];
-                        valueCondition = displaySettings.Split(";".ToCharArray())[4];
-                    }
-                    return EditableFieldDisplay.RenderField(field, where, conditionField, condition, group, valueCondition, li);
-                }
-            }
-            catch { }
-            return true;
+            return HelperFunctions.IsEditable(listItem, field, fieldProperties);
         }
 
         private string GetUpdates(string xml)
