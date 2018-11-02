@@ -1,22 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common.Fakes;
-using System.Data.SqlClient.Fakes;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Fakes;
 using System.Linq;
-using System.Reflection;
-using System.Resources.Fakes;
 using System.Xml;
 using System.Xml.Linq;
 using EPMLiveCore.Fakes;
 using EPMLiveWorkPlanner.Fakes;
-using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
@@ -26,14 +18,14 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
 {
     public partial class WorkPlannerAPITests
     {
+        private const string HoursString = "Hours";
+        private const string DateString = "Date";
         private const string PublishProcessTasksMethodName = "PublishProcessTasks";
         private const string PublishProcessTaskMethodName = "PublishProcessTask";
         private const string PublishGetFieldValueMethodName = "PublishGetFieldValue";
         private const string PublishProcessFoldersMethodName = "PublishProcessFolders";
         private const string PublishMethodName = "Publish";
         private const string IGetGeneralLayoutMethodName = "iGetGeneralLayout";
-        private const string HoursString = "Hours";
-        private const string DateString = "Date";
 
         [TestMethod]
         public void PublishProcessTasks_WhenCalled_ProcessTasks()
