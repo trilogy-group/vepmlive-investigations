@@ -17,20 +17,21 @@ namespace EPMLiveCore.Tests.CascadingLookup
     [TestClass]
     public class CascadingLookupFieldSettingsTests
     {
-        private const string btnLoad_ClickMethodName = "btnLoad_Click";
+        private const string BtnLoadClickMethodName = "btnLoad_Click";
         private const string ConvertToInternalNameMethodName = "ConvertToInternalName";
         private const string CleanupChildrenFieldMethodName = "CleanupChildrenField";
         private const string IsRelativeUrlMethodName = "IsRelativeUrl";
         private const string UpdateDDLSelectionMethodName = "UpdateDDLSelection";
         private const string WSSLoadFieldsMethodName = "WSSLoadFields";
         private const string ValidateSettingsMethodName = "ValidateSettings";
-        private const string ddlField_SelectedIndexChangedMethodName = "ddlField_SelectedIndexChanged";
+        private const string DdlFieldSelectedIndexChangedMethodName = "ddlField_SelectedIndexChanged";
         private const string WSSLoadListsMethodName = "WSSLoadLists";
         private const string DummyString = "DummyString";
         private const string CreateChildControlsMethodName = "CreateChildControls";
-        private CascadingLookupFieldSettings cascadingLookupFieldSettings;
-        private IDisposable shimsContext;
-        private PrivateObject privateObject;
+        private const string OnSaveChangeMethodName = "OnSaveChange";
+        private const string ChkFilterCriteriaCheckedChangedMethodName = "chkFilterCriteria_CheckedChanged";
+        private const string FindRelativeUrlMethodName = "FindRelativeUrl";
+        private const string DdlListSelectedIndexChangedMethodName = "ddlList_SelectedIndexChanged";
         private readonly DropDownList ddlFilterValueField = new DropDownList();
         private readonly DropDownList ddlList = new DropDownList();
         private readonly DropDownList ddlField = new DropDownList();
@@ -45,6 +46,9 @@ namespace EPMLiveCore.Tests.CascadingLookup
         private readonly Label lblParentField = new Label();
         private readonly Label lblFilterValueField = new Label();
         private readonly Label lblError = new Label();
+        private CascadingLookupFieldSettings cascadingLookupFieldSettings;
+        private IDisposable shimsContext;
+        private PrivateObject privateObject;
 
         [TestInitialize]
         public void Initialize()
@@ -201,7 +205,7 @@ namespace EPMLiveCore.Tests.CascadingLookup
             {
                 throw new Exception(ExpectedErrorMessage);
             };
-            ShimCascadingLookupFieldSettings.AllInstances.WSSLoadFieldsSPFieldCollectionDropDownListStringObjectBoolean = 
+            ShimCascadingLookupFieldSettings.AllInstances.WSSLoadFieldsSPFieldCollectionDropDownListStringObjectBoolean =
                 (_, fields, dropDown, valueFields, sener, alloCustomFields) => { };
 
             // Act
@@ -215,7 +219,7 @@ namespace EPMLiveCore.Tests.CascadingLookup
         }
 
         [TestMethod]
-        public void btnLoad_Click()
+        public void BtnLoadClick_OnSuccess_ExecutesCorrectly()
         {
             // Arrange
             var WSSLoadListsWasCalled = false;
@@ -234,7 +238,7 @@ namespace EPMLiveCore.Tests.CascadingLookup
                 };
 
             // Act
-            privateObject.Invoke(btnLoad_ClickMethodName, new object(), EventArgs.Empty);
+            privateObject.Invoke(BtnLoadClickMethodName, new object(), EventArgs.Empty);
 
             // Assert
             cascadingLookupFieldSettings.ShouldSatisfyAllConditions(
@@ -243,7 +247,7 @@ namespace EPMLiveCore.Tests.CascadingLookup
         }
 
         [TestMethod]
-        public void btnLoad_Click_OnException_ReportsError()
+        public void BtnLoadClick_OnException_ReportsError()
         {
             // Arrange
             const string ErrorMessage = "Error Message";
@@ -260,7 +264,7 @@ namespace EPMLiveCore.Tests.CascadingLookup
             privateObject.SetFieldOrProperty("List", DummyString);
 
             // Act
-            privateObject.Invoke(btnLoad_ClickMethodName, new object(), EventArgs.Empty);
+            privateObject.Invoke(BtnLoadClickMethodName, new object(), EventArgs.Empty);
 
             // Assert
             cascadingLookupFieldSettings.ShouldSatisfyAllConditions(
@@ -377,7 +381,7 @@ namespace EPMLiveCore.Tests.CascadingLookup
         }
 
         [TestMethod]
-        public void UpdateDDLSelection()
+        public void UpdateDDLSelection_Should_ExecuteCorrectly()
         {
             // Arrange
             var dropDown = new DropDownList();
@@ -513,38 +517,38 @@ namespace EPMLiveCore.Tests.CascadingLookup
         }
 
         [TestMethod]
-        public void ddlField_SelectedIndexChanged_onSuccess_ShouldExecuteCorrectly()
+        public void DdlFieldSelectedIndexChanged_OnSuccess_ShouldExecuteCorrectly()
         {
             // Arrange
             var chkFilterCriteriaWasCalled = false;
-            ShimCascadingLookupFieldSettings.AllInstances.chkFilterCriteria_CheckedChangedObjectEventArgs = 
-                (_, sender, events) => 
+            ShimCascadingLookupFieldSettings.AllInstances.chkFilterCriteria_CheckedChangedObjectEventArgs =
+                (_, sender, events) =>
                 {
                     chkFilterCriteriaWasCalled = true;
                 };
             ShimDropDownList.AllInstances.SelectedIndexGet = _ => 1;
-            
+
             // Act
-            privateObject.Invoke(ddlField_SelectedIndexChangedMethodName, new object(), EventArgs.Empty);
+            privateObject.Invoke(DdlFieldSelectedIndexChangedMethodName, new object(), EventArgs.Empty);
 
             // Assert
             chkFilterCriteriaWasCalled.ShouldBeTrue();
         }
 
         [TestMethod]
-        public void ddlField_SelectedIndexChanged_OnException_ShouldRetportError()
+        public void DdlFieldSelectedIndexChanged_OnException_ShouldRetportError()
         {
             // Arrange
             const string ErrorMessage = "Error Message";
             ShimDropDownList.AllInstances.SelectedIndexGet = _ => 1;
-            ShimCascadingLookupFieldSettings.AllInstances.chkFilterCriteria_CheckedChangedObjectEventArgs = 
-                (_, sender, events) => 
+            ShimCascadingLookupFieldSettings.AllInstances.chkFilterCriteria_CheckedChangedObjectEventArgs =
+                (_, sender, events) =>
                 {
                     throw new Exception(ErrorMessage);
                 };
 
             // Act
-            privateObject.Invoke(ddlField_SelectedIndexChangedMethodName, new object(), EventArgs.Empty);
+            privateObject.Invoke(DdlFieldSelectedIndexChangedMethodName, new object(), EventArgs.Empty);
 
             // Assert
             lblError.ShouldSatisfyAllConditions(
@@ -553,7 +557,7 @@ namespace EPMLiveCore.Tests.CascadingLookup
         }
 
         [TestMethod]
-        public void WSSLoadLists()
+        public void WSSLoadLists_Should_ExecuteCorrectly()
         {
             // Arrange
             var dropDown = new DropDownList();
@@ -624,5 +628,331 @@ namespace EPMLiveCore.Tests.CascadingLookup
             action.ShouldThrow<Exception>();
         }
 
+        [TestMethod]
+        public void OnSaveChange_IsNewField_ExecutesCorrectly()
+        {
+            // Arrange
+            const string Url = "dummyurl.com";
+            txtUrl.Text = Url;
+            var fields = new Dictionary<string, string>();
+            var field = new ShimCascadingLookupField
+            {
+                UpdateMyCustomPropertyStringString = (propertyName, value) =>
+                {
+                    fields.Add(propertyName, value);
+                }
+            }.Instance;
+            chkFilterCriteria.Checked = true;
+            ShimSPField.AllInstances.ParentListGet = _ => new ShimSPList
+            {
+                FieldsGet = () => new ShimSPFieldCollection
+                {
+                    GetFieldByInternalNameString = name => new ShimCascadingLookupField().Instance
+                }
+            };
+            ShimSPField.AllInstances.TitleGet = _ => DummyString;
+            ShimSPField.AllInstances.InternalNameGet = _ => DummyString;
+            ShimListControl.AllInstances.SelectedIndexGet = _ => 1;
+            ShimListControl.AllInstances.SelectedValueGet = _ => DummyString;
+            ShimCascadingLookupField.AllInstances.ChildrenFieldGet = _ => string.Empty;
+
+            // Act
+            privateObject.Invoke(OnSaveChangeMethodName, field, true);
+
+            // Assert
+            cascadingLookupFieldSettings.ShouldSatisfyAllConditions(
+                () => fields.ShouldNotBeEmpty(),
+                () => fields.Keys.ShouldContain("Url"),
+                () => fields["Url"].ShouldBe(Url));
+        }
+
+        [TestMethod]
+        public void OnSaveChange_IsNewFieldFalse_ExecutesCorrectly()
+        {
+            // Arrange
+            const string Url = "dummyurl.com";
+            var fieldUrl = string.Empty;
+            txtUrl.Text = Url;
+            var field = new ShimCascadingLookupField
+            {
+                UpdateMyCustomPropertyStringString = (propertyName, value) => { },
+                UrlSetString = value => fieldUrl = value
+            }.Instance;
+            chkFilterCriteria.Checked = true;
+            ShimSPField.AllInstances.ParentListGet = _ => new ShimSPList
+            {
+                FieldsGet = () => new ShimSPFieldCollection
+                {
+                    GetFieldByInternalNameString = name => new ShimCascadingLookupField().Instance
+                }
+            };
+            ShimSPField.AllInstances.TitleGet = _ => DummyString;
+            ShimSPField.AllInstances.InternalNameGet = _ => DummyString;
+            ShimListControl.AllInstances.SelectedIndexGet = _ => 1;
+            ShimListControl.AllInstances.SelectedValueGet = _ => DummyString;
+            ShimCascadingLookupField.AllInstances.ChildrenFieldGet = _ => string.Empty;
+            ShimCascadingLookupFieldSettings.AllInstances.CleanupChildrenFieldSPFieldString = (_, property, value) => value;
+
+            // Act
+            privateObject.Invoke(OnSaveChangeMethodName, field, false);
+
+            // Assert
+            cascadingLookupFieldSettings.ShouldSatisfyAllConditions(
+                () => fieldUrl.ShouldNotBeNullOrEmpty(),
+                () => fieldUrl.ShouldBe(Url));
+        }
+
+        [TestMethod]
+        public void ChkFilterCriteriaCheckedChanged_NoUsableFieldInParentList_ThrowsException()
+        {
+            // Arrange
+            const string ExpectedErrorMessage = "No usable Field present in the Parent List.";
+            chkFilterCriteria.Checked = true;
+            ddlField.Items.Add(DummyString);
+            ddlField.Items.Add("Value");
+            ShimDropDownList.AllInstances.SelectedIndexGet = _ => 1;
+            ShimListControl.AllInstances.SelectedValueGet = _ => DummyString;
+            var errorMessage = string.Empty;
+            ShimCascadingLookupFieldSettings.AllInstances.ReportErrorException = (_, expcetion) =>
+            {
+                errorMessage = expcetion.Message;
+            };
+
+            // Act
+            privateObject.Invoke(ChkFilterCriteriaCheckedChangedMethodName, new object(), EventArgs.Empty);
+
+            // Assert
+            errorMessage.ShouldNotBeNullOrEmpty();
+            errorMessage.ShouldBe(ExpectedErrorMessage);
+        }
+
+        [TestMethod]
+        public void ChkFilterCriteriaCheckedChanged_NoCascadingLookupFieldDefined_ThrowsException()
+        {
+            // Arrange
+            const string ExpectedErrorMessage = "This list does not have any Cascading Lookup Field defined. Please define one and try again.";
+            chkFilterCriteria.Checked = true;
+            ddlField.Items.Add(DummyString);
+            ddlField.Items.Add("Value");
+            ddlField.Items.Add("DValue");
+            ShimDropDownList.AllInstances.SelectedIndexGet = _ => 1;
+            ShimListControl.AllInstances.SelectedValueGet = dropDown => dropDown.Items.Count.ToString();
+            var errorMessage = string.Empty;
+            ShimCascadingLookupFieldSettings.AllInstances.ReportErrorException = (_, expcetion) =>
+            {
+                errorMessage = expcetion.Message;
+            };
+            ShimCascadingLookupFieldSettings.AllInstances.UpdateDDLSelectionDropDownListStringStringObject =
+                (_, dropDown, selectedValue, message, sender) => { };
+
+            // Act
+            privateObject.Invoke(ChkFilterCriteriaCheckedChangedMethodName, new object(), EventArgs.Empty);
+
+            // Assert
+            errorMessage.ShouldNotBeNullOrEmpty();
+            errorMessage.ShouldBe(ExpectedErrorMessage);
+        }
+
+        [TestMethod]
+        public void ChkFilterCriteriaCheckedChanged_OnSuccess_ExecutesCorrectly()
+        {
+            // Arrange
+            chkFilterCriteria.Checked = true;
+            ddlField.Items.Add(DummyString);
+            ddlField.Items.Add("Value");
+            ddlField.Items.Add("DValue");
+            ddlFilterValueField.Items.Add(DummyString);
+            ShimDropDownList.AllInstances.SelectedIndexGet = _ => 1;
+            ShimListControl.AllInstances.SelectedValueGet = dropDown => DummyString;
+            ShimCascadingLookupFieldSettings.AllInstances.UpdateDDLSelectionDropDownListStringStringObject =
+                (_, dropDown, selectedValue, message, sender) => { };
+            privateObject.SetFieldOrProperty("ParentField", DummyString);
+
+            // Act
+            privateObject.Invoke(ChkFilterCriteriaCheckedChangedMethodName, cascadingLookupFieldSettings, EventArgs.Empty);
+
+            // Assert
+            ddlParentField.ShouldSatisfyAllConditions(
+                () => ddlParentField.Items.Count.ShouldBeGreaterThan(0),
+                () => ddlParentField.Items[0].Selected.ShouldBeTrue(),
+                () => chkFilterCriteria.Checked.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void FindRelativeUrl_UrlCurrent_ReturnsExpectedResult()
+        {
+            // Arrange
+            const string Url = "dummyurl.com";
+            const string UrlParameter = "Current";
+            ShimCascadingLookupFieldSettings.IsRelativeUrlString = url => true;
+            ShimSPContext.AllInstances.WebGet = _ => new ShimSPWeb
+            {
+                UrlGet = () => Url
+            };
+
+            // Act
+            var result = privateObject.Invoke(FindRelativeUrlMethodName, UrlParameter) as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe(Url));
+        }
+
+        [TestMethod]
+        public void FindRelativeUrl_UrlTop_ReturnsExpectedResult()
+        {
+            // Arrange
+            const string Url = "dummyurl.com";
+            const string UrlParameter = "Top";
+            ShimCascadingLookupFieldSettings.IsRelativeUrlString = url => true;
+            ShimSPContext.AllInstances.SiteGet = _ => new ShimSPSite
+            {
+                RootWebGet = () => new ShimSPWeb
+                {
+                    UrlGet = () => Url
+                }
+            };
+
+            // Act
+            var result = privateObject.Invoke(FindRelativeUrlMethodName, UrlParameter) as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe(Url));
+        }
+
+        [TestMethod]
+        public void FindRelativeUrl_IsNotRelativeUrl_ReturnsParameter()
+        {
+            // Arrange
+            const string UrlParameter = "Top";
+            ShimCascadingLookupFieldSettings.IsRelativeUrlString = url => false;
+
+            // Act
+            var result = privateObject.Invoke(FindRelativeUrlMethodName, UrlParameter) as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe(UrlParameter));
+        }
+
+        [TestMethod]
+        public void FindRelativeUrl_OnNullReferenceException_ThrowsException()
+        {
+            // Arrange
+            const string UrlParameter = "Parent.com";
+            ShimCascadingLookupFieldSettings.IsRelativeUrlString = url => true;
+            ShimSPContext.AllInstances.WebGet = _ =>
+            {
+                throw new NullReferenceException();
+            };
+
+            // Act
+            Action action = () => privateObject.Invoke(FindRelativeUrlMethodName, UrlParameter);
+
+            // Assert
+            action.ShouldThrow<Exception>();
+        }
+
+        [TestMethod]
+        public void FindRelativeUrl_OnException_ThrowsException()
+        {
+            // Arrange
+            const string UrlParameter = "Parent.com";
+            ShimCascadingLookupFieldSettings.IsRelativeUrlString = url => true;
+            ShimSPContext.AllInstances.WebGet = _ =>
+            {
+                throw new Exception();
+            };
+
+            // Act
+            Action action = () => privateObject.Invoke(FindRelativeUrlMethodName, UrlParameter);
+
+            // Assert
+            action.ShouldThrow<Exception>();
+        }
+
+        [TestMethod]
+        public void FindRelativeUrl_Should_ReturnParentWebUrl()
+        {
+            // Arrange
+            const string Url = "dummyurl.com";
+            const string UrlParameter = "Parent.com";
+            ShimCascadingLookupFieldSettings.IsRelativeUrlString = url => true;
+            ShimSPContext.AllInstances.WebGet = _ => new ShimSPWeb
+            {
+                UrlGet = () => Url,
+                ParentWebGet = () => new ShimSPWeb
+                {
+                    UrlGet = () => Url
+                }
+            };
+            ShimSPWeb.AllInstances.ParentWebGet = _ => new ShimSPWeb();
+            ShimSPWeb.AllInstances.UrlGet = _ => Url;
+
+            // Act
+            var result = privateObject.Invoke(FindRelativeUrlMethodName, UrlParameter) as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe(Url));
+        }
+
+        [TestMethod]
+        public void DdlListSelectedIndexChanged_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            var WSSLoadFieldsWasCalled = false;
+            var ddlFieldSelectedIndexChangedWasCalled = false;
+            ShimDropDownList.AllInstances.SelectedIndexGet = _ => 1;
+            ShimListControl.AllInstances.SelectedValueGet = _ => DummyString;
+            ShimCascadingLookupFieldSettings.AllInstances.FindRelativeUrlString = (_, url) => DummyString;
+            ShimCascadingLookupFieldSettings.AllInstances.ddlField_SelectedIndexChangedObjectEventArgs = (_, sender, events) =>
+            {
+                ddlFieldSelectedIndexChangedWasCalled = true;
+            };
+            ShimCascadingLookupFieldSettings.AllInstances.WSSLoadFieldsStringStringDropDownListStringObject =
+                (_, url, list, dropDown, selectedValue, sender) =>
+                {
+                    WSSLoadFieldsWasCalled = true;
+                };
+
+            // Act
+            privateObject.Invoke(DdlListSelectedIndexChangedMethodName, new object(), EventArgs.Empty);
+
+            // Assert
+            WSSLoadFieldsWasCalled.ShouldBeTrue();
+            ddlFieldSelectedIndexChangedWasCalled.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void DdlList_SelectedIndexChanged_OnException_ReporstError()
+        {
+            // Arrange
+            const string ExpectedErrorMessage = "Error Message";
+            var errorMessage = string.Empty;
+            ShimDropDownList.AllInstances.SelectedIndexGet = _ => 1;
+            ShimListControl.AllInstances.SelectedValueGet = _ => DummyString;
+            ShimCascadingLookupFieldSettings.AllInstances.FindRelativeUrlString = 
+                (_, url) =>
+                {
+                    throw new Exception(ExpectedErrorMessage);
+                };
+            ShimCascadingLookupFieldSettings.AllInstances.ReportErrorException = (_, exception) =>
+            {
+                errorMessage = exception.Message;
+            };
+
+            // Act
+            privateObject.Invoke(DdlListSelectedIndexChangedMethodName, new object(), EventArgs.Empty);
+
+            // Assert
+            errorMessage.ShouldNotBeNullOrEmpty();
+            errorMessage.ShouldBe(ExpectedErrorMessage);
+        }
     }
 }
