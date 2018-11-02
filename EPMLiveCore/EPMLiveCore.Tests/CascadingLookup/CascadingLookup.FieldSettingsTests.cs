@@ -393,8 +393,9 @@ namespace EPMLiveCore.Tests.CascadingLookup
             var listItem = dropDown.Items.FindByValue(DummyString);
 
             // Assert
-            listItem.ShouldNotBeNull();
-            listItem.Selected.ShouldBeTrue();
+            cascadingLookupFieldSettings.ShouldSatisfyAllConditions(
+                () => listItem.ShouldNotBeNull(),
+                () => listItem.Selected.ShouldBeTrue());
         }
 
         [TestMethod]
@@ -713,17 +714,18 @@ namespace EPMLiveCore.Tests.CascadingLookup
             ShimDropDownList.AllInstances.SelectedIndexGet = _ => 1;
             ShimListControl.AllInstances.SelectedValueGet = _ => DummyString;
             var errorMessage = string.Empty;
-            ShimCascadingLookupFieldSettings.AllInstances.ReportErrorException = (_, expcetion) =>
+            ShimCascadingLookupFieldSettings.AllInstances.ReportErrorException = (_, exception) =>
             {
-                errorMessage = expcetion.Message;
+                errorMessage = exception.Message;
             };
 
             // Act
             privateObject.Invoke(ChkFilterCriteriaCheckedChangedMethodName, new object(), EventArgs.Empty);
 
             // Assert
-            errorMessage.ShouldNotBeNullOrEmpty();
-            errorMessage.ShouldBe(ExpectedErrorMessage);
+            errorMessage.ShouldSatisfyAllConditions(
+                () => errorMessage.ShouldNotBeNullOrEmpty(),
+                () => errorMessage.ShouldBe(ExpectedErrorMessage));
         }
 
         [TestMethod]
@@ -738,9 +740,9 @@ namespace EPMLiveCore.Tests.CascadingLookup
             ShimDropDownList.AllInstances.SelectedIndexGet = _ => 1;
             ShimListControl.AllInstances.SelectedValueGet = dropDown => dropDown.Items.Count.ToString();
             var errorMessage = string.Empty;
-            ShimCascadingLookupFieldSettings.AllInstances.ReportErrorException = (_, expcetion) =>
+            ShimCascadingLookupFieldSettings.AllInstances.ReportErrorException = (_, exception) =>
             {
-                errorMessage = expcetion.Message;
+                errorMessage = exception.Message;
             };
             ShimCascadingLookupFieldSettings.AllInstances.UpdateDDLSelectionDropDownListStringStringObject =
                 (_, dropDown, selectedValue, message, sender) => { };
@@ -749,8 +751,9 @@ namespace EPMLiveCore.Tests.CascadingLookup
             privateObject.Invoke(ChkFilterCriteriaCheckedChangedMethodName, new object(), EventArgs.Empty);
 
             // Assert
-            errorMessage.ShouldNotBeNullOrEmpty();
-            errorMessage.ShouldBe(ExpectedErrorMessage);
+            errorMessage.ShouldSatisfyAllConditions(
+                () => errorMessage.ShouldNotBeNullOrEmpty(),
+                () => errorMessage.ShouldBe(ExpectedErrorMessage));
         }
 
         [TestMethod]
@@ -925,8 +928,9 @@ namespace EPMLiveCore.Tests.CascadingLookup
             privateObject.Invoke(DdlListSelectedIndexChangedMethodName, new object(), EventArgs.Empty);
 
             // Assert
-            WSSLoadFieldsWasCalled.ShouldBeTrue();
-            ddlFieldSelectedIndexChangedWasCalled.ShouldBeTrue();
+            cascadingLookupFieldSettings.ShouldSatisfyAllConditions(
+                () => WSSLoadFieldsWasCalled.ShouldBeTrue(),
+                () => ddlFieldSelectedIndexChangedWasCalled.ShouldBeTrue());
         }
 
         [TestMethod]
@@ -951,8 +955,9 @@ namespace EPMLiveCore.Tests.CascadingLookup
             privateObject.Invoke(DdlListSelectedIndexChangedMethodName, new object(), EventArgs.Empty);
 
             // Assert
-            errorMessage.ShouldNotBeNullOrEmpty();
-            errorMessage.ShouldBe(ExpectedErrorMessage);
+            errorMessage.ShouldSatisfyAllConditions(
+                () => errorMessage.ShouldNotBeNullOrEmpty(),
+                () => errorMessage.ShouldBe(ExpectedErrorMessage));
         }
     }
 }
