@@ -41,10 +41,16 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private ShimSPListItem spListItem;
         private ShimSPFieldCollection spFieldCollection;
         private ShimSPField spField;
-        private ShimSPFolder spFolder;
         private ShimSPFolderCollection spFolderCollection;
-        private ShimSPFile spFile;
+        private ShimSPFolder spFolder;
         private ShimSPFileCollection spFileCollection;
+        private ShimSPFile spFile;
+        private ShimSPViewCollection spViewCollection;
+        private ShimSPView spView;
+        private ShimSPViewFieldCollection spViewFieldCollection;
+        private ShimSPFieldLinkCollection spFieldLinkCollection;
+        private ShimSPContentTypeCollection spContentTypeCollection;
+        private ShimSPContentType spContentType;
         private Guid guid;
         private int validations;
         private const int DummyInt = 1;
@@ -158,7 +164,8 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spListCollection = new ShimSPListCollection()
             {
                 TryGetListString = _ => spList,
-                ItemGetString = _ => spList
+                ItemGetString = _ => spList,
+                ItemGetGuid = _ => spList
             };
             spList = new ShimSPList()
             {
@@ -166,7 +173,11 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 FieldsGet = () => spFieldCollection,
                 GetItemByIdInt32 = _ => spListItem,
                 GetItemsSPQuery = _ => spListItemCollection,
-                RootFolderGet = () => spFolder
+                RootFolderGet = () => spFolder,
+                ParentWebGet = () => spWeb,
+                DefaultViewGet = () => spView,
+                ViewsGet = () => spViewCollection,
+                ContentTypesGet = () => spContentTypeCollection
             };
             spListItemCollection = new ShimSPListItemCollection()
             {
@@ -220,6 +231,23 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 OpenBinaryStream = () => null,
                 NameGet = () => DummyString,
                 GetListItemStringArray = _ => spListItem
+            };
+            spViewCollection = new ShimSPViewCollection()
+            {
+                ItemGetString = _ => spView
+            };
+            spView = new ShimSPView()
+            {
+                ViewFieldsGet = () => spViewFieldCollection
+            };
+            spViewFieldCollection = new ShimSPViewFieldCollection();
+            spContentTypeCollection = new ShimSPContentTypeCollection()
+            {
+                ItemGetString = _ => spContentType
+            };
+            spContentType = new ShimSPContentType()
+            {
+                FieldLinksGet = () => spFieldLinkCollection
             };
         }
 
