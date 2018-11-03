@@ -232,6 +232,7 @@
     </Compile>
     <Compile Include="ChildParentSync.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\700Steps.cs" />
+	<Compile Include="Jobs\EPMLiveUpgrade\Steps\701Steps.cs" />
     <Compile Include="ListDisplaySettingIterator.OnInit.cs" />
     <Compile Include="ListDisplaySettingIterator.RenderControl.cs" />
     <Compile Include="ListDisplaySettingIterator.IsFieldExcluded.cs" />
