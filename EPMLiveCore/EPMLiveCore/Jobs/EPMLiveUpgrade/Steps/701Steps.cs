@@ -9,16 +9,16 @@ using System.Threading.Tasks;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
-    [UpgradeStep(Version = EPMLiveVersion.V700, Order = 4, Description = "Adding Project Rate feature to Timesheet")]
-    internal class TimeSheetRatePerProject : UpgradeStep
+    [UpgradeStep(Version = EPMLiveVersion.V701, Order = 1, Description = "Updating Project Rate feature to Timesheet")]
+    internal class TimeSheetRatePerProjectUpdate : UpgradeStep
     {
-        public TimeSheetRatePerProject(SPWeb web, bool isPfeSite)
+        public TimeSheetRatePerProjectUpdate(SPWeb web, bool isPfeSite)
             : base(web, isPfeSite)
         {
         }
         public override bool Perform()
         {
-            Guid webAppId = Web.Site.WebApplication.Id;
+            Guid webAppId = Web.Site.WebApplication.Id;          
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(() =>
@@ -30,50 +30,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                     {
                         epmLiveCn.Open();
 
-                        // add Rate column
-                        if (!epmLiveCn.ColumnExist("dbo.TSITEM", "Rate"))
-                        {
-                            epmLiveCn.AddColumn("dbo.TSITEM", "Rate [varchar](50) NULL");
-                            LogMessage("Rate column added to TSITEM table", MessageKind.SUCCESS, 4);
-                        }
-                        else
-                        {
-                            LogMessage("Rate column already exists in TSITEM table", MessageKind.SKIPPED, 4);
-                        }
 
+                        #region ViewCode
 
-                    }
-                });
-
-
-            }
-            catch (Exception exception)
-            {
-                string message = exception.InnerException != null
-                    ? exception.InnerException.Message
-                    : exception.Message;
-
-                LogMessage(message, MessageKind.FAILURE, 4);
-
-            }
-            try
-            {
-                SPSecurity.RunWithElevatedPrivileges(() =>
-                {
-                    LogMessage("Connecting to the database . . .", 2);
-
-                    string epmLiveCnStr = CoreFunctions.getConnectionString(webAppId);
-                    using (var epmLiveCn = new SqlConnection(epmLiveCnStr))
-                    {
-                        epmLiveCn.Open();
-
-                        var metaViewDefinition = epmLiveCn.GetViewDefinition("dbo.vwMeta");
-                        var rateColumn = "TSITEM_1.Rate";
-                        if (metaViewDefinition != null && !metaViewDefinition.Contains(rateColumn))
-                        {
-                            #region ViewCode
-
-                            epmLiveCn.ExecuteNonQuery($@"ALTER VIEW [dbo].[vwMeta] AS
+                        epmLiveCn.ExecuteNonQuery($@"ALTER VIEW [dbo].[vwMeta] AS
 SELECT dbo.TSTIMESHEET.USERNAME AS Username, dbo.TSTIMESHEET.RESOURCENAME AS [Resource Name], dbo.TSUSER.USER_ID AS SharePointAccountID, dbo.TSITEM.LIST_UID, dbo.TSITEM.ITEM_ID, dbo.TSITEM.TS_ITEM_UID AS [Item UID], 
                          dbo.TSITEM.TITLE AS [Item Name], dbo.TSITEM.PROJECT AS Project, dbo.TSITEM.PROJECT_ID AS ProjectID, COALESCE (dbo.TSMETA.ListName + '_' + dbo.TSMETA.ColumnName, 'TempColumn') 
                          AS ColumnName, dbo.TSMETA.DisplayName, dbo.TSMETA.ColumnValue, dbo.TSITEM.ITEM_TYPE AS [Item Type], dbo.TSITEM.TS_UID AS [Timesheet UID], dbo.TSPERIOD.PERIOD_ID AS [Period Id], 
@@ -115,7 +75,7 @@ FROM            dbo.TSITEM INNER JOIN
 UNION
 SELECT        TSTIMESHEET_1.USERNAME, TSTIMESHEET_1.RESOURCENAME AS [Resource Name], TSUSER_1.USER_ID AS SharePointAccountID, TSITEM_1.LIST_UID, TSITEM_1.ITEM_ID, TSITEM_1.TS_ITEM_UID, TSITEM_1.TITLE, TSITEM_1.PROJECT, 
                          TSITEM_1.PROJECT_ID, 'Resource_' + dbo.TSRESMETA.ColumnName AS listcolumnname, dbo.TSRESMETA.DisplayName, 
-						 CASE dbo.TSRESMETA.ColumnName WHEN 'StandardRate' THEN CASE TSITEM_1.Rate WHEN null THEN dbo.TSRESMETA.ColumnValue ELSE TSITEM_1.Rate END  END AS ColumnValue,
+						 CASE dbo.TSRESMETA.ColumnName WHEN 'StandardRate' THEN (CASE TSITEM_1.Rate WHEN null THEN dbo.TSRESMETA.ColumnValue ELSE TSITEM_1.Rate END) ELSE dbo.TSRESMETA.columnvalue  END AS ColumnValue,
 						 TSITEM_1.ITEM_TYPE, TSITEM_1.TS_UID,TSTIMESHEET_1.PERIOD_ID, TSTIMESHEET_1.SITE_UID, TSITEM_1.LIST, TSITEMHOURS_1.TS_ITEM_DATE, TSITEMHOURS_1.TS_ITEM_HOURS, TSITEMHOURS_1.TS_ITEM_TYPE_ID, 
                          TSTYPE_1.TSTYPE_NAME, TSPERIOD_1.PERIOD_START AS Start, TSPERIOD_1.PERIOD_END AS [End], CASE TSTIMESHEET_1.SUBMITTED WHEN 0 THEN 'No' WHEN 1 THEN 'Yes' END AS Submitted, 
                          CASE TSTIMESHEET_1.APPROVAL_STATUS WHEN 0 THEN 'Pending' WHEN 1 THEN 'Approved' WHEN 2 THEN 'Rejected' END AS [Approval Status], 
@@ -132,14 +92,10 @@ FROM            dbo.TSTIMESHEET AS TSTIMESHEET_1 INNER JOIN
                   dbo.TSTYPE AS TSTYPE_1 ON TSTIMESHEET_1.SITE_UID = TSTYPE_1.SITE_UID AND TSITEMHOURS_1.TS_ITEM_TYPE_ID = TSTYPE_1.TSTYPE_ID  LEFT OUTER JOIN
 						dbo.TSUSER AS TSUSER_1 ON TSTIMESHEET_1.TSUSER_UID = TSUSER_1.TSUSERUID");
 
-                            #endregion
+                        #endregion
 
-                            LogMessage("TSItem.Rate, TSItem.Rate columns added to the vwMeta view", MessageKind.SUCCESS, 4);
-                        }
-                        else
-                        {
-                            LogMessage("TSItem.Rate, TSItem.Rate columns already exists in the vwMeta view", MessageKind.SKIPPED, 4);
-                        }
+                        LogMessage("TSItem.Rate, Updated the vwMeta view", MessageKind.SUCCESS, 4);
+
                     }
                 });
 
