@@ -253,6 +253,7 @@
     </Compile>
     <Compile Include="ChildParentSync.cs" />
     <Compile Include="Helpers\Guard.cs" />
+    <Compile Include="Helpers\WebServicesHelper.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\700Steps.cs" />
     <Compile Include="Layouts\epmlive\LayoutsHelper.cs" />
     <Compile Include="ListDisplaySettingIterator.OnInit.cs" />

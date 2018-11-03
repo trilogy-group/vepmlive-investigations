@@ -192,6 +192,7 @@
     <Compile Include="API\NavigationServiceTests.cs" />
     <Compile Include="API\Applications\ApplicationUninstallerTests.cs" />
     <Compile Include="API\Notification\NotificationTests.cs" />
+    <Compile Include="API\PersonalizationManagerTests.cs" />
     <Compile Include="API\Publish\APIPublishTests.cs" />
     <Compile Include="API\Reporting\ReportingTest.cs" />
     <Compile Include="API\ResourceGrid\ResourceExporterTests.cs" />
@@ -203,6 +204,7 @@
     <Compile Include="AppSettingsHelperTests.cs" />
     <Compile Include="AssignmentPlanner\GridManagerTests.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControlTests.cs" />
+    <Compile Include="CascadingLookup\CascadingLookup.FieldSettingsTests.cs" />
     <Compile Include="CheckOpenCloseConnections.cs" />
     <Compile Include="ControlDataBuilderTest.cs" />
     <Compile Include="CoreFunctions.GetPlannerList.Tests.cs" />
