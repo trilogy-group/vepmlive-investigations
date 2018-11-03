@@ -142,6 +142,7 @@
     <Compile Include="API\Analytics\Favorites.cs" />
     <Compile Include="API\Analytics\FavoritesWorkspace.cs" />
     <Compile Include="API\Analytics\FrequentApps.cs" />
+    <Compile Include="API\Analytics\FRFQueries.cs" />
     <Compile Include="API\Analytics\FRFQueryFactory.cs" />
     <Compile Include="API\Analytics\FRFQueryParamFactory.cs" />
     <Compile Include="API\Analytics\RecentItems.cs" />
