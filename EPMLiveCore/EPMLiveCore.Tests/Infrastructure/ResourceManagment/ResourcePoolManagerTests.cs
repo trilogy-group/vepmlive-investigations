@@ -351,7 +351,7 @@ namespace EPMLiveCore.Tests.Infrastructure.ResourceManagment
                 };
                 return new ShimSPFieldCollection().Bind(list);
             };
-            ShimResourcePoolManager.AllInstances.BuildXmlElementsBooleanBooleanIEnumerableOfDataRowListOfSPFieldDataColumnCollectionDataTableDictionaryOfStringObjectArrayOut = BuildXmlElements;
+            ShimReportXmlBuilder.AllInstances.BuildXmlElementsBooleanBooleanIEnumerableOfDataRowIListOfSPFieldDataColumnCollectionDataTableDictionaryOfStringObjectArrayOut = BuildXmlElements;
             ShimTaskFactory.AllInstances.StartNewAction = (_, action) =>
             {
                 return Task.CompletedTask;
@@ -406,23 +406,21 @@ namespace EPMLiveCore.Tests.Infrastructure.ResourceManagment
                 }
             }.Instance;
             var dictionary = new Dictionary<string, object[]>();
-            var args = new object[]
-            {
-                false,
-                false,
-                rowCollection,
-                spFieldCollection,
-                dataColumnCollection,
-                resources,
-                dictionary
-            };
             ShimSPFieldMultiChoiceValue.ConstructorString = (_, value) => { };
             ShimSPFieldMultiChoiceValue.AllInstances.CountGet = _ => 1;
             ShimSPFieldMultiChoiceValue.AllInstances.ItemGetInt32 = (_, index) => DummyString;
             ShimSPListItemManager.AllInstances.GetFieldSpecialValuesSPFieldStringObjectStringOutStringOutStringOut = GetFieldSpecialValues;
+            var reportXmlBuilder = new ReportXmlBuilder(resourcePoolManager, DummyString);
 
             // Act
-            var result = privateObject.Invoke(BuildXmlElementsMethodName, args) as List<XElement>;
+            var result = reportXmlBuilder.BuildXmlElements(
+                false, 
+                false, 
+                rowCollection, 
+                spFieldCollection, 
+                dataColumnCollection, 
+                resources, 
+                out dictionary);
 
             // Assert
             result.ShouldSatisfyAllConditions(
@@ -521,11 +519,11 @@ namespace EPMLiveCore.Tests.Infrastructure.ResourceManagment
         /// This method is fake. All the parameters are required, even though not all of them are used
         /// </summary>
         private List<XElement> BuildXmlElements(
-            ResourcePoolManager resourceManager, 
+            ReportXmlBuilder resourceManager, 
             bool hidden, 
             bool readOnly, 
             IEnumerable<DataRow> rowCollection, 
-            List<SPField> fields, 
+            IList<SPField> fields, 
             DataColumnCollection dataColumns, 
             System.Data.DataTable resources, 
             out Dictionary<string, object[]> valuesDict)
