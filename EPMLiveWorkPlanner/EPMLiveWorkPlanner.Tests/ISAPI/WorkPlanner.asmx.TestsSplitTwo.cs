@@ -1436,7 +1436,15 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spListItem.ItemGetGuid = _ => now;
 
             // Act
-            var actual = (string)privateObject.Invoke(GetFieldValueMethodName, publicStatic, new object[] { spListItem.Instance, spField.Instance, dataSet });
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
 
             // Assert
             actual.ShouldBe(expected);
@@ -1484,7 +1492,15 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             ShimSPFieldLookupValue.AllInstances.ToString01 = _ => DummyString;
 
             // Act
-            var actual = (string)privateObject.Invoke(GetFieldValueMethodName, publicStatic, new object[] { spListItem.Instance, spField.Instance, dataSet });
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
 
             // Assert
             actual.ShouldBe(expected);
@@ -1504,7 +1520,15 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spWeb.ServerRelativeUrlGet = () => DummyString;
 
             // Act
-            var actual = (string)privateObject.Invoke(GetFieldValueMethodName, publicStatic, new object[] { spListItem.Instance, spField.Instance, dataSet });
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
 
             // Assert
             actual.ShouldBe(expected);
@@ -1547,7 +1571,15 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             ShimSPFieldCalculated.AllInstances.GetFieldValueAsTextObject = (_, __) => DummyString;
 
             // Act
-            var actual = (string)privateObject.Invoke(GetFieldValueMethodName, publicStatic, new object[] { spListItem.Instance, newField.Instance, dataSet });
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName, 
+                publicStatic,
+                new object[] 
+                {
+                    spListItem.Instance,
+                    newField.Instance,
+                    dataSet
+                });
 
             // Assert
             actual.ShouldBe(DummyString);
@@ -1569,7 +1601,15 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spListItem.ItemGetGuid = _ => One;
 
             // Act
-            var actual = (string)privateObject.Invoke(GetFieldValueMethodName, publicStatic, new object[] { spListItem.Instance, newField.Instance, dataSet });
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    newField.Instance,
+                    dataSet
+                });
 
             // Assert
             actual.ShouldBe(expected);
@@ -1586,7 +1626,15 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spListItem.ItemGetGuid = _ => DummyString;
 
             // Act
-            var actual = (string)privateObject.Invoke(GetFieldValueMethodName, publicStatic, new object[] { spListItem.Instance, spField.Instance, dataSet });
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
 
             // Assert
             actual.ShouldBe(DummyString);
@@ -1604,7 +1652,15 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spListItem.ItemGetGuid = _ => bool.TrueString;
 
             // Act
-            var actual = (string)privateObject.Invoke(GetFieldValueMethodName, publicStatic, new object[] { spListItem.Instance, spField.Instance, dataSet });
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
 
             // Assert
             actual.ShouldBe(expected);
@@ -1622,7 +1678,15 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spListItem.ItemGetGuid = _ => bool.FalseString;
 
             // Act
-            var actual = (string)privateObject.Invoke(GetFieldValueMethodName, publicStatic, new object[] { spListItem.Instance, spField.Instance, dataSet });
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
 
             // Assert
             actual.ShouldBe(expected);
@@ -1640,7 +1704,15 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spField.GetFieldValueAsTextObject = _ => DummyString;
 
             // Act
-            var actual = (string)privateObject.Invoke(GetFieldValueMethodName, publicStatic, new object[] { spListItem.Instance, spField.Instance, dataSet });
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
 
             // Assert
             actual.ShouldBe(DummyString);
@@ -1676,7 +1748,15 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             };
 
             // Act
-            var actual = (string)privateObject.Invoke(GetFieldValueMethodName, publicStatic, new object[] { spListItem.Instance, spField.Instance, dataSet });
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
 
             // Assert
             actual.ShouldBe(expected);
