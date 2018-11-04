@@ -12,10 +12,10 @@ namespace EPMLiveCore.Infrastructure
     {
         private readonly ResourcePoolManager _resourcePoolManager;
         private readonly string _elementName;
-        private readonly IDictionary<string, string> formatDictionary = new Dictionary<string, string>();
-        private readonly IDictionary<object, string[]> lookupValues = new Dictionary<object, string[]>();
-        private readonly IDictionary<object, string[]> userValues = new Dictionary<object, string[]>();
-        private readonly IList<string> lookupColumns = new List<string>();
+        private readonly IDictionary<string, string> _formatDictionary = new Dictionary<string, string>();
+        private readonly IDictionary<object, string[]> _lookupValues = new Dictionary<object, string[]>();
+        private readonly IDictionary<object, string[]> _userValues = new Dictionary<object, string[]>();
+        private readonly IList<string> _lookupColumns = new List<string>();
 
         public ReportXmlBuilder(ResourcePoolManager resourcePoolManager, string elementName)
         {
@@ -23,7 +23,7 @@ namespace EPMLiveCore.Infrastructure
             _elementName = elementName;
         }
 
-        internal List<XElement> BuildXmlElements(
+        internal IList<XElement> BuildXmlElements(
             bool includeHidden,
             bool includeReadOnly,
             IEnumerable<DataRow> rowCollection,
@@ -77,14 +77,14 @@ namespace EPMLiveCore.Infrastructure
                         out fieldTextValue,
                         out fieldHtmlValue);
 
-                    if (!formatDictionary.ContainsKey(internalName))
+                    if (!_formatDictionary.ContainsKey(internalName))
                     {
-                        formatDictionary.Add(internalName, Utils.GetFormat(spField));
+                        _formatDictionary.Add(internalName, Utils.GetFormat(spField));
                     }
 
                     itemElement.Add(new XElement("Data", new XAttribute("Field", internalName),
                         new XAttribute("Type", spField.Type),
-                        new XAttribute("Format", formatDictionary[internalName]),
+                        new XAttribute("Format", _formatDictionary[internalName]),
                         new XAttribute("Hidden", isHidden),
                         new XAttribute("ReadOnly", isReadOnly),
                         new XAttribute("TextValue", fieldTextValue),
@@ -126,7 +126,7 @@ namespace EPMLiveCore.Infrastructure
                     processHtmlValue = true;
                     break;
                 case SPFieldType.User:
-                    if (!userValues.ContainsKey(objectValues))
+                    if (!_userValues.ContainsKey(objectValues))
                     {
                         _resourcePoolManager.GetFieldSpecialValues(
                             spField,
@@ -136,7 +136,7 @@ namespace EPMLiveCore.Infrastructure
                             out fieldTextValue,
                             out fieldHtmlValue);
 
-                        userValues.Add(
+                        _userValues.Add(
                             objectValues,
                             new[]
                             {
@@ -147,7 +147,7 @@ namespace EPMLiveCore.Infrastructure
                     }
                     else
                     {
-                        var userValue = userValues[objectValues];
+                        var userValue = _userValues[objectValues];
 
                         fieldTextValue = userValue[0];
                         fieldEditValue = userValue[1];
@@ -185,7 +185,7 @@ namespace EPMLiveCore.Infrastructure
             var spFieldLookup = (SPFieldLookup)spField;
             var key = $"{spFieldLookup.LookupList}{spFieldLookup.LookupField}{stringValue}";
 
-            if (!lookupValues.ContainsKey(key))
+            if (!_lookupValues.ContainsKey(key))
             {
                 _resourcePoolManager.GetFieldSpecialValues(
                     spField,
@@ -197,7 +197,7 @@ namespace EPMLiveCore.Infrastructure
 
                 fieldHtmlValue = key;
 
-                lookupValues.Add(
+                _lookupValues.Add(
                     key,
                     new[]
                     {
@@ -216,7 +216,7 @@ namespace EPMLiveCore.Infrastructure
             }
             else
             {
-                var lookupValue = lookupValues[key];
+                var lookupValue = _lookupValues[key];
 
                 fieldTextValue = lookupValue[0];
                 fieldEditValue = lookupValue[1];
@@ -245,16 +245,16 @@ namespace EPMLiveCore.Infrastructure
             }
             else
             {
-                if (!lookupColumns.Contains(internalName))
+                if (!_lookupColumns.Contains(internalName))
                 {
                     EnsureArgumentNotNull(resources, nameof(resources));
                     if (resources.Columns.Contains($"{internalName}ID"))
                     {
-                        lookupColumns.Add(internalName);
+                        _lookupColumns.Add(internalName);
                     }
                 }
 
-                if (lookupColumns.Contains(internalName))
+                if (_lookupColumns.Contains(internalName))
                 {
                     var idValue = row[$"{internalName}ID"];
                     var textValue = row[$"{internalName}Text"];
