@@ -1572,9 +1572,9 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
 
             // Act
             var actual = (string)privateObject.Invoke(
-                GetFieldValueMethodName, 
+                GetFieldValueMethodName,
                 publicStatic,
-                new object[] 
+                new object[]
                 {
                     spListItem.Instance,
                     newField.Instance,
