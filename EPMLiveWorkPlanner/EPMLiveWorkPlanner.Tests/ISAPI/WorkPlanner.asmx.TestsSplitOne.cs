@@ -24,7 +24,8 @@ using static EPMLiveWorkPlanner.WorkPlannerAPI;
 
 namespace EPMLiveWorkPlanner.Tests.ISAPI
 {
-    [TestClass, ExcludeFromCodeCoverage]
+    [TestClass]
+    [ExcludeFromCodeCoverage]
     public partial class WorkPlannerAPITests
     {
         private WorkPlannerAPI testObject;
