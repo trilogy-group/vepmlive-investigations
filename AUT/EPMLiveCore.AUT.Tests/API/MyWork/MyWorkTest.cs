@@ -48,8 +48,8 @@ namespace EPMLiveCore.API
         private const string MethodDeletePersonalView = "DeletePersonalView";
         private const string MethodGenerateColDictionary = "GenerateColDictionary";
         private const string MethodGetDataFromLists = "GetDataFromLists";
-        private const string MethodGetDataFromReportingDB = "GetDataFromReportingDb";
-        private const string MethodGetDataFromSP = "GetDataFromSp";
+        private const string MethodGetDataFromReportingDB = "GetDataFromReportingDB";
+        private const string MethodGetDataFromSP = "GetDataFromSP";
         private const string MethodGetExampleDateFormat = "GetExampleDateFormat";
         private const string MethodGetGridSafeValue = "GetGridSafeValue";
         private const string MethodGetLeftCols = "GetLeftCols";
@@ -88,41 +88,41 @@ namespace EPMLiveCore.API
         private const string MethodRenameMyWorkGridView = "RenameMyWorkGridView";
         private const string MethodSaveMyWorkGridView = "SaveMyWorkGridView";
         private const string MethodUpdateMyWorkItem = "UpdateMyWorkItem";
-        private const string FieldASSIGNED_TO_FIELD = "AssignedToField";
-        private const string FieldCOMMENT_COL_WIDTH = "CommentColWidth";
-        private const string FieldCOMMENT_COUNT_FIELD = "CommentCountField";
-        private const string FieldCOMMENTERS_FIELD = "CommentersField";
-        private const string FieldCOMMENTERS_READ_FIELD = "CommentersReadField";
-        private const string FieldCOMPLETE_COL_WIDTH = "CompleteColWidth";
-        private const string FieldCOMPLETED_FIELD = "CompletedField";
-        private const string FieldCREATED_BY_FIELD = "CreatedByField";
-        private const string FieldCREATED_FIELD = "CreatedField";
-        private const string FieldDUE_DATE_COL_WIDTH = "DueDateColWidth";
-        private const string FieldDUE_DATE_FIELD = "DueDateField";
-        private const string FieldDUE_DAY_COL_WIDTH = "DueDayColWidth";
-        private const string FieldDUE_DAY_FIELD = "DueDayField";
-        private const string FieldFLAG_COL_WIDTH = "FlagColWidth";
-        private const string FieldFLAG_FIELD = "FlagField";
-        private const string FieldGENERAL_SETTINGS_CROSS_SITE_URLS = "GeneralSettingsCrossSiteUrls";
-        private const string FieldGENERAL_SETTINGS_PERFORMANCE_MODE = "GeneralSettingsPerformanceMode";
-        private const string FieldGENERAL_SETTINGS_SELECTED_FIELDS = "GeneralSettingsSelectedFields";
-        private const string FieldGENERAL_SETTINGS_SELECTED_LISTS = "GeneralSettingsSelectedLists";
-        private const string FieldGENERAL_SETTINGS_SELECTED_MY_WORK_LISTS = "GeneralSettingsSelectedMyWorkLists";
-        private const string FieldLIST_ID_FIELD = "ListIdField";
-        private const string FieldMODIFIED_BY_FIELD = "ModifiedByField";
-        private const string FieldMODIFIED_FIELD = "ModifiedField";
-        private const string FieldMY_WORK_GRID_GLOBAL_VIEWS = "MyWorkGridGlobalViews";
-        private const string FieldMY_WORK_GRID_PERSONAL_VIEWS = "MyWorkGridPersonalViews";
-        private const string FieldMY_WORK_LIST_SERVER_TEMPLATE_ID = "MyWorkListServerTemplateId";
-        private const string FieldPRIORITY_COL_WIDTH = "PriorityColWidth";
-        private const string FieldPRIORITY_FIELD = "PriorityField";
-        private const string FieldSITE_ID_FIELD = "SiteIdField";
-        private const string FieldSITE_URL_FIELD = "SiteUrlField";
-        private const string FieldTITLE_COL_WIDTH = "TitleColWidth";
-        private const string FieldTITLE_FIELD = "TitleField";
-        private const string FieldWEB_ID_FIELD = "WebIdField";
-        private const string FieldWORK_TYPE_FIELD = "WorkTypeField";
-        private const string FieldWORKING_ON_FIELD = "WorkingOnField";
+        private const string FieldASSIGNED_TO_FIELD = "ASSIGNED_TO_FIELD";
+        private const string FieldCOMMENT_COL_WIDTH = "COMMENT_COL_WIDTH";
+        private const string FieldCOMMENT_COUNT_FIELD = "COMMENT_COUNT_FIELD";
+        private const string FieldCOMMENTERS_FIELD = "COMMENTERS_FIELD";
+        private const string FieldCOMMENTERS_READ_FIELD = "COMMENTERS_READ_FIELD";
+        private const string FieldCOMPLETE_COL_WIDTH = "COMPLETE_COL_WIDTH";
+        private const string FieldCOMPLETED_FIELD = "COMPLETED_FIELD";
+        private const string FieldCREATED_BY_FIELD = "CREATED_BY_FIELD";
+        private const string FieldCREATED_FIELD = "CREATED_FIELD";
+        private const string FieldDUE_DATE_COL_WIDTH = "DUE_DATE_COL_WIDTH";
+        private const string FieldDUE_DATE_FIELD = "DUE_DATE_FIELD";
+        private const string FieldDUE_DAY_COL_WIDTH = "DUE_DAY_COL_WIDTH";
+        private const string FieldDUE_DAY_FIELD = "DUE_DAY_FIELD";
+        private const string FieldFLAG_COL_WIDTH = "FLAG_COL_WIDTH";
+        private const string FieldFLAG_FIELD = "FLAG_FIELD";
+        private const string FieldGENERAL_SETTINGS_CROSS_SITE_URLS = "GENERAL_SETTINGS_CROSS_SITE_URLS";
+        private const string FieldGENERAL_SETTINGS_PERFORMANCE_MODE = "GENERAL_SETTINGS_PERFORMANCE_MODE";
+        private const string FieldGENERAL_SETTINGS_SELECTED_FIELDS = "GENERAL_SETTINGS_SELECTED_FIELDS";
+        private const string FieldGENERAL_SETTINGS_SELECTED_LISTS = "GENERAL_SETTINGS_SELECTED_LISTS";
+        private const string FieldGENERAL_SETTINGS_SELECTED_MY_WORK_LISTS = "GENERAL_SETTINGS_SELECTED_MY_WORK_LISTS";
+        private const string FieldLIST_ID_FIELD = "LIST_ID_FIELD";
+        private const string FieldMODIFIED_BY_FIELD = "MODIFIED_BY_FIELD";
+        private const string FieldMODIFIED_FIELD = "MODIFIED_FIELD";
+        private const string FieldMY_WORK_GRID_GLOBAL_VIEWS = "MY_WORK_GRID_GLOBAL_VIEWS";
+        private const string FieldMY_WORK_GRID_PERSONAL_VIEWS = "MY_WORK_GRID_PERSONAL_VIEWS";
+        private const string FieldMY_WORK_LIST_SERVER_TEMPLATE_ID = "MY_WORK_LIST_SERVER_TEMPLATE_ID";
+        private const string FieldPRIORITY_COL_WIDTH = "PRIORITY_COL_WIDTH";
+        private const string FieldPRIORITY_FIELD = "PRIORITY_FIELD";
+        private const string FieldSITE_ID_FIELD = "SITE_ID_FIELD";
+        private const string FieldSITE_URL_FIELD = "SITE_URL_FIELD";
+        private const string FieldTITLE_COL_WIDTH = "TITLE_COL_WIDTH";
+        private const string FieldTITLE_FIELD = "TITLE_FIELD";
+        private const string FieldWEB_ID_FIELD = "WEB_ID_FIELD";
+        private const string FieldWORK_TYPE_FIELD = "WORK_TYPE_FIELD";
+        private const string FieldWORKING_ON_FIELD = "WORKING_ON_FIELD";
         private Type _myWorkInstanceType;
         private const int TestsTimeOut = TestContants.TimeOutFiveSeconds;
         private MyWork _myWorkInstance;
@@ -217,8 +217,8 @@ namespace EPMLiveCore.API
             var currentMethodInfo = GetMethodInfo(methodName, overloadingIndex);
 
             // Act
-            ShouldlyExtension.ExploreMethodWithOrWithoutInstance(_myWorkInstanceFixture, 
-                                                                 Fixture, 
+            ShouldlyExtension.ExploreMethodWithOrWithoutInstance(_myWorkInstanceFixture,
+                                                                 Fixture,
                                                                  currentMethodInfo);
 
             // Assert
@@ -276,8 +276,8 @@ namespace EPMLiveCore.API
             var fieldInfo = GetFieldInfo(name);
 
             // Act
-            ShouldlyExtension.ExploreFieldWithOrWithoutInstance(_myWorkInstanceFixture, 
-                                                                Fixture, 
+            ShouldlyExtension.ExploreFieldWithOrWithoutInstance(_myWorkInstanceFixture,
+                                                                Fixture,
                                                                 fieldInfo);
 
             // Assert
@@ -2226,15 +2226,18 @@ namespace EPMLiveCore.API
         [Test]
         [Timeout(TestsTimeOut)]
         [Category("AUT MethodCallTest")]
-        public void AUT_MyWork_GetDataFromLists_Static_Method_Call_Void_With_4_Parameters_Throw_Exception_Thrown_Test()
+        public void AUT_MyWork_GetDataFromLists_Static_Method_Call_Void_With_7_Parameters_Throw_Exception_Thrown_Test()
         {
             // Arrange
             var result = CreateType<XDocument>();
+            var fieldTypes = CreateType<Dictionary<string, SPField>>();
             var query = CreateType<string>();
             var spSite = CreateType<SPSite>();
             var spWeb = CreateType<SPWeb>();
-            var methodGetDataFromListsPrametersTypes = new Type[] { typeof(XDocument), typeof(string), typeof(SPSite), typeof(SPWeb) };
-            object[] parametersOfGetDataFromLists = { result, query, spSite, spWeb };
+            var selectedFields = CreateType<List<string>>();
+            var selectedLists = CreateType<List<string>>();
+            var methodGetDataFromListsPrametersTypes = new Type[] { typeof(XDocument), typeof(Dictionary<string, SPField>), typeof(string), typeof(SPSite), typeof(SPWeb), typeof(List<string>), typeof(List<string>) };
+            object[] parametersOfGetDataFromLists = { result, fieldTypes, query, spSite, spWeb, selectedFields, selectedLists };
             Exception exception = null;
             var methodInfo = GetMethodInfo(MethodGetDataFromLists, methodGetDataFromListsPrametersTypes, out exception);
 
@@ -2245,8 +2248,8 @@ namespace EPMLiveCore.API
             methodInfo.ShouldNotBeNull();
             exception.ShouldBeNull();
             parametersOfGetDataFromLists.ShouldNotBeNull();
-            parametersOfGetDataFromLists.Length.ShouldBe(4);
-            methodGetDataFromListsPrametersTypes.Length.ShouldBe(4);
+            parametersOfGetDataFromLists.Length.ShouldBe(7);
+            methodGetDataFromListsPrametersTypes.Length.ShouldBe(7);
             Should.Throw<Exception>(currentAction);
         }
 
@@ -2257,23 +2260,26 @@ namespace EPMLiveCore.API
         [Test]
         [Timeout(TestsTimeOut)]
         [Category("AUT MethodCallTest")]
-        public void AUT_MyWork_GetDataFromLists_Static_Method_Call_Void_With_4_Parameters_No_Exception_Thrown_With_Encapsulation_Test()
+        public void AUT_MyWork_GetDataFromLists_Static_Method_Call_Void_With_7_Parameters_No_Exception_Thrown_With_Encapsulation_Test()
         {
             // Arrange
             var result = CreateType<XDocument>();
+            var fieldTypes = CreateType<Dictionary<string, SPField>>();
             var query = CreateType<string>();
             var spSite = CreateType<SPSite>();
             var spWeb = CreateType<SPWeb>();
-            var methodGetDataFromListsPrametersTypes = new Type[] { typeof(XDocument), typeof(string), typeof(SPSite), typeof(SPWeb) };
-            object[] parametersOfGetDataFromLists = { result, query, spSite, spWeb};
+            var selectedFields = CreateType<List<string>>();
+            var selectedLists = CreateType<List<string>>();
+            var methodGetDataFromListsPrametersTypes = new Type[] { typeof(XDocument), typeof(Dictionary<string, SPField>), typeof(string), typeof(SPSite), typeof(SPWeb), typeof(List<string>), typeof(List<string>) };
+            object[] parametersOfGetDataFromLists = { result, fieldTypes, query, spSite, spWeb, selectedFields, selectedLists };
 
             // Act
             Action currentAction = () => ReflectionAnalyzer.InvokeVoidStaticMethod(_myWorkInstanceFixture, _myWorkInstanceType, MethodGetDataFromLists, parametersOfGetDataFromLists, methodGetDataFromListsPrametersTypes);
 
             // Assert
             parametersOfGetDataFromLists.ShouldNotBeNull();
-            parametersOfGetDataFromLists.Length.ShouldBe(4);
-            methodGetDataFromListsPrametersTypes.Length.ShouldBe(4);
+            parametersOfGetDataFromLists.Length.ShouldBe(7);
+            methodGetDataFromListsPrametersTypes.Length.ShouldBe(7);
             Should.NotThrow(currentAction);
         }
 
@@ -2288,7 +2294,7 @@ namespace EPMLiveCore.API
         {
             // Arrange
             var methodInfo = GetMethodInfo(MethodGetDataFromLists, 0);
-            const int parametersCount = 4;
+            const int parametersCount = 7;
 
             // Act
             var parameters = methodInfo.GetParameters();
@@ -2485,7 +2491,7 @@ namespace EPMLiveCore.API
         {
             // Arrange
             var methodInfo = GetMethodInfo(MethodGetDataFromReportingDB, 0);
-            const int parametersCount = 2;
+            const int parametersCount = 6;
 
             // Act
             var parameters = methodInfo.GetParameters();
@@ -2641,7 +2647,7 @@ namespace EPMLiveCore.API
         {
             // Arrange
             var methodInfo = GetMethodInfo(MethodGetDataFromSP, 0);
-            const int parametersCount = 4;
+            const int parametersCount = 6;
 
             // Act
             var parameters = methodInfo.GetParameters();
@@ -4212,7 +4218,7 @@ namespace EPMLiveCore.API
         {
             // Arrange
             var methodInfo = GetMethodInfo(MethodGetSettings, 0);
-            const int parametersCount = 1;
+            const int parametersCount = 6;
 
             // Act
             var parameters = methodInfo.GetParameters();
@@ -4976,15 +4982,19 @@ namespace EPMLiveCore.API
         [Test]
         [Timeout(TestsTimeOut)]
         [Category("AUT MethodCallTest")]
-        public void AUT_MyWork_ProcessMyWork_Static_Method_Call_Void_With_4_Parameters_No_Exception_Thrown_Test()
+        public void AUT_MyWork_ProcessMyWork_Static_Method_Call_Void_With_8_Parameters_No_Exception_Thrown_Test()
         {
             // Arrange
             var dataTable = CreateType<DataTable>();
             var spSite = CreateType<SPSite>();
             var spWeb = CreateType<SPWeb>();
+            var selectedFields = CreateType<IEnumerable<string>>();
+            var fieldTypes = CreateType<Dictionary<string, SPField>>();
+            var workTypes = CreateType<Dictionary<string, string>>();
+            var workspaces = CreateType<Dictionary<string, string>>();
             var result = CreateType<XDocument>();
-            var methodProcessMyWorkPrametersTypes = new Type[] { typeof(DataTable), typeof(SPSite), typeof(SPWeb), typeof(XDocument) };
-            object[] parametersOfProcessMyWork = { dataTable, spSite, spWeb, result };
+            var methodProcessMyWorkPrametersTypes = new Type[] { typeof(DataTable), typeof(SPSite), typeof(SPWeb), typeof(IEnumerable<string>), typeof(Dictionary<string, SPField>), typeof(Dictionary<string, string>), typeof(Dictionary<string, string>), typeof(XDocument) };
+            object[] parametersOfProcessMyWork = { dataTable, spSite, spWeb, selectedFields, fieldTypes, workTypes, workspaces, result };
             Exception exception = null;
             var methodInfo = GetMethodInfo(MethodProcessMyWork, methodProcessMyWorkPrametersTypes, out exception);
 
@@ -4995,8 +5005,8 @@ namespace EPMLiveCore.API
             methodInfo.ShouldNotBeNull();
             exception.ShouldBeNull();
             parametersOfProcessMyWork.ShouldNotBeNull();
-            parametersOfProcessMyWork.Length.ShouldBe(4);
-            methodProcessMyWorkPrametersTypes.Length.ShouldBe(4);
+            parametersOfProcessMyWork.Length.ShouldBe(8);
+            methodProcessMyWorkPrametersTypes.Length.ShouldBe(8);
             Should.NotThrow(currentAction);
         }
 
@@ -5007,23 +5017,27 @@ namespace EPMLiveCore.API
         [Test]
         [Timeout(TestsTimeOut)]
         [Category("AUT MethodCallTest")]
-        public void AUT_MyWork_ProcessMyWork_Static_Method_Call_Void_With_4_Parameters_No_Exception_Thrown_With_Encapsulation_Test()
+        public void AUT_MyWork_ProcessMyWork_Static_Method_Call_Void_With_8_Parameters_No_Exception_Thrown_With_Encapsulation_Test()
         {
             // Arrange
             var dataTable = CreateType<DataTable>();
             var spSite = CreateType<SPSite>();
             var spWeb = CreateType<SPWeb>();
+            var selectedFields = CreateType<IEnumerable<string>>();
+            var fieldTypes = CreateType<Dictionary<string, SPField>>();
+            var workTypes = CreateType<Dictionary<string, string>>();
+            var workspaces = CreateType<Dictionary<string, string>>();
             var result = CreateType<XDocument>();
-            var methodProcessMyWorkPrametersTypes = new Type[] { typeof(DataTable), typeof(SPSite), typeof(SPWeb), typeof(XDocument) };
-            object[] parametersOfProcessMyWork = { dataTable, spSite, spWeb, result };
+            var methodProcessMyWorkPrametersTypes = new Type[] { typeof(DataTable), typeof(SPSite), typeof(SPWeb), typeof(IEnumerable<string>), typeof(Dictionary<string, SPField>), typeof(Dictionary<string, string>), typeof(Dictionary<string, string>), typeof(XDocument) };
+            object[] parametersOfProcessMyWork = { dataTable, spSite, spWeb, selectedFields, fieldTypes, workTypes, workspaces, result };
 
             // Act
             Action currentAction = () => ReflectionAnalyzer.InvokeVoidStaticMethod(_myWorkInstanceFixture, _myWorkInstanceType, MethodProcessMyWork, parametersOfProcessMyWork, methodProcessMyWorkPrametersTypes);
 
             // Assert
             parametersOfProcessMyWork.ShouldNotBeNull();
-            parametersOfProcessMyWork.Length.ShouldBe(4);
-            methodProcessMyWorkPrametersTypes.Length.ShouldBe(4);
+            parametersOfProcessMyWork.Length.ShouldBe(8);
+            methodProcessMyWorkPrametersTypes.Length.ShouldBe(8);
             Should.NotThrow(currentAction);
         }
 
@@ -5038,7 +5052,7 @@ namespace EPMLiveCore.API
         {
             // Arrange
             var methodInfo = GetMethodInfo(MethodProcessMyWork, 0);
-            const int parametersCount = 4;
+            const int parametersCount = 8;
 
             // Act
             var parameters = methodInfo.GetParameters();
@@ -6420,7 +6434,7 @@ namespace EPMLiveCore.API
         }
 
         #endregion
-        
+
         #region Method Call : (GetMyWorkFieldType) (Return Type : string) without parameters value verify result should be null.
 
         [Test]
@@ -6684,7 +6698,7 @@ namespace EPMLiveCore.API
         }
 
         #endregion
-        
+
         #region Method Call : (GetMyWorkGridData) (Return Type : string) Invoke Should Not Throw
 
         [Test]

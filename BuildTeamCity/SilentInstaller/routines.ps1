@@ -110,13 +110,16 @@ function Test-ADCredential {
 	{
 		$trimmedUsername = $UserName
 	}
+	Write-Host "Trimmed Username: $trimmedUsername"
     if (!($UserName) -or !($trimmedUsername)) {
         Write-Warning 'Test-ADCredential: Please specify both user name and password'
     } else {
         Add-Type -AssemblyName System.DirectoryServices.AccountManagement
 		$CurrentDomain = 'LDAP://'+([ADSI]"").distinguishedName
+		Write-Host "Current Domain: $CurrentDomain"
         $dom = New-Object System.DirectoryServices.DirectoryEntry($CurrentDomain,$UserName,$Password)
 		$res =  $dom.name
+		Write-Host "Domain result: $res"
 		if ($res -eq $null) {
 			return $False
 		}   else {

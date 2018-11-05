@@ -651,8 +651,7 @@ namespace EPMLiveCore.API
                                             taskCenterProjectField = "Project";
 
                                         SPList oTaskCenter = web.Lists[taskCenterListName];
-                                        SPListItem oProject = oProjectCenter.GetItemById(int.Parse(sID));
-
+                                        
 
                                         SPSiteDataQuery query = new SPSiteDataQuery();
                                         query.Lists = "<Lists><List ID=\"" + oTaskCenter.ID.ToString() + "\"/></Lists>";

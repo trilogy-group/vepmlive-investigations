@@ -618,7 +618,7 @@ namespace PortfolioEngineCore
             portfolioItem.CreateStringAttr(ItemId, projectExtId);
 
             //  get the team -  another SELECT withing the main one is ok? I guess so but not if using SQLDataREader by the way
-            var steamlist = GetStreamList(dbAccess);
+            var steamlist = GetStreamList(dbAccess, projectId);
             if (steamlist.Length > 0)
             {
                 var subStruct = portfolioItem.CreateSubStruct(Field);
@@ -652,7 +652,7 @@ namespace PortfolioEngineCore
             }
         }
 
-        private static string GetStreamList(DBAccess dbAccess)
+        private static string GetStreamList(DBAccess dbAccess,int projectId)
         {
             if (dbAccess == null)
             {
@@ -661,6 +661,8 @@ namespace PortfolioEngineCore
             SqlDataReader reader;
             var cmdText = "Select t.* From EPGP_TEAMS t Join EPG_RESOURCES r On r.WRES_ID = t.WRES_ID Where PROJECT_ID=@PROJECT_ID ";
             var oCommand = new SqlCommand(cmdText, dbAccess.Connection);
+            oCommand.Parameters.AddWithValue("@PROJECT_ID", projectId);
+
             if (ExecuteSQLSelect(oCommand, out reader) != StatusEnum.rsSuccess)
             {
                 return string.Empty;

@@ -7,11 +7,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using System.Collections;
+using System.Collections.Fakes;
+using System.Collections.Generic.Fakes;
+using System.DirectoryServices.ActiveDirectory.Fakes;
 using Microsoft.SharePoint.Fakes;
 using System.Xml;
 using Microsoft.SharePoint;
 
 using System.Web.Fakes;
+using System.Web.UI.Fakes;
 using Microsoft.SharePoint.Administration;
 using EPMLiveWebParts.Fakes;
 using System.Xml.Fakes;
@@ -21,13 +25,31 @@ using Shouldly;
 namespace EPMLiveWebParts.Tests
 {
     [TestClass()]
-    public class getgriditemsTests
+    public partial class getgriditemsTests
     {
         private const string NewGroupString = "Group1\nAtt1\nAtt2";
         private const string Group0 = "Group0\nAtt1";
+        private const string SetGroupsStringsMethodName = "SetGroupsStrings";
+        private const string DummyFieldName = "DummyFieldName";
+        private const string DummyListId = "41201410250102103010204050102030";
+        private const string DummyParentWebId = "10201201456320104521021002014563";
+        private const string DummyChoices = "DummyChoices";
+        private const string DummyListGuid = "47154201369784512014785203694512";
+        private const string DummyShowFieldId = "45120178451203125471020140101020";
+        private const string DummyWebId = "01203105040708050103578777777777";
+        private const string DummyLookupValue = "LookUpValue";
+        private const string DummyQuery = "Select From Where";
+        private const string DummyListViewFielter = "Field > 5";
+        private const string DummyVal = "DummyVal";
 
         private string _groups;
+        private string _xmlAttributeValue;
         private SortedList _sortedList;
+        private string _actualChoicesString;
+        private string _actualLookupList;
+        private string _actualLookupField;
+        private string _actualQuery;
+        private string _actualListView;
 
         [TestMethod()]
         public void addItemTest_WhenFieldType_FilterLookUp()
@@ -774,7 +796,7 @@ namespace EPMLiveWebParts.Tests
                 var privateObject = ArrangeSetGroupsStrings(SPFieldType.User, out parameters);
 
                 // Act
-                privateObject.Invoke("SetGroupsStrings", parameters);
+                privateObject.Invoke(SetGroupsStringsMethodName, parameters);
 
                 // Assert
                 this.ShouldSatisfyAllConditions(
@@ -794,7 +816,7 @@ namespace EPMLiveWebParts.Tests
                 var privateObject = ArrangeSetGroupsStrings(SPFieldType.MultiChoice, out parameters);
 
                 // Act
-                privateObject.Invoke("SetGroupsStrings", parameters);
+                privateObject.Invoke(SetGroupsStringsMethodName, parameters);
 
                 // Assert
                 this.ShouldSatisfyAllConditions(
@@ -814,7 +836,7 @@ namespace EPMLiveWebParts.Tests
                 var privateObject = ArrangeSetGroupsStrings(SPFieldType.Calculated, out parameters);
 
                 // Act
-                privateObject.Invoke("SetGroupsStrings", parameters);
+                privateObject.Invoke(SetGroupsStringsMethodName, parameters);
 
                 // Assert
                 this.ShouldSatisfyAllConditions(() => ((string[])parameters[3])[0].ShouldBe(string.Format("{0}\n{1}", Group0, NewGroupString)));
@@ -831,13 +853,105 @@ namespace EPMLiveWebParts.Tests
                 var privateObject = ArrangeSetGroupsStrings(SPFieldType.Lookup, out parameters);
 
                 // Act
-                privateObject.Invoke("SetGroupsStrings", parameters);
+                privateObject.Invoke(SetGroupsStringsMethodName, parameters);
 
                 // Assert
                 this.ShouldSatisfyAllConditions(
                     () => ((string[])parameters[3])[0].ShouldBe("Group0\nAtt1\nGroup1"),
                     () => ((string[])parameters[3])[1].ShouldBe("Group0\nAtt1\nAtt1"),
                     () => ((string[])parameters[3])[2].ShouldBe("Group0\nAtt1\nAtt2"));
+            }
+        }
+
+        [TestMethod]
+        public void HandleFilteredLookupCase_ValidTypeMultiValueEqualWebGuid_PopulatesDisplayValue()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                object[] parameters;
+                var privateObject = ArrangeHandleFilteredLookupCase(true, true, true, true, out parameters);
+
+                // Act
+                privateObject.Invoke("HandleFilteredLookupCase", parameters);
+
+                // Assert
+                this.ShouldSatisfyAllConditions(
+                    () => _actualChoicesString.ShouldBe(DummyChoices),
+                    () => ((string)parameters[4]).ShouldBe($"{DummyLookupValue}\t{DummyChoices}"),
+                    () => _actualQuery.ShouldBe(DummyQuery),
+                    () => _actualListView.ShouldBe(DummyListViewFielter),
+                    () => _actualLookupList.ShouldBe(new Guid(DummyListGuid).ToString()),
+                    () => _actualLookupField.ShouldBe(new Guid(DummyShowFieldId).ToString()));
+            }
+        }
+
+        [TestMethod]
+        public void HandleFilteredLookupCase_ValidTypeMultiValueDifferentWebGuid_PopulatesDisplayValue()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                object[] parameters;
+                var privateObject = ArrangeHandleFilteredLookupCase(true, true, true, false, out parameters);
+
+                // Act
+                privateObject.Invoke("HandleFilteredLookupCase", parameters);
+
+                // Assert
+                this.ShouldSatisfyAllConditions(
+                    () => _actualChoicesString.ShouldBe(DummyChoices),
+                    () => ((string)parameters[4]).ShouldBe($"{DummyLookupValue}\t{DummyChoices}"),
+                    () => _actualQuery.ShouldBe(DummyQuery),
+                    () => _actualListView.ShouldBe(DummyListViewFielter),
+                    () => _actualLookupList.ShouldBe(new Guid(DummyListGuid).ToString()),
+                    () => _actualLookupField.ShouldBe(new Guid(DummyShowFieldId).ToString()));
+            }
+        }
+
+        [TestMethod]
+        public void HandleFilteredLookupCase_ValidTypeSingleValueEqualWebGuid_PopulatesDisplayValue()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                object[] parameters;
+                var privateObject = ArrangeHandleFilteredLookupCase(true, false, true, true, out parameters);
+
+                // Act
+                privateObject.Invoke("HandleFilteredLookupCase", parameters);
+
+                // Assert
+                this.ShouldSatisfyAllConditions(
+                    () => _actualChoicesString.ShouldBe(DummyChoices),
+                    () => ((string)parameters[4]).ShouldBe($"{DummyVal}\t{DummyChoices}"),
+                    () => _actualQuery.ShouldBe(DummyQuery),
+                    () => _actualListView.ShouldBe(DummyListViewFielter),
+                    () => _actualLookupList.ShouldBe(new Guid(DummyListGuid).ToString()),
+                    () => _actualLookupField.ShouldBe(new Guid(DummyShowFieldId).ToString()));
+            }
+        }
+
+        [TestMethod]
+        public void HandleFilteredLookupCase_ValidTypeSingleValueDifferentWebGuid_PopulatesDisplayValue()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                object[] parameters;
+                var privateObject = ArrangeHandleFilteredLookupCase(true, false, true, false, out parameters);
+
+                // Act
+                privateObject.Invoke("HandleFilteredLookupCase", parameters);
+
+                // Assert
+                this.ShouldSatisfyAllConditions(
+                    () => _actualChoicesString.ShouldBe(DummyChoices),
+                    () => ((string)parameters[4]).ShouldBe($"{DummyVal}\t{DummyChoices}"),
+                    () => _actualQuery.ShouldBe(DummyQuery),
+                    () => _actualListView.ShouldBe(DummyListViewFielter),
+                    () => _actualLookupList.ShouldBe(new Guid(DummyListGuid).ToString()),
+                    () => _actualLookupField.ShouldBe(new Guid(DummyShowFieldId).ToString()));
             }
         }
 
@@ -859,6 +973,144 @@ namespace EPMLiveWebParts.Tests
             };
             return privateObject;
         }
-    }
 
+        private PrivateObject ArrangeHandleFilteredLookupCase(
+            bool shouldTypeBeValid,
+            bool shouldSupportMultipleValues,
+            bool shouldFilterBeRecursive,
+            bool shouldLookupWebBeEqual,
+            out object[] parameters)
+        {
+            var privateObject = new PrivateObject(new getgriditems());
+            privateObject.SetField("inEditMode", true);
+            ShimSPField.AllInstances.InternalNameGet = _ => DummyFieldName;
+            ShimSPField.AllInstances.TypeAsStringGet = _ => shouldTypeBeValid
+                ? "FilteredLookup"
+                : string.Empty;
+
+            var shimXmlDocument = new ShimXmlDocument();
+            var fieldXmlDocument = new ShimXmlDocument();
+            privateObject.SetField("docXml", (XmlDocument)fieldXmlDocument);
+            fieldXmlDocument.CreateAttributeString = str => new ShimXmlAttribute();
+            ShimXmlAttribute.AllInstances.ValueSetString = (_, str) => _xmlAttributeValue = str;
+            ShimXmlNode.AllInstances.SelectSingleNodeString = (node, str) =>
+            {
+                switch (str)
+                {
+                    case "Property[Name='QueryFilterAsString']":
+                        return new ShimXmlNode(node)
+                        {
+                            InnerTextGet = () => DummyQuery
+                        };
+                    case "Property[Name='ListViewFilter']":
+                        return new ShimXmlNode(node)
+                        {
+                                InnerTextGet = () => DummyListViewFielter
+                        };
+                    case "Property[Name='SupportsMultipleValues']":
+                        return new ShimXmlNode(node)
+                        {
+                            InnerTextGet = () => shouldSupportMultipleValues
+                                    ? bool.TrueString
+                                    : bool.FalseString
+                        };
+                    case "Property[Name='IsFilterRecursive']":
+                        return new ShimXmlNode(node)
+                        {
+                                InnerTextGet = () => shouldFilterBeRecursive
+                                    ? bool.TrueString
+                                    : bool.FalseString
+                        };
+                    default:
+                        return new ShimXmlNode(shimXmlDocument);
+                }
+            };
+
+            ShimXmlNode.AllInstances.ChildNodesGet = _1 => new StubXmlNodeList
+            {
+                ItemInt32 = _2 => new ShimXmlNode(shimXmlDocument)
+            };
+            ShimXmlNode.AllInstances.AttributesGet = _ => new ShimXmlAttributeCollection();
+            ShimXmlAttributeCollection.AllInstances.ItemOfGetString = (_1, str) =>
+            {
+                switch (str)
+                {
+                    case "List":
+                        return new ShimXmlAttribute
+                        {
+                            ValueGet = () => DummyListGuid
+                        };
+                    case "ShowField":
+                        return new ShimXmlAttribute
+                        {
+                            ValueGet = () => DummyShowFieldId
+                        };
+                    case "WebId":
+                        return new ShimXmlAttribute
+                        {
+                            ValueGet = () => DummyWebId
+                        };
+                    default:
+                        return null;
+                }
+            };
+
+            ShimSPFieldLookupValueCollection.ConstructorString = (collection, _2) =>
+            {
+                new ShimList<SPFieldLookupValue>(new ShimSPFieldLookupValueCollection(collection))
+                {
+                    GetEnumerator = () =>
+                    {
+                        return new List<SPFieldLookupValue>()
+                        {
+                            new ShimSPFieldLookupValue
+                            {
+                                ToString = () => DummyLookupValue
+                            }
+                        }.GetEnumerator();
+                    }
+                };
+            };
+
+            var paramXmlNode = new ShimXmlNode(shimXmlDocument)
+            {
+                AttributesGet = () => new ShimXmlAttributeCollection
+                {
+                    AppendXmlAttribute = attribute => attribute
+                }
+            };
+            parameters = new object[]
+            {
+                (SPField)new ShimSPField(),
+                (XmlDocument)shimXmlDocument,
+                DummyVal,
+                (XmlNode)paramXmlNode,
+                string.Empty
+            };
+
+            _actualChoicesString = string.Empty;
+            var shimHashtable = new ShimHashtable();
+            privateObject.SetField("hshComboCells", (Hashtable)shimHashtable);
+            shimHashtable.ItemSetObjectObject = (_, obj) => _actualChoicesString = obj.ToString();
+            shimHashtable.ItemGetObject = _ => _actualChoicesString;
+
+            privateObject.SetField("list", (SPList)new ShimSPList());
+
+            ShimSPList.AllInstances.IDGet = _ => new Guid(DummyListId);
+            ShimSPList.AllInstances.ParentWebGet = _ => new ShimSPWeb();
+            ShimSPWeb.AllInstances.IDGet = _ => !shouldLookupWebBeEqual ? new Guid(DummyParentWebId) : new Guid(DummyWebId);
+            ShimSPWeb.AllInstances.SiteGet = _ => new ShimSPSite();
+            ShimSPSite.AllInstances.OpenWebGuid = (_1, _2) => new ShimSPWeb();
+            Shimgetgriditems.AllInstances.getLookupListSPWebGuidGuidStringString = (_1, _2, lookupList, lookupField, query, listView) =>
+            {
+                _actualLookupList = lookupList.ToString();
+                _actualLookupField = lookupField.ToString();
+                _actualQuery = query;
+                _actualListView = listView;
+                return DummyChoices;
+            };
+
+            return privateObject;
+        }
+    }
 }

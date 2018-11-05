@@ -188,13 +188,11 @@
     <Compile Include="API\Integration\IntegrationCoreTest.cs" />
     <Compile Include="API\Integration\SqlIntegrationTest.cs" />
     <Compile Include="API\MyWork\MyWorkTests.cs" />
-    <Compile Include="API\MyWork\MyWorkTestsSplitOne.cs" />
-    <Compile Include="API\MyWork\MyWorkTestsSplitThree.cs" />
-    <Compile Include="API\MyWork\MyWorkTestsSplitTwo.cs" />
     <Compile Include="API\MyWork\UtilsTests.cs" />
     <Compile Include="API\NavigationServiceTests.cs" />
-    <Compile Include="API\Notification\APIEmailTests.cs" />
     <Compile Include="API\Applications\ApplicationUninstallerTests.cs" />
+    <Compile Include="API\Notification\NotificationTests.cs" />
+    <Compile Include="API\PersonalizationManagerTests.cs" />
     <Compile Include="API\Publish\APIPublishTests.cs" />
     <Compile Include="API\Reporting\ReportingTest.cs" />
     <Compile Include="API\ResourceGrid\ResourceExporterTests.cs" />
@@ -206,6 +204,7 @@
     <Compile Include="AppSettingsHelperTests.cs" />
     <Compile Include="AssignmentPlanner\GridManagerTests.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControlTests.cs" />
+    <Compile Include="CascadingLookup\CascadingLookup.FieldSettingsTests.cs" />
     <Compile Include="CheckOpenCloseConnections.cs" />
     <Compile Include="ControlDataBuilderTest.cs" />
     <Compile Include="CoreFunctions.GetPlannerList.Tests.cs" />
@@ -214,6 +213,8 @@
     <Compile Include="CoreFunctionsRemTestsSplitTwo.cs" />
     <Compile Include="CoreFunctionsTest.cs" />
     <Compile Include="EditableFieldDisplayTests.cs" />
+    <Compile Include="EditInTests.cs" />
+    <Compile Include="EPMLivePCForm\ManageableListsTests.cs" />
     <Compile Include="ExtensionMethodsTest.cs" />
     <Compile Include="FilteredLookup\FilteredLookupFieldEditorTests.cs" />
     <Compile Include="Infrastructure\BaseClasses\SPListItemManagerTests.cs" />
@@ -229,6 +230,7 @@
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AddListDataTests.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePoolTests.cs" />
+    <Compile Include="Layouts\epmlive\CreateNewAjaxDataHostTests.cs" />
     <Compile Include="Layouts\epmlive\AddUsersTests.cs" />
     <Compile Include="Layouts\epmlive\CreateNewWorkspaceTest.cs" />
     <Compile Include="Layouts\epmlive\CommentsTests.cs" />
@@ -257,6 +259,7 @@
     <Compile Include="ReportHelper\EPMDataTest.Part2.cs" />
     <Compile Include="ReportHelper\ListBizTest.cs" />
     <Compile Include="ReportHelper\MyWorkReportDataTest.cs" />
+    <Compile Include="ReportHelper\ReportBizTests.cs" />
     <Compile Include="ReportingDataTest.cs" />
     <Compile Include="RequestWorkspaceTest.cs" />
     <Compile Include="NewProjectTest.cs" />
@@ -266,6 +269,7 @@
     <Compile Include="ResourcePoolEvent\ResourcePoolEventTest.cs" />
     <Compile Include="Shared\AssertException.cs" />
     <Compile Include="SocialEngine\Core\ThreadManagerTest.cs" />
+    <Compile Include="SocialEngine\Modules\ListTests.cs" />
     <Compile Include="SocialEngine\Modules\ListItemTests.cs" />
     <Compile Include="SPUtilities\SPListUtilityTest.cs" />
     <Compile Include="Testables\InputFormSectionTestable.cs">

@@ -139,21 +139,19 @@ namespace EPMLiveCore.API
 
             try
             {
-                var stringWriter = new StringWriter();
-                var xmlSerializer = new XmlSerializer(typeof(List<MyWorkGridView>));
-                xmlSerializer.Serialize(stringWriter, myWorkGridViews);
-                stringWriter.Close();
+                using (var stringWriter = new StringWriter())
+                {
+                    var xmlSerializer = new XmlSerializer(typeof(List<MyWorkGridView>));
+                    xmlSerializer.Serialize(stringWriter, myWorkGridViews);
 
-                SPSecurity.RunWithElevatedPrivileges(
-                    () =>
-                    {
-                        configWeb.AllowUnsafeUpdates = true;
-                        CoreFunctions.setConfigSetting(
-                            configWeb,
-                            MyWorkGridGlobalViews,
-                            stringWriter.ToString());
-                        configWeb.AllowUnsafeUpdates = false;
-                    });
+                    SPSecurity.RunWithElevatedPrivileges(
+                        () =>
+                        {
+                            configWeb.AllowUnsafeUpdates = true;
+                            CoreFunctions.setConfigSetting(configWeb, MyWorkGridGlobalViews, stringWriter.ToString());
+                            configWeb.AllowUnsafeUpdates = false;
+                        });
+                }
             }
             catch (APIException apiException)
             {

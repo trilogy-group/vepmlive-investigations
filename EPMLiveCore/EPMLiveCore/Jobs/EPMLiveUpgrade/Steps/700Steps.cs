@@ -41,11 +41,11 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                             LogMessage("Rate column already exists in TSITEM table", MessageKind.SKIPPED, 4);
                         }
 
-                        
+
                     }
                 });
 
-               
+
             }
             catch (Exception exception)
             {
@@ -54,7 +54,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                     : exception.Message;
 
                 LogMessage(message, MessageKind.FAILURE, 4);
-                
+
             }
             try
             {
