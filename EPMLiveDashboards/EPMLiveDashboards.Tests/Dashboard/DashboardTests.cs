@@ -1032,7 +1032,7 @@ namespace EPMLiveDashboards.Tests
                 ShimSPControl.GetContextWebHttpContext = _ => new ShimSPWeb();
 
                 // Act
-                using (var dashBoard = new Dashboard.Dashboard())
+                using (var dashBoard = new Dashboard())
                 {
                     var privateObject = new PrivateObject(dashBoard);
                     privateObject.Invoke("CreateChildControls");
