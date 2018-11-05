@@ -37,6 +37,6 @@ copy-item -path BuildTeamcity\SilentInstaller\epmliveSilentInstaller.ps1 -Destin
 Write-Host 'Copied new installer'
 Remove-PSSession $session
 $scriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("C:\SilentInstaller\deploy.ps1 $username $password $webAppName $siteCollectionToUpgrade $buildNumber")
-Invoke-Command  -ComputerName $serverIP -ScriptBlock $scriptBlock -Credential $cred
+Invoke-Command  -ComputerName $serverIP -ScriptBlock $scriptBlock -Credential $cred -Authentication CredSSP 
 Write-Host 'Run complete'
 
