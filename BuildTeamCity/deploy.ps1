@@ -5,6 +5,8 @@ Param(
 	[string]$siteCollectionToUpgrade = '%epmlive.qa.UpgradeSiteCollection%',
 	[string]$buildNumber = '%build.number%'
 )
+
+Write-Host "Current User: $env:UserName"
 Add-Type -assembly "system.io.compression.filesystem"
 Remove-Item (Join-Path "C:\SilentInstaller" $buildNumber) -Force -Recurse -ErrorAction SilentlyContinue
 Write-Host 'Removed old folder'
