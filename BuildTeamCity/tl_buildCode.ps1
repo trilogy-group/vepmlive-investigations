@@ -214,7 +214,8 @@ if ($TestsOnly)
 	"WorkEnginePPM.Tests", 
 	"ProjectPublisher2016.Tests", 
 	"EPMLiveCore.AUT.Tests",
-	"EPMLiveSynch.Tests")
+	"EPMLiveSynch.Tests",
+	"EPMLiveDashboards.Tests")
 
 	# Directory for outputs
 	$OutputDirectory = Join-Path $SourcesDirectory "Test-Output"

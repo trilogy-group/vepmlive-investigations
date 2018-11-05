@@ -41,6 +41,9 @@
     <AssemblyOriginatorKeyFile>EPMLive.TestFakes.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dashboard.Fakes">
+      <HintPath>FakesAssemblies\Dashboard.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="DocumentFormat.OpenXml.2.5.5631.0.Fakes">
       <HintPath>FakesAssemblies\DocumentFormat.OpenXml.2.5.5631.0.Fakes.dll</HintPath>
@@ -175,6 +178,10 @@
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
       <Name>EPMLiveCore</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EPMLiveDashboards\EPMLiveDashboards\EPMLiveDashboards.csproj">
+      <Project>{bd45273d-42c6-4691-bed6-52279d8e489c}</Project>
+      <Name>EPMLiveDashboards</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveIntegrationService\EPMLiveIntegrationService\EPMLiveIntegrationService.csproj">
       <Project>{e7043f73-7633-4476-b33d-222ec3ac1c8b}</Project>
       <Name>EPMLiveIntegrationService</Name>
@@ -255,6 +262,7 @@
     <Fakes Include="Fakes\DocumentFormat.OpenXml.fakes" />
     <Fakes Include="Fakes\System.Web.Services.fakes" />
     <Fakes Include="Fakes\Microsoft.Office.Project.Server.Library.fakes" />
+    <Fakes Include="Fakes\Dashboard.fakes" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

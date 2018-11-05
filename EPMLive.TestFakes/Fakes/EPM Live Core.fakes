@@ -117,5 +117,7 @@
     <Add FullName="EPMLiveCore.addusers!"/>
     <Add FullName="EPMLiveCore.SocialEngine.Entities.Activity!"/>
     <Add Namespace="EPMLiveCore.Integrations.Salesforce!"/>
+    <Add FullName="EPMLiveCore.CascadingLookupField!"/>
+    <Add FullName="EPMLiveCore.CascadingLookupFieldSettings!"/>
   </ShimGeneration>
 </Fakes>
