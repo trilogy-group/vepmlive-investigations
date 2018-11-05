@@ -37,7 +37,7 @@ namespace EPMLiveWebParts.Utilities
             return returnVal;
         }
 
-        public static string SetTimeZone(SPWeb web, SPContext context, Dictionary<string, string> replaceDisplayName)
+        public static string GetCurrentUserTimeZone(SPWeb web, SPContext context, Dictionary<string, string> replaceDisplayName)
         {
             var currentUserTimeZone = "null";
 

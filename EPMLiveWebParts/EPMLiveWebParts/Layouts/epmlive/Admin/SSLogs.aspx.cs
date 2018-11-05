@@ -47,7 +47,7 @@ namespace EPMLiveWebParts.Layouts.epmlive.Admin
                 { " and ", " & " }
             };
 
-            CurrentUserTimeZone = Utilities.Extensions.SetTimeZone(web, context, dictionaryReplace);
+            CurrentUserTimeZone = Utilities.Extensions.GetCurrentUserTimeZone(web, context, dictionaryReplace);
         }
 
         #endregion Methods 

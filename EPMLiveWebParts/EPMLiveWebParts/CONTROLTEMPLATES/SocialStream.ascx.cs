@@ -86,7 +86,7 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
                 { "(UTC+00:00)", "(UTC)" }
             };
 
-            CurrentUserTimeZone = Utilities.Extensions.SetTimeZone(web, context, dictionaryReplace);
+            CurrentUserTimeZone = Utilities.Extensions.GetCurrentUserTimeZone(web, context, dictionaryReplace);
         }
 
         #endregion
