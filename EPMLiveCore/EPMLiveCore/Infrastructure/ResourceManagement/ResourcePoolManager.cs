@@ -121,7 +121,7 @@ namespace EPMLiveCore.Infrastructure
                 var tasks = new List<Task<object[]>>();
                 var totalRows = rowCollection.Count();
                 var pageSize = 200;
-                var threadCount = totalRows/pageSize;
+                var threadCount = totalRows / pageSize;
 
                 var reportXmlBuilder = new ReportXmlBuilder(this, ElementName);
 
@@ -136,7 +136,7 @@ namespace EPMLiveCore.Infrastructure
                 while (pagesProcessed < threadCount)
                 {
                     var page = pageSize;
-                    var offset = pagesProcessed*pageSize;
+                    var offset = pagesProcessed * pageSize;
 
                     pagesProcessed++;
 
@@ -147,7 +147,7 @@ namespace EPMLiveCore.Infrastructure
 
                     var task = Task<object[]>.Factory.StartNew(() =>
                     {
-                        var dataRows = (from r in rowCollection select r)
+                        var dataRows = rowCollection
                             .Skip(offset)
                             .Take(page);
 
@@ -159,7 +159,7 @@ namespace EPMLiveCore.Infrastructure
                             resources,
                             out valueDictionary);
 
-                        return new object[] 
+                        return new object[]
                         {
                             elements,
                             valueDictionary
@@ -173,8 +173,8 @@ namespace EPMLiveCore.Infrastructure
                 {
                     var result = task.Result;
 
-                    var elements = (List<XElement>) result[0];
-                    ProcessHtmlValues(elements, (Dictionary<string, object[]>) result[1]);
+                    var elements = (List<XElement>)result[0];
+                    ProcessHtmlValues(elements, (Dictionary<string, object[]>)result[1]);
 
                     rootElement.Add(elements);
                 }
@@ -187,7 +187,7 @@ namespace EPMLiveCore.Infrastructure
             catch (Exception exception)
             {
                 Trace.WriteLine(exception);
-                throw new APIException((int) Errors.SPLIMGetAllFromDB, exception.GetBaseException().Message);
+                throw new APIException((int)Errors.SPLIMGetAllFromDB, exception.GetBaseException().Message);
             }
         }
 
@@ -229,7 +229,8 @@ namespace EPMLiveCore.Infrastructure
             string stringValue, 
             object value,
             out string fieldEditValue,
-            out string fieldTextValue, out string fieldHtmlValue)
+            out string fieldTextValue, 
+            out string fieldHtmlValue)
         {
             base.GetFieldSpecialValues(spField, stringValue, value, out fieldEditValue, out fieldTextValue, out fieldHtmlValue);
         }
