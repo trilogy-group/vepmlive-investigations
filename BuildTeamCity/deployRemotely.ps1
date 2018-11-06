@@ -17,14 +17,13 @@ Set-Item wsman:\localhost\Client\TrustedHosts -value * -Force
 $passwd = convertto-securestring -AsPlainText -Force -String $password
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $passwd
 
-Write-Host "Configuring WSMAN remotely: $serverIP"
-$scriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("Set-Item wsman:\localhost\Client\TrustedHosts -value * -Force");
-Invoke-Command -ComputerName $serverIP -ScriptBlock $scriptBlock -Credential $cred
-
-
 Write-Host "Connecting to $serverIP, $webAppName, $siteCollectionToUpgrade, $buildNumber"
 $session = New-PSSession -ComputerName $serverIP -Credential $cred
-Write-Host 'Connected remotely'
+Invoke-Command -Session $session -ScriptBlock { Register-PSSessionConfiguration -Name 'EPMRemoteDeploy' -RunAsCredential $username -Force }
+
+Write-Host "Configuring WSMAN remotely: $serverIP"
+$scriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("Set-Item wsman:\localhost\Client\TrustedHosts -value * -Force");
+Invoke-Command -Session $session -ScriptBlock $scriptBlock
 
 Invoke-Command -Session $session {Remove-Item C:\SilentInstaller\SilentInstaller.zip -ErrorAction SilentlyContinue}
 Invoke-Command -Session $session {Remove-Item C:\SilentInstaller\deploy.ps1 -ErrorAction SilentlyContinue}
@@ -38,10 +37,9 @@ copy-item -path BuildTeamcity\SilentInstaller\routines.ps1 -Destination C:\Silen
 copy-item -path BuildTeamcity\SilentInstaller\epmliveSilentInstaller.ps1 -Destination C:\SilentInstaller\. -ToSession $session
 Write-Host 'Copied new installer'
 
-Remove-PSSession $session
-
-Invoke-Command -ComputerName $serverIP -Credential $cred -ScriptBlock { Register-PSSessionConfiguration -Name 'EPMRemoteDeploy' -RunAsCredential $username -Force }
 $scriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("C:\SilentInstaller\deploy.ps1 $username $password $webAppName $siteCollectionToUpgrade $buildNumber")
-Invoke-Command -ComputerName $serverIP -Credential $cred -ScriptBlock $scriptBlock -ConfigurationName 'EPMRemoteDeploy'
+Invoke-Command -Session $session -ScriptBlock $scriptBlock -ConfigurationName 'EPMRemoteDeploy'
+
+Remove-PSSession $session
 Write-Host 'Run complete'
 
