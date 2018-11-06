@@ -13,6 +13,7 @@ using System.Resources.Fakes;
 using System.Xml;
 using System.Xml.Linq;
 using EPMLiveCore.Fakes;
+using EPMLiveCore.ReportingProxy.Fakes;
 using EPMLiveWorkPlanner.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
@@ -140,6 +141,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             ShimSPPersistedObject.AllInstances.IdGet = _ => guid;
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
             ShimSPFieldUserValueCollection.ConstructorSPWebString = (_, _1, _2) => new ShimSPFieldUserValueCollection();
+            ShimQueryExecutor.ConstructorSPWeb = (_, __) => new ShimQueryExecutor();
         }
 
         private void SetupVariables()
@@ -178,7 +180,8 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 ParentWebGet = () => spWeb,
                 DefaultViewGet = () => spView,
                 ViewsGet = () => spViewCollection,
-                ContentTypesGet = () => spContentTypeCollection
+                ContentTypesGet = () => spContentTypeCollection,
+                TitleGet = () => DummyString
             };
             spListItemCollection = new ShimSPListItemCollection()
             {
@@ -198,7 +201,8 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spFieldCollection = new ShimSPFieldCollection()
             {
                 GetFieldByInternalNameString = _ => spField,
-                ContainsFieldString = _ => false
+                ContainsFieldString = _ => false,
+                GetFieldString = _ => spField
             };
             spField = new ShimSPField()
             {
