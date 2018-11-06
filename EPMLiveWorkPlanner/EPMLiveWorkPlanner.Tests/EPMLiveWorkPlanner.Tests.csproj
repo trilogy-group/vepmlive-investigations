@@ -86,6 +86,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ISAPI\WorkPlanner.asmx.TestsSplitOne.cs" />
+    <Compile Include="ISAPI\WorkPlanner.asmx.TestsSplitThree.cs" />
     <Compile Include="ISAPI\WorkPlanner.asmx.TestsSplitTwo.cs" />
     <Compile Include="Layouts\epmlive\WorkPlanner.aspx.Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
