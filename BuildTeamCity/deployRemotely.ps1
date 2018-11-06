@@ -19,7 +19,6 @@ $cred = new-object -typename System.Management.Automation.PSCredential -argument
 
 Write-Host "Connecting to $serverIP, $webAppName, $siteCollectionToUpgrade, $buildNumber"
 $session = New-PSSession -ComputerName $serverIP -Credential $cred 
-Invoke-Command -Session $session -ScriptBlock { Register-PSSessionConfiguration -Name 'EPMRemoteDeploy' -RunAsCredential $username -Force }
 
 Write-Host "Configuring WSMAN remotely: $serverIP"
 $scriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("Set-Item wsman:\localhost\Client\TrustedHosts -value * -Force");
@@ -37,9 +36,12 @@ copy-item -path BuildTeamcity\SilentInstaller\routines.ps1 -Destination C:\Silen
 copy-item -path BuildTeamcity\SilentInstaller\epmliveSilentInstaller.ps1 -Destination C:\SilentInstaller\. -ToSession $session
 Write-Host 'Copied new installer'
 
-$scriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("C:\SilentInstaller\deploy.ps1 $username $password $webAppName $siteCollectionToUpgrade $buildNumber")
-Invoke-Command -Session $session -ScriptBlock $scriptBlock -ConfigurationName 'EPMRemoteDeploy'
-
 Remove-PSSession $session
+Write-Host 'Session Disconnected' 
+
+Invoke-Command -ComputerName $serverIP -Credential $cred -ScriptBlock { Register-PSSessionConfiguration -Name 'EPMRemoteDeploy' -RunAsCredential $username -Force }
+$scriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("C:\SilentInstaller\deploy.ps1 $username $password $webAppName $siteCollectionToUpgrade $buildNumber")
+Invoke-Command -ComputerName $serverIP -Credential $cred -ScriptBlock $scriptBlock -ConfigurationName 'EPMRemoteDeploy'
+
 Write-Host 'Run complete'
 
