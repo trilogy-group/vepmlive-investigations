@@ -13,6 +13,7 @@ namespace TimeSheets.Layouts.epmlive
     public partial class WorkLog : LayoutsPageBase
     {
         private const string TxtHoursPrefix = "txtHours_";
+        private bool _disposed = false;
 
         private Guid _listId;
         private int _listItemId;
@@ -382,7 +383,12 @@ namespace TimeSheets.Layouts.epmlive
 
         public override void Dispose()
         {
-            phHours?.Dispose();
+            if (!_disposed)
+            {
+                phHours?.Dispose();
+                _disposed = true;
+            }
+
             base.Dispose();
         }
     }
