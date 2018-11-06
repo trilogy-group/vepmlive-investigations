@@ -32,7 +32,7 @@ using Telerik.Web.UI.HtmlChart;
 using RC = EPMLiveWebParts.ReportingChart;
 using WP = EPMLiveWebParts;
 
-namespace EPMLiveWebParts.Tests.ReportingChart
+namespace EPMLiveWebParts.Tests.ReportingChartTests
 {
     [TestClass, ExcludeFromCodeCoverage]
     public class ReportingChartTests
