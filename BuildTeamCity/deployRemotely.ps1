@@ -18,7 +18,7 @@ $passwd = convertto-securestring -AsPlainText -Force -String $password
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $passwd
 
 Write-Host "Connecting to $serverIP, $webAppName, $siteCollectionToUpgrade, $buildNumber"
-$session = New-PSSession -ComputerName $serverIP -Credential $cred -Authentication Credssp
+$session = New-PSSession -ComputerName $serverIP -Credential $cred 
 Invoke-Command -Session $session -ScriptBlock { Register-PSSessionConfiguration -Name 'EPMRemoteDeploy' -RunAsCredential $username -Force }
 
 Write-Host "Configuring WSMAN remotely: $serverIP"
