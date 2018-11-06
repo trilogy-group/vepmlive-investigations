@@ -379,5 +379,11 @@ namespace TimeSheets.Layouts.epmlive
                 cs.RegisterStartupScript(cstype, name, js);
             }
         }
+
+        public override void Dispose()
+        {
+            phHours?.Dispose();
+            base.Dispose();
+        }
     }
 }
