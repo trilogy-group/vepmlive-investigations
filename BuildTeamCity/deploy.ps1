@@ -3,7 +3,8 @@ Param(
 	[string]$password = '%epmlive.qa.farmadmin.password%',
 	[string]$webAppName = '%epmlive.qa.webAppName%',
 	[string]$siteCollectionToUpgrade = '%epmlive.qa.UpgradeSiteCollection%',
-	[string]$buildNumber = '%build.number%'
+	[string]$buildNumber = '%build.number%',
+	[switch]$deploySolutions
 )
 
 Write-Host "Current User: $env:UserName"
@@ -18,5 +19,11 @@ Copy-Item "C:\SilentInstaller\epmliveSilentInstaller.ps1" (Join-Path "C:\SilentI
 CD "C:\SilentInstaller\$buildNumber"
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 Write-Host "Prepared to run -comUserName $username -inPassword $password"
-.\epmliveSilentInstaller.ps1 -deployTimer -deployPFE -deploySolutions -webAppName $webAppName -upgradeSite $siteCollectionToUpgrade -comUserName $username -inPassword $password
-
+if ($deploySolutions)
+{
+	.\epmliveSilentInstaller.ps1 -deployTimer -deployPFE -deploySolutions -webAppName $webAppName -upgradeSite $siteCollectionToUpgrade -comUserName $username -inPassword $password
+}
+else
+{
+	.\epmliveSilentInstaller.ps1 -comUserName $username -inPassword $password
+}
