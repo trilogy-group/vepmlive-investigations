@@ -25,5 +25,5 @@ if ($deploySolutions)
 }
 else
 {
-	.\epmliveSilentInstaller.ps1 -deployTimer -deployPFE -comUserName $username -inPassword $password
+	.\epmliveSilentInstaller.ps1 -comUserName $username -inPassword $password
 }
