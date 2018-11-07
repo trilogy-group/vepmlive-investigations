@@ -11,7 +11,9 @@ import {ValidationsHelper} from '../../../../components/misc-utils/validation-he
 import {ProjectItemPage} from '../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 import {ProjectItemPageHelper} from '../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import { CommonPageSubHelper } from '../../../../page-objects/pages/common/common-page-sub.helper';
+import {ElementHelper} from '../../../../components/html/element-helper';
+import {EditTeamPageHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/edit-team-page.helper';
+import {ExpectationHelper} from '../../../../components/misc-utils/expectation-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -41,8 +43,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(3);
         StepLogger.step('Select check-box for any Project');
-        await WaitHelper.waitForElementToBePresent(CommonPage.record);
-        await CommonPageSubHelper.selectOneRecordFromGrid();
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord());
+        await PageHelper.click(CommonPage.getNthRecord());
 
         StepLogger.step('Click on "Items" tab');
         await PageHelper.click(CommonPage.ribbonTitles.items);
@@ -52,14 +54,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         StepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
-
-        await expect(await CommonPage.dialogTitle.getText())
-            .toBe(CommonPageConstants.ribbonLabels.editTeam,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
-
-        StepLogger.step('Switch to content frame');
-        await CommonPageHelper.switchToContentFrame();
+        await ProjectItemPageHelper.waitForBuildTeamPageToOpenAndSwitchToPage();
 
         // If we able to access Close button under Build Team tab that means Build tab is selected
         StepLogger.verification('"Build Team" tab is selected by default');
@@ -76,22 +71,19 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(4);
         StepLogger.step('Click "Close" button in "Edit Team" window');
-        await PageHelper.click(CommonPage.ribbonItems.close);
-
-        StepLogger.step('switch to default content');
-        await PageHelper.switchToDefaultContent();
+        await EditTeamPageHelper.closeEditTeamPopUpAndSwitchToDefaultContent();
 
         StepLogger.verification('"Edit Team" window is closed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
-            .toBe(false, ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+        await ExpectationHelper.verifyNotDisplayedStatus(
+            CommonPage.dialogTitle, CommonPageConstants.ribbonLabels.editTeam);
 
         StepLogger.verification('"Project Center" page is displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
-            .toBe(true, ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+        await ExpectationHelper.verifyDisplayedStatus(
+            CommonPage.pageHeaders.projects.projectsCenter, CommonPageConstants.pageHeaders.projects.projectCenter);
 
         StepLogger.verification('All previously created Projects are displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.record))
-            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
+        await ExpectationHelper.verifyDisplayedStatus(
+            CommonPage.record, ProjectItemPageConstants.inputLabels.projectName);
     });
 
     it('Launch Build Team from Project Center - Ellipsis icon - [743140]', async () => {
@@ -108,7 +100,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(3);
         StepLogger.step('Mouse over on any Project created as per pre requisites');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.record);
-        await CommonPageSubHelper.selectOneRecordFromGrid();
+        await ElementHelper.actionHoverOver(CommonPage.record);
 
         StepLogger.step('Click on the Ellipses button (...)');
         await PageHelper.click(CommonPage.ellipse);
@@ -116,14 +108,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.contextMenuOptions.editTeam);
 
         StepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
-
-        await expect(await CommonPage.dialogTitle.getText())
-            .toBe(CommonPageConstants.ribbonLabels.editTeam,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
-
-        StepLogger.step('Switch to content frame');
-        await CommonPageHelper.switchToContentFrame();
+        await ProjectItemPageHelper.waitForBuildTeamPageToOpenAndSwitchToPage();
 
         // If we able to access Close button under Build Team tab that means Build tab is selected
         StepLogger.verification('"Build Team" tab is selected by default');
@@ -141,25 +126,19 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(4);
         StepLogger.step('Click "Close" button in "Edit Team" window');
-        await PageHelper.click(CommonPage.ribbonItems.close);
-
-        StepLogger.step('switch to default content');
-        await PageHelper.switchToDefaultContent();
+        await EditTeamPageHelper.closeEditTeamPopUpAndSwitchToDefaultContent();
 
         StepLogger.verification('"Edit Team" window is closed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+        await ExpectationHelper.verifyNotDisplayedStatus(
+            CommonPage.dialogTitle, CommonPageConstants.ribbonLabels.editTeam);
 
         StepLogger.verification('"Project Center" page is displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
-            .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+        await ExpectationHelper.verifyDisplayedStatus(
+            CommonPage.pageHeaders.projects.projectsCenter, CommonPageConstants.pageHeaders.projects.projectCenter);
 
         StepLogger.verification('All previously created Projects are displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.record))
-            .toBe(true,
-                ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
+        await ExpectationHelper.verifyDisplayedStatus(
+            CommonPage.record, ProjectItemPageConstants.inputLabels.projectName);
     });
 
     it('Navigate to Edit Costs page - [966345]', async () => {

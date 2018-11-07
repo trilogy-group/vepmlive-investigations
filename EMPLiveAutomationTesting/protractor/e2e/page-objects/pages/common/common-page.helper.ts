@@ -426,7 +426,10 @@ export class CommonPageHelper {
         await CommonPageHelper.switchToContentFrame();
         await WaitHelper.staticWait(PageHelper.timeout.xs);
         await ResourceAnalyzerPageHelper.clickDisplayButton();
-        await PageHelper.acceptAlert();
+        const isPresent = await PageHelper.waitForAlertToBePresent();
+        if (isPresent) {
+            await PageHelper.acceptAlert();
+        }
         StepLogger.step('Resource Analyzer Page is displayed');
         await expect(await PageHelper.isElementDisplayed(ResourceAnalyzerPage.analyzerTab))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.resourceAnalyzer));

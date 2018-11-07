@@ -5,6 +5,7 @@ import {ResourceAnalyzerPageConstants} from './resource-analyzer-page.constants'
 import {CommonPage} from '../common/common.po';
 import {CommonPageHelper} from '../common/common-page.helper';
 import {CommonPageConstants} from '../common/common-page.constants';
+import {WaitHelper} from '../../../components/html/wait-helper';
 
 export class ResourceAnalyzerPageHelper {
 
@@ -200,5 +201,9 @@ export class ResourceAnalyzerPageHelper {
     static async cancelResourceAnalyzerPopUp() {
         StepLogger.step('cancel Resource Analyzer PopUp');
         await PageHelper.click(ResourceAnalyzerPage.cancel);
+
+        StepLogger.subStep('Switch to default content');
+        await WaitHelper.waitForElementToBeHidden(ResourceAnalyzerPage.cancel);
+        await PageHelper.switchToDefaultContent();
     }
 }
