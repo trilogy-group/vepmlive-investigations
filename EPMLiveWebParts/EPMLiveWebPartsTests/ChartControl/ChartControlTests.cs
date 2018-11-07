@@ -28,6 +28,7 @@ namespace EPMLiveWebParts.Tests.ChartControlTests
     using Fakes;
     using Microsoft.SharePoint.WebPartPages.Fakes;
     using System.Web.UI;
+    using EpmCharting.DomainServices.Fakes;
 
     [TestClass]
     public class ChartControlTests
@@ -49,6 +50,8 @@ namespace EPMLiveWebParts.Tests.ChartControlTests
         private readonly Button BubbleChartApplyButton = new Button();
         private readonly HtmlTable UserSettingsTable = new HtmlTable();
         private readonly HtmlTable MainTable = new HtmlTable();
+        private string PopulateBubbleChartInputsWithInitialValuesMethodName = "PopulateBubbleChartInputsWithInitialValues";
+        private string SetBubbleChartInputsBasedOnWebPartPropertiesMethodName = "SetBubbleChartInputsBasedOnWebPartProperties";
 
         [TestInitialize]
         public void Initialize()
@@ -268,7 +271,175 @@ namespace EPMLiveWebParts.Tests.ChartControlTests
                 () => chartSettings.ListId.ShouldBe(DummyGuid));
         }
 
+        [TestMethod]
+        public void PopulateBubbleChartInputsWithInitialValues_IsBubbleChart_ExecutesCorrectly()
+        {
+            // Arrange
+            var spList = new ShimSPList
+            {
+                FieldsGet = () =>
+                {
+                    var list = new List<SPField>
+                    {
+                        new ShimSPField
+                        {
+                            TypeGet = () => SPFieldType.Choice,
+                            InternalNameGet = () => DummyString,
+                            TitleGet = () => DummyString
+                        },
+                        new ShimSPField
+                        {
+                            TypeGet = () => SPFieldType.Attachments,
+                            InternalNameGet = () => DummyString,
+                            TitleGet = () => DummyString
+                        },
+                        new ShimSPField
+                        {
+                            TypeAsStringGet = () => DummyString,
+                            TypeGet = () => SPFieldType.Integer,
+                            InternalNameGet = () => DummyString,
+                            TitleGet = () => DummyString
+                        },
+                        new ShimSPField
+                        {
+                            TypeAsStringGet = () => "Currency",
+                            TypeGet = () => SPFieldType.Calculated,
+                            InternalNameGet = () => DummyString,
+                            TitleGet = () => DummyString
+                        }
+                    };
+                    return new ShimSPFieldCollection().Bind(list);
+                }
+            }.Instance;
+            ShimChartHelper.IsCalculateableSharepointFieldSPField = _ => true;
+            ShimEpmChart.GetFieldSchemaAttribValueStringString = (search, attribute) => attribute;
+            chartControl.PropChartMainStyle = "bubble";
 
+            // Act
+            privateObject.Invoke(PopulateBubbleChartInputsWithInitialValuesMethodName, spList);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => BubbleChartYaxisAsDropDownList.ShouldNotBeNull(),
+                () => BubbleChartYaxisAsDropDownList.Items.ShouldNotBeNull(),
+                () => BubbleChartYaxisAsDropDownList.Items.Count.ShouldBeGreaterThan(0),
+                () => BubbleChartYaxisAsDropDownList.Items.FindByText(DummyString).ShouldNotBeNull());
+        }
+
+        [TestMethod]
+        public void PopulateBubbleChartInputsWithInitialValues_IsBubbleChartFalse_ExecutesCorrectly()
+        {
+            // Arrange
+            var spList = new ShimSPList
+            {
+                FieldsGet = () =>
+                {
+                    var list = new List<SPField>
+                    {
+                        new ShimSPField
+                        {
+                            TypeGet = () => SPFieldType.Choice,
+                            InternalNameGet = () => DummyString,
+                            TitleGet = () => DummyString
+                        },
+                        new ShimSPField
+                        {
+                            TypeGet = () => SPFieldType.Attachments,
+                            InternalNameGet = () => DummyString,
+                            TitleGet = () => DummyString
+                        },
+                        new ShimSPField
+                        {
+                            TypeAsStringGet = () => DummyString,
+                            TypeGet = () => SPFieldType.Integer,
+                            InternalNameGet = () => DummyString,
+                            TitleGet = () => DummyString
+                        },
+                        new ShimSPField
+                        {
+                            TypeAsStringGet = () => "Currency",
+                            TypeGet = () => SPFieldType.Calculated,
+                            InternalNameGet = () => DummyString,
+                            TitleGet = () => DummyString
+                        }
+                    };
+                    return new ShimSPFieldCollection().Bind(list);
+                }
+            }.Instance;
+            ShimChartHelper.IsCalculateableSharepointFieldSPField = _ => true;
+            ShimEpmChart.GetFieldSchemaAttribValueStringString = (search, attribute) => attribute;
+            chartControl.PropChartMainStyle = string.Empty;
+
+            // Act
+            privateObject.Invoke(PopulateBubbleChartInputsWithInitialValuesMethodName, spList);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => BubbleChartYaxisCheckBoxList.ShouldNotBeNull(),
+                () => BubbleChartYaxisCheckBoxList.Items.ShouldNotBeNull(),
+                () => BubbleChartYaxisCheckBoxList.Items.Count.ShouldBeGreaterThan(0),
+                () => BubbleChartYaxisCheckBoxList.Items.FindByText(DummyString).ShouldNotBeNull());
+        }
+
+        [TestMethod]
+        public void SetBubbleChartInputsBasedOnWebPartProperties_IsBubbleChart_ExecutesCorrectly()
+        {
+            // Arrange
+            chartControl.PropChartXaxisField = DummyString;
+            chartControl.PropChartZaxisField = DummyString;
+            chartControl.PropChartYaxisField = DummyString;
+            chartControl.PropBubbleChartColorField = DummyString;
+            var xAxisFieldItem = new ListItem(DummyString);
+            BubbleChartXaxisDropDownList.Items.Add(xAxisFieldItem);
+            var zAxisFieldItem = new ListItem(DummyString);
+            BubbleChartZaxisDropDownList.Items.Add(zAxisFieldItem);
+            var zColorFieldItem = new ListItem(DummyString);
+            BubbleChartZcolorFieldDropDownList.Items.Add(zColorFieldItem);
+            var bubbleItem = new ListItem(DummyString);
+            BubbleChartYaxisAsDropDownList.Items.Add(bubbleItem);
+            ShimChartControl.AllInstances.GetYaxisFields = _ => new string[] { DummyString };
+            chartControl.PropChartMainStyle = "bubble";
+            
+            // Act
+            privateObject.Invoke(SetBubbleChartInputsBasedOnWebPartPropertiesMethodName);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => xAxisFieldItem.Selected.ShouldBeTrue(),
+                () => zAxisFieldItem.Selected.ShouldBeTrue(),
+                () => zColorFieldItem.Selected.ShouldBeTrue(),
+                () => bubbleItem.Selected.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void SetBubbleChartInputsBasedOnWebPartProperties_IsBubbleChartFalse_ExecutesCorrectly()
+        {
+            // Arrange
+            chartControl.PropChartXaxisField = DummyString;
+            chartControl.PropChartZaxisField = DummyString;
+            chartControl.PropChartYaxisField = DummyString;
+            chartControl.PropBubbleChartColorField = DummyString;
+            var xAxisFieldItem = new ListItem(DummyString);
+            BubbleChartXaxisDropDownList.Items.Add(xAxisFieldItem);
+            var zAxisFieldItem = new ListItem(DummyString);
+            BubbleChartZaxisDropDownList.Items.Add(zAxisFieldItem);
+            var zColorFieldItem = new ListItem(DummyString);
+            BubbleChartZcolorFieldDropDownList.Items.Add(zColorFieldItem);
+            var bubbleItem = new ListItem(DummyString);
+            BubbleChartYaxisCheckBoxList.Items.Add(bubbleItem);
+            ShimChartControl.AllInstances.GetYaxisFields = _ => new string[] { DummyString };
+            chartControl.PropChartMainStyle = DummyString;
+
+            // Act
+            privateObject.Invoke(SetBubbleChartInputsBasedOnWebPartPropertiesMethodName);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => xAxisFieldItem.Selected.ShouldBeTrue(),
+                () => zAxisFieldItem.Selected.ShouldBeTrue(),
+                () => zColorFieldItem.Selected.ShouldBeTrue(),
+                () => bubbleItem.Selected.ShouldBeTrue());
+        }
 
     }
 }
