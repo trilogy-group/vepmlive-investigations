@@ -39,8 +39,8 @@ Write-Host 'Copied new installer'
 Remove-PSSession $session
 Write-Host 'Session Disconnected' 
 
-$scriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("Start-Job -ScriptBlock {`$passwd = convertto-securestring -AsPlainText -Force -String $password; `$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, `$passwd; Register-PSSessionConfiguration -Name EPMRemoteDeploy -RunAsCredential `$cred -NoServiceRestart -verbose:`$false -Force} | Wait-Job -Timeout 10")
-Invoke-Command -ComputerName $serverIP -Credential $cred  -ScriptBlock $scriptBlock
+#$scriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("Start-Job -ScriptBlock {`$passwd = convertto-securestring -AsPlainText -Force -String $password; `$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, `$passwd; Register-PSSessionConfiguration -Name EPMRemoteDeploy -RunAsCredential `$cred -NoServiceRestart -verbose:`$false -Force} | Wait-Job -Timeout 10")
+#Invoke-Command -ComputerName $serverIP -Credential $cred  -ScriptBlock $scriptBlock
 $scriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("C:\SilentInstaller\deploy.ps1 $username $password $webAppName $siteCollectionToUpgrade $buildNumber")
 Invoke-Command -ComputerName $serverIP -Credential $cred  -ScriptBlock $scriptBlock -ConfigurationName EPMRemoteDeploy
 
