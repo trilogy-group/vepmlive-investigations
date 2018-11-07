@@ -755,7 +755,7 @@ namespace TimeSheets
             output.Write("<div id=\"dlgEmailing\" class=\"dialog\"><table width=\"100%\"><tr><td align=\"center\" class=\"ms-sectionheader\">");
             output.Write("<img src=\"/_layouts/images/GEARS_ANv4.GIF\" style=\"vertical-align: middle;\"/><br />");
             output.Write("<H3 class=\"ms-standardheader\">Sending Emails...</h3></td></tr></table></div>");
-            output.Write("$<div id=\"grid{ID}\" style=\"width:100%;display:none;\" ></div>\r\n\r\n");
+            output.Write($"<div id=\"grid{ID}\" style=\"width:100%;display:none;\" ></div>\r\n\r\n");
             output.Write($"<div  width=\"100%\" id=\"loadinggrid{ID}\" align=\"center\">");
             output.Write("<img src=\"/_layouts/images/gears_anv4.gif\" style=\"vertical-align: middle;\"/> Loading Resources...");
             output.Write("</div>");
