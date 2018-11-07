@@ -290,6 +290,7 @@
     <Compile Include="WebPageCode\CreateDatabaseTest.cs" />
     <Compile Include="WebPageCode\ListDisplayPageTests.cs" />
     <Compile Include="WebPageCode\ViewPermissionPageTests.cs" />
+    <Compile Include="WebPageCode\TpreportTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
