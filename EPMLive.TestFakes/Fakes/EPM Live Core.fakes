@@ -128,5 +128,6 @@
     <Add FullName="EPMLiveCore.Helpers.WebServicesHelper!"/>
     <Add FullName="EPMLiveCore.adsyncadmin!"/>
     <Add FullName="EPMLiveCore.ControlCollectionExtensions!"/>
+    <Add FullName="EPMLiveCore.BtnChangeApp!"/>
   </ShimGeneration>
 </Fakes>
