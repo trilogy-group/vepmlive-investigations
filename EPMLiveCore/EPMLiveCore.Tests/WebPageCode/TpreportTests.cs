@@ -37,6 +37,7 @@ namespace EPMLiveCore.Tests.WebPageCode
         private const string PeriodItemFullName = "EPMLiveCore.tpreport+PeriodItem";
         private const string PageLoadMethodName = "Page_Load";
         private const string ProcessDataMethodName = "processData";
+        private const int DataRowLength = 16;
 
         [TestInitialize]
         public void Initialize()
@@ -232,7 +233,7 @@ namespace EPMLiveCore.Tests.WebPageCode
                     }
                 }
             }.Instance;
-            var dataRows = new object[16];
+            var dataRows = new object[DataRowLength];
             ShimCoreFunctions.getConfigSettingSPWebString = (_, setting) => DummyString;
             privateObject.SetFieldOrProperty("arrResOC", new ArrayList
             {
@@ -298,7 +299,7 @@ namespace EPMLiveCore.Tests.WebPageCode
                     }
                 }
             }.Instance;
-            var dataRows = new object[16];
+            var dataRows = new object[DataRowLength];
             ShimCoreFunctions.getConfigSettingSPWebString = (_, setting) => DummyString;
             privateObject.SetFieldOrProperty("arrProjectOC", new ArrayList
             {
@@ -365,7 +366,7 @@ namespace EPMLiveCore.Tests.WebPageCode
                     }
                 }
             }.Instance;
-            var dataRows = new object[16];
+            var dataRows = new object[DataRowLength];
             ShimCoreFunctions.getConfigSettingSPWebString = (_, setting) => DummyString;
             privateObject.SetFieldOrProperty("arrTaskOC", new ArrayList
             {
@@ -400,7 +401,7 @@ namespace EPMLiveCore.Tests.WebPageCode
                     ["capacity"] = "1",
                 })
             });
-            var dataRow = new object[16];
+            var dataRow = new object[DataRowLength];
             var rowAdded = new object[] { };
             var listItem = new ShimSPListItem
             {
