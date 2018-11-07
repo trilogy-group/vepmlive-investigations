@@ -264,7 +264,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('Selected item details displayed in editable mode in the pop up window');
 
         StepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
 
         // Avoiding - Element is not clickable at point (-9553, -9859)
         await browser.sleep(PageHelper.timeout.s);

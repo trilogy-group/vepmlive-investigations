@@ -105,7 +105,7 @@ export class WorkspacePageHelper {
 
     static async clickOnCloseButton() {
         StepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
         StepLogger.step(`click on Close button`);
         await PageHelper.click(CommonPage.ribbonItems.close);
     }

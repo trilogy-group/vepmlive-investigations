@@ -64,7 +64,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             'OK button' +
             'Cancel button');
         await browser.sleep(PageHelper.timeout.s);
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.createColumnTabLabel.nameAndType))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.createColumnTabLabel.nameAndType));
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.createColumnTabLabel.additionalColumnSetting)).toBe

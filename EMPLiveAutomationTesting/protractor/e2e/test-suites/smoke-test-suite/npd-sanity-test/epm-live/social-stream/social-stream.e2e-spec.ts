@@ -188,7 +188,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         // #4 and #5 step are inside the function
         StepLogger.step('Click in Choose file button displayed in Choose a file row in Add a document popup' +
             'Search and select the file to upload [Ex: Testwordfile.docx] and click Open button');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
         await PageHelper.uploadFile(CommonPage.browseButton, newFile.fullFilePath);
 
         // Selected file name is displayed on right side of Choose file button is not possible.

@@ -35,7 +35,7 @@ describe(SuiteNames.regressionTestSuite, () => {
             .toBe(MyTimeOffPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(MyTimeOffPageConstants.pageName));
 
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
 
         StepLogger.step(`Enter/Select below details in 'My Time Off' page`);
         const uniqueId = PageHelper.getUniqueId();

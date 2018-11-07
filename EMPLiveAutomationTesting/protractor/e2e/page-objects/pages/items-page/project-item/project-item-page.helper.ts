@@ -200,7 +200,7 @@ export class ProjectItemPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.editTeamDialog));
 
         StepLogger.step('Switch to frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
     }
 
     static async createTask(uniqueId: string, finishDate: string) {
@@ -313,7 +313,7 @@ export class ProjectItemPageHelper {
 
     static async selectPlannerIfPopUpAppears(planner: ElementFinder) {
         if (await element.all(By.tagName('iframe')).count() >= 1) {
-            await PageHelper.switchToFrame(CommonPage.contentFrame);
+            await CommonPageHelper.switchToContentFrame();
             await PageHelper.click(planner);
             await PageHelper.switchToDefaultContent();
         }

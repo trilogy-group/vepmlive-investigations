@@ -3,13 +3,13 @@ import {PageHelper} from '../../../../../components/html/page-helper';
 import {EditCost} from './edit-cost.po';
 import {CommonPageHelper} from '../../../common/common-page.helper';
 import {CommonPage} from '../../../common/common.po';
-import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {EditCostConstants} from './edit-cost.constants';
 import {HomePage} from '../../../homepage/home.po';
 import {HomePageConstants} from '../../../homepage/home-page.constants';
 import {ExpectationHelper} from '../../../../../components/misc-utils/expectation-helper';
 import {CommonPageConstants} from '../../../common/common-page.constants';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import {WaitHelper} from '../../../../../components/html/wait-helper';
 
 export class EditCostHelper {
 
@@ -75,10 +75,10 @@ export class EditCostHelper {
     }
 
     static async clickCloseCostPlanner() {
-        StepLogger.step('Click Close Button ');
-        await WaitHelper.staticWait(PageHelper.timeout.s);
-
-        await PageHelper.click(CommonPage.ribbonItems.close);
+        StepLogger.step('Click Close Button');
+        await WaitHelper.waitForElementToBeHidden(EditCost.veil);
+        await PageHelper.click(EditCost.close);
+        await CommonPageHelper.acceptAlertIfPresent();
     }
 
     static async validateEditCostIsDisabled() {

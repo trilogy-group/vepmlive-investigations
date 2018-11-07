@@ -185,8 +185,12 @@ export class PageHelper {
      * @returns {any}
      */
     static async click(targetElement: ElementFinder) {
-        await WaitHelper.waitForElementToBePresent(targetElement);
-        await ElementHelper.clickUsingJs(targetElement);
+        await WaitHelper.waitForElementToBeClickable(targetElement);
+        try {
+            targetElement.click();
+        } catch (e) {
+            await ElementHelper.clickUsingJs(targetElement);
+        }
     }
 
     static async clickIfPresent(targetElement: ElementFinder) {
@@ -410,15 +414,6 @@ export class PageHelper {
         return await browser.switchTo().alert().getText();
     }
 
-    /**
-     * Wait for an alert to appear
-     * @param {number} timeout in milliseconds
-     * @param {string} message
-     */
-    public static async waitForAlertToBePresent(timeout: number = PageHelper.DEFAULT_TIMEOUT, message: string = 'Alert is not present') {
-        return await browser.wait(this.EC.alertIsPresent(), timeout, message);
-    }
-
     public static async sleepForXSec(milliseconds: number) {
         await browser.sleep(milliseconds);
     }
@@ -480,5 +475,10 @@ export class PageHelper {
 
     static async isAlertPresent() {
         return await browser.wait(this.EC.alertIsPresent(), 1000).then(() => true).catch(() => false);
+    }
+
+    public static async waitForAlertToBePresent( timeout: number = PageHelper.DEFAULT_TIMEOUT,
+                                                 message: string = 'Alert is not present') {
+        return await browser.wait(this.EC.alertIsPresent(), timeout, message).then(() => true, () => false);
     }
 }

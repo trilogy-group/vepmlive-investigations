@@ -58,7 +58,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         StepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
 
         // If we able to access Close button under Build Team tab that means Build tab is selected
         StepLogger.verification('"Build Team" tab is selected by default');
@@ -122,7 +122,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         StepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
 
         // If we able to access Close button under Build Team tab that means Build tab is selected
         StepLogger.verification('"Build Team" tab is selected by default');

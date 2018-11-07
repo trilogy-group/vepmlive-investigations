@@ -179,7 +179,8 @@ export class CommonPageHelper {
     }
 
     static async switchToFirstContentFrame() {
-        return PageHelper.switchToFrame(CommonPage.contentFrame);
+        await WaitHelper.waitForElementToBePresent(CommonPage.contentFrame);
+        return PageHelper.switchToFrame(CommonPage.contentFrame.getWebElement());
     }
 
     static getAutoCompleteItemByDescription(description: string) {
@@ -202,7 +203,7 @@ export class CommonPageHelper {
 
     static getPageHeaderByTitle(title: string, isContains = false) {
         const xpath = `//*[@id='${CommonPage.titleId}']//*[${ComponentHelpers.getXPathFunctionForDot(title, isContains)}]`;
-        return element(By.xpath(xpath));
+        return element.all(By.xpath(xpath)).first();
     }
 
     static getActionMenuIcons(title: string) {
@@ -328,7 +329,7 @@ export class CommonPageHelper {
     }
 
     static getMenuItemFromRibbonContainer(title: string) {
-        return element(By.css(`#RibbonContainer li[title="${title}"] span`));
+        return element.all(By.css(`#RibbonContainer li[title="${title}"] span`)).first();
     }
 
     static async refreshPageIfRibbonElementIsDisable(targetElement: ElementFinder, item = CommonPage.record) {
@@ -400,6 +401,7 @@ export class CommonPageHelper {
 
     static async clickEditCost() {
         StepLogger.step('Select "Edit Cost" from the options displayed');
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editCost);
         await PageHelper.click(CommonPage.ribbonItems.editCost);
     }
 
@@ -419,7 +421,7 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.resourceAnalyzer);
         await WaitHelper.waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
         await PageHelper.switchToDefaultContent();
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
         await WaitHelper.staticWait(PageHelper.timeout.xs);
         await ResourceAnalyzerPageHelper.clickDisplayButton();
         await PageHelper.acceptAlert();
@@ -619,7 +621,7 @@ export class CommonPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
         StepLogger.stepId(7);
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
         StepLogger.step('Click on "Choose Files" and select the file that needs to be attached');
         await PageHelper.uploadFile(browseFileControl, newFile.fullFilePath);
@@ -650,7 +652,7 @@ export class CommonPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(addWindowTitle));
 
         StepLogger.step('Switch to frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
 
         StepLogger.stepId(4);
         StepLogger.step(`Click on "Choose Files" button in "${addWindowTitle}" pop up`);
@@ -700,10 +702,9 @@ export class CommonPageHelper {
 
     static async switchToContentFrame() {
         StepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
-
-        // Avoiding - Element is not able to click at point (-9553, -9859)
-        await browser.sleep(PageHelper.timeout.m);
+        await WaitHelper.waitForElementToBePresent(CommonPage.contentFrame);
+        await PageHelper.switchToFrame(CommonPage.contentFrame.getWebElement());
+        await browser.sleep(PageHelper.timeout.xs);
     }
 
     static getPublicView(text: string) {
@@ -794,8 +795,7 @@ export class CommonPageHelper {
 
     static async labelDisplayedValidation(targetElement: ElementFinder, name: string, expectedResult = true) {
         await WaitHelper.waitForElementToBeDisplayed(targetElement);
-        await expect(await PageHelper.isElementPresent(targetElement))
-            .toBe(expectedResult,
+        await expect(await PageHelper.isElementDisplayed(targetElement)).toBe(expectedResult,
                 ValidationsHelper.getLabelDisplayedValidation(name));
     }
 
@@ -862,7 +862,7 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.resourceAnalyzer);
         await WaitHelper.waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
         await PageHelper.switchToDefaultContent();
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
         await WaitHelper.staticWait(PageHelper.timeout.xs);
     }
 
@@ -968,5 +968,16 @@ export class CommonPageHelper {
     static async clickEditResourcePlan() {
         StepLogger.step('Click on Edit Resource Plan');
         await CommonPageHelper.getContextMenuItemByText(CommonPageConstants.contextMenuOptions.editResource);
+    }
+
+    public static async acceptAlertIfPresent( timeout: number = PageHelper.timeout.m,
+                                              message: string = 'Alert is not present') {
+        const isPresent = await PageHelper.waitForAlertToBePresent(timeout, message);
+        if (isPresent) {
+            await browser.switchTo().alert().accept();
+            return await browser.switchTo().defaultContent();
+        } else {
+            console.log('Alert is not present');
+        }
     }
 }
