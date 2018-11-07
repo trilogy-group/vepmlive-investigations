@@ -397,6 +397,7 @@ export class PageHelper {
     }
 
     public static async getAlertText() {
+        await this.waitForAlertToBePresent();
         return await browser.switchTo().alert().getText();
     }
 

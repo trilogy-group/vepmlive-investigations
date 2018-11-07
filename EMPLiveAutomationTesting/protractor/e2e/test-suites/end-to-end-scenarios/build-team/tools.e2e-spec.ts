@@ -40,6 +40,7 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.step('Click on the Ellipses button (...)');
         await PageHelper.click(CommonPage.ellipse);
+        await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.contextMenu);
 
         StepLogger.step('select "Edit Team" from the options displayed');
         await PageHelper.click(CommonPage.contextMenuOptions.editTeam);
@@ -64,7 +65,8 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.step('Verify Reporting Services page will be displayed with below fields');
         StepLogger.step('Verify "Period Start"');
-        await PageHelper.switchToNewTabIfAvailable(2);
+        await WaitHelper.staticWait(PageHelper.timeout.s);
+        await PageHelper.switchToNewTabIfAvailable(1);
         await WaitHelper.waitForElementToBePresent(ProjectItemPage.reportParameters.periodStart);
         await expect(await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.reportParameters.periodStart))
             .toBe(true,
@@ -162,7 +164,8 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.step('Verify Reporting Services page will be displayed with below fields');
         StepLogger.step('Verify "Resource"');
-        await PageHelper.switchToNewTabIfAvailable(2);
+        await WaitHelper.staticWait(PageHelper.timeout.s);
+        await PageHelper.switchToNewTabIfAvailable();
         await WaitHelper.waitForElementToBePresent(ProjectItemPage.reportParameters.resource);
         await expect(await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.reportParameters.resource))
             .toBe(true,
@@ -336,6 +339,7 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.step('Click on the Ellipses button (...)');
         await PageHelper.click(CommonPage.ellipse);
+        await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.contextMenu);
 
         StepLogger.step('select "Edit Team" from the options displayed');
         await PageHelper.click(CommonPage.contextMenuOptions.editTeam);
@@ -360,7 +364,8 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.step('Verify Reporting Services page will be displayed with below fields');
         StepLogger.step('Verify "Project Name"');
-        await PageHelper.switchToNewTabIfAvailable(2);
+        await WaitHelper.staticWait(PageHelper.timeout.s);
+        await PageHelper.switchToNewTabIfAvailable();
         await WaitHelper.waitForElementToBePresent(ProjectItemPage.reportParameters.projectName);
         await expect(await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.reportParameters.projectName))
             .toBe(true,
@@ -425,6 +430,7 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.step('Click on the Ellipses button (...)');
         await PageHelper.click(CommonPage.ellipse);
+        await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.contextMenu);
 
         StepLogger.step('select "Edit Team" from the options displayed');
         await PageHelper.click(CommonPage.contextMenuOptions.editTeam);
@@ -448,7 +454,8 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.step('Verify Reporting Services page will be displayed with below fields');
         StepLogger.step('Verify "Resources"');
-        await PageHelper.switchToNewTabIfAvailable(2);
+        await WaitHelper.staticWait(PageHelper.timeout.s);
+        await PageHelper.switchToNewTabIfAvailable();
         await WaitHelper.waitForElementToBePresent(ProjectItemPage.reportParameters.resources);
         await expect(await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.reportParameters.resources))
             .toBe(true,
