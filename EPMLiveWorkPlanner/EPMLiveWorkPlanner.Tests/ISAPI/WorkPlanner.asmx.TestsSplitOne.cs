@@ -65,7 +65,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private const string StatusString = "Status";
         private const string ItemString = "Item";
         private const string UserString = "User";
-        private const string AccountInfpString = "SPAccountInfo";
+        private const string AccountInfoString = "SPAccountInfo";
         private const string TaskUidString = "taskuid";
         private const string CommentCountString = "CommentCount";
         private const string AttachmentsString = "Attachments";
@@ -139,6 +139,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             ShimSPList.AllInstances.GetItemsSPQuery = (_, __) => spListItemCollection;
             ShimSPPersistedObject.AllInstances.IdGet = _ => guid;
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
+            ShimSPFieldUserValueCollection.ConstructorSPWebString = (_, _1, _2) => new ShimSPFieldUserValueCollection();
         }
 
         private void SetupVariables()
@@ -191,11 +192,13 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 ItemGetString = _ => DummyString,
                 ItemSetGuidObject = (_, __) => { },
                 Update = () => { },
-                FileGet = () => spFile
+                FileGet = () => spFile,
+                ParentListGet = () => spList
             };
             spFieldCollection = new ShimSPFieldCollection()
             {
-                GetFieldByInternalNameString = _ => spField
+                GetFieldByInternalNameString = _ => spField,
+                ContainsFieldString = _ => false
             };
             spField = new ShimSPField()
             {
@@ -793,10 +796,10 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             resourceDataSet.Tables.Add(new DataTable());
             resourceDataSet.Tables.Add(new DataTable());
             resourceDataSet.Tables[2].Columns.Add(IDStringCaps);
-            resourceDataSet.Tables[2].Columns.Add(AccountInfpString);
+            resourceDataSet.Tables[2].Columns.Add(AccountInfoString);
             row = resourceDataSet.Tables[2].NewRow();
             row[IDStringCaps] = DummyString;
-            row[AccountInfpString] = DummyString;
+            row[AccountInfoString] = DummyString;
 
             spWeb.AllowUnsafeUpdatesSetBoolean = _ =>
             {

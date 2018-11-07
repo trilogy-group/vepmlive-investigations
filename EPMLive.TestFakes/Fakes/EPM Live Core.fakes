@@ -118,6 +118,8 @@
     <Add Namespace="EPMLiveCore.Integrations.Salesforce!"/>
     <Add FullName="EPMLiveCore.CascadingLookupField!"/>
     <Add FullName="EPMLiveCore.CascadingLookupFieldSettings!"/>
+    <Add FullName="EPMLiveCore.ViewPermissionPage!"/>
+    <Add FullName="EPMLiveCore.ViewPermissionUtil!"/>
     <Add FullName="EPMLiveCore.tpreport!"/>
   </ShimGeneration>
 </Fakes>
