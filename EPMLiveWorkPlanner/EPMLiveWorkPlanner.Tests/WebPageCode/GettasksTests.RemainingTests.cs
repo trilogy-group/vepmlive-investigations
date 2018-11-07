@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Globalization;
 using System.Xml;
 using EPMLiveCore.Fakes;
 using EPMLiveWorkPlanner.Fakes;
@@ -121,13 +122,13 @@ namespace EPMLiveWorkPlanner.Tests.WebPageCode
         private static void SetupUsersAndGroups()
         {
             ShimSPWeb.AllInstances.GroupsGet = _ => new ShimSPGroupCollection().Bind(new SPGroup[]
-                        {
+            {
                 new ShimSPGroup
                 {
                     NameGet = () => GroupName,
                     IDGet = () => DummyInt
                 }
-                        });
+            });
             ShimSPWeb.AllInstances.UsersGet = _ => new ShimSPUserCollection().Bind(new SPUser[]
             {
                 new ShimSPUser
@@ -185,7 +186,9 @@ namespace EPMLiveWorkPlanner.Tests.WebPageCode
             Shimgettasks.AllInstances.getRealFieldSPField = (_, field) => new ShimSPField
             {
                 InternalNameGet = () => field.InternalName,
-                ReadOnlyFieldGet = () => field.InternalName == ReadOnlyField1 || field.InternalName == ReadOnlyField2 || field.InternalName == ReadOnlyField3,
+                ReadOnlyFieldGet = () => field.InternalName == ReadOnlyField1 || 
+                    field.InternalName == ReadOnlyField2 || 
+                    field.InternalName == ReadOnlyField3,
                 TypeGet = () =>
                 {
                     switch(field.InternalName)
@@ -281,7 +284,7 @@ namespace EPMLiveWorkPlanner.Tests.WebPageCode
                 NoteField,
                 TextField
             });
-            ShimSPWeb.AllInstances.LocaleGet = _ => new System.Globalization.CultureInfo(1033);
+            ShimSPWeb.AllInstances.LocaleGet = _ => new CultureInfo(1033);
             ShimSPList.AllInstances.FieldsGet = _ => new ShimSPFieldCollection();
             ShimSPList.AllInstances.ItemsGet = _ => new ShimSPListItemCollection().Bind(new SPListItem[]
             {
