@@ -46,7 +46,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await ExpectationHelper.verifyText(MyWorkPage.getCurrentView, MyWorkPageConstants.currentView, viewName);
     });
 
-    it('Verify that View should be renamed - [744291]', async () => {
+    fit('Verify that View should be renamed - [744291]', async () => {
         StepLogger.caseId = 744291;
         // Step 1 are inside below function
         StepLogger.stepId(1);
@@ -71,6 +71,11 @@ describe(SuiteNames.regressionTestSuite, () => {
         await PageHelper.acceptAlert();
         // Takes time update current view
         await browser.sleep(PageHelper.timeout.xs);
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.myWork,
+            CommonPage.pageHeaders.myWorkplace.myWork,
+            CommonPageConstants.pageHeaders.myWorkplace.myWork,
+        );
         await ExpectationHelper.verifyText(MyWorkPage.getCurrentView,
             MyWorkPageConstants.currentView, viewNewName);
     });
