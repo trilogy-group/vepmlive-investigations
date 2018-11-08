@@ -482,8 +482,8 @@ namespace Dashboard
 
             projectList = site.Lists["Project Center"];
 
-            string noTasksListFound;
-            if (GetTasksLists(out noTasksListFound))
+            string noTasksListFound = string.Empty;
+            if (GetTasksLists(ref noTasksListFound))
             {
                 return noTasksListFound;
             }
@@ -606,7 +606,7 @@ namespace Dashboard
             }
         }
 
-        private bool GetTasksLists(out string noTasksListFound)
+        private bool GetTasksLists(ref string noTasksListFound)
         {
             try
             {
@@ -646,8 +646,7 @@ namespace Dashboard
 
         private void AddRiskStatusColumn()
         {
-            BoundField colTitle;
-            colTitle = new BoundField
+            var colTitle = new BoundField
             {
                 DataField = "riskstatus",
                 HeaderText = "Risk Status",
@@ -660,8 +659,7 @@ namespace Dashboard
 
         private void AddIssueStatusColumn()
         {
-            BoundField colTitle;
-            colTitle = new BoundField
+            var colTitle = new BoundField
             {
                 DataField = "issuestatus",
                 HeaderText = "Issue Status",
@@ -674,8 +672,7 @@ namespace Dashboard
 
         private void AddScheduleStatusColumn()
         {
-            BoundField colTitle;
-            colTitle = new BoundField
+            var colTitle = new BoundField
             {
                 DataField = "schedulestatus",
                 HeaderText = "Schedule Status",
@@ -688,8 +685,7 @@ namespace Dashboard
 
         private void AddLateTasksColumn()
         {
-            BoundField colTitle;
-            colTitle = new BoundField
+            var colTitle = new BoundField
             {
                 DataField = "latetasks",
                 HeaderText = "# of Late Tasks"
@@ -701,8 +697,7 @@ namespace Dashboard
 
         private void AddPercentCompleteColumn()
         {
-            BoundField colTitle;
-            colTitle = new BoundField
+            var colTitle = new BoundField
             {
                 DataField = "pctcomplete",
                 HeaderText = "% Complete"
@@ -714,8 +709,7 @@ namespace Dashboard
 
         private void AddFinishColumn()
         {
-            BoundField colTitle;
-            colTitle = new BoundField
+            var colTitle = new BoundField
             {
                 DataField = "finish",
                 HeaderText = "Finish"
@@ -725,8 +719,7 @@ namespace Dashboard
 
         private void AddStartColumn()
         {
-            BoundField colTitle;
-            colTitle = new BoundField
+            var colTitle = new BoundField
             {
                 DataField = "start",
                 HeaderText = "Start",
