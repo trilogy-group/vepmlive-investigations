@@ -6,7 +6,7 @@ namespace Dashboard
 {
     public static class TaskHelper
     {
-        public static void GetTaskCount(
+        internal static void GetTaskCount(
             SPList spList,
             string project,
             ref int taskCount,
@@ -19,6 +19,11 @@ namespace Dashboard
             ref int milestoneCurrent,
             ref int taskCurrent)
         {
+            if (spList == null)
+            {
+                throw new ArgumentNullException(nameof(spList));
+            }
+
             var query = new SPQuery();
             query.Query = string.Format("<Where><Eq><FieldRef Name='Project'/><Value Type='Text'>{0}</Value></Eq></Where>", project);
 
