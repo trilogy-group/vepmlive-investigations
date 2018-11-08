@@ -115,7 +115,9 @@ function Test-ADCredential {
         Write-Warning 'Test-ADCredential: Please specify both user name and password'
     } else {
         Add-Type -AssemblyName System.DirectoryServices.AccountManagement
-		$CurrentDomain = 'LDAP://'+([ADSI]"").distinguishedName
+		$Root = [ADSI]"LDAP://RootDSE"
+		$Domain = $Root.Get("rootDomainNamingContext")
+		$CurrentDomain = 'LDAP://'+ $Domain
 		Write-Host "Current Domain: $CurrentDomain"
         $dom = New-Object System.DirectoryServices.DirectoryEntry($CurrentDomain,$UserName,$Password)
 		$res =  $dom.name

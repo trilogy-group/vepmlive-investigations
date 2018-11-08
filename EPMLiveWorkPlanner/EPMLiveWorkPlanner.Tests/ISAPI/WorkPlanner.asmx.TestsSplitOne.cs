@@ -41,10 +41,16 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private ShimSPListItem spListItem;
         private ShimSPFieldCollection spFieldCollection;
         private ShimSPField spField;
-        private ShimSPFolder spFolder;
         private ShimSPFolderCollection spFolderCollection;
-        private ShimSPFile spFile;
+        private ShimSPFolder spFolder;
         private ShimSPFileCollection spFileCollection;
+        private ShimSPFile spFile;
+        private ShimSPViewCollection spViewCollection;
+        private ShimSPView spView;
+        private ShimSPViewFieldCollection spViewFieldCollection;
+        private ShimSPFieldLinkCollection spFieldLinkCollection;
+        private ShimSPContentTypeCollection spContentTypeCollection;
+        private ShimSPContentType spContentType;
         private Guid guid;
         private int validations;
         private const int DummyInt = 1;
@@ -59,7 +65,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private const string StatusString = "Status";
         private const string ItemString = "Item";
         private const string UserString = "User";
-        private const string AccountInfpString = "SPAccountInfo";
+        private const string AccountInfoString = "SPAccountInfo";
         private const string TaskUidString = "taskuid";
         private const string CommentCountString = "CommentCount";
         private const string AttachmentsString = "Attachments";
@@ -133,6 +139,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             ShimSPList.AllInstances.GetItemsSPQuery = (_, __) => spListItemCollection;
             ShimSPPersistedObject.AllInstances.IdGet = _ => guid;
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
+            ShimSPFieldUserValueCollection.ConstructorSPWebString = (_, _1, _2) => new ShimSPFieldUserValueCollection();
         }
 
         private void SetupVariables()
@@ -158,7 +165,8 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spListCollection = new ShimSPListCollection()
             {
                 TryGetListString = _ => spList,
-                ItemGetString = _ => spList
+                ItemGetString = _ => spList,
+                ItemGetGuid = _ => spList
             };
             spList = new ShimSPList()
             {
@@ -166,7 +174,11 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 FieldsGet = () => spFieldCollection,
                 GetItemByIdInt32 = _ => spListItem,
                 GetItemsSPQuery = _ => spListItemCollection,
-                RootFolderGet = () => spFolder
+                RootFolderGet = () => spFolder,
+                ParentWebGet = () => spWeb,
+                DefaultViewGet = () => spView,
+                ViewsGet = () => spViewCollection,
+                ContentTypesGet = () => spContentTypeCollection
             };
             spListItemCollection = new ShimSPListItemCollection()
             {
@@ -180,11 +192,13 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 ItemGetString = _ => DummyString,
                 ItemSetGuidObject = (_, __) => { },
                 Update = () => { },
-                FileGet = () => spFile
+                FileGet = () => spFile,
+                ParentListGet = () => spList
             };
             spFieldCollection = new ShimSPFieldCollection()
             {
-                GetFieldByInternalNameString = _ => spField
+                GetFieldByInternalNameString = _ => spField,
+                ContainsFieldString = _ => false
             };
             spField = new ShimSPField()
             {
@@ -220,6 +234,23 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 OpenBinaryStream = () => null,
                 NameGet = () => DummyString,
                 GetListItemStringArray = _ => spListItem
+            };
+            spViewCollection = new ShimSPViewCollection()
+            {
+                ItemGetString = _ => spView
+            };
+            spView = new ShimSPView()
+            {
+                ViewFieldsGet = () => spViewFieldCollection
+            };
+            spViewFieldCollection = new ShimSPViewFieldCollection();
+            spContentTypeCollection = new ShimSPContentTypeCollection()
+            {
+                ItemGetString = _ => spContentType
+            };
+            spContentType = new ShimSPContentType()
+            {
+                FieldLinksGet = () => spFieldLinkCollection
             };
         }
 
@@ -765,10 +796,10 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             resourceDataSet.Tables.Add(new DataTable());
             resourceDataSet.Tables.Add(new DataTable());
             resourceDataSet.Tables[2].Columns.Add(IDStringCaps);
-            resourceDataSet.Tables[2].Columns.Add(AccountInfpString);
+            resourceDataSet.Tables[2].Columns.Add(AccountInfoString);
             row = resourceDataSet.Tables[2].NewRow();
             row[IDStringCaps] = DummyString;
-            row[AccountInfpString] = DummyString;
+            row[AccountInfoString] = DummyString;
 
             spWeb.AllowUnsafeUpdatesSetBoolean = _ =>
             {
