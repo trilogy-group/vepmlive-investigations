@@ -663,7 +663,15 @@ namespace Dashboard
                 out riskStatus,
                 out issueStatus);
 
-            dt.Rows.Add(title, start.ToShortDateString(), finish.ToShortDateString(), $"{percentComplete}%", taskCount.ToString(), schedulestatus, issueStatus, riskStatus);
+            dt.Rows.Add(
+                title,
+                start.ToShortDateString(),
+                finish.ToShortDateString(),
+                $"{percentComplete}%",
+                taskCount.ToString(),
+                schedulestatus,
+                issueStatus,
+                riskStatus);
         }
 
         private string getIssueStatus(string project)

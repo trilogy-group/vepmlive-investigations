@@ -40,14 +40,6 @@ namespace Dashboard
                 catch (Exception ex)
                 {
                     Trace.TraceError("Exception Suppressed {0}", ex);
-                    try
-                    {
-                        tskStart = DateTime.Parse(task["StartDate"].ToString());
-                    }
-                    catch (Exception innerEx)
-                    {
-                        Trace.TraceError("Exception Suppressed {0}", innerEx);
-                    }
                 }
                 try
                 {
