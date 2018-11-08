@@ -274,6 +274,12 @@ namespace PortfolioEngineCore
             Utilities.ArgumentIsNotNull(workHourGroups, nameof(workHourGroups));
             Utilities.ArgumentIsNotNull(holidayGroups, nameof(holidayGroups));
 
+            SqlParameter p_wres = sqlCommand.Parameters.Add("@WresId", SqlDbType.Int);
+            SqlParameter p_wi = sqlCommand.Parameters.Add("@WI", SqlDbType.NVarChar, 255);
+            SqlParameter p_wiext = sqlCommand.Parameters.Add("@WIExtId", SqlDbType.Int);
+            SqlParameter p_date = sqlCommand.Parameters.Add("@date", SqlDbType.Date);
+            SqlParameter p_hours = sqlCommand.Parameters.Add("@hours", SqlDbType.Float);
+
             var listResources = workItem.GetList("Resource");
 
             foreach (var resource in listResources)
@@ -308,11 +314,11 @@ namespace PortfolioEngineCore
                     {
                         if (getWorkHours > 0)
                         {
-                            sqlCommand.Parameters.Add("@WresId", SqlDbType.Int).Value = resourceId;
-                            sqlCommand.Parameters.Add("@WI", SqlDbType.NVarChar, 255).Value = workItemName;
-                            sqlCommand.Parameters.Add("@WIExtId", SqlDbType.Int).Value = sourceId;
-                            sqlCommand.Parameters.Add("@date", SqlDbType.Date).Value = thisDate;
-                            sqlCommand.Parameters.Add("@hours", SqlDbType.Float).Value = getWorkHours;
+                            p_wres.Value = resourceId;
+                            p_wi.Value = workItemName;
+                            p_wiext.Value = sourceId;
+                            p_date.Value = thisDate;
+                            p_hours.Value = getWorkHours;
                             var affectedRows = sqlCommand.ExecuteNonQuery();
                             totalRows += affectedRows;
                         }
