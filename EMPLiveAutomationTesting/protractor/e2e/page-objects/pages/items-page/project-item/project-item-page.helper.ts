@@ -149,6 +149,7 @@ export class ProjectItemPageHelper {
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
         StepLogger.step('Click on Project record');
+        await ElementHelper.actionHoverOver(CommonPageHelper.getRowForTableData(firstTableColumns));
         await PageHelper.click(CommonPageHelper.getRowForTableData(firstTableColumns));
     }
 
@@ -234,9 +235,12 @@ export class ProjectItemPageHelper {
         StepLogger.step('Navigate and open specific project page');
         await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue);
 
+        StepLogger.step('Click on "Items" tab');
+        await PageHelper.click(CommonPage.ribbonTitles.items);
+
         StepLogger.step('Select "Edit Team" from the options displayed');
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
-        await PageHelper.click(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeamButton);
+        await PageHelper.click(CommonPage.ribbonItems.editTeamButton);
 
         StepLogger.step('Wait for Build Team Page to open');
         await ProjectItemPageHelper.waitForBuildTeamPageToOpenAndSwitchToPage();
@@ -247,9 +251,10 @@ export class ProjectItemPageHelper {
         const projectNameValue = `${labels.projectName} ${uniqueId}`;
 
         StepLogger.step('Select a user from resource pool and add');
-        const userCheckBoxForResourcePool = await ProjectItemPage.getUserCheckBoxForTeamType(
-            ProjectItemPageConstants.buildTeamContentIDs.resourcePool, ProjectItemPageConstants.nonAdminUser);
-        await CheckboxHelper.markCheckbox(userCheckBoxForResourcePool, true);
+        // const userCheckBoxForResourcePool = await ProjectItemPage.getUserCheckBoxForTeamType(
+        //     ProjectItemPageConstants.buildTeamContentIDs.resourcePool, ProjectItemPageConstants.nonAdminUser);
+        // await CheckboxHelper.markCheckbox(userCheckBoxForResourcePool, true);
+        await CheckboxHelper.markCheckbox(ProjectItemPage.getFirstUserCheckBox, true);
 
         StepLogger.step('Click on Add resource');
         await PageHelper.click(CommonPage.formButtons.add);
@@ -271,9 +276,12 @@ export class ProjectItemPageHelper {
         StepLogger.step('Navigate and open specific project page');
         await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue);
 
+        StepLogger.step('Click on "Items" tab');
+        await PageHelper.click(CommonPage.ribbonTitles.items);
+
         StepLogger.step('Select "Edit Team" from the options displayed');
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
-        await PageHelper.click(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeamButton);
+        await PageHelper.click(CommonPage.ribbonItems.editTeamButton);
 
         StepLogger.step('Wait for Build Team Page to open');
         await ProjectItemPageHelper.waitForBuildTeamPageToOpenAndSwitchToPage();

@@ -1,4 +1,5 @@
 import {CommonPageConstants} from '../../common/common-page.constants';
+import {LoginPageHelper} from '../../login/login-page.helper';
 
 export class MyTimeOffPageConstants {
     static readonly pagePrefix = 'Time Off';
@@ -17,7 +18,7 @@ export class MyTimeOffPageConstants {
 
     static get inputValues() {
         return {
-            requestorValue: 'admint01',
+            requestorValue: `${LoginPageHelper.adminEmailId}`,
             startDate: '1/1/2019',
             finishDate: '2/1/2019'
         };

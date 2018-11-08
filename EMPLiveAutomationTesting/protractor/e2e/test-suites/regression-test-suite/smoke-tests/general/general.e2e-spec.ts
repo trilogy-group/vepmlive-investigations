@@ -19,7 +19,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    it('Check behavior of "Save and Close" button - [743175]', async () => {
+    fit('Check behavior of "Save and Close" button - [743175]', async () => {
         StepLogger.caseId = 743175;
         const uniqueId = PageHelper.getUniqueId();
 

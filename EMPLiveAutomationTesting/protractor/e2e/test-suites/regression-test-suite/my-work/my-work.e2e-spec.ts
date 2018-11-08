@@ -46,7 +46,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await ExpectationHelper.verifyText(MyWorkPage.getCurrentView, MyWorkPageConstants.currentView, viewName);
     });
 
-    fit('Verify that View should be renamed - [744291]', async () => {
+    it('Verify that View should be renamed - [744291]', async () => {
         StepLogger.caseId = 744291;
         // Step 1 are inside below function
         StepLogger.stepId(1);

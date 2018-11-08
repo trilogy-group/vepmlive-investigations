@@ -385,4 +385,9 @@ export class ProjectItemPage extends BasePage {
         //parent::td//parent::tr/td[contains(@class,"GMCellPanel")]`;
         return element(By.xpath(xpathForUser));
     }
+
+    static get getFirstUserCheckBox() {
+        const xpathForUser = `//*/table[@id='ResourceGrid']//*/tr[@class='GMDataRow ']/td[2]`;
+        return element(By.xpath(xpathForUser));
+    }
 }
