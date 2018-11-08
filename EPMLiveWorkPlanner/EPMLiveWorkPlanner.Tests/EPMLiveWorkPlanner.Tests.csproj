@@ -89,6 +89,7 @@
     <Compile Include="ISAPI\WorkPlanner.asmx.TestsSplitTwo.cs" />
     <Compile Include="Layouts\epmlive\WorkPlanner.aspx.Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebPageCode\GettasksTests.RemainingTests.cs" />
     <Compile Include="WebPageCode\UpdatetaskTests.cs" />
     <Compile Include="WebPageCode\GettasksTests.cs" />
     <Compile Include="WorkPlannerAPITests.cs" />
