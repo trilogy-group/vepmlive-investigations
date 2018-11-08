@@ -56,16 +56,16 @@ namespace EPMLiveReportsAdmin
 
                         string[] sItemInfo = sItem.Split('.');
 
-                        bool found = false;
+                        var found = false;
 
                         using (var cmd = new SqlCommand("SELECT * FROM ROLLUPQUEUE WHERE listid=@listid and itemid = @itemid and status = 0", connection))
                         {
                             cmd.Parameters.AddWithValue("@listid", sItemInfo[1]);
                             cmd.Parameters.AddWithValue("@itemid", sItemInfo[0]);
 
-                            using (var dr = cmd.ExecuteReader())
+                            using (var dataReader = cmd.ExecuteReader())
                             {
-                                if (dr.Read())
+                                if (dataReader.Read())
                                 {
                                     found = true;
                                 }

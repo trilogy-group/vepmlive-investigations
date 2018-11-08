@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EPMLiveCore.Fakes;
 using EPMLiveReportsAdmin;
 using Microsoft.QualityTools.Testing.Fakes;
@@ -19,6 +15,7 @@ namespace EPMLiveReporting.Tests
     [TestClass, ExcludeFromCodeCoverage]
     public class ParentItemUpdateTests
     {
+        private const string DummyString = "DummyString";
         private IDisposable _shimsContext;
         private bool _isConnectionOpenedCalled;
         private bool _isConnectionDisposeCalled;
@@ -87,7 +84,7 @@ namespace EPMLiveReporting.Tests
 
             ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Lookup;
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => fields.GetEnumerator();
-            ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => "DummyString";
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => DummyString;
             ShimCoreFunctions.getConnectionStringGuid = _ => string.Empty;
             ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => 0;
             ShimSPFieldLookupValue.ConstructorString = (_, __) => new ShimSPFieldLookupValue();
@@ -132,7 +129,7 @@ namespace EPMLiveReporting.Tests
                     {
                         ItemGetGuid = _ => new ShimSPList()
                         {
-                            TitleGet = () => "DummyString",
+                            TitleGet = () => DummyString,
                             IDGet = () => Guid.Empty
                         }
                     }
