@@ -149,6 +149,7 @@ export class ProjectItemPageHelper {
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
         StepLogger.step('Click on Project record');
+        await PageHelper.sleepForXSec(PageHelper.timeout.xs);
         await ElementHelper.actionHoverOver(CommonPageHelper.getRowForTableData(firstTableColumns));
         await PageHelper.click(CommonPageHelper.getRowForTableData(firstTableColumns));
     }
@@ -195,8 +196,8 @@ export class ProjectItemPageHelper {
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
-            .toBe(ProjectItemPageConstants.buildTeamPage,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.buildTeamPage));
+            .toBe(ProjectItemPageConstants.editTeamDialog,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.editTeamDialog));
 
         StepLogger.step('Switch to frame');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
@@ -253,8 +254,9 @@ export class ProjectItemPageHelper {
         StepLogger.step('Select a user from resource pool and add');
         // const userCheckBoxForResourcePool = await ProjectItemPage.getUserCheckBoxForTeamType(
         //     ProjectItemPageConstants.buildTeamContentIDs.resourcePool, ProjectItemPageConstants.nonAdminUser);
-        // await CheckboxHelper.markCheckbox(userCheckBoxForResourcePool, true);
-        await CheckboxHelper.markCheckbox(ProjectItemPage.getFirstUserCheckBox, true);
+        const userCheckBoxForResourcePool = ProjectItemPage.getResourcePoolFirstUserCheckBox;
+        const userNameForResourcePool = await PageHelper.getText(ProjectItemPage.getResourcePoolFirstUserLabelLink);
+        await CheckboxHelper.markCheckbox(userCheckBoxForResourcePool, true);
 
         StepLogger.step('Click on Add resource');
         await PageHelper.click(CommonPage.formButtons.add);
@@ -269,9 +271,9 @@ export class ProjectItemPageHelper {
 
         await PageHelper.switchToDefaultContent();
 
-        StepLogger.verification('Verify Project page is displayed');
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(projectNameValue)))
-            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
+        // StepLogger.verification('Verify Project page is displayed');
+        // await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(projectNameValue)))
+        //     .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
 
         StepLogger.step('Navigate and open specific project page');
         await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue);
@@ -287,8 +289,9 @@ export class ProjectItemPageHelper {
         await ProjectItemPageHelper.waitForBuildTeamPageToOpenAndSwitchToPage();
 
         StepLogger.verification('Verify User is moved under Current team');
-        const userCheckBoxForCurrentTeam = await ProjectItemPage.getUserCheckBoxForTeamType(
-            ProjectItemPageConstants.buildTeamContentIDs.currentTeam, ProjectItemPageConstants.nonAdminUser);
+        // const userCheckBoxForCurrentTeam = await ProjectItemPage.getUserCheckBoxForTeamType(
+        //     ProjectItemPageConstants.buildTeamContentIDs.currentTeam, ProjectItemPageConstants.nonAdminUser);
+        const userCheckBoxForCurrentTeam = await ProjectItemPage.getCurrentTeamUserLabelLinkByText(userNameForResourcePool);
         await expect(await PageHelper.isElementDisplayed(userCheckBoxForCurrentTeam))
             .toBe(true, ValidationsHelper.getGridDisplayedValidation(ProjectItemPageConstants.nonAdminUser));
     }
