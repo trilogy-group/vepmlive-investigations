@@ -156,7 +156,7 @@ export class RiskItemPageHelper {
         StepLogger.step('Select "Delete" from the options displayed');
         await PageHelper.click(RiskItemPage.deleteRisk);
 
-        await PageHelper.acceptAlert();
+        await CommonPageHelper.acceptAlertIfPresent();
     }
 
     static async clickCreateNew() {
@@ -197,7 +197,7 @@ export class RiskItemPageHelper {
 
     static async saveRisk() {
         StepLogger.step('Click on "Save" button in "Risks - New Item" window');
-        await PageHelper.click(CommonPage.formButtons.save);
+        await PageHelper.clickAndWaitForElementToHide(CommonPage.formButtons.save);
     }
 
     static async createRiskAndValidateIt() {
@@ -214,6 +214,7 @@ export class RiskItemPageHelper {
         await this.saveRisk();
 
         await PageHelper.switchToDefaultContent();
+        await WaitHelper.waitForElementToBeDisplayed(RiskItemPage.createdRisk(titleValue));
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.risks,
             CommonPage.pageHeaders.projects.risks,
             CommonPageConstants.pageHeaders.projects.risks,

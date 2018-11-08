@@ -277,10 +277,6 @@ export class CommonPageHelper {
 
     static async searchItemByTitle(titleValue: string, columnName: string, verifySearchControl = false) {
 
-        // Give it sometime to create, Created Item is not reflecting immediately. requires time in processing
-        // and search option also requires some time to settle down
-        await browser.sleep(PageHelper.timeout.m);
-
         StepLogger.step('Click on search');
         await PageHelper.click(CommonPage.actionMenuIcons.searchIcon);
 

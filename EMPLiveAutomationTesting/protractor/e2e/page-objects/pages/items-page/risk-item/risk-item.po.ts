@@ -72,4 +72,7 @@ export class RiskItemPage extends BasePage {
         return element.all(By.css('tr.GMHeaderRow td[class*=Title]'));
     }
 
+    static createdRisk(titleValue: string) {
+        return element(By.cssContainingText('a.epm-se-link', titleValue));
+    }
 }
