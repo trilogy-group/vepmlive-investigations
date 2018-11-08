@@ -143,6 +143,7 @@
     <Compile Include="ResourcePlanningTest.cs" />
     <Compile Include="ReportingFilter\ReportingFilterTests.cs" />
     <Compile Include="UserProfileDisplay\DisplayProfilePicturesTests.cs" />
+    <Compile Include="WebPageCode\GetGanttItemsTests.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.cs" />
     <Compile Include="GridListView\GridListViewTests.cs" />
     <Compile Include="Helpers\SpListItemDefinition.cs" />
