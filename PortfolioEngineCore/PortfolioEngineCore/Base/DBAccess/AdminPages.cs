@@ -580,7 +580,12 @@ namespace PortfolioEngineCore
             return error;
         }
 
-        private static bool ValidateAndTrimFormula(int nFieldId, string[] formulas, List<ItemRow> itemRows, DataTable dataTable, ref string error)
+        private static bool ValidateAndTrimFormula(
+            int nFieldId,
+            string[] formulas,
+            List<ItemRow> itemRows,
+            DataTable dataTable,
+            ref string error)
         {
             var opCount = 0;
             var fieldCount = 0;
@@ -631,23 +636,23 @@ namespace PortfolioEngineCore
             string[] formulas,
             List<ItemRow> itemRows,
             DataTable dataTable,
-            int i,
+            int index,
             ItemRow itemRow,
             int opCount,
             ref int fieldCount,
             ref string error,
             ref int decCount)
         {
-            if (Regex.IsMatch(formulas[i], @"\A[0-9]*(\.[0-9]+)\z|\A[0-9]+\z") != true)
+            if (Regex.IsMatch(formulas[index], @"\A[0-9]*(\.[0-9]+)\z|\A[0-9]+\z") != true)
             {
-                if (!ProcessField(nFieldId, formulas, itemRows, dataTable, i, itemRow, ref fieldCount, ref error))
+                if (!ProcessField(nFieldId, formulas, itemRows, dataTable, index, itemRow, ref fieldCount, ref error))
                 {
                     return false;
                 }
             }
             else
             {
-                if (!ProcessConstant(formulas, itemRows, i, itemRow, ref error, ref decCount))
+                if (!ProcessConstant(formulas, itemRows, index, itemRow, ref error, ref decCount))
                 {
                     return false;
                 }
@@ -823,6 +828,7 @@ namespace PortfolioEngineCore
                 const string cmdText = "SELECT MAX(CL_UID) As maxUID FROM EPGP_CALCS";
                 DataTable dataTable;
                 dba.SelectData(cmdText, (StatusEnum)99999, out dataTable);
+
                 if (dataTable.Rows.Count == 1)
                 {
                     var row = dataTable.Rows[0];
@@ -832,28 +838,30 @@ namespace PortfolioEngineCore
                 const string Command = "INSERT INTO  EPGP_CALCS (CL_OBJECT, CL_PRI, CL_OP, CL_UID, CL_SEQ, CL_RESULT, CL_COMPONENT, CL_RATIO) "
                     + "VALUES(1, 0, @CL_OP, @CL_UID, @CL_SEQ, @CL_RESULT, @CL_COMPONENT, @CL_RATIO)";
 
-                var sqlCommand = new SqlCommand(Command, dba.Connection);
-                var clOp = sqlCommand.Parameters.Add("@CL_OP", SqlDbType.Int);
-                var clUId = sqlCommand.Parameters.Add("@CL_UID", SqlDbType.Int);
-                var clSeq = sqlCommand.Parameters.Add("@CL_SEQ", SqlDbType.Int);
-                var clResult = sqlCommand.Parameters.Add("@CL_RESULT", SqlDbType.Int);
-                var clComponent = sqlCommand.Parameters.Add("@CL_COMPONENT", SqlDbType.Int);
-                var clRatio = sqlCommand.Parameters.Add("@CL_RATIO", SqlDbType.Decimal);
-
-                clRatio.Precision = 25;
-                clRatio.Scale = 6;
-
-                var seq = 0;
-                foreach (var itemRow in itemRows)
+                using (var sqlCommand = new SqlCommand(Command, dba.Connection))
                 {
-                    clOp.Value = itemRow.opId;
-                    clUId.Value = newClUId;
-                    clSeq.Value = ++seq;
-                    clResult.Value = nFieldId;
-                    clComponent.Value = itemRow.fieldId;
-                    clRatio.Value = itemRow.ratio;
+                    var clOp = sqlCommand.Parameters.Add("@CL_OP", SqlDbType.Int);
+                    var clUId = sqlCommand.Parameters.Add("@CL_UID", SqlDbType.Int);
+                    var clSeq = sqlCommand.Parameters.Add("@CL_SEQ", SqlDbType.Int);
+                    var clResult = sqlCommand.Parameters.Add("@CL_RESULT", SqlDbType.Int);
+                    var clComponent = sqlCommand.Parameters.Add("@CL_COMPONENT", SqlDbType.Int);
+                    var clRatio = sqlCommand.Parameters.Add("@CL_RATIO", SqlDbType.Decimal);
 
-                    sqlCommand.ExecuteNonQuery();
+                    clRatio.Precision = 25;
+                    clRatio.Scale = 6;
+
+                    var seq = 0;
+                    foreach (var itemRow in itemRows)
+                    {
+                        clOp.Value = itemRow.opId;
+                        clUId.Value = newClUId;
+                        clSeq.Value = ++seq;
+                        clResult.Value = nFieldId;
+                        clComponent.Value = itemRow.fieldId;
+                        clRatio.Value = itemRow.ratio;
+
+                        sqlCommand.ExecuteNonQuery();
+                    }
                 }
             }
         }
