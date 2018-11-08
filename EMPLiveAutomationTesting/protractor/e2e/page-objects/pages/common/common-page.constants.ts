@@ -74,6 +74,12 @@ export class CommonPageConstants {
         };
     }
 
+    static get ribbonIds() {
+        return {
+            editTeamIdSubstr: 'Ribbon.ListItem.EPMLive.BuildTeam'
+        };
+    }
+
     static get ribbonLabels() {
         return {
             save: 'Save',

@@ -129,6 +129,10 @@ export class CommonPageHelper {
         return element(By.xpath(`//a[contains(@class,'ms-cui-ctl') and normalize-space(@title)='${title}']`));
     }
 
+    static getRibbonSmallButtonById(id: string) {
+        return element(By.css(`a[id^='${id}']`));
+    }
+
     static getRibbonSmallButtonByText(text: string) {
         return element(By.xpath(`//a[contains(@class,'ms-cui-ctl') and contains((.),'${text}')]`));
     }
