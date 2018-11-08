@@ -802,87 +802,18 @@ namespace Dashboard
             int taskCount = 0;
             try
             {
-                SPQuery query = new SPQuery();
-                query.Query = "<Where><Eq><FieldRef Name='Project'/><Value Type='Text'>" + project + "</Value></Eq></Where>";
-
-                foreach (SPListItem liTask in taskList.GetItems(query))
-                {
-                    string pjName = "";
-                    DateTime tskFinish = DateTime.Now;
-                    DateTime tskStart = DateTime.Now;
-                    float pctComplete = 0;
-                    string isMS = "False";
-                    try
-                    {
-                        tskStart = DateTime.Parse(liTask["StartDate"].ToString());
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            tskStart = DateTime.Parse(liTask["StartDate"].ToString());
-                        }
-                        catch { }
-                    }
-                    try
-                    {
-                        tskFinish = DateTime.Parse(liTask["DueDate"].ToString());
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            tskFinish = DateTime.Parse(liTask["Finish"].ToString());
-                        }
-                        catch { }
-                    }
-                    try
-                    {
-                        pctComplete = float.Parse(liTask["PercentComplete"].ToString()) * (float)100;
-                    }
-                    catch { }
-                    try
-                    {
-                        isMS = liTask["Milestone"].ToString();
-                    }
-                    catch { }
-
-                    if (tskFinish < DateTime.Now.AddDays(-1) && pctComplete < 100)
-                    {
-                        taskCount++;
-                    }
-                    if (pctComplete >= 100)
-                    {
-                        if (isMS == "True")
-                            ms_complete++;
-                        else
-                            task_complete++;
-                    }
-                    else
-                    {
-                        if (tskStart > DateTime.Now && pctComplete == 0)
-                        {
-                            if (isMS == "True")
-                                ms_future++;
-                            else
-                                task_future++;
-                        }
-                        else if (tskFinish < DateTime.Now.AddDays(-1))
-                        {
-                            if (isMS == "True")
-                                ms_late++;
-                            else
-                                task_late++;
-                        }
-                        else
-                        {
-                            if (isMS == "True")
-                                ms_current++;
-                            else
-                                task_current++;
-                        }
-                    }
-                }
+                TaskHelper.GetTaskCount(
+                    taskList,
+                    project,
+                    ref taskCount,
+                    ref ms_complete,
+                    ref task_complete,
+                    ref ms_future,
+                    ref task_future,
+                    ref ms_late,
+                    ref task_late,
+                    ref ms_current,
+                    ref task_current);
             }
             catch
             {
