@@ -135,6 +135,7 @@
     <Compile Include="GridListView\GridListViewTests.RenderGantt.cs" />
     <Compile Include="IntegrationModuleDisplay\IntegrationModuleDisplayTest.cs" />
     <Compile Include="Layouts\epmlive\TlwizardTests.cs" />
+    <Compile Include="Layouts\epmlive\UpdateWebPartTests.cs" />
     <Compile Include="ListReportView\ListReportViewTest.cs" />
     <Compile Include="ReportingChart\ReportingChartTests.cs" />
     <Compile Include="ReportingChart\ReportingChartToolPartTests.cs" />

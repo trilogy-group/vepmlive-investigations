@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace PortfolioEngineCore
@@ -90,123 +91,187 @@ namespace PortfolioEngineCore
         }
         public static StatusEnum UpdateCustomFieldInfo(DBAccess dba, int nEntity, int nFieldType, ref int nFieldId, string sFieldName, string sFieldDesc, out string sReply)
         {
-            string cmdText;
-            SqlCommand oCommand;
-            SqlDataReader reader;
-            StatusEnum eStatus = StatusEnum.rsSuccess;
-            sReply = "";
+            sReply = string.Empty;
             try
             {
+                if (!ValidateFieldName(dba, nFieldId, ref sFieldName, ref sReply))
                 {
-                    // make sure there isn't already another field with this name
-                    sFieldName = sFieldName.Trim();
-                    if (sFieldName.Length == 0)
-                    {
-                        sReply = DBAccess.FormatAdminError("error", "Customfields.UpdateCustomFieldInfo", "Please enter a Field Name");
-                        return StatusEnum.rsRequestCannotBeCompleted;
-                    }
-                    cmdText = "SELECT FA_FIELD_ID From EPGC_FIELD_ATTRIBS WHERE FA_NAME = @p1";
-                    DataTable dt;
-                    dba.SelectDataByName(cmdText, sFieldName, (StatusEnum)99917, out dt);
-                    if (dt.Rows.Count > 0)
-                    {
-                        DataRow row = dt.Rows[0];
-                        int nExistingId = DBAccess.ReadIntValue(row["FA_FIELD_ID"]);
-                        if (nExistingId != nFieldId)
-                        {
-                            sReply = DBAccess.FormatAdminError("error", "Customfields.UpdateCustomFieldInfo", "Can't save field.\nA field with name '" + sFieldName + "' already exists");
-                            return StatusEnum.rsRequestCannotBeCompleted;
-                        }
-                    }
+                    return StatusEnum.rsRequestCannotBeCompleted;
                 }
 
                 if (nFieldId == 0)
                 {
-
-                    //   ADD new field - no need to figure new Field_ID now because the ID is an IDENTITY column
-
-                    // figure which table
-                    int nTableID = EPKClass01.GetTableID(nEntity, nFieldType);
-                    string sTable;
-                    string sField;
-                    if (EPKClass01.GetTableAndField(nTableID, 1, out sTable, out sField))
+                    var status = AddNewField(dba, nEntity, nFieldType, ref nFieldId, sFieldName, sFieldDesc, ref sReply);
+                    if (status.HasValue)
                     {
-                        cmdText = "SELECT TOP 1 * FROM " + sTable;
-                        DataTable dt;
-                        eStatus = dba.SelectData(cmdText, (StatusEnum)99885, out dt);
-
-                        // find the field with the highest number suffix - eg PC_050 - user can add to these tables
-                        string ColumnName;
-                        int nMaxField = 0;
-                        string sPrefix = sField.Substring(0, 3);
-                        DataColumnCollection columns = dt.Columns;
-                        foreach (DataColumn column in columns)
-                        {
-                            ColumnName = column.ColumnName;
-                            string sThisPrefix = ColumnName.Substring(0, 3);
-                            if (sThisPrefix == sPrefix)
-                            {
-                                string sfieldnumber = ColumnName.Substring(3);
-                                int nFieldNumber = Int32.Parse(ColumnName.Substring(3));
-                                if (nFieldNumber > nMaxField) nMaxField = nFieldNumber;
-                            }
-                        }
-                        List<int> ListUsedFields = new List<int>();
-                        cmdText = "SELECT FA_FIELD_IN_TABLE FROM EPGC_FIELD_ATTRIBS Where FA_TABLE_ID=" + nTableID.ToString();
-                        oCommand = new SqlCommand(cmdText, dba.Connection);
-                        reader = oCommand.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            int nFieldNumber = DBAccess.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
-                            ListUsedFields.Add(nFieldNumber);
-                        }
-                        reader.Close();
-                        reader = null;
-
-                        int nUseField;
-                        for (nUseField = 1; nUseField < nMaxField + 2; nUseField++)
-                        {
-                            if (!ListUsedFields.Contains(nUseField))
-                                break;
-                        }
-                        if (nUseField > nMaxField)
-                        {
-                            //eStatus = dba.HandleStatusError(SeverityEnum.Error, "Update_CustomField", (StatusEnum)99884, "Can't save Field, all Fields of this type are already used");
-                            sReply = DBAccess.FormatAdminError("error", "Customfields.UpdateCustomFieldInfo", "Can't save Field, all Fields of this type are already used");
-                            return eStatus;
-                        }
-                        else
-                        {
-                            cmdText = "INSERT Into EPGC_FIELD_ATTRIBS " + " (FA_NAME,FA_DESC,FA_FORMAT,FA_TABLE_ID,FA_FIELD_IN_TABLE)" + " Values(@pNAME,@pDESC,@pFORMAT,@pTABLE,@pFIELD)";
-                            oCommand = new SqlCommand(cmdText, dba.Connection);
-                            oCommand.Parameters.AddWithValue("@pNAME", sFieldName);
-                            oCommand.Parameters.AddWithValue("@pDESC", sFieldDesc);
-                            oCommand.Parameters.AddWithValue("@pFORMAT", nFieldType);
-                            oCommand.Parameters.AddWithValue("@pTABLE", nTableID);
-                            oCommand.Parameters.AddWithValue("@pFIELD", nUseField);
-                            oCommand.ExecuteNonQuery();
-                            dba.GetLastIdentityValue(out nFieldId);
-                        }
+                        return status.Value;
                     }
                 }
                 else
                 {
-
-                    cmdText = "UPDATE EPGC_FIELD_ATTRIBS "
-                        + " SET FA_NAME=@pNAME,FA_DESC=@pDESC"
-                        + " WHERE FA_FIELD_ID = @pFIELDID";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@pNAME", sFieldName);
-                    oCommand.Parameters.AddWithValue("@pDESC", sFieldDesc);
-                    oCommand.Parameters.AddWithValue("@pFIELDID", nFieldId);
-                    int lRowsAffected = oCommand.ExecuteNonQuery();
+                    UpdateFieldAttributes(dba, nFieldId, sFieldName, sFieldDesc);
                 }
                 return StatusEnum.rsSuccess;
             }
             catch (Exception ex)
             {
-                sReply = DBAccess.FormatAdminError("exception", "Customfields.UpdateCustomFieldInfo", ex.Message);
+                Trace.TraceError("Exception Supressed {0}", ex);
+                sReply = SqlDb.FormatAdminError("exception", "Customfields.UpdateCustomFieldInfo", ex.Message);
                 return StatusEnum.rsRequestCannotBeCompleted;
+            }
+        }
+
+        private static StatusEnum? AddNewField(
+            DBAccess dba,
+            int nEntity,
+            int nFieldType,
+            ref int nFieldId,
+            string sFieldName,
+            string sFieldDesc,
+            ref string sReply)
+        {
+            var tableId = EPKClass01.GetTableID(nEntity, nFieldType);
+            string table;
+            string field;
+            StatusEnum status;
+
+            if (EPKClass01.GetTableAndField(tableId, 1, out table, out field))
+            {
+                int maxField;
+                SelectFirstTable(dba, table, field, out status, out maxField);
+
+                var usedFields = SelectFieldAttributes(dba, tableId);
+
+                int nUseField;
+                if (!ValidateUSedFields(maxField, usedFields, ref sReply, out nUseField))
+                {
+                    return status;
+                }
+
+                InsertFieldAttributes(dba, nFieldType, sFieldName, sFieldDesc, tableId, nUseField);
+                dba.GetLastIdentityValue(out nFieldId);
+            }
+
+            return null;
+        }
+
+        private static bool ValidateFieldName(DBAccess dbAccess, int fieldId, ref string fieldName, ref string reply)
+        {
+            fieldName = fieldName.Trim();
+            if (fieldName.Length == 0)
+            {
+                reply = SqlDb.FormatAdminError("error", "Customfields.UpdateCustomFieldInfo", "Please enter a Field Name");
+                {
+                    return false;
+                }
+            }
+            const string Command = "SELECT FA_FIELD_ID From EPGC_FIELD_ATTRIBS WHERE FA_NAME = @p1";
+            DataTable dataTable;
+            dbAccess.SelectDataByName(Command, fieldName, (StatusEnum)99917, out dataTable);
+            if (dataTable.Rows.Count > 0)
+            {
+                var row = dataTable.Rows[0];
+                var existingId = SqlDb.ReadIntValue(row["FA_FIELD_ID"]);
+                if (existingId != fieldId)
+                {
+                    reply = SqlDb.FormatAdminError(
+                        "error",
+                        "Customfields.UpdateCustomFieldInfo",
+                        string.Format("Can't save field.\nA field with name '{0}' already exists", fieldName));
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        private static void SelectFirstTable(DBAccess dba, string table, string field, out StatusEnum status, out int maxField)
+        {
+            var command = string.Format("SELECT TOP 1 * FROM {0}", table);
+            DataTable dataTable;
+            status = dba.SelectData(command, (StatusEnum)99885, out dataTable);
+
+            // find the field with the highest number suffix - eg PC_050 - user can add to these tables
+            maxField = 0;
+            var prefix = field.Substring(0, 3);
+            var columns = dataTable.Columns;
+            foreach (DataColumn column in columns)
+            {
+                var columnName = column.ColumnName;
+                var thisPrefix = columnName.Substring(0, 3);
+                if (thisPrefix == prefix)
+                {
+                    var fieldNumber = int.Parse(columnName.Substring(3));
+                    if (fieldNumber > maxField)
+                    {
+                        maxField = fieldNumber;
+                    }
+                }
+            }
+        }
+
+        private static List<int> SelectFieldAttributes(DBAccess dba, int tableId)
+        {
+            var usedFields = new List<int>();
+            var command = string.Format("SELECT FA_FIELD_IN_TABLE FROM EPGC_FIELD_ATTRIBS Where FA_TABLE_ID={0}", tableId);
+            using (var sqlCommand = new SqlCommand(command, dba.Connection))
+            {
+                using (var reader = sqlCommand.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var nFieldNumber = SqlDb.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
+                        usedFields.Add(nFieldNumber);
+                    }
+                    reader.Close();
+                }
+            }
+            return usedFields;
+        }
+
+        private static bool ValidateUSedFields(int maxField, List<int> usedFields, ref string reply, out int nUseField)
+        {
+            for (nUseField = 1; nUseField < maxField + 2; nUseField++)
+            {
+                if (!usedFields.Contains(nUseField))
+                {
+                    break;
+                }
+            }
+            if (nUseField > maxField)
+            {
+                reply = SqlDb.FormatAdminError("error", "Customfields.UpdateCustomFieldInfo", "Can't save Field, all Fields of this type are already used");
+                return false;
+            }
+            return true;
+        }
+
+        private static void InsertFieldAttributes(DBAccess dbAccess, int fieldType, string fieldName, string fieldDesc, int tableId, int useField)
+        {
+            const string Command = "INSERT Into EPGC_FIELD_ATTRIBS "
+                + " (FA_NAME,FA_DESC,FA_FORMAT,FA_TABLE_ID,FA_FIELD_IN_TABLE)"
+                + " Values(@pNAME,@pDESC,@pFORMAT,@pTABLE,@pFIELD)";
+            using (var sqlCommand = new SqlCommand(Command, dbAccess.Connection))
+            {
+                sqlCommand.Parameters.AddWithValue("@pNAME", fieldName);
+                sqlCommand.Parameters.AddWithValue("@pDESC", fieldDesc);
+                sqlCommand.Parameters.AddWithValue("@pFORMAT", fieldType);
+                sqlCommand.Parameters.AddWithValue("@pTABLE", tableId);
+                sqlCommand.Parameters.AddWithValue("@pFIELD", useField);
+                sqlCommand.ExecuteNonQuery();
+            }
+        }
+
+        private static void UpdateFieldAttributes(DBAccess dbAccess, int fieldId, string fieldName, string fieldDesc)
+        {
+            const string Command = "UPDATE EPGC_FIELD_ATTRIBS " + " SET FA_NAME=@pNAME,FA_DESC=@pDESC" + " WHERE FA_FIELD_ID = @pFIELDID";
+            using (var sqlCommand = new SqlCommand(Command, dbAccess.Connection, dbAccess.Transaction))
+            {
+                sqlCommand.Parameters.AddWithValue("@pNAME", fieldName);
+                sqlCommand.Parameters.AddWithValue("@pDESC", fieldDesc);
+                sqlCommand.Parameters.AddWithValue("@pFIELDID", fieldId);
+                var rowsAffected = sqlCommand.ExecuteNonQuery();
             }
         }
 
