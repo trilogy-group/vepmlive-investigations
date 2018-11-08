@@ -1,5 +1,6 @@
 export class ReportManagerPageConstants {
     static readonly noErrorMessage = 'No Errors';
+    static readonly queued = 'Queued';
     static readonly pageName = 'Report Manager';
 
     static get labelsIdPostFix() {

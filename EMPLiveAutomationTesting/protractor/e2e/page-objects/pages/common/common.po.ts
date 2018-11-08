@@ -170,7 +170,7 @@ export class CommonPage extends BasePage {
     }
 
     static get contentFrame() {
-        return element(By.css('iframe.ms-dlgFrame'));
+        return element(By.css('.ms-dlgFrame'));
     }
 
     static get analyzerFrame() {

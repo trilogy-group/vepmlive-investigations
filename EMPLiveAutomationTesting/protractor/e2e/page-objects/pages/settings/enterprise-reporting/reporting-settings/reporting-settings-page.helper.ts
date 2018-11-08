@@ -72,11 +72,9 @@ export class ReportingSettingsPageHelper {
         StepLogger.stepId(2);
         await this.clickRunButton();
 
-        await this.refreshBrowserTileLastRunPresent();
-
         StepLogger.verification('Last Result - commonly "No Errors" displayed ]');
-        await expect((await ReportManagerPage.formControls.messages.getText()).trim())
-            .toBe(ReportManagerPageConstants.noErrorMessage,
+        await expect(await PageHelper.getText(ReportManagerPage.formControls.messages))
+            .toBe(ReportManagerPageConstants.queued,
                 ReportManagerPageValidation.lastResultValidation);
     }
 }

@@ -43,7 +43,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         const uniqueId = PageHelper.getUniqueId();
 
         StepLogger.preCondition('Creating New Project');
-        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, );
+        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId);
 
         StepLogger.stepId(1);
 

@@ -179,8 +179,12 @@ export class CommonPageHelper {
     }
 
     static async switchToFirstContentFrame() {
-        await WaitHelper.waitForElementToBePresent(CommonPage.contentFrame);
-        return PageHelper.switchToFrame(CommonPage.contentFrame.getWebElement());
+        await WaitHelper.waitForElementToBePresent(CommonPage.contentFrame, PageHelper.timeout.m);
+        try {
+            return PageHelper.switchToFrame(CommonPage.contentFrame.getWebElement());
+        } catch (e) {
+            console.log('Iframe not present');
+        }
     }
 
     static getAutoCompleteItemByDescription(description: string) {
