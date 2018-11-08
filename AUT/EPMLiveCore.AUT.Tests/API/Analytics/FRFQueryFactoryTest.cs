@@ -124,48 +124,6 @@ namespace EPMLiveCore.API
 
         #endregion
 
-        #region General Initializer : Class (FRFQueryFactory) All Fields Explore By Name
-
-        /// <summary>
-        ///     Class (<see cref="FRFQueryFactory" />) explore and verify fields for coverage gain.
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT Initializer")]
-        [TestCase(FieldqueryCheckFavStatus_Item)]
-        [TestCase(FieldqueryCheckFavStatus_NonItem)]
-        [TestCase(FieldqueryCreateFav_Item)]
-        [TestCase(FieldqueryCreateFav_NonItem)]
-        [TestCase(FieldqueryRemoveFav_Item)]
-        [TestCase(FieldqueryRemoveFav_NonItem)]
-        [TestCase(FieldqueryReadFavWSStatus_Item)]
-        [TestCase(FieldqueryReadFavWSStatus_NonItem)]
-        [TestCase(FieldqueryCreateFavWS_Item)]
-        [TestCase(FieldqueryCreateFavWS_NonItem)]
-        [TestCase(FieldqueryRemoveFavWS_Item)]
-        [TestCase(FieldqueryRemoveFavWS_NonItem)]
-        [TestCase(FieldqueryCheckFrequentStatus_Item)]
-        [TestCase(FieldqueryCheckFrequentStatus_NonItem)]
-        [TestCase(FieldqueryCreateFrequent)]
-        [TestCase(FieldqueryRemoveFrequent_Item)]
-        [TestCase(FieldqueryRemoveFrequent_NonItem)]
-        [TestCase(FieldqueryCreateRecentItem)]
-        public void AUT_FRFQueryFactory_All_Fields_Explore_Verify_By_Name_Test(string name)
-        {
-            // Arrange
-            var fieldInfo = GetFieldInfo(name);
-
-            // Act
-            ShouldlyExtension.ExploreFieldWithOrWithoutInstance(null, 
-                                                                Fixture, 
-                                                                fieldInfo);
-
-            // Assert
-            fieldInfo.ShouldNotBeNull();
-        }
-
-        #endregion
-
         #endregion
 
         #endregion
