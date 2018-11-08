@@ -40,13 +40,17 @@ export class EditCostHelper {
     }
 
     static async verifyValueInBudgetCost(cost: number) {
-        StepLogger.verification('Enter Value in Benefit Tab');
+        StepLogger.verification('Verify Value in budget tab');
         await CommonPageHelper.textPresentValidation(EditCost.inputTextBoxForBudgetTab, cost.toString());
     }
 
     static async clickActualCostsTab() {
         StepLogger.step('Click Actual Cost Tab');
-        await PageHelper.clickAndEnter(EditCost.costTab.actualCostsTab);
+        await PageHelper.click(EditCost.costTab.actualCostsTab);
+        const isClicked = await WaitHelper.waitForElementToBeDisplayed(EditCost.veil, PageHelper.timeout.s);
+        if (!isClicked) {
+            await PageHelper.click(EditCost.costTab.actualCostsTab);
+        }
     }
 
     static async clickBudgetTabCostsTab() {
@@ -56,7 +60,11 @@ export class EditCostHelper {
 
     static async clickBenefitsTab() {
         StepLogger.step('Click Benefits Tab');
-        await PageHelper.clickAndEnter(EditCost.costTab.benefitsTab);
+        await PageHelper.click(EditCost.costTab.benefitsTab);
+        const isClicked = await WaitHelper.waitForElementToBeDisplayed(EditCost.veil, PageHelper.timeout.s);
+        if (!isClicked) {
+            await PageHelper.click(EditCost.costTab.benefitsTab);
+        }
     }
 
     static async clickResourcePlanTab() {
@@ -99,19 +107,10 @@ export class EditCostHelper {
     }
 
     static async validateEditCostFunctionality(value: number) {
-        await this.clickActualCostsTab();
-
-        StepLogger.verification('Validate Edit Cost Functionality ');
+        StepLogger.subStep('Click on "Save" button in "Cost Planner" window');
         await this.clickSaveCostPlanner();
-
-        StepLogger.verification('Validate that Benefits Cost is save ');
-        await this.verifyValueInActualCost(value);
-
-        StepLogger.verification('Validate that Benefits Cost is save ');
-        await this.verifyValueInActualCost(value);
-
         await this.validateSaveButtonDisabled();
-
+        StepLogger.subStep('Click on "Close" button in "Cost Planner" window');
         await this.clickCloseCostPlanner();
 
         StepLogger.verification('Validate that Project center page is displayed');

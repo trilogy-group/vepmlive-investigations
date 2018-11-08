@@ -15,6 +15,7 @@ import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {RiskItemPageHelper} from '../risk-item/risk-item-page.helper';
 import {ProjectItemPageConstants} from '../project-item/project-item-page.constants';
 import {ProjectItemPage} from '../project-item/project-item.po';
+import {ChangeItemPage} from '../change-item/change-item.po';
 
 export class IssueItemPageHelper {
 
@@ -37,11 +38,9 @@ export class IssueItemPageHelper {
     static async clickProject(projectName: string, labels: string) {
         await PageHelper.click(IssueItemPage.inputs.project);
         StepLogger.verification('Required values entered/selected in Project Field');
-        await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
-            .toBe(true,
+        await expect(await PageHelper.isElementDisplayed(ChangeItemPage.getSelectedProject(projectName))).toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels, projectName));
         StepLogger.stepId(4);
-
     }
 
     static async enterIssueTitle(titleValue: string) {
@@ -95,7 +94,7 @@ export class IssueItemPageHelper {
 
         StepLogger.stepId(4);
         StepLogger.step('Click on "Save" button in "Issues - New Item" window');
-        await PageHelper.click(CommonPage.formButtons.save);
+        await PageHelper.clickAndWaitForElementToHide(CommonPage.formButtons.save);
 
         await PageHelper.switchToDefaultContent();
 

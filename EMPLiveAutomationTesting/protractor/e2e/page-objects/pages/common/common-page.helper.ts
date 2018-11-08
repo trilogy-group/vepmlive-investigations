@@ -336,7 +336,7 @@ export class CommonPageHelper {
         let maxAttempts = 0;
         await browser.sleep(PageHelper.timeout.s);
 
-        while ((await CommonPageHelper.getRibbonIsDisable(targetElement, 'aria-disabled') === 'true') && maxAttempts++ < 10) {
+        while ((await CommonPageHelper.getRibbonIsDisable(targetElement, 'aria-disabled') === 'true') && maxAttempts++ < 5) {
             await browser.refresh();
             await this.selectRecordFromGrid(item);
         }
@@ -348,7 +348,7 @@ export class CommonPageHelper {
         await this.refreshPageIfRibbonElementIsDisable(CommonPage.ribbonItems.editItem);
 
         StepLogger.step('Select "Edit Item" from the options displayed');
-        await PageHelper.click(CommonPage.ribbonItems.editItem);
+        await ElementHelper.clickUsingJsNoWait(CommonPage.ribbonItems.editItem);
 
     }
 
@@ -497,6 +497,10 @@ export class CommonPageHelper {
 
         StepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.ribbonTitles.items);
+        const isClicked = await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editItem, PageHelper.timeout.s);
+        if (!isClicked) {
+            await PageHelper.click(CommonPage.ribbonTitles.items);
+        }
     }
 
     static async selectTwoRecordFromGrid() {
@@ -733,7 +737,7 @@ export class CommonPageHelper {
 
     static getCellText(column: string) {
         // it is a part of a object "getCell", object created below
-        return element(By.xpath(`.//*[contains(@onmousemove,"I24")]/td[contains(@class,"${column}")]`));
+        return element.all(By.xpath(`//td[contains(@class,'GMClassEdit GMFloat GMCell')][contains(@class,"${column}")]`)).first();
     }
 
     static getColumnElement(columnName: string) {
@@ -831,9 +835,8 @@ export class CommonPageHelper {
 
     static async textPresentValidation(targetElement: ElementFinder, text: string) {
         await WaitHelper.waitForElementToBeDisplayed(targetElement);
-
-        await expect(await ElementHelper.getText(targetElement))
-            .toBe(text,
+        console.log(await ElementHelper.getText(targetElement));
+        await expect(await ElementHelper.getText(targetElement)).toBe(text,
                 ValidationsHelper.getImageDisplayedValidation(text));
     }
 

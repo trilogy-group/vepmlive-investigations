@@ -69,14 +69,10 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         StepLogger.stepId(3);
         await EditCostHelper.enterValueInBudgetCost(cost);
 
-        await EditCostHelper.verifyValueInBudgetCost(cost);
-
         StepLogger.stepId(4);
         await EditCostHelper.clickActualCostsTab();
 
         await EditCostHelper.enterValueInActualCost(cost);
-
-        await EditCostHelper.verifyValueInActualCost(cost);
 
         StepLogger.stepId(5);
         await EditCostHelper.clickBenefitsTab();

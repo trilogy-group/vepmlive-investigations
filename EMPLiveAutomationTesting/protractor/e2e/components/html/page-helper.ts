@@ -27,7 +27,7 @@ export class PageHelper {
         xxxl: 200000,
         xxxxl: 500000,
     };
-    static DEFAULT_TIMEOUT = PageHelper.timeout.xxl;
+    static DEFAULT_TIMEOUT = PageHelper.timeout.xl;
     private static readonly EC = protractor.ExpectedConditions;
 
     static get isFullScreen() {
@@ -59,8 +59,8 @@ export class PageHelper {
         return browser.actions().sendKeys(key).perform();
     }
 
-    static enterPressForBrowser() {
-        return browser.actions().sendKeys(protractor.Key.ENTER).perform();
+    static async enterPressForBrowser() {
+        return await browser.actions().sendKeys(protractor.Key.ENTER).perform();
     }
 
     static actionMouseUp(location: WebElement) {

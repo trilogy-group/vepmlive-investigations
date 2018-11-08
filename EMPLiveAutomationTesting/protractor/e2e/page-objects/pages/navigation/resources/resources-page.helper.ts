@@ -37,7 +37,7 @@ export class ResourcesPageHelper {
 
         StepLogger.stepId(4);
         StepLogger.step('Click on save');
-        await PageHelper.click(CommonPage.formButtons.save);
+        await PageHelper.clickAndWaitForElementToHide(CommonPage.formButtons.save);
         await PageHelper.switchToDefaultContent();
 
         StepLogger.verification('"New Resource" page is closed');
@@ -46,21 +46,25 @@ export class ResourcesPageHelper {
     }
 
     static async clickNewInviteLink() {
-        StepLogger.step('Click on "+ Invite" link displayed on top of "Resources" page');
         await WaitHelper.staticWait(PageHelper.timeout.s);
         await CommonPageHelper.buttonDisplayedValidation(ResourcesPage.newInviteLink, ResourcesPageConstants.inviteLink);
 
         await PageHelper.click(ResourcesPage.newInviteLink);
-
+        const isClicked = await WaitHelper.waitForElementToBeDisplayed(CommonPage.formButtons.save, PageHelper.timeout.m);
+        if (!isClicked) {
+            await PageHelper.click(ResourcesPage.newInviteLink);
+        }
     }
 
     static async selectGenericBox() {
         StepLogger.step(`Check 'Generic' check box`);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.formButtons.save);
         await PageHelper.click(ResourcesPage.inputs.generic);
     }
 
     static async clickSearchIcon() {
         StepLogger.step('Click on search');
+        await WaitHelper.waitForElementToBeDisplayed(ResourcesPage.searchIcon);
         await PageHelper.click(ResourcesPage.searchIcon);
     }
 
@@ -78,17 +82,23 @@ export class ResourcesPageHelper {
         StepLogger.step('Provide values in required fields');
         await this.fillFormAndSave(displayName);
 
-        await WaitHelper.staticWait(PageHelper.timeout.s);
+        let maxAttempts = 0;
         StepLogger.stepId(4);
-        await this.clickSearchIcon();
+        while (!(await  PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(displayName), false)) && maxAttempts++ < 3) {
+            await this.clickSearchIcon();
 
-        await WaitHelper.staticWait(PageHelper.timeout.s);
-        StepLogger.step('Enter newly created resource name');
-        await TextboxHelper.sendKeys(ResourcesPage.searchTextbox, displayName, true);
-
+            await WaitHelper.staticWait(PageHelper.timeout.s);
+            StepLogger.step('Enter newly created resource name');
+            await TextboxHelper.sendKeys(ResourcesPage.searchTextbox, displayName, true);
+            const isDisplayed = await WaitHelper.waitForElementToBeDisplayed(AnchorHelper.getElementByTextInsideGrid(displayName), PageHelper.timeout.m);
+            if (!isDisplayed) {
+                await PageHelper.refreshPage();
+            } else {
+                break;
+            }
+        }
         StepLogger.verification('Newly created Resource [Ex: Display Name 1] displayed in "Resources" page');
         await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(displayName), displayName);
-
     }
 
     static async navigateToResourcesPage() {
