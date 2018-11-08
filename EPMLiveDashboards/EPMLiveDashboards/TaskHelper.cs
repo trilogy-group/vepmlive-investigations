@@ -135,5 +135,99 @@ namespace Dashboard
                 }
             }
         }
+
+        internal static void ProcessProjectSummaryItem(
+            SPWeb spWeb,
+            SPListItem listItem,
+            bool pTasks,
+            bool pRisks,
+            bool pIssues,
+            Func<string, int> getTaskCountFunc,
+            Func<string, string> getRiskStatusFunc,
+            Func<string, string> getIssueStatusFunc,
+            out DateTime start,
+            out DateTime finish,
+            out string title,
+            out float percentComplete,
+            out int taskCount,
+            out string scheduleStatus,
+            out string riskStatus,
+            out string issueStatus)
+        {
+            if (spWeb == null)
+            {
+                throw new ArgumentNullException(nameof(spWeb));
+            }
+
+            start = new DateTime();
+            finish = new DateTime();
+            title = string.Format("<a href=\"{0}/Lists/Project%20Center/DispForm.aspx?ID={1}\">{2}</a>", spWeb.Url, listItem.ID, listItem.Title);
+            percentComplete = 0;
+            taskCount = 0;
+            scheduleStatus = string.Empty;
+            riskStatus = string.Empty;
+            issueStatus = string.Empty;
+            var project = string.Empty;
+
+            try
+            {
+                start = DateTime.Parse(listItem["Start"].ToString());
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+            try
+            {
+                finish = DateTime.Parse(listItem["Finish"].ToString());
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+            try
+            {
+                percentComplete = float.Parse(listItem["PercentComplete"].ToString()) * 100;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+            try
+            {
+                scheduleStatus = listItem["Status"].ToString();
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+
+            try
+            {
+                scheduleStatus = listItem["Project"].ToString();
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+
+            if (getTaskCountFunc != null && pTasks)
+            {
+                taskCount = getTaskCountFunc(listItem.Title);
+            }
+
+            scheduleStatus = scheduleStatus == "Late"
+                ? "<img src=\"/_layouts/images/red.gif\">"
+                : "<img src=\"/_layouts/images/green.gif\">";
+
+            if (getRiskStatusFunc != null && pRisks)
+            {
+                riskStatus = string.Format("<img src=\"/_layouts/images/{0}.gif\">", getRiskStatusFunc(listItem.Title));
+            }
+            if (getIssueStatusFunc != null && pIssues)
+            {
+                issueStatus = string.Format("<img src=\"/_layouts/images/{0}.gif\">", getIssueStatusFunc(listItem.Title));
+            }
+        }
     }
 }

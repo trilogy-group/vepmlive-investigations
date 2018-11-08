@@ -12,6 +12,7 @@ using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.WebPartPages;
 
 using System.Data;
+using System.Diagnostics;
 
 namespace Dashboard
 {
@@ -321,62 +322,34 @@ namespace Dashboard
 
         private void processProjectSummaryItem(SPListItem li, bool pTasks, bool pRisks, bool pIssues)
         {
-            string title = "<a href=\"" + site.Url + "/Lists/Project%20Center/DispForm.aspx?ID=" + li.ID.ToString() + "\">" + li.Title + "</a>";
-            DateTime start = new DateTime();
-            DateTime finish = new DateTime();
-            float pctComplete = 0;
-            int taskCount = 0;
-            string schedulestatus = "";
-            string riskstatus = "";
-            string issuestatus = "";
-            string project = "";
+            DateTime start;
+            DateTime finish;
+            string scheduleStatus;
+            string riskStatus;
+            string issueStatus;
+            int taskCount;
+            float percentComplete;
+            string title;
 
-            try
-            {
-                start = DateTime.Parse(li["Start"].ToString());
-            }
-            catch { }
-            try
-            {
-                finish = DateTime.Parse(li["Finish"].ToString());
-            }
-            catch { }
-            try
-            {
-                pctComplete = float.Parse(li["PercentComplete"].ToString()) * 100;
-            }
-            catch { }
-            try
-            {
-                schedulestatus = li["Status"].ToString();
-            }
-            catch { }
+            TaskHelper.ProcessProjectSummaryItem(
+                site,
+                li,
+                pTasks,
+                pRisks,
+                pIssues,
+                getTaskCount,
+                getRiskStatus,
+                getIssueStatus,
+                out start,
+                out finish,
+                out title,
+                out percentComplete,
+                out taskCount,
+                out scheduleStatus,
+                out riskStatus,
+                out issueStatus);
 
-            try
-            {
-                schedulestatus = li["Project"].ToString();
-            }
-            catch { }
-
-            if (pTasks)
-                taskCount = getTaskCount(li.Title);
-
-            if (schedulestatus == "Late")
-            {
-                schedulestatus = "<img src=\"/_layouts/images/red.gif\">";
-            }
-            else
-            {
-                schedulestatus = "<img src=\"/_layouts/images/green.gif\">";
-            }
-
-            if(pRisks)
-                riskstatus = "<img src=\"/_layouts/images/" + getRiskStatus(li.Title) + ".gif\">";
-            if(pIssues)
-                issuestatus = "<img src=\"/_layouts/images/" + getIssueStatus(li.Title) + ".gif\">";
-
-            
-            dt.Rows.Add(title, pctComplete.ToString() + "%", taskCount.ToString(), schedulestatus, issuestatus, riskstatus);
+            dt.Rows.Add(title, $"{percentComplete}%", taskCount.ToString(), scheduleStatus, issueStatus, riskStatus);
         }
 
         private string getIssueStatus(string project)
