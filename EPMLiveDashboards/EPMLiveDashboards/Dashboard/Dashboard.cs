@@ -755,59 +755,42 @@ namespace Dashboard
 
         private void processProjectSummaryItem(SPListItem li)
         {
-            string title = "<a href=\"" + site.Url + "/Lists/Project%20Center/DispForm.aspx?ID=" + li.ID.ToString() + "\">" + li.Title + "</a>";
-            DateTime start = new DateTime();
-            DateTime finish = new DateTime();
-            float pctComplete = 0;
-            int taskCount = 0;
-            string schedulestatus = "";
-            string riskstatus = "";
-            string issuestatus = "";
-            string project = "";
+            DateTime start;
+            DateTime finish;
+            string schedulestatus;
+            string riskStatus;
+            string issueStatus;
+            int taskCount;
+            float percentComplete;
+            string title;
 
-            try
-            {
-                start = DateTime.Parse(li["Start"].ToString());
-            }
-            catch { }
-            try
-            {
-                finish = DateTime.Parse(li["Finish"].ToString());
-            }
-            catch { }
-            try
-            {
-                pctComplete = float.Parse(li["PercentComplete"].ToString()) * 100;
-            }
-            catch { }
-            try
-            {
-                schedulestatus = li["Status"].ToString();
-            }
-            catch { }
+            TaskHelper.ProcessProjectSummaryItem(
+                site,
+                li,
+                true,
+                true,
+                true,
+                getTaskCount,
+                getRiskStatus,
+                getIssueStatus,
+                out start,
+                out finish,
+                out title,
+                out percentComplete,
+                out taskCount,
+                out schedulestatus,
+                out riskStatus,
+                out issueStatus);
 
-            try
-            {
-                schedulestatus = li["Project"].ToString();
-            }
-            catch { }
-
-            taskCount = getTaskCount(li.Title);
-
-            if (schedulestatus == "Late")
-            {
-                schedulestatus = "<img src=\"/_layouts/images/red.gif\">";
-            }
-            else
-            {
-                schedulestatus = "<img src=\"/_layouts/images/green.gif\">";
-            }
-
-            riskstatus = "<img src=\"/_layouts/images/" + getRiskStatus(li.Title) + ".gif\">";
-            issuestatus = "<img src=\"/_layouts/images/" + getIssueStatus(li.Title) + ".gif\">";
-
-
-            dt.Rows.Add(title, start.ToShortDateString(), finish.ToShortDateString(), pctComplete.ToString() + "%", taskCount.ToString(), schedulestatus, issuestatus, riskstatus);
+            dt.Rows.Add(
+                title,
+                start.ToShortDateString(),
+                finish.ToShortDateString(),
+                $"{percentComplete}%",
+                taskCount.ToString(),
+                schedulestatus,
+                issueStatus,
+                riskStatus);
         }
 
         private string getIssueStatus(string project)
@@ -921,87 +904,18 @@ namespace Dashboard
             int taskCount = 0;
             try
             {
-                SPQuery query = new SPQuery();
-                query.Query = "<Where><Eq><FieldRef Name='Project'/><Value Type='Text'>" + project + "</Value></Eq></Where>";
-
-                foreach (SPListItem liTask in taskList.GetItems(query))
-                {
-                    string pjName = "";
-                    DateTime tskFinish = DateTime.Now;
-                    DateTime tskStart = DateTime.Now;
-                    float pctComplete = 0;
-                    string isMS = "False";
-                    try
-                    {
-                        tskStart = DateTime.Parse(liTask["StartDate"].ToString());
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            tskStart = DateTime.Parse(liTask["StartDate"].ToString());
-                        }
-                        catch { }
-                    }
-                    try
-                    {
-                        tskFinish = DateTime.Parse(liTask["DueDate"].ToString());
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            tskFinish = DateTime.Parse(liTask["Finish"].ToString());
-                        }
-                        catch { }
-                    }
-                    try
-                    {
-                        pctComplete = float.Parse(liTask["PercentComplete"].ToString()) * (float)100;
-                    }
-                    catch { }
-                    try
-                    {
-                        isMS = liTask["Milestone"].ToString();
-                    }
-                    catch { }
-
-                    if (tskFinish < DateTime.Now.AddDays(-1) && pctComplete < 100)
-                    {
-                        taskCount++;
-                    }
-                    if (pctComplete >= 100)
-                    {
-                        if (isMS == "True")
-                            ms_complete++;
-                        else
-                            task_complete++;
-                    }
-                    else
-                    {
-                        if (tskStart > DateTime.Now && pctComplete == 0)
-                        {
-                            if (isMS == "True")
-                                ms_future++;
-                            else
-                                task_future++;
-                        }
-                        else if (tskFinish < DateTime.Now.AddDays(-1))
-                        {
-                            if (isMS == "True")
-                                ms_late++;
-                            else
-                                task_late++;
-                        }
-                        else
-                        {
-                            if (isMS == "True")
-                                ms_current++;
-                            else
-                                task_current++;
-                        }
-                    }
-                }
+                TaskHelper.GetTaskCount(
+                    taskList,
+                    project,
+                    ref taskCount,
+                    ref ms_complete,
+                    ref task_complete,
+                    ref ms_future,
+                    ref task_future,
+                    ref ms_late,
+                    ref task_late,
+                    ref ms_current,
+                    ref task_current);
             }
             catch
             {
