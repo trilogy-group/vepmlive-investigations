@@ -16,7 +16,7 @@ using System.Xml;
 
 using System.ComponentModel;
 using System.Collections;
-
+using System.Diagnostics;
 
 namespace Dashboard
 {
@@ -462,7 +462,286 @@ namespace Dashboard
 
         private string buildProjectGrid()
         {
+            PopulateDataTable();
 
+            gvPJSummary = new SPGridView
+            {
+                AutoGenerateColumns = false
+            };
+
+            AddProjectNameColumn();
+            AddStartColumn();
+            AddFinishColumn();
+            AddPercentCompleteColumn();
+            AddLateTasksColumn();
+            AddScheduleStatusColumn();
+            AddIssueStatusColumn();
+            AddRiskStatusColumn();
+
+            SetGridViewProperties();
+
+            projectList = site.Lists["Project Center"];
+
+            string noTasksListFound = string.Empty;
+            if (GetTasksLists(ref noTasksListFound))
+            {
+                return noTasksListFound;
+            }
+            issueList = site.Lists["Issues"];
+            riskList = site.Lists["Risks"];
+
+            ProcessIssueStatusFields();
+            ProcessRiskStatusFields();
+
+
+            var fieldGuid = projectList.Fields.GetFieldByInternalName(MyState).Id;
+
+            ProcessProjectFields(fieldGuid);
+
+            gvPJSummary.DataSource = dt;
+            gvPJSummary.DataBind();
+            return string.Empty;
+        }
+
+        private void ProcessProjectFields(Guid fieldGuid)
+        {
+            if (ddlProject.SelectedItem.Value == string.Empty)
+            {
+                ProcessGenericProjectsFields(fieldGuid);
+            }
+            else
+            {
+                processProjectSummaryItem(projectList.Items[new Guid(ddlProject.SelectedItem.Value)]);
+            }
+        }
+
+        private void ProcessGenericProjectsFields(Guid fieldGuid)
+        {
+            foreach (SPListItem listItem in projectList.Items)
+            {
+                try
+                {
+                    if (listItem[fieldGuid].ToString() == ddl.SelectedItem.Text)
+                    {
+                        processProjectSummaryItem(listItem);
+                        ddlProject.Items.Add(new ListItem(listItem.Title, listItem.UniqueId.ToString()));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed: {0}", ex);
+                }
+            }
+        }
+
+        private void ProcessRiskStatusFields()
+        {
+            try
+            {
+                var field = riskList.Fields.GetFieldByInternalName(MyRiskState);
+                var doc = new XmlDocument();
+                doc.LoadXml(field.SchemaXml);
+
+                var defaultSelect = string.Empty;
+                try
+                {
+                    defaultSelect = doc.SelectSingleNode("//Default").InnerText;
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed: {0}", ex);
+                }
+                try
+                {
+                    var ndChoices = doc.SelectSingleNode("//CHOICES");
+                    foreach (XmlNode nd in ndChoices.ChildNodes)
+                    {
+                        arrRisks.Add(nd.InnerText, 0);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed: {0}", ex);
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed: {0}", ex);
+            }
+        }
+
+        private void ProcessIssueStatusFields()
+        {
+            try
+            {
+                var field = issueList.Fields.GetFieldByInternalName(MyIssueState);
+                var doc = new XmlDocument();
+                doc.LoadXml(field.SchemaXml);
+
+                var defaultSelect = string.Empty;
+                try
+                {
+                    defaultSelect = doc.SelectSingleNode("//Default").InnerText;
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed: {0}", ex);
+                }
+                try
+                {
+                    var ndChoices = doc.SelectSingleNode("//CHOICES");
+                    foreach (XmlNode nd in ndChoices.ChildNodes)
+                    {
+                        arrIssues.Add(nd.InnerText, 0);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed: {0}", ex);
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed: {0}", ex);
+            }
+        }
+
+        private bool GetTasksLists(ref string noTasksListFound)
+        {
+            try
+            {
+                taskList = site.Lists["Task Center"];
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed: {0}", ex);
+                try
+                {
+                    taskList = site.Lists["My Tasks"];
+                    {
+                        noTasksListFound =
+                            "In order to take advantage of the new EPM Live functionality, please follow the instructions located <a href=\"http://www.projectpublisher.com/downloads/ProjectPublisherUpdateProcess.pdf\" target=\"_blank\">here</a>.";
+                        return true;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Trace.TraceError("Exception Suppressed: {0}", exception);
+                    {
+                        noTasksListFound = "No Tasks List Found";
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private void SetGridViewProperties()
+        {
+            gvPJSummary.AllowGrouping = false;
+            gvPJSummary.ID = "gvPJSummary";
+            gvPJSummary.Width = Unit.Percentage(100);
+            gvPJSummary.HeaderStyle.CssClass = "ms-vh";
+        }
+
+        private void AddRiskStatusColumn()
+        {
+            var colTitle = new BoundField
+            {
+                DataField = "riskstatus",
+                HeaderText = "Risk Status",
+                HtmlEncode = false
+            };
+            colTitle.ControlStyle.CssClass = "ms-vh";
+            colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
+            gvPJSummary.Columns.Add(colTitle);
+        }
+
+        private void AddIssueStatusColumn()
+        {
+            var colTitle = new BoundField
+            {
+                DataField = "issuestatus",
+                HeaderText = "Issue Status",
+                HtmlEncode = false
+            };
+            colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
+            colTitle.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            gvPJSummary.Columns.Add(colTitle);
+        }
+
+        private void AddScheduleStatusColumn()
+        {
+            var colTitle = new BoundField
+            {
+                DataField = "schedulestatus",
+                HeaderText = "Schedule Status",
+                HtmlEncode = false
+            };
+            colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
+            colTitle.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            gvPJSummary.Columns.Add(colTitle);
+        }
+
+        private void AddLateTasksColumn()
+        {
+            var colTitle = new BoundField
+            {
+                DataField = "latetasks",
+                HeaderText = "# of Late Tasks"
+            };
+            colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
+            colTitle.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            gvPJSummary.Columns.Add(colTitle);
+        }
+
+        private void AddPercentCompleteColumn()
+        {
+            var colTitle = new BoundField
+            {
+                DataField = "pctcomplete",
+                HeaderText = "% Complete"
+            };
+            colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
+            colTitle.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            gvPJSummary.Columns.Add(colTitle);
+        }
+
+        private void AddFinishColumn()
+        {
+            var colTitle = new BoundField
+            {
+                DataField = "finish",
+                HeaderText = "Finish"
+            };
+            gvPJSummary.Columns.Add(colTitle);
+        }
+
+        private void AddStartColumn()
+        {
+            var colTitle = new BoundField
+            {
+                DataField = "start",
+                HeaderText = "Start",
+                HtmlEncode = false
+            };
+            gvPJSummary.Columns.Add(colTitle);
+        }
+
+        private void AddProjectNameColumn()
+        {
+            var colTitle = new BoundField
+            {
+                DataField = "name",
+                HeaderText = "Project Name",
+                HtmlEncode = false
+            };
+
+            gvPJSummary.Columns.Add(colTitle);
+        }
+
+        private void PopulateDataTable()
+        {
             dt = new DataTable();
             dt.Columns.Add("name");
             dt.Columns.Add("start");
@@ -472,166 +751,6 @@ namespace Dashboard
             dt.Columns.Add("schedulestatus");
             dt.Columns.Add("issuestatus");
             dt.Columns.Add("riskstatus");
-
-            gvPJSummary = new SPGridView();
-            gvPJSummary.AutoGenerateColumns = false;
-
-            BoundField colTitle = new BoundField();
-            colTitle.DataField = "name";
-            colTitle.HeaderText = "Project Name";
-            colTitle.HtmlEncode = false;
-            //colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-            gvPJSummary.Columns.Add(colTitle);
-
-            colTitle = new BoundField();
-            colTitle.DataField = "start";
-            colTitle.HeaderText = "Start";
-            colTitle.HtmlEncode = false;
-            gvPJSummary.Columns.Add(colTitle);
-
-            colTitle = new BoundField();
-            colTitle.DataField = "finish";
-            colTitle.HeaderText = "Finish";
-            gvPJSummary.Columns.Add(colTitle);
-
-            colTitle = new BoundField();
-            colTitle.DataField = "pctcomplete";
-            colTitle.HeaderText = "% Complete";
-            colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-            colTitle.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
-            gvPJSummary.Columns.Add(colTitle);
-
-            colTitle = new BoundField();
-            colTitle.DataField = "latetasks";
-            colTitle.HeaderText = "# of Late Tasks";
-            colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-            colTitle.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
-            gvPJSummary.Columns.Add(colTitle);
-
-            colTitle = new BoundField();
-            colTitle.DataField = "schedulestatus";
-            colTitle.HeaderText = "Schedule Status";
-            colTitle.HtmlEncode = false;
-            colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-            colTitle.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
-            gvPJSummary.Columns.Add(colTitle);
-
-            colTitle = new BoundField();
-            colTitle.DataField = "issuestatus";
-            colTitle.HeaderText = "Issue Status";
-            colTitle.HtmlEncode = false;
-            colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-            colTitle.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
-            gvPJSummary.Columns.Add(colTitle);
-
-            colTitle = new BoundField();
-            colTitle.DataField = "riskstatus";
-            colTitle.HeaderText = "Risk Status";
-            colTitle.HtmlEncode = false;
-            colTitle.ControlStyle.CssClass = "ms-vh";
-            colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-            gvPJSummary.Columns.Add(colTitle);
-
-            //gvPJSummary.GroupField = "Status";
-            //gvPJSummary.GroupFieldDisplayName = "Status";
-
-            gvPJSummary.AllowGrouping = false;
-            gvPJSummary.ID = "gvPJSummary";
-            gvPJSummary.Width = Unit.Percentage(100);
-            gvPJSummary.HeaderStyle.CssClass = "ms-vh";
-
-            projectList = site.Lists["Project Center"];
-            try
-            {
-                taskList = site.Lists["Task Center"];
-            }
-            catch
-            {
-                try
-                {
-                    taskList = site.Lists["My Tasks"];
-                    return "In order to take advantage of the new EPM Live functionality, please follow the instructions located <a href=\"http://www.projectpublisher.com/downloads/ProjectPublisherUpdateProcess.pdf\" target=\"_blank\">here</a>.";
-                }
-                catch { return "No Tasks List Found"; }
-
-            }
-            issueList = site.Lists["Issues"];
-            riskList = site.Lists["Risks"];
-            //=========================Issue Status Fields================
-            try
-            {
-                SPField field = issueList.Fields.GetFieldByInternalName(MyIssueState);
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(field.SchemaXml);
-
-                string defaultSelect = "";
-                try
-                {
-                    defaultSelect = doc.SelectSingleNode("//Default").InnerText;
-                }
-                catch { }
-                try
-                {
-                    XmlNode ndChoices = doc.SelectSingleNode("//CHOICES");
-                    foreach (XmlNode nd in ndChoices.ChildNodes)
-                    {
-                        arrIssues.Add(nd.InnerText, 0);
-                    }
-                }
-                catch { }
-            }
-            catch { }
-            //=========================Risk Status Fields================
-            try
-            {
-                SPField field = riskList.Fields.GetFieldByInternalName(MyRiskState);
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(field.SchemaXml);
-
-                string defaultSelect = "";
-                try
-                {
-                    defaultSelect = doc.SelectSingleNode("//Default").InnerText;
-                }
-                catch { }
-                try
-                {
-                    XmlNode ndChoices = doc.SelectSingleNode("//CHOICES");
-                    foreach (XmlNode nd in ndChoices.ChildNodes)
-                    {
-                        arrRisks.Add(nd.InnerText, 0);
-                    }
-                }
-                catch { }
-            }
-            catch { }
-            //====================================================
-
-            Guid fieldGuid = projectList.Fields.GetFieldByInternalName(MyState).Id;
-
-            if (ddlProject.SelectedItem.Value == "")
-            {
-                foreach (SPListItem li in projectList.Items)
-                {
-                    try
-                    {
-                        if (li[fieldGuid].ToString() == ddl.SelectedItem.Text)
-                        {
-                            processProjectSummaryItem(li);
-                            ddlProject.Items.Add(new ListItem(li.Title, li.UniqueId.ToString()));
-                        }
-                    }
-                    catch { }
-                }
-            }
-            else
-            {
-                processProjectSummaryItem(projectList.Items[new Guid(ddlProject.SelectedItem.Value)]);
-            }
-
-            gvPJSummary.DataSource = dt;
-            gvPJSummary.DataBind();
-            return "";
         }
 
         private void processProjectSummaryItem(SPListItem li)
