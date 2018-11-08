@@ -1157,7 +1157,15 @@ namespace PortfolioEngineCore
                         var id = SqlDb.ReadIntValue(reader["CL_UID"]);
                         var fieldInTable = 0;
 
-                        HandleLastFieldCase(ref lastId, id, ref seqStmt, sqlStatements, reader, ref seqStmtStringBuilder, ref whereClause, ref errSql);
+                        HandleLastFieldCase(
+                            ref lastId,
+                            id,
+                            ref seqStmt,
+                            sqlStatements,
+                            reader,
+                            ref seqStmtStringBuilder,
+                            ref whereClause,
+                            ref errSql);
 
                         var seq = SqlDb.ReadIntValue(reader["CL_SEQ"]);
                         var operationId = SqlDb.ReadIntValue(reader["CL_OP"]);
@@ -1271,7 +1279,8 @@ namespace PortfolioEngineCore
 
                 if (seq != 1)
                 {
-                    if (operationId == 3)
+                    const int operationIdToCheck = 3;
+                    if (operationId == operationIdToCheck)
                     {
                         if (whereClause == string.Empty)
                         {
@@ -1308,9 +1317,9 @@ namespace PortfolioEngineCore
         {
             foreach (var sql in sqlStatements)
             {
-                using (var sqlCommand2 = new SqlCommand(sql, dbAccess.Connection))
+                using (var sqlCommand = new SqlCommand(sql, dbAccess.Connection))
                 {
-                    var rowsAffected = sqlCommand2.ExecuteNonQuery();
+                    sqlCommand.ExecuteNonQuery();
                 }
             }
         }
