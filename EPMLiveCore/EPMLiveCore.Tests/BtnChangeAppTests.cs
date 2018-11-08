@@ -20,8 +20,8 @@ namespace EPMLiveCore.Tests
     {
         private const string RenderMethodName = "Render";
         private const string DummyUrl = "http://www.dummy.org/url/";
-        private static bool UrlIsHomeMethodReturn;
-        private static int CommunityId;
+        private bool UrlIsHomeMethodReturn;
+        private int CommunityId;
         private IDisposable shimsContext;
         private BtnChangeApp btnChangeApp;
         private PrivateObject privateObject;
