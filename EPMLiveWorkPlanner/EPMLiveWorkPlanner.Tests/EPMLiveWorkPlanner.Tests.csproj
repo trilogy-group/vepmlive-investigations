@@ -92,6 +92,7 @@
     <Compile Include="WebPageCode\GettasksTests.RemainingTests.cs" />
     <Compile Include="WebPageCode\UpdatetaskTests.cs" />
     <Compile Include="WebPageCode\GettasksTests.cs" />
+    <Compile Include="WebPageCode\UpdatetaskTests.RemainingTests.cs" />
     <Compile Include="WorkPlannerAPITests.cs" />
   </ItemGroup>
   <ItemGroup>
