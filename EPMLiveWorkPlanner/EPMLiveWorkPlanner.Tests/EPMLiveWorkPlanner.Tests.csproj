@@ -100,6 +100,7 @@
     <Compile Include="WebPageCode\UpdatetaskTests.cs" />
     <Compile Include="WebPageCode\GettasksTests.cs" />
     <Compile Include="WorkPlannerAPITests.cs" />
+    <Compile Include="Layouts\epmlive\WorkPlannerTests.GetViewString.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
