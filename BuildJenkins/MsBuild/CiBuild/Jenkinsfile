@@ -54,8 +54,11 @@ pipeline {
     }
     post {
         always {
-            echo 'Publishing unit tests results...'
+		
 			
+            echo 'Publishing unit tests results...'
+			step([$class: 'JUnitResultArchiver', allowEmptyResults: true, testResults: "TestResults/JUnitLikeResultsOutputFile1.xml"])
+		
 			echo 'Publishing coverage report...'
 			publishHTML (
 				target: [
@@ -64,11 +67,12 @@ pipeline {
 					keepAll: true,
 					reportDir: 'TestResults/CoverageReport',
 					reportFiles: 'summary.htm',
-					reportName: 'Coverage report'
+					reportName: 'Coverage Report'
 				]
 			)
+			
         }
-        cleanup {
+		cleanup {
             powershell "Write-Host 'Disk space usage before cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
             echo 'Cleanup workspace...'
             dir ("${env.WORKSPACE}") {
@@ -76,5 +80,6 @@ pipeline {
             }
             powershell "Write-Host 'Disk space usage after cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
         }
+        
     }
 }
