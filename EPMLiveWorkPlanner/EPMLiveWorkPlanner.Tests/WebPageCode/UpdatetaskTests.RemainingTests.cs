@@ -361,7 +361,9 @@ namespace EPMLiveWorkPlanner.Tests.WebPageCode
                 () => output.ShouldBe(expectetOutput),
                 () => itemDeleted.ShouldBe(!inserted),
                 () => itemUpdated.ShouldBe(gridId == DummyString && !ignore && inserted),
-                () => sbUpdatedRows.ToString().Contains($"<row id='{DummyString}'><userdata name='SharePointId'>0</userdata>{DummyString}</row>")
+                () => sbUpdatedRows
+                    .ToString()
+                    .Contains($"<row id='{DummyString}'><userdata name='SharePointId'>0</userdata>{DummyString}</row>")
                     .ShouldBe(gridId == DummyString && !ignore && inserted));
         }
     }
