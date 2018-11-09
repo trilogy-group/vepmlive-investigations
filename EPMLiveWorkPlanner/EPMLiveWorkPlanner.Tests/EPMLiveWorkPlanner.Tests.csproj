@@ -34,6 +34,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>EPMLiveWorkPlanner.Tests.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
@@ -89,6 +95,7 @@
     <Compile Include="ISAPI\WorkPlanner.asmx.TestsSplitTwo.cs" />
     <Compile Include="Layouts\epmlive\WorkPlanner.aspx.Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebPageCode\TaskCenterCalculateTests.cs" />
     <Compile Include="WebPageCode\GettasksTests.RemainingTests.cs" />
     <Compile Include="WebPageCode\UpdatetaskTests.cs" />
     <Compile Include="WebPageCode\GettasksTests.cs" />
@@ -109,6 +116,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="EPMLiveWorkPlanner.Tests.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>
