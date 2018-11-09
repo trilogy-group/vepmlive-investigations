@@ -3,7 +3,7 @@ const testrail = require("testrail-api");
 const setupUtilities = require('./setup-utilities');
 const browserStackBrowser = browserList[setupUtilities.getParam("chrome", "--params.browserstack.browser", false)];
 const maxBrowserInstances = process.env.MAX_INSTANCES || setupUtilities.getParam(10, "--params.maxInstances", false);
-const useHeadlessBrowser = process.env.HEADLESS_BROWSER || setupUtilities.toBoolean(setupUtilities.getParam(true, "--params.headlessBrowser", false));
+const useHeadlessBrowser = process.env.HEADLESS_BROWSER || setupUtilities.toBoolean(setupUtilities.getParam(false, "--params.headlessBrowser", false));
 const chromeHeadlessArgs = ['--headless', '--disable-gpu', '--window-size=1280x800', '--disable-dev-shm-usage', '--no-sandbox', '--disable-blink-features=BlockCredentialedSubresources',
     '--disable-web-security'];
 /*  ABOUT --disable-dev-shm-usage:
@@ -39,10 +39,10 @@ const configSetup = {
     allScriptsTimeout: 300000,
     suites: {
         health_tests: './e2e/test-suites/health-check-test-suite/**/*.e2e-spec.ts',
-        // api_tests: './e2e/test-suites/api-test-suite/**/*.e2e-spec.ts',
-        // smoke_tests: 'e2e/test-suites/smoke-test-suite/**/*.e2e-spec.ts',
-        // regression_tests: './e2e/test-suites/regression-test-suite/**/*.e2e-spec.ts',
-        // end_to_end_tests: './e2e/test-suites/end-to-end-scenarios/**/*.e2e-spec.ts'
+        api_tests: './e2e/test-suites/api-test-suite/**/*.e2e-spec.ts',
+        smoke_tests: 'e2e/test-suites/smoke-test-suite/**/*.e2e-spec.ts',
+        regression_tests: './e2e/test-suites/regression-test-suite/**/*.e2e-spec.ts',
+        end_to_end_tests: './e2e/test-suites/end-to-end-scenarios/**/*.e2e-spec.ts'
     },
     capabilities: {
         "browserName": "chrome",

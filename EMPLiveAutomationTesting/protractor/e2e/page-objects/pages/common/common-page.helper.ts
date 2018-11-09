@@ -835,7 +835,6 @@ export class CommonPageHelper {
 
     static async textPresentValidation(targetElement: ElementFinder, text: string) {
         await WaitHelper.waitForElementToBeDisplayed(targetElement);
-        console.log(await ElementHelper.getText(targetElement));
         await expect(await ElementHelper.getText(targetElement)).toBe(text,
                 ValidationsHelper.getImageDisplayedValidation(text));
     }
