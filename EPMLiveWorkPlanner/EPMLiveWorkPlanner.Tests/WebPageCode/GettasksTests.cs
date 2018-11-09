@@ -16,7 +16,7 @@ using Shouldly;
 namespace EPMLiveWorkPlanner.Tests.WebPageCode
 {
     [TestClass, ExcludeFromCodeCoverage]
-    public class GettasksTests
+    public partial class GettasksTests
     {
         private IDisposable _shimsObject;
         private gettasks _testObj;
@@ -25,6 +25,7 @@ namespace EPMLiveWorkPlanner.Tests.WebPageCode
         private bool _responseWritten;
         private ShimSPSite _site;
         private ShimSPWeb _web;
+        private const int DummyInt = 1;
         private const string DummyUrl = "http://xyz.com";
         private const string DummyString = "DummyString";
         private const string PageLoadMethod = "Page_Load";
@@ -166,6 +167,17 @@ namespace EPMLiveWorkPlanner.Tests.WebPageCode
                             default:
                                 return new ShimSPList();
                         }
+                    },
+                    ItemGetGuid = _ => new ShimSPList
+                    {
+                        ItemsGet = () => new ShimSPListItemCollection().Bind(new SPListItem[]
+                        {
+                            new ShimSPListItem
+                            {
+                                IDGet = () => DummyInt,
+                                ItemGetString = field => DummyString
+                            }
+                        })
                     }
                 }
             };
