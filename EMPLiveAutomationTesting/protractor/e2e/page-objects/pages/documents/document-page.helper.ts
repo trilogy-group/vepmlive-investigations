@@ -11,6 +11,7 @@ import {CheckboxHelper} from '../../../components/html/checkbox-helper';
 import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
 import {WaitHelper} from '../../../components/html/wait-helper';
 import {DocumentPage} from './document-page.po';
+import {CommonPageHelper} from '../common/common-page.helper';
 
 export class DocumentPageHelper {
 
