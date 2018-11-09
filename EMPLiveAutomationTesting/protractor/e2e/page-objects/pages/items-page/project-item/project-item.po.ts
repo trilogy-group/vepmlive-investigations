@@ -385,4 +385,19 @@ export class ProjectItemPage extends BasePage {
         //parent::td//parent::tr/td[contains(@class,"GMCellPanel")]`;
         return element(By.xpath(xpathForUser));
     }
+
+    static get getResourcePoolFirstUserCheckBox() {
+        const xpathForUser = `//*/table[@id='ResourceGrid']//*/tr[@class='GMDataRow ']/td[2]`;
+        return element.all(By.xpath(xpathForUser)).first();
+    }
+
+    static get getResourcePoolFirstUserLabelLink() {
+        const xpathForLink = `//*/table[@id='ResourceGrid']//*/tr[@class='GMDataRow ']//*/a`;
+        return element.all(By.xpath(xpathForLink)).first();
+    }
+
+    static async getCurrentTeamUserLabelLinkByText(text: string) {
+        const xpathForLink = `//*/table[@id='TeamGrid']//*/tr[@class='GMDataRow ']//*/a[contains((.),'${text}')]`;
+        return element(By.xpath(xpathForLink));
+    }
 }

@@ -43,6 +43,11 @@ describe(SuiteNames.regressionTestSuite, () => {
         const viewName = await MyWorkPageHelper.fillAndSubmitSaveView();
         // Takes time update current view
         await browser.sleep(PageHelper.timeout.xs);
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.myWork,
+            CommonPage.pageHeaders.myWorkplace.myWork,
+            CommonPageConstants.pageHeaders.myWorkplace.myWork,
+        );
         await ExpectationHelper.verifyText(MyWorkPage.getCurrentView, MyWorkPageConstants.currentView, viewName);
     });
 
@@ -71,6 +76,11 @@ describe(SuiteNames.regressionTestSuite, () => {
         await PageHelper.acceptAlert();
         // Takes time update current view
         await browser.sleep(PageHelper.timeout.xs);
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.myWork,
+            CommonPage.pageHeaders.myWorkplace.myWork,
+            CommonPageConstants.pageHeaders.myWorkplace.myWork,
+        );
         await ExpectationHelper.verifyText(MyWorkPage.getCurrentView,
             MyWorkPageConstants.currentView, viewNewName);
     });
@@ -99,6 +109,11 @@ describe(SuiteNames.regressionTestSuite, () => {
         await MyWorkPageHelper.verifyAndAcceptRenameConfirmationPopup(currentViewName);
         // Takes time update current view
         await browser.sleep(PageHelper.timeout.xs);
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.myWork,
+            CommonPage.pageHeaders.myWorkplace.myWork,
+            CommonPageConstants.pageHeaders.myWorkplace.myWork,
+        );
         await ExpectationHelper.verifyText(MyWorkPage.getCurrentView,
             MyWorkPageConstants.currentView, viewNewName);
     });

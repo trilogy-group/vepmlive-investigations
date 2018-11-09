@@ -102,6 +102,7 @@ export class CommonPage extends BasePage {
 
     static get ribbonItems() {
         const labels = CommonPageConstants.ribbonLabels;
+        const ids = CommonPageConstants.ribbonIds;
         return {
             viewItem: CommonPageHelper.getRibbonButtonByText(labels.viewItem),
             attachFile: CommonPageHelper.getRibbonButtonByText(labels.attachFile),
@@ -112,6 +113,7 @@ export class CommonPage extends BasePage {
             cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),
             addTask: CommonPageHelper.getRibbonButtonById(labels.addTask),
             editTeam: CommonPageHelper.getRibbonSmallButtonByTitle(labels.editTeam),
+            editTeamButton: CommonPageHelper.getRibbonSmallButtonById(ids.editTeamIdSubstr),
             close: CommonPageHelper.getRibbonButtonByText(labels.close),
             saveAndClose: CommonPageHelper.getRibbonButtonByText(labels.saveAndClose),
             assignmentPlanner: CommonPageHelper.getRibbonMediumButtonByTitle(labels.assignmentPlanner),

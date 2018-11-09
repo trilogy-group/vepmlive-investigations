@@ -6,6 +6,7 @@ export class ProjectItemPageConstants {
     static readonly editPageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
     static readonly resourceAnalyzerPageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.resourceAnalyzer}`;
     static readonly buildTeamPage = 'Build Team';
+    static readonly editTeamDialog = 'Edit Team';
     static readonly teamMember = 'Team Member';
     static readonly languageAndRegion = 'Language and Region';
     static readonly associated = 'Associated';

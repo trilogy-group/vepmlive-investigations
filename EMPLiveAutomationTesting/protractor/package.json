@@ -37,6 +37,7 @@
     "jasmine-reporters": "^2.3.0",
     "jasmine-spec-reporter": "^4.2.1",
     "log4js": "^3.0.5",
+    "moment": "^2.22.2",
     "node-vibrant": "^3.0.0",
     "protractor": "~5.4.1",
     "request-promise-native": "^1.0.5",

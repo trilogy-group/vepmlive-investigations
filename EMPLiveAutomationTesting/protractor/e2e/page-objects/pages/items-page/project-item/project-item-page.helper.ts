@@ -149,6 +149,8 @@ export class ProjectItemPageHelper {
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
         StepLogger.step('Click on Project record');
+        await PageHelper.sleepForXSec(PageHelper.timeout.xs);
+        await ElementHelper.actionHoverOver(CommonPageHelper.getRowForTableData(firstTableColumns));
         await PageHelper.click(CommonPageHelper.getRowForTableData(firstTableColumns));
     }
 
@@ -194,8 +196,8 @@ export class ProjectItemPageHelper {
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
-            .toBe(ProjectItemPageConstants.buildTeamPage,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.buildTeamPage));
+            .toBe(ProjectItemPageConstants.editTeamDialog,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.editTeamDialog));
 
         StepLogger.step('Switch to frame');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
@@ -228,17 +230,20 @@ export class ProjectItemPageHelper {
     }
 
     static async createProjectAndNavigateToBuildTeamPage(uniqueId: string) {
-        StepLogger.step('Create a new project');
+        StepLogger.subStep('Create a new project');
         const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId);
 
-        StepLogger.step('Navigate and open specific project page');
+        StepLogger.subStep('Navigate and open specific project page');
         await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue);
 
-        StepLogger.step('Select "Edit Team" from the options displayed');
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
-        await PageHelper.click(CommonPage.ribbonItems.editTeam);
+        StepLogger.subStep('Click on "Items" tab');
+        await PageHelper.click(CommonPage.ribbonTitles.items);
 
-        StepLogger.step('Wait for Build Team Page to open');
+        StepLogger.subStep('Select "Edit Team" from the options displayed');
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeamButton);
+        await PageHelper.click(CommonPage.ribbonItems.editTeamButton);
+
+        StepLogger.subStep('Wait for Build Team Page to open');
         await ProjectItemPageHelper.waitForBuildTeamPageToOpenAndSwitchToPage();
     }
 
@@ -246,12 +251,12 @@ export class ProjectItemPageHelper {
         const labels = ProjectItemPageConstants.inputLabels;
         const projectNameValue = `${labels.projectName} ${uniqueId}`;
 
-        StepLogger.step('Select a user from resource pool and add');
-        const userCheckBoxForResourcePool = await ProjectItemPage.getUserCheckBoxForTeamType(
-            ProjectItemPageConstants.buildTeamContentIDs.resourcePool, ProjectItemPageConstants.nonAdminUser);
+        StepLogger.subStep('Select a user from resource pool and add');
+        const userCheckBoxForResourcePool = ProjectItemPage.getResourcePoolFirstUserCheckBox;
+        const userNameForResourcePool = await PageHelper.getText(ProjectItemPage.getResourcePoolFirstUserLabelLink);
         await CheckboxHelper.markCheckbox(userCheckBoxForResourcePool, true);
 
-        StepLogger.step('Click on Add resource');
+        StepLogger.subStep('Click on Add resource');
         await PageHelper.click(CommonPage.formButtons.add);
 
         StepLogger.verification('Verify Save and Close button is enabled after addition of resource');
@@ -259,28 +264,26 @@ export class ProjectItemPageHelper {
             ProjectItemPageConstants.buildTeamContentClass.saveAndCloseDisabled))
             .toBe(false, ProjectItemPageConstants.messageText.saveAndCloseEnabled);
 
-        StepLogger.step('Click on Save & Close button');
+        StepLogger.subStep('Click on Save & Close button');
         await PageHelper.click(CommonPage.ribbonItems.saveAndClose);
 
         await PageHelper.switchToDefaultContent();
 
-        StepLogger.verification('Verify Project page is displayed');
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(projectNameValue)))
-            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
-
-        StepLogger.step('Navigate and open specific project page');
+        StepLogger.subStep('Navigate and open specific project page');
         await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue);
 
-        StepLogger.step('Select "Edit Team" from the options displayed');
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
-        await PageHelper.click(CommonPage.ribbonItems.editTeam);
+        StepLogger.subStep('Click on "Items" tab');
+        await PageHelper.click(CommonPage.ribbonTitles.items);
 
-        StepLogger.step('Wait for Build Team Page to open');
+        StepLogger.subStep('Select "Edit Team" from the options displayed');
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeamButton);
+        await PageHelper.click(CommonPage.ribbonItems.editTeamButton);
+
+        StepLogger.subStep('Wait for Build Team Page to open');
         await ProjectItemPageHelper.waitForBuildTeamPageToOpenAndSwitchToPage();
 
-        StepLogger.verification('Verify User is moved under Current team');
-        const userCheckBoxForCurrentTeam = await ProjectItemPage.getUserCheckBoxForTeamType(
-            ProjectItemPageConstants.buildTeamContentIDs.currentTeam, ProjectItemPageConstants.nonAdminUser);
+        StepLogger.subVerification('Verify User is moved under Current team');
+        const userCheckBoxForCurrentTeam = await ProjectItemPage.getCurrentTeamUserLabelLinkByText(userNameForResourcePool);
         await expect(await PageHelper.isElementDisplayed(userCheckBoxForCurrentTeam))
             .toBe(true, ValidationsHelper.getGridDisplayedValidation(ProjectItemPageConstants.nonAdminUser));
     }
