@@ -351,6 +351,12 @@ export class CommonPageHelper {
 
     }
 
+    static async selectCheckBox() {
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dataRows.get(1));
+        await ElementHelper.actionHoverOver(CommonPage.dataRows.get(1));
+        await PageHelper.click(CommonPage.rowsFirstColumn.get(1));
+    }
+
     static async editViaItems() {
         StepLogger.stepId(3);
         StepLogger.step('Select the check box for record');
@@ -359,9 +365,11 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.rowsFirstColumn.get(1));
 
         StepLogger.step('Click on ITEMS on ribbon');
+        await WaitHelper.waitForElementToBePresent(CommonPage.itemsMenu);
         await PageHelper.click(CommonPage.itemsMenu);
 
         StepLogger.step('Select "Edit Item" from the options displayed');
+        await WaitHelper.waitForElementToBePresent(CommonPage.ribbonItems.editItem);
         await PageHelper.click(CommonPage.ribbonItems.editItem);
     }
 
@@ -497,11 +505,21 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
 
+    static async selectOneRecordFromGrid() {
+        StepLogger.subStep('Select the check box for record');
+        await WaitHelper.waitForElementToBePresent(CommonPage.getNthRecord());
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord());
+        await PageHelper.click(CommonPage.getNthRecord());
+    }
+
     static async selectTwoRecordFromGrid() {
         StepLogger.stepId(2);
         StepLogger.step('Select the check box for record');
+        await WaitHelper.waitForElementToBePresent(CommonPage.getNthRecord());
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord());
         await PageHelper.click(CommonPage.getNthRecord());
 
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord(2));
         await PageHelper.click(CommonPage.getNthRecord(2));
 
         StepLogger.step('Click on ITEMS on ribbon');

@@ -12,17 +12,19 @@ import {CommonPage} from '../../../common/common.po';
 export class OptimizerPageHelper {
     static async clickConfigrationButton() {
         // this is work around without it not able to work on new tab
-        await WaitHelper.waitForElementToBeDisplayed(OptimizerPage.saveStrategy);
-
-        await CommonPageHelper.switchToFirstContentFrame();
-
+        await WaitHelper.waitForElementToBePresent(OptimizerPage.iFrame);
+        await WaitHelper.staticWait(PageHelper.timeout.s);
+        await PageHelper.switchToFrame(OptimizerPage.iFrame.getWebElement());
+        await WaitHelper.staticWait(PageHelper.timeout.xs);
         StepLogger.step('Click Configration Button');
         await PageHelper.click(OptimizerPage.configure);
     }
 
     static async selectAvailableFiled() {
         StepLogger.step('Click select Available Filed Button');
-        await PageHelper.click(OptimizerPage.optionAvailable);
+        await WaitHelper.waitForElementToBePresent(OptimizerPage.optionAvailable);
+        await ElementHelper.actionHoverOver(OptimizerPage.optionAvailable);
+        await ElementHelper.actionClick(OptimizerPage.optionAvailable);
     }
 
     static async clickAddOption() {

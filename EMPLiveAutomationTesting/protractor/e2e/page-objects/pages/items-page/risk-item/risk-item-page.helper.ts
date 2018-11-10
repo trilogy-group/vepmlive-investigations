@@ -77,7 +77,7 @@ export class RiskItemPageHelper {
         await CommonPageHelper.showColumns([
             RiskItemPageConstants.columnNames.title,
             RiskItemPageConstants.columnNames.status,
-            RiskItemPageConstants.columnNames.priority]);
+            RiskItemPageConstants.columnNames.assignedTo]);
 
         StepLogger.verification('Verify record by title');
         const firstTableColumns = [titleValue];
@@ -86,7 +86,7 @@ export class RiskItemPageHelper {
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
         StepLogger.verification('Verify by other properties');
-        const secondTableColumns = [status, priority];
+        const secondTableColumns = [status];
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));

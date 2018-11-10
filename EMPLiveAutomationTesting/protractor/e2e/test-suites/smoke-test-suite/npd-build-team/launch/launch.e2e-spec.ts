@@ -41,6 +41,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(3);
         StepLogger.step('Select check-box for any Project');
+        await WaitHelper.waitForElementToBePresent(CommonPage.record);
         await PageHelper.click(CommonPage.record);
 
         StepLogger.step('Click on "Items" tab');

@@ -1,4 +1,4 @@
-import {browser, By, element} from 'protractor';
+import {By, element} from 'protractor';
 import {StepLogger} from '../../../../../core/logger/step-logger';
 import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
@@ -62,15 +62,7 @@ export class LinkPageHelper {
     static async verifyNewLinkAdded(details: { description: string; url: string; }) {
         StepLogger.verification('Newly added Link details are displayed in the list');
         const item = element(By.linkText(details.description));
-        let pagingText = await CommonPage.paging.getText();
-        while (!(await item.isPresent()) && await CommonPage.paginationControlsByTitle.next.isPresent()) {
-            await PageHelper.click(CommonPage.paginationControlsByTitle.next);
-            // Wait if page is not the next one, Ajax operation
-            await browser.wait(async () => pagingText !== await CommonPage.paging.getText());
-            pagingText = await CommonPage.paging.getText();
-        }
-        // Always Description appears whereas we want url to assert
-        await expect(await PageHelper.isElementDisplayed(item))
+        await expect(await PageHelper.isElementDisplayed(item, true))
             .toBe(true, ValidationsHelper.getDisplayedValidation(details.url));
     }
 

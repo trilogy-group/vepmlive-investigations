@@ -155,10 +155,10 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.verification('Show columns whatever is required');
         await CommonPageHelper.showColumns([
-            PortfolioItemPageConstants.columnNames.title,
+            PortfolioItemPageConstants.columnNames.budgetStatus,
             PortfolioItemPageConstants.columnNames.portfolioType,
-            PortfolioItemPageConstants.columnNames.notes,
-            PortfolioItemPageConstants.columnNames.stateIcon]);
+            PortfolioItemPageConstants.columnNames.workStatus,
+            PortfolioItemPageConstants.columnNames.portfolioGoals]);
 
         StepLogger.verification('Click on searched record');
         await PageHelper.click(CommonPage.record);
@@ -170,7 +170,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
         StepLogger.verification('Verify by other properties');
-        const secondTableColumns = [portfolioDescriptionValue, portfolioTypeValue];
+        const secondTableColumns = [portfolioTypeValue];
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));

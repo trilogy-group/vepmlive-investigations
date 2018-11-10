@@ -1,15 +1,15 @@
-import {ElementHelper} from '../../../components/html/element-helper';
-import {WorkSpacesPage} from './workspaces.po';
-import {WaitHelper} from '../../../components/html/wait-helper';
-import {WorkspacesConstants} from './workspaces.constants';
-import {CommonPageHelper} from '../common/common-page.helper';
-import {StepLogger} from '../../../../core/logger/step-logger';
-import {PageHelper} from '../../../components/html/page-helper';
-import {CommonPage} from '../common/common.po';
-import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
-import {TextboxHelper} from '../../../components/html/textbox-helper';
-import {CommonPageConstants} from '../common/common-page.constants';
-import {browser} from 'protractor';
+import { ElementHelper } from '../../../components/html/element-helper';
+import { WorkSpacesPage } from './workspaces.po';
+import { WaitHelper } from '../../../components/html/wait-helper';
+import { WorkspacesConstants } from './workspaces.constants';
+import { CommonPageHelper } from '../common/common-page.helper';
+import { StepLogger } from '../../../../core/logger/step-logger';
+import { PageHelper } from '../../../components/html/page-helper';
+import { CommonPage } from '../common/common.po';
+import { ValidationsHelper } from '../../../components/misc-utils/validation-helper';
+import { TextboxHelper } from '../../../components/html/textbox-helper';
+import { CommonPageConstants } from '../common/common-page.constants';
+import { browser } from 'protractor';
 
 export class WorkspacePageHelper {
 
@@ -145,5 +145,18 @@ export class WorkspacePageHelper {
         StepLogger.verification(`Notification 'Your Workspace <Name of Workspace entered in step# 3> is now ready!'
         displayed in the pop down`);
         await CommonPageHelper.labelContainValidation(modifiedTitle);
+    }
+
+    static async verifyWorkSpaceCreated(title: string, maxCount = 10) {
+        for (let i = 0; i < maxCount; i++) {
+            const message = await CommonPage.latestNotification.getText();
+            if (message.includes(title)) {
+                return true;
+            } else {
+                await WaitHelper.staticWait(PageHelper.timeout.l);
+            }
+        }
+
+        return false;
     }
 }

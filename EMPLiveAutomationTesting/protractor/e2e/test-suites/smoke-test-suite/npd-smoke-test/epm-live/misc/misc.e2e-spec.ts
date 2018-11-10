@@ -19,6 +19,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     afterEach(async () => {
+        await PageHelper.switchToDefaultContent();
         await StepLogger.takeScreenShot();
     });
 
