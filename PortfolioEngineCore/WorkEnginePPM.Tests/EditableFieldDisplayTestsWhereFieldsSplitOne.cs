@@ -16,7 +16,6 @@ namespace WorkEnginePPM.Tests
         private IDisposable _shimsObject;
         private PrivateType _privateType;
         private const string WhereFieldMethod = "WhereField";
-        private const string DummyFieldName = "DummyFieldName";
         private const string DummyGroup = "DummyGroup";
         private const string DummyValue = "DummyValue";
         private const string DummyUser = "DummyUser";
@@ -57,48 +56,6 @@ namespace WorkEnginePPM.Tests
         public void TestCleanup()
         {
             _shimsObject?.Dispose();
-        }
-
-        private void SetupShims()
-        {
-            _conditionField = new ShimSPField();
-            _listItem = new ShimSPListItem()
-            {
-                FieldsGet = () => new ShimSPFieldCollection()
-                {
-                    GetFieldByInternalNameString = internalName => new ShimSPField()
-                    {
-                        TypeGet = () => SPFieldType.Text
-                    }
-                }
-            };
-
-            ShimDateTime.NowGet = () => DummyDateTime;
-
-            const string Group = "group";
-
-            var userGroups = new ShimSPGroupCollection().Instance;
-            userGroups.Add(DummyGroup, null, null, Group);
-
-            ShimSPContext.CurrentGet = () => new ShimSPContext()
-            {
-                WebGet = () => new ShimSPWeb()
-                {
-                    CurrentUserGet = () => new ShimSPUser()
-                    {
-                        GroupsGet = () => userGroups,
-                        NameGet = () => DummyUser
-                    }
-                }
-            };
-
-            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPGroup>()
-            {
-                new ShimSPGroup()
-                {
-                    NameGet = () => DummyGroup
-                }
-            }.GetEnumerator();
         }
 
         [TestMethod]
@@ -505,6 +462,48 @@ namespace WorkEnginePPM.Tests
 
             // Assert
             actualResult.ShouldBeFalse();
+        }
+
+        private void SetupShims()
+        {
+            _conditionField = new ShimSPField();
+            _listItem = new ShimSPListItem()
+            {
+                FieldsGet = () => new ShimSPFieldCollection()
+                {
+                    GetFieldByInternalNameString = internalName => new ShimSPField()
+                    {
+                        TypeGet = () => SPFieldType.Text
+                    }
+                }
+            };
+
+            ShimDateTime.NowGet = () => DummyDateTime;
+
+            const string Group = "group";
+
+            var userGroups = new ShimSPGroupCollection().Instance;
+            userGroups.Add(DummyGroup, null, null, Group);
+
+            ShimSPContext.CurrentGet = () => new ShimSPContext()
+            {
+                WebGet = () => new ShimSPWeb()
+                {
+                    CurrentUserGet = () => new ShimSPUser()
+                    {
+                        GroupsGet = () => userGroups,
+                        NameGet = () => DummyUser
+                    }
+                }
+            };
+
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPGroup>()
+            {
+                new ShimSPGroup()
+                {
+                    NameGet = () => DummyGroup
+                }
+            }.GetEnumerator();
         }
     }
 }

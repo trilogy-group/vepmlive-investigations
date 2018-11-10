@@ -21,7 +21,6 @@ namespace WorkEnginePPM.Tests
         private const string DummyGroup = "DummyGroup";
         private const string DummyValue = "DummyValue";
         private const string DummyUser = "DummyUser";
-        private static readonly Guid conditionFieldId = Guid.NewGuid();
 
         [TestInitialize]
         public void TestInitialize()
@@ -37,12 +36,12 @@ namespace WorkEnginePPM.Tests
             _shimsObject?.Dispose();
         }
 
-        private void SetupShims()
+        public void SetupShims()
         {
-            const string group = "group";
+            const string Group = "group";
 
             var userGroups = new ShimSPGroupCollection().Instance;
-            userGroups.Add(DummyGroup, null, null, group);
+            userGroups.Add(DummyGroup, null, null, Group);
 
             ShimSPContext.CurrentGet = () => new ShimSPContext()
             {
@@ -69,7 +68,7 @@ namespace WorkEnginePPM.Tests
         public void CanEdit_fieldPropertiesMe_ReturnTrue()
         {
             // Arrange
-            string customValue = $"where;[Me];IsInGroup;{DummyGroup}";
+            var customValue = $"where;[Me];IsInGroup;{DummyGroup}";
             var field = new ShimSPField()
             {
                 InternalNameGet = () => DummyFieldName
@@ -77,7 +76,7 @@ namespace WorkEnginePPM.Tests
             var fieldProperties = new Dictionary<string, Dictionary<string, string>>
             {
                 {
-                DummyFieldName, new Dictionary<string, string>
+                    DummyFieldName, new Dictionary<string, string>
                     {
                         { "Editable", customValue }
                     }
@@ -97,7 +96,7 @@ namespace WorkEnginePPM.Tests
         public void CanEdit_fieldPropertiesNotMe_ReturnTrue()
         {
             // Arrange
-            string customValue = $"where;[NotMe];IsNotInGroup;{DummyGroup}";
+            var customValue = $"where;[NotMe];IsNotInGroup;{DummyGroup}";
             var field = new ShimSPField()
             {
                 InternalNameGet = () => DummyFieldName
@@ -105,7 +104,7 @@ namespace WorkEnginePPM.Tests
             var fieldProperties = new Dictionary<string, Dictionary<string, string>>
             {
                 {
-                DummyFieldName, new Dictionary<string, string>
+                    DummyFieldName, new Dictionary<string, string>
                     {
                         { "Editable", customValue }
                     }
@@ -125,7 +124,7 @@ namespace WorkEnginePPM.Tests
         public void CanEdit_fieldPropertiesNotMeShowInEditFormHasValue_ReturnTrue()
         {
             // Arrange
-            string customValue = $"where;[NotMe];IsNotInGroup;{DummyGroup}";
+            var customValue = $"where;[NotMe];IsNotInGroup;{DummyGroup}";
             var field = new ShimSPField()
             {
                 InternalNameGet = () => DummyFieldName,
@@ -134,7 +133,7 @@ namespace WorkEnginePPM.Tests
             var fieldProperties = new Dictionary<string, Dictionary<string, string>>
             {
                 {
-                DummyFieldName, new Dictionary<string, string>
+                    DummyFieldName, new Dictionary<string, string>
                     {
                         { "Editable", customValue }
                     }
@@ -155,22 +154,11 @@ namespace WorkEnginePPM.Tests
         {
             // Arrange
             var fieldId = Guid.NewGuid();
-            
-            var customValue = $"where;[NotMe];IsNotInGroup;{DummyGroup}";
             var field = new ShimSPField()
             {
                 IdGet = () => fieldId,
                 InternalNameGet = () => DummyFieldName,
                 TypeGet = () => SPFieldType.Text
-            };
-            var fieldProperties = new Dictionary<string, Dictionary<string, string>>
-            {
-                {
-                DummyFieldName, new Dictionary<string, string>
-                    {
-                        { "Editable", customValue }
-                    }
-                }
             };
 
             var listItem = new ShimSPListItem()
