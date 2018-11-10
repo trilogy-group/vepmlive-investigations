@@ -193,7 +193,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('Show columns whatever is required');
         await CommonPageHelper.showColumns([
             IssueItemPageConstants.columnNames.title,
-            IssueItemPageConstants.columnNames.status,
+            IssueItemPageConstants.columnNames.scheduleStatus,
             IssueItemPageConstants.columnNames.priority]);
 
         StepLogger.verification('Search item by title');
@@ -209,7 +209,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
         StepLogger.verification('Verify by other properties');
-        const secondTableColumns = [status, priority];
+        const secondTableColumns = [priority];
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));

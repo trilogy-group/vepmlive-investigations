@@ -266,7 +266,7 @@ export class CommonPageHelper {
         await PageHelper.click(linkOfThePage);
 
         StepLogger.verification(`${pageName} page is displayed`);
-        await expect(await PageHelper.isElementDisplayed(pageHeader))
+        await expect(await PageHelper.isElementDisplayed(pageHeader, true))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(pageName));
     }
@@ -360,9 +360,11 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.rowsFirstColumn.get(1));
 
         StepLogger.step('Click on ITEMS on ribbon');
+        await WaitHelper.waitForElementToBePresent(CommonPage.itemsMenu);
         await PageHelper.click(CommonPage.itemsMenu);
 
         StepLogger.step('Select "Edit Item" from the options displayed');
+        await WaitHelper.waitForElementToBePresent(CommonPage.ribbonItems.editItem);
         await PageHelper.click(CommonPage.ribbonItems.editItem);
     }
 
@@ -462,7 +464,11 @@ export class CommonPageHelper {
 
     static async deleteTask() {
         if (await ProjectItemPage.selectTaskName.isPresent() === true) {
+            await WaitHelper.waitForElementToBePresent(ProjectItemPage.deleteTask);
+            await ElementHelper.actionHoverOver(ProjectItemPage.selectTaskName);
             await PageHelper.click(ProjectItemPage.selectTaskName);
+            await WaitHelper.waitForElementToBeClickable(ProjectItemPage.deleteTask);
+            await ElementHelper.actionHoverOver(ProjectItemPage.deleteTask);
             await PageHelper.click(ProjectItemPage.deleteTask);
             await browser.switchTo().alert().accept();
             await ElementHelper.clickUsingJs(ProjectItemPage.save);
@@ -506,8 +512,11 @@ export class CommonPageHelper {
     static async selectTwoRecordFromGrid() {
         StepLogger.stepId(2);
         StepLogger.step('Select the check box for record');
+        await WaitHelper.waitForElementToBePresent(CommonPage.getNthRecord());
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord());
         await PageHelper.click(CommonPage.getNthRecord());
 
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord(2));
         await PageHelper.click(CommonPage.getNthRecord(2));
 
         StepLogger.step('Click on ITEMS on ribbon');
@@ -593,10 +602,15 @@ export class CommonPageHelper {
     }
 
     static async enterTaskNameAndData(hours: string, title: string) {
+        await WaitHelper.waitForElementToBePresent(CommonPage.ribbonItems.addTask);
+        await ElementHelper.actionHoverOver(CommonPage.ribbonItems.addTask);
         await PageHelper.click(CommonPage.ribbonItems.addTask);
         await PageHelper.actionSendKeys(title);
+        await WaitHelper.staticWait(PageHelper.timeout.xs);
+        await ElementHelper.actionHoverOver(ProjectItemPageHelper.newTasksFields.duration);
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
         await PageHelper.actionSendKeys(hours);
+        await WaitHelper.staticWait(PageHelper.timeout.xs);
     }
 
     static async actionTakenViaContextMenu(item: ElementFinder, actionItem: ElementFinder) {

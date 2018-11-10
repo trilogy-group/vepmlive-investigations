@@ -18,7 +18,7 @@ export class OptimizerPage extends BasePage {
     }
 
     static get optionAvailable() {
-        return element(By.css('[name="idOptAvailflds"] option'));
+        return element.all(By.css('[name="idOptAvailflds"] option')).first();
     }
 
     static get addOption() {
@@ -55,5 +55,13 @@ export class OptimizerPage extends BasePage {
 
     static configureMenu(value: string) {
         return element(By.xpath(`//*[@id='idOptDlg']//*[@value='${value}']`));
+    }
+
+    static get iFrame() {
+        return element(By.css('.ms-dlgContent iframe'));
+    }
+
+    static get iFrameForModel() {
+        return element(By.css('#contentBox iframe[class*="modal_cover"]'));
     }
 }

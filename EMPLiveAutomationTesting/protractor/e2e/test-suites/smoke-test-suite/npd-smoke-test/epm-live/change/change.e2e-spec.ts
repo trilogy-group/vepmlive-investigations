@@ -139,7 +139,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('Show columns whatever is required');
         await CommonPageHelper.showColumns([
             ChangeItemPageConstants.columnNames.linkTitleNoMenu,
-            ChangeItemPageConstants.columnNames.project,
+            ChangeItemPageConstants.columnNames.category,
             ChangeItemPageConstants.columnNames.priority]);
 
         StepLogger.verification('Click on searched record');
@@ -152,7 +152,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
         StepLogger.verification('Verify by other properties');
-        const secondTableColumns = [priority, projectName];
+        const secondTableColumns = [projectName];
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
