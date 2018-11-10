@@ -83,10 +83,10 @@ export class EditCostHelper {
     }
 
     static async clickCloseCostPlanner() {
-        StepLogger.step('Click Close Button');
+        StepLogger.subStep('Click Close Button');
         await WaitHelper.waitForElementToBeHidden(EditCost.veil);
         await PageHelper.click(EditCost.close);
-        await CommonPageHelper.acceptAlertIfPresent();
+        await PageHelper.acceptAlertIfPresent();
     }
 
     static async validateEditCostIsDisabled() {

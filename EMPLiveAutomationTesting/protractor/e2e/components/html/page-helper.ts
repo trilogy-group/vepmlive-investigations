@@ -390,20 +390,6 @@ export class PageHelper {
         return shortId.generate().replace(/-/g, '').replace(/_/g, '');
     }
 
-    static getUniqueIdForCategory(length: number) {
-        return Math.random().toString(36).substr(2, length);
-    }
-
-    static getUniqueIdWithAlphabetsOnly() {
-        return this.getUniqueId().replace(/[0-9]/g, '');
-    }
-
-    static getUniqueIntId(size = 6): string {
-        // noinspection reason: Giving error for unknown character function
-        // noinspection Annotator
-        return Math.floor(Math.pow(10, size - 1) + Math.random() * 9 * Math.pow(10, size - 1)).toString();
-    }
-
     static async uploadFile(item: ElementFinder, filePath: string) {
         browser.setFileDetector(new remote.FileDetector());
         await WaitHelper.waitForElementToBePresent(item);
@@ -416,39 +402,6 @@ export class PageHelper {
 
     public static async sleepForXSec(milliseconds: number) {
         await browser.sleep(milliseconds);
-    }
-
-    static async randomString(size: number) {
-        let text = '';
-        const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-        for (let i = 0; i < size; i++) {
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        }
-        return text;
-    }
-
-    public static numberFromString(text: string) {
-        return Number(text.replace(/\D+/g, ''));
-    }
-
-    /**
-     * Gets innertext for all the elements
-     * @param {WebElementPromise} elements
-     * @returns {string} inner text
-     */
-    public static async getAllTextsInLowerCase(elements: ElementArrayFinder): Promise<string[]> {
-        const allTexts = [];
-        const allItems = await elements.asElementFinders_();
-        for (const elem of allItems) {
-            const elementText = await this.getText(elem);
-            allTexts.push(elementText.toLowerCase());
-        }
-        return allTexts;
-    }
-
-    static async replaceSpaceWithMinus(text: string) {
-        return text.replace(/\s+/g, '-');
     }
 
     /**
@@ -480,5 +433,16 @@ export class PageHelper {
     public static async waitForAlertToBePresent( timeout: number = PageHelper.DEFAULT_TIMEOUT,
                                                  message: string = 'Alert is not present') {
         return await browser.wait(this.EC.alertIsPresent(), timeout, message).then(() => true, () => false);
+    }
+
+    public static async acceptAlertIfPresent( timeout: number = PageHelper.timeout.m,
+                                              message: string = 'Alert is not present') {
+        const isPresent = await this.waitForAlertToBePresent(timeout, message);
+        if (isPresent) {
+            await browser.switchTo().alert().accept();
+            return await browser.switchTo().defaultContent();
+        } else {
+            console.log('Alert is not present');
+        }
     }
 }

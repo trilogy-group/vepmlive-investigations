@@ -156,7 +156,7 @@ export class RiskItemPageHelper {
         StepLogger.step('Select "Delete" from the options displayed');
         await PageHelper.click(RiskItemPage.deleteRisk);
 
-        await CommonPageHelper.acceptAlertIfPresent();
+        await PageHelper.acceptAlertIfPresent();
     }
 
     static async clickCreateNew() {

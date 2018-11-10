@@ -88,7 +88,7 @@ export class ResourcesPageHelper {
             await this.clickSearchIcon();
 
             await WaitHelper.staticWait(PageHelper.timeout.s);
-            StepLogger.step('Enter newly created resource name');
+            StepLogger.subStep('Enter newly created resource name');
             await TextboxHelper.sendKeys(ResourcesPage.searchTextbox, displayName, true);
             const isDisplayed = await WaitHelper.waitForElementToBeDisplayed(AnchorHelper.getElementByTextInsideGrid(displayName), PageHelper.timeout.m);
             if (!isDisplayed) {

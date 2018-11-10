@@ -971,15 +971,4 @@ export class CommonPageHelper {
         StepLogger.step('Click on Edit Resource Plan');
         await CommonPageHelper.getContextMenuItemByText(CommonPageConstants.contextMenuOptions.editResource);
     }
-
-    public static async acceptAlertIfPresent( timeout: number = PageHelper.timeout.m,
-                                              message: string = 'Alert is not present') {
-        const isPresent = await PageHelper.waitForAlertToBePresent(timeout, message);
-        if (isPresent) {
-            await browser.switchTo().alert().accept();
-            return await browser.switchTo().defaultContent();
-        } else {
-            console.log('Alert is not present');
-        }
-    }
 }

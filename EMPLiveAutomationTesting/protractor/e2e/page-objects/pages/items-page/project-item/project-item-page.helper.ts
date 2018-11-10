@@ -164,7 +164,7 @@ export class ProjectItemPageHelper {
 
         StepLogger.step('Click on "+ New item" link displayed on top of "Project Center" Page');
         await PageHelper.click(CommonPage.addNewLink);
-        await CommonPageHelper.acceptAlertIfPresent();
+        await PageHelper.acceptAlertIfPresent();
 
         // Note - little mismatch, It doesn't open a popup window
         StepLogger.verification('"Project Center - New Item" window is displayed');
@@ -476,7 +476,7 @@ export class ProjectItemPageHelper {
         StepLogger.step('Select "Delete" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.delete);
 
-        await CommonPageHelper.acceptAlertIfPresent();
+        await PageHelper.acceptAlertIfPresent();
     }
 
     static async deleteProjectAndValidateIt(projectNameValue: string) {
