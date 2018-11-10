@@ -116,6 +116,13 @@
     <Compile Include="Admininfos\AllWorkhoursTests.cs" />
     <Compile Include="ConfigFunctionsTest.cs" />
     <Compile Include="DataServiceModules\DSMCostPlannerTests.cs" />
+    <Compile Include="EditableFieldDisplayTests.cs" />
+    <Compile Include="EditableFieldDisplayTestsWhereFieldsSplitFive.cs" />
+    <Compile Include="EditableFieldDisplayTestsWhereFieldsSplitFour.cs" />
+    <Compile Include="EditableFieldDisplayTestsWhereFieldsSplitOne.cs" />
+    <Compile Include="EditableFieldDisplayTestsWhereFieldsSplitSix.cs" />
+    <Compile Include="EditableFieldDisplayTestsWhereFieldsSplitThree.cs" />
+    <Compile Include="EditableFieldDisplayTestsWhereFieldsSplitTwo.cs" />
     <Compile Include="Events\ResourceManagementEvent\ResourceManagementEventTests.cs" />
     <Compile Include="Jobs\CleanupTests.cs" />
     <Compile Include="Layouts\ppm\CostTypesTests.cs" />
