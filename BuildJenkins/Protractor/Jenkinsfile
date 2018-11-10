@@ -2,9 +2,7 @@ pipeline {
     agent {
         label 'skyvera-jenkins-protractor'
     }
-    triggers {
-        cron('H 12 * * *')
-    }
+  
     stages {
         stage('Preparing for UI tests execution') {
             steps {
