@@ -7,7 +7,7 @@ import {WorkspacePageHelper} from '../../../../../page-objects/pages/workspaces/
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 
-fdescribe(SuiteNames.smokeTestSuite, () => {
+describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
 
     beforeEach(async () => {

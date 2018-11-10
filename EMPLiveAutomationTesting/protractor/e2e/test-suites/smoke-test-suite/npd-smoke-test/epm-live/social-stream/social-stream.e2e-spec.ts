@@ -17,7 +17,7 @@ import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my
 import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
-fdescribe(SuiteNames.smokeTestSuite, () => {
+describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
 
     beforeEach(async () => {

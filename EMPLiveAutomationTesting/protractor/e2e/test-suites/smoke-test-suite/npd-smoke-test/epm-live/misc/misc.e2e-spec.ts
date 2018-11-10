@@ -8,7 +8,7 @@ import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {OptimizerPageHelper} from '../../../../../page-objects/pages/items-page/project-item/optimizer/optimizer-page.helper';
 
-fdescribe(SuiteNames.smokeTestSuite, () => {
+describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
 
     beforeEach(async () => {
