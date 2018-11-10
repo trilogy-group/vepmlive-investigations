@@ -991,6 +991,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
                     }
                 }
             }.Instance);
+
             // Act
             var result = privateObject.Invoke(GetFieldValueMethodName, DummyValue, Value) as string;
 
@@ -1016,6 +1017,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
                     }
                 }
             }.Instance);
+
             // Act
             var result = privateObject.Invoke(GetFieldValueMethodName, DummyValue, Value) as string;
 
