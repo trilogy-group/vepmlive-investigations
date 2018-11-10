@@ -14,6 +14,7 @@ import {ElementHelper} from '../../../../../components/html/element-helper';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
+import { CommonPageSubHelper } from '../../../../../page-objects/pages/common/common-page-sub.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -42,7 +43,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
         );
 
-        await PageHelper.click(CommonPage.projectCheckbox);
+        await CommonPageSubHelper.selectOneRecordFromGrid();
         await PageHelper.click(CommonPage.ribbonTitles.items);
         await PageHelper.click(CommonPage.editPlan);
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
@@ -53,6 +54,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(ProjectItemPage.selectTaskName);
 
         StepLogger.step('Change the duration value [Ex: New Task 1 duration changed from 5 to 10]');
+        await ElementHelper.actionHoverOver(ProjectItemPageHelper.newTasksFields.duration);
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
         await PageHelper.actionSendKeys(CommonPageConstants.hours.durationHours2);
 
@@ -72,10 +74,11 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(2);
         StepLogger.step('Click on Assigned To column');
+        await ElementHelper.actionHoverOver(ProjectItemPage.assignToDropDown);
         await PageHelper.click(ProjectItemPage.assignToDropDown);
 
         StepLogger.step('Select another resource by checking respective check box');
-        await PageHelper.click(ProjectItemPageHelper.selectAssign(2));
+        await ElementHelper.actionDoubleClick(ProjectItemPage.assignToDropDown);
 
         StepLogger.step('Click OK button');
         await PageHelper.click(ProjectItemPageHelper.button.ok);
