@@ -28,6 +28,7 @@ describe(SuiteNames.endToEndSuite, () => {
         await MyWorkPageHelper.verifyDefaultViewName();
 
         StepLogger.stepId(2);
+        await MyWorkPageHelper.clickViewsTab();
         await MyWorkPageHelper.clickDeleteView();
         await MyWorkPageHelper.verifyDeleletViewMessageForDefaultView();
 
