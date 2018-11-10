@@ -74,7 +74,7 @@ export class ReportingSettingsPageHelper {
         await this.clickRunButton();
 
         StepLogger.verification('Last Result - commonly "No Errors" displayed ]');
-        await ExpectationHelper.verifyText(ReportManagerPage.formControls.messages, ReportManagerPageConstants.queued,
-                ReportManagerPageValidation.lastResultValidation);
+        await ExpectationHelper.verifyText(ReportManagerPage.formControls.messages, ReportManagerPageValidation.lastResultValidation,
+            ReportManagerPageConstants.queued);
     }
 }
