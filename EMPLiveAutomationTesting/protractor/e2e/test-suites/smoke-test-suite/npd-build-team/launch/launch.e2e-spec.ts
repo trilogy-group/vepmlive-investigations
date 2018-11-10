@@ -11,7 +11,7 @@ import {ValidationsHelper} from '../../../../components/misc-utils/validation-he
 import {ProjectItemPage} from '../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 import {ProjectItemPageHelper} from '../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import {ElementHelper} from '../../../../components/html/element-helper';
+import { CommonPageSubHelper } from '../../../../page-objects/pages/common/common-page-sub.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -42,7 +42,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(3);
         StepLogger.step('Select check-box for any Project');
         await WaitHelper.waitForElementToBePresent(CommonPage.record);
-        await PageHelper.click(CommonPage.record);
+        await CommonPageSubHelper.selectOneRecordFromGrid();
 
         StepLogger.step('Click on "Items" tab');
         await PageHelper.click(CommonPage.ribbonTitles.items);
@@ -108,7 +108,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(3);
         StepLogger.step('Mouse over on any Project created as per pre requisites');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.record);
-        await ElementHelper.actionHoverOver(CommonPage.record);
+        await CommonPageSubHelper.selectOneRecordFromGrid();
 
         StepLogger.step('Click on the Ellipses button (...)');
         await PageHelper.click(CommonPage.ellipse);
