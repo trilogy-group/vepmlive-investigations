@@ -17,7 +17,7 @@ import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
-describe(SuiteNames.smokeTestSuite, () => {
+fdescribe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
 
     beforeEach(async () => {
