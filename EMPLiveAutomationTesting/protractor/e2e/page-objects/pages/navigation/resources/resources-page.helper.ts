@@ -63,7 +63,7 @@ export class ResourcesPageHelper {
     }
 
     static async clickSearchIcon() {
-        StepLogger.step('Click on search');
+        StepLogger.subStep('Click on search');
         await WaitHelper.waitForElementToBeDisplayed(ResourcesPage.searchIcon);
         await PageHelper.click(ResourcesPage.searchIcon);
     }

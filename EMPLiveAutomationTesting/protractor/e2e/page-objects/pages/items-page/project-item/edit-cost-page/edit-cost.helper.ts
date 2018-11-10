@@ -40,7 +40,7 @@ export class EditCostHelper {
     }
 
     static async verifyValueInBudgetCost(cost: number) {
-        StepLogger.verification('Verify Value in budget tab');
+        StepLogger.subVerification('Verify Value in budget tab');
         await CommonPageHelper.textPresentValidation(EditCost.inputTextBoxForBudgetTab, cost.toString());
     }
 
