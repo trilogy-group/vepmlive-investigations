@@ -44,7 +44,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
 
         StepLogger.verification('Verify Choose File option is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.browseButton))
@@ -75,7 +75,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
 
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
 
@@ -112,7 +112,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(ProjectItemPageConstants.pageName,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName));
 
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
 
         StepLogger.step('Enter/Select required details in "Project Center - New Item" window as described below');
         const uniqueId = PageHelper.getUniqueId();

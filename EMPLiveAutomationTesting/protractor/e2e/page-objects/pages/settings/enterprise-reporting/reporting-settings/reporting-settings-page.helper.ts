@@ -10,6 +10,7 @@ import {ReportingSettingsPage} from './reporting-settings.po';
 import {ReportManagerPageConstants} from './report-manager/report-manager-page.constants';
 import {ReportManagerPage} from './report-manager/report-manager.po';
 import {CommonPageHelper} from '../../../common/common-page.helper';
+import {ExpectationHelper} from '../../../../../components/misc-utils/expectation-helper';
 
 export class ReportingSettingsPageHelper {
     static getTopMenus(name: string) {
@@ -72,11 +73,8 @@ export class ReportingSettingsPageHelper {
         StepLogger.stepId(2);
         await this.clickRunButton();
 
-        await this.refreshBrowserTileLastRunPresent();
-
         StepLogger.verification('Last Result - commonly "No Errors" displayed ]');
-        await expect((await ReportManagerPage.formControls.messages.getText()).trim())
-            .toBe(ReportManagerPageConstants.noErrorMessage,
+        await ExpectationHelper.verifyText(ReportManagerPage.formControls.messages, ReportManagerPageConstants.queued,
                 ReportManagerPageValidation.lastResultValidation);
     }
 }

@@ -46,6 +46,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(2);
         StepLogger.step('Click on "+ New item" link displayed on top of "Project Center" Page');
         await PageHelper.click(CommonPage.addNewLink);
+        await PageHelper.acceptAlertIfPresent();
 
         // Note - little mismatch, It doesn't open a popup window
         StepLogger.verification('"Project Center - New Item" window is displayed');

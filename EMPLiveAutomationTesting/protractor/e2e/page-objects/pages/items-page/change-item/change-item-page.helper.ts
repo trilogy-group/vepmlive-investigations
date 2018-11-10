@@ -35,9 +35,8 @@ export class ChangeItemPageHelper {
         await PageHelper.click(ChangeItemPage.inputs.project);
 
         StepLogger.verification('Required values entered/selected in Project Field');
-        await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.project, projectName));
+        await expect(await PageHelper.isElementDisplayed(ChangeItemPage.getSelectedProject(projectName))).toBe(
+            true, ValidationsHelper.getFieldShouldHaveValueValidation(labels.project, projectName));
 
         StepLogger.step(`Priority: Select the value "${priority}"`);
         await PageHelper.sendKeysToInputField(ChangeItemPage.inputs.priority, priority);

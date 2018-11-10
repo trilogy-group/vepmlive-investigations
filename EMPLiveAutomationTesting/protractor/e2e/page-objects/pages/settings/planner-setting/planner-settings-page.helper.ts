@@ -121,7 +121,7 @@ export class PlannerSettingsPageHelper {
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.selectPlanner));
 
         StepLogger.verification('Newly created Planner [Ex: Smoke Test Planner 1] is displayed in the list');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(name)))
             .toBe(true, ValidationsHelper.getRecordCreatedValidation([name]));
         await PageHelper.switchToDefaultContent();

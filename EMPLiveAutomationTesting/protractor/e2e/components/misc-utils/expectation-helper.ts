@@ -5,6 +5,7 @@ import {ValidationsHelper} from './validation-helper';
 import {HtmlHelper} from './html-helper';
 import {CheckboxHelper} from '../html/checkbox-helper';
 import {TextboxHelper} from '../html/textbox-helper';
+import {WaitHelper} from '../html/wait-helper';
 
 export class ExpectationHelper {
     /**
@@ -284,6 +285,7 @@ export class ExpectationHelper {
      * @returns {Promise<void>}
      */
     static async verifyAttributeValue(targetElement: ElementFinder, attribute: string, expectedValue: string) {
+        await WaitHelper.waitForElementToBeDisplayed(targetElement);
         const actualValue = await PageHelper.getAttributeValue(targetElement, attribute);
         StepLogger.verification(`${actualValue} should be equal to  ${expectedValue} value`);
         await expect(actualValue).toEqual(

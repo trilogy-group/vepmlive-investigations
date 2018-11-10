@@ -170,8 +170,7 @@ export class CommonPage extends BasePage {
     }
 
     static get contentFrame() {
-        // element(By.css('.ms-dlgFrame')) never works in case of iframe
-        return browser.driver.findElement(By.css('.ms-dlgFrame'));
+        return element(By.css('.ms-dlgFrame'));
     }
 
     static get analyzerFrame() {

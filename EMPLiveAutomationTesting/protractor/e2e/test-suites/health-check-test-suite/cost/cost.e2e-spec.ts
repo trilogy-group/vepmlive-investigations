@@ -51,13 +51,9 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         StepLogger.stepId(3);
         await EditCostHelper.enterValueInBudgetCost(cost);
 
-        await EditCostHelper.verifyValueInBudgetCost(cost);
-
         await EditCostHelper.clickActualCostsTab();
 
         await EditCostHelper.enterValueInActualCost(cost);
-
-        await EditCostHelper.verifyValueInActualCost(cost);
 
         await EditCostHelper.clickBenefitsTab();
 
@@ -69,6 +65,5 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         StepLogger.stepId(5);
         StepLogger.stepId(6);
         await EditCostHelper.validateEditCostFunctionality(cost);
-
     });
 });

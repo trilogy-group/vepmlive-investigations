@@ -3,7 +3,6 @@ import {StepLogger} from '../../../../../core/logger/step-logger';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {ProjectItemPageHelper} from '../../items-page/project-item/project-item-page.helper';
 import {HomePage} from '../../homepage/home.po';
-import {CommonPage} from '../../common/common.po';
 import {ProjectItemPageConstants} from '../../items-page/project-item/project-item-page.constants';
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
@@ -30,7 +29,7 @@ export class SocialStreamPageHelper {
 
         await ElementHelper.click(HomePage.toolBarMenuItems.project);
 
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
         StepLogger.step('Enter/Select required details in "Project Center - New Item" window as described below');
 
         await ProjectItemPageHelper.fillForm(

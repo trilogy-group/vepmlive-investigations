@@ -95,7 +95,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(EventsPage.createColumn);
 
         StepLogger.verification('Create Column popup should be displayed');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
         await expect(await PageHelper.isElementDisplayed(EventsPage.columnNameField))
             .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.column));
 

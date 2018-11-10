@@ -129,7 +129,7 @@ const configSetup = {
     framework: 'jasmine',
     jasmineNodeOpts: {
         showColors: true,
-        defaultTimeoutInterval: 300000,
+        defaultTimeoutInterval: 2500000,
         print: function () {
         }
     }

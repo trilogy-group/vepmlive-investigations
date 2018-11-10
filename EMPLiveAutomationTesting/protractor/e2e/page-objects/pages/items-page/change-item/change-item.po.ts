@@ -1,6 +1,7 @@
 import {BasePage} from '../../base-page';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {ChangeItemPageConstants} from './change-item-page.constants';
+import {By, element} from 'protractor';
 
 export class ChangeItemPage extends BasePage {
     static get inputs() {
@@ -24,4 +25,7 @@ export class ChangeItemPage extends BasePage {
         };
     }
 
+    static getSelectedProject(name: string) {
+        return element(By.cssContainingText('span#content', name));
+    }
 }
