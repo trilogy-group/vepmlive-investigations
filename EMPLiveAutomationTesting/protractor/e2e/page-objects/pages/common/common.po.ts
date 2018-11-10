@@ -310,7 +310,7 @@ export class CommonPage extends BasePage {
     }
 
     static get projectTab() {
-        return element(By.css('[id*="Project-title"]'));
+        return element(By.css('[id*="Project-title"] span'));
     }
 
     static get setBaselineTab() {

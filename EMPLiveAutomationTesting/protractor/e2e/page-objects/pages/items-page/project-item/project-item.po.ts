@@ -333,7 +333,7 @@ export class ProjectItemPage extends BasePage {
 
     static get selectTaskName() {
         // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
-        return element(By.xpath('.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow ")]//*[contains(@class,"Start")]'));
+        return element(By.xpath('.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow ")]//*[contains(@class,"Predecessors")]'));
     }
 
     static get assignToDropDown() {
@@ -399,5 +399,9 @@ export class ProjectItemPage extends BasePage {
     static async getCurrentTeamUserLabelLinkByText(text: string) {
         const xpathForLink = `//*/table[@id='TeamGrid']//*/tr[@class='GMDataRow ']//*/a[contains((.),'${text}')]`;
         return element(By.xpath(xpathForLink));
+    }
+
+    static get frame() {
+        return element(By.css('.ms-dlgContent iframe'));
     }
 }

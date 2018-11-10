@@ -30,4 +30,8 @@ export class ReportsItemPage extends BasePage {
         const xpathExpandProjectsList = `//div[normalize-space(.)="${itemName}"]//img[contains(@src,"plus")]`;
         return element(By.xpath(xpathExpandProjectsList));
     }
+
+    static get closeButton() {
+        return element(By.css('#dlgTitleBtns a[title="Close dialog"]'));
+    }
 }

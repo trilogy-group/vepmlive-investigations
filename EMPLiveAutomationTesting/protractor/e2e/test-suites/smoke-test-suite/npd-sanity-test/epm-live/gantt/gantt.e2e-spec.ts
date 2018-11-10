@@ -10,6 +10,7 @@ import {CommonPageConstants} from '../../../../../page-objects/pages/common/comm
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import { ElementHelper } from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -60,9 +61,12 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(2);
         StepLogger.step('Click on Projects tab from ribbon panel');
+        await ElementHelper.actionHoverOver(CommonPage.projectTab);
         await PageHelper.click(CommonPage.projectTab);
 
         StepLogger.step('Click on Set Baseline button from the ribbon');
+        await WaitHelper.waitForElementToBePresent(CommonPage.setBaselineTab);
+        await ElementHelper.actionHoverOver(CommonPage.setBaselineTab);
         await PageHelper.click(CommonPage.setBaselineTab);
         // accept alert required to set new base line
         await browser.switchTo().alert().accept();
@@ -71,6 +75,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.step('Change Duration of any task [Ex: Task One Duration changed from 5 to 10]' +
             'View the base line at the Gantt Chart');
         await browser.sleep(PageHelper.timeout.xs);
+        await ElementHelper.actionHoverOver(ProjectItemPageHelper.newTasksFields.duration);
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
         await PageHelper.actionSendKeys(CommonPageConstants.hours.durationHours1);
 

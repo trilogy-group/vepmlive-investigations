@@ -8,6 +8,7 @@ import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
+import { WaitHelper } from '../../../../../components/html/wait-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -36,6 +37,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(1);
         // step#3, step#4 are inside this function
         StepLogger.verification('Search item by Project Name');
+        await WaitHelper.waitForElementToBePresent(CommonPage.itemsListing);
         const firstProjectName = await CommonPage.itemsListing.getText();
         await CommonPageHelper.searchItemByTitle(firstProjectName, ProjectItemPageConstants.columnNames.title, true);
 

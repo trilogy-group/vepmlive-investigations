@@ -82,6 +82,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.step('Enter details for Task (Name, Hours)');
         StepLogger.step('Click on Save button from ribbon panel in the Project Planner page');
         await CommonPageHelper.enterTaskNameAndData(CommonPageConstants.hours.durationHours3, uniqueId);
+        await WaitHelper.waitForElementToBePresent(ProjectItemPage.save);
         await ElementHelper.clickUsingJs(ProjectItemPage.save);
 
         StepLogger.verification('Third Task is created and required details entered [Ex: New Task 3]');

@@ -23,6 +23,7 @@ import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-pag
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {SocialStreamPage} from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
 import { ExpectationHelper } from '../../../../../components/misc-utils/expectation-helper';
+import { CommonPageSubHelper } from '../../../../../page-objects/pages/common/common-page-sub.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -370,7 +371,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             StepLogger.step('Select on any of the project created as per pre requisites [Ex: Smoke Test Project 2]');
             StepLogger.step('Click on the ITEMS tab above the grid');
             StepLogger.step('From the ITEMS ribbon menu, click on Edit Plan');
-            await PageHelper.click(CommonPage.projectCheckbox);
+            await CommonPageSubHelper.selectOneRecordFromGrid();
             await PageHelper.click(CommonPage.ribbonTitles.items);
             await PageHelper.click(CommonPage.editPlan);
 
@@ -406,10 +407,12 @@ describe(SuiteNames.smokeTestSuite, () => {
 
             StepLogger.stepId(5);
             StepLogger.step('Click on "Assigned To" column');
+            await ElementHelper.actionHoverOver(ProjectItemPage.assignToDropDown);
             await PageHelper.click(ProjectItemPage.assignToDropDown);
 
             StepLogger.step('Select the check box for user to which the task need to be assigned [Ex: User1 User1]');
-            await PageHelper.click(ProjectItemPageHelper.selectLastAssign());
+            await PageHelper.click(ProjectItemPage.assignToDropDown);
+            await ElementHelper.actionHoverOver(ProjectItemPageHelper.selectFirstAssign());
 
             StepLogger.step('Click OK button');
             await PageHelper.click(ProjectItemPageHelper.button.ok);

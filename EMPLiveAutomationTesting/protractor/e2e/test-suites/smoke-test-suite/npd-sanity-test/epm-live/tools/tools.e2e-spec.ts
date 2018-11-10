@@ -66,7 +66,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('Check the columns displayed in bottom grid');
         await ResourcePlannerPageHelper.validateButtonSection();
 
-        await PageHelper.click(CommonPage.ribbonItems.close);
+        await ElementHelper.clickUsingJs(ResourcePlannerPage.close);
 
         StepLogger.verification(`${CommonPageConstants.pageHeaders.projects.projectCenter} page is displayed`);
         await CommonPageHelper.fieldDisplayedValidation
@@ -89,6 +89,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(1);
         StepLogger.step('Click on Project tab');
+        await ElementHelper.actionHoverOver(CommonPage.projectTab);
         await PageHelper.click(CommonPage.projectTab);
 
         StepLogger.step('Click on Fragments icon from the button menu');
@@ -177,6 +178,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(3);
         StepLogger.step('Click on Project tab');
+        await ElementHelper.actionHoverOver(CommonPage.projectTab);
         await PageHelper.click(CommonPage.projectTab);
 
         StepLogger.verification('Project tab opened');

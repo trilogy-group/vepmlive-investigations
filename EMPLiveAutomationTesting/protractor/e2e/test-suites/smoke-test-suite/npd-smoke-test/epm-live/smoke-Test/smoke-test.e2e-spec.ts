@@ -44,7 +44,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         );
 
         StepLogger.verification('Project Center page is displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter, true))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
@@ -85,6 +85,9 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(5);
         StepLogger.step('Click on "Assigned To" column');
+        await WaitHelper.staticWait(PageHelper.timeout.s);
+        await WaitHelper.waitForElementToBePresent(ProjectItemPage.assignToDropDown);
+        await ElementHelper.actionHoverOver(ProjectItemPage.assignToDropDown);
         await PageHelper.click(ProjectItemPage.assignToDropDown);
 
         StepLogger.verification('List of users drop down with a check box on Right side of user name is displayed');
