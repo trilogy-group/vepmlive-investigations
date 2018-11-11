@@ -166,9 +166,10 @@ $projName = [System.IO.Path]::GetFileNameWithoutExtension($projAbsPath)
 
 
 #Log-Section "Downloading Nuget . . ."
-$nugetPath = $SourcesDirectory + "\.nuget\nuget.exe"
-#& $nugetPath update -self
-Invoke-WebRequest -Uri http://nuget.org/nuget.exe -OutFile $nugetPath
+$nugetPath = $SourcesDirectory + "\nuget.exe"
+$NUVersion = '3.5.0'
+Invoke-WebRequest "https://dist.nuget.org/win-x86-commandline/v$NUVersion/nuget.exe" -OutFile $nugetPath
+
 
 Log-Section "Restoring missing packages . . ."
 & $nugetPath restore "$SourcesDirectory"
@@ -176,6 +177,8 @@ Log-Section "Restoring missing packages . . ."
 & $nugetPath restore "$SourcesDirectory\Saas\EPMLiveAccountManagement"
 & $nugetPath restore "$SourcesDirectory\ProjectPublisher2016"
 & $nugetPath restore "$SourcesDirectory\EPMLiveCore"
+& $nugetPath restore "$projAbsPath"
+
 
 $loggerArgs = "LogFile=$LogsDirectory\${projName}.log;Verbosity=normal;Encoding=Unicode"
 $outDir = Join-Path $BinariesDirectory $projName
@@ -215,8 +218,6 @@ foreach($projectToBePackaged in $projectsToBePackaged){
    & $MSBuildExec $projectPath `
    /t:Package `
    /p:OutputPath="$BinariesDirectory" `
-   /p:PreBuildEvent= `
-   /p:PostBuildEvent= `
    /p:WarningLevel=0 `
    /p:Configuration="$ConfigurationToBuild" `
    /p:Platform="$PlatformToBuild" `
@@ -240,14 +241,17 @@ foreach($projectToBeBuildAsEXE in $projectsToBeBuildAsEXE){
 
     Log-SubSection "Building '$projectToBeBuildAsEXE'..."
 	Log-SubSection "projectPath: '$projectPath'...."
-    
+	$buildPlatform = "x64"
+    if ($projectToBeBuildAsEXE -eq "EPK_QueueMgr")
+	{
+		$buildPlatform = "x86"
+	}
+	
    & $MSBuildExec $projectPath `
    /t:build `
    /p:OutputPath="$BinariesDirectory" `
-   /p:PreBuildEvent= `
-   /p:PostBuildEvent= `
    /p:Configuration="$ConfigurationToBuild" `
-   /p:Platform="x64" `
+   /p:Platform=$buildPlatform `
     /p:langversion="$langversion" `
    /p:GenerateSerializationAssemblies="Off" `
    /p:ReferencePath=$referencePath `
@@ -272,8 +276,6 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
    & $MSBuildExec $projectPath `
    /t:build `
    /p:OutputPath="$BinariesDirectory" `
-   /p:PreBuildEvent= `
-   /p:PostBuildEvent= `
    /p:Configuration="$ConfigurationToBuild" `
    /p:Platform="$PlatformToBuild" `
    /p:langversion="$langversion" `

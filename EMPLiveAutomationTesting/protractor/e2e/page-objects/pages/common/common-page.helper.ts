@@ -179,7 +179,12 @@ export class CommonPageHelper {
     }
 
     static async switchToFirstContentFrame() {
-        return PageHelper.switchToFrame(CommonPage.contentFrame);
+        await WaitHelper.waitForElementToBePresent(CommonPage.contentFrame, PageHelper.timeout.m);
+        try {
+            return PageHelper.switchToFrame(CommonPage.contentFrame.getWebElement());
+        } catch (e) {
+            console.log('Iframe not present');
+        }
     }
 
     static getAutoCompleteItemByDescription(description: string) {
@@ -202,7 +207,7 @@ export class CommonPageHelper {
 
     static getPageHeaderByTitle(title: string, isContains = false) {
         const xpath = `//*[@id='${CommonPage.titleId}']//*[${ComponentHelpers.getXPathFunctionForDot(title, isContains)}]`;
-        return element(By.xpath(xpath));
+        return element.all(By.xpath(xpath)).first();
     }
 
     static getActionMenuIcons(title: string) {
@@ -272,10 +277,6 @@ export class CommonPageHelper {
 
     static async searchItemByTitle(titleValue: string, columnName: string, verifySearchControl = false) {
 
-        // Give it sometime to create, Created Item is not reflecting immediately. requires time in processing
-        // and search option also requires some time to settle down
-        await browser.sleep(PageHelper.timeout.m);
-
         StepLogger.step('Click on search');
         await PageHelper.click(CommonPage.actionMenuIcons.searchIcon);
 
@@ -328,14 +329,14 @@ export class CommonPageHelper {
     }
 
     static getMenuItemFromRibbonContainer(title: string) {
-        return element(By.css(`#RibbonContainer li[title="${title}"] span`));
+        return element.all(By.css(`#RibbonContainer li[title="${title}"] span`)).first();
     }
 
     static async refreshPageIfRibbonElementIsDisable(targetElement: ElementFinder, item = CommonPage.record) {
         let maxAttempts = 0;
         await browser.sleep(PageHelper.timeout.s);
 
-        while ((await CommonPageHelper.getRibbonIsDisable(targetElement, 'aria-disabled') === 'true') && maxAttempts++ < 10) {
+        while ((await CommonPageHelper.getRibbonIsDisable(targetElement, 'aria-disabled') === 'true') && maxAttempts++ < 5) {
             await browser.refresh();
             await this.selectRecordFromGrid(item);
         }
@@ -347,7 +348,7 @@ export class CommonPageHelper {
         await this.refreshPageIfRibbonElementIsDisable(CommonPage.ribbonItems.editItem);
 
         StepLogger.step('Select "Edit Item" from the options displayed');
-        await PageHelper.click(CommonPage.ribbonItems.editItem);
+        await ElementHelper.clickUsingJsNoWait(CommonPage.ribbonItems.editItem);
 
     }
 
@@ -402,6 +403,7 @@ export class CommonPageHelper {
 
     static async clickEditCost() {
         StepLogger.step('Select "Edit Cost" from the options displayed');
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editCost);
         await PageHelper.click(CommonPage.ribbonItems.editCost);
     }
 
@@ -421,7 +423,7 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.resourceAnalyzer);
         await WaitHelper.waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
         await PageHelper.switchToDefaultContent();
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
         await WaitHelper.staticWait(PageHelper.timeout.xs);
         await ResourceAnalyzerPageHelper.clickDisplayButton();
         await PageHelper.acceptAlert();
@@ -501,6 +503,10 @@ export class CommonPageHelper {
 
         StepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.ribbonTitles.items);
+        const isClicked = await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editItem, PageHelper.timeout.s);
+        if (!isClicked) {
+            await PageHelper.click(CommonPage.ribbonTitles.items);
+        }
     }
 
     static async selectTwoRecordFromGrid() {
@@ -633,7 +639,7 @@ export class CommonPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
         StepLogger.stepId(7);
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
         StepLogger.step('Click on "Choose Files" and select the file that needs to be attached');
         await PageHelper.uploadFile(browseFileControl, newFile.fullFilePath);
@@ -664,7 +670,7 @@ export class CommonPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(addWindowTitle));
 
         StepLogger.step('Switch to frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
 
         StepLogger.stepId(4);
         StepLogger.step(`Click on "Choose Files" button in "${addWindowTitle}" pop up`);
@@ -714,10 +720,9 @@ export class CommonPageHelper {
 
     static async switchToContentFrame() {
         StepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
-
-        // Avoiding - Element is not able to click at point (-9553, -9859)
-        await browser.sleep(PageHelper.timeout.m);
+        await WaitHelper.waitForElementToBePresent(CommonPage.contentFrame);
+        await PageHelper.switchToFrame(CommonPage.contentFrame.getWebElement());
+        await browser.sleep(PageHelper.timeout.xs);
     }
 
     static getPublicView(text: string) {
@@ -746,7 +751,7 @@ export class CommonPageHelper {
 
     static getCellText(column: string) {
         // it is a part of a object "getCell", object created below
-        return element(By.xpath(`.//*[contains(@onmousemove,"I24")]/td[contains(@class,"${column}")]`));
+        return element.all(By.xpath(`//td[contains(@class,'GMClassEdit GMFloat GMCell')][contains(@class,"${column}")]`)).first();
     }
 
     static getColumnElement(columnName: string) {
@@ -808,8 +813,7 @@ export class CommonPageHelper {
 
     static async labelDisplayedValidation(targetElement: ElementFinder, name: string, expectedResult = true) {
         await WaitHelper.waitForElementToBeDisplayed(targetElement);
-        await expect(await PageHelper.isElementPresent(targetElement))
-            .toBe(expectedResult,
+        await expect(await PageHelper.isElementDisplayed(targetElement)).toBe(expectedResult,
                 ValidationsHelper.getLabelDisplayedValidation(name));
     }
 
@@ -845,9 +849,7 @@ export class CommonPageHelper {
 
     static async textPresentValidation(targetElement: ElementFinder, text: string) {
         await WaitHelper.waitForElementToBeDisplayed(targetElement);
-
-        await expect(await ElementHelper.getText(targetElement))
-            .toBe(text,
+        await expect(await ElementHelper.getText(targetElement)).toBe(text,
                 ValidationsHelper.getImageDisplayedValidation(text));
     }
 
@@ -876,7 +878,7 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.resourceAnalyzer);
         await WaitHelper.waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
         await PageHelper.switchToDefaultContent();
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
         await WaitHelper.staticWait(PageHelper.timeout.xs);
     }
 

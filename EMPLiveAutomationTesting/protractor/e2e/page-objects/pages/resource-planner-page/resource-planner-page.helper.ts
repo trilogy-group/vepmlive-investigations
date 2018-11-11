@@ -17,7 +17,7 @@ export class ResourcePlannerPageHelper {
         await WaitHelper.waitForElementToBeDisplayed(ResourcePlannerPage.topSection.save);
 
         await PageHelper.switchToDefaultContent();
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
 
         await this.deletingAllReadyAddedUser();
 
@@ -69,7 +69,7 @@ export class ResourcePlannerPageHelper {
         await WaitHelper.waitForElementToBeDisplayed(ResourcePlannerPage.topSection.save);
 
         await PageHelper.switchToDefaultContent();
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
 
         await this.deletingAllReadyAddedUser();
 

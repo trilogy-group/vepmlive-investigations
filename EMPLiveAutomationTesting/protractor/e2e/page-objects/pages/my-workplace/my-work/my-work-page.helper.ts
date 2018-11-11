@@ -510,14 +510,17 @@ export class MyWorkPageHelper {
 
     static async clickViewsTab() {
         StepLogger.step('Click on View tab.');
-        await browser.sleep(PageHelper.timeout.s);
-        const isViewTabDisplayed = await PageHelper.isElementPresent(MyWorkPage.selectRibbonTabs.views);
+        await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.topBar);
+        let isViewTabDisplayed = await PageHelper.isElementPresent(MyWorkPage.selectRibbonTabs.views);
         if (!isViewTabDisplayed) {
             await this.clickOnAnyCreatedItem();
         }
         await PageHelper.click(MyWorkPage.selectRibbonTabs.views);
-        // Scripts are failing - page takes time to load
-        await browser.sleep(PageHelper.timeout.s);
+        isViewTabDisplayed = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.getViewRibbonOptions.selectColumns, PageHelper.timeout.m);
+        if (!isViewTabDisplayed) {
+            await PageHelper.click(MyWorkPage.selectRibbonTabs.views);
+        }
+        await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.getViewRibbonOptions.selectColumns);
     }
 
     static async verifyViewRibbonDisplayed() {
@@ -659,7 +662,11 @@ export class MyWorkPageHelper {
     static async clickSelectColumns() {
         await this.clickOnAnyCreatedItem();
         StepLogger.step('Click on "Select Columns".');
-        await ElementHelper.clickUsingJsNoWait(MyWorkPage.getViewRibbonOptions.selectColumns);
+        const isDisplayed = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.getViewRibbonOptions.selectColumns, PageHelper.timeout.s);
+        if (!isDisplayed) {
+            await this.clickViewsTab();
+        }
+        await ElementHelper.click(MyWorkPage.getViewRibbonOptions.selectColumns);
     }
 
     static async verifyButtonsOnSelectColumns() {
@@ -762,9 +769,13 @@ export class MyWorkPageHelper {
     static async selectWorkingOnView() {
         StepLogger.step('Expand the "Current View" drop-down and click on Click on "Working on it"');
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
-        await browser.sleep(PageHelper.timeout.xs);
-        await ElementHelper.clickUsingJsNoWait(MyWorkPage.getCurrentViewByName(MyWorkPageConstants.workingOnItLabel));
-        // sometimes - stale exception
+        const isOpened = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.getCurrentViewByName(MyWorkPageConstants.workingOnItLabel),
+            PageHelper.timeout.s);
+        if (!isOpened) {
+            await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
+            await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.getCurrentViewByName(MyWorkPageConstants.workingOnItLabel));
+        }
+        await ElementHelper.clickUsingJs(MyWorkPage.getCurrentViewByName(MyWorkPageConstants.workingOnItLabel));
         await browser.sleep(PageHelper.timeout.s);
         await this.clickViewsTab();
     }
@@ -992,7 +1003,7 @@ export class MyWorkPageHelper {
 
     static async clickCancelOnSelectColumnsPopup() {
         StepLogger.step('Click on any of the options.');
-        await PageHelper.click(MyWorkPage.selectColumnsPopup.cancel);
+        await PageHelper.clickAndWaitForElementToHide(MyWorkPage.selectColumnsPopup.cancel);
     }
 
     static async verifySelectColumnPopupClosed() {

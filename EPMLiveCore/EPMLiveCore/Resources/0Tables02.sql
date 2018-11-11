@@ -34,7 +34,9 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 		[LASTMODIFIEDBYU] [varchar](255) NULL,
 		[LASTMODIFIEDBYN] [varchar](255) NULL,
 		[TSUSER_UID] [uniqueidentifier] NULL,
-		[APPROVAL_DATE] datetime NULL,
+		[APPROVAL_DATE] [datetime] NULL,
+		[LastSubmittedByName] [varchar](255) NULL,
+		[LastSubmittedByUser] [varchar](255) NULL,
 		 CONSTRAINT [PK_TSTIMESHEET] PRIMARY KEY CLUSTERED 
 		(
 			[TS_UID] ASC
@@ -94,6 +96,7 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 		[APPROVAL_STATUS] [int] NOT NULL CONSTRAINT [DF_TSITEM_APPROVAL_STATUS]  DEFAULT ((0)),
 		PROJECT_LIST_UID uniqueidentifier NULL,
 		ASSIGNEDTOID int NULL,
+		RATE [varchar](50) NULL,
 		CONSTRAINT [PK_TSITEM] PRIMARY KEY CLUSTERED 
 		(
 		[TS_ITEM_UID] ASC
@@ -120,6 +123,13 @@ else
 			Print '     Add Column PROJECT_LIST_UID'
 			ALTER TABLE TSITEM
 			ADD PROJECT_LIST_UID uniqueidentifier NULL
+			
+		end
+		if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'TSITEM' and column_name = 'RATE')
+		begin
+			Print '     Add Column RATE'
+			ALTER TABLE TSITEM
+			ADD [RATE] [varchar](50) NULL
 			
 		end
 	end

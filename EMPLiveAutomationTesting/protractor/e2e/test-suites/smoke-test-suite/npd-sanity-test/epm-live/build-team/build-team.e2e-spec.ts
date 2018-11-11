@@ -418,7 +418,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
             .toBe(true, ValidationsHelper.getWindowShouldBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
 
         StepLogger.verification('"Build Team" tab is selected by default');
         // If we able to access Close button under Build Team tab that means Build tab is selected

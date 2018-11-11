@@ -39,6 +39,24 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>EPMLiveLists.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -59,10 +77,17 @@
     </Compile>
     <Compile Include="Admininfos\AdminFunctions.cs" />
     <Compile Include="Admininfos\Admininfos.cs" />
+    <Compile Include="Admininfos\Admininfos.DeleteResourceTimeoff.cs" />
+    <Compile Include="Admininfos\Admininfos.UpdateCategoriesFromRoles.cs" />
+    <Compile Include="Admininfos\Admininfos.UpdateDepartments.cs" />
+    <Compile Include="Admininfos\Admininfos.UpdateHolidaySchedule.cs" />
+    <Compile Include="Admininfos\Admininfos.UpdateListWork.cs" />
     <Compile Include="Admininfos\AllWorkhours.cs" />
+    <Compile Include="Admininfos\PFELookup.cs" />
     <Compile Include="Admininfos\Workhours.cs" />
     <Compile Include="Analyzers\AnalyzerDataCache.cs" />
     <Compile Include="Analyzers\BaseAnalyzer.cs" />
+    <Compile Include="Analyzers\BaseDetailRowData.cs" />
     <Compile Include="Analyzers\clsCostData.cs" />
     <Compile Include="Analyzers\CostAnalyzerData.cs" />
     <Compile Include="Analyzers\ModSupport.cs" />
@@ -78,13 +103,16 @@
     <Compile Include="Base\DBAccess.cs" />
     <Compile Include="Base\DBAccess\AdminPages.cs" />
     <Compile Include="Base\DBAccess\Calendars.cs" />
+    <Compile Include="Base\DBAccess\CalenderCleaner.cs" />
     <Compile Include="Base\DBAccess\CostCategories.cs" />
     <Compile Include="Base\DBAccess\Costs.cs" />
     <Compile Include="Base\DBAccess\CostTypes.cs" />
     <Compile Include="Base\DBAccess\CostValues.cs" />
     <Compile Include="Base\DBAccess\CostViews.cs" />
     <Compile Include="Base\DBAccess\DataAccess.cs" />
+    <Compile Include="Base\DBAccess\dbaCCV.cs" />
     <Compile Include="Base\DBAccess\DBAdmin.cs" />
+    <Compile Include="Base\DBAccess\dbaUsers.cs" />
     <Compile Include="Base\DBAccess\DbRepository.cs" />
     <Compile Include="Base\DBAccess\General.cs" />
     <Compile Include="Base\DBAccess\Groups.cs" />
@@ -94,9 +122,14 @@
     <Compile Include="Base\DBAccess\Lookups.cs" />
     <Compile Include="Base\DBAccess\Models.cs" />
     <Compile Include="Base\DBAccess\PEClasses.cs" />
+    <Compile Include="Base\DBAccess\ProjectDiscountRates.cs" />
+    <Compile Include="Base\DBAccess\ProjectResourceRate.cs" />
+    <Compile Include="Base\DBAccess\ProjectResourceRates.cs" />
     <Compile Include="Base\DBAccess\QueueManager.cs" />
     <Compile Include="Base\DBAccess\Rates.cs" />
     <Compile Include="Base\DBAccess\ResourcePlanning.cs" />
+    <Compile Include="Base\DBAccess\ViewData.cs" />
+    <Compile Include="Base\DBAccess\ViewDataContext.cs" />
     <Compile Include="Base\DBCommon.cs" />
     <Compile Include="Base\Debugger.cs" />
     <Compile Include="Base\Encrypt.cs" />
@@ -125,6 +158,11 @@
     <Compile Include="Infrastructure\Fields\PFEFieldType.cs" />
     <Compile Include="Infrastructure\Fields\TextField.cs" />
     <Compile Include="Infrastructure\IRepository.cs" />
+    <Compile Include="Interfaces\CostDataValues\IPeriodData.cs" />
+    <Compile Include="Interfaces\CostDataValues\ICustomFieldData.cs" />
+    <Compile Include="Interfaces\CostDataValues\IDataItem.cs" />
+    <Compile Include="Interfaces\CostDataValues\IListItemData.cs" />
+    <Compile Include="Interfaces\CostDataValues\ITargetRowData.cs" />
     <Compile Include="PortfolioItems\PortfolioItems.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -162,6 +200,7 @@
     <Compile Include="Services\LMR_SQLHelper.cs" />
     <Compile Include="Services\PfE_ReportingDB.cs" />
     <Compile Include="Services\QueueManager.cs" />
+    <Compile Include="Services\WSSAdmin.cs" />
     <Compile Include="Setup\SetupSite.cs" />
     <Compile Include="WEIntegration\PfEInterface.cs" />
     <Compile Include="WEIntegration\WEIntegration.cs" />
@@ -217,12 +256,63 @@
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\ND\" />
   </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="VBA">
+      <Guid>{000204EF-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>6</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>9</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="WE_DBASvr">
+      <Guid>{4F431C0A-C446-404B-BB87-8948397DFFFD}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="WE_PDSExt">
+      <Guid>{5D724080-F798-4489-8450-34B4BCC40601}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="WE_RSVP">
+      <Guid>{2401635E-0EE6-42B4-BD19-7DE6405F5388}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
+      <Project>{C773AE44-F066-446A-9CBD-D24AFA794E34}</Project>
+      <Name>EPMLiveCore</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\gacutil.exe" /u "$(TargetName)"</PreBuildEvent>
+    <PreBuildEvent>C:\Windows\syswow64\regsvr32.exe /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_RSVP.dll"
+C:\Windows\syswow64\regsvr32.exe /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_PDSExt.dll"
+C:\Windows\syswow64\regsvr32.exe /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_DBASvr.dll"
+C:\Windows\syswow64\regsvr32.exe /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_RSVP.dll"
+C:\Windows\syswow64\regsvr32.exe /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_PDSExt.dll"
+C:\Windows\syswow64\regsvr32.exe /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_DBASvr.dll"
+</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\gacutil.exe" /i "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

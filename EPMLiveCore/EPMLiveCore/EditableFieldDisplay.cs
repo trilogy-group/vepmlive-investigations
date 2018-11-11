@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Microsoft.SharePoint;
 
@@ -7,6 +8,9 @@ namespace EPMLiveCore
 {
     public class EditableFieldDisplay
     {
+        private const string MeKey = "[Me]";
+        private const string TodayKey = "[Today]";
+
         #region Methods (12)
 
         // Public Methods (5) 
@@ -263,269 +267,326 @@ namespace EPMLiveCore
 
         private static bool WhereField(SPField oConditionField, string where, string condition, string value, SPListItem li)
         {
-            bool bEvalResult = false;
+            var evalResult = false;
             try
             {
-                string sDateFormat = "";
-
-                if(value == "[Me]")
-                {
-                    value = SPContext.Current.Web.CurrentUser.Name;
-                }
-                if(value == "[Today]")
-                {
-                    DateTime dtNow = DateTime.Now;
-                    value = dtNow.ToString();
-                }
-                if(oConditionField.Type == SPFieldType.Boolean)
-                {
-                    if(value.ToUpper() == "YES" || value.ToUpper() == "TRUE")
-                    {
-                        value = "True";
-                    }
-                    else
-                    {
-                        value = "False";
-                    }
-                }
-                if(isDate(value))
-                {
-                    sDateFormat = getFieldSchemaAttribValue(oConditionField.SchemaXml, "Format");
-                }
-
-                string sFldVal = "";
-                if(oConditionField != null)
-                {
-                    sFldVal = li[oConditionField.Id].ToString();
-                    if(oConditionField.Type != SPFieldType.DateTime && oConditionField.Type != SPFieldType.Boolean && oConditionField.Type != SPFieldType.Number && oConditionField.Type != SPFieldType.Currency)
-                    {
-                        sFldVal = oConditionField.GetFieldValueAsText(sFldVal);
-                    }
-                }
-
-                bool bFldVal;
-                bool bVal;
-                DateTime dtFldVal;
-                DateTime dtVal;
-                double dblFldVal = 0;
-                double dblVal = 0;
-
-                switch(condition)
-                {
-                    case "IsEqualTo":
-                        if(DateTime.TryParse(sFldVal, out dtFldVal) && DateTime.TryParse(value, out dtVal))
-                            if(sDateFormat == "DateTime")
-                            {
-                                if(dtFldVal == dtVal)
-                                    bEvalResult = true;
-                                else
-                                    bEvalResult = false;
-                            }
-                            else
-                            {
-                                if(DateTime.Parse(dtFldVal.ToShortDateString()) == DateTime.Parse(dtVal.ToShortDateString()))
-                                    bEvalResult = true;
-                                else
-                                    bEvalResult = false;
-                            }
-                        else if(oConditionField.Type == SPFieldType.Number && double.TryParse(sFldVal, out dblFldVal) && double.TryParse(value, out dblVal))
-                            if(dblFldVal.Equals(dblVal))
-                                bEvalResult = true;
-                            else
-                                bEvalResult = false;
-                        else if(oConditionField.Type == SPFieldType.Currency && double.TryParse(sFldVal, out dblFldVal) && double.TryParse(value, out dblVal))
-                            if(dblFldVal.Equals(dblVal))
-                                bEvalResult = true;
-                            else
-                                bEvalResult = false;
-                        else if(oConditionField.Type == SPFieldType.Boolean && bool.TryParse(sFldVal, out bFldVal) && bool.TryParse(value, out bVal))
-                            if(bFldVal.Equals(bVal))
-                                bEvalResult = true;
-                            else
-                                bEvalResult = false;
-                        else if(sFldVal.Equals(value))
-                            bEvalResult = true;
-                        else
-                            bEvalResult = false;
-                        break;
-                    case "IsNotEqualTo":
-                        if(DateTime.TryParse(sFldVal, out dtFldVal) && DateTime.TryParse(value, out dtVal))
-                            if(sDateFormat == "DateTime")
-                            {
-                                if(!dtFldVal.Equals(dtVal))
-                                    bEvalResult = true;
-                                else
-                                    bEvalResult = false;
-                            }
-                            else
-                            {
-                                if(DateTime.Parse(dtFldVal.ToShortDateString()) != DateTime.Parse(dtVal.ToShortDateString()))
-                                    bEvalResult = true;
-                                else
-                                    bEvalResult = false;
-                            }
-                        else if(oConditionField.Type == SPFieldType.Number && double.TryParse(sFldVal, out dblFldVal) && double.TryParse(value, out dblVal))
-                            if(!dblFldVal.Equals(dblVal))
-                                bEvalResult = true;
-                            else
-                                bEvalResult = false;
-                        else if(oConditionField.Type == SPFieldType.Currency && double.TryParse(sFldVal, out dblFldVal) && double.TryParse(value, out dblVal))
-                            if(!dblFldVal.Equals(dblVal))
-                                bEvalResult = true;
-                            else
-                                bEvalResult = false;
-                        else if(oConditionField.Type == SPFieldType.Boolean && bool.TryParse(sFldVal, out bFldVal) && bool.TryParse(value, out bVal))
-                            if(!bFldVal.Equals(bVal))
-                                bEvalResult = true;
-                            else
-                                bEvalResult = false;
-                        else if(!sFldVal.Equals(value))
-                            bEvalResult = true;
-                        else
-                            bEvalResult = false;
-                        break;
-                    case "IsGreaterThan":
-                        if(DateTime.TryParse(sFldVal, out dtFldVal) && DateTime.TryParse(value, out dtVal))
-                            if(sDateFormat == "DateTime")
-                            {
-                                if(dtFldVal > dtVal)
-                                    bEvalResult = true;
-                                else
-                                    bEvalResult = false;
-                            }
-                            else
-                            {
-                                if(DateTime.Parse(dtFldVal.ToShortDateString()) > DateTime.Parse(dtVal.ToShortDateString()))
-                                    bEvalResult = true;
-                                else
-                                    bEvalResult = false;
-                            }
-                        else if(oConditionField.Type == SPFieldType.Number && double.TryParse(sFldVal, out dblFldVal) && double.TryParse(value, out dblVal))
-                            if(dblFldVal > dblVal)
-                                bEvalResult = true;
-                            else
-                                bEvalResult = false;
-                        else if(oConditionField.Type == SPFieldType.Currency && double.TryParse(sFldVal, out dblFldVal) && double.TryParse(value, out dblVal))
-                            if(dblFldVal > dblVal)
-                                bEvalResult = true;
-                            else
-                                bEvalResult = false;
-                        else
-                            bEvalResult = false;
-                        break;
-                    case "IsLessThan":
-                        if(DateTime.TryParse(sFldVal, out dtFldVal) && DateTime.TryParse(value, out dtVal))
-                            if(sDateFormat == "DateTime")
-                            {
-                                if(dtFldVal < dtVal)
-                                    bEvalResult = true;
-                                else
-                                    bEvalResult = false;
-                            }
-                            else
-                            {
-                                if(DateTime.Parse(dtFldVal.ToShortDateString()) < DateTime.Parse(dtVal.ToShortDateString()))
-                                    bEvalResult = true;
-                                else
-                                    bEvalResult = false;
-                            }
-                        else if(oConditionField.Type == SPFieldType.Number && double.TryParse(sFldVal, out dblFldVal) && double.TryParse(value, out dblVal))
-                            if(dblFldVal < dblVal)
-                                bEvalResult = true;
-                            else
-                                bEvalResult = false;
-                        else if(oConditionField.Type == SPFieldType.Currency && double.TryParse(sFldVal, out dblFldVal) && double.TryParse(value, out dblVal))
-                            if(dblFldVal < dblVal)
-                                bEvalResult = true;
-                            else
-                                bEvalResult = false;
-                        else
-                            bEvalResult = false;
-                        break;
-                    case "IsGreaterThanOrEqual":
-                        if(DateTime.TryParse(sFldVal, out dtFldVal) && DateTime.TryParse(value, out dtVal))
-                            if(sDateFormat == "DateTime")
-                            {
-                                if(dtFldVal >= dtVal)
-                                    bEvalResult = true;
-                                else
-                                    bEvalResult = false;
-                            }
-                            else
-                            {
-                                if(DateTime.Parse(dtFldVal.ToShortDateString()) >= DateTime.Parse(dtVal.ToShortDateString()))
-                                    bEvalResult = true;
-                                else
-                                    bEvalResult = false;
-                            }
-                        else if(oConditionField.Type == SPFieldType.Number && double.TryParse(sFldVal, out dblFldVal) && double.TryParse(value, out dblVal))
-                            if(dblFldVal >= dblVal)
-                                bEvalResult = true;
-                            else
-                                bEvalResult = false;
-                        else if(oConditionField.Type == SPFieldType.Currency && double.TryParse(sFldVal, out dblFldVal) && double.TryParse(value, out dblVal))
-                            if(dblFldVal >= dblVal)
-                                bEvalResult = true;
-                            else
-                                bEvalResult = false;
-                        else
-                            bEvalResult = false;
-                        break;
-                    case "IsLessThanOrEqual":
-                        if(DateTime.TryParse(sFldVal, out dtFldVal) && DateTime.TryParse(value, out dtVal))
-                            if(sDateFormat == "DateTime")
-                            {
-                                if(dtFldVal <= dtVal)
-                                    bEvalResult = true;
-                                else
-                                    bEvalResult = false;
-                            }
-                            else
-                            {
-                                if(DateTime.Parse(dtFldVal.ToShortDateString()) <= DateTime.Parse(dtVal.ToShortDateString()))
-                                    bEvalResult = true;
-                                else
-                                    bEvalResult = false;
-                            }
-                        else if(oConditionField.Type == SPFieldType.Number && double.TryParse(sFldVal, out dblFldVal) && double.TryParse(value, out dblVal))
-                            if(dblFldVal <= dblVal)
-                                bEvalResult = true;
-                            else
-                                bEvalResult = false;
-                        else if(oConditionField.Type == SPFieldType.Currency && double.TryParse(sFldVal, out dblFldVal) && double.TryParse(value, out dblVal))
-                            if(dblFldVal <= dblVal)
-                                bEvalResult = true;
-                            else
-                                bEvalResult = false;
-                        else
-                            bEvalResult = false;
-                        break;
-                    //case "BeginWith":
-                    //    if (sFldVal.StartsWith(value))
-                    //        bEvalResult = true;
-                    //    else
-                    //        bEvalResult = false;
-                    //    break;
-                    //case "EndWith":
-                    //    if (sFldVal.EndsWith(value))
-                    //        bEvalResult = true;
-                    //    else
-                    //        bEvalResult = false;
-                    //    break;
-                    case "Contains":
-                        if(sFldVal.Contains(value))
-                            bEvalResult = true;
-                        else
-                            bEvalResult = false;
-                        break;
-                    default:
-                        break;
-                }
+                var dateFormat = GetDateFormat(oConditionField, ref value);
+                var fieldValue = GetFieldValue(oConditionField, li);
+                evalResult = EvaluateResult(oConditionField, condition, value, evalResult, fieldValue, dateFormat);
             }
-            catch
+            catch(Exception ex)
             {
+                Trace.TraceError("Exception Suppressed {0}", ex);
             }
-            return bEvalResult;
+            return evalResult;
+        }
+
+        private static string GetDateFormat(SPField oConditionField, ref string formatValue)
+        {
+            var dateFormat = string.Empty;
+
+            if (formatValue == MeKey)
+            {
+                formatValue = SPContext.Current.Web.CurrentUser.Name;
+            }
+            if (formatValue == TodayKey)
+            {
+                var now = DateTime.Now;
+                formatValue = now.ToString();
+            }
+            if (oConditionField.Type == SPFieldType.Boolean)
+            {
+                formatValue = string.Equals(formatValue, "YES", StringComparison.OrdinalIgnoreCase) || string.Equals(formatValue, "TRUE", StringComparison.OrdinalIgnoreCase)
+                    ? bool.TrueString
+                    : bool.FalseString;
+            }
+            if (isDate(formatValue))
+            {
+                dateFormat = getFieldSchemaAttribValue(oConditionField.SchemaXml, "Format");
+            }
+            return dateFormat;
+        }
+
+        private static string GetFieldValue(SPField oConditionField, SPListItem li)
+        {
+            var fieldValue = string.Empty;
+            if (oConditionField != null)
+            {
+                fieldValue = li[oConditionField.Id].ToString();
+                if (oConditionField.Type != SPFieldType.DateTime
+                    && oConditionField.Type != SPFieldType.Boolean
+                    && oConditionField.Type != SPFieldType.Number
+                    && oConditionField.Type != SPFieldType.Currency)
+                {
+                    fieldValue = oConditionField.GetFieldValueAsText(fieldValue);
+                }
+            }
+            return fieldValue;
+        }
+
+        private static bool EvaluateResult(SPField oConditionField, string condition, string value, bool evalResult, string fieldValue, string dateFormat)
+        {
+            switch (condition)
+            {
+                case "IsEqualTo":
+                    evalResult = HandleEqualToCase(oConditionField, value, fieldValue, dateFormat);
+                    break;
+                case "IsNotEqualTo":
+                    evalResult = HandleNotEqualToCase(oConditionField, value, fieldValue, dateFormat);
+                    break;
+                case "IsGreaterThan":
+                    evalResult = HandleGreaterThanCase(oConditionField, value, fieldValue, dateFormat);
+                    break;
+                case "IsLessThan":
+                    evalResult = HandleLessThanCase(oConditionField, value, fieldValue, dateFormat);
+                    break;
+                case "IsGreaterThanOrEqual":
+                    evalResult = HandleGreaterThanOrEqualCase(oConditionField, value, fieldValue, dateFormat);
+                    break;
+                case "IsLessThanOrEqual":
+                    evalResult = HandleLEssThanOrEqualCase(oConditionField, value, fieldValue, dateFormat);
+                    break;
+                case "Contains":
+                    evalResult = fieldValue.Contains(value);
+                    break;
+                default:
+                    Trace.TraceError("Unexpected Value for {0}: {1}", nameof(condition), condition);
+                    break;
+            }
+            return evalResult;
+        }
+
+        private static bool HandleEqualToCase(SPField oConditionField, string value, string fieldValue, string dateFormat)
+        {
+            bool evalResult;
+            bool booleanFieldValue;
+            bool booleanValue;
+            DateTime dateTimeFieldValue;
+            DateTime dateTimeValue;
+            double doubleFieldValue = 0;
+            double doubleValue = 0;
+
+            if (DateTime.TryParse(fieldValue, out dateTimeFieldValue) && DateTime.TryParse(value, out dateTimeValue))
+            {
+                if (dateFormat == "DateTime")
+                {
+                    evalResult = dateTimeFieldValue == dateTimeValue;
+                }
+                else
+                {
+                    evalResult = DateTime.Parse(dateTimeFieldValue.ToShortDateString()) == DateTime.Parse(dateTimeValue.ToShortDateString());
+                }
+            }
+            else if (oConditionField.Type == SPFieldType.Number
+                && double.TryParse(fieldValue, out doubleFieldValue)
+                && double.TryParse(value, out doubleValue))
+            {
+                evalResult = doubleFieldValue.Equals(doubleValue);
+            }
+            else if (oConditionField.Type == SPFieldType.Currency
+                && double.TryParse(fieldValue, out doubleFieldValue)
+                && double.TryParse(value, out doubleValue))
+            {
+                evalResult = doubleFieldValue.Equals(doubleValue);
+            }
+            else if (oConditionField.Type == SPFieldType.Boolean
+                && bool.TryParse(fieldValue, out booleanFieldValue)
+                && bool.TryParse(value, out booleanValue))
+            {
+                evalResult = booleanFieldValue.Equals(booleanValue);
+            }
+            else
+            {
+                evalResult = fieldValue.Equals(value);
+            }
+            return evalResult;
+        }
+
+        private static bool HandleNotEqualToCase(SPField oConditionField, string value, string fieldValue, string dateFormat)
+        {
+            bool evalResult;
+            bool booleanFieldValue;
+            bool booleanValue;
+            DateTime dateTimeFieldValue;
+            DateTime dateTimeValue;
+            double doubleFieldValue = 0;
+            double doubleValue = 0;
+
+            if (DateTime.TryParse(fieldValue, out dateTimeFieldValue) && DateTime.TryParse(value, out dateTimeValue))
+            {
+                if (dateFormat == "DateTime")
+                {
+                    evalResult = !dateTimeFieldValue.Equals(dateTimeValue);
+                }
+                else
+                {
+                    evalResult = DateTime.Parse(dateTimeFieldValue.ToShortDateString()) != DateTime.Parse(dateTimeValue.ToShortDateString());
+                }
+            }
+            else if (oConditionField.Type == SPFieldType.Number
+                && double.TryParse(fieldValue, out doubleFieldValue)
+                && double.TryParse(value, out doubleValue))
+            {
+                evalResult = !doubleFieldValue.Equals(doubleValue);
+            }
+            else if (oConditionField.Type == SPFieldType.Currency
+                && double.TryParse(fieldValue, out doubleFieldValue)
+                && double.TryParse(value, out doubleValue))
+            {
+                evalResult = !doubleFieldValue.Equals(doubleValue);
+            }
+            else if (oConditionField.Type == SPFieldType.Boolean
+                && bool.TryParse(fieldValue, out booleanFieldValue)
+                && bool.TryParse(value, out booleanValue))
+            {
+                evalResult = !booleanFieldValue.Equals(booleanValue);
+            }
+            else
+            {
+                evalResult = !fieldValue.Equals(value);
+            }
+            return evalResult;
+        }
+
+        private static bool HandleGreaterThanCase(SPField oConditionField, string value, string fieldValue, string dateFormat)
+        {
+            bool evalResult;
+            bool booleanFieldValue;
+            bool booleanValue;
+            DateTime dateTimeFieldValue;
+            DateTime dateTimeValue;
+            double doubleFieldValue = 0;
+            double doubleValue = 0;
+
+            if (DateTime.TryParse(fieldValue, out dateTimeFieldValue) && DateTime.TryParse(value, out dateTimeValue))
+            {
+                if (dateFormat == "DateTime")
+                {
+                    evalResult = dateTimeFieldValue > dateTimeValue;
+                }
+                else
+                {
+                    evalResult = DateTime.Parse(dateTimeFieldValue.ToShortDateString()) > DateTime.Parse(dateTimeValue.ToShortDateString());
+                }
+            }
+            else if (oConditionField.Type == SPFieldType.Number
+                && double.TryParse(fieldValue, out doubleFieldValue)
+                && double.TryParse(value, out doubleValue))
+            {
+                evalResult = doubleFieldValue > doubleValue;
+            }
+            else
+            {
+                evalResult = oConditionField.Type == SPFieldType.Currency
+                    && double.TryParse(fieldValue, out doubleFieldValue)
+                    && double.TryParse(value, out doubleValue)
+                    && doubleFieldValue > doubleValue;
+            }
+            return evalResult;
+        }
+
+        private static bool HandleLessThanCase(SPField oConditionField, string value, string fieldValue, string dateFormat)
+        {
+            bool evalResult;
+            bool booleanFieldValue;
+            bool booleanValue;
+            DateTime dateTimeFieldValue;
+            DateTime dateTimeValue;
+            double doubleFieldValue = 0;
+            double doubleValue = 0;
+
+            if (DateTime.TryParse(fieldValue, out dateTimeFieldValue) && DateTime.TryParse(value, out dateTimeValue))
+            {
+                if (dateFormat == "DateTime")
+                {
+                    evalResult = dateTimeFieldValue < dateTimeValue;
+                }
+                else
+                {
+                    evalResult = DateTime.Parse(dateTimeFieldValue.ToShortDateString()) < DateTime.Parse(dateTimeValue.ToShortDateString());
+                }
+            }
+            else if (oConditionField.Type == SPFieldType.Number
+                && double.TryParse(fieldValue, out doubleFieldValue)
+                && double.TryParse(value, out doubleValue))
+            {
+                evalResult = doubleFieldValue < doubleValue;
+            }
+            else
+            {
+                evalResult = oConditionField.Type == SPFieldType.Currency
+                    && double.TryParse(fieldValue, out doubleFieldValue)
+                    && double.TryParse(value, out doubleValue)
+                    && doubleFieldValue < doubleValue;
+            }
+            return evalResult;
+        }
+
+        private static bool HandleGreaterThanOrEqualCase(SPField oConditionField, string value, string fieldValue, string dateFormat)
+        {
+            bool evalResult;
+            bool booleanFieldValue;
+            bool booleanValue;
+            DateTime dateTimeFieldValue;
+            DateTime dateTimeValue;
+            double doubleFieldValue = 0;
+            double doubleValue = 0;
+
+            if (DateTime.TryParse(fieldValue, out dateTimeFieldValue) && DateTime.TryParse(value, out dateTimeValue))
+            {
+                if (dateFormat == "DateTime")
+                {
+                    evalResult = dateTimeFieldValue >= dateTimeValue;
+                }
+                else
+                {
+                    evalResult = DateTime.Parse(dateTimeFieldValue.ToShortDateString()) >= DateTime.Parse(dateTimeValue.ToShortDateString());
+                }
+            }
+            else if (oConditionField.Type == SPFieldType.Number
+                && double.TryParse(fieldValue, out doubleFieldValue)
+                && double.TryParse(value, out doubleValue))
+            {
+                evalResult = doubleFieldValue >= doubleValue;
+            }
+            else
+                evalResult = oConditionField.Type == SPFieldType.Currency
+                    && double.TryParse(fieldValue, out doubleFieldValue)
+                    && double.TryParse(value, out doubleValue)
+                    && doubleFieldValue >= doubleValue;
+            return evalResult;
+        }
+
+        private static bool HandleLEssThanOrEqualCase(SPField oConditionField, string value, string fieldValue, string dateFormat)
+        {
+            bool evalResult;
+            bool booleanFieldValue;
+            bool booleanValue;
+            DateTime dateTimeFieldValue;
+            DateTime dateTimeValue;
+            double doubleFieldValue = 0;
+            double doubleValue = 0;
+
+            if (DateTime.TryParse(fieldValue, out dateTimeFieldValue) && DateTime.TryParse(value, out dateTimeValue))
+            {
+                evalResult = dateFormat == "DateTime"
+                    ? dateTimeFieldValue <= dateTimeValue
+                    : DateTime.Parse(dateTimeFieldValue.ToShortDateString()) <= DateTime.Parse(dateTimeValue.ToShortDateString());
+            }
+            else if (oConditionField.Type == SPFieldType.Number
+                && double.TryParse(fieldValue, out doubleFieldValue)
+                && double.TryParse(value, out doubleValue))
+            {
+                evalResult = doubleFieldValue <= doubleValue;
+            }
+            else
+            {
+                evalResult = oConditionField.Type == SPFieldType.Currency
+                    && double.TryParse(fieldValue, out doubleFieldValue)
+                    && double.TryParse(value, out doubleValue)
+                    && doubleFieldValue <= doubleValue;
+            }
+            return evalResult;
         }
 
         private static bool WhereUser(string condition, string group)

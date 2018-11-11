@@ -299,4 +299,8 @@ export class MyWorkPage {
     static get searchItem() {
         return element(By.id('MWG_Search'));
     }
+
+    static get topBar() {
+        return element(By.css('div.ms-cui-topBar2'));
+    }
 }

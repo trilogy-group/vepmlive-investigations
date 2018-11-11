@@ -63,7 +63,23 @@ namespace PortfolioEngineCore
                     //else
                     //    m_oConnection.ConnectionString = dbConnectionStringBuilder.ToString() + ";UID=" + m_sEPKUID + ";PWD=" + m_sEPKPWD + ";Application Name=PortfolioEngine";
 
-                    m_oConnection.Open();
+                    if (!string.IsNullOrEmpty(dbConnectionStringBuilder.ToString()))
+                    {
+                        m_oConnection.Open();
+                    }
+                    else
+                    {
+                        var connectionString = m_oConnection != null
+                            ? ": " + m_oConnection.ConnectionString
+                            : string.Empty;
+
+                        HandleStatusError(
+                            SeverityEnum.Error,
+                            "Sql.Open",
+                            (StatusEnum)99959,
+                            "Empty PPM connection string, database connection skipped " + connectionString,
+                            true);
+                    }
                 }
             }
             catch (Exception ex)
@@ -351,7 +367,7 @@ namespace PortfolioEngineCore
             return s;
         }
 
-        public virtual StatusEnum HandleException(string sFunction, StatusEnum eStatus, Exception ex)
+        public virtual StatusEnum HandleException(string sFunction, StatusEnum eStatus, Exception ex, bool skipDBLog = false)
         {
             m_eStatusSeverity = SeverityEnum.Exception;
             m_sStatusFunction = sFunction;
@@ -361,11 +377,11 @@ namespace PortfolioEngineCore
             // V4.4.3 - don't let exception writing to eventlog hide original error
             try { EventLog.WriteEntry("DBAccess Exception", FormatErrorText(), EventLogEntryType.Error); }
             catch { }
-            DBTrace(eStatus, TraceChannelEnum.Exception, "HandleException", sFunction, ex.Message.ToString(), "Exception Stack : " + ex.StackTrace.ToString(), true);
+            if (!skipDBLog) DBTrace(eStatus, TraceChannelEnum.Exception, "HandleException", sFunction, ex.Message.ToString(), "Exception Stack : " + ex.StackTrace.ToString(), true);
             return m_eStatus;
         }
 
-        public virtual StatusEnum HandleStatusError(SeverityEnum eSeverity, string sFunction, StatusEnum eStatus, string sText)
+        public virtual StatusEnum HandleStatusError(SeverityEnum eSeverity, string sFunction, StatusEnum eStatus, string sText, bool skipDBLog = false)
         {
             m_eStatusSeverity = eSeverity;
             m_sStatusFunction = sFunction;
@@ -374,7 +390,7 @@ namespace PortfolioEngineCore
             // V4.4.3 - don't let exception writing to eventlog hide original error
             try { EventLog.WriteEntry("DBAccess Error", FormatErrorText(), EventLogEntryType.Error); }
             catch { }
-            DBTrace(eStatus, TraceChannelEnum.Exception, "HandleStatusError", sFunction, sText, "Severity : " + eSeverity.ToString(), true);
+            if (!skipDBLog) DBTrace(eStatus, TraceChannelEnum.Exception, "HandleStatusError", sFunction, sText, "Severity : " + eSeverity.ToString(), true);
             return m_eStatus;
         }
 
@@ -584,6 +600,16 @@ namespace PortfolioEngineCore
             }
             bIsNull = true;
             return DateTime.MinValue;
+        }
+
+        public static DateTime? ReadNullableDateValue(object value)
+        {
+            if (!value.Equals(DBNull.Value))
+            {
+                return Convert.ToDateTime(value);
+            }
+
+            return null;
         }
 
         static public string ReadStringValue(object obj)

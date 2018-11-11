@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -62,7 +63,13 @@ namespace EPMLiveCore.Integrations.Salesforce
                 byte[] bytes = webClient.UploadValues(string.Empty, "POST", collection);
 
                 var serializer = new DataContractJsonSerializer(typeof (SalesforceAuthResponse));
-                _salesforceAuthResponse = serializer.ReadObject(new MemoryStream(bytes)) as SalesforceAuthResponse;
+                if (bytes != null)
+                {
+                    using (var memoryStream = new MemoryStream(bytes))
+                    {
+                        _salesforceAuthResponse = serializer.ReadObject(memoryStream) as SalesforceAuthResponse;
+                    }
+                }
             }
 
             // Validating "ModifyAllData" permission. Use of the Metadata API requires a user with the ModifyAllData permission.
@@ -246,18 +253,17 @@ namespace EPMLiveCore.Integrations.Salesforce
 
                 if (method.Equals("GET"))
                 {
-                    response =
-                        serializer.ReadObject(
-                            new MemoryStream(Encoding.Default.GetBytes(webClient.DownloadString(string.Empty)))) as
-                        SalesforceServiceResponse;
+                    using (var memoryStream = new MemoryStream(Encoding.Default.GetBytes(webClient.DownloadString(string.Empty))))
+                    {
+                        response = serializer.ReadObject(memoryStream) as SalesforceServiceResponse;
+                    }
                 }
                 else
                 {
-                    response =
-                        serializer.ReadObject(
-                            new MemoryStream(
-                                Encoding.Default.GetBytes(webClient.UploadString(string.Empty, method, data)))) as
-                        SalesforceServiceResponse;
+                    using (var memoryStream = new MemoryStream(Encoding.Default.GetBytes(webClient.UploadString(string.Empty, method, data))))
+                    {
+                        response = serializer.ReadObject(memoryStream) as SalesforceServiceResponse;
+                    }
                 }
             }
 
@@ -410,6 +416,7 @@ namespace EPMLiveCore.Integrations.Salesforce
         internal List<Dictionary<UpsertKind, SaveResult>> UpsertItems(string objectName, DataTable items)
         {
             var fields = new List<string>();
+
             FillObjectFields(items, fields);
 
             var userFields = new List<string>();
@@ -419,13 +426,53 @@ namespace EPMLiveCore.Integrations.Salesforce
             var timeFields = new List<string>();
 
             var lookupFieldObjects = new Dictionary<string, string>();
+            var objFields = _sfMedadataService.GetFields(objectName);
 
-            Field[] objFields = _sfMedadataService.GetFields(objectName);
-            foreach (Field objField in objFields)
+            PopulateListFields(items, objFields, userFields, lookupFields, lookupFieldObjects, percentFields, dateFields, timeFields);
+
+            var userEmailIdMap = new Dictionary<string, string>();
+            var userEmailNameMap = new Dictionary<string, string>();
+            var emailList = new List<string>();
+
+            PopulateDataRow(items, userFields, emailList);
+
+            var userEmail = string.Empty;
+
+            PopulateuserEmailIdMapDictionary(emailList, userEmailIdMap, userEmailNameMap, ref userEmail);
+
+            foreach (DataRow dataRow in items.Rows)
             {
-                string fieldName = objField.name;
-                DataColumnCollection dataColumnCollection = items.Columns;
-                if (!dataColumnCollection.Contains(fieldName)) continue;
+                SetUserFields(userFields, dataRow, userEmailIdMap, userEmail);
+                SetUserEmailNames(items, userEmailNameMap, dataRow);
+                SetLookUpFields(lookupFields, dataRow, lookupFieldObjects);
+                SetPercentFields(percentFields, dataRow);
+                SetDataFields(dateFields, dataRow);
+                SetTimeFields(timeFields, dataRow);
+            }
+
+            var extIdField = objFields.FirstOrDefault(f => f.name.Equals(_appNamespace + "__EPM_Live_ID__c"));
+
+            return _sfMedadataService.UpsertItems(objectName, items, extIdField != null);
+        }
+
+        private static void PopulateListFields(
+            DataTable items,
+            Field[] objFields,
+            List<string> userFields,
+            List<string> lookupFields,
+            Dictionary<string, string> lookupFieldObjects,
+            List<string> percentFields,
+            List<string> dateFields,
+            List<string> timeFields)
+        {
+            foreach (var objField in objFields)
+            {
+                var fieldName = objField.name;
+                var dataColumnCollection = items.Columns;
+                if (!dataColumnCollection.Contains(fieldName))
+                {
+                    continue;
+                }
 
                 switch (objField.type)
                 {
@@ -454,57 +501,68 @@ namespace EPMLiveCore.Integrations.Salesforce
                         break;
                 }
             }
+        }
 
-            var userEmailIdMap = new Dictionary<string, string>();
-            var userEmailNameMap = new Dictionary<string, string>();
-
-            var emailList = new List<string>();
+        private void PopulateDataRow(DataTable items, List<string> userFields, List<string> emailList)
+        {
             foreach (DataRow dataRow in items.Rows)
             {
-                foreach (string userField in userFields)
+                foreach (var userField in userFields)
                 {
-                    object o = dataRow[userField];
-                    if (o == null || o == DBNull.Value) continue;
+                    var userFieldValue = dataRow[userField];
+                    if (userFieldValue == null || userFieldValue == DBNull.Value)
+                    {
+                        continue;
+                    }
 
-                    if (string.IsNullOrEmpty(o.ToString())) continue;
+                    if (string.IsNullOrWhiteSpace(userFieldValue.ToString()))
+                    {
+                        continue;
+                    }
 
-                    string[] emails = o.ToString().Split(',');
-                    foreach (string sEmail in emails.Select(email => "'" + email + "'")
-                                                    .Where(sEmail => !emailList.Contains(sEmail)))
+                    var emails = userFieldValue.ToString().Split(',');
+                    foreach (var sEmail in emails.Select(email => "'" + email + "'").Where(sEmail => !emailList.Contains(sEmail)))
                     {
                         emailList.Add(sEmail);
                     }
 
                     dataRow[userField] = emails[0];
 
-                    if (emails.Count() <= 1) continue;
+                    if (emails.Count() <= 1)
+                    {
+                        continue;
+                    }
 
                     if (!items.Columns.Contains(_additionalAssignedToField))
                     {
-                        items.Columns.Add(_additionalAssignedToField, typeof (string));
+                        items.Columns.Add(_additionalAssignedToField, typeof(string));
                     }
 
-                    string[] additionalUsers = (emails.Select(e => e)).Skip(1).ToArray();
+                    var additionalUsers = emails.Select(e => e).Skip(1).ToArray();
                     dataRow[_additionalAssignedToField] = string.Join(",", additionalUsers);
                 }
             }
+        }
 
-            string userEmail = string.Empty;
-
+        private void PopulateuserEmailIdMapDictionary(List<string> emailList, Dictionary<string, string> userEmailIdMap, Dictionary<string, string> userEmailNameMap, ref string userEmail)
+        {
             if (emailList.Count > 0)
             {
                 try
                 {
-                    IEnumerable<sObject> sfUsers =
-                        _sfMedadataService.ExecuteQuery(
-                            string.Format(
-                                "SELECT Id, Email, Name, Username FROM User WHERE Email IN ({0}) OR Username = '{1}'",
-                                string.Join(",", emailList.ToArray()), _username));
+                    var sfUsers = _sfMedadataService.ExecuteQuery(
+                        string.Format(
+                            "SELECT Id, Email, Name, Username FROM User WHERE Email IN ({0}) OR Username = '{1}'",
+                            string.Join(",", emailList.ToArray()),
+                            _username));
 
-                    foreach (sObject sObject in sfUsers)
+                    foreach (var sObject in sfUsers)
                     {
-                        string email = sObject.Any[1].InnerText;
-                        if (userEmailIdMap.ContainsKey(email)) continue;
+                        var email = sObject.Any[1].InnerText;
+                        if (userEmailIdMap.ContainsKey(email))
+                        {
+                            continue;
+                        }
 
                         userEmailIdMap.Add(email, sObject.Id);
                         userEmailNameMap.Add(email, sObject.Any[2].InnerText);
@@ -515,108 +573,132 @@ namespace EPMLiveCore.Integrations.Salesforce
                         }
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
                 }
             }
+        }
 
-            foreach (DataRow dataRow in items.Rows)
+        private static void SetUserFields(List<string> userFields, DataRow dataRow, Dictionary<string, string> userEmailIdMap, string userEmail)
+        {
+            foreach (var userField in userFields)
             {
-                foreach (string userField in userFields)
-                {
-                    object value = null;
+                object userFieldValue = null;
 
-                    object oEmail = dataRow[userField];
-                    if (oEmail != null && oEmail != DBNull.Value)
+                var emailValue = dataRow[userField];
+                if (emailValue != null && emailValue != DBNull.Value)
+                {
+                    var email = emailValue.ToString();
+                    if (userEmailIdMap.ContainsKey(email))
                     {
-                        string email = oEmail.ToString();
-                        if (userEmailIdMap.ContainsKey(email))
+                        userFieldValue = userEmailIdMap[email];
+                    }
+                    else if (userField.Equals("ownerid", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
                         {
-                            value = userEmailIdMap[email];
+                            userFieldValue = userEmailIdMap[userEmail];
                         }
-                        else if (userField.ToLower().Equals("ownerid"))
+                        catch (Exception ex)
                         {
-                            try
-                            {
-                                value = userEmailIdMap[userEmail];
-                            }
-                            catch
-                            {
-                            }
-                        }
-                    }
-
-                    dataRow[userField] = value;
-                }
-
-                if (items.Columns.Contains(_additionalAssignedToField))
-                {
-                    foreach (var p in userEmailNameMap)
-                    {
-                        dataRow[_additionalAssignedToField] =
-                            dataRow[_additionalAssignedToField].ToString().Replace(p.Key, p.Value);
-                    }
-                }
-
-                foreach (string lookupField in lookupFields)
-                {
-                    object oValue = dataRow[lookupField];
-                    if (oValue != null && oValue != DBNull.Value)
-                    {
-                        if (oValue.ToString().Contains(";#")) dataRow[lookupField] = null;
-                    }
-
-                    oValue = dataRow[lookupField];
-
-                    if (oValue != null && oValue != DBNull.Value)
-                    {
-                        if (!LookupItemExists(oValue.ToString(), lookupFieldObjects[lookupField]))
-                        {
-                            dataRow[lookupField] = null;
+                            Trace.TraceError("Exception Suppressed {0}", ex);
                         }
                     }
                 }
 
-                foreach (string percentField in percentFields)
-                {
-                    object oValue = dataRow[percentField];
-                    if (oValue == null || oValue == DBNull.Value) continue;
+                dataRow[userField] = userFieldValue;
+            }
+        }
 
-                    double dValue;
-                    if (double.TryParse(oValue.ToString(), out dValue))
+        private void SetUserEmailNames(DataTable items, Dictionary<string, string> userEmailNameMap, DataRow dataRow)
+        {
+            if (items.Columns.Contains(_additionalAssignedToField))
+            {
+                foreach (var userEmailName in userEmailNameMap)
+                {
+                    dataRow[_additionalAssignedToField] = dataRow[_additionalAssignedToField].ToString().Replace(userEmailName.Key, userEmailName.Value);
+                }
+            }
+        }
+
+        private void SetLookUpFields(List<string> lookupFields, DataRow dataRow, Dictionary<string, string> lookupFieldObjects)
+        {
+            foreach (var lookupField in lookupFields)
+            {
+                var lookUpValue = dataRow[lookupField];
+                if (lookUpValue != null && lookUpValue != DBNull.Value)
+                {
+                    if (lookUpValue.ToString().Contains(";#"))
                     {
-                        dataRow[percentField] = dValue/100;
+                        dataRow[lookupField] = null;
                     }
                 }
 
-                foreach (string dateField in dateFields)
+                lookUpValue = dataRow[lookupField];
+
+                if (lookUpValue != null && lookUpValue != DBNull.Value)
                 {
-                    object oValue = dataRow[dateField];
-                    if (oValue == null || oValue == DBNull.Value) continue;
-
-                    DateTime dtValue;
-                    if (DateTime.TryParse(oValue.ToString(), out dtValue))
+                    if (!LookupItemExists(lookUpValue.ToString(), lookupFieldObjects[lookupField]))
                     {
-                        dataRow[dateField] = dtValue.ToString("yyyy-MM-dd");
-                    }
-                }
-
-                foreach (string timeField in timeFields)
-                {
-                    object oValue = dataRow[timeField];
-                    if (oValue == null || oValue == DBNull.Value) continue;
-
-                    DateTime dtValue;
-                    if (DateTime.TryParse(oValue.ToString(), out dtValue))
-                    {
-                        dataRow[timeField] = dtValue.ToString("HH:mm:ss");
+                        dataRow[lookupField] = null;
                     }
                 }
             }
+        }
 
-            Field extIdField = objFields.FirstOrDefault(f => f.name.Equals(_appNamespace + "__EPM_Live_ID__c"));
+        private static void SetPercentFields(List<string> percentFields, DataRow dataRow)
+        {
+            foreach (var percentField in percentFields)
+            {
+                var percentValue = dataRow[percentField];
+                if (percentValue == null || percentValue == DBNull.Value)
+                {
+                    continue;
+                }
 
-            return _sfMedadataService.UpsertItems(objectName, items, extIdField != null);
+                double percent;
+                if (double.TryParse(percentValue.ToString(), out percent))
+                {
+                    dataRow[percentField] = percent / 100;
+                }
+            }
+        }
+
+        private static void SetDataFields(List<string> dateFields, DataRow dataRow)
+        {
+            foreach (var dateField in dateFields)
+            {
+                var dateTimeValue = dataRow[dateField];
+                if (dateTimeValue == null || dateTimeValue == DBNull.Value)
+                {
+                    continue;
+                }
+
+                DateTime dateTime;
+                if (DateTime.TryParse(dateTimeValue.ToString(), out dateTime))
+                {
+                    dataRow[dateField] = dateTime.ToString("yyyy-MM-dd");
+                }
+            }
+        }
+
+        private static void SetTimeFields(List<string> timeFields, DataRow dataRow)
+        {
+            foreach (var timeField in timeFields)
+            {
+                var timeFieldValue = dataRow[timeField];
+                if (timeFieldValue == null || timeFieldValue == DBNull.Value)
+                {
+                    continue;
+                }
+
+                DateTime dateTime;
+                if (DateTime.TryParse(timeFieldValue.ToString(), out dateTime))
+                {
+                    dataRow[timeField] = dateTime.ToString("HH:mm:ss");
+                }
+            }
         }
 
         #endregion Methods 

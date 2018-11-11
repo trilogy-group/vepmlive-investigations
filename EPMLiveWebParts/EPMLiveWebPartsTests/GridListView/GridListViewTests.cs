@@ -2,21 +2,185 @@
 using System;
 using System.Web.UI.Fakes;
 using System.Web.Fakes;
-//using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using System.Xml;
 using System.Collections;
 using System.Web.Script.Serialization.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
 using System.Collections.Specialized.Fakes;
-using System.Collections.Generic;
 using Microsoft.SharePoint;
+using EPMLive.TestFakes.Utility;
+using Microsoft.QualityTools.Testing.Fakes;
+using System.Web.UI;
+using System.IO;
+using System.Text;
+using EPMLiveCore.Fakes;
+using EPMLiveWebParts.Fakes;
+using System.Globalization;
+using System.Threading;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.SharePoint.WebControls;
+using Microsoft.SharePoint.WebControls.Fakes;
+using System.Collections.Generic;
+using Microsoft.SharePoint.WebPartPages.Fakes;
+using Microsoft.SharePoint.Utilities;
+using Microsoft.SharePoint.Administration.Fakes;
+using System.Data.SqlClient.Fakes;
+using WP = System.Web.UI.WebControls.WebParts;
 
 namespace EPMLiveWebParts.Tests
 {
-    [TestClass()]
-    public class GridListViewTests
+    [TestClass]
+    [ExcludeFromCodeCoverage]
+    public partial class GridListViewTests
     {
+        private IDisposable _shimsContext;
+        private SharepointShims _sharepointShims;
+
+        private GridListView _testable;
+        private PrivateObject _testablePrivate;
+
+        private StringBuilder _outputBuilder;
+        private StringWriter _outputWriterString;
+        private HtmlTextWriter _outputWriterHtml;
+        private CultureInfo _currentCulture;
+
+        private string Output
+        {
+            get
+            {
+                _outputWriterHtml?.Flush();
+                _outputWriterString?.Flush();
+                return _outputBuilder.ToString();
+            }
+        }
+
+        private string _fullGridId;
+        private bool _showSearch;
+        private bool _hasSearchResults;
+        private string _searchField;
+        private string _searchString;
+        private StringBuilder _controlOutputString;
+
+        [TestInitialize]
+        public void SetUp()
+        {
+            _currentCulture = Thread.CurrentThread.CurrentCulture;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            _shimsContext = ShimsContext.Create();
+            _sharepointShims = SharepointShims.ShimSharepointCalls();
+
+            _testable = new GridListView();
+            _testablePrivate = new PrivateObject(_testable);
+
+            SetUpDefaultValues();
+
+            _testablePrivate.SetField("sFullGridId", _fullGridId);
+            _testablePrivate.SetField("bShowSearch", _showSearch);
+            _testablePrivate.SetField("bHasSearchResults", _hasSearchResults);
+            _testablePrivate.SetField("sSearchField", _searchField);
+            _testablePrivate.SetField("sSearchValue", _searchString);
+            _testablePrivate.SetField("list", _sharepointShims.ListShim.Instance);
+            _testablePrivate.SetField("view", _sharepointShims.ViewShim.Instance);
+            _testablePrivate.SetField("gSettings", new ShimGridGanttSettings().Instance);
+            _testablePrivate.SetField("gvs", new ShimGridViewSession().Instance);
+            ShimSPContext.AllInstances.ViewContextGet = _ => new ShimSPViewContext()
+            {
+                ViewGet = () => _sharepointShims.ViewShim.Instance,
+            }.Instance;
+            ShimControl.AllInstances.PageGet = _ => new ShimPage()
+            {
+                RequestGet = () => new ShimHttpRequest().Instance,
+            }.Instance;
+
+            _outputBuilder = new StringBuilder();
+            _outputWriterString = new StringWriter(_outputBuilder);
+            _outputWriterHtml = new HtmlTextWriter(_outputWriterString);
+            ShimSPList.AllInstances.ViewsGet = _ => new ShimSPViewCollection().Bind(
+               new SPView[]
+               {
+                    new ShimSPView
+                    {
+                        ServerRelativeUrlGet = () => DummyUrl
+                    }
+               });
+            ShimHttpRequest.AllInstances.UrlGet = (_) => new Uri(DummyUrl);
+            _testablePrivate.SetFieldOrProperty("peMulti", new PeopleEditor());
+            _testablePrivate.SetFieldOrProperty("peSingle", new PeopleEditor());
+            _controlOutputString = new StringBuilder();
+            ShimControl.AllInstances.RenderControlHtmlTextWriter = (_, __) => { };
+            ShimSPField.AllInstances.ReorderableGet = (_) => true;
+            ShimSPField.AllInstances.HiddenGet = (_) => false;
+            ShimSPField.AllInstances.TitleGet = (field) => field.InternalName;
+            ShimSPField.AllInstances.TypeGet = (_) => SPFieldType.Boolean;
+            ShimSPField.AllInstances.SchemaXmlGet = (_) => $"<Element List=\"{DummyString}\" WebId=\"{DummyString}\" Min=\"1\" Max=\"1\"/>";
+            ShimCoreFunctions.getListSettingStringSPList = (_, __) => DummyString;
+            ShimGridGanttSettings.ConstructorSPList = (_, __) => { };
+            ShimListDisplayUtils.ConvertFromStringString = (_) => new Dictionary<string, Dictionary<string, string>>()
+            {
+                {
+                    DummyString,
+                    new Dictionary<string, string>()
+                }
+            };
+            ShimHttpContext.CurrentGet = () => new ShimHttpContext()
+            {
+                RequestGet = () => new ShimHttpRequest()
+                {
+                    UrlGet = () => new Uri("http://fake.url")
+                },
+            };
+            ShimWebPart.AllInstances.QualifierGet = (_) => DummyString;
+            ShimSPList.AllInstances.ParentWebGet = (_) => new ShimSPWeb()
+            {
+                PropertiesGet = () => new ShimSPPropertyBag()
+                {
+                }.Instance,
+                SiteGet = () => _sharepointShims.SiteShim.Instance,
+            }.Instance;
+            ShimStringDictionary.AllInstances.ItemGetString = (_, __) => "1";
+            ShimSPUser.AllInstances.GroupsGet = (_) => _sharepointShims.GroupsShim;
+            ShimCoreFunctions.getConnectionStringGuid = (_) => DummyString;
+            ShimSqlConnection.ConstructorString = (_,__) => { };
+            ShimSqlConnection.AllInstances.Open = (_) => { };
+            ShimSqlConnection.AllInstances.Close = (_) => { };
+            ShimSqlCommand.ConstructorString = (_, __) => { };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = (_) => 0;
+            ShimSqlCommand.AllInstances.ExecuteReader = (_) => new ShimSqlDataReader().Instance;
+            ShimSqlDataReader.AllInstances.Read = (_) => true;
+            ShimSPSite.AllInstances.OpenWeb = (_) => _sharepointShims.WebShim.Instance;
+            ShimSPWeb.AllInstances.WebsGet = (_) => new ShimSPWebCollection();
+            ShimSPSite.AllInstances.RootWebGet = (_) => _sharepointShims.WebShim.Instance;
+            ShimSPSite.AllInstances.FeaturesGet = (_) => new ShimSPFeatureCollection().Instance;
+            ShimSPWeb.AllInstances.PropertiesGet = (_) => new ShimSPPropertyBag().Instance;
+            ShimSPSite.AllInstances.Dispose = (_) => { };
+            ShimSPContext.AllInstances.ListItemGet = (_) => _sharepointShims.ListItemShim.Instance;
+            ShimWebPart.AllInstances.WebPartManagerGet = (_) => new ShimSPWebPartManager().Instance;
+            WP.Fakes.ShimWebPartManager.AllInstances.WebPartsGet = (_) => new WP.WebPartCollection(new List<WP.WebPart>()
+            {
+                new BackButton()
+            });
+        }
+
+        private void SetUpDefaultValues()
+        {
+            _fullGridId = "test-grid-id";
+            _showSearch = true;
+            _hasSearchResults = true;
+            _searchField = "test-search-field";
+            _searchString = "test-search-string";
+        }
+
+        [TestCleanup]
+        public void TearDown()
+        {
+            _shimsContext.Dispose();
+
+            _outputWriterString.Dispose();
+            _outputWriterHtml.Dispose();
+            Thread.CurrentThread.CurrentCulture = _currentCulture;
+        }
+
         [TestMethod()]
         public void GetViewsTest_When_propertbag_Is_Null()
         {
@@ -310,7 +474,201 @@ namespace EPMLiveWebParts.Tests
 
             }
         }
+
+        [TestMethod]
+        public void RenderSearch_Always_RendersSearchLoad()
+        {
+            // Arrange,  Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"<div id=\"searchload{_fullGridId}\""));
+        }
+
+        [TestMethod]
+        public void RenderSearch_Always_RendersSearchDiv()
+        {
+            // Arrange, Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"<div id=\"searchdiv{_fullGridId}\""));
+        }
+
+        [TestMethod]
+        public void RenderSearch_DisplayableField_AddedToSelectOptions()
+        {
+            // Arrange
+            const string fieldTitle = "test-title";
+            const string fieldName = "Title";
+            _sharepointShims.FieldShim.ReorderableGet = () => true;
+            _sharepointShims.FieldShim.TitleGet = () => fieldTitle;
+            _sharepointShims.FieldShim.InternalNameGet = () => fieldName;
+
+            // Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"<option value=\"{fieldName}\">{fieldTitle}</option>"));
+        }
+
+        [TestMethod]
+        public void RenderSearch_DisplayableFieldTypeBoolean_AddedToJson()
+        {
+            // Arrange
+            const string fieldTitle = "test-title";
+            const string fieldName = "Title";
+            _sharepointShims.FieldShim.ReorderableGet = () => true;
+            _sharepointShims.FieldShim.TitleGet = () => fieldTitle;
+            _sharepointShims.FieldShim.InternalNameGet = () => fieldName;
+            _sharepointShims.FieldShim.TypeGet = () => SPFieldType.Boolean;
+
+            // Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"{fieldName}: [ \"Yes\", \"No\" ]"));
+        }
+
+        [TestMethod]
+        public void RenderSearch_Always_JsonSearchFieldsInitialized()
+        {
+            // Arrange
+            const string fieldTitle = "test-title";
+            const string fieldName = "Title";
+            _sharepointShims.FieldShim.ReorderableGet = () => true;
+            _sharepointShims.FieldShim.TitleGet = () => fieldTitle;
+            _sharepointShims.FieldShim.InternalNameGet = () => fieldName;
+            _sharepointShims.FieldShim.TypeGet = () => SPFieldType.Boolean;
+
+            // Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"var searchfields{_fullGridId} = {{{fieldName}: [ \"Yes\", \"No\" ]}}"));
+        }
+
+        [TestMethod]
+        public void RenderSearch_Always_FunctionDeclared_switchsearch()
+        {
+            // Arrange, Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"function switchsearch{_fullGridId}()"));
+        }
+
+        [TestMethod]
+        public void RenderSearch_Always_FunctionDeclared_unSearch()
+        {
+            // Arrange, Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"function unSearch{_fullGridId}()"));
+        }
+
+        [TestMethod]
+        public void RenderSearch_Always_FunctionDeclared_doSearch()
+        {
+            // Arrange, Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"function doSearch{_fullGridId}()"));
+        }
+
+        [TestMethod]
+        public void RenderSearch_Always_FunctionDeclared_enablesearcher()
+        {
+            // Arrange, Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"function enablesearcher{_fullGridId}()"));
+        }
+
+        [TestMethod]
+        public void RenderSearch_Always_FunctionDeclared_searchKeyPress()
+        {
+            // Arrange, Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"function searchKeyPress{_fullGridId}(e)"));
+        }
+
+        [TestMethod]
+        public void RenderSearch_Always_RunStartupScript()
+        {
+            // Arrange, Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"<script language=\"javascript\">switchsearch{_fullGridId}();</script>"));
+        }
+
+        [TestMethod]
+        public void RenderSearch_Always_RendersSearchContainer()
+        {
+            // Arrange, Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"<div id=\"search{_testable.ID}\""));
+        }
+
+        [TestMethod]
+        public void RenderSearch_Always_RendersSearchSelect()
+        {
+            // Arrange, Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"<select id=\"search{_fullGridId}\""));
+        }
+
+        [TestMethod]
+        public void RenderSearch_Always_RendersSearchTypeSelect()
+        {
+            // Arrange, Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"<select id=\"searchtype{_fullGridId}\" class=\"form-control\">"));
+        }
+
+        [TestMethod]
+        public void RenderSearch_Always_RendersUnsearch()
+        {
+            // Arrange, Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"<div id=\"unsearch{_fullGridId}\""));
+        }
+
+        [TestMethod]
+        public void RenderSearch_Always_RendersSearchInput()
+        {
+            // Arrange, Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"<input type=\"text\" id=\"searchtext{_fullGridId}\" value=\"{_searchString}\""));
+        }
+
+        [TestMethod]
+        public void RenderSearch_Always_RendersSearchButton()
+        {
+            // Arrange, Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
+            Assert.IsTrue(Output.Contains($"<img onclick=\"doSearch{_fullGridId}()\" src=\"/_layouts/epmlive/images/find_icon.png\"/>"));
+        }
     }
+
     public class TestEnumerator : IEnumerator
     {
         public SPView[] _spView = new SPView[1];

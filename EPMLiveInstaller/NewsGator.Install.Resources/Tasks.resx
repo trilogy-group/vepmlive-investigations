@@ -1,0 +1,495 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="TaskDetails_AddSolution" xml:space="preserve">
+    <value>Adding solution to the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_AddSolution_CheckIfExists" xml:space="preserve">
+    <value>Ensuring solution is not already added to the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_AddSolution_CheckPath" xml:space="preserve">
+    <value>Ensuring solution file exists: {0}</value>
+  </data>
+  <data name="TaskDetails_AddSolution_Complete" xml:space="preserve">
+    <value>Solution successfully added to the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_AddSolution_EnsureAdded" xml:space="preserve">
+    <value>Ensuring solution was added to the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_CopyAppBin" xml:space="preserve">
+    <value>Copying application bin content.</value>
+  </data>
+  <data name="TaskDetails_CopyAppBinComplete" xml:space="preserve">
+    <value>Copying application bin content complete.</value>
+  </data>
+  <data name="TaskDetails_CopyAppBinOn" xml:space="preserve">
+    <value>Copying application bin content on {0}.</value>
+  </data>
+  <data name="TaskDetails_CopyAppBinOnComplete" xml:space="preserve">
+    <value>Copying application bin content complete on {0}.</value>
+  </data>
+  <data name="TaskDetails_DeploySolution_CheckIfDeployed" xml:space="preserve">
+    <value>Ensuring solution is not already deployed to the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_DeploySolution_CheckIfExists" xml:space="preserve">
+    <value>Ensuring solution is on the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_DeploySolution_Complete" xml:space="preserve">
+    <value>Solution successfully deployed to the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_DeploySolution_DeployingToFarm" xml:space="preserve">
+    <value>Deploying solution to the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_DisableDebugger" xml:space="preserve">
+    <value>Disabling just-in-time debugger.</value>
+  </data>
+  <data name="TaskDetails_DisableDebugger_Complete" xml:space="preserve">
+    <value>Disabling just-in-time debugger complete.</value>
+  </data>
+  <data name="TaskDetails_DisableFeatures" xml:space="preserve">
+    <value>Disabling features.</value>
+  </data>
+  <data name="TaskDetails_DisableFeatures_Complete" xml:space="preserve">
+    <value>Disabling features complete.</value>
+  </data>
+  <data name="TaskDetails_DisableJobs" xml:space="preserve">
+    <value>Disabling Sitrion Social jobs.</value>
+  </data>
+  <data name="TaskDetails_DisableJobs_Complete" xml:space="preserve">
+    <value>Disabling Sitrion Social jobs complete.</value>
+  </data>
+  <data name="TaskDetails_DisableUserProfileJob" xml:space="preserve">
+    <value>Disabling user profile job.</value>
+  </data>
+  <data name="TaskDetails_DisableUserProfileJob_Complete" xml:space="preserve">
+    <value>Disabling user profile job complete.</value>
+  </data>
+  <data name="TaskDetails_DisableWebApps" xml:space="preserve">
+    <value>Disabling web applications.</value>
+  </data>
+  <data name="TaskDetails_DisableWebAppsComplete" xml:space="preserve">
+    <value>Disabling web applications complete.</value>
+  </data>
+  <data name="TaskDetails_DisableWebAppsOn" xml:space="preserve">
+    <value>Disabling web applications on {0}.</value>
+  </data>
+  <data name="TaskDetails_DisableWebAppsOnComplete" xml:space="preserve">
+    <value>Disabling web applications complete on {0}.</value>
+  </data>
+  <data name="TaskDetails_EnableDebugger" xml:space="preserve">
+    <value>Enabling just-in-time debugger.</value>
+  </data>
+  <data name="TaskDetails_EnableDebugger_Complete" xml:space="preserve">
+    <value>Enabling just-in-time debugger complete.</value>
+  </data>
+  <data name="TaskDetails_EnableJobs" xml:space="preserve">
+    <value>Enabling Sitrion Social jobs.</value>
+  </data>
+  <data name="TaskDetails_EnableJobs_Complete" xml:space="preserve">
+    <value>Enabling Sitrion Social jobs complete.</value>
+  </data>
+  <data name="TaskDetails_EnableUserProfileJob" xml:space="preserve">
+    <value>Enabling user profile job.</value>
+  </data>
+  <data name="TaskDetails_EnableUserProfileJob_Complete" xml:space="preserve">
+    <value>Enabling user profile job complete.</value>
+  </data>
+  <data name="TaskDetails_EnableWebApps" xml:space="preserve">
+    <value>Enabling web applications.</value>
+  </data>
+  <data name="TaskDetails_EnableWebAppsComplete" xml:space="preserve">
+    <value>Enabling web applications complete.</value>
+  </data>
+  <data name="TaskDetails_EnableWebAppsOn" xml:space="preserve">
+    <value>Enabling web applications on {0}.</value>
+  </data>
+  <data name="TaskDetails_EnableWebAppsOnComplete" xml:space="preserve">
+    <value>Enabling web applications complete on {0}.</value>
+  </data>
+  <data name="TaskDetails_EnsureWebApps" xml:space="preserve">
+    <value>Ensuring web application pools.</value>
+  </data>
+  <data name="TaskDetails_EnsureWebAppsComplete" xml:space="preserve">
+    <value>Ensuring web application pools complete.</value>
+  </data>
+  <data name="TaskDetails_EnsureWebAppsOn" xml:space="preserve">
+    <value>Ensuring web application pools on {0}.</value>
+  </data>
+  <data name="TaskDetails_EnsureWebAppsOnComplete" xml:space="preserve">
+    <value>Ensuring web application pools complete on {0}.</value>
+  </data>
+  <data name="TaskDetails_MySiteEnableLookout" xml:space="preserve">
+    <value>Enabling Lookout on My Site host.</value>
+  </data>
+  <data name="TaskDetails_MySiteEnableLookout_Complete" xml:space="preserve">
+    <value>Enabling Lookout on My Site host complete.</value>
+  </data>
+  <data name="TaskDetails_MySiteNewsFeedPage" xml:space="preserve">
+    <value>Replacing web parts on My Site Newsfeed page.</value>
+  </data>
+  <data name="TaskDetails_MySiteNewsFeedPage_Complete" xml:space="preserve">
+    <value>Replacing web parts on My Site Newsfeed page complete.</value>
+  </data>
+  <data name="TaskDetails_MySiteSetLookoutHomePage" xml:space="preserve">
+    <value>Setting Lookout as home page for My Site host.</value>
+  </data>
+  <data name="TaskDetails_MySiteSetLookoutHomePage_Complete" xml:space="preserve">
+    <value>Setting Lookout as home page for My Site host complete.</value>
+  </data>
+  <data name="TaskDetails_MySiteWebParts" xml:space="preserve">
+    <value>Enabling Sitrion Social web parts feature on My Site host.</value>
+  </data>
+  <data name="TaskDetails_MySiteWebParts_Complete" xml:space="preserve">
+    <value>Enabling Sitrion Social web parts feature on My Site host complete.</value>
+  </data>
+  <data name="TaskDetails_ProvisionServiceApplication" xml:space="preserve">
+    <value>Provisioning service application: {0}</value>
+  </data>
+  <data name="TaskDetails_ProvisionServiceApplication_Complete" xml:space="preserve">
+    <value>Provisioning service application complete: {0}</value>
+  </data>
+  <data name="TaskDetails_ReactivateFeatures" xml:space="preserve">
+    <value>Reactivating features.</value>
+  </data>
+  <data name="TaskDetails_ReactivateFeatures_Complete" xml:space="preserve">
+    <value>Reactivating features complete.</value>
+  </data>
+  <data name="TaskDetails_RemoveOrphanedFeatures" xml:space="preserve">
+    <value>Removing orphaned features.</value>
+  </data>
+  <data name="TaskDetails_RemoveOrphanedFeatures_Complete" xml:space="preserve">
+    <value>Removing orphaned features complete.</value>
+  </data>
+  <data name="TaskDetails_RemoveServiceApplication" xml:space="preserve">
+    <value>Removing service application: {0}</value>
+  </data>
+  <data name="TaskDetails_RemoveServiceApplication_Complete" xml:space="preserve">
+    <value>Removing service application complete: {0}</value>
+  </data>
+  <data name="TaskDetails_RemoveSolution" xml:space="preserve">
+    <value>Removing solution from the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_RemoveSolution_CheckIfExists" xml:space="preserve">
+    <value>Ensuring solution is on the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_RemoveSolution_Complete" xml:space="preserve">
+    <value>Solution successfully removed from the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_RemoveSolution_EnsureRemoved" xml:space="preserve">
+    <value>Ensuring solution was removed from the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_RemoveSolution_EnsureRetracted" xml:space="preserve">
+    <value>Ensuring solution is not deployed: {0}</value>
+  </data>
+  <data name="TaskDetails_RestartServices" xml:space="preserve">
+    <value>Restarting SharePoint Services</value>
+  </data>
+  <data name="TaskDetails_RestartServices_ActivatingFarmFeature" xml:space="preserve">
+    <value>Activating Sitrion Social Installer Jobs farm feature.</value>
+  </data>
+  <data name="TaskDetails_RestartServices_Complete" xml:space="preserve">
+    <value>Restarting SharePoint Services Complete</value>
+  </data>
+  <data name="TaskDetails_RestartServices_JobComplete" xml:space="preserve">
+    <value>Restart Services Job Completed on {0}</value>
+  </data>
+  <data name="TaskDetails_RestartServices_StartingJob" xml:space="preserve">
+    <value>Starting Restart Services Job on {0}</value>
+  </data>
+  <data name="TaskDetails_UpdateFeatures" xml:space="preserve">
+    <value>Updating features.</value>
+  </data>
+  <data name="TaskDetails_UpdateFeatures_Complete" xml:space="preserve">
+    <value>Updating features complete.</value>
+  </data>
+  <data name="TaskDetails_UpdateServiceApplication" xml:space="preserve">
+    <value>Updating service application: {0}</value>
+  </data>
+  <data name="TaskDetails_UpdateServiceApplication_Complete" xml:space="preserve">
+    <value>Updating service application complete: {0}</value>
+  </data>
+  <data name="TaskDetails_UpdateSolution" xml:space="preserve">
+    <value>Updating solution on the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_UpdateSolution_AddSolution" xml:space="preserve">
+    <value>Adding solution to the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_UpdateSolution_CheckPath" xml:space="preserve">
+    <value>Ensuring solution file exists: {0}</value>
+  </data>
+  <data name="TaskDetails_UpdateSolution_Complete" xml:space="preserve">
+    <value>Solution was successfully updated on the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_UpdateSolution_DeployingToFarm" xml:space="preserve">
+    <value>Deploying solution to the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_UpdateSolution_EnsureOnFarm" xml:space="preserve">
+    <value>Ensuring solution is on the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_UpdateSolution_EnsuringUpdated" xml:space="preserve">
+    <value>Ensuring solution was updated on the farm: {0}</value>
+  </data>
+  <data name="TaskDetails_UpdateSolution_NotDeployed" xml:space="preserve">
+    <value>Solution is not deployed, removing existing solution from the farm: {0}</value>
+  </data>
+  <data name="TaskName_AddSolution" xml:space="preserve">
+    <value>Add SharePoint Solution: {0}</value>
+  </data>
+  <data name="TaskName_CopyAppBin" xml:space="preserve">
+    <value>Copy Application Bin Content</value>
+  </data>
+  <data name="TaskName_DeploySolution" xml:space="preserve">
+    <value>Deploy SharePoint Solution: {0}</value>
+  </data>
+  <data name="TaskName_DisableDebugger" xml:space="preserve">
+    <value>Disable Just-In-Time Debugger</value>
+  </data>
+  <data name="TaskName_DisableFeatures" xml:space="preserve">
+    <value>Disable Features</value>
+  </data>
+  <data name="TaskName_DisableJobs" xml:space="preserve">
+    <value>Disable Sitrion Social Jobs</value>
+  </data>
+  <data name="TaskName_DisableUserProfileJob" xml:space="preserve">
+    <value>Disable User Profile Job</value>
+  </data>
+  <data name="TaskName_DisableWebApps" xml:space="preserve">
+    <value>Disable Web Applications</value>
+  </data>
+  <data name="TaskName_EnableDebugger" xml:space="preserve">
+    <value>Enable Just-In-Time Debugger</value>
+  </data>
+  <data name="TaskName_EnableJobs" xml:space="preserve">
+    <value>Enable Sitrion Social Jobs</value>
+  </data>
+  <data name="TaskName_EnableUserProfileJob" xml:space="preserve">
+    <value>Enable User Profile Job</value>
+  </data>
+  <data name="TaskName_EnableWebApps" xml:space="preserve">
+    <value>Enable Web Applications</value>
+  </data>
+  <data name="TaskName_EnsureWebApps" xml:space="preserve">
+    <value>Ensure Web Application Pools</value>
+  </data>
+  <data name="TaskName_MySiteEnableLookout" xml:space="preserve">
+    <value>Enable Lookout on My Site Host</value>
+  </data>
+  <data name="TaskName_MySiteNewsFeedPage" xml:space="preserve">
+    <value>Replace Web Parts on My Site Newsfeed Page</value>
+  </data>
+  <data name="TaskName_MySiteSetLookoutHomePage" xml:space="preserve">
+    <value>Set Lookout as Home Page for My Site Host</value>
+  </data>
+  <data name="TaskName_MySiteWebParts" xml:space="preserve">
+    <value>Enable Sitrion Social Web Parts Feature on My Site Host</value>
+  </data>
+  <data name="TaskName_ProvisionServiceApplication" xml:space="preserve">
+    <value>Provision Service Application: {0}</value>
+  </data>
+  <data name="TaskName_ReactivateFeatures" xml:space="preserve">
+    <value>Reactivate Features</value>
+  </data>
+  <data name="TaskName_RemoveOrphanedFeatures" xml:space="preserve">
+    <value>Remove Orphaned Features</value>
+  </data>
+  <data name="TaskName_RemoveServiceApplication" xml:space="preserve">
+    <value>Remove Service Application: {0}</value>
+  </data>
+  <data name="TaskName_RemoveSolution" xml:space="preserve">
+    <value>Remove SharePoint Solution: {0}</value>
+  </data>
+  <data name="TaskName_RestartServices" xml:space="preserve">
+    <value>Restart SharePoint Services</value>
+  </data>
+  <data name="TaskName_UpdateFeatures" xml:space="preserve">
+    <value>Update Features</value>
+  </data>
+  <data name="TaskName_UpdateServiceApplication" xml:space="preserve">
+    <value>Update Service Application: {0}</value>
+  </data>
+  <data name="TaskName_UpdateSolution" xml:space="preserve">
+    <value>Update SharePoint Solution: {0}</value>
+  </data>
+  <data name="TaskOperations_BuildingList" xml:space="preserve">
+    <value>Building Task List</value>
+  </data>
+  <data name="TaskOperations_BuildingList_Complete" xml:space="preserve">
+    <value>Building Task List Complete</value>
+  </data>
+  <data name="TaskOperations_RunningTasks" xml:space="preserve">
+    <value>Running Tasks</value>
+  </data>
+  <data name="TaskOperations_RunningTasks_Complete" xml:space="preserve">
+    <value>Running Tasks Complete</value>
+  </data>
+  <data name="TaskOperations_RunTask" xml:space="preserve">
+    <value>Running Task: {0}</value>
+  </data>
+  <data name="TaskOperations_RunTask_Complete" xml:space="preserve">
+    <value>Task Complete: {0}</value>
+  </data>
+  <data name="TaskRunner_CompleteFailed" xml:space="preserve">
+    <value>Task Failed to Complete: {0}.  To retry this task manually from the Sitrion Social Management Shell, use the following command: \r\n{1}</value>
+  </data>
+  <data name="TaskRunner_CompleteSuccess" xml:space="preserve">
+    <value>Task Completed Successfully: {0}</value>
+  </data>
+  <data name="TaskRunner_StartingTask" xml:space="preserve">
+    <value>Starting Task: {0}</value>
+  </data>
+  <data name="TaskRunner_Timeout" xml:space="preserve">
+    <value>Task Timed Out: {0}</value>
+  </data>
+  <data name="TaskDetails_ExecuteAdminJobs" xml:space="preserve">
+    <value>Executing SharePoint Admin service jobs.</value>
+  </data>
+  <data name="TaskDetails_ExecuteAdminJobsOn" xml:space="preserve">
+    <value>Executing SharePoint Admin service jobs on {0}.</value>
+  </data>
+  <data name="TaskDetails_ExecuteAdminJobs_Complete" xml:space="preserve">
+    <value>Executing SharePonit Admin service jobs complete.</value>
+  </data>
+  <data name="TaskDetails_ExecuteAdminJobs_CompleteOn" xml:space="preserve">
+    <value>Executing SharePonit Admin service jobs complete on {0}.</value>
+  </data>
+  <data name="TaskName_ExecuteAdminJobs" xml:space="preserve">
+    <value>Execute SharePoint Admin Service Job</value>
+  </data>
+  <data name="TaskName_ExecuteAdminJobsOn" xml:space="preserve">
+    <value>Execute SharePoint Admin Service Job on {0}</value>
+  </data>
+  <data name="TaskRunner_Time" xml:space="preserve">
+    <value>Task "{0}" operation time: {1} ms</value>
+  </data>
+  <data name="TaskDetails_StartingJob" xml:space="preserve">
+    <value>Starting Job on {0}</value>
+  </data>
+  <data name="TaskDetails_ExecuteTimerServiceJob" xml:space="preserve">
+    <value>Executing SharePoint Timer Service Recycle job.</value>
+  </data>
+  <data name="TaskDetails_ExecuteTimerServiceJobComplete" xml:space="preserve">
+    <value>Executing SharePoint Timer Service Recycle job complete.</value>
+  </data>
+  <data name="TaskName_ExecuteTimerServiceJob" xml:space="preserve">
+    <value>Execute SharePoint Timer Service Recycle Job</value>
+  </data>
+  <data name="TaskFailed_Retrying" xml:space="preserve">
+    <value>Task Failed, Trying Again.</value>
+  </data>
+</root>

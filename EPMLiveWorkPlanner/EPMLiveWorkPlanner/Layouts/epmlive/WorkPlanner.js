@@ -1070,6 +1070,14 @@ function SetTaskAssignments(Row) {
 
     var grid = Grids.WorkPlannerGrid;
 
+     // To handle summary tasks EPMLCID-18836
+     if (Row.Summary && Row.AssignedTo != null) {
+         alert("Resources should be assigned to sub tasks only, as the Summary Task is a sum of all sub tasks.");
+         grid.SetValue(Row, "AssignedTo", "", 1);
+         return;
+     }
+
+    
     var turnoncalc = false;
 
     if (grid.Calculated) {
@@ -1388,7 +1396,6 @@ function DeleteTasks() {
                             Grids.WorkPlannerGrid.MoveRow(row, row.parentNode.parentNode, row.parentNode.nextSibling, 1);
                         } catch (e) { }
                         grid.DeleteRow(row, 2);
-                        grid.RemoveRow(row);
                     } catch (e) { }
                 }
                 grid.ActionCorrectAllDependencies();

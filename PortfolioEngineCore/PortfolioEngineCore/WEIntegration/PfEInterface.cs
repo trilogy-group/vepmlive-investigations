@@ -1,5 +1,7 @@
-﻿using System;
+﻿using PortfolioEngineCore.Services;
+using System;
 using System.Reflection;
+
 
 namespace PortfolioEngineCore
 {
@@ -29,14 +31,9 @@ namespace PortfolioEngineCore
                 //oEPK = new WE_PDSExt.CMain();
                 //s = oEPK.SoapXMLRequest(sXML, sRequest, "");
                 //oEPK = null;
-
-                // this is what we have to do to late bind to a 32bit com+ vb6 object from a 64bit .net process
-                Type comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
-                object comObject = Activator.CreateInstance(comObjectType);
-                object[] myparams = new object[] {sContext, sXML, sRequest};
-                sReply = (string)comObjectType.InvokeMember("XMLRequest", BindingFlags.InvokeMethod, null, comObject, myparams);
-
-                comObject = null;
+                WSSAdmin wssadmin = new WSSAdmin();
+                sReply = wssadmin.XMLRequest(sContext, sXML, sRequest);
+               
             }
             catch (Exception ex)
             {

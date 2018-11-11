@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="GetTimesheetApprovalsGrid_Called_SqlDisposed_ExpectedResult" xml:space="preserve">
+    <value>&lt;Grid&gt;&lt;Cfg TimesheetUID="" /&gt;&lt;Body&gt;&lt;B&gt;&lt;/B&gt;&lt;/Body&gt;&lt;/Grid&gt;</value>
+  </data>
+  <data name="GetTimesheetGridLayout_Called_SqlDisposed_ExpectedResult" xml:space="preserve">
+    <value>&lt;Grid&gt;&lt;Cfg Code="GTACCNPSQEBSLC" Version="4.0" NoVScroll="0" id="TS91" GridEditable="true" PeriodId="may" SaveAndSubmit="false" MinRightWidth="260" MinMidWidth="0" /&gt;&lt;Cfg SuppressCfg="1" Style="GM" CSS="/_layouts/15/epmlive/treegrid/grid/grid.min.css" /&gt;&lt;Cfg MainCol="Title" NameCol="Title" /&gt;&lt;Cfg ConstWidth="1" /&gt;&lt;Cfg Undo="0" /&gt;&lt;Cfg NumberId="1" FullId="0" IdChars="1234567890" AddFocusCol="Title" SortIcons="1" /&gt;&lt;Cfg Searching="1" /&gt;&lt;Cfg StaticCursor="1" Dragging="0" SelectingCells="0" SelectClass="0" Selecting="1" /&gt;&lt;Cfg NoTreeLines="1" DetailOn="0" MinRowHeight="25" MaxRowHeight="25" MenuColumnsSort="1" StandardFilter="0" ChildParts="2" /&gt;&lt;Cfg NoPager="1" InEditMode="2" ShowDeleted="0" /&gt;&lt;Def&gt;&lt;D GroupEmpty="0" Name="R" Calculated="1" Wrap="0" HoverCell="0" HoverRow="Class" FocusCell="Border" FocusRow="0" ShowHint="0" NoColorState="1" CanEdit="0" CalcOrder="TSTotals,Progress,ProgressHtmlPrefix,P636521760000000000" CanSelect="1" /&gt;&lt;D TitleGroupEmpty="0" GroupEmpty="0" Name="Group" Calculated="1" Class="TSBold" CalcOrder="TSTotals,P636521760000000000,TSTotals" Expanded="1" P636521760000000000Formula="sum()" P636521760000000000Type="Float" TSTotalsFormula="P636521760000000000" /&gt;&lt;D Name="Resource" Expanded="0" ProgressFormula="" ProgressHtmlPrefixFormula="" ProgressType="Html" CanSelect="1" Class="TSBold" /&gt;&lt;/Def&gt;&lt;Toolbar Visible="0" CanHide="0" /&gt;&lt;Panel Delete="0" Visible="0" CanHide="0" /&gt;&lt;Head&gt;&lt;Header id="Header" StopWatchType="Html" StopWatch="&amp;lt;a id='tssw' data-delay='100' data-toggle='tooltip' data-placement='top' title='Stop Watch'&amp;gt;&amp;lt;img src='/_layouts/15/epmlive/images/tstimeroff.png' style='padding-top:4px;padding-left:4px'&amp;gt;&amp;lt;/a&amp;gt;" WorkTypeField="Work Type" Comments="" Color="" Hover="" HoverCell="" HoverColor="" HoverRow="" TMApproval="TM" PMApproval="PM" Approve="" ApprovalNotes="&amp;lt;a id='tsan' alt='Approval Notes' style='padding-top:10px;padding-left:4px;text-decoration:none'&amp;gt;&amp;lt;span class='icon-file-3' style='text-decoration:none;font-size:15px;color:#999'&amp;gt;&amp;lt;/a&amp;gt;" P636521760000000000="Mon&amp;lt;br&amp;gt;Jan 22" TSTotals="Totals" /&gt;&lt;Filter CanHide="0" CanEdit="1" Visible="0" /&gt;&lt;/Head&gt;&lt;Solid&gt;&lt;Group CanHide="0" Visible="0" id="Group" /&gt;&lt;/Solid&gt;&lt;LeftCols&gt;&lt;C Name="Edited" Type="Bool" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="ItemTypeID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="AssignedToID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="TSEnabled" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="UID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="ItemID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="ListID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="WebID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="SiteID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="TSOtherHours" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" Type="Float" /&gt;&lt;C Name="Comments" Type="Html" Width="40" CanFilter="0" CanGroup="0" CanResize="0" CanSort="0" Visible="0" /&gt;&lt;C Name="Title" Type="Html" RelWidth="100" MinWidth="100" CanGroup="0" CanHide="0" GroupEmpty="0" Button="Html" ButtonText=" " /&gt;&lt;C Name="WorkTypeField" Type="Html" GroupEmpty="0" /&gt;&lt;C Name="HasComments" Visible="0" CanPrint="0" CanHide="0" /&gt;&lt;/LeftCols&gt;&lt;Cols&gt;&lt;/Cols&gt;&lt;RightCols&gt;&lt;C Name="StopWatch" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" CanSort="0" Width="80" Type="Html" CanEdit="0" CanResize="0" /&gt;&lt;C Name="P636521760000000000" Visible="1" CanHide="0" CanSort="0" CanResize="0" CanEdit="1" Width="60" Align="Right" Type="Text" Format=",0.00" EditFormat=",0.00" /&gt;&lt;C Name="Progress" Visible="1" CanHide="0" CanSort="0" Width="100" Type="Float" Format="0%" HtmlPrefixFormula="'&amp;lt;div style=\&amp;quot;width:50px;border:1px solid gray;float:left;height:12px\&amp;quot;&amp;gt;&amp;lt;div style=\&amp;quot;width:'+(Value&amp;gt;1?50:Math.abs(Value*50))+'px;overflow:hidden;float:left;background:'+(Value&amp;gt;1?'#DD0000':'#4B75FC')+';height:12px\&amp;quot;&amp;gt;&amp;amp;nbsp;&amp;lt;/div&amp;gt;&amp;lt;/div&amp;gt;'" Formula="Work&amp;gt;0?((TSOtherHours + TSTotals)/Work):0" /&gt;&lt;C Name="TSTotals" Visible="1" CanHide="0" CanSort="0" Width="50" Class="Totals" Type="Float" CanEdit="0" Formula="P636521760000000000" Format=",0.00" /&gt;&lt;/RightCols&gt;&lt;Foot&gt;&lt;I id="-1" Def="Group" Calculated="1" LeftHtml="&amp;lt;div align=&amp;quot;right&amp;quot;&amp;gt;&amp;lt;b&amp;gt;Total:&amp;amp;nbsp;&amp;lt;/b&amp;gt;&amp;lt;/div&amp;gt;" MidHtml="" Class="Totals" Progress="" /&gt;&lt;/Foot&gt;&lt;/Grid&gt;</value>
+  </data>
+  <data name="GetTimesheetGrid_Called_SqlDisposed_ExpectedResult" xml:space="preserve">
+    <value>&lt;Grid&gt;&lt;Body&gt;&lt;B&gt;&lt;I Title="Data Error: Cannot insert a node or any ancestor of that node as a child of itself." /&gt;&lt;/B&gt;&lt;/Body&gt;&lt;/Grid&gt;</value>
+  </data>
+  <data name="GetWork_Called_SqlDisposed_ExpectedResult" xml:space="preserve">
+    <value>&lt;Grid&gt;&lt;Cfg Code="GTACCNPSQEBSLC" Version="4.0" id="TSWork" /&gt;&lt;Cfg SuppressCfg="1" Style="GM" CSS="/_layouts/epmlive/treegrid/myts/gridwork.css" /&gt;&lt;Cfg MainCol="Title" NameCol="Title" /&gt;&lt;Cfg ConstHeight="0" ConstWidth="1" NoVScroll="1" /&gt;&lt;Cfg Undo="0" /&gt;&lt;Cfg NumberId="1" FullId="0" IdChars="1234567890" AddFocusCol="Title" SortIcons="1" /&gt;&lt;Cfg Searching="1" /&gt;&lt;Cfg StaticCursor="1" Dragging="0" SelectingCells="1" SelectClass="0" /&gt;&lt;Cfg NoTreeLines="1" DetailOn="0" MinRowHeight="25" MaxRowHeight="25" MenuColumnsSort="1" StandardFilter="2" /&gt;&lt;Cfg Paging="2" NoPager="1" ChildParts="2" InEditMode="2" /&gt;&lt;Def&gt;&lt;D Name="R" Calculated="1" Wrap="0" HoverCell="0" HoverRow="Class" FocusCell="Border" FocusRow="0" ShowHint="0" NoColorState="1" CanEdit="0" TSTotals="0" /&gt;&lt;D Name="Group" Calculated="1" CanFilter="2" Class="MWG_Bold" Expanded="1" /&gt;&lt;/Def&gt;&lt;Toolbar Visible="0" CanHide="0" /&gt;&lt;Panel Visible="0" CanHide="0" /&gt;&lt;Head&gt;&lt;Header id="Header" Check="" CheckClass="GMBool0RO" WorkTypeField="Work Type" Color="" Hover="" HoverCell="" HoverColor="" HoverRow="" /&gt;&lt;Filter CanHide="0" CanEdit="1" Visible="0" /&gt;&lt;/Head&gt;&lt;Solid&gt;&lt;Group CanHide="0" Visible="0" id="Group" /&gt;&lt;/Solid&gt;&lt;LeftCols&gt;&lt;C Name="ItemTypeID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="UID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="Current" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="ItemID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="ListID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="WebID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="SiteID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" /&gt;&lt;C Name="Check" Type="Bool" Width="20" CanGroup="0" CanHide="0" CanSort="0" CanEdit="1" CanResize="0" CanMove="0" Class="GMBool0RO" /&gt;&lt;C Name="Title" Type="Html" RelWidth="100" MinWidth="100" CanGroup="0" CanHide="0" /&gt;&lt;C Name="WorkTypeField" Type="Html" Visible="0" /&gt;&lt;/LeftCols&gt;&lt;Cols&gt;&lt;/Cols&gt;&lt;Body&gt;&lt;B&gt;&lt;I Title="Data Error: Object reference not set to an instance of an object." /&gt;&lt;/B&gt;&lt;/Body&gt;&lt;/Grid&gt;</value>
+  </data>
+  <data name="StopStopWatch_Called_SqlDisposed_ExpectedResult" xml:space="preserve">
+    <value>&lt;StopWatch Status="0"&gt;&lt;StopWatchValue Date="Tuesday, January 9, 2018 12:00:00 AM" DateTicks="636510528000000000" Minutes="0"/&gt;&lt;/StopWatch&gt;</value>
+  </data>
+</root>

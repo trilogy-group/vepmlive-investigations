@@ -380,10 +380,8 @@ export class ProjectItemPage extends BasePage {
         return CommonPage.getNthProject(2);
     }
 
-    static async getUserCheckBoxForTeamType(teamType: string, userName: string) {
-        const xpathForUser = `//td[normalize-space(@id)="${teamType}"]//a[normalize-space(text())="${userName}"]
-        //parent::td//parent::tr/td[contains(@class,"GMCellPanel")]`;
-        return element(By.xpath(xpathForUser));
+    static get contextMenu() {
+        return element(By.css('ul.epm-nav-contextual-menu'));
     }
 
     static get getResourcePoolFirstUserCheckBox() {

@@ -43,4 +43,12 @@ export class EditCost {
     static category(index = 0) {
         return ElementHelper.getAllElementByText(EditCostConstants.category).get(index);
     }
+
+    static get close() {
+        return element(By.id('CloseBtn'));
+    }
+
+    static get veil() {
+        return element(By.id('veil'));
+    }
 }

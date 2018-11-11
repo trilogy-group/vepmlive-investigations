@@ -34,22 +34,39 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>EPMLiveTimesheets.Tests.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="EPMLiveWebParts.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPMLiveWebParts.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.dll</HintPath>
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.SharePoint.16.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\Microsoft.SharePoint.16.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Web.CommandUI.16.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\Microsoft.Web.CommandUI.16.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="Shouldly, Version=3.0.0.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Shouldly.3.0.0\lib\net40\Shouldly.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="SPEmulators">
       <HintPath>..\..\Libraries\SPEmulators.dll</HintPath>
@@ -58,6 +75,7 @@
     <Reference Include="System.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Data.4.0.0.0.Fakes.dll</HintPath>
@@ -66,7 +84,18 @@
     <Reference Include="System.Web.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Extensions.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.Extensions.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="System.XML.4.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="TimeSheets.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\TimeSheets.Fakes.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -76,24 +105,95 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="API\TimesheetAPI.CheckSaveStatus.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetTimesheetGrid.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetTimesheetApprovalsGrid.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetTimesheetGridLayout.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.AutoAddWork.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GenerateTSFromPast.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.ApproveTimesheetsCore.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetTSData.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.AddWork.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetWork.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetTSDataSet.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.FillTimesheetItemsDataset.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.CheckApproveStatus.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetOtherHours.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.SaveTimesheet.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetTimesheetUpdates.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.StopStopWatch.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.StartStopWatch.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.SubmitTimesheet.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.UnSubmitTimesheet.Tests.cs" />
     <Compile Include="API\TimesheetAPITests.cs" />
+    <Compile Include="GetTsTests.addGroups.cs" />
+    <Compile Include="GetTsTests.PageLoad.cs" />
     <Compile Include="GetTsTests.cs" />
+    <Compile Include="Jobs\SaveJobTests.cs" />
+    <Compile Include="Layouts\WorkLogTest.cs" />
+    <Compile Include="MyTimesheetTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SheetTestBase.cs" />
+    <Compile Include="TimesheetApprovalsTest.cs" />
+    <Compile Include="TimesheetTest.cs" />
+    <Compile Include="WebPageCode\GetPMApprovalsTests.cs" />
+    <Compile Include="WebPageCode\GetTSApprovalsTests.cs" />
+    <Compile Include="PMApprovalsTest.cs" />
+    <Compile Include="WebPageCode\GetTimesheetTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
+      <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
+      <Name>EPMLive.TestFakes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
       <Name>EPMLiveCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EPMLiveWebParts\EPMLiveWebParts\EPMLiveWebParts.csproj">
+      <Project>{a7f83fd4-be8b-49ab-be24-39209e8fabc2}</Project>
+      <Name>EPMLiveWebParts</Name>
     </ProjectReference>
     <ProjectReference Include="..\EPMLiveTimesheets\EPMLiveTimesheets.csproj">
       <Project>{fd812bf8-05a3-4d77-b9bc-6ad4991b8049}</Project>
       <Name>EPMLiveTimesheets</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="EPMLiveTimesheets.Tests.snk" />
+    <Compile Include="GetTsTests.addHeader.cs" />
+    <None Include="packages.config" />
+    <Compile Include="WebPageCode\GetTsApprovalsTests.getParams.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Fakes\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

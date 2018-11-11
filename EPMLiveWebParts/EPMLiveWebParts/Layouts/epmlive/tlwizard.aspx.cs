@@ -54,7 +54,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 //else
                 {
                     ssrsurl = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
-
+					if (ssrsurl.StartsWith("/"))
+						ssrsurl = SPContext.Current.Site.Url + ssrsurl;
+						
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         string strCon = EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id);

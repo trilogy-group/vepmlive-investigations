@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using EPMLiveCore;
 using EPMLiveCore.Properties;
@@ -14,7 +15,7 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore.ReportHelper
 {
-    public class ReportData : IDisposable
+    public partial class ReportData : IDisposable
     {
         protected readonly string _epmLiveCs;
         protected readonly Guid _siteId;
@@ -451,140 +452,6 @@ namespace EPMLiveCore.ReportHelper
         {
             string message;
             return CreateTable(name, columnDefs, false, out message);
-        }
-
-        public bool CreateTable(string name, List<ColumnDef> columnDefs, bool dropIfExists, out string message)
-        {
-            if (!dropIfExists && TableExists(name))
-            {
-                message = "Table already exists.";
-                return false;
-            }
-
-            var columns = new List<string>();
-            foreach (ColumnDef columnDef in columnDefs)
-            {
-                columns.Add(columnDef.ToString());
-            }
-
-            string script;
-            if (name.ToLower().Contains("rpttsdata"))
-            {
-                script = string.Format(@"
-                IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}]') AND type in (N'U'))
-                    DROP TABLE [{0}]
-                create table [{0}]({1},
-                CONSTRAINT [PK_{0}] 
-                PRIMARY KEY CLUSTERED ([rpttsduid] ASC)
-                WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, 
-                IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, 
-                ALLOW_PAGE_LOCKS  = ON) 
-                )ON [PRIMARY]", name, string.Join(", ", columns.ToArray()));
-            }
-            else if (name.ToLower().Equals("lstmyworksnapshot"))
-            {
-                foreach (var col in new Dictionary<string, string>
-                {
-                    {"[WorkType]", "[NVarChar](256) NOT NULL"},
-                    {"[DataSource]", "[Int] NULL"},
-                    {"[Commenters]", "[NVarChar](MAX) NULL"},
-                    {"[CommentersRead]", "[NVarChar](MAX) NULL"},
-                    {"[CommentCount]", "[Int] NULL"}
-                }.Where(col => !columns.Exists(c => c.ToLower().StartsWith(col.Key.ToLower()))))
-                {
-                    columns.Add(col.Key + col.Value);
-                }
-
-                script = string.Format(@"
-                IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}]') AND type in (N'U'))
-                    DROP TABLE [{0}]
-
-                create table [{0}]({1})ON [PRIMARY]
-
-                CREATE CLUSTERED INDEX [IX_SiteId_WebId_ListId_ItemId] ON [{0}] 
-                (
-	                [SiteId] ASC,
-	                [WebId] ASC,
-	                [ListId] ASC,
-	                [ItemId] ASC
-                )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, 
-                DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]", name,
-                    string.Join(", ", columns.ToArray()));
-            }
-            else if (name.ToLower().Contains("snapshot"))
-            {
-                script = string.Format(@"
-                IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}]') AND type in (N'U'))
-                    DROP TABLE [{0}]
-
-                create table [{0}]({1},  
-                CONSTRAINT [PK_{0}] 
-                PRIMARY KEY CLUSTERED ([PeriodId] ASC, [WebId] ASC,[ItemId] ASC)
-                WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, 
-                IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, 
-                ALLOW_PAGE_LOCKS  = ON) 
-                )ON [PRIMARY]
-                ALTER TABLE [dbo].[{0}]  WITH NOCHECK ADD  CONSTRAINT [FK_EPM_{0}_RPTPeriod] FOREIGN KEY([PeriodId])
-                REFERENCES [dbo].[RPTPeriods] ([PeriodId])
-                NOT FOR REPLICATION                
-                ALTER TABLE [dbo].[{0}] NOCHECK CONSTRAINT [FK_EPM_{0}_RPTPeriod]
-                ", name, string.Join(", ", columns.ToArray()));
-            }
-            else if (name.ToLower().Equals("lstmywork"))
-            {
-                foreach (var col in new Dictionary<string, string>
-                {
-                    {"[WorkType]", "[NVarChar](256) NOT NULL"},
-                    {"[DataSource]", "[Int] NULL"},
-                    {"[Commenters]", "[NVarChar](MAX) NULL"},
-                    {"[CommentersRead]", "[NVarChar](MAX) NULL"},
-                    {"[CommentCount]", "[Int] NULL"}
-                }.Where(col => !columns.Exists(c => c.ToLower().StartsWith(col.Key.ToLower()))))
-                {
-                    columns.Add(col.Key + col.Value);
-                }
-
-                script = string.Format(@"
-                IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}]') AND type in (N'U'))
-                    DROP TABLE [{0}]
-
-                create table [{0}]({1})ON [PRIMARY]
-
-                CREATE CLUSTERED INDEX [IX_SiteId_WebId_ListId_ItemId] ON [{0}] 
-                (
-	                [SiteId] ASC,
-	                [WebId] ASC,
-	                [ListId] ASC,
-	                [ItemId] ASC
-                )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, 
-                DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]", name,
-                    string.Join(", ", columns.ToArray()));
-            }
-            else
-            {
-                script = string.Format(@"
-                IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}]') AND type in (N'U'))
-                    DROP TABLE [{0}]
-
-                create table [{0}]({1},  
-                CONSTRAINT [PK_{0}] 
-                PRIMARY KEY CLUSTERED ([WebId] ASC,[ItemId] ASC)
-                WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, 
-                IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, 
-                ALLOW_PAGE_LOCKS  = ON) 
-                )ON [PRIMARY]", name, string.Join(", ", columns.ToArray()));
-            }
-
-
-            _DAO.Command = script;
-            if (!_DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection))
-            {
-                message = "Error creating table: " + _DAO.SqlError;
-                return false;
-            }
-
-            message = string.Format("Table [{0}] successfully created.", name);
-            return true;
         }
 
         public bool DeleteTable(string name)
@@ -1305,10 +1172,12 @@ namespace EPMLiveCore.ReportHelper
             return (bool)_DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
         }
 
-        public void Dispose()
-        {
-            _DAO.Dispose();
-        }
+		public void Dispose()
+		{
+			_DAO.Dispose();
+			if (_cmdWithParams != null)
+				_cmdWithParams.Dispose();
+		}
 
         public bool BulkInsert(DataSet dsLists, Guid timerjobguid)
         {
@@ -1992,155 +1861,6 @@ namespace EPMLiveCore.ReportHelper
             return param;
         }
 
-        public static SqlParameter GetParam(SPField field, string sColumnName)
-        {
-            var param = new SqlParameter();
-            SPFieldType type = field.Type;
-            string sType = field.TypeAsString.ToLower();
-
-            switch (type)
-            {
-                case SPFieldType.Integer:
-                    param.SqlDbType = SqlDbType.Float;
-                    param.Direction = ParameterDirection.Input;
-                    break;
-
-                case SPFieldType.Lookup:
-                    if (sColumnName.ToLower().EndsWith("id") && sType != "lookupmulti")
-                    {
-                        param.SqlDbType = SqlDbType.Int;
-                    }
-                    else
-                    {
-                        param.SqlDbType = SqlDbType.NVarChar;
-                        param.Size = 8001;
-                    }
-
-                    param.Direction = ParameterDirection.Input;
-                    break;
-
-                case SPFieldType.User:
-                    if (sColumnName.ToLower().EndsWith("id") && sType != "usermulti")
-                    {
-                        param.SqlDbType = SqlDbType.Int;
-                    }
-                    else
-                    {
-                        param.SqlDbType = SqlDbType.NVarChar;
-                        param.Size = -1;
-                    }
-
-                    param.Direction = ParameterDirection.Input;
-                    break;
-
-                case SPFieldType.Text:
-                    param.SqlDbType = SqlDbType.NVarChar;
-                    param.Size = 256;
-                    param.Direction = ParameterDirection.Input;
-                    break;
-
-                case SPFieldType.Note:
-                    param.SqlDbType = SqlDbType.NText;
-                    param.Direction = ParameterDirection.Input;
-                    break;
-
-                case SPFieldType.MultiChoice:
-                    if (sColumnName.ToLower().EndsWith("id"))
-                    {
-                        param.SqlDbType = SqlDbType.Int;
-                    }
-                    else
-                    {
-                        param.SqlDbType = SqlDbType.NVarChar;
-                        param.Size = 8001;
-                    }
-
-                    param.Direction = ParameterDirection.Input;
-                    break;
-
-                case SPFieldType.Number:
-                    param.SqlDbType = SqlDbType.Float;
-                    param.Direction = ParameterDirection.Input;
-                    break;
-
-                case SPFieldType.Currency:
-                    param.SqlDbType = SqlDbType.Float;
-                    param.Direction = ParameterDirection.Input;
-                    break;
-
-                case SPFieldType.Boolean:
-                    param.SqlDbType = SqlDbType.Bit;
-                    param.Direction = ParameterDirection.Input;
-                    break;
-
-                case SPFieldType.DateTime:
-                    param.SqlDbType = SqlDbType.DateTime;
-                    param.Direction = ParameterDirection.Input;
-                    break;
-
-                case SPFieldType.Calculated:
-                    string sResultType = field.GetProperty("ResultType").ToLower();
-                    switch (sResultType)
-                    {
-                        case "currency":
-                            param.SqlDbType = SqlDbType.Float;
-                            param.Direction = ParameterDirection.Input;
-                            break;
-
-                        case "number":
-                            param.SqlDbType = SqlDbType.Float;
-                            param.Direction = ParameterDirection.Input;
-                            break;
-
-                        case "datetime":
-                            param.SqlDbType = SqlDbType.DateTime;
-                            param.Direction = ParameterDirection.Input;
-                            break;
-
-                        case "boolean":
-                            param.SqlDbType = SqlDbType.Bit;
-                            param.Direction = ParameterDirection.Input;
-                            break;
-
-                        case "text":
-                            param.SqlDbType = SqlDbType.NVarChar;
-                            param.Size = 256;
-                            break;
-                    }
-                    break;
-
-                case SPFieldType.Guid:
-                    param.SqlDbType = SqlDbType.UniqueIdentifier;
-                    param.Direction = ParameterDirection.Input;
-                    break;
-
-                case SPFieldType.Counter:
-                    param.SqlDbType = SqlDbType.Int;
-                    param.Direction = ParameterDirection.Input;
-                    break;
-
-                case SPFieldType.URL:
-                    param.SqlDbType = SqlDbType.NVarChar;
-                    param.Size = 256;
-                    break;
-
-                default:
-                    switch (sType)
-                    {
-                        case "totalrollup":
-                            param.SqlDbType = SqlDbType.Float;
-                            break;
-
-                        default:
-                            param.SqlDbType = SqlDbType.NVarChar;
-                            param.Size = 256;
-                            break;
-                    }
-                    break;
-            }
-            return param;
-        }
-
         public bool InsertAllItemsDB(DataSet dsLists, Guid timerjobguid)
         {
             bool blnPassed = _DAO.BulkInsert(dsLists, timerjobguid);
@@ -2190,570 +1910,402 @@ namespace EPMLiveCore.ReportHelper
             return oValue;
         }
 
-        public DataTable ListItemsDataTable(Guid timerjobguid, string sTableName, SPWeb spWeb, string sListName,
-            ArrayList _arrayListDefaultColumns, out bool error, out string errMsg)
-        {
-            var dtItems = new DataTable();
+		public DataTable MyWorkListItemsDataTable(Guid timerjobguid, string sTableName, SPWeb spWeb, string sListName,
+					  ArrayList _arrayListDefaultColumns, Guid listId, out bool error, out string errMsg)
+		{
+			List<Task> workTasks = new List<Task>();
+			var dtItems = new DataTable();
+			DataTable dtColumns = GetListColumns("My Work");
+			dtColumns = AddMetaInfoCols(dtColumns);
+			SPList spList = null;
+			DataRow itemRow;
+			SPField field;
+			string sType;
+			string errItemTitle = string.Empty;
+			string errItemID = string.Empty;
+			string errColumnName = string.Empty;
 
-            SPList spList = null;
-            DataRow itemRow;
-            SPField field;
-            string sType;
-            string errItemTitle = string.Empty;
-            string errItemID = string.Empty;
-            string errColumnName = string.Empty;
+			error = false;
+			errMsg = string.Empty;
 
-            error = false;
-            errMsg = string.Empty;
+			try
+			{
+				// verify the columns in RPTColumns exist in LST<xxx> tables.
+				VerifyListColumns(dtColumns, sTableName);
 
-            try
-            {
-                spList = spWeb.Lists[sListName];
-                DataTable dtColumns = GetListColumns(spList.ID);
+				//LOAD LIST COLUMNS --- START
+				foreach (DataRow row in dtColumns.Rows)
+				{
+					//Checking for column type in db, then setting appropiate column type
+					sType = row["ColumnType"].ToString().ToLower();
+					switch (sType)
+					{
+						case "uniqueidentifier":
+							dtItems.Columns.Add(row["ColumnName"].ToString(), Type.GetType("System.Guid"));
+							break;
 
-                // verify the columns in RPTColumns exist in LST<xxx> tables.
-                VerifyListColumns(dtColumns, sTableName);
+						case "int":
+							dtItems.Columns.Add(row["ColumnName"].ToString(), Type.GetType("System.Decimal"));
+							break;
 
-                //LOAD LIST COLUMNS --- START
-                foreach (DataRow row in dtColumns.Rows)
-                {
-                    //Checking for column type in db, then setting appropiate column type
-                    sType = row["ColumnType"].ToString().ToLower();
-                    switch (sType)
-                    {
-                        case "uniqueidentifier":
-                            dtItems.Columns.Add(row["ColumnName"].ToString(), Type.GetType("System.Guid"));
-                            break;
+						case "datetime":
+							dtItems.Columns.Add(row["ColumnName"].ToString(), Type.GetType("System.DateTime"));
+							break;
 
-                        case "int":
-                            dtItems.Columns.Add(row["ColumnName"].ToString(), Type.GetType("System.Decimal"));
-                            break;
+						case "float":
+							dtItems.Columns.Add(row["ColumnName"].ToString(), Type.GetType("System.Decimal"));
+							break;
 
-                        case "datetime":
-                            dtItems.Columns.Add(row["ColumnName"].ToString(), Type.GetType("System.DateTime"));
-                            break;
+						default:
+							dtItems.Columns.Add(row["ColumnName"].ToString());
+							break;
+					}
+				} // END
 
-                        case "float":
-                            dtItems.Columns.Add(row["ColumnName"].ToString(), Type.GetType("System.Decimal"));
-                            break;
+				string tableName = _DAO.GetTableName(listId);
+				bool listReportsWork = false;
+				if (!string.IsNullOrWhiteSpace(tableName))
+				{
+					listReportsWork = ListReportsWork(tableName);
+				}
+				spList = spWeb.Lists[sListName];
+				int totalCount = spList.Items.Count;
+				int index = 0;
+				List<long> executionTime = new List<long>();
+				foreach (SPListItem item in spList.Items)
+				{
+					var sw = Stopwatch.StartNew();
+					index++;
+					if (index % 1000 == 0)
+					{
+						double averageExecution = 0;
+						if (executionTime.Count > 0)
+						{
+							averageExecution = executionTime.Average();
+						}
+						executionTime.Clear();
+					}
+					// set item info for logging
+					errItemID = item.ID.ToString();
+					errItemTitle = item.Title;
 
-                        default:
-                            dtItems.Columns.Add(row["ColumnName"].ToString());
-                            break;
-                    }
-                } // END
+					SPFieldCollection spFieldCollection = item.ParentList.Fields;
+					Dictionary<string, List<string>> assignedToCache = new Dictionary<string, List<string>>();
+					if (spFieldCollection.ContainsFieldWithInternalName("AssignedTo") && item["AssignedTo"] != null)
+					{
+						var spFieldUserValueCollection = new SPFieldUserValueCollection(item.Web, item["AssignedTo"].ToString());
+						var allUsers = new List<string>();
+						var assignedTo = item["AssignedTo"]?.ToString();
+						if (!assignedToCache.ContainsKey(assignedTo))
+						{
+							if (!string.IsNullOrWhiteSpace(assignedTo))
+							{
+								try
+								{
+									assignedToCache.Add(assignedTo, spFieldUserValueCollection.Select(userValue => userValue.User.Name).ToList());
+								}
+								catch
+								{
+									assignedToCache.Add(assignedTo, new List<string>());
+								}
+							}
+							else
+							{
+								assignedToCache.Add(assignedTo, new List<string>());
+							}
+						}
+						allUsers = assignedToCache[assignedTo];
+						int totalAssignedToUsers = allUsers.Count;
 
-                foreach (SPListItem item in spList.Items)
-                {
-                    // set item info for logging
-                    errItemID = item.ID.ToString();
-                    errItemTitle = item.Title;
+						if (spFieldCollection.ContainsFieldWithInternalName("Work"))
+						{
+							var stringBuilder = new StringBuilder();
+							object originalWork = item["Work"] == null ? DBNull.Value : item["Work"];
+							string originalUser = item["AssignedTo"].ToString();
+							item["AssignedTo"] = string.Format("-99;#{0}", string.Join(", ", allUsers.Distinct()));
+							item["AssignedTo"] = "-99;#";
 
-                    itemRow = dtItems.NewRow();
-                    foreach (DataRow column in dtColumns.Rows)
-                    {
-                        errColumnName = column["ColumnName"].ToString();
-                        if (spList.Fields.ContainsField(column["internalname"].ToString()))
-                        {
-                            if (column["SharepointType"].ToString().ToLower() == "lookup" ||
-                                column["SharepointType"].ToString().ToLower() == "user")
-                            {
-                                if (column["ColumnName"].ToString().ToLower().EndsWith("text"))
-                                {
-                                    if (ItemHasValue(item, column["internalname"].ToString()))
-                                    //if (item[column["internalname"].ToString()] != null)
-                                    {
-                                        itemRow[column["ColumnName"].ToString()] =
-                                            AddLookUpFieldValues(item[column["internalname"].ToString()].ToString(),
-                                                "text");
-                                    }
-                                    else
-                                    {
-                                        itemRow[column["ColumnName"].ToString()] = DBNull.Value;
-                                    }
-                                }
-                                else if (column["ColumnName"].ToString().ToLower().EndsWith("id"))
-                                {
-                                    if (ItemHasValue(item, column["internalname"].ToString()))
-                                    //if (item[column["internalname"].ToString()] != null)
-                                    {
-                                        string fieldType = GetFieldType(item, column["internalname"].ToString());
+							#region Adding Summary Row
 
-                                        int iResult;
-                                        string sInt =
-                                            AddLookUpFieldValues(item[column["internalname"].ToString()].ToString(),
-                                                "id");
-                                        if (fieldType.Equals("lookupmulti", StringComparison.InvariantCultureIgnoreCase) || fieldType.Equals("usermulti", StringComparison.InvariantCultureIgnoreCase))
-                                        {
-                                            itemRow[column["ColumnName"].ToString()] = sInt;
-                                        }
-                                        else
-                                        {
-                                            if (int.TryParse(sInt, out iResult))
-                                            {
-                                                itemRow[column["ColumnName"].ToString()] = sInt;
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        itemRow[column["ColumnName"].ToString()] = DBNull.Value;
-                                    }
-                                }
-                            }
-                            else if (column["SharepointType"].ToString().ToLower() == "multichoice")
-                            {
-                                field = item.Fields.GetFieldByInternalName(column["columnname"].ToString());
-                                if (ItemHasValue(item, field.InternalName))
-                                {
-                                    string itemVal = Convert.ToString(item[field.InternalName]);
+							itemRow = dtItems.NewRow();
+							itemRow["Work"] = originalWork;
+							itemRow["WorkType"] = sListName;
+							itemRow["DataSource"] = 1;
 
-                                    try
-                                    {
-                                        if (itemVal.StartsWith(";#") && itemVal.EndsWith(";#"))
-                                            itemRow[column["ColumnName"].ToString()] = itemVal.Substring(2, itemVal.Length - 4);
-                                        else
-                                            itemRow[column["ColumnName"].ToString()] = itemVal;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        itemRow[column["ColumnName"].ToString()] = DBNull.Value;
-                                    }
-                                }
-                                else
-                                {
-                                    itemRow[column["ColumnName"].ToString()] = DBNull.Value;
-                                }
-                            }
-                            else
-                            {
-                                if (!_arrayListDefaultColumns.Contains(column["ColumnName"].ToString().ToLower()))
-                                {
-                                    field = item.Fields.GetFieldByInternalName(column["columnname"].ToString());
-                                    if (ItemHasValue(item, field.InternalName))
-                                    //if (item[field.InternalName] != null)
-                                    {
-                                        try
-                                        {
-                                            if (field.Type != SPFieldType.Calculated)
-                                            {
-                                                itemRow[column["ColumnName"].ToString()] = item[field.InternalName];
-                                            }
-                                            else
-                                            {
-                                                itemRow[column["ColumnName"].ToString()] =
-                                                    _DAO.GetCalculatedFieldValue(item, (SPFieldCalculated)field);
-                                            }
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            itemRow[column["ColumnName"].ToString()] = DBNull.Value;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        itemRow[column["ColumnName"].ToString()] = DBNull.Value;
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            bool blnGuid;
-                            object obj;
-                            obj = GetDefaultColumnValue(column["ColumnName"].ToString().ToLower(), item, out blnGuid);
-                            if (blnGuid && obj != null)
-                            {
-                                var id = (Guid)obj;
-                                itemRow[column["ColumnName"].ToString()] = id;
-                            }
-                            else if (obj != null)
-                            {
-                                itemRow[column["ColumnName"].ToString()] = obj;
-                            }
-                        }
-                    }
-                    dtItems.Rows.Add(itemRow);
-                }
-            }
-            catch (Exception ex)
-            {
-                //DataRow[] dr = dtResults.Select("ListName='" + sListName + "'");
+							foreach (DataRow column in dtColumns.Rows)
+							{
+								errColumnName = column["ColumnName"].ToString();
+								if (spList.Fields.ContainsField(column["internalname"].ToString()) &&
+									spList.Fields.GetFieldByInternalName(column["internalname"].ToString())
+										.Type.ToString()
+										.ToLower() == column["SharepointType"].ToString().ToLower())
+								{
+									if (column["SharepointType"].ToString().ToLower() == "lookup" ||
+										column["SharepointType"].ToString().ToLower() == "user")
+									{
+										if (column["ColumnName"].ToString().ToLower() == "assignedtotext")
+										{
+											itemRow[column["ColumnName"].ToString()] = string.Join(", ", allUsers.Distinct());
+										}
+										else if (column["ColumnName"].ToString().ToLower().EndsWith("text"))
+										{
+											if (ItemHasValue(item, column["internalname"].ToString()))
+											//if (item[column["internalname"].ToString()] != null)
+											{
+												itemRow[column["ColumnName"].ToString()] =
+													AddLookUpFieldValues(
+														item[column["internalname"].ToString()].ToString(), "text");
+											}
+											else
+											{
+												itemRow[column["ColumnName"].ToString()] = DBNull.Value;
+											}
+										}
+										else if (column["ColumnName"].ToString().ToLower().EndsWith("id"))
+										{
+											if (ItemHasValue(item, column["internalname"].ToString()))
+											//if (item[column["internalname"].ToString()] != null)
+											{
+												itemRow[column["ColumnName"].ToString()] =
+													AddLookUpFieldValues(
+														item[column["internalname"].ToString()].ToString(), "id");
+											}
+											else
+											{
+												itemRow[column["ColumnName"].ToString()] = DBNull.Value;
+											}
+										}
+									}
+									else
+									{
+										if (
+											!_arrayListDefaultColumns.Contains(column["ColumnName"].ToString().ToLower()))
+										{
+											field = item.Fields.GetFieldByInternalName(column["columnname"].ToString());
+											if (ItemHasValue(item, field.InternalName))
+											//if (item[field.InternalName] != null)
+											{
+												try
+												{
+													if (field.Type != SPFieldType.Calculated)
+													{
+														itemRow[column["ColumnName"].ToString()] =
+															item[field.InternalName];
+													}
+													else
+													{
+														itemRow[column["ColumnName"].ToString()] =
+															_DAO.GetCalculatedFieldValue(item, (SPFieldCalculated)field);
+													}
+												}
+												catch (Exception ex)
+												{
+													itemRow[column["ColumnName"].ToString()] = DBNull.Value;
+												}
+											}
+											else
+											{
+												itemRow[column["ColumnName"].ToString()] = DBNull.Value;
+											}
+										}
+									}
+								}
+								else
+								{
+									bool blnGuid;
+									object obj;
+									obj = GetDefaultColumnValue(column["ColumnName"].ToString().ToLower(), item,
+										out blnGuid);
+									if (blnGuid && obj != null)
+									{
+										var id = (Guid)obj;
+										itemRow[column["ColumnName"].ToString()] = id;
+									}
+									else if (obj != null)
+									{
+										itemRow[column["ColumnName"].ToString()] = obj;
+									}
+								}
 
-                //if (dr[0]["ResultText"] == null)
-                //{
-                //    dr[0]["ResultText"] = ex.Message;
-                //}
-                //else
-                //{
-                //    dr[0]["ResultText"] = dr[0]["ResultText"] + ", Error:" + ex.Message.ToString();
-                //}                
+								//AddMetaInfoCols(listName, listItem, ref rcols, ref rvalues);
+							}
+							dtItems.Rows.Add(itemRow);
 
-                //dtItems = null;
-                //Guid tjb = Guid.NewGuid();                
-                //_DAO.LogStatus(_DAO.GetListId(spList.Title).ToString(), spList.Title, spWeb.Name + " (" + spWeb.ServerRelativeUrl + ") - Processed with errors.", ex.Message + " -- Stack: " + ex.StackTrace, 2, 3, tjb.ToString());
-                //_DAO.LogStatus(_DAO.GetListId(sListName).ToString(), sListName, "Error on Refresh.", ex.Message, 2, 3, timerjobguid.ToString());            
-                error = true;
-                errMsg = ex.Message + "[LOCATION INFO] - ItemTitle: " + errItemTitle + ", ItemId: " + errItemID +
-                         ", ColumnName: " + errColumnName + ".";
-            }
-            return dtItems;
-        }
+							#endregion
 
-        public DataTable MyWorkListItemsDataTable(Guid timerjobguid, string sTableName, SPWeb spWeb, string sListName,
-            ArrayList _arrayListDefaultColumns, Guid listId, out bool error, out string errMsg)
-        {
-            var dtItems = new DataTable();
-            DataTable dtColumns = GetListColumns("My Work");
-            dtColumns = AddMetaInfoCols(dtColumns);
-            SPList spList = null;
-            DataRow itemRow;
-            SPField field;
-            string sType;
-            string errItemTitle = string.Empty;
-            string errItemID = string.Empty;
-            string errColumnName = string.Empty;
+							double tempHours, hours;
 
-            error = false;
-            errMsg = string.Empty;
+							if (double.TryParse(originalWork.ToString(), out tempHours))
+							{
+								hours = tempHours / totalAssignedToUsers;
+							}
+							else
+							{
+								hours = 0.0;
+							}
 
-            try
-            {
-                // verify the columns in RPTColumns exist in LST<xxx> tables.
-                VerifyListColumns(dtColumns, sTableName);
+							foreach (SPFieldUserValue spFieldUserValue in spFieldUserValueCollection)
+							{
+								itemRow = dtItems.NewRow();
+								item["Work"] = hours;
+								item["AssignedTo"] = spFieldUserValue;
+								string columnName = string.Empty;
+								string internalName = string.Empty;
 
-                //LOAD LIST COLUMNS --- START
-                foreach (DataRow row in dtColumns.Rows)
-                {
-                    //Checking for column type in db, then setting appropiate column type
-                    sType = row["ColumnType"].ToString().ToLower();
-                    switch (sType)
-                    {
-                        case "uniqueidentifier":
-                            dtItems.Columns.Add(row["ColumnName"].ToString(), Type.GetType("System.Guid"));
-                            break;
+								itemRow["WorkType"] = sListName;
+								itemRow["DataSource"] = 1;
 
-                        case "int":
-                            dtItems.Columns.Add(row["ColumnName"].ToString(), Type.GetType("System.Decimal"));
-                            break;
+								foreach (DataRow column in dtColumns.Rows)
+								{
+									if (spList.Fields.ContainsField(column["internalname"].ToString()) &&
+										spList.Fields.GetFieldByInternalName(column["internalname"].ToString())
+											.Type.ToString()
+											.ToLower() == column["SharepointType"].ToString().ToLower())
+									{
+										if (column["SharepointType"].ToString().ToLower() == "lookup" ||
+											column["SharepointType"].ToString().ToLower() == "user")
+										{
+											if (column["ColumnName"].ToString().ToLower() == "assignedtotext")
+											{
+												itemRow[column["ColumnName"].ToString()] = string.Join(", ", allUsers.Distinct());
+											}
+											else if (column["ColumnName"].ToString().ToLower().EndsWith("text"))
+											{
+												if (ItemHasValue(item, column["internalname"].ToString()))
+												//if (item[column["internalname"].ToString()] != null)
+												{
+													itemRow[column["ColumnName"].ToString()] =
+														AddLookUpFieldValues(
+															item[column["internalname"].ToString()].ToString(), "text");
+												}
+												else
+												{
+													itemRow[column["ColumnName"].ToString()] = DBNull.Value;
+												}
+											}
+											else if (column["ColumnName"].ToString().ToLower().EndsWith("id"))
+											{
+												if (ItemHasValue(item, column["internalname"].ToString()))
+												//if (item[column["internalname"].ToString()] != null)
+												{
+													itemRow[column["ColumnName"].ToString()] =
+														AddLookUpFieldValues(
+															item[column["internalname"].ToString()].ToString(), "id");
+												}
+												else
+												{
+													itemRow[column["ColumnName"].ToString()] = DBNull.Value;
+												}
+											}
+										}
+										else
+										{
+											if (
+												!_arrayListDefaultColumns.Contains(
+													column["ColumnName"].ToString().ToLower()))
+											{
+												field =
+													item.Fields.GetFieldByInternalName(column["columnname"].ToString());
+												if (ItemHasValue(item, field.InternalName))
+												//if (item[field.InternalName] != null)
+												{
+													try
+													{
+														if (field.Type != SPFieldType.Calculated)
+														{
+															itemRow[column["ColumnName"].ToString()] =
+																item[field.InternalName];
+														}
+														else
+														{
+															itemRow[column["ColumnName"].ToString()] =
+																_DAO.GetCalculatedFieldValue(item,
+																	(SPFieldCalculated)field);
+														}
+													}
+													catch (Exception ex)
+													{
+														itemRow[column["ColumnName"].ToString()] = DBNull.Value;
+													}
+												}
+												else
+												{
+													itemRow[column["ColumnName"].ToString()] = DBNull.Value;
+												}
+											}
+										}
+									}
+									else
+									{
+										bool blnGuid;
+										object obj;
+										obj = GetDefaultColumnValue(column["ColumnName"].ToString().ToLower(), item,
+											out blnGuid);
+										if (blnGuid && obj != null)
+										{
+											var id = (Guid)obj;
+											itemRow[column["ColumnName"].ToString()] = id;
+										}
+										else if (obj != null)
+										{
+											itemRow[column["ColumnName"].ToString()] = obj;
+										}
+									}
 
-                        case "datetime":
-                            dtItems.Columns.Add(row["ColumnName"].ToString(), Type.GetType("System.DateTime"));
-                            break;
+									//AddMetaInfoCols(listName, listItem, ref rcols, ref rvalues);
+								}
+								dtItems.Rows.Add(itemRow);
+							}
 
-                        case "float":
-                            dtItems.Columns.Add(row["ColumnName"].ToString(), Type.GetType("System.Decimal"));
-                            break;
-
-                        default:
-                            dtItems.Columns.Add(row["ColumnName"].ToString());
-                            break;
-                    }
-                } // END
+							item["Work"] = originalWork;
+							item["AssignedTo"] = spFieldUserValueCollection;
+						}
 
 
-                spList = spWeb.Lists[sListName];
-                foreach (SPListItem item in spList.Items)
-                {
-                    // set item info for logging
-                    errItemID = item.ID.ToString();
-                    errItemTitle = item.Title;
+						if (listReportsWork)
+						{
+							Task workTask = _DAO.SaveWorkAsync(item);
+							workTasks.Add(workTask);
+							if (workTasks.Count == 20)
+							{
+								Task.WaitAll(workTasks.Where(x=>x!=null).ToArray());
+								workTasks.Clear();
+							}
+						}
+						sw.Stop();
+						executionTime.Add(sw.ElapsedMilliseconds);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+				//DataRow[] dr = dtResults.Select("ListName='" + sListName + "'");
 
-                    SPFieldCollection spFieldCollection = item.ParentList.Fields;
+				//if (dr[0]["ResultText"] == null)
+				//{
+				//    dr[0]["ResultText"] = ex.Message;
+				//}
+				//else
+				//{
+				//    dr[0]["ResultText"] = dr[0]["ResultText"] + ", Error:" + ex.Message.ToString();
+				//}                
 
-                    if (spFieldCollection.ContainsFieldWithInternalName("AssignedTo") && item["AssignedTo"] != null)
-                    {
-                        var spFieldUserValueCollection = new SPFieldUserValueCollection(item.Web,
-                            item["AssignedTo"].ToString());
+				//dtItems = null;
+				//Guid tjb = Guid.NewGuid();                
+				//_DAO.LogStatus(_DAO.GetListId(spList.Title).ToString(), spList.Title, spWeb.Name + " (" + spWeb.ServerRelativeUrl + ") - Processed with errors.", ex.Message + " -- Stack: " + ex.StackTrace, 2, 3, tjb.ToString());
+				//_DAO.LogStatus(_DAO.GetListId(sListName).ToString(), sListName, "Error on Refresh.", ex.Message, 2, 3, timerjobguid.ToString());            
+				error = true;
+				errMsg = ex.Message + "[LOCATION INFO] - ItemTitle: " + errItemTitle + ", ItemId: " + errItemID +
+						 ", ColumnName: " + errColumnName + ".";
+			}
 
-                        int totalAssignedToUsers = spFieldUserValueCollection.Count;
+            Task.WaitAll(workTasks.Where(x => x != null).ToArray());
+			workTasks.Clear();
+			return dtItems;
+		}
 
-                        if (spFieldCollection.ContainsFieldWithInternalName("Work"))
-                        {
-                            var stringBuilder = new StringBuilder();
-                            object originalWork = item["Work"] == null ? DBNull.Value : item["Work"];
-                            string originalUser = item["AssignedTo"].ToString();
-
-                            var allUsers = new List<string>();
-
-                            try
-                            {
-                                allUsers.AddRange(spFieldUserValueCollection.Select(userValue => userValue.User.Name));
-                            }
-                            catch { }
-
-                            //item["AssignedTo"] = string.Format("-99;#{0}", string.Join(", ", allUsers.Distinct()));
-                            item["AssignedTo"] = "-99;#";
-
-                            #region Adding Summary Row
-
-                            itemRow = dtItems.NewRow();
-                            itemRow["Work"] = originalWork;
-                            itemRow["WorkType"] = sListName;
-                            itemRow["DataSource"] = 1;
-
-                            foreach (DataRow column in dtColumns.Rows)
-                            {
-                                errColumnName = column["ColumnName"].ToString();
-                                if (spList.Fields.ContainsField(column["internalname"].ToString()) &&
-                                    spList.Fields.GetFieldByInternalName(column["internalname"].ToString())
-                                        .Type.ToString()
-                                        .ToLower() == column["SharepointType"].ToString().ToLower())
-                                {
-                                    if (column["SharepointType"].ToString().ToLower() == "lookup" ||
-                                        column["SharepointType"].ToString().ToLower() == "user")
-                                    {
-                                        if (column["ColumnName"].ToString().ToLower() == "assignedtotext")
-                                        {
-                                            itemRow[column["ColumnName"].ToString()] = string.Join(", ", allUsers.Distinct());
-                                        }
-                                        else if (column["ColumnName"].ToString().ToLower().EndsWith("text"))
-                                        {
-                                            if (ItemHasValue(item, column["internalname"].ToString()))
-                                            //if (item[column["internalname"].ToString()] != null)
-                                            {
-                                                itemRow[column["ColumnName"].ToString()] =
-                                                    AddLookUpFieldValues(
-                                                        item[column["internalname"].ToString()].ToString(), "text");
-                                            }
-                                            else
-                                            {
-                                                itemRow[column["ColumnName"].ToString()] = DBNull.Value;
-                                            }
-                                        }
-                                        else if (column["ColumnName"].ToString().ToLower().EndsWith("id"))
-                                        {
-                                            if (ItemHasValue(item, column["internalname"].ToString()))
-                                            //if (item[column["internalname"].ToString()] != null)
-                                            {
-                                                itemRow[column["ColumnName"].ToString()] =
-                                                    AddLookUpFieldValues(
-                                                        item[column["internalname"].ToString()].ToString(), "id");
-                                            }
-                                            else
-                                            {
-                                                itemRow[column["ColumnName"].ToString()] = DBNull.Value;
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (
-                                            !_arrayListDefaultColumns.Contains(column["ColumnName"].ToString().ToLower()))
-                                        {
-                                            field = item.Fields.GetFieldByInternalName(column["columnname"].ToString());
-                                            if (ItemHasValue(item, field.InternalName))
-                                            //if (item[field.InternalName] != null)
-                                            {
-                                                try
-                                                {
-                                                    if (field.Type != SPFieldType.Calculated)
-                                                    {
-                                                        itemRow[column["ColumnName"].ToString()] =
-                                                            item[field.InternalName];
-                                                    }
-                                                    else
-                                                    {
-                                                        itemRow[column["ColumnName"].ToString()] =
-                                                            _DAO.GetCalculatedFieldValue(item, (SPFieldCalculated)field);
-                                                    }
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    itemRow[column["ColumnName"].ToString()] = DBNull.Value;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                itemRow[column["ColumnName"].ToString()] = DBNull.Value;
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    bool blnGuid;
-                                    object obj;
-                                    obj = GetDefaultColumnValue(column["ColumnName"].ToString().ToLower(), item,
-                                        out blnGuid);
-                                    if (blnGuid && obj != null)
-                                    {
-                                        var id = (Guid)obj;
-                                        itemRow[column["ColumnName"].ToString()] = id;
-                                    }
-                                    else if (obj != null)
-                                    {
-                                        itemRow[column["ColumnName"].ToString()] = obj;
-                                    }
-                                }
-
-                                //AddMetaInfoCols(listName, listItem, ref rcols, ref rvalues);
-                            }
-                            dtItems.Rows.Add(itemRow);
-
-                            #endregion
-
-                            double tempHours, hours;
-
-                            if (double.TryParse(originalWork.ToString(), out tempHours))
-                            {
-                                hours = tempHours / totalAssignedToUsers;
-                            }
-                            else
-                            {
-                                hours = 0.0;
-                            }
-
-                            foreach (SPFieldUserValue spFieldUserValue in spFieldUserValueCollection)
-                            {
-                                itemRow = dtItems.NewRow();
-                                item["Work"] = hours;
-                                item["AssignedTo"] = spFieldUserValue;
-                                string columnName = string.Empty;
-                                string internalName = string.Empty;
-
-                                itemRow["WorkType"] = sListName;
-                                itemRow["DataSource"] = 1;
-
-                                foreach (DataRow column in dtColumns.Rows)
-                                {
-                                    if (spList.Fields.ContainsField(column["internalname"].ToString()) &&
-                                        spList.Fields.GetFieldByInternalName(column["internalname"].ToString())
-                                            .Type.ToString()
-                                            .ToLower() == column["SharepointType"].ToString().ToLower())
-                                    {
-                                        if (column["SharepointType"].ToString().ToLower() == "lookup" ||
-                                            column["SharepointType"].ToString().ToLower() == "user")
-                                        {
-                                            if (column["ColumnName"].ToString().ToLower() == "assignedtotext")
-                                            {
-                                                itemRow[column["ColumnName"].ToString()] = string.Join(", ", allUsers.Distinct());
-                                            }
-                                            else if (column["ColumnName"].ToString().ToLower().EndsWith("text"))
-                                            {
-                                                if (ItemHasValue(item, column["internalname"].ToString()))
-                                                //if (item[column["internalname"].ToString()] != null)
-                                                {
-                                                    itemRow[column["ColumnName"].ToString()] =
-                                                        AddLookUpFieldValues(
-                                                            item[column["internalname"].ToString()].ToString(), "text");
-                                                }
-                                                else
-                                                {
-                                                    itemRow[column["ColumnName"].ToString()] = DBNull.Value;
-                                                }
-                                            }
-                                            else if (column["ColumnName"].ToString().ToLower().EndsWith("id"))
-                                            {
-                                                if (ItemHasValue(item, column["internalname"].ToString()))
-                                                //if (item[column["internalname"].ToString()] != null)
-                                                {
-                                                    itemRow[column["ColumnName"].ToString()] =
-                                                        AddLookUpFieldValues(
-                                                            item[column["internalname"].ToString()].ToString(), "id");
-                                                }
-                                                else
-                                                {
-                                                    itemRow[column["ColumnName"].ToString()] = DBNull.Value;
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (
-                                                !_arrayListDefaultColumns.Contains(
-                                                    column["ColumnName"].ToString().ToLower()))
-                                            {
-                                                field =
-                                                    item.Fields.GetFieldByInternalName(column["columnname"].ToString());
-                                                if (ItemHasValue(item, field.InternalName))
-                                                //if (item[field.InternalName] != null)
-                                                {
-                                                    try
-                                                    {
-                                                        if (field.Type != SPFieldType.Calculated)
-                                                        {
-                                                            itemRow[column["ColumnName"].ToString()] =
-                                                                item[field.InternalName];
-                                                        }
-                                                        else
-                                                        {
-                                                            itemRow[column["ColumnName"].ToString()] =
-                                                                _DAO.GetCalculatedFieldValue(item,
-                                                                    (SPFieldCalculated)field);
-                                                        }
-                                                    }
-                                                    catch (Exception ex)
-                                                    {
-                                                        itemRow[column["ColumnName"].ToString()] = DBNull.Value;
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    itemRow[column["ColumnName"].ToString()] = DBNull.Value;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        bool blnGuid;
-                                        object obj;
-                                        obj = GetDefaultColumnValue(column["ColumnName"].ToString().ToLower(), item,
-                                            out blnGuid);
-                                        if (blnGuid && obj != null)
-                                        {
-                                            var id = (Guid)obj;
-                                            itemRow[column["ColumnName"].ToString()] = id;
-                                        }
-                                        else if (obj != null)
-                                        {
-                                            itemRow[column["ColumnName"].ToString()] = obj;
-                                        }
-                                    }
-
-                                    //AddMetaInfoCols(listName, listItem, ref rcols, ref rvalues);
-                                }
-                                dtItems.Rows.Add(itemRow);
-                            }
-
-                            item["Work"] = originalWork;
-                            item["AssignedTo"] = spFieldUserValueCollection;
-                        }
-
-                        string tableName = _DAO.GetTableName(listId);
-                        if (ListReportsWork(tableName))
-                        {
-                            _DAO.SaveWork(item);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //DataRow[] dr = dtResults.Select("ListName='" + sListName + "'");
-
-                //if (dr[0]["ResultText"] == null)
-                //{
-                //    dr[0]["ResultText"] = ex.Message;
-                //}
-                //else
-                //{
-                //    dr[0]["ResultText"] = dr[0]["ResultText"] + ", Error:" + ex.Message.ToString();
-                //}                
-
-                //dtItems = null;
-                //Guid tjb = Guid.NewGuid();                
-                //_DAO.LogStatus(_DAO.GetListId(spList.Title).ToString(), spList.Title, spWeb.Name + " (" + spWeb.ServerRelativeUrl + ") - Processed with errors.", ex.Message + " -- Stack: " + ex.StackTrace, 2, 3, tjb.ToString());
-                //_DAO.LogStatus(_DAO.GetListId(sListName).ToString(), sListName, "Error on Refresh.", ex.Message, 2, 3, timerjobguid.ToString());            
-                error = true;
-                errMsg = ex.Message + "[LOCATION INFO] - ItemTitle: " + errItemTitle + ", ItemId: " + errItemID +
-                         ", ColumnName: " + errColumnName + ".";
-            }
-            return dtItems;
-        }
-
-        private DataTable AddMetaInfoCols(DataTable dt)
+		private DataTable AddMetaInfoCols(DataTable dt)
         {
             DataTable result = dt;
             if (result != null)

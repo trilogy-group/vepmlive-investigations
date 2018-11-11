@@ -76,15 +76,9 @@ iisreset</PostDeploymentCommand>
     <TokenReplacementFileExtensions>ashx</TokenReplacementFileExtensions>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.SharePoint.Security, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Security.dll</HintPath>
-    </Reference>
+    <Reference Include="Microsoft.SharePoint.Security, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL"/>
     <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.Web.CommandUI.dll</HintPath>
-    </Reference>
+    <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL"/>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -101,7 +95,9 @@ iisreset</PostDeploymentCommand>
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.SharePoint" />
+    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +160,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\Admin\InstallDataSyncEvents.aspx.designer.cs">
       <DependentUpon>InstallDataSyncEvents.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\AutoAdjustPeriods.cs" />
     <Compile Include="Layouts\ppm\calendarform.aspx.cs">
       <DependentUpon>calendarform.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -194,6 +191,9 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\ClientPrioritization.ascx.designer.cs">
       <DependentUpon>ClientPrioritization.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\ControlBase.cs">
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\CostAnalyzer.ascx.cs">
       <DependentUpon>CostAnalyzer.ascx</DependentUpon>
@@ -291,6 +291,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\CustomFieldForm.aspx.designer.cs">
       <DependentUpon>CustomFieldForm.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\CustomFieldHelper.cs" />
     <Compile Include="Layouts\ppm\Customfields.ashx.cs">
       <DependentUpon>Customfields.ashx</DependentUpon>
     </Compile>
@@ -391,12 +392,14 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\EditList.aspx.designer.cs">
       <DependentUpon>EditList.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\EPKClass01.cs" />
     <Compile Include="Layouts\ppm\EPKCSRequest.ashx.cs">
       <DependentUpon>EPKCSRequest.ashx</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\EPKRequest.ashx.cs">
       <DependentUpon>EPKRequest.ashx</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\GenerateTicketResponse.cs" />
     <Compile Include="Layouts\ppm\gotopage.aspx.cs">
       <DependentUpon>gotopage.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -791,6 +794,7 @@ iisreset</PostDeploymentCommand>
       <DependentUpon>workitems.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\XEPKadmin1.cs" />
+    <Compile Include="Layouts\ppm\XmlHelper.cs" />
     <Compile Include="ListDisplayUtils.cs" />
     <Compile Include="MyTasks\MyTasks.cs" />
     <Compile Include="PersonalPlanner\PersonalPlanner.cs" />
@@ -1049,6 +1053,7 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\DHTML\xgrid\skins\dhtmlxgrid_dhx_dgrid.css" />
     <Content Include="Layouts\ppm\AddList.aspx" />
     <Content Include="Layouts\ppm\Admin\InstallDataSyncEvents.aspx" />
+    <Content Include="Layouts\ppm\AnalyzerHelper.js" />
     <Content Include="Layouts\ppm\CAB\WE_Client.CAB" />
     <Content Include="Layouts\ppm\calendarform.aspx" />
     <Content Include="Layouts\ppm\Calendars.aspx" />
@@ -1242,6 +1247,7 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\ppm\Optimizer.ascx.js" />
     <Content Include="Layouts\ppm\optimizer.aspx" />
     <Content Include="Layouts\ppm\Optimizer.js" />
+    <Content Include="Layouts\ppm\AutoAdjustPeriods.js" />
     <Content Include="Layouts\ppm\PFEFileImport.aspx" />
     <Content Include="Layouts\ppm\PFEFileImportStatus.aspx" />
     <Content Include="Layouts\ppm\Postcostoptions.aspx" />

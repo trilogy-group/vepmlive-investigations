@@ -27,7 +27,7 @@ export class PageHelper {
         xxxl: 200000,
         xxxxl: 500000,
     };
-    static DEFAULT_TIMEOUT = PageHelper.timeout.xxl;
+    static DEFAULT_TIMEOUT = PageHelper.timeout.xl;
     private static readonly EC = protractor.ExpectedConditions;
 
     static get isFullScreen() {
@@ -59,8 +59,8 @@ export class PageHelper {
         return browser.actions().sendKeys(key).perform();
     }
 
-    static enterPressForBrowser() {
-        return browser.actions().sendKeys(protractor.Key.ENTER).perform();
+    static async enterPressForBrowser() {
+        return await browser.actions().sendKeys(protractor.Key.ENTER).perform();
     }
 
     static actionMouseUp(location: WebElement) {
@@ -185,8 +185,12 @@ export class PageHelper {
      * @returns {any}
      */
     static async click(targetElement: ElementFinder) {
-        await WaitHelper.waitForElementToBePresent(targetElement);
-        await ElementHelper.clickUsingJs(targetElement);
+        await WaitHelper.waitForElementToBeClickable(targetElement);
+        try {
+            targetElement.click();
+        } catch (e) {
+            await ElementHelper.clickUsingJs(targetElement);
+        }
     }
 
     static async clickIfPresent(targetElement: ElementFinder) {
@@ -386,20 +390,6 @@ export class PageHelper {
         return shortId.generate().replace(/-/g, '').replace(/_/g, '');
     }
 
-    static getUniqueIdForCategory(length: number) {
-        return Math.random().toString(36).substr(2, length);
-    }
-
-    static getUniqueIdWithAlphabetsOnly() {
-        return this.getUniqueId().replace(/[0-9]/g, '');
-    }
-
-    static getUniqueIntId(size = 6): string {
-        // noinspection reason: Giving error for unknown character function
-        // noinspection Annotator
-        return Math.floor(Math.pow(10, size - 1) + Math.random() * 9 * Math.pow(10, size - 1)).toString();
-    }
-
     static async uploadFile(item: ElementFinder, filePath: string) {
         browser.setFileDetector(new remote.FileDetector());
         await WaitHelper.waitForElementToBePresent(item);
@@ -407,53 +397,12 @@ export class PageHelper {
     }
 
     public static async getAlertText() {
+        await this.waitForAlertToBePresent();
         return await browser.switchTo().alert().getText();
-    }
-
-    /**
-     * Wait for an alert to appear
-     * @param {number} timeout in milliseconds
-     * @param {string} message
-     */
-    public static async waitForAlertToBePresent(timeout: number = PageHelper.DEFAULT_TIMEOUT, message: string = 'Alert is not present') {
-        return await browser.wait(this.EC.alertIsPresent(), timeout, message);
     }
 
     public static async sleepForXSec(milliseconds: number) {
         await browser.sleep(milliseconds);
-    }
-
-    static async randomString(size: number) {
-        let text = '';
-        const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-        for (let i = 0; i < size; i++) {
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        }
-        return text;
-    }
-
-    public static numberFromString(text: string) {
-        return Number(text.replace(/\D+/g, ''));
-    }
-
-    /**
-     * Gets innertext for all the elements
-     * @param {WebElementPromise} elements
-     * @returns {string} inner text
-     */
-    public static async getAllTextsInLowerCase(elements: ElementArrayFinder): Promise<string[]> {
-        const allTexts = [];
-        const allItems = await elements.asElementFinders_();
-        for (const elem of allItems) {
-            const elementText = await this.getText(elem);
-            allTexts.push(elementText.toLowerCase());
-        }
-        return allTexts;
-    }
-
-    static async replaceSpaceWithMinus(text: string) {
-        return text.replace(/\s+/g, '-');
     }
 
     /**
@@ -480,5 +429,21 @@ export class PageHelper {
 
     static async isAlertPresent() {
         return await browser.wait(this.EC.alertIsPresent(), 1000).then(() => true).catch(() => false);
+    }
+
+    public static async waitForAlertToBePresent( timeout: number = PageHelper.DEFAULT_TIMEOUT,
+                                                 message: string = 'Alert is not present') {
+        return await browser.wait(this.EC.alertIsPresent(), timeout, message).then(() => true, () => false);
+    }
+
+    public static async acceptAlertIfPresent( timeout: number = PageHelper.timeout.m,
+                                              message: string = 'Alert is not present') {
+        const isPresent = await this.waitForAlertToBePresent(timeout, message);
+        if (isPresent) {
+            await browser.switchTo().alert().accept();
+            return await browser.switchTo().defaultContent();
+        } else {
+            console.log('Alert is not present');
+        }
     }
 }

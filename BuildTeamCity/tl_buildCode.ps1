@@ -82,72 +82,19 @@ $referencePath = "C:\Program Files\Reference Assemblies\Microsoft\VSTO40\v4.0.Fr
 $referencePath = $referencePath -replace "\s","%20" 
 $referencePath = $referencePath -replace ";","%3B"
 
-
-if ($TestsOnly)
-{
-	$projectsToBeBuildAsDLL = @("EPMLiveCore.Tests","EPMLiveReporting.Tests","EPMLiveTimerService.Tests", "EPMLiveTimesheets.Tests", "EPMLiveWebParts.Tests", "EPMLiveWorkPlanner.Tests", "PortfolioEngineCore.Tests", "WorkEnginePPM.Tests", "ProjectPublisher2016.Tests")
-	
-	# Directory for outputs
-	$OutputDirectory = Join-Path $SourcesDirectory "Test-Output"
-	if (!(Test-Path -Path $OutputDirectory)){
-		New-Item $OutputDirectory -ItemType Directory
-	}
-	foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
-    
-    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsDLL + ".csproj") -Recurse
-
-
-    Log-SubSection "Building '$projectToBeBuildAsDLL'..."
-	Log-SubSection "projectPath: '$projectPath'...."
-	
-	& $MSBuildExec $projectPath `
-	/t:Build `
-	/p:OutputPath="$OutputDirectory" `
-    /p:PreBuildEvent= `
-    /p:PostBuildEvent= `
-    /p:Configuration="Debug" `
-    /p:Platform="$PlatformToBuild" `
-	/p:langversion="$langversion" `
-    /p:WarningLevel=0 `
-    /p:GenerateSerializationAssemblies="Off" `
-    /p:ReferencePath=$referencePath `
-    /fl /flp:"$loggerArgs" `
-    /m:4 `
-    $ToolsVersion `
-	$DfMsBuildArgs `
-	$MsBuildArguments  
-	if ($LastExitCode -ne 0) {
-		throw "Project build failed with exit code: $LastExitCode."
-	}
-
-}
-}
-else
-{
-# Directory for outputs
-$OutputDirectory = Join-Path $SourcesDirectory "output"
-# Initialize Binaries Directory
-$BinariesDirectory = Join-Path $OutputDirectory "binaries"
-# Initialize merged binaries folder
-# This directory holds "Single-Folder" build output of all projects
-# This is used as a repository to look up dependent DLLs for projects when  
-# packaging libs for each project in a separate folder.
-# Initialize Libraries Directory
-$LibrariesDirectory = "$OutputDirectory\libraries"
-# Initialize intermediates directory (PDB)
-$IntermediatesDirectory = "$OutputDirectory\intermediate"
 $projAbsPath = Join-Path $SourcesDirectory "EPMLive.sln"
 $projPublisherAbsPath = Join-Path $SourcesDirectory "\ProjectPublisher2016\ProjectPublisher2016.sln"
 $projSSRSPath = Join-Path $SourcesDirectory "\EPMLiveNativeSSRSComponents\EPMLiveNativeSSRSComponents.sln"
+$projAUTPath = Join-Path $SourcesDirectory "\AUT\EPMLive.AUT.Tests.sln"
+
 $projDir = Split-Path $projAbsPath -parent
 $projName = [System.IO.Path]::GetFileNameWithoutExtension($projAbsPath) 
-
+$OutputDirectory = Join-Path $SourcesDirectory "output"
+$BinariesDirectory = Join-Path $OutputDirectory "binaries"
+$LibrariesDirectory = "$OutputDirectory\libraries"
+$IntermediatesDirectory = "$OutputDirectory\intermediate"
 
 ### Build preparation steps
-
-# set timezone to UTC - for aline to correctly report on time spent in build tasks
-#& tzutil /s "UTC"
-
 
 Log-Section "Build configuration"
 Log-Message "`t Configuration: '$ConfigurationToBuild'"
@@ -216,17 +163,99 @@ If ($CleanBuild -eq $true) {
 	if ($LastExitCode -ne 0) {
 		throw "Project clean-up failed with exit code: $LastExitCode."
 	}
+	
+	Log-SubSection "Cleaning AUT"
+	    
+	& $MSBuildExec "$projAUTPath"  `
+	    /t:Clean `
+	    /p:SkipInvalidConfigurations=true `
+	    /p:Configuration="$ConfigurationToBuild" `
+	    /p:Platform="$PlatformToBuild" `
+        /m:4 `
+        /p:WarningLevel=0 `
+        $ToolsVersion `
+	    $DfMsBuildArgs `
+	    $MsBuildArguments
+	if ($LastExitCode -ne 0) {
+		throw "Project clean-up failed with exit code: $LastExitCode."
+	}
 }
 
 Log-Section "Downloading Nuget . . ."
+
 $nugetPath = $SourcesDirectory + "\nuget.exe"
-Invoke-WebRequest -Uri http://nuget.org/nuget.exe -OutFile $nugetPath
+$NUVersion = '3.5.0'
+Invoke-WebRequest "https://dist.nuget.org/win-x86-commandline/v$NUVersion/nuget.exe" -OutFile $nugetPath
 
-
-Log-Section "Restoring missing packages . . ."
+$nuSln = Resolve-Path $projAbsPath
+Log-Section "Restoring missing packages . . . $nuSln"
 & $nugetPath `
 restore `
-$projAbsPath
+$nuSln
+
+$nuSln = Resolve-Path $projAUTPath
+Log-Section "Restoring missing packages . . . $nuSln"
+& $nugetPath `
+restore `
+$nuSln
+
+if ($TestsOnly)
+{
+	$projectsToBeBuildAsDLL = @(
+	"EPMLiveCore.Tests",
+	"EPMLiveIntegrationService.Tests",
+	"EPMLivePS.Tests",
+	"EPMLiveReporting.Tests",
+	"EPMLiveTimerService.Tests", 
+	"EPMLiveTimesheets.Tests", 
+	"EPMLiveWebParts.Tests", 
+	"EPMLiveWorkPlanner.Tests", 
+	"PortfolioEngineCore.Tests", 
+	"WorkEnginePPM.Tests", 
+	"ProjectPublisher2016.Tests", 
+	"EPMLiveCore.AUT.Tests",
+	"EPMLiveSynch.Tests",
+	"EPMLiveDashboards.Tests")
+
+	# Directory for outputs
+	$OutputDirectory = Join-Path $SourcesDirectory "Test-Output"
+	
+	foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
+    $projOutput = Join-Path $OutputDirectory $projectToBeBuildAsDLL
+	if (!(Test-Path -Path $projOutput)){
+		New-Item $projOutput -ItemType Directory
+	}
+	
+    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsDLL + ".csproj") -Recurse
+
+
+    Log-SubSection "Building '$projectToBeBuildAsDLL'..."
+	Log-SubSection "projectPath: '$projectPath'...."
+	
+	& $MSBuildExec $projectPath `
+	/t:Build `
+	/p:OutputPath="$projOutput" `
+    /p:Configuration="Debug" `
+    /p:Platform="$PlatformToBuild" `
+	/p:langversion="$langversion" `
+    /p:WarningLevel=0 `
+    /p:GenerateSerializationAssemblies="Off" `
+    /p:ReferencePath=$referencePath `
+    /fl /flp:"$loggerArgs" `
+    /m:4 `
+    $ToolsVersion `
+	$DfMsBuildArgs `
+	$MsBuildArguments  
+	if ($LastExitCode -ne 0) {
+		throw "Project build failed with exit code: $LastExitCode."
+	}
+
+}
+}
+else
+{
+
+
 
 # ### Make build the same way SolutionPackager does
 
@@ -241,8 +270,6 @@ Log-SubSection "Building '$projName'..."
     
 # Run MSBuild
 & $MSBuildExec $projAbsPath `
-    /p:PreBuildEvent= `
-    /p:PostBuildEvent= `
     /p:Configuration="$ConfigurationToBuild" `
     /p:Platform="$PlatformToBuild" `
 	/p:langversion="$langversion" `
@@ -270,8 +297,6 @@ $sGenToolPath = $sGenToolPath -replace "\s","%20"
 
 # Run MSBuild
 & $MSBuildExec $projPublisherAbsPath `
-    /p:PreBuildEvent= `
-    /p:PostBuildEvent= `
     /p:Configuration="$ConfigurationToBuild" `
     /p:Platform="$PlatformToBuild" `
 	/p:langversion="$langversion" `
@@ -292,8 +317,6 @@ Log-SubSection "Building SSRS Injector"
     
 # Run MSBuild
 & $MSBuildExec $projSSRSPath `
-    /p:PreBuildEvent= `
-    /p:PostBuildEvent= `
     /p:Configuration="$ConfigurationToBuild" `
     /p:Platform="$PlatformToBuild" `
 	/p:langversion="$langversion" `
@@ -308,6 +331,27 @@ Log-SubSection "Building SSRS Injector"
 if ($LastExitCode -ne 0) {
     throw "Project build failed with exit code: $LastExitCode."
 }
+
+
+Log-SubSection "Building AUT"
+    
+# Run MSBuild
+& $MSBuildExec $projAUTPath `
+    /p:Configuration="$ConfigurationToBuild" `
+    /p:Platform="$PlatformToBuild" `
+	/p:langversion="$langversion" `
+    /p:WarningLevel=0 `
+    /p:GenerateSerializationAssemblies="Off" `
+    /p:ReferencePath=$referencePath `
+    /fl /flp:"$loggerArgs" `
+    /m:4 `
+    $ToolsVersion `
+	$DfMsBuildArgs `
+	$MsBuildArguments  
+if ($LastExitCode -ne 0) {
+    throw "Project build failed with exit code: $LastExitCode."
+}
+
 
 }
 

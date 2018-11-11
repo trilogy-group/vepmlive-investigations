@@ -6,44 +6,37 @@ param (
 $ScriptDir = split-path -parent $MyInvocation.MyCommand.Definition
 $ScriptDir = (get-item $ScriptDir).parent.FullName
 
-$openCoverPath = (Resolve-Path "$ScriptDir\packages\OpenCover.*\tools\OpenCover.Console.exe").ToString()
-$vsConsolePath = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
-$a = New-Object -ComObject Scripting.FileSystemObject
-$f = $a.GetFile($vsConsolePath)
-$vsConsolePath = $f.ShortPath
+
+$covConsolePath = "C:\Program Files (x86)\Microsoft Visual Studio\2017\TestAgent\Team Tools\Dynamic Code Coverage Tools\amd64\CodeCoverage.exe"
+
 
 $targetFiles= (@(Get-ChildItem "$ScriptDir" -Include *.Tests.dll -Recurse -File |
     Where-Object {($_.DirectoryName -inotmatch '\\obj\\' -and ($_.DirectoryName -ilike "*\$ConfigurationToBuild" -or $_.DirectoryName -ilike "*\Test-Output"))}
-) | Select -ExpandProperty FullName) -join " "
+) | Select -ExpandProperty FullName) 
 
-Write-Host $targetFiles
 
-&$openCoverPath  -register:user -target:$vsConsolePath "-targetargs:$targetFiles" "-filter:+[*]* -[*.tests]* -[*.Tests]* -[*.TestFakes]*" -excludebyfile:"*\*Designer.cs" -output:$ScriptDir\opencovertests.xml -mergebyhash
+Write-Host "=> Running Tests " -ForegroundColor DarkCyan
+$xmlCoverageFile = "$ScriptDir\CodeCoverage.xml"
+Remove-Item $xmlCoverageFile -ErrorAction SilentlyContinue
 
-function PublishArtifact($artifactPath) {
-    Write-Host ("`n`nPublishing Artifact") -ForegroundColor Yellow
-    Write-Host "##teamcity[publishArtifacts '$artifactPath']"
-}
+#$vsConsolePath = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+#$vsConsolePath = "C:\Program Files (x86)\Microsoft Visual Studio\2017\TestAgent\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+#$a = New-Object -ComObject Scripting.FileSystemObject
+#$f = $a.GetFile($vsConsolePath)
+#$vsConsolePath = $f.ShortPath
+#& $vsConsolePath  $targetFiles /InIsolation /Platform:X64 /EnableCodeCoverage
+$coverageFile = $(get-ChildItem -Path "$ScriptDir\TestResults" -Recurse -Include *coverage)[0]
+& $covConsolePath  analyze  /output:$xmlCoverageFile $coverageFile 
 
-#$ScriptDir = split-path -parent $MyInvocation.MyCommand.Definition
-#$ScriptDir = (get-item $ScriptDir).parent.FullName 
-#$coverageFile = $(get-ChildItem -Path "$ScriptDir\TestResults" -Recurse -Include *coverage)[0]
-$xmlCoverageFile = "$ScriptDir\opencovertests.xml"
+Write-Host "=> Ended Test Coverage" -ForegroundColor DarkCyan   
+
 $reportPath = "$ScriptDir\CoverageReports"
 $artifactsDir = "$ScriptDir\Artifacts"
 
+Remove-Item  -Recurse $reportPath -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force -Path $reportPath
+Remove-Item -Recurse $artifactsDir -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force -Path $artifactsDir
-
-#Add-Type -path "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\PrivateAssemblies\Microsoft.VisualStudio.Coverage.Analysis.dll"
-
-#[string[]] $executablePaths = @($coverageFile)
-#[string[]] $symbolPaths = @()
-
-#$info = [Microsoft.VisualStudio.Coverage.Analysis.CoverageInfo]::CreateFromFile($coverageFile, $executablePaths, $symbolPaths);
-#$data = $info.BuildDataSet()
-
-#$data.WriteXml($xmlCoverageFile)
 
 $RepGenPath = (Resolve-Path "$ScriptDir\packages\ReportGenerator.*\tools\ReportGenerator.exe").ToString()
 

@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Data;
-using System.Configuration;
 using System.Collections;
+using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Text;
 using System.Web;
-using System.Web.Security;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
+using EPMLiveCore;
+using EPMLiveEnterprise.WebSvcEvents;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using PSLibrary = Microsoft.Office.Project.Server.Library;
-using System.Data.SqlClient;
-using System.Diagnostics;
 
 namespace EPMLiveEnterprise.Layouts.epmlive
 {
@@ -36,7 +34,6 @@ namespace EPMLiveEnterprise.Layouts.epmlive
         protected Label lblResUpdated;
         protected Label lblResDeleted;
 
-
         protected void lnkSynchResources_Click(object sender, EventArgs e)
         {
             ResourceSyncher resSynch = new ResourceSyncher(SPContext.Current.Site.ID);
@@ -50,64 +47,63 @@ namespace EPMLiveEnterprise.Layouts.epmlive
         {
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-
-                EventLog myLog = new EventLog("EPM Live", ".", "EPM Live Feature Activation");
-                //myLog.MaximumKilobytes = 32768;
+                var eventLog = default(EventLog);
 
                 try
                 {
-                    WebSvcEvents.Events events = new EPMLiveEnterprise.WebSvcEvents.Events();
-                    events.Url = SPContext.Current.Site.Url + "/_vti_bin/psi/events.asmx";
-                    events.UseDefaultCredentials = true;
+                    eventLog = new EventLog("EPM Live", ".", "EPM Live Feature Activation");
 
-                    WebSvcEvents.EventHandlersDataSet ds = events.ReadEventHandlerAssociations();
+                    var events = new Events()
+                    {
+                        Url = $"{SPContext.Current.Site.Url}/_vti_bin/psi/events.asmx",
+                        UseDefaultCredentials = true
+                    };
 
-                    //========================Publish=========================
-                    if (ds.EventHandlers.Select("EventId = 53 and name = 'EPMLivePublisher'").Length <= 0)
+                    var handlerDataSet = events.ReadEventHandlerAssociations();
+
+                    foreach (var definition in EventDefinition.AllDefinitions)
                     {
-                        WebSvcEvents.EventHandlersDataSet newDs = new EPMLiveEnterprise.WebSvcEvents.EventHandlersDataSet();
-                        newDs.EventHandlers.AddEventHandlersRow(new Guid("73DBE692-F21D-4129-8E2B-8B1ED4FA00F5"), "EPMLivePublisher", "EPMLiveEnterprise, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5", "EPMLiveEnterprise.OnPublish", 53, "", 10);
-                        events.CreateEventHandlerAssociations(newDs);
-                        myLog.WriteEntry("Successfully started install of EPM Live Publishing EventHandler (Project.Published)", EventLogEntryType.Information, 610);
-                    }
-                    //========================Statusing=========================
-                    if (ds.EventHandlers.Select("EventId = 133 and name = 'EPMLiveStatusing'").Length <= 0)
-                    {
-                        WebSvcEvents.EventHandlersDataSet newDs = new EPMLiveEnterprise.WebSvcEvents.EventHandlersDataSet();
-                        newDs.EventHandlers.AddEventHandlersRow(new Guid("8BBBBC25-7E9D-440b-BE1C-78ED667D5D0B"), "EPMLiveStatusing", "EPMLiveEnterprise, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5", "EPMLiveEnterprise.Status", 133, "", 10);
-                        events.CreateEventHandlerAssociations(newDs);
-                        myLog.WriteEntry("Successfully started install of EPM Live Statusing EventHandler (Statusing.Applied)", EventLogEntryType.Information, 610);
-                    }
-                    //========================Resource Changed=========================
-                    if (ds.EventHandlers.Select("EventId = 95 and name = 'EPMLiveResUpdated'").Length <= 0)
-                    {
-                        WebSvcEvents.EventHandlersDataSet newDs = new EPMLiveEnterprise.WebSvcEvents.EventHandlersDataSet();
-                        newDs.EventHandlers.AddEventHandlersRow(new Guid("B0C1D09C-F1F6-4a6b-858C-529E22B7688C"), "EPMLiveResUpdated", "EPMLiveEnterprise, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5", "EPMLiveEnterprise.ResourceEvents", 95, "", 10);
-                        events.CreateEventHandlerAssociations(newDs);
-                        myLog.WriteEntry("Successfully started install of EPM Live Resource EventHandler (Resource.Updated)", EventLogEntryType.Information, 610);
-                    }
-                    //========================Resource Added=========================
-                    if (ds.EventHandlers.Select("EventId = 89 and name = 'EPMLiveResCreated'").Length <= 0)
-                    {
-                        WebSvcEvents.EventHandlersDataSet newDs = new EPMLiveEnterprise.WebSvcEvents.EventHandlersDataSet();
-                        newDs.EventHandlers.AddEventHandlersRow(new Guid("286DE0F8-2042-4c8b-A8F7-3E276150CD9C"), "EPMLiveResCreated", "EPMLiveEnterprise, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5", "EPMLiveEnterprise.ResourceEvents", 89, "", 10);
-                        events.CreateEventHandlerAssociations(newDs);
-                        myLog.WriteEntry("Successfully started install of EPM Live Resource EventHandler (Resource.Created)", EventLogEntryType.Information, 610);
-                    }
-                    ////========================Resource Deleted=========================
-                    if (ds.EventHandlers.Select("EventId = 92 and name = 'EPMLiveResDeleting'").Length <= 0)
-                    {
-                        WebSvcEvents.EventHandlersDataSet newDs = new EPMLiveEnterprise.WebSvcEvents.EventHandlersDataSet();
-                        newDs.EventHandlers.AddEventHandlersRow(new Guid("074BCE6F-CF3B-4a94-BCC4-A262B32AE41E"), "EPMLiveResDeleting", "EPMLiveEnterprise, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5", "EPMLiveEnterprise.ResourceEvents", 92, "", 10);
-                        events.CreateEventHandlerAssociations(newDs);
-                        myLog.WriteEntry("Successfully started install of EPM Live Resource EventHandler (Resource.Deleting)", EventLogEntryType.Information, 610);
+                        InstallEvent(events, handlerDataSet, definition.Value, eventLog);
                     }
                 }
                 catch (Exception ex)
                 {
-                    myLog.WriteEntry("Error Installing Enterprise Event Handler:\r\n " + ex.Message + ex.StackTrace + ex.InnerException, EventLogEntryType.Error, 650);
+                    const int eventId = 650;
+
+                    var logMessage = $"Error Installing Enterprise Event Handler:\r\n {ex.Message}{ex.StackTrace}{ex.InnerException}";
+                    eventLog?.WriteEntry(logMessage, EventLogEntryType.Error, eventId);
+                }
+                finally
+                {
+                    eventLog?.Dispose();
                 }
             });
+        }
+
+        private void InstallEvent(Events events, EventHandlersDataSet dataSet, EventDefinition definition, EventLog logger)
+        {
+            const string assemblyName = "EPMLiveEnterprise, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+            const int orderValue = 10;
+            const int logEventId = 610;
+
+            var query = $"EventId = {definition.EventId} and name = '{definition.Name}'";
+            if (dataSet.EventHandlers.Select(query).Length <= 0)
+            {
+                var newDs = new EventHandlersDataSet();
+                newDs.EventHandlers.AddEventHandlersRow(
+                    definition.EventHandlerUid,
+                    definition.Name,
+                    assemblyName,
+                    definition.ClassName,
+                    definition.EventId,
+                    string.Empty,
+                    orderValue);
+
+                events.CreateEventHandlerAssociations(newDs);
+
+                var logMessage = $"Successfully started install of EPM Live {definition.LoggerDescription}";
+                logger.WriteEntry(logMessage, EventLogEntryType.Information, logEventId);
+            }
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -226,87 +222,96 @@ namespace EPMLiveEnterprise.Layouts.epmlive
 
                         ddlTimesheetHours.Items.Add(new ListItem("Actual Work", "251658250"));
 
-                        //SqlConnection cn = new SqlConnection(EPMLiveHelperClasses.getEPMLiveConnectionString(siteGuid));
-                        SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id));
-                        cn.Open();
-
-                        SqlCommand cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='AssignedToField'", cn);
-                        SqlDataReader dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
+                        using (var connection = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
                         {
-                            ddlAssignedToField.SelectedValue = dReader.GetString(0);
+                            connection.Open();
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='AssignedToField'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    ddlAssignedToField.SelectedValue = reader.GetString(0);
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='TimesheetField'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    ddlTimesheet.SelectedValue = reader.GetString(0);
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='TimesheetHoursField'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    ddlTimesheetHours.SelectedValue = reader.GetString(0);
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='LockSynch'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    chkLockSynch.Checked = bool.Parse(reader.GetString(0));
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ForceWS'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    chkForceWS.Checked = bool.Parse(reader.GetString(0));
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ValidTemplates'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    loadTemplates(reader.GetString(0));
+                                }
+                                else
+                                {
+                                    loadTemplates(string.Empty);
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='CrossSite'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    chkCrossSite.Checked = bool.Parse(reader.GetString(0));
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='DefaultURL'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    txtDefaultURL.Text = reader.GetString(0);
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ConnectedURLs'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    txtUrls.Text = reader.GetString(0);
+                                }
+                            }
                         }
-                        dReader.Close();
 
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='TimesheetField'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            ddlTimesheet.SelectedValue = dReader.GetString(0);
-                        }
-                        dReader.Close();
-
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='TimesheetHoursField'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            ddlTimesheetHours.SelectedValue = dReader.GetString(0);
-                        }
-                        dReader.Close();
-
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='LockSynch'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            chkLockSynch.Checked = bool.Parse(dReader.GetString(0));
-                        }
-                        dReader.Close();
-
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ForceWS'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            chkForceWS.Checked = bool.Parse(dReader.GetString(0));
-                        }
-                        dReader.Close();
-
-
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ValidTemplates'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            loadTemplates(dReader.GetString(0));
-                        }
-                        else
-                            loadTemplates("");
-                        dReader.Close();
-
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='CrossSite'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            chkCrossSite.Checked = bool.Parse(dReader.GetString(0));
-                        }
-                        dReader.Close();
-
-
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='DefaultURL'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            txtDefaultURL.Text = dReader.GetString(0);
-                        }
-                        dReader.Close();
-
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ConnectedURLs'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            txtUrls.Text = dReader.GetString(0);
-                        }
-                        dReader.Close();
-
-                        cn.Close();
                         lblError.Visible = false;
 
                         WebSvcEvents.Events events = new EPMLiveEnterprise.WebSvcEvents.Events();
@@ -365,51 +370,55 @@ namespace EPMLiveEnterprise.Layouts.epmlive
         {
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
-                cn.Open();
-
-                setVal(cn, "AssignedToField", ddlAssignedToField.SelectedValue);
-                setVal(cn, "TimesheetField", ddlTimesheet.SelectedValue);
-                setVal(cn, "TimesheetHoursField", ddlTimesheetHours.SelectedValue);
-                setVal(cn, "LockSynch", chkLockSynch.Checked.ToString());
-                setVal(cn, "ForceWS", chkForceWS.Checked.ToString());
-                setVal(cn, "CrossSite", chkCrossSite.Checked.ToString());
-                setVal(cn, "DefaultURL", txtDefaultURL.Text);
-                setVal(cn, "ConnectedURLs", txtUrls.Text);
-
-                string validtemplates = "";
-
-                foreach (ListItem li in lstSelectedTemplates.Items)
+                var connectionString = CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id);
+                using (var connection = new SqlConnection(connectionString))
                 {
-                    validtemplates += "|" + li.Value;
+                    connection.Open();
+
+                    setVal(connection, "AssignedToField", ddlAssignedToField.SelectedValue);
+                    setVal(connection, "TimesheetField", ddlTimesheet.SelectedValue);
+                    setVal(connection, "TimesheetHoursField", ddlTimesheetHours.SelectedValue);
+                    setVal(connection, "LockSynch", chkLockSynch.Checked.ToString());
+                    setVal(connection, "ForceWS", chkForceWS.Checked.ToString());
+                    setVal(connection, "CrossSite", chkCrossSite.Checked.ToString());
+                    setVal(connection, "DefaultURL", txtDefaultURL.Text);
+                    setVal(connection, "ConnectedURLs", txtUrls.Text);
+
+                    var templatesBuilder = new StringBuilder();
+                    foreach (ListItem item in lstSelectedTemplates.Items)
+                    {
+                        if (templatesBuilder.Length > 0)
+                        {
+                            templatesBuilder.Append("|");
+                        }
+
+                        templatesBuilder.Append(item.Value);
+                    }
+
+                    setVal(connection, "ValidTemplates", templatesBuilder.ToString());
                 }
-                if (validtemplates.Length > 1)
-                    validtemplates = validtemplates.Substring(1);
-
-                setVal(cn, "ValidTemplates", validtemplates);
-
-
-                cn.Close();
             });
         }
 
-        private void setVal(SqlConnection cn, string key, string val)
+        private void setVal(SqlConnection connection, string itemKey, string itemValue)
         {
-            SqlCommand cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='" + key + "'", cn);
-            SqlDataReader dReader = cmd.ExecuteReader();
-            if (dReader.Read())
+            var updateExisting = false;
+            var queryText = $"SELECT config_value FROM ECONFIG where config_name='{itemKey}'";
+
+            using (var command = new SqlCommand(queryText, connection))
+            using (var dataReader = command.ExecuteReader())
             {
-                dReader.Close();
-                cmd = new SqlCommand("UPDATE ECONFIG set config_value = @val where config_name='" + key + "'", cn);
-                cmd.Parameters.AddWithValue("@val", val);
-                cmd.ExecuteNonQuery();
+                updateExisting = dataReader.Read();
             }
-            else
+
+            var cmdText = updateExisting
+                ? $"UPDATE ECONFIG set config_value = @val where config_name='{itemKey}'"
+                : $"INSERT INTO ECONFIG (config_value,config_name) VALUES (@val,'{itemKey}')";
+
+            using (var command = new SqlCommand(cmdText, connection))
             {
-                dReader.Close();
-                cmd = new SqlCommand("INSERT INTO ECONFIG (config_value,config_name) VALUES (@val,'" + key + "')", cn);
-                cmd.Parameters.AddWithValue("@val", val);
-                cmd.ExecuteNonQuery();
+                command.Parameters.AddWithValue("@val", itemValue);
+                command.ExecuteNonQuery();
             }
         }
     }

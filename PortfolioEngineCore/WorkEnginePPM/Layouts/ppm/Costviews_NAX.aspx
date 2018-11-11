@@ -16,6 +16,7 @@
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxcommon.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxcontainer.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxwindows.js" type="text/javascript"></script>
+<script src="/_layouts/ppm/AutoAdjustPeriods.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <style type="text/css">
 .ms-cui-tabBody {
     border-bottom: 0 !important;
@@ -86,6 +87,30 @@ html, body {
             <td class="controlcell">
                 <select id="idToPeriod" >
                 </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="descriptioncell">
+                Automatically adjust periods
+            </td>
+            <td class="controlcell">
+                <input id="autoAdjustPeriodsCheckBox" type="checkbox" onclick="javascript: CostviewDlg_event('AutoAdjustPeriodsCheckBoxOnClick');" />
+            </td>
+        </tr>
+        <tr id="startPeriodDeltaRow">
+            <td class="descriptioncell">
+                From Period
+            </td>
+            <td class="controlcell">
+                <span>Current period minus </span><input id="startPeriodDeltaInput" type="number" value="6" min="0" style="width:40px; text-align:left;margin-bottom:3px;" disabled="disabled" /><span> period(s)</span>
+            </td>
+        </tr>
+        <tr id="finishPeriodDeltaRow">
+            <td class="descriptioncell">
+                To Period
+            </td>
+            <td class="controlcell">
+                <span>Current period plus </span><input id="finishPeriodDeltaInput" type="number" value="6" min="0" style="width:40px; text-align:left;margin-bottom:3px;" disabled="disabled" /><span> period(s)</span>
             </td>
         </tr>
     </table>
@@ -203,6 +228,32 @@ html, body {
             return "";
         return val.toString();
     };
+
+    function LoadDialogAutoAdjustPeriods(view, disabled) {
+        // parse config
+        var autoAdjustPeriods = AutoAdjustPeriods.TryCreateFromConfig(view);
+
+        // get the ui controls
+        var autoAdjustPeriodsCheckBox = document.getElementById("autoAdjustPeriodsCheckBox");
+        var startPeriodDeltaInput = document.getElementById("startPeriodDeltaInput");
+        var finishPeriodDeltaInput = document.getElementById("finishPeriodDeltaInput");
+
+        // set values
+        autoAdjustPeriodsCheckBox.checked = autoAdjustPeriods.enabled;
+        startPeriodDeltaInput.value = autoAdjustPeriods.startPeriodDelta;
+        finishPeriodDeltaInput.value = autoAdjustPeriods.finishPeriodDelta;
+
+        // reset disabled state
+        autoAdjustPeriodsCheckBox.disabled = disabled;
+        startPeriodDeltaInput.disabled = disabled;
+        finishPeriodDeltaInput.disabled = disabled;
+        
+        // for not read only mode call update events
+        if (!disabled) {
+            CostviewDlg_event("AutoAdjustPeriodsCheckBoxOnClick");
+        }
+    };
+
     function toolbar_event(event) {
         var sRowId = "";
         document.getElementById('idCostviewDlgMode').value = event;
@@ -231,6 +282,8 @@ html, body {
                 document.getElementById('txtId').value = fieldId;
                 document.getElementById('txtName').value = GetStringFromValue(json.reply.Costview.VIEW_NAME);
                 document.getElementById('txtDesc').value = GetStringFromValue(json.reply.Costview.VIEW_DESC);
+
+                LoadDialogAutoAdjustPeriods(json.reply.Costview, false);
 
                 var nCalendar = json.reply.Costview.VIEW_COST_BREAKDOWN;
                 var idCalendar = document.getElementById('idCalendar');
@@ -270,8 +323,7 @@ html, body {
                     else
                         idCostTypesIn.options[idCostTypesIn.options.length] = new Option(item[i].name, item[i].id);
                 }
-
-                DisplayDialog(645, 550, dlgTitle, "winCostviewDlg", "idCostviewDlg", true, false);
+                DisplayDialog(570, 560, dlgTitle, "winCostviewDlg", "idCostviewDlg", true, false);
                 break;
             case "btnDelete":
                 if (toolbar.isItemDisabled("btnDelete") == true) {
@@ -286,12 +338,15 @@ html, body {
                     if (jsf_alertError(json.reply.error) == true)
                         return false;
                 }
+
                 var fieldId = json.reply.Costview.VIEW_UID;
                 document.getElementById('txtId').value = fieldId;
                 document.getElementById('txtName').value = GetStringFromValue(json.reply.Costview.VIEW_NAME);
                 document.getElementById('txtDesc').value = GetStringFromValue(json.reply.Costview.VIEW_DESC);
                 document.getElementById('txtName').disabled = true;
                 document.getElementById('txtDesc').disabled = true;
+                
+                LoadDialogAutoAdjustPeriods(json.reply.Costview, true);
 
                 var nCalendar = json.reply.Costview.VIEW_COST_BREAKDOWN;
                 var idCalendar = document.getElementById('idCalendar');
@@ -397,18 +452,27 @@ html, body {
                     case "btnModify":
                         //alert("btnModify.OK");
                         var sRowId = dgrid1_selectedRow;
+                        var calendarId = document.getElementById('idCalendar').value;
+                        var fromPeriod = document.getElementById('idFromPeriod').value;
+                        var toPeriod = document.getElementById('idToPeriod').value;
+
+                        var autoAdjustPeriods = AutoAdjustPeriods.CreateFromDocument(document);
+                        if (autoAdjustPeriods == null) {
+                            return false;
+                        }
+
                         var sb = new StringBuilder();
                         sb.append('<request function="CostviewsRequest" context="UpdateCostviewInfo">');
                         sb.append('<data');
                         sb.append(' VIEW_UID="' + document.getElementById('txtId').value + '"');
                         sb.append(' VIEW_NAME="' + jsf_xml(document.getElementById('txtName').value) + '"');
                         sb.append(' VIEW_DESC="' + jsf_xml(document.getElementById('txtDesc').value) + '"');
-                        var calendarId=document.getElementById('idCalendar').value;
                         sb.append(' VIEW_COST_BREAKDOWN="' + calendarId + '"');
-                        var fromPeriod = document.getElementById('idFromPeriod').value;
                         sb.append(' VIEW_FIRST_PERIOD="' + fromPeriod + '"');
-                        var toPeriod = document.getElementById('idToPeriod').value;
                         sb.append(' VIEW_LAST_PERIOD="' + toPeriod + '"');
+                        sb.append(' AutoAdjustPeriods="' + (autoAdjustPeriods.enabled ? "1" : "0") + '"');
+                        sb.append(' StartPeriodDelta="' + autoAdjustPeriods.startPeriodDelta + '"');
+                        sb.append(' FinishPeriodDelta="' + autoAdjustPeriods.finishPeriodDelta + '"');
                         var sCTs = "";
                         var idCostTypesIn = document.getElementById('idCostTypesIn');
                         for (var i = 0; i < idCostTypesIn.options.length; i++) {
@@ -463,8 +527,13 @@ html, body {
             case "cancel":
                 CloseDialog('winCostviewDlg');
                 break;
+            case "AutoAdjustPeriodsCheckBoxOnClick":
+                AutoAdjustPeriods.DocumentAutoAdjustPeriodsCheckBoxOnClick(document);
+                break;
         }
-    };
+
+        return true;
+     };
 
     var thiswins = new dhtmlXWindows();
     thiswins.setImagePath("../epmlive/dhtml/windows/imgs/");

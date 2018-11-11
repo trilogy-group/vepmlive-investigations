@@ -1,230 +1,353 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using PortfolioEngineCore.Base.DBAccess;
 
 namespace PortfolioEngineCore
 {
     public class dbaCostValues
     {
-        public static bool PostCostValues(DBAccess dba, string data, out string sResult, out string sPostInstruction)
+        public static readonly string DetailValuesDiscountRateColumn = "BD_DISCOUNT_RATE";
+        public static readonly string DetailValuesDiscountValueColumn = "BD_DISCOUNT_VALUE";
+        public static readonly string DetailValuesDiscountRateParameter = "@BD_DISCOUNT_RATE";
+        public static readonly string DetailValuesDiscountValueParameter = "@BD_DISCOUNT_VALUE";
+
+        public static bool PostCostValues(DBAccess dbAccess, string data, out string result, out string postInstruction)
         {
             try
             {
-                dba.WriteImmTrace("PfECore", "PostCostValues", "Input", data);
-
-                sResult = "";
-                string sErrorReply = "";
-                bool bPostToWE = false;
-                sPostInstruction = "";
-
-                CStruct xData = new CStruct();
-                xData.LoadXML(data);
-                CStruct xDataCT = xData.GetSubStruct("CT");
-                int CT_ID = xDataCT.GetIntAttr("Id");
-                CStruct xDataCB = xData.GetSubStruct("CB");
-                int CB_ID = xDataCB.GetIntAttr("Id");
-                List<CStruct> listPIs = xData.GetList("PI");
-
-                //  if CT or CB not set then error
-                if (CB_ID < 0 || CT_ID <= 0)
+                if (dbAccess == null)
                 {
-                    sResult = "Calendar and Cost Type must be specified";
+                    throw new ArgumentNullException(nameof(dbAccess));
+                }
+
+                dbAccess.WriteImmTrace("PfECore", "PostCostValues", "Input", data);
+                result = string.Empty;
+                var isPostToWE = false;
+                postInstruction = string.Empty;
+
+                int ctId;
+                int cbId;
+                var structData = LoadStructDataAndGetIds(data, out ctId, out cbId);
+
+                if (cbId < 0 || ctId <= 0)
+                {
+                    result = "Calendar and Cost Type must be specified";
                     return false;
                 }
 
-                SqlCommand oCommand;
-                SqlDataReader reader;
-                string cmdText;
-
-                bool bupdateOK = true;
-
-                string sCTName;
-                int nCTEditMode = -1;
-                CTEditMode CTEditMode;
-                int nInputCalendar=-1;
-                cmdText = "SELECT CT_NAME,CT_EDIT_MODE,CT_CB_ID FROM EPGP_COST_TYPES Where CT_ID=@CTID";
-                oCommand = new SqlCommand(cmdText, dba.Connection);
-                oCommand.Parameters.AddWithValue("@CTID", CT_ID);
-                reader = oCommand.ExecuteReader();
-                if (reader.Read())
-                {
-                    nCTEditMode = DBAccess.ReadIntValue(reader["CT_EDIT_MODE"]);
-                    nInputCalendar = DBAccess.ReadIntValue(reader["CT_CB_ID"]);
-                    sCTName = DBAccess.ReadStringValue(reader["CT_NAME"]);
-                }
-                reader.Close();
+                int editMode;
+                int inputCalendar;
+                GetEditModeAndInputCalendar(dbAccess, ctId, out editMode, out inputCalendar);
 
                 // set up the list of PIs we are going to process - as passed or ALL
-                List<int> PIs = new List<int>();
-                bool allPIs = false;
-                foreach (CStruct xProject in listPIs)
-                {
-                    int PROJECT_ID = xProject.GetIntAttr("Id");
-                    PIs.Add(PROJECT_ID);
-                }
-                if (PIs.Count == 0)
-                {
-                    allPIs = true;
-                    cmdText = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE PROJECT_MARKED_DELETION = 0";
-                    oCommand = new SqlCommand(cmdText, dba.Connection);
-                    if (dbaUsers.ExecuteSQLSelect(oCommand, out reader) == StatusEnum.rsSuccess)
-                    {
-                        while (reader.Read())
-                        {
-                            int lProjectID = (int)reader["PROJECT_ID"];
-                            PIs.Add(lProjectID);
-                        }
-                        reader.Close();
-                    }
+                var listPIs = structData.GetList("PI");
+                bool allPIs;
+                var toBeProcessedPIs = GetPIsToBeProcessed(dbAccess, listPIs, out allPIs);
 
-                }
-                //  any pIs to process?
-                if (PIs.Count == 0)
+                if (!toBeProcessedPIs.Any())
                 {
-                    sResult = "No PIs to process";
+                    result = "No PIs to process";
                     return false;
                 }
 
-                List<PfEPeriod> periods = new List<PfEPeriod>();
-                Dictionary<int, int> xrefs = new Dictionary<int, int>();
-                Dictionary<int, PfECostCategory> costcategories = new Dictionary<int, PfECostCategory>();
-                Dictionary<int, EPKItem> majorcategories = new Dictionary<int, EPKItem>();
-                Dictionary<int, Dictionary<int,double>> rates = new Dictionary<int,Dictionary<int,double>>();
-                PfENamedRates namedrates = new PfENamedRates();
-                //Dictionary<int, double> Periodrates;
-                PfEAdmin admininfo = new PfEAdmin();
 
-                CTEditMode = (CTEditMode)nCTEditMode;
-                switch (CTEditMode)
+                if (!ValidEditModeData(dbAccess, ref result, ref isPostToWE, ctId, cbId, editMode, inputCalendar, toBeProcessedPIs, allPIs))
                 {
-                    case CTEditMode.ctBudget:
-                    case CTEditMode.ctDisplay:
-                    case CTEditMode.ctDisplaywDetails:
-                        if (GetPeriods(dba, CB_ID, periods, ref sErrorReply) != StatusEnum.rsSuccess)
-                        {
-                            sResult = FormatError(dba, CB_ID, CT_ID, "Failed during load of periods: " + sErrorReply);
-                            return false;
-                        }
-                        if (CopyCostValues(dba, CB_ID, CT_ID, nInputCalendar, PIs, periods, out sErrorReply) == false)
-                        {
-                            sResult = FormatError(dba, CB_ID, CT_ID, sErrorReply);
-                            return false;
-                        }
-                        break;
-                    case CTEditMode.ctTSActuals:
-                    case CTEditMode.ctTSActualsToDate:
-                        // no reason to do this here - does include Hershey filter on CF option if ever done need to consider that also    
-                        break;
-                    case CTEditMode.ctWEActuals:
-                        if (GetPeriods(dba, CB_ID, periods, ref sErrorReply) != StatusEnum.rsSuccess)
-                        {
-                            sResult = FormatError(dba, CB_ID, CT_ID, "Failed during load of periods: " + sErrorReply);
-                            return false;
-                        }
-                        if (GetXrefs(dba, xrefs, ref sErrorReply) != StatusEnum.rsSuccess)
-                        {
-                            sResult = FormatError(dba, CB_ID, CT_ID, "Failed during load of xrefs: " + sErrorReply);
-                            return false;
-                        }
-                        if (GetCostCategories(dba, CT_ID, costcategories, majorcategories, ref sErrorReply) != StatusEnum.rsSuccess) 
-                        {
-                            sResult = FormatError(dba, CB_ID, CT_ID, "Failed during load of cost categoiories: " + sErrorReply);
-                            return false;
-                        }
-                        if (GetCostCategoryRates(dba, CB_ID, rates, ref sErrorReply) != StatusEnum.rsSuccess) 
-                        {
-                            sResult = FormatError(dba, CB_ID, CT_ID, "Failed during load of cost categoiory rates: " + sErrorReply);
-                            return false;
-                        }
-                        if (GetNamedRates(dba, ref namedrates, ref sErrorReply) != StatusEnum.rsSuccess) 
-                        {
-                            sResult = "Failed during load of named rates";
-                            sResult = FormatError(dba, CB_ID, CT_ID, "Failed during load of named rates: " + sErrorReply);
-                            return false;
-                        }
-                        GetAdminInfo(dba, admininfo);
-                        SetDefaultMC(admininfo, majorcategories);
-
-                        if (PostWETimesheets(dba, CB_ID, CT_ID, PIs, allPIs, periods, xrefs, costcategories, majorcategories, rates, namedrates, admininfo, out sErrorReply) == false)
-                        {
-                            sResult = FormatError(dba, CB_ID, CT_ID, "Failed during PostWETimesheets: " + sErrorReply);
-                            return false;
-                        }
-                        break;
-                    case CTEditMode.ctCommitments: // this is the only one that should exist right now
-                    case CTEditMode.ctForecastCommitments:
-                    case CTEditMode.ctCommitmentsREV:
-                    case CTEditMode.ctForecastCommitmentsREV:
-                        if (GetPeriods(dba, CB_ID, periods, ref sErrorReply) != StatusEnum.rsSuccess)
-                        {
-                            sResult = FormatError(dba, CB_ID, CT_ID, "Failed during load of periods: " + sErrorReply);
-                            return false;
-                        }
-                        if (GetXrefs(dba, xrefs, ref sErrorReply) != StatusEnum.rsSuccess)
-                        {
-                            sResult = FormatError(dba, CB_ID, CT_ID, "Failed during load of xrefs: " + sErrorReply);
-                            return false;
-                        }
-                        if (GetCostCategories(dba, CT_ID, costcategories, majorcategories, ref sErrorReply) != StatusEnum.rsSuccess)
-                        {
-                            sResult = FormatError(dba, CB_ID, CT_ID, "Failed during load of cost categoiories: " + sErrorReply);
-                            return false;
-                        }
-                        if (GetCostCategoryRates(dba, CB_ID, rates, ref sErrorReply) != StatusEnum.rsSuccess)
-                        {
-                            sResult = FormatError(dba, CB_ID, CT_ID, "Failed during load of cost categoiory rates: " + sErrorReply);
-                            return false;
-                        }
-                        if (GetNamedRates(dba, ref namedrates, ref sErrorReply) != StatusEnum.rsSuccess)
-                        {
-                            sResult = FormatError(dba, CB_ID, CT_ID, "Failed during load of named rates: " + sErrorReply);
-                            return false;
-                        }
-                        GetAdminInfo(dba, admininfo);
-                        SetDefaultMC(admininfo, majorcategories);
-
-                        if (PostCommitments(dba, CB_ID, CT_ID, PIs, allPIs, periods, xrefs, costcategories, majorcategories, rates, namedrates, admininfo, ref bPostToWE, out sErrorReply) == false)
-                        {
-                            sResult = FormatError(dba, CB_ID, CT_ID, "Failed during PostCommitments: " + sErrorReply);
-                            return false;
-                        }
-                        break;
-                    default:
-                        break;
+                    return false;
                 }
 
-                // if we hve a successfull Post and there are Cost Totals to post to WE then pass that instruction back to WorkEnginePPM
-                if (bPostToWE)
-                {
-                    CStruct xPost = new CStruct();
-                    xPost.Initialize("Post");
-                    CStruct xItem = xPost.CreateSubStruct("PIs");
-                    if (allPIs)
-                    {
-                        xItem.CreateStringAttr("Ids", "");
-                    }
-                    else
-                    {
-                        string sPIs = "";
-                        foreach (int ProjectID in PIs)
-                        {
-                            if (sPIs.Length < 1) { sPIs = ProjectID.ToString(); }
-                            else { sPIs += "," + ProjectID.ToString(); }
-                            xItem.CreateStringAttr("IDs", sPIs);
-                        }
-                    }
-                    sPostInstruction = xPost.XML();
-
-                    // if return NOT true then sResult should contain info
-                }
-                return bupdateOK;
-
+                postInstruction = GetPostInstructions(postInstruction, isPostToWE, allPIs, toBeProcessedPIs);
+                return true;
             }
             catch (Exception exception)
             {
                 throw new PFEException((int)PFEError.PostCostValues, exception.GetBaseMessage());
             }
+        }
+
+        private static void GetEditModeAndInputCalendar(DBAccess dba, int ctId, out int editMode, out int inputCalendar)
+        {
+            editMode = -1;
+            inputCalendar = -1;
+            const string cmdText = "SELECT CT_NAME,CT_EDIT_MODE,CT_CB_ID FROM EPGP_COST_TYPES Where CT_ID=@CTID";
+            using (var sqlCommand = new SqlCommand(cmdText, dba.Connection))
+            {
+                sqlCommand.Parameters.AddWithValue("@CTID", ctId);
+                using (var reader = sqlCommand.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        editMode = DBAccess.ReadIntValue(reader["CT_EDIT_MODE"]);
+                        inputCalendar = DBAccess.ReadIntValue(reader["CT_CB_ID"]);
+                        DBAccess.ReadStringValue(reader["CT_NAME"]);
+                    }
+                }
+            }
+        }
+
+        private static CStruct LoadStructDataAndGetIds(string data, out int ctId, out int cbId)
+        {
+            var structData = new CStruct();
+            structData.LoadXML(data);
+
+            ctId = GetSubStruct(structData, "CT");
+            cbId = GetSubStruct(structData, "CB");
+
+            return structData;
+        }
+
+        private static int GetSubStruct(CStruct structData, string itemName)
+        {
+            var subStructDataCT = structData.GetSubStruct(itemName);
+            return subStructDataCT.GetIntAttr("Id");
+        }
+
+        /// <summary>
+        /// if we hve a successfull Post and there are Cost Totals to post to WE then pass that instruction back to WorkEnginePPM
+        /// </summary>
+        private static string GetPostInstructions(
+            string postInstruction, 
+            bool isPostToWE, 
+            bool allPIs, 
+            IList<int> toBeProcessedPIs)
+        {
+            if (isPostToWE)
+            {
+                var post = new CStruct();
+                post.Initialize("Post");
+                var subStructPIs = post.CreateSubStruct("PIs");
+                if (allPIs)
+                {
+                    subStructPIs.CreateStringAttr("Ids", string.Empty);
+                }
+                else
+                {
+                    var piValue = new StringBuilder();
+                    foreach (var projectId in toBeProcessedPIs)
+                    {
+                        if (piValue.Length < 1)
+                        {
+                            piValue.Append(projectId.ToString());
+                        }
+                        else
+                        {
+                            piValue.AppendFormat(",{0}", projectId.ToString());
+                        }
+
+                        subStructPIs.CreateStringAttr("IDs", piValue.ToString());
+                    }
+                }
+
+                postInstruction = post.XML();
+            }
+
+            return postInstruction;
+        }
+
+        private static List<int> GetPIsToBeProcessed(DBAccess dba, IList<CStruct> listPIs, out bool allPIs)
+        {
+            var toBeProcessedPIs = new List<int>();
+            allPIs = false;
+            foreach (var project in listPIs)
+            {
+                toBeProcessedPIs.Add(project.GetIntAttr("Id"));
+            }
+
+            if (!toBeProcessedPIs.Any())
+            {
+                allPIs = true;
+                const string cmdText = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE PROJECT_MARKED_DELETION = 0";
+                using (var sqlCommand = new SqlCommand(cmdText, dba.Connection))
+                {
+                    SqlDataReader reader;
+                    if (dbaUsers.ExecuteSQLSelect(sqlCommand, out reader) == StatusEnum.rsSuccess)
+                    {
+                        while (reader.Read())
+                        {
+                            var projectId = (int)reader["PROJECT_ID"];
+                            toBeProcessedPIs.Add(projectId);
+                        }
+
+                        reader.Close();
+                    }
+                }
+            }
+
+            return toBeProcessedPIs;
+        }
+
+        private static bool ValidEditModeData(
+            DBAccess dba,
+            ref string result,
+            ref bool isPostToWE,
+            int ctId,
+            int cbId,
+            int ctEditMode,
+            int inputCalendar,
+            List<int> toBeProcessedPIs,
+            bool allPIs)
+        {
+            var errorReply = string.Empty;
+            var periods = new List<PfEPeriod>();
+            var xrefs = new Dictionary<int, int>();
+            var costcategories = new Dictionary<int, PfECostCategory>();
+            var majorcategories = new Dictionary<int, EPKItem>();
+            var rates = new Dictionary<int, Dictionary<int, double>>();
+            var namedrates = new PfENamedRates();
+            var admininfo = new PfEAdmin();
+
+            switch ((CTEditMode)ctEditMode)
+            {
+                case CTEditMode.ctBudget:
+                case CTEditMode.ctDisplay:
+                case CTEditMode.ctDisplaywDetails:
+                    if (GetPeriods(dba, cbId, periods, ref errorReply) != StatusEnum.rsSuccess)
+                    {
+                        result = FormatError(dba, cbId, ctId, $"Failed during load of periods: {errorReply}");
+                        return false;
+                    }
+                    if (CopyCostValues(dba, cbId, ctId, inputCalendar, toBeProcessedPIs, periods, out errorReply) == false)
+                    {
+                        result = FormatError(dba, cbId, ctId, errorReply);
+                        return false;
+                    }
+                    break;
+                case CTEditMode.ctTSActuals:
+                case CTEditMode.ctTSActualsToDate:
+                    // no reason to do this here - does include Hershey filter on CF option if ever done need to consider that also    
+                    break;
+                case CTEditMode.ctWEActuals:
+                    if (!GetInfoAndSetDefaultMC(
+                        dba, 
+                        ref result,
+                        ctId, 
+                        cbId, 
+                        ref errorReply,
+                        periods, 
+                        xrefs, 
+                        costcategories, 
+                        majorcategories, 
+                        rates, 
+                        ref namedrates, 
+                        admininfo))
+                    {
+                        return false;
+                    }
+                    if (PostWETimesheets(
+                        dba, 
+                        cbId, 
+                        ctId, 
+                        toBeProcessedPIs, 
+                        allPIs, 
+                        periods, 
+                        xrefs, 
+                        costcategories, 
+                        majorcategories, 
+                        rates, 
+                        namedrates, 
+                        admininfo, 
+                        out errorReply) == false)
+                    {
+                        result = FormatError(dba, cbId, ctId, $"Failed during PostWETimesheets: {errorReply}");
+                        return false;
+                    }
+                    break;
+                case CTEditMode.ctCommitments: // this is the only one that should exist right now
+                case CTEditMode.ctForecastCommitments:
+                case CTEditMode.ctCommitmentsREV:
+                case CTEditMode.ctForecastCommitmentsREV:
+                    if (!GetInfoAndSetDefaultMC(
+                        dba, 
+                        ref result,
+                        ctId, 
+                        cbId, 
+                        ref errorReply,
+                        periods, 
+                        xrefs, 
+                        costcategories, 
+                        majorcategories, 
+                        rates, 
+                        ref namedrates, 
+                        admininfo))
+                    {
+                        return false;
+                    }
+                    if (PostCommitments(
+                        dba, 
+                        cbId, 
+                        ctId, 
+                        toBeProcessedPIs, 
+                        allPIs, 
+                        periods, 
+                        xrefs, 
+                        costcategories, 
+                        majorcategories, 
+                        rates, 
+                        namedrates, 
+                        admininfo,
+                        ref isPostToWE, 
+                        out errorReply) == false)
+                    {
+                        result = FormatError(dba, cbId, ctId, $"Failed during PostCommitments: {errorReply}");
+                        return false;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
+        }
+
+        private static bool GetInfoAndSetDefaultMC(
+            DBAccess dba,
+            ref string result,
+            int ctId,
+            int cbId,
+            ref string errorReply,
+            List<PfEPeriod> periods,
+            Dictionary<int, int> xrefs,
+            Dictionary<int, PfECostCategory> costcategories,
+            Dictionary<int, EPKItem> majorcategories,
+            Dictionary<int, Dictionary<int, double>> rates,
+            ref PfENamedRates namedrates,
+            PfEAdmin admininfo)
+        {
+            if (GetPeriods(dba, cbId, periods, ref errorReply) != StatusEnum.rsSuccess)
+            {
+                result = FormatError(dba, cbId, ctId, $"Failed during load of periods: {errorReply}");
+                return false;
+            }
+            if (GetXrefs(dba, xrefs, ref errorReply) != StatusEnum.rsSuccess)
+            {
+                result = FormatError(dba, cbId, ctId, $"Failed during load of xrefs: {errorReply}");
+                return false;
+            }
+            if (GetCostCategories(dba, ctId, costcategories, majorcategories, ref errorReply) != StatusEnum.rsSuccess)
+            {
+                result = FormatError(dba, cbId, ctId, $"Failed during load of cost categoiories: {errorReply}");
+                return false;
+            }
+            if (GetCostCategoryRates(dba, cbId, rates, ref errorReply) != StatusEnum.rsSuccess)
+            {
+                result = FormatError(dba, cbId, ctId, $"Failed during load of cost categoiory rates: {errorReply}");
+                return false;
+            }
+            if (GetNamedRates(dba, ref namedrates, ref errorReply) != StatusEnum.rsSuccess)
+            {
+                result = FormatError(dba, cbId, ctId, $"Failed during load of named rates: {errorReply}");
+                return false;
+            }
+
+            GetAdminInfo(dba, admininfo);
+            SetDefaultMC(admininfo, majorcategories);
+
+            return true;
         }
 
         //////////////////////////////////////////////////////////////////////////////
@@ -238,177 +361,275 @@ namespace PortfolioEngineCore
         //   If the target CT has CCs at a higher level then need to rollup through the CC structure - tough when there are Cost Details
         //     we could say - can only copy when available CCs are the same?
         //////////////////////////////////////////////////////////////////////////////
-        private static bool CopyCostValues(DBAccess dba, int nCB_ID, int nCT_ID, int nInputCalendar, List<int> PIs, List<PfEPeriod> periods, out string sReply)
+        private static bool CopyCostValues(
+            DBAccess dbAccess, 
+            int calId, 
+            int ctId, 
+            int inputCalendar, 
+            IList<int> projectIds, 
+            IList<PfEPeriod> periods, 
+            out string reply)
         {
-            if (nCB_ID < 0 || nCT_ID <= 0 || nInputCalendar < 0)
+            if (calId < 0 || ctId <= 0 || inputCalendar < 0)
             {
-                sReply = "Calendars and Cost Type must be specified";
+                reply = "Calendars and Cost Type must be specified";
                 return false;
             }
 
             try
             {
-                sReply = "";
-
-                SqlCommand oCommand;
-                SqlDataReader reader;
-                string cmdText;
-
-                foreach (int ProjectID in PIs)
+                reply = string.Empty;
+                foreach (var projectId in projectIds)
                 {
-                    dba.BeginTransaction();
-
-                    // clear existing COST VALUES
-                    cmdText = "DELETE FROM  EPGP_COST_VALUES WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                    oCommand.CommandType = CommandType.Text;
-                    oCommand.ExecuteNonQuery();
-
-                    cmdText = "DELETE FROM  EPGP_DETAIL_VALUES WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                    oCommand.CommandType = CommandType.Text;
-                    oCommand.ExecuteNonQuery();
-
-                    cmdText = "DELETE FROM  EPGP_COST_DETAILS WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                    oCommand.CommandType = CommandType.Text;
-                    oCommand.ExecuteNonQuery();
-
-                    cmdText = "DELETE FROM  EPGP_PROJECT_CT_STATUS WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                    oCommand.CommandType = CommandType.Text;
-                    oCommand.ExecuteNonQuery();
+                    dbAccess.BeginTransaction();
+                    var discountPercentValue = ProjectDiscountRates.GetProjectDiscountRate(dbAccess, projectId);
+                    ClearExistingCostValues(dbAccess, calId, ctId, projectId);
 
                     // Create new values - first just copy CT_STATUS
-                    cmdText = "Insert Into EPGP_PROJECT_CT_STATUS (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_STATUS)"
-                            + " Select " + nCB_ID.ToString() + ",CT_ID,PROJECT_ID,BC_UID,BC_STATUS FROM  EPGP_PROJECT_CT_STATUS WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nInputCalendar);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                    oCommand.CommandType = CommandType.Text;
-                    oCommand.ExecuteNonQuery();
+                    var cmdText = $@"Insert Into EPGP_PROJECT_CT_STATUS (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_STATUS)
+                         Select {calId},CT_ID,PROJECT_ID,BC_UID,BC_STATUS FROM  EPGP_PROJECT_CT_STATUS
+                         WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
+                    ExcuteInsertInto(dbAccess, ctId, inputCalendar, cmdText, projectId);
 
-                    //  straight copy for COST_DETAILS then read in the CB/CT info from DETAIL_VALUES, convert to new period and write out for new calendar
-                    cmdText = "INSERT INTO EPGP_COST_DETAILS (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_SEQ,OC_01,OC_02,OC_03,OC_04,OC_05,TEXT_01,TEXT_02,TEXT_03,TEXT_04,TEXT_05)"
-                            + " Select " + nCB_ID.ToString() + ",CT_ID,PROJECT_ID,BC_UID,BC_SEQ,OC_01,OC_02,OC_03,OC_04,OC_05,TEXT_01,TEXT_02,TEXT_03,TEXT_04,TEXT_05"
-                            + " FROM  EPGP_COST_DETAILS WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nInputCalendar);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                    oCommand.CommandType = CommandType.Text;
-                    oCommand.ExecuteNonQuery();
+                    // straight copy for COST_DETAILS then read in the CB/CT info from DETAIL_VALUES, convert to new period and write out for new calendar
+                    cmdText = $@"INSERT INTO EPGP_COST_DETAILS (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_SEQ,OC_01,OC_02,OC_03,OC_04,OC_05,TEXT_01,TEXT_02,TEXT_03,TEXT_04,TEXT_05)
+                             Select {calId},CT_ID,PROJECT_ID,BC_UID,BC_SEQ,OC_01,OC_02,OC_03,OC_04,OC_05,TEXT_01,TEXT_02,TEXT_03,TEXT_04,TEXT_05
+                             FROM  EPGP_COST_DETAILS WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
+                    ExcuteInsertInto(dbAccess, ctId, inputCalendar, cmdText, projectId);
 
-                    cmdText = "Select BC_UID,BC_SEQ,BD_PERIOD,PRD_START_DATE,BD_VALUE,BD_COST From EPGP_DETAIL_VALUES cv"
-                                + " Inner Join EPG_PERIODS p On cv.CB_ID = p.CB_ID And cv.BD_PERIOD = p.PRD_ID"
-                                + " Where cv.CB_ID = @CalID And CT_ID = @CTID And PROJECT_ID=@ProjectID Order by BC_UID,BC_SEQ,BD_PERIOD";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nInputCalendar);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                    DataTable dt = new DataTable();
-                    dt.Load(oCommand.ExecuteReader());
+                    var dataTable = LoadDataTable(dbAccess, ctId, inputCalendar, projectId);
 
                     // set up the INSERT I need to add new records
-                    cmdText = "INSERT INTO EPGP_DETAIL_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_SEQ,BD_PERIOD,BD_VALUE,BD_COST) VALUES(@CalID,@CTID,@ProjectID,@BC_UID,@BC_SEQ,@BD_PERIOD,@BD_VALUE,@BD_COST)";
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-
-                    SqlParameter pBC_UID = oCommand.Parameters.Add("@BC_UID", SqlDbType.Int);
-                    SqlParameter pBC_SEQ = oCommand.Parameters.Add("@BC_SEQ", SqlDbType.Int);
-                    SqlParameter pBD_PERIOD = oCommand.Parameters.Add("@BD_PERIOD", SqlDbType.Int);
-                    SqlParameter pBD_VALUE = oCommand.Parameters.Add("@BD_VALUE", SqlDbType.Decimal);
-                    SqlParameter pBD_COST = oCommand.Parameters.Add("@BD_COST", SqlDbType.Decimal);
-                    pBD_VALUE.Precision = 25;
-                    pBD_VALUE.Scale = 6;
-                    pBD_COST.Precision = 25;
-                    pBD_COST.Scale = 6;
-
-                    int lCat; int lSeq; int lPeriodID; int lNewPeriodID=0;
-                    int lPrevCat=0; int lPrevSeq=0; int lPrevNewPeriodID=0;
-                    DateTime dtStartDate;
-                    double dHours; double dCost;
-                    double dTotalHours=0; double dTotalCost=0;
-
-                    if (dt != null)
-                    {
-                        foreach (DataRow row in dt.Rows)
-                        {
-                            PfEPeriod period = new PfEPeriod();
-                            lPeriodID = DBAccess.ReadIntValue(row["BD_PERIOD"]);
-                            dtStartDate = DBAccess.ReadDateValue(row["PRD_START_DATE"]);
-                            lCat = DBAccess.ReadIntValue(row["BC_UID"]);
-                            lSeq = DBAccess.ReadIntValue(row["BC_SEQ"]);
-                            dHours = DBAccess.ReadDoubleValue(row["BD_VALUE"]);
-                            dCost = DBAccess.ReadDoubleValue(row["BD_COST"]);
-
-                            lNewPeriodID = MapToPeriod(dtStartDate, periods);
-                                
-                            if (lPrevNewPeriodID != lNewPeriodID || lPrevCat != lCat || lPrevSeq != lSeq)
-                            {
-                                if (lPrevCat >= 0 && lPrevNewPeriodID > 0 && (dTotalHours != 0 || dTotalCost != 0))
-                                {
-                                    // write out the record for this cat/seq for this period
-                                    pBC_UID.Value = lPrevCat;
-                                    pBC_SEQ.Value = lPrevSeq;
-                                    pBD_PERIOD.Value = lPrevNewPeriodID;
-                                    pBD_VALUE.Value = dTotalHours;
-                                    pBD_COST.Value = dTotalCost;
-                                    oCommand.ExecuteNonQuery();
-                                }
-                                dTotalHours = 0;
-                                dTotalCost = 0;
-                            }
-        
-                            dTotalHours = dTotalHours + dHours;
-                            dTotalCost = dTotalCost + dCost;
-                            lPrevNewPeriodID = lNewPeriodID;
-                            lPrevCat = lCat;
-                            lPrevSeq = lSeq;                   
-                        }
-                    }
-                    if (lPrevCat >= 0 && lPrevNewPeriodID > 0 && (dTotalHours != 0 || dTotalCost != 0))
-                    {
-                        // write out possible final record
-                        pBC_UID.Value = lPrevCat;
-                        pBC_SEQ.Value = lPrevSeq;
-                        pBD_PERIOD.Value = lPrevNewPeriodID;
-                        pBD_VALUE.Value = dTotalHours;
-                        pBD_COST.Value = dTotalCost;
-                        oCommand.ExecuteNonQuery();
-                    }
-                    dba.CommitTransaction();
+                    InsertDetailValues(dbAccess, calId, ctId, periods, projectId, discountPercentValue, dataTable);
+                    dbAccess.CommitTransaction();
 
                     // use CalculateCostValues (as used in Cost Planner) to create COST_VALUES from COST DETAILS
                     string sResult;
-                    if (dbaCCV.CalculateCostValues(dba, nCT_ID, nCB_ID, ProjectID, out sResult) != StatusEnum.rsSuccess)
-                    { 
-                        sReply = sResult;
+                    if (dbaCCV.CalculateCostValues(dbAccess, ctId, calId, projectId, out sResult) != StatusEnum.rsSuccess)
+                    {
+                        reply = sResult;
                         return false;
                     }
                 }
             }
             catch (Exception exception)
             {
-                sReply = "CostValues.CopyCostValues, Exception: " + exception.Message;
+                Trace.WriteLine(exception.ToString());
+                reply = "CostValues.CopyCostValues, Exception: " + exception.Message;
                 return false;
             }
+
             return true;
+        }
+
+        private static void ClearExistingCostValues(DBAccess dbAccess, int calId, int ctId, int projectId)
+        {
+            const string whereClause = " WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
+
+            DeleteFromTable("EPGP_COST_VALUES", dbAccess, projectId, calId, ctId, whereClause);
+            DeleteFromTable("EPGP_DETAIL_VALUES", dbAccess, projectId, calId, ctId, whereClause);
+            DeleteFromTable("EPGP_COST_DETAILS", dbAccess, projectId, calId, ctId, whereClause);
+            DeleteFromTable("EPGP_PROJECT_CT_STATUS", dbAccess, projectId, calId, ctId, whereClause);
+        }
+
+        private static void InsertDetailValues(
+            DBAccess dbAccess, 
+            int calId, 
+            int ctId, 
+            IList<PfEPeriod> periods, 
+            int projectId, 
+            decimal discountPercentValue, 
+            DataTable dataTable)
+        {
+            var cmdText = "INSERT INTO EPGP_DETAIL_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_SEQ,BD_PERIOD,BD_VALUE,BD_COST,BD_DISCOUNT_RATE,BD_DISCOUNT_VALUE) VALUES(@CalID,@CTID,@ProjectID,@BC_UID,@BC_SEQ,@BD_PERIOD,@BD_VALUE,@BD_COST,@BD_DISCOUNT_RATE,@BD_DISCOUNT_VALUE)";
+            using (var command = new SqlCommand(cmdText, dbAccess.Connection, dbAccess.Transaction))
+            {
+                command.Parameters.AddWithValue("@CalID", calId);
+                command.Parameters.AddWithValue("@CTID", ctId);
+                command.Parameters.AddWithValue("@ProjectID", projectId);
+
+                var uidParameter = command.Parameters.Add("@BC_UID", SqlDbType.Int);
+                var seqParameter = command.Parameters.Add("@BC_SEQ", SqlDbType.Int);
+                var periodParameter = command.Parameters.Add("@BD_PERIOD", SqlDbType.Int);
+                var valueParameter = command.Parameters.Add("@BD_VALUE", SqlDbType.Decimal);
+                var costParameter = command.Parameters.Add("@BD_COST", SqlDbType.Decimal);
+                var discountRateParameter = command.Parameters.Add(DetailValuesDiscountRateParameter, SqlDbType.Decimal);
+                var discountValueParameter = command.Parameters.Add(DetailValuesDiscountValueParameter, SqlDbType.Decimal);
+                SetPrecisionAndScale(valueParameter, costParameter, discountRateParameter, discountValueParameter);
+
+                int catId;
+                int seqId;
+                int periodId;
+                var newPeriodId = 0;
+                var prevCat = 0;
+                var prevSeq = 0;
+                var prevNewPeriodId = 0;
+                DateTime dtStartDate;
+                double hours;
+                double cost;
+                var totalHours = 0.0;
+                var totalCost = 0.0;
+                var discountValueTotal = 0m;
+                var discountValue = 0m;
+
+                if (dataTable != null)
+                {
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        ReadValues(
+                            periods, 
+                            out catId, 
+                            out seqId, 
+                            out periodId, 
+                            out newPeriodId, 
+                            out dtStartDate, 
+                            out hours, 
+                            out cost, 
+                            out discountValue, 
+                            row);
+
+                        if (prevNewPeriodId != newPeriodId || prevCat != catId || prevSeq != seqId)
+                        {
+                            WriteRecordForPeriod(
+                                discountPercentValue, 
+                                command, 
+                                uidParameter, 
+                                seqParameter, 
+                                periodParameter, 
+                                valueParameter, 
+                                costParameter, 
+                                discountRateParameter, 
+                                discountValueParameter, 
+                                prevCat, 
+                                prevSeq, 
+                                prevNewPeriodId, 
+                                totalHours, 
+                                totalCost, 
+                                discountValueTotal);
+
+                            totalHours = 0;
+                            totalCost = 0;
+                            discountValueTotal = 0;
+                        }
+
+                        totalHours = totalHours + hours;
+                        totalCost = totalCost + cost;
+                        discountValueTotal = discountValueTotal + discountValue;
+                        prevNewPeriodId = newPeriodId;
+                        prevCat = catId;
+                        prevSeq = seqId;
+                    }
+                }
+
+                WriteRecordForPeriod(
+                    discountPercentValue, 
+                    command, 
+                    uidParameter, 
+                    seqParameter, 
+                    periodParameter, 
+                    valueParameter, 
+                    costParameter, 
+                    discountRateParameter, 
+                    discountValueParameter, 
+                    prevCat, 
+                    prevSeq, 
+                    prevNewPeriodId, 
+                    totalHours, 
+                    totalCost, 
+                    discountValueTotal);
+            }
+        }
+
+        private static void ReadValues(
+            IList<PfEPeriod> periods, 
+            out int catId, 
+            out int seqId, 
+            out int periodId, 
+            out int newPeriodId, 
+            out DateTime dtStartDate, 
+            out double hours, 
+            out double cost, 
+            out decimal discountValue, 
+            DataRow row)
+        {
+            periodId = DBAccess.ReadIntValue(row["BD_PERIOD"]);
+            dtStartDate = DBAccess.ReadDateValue(row["PRD_START_DATE"]);
+            catId = DBAccess.ReadIntValue(row["BC_UID"]);
+            seqId = DBAccess.ReadIntValue(row["BC_SEQ"]);
+            hours = DBAccess.ReadDoubleValue(row["BD_VALUE"]);
+            cost = DBAccess.ReadDoubleValue(row["BD_COST"]);
+            discountValue = SqlDb.ReadDecimalValue(row[DetailValuesDiscountValueColumn]);
+            newPeriodId = MapToPeriod(dtStartDate, periods);
+        }
+
+        private static void SetPrecisionAndScale(
+            SqlParameter valueParameter, 
+            SqlParameter costParameter, 
+            SqlParameter discountRateParameter, 
+            SqlParameter discountValueParameter)
+        {
+            const int precision = 25;
+            const int scale = 6;
+            valueParameter.Precision = precision;
+            valueParameter.Scale = scale;
+            costParameter.Precision = precision;
+            costParameter.Scale = scale;
+            discountValueParameter.Precision = precision;
+            discountValueParameter.Scale = scale;
+
+            const int discountRatePrecision = 6;
+            const int discountRateScale = 5;
+            discountRateParameter.Precision = discountRatePrecision;
+            discountRateParameter.Scale = discountRateScale;
+        }
+
+        private static void WriteRecordForPeriod(
+            decimal discountPercentValue, 
+            SqlCommand command, 
+            SqlParameter uidParameter, 
+            SqlParameter seqParameter, 
+            SqlParameter periodParameter, 
+            SqlParameter valueParameter, 
+            SqlParameter costParameter, 
+            SqlParameter discountRateParameter, 
+            SqlParameter discountValueParameter, 
+            int prevCat, 
+            int prevSeq, 
+            int prevNewPeriodId, 
+            double totalHours, 
+            double totalCost, 
+            decimal discountValueTotal)
+        {
+            if (prevCat >= 0 
+                && prevNewPeriodId > 0 
+                && (totalHours != 0 || totalCost != 0 || discountValueTotal != 0))
+            {
+                uidParameter.Value = prevCat;
+                seqParameter.Value = prevSeq;
+                periodParameter.Value = prevNewPeriodId;
+                valueParameter.Value = totalHours;
+                costParameter.Value = totalCost;
+                discountValueParameter.Value = discountValueTotal;
+                discountRateParameter.Value = discountPercentValue;
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private static DataTable LoadDataTable(DBAccess dbAccess, int ctId, int inputCalendar, int projectId)
+        {
+            var cmdText = @"Select BC_UID,BC_SEQ,BD_PERIOD,PRD_START_DATE,BD_VALUE,BD_COST From EPGP_DETAIL_VALUES cv
+                          Inner Join EPG_PERIODS p On cv.CB_ID = p.CB_ID And cv.BD_PERIOD = p.PRD_ID
+                          Where cv.CB_ID = @CalID And CT_ID = @CTID And PROJECT_ID=@ProjectID Order by BC_UID,BC_SEQ,BD_PERIOD";
+
+            using (var command = new SqlCommand(cmdText, dbAccess.Connection, dbAccess.Transaction))
+            {
+                command.Parameters.AddWithValue("@CalID", inputCalendar);
+                command.Parameters.AddWithValue("@CTID", ctId);
+                command.Parameters.AddWithValue("@ProjectID", projectId);
+                var dataTable = new DataTable();
+                dataTable.Load(command.ExecuteReader());
+                return dataTable;
+            }
         }
 
         //////////////////////////////////////////////////////////////////////////////
@@ -452,6 +673,9 @@ namespace PortfolioEngineCore
                         }
                     }
 
+                    var projectRates = ProjectResourceRates.GetRates(dba, ProjectID);
+                    var discountRate = Convert.ToDouble(1 - ProjectDiscountRates.GetProjectDiscountRate(dba, ProjectID));
+
                     oCommand = new SqlCommand("EPG_SP_PCTReadWEActuals", dba.Connection);
                     oCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     oCommand.Parameters.AddWithValue("@ProjID", ProjectID);
@@ -479,12 +703,12 @@ namespace PortfolioEngineCore
                                 // get rates for this resource or cost category
                                 double dblRate;
                                 double dblOvertimeRate;
-                                GetRate(namedrates, rates, costcategory.UID, lWResID, periodid, startdate, out dblRate, out dblOvertimeRate);
+                                GetRate(namedrates, projectRates, rates, costcategory.UID, lWResID, periodid, startdate, out dblRate, out dblOvertimeRate);
 
                                 // tabulate quantity and cost
                                 quantity[costcategory.ID, periodid] += hours;
                                 quantity[costcategory.ID, periodid] += overtimehours;
-                                cost[costcategory.ID, periodid] += hours * dblRate;
+                                cost[costcategory.ID, periodid] += hours * dblRate * discountRate;
                                 cost[costcategory.ID, periodid] += overtimehours * dblOvertimeRate;
                             }
                         }
@@ -565,6 +789,9 @@ namespace PortfolioEngineCore
                         }
                     }
 
+                    var projectRates = ProjectResourceRates.GetRates(dba, ProjectID);
+                    var discountRate = Convert.ToDouble(1 - ProjectDiscountRates.GetProjectDiscountRate(dba, ProjectID));
+
                     int lReadCustomFields = 0;
                     oCommand = new SqlCommand("EPG_SP_PCTReadCommitments", dba.Connection);
                     oCommand.CommandType = System.Data.CommandType.StoredProcedure;
@@ -602,13 +829,13 @@ namespace PortfolioEngineCore
                                     // get rates for this resource or cost category
                                     double dblRate;
                                     double dblOvertimeRate;
-                                    GetRate(namedrates, rates, costcategory.UID, lWResID, periodid, startdate, out dblRate, out dblOvertimeRate);
+                                    GetRate(namedrates, projectRates, rates, costcategory.UID, lWResID, periodid, startdate, out dblRate, out dblOvertimeRate);
 
                                     // tabulate quantity and cost
                                     // in the old system here we checked the editmode for: Commitments, Forecast Commitments, Revenue, or Forecast Revenue
                                     //    right now we only have Commitments
                                     quantity[costcategory.ID, periodid] += hours;
-                                    cost[costcategory.ID, periodid] += hours * dblRate;
+                                    cost[costcategory.ID, periodid] += hours * dblRate * discountRate;
                                 }
                             }
                         }
@@ -680,7 +907,7 @@ namespace PortfolioEngineCore
             }
         }
 
-        private static int MapToPeriod(DateTime dtDate, List<PfEPeriod> periods)
+        private static int MapToPeriod(DateTime dtDate, IList<PfEPeriod> periods)
         {
             int nPeriod = 0;
 
@@ -966,16 +1193,30 @@ namespace PortfolioEngineCore
             }
         }
 
-        private static bool GetRate(PfENamedRates namedrates, Dictionary<int, Dictionary<int, double>> categoryrates, int costcategory, int lWresID, int periodid, DateTime startdate, out double dblRate, out double dblOvertimeRate)
+        private static bool GetRate(PfENamedRates namedrates, List<ProjectResourceRate> projectRates, Dictionary<int, Dictionary<int, double>> categoryrates, int costcategory, int lWresID, int periodid, DateTime startdate, out double dblRate, out double dblOvertimeRate)
         {
             dblRate = 0;
             dblOvertimeRate = 0;
 
             // if resource specified and it has a rate use that
             bool bfoundresourcerate = false;
+            var foundProjectRate = false;
             if (lWresID > 0)
             {
-                if (namedrates.resourcerates.ContainsKey(lWresID))
+                // first try to get resource rate for the project (specified in project team)
+                var projectRateForResource = projectRates.Where(x => x.ResourceId == lWresID && x.EffectiveDate <= startdate)
+                    .OrderBy(x => x.EffectiveDate)
+                    .LastOrDefault();
+
+                if (projectRateForResource != null)
+                {
+                    dblRate = Convert.ToDouble(projectRateForResource.Rate);
+                    dblOvertimeRate = dblRate;
+                    foundProjectRate = true;
+                }
+
+                // then try to get resource rate specified in Rates configuration
+                if (!foundProjectRate && namedrates.resourcerates.ContainsKey(lWresID))
                 {
                     int lRTUID=namedrates.resourcerates[lWresID];
                     if (namedrates.rates.ContainsKey(lRTUID))
@@ -1001,8 +1242,9 @@ namespace PortfolioEngineCore
                     }
                 }
             }
+
             // if no resource rate then use Cost Category rate
-            if (!bfoundresourcerate && costcategory > 0)
+            if (!foundProjectRate && !bfoundresourcerate && costcategory > 0)
             {
                 if (categoryrates.ContainsKey(costcategory))
                 {
@@ -1285,141 +1527,171 @@ namespace PortfolioEngineCore
             return true;
         }
 
-        private static void WriteToDatabaseThisPI(DBAccess dba, int ProjectID, int nCB_ID, int nCT_ID,
-                                                    bool allPIs, ref bool firsttimethrough,
-                                                    double[,] quantity, double[,] cost, Dictionary<int, PfECostCategory> costcategories)
+        private static void WriteToDatabaseThisPI(
+            DBAccess dbAccess, 
+            int projectId, 
+            int calId, 
+            int ctId,
+            bool allPIs, 
+            ref bool firstTimeThrough,
+            double[,] quantity, 
+            double[,] cost, 
+            IDictionary<int, PfECostCategory> costcategories)
         {
-            SqlCommand oCommand;
-            string cmdText;
+            dbAccess.BeginTransaction();
 
-            string swhereclause;
-            dba.BeginTransaction();
-
-            // clear all existing values and write out new ones, all at once when for allPIs
-            if (!allPIs || firsttimethrough)
-            {
-                firsttimethrough = false;
-                if (allPIs)
-                {
-                    swhereclause = " WHERE CB_ID=@CalID And CT_ID=@CTID";
-                }
-                else
-                {
-                    swhereclause = " WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
-                }
-                cmdText = "DELETE FROM  EPGP_COST_VALUES" + swhereclause;
-                oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                oCommand.CommandType = CommandType.Text;
-                oCommand.ExecuteNonQuery();
-
-                cmdText = "DELETE FROM  EPGP_DETAIL_VALUES" + swhereclause;
-                oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                oCommand.CommandType = CommandType.Text;
-                oCommand.ExecuteNonQuery();
-
-                cmdText = "DELETE FROM  EPGP_COST_DETAILS" + swhereclause;
-                oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-                oCommand.CommandType = CommandType.Text;
-                oCommand.ExecuteNonQuery();
-
-                if (allPIs)
-                {
-                    swhereclause = " WHERE CB_ID=@CalID And CT_ID=@CTID";
-                    cmdText = "DELETE FROM  EPGP_COST_VALUES_INFO" + swhereclause;
-                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                    oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                    oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                    oCommand.CommandType = CommandType.Text;
-                    oCommand.ExecuteNonQuery();
-                }
-            }
+            firstTimeThrough = ClearAllExistingValues(dbAccess, projectId, calId, ctId, allPIs, firstTimeThrough);
 
             // Create new values 
-
             // set up the INSERT I need to add new records
-            cmdText = "INSERT INTO EPGP_COST_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID,BD_PERIOD,BD_VALUE,BD_COST,BD_IS_SUMMARY)"
+            var commandText = "INSERT INTO EPGP_COST_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID,BD_PERIOD,BD_VALUE,BD_COST,BD_IS_SUMMARY)"
                     + " VALUES(@CalID,@CTID,@ProjectID,@BC_UID,@BD_PERIOD,@BD_VALUE,@BD_COST,@SUM_FLAG)";
-            oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-            oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-            oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-            oCommand.Parameters.AddWithValue("@ProjectID", ProjectID);
-            SqlParameter pBC_UID = oCommand.Parameters.Add("@BC_UID", SqlDbType.Int);
-            SqlParameter pBD_PERIOD = oCommand.Parameters.Add("@BD_PERIOD", SqlDbType.Int);
-            SqlParameter pBD_VALUE = oCommand.Parameters.Add("@BD_VALUE", SqlDbType.Decimal);
-            SqlParameter pBD_COST = oCommand.Parameters.Add("@BD_COST", SqlDbType.Decimal);
-            SqlParameter pSUM_FLAG = oCommand.Parameters.Add("@SUM_FLAG", SqlDbType.Int);
-            pBD_VALUE.Precision = 25;
-            pBD_VALUE.Scale = 6;
-            pBD_COST.Precision = 25;
-            pBD_COST.Scale = 6;
+            using (var command = new SqlCommand(commandText, dbAccess.Connection, dbAccess.Transaction))
+            {
+                command.Parameters.AddWithValue("@CalID", calId);
+                command.Parameters.AddWithValue("@CTID", ctId);
+                command.Parameters.AddWithValue("@ProjectID", projectId);
+                WriteTotalLineForEachCostCategory(quantity, cost, costcategories, command);
+            }
+            dbAccess.CommitTransaction();
+
+            // write n INFO record if appropriate
+            if (allPIs)
+            {
+                commandText = "INSERT INTO EPGP_COST_VALUES_INFO (CB_ID,CT_ID,CV_INFO,CV_TIMESTAMP)"
+                        + " VALUES(@CalID,@CTID,@INFO,GETDATE())";
+                using (var command = new SqlCommand(commandText, dbAccess.Connection, dbAccess.Transaction))
+                {
+                    command.Parameters.AddWithValue("@CalID", calId);
+                    command.Parameters.AddWithValue("@CTID", ctId);
+                    command.Parameters.AddWithValue("@INFO", "Post Cost Values");
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        private static void WriteTotalLineForEachCostCategory(
+            double[,] quantity,
+            double[,] cost,
+            IDictionary<int, PfECostCategory> costcategories,
+            SqlCommand command)
+        {
+            var uidParameter = command.Parameters.Add("@BC_UID", SqlDbType.Int);
+            var periodParameter = command.Parameters.Add("@BD_PERIOD", SqlDbType.Int);
+            var valueParameter = command.Parameters.Add("@BD_VALUE", SqlDbType.Decimal);
+            var costParameter = command.Parameters.Add("@BD_COST", SqlDbType.Decimal);
+            var sumFlagParameter = command.Parameters.Add("@SUM_FLAG", SqlDbType.Int);
+            valueParameter.Precision = 25;
+            valueParameter.Scale = 6;
+            costParameter.Precision = 25;
+            costParameter.Scale = 6;
 
             // go through each Cost Category
-            int numperiods = quantity.GetLength(1);
-            foreach (KeyValuePair<int, PfECostCategory> costcategory in costcategories)
+            var numperiods = quantity.GetLength(1);
+            foreach (var costcategory in costcategories)
             {
-
-                int catindex = costcategory.Value.ID;
+                var catindex = costcategory.Value.ID;
                 if (costcategory.Value.available == 1)
                 {
-                    for (int j = 1; j < numperiods; j++)
+                    for (var j = 1; j < numperiods; j++)
                     {
-                        double dQuantity = quantity[catindex, j];
-                        double dCost = cost[catindex, j];
+                        var dQuantity = quantity[catindex, j];
+                        var dCost = cost[catindex, j];
                         if (dQuantity != 0 || dCost != 0)
                         {
-                            pBC_UID.Value = costcategory.Value.UID;
-                            pBD_PERIOD.Value = j;
-                            pBD_VALUE.Value = dQuantity;
-                            pBD_COST.Value = dCost;
-                            if (costcategory.Value.flag == true) pSUM_FLAG.Value = 1; else pSUM_FLAG.Value = 0;
-                            oCommand.ExecuteNonQuery();
+                            uidParameter.Value = costcategory.Value.UID;
+                            periodParameter.Value = j;
+                            valueParameter.Value = dQuantity;
+                            costParameter.Value = dCost;
+                            sumFlagParameter.Value = costcategory.Value.flag
+                                ? 1
+                                : 0;
+                            command.ExecuteNonQuery();
                         }
                     }
                 }
             }
 
             // write out the TOTAL line 
+            for (var j = 1; j < numperiods; j++)
             {
-                for (int j = 1; j < numperiods; j++)
+                var theQuantity = quantity[0, j];
+                var theCost = cost[0, j];
+                if (theQuantity != 0 || theCost != 0)
                 {
-                    double dQuantity = quantity[0, j];
-                    double dCost = cost[0, j];
-                    if (dQuantity != 0 || dCost != 0)
-                    {
-                        pBC_UID.Value = 0;
-                        pBD_PERIOD.Value = j;
-                        pBD_VALUE.Value = dQuantity;
-                        pBD_COST.Value = dCost;
-                        pSUM_FLAG.Value = 1;
-                        oCommand.ExecuteNonQuery();
-                    }
+                    uidParameter.Value = 0;
+                    periodParameter.Value = j;
+                    valueParameter.Value = theQuantity;
+                    costParameter.Value = theCost;
+                    sumFlagParameter.Value = 1;
+                    command.ExecuteNonQuery();
                 }
             }
-            dba.CommitTransaction();
+        }
 
-            // write n INFO record if appropriate
-            if (allPIs)
+        // clear all existing values and write out new ones, all at once when for allPIs
+        private static bool ClearAllExistingValues(
+            DBAccess dbAccess, 
+            int projectId, 
+            int calId, 
+            int ctId, 
+            bool allPIs, 
+            bool firstTimeThrough)
+        {
+            string whereClause;
+            if (!allPIs || firstTimeThrough)
             {
-                cmdText = "INSERT INTO EPGP_COST_VALUES_INFO (CB_ID,CT_ID,CV_INFO,CV_TIMESTAMP)"
-                        + " VALUES(@CalID,@CTID,@INFO,GETDATE())";
-                oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
-                oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
-                oCommand.Parameters.AddWithValue("@INFO", "Post Cost Values");
+                firstTimeThrough = false;
+                whereClause = allPIs
+                    ? " WHERE CB_ID=@CalID And CT_ID=@CTID"
+                    : " WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
 
-                oCommand.ExecuteNonQuery();
+                DeleteFromTable("EPGP_COST_VALUES", dbAccess, projectId, calId, ctId, whereClause);
+                DeleteFromTable("EPGP_DETAIL_VALUES", dbAccess, projectId, calId, ctId, whereClause);
+                DeleteFromTable("EPGP_COST_DETAILS", dbAccess, projectId, calId, ctId, whereClause);
+
+                if (allPIs)
+                {
+                    DeleteFromTable("EPGP_COST_VALUES_INFO", dbAccess, projectId, calId, ctId, whereClause, false);
+                }
             }
 
-            return;
+            return firstTimeThrough;
+        }
+
+        private static void DeleteFromTable(
+            string tableName,
+            DBAccess dbAccess,
+            int projectId,
+            int calId,
+            int ctId,
+            string whereClause,
+            bool addProjectParameter = true)
+        {
+            var commandText = string.Format("DELETE FROM  {0}{1}", tableName, whereClause);
+            using (var command = new SqlCommand(commandText, dbAccess.Connection, dbAccess.Transaction))
+            {
+                command.Parameters.AddWithValue("@CalID", calId);
+                command.Parameters.AddWithValue("@CTID", ctId);
+                if (addProjectParameter)
+                {
+                    command.Parameters.AddWithValue("@ProjectID", projectId);
+                }
+                command.CommandType = CommandType.Text;
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private static void ExcuteInsertInto(DBAccess dbAccess, int ctId, int inputCalendar, string cmdText, int projectId)
+        {
+            using (var command = new SqlCommand(cmdText, dbAccess.Connection, dbAccess.Transaction))
+            {
+                command.Parameters.AddWithValue("@CalID", inputCalendar);
+                command.Parameters.AddWithValue("@CTID", ctId);
+                command.Parameters.AddWithValue("@ProjectID", projectId);
+                command.CommandType = CommandType.Text;
+                command.ExecuteNonQuery();
+            }
         }
 
         private static bool SetCostTotals(DBAccess dba, int ProjectID, int nCB_ID, int nCT_ID)

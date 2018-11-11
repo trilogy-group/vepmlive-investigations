@@ -1,0 +1,54 @@
+pipeline {
+    agent {
+        node {
+            label 'skyvera-jenkins-win-build'
+            customWorkspace "c:\\jenkins\\build"
+        }
+    }
+    options {
+        skipDefaultCheckout true
+        timestamps()
+    }
+    parameters {
+        string(name: 'Version', defaultValue: '7.0.0.x', description: 'Version to set (x is replaced with current build number)')
+    }
+    stages {
+        stage('Prepare for build') {
+            steps {
+                echo 'Setting parameters...'
+                script {
+                    env.BUILD_VERSION = params.Version.replace('x', env.BUILD_NUMBER)
+                }
+                
+                echo 'Cleanup previous build workspace...'
+                dir ("${env.WORKSPACE}") {
+                    deleteDir()
+                }
+                powershell "Write-Host 'Disk space usage:'(Get-PSDrive C | Select-Object Used,Free)"
+                
+                echo 'Checkout SCM..'
+                checkout scm
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Executing build...'
+                powershell "${env.WORKSPACE}/BuildJenkins/RC/build.ps1 ${env.BUILD_VERSION} \"${env.WORKSPACE}\" \"${env.WORKSPACE}/finalBuild\""
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Publishing artifacts...'
+            zip(zipFile: "EPMLive_${env.BUILD_VERSION}.zip", dir: "${env.WORKSPACE}/finalBuild", archive: true)
+        }
+        cleanup {
+            powershell "Write-Host 'Disk space usage before cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
+            echo 'Cleanup workspace...'
+            dir ("${env.WORKSPACE}") {
+                deleteDir()
+            }
+            powershell "Write-Host 'Disk space usage after cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
+        }
+    }
+}

@@ -9,6 +9,7 @@ import {CommonPage} from '../../../page-objects/pages/common/common.po';
 import {MyTimeOffPageConstants} from '../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
 import {MyTimeOffPageHelper} from '../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
+import {CommonPageHelper} from '../../../page-objects/pages/common/common-page.helper';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
@@ -35,7 +36,7 @@ describe(SuiteNames.regressionTestSuite, () => {
             .toBe(MyTimeOffPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(MyTimeOffPageConstants.pageName));
 
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
 
         StepLogger.step(`Enter/Select below details in 'My Time Off' page`);
         const uniqueId = PageHelper.getUniqueId();

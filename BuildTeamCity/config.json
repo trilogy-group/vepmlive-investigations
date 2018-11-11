@@ -4,24 +4,29 @@
 			"name": "API", 
 			"files": ["api.zip"],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013",
-			"unzip": "[ProgramFilesFolder]EPM Live\\EPM Live 2013"		},
+			"unzip": "[ProgramFilesFolder]EPM Live\\EPM Live 2013"
+		},
 		{
 			"name": "AllOtherFiles2", 
 			"files": ["0Tables01.sql","0Tables02.sql", "1Views01.sql", "2SPs01.sql", "9Data01.sql", "9Data02.sql"],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\sql\\PS",
-			"runSQL": "true"		},
+			"runSQL": "true"
+		},
 		{
 			"name": "DocumentFormat.OpenXml.dll", 
 			"files": ["DocumentFormat.OpenXml.dll"],
-			"destination": "GAC"		},
+			"destination": "GAC"
+		},
 		{
 			"name": "EPMLiveIntegration.dll", 
 			"files": ["EPMLiveIntegration.dll"],
-			"destination": "GAC"		},
+			"destination": "GAC"
+		},
 		{
 			"name": "Eula", 
 			"files": ["eula.rtf"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013"
+		},
 		{
 			"name": "Newtonsoft.Json.dll", 
 			"files": ["Newtonsoft.Json.dll"],
@@ -30,7 +35,8 @@
 		{
 			"name": "PortfolioEngineCore.dll", 
 			"files": ["PortfolioEngineCore.dll"],
-			"destination": "GAC"		},
+			"destination": "GAC"
+		},
 		{
 			"name": "QueueService", 
 			"files": ["WE_QueueMgr.exe"],
@@ -42,11 +48,13 @@
  				"description": " ",
 				"key": "PFE",
 				"dependency": "MSMQ"
-			}		},
+			}
+		},
 		{
 			"name": "RestSharp.dll", 
 			"files": ["RestSharp.dll"],
-			"destination": "GAC"		},
+			"destination": "GAC"
+		},
 		{
 			"name": "SPFiles", 
 			"files": [
@@ -58,7 +66,8 @@
 				"WorkEngineForms.wsp"
 				],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\webparts",
-			"deployWSP": "web"		},
+			"deployWSP": "web"
+		},
 		{
 			"name": "SPFiles2",
 			"files": [
@@ -74,12 +83,14 @@
 		{
 			"name": "TemplateFilesPortfolioEngine", 
 			"files": ["PortfolioEngine.wsp"],
-			"destination": "[CommonFiles64Folder]WorkEngine\\Templates\\PortfolioEngine" 		},
+			"destination": "[CommonFiles64Folder]WorkEngine\\Templates\\PortfolioEngine" 
+		},
 		{
 			"name": "UplandAnalytics", 
 			"files": "UplandAnalytics.zip",
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013",
-			"unzip": "[ProgramFilesFolder]EPM Live\\EPM Live 2013"		},
+			"unzip": "[ProgramFilesFolder]EPM Live\\EPM Live 2013"
+		},
 		{
 			"name": "UplandIntegrations.dll", 
 			"files": ["UplandIntegrations.dll"],
@@ -96,76 +107,98 @@
 				"description": " ",
 				"key": "Timer",
 				"dependency": ""
-			}		},
+			}
+		},
 		{	"name": "WE_CSRequest.dll", 
 			"files": ["WE_CSRequest.dll"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
+		},
 		{
 			"name": "WE_CSRequest.tlb", 
 			"files": ["WE_CSRequest.tlb"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
+		},
 		{
 			"name": "WE_CSUtils.dll", 
 			"files": ["WE_CSUtils.dll"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
+		},
 		{
 			"name": "WE_CSUtils.tlb", 
 			"files": ["WE_CSUtils.tlb"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
+		},
 		{
 			"name": "WE_Common.dll", 
 			"files": ["WE_Common.dll"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
+		},
 		{
 			"name": "WE_Common.tlb", 
 			"files": ["WE_Common.tlb"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
+		},
 		{
 			"name": "WE_DBASvr.dll", 
 			"files": ["WE_DBASvr.dll"],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN",
-			"registerCOM": "true"		},
+			"registerCOM": "true"
+		},
 		{
 			"name": "WE_FA.dll", 
 			"files": ["WE_FA.dll"],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN",
-			"registerCOM": "true"		},
+			"registerCOM": "true"
+		},
 		{
 			"name": "WE_PDSExt.dll", 
 			"files": ["WE_PDSExt.dll"],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN",
-			"registerCOM": "true"		},
+			"registerCOM": "true"
+		},
 		{
 			"name": "WE_RSVP.dll", 
 			"files": ["WE_RSVP.dll"],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN",
-			"registerCOM": "true"		},
+			"registerCOM": "true"
+		},
 		{
 			"name": "WE_Security.dll", 
 			"files": ["WE_Security.dll"],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN",
-			"registerCOM": "true"		},
+			"registerCOM": "true"
+		},
 		{
 			"name": "WE_Util.ocx", 
 			"files": ["WE_Util.ocx"],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN",
-			"registerCOM": "true"		},
+			"registerCOM": "true"
+		},
 		{
 			"name": "WE_WEI.dll", 
 			"files": ["WE_WEI.dll"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
+		},
 		{
 			"name": "WE_WEI.tlb", 
 			"files": ["WE_WEI.tlb"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
+		},
 		{
 			"name": "WE_WSIF.dll", 
 			"files": ["WE_WSIF.dll"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
+		},
 		{
 			"name": "WE_WSIF.tlb", 
 			"files": ["WE_WSIF.tlb"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
+		},
+		{
+			"name": "WE_WSSAdmin.dll", 
+			"files": ["WE_WSSAdmin.dll"],
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"
+		},
 		{
 			"name": "WE_WSSAdmin.dll", 
 			"files": ["WE_WSSAdmin.dll"],
@@ -173,10 +206,13 @@
 			"registerCOMplus": {
 				"ID": "{9E3ABD82-916F-4B55-BC80-581D307471E0}",
 				"Name": "WssAdmin"
-				}		},
+				}
+		},
+
 		{
 			"name": "workenginesetup.exe", 
 			"files": ["workenginesetup.exe"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013"		}
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013"
+		}
 	]
 }

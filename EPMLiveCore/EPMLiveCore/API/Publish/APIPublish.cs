@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Text;
+using System.Xml;
 using Microsoft.SharePoint;
-using System.Collections;
 
 namespace EPMLiveCore.API
 {
@@ -378,84 +378,123 @@ namespace EPMLiveCore.API
 
                                 int status = 2;
 
-                                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(oSite.WebApplication.Id));
-
-                                SPSecurity.RunWithElevatedPrivileges(delegate()
+                                using (var connection = new SqlConnection(CoreFunctions.getConnectionString(oSite.WebApplication.Id)))
                                 {
-                                    cn.Open();
-                                });
+                                    SPSecurity.RunWithElevatedPrivileges(connection.Open);
 
-                                SqlCommand cmd = new SqlCommand("select timerjobuid,status from vwQueueTimerLog where siteguid=@siteguid and webguid=@webguid and listguid=@listguid and itemid=@itemid and jobtype=9 and [key] = @key", cn);
-                                cmd.Parameters.AddWithValue("@siteguid", oSite.ID);
-                                cmd.Parameters.AddWithValue("@webguid", oWeb.ID);
-                                cmd.Parameters.AddWithValue("@listguid", oList.ID);
-                                cmd.Parameters.AddWithValue("@itemid", sID);
-                                cmd.Parameters.AddWithValue("@key", sPlannerID);
-                                SqlDataReader dr = cmd.ExecuteReader();
-
-                                Guid tJob = Guid.Empty;
-
-                                if(!dr.Read())
-                                {
-                                    tJob = Guid.NewGuid();
-                                    dr.Close();
-                                    cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname,  scheduletype, webguid, listguid, itemid, jobdata, [key]) VALUES (@timerjobuid, @siteguid, 9, @jobname, 9, @webguid, @listguid, @itemid, @jobdata, @key)", cn);
-                                    cmd.Parameters.AddWithValue("@siteguid", oSite.ID.ToString());
-                                    cmd.Parameters.AddWithValue("@webguid", oWeb.ID);
-                                    cmd.Parameters.AddWithValue("@listguid", oList.ID);
-                                    cmd.Parameters.AddWithValue("@itemid", sID);
-                                    cmd.Parameters.AddWithValue("@jobdata", doc.FirstChild.OuterXml);
-                                    cmd.Parameters.AddWithValue("@timerjobuid", tJob);                                    
-                                    cmd.Parameters.AddWithValue("@jobname", "Project Publish" + "_" + projectName);
-                                    cmd.Parameters.AddWithValue("@key", sPlannerID);
-                                    cmd.ExecuteNonQuery();
-                                }
-                                else
-                                {
-                                    tJob = dr.GetGuid(0);
-                                    if(!dr.IsDBNull(1))
-                                        status = dr.GetInt32(1);
-
-                                    dr.Close();
-
-                                    cmd = new SqlCommand("update timerjobs set jobdata=@jobdata where timerjobuid=@timerjobuid", cn);
-                                    cmd.Parameters.AddWithValue("@jobdata", doc.FirstChild.OuterXml);
-                                    cmd.Parameters.AddWithValue("@timerjobuid", tJob);
-                                    cmd.ExecuteNonQuery();
-                                }
-
-                                if(status == 2)
-                                {
-                                    if(tJob != Guid.Empty)
+                                    Guid jobGuid;
+                                    using (var logCommand = new SqlCommand(
+                                        "select timerjobuid,status from vwQueueTimerLog " +
+                                        "where siteguid=@siteguid and webguid=@webguid " +
+                                        "and listguid=@listguid and itemid=@itemid and jobtype=9 and [key] = @key",
+                                        connection))
                                     {
-                                        CoreFunctions.enqueue(tJob, 0);
-                                        message = "Success";
+                                        logCommand.Parameters.AddWithValue("@siteguid", oSite.ID);
+                                        logCommand.Parameters.AddWithValue("@webguid", oWeb.ID);
+                                        logCommand.Parameters.AddWithValue("@listguid", oList.ID);
+                                        logCommand.Parameters.AddWithValue("@itemid", sID);
+                                        logCommand.Parameters.AddWithValue("@key", sPlannerID);
 
-                                        if (!String.IsNullOrEmpty(sPlannerID) && sPlannerID.ToLower().Equals("msproject"))
+                                        bool newGuid;
+                                        using (var dataReader = logCommand.ExecuteReader())
                                         {
-                                            SPUser currentuser = oWeb.CurrentUser;
-                                            var res = new Hashtable();
-                                            res.Add("ProjectName", projectName);
-                                            string queueJobsUrl = oWeb.Url + "/_layouts/epmlive/queuejobs.aspx?jobid=" + tJob + "&isdlg=1";
-                                            string pageUrl = "javascript:var options = { url:'" + queueJobsUrl + "', width: 1000, height:600, title: 'Work Queue'}; SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);  return false;";
-                                            res.Add("PageUrl", pageUrl);
-                                            EPMLiveCore.API.APIEmail.QueueItemMessage(14, true, res, new[] { currentuser.ID.ToString() }, null, true, true, oWeb, currentuser, true);
+                                            if (!dataReader.Read())
+                                            {
+                                                newGuid = true;
+                                                jobGuid = Guid.NewGuid();
+                                            }
+                                            else
+                                            {
+                                                newGuid = false;
+                                                jobGuid = dataReader.GetGuid(0);
+                                                if (!dataReader.IsDBNull(1))
+                                                {
+                                                    status = dataReader.GetInt32(1);
+                                                }
+                                            }
                                         }
 
+                                        if (newGuid)
+                                        {
+                                            using (var timeJobsCommand = new SqlCommand(
+                                                "INSERT INTO TIMERJOBS " +
+                                                "(timerjobuid, siteguid, jobtype, jobname,  scheduletype, " +
+                                                "webguid, listguid, itemid, jobdata, [key]) " +
+                                                "VALUES (" +
+                                                "@timerjobuid, @siteguid, 9, @jobname, 9, @webguid, " +
+                                                "@listguid, @itemid, @jobdata, @key)",
+                                                connection))
+                                            {
+                                                timeJobsCommand.Parameters.AddWithValue("@siteguid", oSite.ID.ToString());
+                                                timeJobsCommand.Parameters.AddWithValue("@webguid", oWeb.ID);
+                                                timeJobsCommand.Parameters.AddWithValue("@listguid", oList.ID);
+                                                timeJobsCommand.Parameters.AddWithValue("@itemid", sID);
+                                                timeJobsCommand.Parameters.AddWithValue("@jobdata", doc.FirstChild.OuterXml);
+                                                timeJobsCommand.Parameters.AddWithValue("@timerjobuid", jobGuid);
+                                                timeJobsCommand.Parameters.AddWithValue("@jobname",
+                                                    string.Format("Project Publish_{0}", projectName));
+                                                timeJobsCommand.Parameters.AddWithValue("@key", sPlannerID);
+                                                timeJobsCommand.ExecuteNonQuery();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (var timeJobsCommand = new SqlCommand(
+                                                "update timerjobs set jobdata=@jobdata where timerjobuid=@timerjobuid",
+                                                connection))
+                                            {
+                                                timeJobsCommand.Parameters.AddWithValue("@jobdata", doc.FirstChild.OuterXml);
+                                                timeJobsCommand.Parameters.AddWithValue("@timerjobuid", jobGuid);
+                                                timeJobsCommand.ExecuteNonQuery();
+                                            }
+                                        }
                                     }
 
-                                }
-                                else
-                                {
-                                    throw new APIException(4019, "Item Already Queued");
-                                }
+                                    if (status == 2)
+                                    {
+                                        if (jobGuid != Guid.Empty)
+                                        {
+                                            CoreFunctions.enqueue(jobGuid, 0);
+                                            message = "Success";
 
-                                cn.Close();
+                                            if (!string.IsNullOrEmpty(sPlannerID)
+                                                && sPlannerID.Equals("msproject", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                var currentUser = oWeb.CurrentUser;
+                                                var res = new Hashtable { {"ProjectName", projectName} };
+                                                var queueJobsUrl = string.Format(
+                                                    "{0}/_layouts/epmlive/queuejobs.aspx?jobid={1}&isdlg=1",
+                                                    oWeb.Url,
+                                                    jobGuid);
+                                                var pageUrl = string.Format(
+                                                        "javascript:var options = {{ url:\'{0}\', width: 1000, height:600, " +
+                                                        "title: \'Work Queue\'}}; SP.SOD.execute(\'sp.ui.dialog.js\', " +
+                                                        "\'SP.UI.ModalDialog.showModalDialog\', options);  return false;",
+                                                        queueJobsUrl);
+                                                res.Add("PageUrl", pageUrl);
+                                                APIEmail.QueueItemMessage(
+                                                    14,
+                                                    true,
+                                                    res,
+                                                    new[] { currentUser.ID.ToString() },
+                                                    null,
+                                                    true,
+                                                    true,
+                                                    oWeb,
+                                                    currentUser,
+                                                    true);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new APIException(4019, "Item Already Queued");
+                                    }
+                                }
                             }
                         }
                     }
                 }
-
             }
             catch(Exception ex)
             {
@@ -490,57 +529,76 @@ namespace EPMLiveCore.API
 
                             if(oList != null)
                             {
-                                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id));
-                                SPSecurity.RunWithElevatedPrivileges(delegate()
+                                using (var connection = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
                                 {
-                                    cn.Open();
-                                });
-                                SqlCommand cmd = new SqlCommand("select percentComplete,status,dtfinished,result,resulttext from vwQueueTimerLog where siteguid=@siteguid and webguid=@webguid and listguid=@listguid and itemid=@itemid and jobtype=9 and [key] = @key", cn);
-                                cmd.Parameters.AddWithValue("@siteguid", site.ID);
-                                cmd.Parameters.AddWithValue("@webguid", oWeb.ID);
-                                cmd.Parameters.AddWithValue("@listguid", oList.ID);
-                                cmd.Parameters.AddWithValue("@itemid", sID);
-                                cmd.Parameters.AddWithValue("@key", sPlannerID);
-                                
-                                SqlDataReader dr = cmd.ExecuteReader();
-
-                                Guid tJob = Guid.Empty;
-
-                                if(dr.Read())
-                                {
-                                    string status = "";
-                                    string result = (dr.IsDBNull(3)) ? "" : dr.GetString(3);
-                                    string resulttext = (dr.IsDBNull(4)) ? "" : dr.GetString(4);
-                                    string dtfinish = (dr.IsDBNull(2)) ? "" : dr.GetDateTime(2).ToString();
-
-                                    switch(dr.GetInt32(1))
+                                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                                     {
-                                        case 0:
-                                            status = "Queued";
-                                            break;
-                                        case 1:
-                                            status = "Processing";
-                                            break;
-                                        case 2:
-                                            status = "Complete";
-                                            break;
-                                    };
-                                    if(showresults.ToLower() == "true")
-                                        message = "<PublishStatus Status=\"" + status + "\" PercentComplete=\"" + dr.GetInt32(0) + "\" TimeFinished=\"" + dtfinish + "\" Result=\"" + result + "\"><![CDATA[" + resulttext + "]]></PublishStatus>";
-                                    else
-                                        message = "<PublishStatus Status=\"" + status + "\" PercentComplete=\"" + dr.GetInt32(0) + "\" TimeFinished=\"" + dtfinish + "\" Result=\"" + result + "\"/>";
-                                }
-                                else
-                                {
-                                    message = "<PublishStatus/>";
-                                }
+                                        connection.Open();
+                                    });
+                                    using (var command = new SqlCommand(
+                                        "select percentComplete,status,dtfinished,result,resulttext from vwQueueTimerLog " +
+                                        "where siteguid=@siteguid and webguid=@webguid " +
+                                        "and listguid=@listguid and itemid=@itemid and jobtype=9 and [key] = @key",
+                                        connection))
+                                    {
+                                        command.Parameters.AddWithValue("@siteguid", site.ID);
+                                        command.Parameters.AddWithValue("@webguid", oWeb.ID);
+                                        command.Parameters.AddWithValue("@listguid", oList.ID);
+                                        command.Parameters.AddWithValue("@itemid", sID);
+                                        command.Parameters.AddWithValue("@key", sPlannerID);
 
-                                cn.Close();
+                                        using (var dataReader = command.ExecuteReader())
+                                        {
+                                            if (dataReader.Read())
+                                            {
+                                                var status = string.Empty;
+                                                var result = (dataReader.IsDBNull(3)) ? string.Empty : dataReader.GetString(3);
+                                                var resulttext = (dataReader.IsDBNull(4)) ? string.Empty : dataReader.GetString(4);
+                                                var dtfinish = (dataReader.IsDBNull(2)) ? string.Empty : dataReader.GetDateTime(2).ToString();
+
+                                                switch (dataReader.GetInt32(1))
+                                                {
+                                                    case 0:
+                                                        status = "Queued";
+                                                        break;
+                                                    case 1:
+                                                        status = "Processing";
+                                                        break;
+                                                    case 2:
+                                                        status = "Complete";
+                                                        break;
+                                                    default:
+                                                        status = string.Empty;
+                                                        break;
+                                                }
+
+                                                var parseResult = false;
+                                                if (bool.TryParse(showresults, out parseResult)
+                                                    && parseResult)
+                                                {
+                                                    message = "<PublishStatus Status=\"" + status + "\" PercentComplete=\"" +
+                                                              dataReader.GetInt32(0) +
+                                                              "\" TimeFinished=\"" + dtfinish + "\" Result=\"" + result + "\"><![CDATA[" +
+                                                              resulttext + "]]></PublishStatus>";
+                                                }
+                                                else
+                                                {
+                                                    message = "<PublishStatus Status=\"" + status + "\" PercentComplete=\"" +
+                                                              dataReader.GetInt32(0) +
+                                                              "\" TimeFinished=\"" + dtfinish + "\" Result=\"" + result + "\"/>";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                message = "<PublishStatus/>";
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
-
             }
             catch(Exception ex)
             {
@@ -593,8 +651,7 @@ namespace EPMLiveCore.API
                                             taskCenterProjectField = "Project";
 
                                         SPList oTaskCenter = web.Lists[taskCenterListName];
-                                        SPListItem oProject = oProjectCenter.GetItemById(int.Parse(sID));
-
+                                        
 
                                         SPSiteDataQuery query = new SPSiteDataQuery();
                                         query.Lists = "<Lists><List ID=\"" + oTaskCenter.ID.ToString() + "\"/></Lists>";

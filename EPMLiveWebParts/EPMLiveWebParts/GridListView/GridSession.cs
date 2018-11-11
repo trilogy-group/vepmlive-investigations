@@ -9,6 +9,7 @@ namespace EPMLiveWebParts
 {
     public class GridViewSession
     {
+		[Serializable]
         private class GridSession
         {
             public Guid ViewId;

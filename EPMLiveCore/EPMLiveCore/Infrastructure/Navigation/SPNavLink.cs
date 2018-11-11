@@ -12,6 +12,8 @@
 
         public string WebId { get; set; }
 
+        public bool Archived { get; set; }
+
         #endregion Properties 
     }
 }

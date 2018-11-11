@@ -48,6 +48,87 @@
     
     <script src="DHTML/xdataproc/dhtmlxdataprocessor.js"></script>
 
+    <script src="/_layouts/epmlive/javascripts/DateHelper.js?ver=<%=FileVersion%>" type="text/javascript"></script>
+    <script src="/_layouts/epmlive/javascripts/PeriodAutomation.js?ver=<%=FileVersion%>" type="text/javascript"></script>
+    <script src="/_layouts/epmlive/javascripts/libraries/jquery-ui.min.js" type="text/javascript"></script>
+    <style type="text/css">
+        #periodAutomationTable {
+            width: 100%;
+            border-spacing: 0;
+            border-collapse: collapse;
+            padding: 0;
+        }
+         
+        #periodAutomationTable tr {
+            height: 23px;
+        }
+
+        #periodAutomationTable td {
+            padding-bottom: 5px;
+        }
+
+        .normaldescription {
+            width: 210px !important;
+        }
+
+        .tinyinput {
+            width: 70px;
+        }
+
+        .normalinput {
+            width: 300px;
+        }
+
+        .l2 {
+            padding-left: 20px;
+        }
+
+        .l3 {
+            padding-left: 40px;
+        }
+
+        #periodAutomationTable input[type="radio"],
+        #periodAutomationTable label {
+            cursor: pointer;
+        }
+
+        .hiddenelement {
+            display: none;
+        }
+
+        .message {
+            padding: 8px 35px 8px 14px;
+            margin-bottom: 10px;
+            background-color: #fcf8e3;
+            border: 1px solid #fbeed5;
+        }
+
+        .message-info {
+            color: #3a87ad;
+            background-color: #d9edf7;
+            border-color: #bce8f1;
+        }
+
+        .message-success {
+            color: #468847;
+            background-color: #dff0d8;
+            border-color: #d6e9c6;
+        }
+
+        #createPeriodsButton {
+            width: 100px !important;
+            margin-left: 30px;
+            cursor: pointer;
+        }
+
+        #cutPeriodsNamesText {
+            width: 100%;
+            height: 300px;
+            overflow-y: auto;
+            background-color: whitesmoke;
+            border: 1px gray solid;
+        }
+    </style>
 <div id="dlgAddPeriod" class="dialog">
             <table width="100%">
                 <tr>
@@ -518,6 +599,9 @@
 	            <table class="ms-toolbar" width="100%" cellpadding="3" style="height:10px">
                     <tr><td class="ms-linksectionheader"><h3 class="ms-standardheader">Periods</h3></td></tr>
                 </table>
+	            <div id="successMessage" class="message message-success <%=Request["periodsCreated"]==null?"hiddenelement":string.Empty%> ">
+	                Period creation is successful.
+	            </div>
 	        </td></tr>
 	        <tr>
 	            <td colspan="2">
@@ -542,7 +626,129 @@
 		            <br />
 	            </td>
 	        </tr>
-	        
+            <tr>
+			    <td class="ms-descriptiontext" valign="top">
+				    <table border="0" cellpadding="1" cellspacing="0" width="100%">
+					    <tr>
+						    <td class="ms-sectionheader" style="padding-top: 4px;" height="22" valign="top">
+						      <h3 class="ms-standardheader ms-inputformheader">Period Automation</h3>
+						    </td>
+					    </tr>
+					    <tr>
+						    <td class="ms-descriptiontext ms-inputformdescription">
+						        Enable automation to create new periods without the need to manually create them.<br/>
+						    </td>
+					    </tr>
+					    <tr>
+						    <td><img src="/_layouts/images/blank.gif" width="150" height="19" alt=""></td>
+					    </tr>
+
+				    </table>
+			    </td>
+			<td class="ms-authoringcontrols ms-inputformcontrols" valign="top" align="left">
+				<table id="periodAutomationTable">
+					<tr>
+                        <td class="topcell normaldescription"></td>
+                        <td class="topcell"></td>
+                    </tr>
+                    <tr title="Enable automation to create new periods without the need to manually create them." >
+                        <td class="descriptioncell normaldescription">
+                            <label for="automateNewPeriodCreationRadioYes">Automate new period creation</label>
+                        </td>
+                        <td class="controlcell">
+                            <input id="automateNewPeriodCreationRadioYes" type="radio" name="automateNewPeriodCreationRadioGroup" onclick="javascript: periodAutomationControlEvent('AutomateNewPeriodCreationRadioOnClick');" /> <label for="automateNewPeriodCreationRadioYes">Yes</label>
+                            <input id="automateNewPeriodCreationRadioNo" type="radio" name="automateNewPeriodCreationRadioGroup" onclick="javascript: periodAutomationControlEvent('AutomateNewPeriodCreationRadioOnClick');" /> <label for="automateNewPeriodCreationRadioNo">No</label>
+                        </td>
+                    </tr>
+                    <tr id="cutPeriodsSummaryRow" class="hiddenelement">
+                        <td colspan="2">&nbsp;</td>
+                    </tr>
+                    <tr id="cutPeriodsWeeklyRow">
+                        <td class="descriptioncell normaldescription l2">
+                            <span>Cut Periods Weekly:</span>
+                        </td>
+                        <td class="controlcell">
+                            <input id="cutPeriodsWeeklyRadioYes" type="radio" name="cutPeriodsWeeklyRadioGroup" onclick="javascript: periodAutomationControlEvent('CutPeriodsWeeklyRadioOnClick');" /> <label for="cutPeriodsWeeklyRadioYes">Yes</label>
+                            <input id="cutPeriodsWeeklyRadioNo" type="radio" name="cutPeriodsWeeklyRadioGroup" onclick="javascript: periodAutomationControlEvent('CutPeriodsWeeklyRadioOnClick');" /> <label for="cutPeriodsWeeklyRadioNo">No</label>
+                        </td>
+                    </tr>
+                    <tr id="cutPeriodsWeeklyPeriodicityRow">
+                        <td class="descriptioncell normaldescription l3">
+                            <span>Cut every how many weeks</span>
+                        </td>
+                        <td class="controlcell tinyinput">
+                            <input type="number" min="1" id="cutPeriodsWeeklyPeriodicityInput"/>
+                        </td>
+                    </tr>
+                    <tr id="cutPeriodsWeeklyDayRow">
+                        <td class="descriptioncell normaldescription l3">
+                            <span>Cut on what day of the week</span>
+                        </td>
+                        <td class="controlcell normalinput">
+                            <select id="cutPeriodsWeeklyDayInput" >
+                                <option value="1">Monday</option>
+                                <option value="2">Tuesday</option>
+                                <option value="3">Wednesday</option>
+                                <option value="4">Thursday</option>
+                                <option value="5">Friday</option>
+                                <option value="6">Saturday</option>
+                                <option value="0" selected>Sunday</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr id="cutPeriodsMonthlyRow">
+                        <td class="descriptioncell normaldescription l2">
+                            <span>Cut Periods Monthly:</span>
+                        </td>
+                        <td class="controlcell">
+                            <input id="cutPeriodsMonthlyRadioYes" type="radio" name="cutPeriodsMonthlyRadioGroup" onclick="javascript: periodAutomationControlEvent('CutPeriodsMonthlyRadioOnClick');" /> <label for="cutPeriodsMonthlyRadioYes">Yes</label>
+                            <input id="cutPeriodsMonthlyRadioNo" type="radio" name="cutPeriodsMonthlyRadioGroup" onclick="javascript: periodAutomationControlEvent('CutPeriodsMonthlyRadioOnClick');" /> <label for="cutPeriodsMonthlyRadioNo">No</label>
+                        </td>
+                    </tr>
+                    <tr id="cutPeriodsMonthlyPeriodicityRow">
+                        <td class="descriptioncell normaldescription l3">
+                            <span>Cut every how many months</span>
+                        </td>
+                        <td class="controlcell tinyinput">
+                            <input type="number" min="1" id="cutPeriodsMonthlyPeriodicityInput"/>
+                        </td>
+                    </tr>
+                    <tr id="cutPeriodsMonthlyDayRow">
+                        <td class="descriptioncell normaldescription l3">
+                            <span>Cut on what day of the month</span>
+                        </td>
+                        <td class="controlcell tinyinput">
+                            <input type="number" min="1" max="31" id="cutPeriodsMonthlyDayInput"/>
+                            <input id="cutPeriodsMonthlyEndOfDayCheckBox" type="checkbox" onclick="javascript: periodAutomationControlEvent('CutPeriodsMonthlyEndOfDayCheckBoxOnClick');" /> <label for="cutPeriodsMonthlyRadioNo">Last Day</label>
+                        </td>
+                    </tr>
+                    <tr id="cutPeriodsStartDateRow">
+                        <td class="descriptioncell normaldescription l2">
+                            <span>Start On</span>
+                        </td>
+                        <td class="controlcell normalinput">
+                            <input type="text" id="cutPeriodsStartDateInput">
+                        </td>
+                    </tr>
+                    <tr id="cutPeriodsEndDateRow">
+                        <td class="descriptioncell normaldescription l2">
+                            <span>End By</span>
+                        </td>
+                        <td class="controlcell normalinput">
+                            <input type="text" id="cutPeriodsEndDateInput">
+                        </td>
+                    </tr>
+                    <tr id="createPeriodsActionRow">
+                        <td class="descriptioncell">
+                            &nbsp;
+                        </td>
+                        <td>
+                            <input id="createPeriodsButton" type="button" class="epmliveButton" value="Create Periods" onclick="periodAutomationControlEvent('CreatePeriodsButtonOnClick');"/>
+                        </td>
+                    </tr>
+				</table>
+			</td>
+		</tr>
 	    </table>
 	    
 	    <div id="dlgAction" class="dialog">
@@ -555,9 +761,7 @@
                 </tr>
                 
             </table>
-        </div> 
-        
-        
+        </div>
         
         <div id="dlgEditType" class="dialog">
             <table width="100%">
@@ -574,6 +778,30 @@
                     <td colspan="2">
                         <input type="button" class="ms-input" value="Save Work Type" onclick="doEditType();" /> 
                         <input type="button" class="ms-input" value="Cancel" onclick="hm('dlgEditType');" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <div id="dlgConfirmAddPeriods" class="dialog">
+            <table width="100%">
+                <tr>
+                    <td>
+                        <div class="message message-info">
+                            <span id="cutPeriodsSummaryText"></span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div id="cutPeriodsNamesText">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="button" class="ms-input" value="Add Periods" onclick="periodAutomationControlEvent('ConfirmAddPeriods');" /> 
+                        <input type="button" class="ms-input" value="Cancel" onclick="resetModal('dlgConfirmAddPeriods');" />
                     </td>
                 </tr>
             </table>
@@ -598,7 +826,14 @@
 	        mygrid.enableEditTabOnly(true);
 
 	        mygrid.init();
-	        mygrid.loadXML("gettsperiods.aspx");
+	        mygrid.loadXML("gettsperiods.aspx", function() {
+	            if (mygrid.getRowsNum() === 0) {
+	                return;
+	            }
+
+	            var lastDate = mygrid.cells(mygrid.getRowsNum(), 1).getValue();
+	            PeriodAutomation.setMinDate(DateHelper.addDays(DateHelper.convertToUtcDate(lastDate), 1));
+	        });
 
 	        function switchList() {
 	            var lst = document.getElementById("<%=ddlFieldLists.ClientID%>").value;
@@ -875,11 +1110,15 @@
 	        function closeAdd(loader) {
 	            if (loader.xmlDoc.responseText != null) {
 	                if (loader.xmlDoc.responseText.substring(0, 5) != "Error") {
-	                    var strPeriod = loader.xmlDoc.responseText;
+	                    var message = loader.xmlDoc.responseText.split(",");
+	                    var extraParam = "";
+	                    if (message.length > 1) {
+	                        if (message[0] === "Success" && message[1] === "addPeriods") {
+	                            extraParam = "&periodsCreated=true"
+	                        }
+	                    }
 	                    newURL = "<%=siteUrl%>/_layouts/epmlive/timesheetadmin.aspx";
-
-	                    window.location.href = newURL + "?rnd=" + guid() + "#addperiod";
-
+	                    window.location.href = newURL + "?rnd=" + guid() + extraParam + "#addperiod";
 	                }
 	                else {
 	                    alert(loader.xmlDoc.responseText);
@@ -909,6 +1148,13 @@
 	        function S4() {
 	            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
 	        }
+            function resetModal(id) {
+                hm(id);
+                var modalWindow = document.getElementById('mbd');
+                if (modalWindow) {
+                    modalWindow.innerHTML = "";
+                }
+            }
 	        function doAddPeriod() {
 	            var dateStart = new Date(document.getElementById('<%=dtSpStart.ClientID%>_dtSpStartDate').value);
 	            var dtStart = document.getElementById('<%=dtSpStart.ClientID%>_dtSpStartDate').value;
@@ -925,6 +1171,14 @@
 	                dhtmlxAjax.post(url + "/_layouts/epmlive/dotsaction.aspx", "action=addPeriod&start=" + dtStart + "&end=" + dtEnd, closeAdd);
 	            }
 	        }
+            function doAddPeriodList(data) {
+                var jsonData = JSON.stringify(data.periods);
+                hm('dlgConfirmAddPeriods');
+                sm('dlgAction', 200, 100);
+                var url = '<%=siteUrl%>';
+                document.getElementById("dlgHAction").innerText = "Adding Periods...";
+                dhtmlxAjax.post(url + "/_layouts/epmlive/dotsaction.aspx", "action=addPeriods&jsonData=" + jsonData, closeAdd);
+            }
 	        function doAddType() {
 
 	            var typename = document.getElementById('txtAddType').value;
@@ -951,11 +1205,8 @@
 	        function closeAddType(loader) {
 	            if (loader.xmlDoc.responseText != null) {
 	                if (loader.xmlDoc.responseText.substring(0, 5) != "Error") {
-	                    var strPeriod = loader.xmlDoc.responseText;
 	                    newURL = "<%=siteUrl%>/_layouts/epmlive/timesheetadmin.aspx";
-
 	                    window.location.href = newURL + "?rnd=" + guid() + "#addtype";
-
 	                }
 	                else {
 	                    alert(loader.xmlDoc.responseText);
@@ -968,7 +1219,40 @@
 	            }
 	        }
 
+	        function periodAutomationControlEvent(eventName) {
+	            switch (eventName) {
+	                case "AutomateNewPeriodCreationRadioOnClick":
+	                    PeriodAutomation.automateNewPeriodCreationRadioOnClick();
+	                    break;
+	                case "CutPeriodsWeeklyRadioOnClick":
+	                    PeriodAutomation.cutPeriodsWeeklyRadioOnClick();
+	                    break;
+	                case "CutPeriodsMonthlyRadioOnClick":
+	                    PeriodAutomation.cutPeriodsMonthlyRadioOnClick();
+	                    break;
+	                case "CutPeriodsMonthlyEndOfDayCheckBoxOnClick":
+	                    PeriodAutomation.cutPeriodsMonthlyEndOfDayCheckBoxOnClick();
+	                    break;
+	                case "CreatePeriodsButtonOnClick":
+	                    if (PeriodAutomation.validateForm()) {
+	                        PeriodAutomation.pendingPeriods = PeriodAutomation.getPeriods();
+	                        document.getElementById("cutPeriodsSummaryText").innerHTML = PeriodAutomation.pendingPeriods.summary;
+	                        document.getElementById("cutPeriodsNamesText").innerHTML = PeriodAutomation.pendingPeriods.names.join("<br/>");
+	                        sm("dlgConfirmAddPeriods", 400, 400);
+	                    }
+	                    break;
+	                case "ConfirmAddPeriods":
+	                    if (PeriodAutomation.pendingPeriods) {
+	                        doAddPeriodList(PeriodAutomation.pendingPeriods);
+	                        PeriodAutomation.pendingPeriods = null;
+	                    }
+	                    break;
+	            }
+	        }
+
 	        initmb();
+	        PeriodAutomation.initializeForm(null);
+	        PeriodAutomation.updateFormValues(false, false, false, false, true);
             </script>
 	    </asp:Panel>
 	</asp:Panel>

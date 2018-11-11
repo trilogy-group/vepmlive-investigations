@@ -87,8 +87,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.SharePoint" />
-    <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
+    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.ServerRuntime, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\CommonAssemblyInfo.cs">
@@ -97,6 +99,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="API\DataManager.cs" />
     <Compile Include="API\Errors.cs" />
     <Compile Include="API\ReportManager.cs" />
+    <Compile Include="DataScrubber.BulkInsert.cs" />
     <Compile Include="DataScrubber.cs" />
     <Compile Include="EPMLiveReportLibraryEventReceiver\EPMLiveReportLibraryEventReceiver.cs" />
     <Compile Include="epmlive\ReportDatabases.aspx.cs">
@@ -145,6 +148,9 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\EPMLive\AllSnapshots.aspx.designer.cs">
       <DependentUpon>AllSnapshots.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\EventAudit.AddEventHandler.cs">
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\EPMLive\cleanupwarning.aspx.cs">
       <DependentUpon>cleanupwarning.aspx</DependentUpon>
@@ -238,6 +244,9 @@ net start "WETimer"</PostDeploymentCommand>
       <FeatureId>{e399d077-9e80-4787-9d1a-3e07d65a59a1}</FeatureId>
     </None>
     <None Include="key.snk" />
+    <Compile Include="Layouts\EPMLive\EventAudit.AuditWebs.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <None Include="Layouts\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{805e2070-4cdf-4f20-9a9a-296da0e466a4}</SharePointProjectItemId>
     </None>

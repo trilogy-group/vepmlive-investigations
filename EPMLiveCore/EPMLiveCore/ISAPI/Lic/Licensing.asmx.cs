@@ -10,6 +10,7 @@ using EPMLiveCore.API.ResourceManagement;
 using EPMLiveCore.API.SPAdmin;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
+using static EPMLiveCore.Helpers.WebServicesHelper;
 
 namespace EPMLiveCore
 {
@@ -200,35 +201,7 @@ namespace EPMLiveCore
 
         private ArrayList GetFarmFeatureUsers(int featureId)
         {
-            UserManager _chrono = null;
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                try
-                {
-                    SPFarm farm = SPFarm.Local;
-
-                    _chrono = farm.GetChild<UserManager>("UserManager" + featureId);
-                    if(_chrono == null)
-                    {
-                        SPWeb web = SPContext.Current.Web;
-                        web.AllowUnsafeUpdates = true;
-                        SPSite site = web.Site;
-                        site.AllowUnsafeUpdates = true;
-                        SPWebApplication app = site.WebApplication;
-                        farm = app.Farm;
-                        _chrono = new UserManager("UserManager" + featureId, farm, Guid.NewGuid());
-                        _chrono.Update();
-                        farm.Update();
-                    }
-                }
-                catch { }
-            });
-
-            if(_chrono != null)
-                return _chrono.UserList;
-
-            return new ArrayList();
+            return FarmFeatureUsers(featureId);
         }
 
     }

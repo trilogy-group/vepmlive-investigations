@@ -166,6 +166,24 @@ namespace EPMLiveCore.Layouts.EPMLiveCore {
         protected global::Microsoft.SharePoint.WebControls.EncodedLiteral EncodedLiteral7;
         
         /// <summary>
+        /// chkHostHeader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.InputFormCheckBox chkHostHeader;
+        
+        /// <summary>
+        /// pnlNonHostHeader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlNonHostHeader;
+        
+        /// <summary>
         /// HidVirtualServerUrl control.
         /// </summary>
         /// <remarks>
@@ -209,6 +227,24 @@ namespace EPMLiveCore.Layouts.EPMLiveCore {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Microsoft.SharePoint.WebControls.UrlNameValidator CusValSiteName;
+        
+        /// <summary>
+        /// pnlHostHeader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlHostHeader;
+        
+        /// <summary>
+        /// ddlSiteCollections control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlSiteCollections;
         
         /// <summary>
         /// ddlSolution control.

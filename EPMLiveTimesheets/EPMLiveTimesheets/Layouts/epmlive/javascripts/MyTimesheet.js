@@ -376,7 +376,7 @@ function TSOnMouseOverRow(grid, row, col, event) {
         CurrentGrid = grid;
         if (grid.GetValue(row, "ItemID") != "" && grid.Rows[row.id].IsDeleted != "True") {
             grid.SetAttribute(row, "Title", "ButtonText", '<div class="gridmenuspan" style="position:absolute;overflow:visible" id=\"' + row.id + '\"><a data-itemid="' + grid.GetValue(row, "ItemID") + '" data-listid="' + grid.GetValue(row, "ListID") + '" data-webid="' + grid.GetValue(row, "WebID") + '" data-siteid="' + grid.GetValue(row, "SiteID") + '" ></a></div>', 1);
-            window.epmLiveNavigation.addContextualMenu($('#' + row.id), [], false, true, { "delete": "GridGanttDeleteRow" });
+            window.epmLiveNavigation.addContextualMenu($('#' + row.id), [], false, false, { "delete": "GridGanttDeleteRow" });
         }
     }
 }

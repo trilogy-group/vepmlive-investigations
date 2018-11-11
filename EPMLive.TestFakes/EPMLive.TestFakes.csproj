@@ -34,9 +34,31 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>EPMLive.TestFakes.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dashboard.Fakes">
+      <HintPath>FakesAssemblies\Dashboard.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="DocumentFormat.OpenXml.2.5.5631.0.Fakes">
+      <HintPath>FakesAssemblies\DocumentFormat.OpenXml.2.5.5631.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="EPMLiveEnterprise.Fakes">
+      <HintPath>FakesAssemblies\EPMLiveEnterprise.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="EPMLiveIntegrationService.Fakes">
+      <HintPath>FakesAssemblies\EPMLiveIntegrationService.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="EPMLiveReportsAdmin.Fakes">
+      <HintPath>FakesAssemblies\EPMLiveReportsAdmin.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="EPMLiveTimerService.Fakes">
       <HintPath>FakesAssemblies\EPMLiveTimerService.Fakes.dll</HintPath>
@@ -44,12 +66,34 @@
     <Reference Include="EPMLiveWebParts.Fakes">
       <HintPath>FakesAssemblies\EPMLiveWebParts.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="EPMLiveWorkPlanner.Fakes">
+      <HintPath>FakesAssemblies\EPMLiveWorkPlanner.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.Services.Client, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Data.Services.Client.5.6.0\lib\net40\Microsoft.Data.Services.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Project.Server.Library, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+    </Reference>
+    <Reference Include="Microsoft.Office.Project.Server.Library.16.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\Microsoft.Office.Project.Server.Library.16.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.SharePoint.16.0.0.0.Fakes">
       <HintPath>FakesAssemblies\Microsoft.SharePoint.16.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Security, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint.Security\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Web.CommandUI.16.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\Microsoft.Web.CommandUI.16.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
@@ -61,10 +105,23 @@
     <Reference Include="System.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Configuration.4.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\System.Configuration.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.Data.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.DataSetExtensions.4.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\System.Data.DataSetExtensions.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.4.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\System.DirectoryServices.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
@@ -73,9 +130,20 @@
     <Reference Include="System.Web.Extensions.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.Web.Extensions.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Web.Services.4.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\System.Web.Services.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System.XML" />
     <Reference Include="System.XML.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml.Linq.4.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\System.Xml.Linq.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="TimeSheets.Fakes">
+      <HintPath>FakesAssemblies\TimeSheets.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="WorkEnginePPM.Fakes">
       <HintPath>FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
@@ -95,24 +163,52 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\EPM Live Core.fakes">
-      <SubType>Designer</SubType>
-    </Fakes>
+    <Compile Include="Testables\TestableCryptoTransform.cs" />
+    <Compile Include="TestClassInitializer.cs" />
+    <Compile Include="Utility\AdoShims.cs" />
+    <Compile Include="Utility\HtmlTextWriterShims.cs" />
+    <Compile Include="Utility\DirectoryShims.cs" />
+    <Compile Include="Utility\CryptographyShims.cs" />
+    <Compile Include="Utility\IOShims.cs" />
+    <Compile Include="Utility\SharepointShims.cs" />
+    <Compile Include="Utility\HttpShims.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
       <Name>EPMLiveCore</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EPMLiveDashboards\EPMLiveDashboards\EPMLiveDashboards.csproj">
+      <Project>{bd45273d-42c6-4691-bed6-52279d8e489c}</Project>
+      <Name>EPMLiveDashboards</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EPMLiveIntegrationService\EPMLiveIntegrationService\EPMLiveIntegrationService.csproj">
+      <Project>{e7043f73-7633-4476-b33d-222ec3ac1c8b}</Project>
+      <Name>EPMLiveIntegrationService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EPMLivePS\EPMLivePS\EPMLivePS.csproj">
+      <Project>{1121d2ff-7eaa-4532-a1ce-473de551dd70}</Project>
+      <Name>EPMLivePS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EPMLiveReporting\EPMLiveReporting\EPMLiveReporting.csproj">
+      <Project>{b56160fe-490c-462a-bc9a-feffd2f1487c}</Project>
+      <Name>EPMLiveReporting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveTimerService\EPMLiveTimerService\EPMLiveTimerService.csproj">
       <Project>{6c2be0de-af49-4f4d-bab8-ae256f1cbdd7}</Project>
       <Name>EPMLiveTimerService</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EPMLiveTimesheets\EPMLiveTimesheets\EPMLiveTimesheets.csproj">
+      <Project>{fd812bf8-05a3-4d77-b9bc-6ad4991b8049}</Project>
+      <Name>EPMLiveTimesheets</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveWebParts\EPMLiveWebParts\EPMLiveWebParts.csproj">
       <Project>{a7f83fd4-be8b-49ab-be24-39209e8fabc2}</Project>
       <Name>EPMLiveWebParts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EPMLiveWorkPlanner\EPMLiveWorkPlanner\EPMLiveWorkPlanner.csproj">
+      <Project>{fcf0c151-0a3f-4b9f-9327-3bbbf109d776}</Project>
+      <Name>EPMLiveWorkPlanner</Name>
     </ProjectReference>
     <ProjectReference Include="..\PortfolioEngineCore\PortfolioEngineCore\PortfolioEngineCore.csproj">
       <Project>{bb86b09c-cb35-4888-8639-c047a40a9c0c}</Project>
@@ -140,12 +236,36 @@
   </ItemGroup>
   <ItemGroup>
     <Fakes Include="Fakes\System.Data.fakes" />
-    <Fakes Include="Fakes\Microsoft.SharePoint.fakes" />
-    <Fakes Include="Fakes\System.Web.fakes" />
+    <Fakes Include="Fakes\Microsoft.SharePoint.fakes">
+      <SubType>Designer</SubType>
+    </Fakes>
+    <Fakes Include="Fakes\System.Web.fakes">
+      <SubType>Designer</SubType>
+    </Fakes>
     <Fakes Include="Fakes\System.fakes" />
     <Fakes Include="Fakes\EPMLiveTimerService.fakes" />
     <Fakes Include="Fakes\PortfolioEngineCore.fakes" />
-    <None Include="packages.config" />
+    <Fakes Include="Fakes\EPM Live Core.fakes">
+      <SubType>Designer</SubType>
+    </Fakes>
+    <Fakes Include="Fakes\EPMLiveEnterprise.fakes" />
+    <None Include="EPMLive.TestFakes.snk" />
+    <Fakes Include="Fakes\EPMLiveIntegrationService.fakes" />
+    <Fakes Include="Fakes\TimeSheets.fakes" />
+    <Fakes Include="Fakes\System.DirectoryServices.fakes" />
+    <Fakes Include="Fakes\System.Xml.Linq.fakes" />
+    <Fakes Include="Fakes\System.Configuration.fakes" />
+    <Fakes Include="Fakes\System.Data.DataSetExtensions.fakes" />
+    <Fakes Include="Fakes\Microsoft.Web.CommandUI.fakes" />
+    <Fakes Include="Fakes\EPMLiveWorkPlanner.fakes" />
+    <Fakes Include="Fakes\EPMLiveReportsAdmin.fakes" />
+    <Fakes Include="Fakes\DocumentFormat.OpenXml.fakes" />
+    <Fakes Include="Fakes\System.Web.Services.fakes" />
+    <Fakes Include="Fakes\Microsoft.Office.Project.Server.Library.fakes" />
+    <Fakes Include="Fakes\Dashboard.fakes" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

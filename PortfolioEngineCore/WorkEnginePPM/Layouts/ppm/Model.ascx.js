@@ -3086,6 +3086,12 @@
 	            var lloc = (this.UserViews[indx].Id == 0 ? 0 : 1);
 
 	            var uv = this.UserViews[indx];
+
+	            if (uv.Deflt == 1) {
+	                alert("Default view can not be deleted");
+	                return;
+	            }
+
 	            this.CurrUserView = "";
 
 	            WorkEnginePPM.Model.DeleteUserViewData(this.TicketVal, SelViewName, lloc, LoadUserViewDataCompleteDelegate);
@@ -5581,7 +5587,7 @@
            var arows = grid.Rows;
 
 
-           for (i = 1; i <= grid.RowCount; i++) {
+           for (i = 0; i < grid.RowCount; i++) {
                var xr = arows[i];
 
                if (xr.Level >= dstl) {

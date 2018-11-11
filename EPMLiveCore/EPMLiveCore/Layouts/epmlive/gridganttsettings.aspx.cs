@@ -17,10 +17,15 @@ using Microsoft.SharePoint.WebPartPages;
 using EPMLiveCore.ReportHelper;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using EPMLiveCore.API;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Logging;
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 using Microsoft.SharePoint.Administration;
+using Microsoft.SharePoint.Utilities;
+using static System.Diagnostics.Trace;
+using static EPMLiveCore.Layouts.epmlive.LayoutsHelper;
+using ListItem = System.Web.UI.WebControls.ListItem;
 
 namespace EPMLiveCore.Layouts.epmlive
 {
@@ -49,6 +54,7 @@ namespace EPMLiveCore.Layouts.epmlive
         protected DataTable dtGroupsPermissions = new DataTable();
 
         const string REPORT_CHECK_URL = "/_layouts/epmlive/ReportCheckActions.aspx";
+        private const char Separator = '|';
         public override string PageToRedirectOnCancel
         {
             get
@@ -108,36 +114,13 @@ namespace EPMLiveCore.Layouts.epmlive
 
         protected void btnGrpPermAdd_OnClick(object sender, EventArgs e)
         {
-
-            if (ViewState["dtGroupsPermissions"] != null)
-            {
-                dtGroupsPermissions = (DataTable)ViewState["dtGroupsPermissions"];
-                DataRow dr = dtGroupsPermissions.NewRow();
-                dr["GroupsText"] = ddlGroups.Items[ddlGroups.SelectedIndex].Text;
-                dr["GroupsID"] = ddlGroups.Items[ddlGroups.SelectedIndex].Value;
-                dr["PermissionsText"] = ddlSPPermissions.Items[ddlSPPermissions.SelectedIndex].Text;
-                dr["PermissionsID"] = ddlSPPermissions.Items[ddlSPPermissions.SelectedIndex].Value;
-
-                bool blnRecordExists = false;
-                foreach (DataRow dr2 in dtGroupsPermissions.Rows)
-                {
-                    if ((dr2["GroupsID"] + ";" + dr2["PermissionsID"]) == ddlGroups.Items[ddlGroups.SelectedIndex].Value + ";" + ddlSPPermissions.Items[ddlSPPermissions.SelectedIndex].Value)
-                    {
-                        blnRecordExists = true;
-                        break;
-                    }
-                }
-
-                if (!blnRecordExists)
-                {
-                    dtGroupsPermissions.Rows.Add(dr);
-                    GvGroupsPermissions.DataSource = dtGroupsPermissions;
-                    GvGroupsPermissions.DataBind();
-                    ViewState["dtGroupsPermissions"] = dtGroupsPermissions;
-                }
-            }
-
-            Button1.Focus();
+            HandleGridPermanentAddClickEvent(
+                ViewState,
+                ref dtGroupsPermissions,
+                ddlGroups,
+                ddlSPPermissions,
+                GvGroupsPermissions,
+                Button1);
         }
         protected override void OnPreLoad(EventArgs e)
         {
@@ -156,276 +139,322 @@ namespace EPMLiveCore.Layouts.epmlive
                 strReportActionUrl = SPContext.Current.Web.Url + REPORT_CHECK_URL;
                 chkTimesheet.InputAttributes.Add("onclick", "CheckTimesheet();");
 
-                SPWeb web = SPContext.Current.Web;
+                var web = SPContext.Current.Web;
+                PopulatePermissionControls(web);
+                var arrLookups = new ArrayList();
+                var list = web.Lists[new Guid(Request["List"])];
+                strListName = list.Title;
+                PopulateListItemDropDowns();
+                PopulateLinkDropDowns(web, list);
+                PopulateInformationControls(list);
+                PopulateGridGanttSettings(list, web);
+                PopulateViewState();
+                var rootWeb = web.Site.RootWeb;
+                PopulateTimeSheetCheckBox(rootWeb, list);
+                LoadReportControls(rootWeb, list);
+            }
+        }
+
+        private void PopulatePermissionControls(SPWeb web)
+        {
+            var oRoleDefinitions = web.Site.RootWeb.RoleDefinitions;
+
+            foreach (SPRoleDefinition oRoleDefinition in oRoleDefinitions)
+            {
+                ddlSPPermissions.Items.Add(new ListItem(oRoleDefinition.Name, oRoleDefinition.Id.ToString()));
+            }
+
+            var collGroups = web.Site.RootWeb.SiteGroups;
+            foreach (SPGroup oGroup in collGroups)
+            {
+                ddlGroups.Items.Add(new ListItem(oGroup.Name, oGroup.ID.ToString()));
+            }
+
+            dtGroupsPermissions.Columns.Add("GroupsText");
+            dtGroupsPermissions.Columns.Add("GroupsID");
+            dtGroupsPermissions.Columns.Add("PermissionsText");
+            dtGroupsPermissions.Columns.Add("PermissionsID");
+        }
+
+        private void PopulateListItemDropDowns()
+        {
+            ddlStartDate.Items.Add(new ListItem("< Select Field >", string.Empty));
+            ddlDueDate.Items.Add(new ListItem("< Select Field >", string.Empty));
+            ddlProgressBar.Items.Add(new ListItem("< Select Field >", string.Empty));
+            ddlMilestone.Items.Add(new ListItem("< Select Field >", string.Empty));
+            ddlInformation.Items.Add(new ListItem("< Select Field >", string.Empty));
+            ddlWBS.Items.Add(new ListItem("< Select Field >", ""));
+        }
+
+        private void PopulateLinkDropDowns(SPWeb web, SPList list)
+        {
+            if (list.Title == CoreFunctions.getConfigSetting(web, "EPMLiveProjectCenter") || list.Title == "Project Center Rollup")
+            {
+                ddlItemLink.Items.Add(new ListItem("Edit Work Plan", "workplan"));
+                ddlItemLink.Items.Add(new ListItem("Task Center", "tasks"));
+            }
+
+            SPSecurity.RunWithElevatedPrivileges(
+                delegate
                 {
-
-                    SPRoleDefinitionCollection oRoleDefinitions = web.Site.RootWeb.RoleDefinitions;
-
-                    foreach (SPRoleDefinition oRoleDefinition in oRoleDefinitions)
+                    using (var site = new SPSite(web.Site.ID))
                     {
-                        ddlSPPermissions.Items.Add(new ListItem(oRoleDefinition.Name, oRoleDefinition.Id.ToString()));
-                    }
-
-                    SPGroupCollection collGroups = web.Site.RootWeb.SiteGroups;
-                    foreach (SPGroup oGroup in collGroups)
-                    {
-                        ddlGroups.Items.Add(new ListItem(oGroup.Name, oGroup.ID.ToString()));
-                    }
-
-                    dtGroupsPermissions.Columns.Add("GroupsText");
-                    dtGroupsPermissions.Columns.Add("GroupsID");
-                    dtGroupsPermissions.Columns.Add("PermissionsText");
-                    dtGroupsPermissions.Columns.Add("PermissionsID");
-
-                    ArrayList arrLookups = new ArrayList();
-                    SPList list = web.Lists[new Guid(Request["List"])];
-                    strListName = list.Title;
-
-                    ddlStartDate.Items.Add(new ListItem("< Select Field >", ""));
-                    ddlDueDate.Items.Add(new ListItem("< Select Field >", ""));
-                    ddlProgressBar.Items.Add(new ListItem("< Select Field >", ""));
-                    ddlMilestone.Items.Add(new ListItem("< Select Field >", ""));
-                    ddlInformation.Items.Add(new ListItem("< Select Field >", ""));
-                    ddlWBS.Items.Add(new ListItem("< Select Field >", ""));
-
-                    if (list.Title == CoreFunctions.getConfigSetting(web, "EPMLiveProjectCenter") || list.Title == "Project Center Rollup")
-                    {
-                        ddlItemLink.Items.Add(new ListItem("Edit Work Plan", "workplan"));
-                        ddlItemLink.Items.Add(new ListItem("Task Center", "tasks"));
-                    }
-
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                    {
-                        using (SPSite site = new SPSite(web.Site.ID))
+                        using (var spWeb = site.OpenWeb(web.ID))
                         {
-                            using (SPWeb w = site.OpenWeb(web.ID))
+                            var planners = CoreFunctions.getLockConfigSetting(spWeb, "EPMLivePlannerPlanners", false);
+
+                            var anyFound = planners.Split(',')
+                                .Where(planner => !string.IsNullOrWhiteSpace(planner))
+                                .Select(planner => planner.Split('|'))
+                                .Select(
+                                    sPlanner => CoreFunctions.getLockConfigSetting(
+                                        spWeb,
+                                        string.Format("EPMLivePlanner{0}ProjectCenter", sPlanner[0]),
+                                        false)).Any(projectCenter => projectCenter == list.Title);
+
+                            if (anyFound)
                             {
-                                string planners = CoreFunctions.getLockConfigSetting(w, "EPMLivePlannerPlanners", false);
-
-                                foreach (string planner in planners.Split(','))
-                                {
-                                    if (!String.IsNullOrEmpty(planner))
-                                    {
-                                        string[] sPlanner = planner.Split('|');
-                                        string pc = CoreFunctions.getLockConfigSetting(w, "EPMLivePlanner" + sPlanner[0] + "ProjectCenter", false);
-
-                                        if (pc == list.Title)
-                                        {
-                                            ddlItemLink.Items.Add(new ListItem("Planner", "planner"));
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    foreach (SPField field in list.Fields)
-                    {
-                        if (!field.Hidden && field.Type != SPFieldType.Computed)
-                        {
-                            switch (field.Type)
-                            {
-                                case SPFieldType.DateTime:
-                                    ddlStartDate.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    ddlDueDate.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    break;
-                                case SPFieldType.Number:
-                                    ddlProgressBar.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    break;
-                                case SPFieldType.Text:
-                                    ddlWBS.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    break;
-                                case SPFieldType.Boolean:
-                                    ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    ddlMilestone.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    break;
-                                default:
-                                    ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
-                                    break;
-                            };
-                        }
-                    }
-
-                    var gSettings = new GridGanttSettings(list);
-
-                    ddlStartDate.SelectedValue = gSettings.StartDate;
-                    ddlDueDate.SelectedValue = gSettings.DueDate;
-                    ddlProgressBar.SelectedValue = gSettings.Progress;
-                    ddlWBS.SelectedValue = gSettings.WBS;
-                    ddlMilestone.SelectedValue = gSettings.Milestone;
-                    chkExecutive.Checked = gSettings.Executive;
-                    ddlInformation.SelectedValue = gSettings.Information;
-                    ddlItemLink.SelectedValue = gSettings.ItemLink;
-                    txtRollupLists.Text = gSettings.RollupLists.Replace(",", "\r\n").Replace("|", ",");
-                    txtRollupSites.Text = gSettings.RollupSites.Replace(",", "\r\n");
-                    chkShowViewToolbar.Checked = gSettings.ShowViewToolbar;
-                    chkHideNewButton.Checked = gSettings.HideNewButton;
-                    chkPerformance.Checked = gSettings.Performance;
-                    chkAllowEdit.Checked = gSettings.AllowEdit;
-                    chkEditDefault.Checked = gSettings.EditDefault;
-                    chkShowInsert.Checked = gSettings.ShowInsert;
-                    chkDisableNewRollup.Checked = gSettings.DisableNewItemMod;
-                    chkUseNewMenu.Checked = gSettings.UseNewMenu;
-                    txtNewMenuName.Text = gSettings.NewMenuName;
-                    chkUsePopup.Checked = gSettings.UsePopup;
-                    chkEnableRequests.Checked = gSettings.EnableRequests;
-
-                    var defaultTemps = GetAvailableDefaultTemps();
-                    bool showAutoCreate = defaultTemps.Count > 1;
-
-                    chkAutoCreate.Checked = gSettings.EnableAutoCreation;
-                    ifcAutoCreate.Visible = showAutoCreate;
-
-                    ddlAutoCreateTemplate.DataSource = defaultTemps;
-                    ddlAutoCreateTemplate.DataTextField = "Key";
-                    ddlAutoCreateTemplate.DataValueField = "Value";
-                    ddlAutoCreateTemplate.DataBind();
-                    ddlAutoCreateTemplate.SelectedValue = gSettings.AutoCreationTemplateId;
-                    ifcAutoCreateTemplate.Visible = showAutoCreate;
-                    ddlAutoCreateTemplate.Enabled = (showAutoCreate && chkAutoCreate.Checked);
-
-                    //fill parentsitelookup ddl
-                    ddlParentSiteLookup.DataSource = GetAvailableParentSiteLookups(list, gSettings);
-                    ddlParentSiteLookup.DataTextField = "Key";
-                    ddlParentSiteLookup.DataValueField = "Value";
-                    ddlParentSiteLookup.DataBind();
-                    ddlParentSiteLookup.SelectedValue = gSettings.WorkspaceParentSiteLookup;
-
-                    //load list icon
-                    spnListIcon.CssClass = string.IsNullOrEmpty(gSettings.ListIcon) ? "icon-square" : gSettings.ListIcon;
-                    hdnListIcon.Value = string.IsNullOrEmpty(gSettings.ListIcon) ? "icon-square" : gSettings.ListIcon;
-
-                    chkWorkListFeat.Checked = gSettings.EnableWorkList;
-                    chkFancyForms.Checked = gSettings.EnableFancyForms;
-                    chkEmails.Checked = gSettings.SendEmails;
-                    chkDeleteRequest.Checked = gSettings.DeleteRequest;
-                    txtRequestList.Text = gSettings.RequestList;
-                    chkUseParent.Checked = gSettings.UseParent;
-                    chkSearch.Checked = gSettings.Search;
-                    chkLockSearch.Checked = gSettings.LockSearch;
-                    chkAssociatedItems.Checked = gSettings.AssociatedItems;
-                    chkEnableTeam.Checked = gSettings.BuildTeam;
-                    chkContentReporting.Checked = gSettings.EnableContentReporting;
-                    chkResTools.Checked = gSettings.EnableResourcePlan;
-                    chkDisplayRedirect.Checked = gSettings.DisplayFormRedirect;
-                    ddlRibbonBehavior.SelectedValue = gSettings.RibbonBehavior;
-                    chkDisableThumbnails.Checked = gSettings.DisableThumbnails;
-                    //if ((uint)list.BaseTemplate == 10115 || (uint)list.BaseTemplate == 10702 || (uint)list.BaseTemplate == 10701)
-                    {
-                        SectionEmail.Visible = true;
-                        //try
-                        //{
-                        //    chkEmails.Checked = bool.Parse(CoreFunctions.getListSetting(list, "AssignedToEmail"));
-                        //}
-                        //catch { }
-                        //chkEmails.Checked = list.EnableAssignToEmail;
-                    }
-
-                    chkEnableTeamSecurity.Checked = gSettings.BuildTeamSecurity;
-
-                    if (gSettings.BuildTeamPermissions.Length > 1)
-                    {
-
-                        string[] strOuter = gSettings.BuildTeamPermissions.Split(new string[] { "|~|" }, StringSplitOptions.None);
-                        foreach (string strInner in strOuter)
-                        {
-                            string[] strInnerMost = strInner.Split('~');
-                            DataRow dr = dtGroupsPermissions.NewRow();
-                            SPGroup g = null;
-                            SPRoleDefinition r = null;
-
-                            try
-                            {
-                                g = web.SiteGroups.GetByID(Convert.ToInt32(strInnerMost[0]));
-                                r = web.RoleDefinitions.GetById(Convert.ToInt32(strInnerMost[1]));
-                            }
-                            catch { }
-                            if (g != null && r != null)
-                            {
-                                dr["GroupsText"] = g.Name;
-                                dr["GroupsID"] = strInnerMost[0];
-                                dr["PermissionsText"] = r.Name;
-                                dr["PermissionsID"] = strInnerMost[1];
-                                dtGroupsPermissions.Rows.Add(dr);
+                                ddlItemLink.Items.Add(new ListItem("Planner", "planner"));
                             }
                         }
                     }
+                });
+        }
 
-                    GvGroupsPermissions.DataSource = dtGroupsPermissions;
-                    GvGroupsPermissions.DataBind();
-
-                    if (ViewState["dtGroupsPermissions"] == null)
-                        ViewState.Add("dtGroupsPermissions", dtGroupsPermissions);
-
-                    SPWeb rootWeb = web.Site.RootWeb;
-
-                    ArrayList lists = new ArrayList(CoreFunctions.getConfigSetting(rootWeb, "EPMLiveTSLists").Replace("\r\n", "\n").Split('\n')); ;
-
-                    if (lists.Contains(list.Title))
+        private void PopulateInformationControls(SPList list)
+        {
+            foreach (SPField field in list.Fields)
+            {
+                if (!field.Hidden && field.Type != SPFieldType.Computed)
+                {
+                    switch (field.Type)
                     {
-                        chkTimesheet.Checked = true;
-                    }
-
-                    bool isReportingV2Enabled = false;
-                    try
-                    {
-                        isReportingV2Enabled = Convert.ToBoolean(CoreFunctions.getConfigSetting(rootWeb, "ReportingV2"));
-                    }
-                    catch { }
-
-                    // display reporting section dynamically
-                    ReportBiz reportBiz = new ReportBiz(SPContext.Current.Site.ID, SPContext.Current.Web.ID, isReportingV2Enabled);
-                    if (reportBiz.SiteExists())
-                    {
-                        ifsEnableReporting.Visible = true;
-                        Collection<string> mappedLists = reportBiz.GetMappedLists();
-                        Collection<string> mappedListIds = reportBiz.GetMappedListsIds();
-                        bool isMapped = mappedLists.Contains(list.Title);
-                        bool isMaster = mappedListIds.Contains(list.ID.ToString().ToLower());
-
-                        if (!isReportingV2Enabled)
-                        {
-                            cbEnableReporting.Checked = isMapped;
-                            cbEnableReporting.Enabled = (isMaster || !isMapped);
-                        }
-                        else
-                        {
-                            if (isMapped)
-                            {
-                                if (isMaster)
-                                {
-                                    cbEnableReporting.Checked = true;
-                                    cbEnableReporting.Enabled = false;
-                                }
-                                else
-                                {
-                                    cbEnableReporting.Checked = false;
-                                    cbEnableReporting.Enabled = true;
-                                }
-                            }
-                            else
-                            {
-                                cbEnableReporting.Checked = false;
-                                cbEnableReporting.Enabled = true;
-                            }
-                        }
-
-                        List<SPEventReceiverDefinition> evts = GetListEvents(list,
-                                                                            "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
-                                                                            "EPMLiveReportsAdmin.ListEvents",
-                                                                            new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
-                                                                                                            SPEventReceiverType.ItemUpdated,
-                                                                                                            SPEventReceiverType.ItemDeleting });
-
-                        bool hasEvents = (evts.Count > 0);
-                        btnAddEvt.Visible = (isMapped && !hasEvents);
+                        case SPFieldType.DateTime:
+                            ddlStartDate.Items.Add(new ListItem(field.Title, field.InternalName));
+                            ddlDueDate.Items.Add(new ListItem(field.Title, field.InternalName));
+                            ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
+                            break;
+                        case SPFieldType.Number:
+                            ddlProgressBar.Items.Add(new ListItem(field.Title, field.InternalName));
+                            ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
+                            break;
+                        case SPFieldType.Text:
+                            ddlWBS.Items.Add(new ListItem(field.Title, field.InternalName));
+                            ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
+                            break;
+                        case SPFieldType.Boolean:
+                            ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
+                            ddlMilestone.Items.Add(new ListItem(field.Title, field.InternalName));
+                            break;
+                        default:
+                            ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
+                            break;
                     }
                 }
             }
+        }
+
+        private void PopulateGridGanttSettings(SPList list, SPWeb web)
+        {
+            var gSettings = new GridGanttSettings(list);
+
+            PopulateTextBox(gSettings);
+
+            var defaultTemps = GetAvailableDefaultTemps();
+            var showAutoCreate = defaultTemps.Count > 1;
+
+            chkAutoCreate.Checked = gSettings.EnableAutoCreation;
+            ifcAutoCreate.Visible = showAutoCreate;
+
+            PopulateDropDownLists(defaultTemps, gSettings, showAutoCreate, list);
+            PopulateListIcon(gSettings);
+            PopulateCheckBoxes(gSettings);
+            PopulatePermissionControls(gSettings, web);
+        }
+
+        private void PopulateTextBox(GridGanttSettings gSettings)
+        {
+            txtRollupLists.Text = gSettings.RollupLists.Replace(",", "\r\n").Replace("|", ",");
+            txtRollupSites.Text = gSettings.RollupSites.Replace(",", "\r\n");
+            txtNewMenuName.Text = gSettings.NewMenuName;
+            txtRequestList.Text = gSettings.RequestList;
+        }
+
+        private void PopulateDropDownLists(Dictionary<string, int> defaultTemps, GridGanttSettings gSettings, bool showAutoCreate, SPList list)
+        {
+            ddlStartDate.SelectedValue = gSettings.StartDate;
+            ddlDueDate.SelectedValue = gSettings.DueDate;
+            ddlProgressBar.SelectedValue = gSettings.Progress;
+            ddlWBS.SelectedValue = gSettings.WBS;
+            ddlMilestone.SelectedValue = gSettings.Milestone;
+            ddlInformation.SelectedValue = gSettings.Information;
+            ddlItemLink.SelectedValue = gSettings.ItemLink;
+            ddlRibbonBehavior.SelectedValue = gSettings.RibbonBehavior;
+            ddlAutoCreateTemplate.DataSource = defaultTemps;
+            ddlAutoCreateTemplate.DataTextField = "Key";
+            ddlAutoCreateTemplate.DataValueField = "Value";
+            ddlAutoCreateTemplate.DataBind();
+            ddlAutoCreateTemplate.SelectedValue = gSettings.AutoCreationTemplateId;
+            ifcAutoCreateTemplate.Visible = showAutoCreate;
+            ddlAutoCreateTemplate.Enabled = showAutoCreate && chkAutoCreate.Checked;
+
+            PopulateParentSiteLookupDropDown(list, gSettings);
+        }
+
+        private void PopulateParentSiteLookupDropDown(SPList list, GridGanttSettings gSettings)
+        {
+            ddlParentSiteLookup.DataSource = GetAvailableParentSiteLookups(list, gSettings);
+            ddlParentSiteLookup.DataTextField = "Key";
+            ddlParentSiteLookup.DataValueField = "Value";
+            ddlParentSiteLookup.DataBind();
+            ddlParentSiteLookup.SelectedValue = gSettings.WorkspaceParentSiteLookup;
+        }
+
+        private void PopulateListIcon(GridGanttSettings gSettings)
+        {
+            spnListIcon.CssClass = string.IsNullOrEmpty(gSettings.ListIcon)
+                ? "icon-square"
+                : gSettings.ListIcon;
+            hdnListIcon.Value = string.IsNullOrEmpty(gSettings.ListIcon)
+                ? "icon-square"
+                : gSettings.ListIcon;
+        }
+
+        private void PopulateCheckBoxes(GridGanttSettings gSettings)
+        {
+            chkExecutive.Checked = gSettings.Executive;
+            chkUsePopup.Checked = gSettings.UsePopup;
+            chkShowViewToolbar.Checked = gSettings.ShowViewToolbar;
+            chkHideNewButton.Checked = gSettings.HideNewButton;
+            chkPerformance.Checked = gSettings.Performance;
+            chkAllowEdit.Checked = gSettings.AllowEdit;
+            chkEditDefault.Checked = gSettings.EditDefault;
+            chkShowInsert.Checked = gSettings.ShowInsert;
+            chkDisableNewRollup.Checked = gSettings.DisableNewItemMod;
+            chkUseNewMenu.Checked = gSettings.UseNewMenu;
+            chkEnableRequests.Checked = gSettings.EnableRequests;
+            chkWorkListFeat.Checked = gSettings.EnableWorkList;
+            chkFancyForms.Checked = gSettings.EnableFancyForms;
+            chkEmails.Checked = gSettings.SendEmails;
+            chkDeleteRequest.Checked = gSettings.DeleteRequest;
+            chkUseParent.Checked = gSettings.UseParent;
+            chkSearch.Checked = gSettings.Search;
+            chkLockSearch.Checked = gSettings.LockSearch;
+            chkAssociatedItems.Checked = gSettings.AssociatedItems;
+            chkEnableTeam.Checked = gSettings.BuildTeam;
+            chkContentReporting.Checked = gSettings.EnableContentReporting;
+            chkResTools.Checked = gSettings.EnableResourcePlan;
+            chkDisplayRedirect.Checked = gSettings.DisplayFormRedirect;
+            chkDisableThumbnails.Checked = gSettings.DisableThumbnails;
+
+            SectionEmail.Visible = true;
+
+            chkEnableTeamSecurity.Checked = gSettings.BuildTeamSecurity;
+        }
+
+        private void PopulatePermissionControls(GridGanttSettings gSettings, SPWeb web)
+        {
+            if (gSettings.BuildTeamPermissions.Length > 1)
+            {
+                var strOuter = gSettings.BuildTeamPermissions.Split(
+                    new[]
+                    {
+                        "|~|"
+                    },
+                    StringSplitOptions.None);
+                ProcessPermissionStrings(web, strOuter, dtGroupsPermissions);
+            }
+
+            GvGroupsPermissions.DataSource = dtGroupsPermissions;
+            GvGroupsPermissions.DataBind();
+        }
+
+        private void PopulateViewState()
+        {
+            if (ViewState["dtGroupsPermissions"] == null)
+            {
+                ViewState.Add("dtGroupsPermissions", dtGroupsPermissions);
+            }
+        }
+
+        private void PopulateTimeSheetCheckBox(SPWeb rootWeb, SPList list)
+        {
+            var lists = new ArrayList(CoreFunctions.getConfigSetting(rootWeb, "EPMLiveTSLists").Replace("\r\n", "\n").Split('\n'));
+
+            if (lists.Contains(list.Title))
+            {
+                chkTimesheet.Checked = true;
+            }
+        }
+
+        private void LoadReportControls(SPWeb rootWeb, SPList list)
+        {
+            var isReportingV2Enabled = false;
+            try
+            {
+                isReportingV2Enabled = Convert.ToBoolean(CoreFunctions.getConfigSetting(rootWeb, "ReportingV2"));
+            }
+            catch (Exception ex)
+            {
+                TraceError("Exception Suppressed {0}", ex);
+            }
+
+            var reportBiz = new ReportBiz(SPContext.Current.Site.ID, SPContext.Current.Web.ID, isReportingV2Enabled);
+            if (reportBiz.SiteExists())
+            {
+                ifsEnableReporting.Visible = true;
+
+                var mappedLists = reportBiz.GetMappedLists();
+                var mappedListIds = reportBiz.GetMappedListsIds();
+                var isMapped = mappedLists.Contains(list.Title);
+                var isMaster = mappedListIds.Contains(list.ID.ToString().ToLower());
+
+                if (!isReportingV2Enabled)
+                {
+                    cbEnableReporting.Checked = isMapped;
+                    cbEnableReporting.Enabled = isMaster || !isMapped;
+                }
+                else
+                {
+                    if (isMapped)
+                    {
+                        if (isMaster)
+                        {
+                            cbEnableReporting.Checked = true;
+                            cbEnableReporting.Enabled = false;
+                        }
+                        else
+                        {
+                            cbEnableReporting.Checked = false;
+                            cbEnableReporting.Enabled = true;
+                        }
+                    }
+                    else
+                    {
+                        cbEnableReporting.Checked = false;
+                        cbEnableReporting.Enabled = true;
+                    }
+                }
+
+                SetButtonEventsVisibility(list, isMapped);
+            }
+        }
+
+        private void SetButtonEventsVisibility(SPList list, bool isMapped)
+        {
+            var events = GetListEvents(
+                list,
+                "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
+                "EPMLiveReportsAdmin.ListEvents",
+                new List<SPEventReceiverType>
+                {
+                    SPEventReceiverType.ItemAdded,
+                    SPEventReceiverType.ItemUpdated,
+                    SPEventReceiverType.ItemDeleting
+                });
+
+            var hasEvents = events.Count > 0;
+            btnAddEvt.Visible = isMapped && !hasEvents;
         }
 
         private Dictionary<string, int> GetAvailableDefaultTemps()
@@ -586,365 +615,431 @@ namespace EPMLiveCore.Layouts.epmlive
 
             var spUserToken = list.ParentWeb.CurrentUser.UserToken;
 
-            Task.Factory.StartNew(() =>
-            {
-                using (var spSite = new SPSite(siteId, spUserToken))
+            Task.Factory.StartNew(
+                () =>
                 {
-                    using (var spWeb = spSite.OpenWeb(webId))
+                    using (var spSite = new SPSite(siteId, spUserToken))
                     {
-                        string fieldName = string.Empty;
-
-                        try
+                        using (var spWeb = spSite.OpenWeb(webId))
                         {
-                            list = spWeb.Lists.GetList(listId, true);
+                            var fieldName = string.Empty;
 
-                            // add startdate field
-                            if (!FieldExistsInList(list, "StartDate"))
+                            try
                             {
-                                fieldName = "StartDate";
+                                list = spWeb.Lists.GetList(listId, true);
+                                AddFields(list, ref fieldName);
+                                list.Update();
 
-                                string fldSDIntName = list.Fields.Add("StartDate", SPFieldType.DateTime, false);
-                                SPFieldDateTime fldSD =
-                                    list.Fields.GetFieldByInternalName(fldSDIntName) as SPFieldDateTime;
-                                fldSD.Title = "Start Date";
-                                fldSD.DisplayFormat = SPDateTimeFieldFormatType.DateOnly;
-                                fldSD.Sealed = false;
-                                fldSD.AllowDeletion = false;
-                                fldSD.Description = "Enter the estimated start date for this item.";
-                                fldSD.Update();
+                                FixLookupFields(list);
                             }
-
-                            // add DueDate field
-                            if (!FieldExistsInList(list, "DueDate"))
+                            catch (Exception exception)
                             {
-                                fieldName = "DueDate";
-
-                                string fldDDIntName = list.Fields.Add("DueDate", SPFieldType.DateTime, false);
-                                SPFieldDateTime fldDD =
-                                    list.Fields.GetFieldByInternalName(fldDDIntName) as SPFieldDateTime;
-                                fldDD.Title = "Due Date";
-                                fldDD.DisplayFormat = SPDateTimeFieldFormatType.DateOnly;
-                                fldDD.Sealed = false;
-                                fldDD.AllowDeletion = false;
-                                fldDD.Description = "Enter the estimated due date for this item.";
-                                fldDD.Update();
+                                System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", exception);
+                                var logger = new ReportingLogger(list.ParentWeb);
+                                logger.Log(
+                                    list,
+                                    "Problem adding one or more field or fixing a lookup field when enabling work features for the list.",
+                                    string.Format("Field: {0}, Exception: {1}", fieldName, exception.Message),
+                                    2,
+                                    1,
+                                    string.Empty);
                             }
-
-                            // add AssignedTo field
-                            if (!FieldExistsInList(list, "AssignedTo"))
-                            {
-                                fieldName = "AssignedTo";
-
-                                string fldATIntName = list.Fields.Add("AssignedTo", SPFieldType.User, false);
-                                SPFieldUser fldAT = list.Fields.GetFieldByInternalName(fldATIntName) as SPFieldUser;
-                                fldAT.Title = "Assigned To";
-                                fldAT.AllowMultipleValues = true;
-                                fldAT.Sealed = false;
-                                fldAT.AllowDeletion = false;
-                                fldAT.Description =
-                                    "Enter the resource(s) assigned to this item.  You can enter their email address, username, or use the address book.";
-                                fldAT.Update();
-                            }
-
-                            // add Priority field
-                            if (!FieldExistsInList(list, "Priority"))
-                            {
-                                fieldName = "Priority";
-
-                                StringCollection choices = new StringCollection();
-                                choices.AddRange(new string[] { "(1) High", "(2) Normal", "(3) Low" });
-                                string fldPIntName = list.Fields.Add("Priority", SPFieldType.Choice, false, false,
-                                    choices);
-                                SPFieldChoice fldP = list.Fields.GetFieldByInternalName(fldPIntName) as SPFieldChoice;
-                                fldP.Title = "Priority";
-                                fldP.DefaultValue = "(1) High";
-                                fldP.Sealed = false;
-                                fldP.AllowDeletion = false;
-                                fldP.Update();
-                            }
-
-                            // add status field
-                            if (!FieldExistsInList(list, "Status"))
-                            {
-                                fieldName = "Status";
-
-                                StringCollection choices = new StringCollection();
-                                choices.AddRange(new string[] { "Not Started", "In Progress", "Completed", "Deferred", "Waiting on someone else" });
-                                string fldStatusIntName = list.Fields.Add("Status", SPFieldType.Choice, false, false,
-                                    choices);
-                                SPFieldChoice fldStatus =
-                                    list.Fields.GetFieldByInternalName(fldStatusIntName) as SPFieldChoice;
-                                fldStatus.DefaultValue = "Not Started";
-                                fldStatus.Sealed = true;
-                                fldStatus.AllowDeletion = false;
-                                fldStatus.ReadOnlyField = true;
-                                fldStatus.Update();
-                            }
-
-                            // add Work field
-                            if (!FieldExistsInList(list, "Work"))
-                            {
-                                fieldName = "Work";
-
-                                string fldWIntName = list.Fields.Add("Work", SPFieldType.Number, false);
-                                SPFieldNumber fldW = list.Fields.GetFieldByInternalName(fldWIntName) as SPFieldNumber;
-                                fldW.Title = "Work";
-                                fldW.DisplayFormat = SPNumberFormatTypes.TwoDecimals;
-                                fldW.Description = "Enter the estimated work (in hours) for this item.";
-                                fldW.Update();
-                            }
-
-                            // add percent complete field
-                            if (!FieldExistsInList(list, "PercentComplete"))
-                            {
-                                fieldName = "PercentComplete";
-
-                                string fldPCIntName = list.Fields.Add("PercentComplete", SPFieldType.Number, false);
-                                SPFieldNumber fldPC = list.Fields.GetFieldByInternalName(fldPCIntName) as SPFieldNumber;
-                                fldPC.Title = "% Complete";
-                                fldPC.ShowAsPercentage = true;
-                                fldPC.DisplayFormat = SPNumberFormatTypes.NoDecimal;
-                                fldPC.MinimumValue = 0;
-                                fldPC.MaximumValue = 1;
-                                fldPC.Sealed = false;
-                                fldPC.AllowDeletion = false;
-                                fldPC.Update();
-                            }
-
-                            // add body field
-                            if (!FieldExistsInList(list, "Body"))
-                            {
-                                fieldName = "Body";
-
-                                string fldBIntName = list.Fields.Add("Body", SPFieldType.Note, false);
-                                SPFieldMultiLineText fldB =
-                                    list.Fields.GetFieldByInternalName(fldBIntName) as SPFieldMultiLineText;
-                                fldB.Title = "Description";
-                                fldB.RichText = true;
-                                fldB.Sealed = false;
-                                fldB.AllowDeletion = false;
-                                fldB.Update();
-                            }
-
-                            // add commentcount field
-                            if (!FieldExistsInList(list, "CommentCount"))
-                            {
-                                fieldName = "CommentCount";
-
-                                string fldCCIntName = list.Fields.Add("CommentCount", SPFieldType.Number, false);
-                                SPFieldNumber fldCC = list.Fields.GetFieldByInternalName(fldCCIntName) as SPFieldNumber;
-                                fldCC.MinimumValue = 0;
-                                fldCC.Sealed = false;
-                                fldCC.AllowDeletion = false;
-                                fldCC.Hidden = true;
-                                fldCC.Update();
-                            }
-
-                            // add complete field
-                            if (!FieldExistsInList(list, "Complete"))
-                            {
-                                fieldName = "Complete";
-
-                                string fldCompleteIntName = list.Fields.Add("Complete", SPFieldType.Boolean, false);
-                                SPFieldBoolean fldComplete =
-                                    list.Fields.GetFieldByInternalName(fldCompleteIntName) as SPFieldBoolean;
-                                fldComplete.Sealed = false;
-                                fldComplete.ShowInEditForm = true;
-                                fldComplete.ShowInNewForm = false;
-                                fldComplete.AllowDeletion = false;
-                                fldComplete.DefaultValue = "0";
-                                fldComplete.Update();
-                            }
-
-                            // add DaysOverdue field
-                            if (!FieldExistsInList(list, "DaysOverdue"))
-                            {
-                                fieldName = "DaysOverdue";
-
-                                string fldDOIntName = list.Fields.Add("DaysOverdue", SPFieldType.Calculated, false);
-                                SPFieldCalculated fldDO =
-                                    list.Fields.GetFieldByInternalName(fldDOIntName) as SPFieldCalculated;
-                                fldDO.OutputType = SPFieldType.Number;
-                                fldDO.Title = "Days Overdue";
-                                fldDO.Sealed = false;
-                                fldDO.ShowInEditForm = false;
-                                fldDO.AllowDeletion = false;
-                                fldDO.Formula =
-                                    "=IF([Due Date]<>\"\",IF(Status<>\"Completed\",IF([Due Date]<Today,Today-[Due Date],0),0),0)";
-                                fldDO.Update();
-                            }
-
-                            // add ScheduleStatus field
-                            if (!FieldExistsInList(list, "ScheduleStatus"))
-                            {
-                                fieldName = "ScheduleStatus";
-
-                                string fldSSIntName = list.Fields.Add("ScheduleStatus", SPFieldType.Calculated, false);
-                                SPFieldCalculated fldSS =
-                                    list.Fields.GetFieldByInternalName(fldSSIntName) as SPFieldCalculated;
-                                fldSS.Title = "Schedule Status";
-                                fldSS.OutputType = SPFieldType.Text;
-                                fldSS.Sealed = false;
-                                fldSS.ShowInEditForm = false;
-                                fldSS.ShowInNewForm = false;
-                                fldSS.AllowDeletion = false;
-                                fldSS.Formula =
-                                    "=IF(Status=\"Completed\",\"checkmark.GIF\",IF([Days Overdue]>=30,\"RED.GIF\",IF([Days Overdue]>0,\"YELLOW.GIF\",\"GREEN.GIF\")))";
-                                fldSS.Update();
-                            }
-
-                            // add TodayYear field
-                            if (!FieldExistsInList(list, "TodayYear"))
-                            {
-                                fieldName = "TodayYear";
-
-                                string fldTYIntName = list.Fields.Add("TodayYear", SPFieldType.Calculated, false);
-                                SPFieldCalculated fldTY =
-                                    list.Fields.GetFieldByInternalName(fldTYIntName) as SPFieldCalculated;
-                                fldTY.Title = "Today Year";
-                                fldTY.OutputType = SPFieldType.Number;
-                                fldTY.Sealed = false;
-                                fldTY.ShowInEditForm = false;
-                                fldTY.ShowInNewForm = false;
-                                fldTY.ShowInDisplayForm = false;
-                                fldTY.AllowDeletion = false;
-                                fldTY.Formula = "=YEAR(Today)";
-                                fldTY.Update();
-                            }
-
-                            // add TodayWeek field
-                            if (!FieldExistsInList(list, "TodayWeek"))
-                            {
-                                fieldName = "TodayWeek";
-
-                                string fldTWIntName = list.Fields.Add("TodayWeek", SPFieldType.Calculated, false);
-                                SPFieldCalculated fldTW =
-                                    list.Fields.GetFieldByInternalName(fldTWIntName) as SPFieldCalculated;
-                                fldTW.Title = "Today Week";
-                                fldTW.OutputType = SPFieldType.Number;
-                                fldTW.Sealed = false;
-                                fldTW.ShowInEditForm = false;
-                                fldTW.ShowInNewForm = false;
-                                fldTW.ShowInDisplayForm = false;
-                                fldTW.AllowDeletion = false;
-                                fldTW.Formula =
-                                    "=IF(Today<>\"\",INT((Today-DATE(YEAR(Today),1,1)+(TEXT(WEEKDAY(DATE(YEAR(Today),1,1)),\"d\")))/7)+1,0)";
-                                fldTW.Update();
-                            }
-
-                            // add Year field
-                            if (!FieldExistsInList(list, "Year"))
-                            {
-                                fieldName = "Year";
-
-                                string fldYIntName = list.Fields.Add("Year", SPFieldType.Calculated, false);
-                                SPFieldCalculated fldY =
-                                    list.Fields.GetFieldByInternalName(fldYIntName) as SPFieldCalculated;
-                                fldY.Title = "Year";
-                                fldY.OutputType = SPFieldType.Number;
-                                fldY.Sealed = false;
-                                fldY.ShowInEditForm = false;
-                                fldY.ShowInNewForm = false;
-                                fldY.ShowInDisplayForm = false;
-                                fldY.AllowDeletion = false;
-                                fldY.Formula = "=IF([Due Date]<>\"\",YEAR([Due Date]))";
-                                fldY.Update();
-                            }
-
-                            // add Week field
-                            if (!FieldExistsInList(list, "Week"))
-                            {
-                                fieldName = "Week";
-
-                                string fldWIntName = list.Fields.Add("Week", SPFieldType.Calculated, false);
-                                SPFieldCalculated fldW =
-                                    list.Fields.GetFieldByInternalName(fldWIntName) as SPFieldCalculated;
-                                fldW.Title = "Week";
-                                fldW.OutputType = SPFieldType.Number;
-                                fldW.Sealed = false;
-                                fldW.ShowInEditForm = false;
-                                fldW.ShowInNewForm = false;
-                                fldW.ShowInDisplayForm = false;
-                                fldW.AllowDeletion = false;
-                                fldW.Formula =
-                                    "=IF([Due Date]<>\"\",INT(([Due Date]-DATE(YEAR([Due Date]),1,1)+(TEXT(WEEKDAY(DATE(YEAR([Due Date]),1,1)),\"d\")))/7)+1,0)";
-                                fldW.Update();
-                            }
-
-                            // add Due field
-                            if (!FieldExistsInList(list, "Due"))
-                            {
-                                fieldName = "Due";
-
-                                string fldDIntName = list.Fields.Add("Due", SPFieldType.Calculated, false);
-                                SPFieldCalculated fldD =
-                                    list.Fields.GetFieldByInternalName(fldDIntName) as SPFieldCalculated;
-                                fldD.Title = "Due";
-                                fldD.OutputType = SPFieldType.Text;
-                                fldD.Sealed = false;
-                                fldD.ShowInEditForm = false;
-                                fldD.ShowInNewForm = false;
-                                fldD.AllowDeletion = false;
-                                fldD.Formula =
-                                    "=IF([Status]=\"Completed\",\"NA\",IF([Due Date]=\"\",\"No Due Date\",IF([Due Date]<Today,\"(1) Overdue\",IF([Due Date]=Today,\"(2) Due Today\",IF([Due Date]=Today+1,\"(3) Due Tomorrow\",IF(Week=[Today Week],IF(Year=[Today Year],\"(4) Due This Week\",\"(7) Future\"),IF(Week=[Today Week]+1,IF(Year=[Today Year],\"(5) Due Next Week\",\"(7) Future\"),IF(MONTH([Due Date])=MONTH(Today),IF(Year=[Today Year],\"(6) Due This Month\",\"(7) Future\"),\"(7) Future\"))))))))";
-                                fldD.Update();
-                            }
-
-                            // add Commenters field
-                            if (!FieldExistsInList(list, "Commenters"))
-                            {
-                                fieldName = "Commenters";
-
-                                string fldCIntName = list.Fields.Add("Commenters", SPFieldType.Note, false);
-                                SPFieldMultiLineText fldC =
-                                    list.Fields.GetFieldByInternalName(fldCIntName) as SPFieldMultiLineText;
-                                fldC.Title = "Commenters";
-                                fldC.Hidden = true;
-                                fldC.Sealed = false;
-                                fldC.AllowDeletion = false;
-                                fldC.Update();
-                            }
-
-                            // add CommentersRead field
-                            if (!FieldExistsInList(list, "CommentersRead"))
-                            {
-                                fieldName = "CommentersRead";
-
-                                string fldCRIntName = list.Fields.Add("CommentersRead", SPFieldType.Note, false);
-                                SPFieldMultiLineText fldCR =
-                                    list.Fields.GetFieldByInternalName(fldCRIntName) as SPFieldMultiLineText;
-                                fldCR.Title = "Commenters Read";
-                                fldCR.Hidden = true;
-                                fldCR.Sealed = false;
-                                fldCR.AllowDeletion = false;
-                                fldCR.Update();
-                            }
-
-                            // remove Today field
-                            if (FieldExistsInList(list, "Today"))
-                            {
-                                try
-                                {
-                                    list.Fields.Delete("Today");
-                                }
-                                catch { }
-                            }
-
-                            list.Update();
-
-                            FixLookupFields(list);
-                        }
-                        catch (Exception exception)
-                        {
-                            var logger = new ReportingLogger(list.ParentWeb);
-                            logger.Log(list,
-                                "Problem adding one or more field or fixing a lookup field when enabling work features for the list.",
-                                string.Format("Field: {0}, Exception: {1}", fieldName, exception.Message), 2, 1,
-                                string.Empty);
                         }
                     }
+                });
+        }
+
+        private void AddFields(SPList list, ref string fieldName)
+        {
+            AddStartDateField(list, ref fieldName);
+            AddDueDateField(list, ref fieldName);
+            AddAssignedToField(list, ref fieldName);
+            AddPriorityField(list, ref fieldName);
+            AddStatusField(list, ref fieldName);
+            AddWorkField(list, ref fieldName);
+            AddPercentCompleteField(list, ref fieldName);
+            AddBodyField(list, ref fieldName);
+            AddCommentCountField(list, ref fieldName);
+            AddCompleteField(list, ref fieldName);
+            AddDaysOverdueField(list, ref fieldName);
+            AddScheduleStatusField(list, ref fieldName);
+            AddTodayYearField(list, ref fieldName);
+            AddTodayWeekField(list, ref fieldName);
+            AddYearField(list, ref fieldName);
+            AddWeekField(list, ref fieldName);
+            AddDueField(list, ref fieldName);
+            AddCommentersField(list, ref fieldName);
+            AddCommentersReadField(list, ref fieldName);
+            RemoveTodayField(list);
+        }
+
+        private void AddStartDateField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "StartDate"))
+            {
+                fieldName = "StartDate";
+
+                var fldSDIntName = list.Fields.Add("StartDate", SPFieldType.DateTime, false);
+                var fldSD = list.Fields.GetFieldByInternalName(fldSDIntName) as SPFieldDateTime;
+                fldSD.Title = "Start Date";
+                fldSD.DisplayFormat = SPDateTimeFieldFormatType.DateOnly;
+                fldSD.Sealed = false;
+                fldSD.AllowDeletion = false;
+                fldSD.Description = "Enter the estimated start date for this item.";
+                fldSD.Update();
+            }
+        }
+
+        private void AddDueDateField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "DueDate"))
+            {
+                fieldName = "DueDate";
+
+                var fldDDIntName = list.Fields.Add("DueDate", SPFieldType.DateTime, false);
+                var fldDD = list.Fields.GetFieldByInternalName(fldDDIntName) as SPFieldDateTime;
+                fldDD.Title = "Due Date";
+                fldDD.DisplayFormat = SPDateTimeFieldFormatType.DateOnly;
+                fldDD.Sealed = false;
+                fldDD.AllowDeletion = false;
+                fldDD.Description = "Enter the estimated due date for this item.";
+                fldDD.Update();
+            }
+        }
+
+        private void AddAssignedToField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "AssignedTo"))
+            {
+                fieldName = "AssignedTo";
+
+                var fldATIntName = list.Fields.Add("AssignedTo", SPFieldType.User, false);
+                var fldAT = list.Fields.GetFieldByInternalName(fldATIntName) as SPFieldUser;
+                fldAT.Title = "Assigned To";
+                fldAT.AllowMultipleValues = true;
+                fldAT.Sealed = false;
+                fldAT.AllowDeletion = false;
+                fldAT.Description = "Enter the resource(s) assigned to this item.  You can enter their email address, username, or use the address book.";
+                fldAT.Update();
+            }
+        }
+
+        private void AddPriorityField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Priority"))
+            {
+                fieldName = "Priority";
+
+                var choices = new StringCollection();
+                choices.AddRange(
+                    new[]
+                    {
+                        "(1) High",
+                        "(2) Normal",
+                        "(3) Low"
+                    });
+                var fldPIntName = list.Fields.Add("Priority", SPFieldType.Choice, false, false, choices);
+                var fldP = list.Fields.GetFieldByInternalName(fldPIntName) as SPFieldChoice;
+                fldP.Title = "Priority";
+                fldP.DefaultValue = "(1) High";
+                fldP.Sealed = false;
+                fldP.AllowDeletion = false;
+                fldP.Update();
+            }
+        }
+
+        private void AddStatusField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Status"))
+            {
+                fieldName = "Status";
+
+                var choices = new StringCollection();
+                choices.AddRange(
+                    new[]
+                    {
+                        "Not Started",
+                        "In Progress",
+                        "Completed",
+                        "Deferred",
+                        "Waiting on someone else"
+                    });
+                var fldStatusIntName = list.Fields.Add("Status", SPFieldType.Choice, false, false, choices);
+                var fldStatus = list.Fields.GetFieldByInternalName(fldStatusIntName) as SPFieldChoice;
+                fldStatus.DefaultValue = "Not Started";
+                fldStatus.Sealed = true;
+                fldStatus.AllowDeletion = false;
+                fldStatus.ReadOnlyField = true;
+                fldStatus.Update();
+            }
+        }
+
+        private void AddWorkField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Work"))
+            {
+                fieldName = "Work";
+
+                var fldWIntName = list.Fields.Add("Work", SPFieldType.Number, false);
+                var fldW = list.Fields.GetFieldByInternalName(fldWIntName) as SPFieldNumber;
+                fldW.Title = "Work";
+                fldW.DisplayFormat = SPNumberFormatTypes.TwoDecimals;
+                fldW.Description = "Enter the estimated work (in hours) for this item.";
+                fldW.Update();
+            }
+        }
+
+        private void AddPercentCompleteField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "PercentComplete"))
+            {
+                fieldName = "PercentComplete";
+
+                var fldPCIntName = list.Fields.Add("PercentComplete", SPFieldType.Number, false);
+                var fldPC = list.Fields.GetFieldByInternalName(fldPCIntName) as SPFieldNumber;
+                fldPC.Title = "% Complete";
+                fldPC.ShowAsPercentage = true;
+                fldPC.DisplayFormat = SPNumberFormatTypes.NoDecimal;
+                fldPC.MinimumValue = 0;
+                fldPC.MaximumValue = 1;
+                fldPC.Sealed = false;
+                fldPC.AllowDeletion = false;
+                fldPC.Update();
+            }
+        }
+
+        private void AddBodyField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Body"))
+            {
+                fieldName = "Body";
+
+                var fldBIntName = list.Fields.Add("Body", SPFieldType.Note, false);
+                var fldB = list.Fields.GetFieldByInternalName(fldBIntName) as SPFieldMultiLineText;
+                fldB.Title = "Description";
+                fldB.RichText = true;
+                fldB.Sealed = false;
+                fldB.AllowDeletion = false;
+                fldB.Update();
+            }
+        }
+
+        private void AddCommentCountField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "CommentCount"))
+            {
+                fieldName = "CommentCount";
+
+                var fldCCIntName = list.Fields.Add("CommentCount", SPFieldType.Number, false);
+                var fldCC = list.Fields.GetFieldByInternalName(fldCCIntName) as SPFieldNumber;
+                fldCC.MinimumValue = 0;
+                fldCC.Sealed = false;
+                fldCC.AllowDeletion = false;
+                fldCC.Hidden = true;
+                fldCC.Update();
+            }
+        }
+
+        private void AddCompleteField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Complete"))
+            {
+                fieldName = "Complete";
+
+                var fldCompleteIntName = list.Fields.Add("Complete", SPFieldType.Boolean, false);
+                var fldComplete = list.Fields.GetFieldByInternalName(fldCompleteIntName) as SPFieldBoolean;
+                fldComplete.Sealed = false;
+                fldComplete.ShowInEditForm = true;
+                fldComplete.ShowInNewForm = false;
+                fldComplete.AllowDeletion = false;
+                fldComplete.DefaultValue = "0";
+                fldComplete.Update();
+            }
+        }
+
+        private void AddDaysOverdueField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "DaysOverdue"))
+            {
+                fieldName = "DaysOverdue";
+
+                var fldDOIntName = list.Fields.Add("DaysOverdue", SPFieldType.Calculated, false);
+                var fldDO = list.Fields.GetFieldByInternalName(fldDOIntName) as SPFieldCalculated;
+                fldDO.OutputType = SPFieldType.Number;
+                fldDO.Title = "Days Overdue";
+                fldDO.Sealed = false;
+                fldDO.ShowInEditForm = false;
+                fldDO.AllowDeletion = false;
+                fldDO.Formula = "=IF([Due Date]<>\"\",IF(Status<>\"Completed\",IF([Due Date]<Today,Today-[Due Date],0),0),0)";
+                fldDO.Update();
+            }
+        }
+
+        private void AddScheduleStatusField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "ScheduleStatus"))
+            {
+                fieldName = "ScheduleStatus";
+
+                var fldSSIntName = list.Fields.Add("ScheduleStatus", SPFieldType.Calculated, false);
+                var fldSS = list.Fields.GetFieldByInternalName(fldSSIntName) as SPFieldCalculated;
+                fldSS.Title = "Schedule Status";
+                fldSS.OutputType = SPFieldType.Text;
+                fldSS.Sealed = false;
+                fldSS.ShowInEditForm = false;
+                fldSS.ShowInNewForm = false;
+                fldSS.AllowDeletion = false;
+                fldSS.Formula =
+                    "=IF(Status=\"Completed\",\"checkmark.GIF\",IF([Days Overdue]>=30,\"RED.GIF\",IF([Days Overdue]>0,\"YELLOW.GIF\",\"GREEN.GIF\")))";
+                fldSS.Update();
+            }
+        }
+
+        private void AddTodayYearField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "TodayYear"))
+            {
+                fieldName = "TodayYear";
+
+                var fldTYIntName = list.Fields.Add("TodayYear", SPFieldType.Calculated, false);
+                var fldTY = list.Fields.GetFieldByInternalName(fldTYIntName) as SPFieldCalculated;
+                fldTY.Title = "Today Year";
+                fldTY.OutputType = SPFieldType.Number;
+                fldTY.Sealed = false;
+                fldTY.ShowInEditForm = false;
+                fldTY.ShowInNewForm = false;
+                fldTY.ShowInDisplayForm = false;
+                fldTY.AllowDeletion = false;
+                fldTY.Formula = "=YEAR(Today)";
+                fldTY.Update();
+            }
+        }
+
+        private void AddTodayWeekField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "TodayWeek"))
+            {
+                fieldName = "TodayWeek";
+
+                var fldTWIntName = list.Fields.Add("TodayWeek", SPFieldType.Calculated, false);
+                var fldTW = list.Fields.GetFieldByInternalName(fldTWIntName) as SPFieldCalculated;
+                fldTW.Title = "Today Week";
+                fldTW.OutputType = SPFieldType.Number;
+                fldTW.Sealed = false;
+                fldTW.ShowInEditForm = false;
+                fldTW.ShowInNewForm = false;
+                fldTW.ShowInDisplayForm = false;
+                fldTW.AllowDeletion = false;
+                fldTW.Formula = "=IF(Today<>\"\",INT((Today-DATE(YEAR(Today),1,1)+(TEXT(WEEKDAY(DATE(YEAR(Today),1,1)),\"d\")))/7)+1,0)";
+                fldTW.Update();
+            }
+        }
+
+        private void AddYearField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Year"))
+            {
+                fieldName = "Year";
+
+                var fldYIntName = list.Fields.Add("Year", SPFieldType.Calculated, false);
+                var fldY = list.Fields.GetFieldByInternalName(fldYIntName) as SPFieldCalculated;
+                fldY.Title = "Year";
+                fldY.OutputType = SPFieldType.Number;
+                fldY.Sealed = false;
+                fldY.ShowInEditForm = false;
+                fldY.ShowInNewForm = false;
+                fldY.ShowInDisplayForm = false;
+                fldY.AllowDeletion = false;
+                fldY.Formula = "=IF([Due Date]<>\"\",YEAR([Due Date]))";
+                fldY.Update();
+            }
+        }
+
+        private void AddWeekField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Week"))
+            {
+                fieldName = "Week";
+
+                var fldWIntName = list.Fields.Add("Week", SPFieldType.Calculated, false);
+                var fldW = list.Fields.GetFieldByInternalName(fldWIntName) as SPFieldCalculated;
+                fldW.Title = "Week";
+                fldW.OutputType = SPFieldType.Number;
+                fldW.Sealed = false;
+                fldW.ShowInEditForm = false;
+                fldW.ShowInNewForm = false;
+                fldW.ShowInDisplayForm = false;
+                fldW.AllowDeletion = false;
+                fldW.Formula = "=IF([Due Date]<>\"\",INT(([Due Date]-DATE(YEAR([Due Date]),1,1)+(TEXT(WEEKDAY(DATE(YEAR([Due Date]),1,1)),\"d\")))/7)+1,0)";
+                fldW.Update();
+            }
+        }
+
+        private void AddDueField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Due"))
+            {
+                fieldName = "Due";
+
+                var fldDIntName = list.Fields.Add("Due", SPFieldType.Calculated, false);
+                var fldD = list.Fields.GetFieldByInternalName(fldDIntName) as SPFieldCalculated;
+                fldD.Title = "Due";
+                fldD.OutputType = SPFieldType.Text;
+                fldD.Sealed = false;
+                fldD.ShowInEditForm = false;
+                fldD.ShowInNewForm = false;
+                fldD.AllowDeletion = false;
+                fldD.Formula =
+                    "=IF([Status]=\"Completed\",\"NA\",IF([Due Date]=\"\",\"No Due Date\",IF([Due Date]<Today,\"(1) Overdue\",IF([Due Date]=Today,\"(2) Due Today\",IF([Due Date]=Today+1,\"(3) Due Tomorrow\",IF(Week=[Today Week],IF(Year=[Today Year],\"(4) Due This Week\",\"(7) Future\"),IF(Week=[Today Week]+1,IF(Year=[Today Year],\"(5) Due Next Week\",\"(7) Future\"),IF(MONTH([Due Date])=MONTH(Today),IF(Year=[Today Year],\"(6) Due This Month\",\"(7) Future\"),\"(7) Future\"))))))))";
+                fldD.Update();
+            }
+        }
+
+        private void AddCommentersField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "Commenters"))
+            {
+                fieldName = "Commenters";
+
+                var fldCIntName = list.Fields.Add("Commenters", SPFieldType.Note, false);
+                var fldC = list.Fields.GetFieldByInternalName(fldCIntName) as SPFieldMultiLineText;
+                fldC.Title = "Commenters";
+                fldC.Hidden = true;
+                fldC.Sealed = false;
+                fldC.AllowDeletion = false;
+                fldC.Update();
+            }
+        }
+
+        private void AddCommentersReadField(SPList list, ref string fieldName)
+        {
+            if (!FieldExistsInList(list, "CommentersRead"))
+            {
+                fieldName = "CommentersRead";
+
+                var fldCRIntName = list.Fields.Add("CommentersRead", SPFieldType.Note, false);
+                var fldCR = list.Fields.GetFieldByInternalName(fldCRIntName) as SPFieldMultiLineText;
+                fldCR.Title = "Commenters Read";
+                fldCR.Hidden = true;
+                fldCR.Sealed = false;
+                fldCR.AllowDeletion = false;
+                fldCR.Update();
+            }
+        }
+
+        private void RemoveTodayField(SPList list)
+        {
+            if (FieldExistsInList(list, "Today"))
+            {
+                try
+                {
+                    list.Fields.Delete("Today");
                 }
-            });
+                catch (Exception exception)
+                {
+                    System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", exception);
+                }
+            }
         }
 
         private void AddEventHandlers()
@@ -1083,268 +1178,346 @@ namespace EPMLiveCore.Layouts.epmlive
 
         protected void Button1_Click(object sender, EventArgs e)
         {
-            SPWeb web = SPContext.Current.Web;
-            SPList list = web.Lists[new Guid(Request["List"])];
-            var gSettings = new GridGanttSettings(list);
+            var web = SPContext.Current.Web;
+            var list = web.Lists[new Guid(Request["List"])];
+            var gSettings = GetGridGanttSettings(list);
 
-            gSettings.StartDate = ddlStartDate.SelectedValue;
-            gSettings.DueDate = ddlDueDate.SelectedValue;
-            gSettings.Progress = ddlProgressBar.SelectedValue;
-            gSettings.WBS = ddlWBS.SelectedValue;
-            gSettings.Milestone = ddlMilestone.SelectedValue;
-            gSettings.Executive = chkExecutive.Checked;
-            gSettings.Information = ddlInformation.SelectedValue;
-            gSettings.ItemLink = ddlItemLink.SelectedValue;
-            gSettings.RibbonBehavior = ddlRibbonBehavior.SelectedValue;
-            gSettings.RollupLists = txtRollupLists.Text.Replace(",", "|").Replace("\r\n", ",");
-            gSettings.RollupSites = txtRollupSites.Text.Replace("\r\n", ",");
-            gSettings.ShowViewToolbar = chkShowViewToolbar.Checked;
-            gSettings.HideNewButton = chkHideNewButton.Checked;
-            gSettings.Performance = chkPerformance.Checked;
-            gSettings.AllowEdit = chkAllowEdit.Checked;
-            gSettings.EditDefault = chkEditDefault.Checked;
-            gSettings.ShowInsert = chkShowInsert.Checked;
-            gSettings.DisableNewItemMod = chkDisableNewRollup.Checked;
-            gSettings.UseNewMenu = chkUseNewMenu.Checked;
-            gSettings.NewMenuName = txtNewMenuName.Text;
-            gSettings.UsePopup = chkUsePopup.Checked;
-            gSettings.EnableRequests = chkEnableRequests.Checked;
-            gSettings.EnableAutoCreation = chkAutoCreate.Checked;
-            gSettings.AutoCreationTemplateId = ddlAutoCreateTemplate.SelectedValue;
-            gSettings.WorkspaceParentSiteLookup = ddlParentSiteLookup.SelectedValue;
-            gSettings.ListIcon = hdnListIcon.Value;
-            gSettings.EnableWorkList = chkWorkListFeat.Checked;
-            gSettings.EnableFancyForms = chkFancyForms.Checked;
-            gSettings.SendEmails = chkEmails.Checked;
-            gSettings.DeleteRequest = chkDeleteRequest.Checked;
-            gSettings.RequestList = txtRequestList.Text;
-            gSettings.UseParent = chkUseParent.Checked;
-            gSettings.Search = chkSearch.Checked;
-            gSettings.LockSearch = chkLockSearch.Checked;
-            gSettings.AssociatedItems = chkAssociatedItems.Checked;
-            gSettings.DisplayFormRedirect = chkDisplayRedirect.Checked;
-            gSettings.EnableResourcePlan = chkResTools.Checked;
-            gSettings.BuildTeam = chkEnableTeam.Checked;
-            gSettings.BuildTeamSecurity = chkEnableTeamSecurity.Checked;
-            gSettings.BuildTeamPermissions = GetGroupsPermissionsAssignment();
-            gSettings.EnableContentReporting = chkContentReporting.Checked;
-            gSettings.DisableThumbnails = chkDisableThumbnails.Checked;
             gSettings.SaveSettings(list);
+            
+            UpdateEmaiInstalls(list);
+            UpdateListEvents(gSettings, list);
+            ProcessTimeSheets(list, web);
+            ProcessFancyForms(list);
+            ProcessGridGanttViews(list);
+            ProcessWorkEngineFeatures(list);
+            UpdateReportBiz(list);
+            SetListIcon(gSettings.ListIcon);
 
-            //if ((uint)list.BaseTemplate == 10115 || (uint)list.BaseTemplate == 10701 || (uint)list.BaseTemplate == 10702)
+            CacheStore.Current.RemoveCategory("GridSettings-" + list.ID);
+
+            SPUtility.Redirect("listedit.aspx?List=" + Request["List"], SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+        }
+
+        private void UpdateEmaiInstalls(SPList list)
+        {
+            if (chkEmails.Checked)
             {
-                if (chkEmails.Checked)
-                    API.APIEmail.InstallAssignedToEvent(list);
-                else
-                    API.APIEmail.UnInstallAssignedToEvent(list);
-                //list.EnableAssignToEmail = chkEmails.Checked;
-                //list.Update();
-                //CoreFunctions.setListSetting(list, "AssignedToEmail", chkEmails.Checked.ToString());
+                APIEmail.InstallAssignedToEvent(list);
+            }
+            else
+            {
+                APIEmail.UnInstallAssignedToEvent(list);
+            }
+        }
+
+        private void UpdateListEvents(GridGanttSettings gSettings, SPList list)
+        {
+            UpdateItemSecurityEvents(gSettings, list);
+
+            UpdateItemEnableTeamEvents(list);
+
+            UpdateItemWorkspaceEvents(list);
+        }
+
+        private void UpdateItemWorkspaceEvents(SPList list)
+        {
+            if (chkAutoCreate.Checked)
+            {
+                UpdateAutoCreateItemWorkspaceEvents(list);
+            }
+            else
+            {
+                UpdateNoAutoCreateItemWorkspaceEvents(list);
+            }
+        }
+
+        private static void UpdateNoAutoCreateItemWorkspaceEvents(SPList list)
+        {
+            var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+            var className = "EPMLiveCore.ItemWorkspaceEventReceiver";
+
+            var listEvents = CoreFunctions.GetListEvents(
+                list,
+                assemblyName,
+                className,
+                new List<SPEventReceiverType>
+                {
+                    SPEventReceiverType.ItemAdded
+                });
+            foreach (var listEvent in listEvents)
+            {
+                listEvent.Delete();
             }
 
-            if (gSettings.BuildTeamSecurity)
+            list.Update();
+        }
+
+        private static void UpdateAutoCreateItemWorkspaceEvents(SPList list)
+        {
+            var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+            var className = "EPMLiveCore.ItemWorkspaceEventReceiver";
+
+            var listEvents = CoreFunctions.GetListEvents(
+                list,
+                assemblyName,
+                className,
+                new[]
+                {
+                    SPEventReceiverType.ItemAdded
+                });
+            foreach (var listEvent in listEvents)
             {
-                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
-                string className = "EPMLiveCore.ItemSecurityEventReceiver";
+                listEvent.Delete();
+            }
 
-                List<SPEventReceiverDefinition> evts = CoreFunctions.GetListEvents(list,
-                                                                     assemblyName,
-                                                                     className,
-                                                                     new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
-                                                                                                     SPEventReceiverType.ItemUpdated,
-                                                                                                     SPEventReceiverType.ItemDeleting});
-                foreach (SPEventReceiverDefinition evt in evts)
+            var evtAdded = list.EventReceivers.Add();
+            evtAdded.Type = SPEventReceiverType.ItemAdded;
+            evtAdded.Assembly = assemblyName;
+            evtAdded.Class = className;
+            evtAdded.Update();
+            list.Update();
+        }
+
+        private void UpdateItemEnableTeamEvents(SPList list)
+        {
+            if (chkEnableTeam.Checked && !chkEnableTeamSecurity.Checked)
+            {
+                UpdateItemEnableTeamEventsWithSecurity(list);
+            }
+            else
+            {
+                UpdateItemEnableTeamEventsWithNoSecurity(list);
+            }
+        }
+
+        private void UpdateItemEnableTeamEventsWithNoSecurity(SPList list)
+        {
+            if (chkEnableTeam.Checked || chkEnableTeamSecurity.Checked && list.BaseTemplate == SPListTemplateType.DocumentLibrary)
+            {
+                // EPML-4257 : In  document library if you have enable team and enable team security on the library will not load
+                ListCommands.EnableTeamFeatures(list);
+
+                var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+                var className = "EPMLiveCore.ItemEnableTeamEvent";
+
+                var listEvents = CoreFunctions.GetListEvents(
+                    list,
+                    assemblyName,
+                    className,
+                    new[]
+                    {
+                        SPEventReceiverType.ItemAdded
+                    });
+                foreach (var listEvent in listEvents)
                 {
-                    evt.Delete();
+                    listEvent.Delete();
                 }
 
-                list.EventReceivers.Add(SPEventReceiverType.ItemAdded, assemblyName, className);
-                list.EventReceivers.Add(SPEventReceiverType.ItemUpdated, assemblyName, className);
-                list.EventReceivers.Add(SPEventReceiverType.ItemDeleting, assemblyName, className);
-
-                List<SPEventReceiverDefinition> newEvts = CoreFunctions.GetListEvents(list,
-                                                                   assemblyName,
-                                                                   className,
-                                                                   new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
-                                                                                                     SPEventReceiverType.ItemUpdated,
-                                                                                                     SPEventReceiverType.ItemDeleting});
-                foreach (SPEventReceiverDefinition evt in newEvts)
-                {
-                    evt.SequenceNumber = 11000;
-                    evt.Update();
-                }
-
+                var evtAdded = list.EventReceivers.Add();
+                evtAdded.Type = SPEventReceiverType.ItemAdded;
+                evtAdded.Assembly = assemblyName;
+                evtAdded.Class = className;
+                evtAdded.SequenceNumber = 11000;
+                evtAdded.Update();
                 list.Update();
             }
             else
             {
-                bool hasSecFld = false;
-                string lookups = gSettings.Lookups;
-                if (!string.IsNullOrEmpty(lookups))
-                {
-                    string[] settings = lookups.Split('|');
-                    foreach (string s in settings)
-                    {
-                        if (!string.IsNullOrEmpty(s))
-                        {
-                            string[] vals = s.Split('^');
+                var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+                var className = "EPMLiveCore.ItemEnableTeamEvent";
 
-                            bool isSec = false;
-                            try
-                            {
-                                isSec = bool.Parse(vals[4]);
-                            }
-                            catch { }
-                            if (isSec)
-                            {
-                                hasSecFld = true;
-                                break;
-                            }
+                var listEvents = CoreFunctions.GetListEvents(
+                    list,
+                    assemblyName,
+                    className,
+                    new[]
+                    {
+                        SPEventReceiverType.ItemAdded
+                    });
+                foreach (var listEvent in listEvents)
+                {
+                    listEvent.Delete();
+                }
+
+                list.Update();
+            }
+        }
+
+        private static void UpdateItemEnableTeamEventsWithSecurity(SPList list)
+        {
+            ListCommands.EnableTeamFeatures(list);
+
+            var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+            var className = "EPMLiveCore.ItemEnableTeamEvent";
+
+            var listEvents = CoreFunctions.GetListEvents(
+                list,
+                assemblyName,
+                className,
+                new[]
+                {
+                    SPEventReceiverType.ItemAdded
+                });
+            foreach (var listEvent in listEvents)
+            {
+                listEvent.Delete();
+            }
+
+            var evtAdded = list.EventReceivers.Add();
+            evtAdded.Type = SPEventReceiverType.ItemAdded;
+            evtAdded.Assembly = assemblyName;
+            evtAdded.Class = className;
+            evtAdded.SequenceNumber = 11000;
+            evtAdded.Update();
+            list.Update();
+        }
+
+        private static void UpdateItemSecurityEvents(GridGanttSettings gSettings, SPList list)
+        {
+            if (gSettings.BuildTeamSecurity)
+            {
+                UpdateItemSecurityEventsWithSecurity(list);
+            }
+            else
+            {
+                UpdateItemSecurityEventsWithNoSecurity(gSettings, list);
+            }
+        }
+
+        private static void UpdateItemSecurityEventsWithNoSecurity(GridGanttSettings gSettings, SPList list)
+        {
+            var hasSecFld = false;
+            var lookups = gSettings.Lookups;
+            if (!string.IsNullOrWhiteSpace(lookups))
+            {
+                var settings = lookups.Split(Separator);
+                foreach (var setting in settings)
+                {
+                    if (!string.IsNullOrWhiteSpace(setting))
+                    {
+                        var values = setting.Split('^');
+
+                        var isSec = false;
+                        try
+                        {
+                            isSec = bool.Parse(values[4]);
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                        }
+                        if (isSec)
+                        {
+                            hasSecFld = true;
+                            break;
                         }
                     }
                 }
+            }
 
-                if (!hasSecFld)
-                {
-                    string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
-                    string className = "EPMLiveCore.ItemSecurityEventReceiver";
+            if (!hasSecFld)
+            {
+                var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+                var className = "EPMLiveCore.ItemSecurityEventReceiver";
 
-                    List<SPEventReceiverDefinition> evts = CoreFunctions.GetListEvents(list,
-                                                                         assemblyName,
-                                                                         className,
-                                                                         new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
-                                                                                                     SPEventReceiverType.ItemUpdated,
-                                                                                                     SPEventReceiverType.ItemDeleting});
-                    foreach (SPEventReceiverDefinition evt in evts)
+                var listEvents = CoreFunctions.GetListEvents(
+                    list,
+                    assemblyName,
+                    className,
+                    new[]
                     {
-                        evt.Delete();
-                    }
-                    list.Update();
-                }
-            }
+                        SPEventReceiverType.ItemAdded,
+                        SPEventReceiverType.ItemUpdated,
+                        SPEventReceiverType.ItemDeleting
+                    });
 
-
-
-            if (chkEnableTeam.Checked && !chkEnableTeamSecurity.Checked)
-            {
-                API.ListCommands.EnableTeamFeatures(list);
-
-                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
-                string className = "EPMLiveCore.ItemEnableTeamEvent";
-
-                List<SPEventReceiverDefinition> evts = CoreFunctions.GetListEvents(list,
-                                                                     assemblyName,
-                                                                     className,
-                                                                     new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded });
-                foreach (SPEventReceiverDefinition evt in evts)
+                foreach (var listEvent in listEvents)
                 {
-                    evt.Delete();
+                    listEvent.Delete();
                 }
-
-                SPEventReceiverDefinition evtAdded = list.EventReceivers.Add();
-                evtAdded.Type = SPEventReceiverType.ItemAdded;
-                evtAdded.Assembly = assemblyName;
-                evtAdded.Class = className;
-                evtAdded.SequenceNumber = 11000;
-                evtAdded.Update();
                 list.Update();
             }
-            else if (chkEnableTeam.Checked || chkEnableTeamSecurity.Checked && list.BaseTemplate == SPListTemplateType.DocumentLibrary)
-            {
-                //EPML-4257 : In  document library if you have enable team and enable team security on the library will not load
-                API.ListCommands.EnableTeamFeatures(list);
+        }
 
-                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
-                string className = "EPMLiveCore.ItemEnableTeamEvent";
+        private static void UpdateItemSecurityEventsWithSecurity(SPList list)
+        {
+            var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+            var className = "EPMLiveCore.ItemSecurityEventReceiver";
 
-                List<SPEventReceiverDefinition> evts = CoreFunctions.GetListEvents(list,
-                                                                     assemblyName,
-                                                                     className,
-                                                                     new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded });
-                foreach (SPEventReceiverDefinition evt in evts)
+            var listEvents = CoreFunctions.GetListEvents(
+                list,
+                assemblyName,
+                className,
+                new[]
                 {
-                    evt.Delete();
-                }
+                    SPEventReceiverType.ItemAdded,
+                    SPEventReceiverType.ItemUpdated,
+                    SPEventReceiverType.ItemDeleting
+                });
 
-                SPEventReceiverDefinition evtAdded = list.EventReceivers.Add();
-                evtAdded.Type = SPEventReceiverType.ItemAdded;
-                evtAdded.Assembly = assemblyName;
-                evtAdded.Class = className;
-                evtAdded.SequenceNumber = 11000;
-                evtAdded.Update();
-                list.Update();
-            }
-            else
+            foreach (var listEvent in listEvents)
             {
-                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
-                string className = "EPMLiveCore.ItemEnableTeamEvent";
-
-                List<SPEventReceiverDefinition> evts = CoreFunctions.GetListEvents(list,
-                                                                     assemblyName,
-                                                                     className,
-                                                                     new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded });
-                foreach (SPEventReceiverDefinition evt in evts)
-                {
-                    evt.Delete();
-                }
-
-                list.Update();
+                listEvent.Delete();
             }
 
-            // attached workspace auto creation event
-            if (chkAutoCreate.Checked)
-            {
-                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
-                string className = "EPMLiveCore.ItemWorkspaceEventReceiver";
+            list.EventReceivers.Add(SPEventReceiverType.ItemAdded, assemblyName, className);
+            list.EventReceivers.Add(SPEventReceiverType.ItemUpdated, assemblyName, className);
+            list.EventReceivers.Add(SPEventReceiverType.ItemDeleting, assemblyName, className);
 
-                List<SPEventReceiverDefinition> evts = CoreFunctions.GetListEvents(list,
-                                                                     assemblyName,
-                                                                     className,
-                                                                     new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded });
-                foreach (SPEventReceiverDefinition evt in evts)
+            var newEvents = CoreFunctions.GetListEvents(
+                list,
+                assemblyName,
+                className,
+                new[]
                 {
-                    evt.Delete();
-                }
+                    SPEventReceiverType.ItemAdded,
+                    SPEventReceiverType.ItemUpdated,
+                    SPEventReceiverType.ItemDeleting
+                });
 
-                SPEventReceiverDefinition evtAdded = list.EventReceivers.Add();
-                evtAdded.Type = SPEventReceiverType.ItemAdded;
-                evtAdded.Assembly = assemblyName;
-                evtAdded.Class = className;
-                evtAdded.Update();
-                list.Update();
-            }
-            else
+            foreach (var newEvent in newEvents)
             {
-                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
-                string className = "EPMLiveCore.ItemWorkspaceEventReceiver";
-
-                List<SPEventReceiverDefinition> evts = CoreFunctions.GetListEvents(list,
-                                                                     assemblyName,
-                                                                     className,
-                                                                     new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded });
-                foreach (SPEventReceiverDefinition evt in evts)
-                {
-                    evt.Delete();
-                }
-
-                list.Update();
+                newEvent.SequenceNumber = 11000;
+                newEvent.Update();
             }
 
+            list.Update();
+        }
+
+        private void ProcessTimeSheets(SPList list, SPWeb web)
+        {
             if (chkTimesheet.Checked)
-                API.ListCommands.EnableTimesheets(list, web);
+            {
+                ListCommands.EnableTimesheets(list, web);
+            }
             else
-                API.ListCommands.DisableTimesheets(list, web);
+            {
+                ListCommands.DisableTimesheets(list, web);
+            }
+        }
 
+        private void ProcessFancyForms(SPList list)
+        {
             if (chkFancyForms.Checked)
+            {
                 EnableFancyForms(list);
+            }
             else
+            {
                 DisableFancyForms(list);
+            }
+        }
 
+        private void ProcessGridGanttViews(SPList list)
+        {
             if (chkAssociatedItems.Checked)
             {
                 AddGridGanttToViews(list);
             }
+        }
 
+        private void ProcessWorkEngineFeatures(SPList list)
+        {
             if (chkWorkListFeat.Checked)
             {
                 EnableWorkengineListFeatures(list);
@@ -1353,80 +1526,136 @@ namespace EPMLiveCore.Layouts.epmlive
             {
                 RemoveWorkengineListFeatures();
             }
+        }
 
-            if (ifsEnableReporting.Visible && cbEnableReporting.Checked)
+        private void UpdateReportBiz(SPList list)
+        {
+            if (ifsEnableReporting.Visible)
             {
-                ReportBiz reportBiz = new ReportBiz(SPContext.Current.Site.ID);
-                if (reportBiz.SiteExists())
+                if (cbEnableReporting.Checked)
                 {
-                    Collection<string> mappedLists = reportBiz.GetMappedListsIds();
-                    if (!mappedLists.Contains(list.ID.ToString().ToLower()))
+                    var reportBiz = new ReportBiz(SPContext.Current.Site.ID);
+                    if (reportBiz.SiteExists())
                     {
-                        var fields = new ListItemCollection();
-                        fields = GetListFields(list);
-                        reportBiz.CreateListBiz(list.ID, SPContext.Current.Web.ID, fields);
+                        var mappedLists = reportBiz.GetMappedListsIds();
+                        if (!mappedLists.Contains(list.ID.ToString().ToLower()))
+                        {
+                            var fields = GetListFields(list);
+                            reportBiz.CreateListBiz(list.ID, SPContext.Current.Web.ID, fields);
 
-                        //reportBiz.CreateListBiz(list.ID);
+                            try
+                            {
+                                using (var epmData = new EPMData(SPContext.Current.Site.ID))
+                                {
+                                    reportBiz.UpdateForeignKeys(epmData);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                SPSecurity.RunWithElevatedPrivileges(
+                                    delegate
+                                    {
+                                        if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
+                                        {
+                                            EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
+                                        }
 
+                                        using (var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys"))
+                                        {
+                                            const int MaximumKilobytes = 32768;
+                                            myLog.MaximumKilobytes = MaximumKilobytes;
+                                            const int EventId = 4001;
+                                            myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, EventId);
+                                        }
+                                    });
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    var reportBiz = new ReportBiz(SPContext.Current.Site.ID);
+                    var listId = new Guid(Request["List"]);
+                    using (var epmData = new EPMData(SPContext.Current.Site.ID))
+                    {
+                        epmData.Command = "SELECT TableName FROM RPTList WHERE RPTListID=@RPTListID";
+                        epmData.AddParam("@RPTListID", Request["List"]);
+                        var sTableName = string.Empty;
                         try
                         {
-                            //FOREIGN IMPLEMENTATION -- START
-                            EPMData DAO = new EPMData(SPContext.Current.Site.ID);
-                            reportBiz.UpdateForeignKeys(DAO);
-                            DAO.Dispose();
-                            // -- END
+                            sTableName = epmData.ExecuteScalar(epmData.GetClientReportingConnection).ToString();
                         }
                         catch (Exception ex)
                         {
-                            SPSecurity.RunWithElevatedPrivileges(delegate ()
-                            {
-                                if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
-                                    EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
+                            System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                        }
+                        var refTables = new DataTable();
 
-                                EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys");
-                                myLog.MaximumKilobytes = 32768;
-                                myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 4001);
-                            });
+                        if (!string.IsNullOrWhiteSpace(sTableName))
+                        {
+                            refTables = reportBiz.GetReferencingTables(epmData, sTableName);
+                            if (refTables.Rows.Count == 0)
+                            {
+                                reportBiz.GetListBiz(new Guid(Request["List"])).Delete();
+                            }
+                            else
+                            {
+                                ShowAlert();
+                            }
                         }
                     }
                 }
             }
-            else if (ifsEnableReporting.Visible && !cbEnableReporting.Checked)
+        }
+
+        private GridGanttSettings GetGridGanttSettings(SPList list)
+        {
+            var gSettings = new GridGanttSettings(list)
             {
-
-                var reportBiz = new ReportBiz(SPContext.Current.Site.ID);
-                Guid listId = new Guid(Request["List"]);
-                EPMData _DAO = new EPMData(SPContext.Current.Site.ID);
-                _DAO.Command = "SELECT TableName FROM RPTList WHERE RPTListID=@RPTListID";
-                _DAO.AddParam("@RPTListID", Request["List"]);
-                string sTableName = string.Empty;
-                try
-                {
-                    sTableName = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection).ToString();
-                }
-                catch { }
-                DataTable refTables = new DataTable();
-
-                if (!string.IsNullOrEmpty(sTableName))
-                {
-                    refTables = reportBiz.GetReferencingTables(_DAO, sTableName);
-                    if (refTables.Rows.Count == 0)
-                    {
-                        reportBiz.GetListBiz(new Guid(Request["List"])).Delete();
-                    }
-                    else
-                    {
-                        //SPUtility.Redirect("epmlive/ListMappings.aspx?delete=true&id=" + param + "&name=" + sTableName, SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-                        ShowAlert();
-                    }
-                }
-            }
-
-            SetListIcon(gSettings.ListIcon);
-
-            Infrastructure.CacheStore.Current.RemoveCategory("GridSettings-" + list.ID);
-
-            Microsoft.SharePoint.Utilities.SPUtility.Redirect("listedit.aspx?List=" + Request["List"], Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+                StartDate = ddlStartDate.SelectedValue,
+                DueDate = ddlDueDate.SelectedValue,
+                Progress = ddlProgressBar.SelectedValue,
+                WBS = ddlWBS.SelectedValue,
+                Milestone = ddlMilestone.SelectedValue,
+                Executive = chkExecutive.Checked,
+                Information = ddlInformation.SelectedValue,
+                ItemLink = ddlItemLink.SelectedValue,
+                RibbonBehavior = ddlRibbonBehavior.SelectedValue,
+                RollupLists = txtRollupLists.Text.Replace(",", "|").Replace("\r\n", ","),
+                RollupSites = txtRollupSites.Text.Replace("\r\n", ","),
+                ShowViewToolbar = chkShowViewToolbar.Checked,
+                HideNewButton = chkHideNewButton.Checked,
+                Performance = chkPerformance.Checked,
+                AllowEdit = chkAllowEdit.Checked,
+                EditDefault = chkEditDefault.Checked,
+                ShowInsert = chkShowInsert.Checked,
+                DisableNewItemMod = chkDisableNewRollup.Checked,
+                UseNewMenu = chkUseNewMenu.Checked,
+                NewMenuName = txtNewMenuName.Text,
+                UsePopup = chkUsePopup.Checked,
+                EnableRequests = chkEnableRequests.Checked,
+                EnableAutoCreation = chkAutoCreate.Checked,
+                AutoCreationTemplateId = ddlAutoCreateTemplate.SelectedValue,
+                WorkspaceParentSiteLookup = ddlParentSiteLookup.SelectedValue,
+                ListIcon = hdnListIcon.Value,
+                EnableWorkList = chkWorkListFeat.Checked,
+                EnableFancyForms = chkFancyForms.Checked,
+                SendEmails = chkEmails.Checked,
+                DeleteRequest = chkDeleteRequest.Checked,
+                RequestList = txtRequestList.Text,
+                UseParent = chkUseParent.Checked,
+                Search = chkSearch.Checked,
+                LockSearch = chkLockSearch.Checked,
+                AssociatedItems = chkAssociatedItems.Checked,
+                DisplayFormRedirect = chkDisplayRedirect.Checked,
+                EnableResourcePlan = chkResTools.Checked,
+                BuildTeam = chkEnableTeam.Checked,
+                BuildTeamSecurity = chkEnableTeamSecurity.Checked,
+                BuildTeamPermissions = GetGroupsPermissionsAssignment(),
+                EnableContentReporting = chkContentReporting.Checked,
+                DisableThumbnails = chkDisableThumbnails.Checked
+            };
+            return gSettings;
         }
 
         private void SetListIcon(string icon)

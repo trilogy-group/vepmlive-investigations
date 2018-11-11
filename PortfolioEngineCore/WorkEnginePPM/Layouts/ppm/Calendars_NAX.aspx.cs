@@ -9,6 +9,14 @@ namespace WorkEnginePPM.Layouts.ppm
 {
     public partial class Calendars_NAX : LayoutsPageBase
     {
+        public string FileVersion
+        {
+            get
+            {
+                return PPM.PfEAssemblyInfo.FileVersion();
+            }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
              DBAccess dba = null;

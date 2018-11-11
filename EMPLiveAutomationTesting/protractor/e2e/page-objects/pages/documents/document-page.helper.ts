@@ -11,6 +11,7 @@ import {CheckboxHelper} from '../../../components/html/checkbox-helper';
 import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
 import {WaitHelper} from '../../../components/html/wait-helper';
 import {DocumentPage} from './document-page.po';
+import {CommonPageHelper} from '../common/common-page.helper';
 
 export class DocumentPageHelper {
 
@@ -46,7 +47,7 @@ export class DocumentPageHelper {
         StepLogger.stepId(3);
         StepLogger.step('Click on Choose File button in Add a document pop up > Browse and select the file ' +
             'that need to be added as a Project document [Ex: testfile.txt]');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
         await PageHelper.uploadFile(CommonPage.browseButton, filePath);
 
         if (newVersionFile === true) {
@@ -148,7 +149,7 @@ export class DocumentPageHelper {
         StepLogger.stepId(4);
         StepLogger.step('Click in Choose file button displayed in Choose a file row in Add a document popup' +
             'Search and select the file to upload [Ex: Testwordfile.docx] and click Open button');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame();
         await PageHelper.uploadFile(CommonPage.browseButton, filePath);
 
         // Selected file name is displayed on right side of Choose file button is not possible.

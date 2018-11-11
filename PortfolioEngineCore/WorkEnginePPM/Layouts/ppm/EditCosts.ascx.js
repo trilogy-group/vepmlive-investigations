@@ -1023,11 +1023,14 @@
                     var col = g.ColNames[1][c];
                     var sType = col.substring(0, 1);
                     var periodId = parseInt(col.substring(1));
-                    if (grid.GetAttribute(null, col, "Current") == true) {
+
+                    if (grid.GetAttribute(null, col, "Current")) {
                         this.currentPeriod = periodId;
-                        if (this.startPeriod <= this.currentPeriod) {
-                            this.startPeriod = this.currentPeriod;
-                            this.editorTab.selectByValue("idViewTab_FromPeriod", 0);
+                        if (!grid.FloatingPeriods) {
+                            if (this.startPeriod <= this.currentPeriod) {
+                                this.startPeriod = this.currentPeriod;
+                                this.editorTab.selectByValue("idViewTab_FromPeriod", 0);
+                            }
                         }
                         break;
                     }
@@ -1348,8 +1351,8 @@
         var sType = col.substring(0, 1);
         var sId = col.substring(1);
         var r = this.GetRate(grid, row, col);
-        if (sType == "Q" && r > 0) {
-            var v = row[col] * r;
+        if (sType === "Q" && r.Rate > 0) {
+            var v = row[col] * r.Rate * (1 - r.Discount);
             if (v != row["C" + sId]) {
                 row["C" + sId] = v;
                 this.CalculateRowTotals(grid, row);
@@ -1362,8 +1365,14 @@
                 this.CalculateColCostTotals(grid, grid.GetFirst(null, 0), "TC", true);
                 grid.RefreshRow(row);
             }
+
+            // if discount is set then make sure we have included discount value in row
+            // discount value will be used on server side calculations when project discount rate changed
+            if (r.Discount > 0) {
+                row["D" + sId] = row[col] * r.Rate * r.Discount;
+            }
         }
-        else if (sType == "C") {
+        else if (sType === "C") {
             this.CalculateRowTotals(grid, row);
             this.CalculateColCostTotals(grid, grid.GetFirst(null, 0), col, true);
             this.CalculateColCostTotals(grid, grid.GetFirst(null, 0), "TC", true);
@@ -1396,7 +1405,15 @@
         grid.RefreshRow(row);
     };
     EditCosts.prototype.GetRate = function (grid, row, col) {
-        var r = null;
+        var r = {
+            Rate: null,
+            Discount: grid.GetAttribute(row, null, "Discount")
+        };
+
+        if (isNaN(r.Discount)) {
+            r.Discount = 0;
+        }
+        
         var sId = col.substring(1);
         if (this.NamedRateValues != null) {
             var rowNamedRateUid = grid.GetAttribute(row, null, "V");
@@ -1408,16 +1425,19 @@
                     for (var n = 0; n < this.NamedRateValues.length; n++) {
                         if (rowNamedRateUid == this.NamedRateValues[n].Id) {
                             if (this.NamedRateValues[n].EffectiveDate <= start) {
-                                return this.NamedRateValues[n].Rate;
+                                r.Rate = this.NamedRateValues[n].Rate;
+                                return r;
                             }
                         }
                     }
                 }
             }
         }
-        if (r == null) {
-            r = grid.GetAttribute(row, null, "R" + sId);
+
+        if (r.Rate == null) {
+            r.Rate = grid.GetAttribute(row, null, "R" + sId);
         }
+
         return r;
     };
     EditCosts.prototype.UpdateAllCalculatedCells = function (grid) {
@@ -1451,8 +1471,8 @@
                                 if (calccosts == true) {
                                     if (row["uom"] != "") {
                                         var r = this.GetRate(grid, row, col);
-                                        if (r > 0) {
-                                            var v = q * r;
+                                        if (r.Rate > 0) {
+                                            var v = q * r.Rate * (1 - r.Discount);
                                             var cv = row["C" + sId];
                                             var diff = (cv - v);
                                             if (diff > 0.01 || diff < -0.01)
@@ -1462,6 +1482,13 @@
                                         }
                                         else if (q != 0)
                                             row["C" + sId] = "";
+
+                                        if (r.Discount > 0) {
+                                            row["D" + sId] = q * r.Rate * r.Discount;
+                                        }
+                                        else if (q > 0) {
+                                            row["D" + sId] = 0;
+                                        }
                                     }
                                 }
                                 if (FTEconv > 0)

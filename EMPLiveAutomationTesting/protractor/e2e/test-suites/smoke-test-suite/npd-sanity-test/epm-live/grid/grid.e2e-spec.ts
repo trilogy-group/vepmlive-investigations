@@ -79,7 +79,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.step('Select another resource by checking respective check box');
         await ElementHelper.actionDoubleClick(ProjectItemPage.assignToDropDown);
-        // await browser.actions().click(ProjectItemPageHelper.selectAssign(2)).perform();
 
         StepLogger.step('Click OK button');
         await PageHelper.click(ProjectItemPageHelper.button.ok);

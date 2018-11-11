@@ -17,6 +17,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using EPMLiveCore;
 using EPMLiveCore.Infrastructure;
+using WorkEnginePPM;
+using Diagnostics = System.Diagnostics;
+using ListDisplayUtils = EPMLiveCore.ListDisplayUtils;
 
 namespace EPMLiveWebParts
 {
@@ -1779,71 +1782,7 @@ namespace EPMLiveWebParts
                                         ndNewCell.Attributes.Append(attrType);
                                         break;
                                     default:
-                                        switch (field.TypeAsString)
-                                        {
-                                            case "FilteredLookup":
-
-                                                if (inEditMode)
-                                                {
-
-                                                    Guid lookuplist = new Guid(fieldXml.ChildNodes[0].Attributes["List"].Value);
-                                                    Guid lookupfield = new Guid(fieldXml.ChildNodes[0].Attributes["ShowField"].Value);
-                                                    Guid lookupweb = new Guid(fieldXml.ChildNodes[0].Attributes["WebId"].Value);
-
-                                                    XmlNode nd = fieldXml.ChildNodes[0].SelectSingleNode("Customization").SelectSingleNode("ArrayOfProperty");
-
-                                                    string query = nd.SelectSingleNode("Property[Name='QueryFilterAsString']").SelectSingleNode("Value").InnerText;
-                                                    string listview = nd.SelectSingleNode("Property[Name='ListViewFilter']").SelectSingleNode("Value").InnerText;
-                                                    string multi = nd.SelectSingleNode("Property[Name='SupportsMultipleValues']").SelectSingleNode("Value").InnerText;
-                                                    string recurse = nd.SelectSingleNode("Property[Name='IsFilterRecursive']").SelectSingleNode("Value").InnerText;
-
-                                                    string strType = "choice";
-                                                    if (multi.ToLower() == "true")
-                                                    {
-                                                        strType = "mchoice";
-                                                        SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(val);
-                                                        foreach (SPFieldLookupValue lv in lvc)
-                                                        {
-                                                            displayValue += "\n" + lv.ToString();
-                                                        }
-                                                        if (displayValue.Length > 1)
-                                                            displayValue = displayValue.Substring(1);
-                                                    }
-                                                    else
-                                                    {
-                                                        displayValue = val;
-                                                    }
-
-                                                    attrType = docXml.CreateAttribute("type");
-                                                    attrType.Value = strType;
-                                                    ndNewCell.Attributes.Append(attrType);
-
-                                                    if (!hshComboCells.Contains(field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()))
-                                                    {
-                                                        string choices = "";
-                                                        if (lookupweb == list.ParentWeb.ID)
-                                                        {
-                                                            choices = getLookupList(list.ParentWeb, lookuplist, lookupfield, query, listview);
-                                                        }
-                                                        else
-                                                        {
-                                                            try
-                                                            {
-                                                                using (SPWeb w = list.ParentWeb.Site.OpenWeb(lookupweb))
-                                                                {
-                                                                    choices = getLookupList(w, lookuplist, lookupfield, query, listview);
-                                                                }
-                                                            }
-                                                            catch { }
-                                                        }
-                                                        hshComboCells[field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()] = choices;
-                                                    }
-                                                    displayValue += "\t" + hshComboCells[field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()].ToString();
-
-                                                }
-
-                                                break;
-                                        }
+                                        HandleFilteredLookupCase(field, fieldXml, val, ndNewCell, ref displayValue);
                                         break;
                                 };
 
@@ -2065,68 +2004,85 @@ namespace EPMLiveWebParts
             }
         }
 
-        private bool isEditable(SPListItem li, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
+        private void HandleFilteredLookupCase(SPField field, XmlDocument fieldXml, string val, XmlNode ndNewCell, ref string displayValue)
         {
-
-            try
+            switch (field.TypeAsString)
             {
-                if (!fieldProperties[field.InternalName].ContainsKey("Edit"))
-                    return true;
+                case "FilteredLookup":
 
-                string displaySettings = string.Empty;
+                    if (inEditMode)
+                    {
+                        var lookuplist = new Guid(fieldXml.ChildNodes[0].Attributes["List"].Value);
+                        var lookupfield = new Guid(fieldXml.ChildNodes[0].Attributes["ShowField"].Value);
+                        var lookupweb = new Guid(fieldXml.ChildNodes[0].Attributes["WebId"].Value);
 
-                displaySettings = fieldProperties[field.InternalName]["Edit"];
-                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
-                {
-                    string where = displaySettings.Split(";".ToCharArray())[1];
-                    string conditionField = "";
-                    string condition = "";
-                    string group = "";
-                    string valueCondition = "";
-                    if (where.Equals("[Me]"))
-                    {
-                        condition = displaySettings.Split(";".ToCharArray())[2];
-                        group = displaySettings.Split(";".ToCharArray())[3];
-                    }
-                    else // [Field]
-                    {
-                        conditionField = displaySettings.Split(";".ToCharArray())[2];
-                        condition = displaySettings.Split(";".ToCharArray())[3];
-                        valueCondition = displaySettings.Split(";".ToCharArray())[4];
-                    }
-                    bool e = EPMLiveCore.EditableFieldDisplay.RenderField(field, where, conditionField, condition, group, valueCondition, li);
-                    if (!e)
-                        return false;
-                }
+                        var node = fieldXml.ChildNodes[0].SelectSingleNode("Customization").SelectSingleNode("ArrayOfProperty");
 
-                displaySettings = fieldProperties[field.InternalName]["Editable"];
-                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("never"))
-                    return false;
-                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
-                {
-                    string where = displaySettings.Split(";".ToCharArray())[1];
-                    string conditionField = "";
-                    string condition = "";
-                    string group = "";
-                    string valueCondition = "";
-                    if (where.Equals("[Me]"))
-                    {
-                        condition = displaySettings.Split(";".ToCharArray())[2];
-                        group = displaySettings.Split(";".ToCharArray())[3];
-                    }
-                    else // [Field]
-                    {
-                        conditionField = displaySettings.Split(";".ToCharArray())[2];
-                        condition = displaySettings.Split(";".ToCharArray())[3];
-                        valueCondition = displaySettings.Split(";".ToCharArray())[4];
-                    }
-                    return EPMLiveCore.EditableFieldDisplay.RenderField(field, where, conditionField, condition, group, valueCondition, li);
-                }
+                        var query = node.SelectSingleNode("Property[Name='QueryFilterAsString']").SelectSingleNode("Value").InnerText;
+                        var listview = node.SelectSingleNode("Property[Name='ListViewFilter']").SelectSingleNode("Value").InnerText;
+                        var multi = node.SelectSingleNode("Property[Name='SupportsMultipleValues']").SelectSingleNode("Value").InnerText;
+                        var recurse = node.SelectSingleNode("Property[Name='IsFilterRecursive']").SelectSingleNode("Value").InnerText;
 
+                        var type = "choice";
+                        if (string.Equals(multi, "true", StringComparison.OrdinalIgnoreCase))
+                        {
+                            type = "mchoice";
+                            var lookupValueCollection = new SPFieldLookupValueCollection(val);
+                            var displayValueBuilder = new StringBuilder(displayValue);
+                            foreach (var lookupValue in lookupValueCollection)
+                            {
+                                displayValueBuilder.Append($"\n{lookupValue}");
+                            }
+                            displayValue = displayValueBuilder.ToString();
+
+                            if (displayValue.Length > 1)
+                            {
+                                displayValue = displayValue.Substring(1);
+                            }
+                        }
+                        else
+                        {
+                            displayValue = val;
+                        }
+
+                        var attrType = docXml.CreateAttribute("type");
+                        attrType.Value = type;
+                        ndNewCell.Attributes.Append(attrType);
+
+                        if (!hshComboCells.Contains($"{field.InternalName}-{list.ID}-{list.ParentWeb.ID}"))
+                        {
+                            var choices = string.Empty;
+                            if (lookupweb == list.ParentWeb.ID)
+                            {
+                                choices = getLookupList(list.ParentWeb, lookuplist, lookupfield, query, listview);
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    using (var w = list.ParentWeb.Site.OpenWeb(lookupweb))
+                                    {
+                                        choices = getLookupList(w, lookuplist, lookupfield, query, listview);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                                }
+                            }
+                            hshComboCells[$"{field.InternalName}-{list.ID}-{list.ParentWeb.ID}"] = choices;
+                        }
+                        displayValue += $"\t{hshComboCells[field.InternalName + "-" + list.ID + "-" + list.ParentWeb.ID]}";
+                    }
+                    break;
+                default:
+                    break;
             }
-            catch { }
-            return true;
+        }
 
+        private bool isEditable(SPListItem listItem, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
+        {
+                return HelperFunctions.IsEditable(listItem, field, fieldProperties);
         }
 
 
@@ -2854,71 +2810,7 @@ namespace EPMLiveWebParts
                                         ndNewCell.Attributes.Append(attrType);
                                         break;
                                     default:
-                                        switch (field.TypeAsString)
-                                        {
-                                            case "FilteredLookup":
-
-                                                if (inEditMode)
-                                                {
-
-                                                    Guid lookuplist = new Guid(fieldXml.ChildNodes[0].Attributes["List"].Value);
-                                                    Guid lookupfield = new Guid(fieldXml.ChildNodes[0].Attributes["ShowField"].Value);
-                                                    Guid lookupweb = new Guid(fieldXml.ChildNodes[0].Attributes["WebId"].Value);
-
-                                                    XmlNode nd = fieldXml.ChildNodes[0].SelectSingleNode("Customization").SelectSingleNode("ArrayOfProperty");
-
-                                                    string query = nd.SelectSingleNode("Property[Name='QueryFilterAsString']").SelectSingleNode("Value").InnerText;
-                                                    string listview = nd.SelectSingleNode("Property[Name='ListViewFilter']").SelectSingleNode("Value").InnerText;
-                                                    string multi = nd.SelectSingleNode("Property[Name='SupportsMultipleValues']").SelectSingleNode("Value").InnerText;
-                                                    string recurse = nd.SelectSingleNode("Property[Name='IsFilterRecursive']").SelectSingleNode("Value").InnerText;
-
-                                                    string strType = "choice";
-                                                    if (multi.ToLower() == "true")
-                                                    {
-                                                        strType = "mchoice";
-                                                        SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(val);
-                                                        foreach (SPFieldLookupValue lv in lvc)
-                                                        {
-                                                            displayValue += "\n" + lv.ToString();
-                                                        }
-                                                        if (displayValue.Length > 1)
-                                                            displayValue = displayValue.Substring(1);
-                                                    }
-                                                    else
-                                                    {
-                                                        displayValue = val;
-                                                    }
-
-                                                    attrType = docXml.CreateAttribute("type");
-                                                    attrType.Value = strType;
-                                                    ndNewCell.Attributes.Append(attrType);
-
-                                                    if (!hshComboCells.Contains(field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()))
-                                                    {
-                                                        string choices = "";
-                                                        if (lookupweb == list.ParentWeb.ID)
-                                                        {
-                                                            choices = getLookupList(list.ParentWeb, lookuplist, lookupfield, query, listview);
-                                                        }
-                                                        else
-                                                        {
-                                                            try
-                                                            {
-                                                                using (SPWeb w = list.ParentWeb.Site.OpenWeb(lookupweb))
-                                                                {
-                                                                    choices = getLookupList(w, lookuplist, lookupfield, query, listview);
-                                                                }
-                                                            }
-                                                            catch { }
-                                                        }
-                                                        hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()] = choices;
-                                                    }
-                                                    displayValue += "\t" + hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()].ToString();
-
-                                                }
-
-                                                break;
-                                        }
+                                        HandleFilteredLookupCase(field, fieldXml, val, ndNewCell, ref displayValue);
                                         break;
                                 };
                             }
@@ -3161,7 +3053,116 @@ namespace EPMLiveWebParts
                 ndSiteUrl.InnerText = "yes";
                 ndNewItem.AppendChild(ndSiteUrl);
             }
+            //============Comments===================
+            {
+                try
+                {
+                    string HasComments = "";
 
+                    string scomments = li["CommentCount"].ToString();
+                    double comments = 0;
+                    double.TryParse(scomments, out comments);
+                    if (comments > 0)
+                    {
+                        if (list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
+                        {
+                            ArrayList commenters = new ArrayList();
+                            int authorid = 0;
+                            try
+                            {
+                                commenters = new ArrayList(li["Commenters"].ToString().Split(','));
+                            }
+                            catch { }
+                            try
+                            {
+                                SPFieldUserValue uv = new SPFieldUserValue(list.ParentWeb, li["Author"].ToString());
+                                authorid = uv.LookupId;
+                            }
+                            catch { }
+                            bool isAssigned = false;
+                            try
+                            {
+                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(list.ParentWeb, li["AssignedTo"].ToString());
+                                foreach (SPFieldUserValue uv in uvc)
+                                {
+                                    if (uv.LookupId == list.ParentWeb.CurrentUser.ID)
+                                    {
+                                        isAssigned = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            catch { }
+                            if (commenters.Contains(list.ParentWeb.CurrentUser.ID.ToString()) || authorid == list.ParentWeb.CurrentUser.ID || isAssigned)
+                            {
+                                ArrayList commentersread = new ArrayList();
+                                try
+                                {
+                                    commentersread = new ArrayList(li["CommentersRead"].ToString().Split(','));
+                                }
+                                catch { }
+                                if (commentersread.Contains(list.ParentWeb.CurrentUser.ID.ToString()))
+                                {
+                                    HasComments += "1";
+                                }
+                                else
+                                {
+                                    HasComments += "2";
+                                }
+                            }
+                            else
+                                HasComments += "1";
+                        }
+                    }
+
+
+                    XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
+                    XmlAttribute attrName = docXml.CreateAttribute("name");
+                    attrName.Value = "HasComments";
+                    ndSiteUrl.Attributes.Append(attrName);
+                    ndSiteUrl.InnerText = HasComments;
+                    ndNewItem.AppendChild(ndSiteUrl);
+                }
+                catch { }
+            }
+            //===========
+            //============Plan===================
+            {
+                try
+                {
+                    string HasPlan = "";
+                    if (list.Title.Contains(TitleProjectCenter))
+                    {
+                        var plannerExists = false;
+                        SPFile file = GetTaskFile(list.ParentWeb, li.ID.ToString(), sPlannerID);
+                        if (file != null)
+                        {
+                            plannerExists = file.Exists;
+                        }
+                        if (!plannerExists)
+                        {
+                            file = list.ParentWeb.GetFile("Project Schedules/MSProject/" + li["Title"].ToString() + ".mpp");
+                            if (file != null)
+                            {
+                                plannerExists = file.Exists;
+                            }
+                        }
+                        if (plannerExists)
+                        {
+                            HasPlan = "1";
+                        }
+                    }
+
+
+                    XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
+                    XmlAttribute attrName = docXml.CreateAttribute("name");
+                    attrName.Value = "HasPlan";
+                    ndSiteUrl.Attributes.Append(attrName);
+                    ndSiteUrl.InnerText = HasPlan;
+                    ndNewItem.AppendChild(ndSiteUrl);
+                }
+                catch { }
+            }
             int counter = 1;
 
             foreach (string group in groups)
@@ -3698,47 +3699,7 @@ namespace EPMLiveWebParts
                                 catch { }
                                 if (newgroup == "")
                                     newgroup = " No " + field.Title;
-                                if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice || field.Type == SPFieldType.Lookup || field.TypeAsString == "FilteredLookup")
-                                {
-                                    string[] sGroups = newgroup.Split('\n');
-                                    string[] tmpGroups = new string[group.Length * sGroups.Length];
-
-                                    //group = new string[sGroups.Length];
-                                    int tmpCounter = 0;
-                                    foreach (string g in group)
-                                    {
-                                        foreach (string sGroup in sGroups)
-                                        {
-                                            if (g == null)
-                                                tmpGroups[tmpCounter] = sGroup.Trim();
-                                            else
-                                                tmpGroups[tmpCounter] = g + "\n" + sGroup.Trim();
-
-                                            if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
-                                            {
-                                                arrGTemp.Add(tmpGroups[tmpCounter], "");
-                                            }
-                                            tmpCounter++;
-                                        }
-                                    }
-                                    group = tmpGroups;
-                                }
-                                else
-                                {
-                                    for (int i = 0; i < group.Length; i++)
-                                    {
-                                        if (group[i] == null)
-                                            group[i] = newgroup;
-                                        else
-                                            group[i] += "\n" + newgroup;
-                                        if (!arrGTemp.Contains(group[i]))
-                                        {
-                                            arrGTemp.Add(group[i], "");
-                                        }
-                                    }
-                                }
-                                //}
-
+                                SetGroupsStrings(arrGTemp, field, newgroup, ref @group);
                             }
                         }
                         arrItems.Add(web.ID + "." + li.ParentList.ID + "." + li.ID, group);
@@ -3860,45 +3821,7 @@ namespace EPMLiveWebParts
                                 catch { }
                                 if (newgroup == "")
                                     newgroup = " No " + field.Title;
-                                if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice || field.Type == SPFieldType.Lookup || field.TypeAsString == "FilteredLookup")
-                                {
-                                    string[] sGroups = newgroup.Split('\n');
-                                    string[] tmpGroups = new string[group.Length * sGroups.Length];
-
-                                    //group = new string[sGroups.Length];
-                                    int tmpCounter = 0;
-                                    foreach (string g in group)
-                                    {
-                                        foreach (string sGroup in sGroups)
-                                        {
-                                            if (g == null)
-                                                tmpGroups[tmpCounter] = sGroup.Trim();
-                                            else
-                                                tmpGroups[tmpCounter] = g + "\n" + sGroup.Trim();
-
-                                            if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
-                                            {
-                                                arrGTemp.Add(tmpGroups[tmpCounter], "");
-                                            }
-                                            tmpCounter++;
-                                        }
-                                    }
-                                    group = tmpGroups;
-                                }
-                                else
-                                {
-                                    for (int i = 0; i < group.Length; i++)
-                                    {
-                                        if (group[i] == null)
-                                            group[i] = newgroup;
-                                        else
-                                            group[i] += "\n" + newgroup;
-                                        if (!arrGTemp.Contains(group[i]))
-                                        {
-                                            arrGTemp.Add(group[i], "");
-                                        }
-                                    }
-                                }
+                                SetGroupsStrings(arrGTemp, field, newgroup, ref @group);
                                 //}
                             }
                         }
@@ -3911,6 +3834,60 @@ namespace EPMLiveWebParts
 
         }
 
+        private void SetGroupsStrings(SortedList tempGroups, SPField field, string newgroup, ref string[] groups)
+        {
+            if (field.Type == SPFieldType.User
+                || field.Type == SPFieldType.MultiChoice
+                || field.Type == SPFieldType.Lookup
+                || field.TypeAsString == "FilteredLookup")
+            {
+                var newGroupAttributes = newgroup.Split('\n');
+                var tmpGroups = new string[groups.Length * newGroupAttributes.Length];
+
+                var tmpCounter = 0;
+                foreach (var groupString in groups)
+                {
+                    foreach (var groupAttribute in newGroupAttributes)
+                    {
+                        if (groupString == null)
+                        {
+                            tmpGroups[tmpCounter] = groupAttribute.Trim();
+                        }
+                        else
+                        {
+                            tmpGroups[tmpCounter] = $"{groupString}\n{groupAttribute.Trim()}";
+                        }
+
+                        if (!tempGroups.Contains(tmpGroups[tmpCounter]))
+                        {
+                            tempGroups.Add(tmpGroups[tmpCounter], string.Empty);
+                        }
+                        tmpCounter++;
+                    }
+                }
+                groups = tmpGroups;
+            }
+            else
+            {
+                for (var i = 0; i < groups.Length; i++)
+                {
+                    if (groups[i] == null)
+                    {
+                        groups[i] = newgroup;
+                    }
+                    else
+                    {
+                        var stringBuilder = new StringBuilder(groups[i]);
+                        stringBuilder.Append($"\n{newgroup}");
+                        groups[i] = stringBuilder.ToString();
+                    }
+                    if (!tempGroups.Contains(groups[i]))
+                    {
+                        tempGroups.Add(groups[i], string.Empty);
+                    }
+                }
+            }
+        }
 
         public virtual string getQuery()
         {
@@ -4804,6 +4781,10 @@ namespace EPMLiveWebParts
                     }
                     foreach (string f in aViewFields)
                     {
+                        //EPMLCID-6880 : to fix empty field issue
+                        if (string.IsNullOrEmpty(f))
+                            continue;
+                         
                         SPField field = getRealField(list.Fields.GetFieldByInternalName(f));
                         //EPML-5172 : to fix grouping issue on PM Approval page.
                         if ((!arrAggregationDef.Contains(field.InternalName) && field.InternalName.Equals("Title")) || field.InternalName == "URL" || field.InternalName == "FileLeafRef")
@@ -5009,6 +4990,9 @@ namespace EPMLiveWebParts
 
             foreach (string field in aViewFields)
             {
+
+                if(string.IsNullOrEmpty(field))
+                    continue;
 
                 tooltips += ",true";
                 SPField f = getRealField(list.Fields.GetFieldByInternalName(field));
