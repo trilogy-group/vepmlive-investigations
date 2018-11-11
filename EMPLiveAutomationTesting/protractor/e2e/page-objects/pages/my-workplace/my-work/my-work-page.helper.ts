@@ -571,7 +571,11 @@ export class MyWorkPageHelper {
     static async selectViewFromCurrentView() {
         StepLogger.step('Select some other view apart from Default view ');
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
-        await browser.sleep(PageHelper.timeout.xs);
+        const isOpened = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.selectViewNameOtherThanDefault, PageHelper.timeout.s);
+        if (!isOpened) {
+            await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
+            await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.selectViewNameOtherThanDefault);
+        }
         await PageHelper.click(MyWorkPage.selectViewNameOtherThanDefault);
         // sometimes - stale exception
         await browser.sleep(PageHelper.timeout.s);

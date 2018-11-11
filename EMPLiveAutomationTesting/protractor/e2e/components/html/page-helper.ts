@@ -366,10 +366,12 @@ export class PageHelper {
     }
 
     static async acceptAlert() {
+        await PageHelper.waitForAlertToBePresent();
         return await browser.switchTo().alert().accept();
     }
 
     static async dismissAlert() {
+        await PageHelper.waitForAlertToBePresent();
         return await browser.switchTo().alert().dismiss();
     }
 
