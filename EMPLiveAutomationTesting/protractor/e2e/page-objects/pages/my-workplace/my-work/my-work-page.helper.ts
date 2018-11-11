@@ -275,11 +275,10 @@ export class MyWorkPageHelper {
         if (switchToFrame) {
             await CommonPageHelper.switchToFirstContentFrame();
         }
-        await PageHelper.click(MyWorkPage.buttonsOnPopup.save);
+        await PageHelper.clickAndWaitForElementToHide(MyWorkPage.buttonsOnPopup.save);
     }
 
     static async verifyCreateItem(itemTitle: string) {
-        await browser.sleep(PageHelper.timeout.s);
         await TextboxHelper.sendKeys(MyWorkPage.searchItem, itemTitle, true);
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.getItemByName(itemTitle),
