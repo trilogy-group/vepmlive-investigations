@@ -2,7 +2,10 @@ pipeline {
     agent {
         label 'skyvera-jenkins-protractor'
     }
-  
+	parameters {
+        string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')
+		string(name: 'fullHostName', defaultValue: 'tenant01.epmdev.com', description: 'Target full host name')
+    }
     stages {
         stage('Preparing for UI tests execution') {
             steps {
@@ -16,7 +19,7 @@ pipeline {
                 
                 echo 'Updating hosts file...'
                 dir ("${env.WORKSPACE}/TestSuite.Protractor") {
-                    sh "${env.WORKSPACE}/BuildJenkins/Protractor/update-hosts-file.sh"
+                    sh "${env.WORKSPACE}/BuildJenkins/Protractor/update-hosts-file.sh ${params.TargetHost} ${params.fullHostName}"
                 }
             }
         }
