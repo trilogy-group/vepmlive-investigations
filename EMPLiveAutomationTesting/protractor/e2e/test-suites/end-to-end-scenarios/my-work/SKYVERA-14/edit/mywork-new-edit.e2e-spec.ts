@@ -9,6 +9,7 @@ import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
+import {IssueItemPageConstants} from '../../../../../page-objects/pages/items-page/issue-item/issue-item-page.constants';
 
 describe(SuiteNames.endToEndSuite, () => {
 
@@ -76,7 +77,15 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.stepId(4);
         const issuesTitle = await MyWorkPageHelper.fillNewItemFormForIssues();
-        await MyWorkPageHelper.verifyCreateItem(issuesTitle);
+        await PageHelper.switchToDefaultContent();
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.issues,
+            CommonPage.pageHeaders.projects.issues,
+            CommonPageConstants.pageHeaders.projects.issues,
+            issuesTitle,
+            IssueItemPageConstants.columnNames.title);
+
+        StepLogger.verification('Newly created Issue displayed in "Issues" page');
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(issuesTitle), issuesTitle);
     });
 
     it('Create New "Risks" Item. - [745086]', async () => {
