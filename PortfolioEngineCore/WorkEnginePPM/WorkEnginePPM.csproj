@@ -721,6 +721,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\setupstatus.aspx.designer.cs">
       <DependentUpon>setupstatus.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\SPHelper.cs" />
     <Compile Include="Layouts\ppm\SPResourceFieldMapping.aspx.cs">
       <DependentUpon>SPResourceFieldMapping.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
