@@ -820,11 +820,13 @@ export class MyWorkPageHelper {
         const ellipseMyWorkPageItems = MyWorkPage.ellipsesDropdown;
         await ElementHelper.actionHoverOver(ellipseMyWorkPageItems.workTypes);
         const workType = await PageHelper.getText(ellipseMyWorkPageItems.workTypeSubmenuItem);
-        await ElementHelper.actionHoverOverAndClick(ellipseMyWorkPageItems.workTypes, ellipseMyWorkPageItems.workTypeSubmenuItem);
+        await ElementHelper.actionHoverOver(ellipseMyWorkPageItems.workTypes);
+        await PageHelper.click(ellipseMyWorkPageItems.workTypeSubmenuItem);
         return workType;
     }
 
     static async verifySearchResults(workType: string) {
+        await WaitHelper.staticWait(PageHelper.timeout.xs);
         const rowCount = await MyWorkPage.gridDetails.workType.count();
         for (let i = 0; i < rowCount; i++) {
             await ExpectationHelper.verifyText(
