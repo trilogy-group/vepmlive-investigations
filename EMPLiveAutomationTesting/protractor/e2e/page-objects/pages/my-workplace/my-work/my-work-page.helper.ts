@@ -612,6 +612,10 @@ export class MyWorkPageHelper {
 
     static async clickDeleteView() {
         StepLogger.step('Click on Delete View button.');
+        const isPresent = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.getViewRibbonOptions.deleteView, PageHelper.timeout.s);
+        if (!isPresent) {
+            await this.clickViewsTab();
+        }
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.deleteView);
     }
 
