@@ -10,6 +10,7 @@ import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {IssueItemPageConstants} from '../../../../../page-objects/pages/items-page/issue-item/issue-item-page.constants';
+import {ChangeItemPageConstants} from '../../../../../page-objects/pages/items-page/change-item/change-item-page.constants';
 
 describe(SuiteNames.endToEndSuite, () => {
 
@@ -61,7 +62,15 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.stepId(4);
         const changesTitle = await MyWorkPageHelper.fillNewItemFormForChanges();
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.changes,
+            CommonPage.pageHeaders.projects.changes,
+            CommonPageConstants.pageHeaders.projects.changes,
+            changesTitle,
+            ChangeItemPageConstants.columnNames.linkTitleNoMenu);
         await MyWorkPageHelper.verifyCreateItem(changesTitle);
+
+        StepLogger.verification('Newly created Change displayed in "Changes" page');
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(changesTitle), changesTitle);
     });
 
     it('Create New "Issues" Item. - [745085]', async () => {
