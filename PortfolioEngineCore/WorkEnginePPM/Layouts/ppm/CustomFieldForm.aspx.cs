@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Text;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint.WebControls;
 using PortfolioEngineCore;
@@ -10,209 +12,137 @@ namespace WorkEnginePPM.Layouts.ppm
 {
     public partial class CustomFieldForm : LayoutsPageBase
     {
-        protected string DialogTitle = "";
-        private int c_id = 0;
-        public int id
+        private const string UpdateCustomFieldId = "Update_CustomField";
+        private const string ModeAdd = "Add";
+        private const string ModeDelete = "Delete";
+        private const string ModeModify = "Modify";
+        private const string QueryId = "id";
+        private const string QueryMode = "mode";
+        private const string FaFieldId = "FA_FIELD_ID";
+        private const string FaName = "FA_NAME";
+        private const string FaTableId = "FA_TABLE_ID";
+        private const string FaFormat = "FA_FORMAT";
+        private const string FaDesc = "FA_DESC";
+        private const string UsedMessage = "UsedMessage";
+        private const string UsedData = "UsedData";
+        private const int TableNumberMin = 100;
+        private const int TableNumberMax = 200;
+
+        private int _dataType;
+        private int _entity;
+        private int _id;
+
+        protected string DialogTitle = string.Empty;
+
+        public int Id
         {
-            get { return c_id; }
+            get { return _id; }
         }
-        private int c_entity = 0;
+
         public int Entity
         {
-            get { return c_entity; }
+            get { return _entity; }
         }
-        private string c_name = "";
-        public string Name
-        {
-            get { return c_name; }
-        }
-        private string c_desc = "";
-        public string Desc
-        {
-            get { return c_desc; }
-        }
-        private int c_datatype = 0;
+
+        public string Name { get; private set; } = string.Empty;
+
+        public string Desc { get; private set; } = string.Empty;
+
         public int DataType
         {
-            get { return c_datatype; }
+            get { return _dataType; }
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            DBAccess dba = null;
-            Boolean bIsNull;
-            if (!IsPostBack)
+            if (IsPostBack || !Request.QueryString.HasKeys())
             {
-                if (Request.QueryString.HasKeys())
+                return;
+            }
+
+            var queryId = Request.QueryString[QueryId];
+            var queryMode = Request.QueryString[QueryMode];
+
+            InitControls(queryMode);
+            InitEntityDropDown();
+            InitFieldTypeDropDown();
+
+            int fieldId;
+            if (int.TryParse(queryId, out fieldId))
+            {
+                var connectionString = GetConnectionString();
+                using (var dbAccess = new DBAccess(connectionString))
                 {
-                    string m_sId = Request.QueryString["id"].ToString();
-                    string m_sMode = Request.QueryString["mode"].ToString();
-
-                    //if (!PPM.WebAdmin.HasPagePermission("CustomFieldForm", m_sMode))
-                    //    HttpContext.Current.Response.Redirect("NoPermForm.aspx");
-
-                    //lblMode.Text = "Unknown Mode";
-                    switch (m_sMode)
+                    if (dbAccess.Open() != StatusEnum.rsSuccess)
                     {
-                        case "Add":
-                            DialogTitle = "Add a new Custom Field";
-                            btnOK.Visible = true;
-                            btnDelete.Visible = false;
-                            break;
-                        case "Modify":
-                            DialogTitle = "Modify Custom Field";
-                            btnOK.Visible = true;
-                            btnDelete.Visible = false;
-                            ddlEntity.Enabled = false;
-                            ddlFieldType.Enabled = false;
-                            break;
-                        case "Delete":
-                            DialogTitle = "Delete Custom Field";
-                            btnOK.Visible = false;
-                            btnDelete.Visible = true;
-                            txtName.Enabled = false;
-                            ddlEntity.Enabled = false;
-                            ddlFieldType.Enabled = false;
-                            break;
+                        lblGeneralError.Text = dbAccess.FormatErrorText();
+                        lblGeneralError.Visible = true;
+
+                        return;
                     }
 
-                    ddlEntity.Items.Clear();
-                    int nEntity;
-                    nEntity = (int)EntityID.Portfolio;
-                    ddlEntity.Items.Add(new ListItem(EPKClass01.GetEntity(nEntity), nEntity.ToString()));
-                    nEntity = (int)EntityID.Resource;
-                    ddlEntity.Items.Add(new ListItem(EPKClass01.GetEntity(nEntity), nEntity.ToString()));
-
-                    ddlFieldType.Items.Clear();
-                    int nDataType;
-                    nDataType = (int)FieldType.TypeText;
-                    ddlFieldType.Items.Add(new ListItem(EPKClass01.GetDataType(nDataType), nDataType.ToString()));
-                    nDataType = (int)FieldType.TypeNumber;
-                    ddlFieldType.Items.Add(new ListItem(EPKClass01.GetDataType(nDataType), nDataType.ToString()));
-                    nDataType = (int)FieldType.TypeCost;
-                    ddlFieldType.Items.Add(new ListItem(EPKClass01.GetDataType(nDataType), nDataType.ToString()));
-                    nDataType = (int)FieldType.TypeFlag;
-                    ddlFieldType.Items.Add(new ListItem(EPKClass01.GetDataType(nDataType), nDataType.ToString()));
-                    nDataType = (int)FieldType.TypeDate;
-                    ddlFieldType.Items.Add(new ListItem(EPKClass01.GetDataType(nDataType), nDataType.ToString()));
-                    nDataType = (int)FieldType.TypeMVCode;
-                    ddlFieldType.Items.Add(new ListItem(EPKClass01.GetDataType(nDataType), nDataType.ToString()));
-
-                    int nFieldId;
-                    if (Int32.TryParse(m_sId, out nFieldId))
+                    if (queryMode != ModeAdd)
                     {
-                        string basePath = WebAdmin.GetBasePath();
-                        hiddenData.Value = basePath;
-                        string sDBConnect = WebAdmin.GetConnectionString(basePath);
-                        dba = new DBAccess(sDBConnect);
-                        if (dba.Open() != StatusEnum.rsSuccess) goto Status_Error;
-                        DataTable dt;
-
-                        if (m_sMode != "Add")
+                        if (fieldId <= 0)
                         {
-                            if (nFieldId <= 0)
-                            {
-                                lblGeneralError.Text = "Invalid field selected";
-                                lblGeneralError.Visible = true;
-                            }
-                            else
-                            {
-                                string cmdText = "SELECT * FROM EPGC_FIELD_ATTRIBS WHERE FA_FIELD_ID = @p1";
-                                dba.SelectDataById(cmdText, nFieldId, (StatusEnum)99917, out dt);
-                                //if (dbaUsers.SelectCustomField(dba, nFieldId, out dt) != StatusEnum.rsSuccess) goto Status_Error;
-
-                                if (dt.Rows.Count == 1)
-                                {
-                                    DataRow row = dt.Rows[0];
-                                    txtId.Text = row["FA_FIELD_ID"].ToString();
-                                    txtName.Text = row["FA_NAME"].ToString();
-                                    txtDesc.Text = row["FA_DESC"].ToString();
-                                    int iTable = DBAccess.ReadIntValue(row["FA_TABLE_ID"], out bIsNull);
-                                    int iEntity = EPKClass01.GetEntityID(iTable);
-                                    ddlEntity.SelectedValue = iEntity.ToString();
-                                    int iDataType = DBAccess.ReadIntValue(row["FA_FORMAT"], out bIsNull);
-                                    ddlFieldType.SelectedValue = iDataType.ToString();
-                                }
-                            }
-
-                            if (m_sMode == "Delete")
-                            {
-                                string deletemessage = "";
-                                if (CanDeleteCustomField(dba, nFieldId, out deletemessage) == false)
-                                {
-                                    lblGeneralError.Text = deletemessage;
-                                    lblGeneralError.Visible = true;
-                                    btnDelete.Visible = false;
-                                }
-                                else
-                                {
-                                    CheckDeleteCustomField(dba, nFieldId, out deletemessage);
-                                    lblGeneralError.Text = deletemessage;
-                                    lblGeneralError.Visible = true;
-                                }
-                            }
+                            lblGeneralError.Text = "Invalid field selected";
+                            lblGeneralError.Visible = true;
                         }
                         else
                         {
-                            txtId.Text = "0";
-                            txtName.Text = "New Custom Field";
+                            ReadData(dbAccess, fieldId);
                         }
 
-                        dba.Close();
+                        if (queryMode == ModeDelete)
+                        {
+                            ProcessDelete(dbAccess, fieldId);
+                        }
                     }
                     else
                     {
-                        lblGeneralError.Text = "Invalid field selected";
-                        lblGeneralError.Visible = true;
+                        txtId.Text = "0";
+                        txtName.Text = "New Custom Field";
                     }
                 }
             }
-            return;
-        Status_Error:
-            if (dba != null)
+            else
             {
-                dba.Close();
-                lblGeneralError.Text = dba.FormatErrorText();
+                lblGeneralError.Text = "Invalid field selected";
                 lblGeneralError.Visible = true;
             }
         }
 
         protected void btnDelete_Click(object sender, EventArgs e)
         {
-            DBAccess dba = null;
-            Int32.TryParse(txtId.Text, out c_id);
+            int.TryParse(txtId.Text, out _id);
 
-            string basePath = hiddenData.Value;
-            string sDBConnect = WebAdmin.GetConnectionString(basePath);
-            dba = new DBAccess(sDBConnect);
-            if (dba.Open() != StatusEnum.rsSuccess) goto Exit_Function;
-
-            int lRowsAffected;
-            if (DeleteCustomField(dba, this, out lRowsAffected) != StatusEnum.rsSuccess)
+            var basePath = hiddenData.Value;
+            var connectionString = WebAdmin.GetConnectionString(basePath);
+            using (var dbAccess = new DBAccess(connectionString))
             {
-                lblGeneralError.Text = "DELETE FAILED!";
-                lblGeneralError.Visible = true;
-                dba.Close();
-                return;
-            }
-
-            ClientScript.RegisterStartupScript(this.GetType(), "CT_Script", "OnCostTypeSavedOK();", true);
-        Exit_Function:
-            if (dba != null)
-            {
-                if (dba.Status != StatusEnum.rsSuccess)
+                if (dbAccess.Open() == StatusEnum.rsSuccess)
                 {
-                    lblGeneralError.Text = dba.FormatErrorText();
+                    int rowsAffected;
+                    if (DeleteCustomField(dbAccess, this, out rowsAffected) != StatusEnum.rsSuccess)
+                    {
+                        lblGeneralError.Text = "DELETE FAILED!";
+                        lblGeneralError.Visible = true;
+
+                        return;
+                    }
+
+                    ClientScript.RegisterStartupScript(GetType(), "CT_Script", "OnCostTypeSavedOK();", true);
+                }
+                else
+                {
+                    lblGeneralError.Text = dbAccess.FormatErrorText();
                     lblGeneralError.Visible = true;
                 }
-                dba.Close();
             }
-            return;
         }
 
         protected void btnOK_Click(object sender, EventArgs e)
         {
-            DBAccess dba = null;
             if (txtName.Text.Trim() == string.Empty)
             {
                 lblGeneralError.Text = "Error Saving Field : Name cannot be blank";
@@ -220,202 +150,408 @@ namespace WorkEnginePPM.Layouts.ppm
                 return;
             }
 
-            Int32.TryParse(txtId.Text, out c_id);
-            c_name = txtName.Text;
-            c_desc = txtDesc.Text;
-            Int32.TryParse(ddlEntity.SelectedValue, out c_entity);
-            Int32.TryParse(ddlFieldType.SelectedValue, out c_datatype);
+            int.TryParse(txtId.Text, out _id);
+            Name = txtName.Text;
+            Desc = txtDesc.Text;
+            int.TryParse(ddlEntity.SelectedValue, out _entity);
+            int.TryParse(ddlFieldType.SelectedValue, out _dataType);
 
-            string basePath = hiddenData.Value;
-            string sDBConnect = WebAdmin.GetConnectionString(basePath);
-            dba = new DBAccess(sDBConnect);
-            if (dba.Open() != StatusEnum.rsSuccess) goto Exit_Function;
-
-            int lRowsAffected;
-            if (UpdateCustomField(dba, this, out lRowsAffected) != StatusEnum.rsSuccess) goto Exit_Function;
-
-            ClientScript.RegisterStartupScript(this.GetType(), "CT_Script", "OnCostTypeSavedOK();", true);
-        Exit_Function:
-            if (dba != null)
+            var basePath = hiddenData.Value;
+            var sDBConnect = WebAdmin.GetConnectionString(basePath);
+            using (var dbAccees = new DBAccess(sDBConnect))
             {
-                if (dba.Status != StatusEnum.rsSuccess)
+                if (dbAccees.Open() == StatusEnum.rsSuccess)
                 {
-                    lblGeneralError.Text = dba.FormatErrorText();
+                    int rowsAffected;
+                    if (UpdateCustomField(dbAccees, this, out rowsAffected) != StatusEnum.rsSuccess)
+                    {
+                        lblGeneralError.Text = dbAccees.FormatErrorText();
+                        lblGeneralError.Visible = true;
+                        return;
+                    }
+
+                    ClientScript.RegisterStartupScript(GetType(), "CT_Script", "OnCostTypeSavedOK();", true);
+                }
+                else
+                {
+                    lblGeneralError.Text = dbAccees.FormatErrorText();
                     lblGeneralError.Visible = true;
                 }
-                dba.Close();
             }
-            return;
         }
 
         protected void btnClose_Click(object sender, EventArgs e)
         {
-            //ClientScript.RegisterStartupScript(this.GetType(), "CT_Script", "OnCostTypeClose();", true);
+            // nothing here
         }
-        private static StatusEnum UpdateCustomField(DBAccess dba, CustomFieldForm Field, out int lRowsAffected)
+
+        private string GetConnectionString()
         {
-            StatusEnum eStatus = StatusEnum.rsSuccess;
-            lRowsAffected = 0;
+            var basePath = WebAdmin.GetBasePath();
+            hiddenData.Value = basePath;
+            var connectionString = WebAdmin.GetConnectionString(basePath);
+            return connectionString;
+        }
 
-            int nFieldId = Field.id;
-            string sFieldName = Field.Name;
-            string sFieldDesc = Field.Desc;
-            int nEntity = Field.Entity;
-            int nDataType = Field.DataType;
+        private void InitControls(string queryMode)
+        {
+            switch (queryMode)
+            {
+                case ModeAdd:
+                    DialogTitle = "Add a new Custom Field";
+                    btnOK.Visible = true;
+                    btnDelete.Visible = false;
+                    break;
+                case ModeModify:
+                    InitControls("Modify Custom Field", true, false);
+                    break;
+                case ModeDelete:
+                    InitControls("Delete Custom Field", false, true);
+                    break;
+                default:
+                    // nothing here
+                    break;
+            }
+        }
 
-            SqlCommand oCommand;
-            string cmdText;
-            SqlDataReader reader;
+        private void ReadData(DBAccess dbAccess, int fieldId)
+        {
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            DataTable dataTable;
+            var cmdText = "SELECT * FROM EPGC_FIELD_ATTRIBS WHERE FA_FIELD_ID = @p1";
+            if (dbAccess.SelectDataById(cmdText, fieldId, (StatusEnum)99917, out dataTable) == StatusEnum.rsSuccess)
+            {
+                using (dataTable)
+                {
+                    if (dataTable?.Rows?.Count == 1)
+                    {
+                        bool bIsNull;
+                        var row = dataTable.Rows[0];
+                        txtId.Text = row[FaFieldId].ToString();
+                        txtName.Text = row[FaName].ToString();
+                        txtDesc.Text = row[FaDesc].ToString();
+                        var tableId = SqlDb.ReadIntValue(row[FaTableId], out bIsNull);
+                        var iEntity = EPKClass01.GetEntityID(tableId);
+                        ddlEntity.SelectedValue = iEntity.ToString();
+                        var dataType = SqlDb.ReadIntValue(row[FaFormat], out bIsNull);
+                        ddlFieldType.SelectedValue = dataType.ToString();
+                    }
+                }
+            }
+        }
+
+        private void ProcessDelete(DBAccess dbAccess, int fieldId)
+        {
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            var deletemessage = string.Empty;
+            if (CanDeleteCustomField(dbAccess, fieldId, out deletemessage) == false)
+            {
+                lblGeneralError.Text = deletemessage;
+                lblGeneralError.Visible = true;
+
+                btnDelete.Visible = false;
+            }
+            else
+            {
+                CheckDeleteCustomField(dbAccess, fieldId, out deletemessage);
+                lblGeneralError.Text = deletemessage;
+                lblGeneralError.Visible = true;
+            }
+        }
+
+        private void InitFieldTypeDropDown()
+        {
+            ddlFieldType.Items.Clear();
+            AddItem(ddlFieldType.Items, FieldType.TypeText);
+            AddItem(ddlFieldType.Items, FieldType.TypeNumber);
+            AddItem(ddlFieldType.Items, FieldType.TypeCost);
+            AddItem(ddlFieldType.Items, FieldType.TypeFlag);
+            AddItem(ddlFieldType.Items, FieldType.TypeDate);
+            AddItem(ddlFieldType.Items, FieldType.TypeMVCode);
+        }
+
+        private void AddItem(ListItemCollection items, FieldType fieldType)
+        {
+            if (items == null)
+            {
+                throw new ArgumentNullException(nameof(items));
+            }
+            var id = (int)fieldType;
+            items.Add(new ListItem(EPKClass01.GetDataType(id), id.ToString()));
+        }
+
+        private void InitEntityDropDown()
+        {
+            ddlEntity.Items.Clear();
+            AddItem(ddlEntity.Items, EntityID.Portfolio);
+            AddItem(ddlEntity.Items, EntityID.Resource);
+        }
+
+        private void AddItem(ListItemCollection items, EntityID entityId)
+        {
+            if (items == null)
+            {
+                throw new ArgumentNullException(nameof(items));
+            }
+            var id = (int)entityId;
+            items.Add(new ListItem(EPKClass01.GetEntity(id), id.ToString()));
+        }
+
+        private void InitControls(string title, bool isOkVisible, bool isDeleteVisible)
+        {
+            DialogTitle = title;
+            btnOK.Visible = isOkVisible;
+            btnDelete.Visible = isDeleteVisible;
+
+            txtName.Enabled = false;
+            ddlEntity.Enabled = false;
+            ddlFieldType.Enabled = false;
+        }
+
+        private static StatusEnum UpdateCustomField(DBAccess dbAccess, CustomFieldForm customField, out int rowsAffected)
+        {
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            StatusEnum status;
+            rowsAffected = 0;
 
             try
             {
                 // make sure there isn't already another field with this name
+                if (!CheckExistingId(dbAccess, customField, out status))
                 {
-                    cmdText = "SELECT FA_FIELD_ID From EPGC_FIELD_ATTRIBS WHERE FA_NAME = @FIELD_NAME";
-                    oCommand = new SqlCommand(cmdText, dba.Connection);
-                    oCommand.Parameters.Add("@FIELD_NAME", SqlDbType.VarChar, 255).Value = sFieldName;
-                    reader = oCommand.ExecuteReader();
-
-                    int nExistingId;
-                    if (reader.Read())
-                    {
-                        nExistingId = DBAccess.ReadIntValue(reader["FA_FIELD_ID"]);
-                        if (nExistingId != nFieldId)
-                        {
-                            eStatus = dba.HandleStatusError(SeverityEnum.Error, "Update_CustomField", (StatusEnum)99886, "Can't save Field, a Field with this name already exists");
-                            return eStatus;
-                        }
-                    }
+                    return status;
                 }
 
-                if (nFieldId > 0)
+                if (customField.Id > 0)
                 {
-                    cmdText =
-                           "UPDATE EPGC_FIELD_ATTRIBS "
-                       + " SET FA_NAME=@pNAME,FA_DESC=@pDESC"
-                       + " WHERE FA_FIELD_ID = " + nFieldId.ToString();
-
-                    oCommand = new SqlCommand(cmdText, dba.Connection);
-                    oCommand.Parameters.AddWithValue("@pNAME", sFieldName);
-                    oCommand.Parameters.AddWithValue("@pDESC", sFieldDesc);
-
-                    lRowsAffected += oCommand.ExecuteNonQuery();
+                    rowsAffected += UpdateField(dbAccess, customField);
                 }
                 else
                 {
-
-                    //   need to figure new Field_ID but also database field to hold the information - FALSE! the ID is an IDENTITY column
-                    //cmdText = "SELECT MAX(FA_FIELD_ID) As maxFieldId FROM EPGC_FIELD_ATTRIBS";
-                    //oCommand = new SqlCommand(cmdText, dba.Connection);
-                    //reader = oCommand.ExecuteReader();
-
-                    //if (reader.Read())
-                    //{
-                    //    nFieldId = DBAccess.ReadIntValue(reader["maxFieldId"]);
-                    //}
-                    //nFieldId = nFieldId + 1;
-                    //if (nFieldId <= 20001) nFieldId = 20001;
-
                     // figure which table
-                    int nTableID = EPKClass01.GetTableID(nEntity, nDataType);
-                    string sTable;
-                    string sField;
-                    if (EPKClass01.GetTableAndField(nTableID, 1, out sTable, out sField))
+                    var tableId = EPKClass01.GetTableID(customField.Entity, customField.DataType);
+                    string tableName;
+                    string fieldNam;
+                    if (EPKClass01.GetTableAndField(tableId, 1, out tableName, out fieldNam))
                     {
-                        cmdText = "SELECT TOP 1 * FROM " + sTable;
-                        DataTable dt;
-                        eStatus = dba.SelectData(cmdText, (StatusEnum)99885, out dt);
+                        var maxField = GetMaxField(dbAccess, out status, tableName, fieldNam);
 
-                        // find the field with the highest number suffix - eg PC_050 - user can add to these tables
-                        string ColumnName;
-                        int nMaxField = 0;
-                        string sPrefix = sField.Substring(0, 3);
-                        DataColumnCollection columns = dt.Columns;
-                        foreach (DataColumn column in columns)
-                        {
-                            ColumnName = column.ColumnName;
-                            string sThisPrefix = ColumnName.Substring(0, 3);
-                            if (sThisPrefix == sPrefix)
-                            {
-                                string sfieldnumber = ColumnName.Substring(3);
-                                int nFieldNumber = Int32.Parse(ColumnName.Substring(3));
-                                if (nFieldNumber > nMaxField) nMaxField = nFieldNumber;
-                            }
-                        }
-                        List<int> ListUsedFields = new List<int>();
-                        cmdText = "SELECT FA_FIELD_IN_TABLE FROM EPGC_FIELD_ATTRIBS Where FA_TABLE_ID=" + nTableID.ToString();
-                        oCommand = new SqlCommand(cmdText, dba.Connection);
-                        reader = oCommand.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            int nFieldNumber = DBAccess.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
-                            ListUsedFields.Add(nFieldNumber);
-                        }
-                        reader.Close();
-                        reader = null;
+                        var useField = GetUseField(dbAccess, tableId, maxField);
 
-                        int nUseField;
-                        for (nUseField = 1; nUseField < nMaxField + 2; nUseField++)
+                        if (useField > maxField)
                         {
-                            if (!ListUsedFields.Contains(nUseField))
-                                break;
+                            status = dbAccess.HandleStatusError(
+                                SeverityEnum.Error,
+                                UpdateCustomFieldId,
+                                (StatusEnum)99884,
+                                "Can't save Field, all Fields of this type are already used");
+                            return status;
                         }
-                        if (nUseField > nMaxField)
-                        {
-                            eStatus = dba.HandleStatusError(SeverityEnum.Error, "Update_CustomField", (StatusEnum)99884, "Can't save Field, all Fields of this type are already used");
-                            return eStatus;
-                        }
-                        else
-                        {
-                            cmdText =
-                                   "INSERT Into EPGC_FIELD_ATTRIBS "
-                               + " (FA_NAME,FA_DESC,FA_FORMAT,FA_TABLE_ID,FA_FIELD_IN_TABLE)"
-                               + " Values(@pNAME,@pDESC,@pFORMAT,@pTABLE,@pFIELD)";
-                            oCommand = new SqlCommand(cmdText, dba.Connection);
-                            oCommand.Parameters.AddWithValue("@pNAME", sFieldName);
-                            oCommand.Parameters.AddWithValue("@pDESC", sFieldDesc);
-                            oCommand.Parameters.AddWithValue("@pFORMAT", nDataType);
-                            oCommand.Parameters.AddWithValue("@pTABLE", nTableID);
-                            oCommand.Parameters.AddWithValue("@pFIELD", nUseField);
 
-                            lRowsAffected += oCommand.ExecuteNonQuery();
-                        }
+                        rowsAffected += AddField(dbAccess, customField, tableId, useField);
                     }
                 }
             }
             catch (Exception ex)
             {
-                eStatus = dba.HandleStatusError(SeverityEnum.Exception, "UpdateCustomField_Main", (StatusEnum)99883, ex.Message.ToString());
+                status = dbAccess.HandleStatusError(SeverityEnum.Exception, "UpdateCustomField_Main", (StatusEnum)99883, ex.Message);
+                Debug.WriteLine(ex.ToString());
             }
 
-            return eStatus;
+            return status;
         }
 
-        private static Boolean CanDeleteCustomField(DBAccess dba, int nField, out string message)
+        private static bool CheckExistingId(DBAccess dbAccess, CustomFieldForm customField, out StatusEnum status)
         {
-            message = "";
-            try
+            if (dbAccess == null)
             {
-                {
-                    SqlCommand oCommand = new SqlCommand("EPG_SP_ReadUsedCF", dba.Connection);
-                    oCommand.Parameters.AddWithValue("@FieldId", nField);
-                    oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                    SqlDataReader reader = oCommand.ExecuteReader();
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            if (customField == null)
+            {
+                throw new ArgumentNullException(nameof(customField));
+            }
 
+            status = StatusEnum.rsSuccess;
+
+            const string cmdText = "SELECT FA_FIELD_ID From EPGC_FIELD_ATTRIBS WHERE FA_NAME = @FIELD_NAME";
+            using (var command = new SqlCommand(cmdText, dbAccess.Connection))
+            {
+                command.Parameters.Add("@FIELD_NAME", SqlDbType.VarChar, 255).Value = customField.Name;
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        var existingId = SqlDb.ReadIntValue(reader[FaFieldId]);
+                        if (existingId != customField.Id)
+                        {
+                            status = dbAccess.HandleStatusError(
+                                SeverityEnum.Error,
+                                UpdateCustomFieldId,
+                                (StatusEnum)99886,
+                                "Can't save Field, a Field with this name already exists");
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private static int UpdateField(DBAccess dbAccess, CustomFieldForm customField)
+        {
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            if (customField == null)
+            {
+                throw new ArgumentNullException(nameof(customField));
+            }
+            var cmdText = new StringBuilder();
+            cmdText.Append("UPDATE EPGC_FIELD_ATTRIBS ")
+                .Append(" SET FA_NAME=@pNAME,FA_DESC=@pDESC")
+                .AppendFormat(" WHERE FA_FIELD_ID = {0}", customField.Id);
+
+            using (var command = new SqlCommand(cmdText.ToString(), dbAccess.Connection))
+            {
+                command.Parameters.AddWithValue("@pNAME", customField.Name);
+                command.Parameters.AddWithValue("@pDESC", customField.Desc);
+                return command.ExecuteNonQuery();
+            }
+        }
+
+        private static int GetMaxField(DBAccess dbAccess, out StatusEnum status, string tableName, string fieldName)
+        {
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            var cmdText = $"SELECT TOP 1 * FROM {tableName}";
+            DataTable dataTable;
+            status = dbAccess.SelectData(cmdText, (StatusEnum)99885, out dataTable);
+
+            // find the field with the highest number suffix - eg PC_050 - user can add to these tables
+            var maxField = 0;
+            var prefix = fieldName.Substring(0, 3);
+            var columns = dataTable.Columns;
+            foreach (DataColumn column in columns)
+            {
+                var columnName = column.ColumnName;
+                var thisPrefix = columnName.Substring(0, 3);
+                if (thisPrefix == prefix)
+                {
+                    var fieldNumber = int.Parse(columnName.Substring(3));
+                    if (fieldNumber > maxField)
+                    {
+                        maxField = fieldNumber;
+                    }
+                }
+            }
+
+            return maxField;
+        }
+
+        private static int GetUseField(DBAccess dbAccess, int tableId, int maxField)
+        {
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            var useField = 1;
+            var listUsedFields = new List<int>();
+            var cmdText = $"SELECT FA_FIELD_IN_TABLE FROM EPGC_FIELD_ATTRIBS Where FA_TABLE_ID={tableId}";
+            using (var command = new SqlCommand(cmdText, dbAccess.Connection))
+            {
+                using (var reader = command.ExecuteReader())
+                {
                     while (reader.Read())
                     {
-                        message += "<br>" + (string)reader["UsedMessage"] + ": ";
-                        message += (string)reader["UsedData"];
+                        var fieldNumber = SqlDb.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
+                        listUsedFields.Add(fieldNumber);
                     }
-                    reader.Close();
+                }
+
+                for (useField = 1; useField < maxField + 2; useField++)
+                {
+                    if (!listUsedFields.Contains(useField))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return useField;
+        }
+
+        private static int AddField(DBAccess dbAccess, CustomFieldForm customField, int tableId, int useField)
+        {
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            if (customField == null)
+            {
+                throw new ArgumentNullException(nameof(customField));
+            }
+            var cmdText = new StringBuilder();
+            cmdText.Append("INSERT Into EPGC_FIELD_ATTRIBS ")
+                .Append(" (FA_NAME,FA_DESC,FA_FORMAT,FA_TABLE_ID,FA_FIELD_IN_TABLE)")
+                .Append(" Values(@pNAME,@pDESC,@pFORMAT,@pTABLE,@pFIELD)");
+
+            using (var command = new SqlCommand(cmdText.ToString(), dbAccess.Connection))
+            {
+                command.Parameters.AddWithValue("@pNAME", customField.Name);
+                command.Parameters.AddWithValue("@pDESC", customField.Desc);
+                command.Parameters.AddWithValue("@pFORMAT", customField.DataType);
+                command.Parameters.AddWithValue("@pTABLE", tableId);
+                command.Parameters.AddWithValue("@pFIELD", useField);
+
+                return command.ExecuteNonQuery();
+            }
+        }
+
+        private static bool CanDeleteCustomField(DBAccess dbAccess, int fieldId, out string message)
+        {
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            var stringBuilder = new StringBuilder();
+            try
+            {
+                using (var command = new SqlCommand("EPG_SP_ReadUsedCF", dbAccess.Connection))
+                {
+                    command.Parameters.AddWithValue("@FieldId", fieldId);
+                    command.CommandType = CommandType.StoredProcedure;
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            stringBuilder.AppendFormat("<br>{0}: ", reader[UsedMessage])
+                                .Append(reader[UsedData]);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
             {
-                //eStatus = dba.HandleStatusError(SeverityEnum.Exception, "UpdateCustomField_Main", (StatusEnum)99883, ex.Message.ToString());
-                message += "<br>" + "Check for field used FAILED!";
+                stringBuilder.Append("<br>")
+                    .Append("Check for field used FAILED!");
+                Debug.WriteLine(ex.ToString());
             }
 
+            message = stringBuilder.ToString();
             if (message.Length > 0)
             {
                 message = "This custom field cannot be deleted until you remove it from these areas:" + message;
@@ -424,441 +560,131 @@ namespace WorkEnginePPM.Layouts.ppm
             return true;
         }
 
-        private static Boolean CheckDeleteCustomField(DBAccess dba, int nField, out string message)
+        private static bool CheckDeleteCustomField(DBAccess dbAccess, int fieldId, out string message)
         {
-            message = "";
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            var stringBuilder = new StringBuilder();
             try
             {
+                using (var command = new SqlCommand("EPG_SP_ReadFieldInfo", dbAccess.Connection))
                 {
-                    SqlCommand oCommand = new SqlCommand("EPG_SP_ReadFieldInfo", dba.Connection);
-                    oCommand.Parameters.AddWithValue("@FieldId", nField);
-                    oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                    SqlDataReader reader = oCommand.ExecuteReader();
+                    command.Parameters.AddWithValue("@FieldId", fieldId);
+                    command.CommandType = CommandType.StoredProcedure;
 
-                    int lTableNumber = 0;
-                    //int lFieldNumber = 0;
-                    string sFieldName = "";
-                    while (reader.Read())
+                    using (var reader = command.ExecuteReader())
                     {
-                        lTableNumber = DBAccess.ReadIntValue(reader["FA_TABLE_ID"]);
-                        //lFieldNumber = DBAccess.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
-                        sFieldName = DBAccess.ReadStringValue(reader["FA_NAME"]);
-                    }
-                    reader.Close();
+                        var tableNumber = 0;
+                        var fieldName = string.Empty;
+                        while (reader.Read())
+                        {
+                            tableNumber = SqlDb.ReadIntValue(reader[FaTableId]);
+                            fieldName = SqlDb.ReadStringValue(reader[FaName]);
+                        }
 
-                    if (lTableNumber > 100 && lTableNumber < 200)
-                    {
-                        message = "Values for " + sFieldName + " will be cleared from all Resources";
-                    }
-                    else
-                    {
-                        message = "Values for " + sFieldName + " will be cleared from all PIs";
+                        if (tableNumber > TableNumberMin && tableNumber < TableNumberMax)
+                        {
+                            stringBuilder.AppendFormat("Values for {0} will be cleared from all Resources", fieldName);
+                        }
+                        else
+                        {
+                            stringBuilder.AppendFormat("Values for {0} will be cleared from all PIs", fieldName);
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                //eStatus = dba.HandleStatusError(SeverityEnum.Exception, "UpdateCustomField_Main", (StatusEnum)99883, ex.Message.ToString());
-                message += "<br>" + "Check for field FAILED!";
+                stringBuilder.Append("<br>")
+                    .Append("Check for field FAILED!");
+                Debug.WriteLine(ex.ToString());
             }
 
-            message += "<br><br>Are you sure you want to delete this custom field?";
+            stringBuilder.Append("<br><br>Are you sure you want to delete this custom field?");
+            message = stringBuilder.ToString();
 
             return true;
         }
 
-        private static StatusEnum DeleteCustomField(DBAccess dba, CustomFieldForm Field, out int lRowsAffected)
+        private static StatusEnum DeleteCustomField(DBAccess dbAccess, CustomFieldForm field, out int rowsAffected)
         {
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            if (field == null)
+            {
+                throw new ArgumentNullException(nameof(field));
+            }
             // NOTE - CF cannot be deleted right now (Sep06) when used in a view or on a TAB so don't have to worry to delete the ref
-            
-            int nFieldId = Field.id;
-            StatusEnum eStatus = StatusEnum.rsSuccess;
-            lRowsAffected = 0;
+
+            var fieldId = field.Id;
+            var status = StatusEnum.rsSuccess;
+            rowsAffected = 0;
 
             try
             {
-                SqlCommand oCommand;
-                SqlDataReader reader;
+                var tableNumber = 0;
+                var fieldNumber = 0;
+
+                using (var command = new SqlCommand("EPG_SP_ReadFieldInfo", dbAccess.Connection))
                 {
-                    oCommand = new SqlCommand("EPG_SP_ReadFieldInfo", dba.Connection);
-                    oCommand.Parameters.AddWithValue("@FieldId", nFieldId);
-                    oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                    reader = oCommand.ExecuteReader();
-
-                    int lTableNumber = 0;
-                    int lFieldNumber = 0;
-                    //string sFieldName = "";
-                    while (reader.Read())
+                    command.Parameters.AddWithValue("@FieldId", fieldId);
+                    command.CommandType = CommandType.StoredProcedure;
+                    using (var reader = command.ExecuteReader())
                     {
-                        lTableNumber = DBAccess.ReadIntValue(reader["FA_TABLE_ID"]);
-                        lFieldNumber = DBAccess.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
-                        //sFieldName = DBAccess.ReadStringValue(reader["FA_NAME"]);
+                        while (reader.Read())
+                        {
+                            tableNumber = SqlDb.ReadIntValue(reader[FaTableId]);
+                            fieldNumber = SqlDb.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
+                        }
                     }
-                    reader.Close();
+                }
 
-                    // erase the values for this CF by setting all to NULL or deleting records as necessary
-                    string sTable;
-                    string sField;
-                    if (EPKClass01.GetTableAndField(lTableNumber, lFieldNumber, out sTable, out sField))
+                // erase the values for this CF by setting all to NULL or deleting records as necessary
+                string tableName;
+                string fieldName;
+                if (EPKClass01.GetTableAndField(tableNumber, fieldNumber, out tableName, out fieldName))
+                {
+                    if (tableNumber == (int)CustomFieldTable.ResourceMV)
                     {
-                        if (lTableNumber == 151)
+                        var cmdText = "Delete From EPGC_RESOURCE_MV_VALUES Where MVR_FIELD_ID= @FieldId";
+                        using (var command = new SqlCommand(cmdText, dbAccess.Connection))
                         {
-                            string cmdText = "Delete From EPGC_RESOURCE_MV_VALUES Where MVR_FIELD_ID= @FieldId";                            
-                            oCommand = new SqlCommand(cmdText, dba.Connection);
-                            oCommand.Parameters.AddWithValue("@FieldId", nFieldId);
-                            oCommand.ExecuteNonQuery();
+                            command.Parameters.AddWithValue("@FieldId", fieldId);
+                            command.ExecuteNonQuery();
                         }
-                        else
-                        {
-                            string cmdText = "Update " + sTable + " Set " + sField + "=NULL";
-                            oCommand = new SqlCommand(cmdText, dba.Connection);
-                            //oCommand.Parameters.AddWithValue("FieldId", nFieldId);
-                            oCommand.ExecuteNonQuery();
-                        }
-
-                        // delete the custom field itself
-                        oCommand = new SqlCommand("EPG_SP_DeleteCustomFieldX", dba.Connection);
-                        oCommand.Parameters.AddWithValue("@FieldId", nFieldId);
-                        oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                        oCommand.ExecuteNonQuery();
                     }
                     else
                     {
-                        eStatus = StatusEnum.rsRequestCannotBeCompleted;
+                        var cmdText = $"Update {tableName} Set {fieldName}=NULL";
+                        using (var command = new SqlCommand(cmdText, dbAccess.Connection))
+                        {
+                            command.ExecuteNonQuery();
+                        }
                     }
+
+                    // delete the custom field itself
+                    using (var command = new SqlCommand("EPG_SP_DeleteCustomFieldX", dbAccess.Connection))
+                    {
+                        command.Parameters.AddWithValue("@FieldId", fieldId);
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.ExecuteNonQuery();
+                    }
+                }
+                else
+                {
+                    status = StatusEnum.rsRequestCannotBeCompleted;
                 }
             }
             catch (Exception ex)
             {
-                eStatus = dba.HandleStatusError(SeverityEnum.Exception, "DeleteCustomField_Main", (StatusEnum)99882, ex.Message.ToString());
+                status = dbAccess.HandleStatusError(SeverityEnum.Exception, "DeleteCustomField_Main", (StatusEnum)99882, ex.Message);
+                Debug.WriteLine((ex.ToString()));
             }
-            return eStatus;
+            return status;
         }
-    }
-    internal enum CustomFieldTable
-    {
-        Unknown = 0,
-        ResourceINT = 101,
-        ResourceTEXT = 102,
-        ResourceDEC = 103,
-        ResourceNTEXT = 104,
-        ResourceDATE = 105,
-        ResourceMV = 151,
-        PortfolioINT = 201,
-        PortfolioTEXT = 202,
-        PortfolioDEC = 203,
-        PortfolioNTEXT = 204,
-        PortfolioDATE = 205,
-        Program = 251,
-        ProjectINT = 301,
-        ProjectTEXT = 302,
-        ProjectDEC = 303,
-        ProjectNTEXT = 304,
-        ProjectDATE = 305,
-        ProgramText = 402, //  ??
-        TaskWIINT = 801,
-        TaskWITEXT = 802,
-        TaskWIDEC = 803
-    }
-
-    internal enum FieldType
-    {
-        TypeCost = 8,
-        TypeCode = 4,
-        TypeMVCode = 40,
-        TypeFlag = 13,
-        TypeText = 9,
-        TypeNumber = 3,
-        TypeDate = 1,
-        TypeNText = 19,
-    }
-
-    internal enum EntityID
-    {
-        Resource = 1,
-        Portfolio = 2,
-        Program = 3,
-        Project = 4,
-        Task = 5,
-        Unknown = 0
-    }
-
-    internal class EPKClass01
-    {
-
-        public static int GetEntityID(int iTable)
-        {
-            EntityID nEntity;
-            CustomFieldTable nTable = (CustomFieldTable)iTable;
-            if (nTable >= CustomFieldTable.ResourceINT && nTable <= CustomFieldTable.ResourceMV)
-                nEntity = EntityID.Resource;
-            else if (nTable >= CustomFieldTable.PortfolioINT && nTable <= CustomFieldTable.PortfolioDATE)
-                nEntity = EntityID.Portfolio;
-            else if (nTable == CustomFieldTable.Program)
-                nEntity = EntityID.Program;
-            else if (nTable >= CustomFieldTable.ProjectINT && nTable <= CustomFieldTable.ProjectDATE)
-                nEntity = EntityID.Project;
-            else if (nTable >= CustomFieldTable.TaskWIINT && nTable <= CustomFieldTable.TaskWIDEC)
-                nEntity = EntityID.Task;
-            else
-                nEntity = EntityID.Unknown;
-            int iEntity = (Int32)nEntity;
-            return iEntity;
-        }
-
-        public static string GetEntity(int iEntity)
-        {
-            string sEntity = "";
-            EntityID nEntity = (EntityID)iEntity;
-
-            if (nEntity == EntityID.Resource)
-                sEntity = "Resource";
-            else if (nEntity == EntityID.Portfolio)
-                sEntity = "Portfolio";
-            else if (nEntity == EntityID.Program)
-                sEntity = "Program";
-            else if (nEntity == EntityID.Project)
-                sEntity = "Project";
-            else if (nEntity == EntityID.Task)
-                sEntity = "Task";
-            else
-                sEntity = "Unknown";
-            return sEntity;
-        }
-        public static string GetDataType(int iFieldType)
-        {
-            string sDataType = "";
-            FieldType nFieldType = (FieldType)iFieldType;
-
-            switch (nFieldType)
-            {
-                case FieldType.TypeCost:
-                    sDataType = "Cost";
-                    break;
-                case FieldType.TypeCode:
-                    sDataType = "Code";
-                    break;
-                case FieldType.TypeDate:
-                    sDataType = "Date";
-                    break;
-                case FieldType.TypeFlag:
-                    sDataType = "Flag";
-                    break;
-                case FieldType.TypeNumber:
-                    sDataType = "Number";
-                    break;
-                case FieldType.TypeText:
-                    sDataType = "Text";
-                    break;
-                case FieldType.TypeNText:
-                    sDataType = "RTF";
-                    break;
-                default:
-                    sDataType = "Unknown";
-                    break;
-
-            }
-            return sDataType;
-        }
-
-        public static string GetFieldFormat(int iDataType)
-        {
-            string sdatatype = "";
-            FieldType nDataType = (FieldType)iDataType;
-            switch (nDataType)
-            {
-                case FieldType.TypeCost:
-                    sdatatype = "Cost";
-                    break;
-                case FieldType.TypeCode:
-                    sdatatype = "Code";
-                    break;
-                case FieldType.TypeMVCode:
-                    sdatatype = "MV Code";
-                    break;
-                case FieldType.TypeFlag:
-                    sdatatype = "Flag";
-                    break;
-                case FieldType.TypeText:
-                    sdatatype = "Text";
-                    break;
-                case FieldType.TypeNumber:
-                    sdatatype = "Number";
-                    break;
-                case FieldType.TypeDate:
-                    sdatatype = "Date";
-                    break;
-                case FieldType.TypeNText:
-                    sdatatype = "NText";
-                    break;
-                default:
-                    sdatatype = "Unknown Type";
-                    break;
-            }
-            return sdatatype;
-        }
-
-        public static bool GetTableAndField(int iTable, int iField, out string sTable, out string sField)
-        {
-            bool bFound = true;
-            string stable = "";
-            string sfield = "";
-            CustomFieldTable nTable = (CustomFieldTable)iTable;
-            switch (nTable)
-            {
-                case CustomFieldTable.ResourceINT:
-                    stable = "EPGC_RESOURCE_INT_VALUES";
-                    sfield = "RI_" + String.Format("{0:d3}", iField);
-                    break;
-                case CustomFieldTable.ResourceTEXT:
-                    stable = "EPGC_RESOURCE_TEXT_VALUES";
-                    sfield = "RT_" + String.Format("{0:d3}", iField);
-                    break;
-                case CustomFieldTable.ResourceDEC:
-                    stable = "EPGC_RESOURCE_DEC_VALUES";
-                    sfield = "RC_" + String.Format("{0:d3}", iField);
-                    break;
-                case CustomFieldTable.ResourceNTEXT:
-                    stable = "EPGC_RESOURCE_NTEXT_VALUES";
-                    sfield = "RN_" + String.Format("{0:d3}", iField);
-                    break;
-                case CustomFieldTable.ResourceDATE:
-                    stable = "EPGC_RESOURCE_DATE_VALUES";
-                    sfield = "RD_" + String.Format("{0:d3}", iField);
-                    break;
-                case CustomFieldTable.ResourceMV:
-                    stable = "EPGC_RESOURCE_MV_VALUES";
-                    sfield = "MVR_UID";
-                    break;
-                case CustomFieldTable.PortfolioINT:
-                    stable = "EPGP_PROJECT_INT_VALUES";
-                    sfield = "PI_" + String.Format("{0:d3}", iField);
-                    break;
-                case CustomFieldTable.PortfolioTEXT:
-                    stable = "EPGP_PROJECT_TEXT_VALUES";
-                    sfield = "PT_" + String.Format("{0:d3}", iField);
-                    break;
-                case CustomFieldTable.PortfolioDEC:
-                    stable = "EPGP_PROJECT_DEC_VALUES";
-                    sfield = "PC_" + String.Format("{0:d3}", iField);
-                    break;
-                case CustomFieldTable.PortfolioNTEXT:
-                    stable = "EPGP_PROJECT_NTEXT_VALUES";
-                    sfield = "PN_" + String.Format("{0:d3}", iField);
-                    break;
-                case CustomFieldTable.PortfolioDATE:
-                    stable = "EPGP_PROJECT_DATE_VALUES";
-                    sfield = "PD_" + String.Format("{0:d3}", iField);
-                    break;
-                default:
-                    stable = "Unknown Table";
-                    sfield = "";
-                    bFound = false;
-                    break;
-            }
-
-            sTable = stable;
-            sField = sfield;
-            return bFound;
-        }
-
-        public static int GetTableID(int iEntity, int iDataType)
-        {
-            CustomFieldTable nTable = 0;
-            FieldType nDataType = (FieldType)iDataType;
-            EntityID nEntity = (EntityID)iEntity;
-
-            switch (nEntity)
-            {
-                case EntityID.Resource:
-                    switch (nDataType)
-                    {
-                        case FieldType.TypeNumber:
-                        case FieldType.TypeCost:
-                            nTable = CustomFieldTable.ResourceDEC;
-                            break;
-                        case FieldType.TypeDate:
-                            nTable = CustomFieldTable.ResourceDATE;
-                            break;
-                        case FieldType.TypeCode:
-                        case FieldType.TypeFlag:
-                            nTable = CustomFieldTable.ResourceINT;
-                            break;
-                        case FieldType.TypeText:
-                            nTable = CustomFieldTable.ResourceTEXT;
-                            break;
-                        case FieldType.TypeMVCode:
-                            nTable = CustomFieldTable.ResourceMV;
-                            break;
-                    }
-                    break;
-                case EntityID.Portfolio:
-                    switch (nDataType)
-                    {
-                        case FieldType.TypeNumber:
-                        case FieldType.TypeCost:
-                            nTable = CustomFieldTable.PortfolioDEC;
-                            break;
-                        case FieldType.TypeDate:
-                            nTable = CustomFieldTable.PortfolioDATE;
-                            break;
-                        case FieldType.TypeCode:
-                        case FieldType.TypeFlag:
-                            nTable = CustomFieldTable.PortfolioINT;
-                            break;
-                        case FieldType.TypeText:
-                            nTable = CustomFieldTable.PortfolioTEXT;
-                            break;
-                        case FieldType.TypeNText:
-                            nTable = CustomFieldTable.PortfolioNTEXT;
-                            break;
-                    }
-                    break;
-                case EntityID.Program:
-                    nTable = CustomFieldTable.Program;
-                    break;
-                case EntityID.Project:
-                    switch (nDataType)
-                    {
-                        case FieldType.TypeNumber:
-                        case FieldType.TypeCost:
-                            nTable = CustomFieldTable.ProjectDEC;
-                            break;
-                        case FieldType.TypeDate:
-                            nTable = CustomFieldTable.ProjectDATE;
-                            break;
-                        case FieldType.TypeCode:
-                        case FieldType.TypeFlag:
-                            nTable = CustomFieldTable.ProjectINT;
-                            break;
-                        case FieldType.TypeText:
-                            nTable = CustomFieldTable.ProjectTEXT;
-                            break;
-                        case FieldType.TypeNText:
-                            nTable = CustomFieldTable.ProjectNTEXT;
-                            break;
-                    }
-                    break;
-                case EntityID.Task:
-                    switch (nDataType)
-                    {
-                        case FieldType.TypeNumber:
-                            nTable = CustomFieldTable.TaskWIDEC;
-                            break;
-                        case FieldType.TypeFlag:
-                            nTable = CustomFieldTable.TaskWIINT;
-                            break;
-                        case FieldType.TypeText:
-                            nTable = CustomFieldTable.TaskWITEXT;
-                            break;
-                    }
-                    break;
-                default:
-                    nTable = CustomFieldTable.Unknown;
-                    break;
-            }
-            return (int)nTable;
-        }
-
     }
 }

@@ -11,8 +11,11 @@ namespace EPMLiveCore.API
     {
         public string sErrors = "";
         public bool bErrors = false;
+        private const int MAXFAILEDCOUNT = 1;
+        private const int FINISHJOBSTATUS = 2;
+        private const int RESTARTJOBSTATUS = 0;
 
-
+        private static Dictionary<Guid, int> failedjobs = new Dictionary<Guid, int>();
 
         public int queuetype;
 
@@ -32,7 +35,7 @@ namespace EPMLiveCore.API
 
         protected SqlConnection CreateConnection()
         {
-           string strConn = EPMLiveCore.CoreFunctions.getConnectionString(WebAppId);
+            string strConn = EPMLiveCore.CoreFunctions.getConnectionString(WebAppId);
             return new SqlConnection(strConn);
         }
 
@@ -60,8 +63,10 @@ namespace EPMLiveCore.API
 
                     //if (!tempJob)
                     {
-                        using (SqlCommand cmd = new SqlCommand("update queue set status = 2, percentcomplete=100, dtfinished=GETDATE() where queueuid=@queueuid", cn))
+                        using (SqlCommand cmd = new SqlCommand("update queue set status = @status, percentcomplete=100, dtfinished=GETDATE() where queueuid=@queueuid", cn))
                         {
+                            var paramValue = getStatusParam();
+                            cmd.Parameters.AddWithValue("@status", paramValue);
                             cmd.Parameters.AddWithValue("@queueuid", QueueUid);
                             cmd.ExecuteNonQuery();
                         }
@@ -99,6 +104,39 @@ namespace EPMLiveCore.API
             }
         }
 
+        private Object LockFailedIds = new Object();
+        private int getStatusParam()
+        {
+            lock (LockFailedIds)
+            {
+                if (bErrors)
+                {
+                    if (failedjobs.ContainsKey(QueueUid))
+                    {
+                        if (failedjobs[QueueUid] <= MAXFAILEDCOUNT)
+                        {
+                            failedjobs.Remove(QueueUid);
+                            return FINISHJOBSTATUS;
+                        }
+                        failedjobs[QueueUid] += 1;
+                        return RESTARTJOBSTATUS;
+                    }
+                    else
+                    {
+                        failedjobs.Add(QueueUid, 1);
+                        return RESTARTJOBSTATUS;
+                    }
+                }
+                else
+                {
+                    if (failedjobs.ContainsKey(QueueUid))
+                    {
+                        failedjobs.Remove(QueueUid);
+                    }
+                    return FINISHJOBSTATUS;
+                }
+            }
+        }
         protected void updateProgress(float newCount)
         {
             float percent = (newCount + 1) / totalCount * 100;
@@ -167,7 +205,7 @@ namespace EPMLiveCore.API
                     }
                     return true;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     bErrors = true;
                     sErrors = ex.ToString();

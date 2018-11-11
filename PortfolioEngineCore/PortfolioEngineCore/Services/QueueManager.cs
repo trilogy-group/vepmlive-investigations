@@ -1,6 +1,8 @@
-﻿using System;
+﻿using PortfolioEngineCore.Services;
+using System;
 using System.Data.SqlClient;
 using System.Reflection;
+
 
 namespace PortfolioEngineCore
 {
@@ -244,6 +246,28 @@ namespace PortfolioEngineCore
             return bSuccess;
         }
 
+        public bool RequeueJob(Guid jobid)
+        {
+            bool bSuccess = false;
+            try
+            {
+                if (jobid != Guid.Empty)
+                {
+                    const string sCommand =
+                        "UPDATE EPG_JOBS SET JOB_SUBMITTED = @JOB_SUBMITTED, JOB_STATUS = 0 WHERE JOB_GUID = @JOB_GUID";
+                    SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                    oCommand.Parameters.AddWithValue("@JOB_SUBMITTED", DateTime.Now);
+                    oCommand.Parameters.AddWithValue("@JOB_GUID", jobid);
+                    bSuccess = (oCommand.ExecuteNonQuery() != 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                _dba.HandleException("RequeueJob", (StatusEnum)99999, ex);
+            }
+            return bSuccess;
+        }
+
         public bool HandleRequest(string sContext, string sRequest, out string sReply)
         {
             sReply = "";
@@ -251,13 +275,8 @@ namespace PortfolioEngineCore
             try
             {
                 string sXML = BuildProductInfoString(IntPtr.Zero);
-                // this is what we have to do to late bind to a 32bit com+ vb6 object from a 64bit .net process
-                Type comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
-                object comObject = Activator.CreateInstance(comObjectType);
-                object[] myparams = new object[] { sContext, BasePath};
-                sReply = (string)comObjectType.InvokeMember("RSVPRequest", BindingFlags.InvokeMethod, null, comObject, myparams);
-
-                comObject = null;
+                WSSAdmin wssadmin = new WSSAdmin();
+                sReply = wssadmin.RSVPRequest(sContext, BasePath);
             }
             catch (Exception ex)
             {

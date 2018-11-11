@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Services;
 using System.Data.SqlClient;
 using System.Data;
+using System.Diagnostics;
+using System.Web.Script.Services;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using System.Xml;
 using System.Web.Services.Protocols;
+using System.Xml.XPath;
 
 namespace EPMLiveIntegrationService
 {
@@ -24,11 +29,12 @@ namespace EPMLiveIntegrationService
     /// </summary>
     [WebService(Namespace = "http://epmlive.com/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
-    [System.ComponentModel.ToolboxItem(false)]
+    [ToolboxItem(false)]
     // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
-    [System.Web.Script.Services.ScriptService]
+    [ScriptService]
     public class Integration : System.Web.Services.WebService
     {
+        public const string ModuleId = "a0950b9b-3525-40b8-a456-6403156dc49c";
         /// <summary>
         /// Used for TfsIntegration Events
         /// </summary>
@@ -38,10 +44,9 @@ namespace EPMLiveIntegrationService
         [SoapDocumentMethod(Action = "http://schemas.microsoft.com/TeamFoundation/2005/06/Services/Notification/03/Notify", RequestNamespace = "http://schemas.microsoft.com/TeamFoundation/2005/06/Services/Notification/03")]
         public string Notify(string eventXml, string tfsIdentityXml)
         {
-            string ret = "";
+            var result = string.Empty;
             XmlDocument xmlDocument;
             XmlNode xmlNode;
-            XmlNode xmlNodeToCheckDelete;
             try
             {
                 if (!string.IsNullOrEmpty(eventXml))
@@ -53,23 +58,23 @@ namespace EPMLiveIntegrationService
                     {
                         case "WorkItemChangedEvent":
                             xmlNode = xmlDocument.SelectSingleNode("WorkItemChangedEvent/CoreFields/IntegerFields/Field");
-                            xmlNodeToCheckDelete = xmlDocument.SelectSingleNode("WorkItemChangedEvent/CoreFields/BooleanFields/Field");
-                            Int64 ID;
-                            Boolean isDeleted = false;
-                            if (xmlNode != null && Int64.TryParse(xmlNode.SelectSingleNode("NewValue").InnerText, out ID) && !string.IsNullOrEmpty(Convert.ToString(HttpContext.Current.Request["IntegrationKey"])))
+                            var xmlNodeToCheckDelete = xmlDocument.SelectSingleNode("WorkItemChangedEvent/CoreFields/BooleanFields/Field");
+                            long ID;
+                            var isDeleted = false;
+                            if (xmlNode != null && long.TryParse(xmlNode.SelectSingleNode("NewValue").InnerText, out ID) && !string.IsNullOrEmpty(Convert.ToString(HttpContext.Current.Request["IntegrationKey"])))
                             {
                                 if (xmlNodeToCheckDelete != null)
                                 {
-                                    Boolean.TryParse(xmlNodeToCheckDelete.SelectSingleNode("NewValue").InnerText, out isDeleted);
+                                    bool.TryParse(xmlNodeToCheckDelete.SelectSingleNode("NewValue").InnerText, out isDeleted);
                                 }
 
-                                SPFarm farm = SPFarm.Local;
-                                SPWebService service = farm.Services.GetValue<SPWebService>("");
-                                foreach (SPWebApplication webapp in service.WebApplications)
+                                var farm = SPFarm.Local;
+                                var service = farm.Services.GetValue<SPWebService>(string.Empty);
+                                foreach (var webapp in service.WebApplications)
                                 {
-                                    if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
+                                    if (webapp.Name == ConfigurationManager.AppSettings["WebApplication"])
                                     {
-                                        ret = iPostSimple(webapp, Convert.ToString(HttpContext.Current.Request["IntegrationKey"]), Convert.ToString(ID), isDeleted ? "2" : "1");
+                                        result = iPostSimple(webapp, Convert.ToString(HttpContext.Current.Request["IntegrationKey"]), Convert.ToString(ID), isDeleted ? "2" : "1");
                                         break;
                                     }
                                 }
@@ -82,222 +87,249 @@ namespace EPMLiveIntegrationService
             }
             catch (Exception ex)
             {
-                ret = "<Error>" + ex.Message + "</Error>";
+                result = $"<Error>{ex.Message}</Error>";
             }
             finally
             {
                 xmlDocument = null;
                 xmlNode = null;
             }
-            return ret;
+            return result;
         }
 
 
         [WebMethod]
         public UserInfo CheckAuth(string AuthCode)
         {
+            var userInfo = new UserInfo { bValidAuth = false };
 
-            string ret = "";
-            UserInfo ui = new UserInfo();
-            ui.bValidAuth = false;
-            //try
+            var farm = SPFarm.Local;
+            //Get all SharePoint Web services 
+            var service = farm.Services.GetValue<SPWebService>(string.Empty);
+
+            foreach (var webapp in service.WebApplications)
             {
-                SPFarm farm = SPFarm.Local;
-                //Get all SharePoint Web services 
-                SPWebService service = farm.Services.GetValue<SPWebService>("");
-
-                foreach (SPWebApplication webapp in service.WebApplications)
+                if (webapp.Name == ConfigurationManager.AppSettings["WebApplication"])
                 {
-                    if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
-                    {
-                        ui = iCheckAuth(webapp, AuthCode);
-                    }
+                    userInfo = iCheckAuth(webapp, AuthCode);
                 }
             }
-            //catch(Exception ex)
-            {
 
-            }
-            return ui;
+            return userInfo;
         }
 
         [WebMethod]
         public string PostItemSimple(string IntegrationKey, string ID)
         {
-            string ret = "";
+            var result = string.Empty;
 
             try
             {
-                SPFarm farm = SPFarm.Local;
+                var farm = SPFarm.Local;
                 //Get all SharePoint Web services 
-                SPWebService service = farm.Services.GetValue<SPWebService>("");
+                var service = farm.Services.GetValue<SPWebService>(string.Empty);
 
-                foreach (SPWebApplication webapp in service.WebApplications)
+                foreach (var webapp in service.WebApplications)
                 {
-                    if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
+                    if (webapp.Name == ConfigurationManager.AppSettings["WebApplication"])
                     {
-                        ret = iPostSimple(webapp, IntegrationKey, ID, "1");
+                        result = iPostSimple(webapp, IntegrationKey, ID, "1");
                         break;
                     }
                 }
             }
             catch (Exception ex)
             {
-                ret = "<Error>" + ex.Message + "</Error>";
+                result = $"<Error>{ex.Message}</Error>";
             }
-            return ret;
+            return result;
         }
 
         [WebMethod]
         public string AddUpdateItem(string IntegrationKey, string XML)
         {
-            string ret = "";
+            var result = string.Empty;
 
             try
             {
-                SPFarm farm = SPFarm.Local;
+                var farm = SPFarm.Local;
                 //Get all SharePoint Web services 
-                SPWebService service = farm.Services.GetValue<SPWebService>("");
+                var service = farm.Services.GetValue<SPWebService>(string.Empty);
 
-                foreach (SPWebApplication webapp in service.WebApplications)
+                foreach (var webapp in service.WebApplications)
                 {
-                    if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
+                    if (webapp.Name == ConfigurationManager.AppSettings["WebApplication"])
                     {
-                        ret = iPostComplex(webapp, IntegrationKey, XML);
+                        result = iPostComplex(webapp, IntegrationKey, XML);
                         break;
                     }
                 }
             }
             catch (Exception ex)
             {
-                ret = "<Error>" + ex.Message + "</Error>";
+                result = $"<Error>{ex.Message}</Error>";
             }
-            return ret;
+            return result;
         }
 
         [WebMethod]
         public string DeleteItem(string IntegrationKey, string ID)
         {
-            string ret = "";
+            var result = string.Empty;
 
             try
             {
-                SPFarm farm = SPFarm.Local;
+                var farm = SPFarm.Local;
                 //Get all SharePoint Web services 
-                SPWebService service = farm.Services.GetValue<SPWebService>("");
+                var service = farm.Services.GetValue<SPWebService>(string.Empty);
 
-                foreach (SPWebApplication webapp in service.WebApplications)
+                foreach (var webapp in service.WebApplications)
                 {
-                    if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
+                    if (webapp.Name == ConfigurationManager.AppSettings["WebApplication"])
                     {
-                        ret = iDeleteItem(webapp, IntegrationKey, ID);
+                        result = iDeleteItem(webapp, IntegrationKey, ID);
                         break;
                     }
                 }
             }
             catch (Exception ex)
             {
-                ret = "<Error>" + ex.Message + "</Error>";
+                result = $"<Error>{ex.Message}</Error>";
             }
-            return ret;
+            return result;
         }
 
         private UserInfo iCheckAuth(SPWebApplication webapp, string AuthCode)
         {
-            UserInfo ui = new UserInfo();
-            ui.bValidAuth = false;
-            SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id));
-            cn.Open();
-
-            SqlCommand cmd = new SqlCommand("SELECT username,email from INT_AUTH WHERE     (AUTH_ID = @authid) AND (DATEDIFF(mi, datetime, GETDATE()) < 2)", cn);
-            cmd.Parameters.AddWithValue("@authid", AuthCode);
-            SqlDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
+            var ui = new UserInfo { bValidAuth = false };
+            using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id)))
             {
+                connection.Open();
 
-                ui.bValidAuth = true;
-                ui.username = dr.GetString(0);
-                ui.email = dr.GetString(1);
+                var sql = "SELECT username,email from INT_AUTH WHERE     (AUTH_ID = @authid) AND (DATEDIFF(mi, datetime, GETDATE()) < 2)";
+                using (var command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@authid", AuthCode);
+                    using (var dataReader = command.ExecuteReader())
+                    {
+                        if (dataReader.Read())
+                        {
+                            ui.bValidAuth = true;
+                            ui.username = dataReader.GetString(0);
+                            ui.email = dataReader.GetString(1);
+                        }
+                    }
+                }
 
+                using (var command = new SqlCommand("DELETE from INT_AUTH WHERE     (AUTH_ID = @authid)", connection))
+                {
+                    command.Parameters.AddWithValue("@authid", AuthCode);
+                    command.ExecuteNonQuery();
+                }
             }
-            dr.Close();
-            cmd = new SqlCommand("DELETE from INT_AUTH WHERE     (AUTH_ID = @authid)", cn);
-            cmd.Parameters.AddWithValue("@authid", AuthCode);
-            cmd.ExecuteNonQuery();
-            cn.Close();
-
 
             return ui;
         }
 
-        private bool iAuthenticate(string IntegrationKey, out string ret, out DataSet dsIntegration, SqlConnection cn)
+        private bool iAuthenticate(string IntegrationKey, out string result, out DataSet dsIntegration, SqlConnection connection)
         {
-            Guid intlistid = Guid.Empty;
-            int attempts = 0;
-            dsIntegration = new DataSet();
-            string ip = HttpContext.Current.Request.UserHostAddress;
+            var attempts = 0;
 
-            SqlCommand cmd = new SqlCommand("SELECT count(*) FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() )", cn);
-            cmd.Parameters.AddWithValue("@ip", ip);
-            SqlDataReader dr = cmd.ExecuteReader();
-            dr.Read();
-            attempts = dr.GetInt32(0);
-            dr.Close();
+            dsIntegration = new DataSet();
+            var ip = HttpContext.Current.Request.UserHostAddress;
+
+            using (var command = new SqlCommand("SELECT count(*) FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() )", connection))
+            {
+                command.Parameters.AddWithValue("@ip", ip);
+                var dataReader = command.ExecuteReader();
+                dataReader.Read();
+                attempts = dataReader.GetInt32(0);
+                dataReader.Close();
+            }
 
             if (attempts < 5)
             {
-                cmd = new SqlCommand("SELECT * FROM INT_LISTS where int_key=@intkey and LIVEINCOMING=1", cn);
-                cmd.Parameters.AddWithValue("@intkey", IntegrationKey);
-
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(dsIntegration);
-
-                if (dsIntegration.Tables[0].Rows.Count > 0)
+                using (var command = new SqlCommand("SELECT * FROM INT_LISTS where int_key=@intkey and LIVEINCOMING=1", connection))
                 {
-                    ret = "";
+                    command.Parameters.AddWithValue("@intkey", IntegrationKey);
+
+                    using (var adapter = new SqlDataAdapter(command))
+                    {
+                        adapter.Fill(dsIntegration);
+                    }
+                }
+
+                if (GetRowsCount(dsIntegration) > 0)
+                {
+                    result = string.Empty;
                     return true;
                 }
-                else
+
+                result = "<Error>Invalid Key</Error>";
+                var found = false;
+                var sql = "SELECT * FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() ) and intkey=@intkey";
+                using (var commmand = new SqlCommand(sql, connection))
                 {
-                    ret = "<Error>Invalid Key</Error>";
+                    commmand.Parameters.AddWithValue("@ip", ip);
+                    commmand.Parameters.AddWithValue("@intkey", IntegrationKey);
 
-                    cmd = new SqlCommand("SELECT * FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() ) and intkey=@intkey", cn);
-                    cmd.Parameters.AddWithValue("@ip", ip);
-                    cmd.Parameters.AddWithValue("@intkey", IntegrationKey);
-
-                    bool found = false;
-
-                    dr = cmd.ExecuteReader();
-                    if (dr.Read())
-                        found = true;
-                    dr.Close();
-
-                    if (!found)
+                    using (var reader = commmand.ExecuteReader())
                     {
-                        cmd = new SqlCommand("INSERT INTO INT_IP (IP,intkey) VALUES (@ip,@intkey)", cn);
-                        cmd.Parameters.AddWithValue("@ip", ip);
-                        cmd.Parameters.AddWithValue("@intkey", IntegrationKey);
-                        cmd.ExecuteNonQuery();
+                        if (reader.Read())
+                        {
+                            found = true;
+                        }
+                    }
+                }
+
+                if (!found)
+                {
+                    using (var commmand = new SqlCommand("INSERT INTO INT_IP (IP,intkey) VALUES (@ip,@intkey)", connection))
+                    {
+                        commmand.Parameters.AddWithValue("@ip", ip);
+                        commmand.Parameters.AddWithValue("@intkey", IntegrationKey);
+                        commmand.ExecuteNonQuery();
                     }
                 }
             }
             else
             {
-                ret = "<Error>Too Many Attempts</Error>";
+                result = "<Error>Too Many Attempts</Error>";
             }
             return false;
         }
 
-        private bool iCheckXml(XmlDocument doc, out string sError)
+        public static int GetRowsCount(DataSet dataSet, int tableIndex = 0)
         {
-            sError = "";
+            return dataSet.Tables.Count > tableIndex
+                ? dataSet.Tables[tableIndex].Rows.Count
+                : 0;
+        }
+
+        public static string GetRowValue(DataSet dataSet, string key, int tableIndex = 0, int rowIndex = 0)
+        {
+            var rows = dataSet.Tables.Count > tableIndex
+                ? dataSet.Tables[tableIndex].Rows
+                : null;
+            if (rows == null)
+            {
+                return string.Empty;
+            }
+
+            return rows.Count > rowIndex
+                ? rows[rowIndex][key].ToString()
+                : string.Empty;
+        }
+
+        public static bool iCheckXml(XmlDocument doc, out string sError)
+        {
+            sError = string.Empty;
 
             try
             {
-
                 if (doc.FirstChild.Name == "Items")
                 {
-                    XmlNode ndItem = doc.FirstChild.SelectSingleNode("Item");
+                    var ndItem = doc.FirstChild.SelectSingleNode("Item");
                     if (ndItem != null)
                     {
                         return true;
@@ -323,156 +355,165 @@ namespace EPMLiveIntegrationService
 
         private string iPostComplex(SPWebApplication webapp, string IntegrationKey, string XML)
         {
-            string ret = "";
+            string result;
             try
             {
-                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id));
-                cn.Open();
-
-                DataSet dsIntegration = new DataSet();
-
-                if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, cn))
+                using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id)))
                 {
-                    if (dsIntegration.Tables[0].Rows[0]["MODULE_ID"].ToString() == "a0950b9b-3525-40b8-a456-6403156dc49c")
+                    connection.Open();
+
+                    var dsIntegration = new DataSet();
+
+                    if (iAuthenticate(IntegrationKey, out result, out dsIntegration, connection))
                     {
-                        string sError = "";
-
-                        XmlDocument doc = new XmlDocument();
-                        doc.LoadXml(XML);
-
-                        if (iCheckXml(doc, out sError))
+                        if (GetRowValue(dsIntegration, "MODULE_ID") == ModuleId)
                         {
-                            string idCol = "";
+                            string sError;
 
-                            SqlCommand cmd = new SqlCommand("SELECT [VALUE] FROM INT_PROPS WHERE INT_LIST_ID=@intlistid and [PROPERTY]='IDColumn'", cn);
-                            cmd.Parameters.AddWithValue("@intlistid", dsIntegration.Tables[0].Rows[0]["INT_LIST_ID"].ToString());
-                            SqlDataReader r = cmd.ExecuteReader();
-                            if (r.Read())
+                            var doc = new XmlDocument();
+                            doc.LoadXml(XML);
+
+                            if (iCheckXml(doc, out sError))
                             {
-                                idCol = r.GetString(0);
-                            }
-                            r.Close();
+                                var idCol = string.Empty;
 
-                            if (idCol != "")
-                            {
-                                XmlNode ndItems = doc.SelectSingleNode("Items");
-
-                                foreach (XmlNode ndItem in ndItems.SelectNodes("Item"))
+                                var sql = "SELECT [VALUE] FROM INT_PROPS WHERE INT_LIST_ID=@intlistid and [PROPERTY]='IDColumn'";
+                                using (var command = new SqlCommand(sql, connection))
                                 {
-                                    string ID = "";
-
-                                    try
+                                    command.Parameters.AddWithValue("@intlistid", GetRowValue(dsIntegration, "INT_LIST_ID"));
+                                    using (var dataReader = command.ExecuteReader())
                                     {
-                                        ID = ndItem.SelectSingleNode("Fields/Field[@Name='" + idCol + "']").InnerText;
-                                    }
-                                    catch { }
-
-                                    if (ID != "")
-                                    {
-                                        cmd = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE, DATA) VALUES (@listid, @intitemid, @colid, 0, 2, 1, @data)", cn);
-                                        cmd.Parameters.AddWithValue("@listid", dsIntegration.Tables[0].Rows[0]["LIST_ID"].ToString());
-                                        cmd.Parameters.AddWithValue("@intitemid", ID);
-                                        cmd.Parameters.AddWithValue("@colid", dsIntegration.Tables[0].Rows[0]["INT_COLID"].ToString());
-                                        cmd.Parameters.AddWithValue("@data", ndItem.OuterXml);
-                                        cmd.ExecuteNonQuery();
+                                        if (dataReader.Read())
+                                        {
+                                            idCol = dataReader.GetString(0);
+                                        }
                                     }
                                 }
 
-                                ret = "<Success/>";
+                                if (!string.IsNullOrWhiteSpace(idCol))
+                                {
+                                    var ndItems = doc.SelectSingleNode("Items");
+
+                                    foreach (XmlNode ndItem in ndItems.SelectNodes("Item"))
+                                    {
+                                        var id = string.Empty;
+
+                                        try
+                                        {
+                                            id = ndItem.SelectSingleNode($"Fields/Field[@Name='{idCol}']").InnerText;
+                                        }
+                                        catch (XPathException ex)
+                                        {
+                                            Debug.WriteLine("Error evaluating XPath: " + ex);
+                                        }
+
+                                        if (!string.IsNullOrWhiteSpace(id))
+                                        {
+                                            sql = "INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE, DATA) VALUES (@listid, @intitemid, @colid, 0, 2, 1, @data)";
+                                            using (var command = new SqlCommand(sql, connection))
+                                            {
+                                                command.Parameters.AddWithValue("@listid", GetRowValue(dsIntegration, "LIST_ID"));
+                                                command.Parameters.AddWithValue("@intitemid", id);
+                                                command.Parameters.AddWithValue("@colid", GetRowValue(dsIntegration, "INT_COLID"));
+                                                command.Parameters.AddWithValue("@data", ndItem.OuterXml);
+                                                command.ExecuteNonQuery();
+                                            }
+                                        }
+                                    }
+
+                                    result = "<Success/>";
+                                }
+                                else
+                                {
+                                    result = "<Error>ID Column not specified in settings</Error>";
+                                }
                             }
                             else
                             {
-                                ret = "<Error>ID Column not specified in settings</Error>";
+                                result = $"<Error>{sError}</Error>";
                             }
                         }
                         else
                         {
-                            ret = "<Error>" + sError + "</Error>";
+                            result = "<Error>That integration key is not a generic integration</Error>";
                         }
                     }
-                    else
-                    {
-                        ret = "<Error>That integration key is not a generic integration</Error>";
-                    }
                 }
-
-                cn.Close();
-
-                //ret = "<Success/>";
 
             }
             catch (Exception ex)
             {
-                ret = "<Error>" + ex.Message + "</Error>";
+                result = $"<Error>{ex.Message}</Error>";
             }
-            return ret;
+            return result;
         }
 
         private string iPostSimple(SPWebApplication webapp, string IntegrationKey, string ID, string type)
         {
-            string ret = "";
+            string result;
             try
             {
-                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id));
-                cn.Open();
-
-                DataSet dsIntegration = new DataSet();
-
-                if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, cn))
+                using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id)))
                 {
-                    SqlCommand cmd = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @intitemid, @colid, 0, 2, @type)", cn);
-                    cmd.Parameters.AddWithValue("@listid", dsIntegration.Tables[0].Rows[0]["LIST_ID"].ToString());
-                    cmd.Parameters.AddWithValue("@intitemid", ID);
-                    cmd.Parameters.AddWithValue("@colid", dsIntegration.Tables[0].Rows[0]["INT_COLID"].ToString());
-                    cmd.Parameters.AddWithValue("@type", type);
-                    cmd.ExecuteNonQuery();
+                    connection.Open();
 
-                    ret = "<Success/>";
+                    var dsIntegration = new DataSet();
+
+                    if (iAuthenticate(IntegrationKey, out result, out dsIntegration, connection))
+                    {
+                        var sql = "INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @intitemid, @colid, 0, 2, @type)";
+                        using (var command = new SqlCommand(sql, connection))
+                        {
+                            command.Parameters.AddWithValue("@listid", GetRowValue(dsIntegration, "LIST_ID"));
+                            command.Parameters.AddWithValue("@intitemid", ID);
+                            command.Parameters.AddWithValue("@colid", GetRowValue(dsIntegration, "INT_COLID"));
+                            command.Parameters.AddWithValue("@type", type);
+                            command.ExecuteNonQuery();
+                        }
+
+                        result = "<Success/>";
+                    }
                 }
-
-                cn.Close();
-
-                //ret = "<Success/>";
 
             }
             catch (Exception ex)
             {
-                ret = "<Error>" + ex.Message + "</Error>";
+                result = $"<Error>{ex.Message}</Error>";
             }
-            return ret;
+            return result;
         }
 
         private string iDeleteItem(SPWebApplication webapp, string IntegrationKey, string ID)
         {
-            string ret = "";
+            string result;
             try
             {
-                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id));
-                cn.Open();
-
-                DataSet dsIntegration = new DataSet();
-
-                if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, cn))
+                using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id)))
                 {
-                    SqlCommand cmd = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @intitemid, @colid, 0, 2, 2)", cn);
-                    cmd.Parameters.AddWithValue("@listid", dsIntegration.Tables[0].Rows[0]["LIST_ID"].ToString());
-                    cmd.Parameters.AddWithValue("@intitemid", ID);
-                    cmd.Parameters.AddWithValue("@colid", dsIntegration.Tables[0].Rows[0]["INT_COLID"].ToString());
-                    cmd.ExecuteNonQuery();
+                    connection.Open();
 
-                    ret = "<Success/>";
+                    var dsIntegration = new DataSet();
+
+                    if (iAuthenticate(IntegrationKey, out result, out dsIntegration, connection))
+                    {
+                        var sql = "INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @intitemid, @colid, 0, 2, 2)";
+                        using (var command = new SqlCommand(sql, connection))
+                        {
+                            command.Parameters.AddWithValue("@listid", GetRowValue(dsIntegration, "LIST_ID"));
+                            command.Parameters.AddWithValue("@intitemid", ID);
+                            command.Parameters.AddWithValue("@colid", GetRowValue(dsIntegration, "INT_COLID"));
+                            command.ExecuteNonQuery();
+                        }
+
+                        result = "<Success/>";
+                    }
                 }
-
-                cn.Close();
-
-                //ret = "<Success/>";
-
             }
             catch (Exception ex)
             {
-                ret = "<Error>" + ex.Message + "</Error>";
+                result = $"<Error>{ex.Message}</Error>";
             }
-            return ret;
+            return result;
         }
     }
 }

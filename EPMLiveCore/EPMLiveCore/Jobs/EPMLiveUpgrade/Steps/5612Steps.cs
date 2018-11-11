@@ -38,12 +38,16 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                         string className = "EPMLiveCore.DepartmentEvent";
 
 
-                        List<SPEventReceiverDefinition> evts = CoreFunctions.GetListEvents(deptList,
-                                                                                      assemblyName,
-                                                                                      className,
-                                                                                      new List<SPEventReceiverType> { SPEventReceiverType.ItemAdding,
-                                                                                                              SPEventReceiverType.ItemUpdating,
-                                                                                                              SPEventReceiverType.ItemDeleted });
+                        var evts = CoreFunctions.GetListEvents(
+                            deptList,
+                            assemblyName,
+                            className,
+                            new [] {
+                                SPEventReceiverType.ItemAdding,
+                                SPEventReceiverType.ItemUpdating,
+                                SPEventReceiverType.ItemDeleted
+                            });
+
                         LogMessage("Department Events Deleting", MessageKind.SUCCESS, 4);
 
                         foreach (SPEventReceiverDefinition e in evts)
@@ -58,12 +62,15 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                         deptList.EventReceivers.Add(SPEventReceiverType.ItemUpdating, assemblyName, className);
                         deptList.EventReceivers.Add(SPEventReceiverType.ItemDeleted, assemblyName, className);
 
-                        List<SPEventReceiverDefinition> newEvts = CoreFunctions.GetListEvents(deptList,
-                                                                                      assemblyName,
-                                                                                      className,
-                                                                                      new List<SPEventReceiverType> { SPEventReceiverType.ItemAdding,
-                                                                                                              SPEventReceiverType.ItemUpdating,
-                                                                                                              SPEventReceiverType.ItemDeleted });
+                        var newEvts = CoreFunctions.GetListEvents(
+                            deptList,
+                            assemblyName,
+                            className,
+                            new [] {
+                                SPEventReceiverType.ItemAdding,
+                                SPEventReceiverType.ItemUpdating,
+                                SPEventReceiverType.ItemDeleted
+                            });
 
                         foreach (SPEventReceiverDefinition e in newEvts)
                         {

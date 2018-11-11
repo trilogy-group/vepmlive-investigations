@@ -8,6 +8,8 @@ namespace EPMLiveAccountManagement.Layouts.epmlive
 {
     public partial class manageaccountusers : LayoutsPageBase
     {
+        private const int AccountSecondaryOwnerIdFieldIndex = 17;
+
         private int accountref = 0;
         private int maxUsers = 0;
         private int currentUsers = 0;
@@ -42,6 +44,7 @@ namespace EPMLiveAccountManagement.Layouts.epmlive
                 cmd.Parameters.AddWithValue("@contractLevel", Settings.getContractLevel());
                 SqlDataReader dr = cmd.ExecuteReader();
                 string owneruname = "";
+                var secondaryOwnerLogin = string.Empty;
 
                 if(dr.Read())
                 {
@@ -49,6 +52,10 @@ namespace EPMLiveAccountManagement.Layouts.epmlive
                     maxUsers = dr.GetInt32(0);
                     currentUsers = dr.GetInt32(1);
                     owneruname = dr.GetString(13);
+                    if (dr.FieldCount > AccountSecondaryOwnerIdFieldIndex && !dr.IsDBNull(AccountSecondaryOwnerIdFieldIndex))
+                    {
+                        secondaryOwnerLogin = dr.GetString(AccountSecondaryOwnerIdFieldIndex);
+                    }
                 }
                 dr.Close();
 
@@ -64,7 +71,8 @@ namespace EPMLiveAccountManagement.Layouts.epmlive
 
                 cn.Close();
 
-                if(owneruname.ToLower() != EPMLiveCore.CoreFunctions.GetRealUserName(SPContext.Current.Web.CurrentUser.LoginName).ToLower())
+                var loggedInUserName = EPMLiveCore.CoreFunctions.GetRealUserName(SPContext.Current.Web.CurrentUser.LoginName).ToLower();
+                if (owneruname.ToLower() != loggedInUserName && secondaryOwnerLogin.ToLower() != loggedInUserName)
                 {
                     Response.Redirect("../AccessDenied.aspx");
                 }

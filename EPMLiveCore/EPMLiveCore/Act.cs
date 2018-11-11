@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.SharePoint;
 using System.Collections;
-using Microsoft.SharePoint.Administration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
 using System.Reflection;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
+using static EPMLiveCore.Helpers.WebServicesHelper;
 
 namespace EPMLiveCore
 {
@@ -25,6 +26,18 @@ namespace EPMLiveCore
 
     public class Act
     {
+        private const int AccessLicense = 0;
+        private const int OldPurchaseMethod = 1;
+        private const int Trial = 2;
+        private const int NewPurchaseMethod = 3;
+        private const int PurchasedLicense = 6;
+        private const string LevelColumn = "Level";
+        private const string SharepointSystemUser = "sharepoint\\system";
+        private const string EPMLiveAccountManagementAssembly = "EPMLiveAccountManagement, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+        private const string FeaturesColumn = "Features";
+        private const string UserCountColumn = "UserCount";
+        private const string QuantityColumn = "quantity";
+        private const string NotAvailableString = "NA";
         private SPWeb _web;
         private bool _bIsOnline = false;
         public string OwnerUsername = "";
@@ -47,22 +60,23 @@ namespace EPMLiveCore
                     m = thisClass.GetMethod("getConnectionStringByWebApp");
                     string sConn = (string)m.Invoke(null, new object[] { web.Site.WebApplication.Name });
 
-                    SqlConnection cn = new SqlConnection(sConn);
-                    cn.Open();
-
-                    SqlCommand cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                    cmd.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel(web.Site));
-
-                    SqlDataReader dr = cmd.ExecuteReader();
-
-                    if(dr.Read())
+                    using (var sqlConnection = new SqlConnection(sConn))
                     {
-                        OwnerUsername = dr.GetString(13);
+                        sqlConnection.Open();
+
+                        var sqlCommand = new SqlCommand("2010SP_GetSiteAccountNums", sqlConnection);
+                        sqlCommand.CommandType = CommandType.StoredProcedure;
+                        sqlCommand.Parameters.AddWithValue("@siteid", web.Site.ID);
+                        sqlCommand.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel(web.Site));
+
+                        using (var dataReader = sqlCommand.ExecuteReader())
+                        {
+                            if (dataReader.Read())
+                            {
+                                OwnerUsername = dataReader.GetString(13);
+                            }
+                        }
                     }
-                    dr.Close();
-                    cn.Close();
                 });
             }
 
@@ -104,147 +118,191 @@ namespace EPMLiveCore
             };
         }
 
-
-
         private int CheckOnlineFeatureLicense(ActFeature feature, string username, SPSite site)
         {
+            var assemblyInstance = Assembly.Load(EPMLiveAccountManagementAssembly);
+            var thisClass = assemblyInstance.GetType("EPMLiveAccountManagement.AccountManagement", true, true);
 
-            MethodInfo m;
+            var methodInfo = thisClass.GetMethod("GetActivationInfo");
+            var dsInfo = (DataSet)methodInfo.Invoke(
+                null, 
+                new object[]
+                {
+                    _web.Site.ID,
+                    CoreFunctions.GetRealUserName(username, site)
+                });
 
-            Assembly assemblyInstance = Assembly.Load("EPMLiveAccountManagement, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
-            Type thisClass = assemblyInstance.GetType("EPMLiveAccountManagement.AccountManagement", true, true);
+            if (dsInfo.Tables.Count == 0 || dsInfo.Tables[0].Rows.Count == 0 || dsInfo.Tables[0].Columns.Count == 0)
+            {
+                throw new InvalidOperationException("dsInfo.Tables[0].Rows[0][0] should not be null.");
+            }
 
-            m = thisClass.GetMethod("GetActivationInfo");
-            DataSet dsInfo = (DataSet)m.Invoke(null, new object[] { _web.Site.ID, CoreFunctions.GetRealUserName(username, site) });
+            int activationType;
+            if (!int.TryParse(dsInfo.Tables[0].Rows[0][0]?.ToString(), out activationType))
+            {
+                activationType = 0;
+            }
 
-            int ActivationType = 0;
+            switch (activationType)
+            {
+                case AccessLicense:
+                    return 7;
+                case OldPurchaseMethod:
+                    return CheckOldPurchaseMethod(feature, username, dsInfo);
+                case Trial:
+                    return HasAccess(username, dsInfo)
+                        ? AccessLicense
+                        : PurchasedLicense;
+                case NewPurchaseMethod:
+                    return CheckNewPurchaseMethod(feature, username, dsInfo);
+                default:
+                    Trace.WriteLine("Unexpected activationType: " + activationType);
+                    break;
+            }
 
+            return -1;
+        }
+
+        private int CheckNewPurchaseMethod(ActFeature feature, string username, DataSet dsInfo)
+        {
+            if (dsInfo.Tables.Count < 3)
+            {
+                throw new ArgumentException("dsInfo.Tables should have at least 3 tables.", nameof(dsInfo));
+            }
+            var hasPurchased = false;
+            var hasAccess = false;
+            var userLevel = 0;
+
+            foreach (DataRow dataRow in dsInfo.Tables[1].Rows)
+            {
+                var arrFeatures = new ArrayList(dataRow[FeaturesColumn]?.ToString().Split(','));
+                if (arrFeatures.Contains(((int)feature).ToString()))
+                {
+                    hasPurchased = true;
+                    if (SharepointSystemUser.Equals(username, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return AccessLicense;
+                    }
+                    break;
+                }
+            }
+
+            if (!int.TryParse(dsInfo.Tables[2].Rows[0][0].ToString(), out userLevel))
+            {
+                Trace.WriteLine("Unable to parse dsInfo.Tables[2].Rows[0][0]");
+            }
+
+            if (userLevel == 9999)
+            {
+                return AccessLicense;
+            }
+            else
+            {
+                var dataRows = dsInfo.Tables[1].Select($"ResLevel='{userLevel}'");
+                if (dataRows.Any())
+                {
+                    int usercount;
+                    int maxusers;
+                    if (!int.TryParse(dataRows[0][UserCountColumn]?.ToString(), out usercount))
+                    {
+                        usercount = 0;
+                    }
+                    if (!int.TryParse(dataRows[0][QuantityColumn]?.ToString(), out maxusers))
+                    {
+                        maxusers = 0;
+                    }
+
+                    if (maxusers >= usercount)
+                    {
+                        var arrFeatures = new ArrayList(dataRows[0][FeaturesColumn]?.ToString().Split(','));
+                        if (arrFeatures.Contains(((int)feature).ToString()))
+                        {
+                            hasAccess = true;
+                        }
+                    }
+                    else
+                    {
+                        return Trial;
+                    }
+                }
+            }
+
+            return GetLicenseValue(hasPurchased, hasAccess);
+        }
+
+        private static int GetLicenseValue(bool hasPurchased, bool hasAccess)
+        {
+            if (hasAccess)
+            {
+                return AccessLicense;
+            }
+            else if (hasPurchased)
+            {
+                return PurchasedLicense;
+            }
+
+            return 5;
+        }
+
+        private static int CheckOldPurchaseMethod(ActFeature feature, string username, DataSet dsInfo)
+        {
+            if (dsInfo.Tables.Count < 2 || dsInfo.Tables[1].Rows.Count == 0 || !dsInfo.Tables[1].Columns.Contains(LevelColumn))
+            {
+                throw new InvalidOperationException($"dsInfo.Tables[1].Rows[0][{LevelColumn}] should not be null");
+            }
+
+            int contractlevel;
+            if (!int.TryParse(dsInfo.Tables[1].Rows[0][LevelColumn]?.ToString(), out contractlevel))
+            {
+                contractlevel = 2;
+            }
+
+            var userLevels = new UserLevels();
+            var userLevel = userLevels.GetById(1);
+            if (contractlevel == 2)
+            {
+                userLevel = userLevels.GetById(2);
+            }
+            else if (contractlevel == 4)
+            {
+                userLevel = userLevels.GetById(3);
+            }
+
+            if (userLevel == null || userLevel.levels == null)
+            {
+                throw new InvalidOperationException("userLevel.levels should not be null.");
+            }
+            if (userLevel.levels.Contains((int)feature))
+            {
+                if (HasAccess(username, dsInfo))
+                {
+                    return AccessLicense;
+                }
+                return 6;
+            }
+
+            return 5;
+        }
+
+        private static bool HasAccess(string username, DataSet dsInfo)
+        {
+            if (SharepointSystemUser.Equals(username, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
             try
             {
-                ActivationType = int.Parse(dsInfo.Tables[0].Rows[0][0].ToString());
+                if (dsInfo.Tables[2].Rows[0][0].ToString() == "1")
+                {
+                    return true;
+                }
             }
-            catch { }
-            
-            UserLevels uls = new UserLevels();
-
-            switch(ActivationType)
+            catch (Exception ex)
             {
-                case 0:
-                    return 7;
-                case 1: //old purchase method
-                    {
-                        int contractlevel = 2;
-
-                        try
-                        {
-                            contractlevel = int.Parse(dsInfo.Tables[1].Rows[0]["Level"].ToString());
-                        }
-                        catch { }
-
-                        UserLevel userlevel = uls.GetById(1);
-                        if(contractlevel == 2)
-                            userlevel = uls.GetById(2);
-                        else if(contractlevel == 4)
-                            userlevel = uls.GetById(3);
-
-                        if(userlevel.levels.Contains((int)feature))
-                        {
-
-                            if(username.ToLower() == "sharepoint\\system")
-                                return 0;
-                            try
-                            {
-                                if(dsInfo.Tables[2].Rows[0][0].ToString() == "1")
-                                {
-                                    return 0;
-                                }
-                            }
-                            catch { }
-                            return 6;
-                        }
-                        return 5;
-                    }
-                case 2: //Trial
-                    if(username.ToLower() == "sharepoint\\system")
-                        return 0;
-
-                    if(dsInfo.Tables[2].Rows[0][0].ToString() == "1")
-                    {
-                        return 0;
-                    }
-                    return 6;
-
-                case 3: //New purchase method
-                    {
-                        bool HasPurchased = false;
-                        bool HasAccess = false;
-
-                        int userLevel = 0;
-
-                        foreach(DataRow dr in dsInfo.Tables[1].Rows)
-                        {
-                            ArrayList arrFeatures = new ArrayList(dr["Features"].ToString().Split(','));
-                            if(arrFeatures.Contains(((int)feature).ToString()))
-                            {
-                                HasPurchased = true;
-                                if(username.ToLower() == "sharepoint\\system")
-                                    return 0;
-                                break;
-                            }
-                        }
-
-                        try
-                        {
-                            userLevel = int.Parse(dsInfo.Tables[2].Rows[0][0].ToString());
-                        }
-                        catch { }
-                        if(userLevel == 9999)
-                        {
-                            return 0;
-                        }
-                        else
-                        {
-                            DataRow[] drs = dsInfo.Tables[1].Select("ResLevel='" + userLevel + "'");
-                            if(drs.Length > 0)
-                            {
-
-                                int usercount = 0;
-                                int maxusers = 0;
-                                try
-                                {
-                                    usercount = int.Parse(drs[0]["UserCount"].ToString());
-                                }
-                                catch { }
-                                try
-                                {
-                                    maxusers = int.Parse(drs[0]["quantity"].ToString());
-                                }
-                                catch { }
-
-                                if(maxusers >= usercount)
-                                {
-
-                                    ArrayList arrFeatures = new ArrayList(drs[0]["Features"].ToString().Split(','));
-                                    if(arrFeatures.Contains(((int)feature).ToString()))
-                                    {
-                                        HasAccess = true;
-                                    }
-                                }
-                                else
-                                    return 2;
-                            }
-                        }
-
-                        if(HasAccess)
-                            return 0;
-                        else if(HasPurchased)
-                            return 6;
-                        else
-                            return 5;
-                    }
-
+                Trace.WriteLine(ex.ToString());
             }
-            return -1;
+
+            return false;
         }
 
         private int SetUserActivation(int feature, string username, SPSite site)
@@ -758,35 +816,7 @@ namespace EPMLiveCore
 
         private ArrayList GetFarmFeatureUsers(int featureId)
         {
-            UserManager _chrono = null;
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                try
-                {
-                    SPFarm farm = SPFarm.Local;
-
-                    _chrono = farm.GetChild<UserManager>("UserManager" + featureId);
-                    if(_chrono == null)
-                    {
-                        SPWeb web = SPContext.Current.Web;
-                        web.AllowUnsafeUpdates = true;
-                        SPSite site = web.Site;
-                        site.AllowUnsafeUpdates = true;
-                        SPWebApplication app = site.WebApplication;
-                        farm = app.Farm;
-                        _chrono = new UserManager("UserManager" + featureId, farm, Guid.NewGuid());
-                        _chrono.Update();
-                        farm.Update();
-                    }
-                }
-                catch { }
-            });
-
-            if(_chrono != null)
-                return _chrono.UserList;
-
-            return new ArrayList();
+            return FarmFeatureUsers(featureId);
         }
 
         public ArrayList GetActivatedLevels()
@@ -845,170 +875,208 @@ namespace EPMLiveCore
 
         public static SortedList GetAllAvailableLevels(out int ActivationType)
         {
-            SortedList slLevels = new SortedList();
+            var levels = new SortedList();
 
             ActivationType = 0;
 
-            string keys = "";
+            var keysString = string.Empty;
 
             try
             {
-                keys = SPFarm.Local.Properties["EPMLiveKeys"].ToString();
+                keysString = SPFarm.Local.Properties["EPMLiveKeys"].ToString();
             }
-            catch { }
-            if(keys != "")
+            catch (Exception ex)
             {
-                string[] arrKeys = keys.Split('\t');
-                for(int i = 0; i < arrKeys.Length; i = i + 2)
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+            if (keysString != string.Empty)
+            {
+                var keys = keysString.Split('\t');
+                for (var i = 0; i < keys.Length; i = i + 2)
                 {
-                    if(arrKeys[i] != "")
+                    if (keys[i] != string.Empty)
                     {
-                        string val = arrKeys[i];
-                        string s = arrKeys[i + 1];
-                        if(farmEncode(val) == s)
+                        var keyValue = keys[i];
+                        var keyChar = keys[i + 1];
+                        if (farmEncode(keyValue) == keyChar)
                         {
-                            string feature = CoreFunctions.Decrypt(val, "jLHKJH5416FL>1dcv3#I");
-                            string[] features = feature.Split('\n');
-                            if(features[0][0] == '*')
+                            const string PassPhrase = "jLHKJH5416FL>1dcv3#I";
+                            var feature = CoreFunctions.Decrypt(keyValue, PassPhrase);
+                            var features = feature.Split('\n');
+                            if (features[0][0] == '*')
                             {
-
-                                if(features[0][1] == '2' && (ActivationType == 2 || ActivationType == 0))
+                                if (features[0][1] == '2' && (ActivationType == 2 || ActivationType == 0))
                                 {
-                                    ActivationType = 2;
-
-                                    string expiration = features[4];
-                                    bool goodFeatureExp = false;
-                                    if(expiration == "NA")
+                                    var sortedList = AddFeaturesActivationType2(out ActivationType, features, levels);
+                                    if (sortedList != null)
                                     {
-                                        goodFeatureExp = true;
+                                        return sortedList;
                                     }
-                                    else
-                                    {
-                                        try
-                                        {
-                                            System.Globalization.CultureInfo eng = new System.Globalization.CultureInfo(1033);
-                                            DateTime dtEng = DateTime.Parse(expiration, eng);
-                                            if(new DateTime(dtEng.Year, dtEng.Month, dtEng.Day) > DateTime.Now)
-                                            {
-                                                goodFeatureExp = true;
-                                            }
-                                        }
-                                        catch { }
-                                    }
-
-                                    if(goodFeatureExp)
-                                    {
-                                        string[] featureNames = features[3].Split(',');
-                                        foreach(string featureName in featureNames)
-                                        {
-                                            string[] sFeatureName = featureName.Split(':');
-
-                                            int featureId = int.Parse(sFeatureName[0]);
-                                            int userCount = int.Parse(sFeatureName[1]);
-
-                                            if(slLevels.Contains(featureId))
-                                                slLevels[featureId] = (int)slLevels[featureId] + userCount;
-                                            else
-                                                slLevels.Add(featureId, userCount);
-                                        }
-                                        return slLevels;
-                                    }
-                                    
                                 }
-                                else if(features[0][1] == '3' && (ActivationType == 3 || ActivationType == 0))
+                                else if (features[0][1] == '3' && (ActivationType == 3 || ActivationType == 0))
                                 {
-                                    ActivationType = 3;
-
-                                    string expiration = features[4];
-                                    bool goodFeatureExp = false;
-                                    if(expiration == "NA")
+                                    var allAvailableLevels = AddFeatureActivationType3(out ActivationType, features, levels);
+                                    if (allAvailableLevels != null)
                                     {
-                                        goodFeatureExp = true;
-                                    }
-                                    else
-                                    {
-                                        try
-                                        {
-                                            System.Globalization.CultureInfo eng = new System.Globalization.CultureInfo(1033);
-                                            DateTime dtEng = DateTime.Parse(expiration, eng);
-                                            if(new DateTime(dtEng.Year, dtEng.Month, dtEng.Day) > DateTime.Now)
-                                            {
-                                                goodFeatureExp = true;
-                                            }
-                                        }
-                                        catch { }
-                                    }
-
-                                    if(goodFeatureExp)
-                                    {
-                                        string[] featureNames = features[3].Split(',');
-                                        foreach(string featureName in featureNames)
-                                        {
-                                            string[] sFeatureName = featureName.Split(':');
-
-                                            int featureId = int.Parse(sFeatureName[0]);
-                                            int userCount = int.Parse(sFeatureName[1]);
-
-                                            if(slLevels.Contains(featureId))
-                                                slLevels[featureId] = (int)slLevels[featureId] + userCount;
-                                            else
-                                                slLevels.Add(featureId, userCount);
-                                        }
-                                        return slLevels;
-                                    }
-                                    
-                                }
-                                
-                            }
-                            else if(ActivationType == 1 || ActivationType == 0)
-                            {
-                                ActivationType = 1;
-
-                                string expiration = features[4];
-                                bool goodFeatureExp = false;
-                                if(expiration == "NA")
-                                {
-                                    goodFeatureExp = true;
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        System.Globalization.CultureInfo eng = new System.Globalization.CultureInfo(1033);
-                                        DateTime dtEng = DateTime.Parse(expiration, eng);
-                                        if(new DateTime(dtEng.Year, dtEng.Month, dtEng.Day) > DateTime.Now)
-                                        {
-                                            goodFeatureExp = true;
-                                        }
-                                    }
-                                    catch { }
-                                }
-                                
-                                int userCount = int.Parse(features[2]);
-
-                                if(goodFeatureExp)
-                                {
-                                    string[] featureNames = features[1].Split(',');
-                                    foreach(string featureName in featureNames)
-                                    {
-                                        int featureId = int.Parse(featureName);
-
-                                        if(slLevels.Contains(featureId))
-                                            slLevels[featureId] = (int)slLevels[featureId] + userCount;
-                                        else
-                                            slLevels.Add(featureId, userCount);
+                                        return allAvailableLevels;
                                     }
                                 }
                             }
-
-
+                            else if (ActivationType == 1 || ActivationType == 0)
+                            {
+                                AddFeatureActivationType1(out ActivationType, features, levels);
+                            }
                         }
                     }
                 }
             }
-            
-            return slLevels;
 
+            return levels;
+
+        }
+
+        private static SortedList AddFeaturesActivationType2(out int ActivationType, string[] features, SortedList levels)
+        {
+            ActivationType = 2;
+
+            var expiration = features[4];
+            var goodFeatureExp = false;
+            if (expiration == NotAvailableString)
+            {
+                goodFeatureExp = true;
+            }
+            else
+            {
+                try
+                {
+                    var engCulture = new CultureInfo(1033);
+                    var dateTime = DateTime.Parse(expiration, engCulture);
+                    if (new DateTime(dateTime.Year, dateTime.Month, dateTime.Day) > DateTime.Now)
+                    {
+                        goodFeatureExp = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+
+            var allAvailableLevels = AddOrUpdateFeatures(goodFeatureExp, features, levels);
+            return allAvailableLevels;
+        }
+
+        private static SortedList AddOrUpdateFeatures(bool goodFeatureExp, string[] features, SortedList levels)
+        {
+            if (goodFeatureExp)
+            {
+                var featureNames = features[3].Split(',');
+                foreach (var featureName in featureNames)
+                {
+                    var nameParts = featureName.Split(':');
+
+                    var featureId = int.Parse(nameParts[0]);
+                    var userCount = int.Parse(nameParts[1]);
+
+                    if (levels.Contains(featureId))
+                    {
+                        levels[featureId] = (int)levels[featureId] + userCount;
+                    }
+                    else
+                    {
+                        levels.Add(featureId, userCount);
+                    }
+                }
+                return levels;
+            }
+            return null;
+        }
+
+        private static SortedList AddFeatureActivationType3(out int ActivationType, string[] features, SortedList levels)
+        {
+            ActivationType = 3;
+
+            var expiration = features[4];
+            var goodFeatureExp = false;
+            if (expiration == "NA")
+            {
+                goodFeatureExp = true;
+            }
+            else
+            {
+                try
+                {
+                    var engCulture = new CultureInfo(1033);
+                    var dateTime = DateTime.Parse(expiration, engCulture);
+                    if (new DateTime(dateTime.Year, dateTime.Month, dateTime.Day) > DateTime.Now)
+                    {
+                        goodFeatureExp = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+
+            var allAvailableLevels = AddOrUpdateFeatures(goodFeatureExp, features, levels);
+            return allAvailableLevels;
+        }
+
+        private static void AddFeatureActivationType1(out int ActivationType, string[] features, SortedList levels)
+        {
+            ActivationType = 1;
+
+            var goodFeatureExp = GetIsGoodFeatureExp(features);
+            var userCount = int.Parse(features[2]);
+
+            AddGoodFeature(goodFeatureExp, features, levels, userCount);
+        }
+
+        private static bool GetIsGoodFeatureExp(string[] features)
+        {
+            var expiration = features[4];
+            var goodFeatureExp = false;
+            if (expiration == "NA")
+            {
+                goodFeatureExp = true;
+            }
+            else
+            {
+                try
+                {
+                    var engCulture = new CultureInfo(1033);
+                    var dateTime = DateTime.Parse(expiration, engCulture);
+                    if (new DateTime(dateTime.Year, dateTime.Month, dateTime.Day) > DateTime.Now)
+                    {
+                        goodFeatureExp = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+            return goodFeatureExp;
+        }
+
+        private static void AddGoodFeature(bool goodFeatureExp, string[] features, SortedList levels, int userCount)
+        {
+            if (goodFeatureExp)
+            {
+                var featureNames = features[1].Split(',');
+                foreach (var featureId in featureNames.Select(featureName => int.Parse(featureName)))
+                {
+                    if (levels.Contains(featureId))
+                    {
+                        levels[featureId] = (int)levels[featureId] + userCount;
+                    }
+                    else
+                    {
+                        levels.Add(featureId, userCount);
+                    }
+                }
+            }
         }
 
         private static string farmEncode(string code)

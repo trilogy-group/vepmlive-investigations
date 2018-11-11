@@ -89,23 +89,15 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.SharePoint.Client, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Client.dll</HintPath>
+    <Reference Include="Microsoft.SharePoint.Client, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
     </Reference>
-    <Reference Include="Microsoft.SharePoint.Client.Runtime, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Client.Runtime.dll</HintPath>
+    <Reference Include="Microsoft.SharePoint.Client.Runtime, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
     </Reference>
-    <Reference Include="Microsoft.SharePoint.Security, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Security.dll</HintPath>
+    <Reference Include="Microsoft.SharePoint.Security, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
     </Reference>
     <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.Web.CommandUI.dll</HintPath>
+    <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -125,8 +117,10 @@
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.SharePoint" />
-    <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
+    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.ServerRuntime, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Telerik.Web.UI, Version=2013.1.220.35, Culture=neutral, PublicKeyToken=121fae78165ba3d4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Telerik.Web.UI.dll</HintPath>
@@ -153,14 +147,35 @@
     <Compile Include="API\Analytics\RecentItems.cs" />
     <Compile Include="API\APIException.cs" />
     <Compile Include="API\APITeam.cs" />
+    <Compile Include="API\Applications\ApplicationBase.cs" />
     <Compile Include="API\Applications\ApplicationInstaller.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.iInstallQuickLaunch.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallAndConfigureApp.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallFeatures.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallFiles.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallFilesProcessFolder.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallLists.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallListsFields.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallListsLookups.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallListsViews.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallListsViewsWebPartsInstall.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.InstallProperties.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.ReportToAppReporting.cs" />
+    <Compile Include="API\Applications\ApplicationInstallerHelpers.cs" />
     <Compile Include="API\Applications\Applications.cs" />
     <Compile Include="API\Applications\ApplicationUninstaller.cs" />
+    <Compile Include="API\Applications\ErrorLevels.cs" />
     <Compile Include="API\AppsStoreHelper.cs" />
     <Compile Include="API\AssociatedListItems\AssociatedListItems.cs" />
     <Compile Include="API\BaseJob.cs" />
     <Compile Include="API\ChartWizard\ChartWizardDataHelper.cs" />
+    <Compile Include="API\Comments\CommentManager.Create.cs" />
+    <Compile Include="API\Comments\CommentManager.Create.Public.cs" />
     <Compile Include="API\Comments\CommentManager.cs" />
+    <Compile Include="API\Comments\CommentManager.Delete.cs" />
+    <Compile Include="API\Comments\CommentManager.List.cs" />
+    <Compile Include="API\Comments\CommentManager.Update.cs" />
+    <Compile Include="API\Comments\CommentManager.Utils.cs" />
     <Compile Include="API\Comments\XmlDataManager.cs" />
     <Compile Include="API\CreateWorkspace\DAL.cs" />
     <Compile Include="API\CreateWorkspace\WorkspaceController.cs" />
@@ -186,10 +201,17 @@
     <Compile Include="API\MyWork\Utils.cs" />
     <Compile Include="API\NavigationService.cs" />
     <Compile Include="API\Notification\APIEmail.cs" />
+    <Compile Include="API\Notification\ItemMessage.cs" />
     <Compile Include="API\Notification\Notification.cs" />
+    <Compile Include="API\Notification\NotificationUpserter.cs" />
     <Compile Include="API\Personalization.cs" />
     <Compile Include="API\PersonalizationManager.cs" />
     <Compile Include="API\PlatformIntegration.cs" />
+    <Compile Include="API\ProjectArchiver\IProjectArchiverService.cs" />
+    <Compile Include="API\ProjectArchiver\IProjectArchiverSetupService.cs" />
+    <Compile Include="API\ProjectArchiver\ProjectArchiverSetupService.cs" />
+    <Compile Include="API\ProjectArchiver\ProjectArchiverSetupServiceLogEventArgs.cs" />
+    <Compile Include="API\ProjectDiscountRate\ProjectDiscountRateService.cs" />
     <Compile Include="API\PropertyHash.cs" />
     <Compile Include="API\Publish\APIPublish.cs" />
     <Compile Include="API\Reporting\Reporting.cs" />
@@ -221,6 +243,7 @@
     <Compile Include="BtnCommonActions.cs" />
     <Compile Include="BtnCreateNew.cs" />
     <Compile Include="CascadingLookupFieldValueCollection.cs" />
+    <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControl.CreateChildControls.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControl.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingMultiLookupRenderControl.cs" />
     <Compile Include="CascadingLookup\CascadingLookup.Field.cs" />
@@ -229,7 +252,19 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="ChildParentSync.cs" />
+    <Compile Include="Helpers\Guard.cs" />
+    <Compile Include="Helpers\WebServicesHelper.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\701Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\700Steps.cs" />
+    <Compile Include="Layouts\epmlive\LayoutsHelper.cs" />
+    <Compile Include="ListDisplaySettingIterator.OnInit.cs" />
+    <Compile Include="ListDisplaySettingIterator.RenderControl.cs" />
+    <Compile Include="ListDisplaySettingIterator.IsFieldExcluded.cs" />
+    <Compile Include="ListDisplaySettingIterator.AddEntityPickersToLookups.cs" />
     <Compile Include="CommentCCPeopleEditor.cs" />
+    <Compile Include="ControlCollectionExtensions.cs" />
+    <Compile Include="ControlDataBuilder.cs" />
+    <Compile Include="ControlExtensions.cs" />
     <Compile Include="Controls\Navigation\EPMLiveNavigation.cs" />
     <Compile Include="Controls\Navigation\EPMLiveQuickLaunchProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\ApplicationsLinkProvider.cs" />
@@ -361,6 +396,7 @@
     <Compile Include="GenericPickerDialog.cs" />
     <Compile Include="GenericPublishEvent.cs" />
     <Compile Include="GenericQueryControl.cs" />
+    <Compile Include="GlobalConstants.cs" />
     <Compile Include="GlobalResourceHelper.cs" />
     <Compile Include="GlobalResources\MultiAppNavigationResources.Designer.cs" />
     <Compile Include="GlobalResources\WorkEngineLookupPickerResources.Designer.cs" />
@@ -419,6 +455,10 @@
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\631Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\633Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\634Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\6404Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\6403Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\6402Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\6401Steps.cs" />
     <Compile Include="Jobs\SSRS\ExtensionMethods.cs" />
     <Compile Include="Jobs\SSRS\IReportingService.cs" />
     <Compile Include="Jobs\SSRS\SSRSSyncQueueAgent.cs" />
@@ -483,11 +523,18 @@
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\DBUpgrader.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\InstallAndConfigureLists.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\InstallReportingEvents.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ListDataRolesProcessor.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ListDataDepartmentsProcessor.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ListDataWorkHoursProcessor.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ListDataHolidaysProcessor.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ListDataNonWorkProcessor .cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ListDataResourceProcessor.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\MasterPageUpdateStep.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\Miscellaneous.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\PFEPermissionMapper.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ReportingUpgrade.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\SiteFeatures.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\StepProcessor.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\TimeOff.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePool.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateWebs.cs" />
@@ -1287,11 +1334,22 @@
     <Compile Include="ListDefinitions\EPMLiveLists.cs" />
     <Compile Include="ListDisplaySettingIterator.cs" />
     <Compile Include="ListDisplayUtils.cs" />
+    <Compile Include="ListFieldIteratorExtensions.cs" />
     <Compile Include="MultiAppCustomSiteMapProvider.cs" />
     <Compile Include="NotificationCounter.cs" />
     <Compile Include="NotificationCounterV2.cs" />
     <Compile Include="NotificationEvent.cs" />
+    <Compile Include="PfeData\ConnectionProvider.cs" />
+    <Compile Include="PfeData\IConnectionProvider.cs" />
+    <Compile Include="PfeData\IProjectRepository.cs" />
+    <Compile Include="PfeData\IProjectResourceRateRepository.cs" />
+    <Compile Include="PfeData\IResourceRepository.cs" />
+    <Compile Include="PfeData\ProjectRepository.cs" />
+    <Compile Include="PfeData\ResourceRepository.cs" />
+    <Compile Include="PfeData\ProjectResourceRateRepository.cs" />
+    <Compile Include="PfeData\ProjectResourceRate.cs" />
     <Compile Include="PlatformIntegrationEvent.cs" />
+    <Compile Include="API\ProjectArchiver\ProjectArchiverService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -1305,7 +1363,11 @@
     <Compile Include="ReportHelper\ListBiz.cs" />
     <Compile Include="ReportHelper\MyWorkReportData.cs" />
     <Compile Include="ReportHelper\ReportBiz.cs" />
+    <Compile Include="ReportHelper\ReportData.CreateTable.cs" />
     <Compile Include="ReportHelper\ReportData.cs" />
+    <Compile Include="ReportHelper\ReportData.Fields.cs" />
+    <Compile Include="ReportHelper\ReportData.GetParam.cs" />
+    <Compile Include="ReportHelper\ReportData.ListItemsDataTable.cs" />
     <Compile Include="ReportHelper\ReportingScope.cs" />
     <Compile Include="ReportHelper\UpgradeReportingDBHelper.cs" />
     <Compile Include="ReportingData.cs" />
@@ -1313,6 +1375,7 @@
     <Compile Include="ReportingProxy\ReportingLogger.cs" />
     <Compile Include="ResourceLevels\ResourceLevelsField.cs" />
     <Compile Include="ResourceLevels\ResourceLevelsFieldControl.cs" />
+    <Compile Include="ResourcePlanProcessingResult.cs" />
     <Compile Include="ResourcePermissions\ResourcePermissionsField.cs" />
     <Compile Include="ResourcePermissions\ResourcePermissionsFieldControl.cs" />
     <Compile Include="ResourcePoolEvent\ResourcePoolEvent.cs" />
@@ -1338,6 +1401,8 @@
     <Compile Include="SocialEngine\Core\SocialEngineException.cs" />
     <Compile Include="SocialEngine\Core\StreamManager.cs" />
     <Compile Include="SocialEngine\Core\ThreadManager.cs" />
+    <Compile Include="SocialEngine\Core\ThreadManager.Fields.cs" />
+    <Compile Include="SocialEngine\Core\ThreadManager.ProcessThreads.cs" />
     <Compile Include="SocialEngine\Core\Transaction.cs" />
     <Compile Include="SocialEngine\Core\TransactionManager.cs" />
     <Compile Include="SocialEngine\Core\Utilities.cs" />
@@ -1351,13 +1416,17 @@
     <Compile Include="SocialEngine\Modules\GlobalValidator.cs" />
     <Compile Include="SocialEngine\Modules\List.cs" />
     <Compile Include="SocialEngine\Modules\ListItem.cs" />
+    <Compile Include="SocialEngine\Modules\ListItemValidator.cs" />
     <Compile Include="SocialEngine\Modules\StatusUpdate.cs" />
     <Compile Include="SocialEngine\Modules\Workspace.cs" />
     <Compile Include="SocialEngine\SocialEngine.cs" />
     <Compile Include="SocialEngine\SocialEngineProxy.cs" />
     <Compile Include="SPFields\DaysHoursBreakdownField.cs" />
     <Compile Include="SPFields\DaysHoursBreakdownFieldControl.cs" />
+    <Compile Include="SPUtilities\SPListUtility.cs" />
+    <Compile Include="SPUtilities\SPProjectUtility.cs" />
     <Compile Include="StatusingEvent.cs" />
+    <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="TagManager\API\Gateway.cs" />
     <Compile Include="TagManager\Tag.cs" />
     <Compile Include="TagManager\TagManager.cs" />
@@ -1527,6 +1596,15 @@
     <Compile Include="WebPageCode\ListDisplayPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebPageCode\ListDisplayPage.RegisterScript.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\ListDisplayPage.Render.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\ListDisplayPage.RenderWhere.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="WebPageCode\manageschedule.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1591,6 +1669,7 @@
     <Compile Include="XmlDataManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\Comments\CommentManager.Strings.cs" />
     <None Include="app.config" />
     <None Include="AppsListEvents\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{a0b8e287-cd4e-45c4-b77c-6ec4dfe05a4a}</SharePointProjectItemId>
@@ -1598,6 +1677,7 @@
     <None Include="BuildTeam\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{9cf05ac6-0692-49fb-8c37-2ec1acb6a29c}</SharePointProjectItemId>
     </None>
+    <None Include="bundleconfig.json" />
     <None Include="CONFIG\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{ce3e15fd-6a5b-4e21-8c3d-b5d4df121ea3}</SharePointProjectItemId>
     </None>
@@ -1805,7 +1885,9 @@
     <None Include="Layouts\epmlive\javascripts\EPM.ts" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.Analytics.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.min.js.map" />
-    <None Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js.map">
+      <DependentUpon>EPMLive.Navigation.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.min.js.map" />
@@ -3549,6 +3631,7 @@
     <Content Include="Layouts\epmlive\images\dragger.png" />
     <Content Include="Layouts\epmlive\images\dropdown2.gif" />
     <Content Include="Layouts\epmlive\images\dropdown2.png" />
+    <Content Include="Layouts\epmlive\images\editrate16.gif" />
     <Content Include="Layouts\epmlive\images\epmlive-header.png" />
     <Content Include="Layouts\epmlive\images\epmlive-logo.png" />
     <Content Include="Layouts\epmlive\images\epmlivelogo-white.png" />
@@ -3669,6 +3752,7 @@
     <Content Include="Layouts\epmlive\Integration\Proxy.aspx" />
     <Content Include="Layouts\epmlive\javascripts\AddFavorite.js" />
     <Content Include="Layouts\epmlive\javascripts\BtnChangeApp.js" />
+    <Content Include="Layouts\epmlive\javascripts\DateHelper.js" />
     <Content Include="Layouts\epmlive\javascripts\EPM.js" />
     <Content Include="Layouts\epmlive\javascripts\EPM.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Analytics.js" />
@@ -3676,7 +3760,9 @@
     <Content Include="Layouts\epmlive\javascripts\EPMLive.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.js" />
-    <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js">
+      <DependentUpon>EPMLive.Navigation.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.js" />
@@ -3717,6 +3803,7 @@
     <Content Include="Layouts\epmlive\javascripts\masterpages\webfont.js" />
     <Content Include="Layouts\epmlive\javascripts\Notifications.js" />
     <Content Include="Layouts\epmlive\javascripts\Notifications.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\PeriodAutomation.js" />
     <Content Include="Layouts\epmlive\javascripts\ResourceImporter.js" />
     <Content Include="Layouts\epmlive\jQueryLibrary\jquery-1.5.2.js" />
     <Content Include="Layouts\epmlive\jQueryLibrary\jquery-1.6.2.min.js" />
@@ -4375,8 +4462,8 @@
   <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
   <ProjectExtensions />
   <PropertyGroup>
-    <PreBuildEvent>del "$(TargetDir)$(TargetName).XmlSerializers.dll"
-del "$(ProjectDir)$(TargetName).XmlSerializers.dll"</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
 </Project>

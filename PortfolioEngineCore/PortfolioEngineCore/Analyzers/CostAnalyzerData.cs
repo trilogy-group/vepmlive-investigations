@@ -69,15 +69,31 @@ namespace PortfolioEngineCore
                 int lFirstP = 0;
                 int lLastP = 0;
 
-                GrabCostViewInfo(_sqlConnection, sViewID, out clscd.m_CB_ID, out clscd.m_sCostTypes, out clscd.m_sOtherCostTypes, out clscd.m_sCalcCostTypes, out lFirstP, out lLastP);
-
+                string m_sCalcCostTypes = string.Empty;
+                if (sViewID != "-1" || CheckIfCostViewsExist(_sqlConnection))
+                {
+                    GrabCostViewInfo(
+                        _sqlConnection,
+                        sViewID,
+                        ref clscd.m_sCalcCostTypes,
+                        out clscd.m_CB_ID,
+                        out clscd.m_sCostTypes,
+                        out clscd.m_sOtherCostTypes,
+                        out lFirstP,
+                        out lLastP);
+                }
+                else
+                {
+                    lFirstP = 0;
+                    lLastP = 0;
+                    clscd.m_CB_ID = 0;
+                    clscd.m_sCostTypes = string.Empty;
+                    clscd.m_sOtherCostTypes = string.Empty;
+                }
 
                 m_loaddatareturn = 30;
 
-
-
-
-                if (clscd.m_CB_ID < 0 || clscd.m_sPids == "")
+                if (clscd.m_CB_ID < 0 || clscd.m_sPids == string.Empty)
                 {
                     if (clscd.m_CB_ID < 0)
                     {
@@ -198,214 +214,208 @@ namespace PortfolioEngineCore
             //return 2;
         }
 
-        private int GrabPidsFromTickect(SqlConnection oDataAccess, string ticket, out string sPids, out bool bNoneMissing, out int PICount)
+        public static int GrabPidsFromTickect(
+            SqlConnection sqlConnection,
+            string ticket,
+            out string projectIdsString,
+            out bool projectsExist,
+            out int projectsCount)
         {
+            var commandText = string.Empty;
+            var guidsString = string.Empty;
+            var eStatus = 0;
+            projectIdsString = string.Empty;
+            projectsExist = true;
+            projectsCount = 0;
+            int projectId;
 
-            string sCommand = "";
-            int eStatus = 0;
-            SqlCommand oCommand = null;
-            SqlDataReader reader = null;
-            string sGuids = "";
-            string sGin = "";
-            sPids = "";
-            bNoneMissing = true;
-            PICount = 0;
-            int i = 0;
-            int lPid;
-
-             sCommand = "SELECT DC_DATA FROM EPG_DATA_CACHE WHERE DC_TICKET = '" + ticket + "'";
-
-            oCommand = new SqlCommand(sCommand, oDataAccess);
-            reader = oCommand.ExecuteReader();
-            while (reader.Read())
+            commandText = string.Format("SELECT DC_DATA FROM EPG_DATA_CACHE WHERE DC_TICKET = '{0}'", ticket);
+            using (var sqlCommand = new SqlCommand(commandText, sqlConnection))
             {
-                sGuids = DBAccess.ReadStringValue(reader["DC_DATA"]);
-            }
-            reader.Close();
-            reader = null;
-
-
-            sGuids = sGuids.Replace(",", " ");
-            sGuids = sGuids.ToUpper();
-            sGuids = sGuids.Trim();
-
-
-            while (sGuids.Length != 0)
-            {
-                sGin = "";
-
-                i = sGuids.IndexOf(" ");
-
-                if (i == -1)
+                using (var reader = sqlCommand.ExecuteReader())
                 {
-                    sGin = sGuids;
-                    sGuids = "";
-                }
-                else
-                {
-                    sGin = sGuids.Substring(0, i);
-                    sGuids = sGuids.Substring(i + 1);
-                }
-
-                // Avoiding "UNDEFINED.UNDEFINED.UNDEFINED" value which comes due to selection of grouping row and is not required.
-                // Failing to do so was resulting in unwanted popup message "Not all list items had matching Portfolio items!" before loading Cost Analyzer
-                if (sGin != "" && !sGin.Equals("UNDEFINED.UNDEFINED.UNDEFINED", StringComparison.InvariantCultureIgnoreCase))
-                {
-
-                    sCommand = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE { fn UCASE(PROJECT_EXT_UID) }  = '" + sGin + "'";
-
-                    oCommand = new SqlCommand(sCommand, oDataAccess);
-                    reader = oCommand.ExecuteReader();
-                    lPid = 0;
                     while (reader.Read())
                     {
-                        lPid = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                        guidsString = DBAccess.ReadStringValue(reader["DC_DATA"]);
                     }
-                    reader.Close();
-                    reader = null;
-
-                    if (lPid == 0)
-                        bNoneMissing = false;
-                    else
-                    {
-                        ++PICount;
-                        if (sPids == "")
-                            sPids = lPid.ToString();
-                        else
-                            sPids = sPids + "," + lPid.ToString();
-                    }
-
                 }
-
             }
-            return eStatus;
 
+            guidsString = guidsString.Replace(",", " ");
+            guidsString = guidsString.ToUpper();
+            guidsString = guidsString.Trim();
+
+            if (!string.IsNullOrEmpty(guidsString))
+            {
+                var guids = guidsString.Split(' ');
+                foreach (var guid in guids)
+                {
+                    // Avoiding "UNDEFINED.UNDEFINED.UNDEFINED" value which comes due to selection of grouping row and is not required.
+                    // Failing to do so was resulting in unwanted popup message "Not all list items had matching Portfolio items!" before loading Cost Analyzer
+                    if (guid != string.Empty && !guid.Equals("UNDEFINED.UNDEFINED.UNDEFINED", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        commandText = string.Format("SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE {{ fn UCASE(PROJECT_EXT_UID) }}  = '{0}'", guid);
+                        using (var sqlCommand = new SqlCommand(commandText, sqlConnection))
+                        {
+                            using (var reader = sqlCommand.ExecuteReader())
+                            {
+                                projectId = 0;
+                                while (reader.Read())
+                                {
+                                    projectId = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                                }
+                            }
+                        }
+
+                        if (projectId == 0)
+                        {
+                            projectsExist = false;
+                        }
+                        else
+                        {
+                            ++projectsCount;
+                            if (projectIdsString == string.Empty)
+                            {
+                                projectIdsString = projectId.ToString();
+                            }
+                            else
+                            {
+                                projectIdsString = projectIdsString + "," + projectId.ToString();
+                            }
+                        }
+                    }
+                }
+            }
+
+            return eStatus;
         }
-        private int GrabCostViewInfo(SqlConnection oDataAccess, string sCostView, out int lCB_ID, out string sCostTypes, out string sOtherCostTypes, out string m_sCalcCostTypes, out int lMinP, out int lMaxP)
+
+
+        public static bool CheckIfCostViewsExist(SqlConnection sqlConnection)
         {
-
-            int eStatus = 0;
-            string sCommand = "";
-            SqlCommand oCommand = null;
-            SqlDataReader reader = null;
-
-            int lCostView = 0;
-            lMinP = 0;
-            lMaxP = 0;
-
-
-
-            lCB_ID = 0;
-            sCostTypes = "";
-            sOtherCostTypes = "";
-            m_sCalcCostTypes = "";
-
-
-            try
+            if (sqlConnection == null)
             {
-                lCostView = Int32.Parse(sCostView);
-            }
-            catch
-            {
-                lCostView = 0;
+                throw new ArgumentNullException("sqlConnection");
             }
 
-            if (lCostView == 0)
-                return 1;
-
-            if (lCostView == -1)
+            const string commandText = "SELECT * FROM EPGT_COSTVIEW_DISPLAY";
+            using (var sqlCommand = new SqlCommand(commandText, sqlConnection))
             {
-
-                bool bfnd = false;
-                sCommand = "SELECT * FROM EPGT_COSTVIEW_DISPLAY";
-                oCommand = new SqlCommand(sCommand, oDataAccess);
-                reader = oCommand.ExecuteReader();
-
-
-                while (reader.Read())
+                using (var reader = sqlCommand.ExecuteReader())
                 {
-                    if (bfnd == false)
+                    while (reader.Read())
                     {
-                        bfnd = true;
-                        lCostView = DBAccess.ReadIntValue(reader["VIEW_UID"]);
-                        sCostView = lCostView.ToString();
+                        // (CC-76796, 2018-07-20) For some reason, original code was reading these values without using them further.
+                        // It's unlikely that deleting these lines would break anything, but no-change policy assumes no changes.
+                        var costViewId = DBAccess.ReadIntValue(reader["VIEW_UID"]);
+                        var costViewIdString = costViewId.ToString();
+
+                        return true;
                     }
-
                 }
-                reader.Close();
-                reader = null;
-
-                if (bfnd == false)
-                    return 1;
-
             }
 
-            sCommand = "SELECT * FROM EPGT_COSTVIEW_DISPLAY WHERE VIEW_UID = " + sCostView;
-            oCommand = new SqlCommand(sCommand, oDataAccess);
-            reader = oCommand.ExecuteReader();
-
-
-            while (reader.Read())
-            {
-                lCB_ID = DBAccess.ReadIntValue(reader["VIEW_COST_BREAKDOWN"]);
-                lMinP = DBAccess.ReadIntValue(reader["VIEW_FIRST_PERIOD"]);
-                lMaxP = DBAccess.ReadIntValue(reader["VIEW_LAST_PERIOD"]);
-
-
-            }
-            reader.Close();
-            reader = null;
-
-            if (lCB_ID == 0)
-                return 1;
-
-
-
-
-            sCommand = "SELECT  EPGT_COSTVIEW_COST_TYPES.CT_ID, EPGP_COST_TYPES.CT_EDIT_MODE FROM EPGT_COSTVIEW_COST_TYPES INNER JOIN EPGP_COST_TYPES ON EPGT_COSTVIEW_COST_TYPES.CT_ID = EPGP_COST_TYPES.CT_ID WHERE VIEW_UID = " + sCostView;
-
-            int lCTID = 0;
-            int lEMode = 0;
-
-            oCommand = new SqlCommand(sCommand, oDataAccess);
-            reader = oCommand.ExecuteReader();
-            while (reader.Read())
-            {
-                lCTID = DBAccess.ReadIntValue(reader["CT_ID"]);
-                lEMode = DBAccess.ReadIntValue(reader["CT_EDIT_MODE"]);
-
-                if (lEMode == 1)
-                {
-                    if (sCostTypes == "")
-                        sCostTypes = lCTID.ToString();
-                    else
-                        sCostTypes = sCostTypes + "," + lCTID.ToString();
-
-                }
-                else
-                {
-                    if (sOtherCostTypes == "")
-                        sOtherCostTypes = lCTID.ToString();
-                    else
-                        sOtherCostTypes = sOtherCostTypes + "," + lCTID.ToString();
-
-                    if (lEMode == 3)
-                    {
-                        if (m_sCalcCostTypes == "")
-                            m_sCalcCostTypes = lCTID.ToString();
-                        else
-                            m_sCalcCostTypes = m_sCalcCostTypes + "," + lCTID.ToString();
-                    }
-
-
-                }
-
-            }
-            reader.Close();
-            reader = null;
-
-            return eStatus;
+            return false;
         }
+
+        public static int GrabCostViewInfo(
+            SqlConnection sqlConnection,
+            string costViewIdString,
+            ref string calculatedCostTypesString,
+            out int costBreakdownId,
+            out string costTypesString,
+            out string otherCostTypesString,
+            out int firstPeriod,
+            out int lastPeriod)
+        {
+            if (sqlConnection == null)
+            {
+                throw new ArgumentNullException("sqlConnection");
+            }
+
+            var costViewId = 0;
+            var statusCode = 0;
+            var commandText = string.Empty;
+            firstPeriod = 0;
+            lastPeriod = 0;
+            costBreakdownId = 0;
+            costTypesString = string.Empty;
+            otherCostTypesString = string.Empty;
+
+            if (!int.TryParse(costViewIdString, out costViewId))
+            {
+                costViewId = 0;
+            }
+
+            if (costViewId == 0)
+            {
+                return 1;
+            }
+
+            // (CC-76796, 2018-07-20) The right thing to do would be refactoring to pass CostString as a parameter. But since it's not allowed to change the behavior of the code, the change is not introduced
+            commandText = "SELECT * FROM EPGT_COSTVIEW_DISPLAY WHERE VIEW_UID = " + costViewIdString;
+            using (var sqlCommand = new SqlCommand(commandText, sqlConnection))
+            {
+                using (var sqlDataReader = sqlCommand.ExecuteReader())
+                {
+                    while (sqlDataReader.Read())
+                    {
+                        costBreakdownId = DBAccess.ReadIntValue(sqlDataReader["VIEW_COST_BREAKDOWN"]);
+                        firstPeriod = DBAccess.ReadIntValue(sqlDataReader["VIEW_FIRST_PERIOD"]);
+                        lastPeriod = DBAccess.ReadIntValue(sqlDataReader["VIEW_LAST_PERIOD"]);
+                    }
+                }
+            }
+
+            if (costBreakdownId == 0)
+            {
+                return 1;
+            }
+
+            commandText = @"
+                SELECT 
+                    EPGT_COSTVIEW_COST_TYPES.CT_ID, 
+                    EPGP_COST_TYPES.CT_EDIT_MODE 
+                FROM EPGT_COSTVIEW_COST_TYPES 
+                     INNER JOIN EPGP_COST_TYPES ON EPGT_COSTVIEW_COST_TYPES.CT_ID = EPGP_COST_TYPES.CT_ID 
+                WHERE VIEW_UID = " + costViewIdString;
+
+            using (var sqlCommand = new SqlCommand(commandText, sqlConnection))
+            {
+                using (var sqlDataReader = sqlCommand.ExecuteReader())
+                {
+                    while (sqlDataReader.Read())
+                    {
+                        var id = DBAccess.ReadIntValue(sqlDataReader["CT_ID"]);
+                        var editMode = DBAccess.ReadIntValue(sqlDataReader["CT_EDIT_MODE"]);
+
+                        if (editMode == 1)
+                        {
+                            costTypesString = AppendId(costTypesString, id);
+                        }
+                        else
+                        {
+                            otherCostTypesString = AppendId(otherCostTypesString, id);
+
+                            if (editMode == 3)
+                            {
+                                calculatedCostTypesString = AppendId(calculatedCostTypesString, id);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return statusCode;
+        }
+
+        private static string AppendId(string costTypesString, int id)
+        {
+            return costTypesString != string.Empty
+                ? costTypesString + "," + id.ToString()
+                : id.ToString();
+        }
+
         private void GrabStatus(SqlConnection oDataAccess, clsCostData clscd)
         {
 
@@ -1958,7 +1968,6 @@ namespace PortfolioEngineCore
             CStruct xRPE = new CStruct();
             xRPE.Initialize("Views");
 
-            //string sCommand = "SELECT VIEW_GUID,VIEW_NAME,VIEW_PERSONAL,VIEW_DEFAULT FROM EPG_VIEWS WHERE VIEW_CONTEXT=30000 AND (WRES_ID=0 OR WRES_ID=" + this._userWResID.ToString() + ") ORDER BY VIEW_DEFAULT DESC,WRES_ID DESC,VIEW_NAME";
             string sCommand = "SELECT VIEW_DATA FROM EPG_VIEWS WHERE VIEW_CONTEXT=33000 AND (WRES_ID=0 OR WRES_ID=" + this._userWResID.ToString() + ") ORDER BY VIEW_NAME";
 
             SqlCommand oCommand = new SqlCommand(sCommand, _sqlConnection);
@@ -2028,9 +2037,6 @@ namespace PortfolioEngineCore
             if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
             _sqlConnection.Open();
 
-            //SqlCommand cmd = new SqlCommand("DELETE FROM EPG_VIEWS WHERE VIEW_CONTEXT=30000 AND VIEW_UID=?",  _sqlConnection);
-            //cmd.Parameters.AddWithValue("VIEW_UID", nViewUID);
-            //int lRowsAffected = cmd.ExecuteNonQuery();
             string sCommand;
             sCommand = "UPDATE EPG_VIEWS SET VIEW_NAME=@vname,WRES_ID=@wres,VIEW_DEFAULT=@vdef,VIEW_DATA=@vdata,VIEW_CONTEXT=33000 WHERE VIEW_GUID=@guid";
             SqlCommand cmd = new SqlCommand(sCommand, _sqlConnection);

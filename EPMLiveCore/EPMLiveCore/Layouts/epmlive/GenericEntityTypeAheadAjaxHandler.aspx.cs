@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Text;
+using System.Xml;
+using EPMLiveCore.API.ProjectArchiver;
+using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using System.Xml;
-using System.Text;
-using System.Data;
-using EPMLiveCore.ReportingProxy;
-using System.Collections.Generic;
 
 namespace EPMLiveCore
 {
@@ -126,7 +127,6 @@ namespace EPMLiveCore
                 if (items.Count > 0)
                 {
                     DataTable dt = items.GetDataTable();
-                    _sbResult = new StringBuilder();
 
                     if (!string.IsNullOrEmpty(_selectedChildren))
                     {
@@ -141,10 +141,7 @@ namespace EPMLiveCore
                         { }
                     }
 
-                    foreach (DataRow r in dt.Rows)
-                    {
-                        _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
-                    }
+                    ApplyFiltersAndCreateOutput(dt.Select(string.Empty));
                 }
             }
             else
@@ -164,7 +161,10 @@ namespace EPMLiveCore
                 {
                     query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='ID' /><FieldRef Name='Title' />";
                 }
-
+                if (list.Fields.ContainsFieldWithInternalName(ProjectArchiverService.ArchivedColumn))
+                {
+                    query.ViewFields += "<FieldRef Type=\"Boolean\" Name='" + ProjectArchiverService.ArchivedColumn + "'/>";
+                }
                 //This special check needs to add to load Roles and Departments and few other lists which won't configured / added as part of List mapping screen.
                 bool isEmptyTableName = true;
                 if (list.EnableThrottling)
@@ -177,43 +177,79 @@ namespace EPMLiveCore
                         if (!string.IsNullOrEmpty(tableName))
                         {
                             isEmptyTableName = false;
-                            DataTable dt = ReportingData.GetReportingData(SPContext.Current.Web, list.Title, false, string.Empty, _field);
-                            _sbResult = new StringBuilder();
-
-                            if (dt != null)
-                            {
-                                foreach (DataRow r in dt.Rows)
-                                {
-                                    _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
-                                }
-                            }
+                            var dataTable = ReportingData.GetReportingData(SPContext.Current.Web, list.Title, false, string.Empty, _field);
+                            ApplyFiltersAndCreateOutput(dataTable?.Select(string.Empty));
                         }
                     }
                     catch { }
                 }
-                
-                if(!list.EnableThrottling || isEmptyTableName)
+
+                if (!list.EnableThrottling || isEmptyTableName)
                 {
                     query.Query += "<OrderBy><FieldRef Name='" + _field + "' Ascending='True' /></OrderBy>";
                     query.ViewFieldsOnly = true;
-                    SPListItemCollection items = list.GetItems(query);
-                    DataTable dt = items.GetDataTable();
-                    _sbResult = new StringBuilder();
-
-                    if (dt != null)
-                    {
-                        //dt.DefaultView.Sort = _field;
-                        //dt = dt.DefaultView.ToTable();
-                        DataRow[] results = dt.Select("", _field + " ASC");
-                        foreach (DataRow r in results)
-                        {
-                            _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
-                        }
-                    }
+                    var items = list.GetItems(query);
+                    ApplyFiltersAndCreateOutput(items);
                 }
             }
         }
 
+        private void ApplyFiltersAndCreateOutput(DataRow[] results)
+        {
+            // if no results do not add anything
+            if (results == null)
+            {
+                return;
+            }
+
+            // check for archived status only if archived column exists
+            var checkArchivedRecords = results.Length > 0 && results[0].Table.Columns.Contains(ProjectArchiverService.ArchivedColumn);
+
+            _sbResult = new StringBuilder();
+            foreach (var row in results)
+            {
+                // skip record if status is archived
+                if (checkArchivedRecords && RecordIsArchived(row))
+                {
+                    continue;
+                }
+
+                // otherwise add row to output
+                _sbResult.Append(row["ID"] + "^^" + row[_field] + "^^" +
+                                 (!string.IsNullOrEmpty(row[_field].ToString()) ? row[_field].ToString() : string.Empty) + ";#");
+            }
+        }
+
+        private static bool RecordIsArchived(DataRow row)
+        {
+            return row[ProjectArchiverService.ArchivedColumn] != DBNull.Value
+                          && row[ProjectArchiverService.ArchivedColumn] != null
+                          && (bool)row[ProjectArchiverService.ArchivedColumn];
+        }
+
+        private void ApplyFiltersAndCreateOutput(SPListItemCollection results)
+        {
+            // if no results do not add anything
+            if (results == null)
+            {
+                return;
+            }
+
+            // check for archived status only if archived column exists
+            var checkArchivedRecords = results.Count > 0 && results.Fields.ContainsFieldWithInternalName(ProjectArchiverService.ArchivedColumn);
+
+            _sbResult = new StringBuilder();
+            foreach (SPListItem li in results)
+            {
+                // skip record if status is archived
+                if (checkArchivedRecords && li[ProjectArchiverService.ArchivedColumn] != null && (bool)li[ProjectArchiverService.ArchivedColumn])
+                    continue;
+
+                // otherwise add row to output
+                _sbResult.Append(li["ID"] + "^^" + li[_field] + "^^" +
+                                 (!string.IsNullOrEmpty(li[_field].ToString()) ? li[_field].ToString() : string.Empty) + ";#");
+            }
+        }
         private string GetTableName(Guid listID)
         {
             string sql;

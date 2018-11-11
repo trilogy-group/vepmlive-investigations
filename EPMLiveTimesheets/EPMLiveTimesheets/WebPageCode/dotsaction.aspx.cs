@@ -1,25 +1,27 @@
-
 using System;
-using System.Data;
-using System.Configuration;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.Administration;
-using System.Xml;
-using System.Data.SqlClient;
 using System.Collections;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 using System.Net.Mail;
+using System.Text.RegularExpressions;
+using System.Web.Security;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.WebControls;
+using System.Web.UI;
+using System.Web;
+using System.Xml;
+using Microsoft.SharePoint.Administration;
+using Microsoft.SharePoint;
+using Newtonsoft.Json;
 
 namespace TimeSheets
 {
     public partial class dotsaction : System.Web.UI.Page
     {
+        private const string JsonDataParameter = "jsonData";
         private XmlDocument doc = new XmlDocument();
         protected string data;
         string username = SPContext.Current.Web.CurrentUser.LoginName;
@@ -231,6 +233,11 @@ namespace TimeSheets
                                         cmd.ExecuteNonQuery();
                                         data = "Success";
                                         break;
+                                    case "addPeriods":
+                                        var periods = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(Request[JsonDataParameter]);
+                                        var createdIds = CreatePeriods(cn, periods);
+                                        data = string.Format("Success,{0},{1}", strAction, string.Join(",", createdIds));
+                                        break;
                                     case "addType":
                                         cmd = new SqlCommand("select top 1 tstype_id from tstype where site_uid=@siteid order by tstype_id desc", cn);
                                         cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
@@ -390,6 +397,53 @@ namespace TimeSheets
                     }
                 }
             }
+        }
+
+        private static string[] CreatePeriods(SqlConnection connection, List<Dictionary<string, string>> periods)
+        {
+            var periodIds = new List<string>();
+            if (periods != null && periods.Count > 0)
+            {
+                var siteId = SPContext.Current.Site.ID;
+                var periodId = 1;
+
+                using (var sqlCommand = new SqlCommand("select top 1 period_id from tsperiod where site_id=@siteid order by period_id desc", connection))
+                {
+                    sqlCommand.Parameters.AddWithValue("@siteid", siteId);
+                    var reader = sqlCommand.ExecuteReader();
+                    try
+                    {
+                        if (reader.Read())
+                        {
+                            periodId = reader.GetInt32(0) + 1;
+                        }
+                    }
+                    finally
+                    {
+                        reader.Close();
+                    }
+                }
+
+                using (var sqlCommand = new SqlCommand("insert into tsperiod (period_start,period_end,period_id,site_id) values (@periodstart,@periodend,@period_id,@siteid)", connection))
+                {
+                    sqlCommand.Parameters.AddWithValue("@periodstart", string.Empty);
+                    sqlCommand.Parameters.AddWithValue("@periodend", string.Empty);
+                    sqlCommand.Parameters.AddWithValue("@period_id", 0);
+                    sqlCommand.Parameters.AddWithValue("@siteid", siteId);
+
+                    foreach (var periodData in periods)
+                    {
+                        sqlCommand.Parameters["@periodstart"].Value = periodData["start"].Substring(0, 10);
+                        sqlCommand.Parameters["@periodend"].Value = periodData["finish"].Substring(0, 10);
+                        sqlCommand.Parameters["@period_id"].Value = periodId;
+                        sqlCommand.ExecuteNonQuery();
+                        periodIds.Add(periodId.ToString());
+                        periodId++;
+                    }
+                }
+            }
+
+            return periodIds.ToArray();
         }
 
         private void approve(string sTSUids, SPWeb web, string period)

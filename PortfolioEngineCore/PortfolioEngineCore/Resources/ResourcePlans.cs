@@ -123,8 +123,11 @@ namespace PortfolioEngineCore
                     bool bSuperPIM = Security.CheckUserGlobalPermission(_dba, _userWResID, GlobalPermissionsEnum.gpSuperPIM);
                     bool bSuperRM = Security.CheckUserGlobalPermission(_dba, _userWResID, GlobalPermissionsEnum.gpSuperRM);
 
-                    string sCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS WHERE PROJECT_EXT_UID IS NOT NULL OR PROJECT_EXT_UID <> '' ORDER BY PROJECT_NAME";
-                    SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection);
+                    var sqlCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS "
+                                      + "WHERE (PROJECT_EXT_UID IS NOT NULL OR PROJECT_EXT_UID <> '')"
+                                      + " AND (PROJECT_ARCHIVED IS NULL OR PROJECT_ARCHIVED = 0)"
+                                      + " ORDER BY PROJECT_NAME";
+                    SqlCommand oCommand = new SqlCommand(sqlCommand, _dba.Connection);
                     SqlDataReader reader = null;
                     reader = oCommand.ExecuteReader();
                     while (reader.Read())
@@ -148,12 +151,14 @@ namespace PortfolioEngineCore
                         xPIs = new CStruct();
                         xPIs.Initialize("PIs");
 
-                        sCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS" +
-                       " LEFT JOIN EPG_DELEGATES SU ON SURR_CONTEXT = 4 AND SURR_CONTEXT_VALUE = PROJECT_ID" +
-                       " WHERE PROJECT_MARKED_DELETION = 0 AND (PROJECT_MANAGER = " + _userWResID.ToString("0") + " OR SU.SURR_WRES_ID = " + _userWResID.ToString("0") + ")" +
-                       " AND PROJECT_ID in (" + sProjectIDs + ")  ORDER BY PROJECT_NAME";
+                        sqlCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS"
+                                     + " LEFT JOIN EPG_DELEGATES SU ON SURR_CONTEXT = 4 AND SURR_CONTEXT_VALUE = PROJECT_ID"
+                                     + " WHERE PROJECT_MARKED_DELETION = 0 AND (PROJECT_MANAGER = "
+                                     + _userWResID.ToString("0") + " OR SU.SURR_WRES_ID = " + _userWResID.ToString("0") + ")" 
+                                     + " AND (PROJECT_ARCHIVED IS NULL OR PROJECT_ARCHIVED = 0)"
+                                     + " AND PROJECT_ID in (" + sProjectIDs + ") ORDER BY PROJECT_NAME";
 
-                        oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                        oCommand = new SqlCommand(sqlCommand, _dba.Connection, _dba.Transaction);
                         reader = oCommand.ExecuteReader();
                         while (reader.Read())
                         {
@@ -1730,6 +1735,7 @@ namespace PortfolioEngineCore
                         sCommand = "SELECT DISTINCT PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_MANAGER"
                                     + "  FROM EPGP_PROJECTS"
                                     + " WHERE PROJECT_MARKED_DELETION = 0"
+                                    + "  AND (PROJECT_ARCHIVED IS NULL OR PROJECT_ARCHIVED = 0)"
                                     + "   AND PROJECT_ID IN "
                                     + " (SELECT DISTINCT PROJECT_ID"
                                     + "    FROM EPG_RESOURCEPLANS "
@@ -1787,7 +1793,7 @@ namespace PortfolioEngineCore
                 xCalendar.CreateIntAttr("CalID", oAdmin.PortfolioCommitmentsCalendarUID);
 
                 // Take into account the status date
-                int lStartPeriodID = clnPeriods[0].PeriodID;
+                int lStartPeriodID = clnPeriods.Count > 0 ? clnPeriods[0].PeriodID : 0;
                 int lFinishPeriodID;
                 xRPE.CreateInt("StartPeriodID", lStartPeriodID);
                 if (clnPeriods.Count > 0)
@@ -2838,7 +2844,6 @@ namespace PortfolioEngineCore
             CStruct xRPE = new CStruct();
             xRPE.Initialize("Views");
 
-            //string sCommand = "SELECT VIEW_GUID,VIEW_NAME,VIEW_PERSONAL,VIEW_DEFAULT FROM EPG_VIEWS WHERE VIEW_CONTEXT=30000 AND (WRES_ID=0 OR WRES_ID=" + this._userWResID.ToString() + ") ORDER BY VIEW_DEFAULT DESC,WRES_ID DESC,VIEW_NAME";
             string sCommand = "SELECT VIEW_DEFAULT,VIEW_DATA FROM EPG_VIEWS WHERE VIEW_CONTEXT=30000 AND (WRES_ID=0 OR WRES_ID=" + _userWResID.ToString("0") + ") ORDER BY VIEW_DEFAULT DESC,WRES_ID DESC,VIEW_NAME";
 
             SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
@@ -2895,45 +2900,6 @@ namespace PortfolioEngineCore
             //        Exit_Function:
             return (_dba.Status == StatusEnum.rsSuccess);
         }
-
-        //public bool SaveResourcePlanViewXML(Guid guidView, string sName, bool bPersonal, bool bDefault, string sData)
-        //{
-        //    //SqlCommand cmd = new SqlCommand("DELETE FROM EPG_VIEWS WHERE VIEW_CONTEXT=30000 AND VIEW_UID=@", _dba.Connection, _dba.Transaction);
-        //    //cmd.Parameters.AddWithValue("VIEW_UID", nViewUID);
-        //    //int lRowsAffected = cmd.ExecuteNonQuery();
-        //    string sCommand;
-        //    sCommand = "UPDATE EPG_VIEWS SET VIEW_NAME=@,WRES_ID=@,VIEW_DEFAULT=@,VIEW_DATA=@,VIEW_CONTEXT=30000 WHERE VIEW_GUID=@";
-        //    SqlCommand cmd = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
-        //    cmd.Parameters.AddWithValue("VIEW_NAME", sName);
-        //    cmd.Parameters.AddWithValue("WRES_ID", bPersonal @ this._userWResID : 0);
-        //    cmd.Parameters.AddWithValue("VIEW_DEFAULT", bDefault);
-        //    cmd.Parameters.AddWithValue("VIEW_DATA", sData);
-        //    cmd.Parameters.AddWithValue("VIEW_GUID", guidView);
-        //    int nRowsAffected = cmd.ExecuteNonQuery();
-
-        //    if (nRowsAffected == 0)
-        //    {
-        //        sCommand = "INSERT INTO EPG_VIEWS (VIEW_GUID,VIEW_NAME,WRES_ID,VIEW_DEFAULT,VIEW_DATA,VIEW_CONTEXT) VALUES(@,@,@,@,@,30000)";
-        //        cmd = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
-        //        cmd.Parameters.AddWithValue("VIEW_GUID", guidView);
-        //        cmd.Parameters.AddWithValue("VIEW_NAME", sName);
-        //        cmd.Parameters.AddWithValue("WRES_ID", bPersonal @ this._userWResID : 0);
-        //        cmd.Parameters.AddWithValue("VIEW_DEFAULT", bDefault);
-        //        cmd.Parameters.AddWithValue("VIEW_DATA", sData);
-        //        nRowsAffected = cmd.ExecuteNonQuery();
-        //    }
-
-        //    return (_dba.Status == StatusEnum.rsSuccess);
-        //}
-
-        //public bool DeleteResourcePlanViewXML(Guid guidView)
-        //{
-        //    string sCommand = "DELETE FROM EPG_VIEWS WHERE VIEW_GUID=@";
-        //    SqlCommand cmd = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
-        //    cmd.Parameters.AddWithValue("VIEW_GUID", guidView);
-        //    int nRowsAffected = cmd.ExecuteNonQuery();
-        //    return (_dba.Status == StatusEnum.rsSuccess);
-        //}
 
         private static StatusEnum GetPeriods(DBAccess dba, int iCal, out List<CPeriod> clnPeriods)
         {

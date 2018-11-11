@@ -1,0 +1,1883 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ActionInstall" xml:space="preserve">
+    <value>Install</value>
+  </data>
+  <data name="ActionLaunch" xml:space="preserve">
+    <value>Launch</value>
+  </data>
+  <data name="ActionManage" xml:space="preserve">
+    <value>Manage</value>
+  </data>
+  <data name="ActionRepair" xml:space="preserve">
+    <value>Repair</value>
+  </data>
+  <data name="ActionUninstall" xml:space="preserve">
+    <value>Uninstall</value>
+  </data>
+  <data name="ActionUpdate" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="ActionVisit" xml:space="preserve">
+    <value>Visit</value>
+  </data>
+  <data name="ActivatingFeatureVerbose" xml:space="preserve">
+    <value>Activating Feature '{0}' at '{1}'.</value>
+  </data>
+  <data name="ActivitiesNotProvisioned" xml:space="preserve">
+    <value>Activities Templates Were Not Provisioned, Consult the Log or Windows Event Viewer for Details.</value>
+  </data>
+  <data name="ActivitiesProvisioned" xml:space="preserve">
+    <value>Activities Provisioned.</value>
+  </data>
+  <data name="ActivityTypeNameAnswer" xml:space="preserve">
+    <value>Answer</value>
+  </data>
+  <data name="ActivityTypeNameComment" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="ActivityTypeNameLike" xml:space="preserve">
+    <value>Like</value>
+  </data>
+  <data name="ActivityTypeNameMarkAnswer" xml:space="preserve">
+    <value>Answer marked as Answer</value>
+  </data>
+  <data name="ActivityTypeNameReceiveAnswer" xml:space="preserve">
+    <value>Received Answer</value>
+  </data>
+  <data name="ActivityTypeNameReceiveComment" xml:space="preserve">
+    <value>Received Comment</value>
+  </data>
+  <data name="ActivityTypeNameReceivedKudos" xml:space="preserve">
+    <value>Received Kudos</value>
+  </data>
+  <data name="ActivityTypeNameReceiveLike" xml:space="preserve">
+    <value>Received Like</value>
+  </data>
+  <data name="ActivityTypeNameReceiveVote" xml:space="preserve">
+    <value>Received Vote</value>
+  </data>
+  <data name="ActivityTypeNameSentKudos" xml:space="preserve">
+    <value>Sent Kudos</value>
+  </data>
+  <data name="ActivityTypeNameTag" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="ActivityTypeNameVote" xml:space="preserve">
+    <value>Vote</value>
+  </data>
+  <data name="AddingSolution" xml:space="preserve">
+    <value>Adding Sitrion Social Solution: {0}</value>
+  </data>
+  <data name="AddingSolutionComplete" xml:space="preserve">
+    <value>Sitrion Social Solution Added: {0}</value>
+  </data>
+  <data name="AppDomainCreatingHelper" xml:space="preserve">
+    <value>Initializing AppDomain Helper Class.</value>
+  </data>
+  <data name="AppDomainInitialized" xml:space="preserve">
+    <value>AppDomain Initialized.</value>
+  </data>
+  <data name="AppDomainInitializing" xml:space="preserve">
+    <value>Initializing AppDomain.</value>
+  </data>
+  <data name="ApplicationDescription" xml:space="preserve">
+    <value>NewsGator Social Sites is now Sitrion Social.  The Sitrion Social Launcher provides easy access to the installation, configuration, and support tools for Sitrion Social.  </value>
+    <comment>{ApplicationTitleLauncher} provides easy access to the installation, configuration, and support tools for {ProductName}.</comment>
+  </data>
+  <data name="ApplicationPoolAlreadyStarted" xml:space="preserve">
+    <value>Application Pool Already Started: {0}</value>
+  </data>
+  <data name="ApplicationPoolAlreadyStopped" xml:space="preserve">
+    <value>Application Pool Already Stopped: {0}</value>
+  </data>
+  <data name="ApplicationPoolGettingStatus" xml:space="preserve">
+    <value>Getting Application Pool Status: {0}</value>
+  </data>
+  <data name="ApplicationPoolNotSpecified" xml:space="preserve">
+    <value>Application Pool Not Specified, Using Default SharePoint Web Services Application Pool.</value>
+  </data>
+  <data name="ApplicationPoolsEnsuring" xml:space="preserve">
+    <value>Ensuring Application Pools are Started</value>
+  </data>
+  <data name="ApplicationPoolsEnsuringComplete" xml:space="preserve">
+    <value>Ensuring Application Pools are Started Complete</value>
+  </data>
+  <data name="ApplicationPoolsGettingCAName" xml:space="preserve">
+    <value>Getting Central Administration Application Pool Name</value>
+  </data>
+  <data name="ApplicationPoolsGettingCAServer" xml:space="preserve">
+    <value>Getting Central Administration Server</value>
+  </data>
+  <data name="ApplicationPoolsGettingNames" xml:space="preserve">
+    <value>Getting Application Pool Names</value>
+  </data>
+  <data name="ApplicationPoolsGettingServers" xml:space="preserve">
+    <value>Getting Server Names</value>
+  </data>
+  <data name="ApplicationPoolsGettingWMIAddresses" xml:space="preserve">
+    <value>Getting WMI Application Pool Addresses</value>
+  </data>
+  <data name="ApplicationPoolsStarting" xml:space="preserve">
+    <value>Starting Application Pools</value>
+  </data>
+  <data name="ApplicationPoolsStopping" xml:space="preserve">
+    <value>Stopping Application Pools</value>
+  </data>
+  <data name="ApplicationPoolStarting" xml:space="preserve">
+    <value>Starting Application Pool: {0}</value>
+  </data>
+  <data name="ApplicationPoolStopping" xml:space="preserve">
+    <value>Stopping Application Pool: {0}</value>
+  </data>
+  <data name="ApplicationPoolUnknownState" xml:space="preserve">
+    <value>Unknown Application Pool State: {0}</value>
+  </data>
+  <data name="ApplicationTitle" xml:space="preserve">
+    <value>Install Sitrion Social v{0}</value>
+  </data>
+  <data name="ApplicationTitleLauncher" xml:space="preserve">
+    <value>Skyvera Launcher v{0}</value>
+    <comment>{ProductName} Launcher v{Version}</comment>
+  </data>
+  <data name="ApplicationTitleSetup" xml:space="preserve">
+    <value>{0} {1} v{2}</value>
+    <comment>{Action} {ProductName} v{Version}</comment>
+  </data>
+  <data name="AssemblyVersion" xml:space="preserve">
+    <value>Validating Assembly Version for '{0}': Expected {1} - Actual {2}</value>
+  </data>
+  <data name="AttemptingToCreateServiceApplicationProxy" xml:space="preserve">
+    <value>Attempting to Create Service Application Proxy.</value>
+  </data>
+  <data name="ButtonAccept" xml:space="preserve">
+    <value>ACCEPT</value>
+  </data>
+  <data name="ButtonCancel" xml:space="preserve">
+    <value>CANCEL</value>
+  </data>
+  <data name="ButtonClose" xml:space="preserve">
+    <value>CLOSE</value>
+  </data>
+  <data name="ButtonDoNotAccept" xml:space="preserve">
+    <value>DO NOT ACCEPT</value>
+  </data>
+  <data name="ButtonInstall" xml:space="preserve">
+    <value>INSTALL</value>
+  </data>
+  <data name="ButtonNext" xml:space="preserve">
+    <value>NEXT</value>
+  </data>
+  <data name="ButtonNo" xml:space="preserve">
+    <value>NO</value>
+  </data>
+  <data name="ButtonOk" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="ButtonPrevious" xml:space="preserve">
+    <value>PREVIOUS</value>
+  </data>
+  <data name="ButtonSave" xml:space="preserve">
+    <value>SAVE</value>
+  </data>
+  <data name="ButtonUninstall" xml:space="preserve">
+    <value>UNINSTALL</value>
+  </data>
+  <data name="ButtonUpgrade" xml:space="preserve">
+    <value>UPGRADE</value>
+  </data>
+  <data name="ButtonYes" xml:space="preserve">
+    <value>YES</value>
+  </data>
+  <data name="CancelConfirmationDescription" xml:space="preserve">
+    <value>Are you sure you want to cancel?</value>
+  </data>
+  <data name="CancelConfirmationTitle" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CentralAdministration" xml:space="preserve">
+    <value>Central Administration</value>
+  </data>
+  <data name="CheckingAssemblyVersions" xml:space="preserve">
+    <value>Checking Assembly Versions.</value>
+  </data>
+  <data name="CheckingAssemblyVersionsComplete" xml:space="preserve">
+    <value>Assembly Version Check Complete.</value>
+  </data>
+  <data name="CheckingExistingManagedAccount" xml:space="preserve">
+    <value>Checking for Existing Managed Account: {0}</value>
+  </data>
+  <data name="CheckingExistingServiceApplicationPool" xml:space="preserve">
+    <value>Checking for Existing Service Application Pool: {0}</value>
+  </data>
+  <data name="CheckingExistingServiceApplicationPool1" xml:space="preserve">
+    <value>Checking for Existing Service Application Pool: {0}</value>
+  </data>
+  <data name="CheckingPrerequisite" xml:space="preserve">
+    <value>Checking Prerequisite '{0}'</value>
+  </data>
+  <data name="CheckingPrerequisiteComplete" xml:space="preserve">
+    <value>Prerequisite '{0}' has {1}.</value>
+  </data>
+  <data name="CheckingPrerequisiteFailed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="CheckingPrerequisitePassed" xml:space="preserve">
+    <value>Passed</value>
+  </data>
+  <data name="CheckingReportingDatabaseVersion" xml:space="preserve">
+    <value>Checking Reporting Database Version.</value>
+  </data>
+  <data name="CheckingServicesDatabaseVersion" xml:space="preserve">
+    <value>Checking Services Database Version.</value>
+  </data>
+  <data name="CheckingSolutionFiles" xml:space="preserve">
+    <value>Checking Solution Files.</value>
+  </data>
+  <data name="CheckingSolutionFilesComplete" xml:space="preserve">
+    <value>Solution File Check Complete.</value>
+  </data>
+  <data name="CheckingSolutionPath" xml:space="preserve">
+    <value>Checking Solution Path.</value>
+  </data>
+  <data name="CheckingSolutionPathComplete" xml:space="preserve">
+    <value>Solution Path Check Complete.</value>
+  </data>
+  <data name="CmdletSocialSites" xml:space="preserve">
+    <value>SocialSites</value>
+  </data>
+  <data name="CmdletSocialSitesConfiguration" xml:space="preserve">
+    <value>SocialSitesConfiguration</value>
+  </data>
+  <data name="CmdletSocialSitesFeatures" xml:space="preserve">
+    <value>SocialSitesFeatures</value>
+  </data>
+  <data name="CmdletSocialSitesModules" xml:space="preserve">
+    <value>SocialSitesModules</value>
+  </data>
+  <data name="CmdletSocialSitesServiceApplication" xml:space="preserve">
+    <value>SocialSitesServiceApplication</value>
+  </data>
+  <data name="CmdletSocialSitesSolutions" xml:space="preserve">
+    <value>SocialSitesSolutions</value>
+  </data>
+  <data name="ComboBoxCreateNew" xml:space="preserve">
+    <value>(Create New...)</value>
+  </data>
+  <data name="ComingSoon" xml:space="preserve">
+    <value>Coming Soon...</value>
+  </data>
+  <data name="ConfigurationExplorer" xml:space="preserve">
+    <value>Configuration Explorer</value>
+  </data>
+  <data name="ConfigurationExplorerDescription" xml:space="preserve">
+    <value>The Sitrion Social Configuration Explorer gathers detailed Sitrion Social and SharePoint configuration details.  These details may be useful when working with Sitrion Support.</value>
+  </data>
+  <data name="ConfigurationSavedMessage" xml:space="preserve">
+    <value>The Sitrion Social Configuration has been saved.</value>
+  </data>
+  <data name="ConfigurationSavedTitle" xml:space="preserve">
+    <value>Configuration Saved</value>
+  </data>
+  <data name="CreatingManagedAccount" xml:space="preserve">
+    <value>Creating Managed Account: {0}</value>
+  </data>
+  <data name="CreatingService" xml:space="preserve">
+    <value>Creating Service.</value>
+  </data>
+  <data name="CreatingServiceApplicationPool" xml:space="preserve">
+    <value>Creating Service Application Pool: {0}</value>
+  </data>
+  <data name="CreatingSetupInstance" xml:space="preserve">
+    <value>Creating Setup Instance.</value>
+  </data>
+  <data name="CreatingSetupInstanceComplete" xml:space="preserve">
+    <value>Setup Instance Created.</value>
+  </data>
+  <data name="DatabaseEnrich" xml:space="preserve">
+    <value>Sitrion Social Enrich Services</value>
+  </data>
+  <data name="DatabaseEnrichFailoverServer" xml:space="preserve">
+    <value>Enrich Failover Database Server</value>
+  </data>
+  <data name="DatabaseEnrichServer" xml:space="preserve">
+    <value>Enrich Database Server</value>
+  </data>
+  <data name="DatabaseFailoverServer" xml:space="preserve">
+    <value>Failover Database Server</value>
+  </data>
+  <data name="DatabaseInnovation" xml:space="preserve">
+    <value>Sitrion Social Innovation Services</value>
+  </data>
+  <data name="DatabaseInnovationFailoverServer" xml:space="preserve">
+    <value>Innovation Failover Database Server</value>
+  </data>
+  <data name="DatabaseInnovationServer" xml:space="preserve">
+    <value>Innovation Database Server</value>
+  </data>
+  <data name="DatabaseInterComm" xml:space="preserve">
+    <value>Sitrion Social Internal Communications Services</value>
+  </data>
+  <data name="DatabaseNameEnrich" xml:space="preserve">
+    <value>Enrich Database Name</value>
+  </data>
+  <data name="DatabaseNameInnovation" xml:space="preserve">
+    <value>Innovation Database Name</value>
+  </data>
+  <data name="DatabaseNameNews" xml:space="preserve">
+    <value>News Stream Database Name</value>
+  </data>
+  <data name="DatabaseNameReporting" xml:space="preserve">
+    <value>Social Reporting Database Name</value>
+  </data>
+  <data name="DatabaseNameSocial" xml:space="preserve">
+    <value>Social Database Name</value>
+  </data>
+  <data name="DatabaseNameVideo" xml:space="preserve">
+    <value>Video Stream Database Name</value>
+  </data>
+  <data name="DatabaseNewsFailoverServer" xml:space="preserve">
+    <value>News Stream Failover Database Server</value>
+  </data>
+  <data name="DatabaseNewsManager" xml:space="preserve">
+    <value>Sitrion Social News Stream Services</value>
+  </data>
+  <data name="DatabaseNewsServer" xml:space="preserve">
+    <value>News Stream Database Server</value>
+  </data>
+  <data name="DatabasePlatform" xml:space="preserve">
+    <value>Sitrion Social Platform Services</value>
+  </data>
+  <data name="DatabaseReportingFailoverServer" xml:space="preserve">
+    <value>Reporting Failover Database Server</value>
+  </data>
+  <data name="DatabaseReportingServer" xml:space="preserve">
+    <value>Reporting Database Server</value>
+  </data>
+  <data name="DatabasesCore" xml:space="preserve">
+    <value>Sitrion Social Database Servers</value>
+  </data>
+  <data name="DatabaseServer" xml:space="preserve">
+    <value>Database Server</value>
+  </data>
+  <data name="DatabaseServerSameForModules" xml:space="preserve">
+    <value>Use Same Database Server(s) for Modules</value>
+  </data>
+  <data name="DatabasesNames" xml:space="preserve">
+    <value>Social Sites Database Names</value>
+  </data>
+  <data name="DatabaseVideo" xml:space="preserve">
+    <value>Sitrion Social Video Stream Services</value>
+  </data>
+  <data name="DatabaseVideoFailoverServer" xml:space="preserve">
+    <value>Video Stream Failover Database Server</value>
+  </data>
+  <data name="DatabaseVideoServer" xml:space="preserve">
+    <value>Video Stream Database Server</value>
+  </data>
+  <data name="DebuggerDisabling" xml:space="preserve">
+    <value>Disabling Just-In-Time Debugger</value>
+  </data>
+  <data name="DebuggerEnabling" xml:space="preserve">
+    <value>Enabling Just-In-Time Debugger</value>
+  </data>
+  <data name="DeleteDatabases" xml:space="preserve">
+    <value>Delete Databases</value>
+  </data>
+  <data name="DeleteDatabasesDescription" xml:space="preserve">
+    <value>Use this option to delete the Sitrion Social databases when uninstalling.  </value>
+  </data>
+  <data name="DeleteFeature" xml:space="preserve">
+    <value>Deleting Feature: {0}</value>
+  </data>
+  <data name="DeleteFeatureComplete" xml:space="preserve">
+    <value>Feature Deleted: {0}</value>
+  </data>
+  <data name="DeletingServiceApplication" xml:space="preserve">
+    <value>Deleting Service Application</value>
+  </data>
+  <data name="DeletingServiceApplicationComplete" xml:space="preserve">
+    <value>Service Application Deleted</value>
+  </data>
+  <data name="DeletingServiceApplicationProxy" xml:space="preserve">
+    <value>Deleting Service Application Proxy</value>
+  </data>
+  <data name="DeletingServiceApplicationProxyComplete" xml:space="preserve">
+    <value>Service Application Proxy Deleted</value>
+  </data>
+  <data name="DeletingServiceInstance" xml:space="preserve">
+    <value>Deleting Service Instance</value>
+  </data>
+  <data name="DeletingServiceInstanceComplete" xml:space="preserve">
+    <value>Service Instance Deleted</value>
+  </data>
+  <data name="DeletingServiceProxy" xml:space="preserve">
+    <value>Deleting Service Proxy</value>
+  </data>
+  <data name="DeletingServiceProxyComplete" xml:space="preserve">
+    <value>Service Proxy Deleted</value>
+  </data>
+  <data name="DeletingWebServiceInstance" xml:space="preserve">
+    <value>Deleting Web Service Instance</value>
+  </data>
+  <data name="DeletingWebServiceInstanceComplete" xml:space="preserve">
+    <value>Web Service Instance Deleted</value>
+  </data>
+  <data name="DeployJobWaiting" xml:space="preserve">
+    <value>Waiting For Solution Job To Finish For '{0}'.</value>
+  </data>
+  <data name="DeploySolution" xml:space="preserve">
+    <value>Deploying Solution '{0}'.</value>
+  </data>
+  <data name="DeploySolutionRemoveJob" xml:space="preserve">
+    <value>Removing Job Definition '{0}' for '{1}.</value>
+  </data>
+  <data name="DeploySolutionVerbose" xml:space="preserve">
+    <value>Force Deploying Solution '{0}'.</value>
+  </data>
+  <data name="DisableFeature" xml:space="preserve">
+    <value>Disabling {0} Feature: {1}</value>
+  </data>
+  <data name="DisableFeatureComplete" xml:space="preserve">
+    <value>Disabling {0} Feature Complete: {0}</value>
+  </data>
+  <data name="DisableFeatureForSolution" xml:space="preserve">
+    <value>Disabling Features for Solution: {0}</value>
+  </data>
+  <data name="DisableFeatureForSolutionComplete" xml:space="preserve">
+    <value>Disabling Features for Solution Complete: {0}</value>
+  </data>
+  <data name="DisableFeatureOn" xml:space="preserve">
+    <value>Disabling {0} Feature on {1}: {2}</value>
+  </data>
+  <data name="DisableJob" xml:space="preserve">
+    <value>Disabling Sitrion Social Job '{0}'...</value>
+  </data>
+  <data name="DisableJobComplete" xml:space="preserve">
+    <value>Job Disabled.</value>
+  </data>
+  <data name="DisableJobsProcessingServiceAppVerbose" xml:space="preserve">
+    <value>Disable Sitrion Social Jobs: Processing Service Application '{0}'</value>
+  </data>
+  <data name="DisableJobsProcessingServiceVerbose" xml:space="preserve">
+    <value>Disable Sitrion Social Jobs: Processing Service '{0}'</value>
+  </data>
+  <data name="Done" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="EnableJob" xml:space="preserve">
+    <value>Enabling Sitrion Social Job '{0}'...</value>
+  </data>
+  <data name="EnableJobComplete" xml:space="preserve">
+    <value>Job Enabled.</value>
+  </data>
+  <data name="EnableJobsProcessingServiceAppVerbose" xml:space="preserve">
+    <value>Enable Sitrion Social Jobs: Processing Service Application '{0}'</value>
+  </data>
+  <data name="EnsureTimerService" xml:space="preserve">
+    <value>Ensuring SharePoint Timer Service Is Started On {0}...</value>
+  </data>
+  <data name="EnsuringServiceExists" xml:space="preserve">
+    <value>Ensuring Service Exists.</value>
+  </data>
+  <data name="EnsuringServiceInstanceExists" xml:space="preserve">
+    <value>Ensuring Service Instance Exists.</value>
+  </data>
+  <data name="EnsuringServiceProxyExists" xml:space="preserve">
+    <value>Ensuring Service Proxy Exists.</value>
+  </data>
+  <data name="ErrorCopyAppBinContent" xml:space="preserve">
+    <value>Unable to automatically apply app/bin content. You must run the command "stsadm -o copyappbincontent" on all servers after installation.</value>
+  </data>
+  <data name="ErrorCount" xml:space="preserve">
+    <value>Errors: {0}</value>
+  </data>
+  <data name="EventReceiverRemoved" xml:space="preserve">
+    <value>Event Receiver Removed</value>
+  </data>
+  <data name="EventReceiverRemovingList" xml:space="preserve">
+    <value>Removing List Event Receiver for '{0}': {1} ({2})</value>
+  </data>
+  <data name="EventReceiverRemovingWeb" xml:space="preserve">
+    <value>Removing Web Event Receiver for '{0}': {1} ({2})</value>
+  </data>
+  <data name="EventReceiversRemoving" xml:space="preserve">
+    <value>Removing All Sitrion Social Event Receivers</value>
+  </data>
+  <data name="EventReceiversRemovingComplete" xml:space="preserve">
+    <value>Removal of Sitrion Social Event Receivers Complete</value>
+  </data>
+  <data name="ExistingServiceApplicationPoolFound" xml:space="preserve">
+    <value>Existing Service Application Pool Found.</value>
+  </data>
+  <data name="ExtractingFiles" xml:space="preserve">
+    <value>Extracting Files.</value>
+  </data>
+  <data name="ExtractingFilesFrom" xml:space="preserve">
+    <value>Extracting Files From '{0}'.</value>
+  </data>
+  <data name="ExtractingSolutionFiles" xml:space="preserve">
+    <value>Extracting Solution Files.</value>
+  </data>
+  <data name="ExtractingSolutionFilesComplete" xml:space="preserve">
+    <value>Solution Files Extracted.</value>
+  </data>
+  <data name="FeatureActivatedVerbose" xml:space="preserve">
+    <value>Feature '{0}' Activated at '{1}'.</value>
+  </data>
+  <data name="FeatureAlreadyActivatedVerbose" xml:space="preserve">
+    <value>Feature '{0}' Already Activated at '{1}'.</value>
+  </data>
+  <data name="FeatureReactivating" xml:space="preserve">
+    <value>Reactivating Feature: {0}</value>
+  </data>
+  <data name="FeatureScopeFarm" xml:space="preserve">
+    <value>Farm</value>
+  </data>
+  <data name="FeatureScopeSite" xml:space="preserve">
+    <value>Site Collection</value>
+  </data>
+  <data name="FeatureScopeWeb" xml:space="preserve">
+    <value>Web</value>
+  </data>
+  <data name="FeatureScopeWebApplication" xml:space="preserve">
+    <value>Web Application</value>
+  </data>
+  <data name="FeatureUpgrade_AddingWebFeature" xml:space="preserve">
+    <value>Adding Web Feature '{0}': {1}</value>
+  </data>
+  <data name="FeatureUpgrade_CheckingForOldFeatures" xml:space="preserve">
+    <value>Checking for Old Features to Remove</value>
+  </data>
+  <data name="FeatureUpgrade_CheckingUpgradedFeatureVersion" xml:space="preserve">
+    <value>Ensuring Feature Version Upgraded '{0}' ({1})</value>
+  </data>
+  <data name="FeatureUpgrade_GettingFeatureDefinition" xml:space="preserve">
+    <value>Getting Feature Definition for {0}</value>
+  </data>
+  <data name="FeatureUpgrade_GettingScope" xml:space="preserve">
+    <value>Getting Feature Scope for '{0}' ({1})</value>
+  </data>
+  <data name="FeatureUpgrade_GettingWebApplications" xml:space="preserve">
+    <value>Getting Web Applications</value>
+  </data>
+  <data name="FeatureUpgrade_RemovingFarmFeature" xml:space="preserve">
+    <value>Removing Farm Feature '{0}'</value>
+  </data>
+  <data name="FeatureUpgrade_RemovingFeature" xml:space="preserve">
+    <value>Removing Feature '{0}'</value>
+  </data>
+  <data name="FeatureUpgrade_RemovingSiteFeature" xml:space="preserve">
+    <value>Removing Site Collection Feature '{0}': {1}</value>
+  </data>
+  <data name="FeatureUpgrade_RemovingWebAppFeature" xml:space="preserve">
+    <value>Removing Web Application Feature '{0}': {1}</value>
+  </data>
+  <data name="FeatureUpgrade_RemovingWebFeature" xml:space="preserve">
+    <value>Removing Web Feature '{0}': {1}</value>
+  </data>
+  <data name="FeatureUpgrade_UpdatingFarmFeature" xml:space="preserve">
+    <value>Updating Farm Feature '{0}' ({1})</value>
+  </data>
+  <data name="FeatureUpgrade_UpdatingSiteFeature" xml:space="preserve">
+    <value>Updating Site Collection Feature '{0}' ({1}): {2}</value>
+  </data>
+  <data name="FeatureUpgrade_UpdatingWebAppFeature" xml:space="preserve">
+    <value>Updating Web Application Feature '{0}' ({1}): {2}</value>
+  </data>
+  <data name="FeatureUpgrade_UpdatingWebFeature" xml:space="preserve">
+    <value>Updating Web Feature '{0}' ({1}): {2}</value>
+  </data>
+  <data name="FilesLocked" xml:space="preserve">
+    <value>Assembly File Locked: {0}</value>
+  </data>
+  <data name="FilesLockedBy" xml:space="preserve">
+    <value>File Locked By Process: {0}</value>
+  </data>
+  <data name="FilesLockedChecking" xml:space="preserve">
+    <value>Checking for Locked Assembly Files</value>
+  </data>
+  <data name="FilesLockedCheckingFile" xml:space="preserve">
+    <value>Checking Assembly File: {0}</value>
+  </data>
+  <data name="FilesLockedComplete" xml:space="preserve">
+    <value>Check for Locked Assembly Files Complete</value>
+  </data>
+  <data name="FilesLockedNotLock" xml:space="preserve">
+    <value>Assembly File Not Locked: {0}</value>
+  </data>
+  <data name="ForceDeployingSolution" xml:space="preserve">
+    <value>Force Deploying Solution '{0}'</value>
+  </data>
+  <data name="GettingCurrentServiceContext" xml:space="preserve">
+    <value>Getting Current SharePoint Service Context</value>
+  </data>
+  <data name="IgnoringSolution" xml:space="preserve">
+    <value>Ignoring Solution: {0}</value>
+  </data>
+  <data name="InstallingSolution" xml:space="preserve">
+    <value>Adding or Updating Solution: {0}</value>
+  </data>
+  <data name="KnownSolutionFound" xml:space="preserve">
+    <value>Social Sites Solution Found: '{0}'</value>
+  </data>
+  <data name="KnownSolutionFoundIgnoring" xml:space="preserve">
+    <value>Ignoring Solution: '{0}'</value>
+  </data>
+  <data name="LauncherActionCentralAdministration" xml:space="preserve">
+    <value>Launch SharePoint Server Central Administration</value>
+  </data>
+  <data name="LauncherActionCheckPrerequisites" xml:space="preserve">
+    <value>Check Prerequisites</value>
+  </data>
+  <data name="LauncherActionConfigurationExplorer" xml:space="preserve">
+    <value>Launch Sitrion Social Configuration Explorer</value>
+  </data>
+  <data name="LauncherActionEngage" xml:space="preserve">
+    <value>Visit Sitrion Engage Site</value>
+  </data>
+  <data name="LauncherActionInstallOrUpdate" xml:space="preserve">
+    <value>Install or Upgrade Sitrion Social</value>
+  </data>
+  <data name="LauncherActionInstallVideoComponents" xml:space="preserve">
+    <value>Run Additional Components Installer for Video Module</value>
+  </data>
+  <data name="LauncherActionNewsGatorShell" xml:space="preserve">
+    <value>Launch Sitrion Social Management Shell</value>
+  </data>
+  <data name="LauncherActionProductsConfigurationWizard" xml:space="preserve">
+    <value>Launch SharePoint Products Configuration Wizard</value>
+  </data>
+  <data name="LauncherActionRepair" xml:space="preserve">
+    <value>Repair {0}</value>
+  </data>
+  <data name="LauncherActionServiceApplicationsAndFeatures" xml:space="preserve">
+    <value>{0} {1} Service Applications and Features</value>
+  </data>
+  <data name="LauncherActionSharePointShell" xml:space="preserve">
+    <value>Launch Microsoft SharePoint Server Management Shell</value>
+  </data>
+  <data name="LauncherActionUninstall" xml:space="preserve">
+    <value>Uninstall Sitrion Social</value>
+  </data>
+  <data name="LauncherGroupAdvanced" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
+  <data name="LauncherGroupInstall" xml:space="preserve">
+    <value>Install</value>
+  </data>
+  <data name="LauncherGroupSupport" xml:space="preserve">
+    <value>Support</value>
+  </data>
+  <data name="LicenseAgreementDescription" xml:space="preserve">
+    <value>Review the Sitrion Social License Agreement.  Select "Accept" to accept the Software License and Software Agreement to continue the installation.</value>
+  </data>
+  <data name="LicenseAgreementNotAcceptedDescription" xml:space="preserve">
+    <value>Not accepting the license agreement will cancel the installation.  Are you sure you want to continue?</value>
+  </data>
+  <data name="LicenseAgreementNotAcceptedTitle" xml:space="preserve">
+    <value>License Agreement Not Accepted</value>
+  </data>
+  <data name="LicenseAgreementText" xml:space="preserve">
+    <value>SOFTWARE LICENSE AND SERVICE AGREEMENT
+ 
+ 
+IMPORTANT – PLEASE READ THE TERMS OF THIS SOFTWARE LICENSE AND SERVICE AGREEMENT ("AGREEMENT") CAREFULLY.  BY CLICKING ON THE "ACCEPT" BUTTON BELOW OR USING ANY SITRION SOFTWARE, YOU AGREE TO BE BOUND BY THIS AGREEMENT.  
+ 
+IF YOU DO NOT AGREE TO ANY OF THE TERMS OR CONDITIONS BELOW, YOU MUST NOT USE SITRION’S SOFTWARE AND YOU MUST CLICK ON THE "DO NOT ACCEPT" BUTTON TO DISCONTINUE THE INSTALLATION OR DOWNLOAD PROCESS. IN SUCH CASE, ANY AMOUNTS ALREADY PAID BY YOU SHALL BE REFUNDED.
+ 
+This is a legal agreement between you and Sitrion, Inc. ("Sitrion") for the Sitrion software ("Software") and/or Services (as that term is defined below; the Software and the Services are collectively referred to as the "Sitrion Products") listed on order that you have submitted and Sitrion has accepted (your "Order").  The term "you" means the individual person installing or using the Software on his or her own behalf; or, if the Software is being used, downloaded or installed on behalf of a company (the "Company"), "you" means that Company and the person using, downloading or installing the Software.  If you are downloading or installing the Software on behalf of your Company, then you represent that you have the authority to do so on the Company’s behalf.  
+ 
+The "Software" includes modifications, updates, enhancements, associated media and printed materials listed on your Order and provided to you by Sitrion in its discretion or as part of the Services.  "Documentation" means the user instructions and functional specifications relating to the function and operation of the Software available to you through Sitrion’s extranet site.  The "Services" means any maintenance and support service(s), training, installation or other services listed on your Order.  Each "User" is a person who has been authorized by you to use the Software, as provided in this Agreement.  
+
+All Orders are subject to and governed by the terms and conditions of this Agreement, regardless of whether the Orders reference this Agreement. Any different or additional terms or conditions in any Order, proposal, acknowledgement form or any other document will be of no force or effect and will not become part of the agreement between you and Sitrion.  If there is another signed, written agreement in place between you and Sitrion with respect to the Sitrion Products, then the terms and conditions of such agreement will prevail in the event of a conflict between the terms and conditions of such agreement and those of this Agreement. 
+1.                  Software License.  
+1.1	License Grant.  Subject to the terms of this Agreement, to the extent that Software is included in your Order, Sitrion grants you a limited, non-exclusive, non-transferable, royalty-bearing, worldwide license to reproduce and execute the Software, in executable object code format only, as necessary to install the Software on your internal servers and to enable your Users to access and use the Software, in accordance with the Documentation and the limitations as set forth in this Agreement.   You may reproduce the Software as reasonably required for backup and archival purposes, provided that each copy that you make includes all copyright and other proprietary notices that are on the original copy of the Software provided by Sitrion. 
+1.2	Restrictions.  You acknowledge that the Software and its structure and organization constitute valuable trade secrets of Sitrion.  Except as expressly permitted by this Agreement, you agree that you shall not, and you shall not permit your Users or any third party to: (a) modify, translate, or create derivative works of the Software or the Documentation; (b) sublicense, distribute, sell, use for service bureau use, for time-sharing use, for outsourcing use, as an application service provider or managed service provider environment, or as software as a service, lease, rent, loan, or otherwise transfer the Software or the Documentation to any third party; (c) reverse engineer, decompile, disassemble, or otherwise attempt to derive the source code for the Software, except and only to the extent that such activity is expressly permitted by applicable law notwithstanding this limitation; (d) remove, alter, or obfuscate any copyright notices or other proprietary rights notices included in the Software or the Documentation; or (e) otherwise use or copy the Software or the Documentation except as expressly permitted hereunder.  
+2.                  Services.  To the extent that Services are included in your Order, then subject to the terms and conditions of this Agreement (including without limitation your payment of the applicable fees set forth on the Order), Sitrion will perform those Services in accordance with its then-current policies applicable to such Services, which are available on Sitrion’s extranet site.
+3.                  Registration.  A user account may be required to download Software and/or access the Services.  To open a user account, you must complete the registration process by providing Sitrion with current, complete and accurate information about yourself or the Company, and you must promptly update such information if it changes.  Should Sitrion suspect that any such information is untrue, inaccurate, not current or incomplete, Sitrion has the right to either suspend or terminate your use of and your access to the Sitrion Products.  If you are an individual, you represent that you are at least 18 years of age.  You will be responsible for all activities that occur under your user name and password and therefore you should keep your password confidential. You agree to notify Sitrion immediately of any unauthorized use of your password or if you believe that your password is no longer confidential.  Sitrion reserves the right to require you to alter your password if Sitrion believes that your password is no longer secure.  
+4.                  Fees and Payment.  You or your Company agrees to pay all fees or charges to your account in accordance with your Order.  Sitrion’s fees are exclusive of all taxes, levies, or duties imposed by taxing authorities, and you are responsible for payment of all such taxes, levies or duties.  Except at provided in this Section 4, all fees for the Sitrion Products are non-refundable.  All invoices shall be due and payable within 30 days after the invoice date.  If timely payment is not received or cannot be charged to your credit card for any reason, Sitrion has the right to either suspend or terminate your use of and your access to the Sitrion Products.
+5.	License Compliance Reporting.  You will maintain accurate and complete records of all use of the Software in accordance with the terms of this Agreement. At Sitrion’s request, you shall deliver to Sitrion an active User report generated by the Software that reflects your then-current use of the Software.  If the report reflects that your use of the Software exceeds the number of User licenses purchased by you, Sitrion will invoice you its then-current fees for that number of additional User licenses equal to the difference between the number of User licenses purchased by you and the number of Users reflected in the active User report.
+6.                  Ownership.     Sitrion Products are licensed, not sold, to you for your use only under the terms of this Agreement, and Sitrion reserves all rights not expressly granted to you.  You own the media, if any, on which the Sitrion Products are recorded, but Sitrion retains ownership of all copies of the Sitrion Products.  Sitrion alone will own all right, title and interest, including all related intellectual property rights, to any suggestions, ideas, feedback, recommendations, or other information provided by you relating to the Sitrion Products and you hereby assign such submissions to Sitrion free of charge.  Sitrion may use such submissions as it deems appropriate in its sole discretion.
+7.                  Warranties.  
+7.1	Limited Software Warranty.  For a period of thirty (30) days after the date on which you accept the terms of this Agreement (the "Warranty Period"), Sitrion warrants that the Software, when used as permitted under this Agreement and in accordance with the instructions in the Documentation (including use in the systems environment specified in the Documentation), will operate substantially as described in the Documentation.  Sitrion will, at its own expense and as its sole obligation and your exclusive remedy for any breach of this warranty, use commercially reasonable efforts to correct any reproducible error in the Software reported by you to Sitrion during the Warranty Period.  Any error correction provided hereunder will not extend the original Warranty Period.
+7.2	Disclaimer of Other Warranties.  EXCEPT AS OTHERWISE EXPRESSLY SET FORTH IN ABOVE IN THIS SECTION 7, SITRION HEREBY DISCLAIMS, ON BEHALF OF ITSELF AND ITS LICENSORS, ALL WARRANTIES (WHETHER EXPRESS, IMPLIED, STATUTORY OR OTHERWISE) RELATING TO THE SOFTWARE, THE DOCUMENTATION AND ANY SERVICES PROVIDED UNDER AN ORDER OR THIS AGREEMENT, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT, AND ANY WARRANTIES ARISING OUT OF A COURSE OF DEALING OR COURSE OF PERFORMANCE.  SITRION DOES NOT WARRANT THAT USE OF THE SOFTWARE WILL BE UNINTERRUPTED OR ERROR-FREE, THAT DEFECTS WILL BE CORRECTED, OR THAT THE SOFTWARE IS FREE OF VIRUSES OR OTHER HARMFUL CODE.
+8.	Confidentiality.  You acknowledge that Sitrion may provide technology and information regarding its business that Sitrion considers proprietary and confidential (the "Confidential Information").  For the avoidance of doubt, the Software, the Documentation, future product information, pricing and the terms and conditions of this Agreement shall be considered Confidential Information.  During the term of this Agreement and for five (5) years thereafter, you agree that you will not use any Confidential Information for any purpose not expressly permitted by this Agreement, and you will maintain the Confidential Information in strict confidence.  You will disclose Confidential Information only to your employees or contractors who have a need to know such Confidential Information for the purpose of exercising your rights or performing your obligations under this Agreement, and who are under a duty of confidentiality no less restrictive than your duty hereunder.  You will protect the Confidential Information from unauthorized use, access, or disclosure in the same manner as you protect your own confidential or proprietary information of a similar nature and with no less than reasonable care.  You shall have no obligation under this Section 8 with respect to any Confidential Information: (a) that was previously known to you free of any obligation to keep it confidential; (b) that is or becomes generally available to the public by other than unauthorized disclosure; or (c) that you receive from a third party whose disclosure does not violate any confidentiality obligation. In addition, you may disclose Confidential Information to the extent required by law or by the order of a court of similar judicial or administrative body, provided that you notify Sitrion of such required disclosure promptly and in writing and cooperate with Sitrion, at Sitrion’s request and expense, in any lawful action to contest or limit the scope of such required disclosure. You acknowledge that your failure to comply with the provisions of this Section 8 shall result in irreparable harm to Sitrion or its suppliers for which a remedy at law would be inadequate, and therefore, in the event of the breach or threatened breach by you of your obligations under this Section 8, Sitrion shall be entitled to seek equitable relief in the form of specific performance and/or an injunction for any such actual or threatened breach, in addition to the exercise of any other remedies at law and in equity.
+9.	Indemnification.  
+9.1	Your Indemnification. You agree to defend, indemnify and hold Sitrion, and its subsidiaries, affiliates, officers, agents, partners, and employees, harmless from and against any and all claims, costs, damages, losses, liabilities, and expenses (including attorneys’ fees and costs) arising out of or in connection with your (or your Users’): (a) breach of this Agreement; and/or (b) access to or use of the Sitrion Products.
+9.2	Sitrion’s Indemnification.  Sitrion will defend at its own expense any action brought against you by a third party, to the extent that the action is based on a claim that the Software infringes any copyright or misappropriates any trade secrets, and Sitrion will pay those costs and damages finally awarded against you in any such action that are specifically attributable to such claim or those costs and damages agreed to in a monetary settlement of such action. The foregoing obligations are conditioned on you: (a) notifying Sitrion promptly in writing of such action; (b) giving Sitrion sole control of the defense thereof and any related settlement negotiations; and (c) cooperating and, at Sitrion’s request and expense, assisting in such defense.  If the Software becomes, or in Sitrion’s opinion is likely to become, the subject of an infringement claim, Sitrion may, at its option and expense: (i) procure for you the right to continue using the Software; (ii) replace or modify the Software so that it becomes non-infringing and remains functionally equivalent; or (iii) if neither of the options set forth in subsections (i) or (ii) are commercially practicable, accept return of the Software, terminate this Agreement, in whole or in part, as appropriate, upon written notice to you.  Notwithstanding the foregoing, Sitrion will have no obligation under this Section 9 or otherwise with respect to any infringement claim based upon (A) any use of the Software not in accordance with this Agreement; (B) any use of the Software in combination with products, equipment, software, or data not supplied by Sitrion if the infringement would have been avoided but for such combination; (C) any use of any release of the Software other than the most current release made available to you; or (D) any modification of the Software by any person other than Sitrion or its authorized agents or subcontractors.  THIS SECTION 9.2 STATES SITRION’S ENTIRE LIABILITY AND YOUR EXCLUSIVE REMEDY FOR ANY CLAIMS OF INFRINGEMENT.
+10.              Limitation of Remedies and Damages.  IN NO EVENT WILL SITRION  BE LIABLE FOR ANY CONSEQUENTIAL, INDIRECT, EXEMPLARY, SPECIAL OR INCIDENTAL DAMAGES, INCLUDING ANY LOST DATA AND LOST PROFITS, ARISING FROM OR RELATING TO THIS AGREEMENT, EVEN IF SITRION HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. SITRION’S TOTAL CUMULATIVE LIABILITY IN CONNECTION WITH THIS AGREEMENT, WHETHER IN CONTRACT OR TORT OR OTHERWISE, WILL NOT EXCEED THE AMOUNT PAID BY YOU IN THE 12 MONTH PERIOD IMMEDIATELY PRECEDING THE EVENT GIVING RISE TO A CLAIM.  ONE OR MORE CLAIMS WILL NOT ENLARGE THIS LIMITATION.  THE DISCLAIMERS, WAIVERS AND LIMITATIONS IN THIS AGREEMENT SHALL APPLY NOTWITHSTANDING ANY FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.  CERTAIN STATES AND/OR JURISDICTIONS DO NOT ALLOW THE EXCLUSION OF IMPLIED WARRANTIES OR LIMITATION OF LIABILITY FOR INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO THE EXCLUSIONS SET FORTH ABOVE MAY NOT APPLY TO YOU.  SITRION DISCLAIMS ALL LIABILITY OF ANY KIND OF SITRION’S SUPPLIERS.
+11.              Basis of Bargain.  Sections 7.2 (Disclaimer of Other Warranties) and 10 (Limitation of Remedies and Damages) set forth above are fundamental elements of the basis of the agreement between Sitrion and you.  Sitrion would not be able to provide the Sitrion Products on an economic basis without such limitations. 
+12.              Consumers Located Outside the United States.  If you are located outside the United States and you are a consumer, i.e., a person acquiring goods otherwise than in the course of a business, the limitations or exclusions of warranties and liability contained in this Agreement do not affect or prejudice your statutory rights.  The limitations or exclusions of warranties and remedies contained in this Agreement shall apply to you only to the extent such limitations or exclusions and remedies are permitted under the laws of the jurisdiction where you are located.
+13.              Term and Termination.  This Agreement is effective on the earlier of the date you download, install, or start using a Sitrion Product and shall continue for as long as you pay the required fees, unless this Agreement is terminated earlier by either party pursuant to this Section 13 or terms of your Order.  Sitrion may terminate this Agreement immediately upon notice to you in the event of (a) your breach of this Agreement, (b) request(s) by law enforcement or other government agencies, (c) discontinuance of or material modification to the Sitrion Products (or any part thereof), or (d) regulatory changes. You may terminate this Agreement per the terms of your Order.  In the event of any expiration or termination of this Agreement, (i) any amounts owed to Sitrion under this Agreement will be immediately due and payable; (ii) all licensed rights granted in this Agreement will immediately cease to exist; and (iii) you must promptly discontinue all use of the Software and Documentation, erase all copies of the Software and Documentation from your computers, and return to Sitrion or destroy all copies of the Software and Documentation on tangible media in your possession or control.  Sitrion shall not be liable for any termination of your account or of your access to the Sitrion Products.  Upon termination of this Agreement, the following sections of this Agreement will survive remain in effect: 4, 5, 7.2, 8, and 10-18.
+14.              United States Government Users.  The Software is a "commercial item" as that term is defined at 48 C.F.R. 2.101, consisting of "commercial computer software" and "commercial computer software documentation" as such terms are used in 48 C.F.R. 12.212.  Consistent with 48 C.F.R. 12.212 and 48 C.F.R. 227.7202-1 through 227.7202-4, all United States Government end users acquire the Software with only those rights set forth therein.
+15.              Local Laws and Export Control.  The Sitrion Products and related technology are subject to United States export control laws and may be subject to export or import regulations in other countries.  You agree to strictly comply with all applicable export and import laws and regulations and acknowledge that you have the responsibility to obtain authorization to export, re-export, or import the Sitrion Products and related technology, as may be required.  You will indemnify and hold Sitrion harmless from any and all claims, losses, liabilities, damages, fines, penalties, costs and expenses (including attorney’s fees) arising from or relating to any breach by you of your obligations under this Section 15. 
+16.              Modifications.  Sitrion reserves the right to change the terms and conditions of this Agreement at any time, and shall notify you by posting an updated version of this Agreement at http://www.sitrion.com/license. You are responsible for regularly reviewing these terms. Your continued use of the Sitrion Products after any such changes shall constitute your consent to such changes. Sitrion shall not be liable to you or to any third party for any modification, suspension, or discontinuance of the Sitrion Products.
+17.              Miscellaneous.  Neither the rights nor the obligations arising under this Agreement are assignable by you, and any such attempted assignment or transfer shall be void and without effect.  This Agreement shall be governed by and construed in accordance with the laws of the State of Colorado and the United States without regard to the conflict of laws provisions therein. Any action under or relating to this Agreement shall be brought solely in the state and federal courts located in Colorado, with sole venue in the courts located in Denver County and each party hereby submits to the personal jurisdiction of such courts.  In the event any proceeding or lawsuit is brought by Sitrion or you in connection with this Agreement, the prevailing party in such proceeding or lawsuit shall be entitled to receive its costs, expert witness fees and reasonable attorney’s fees, including costs and fees on appeal. You agree that regardless of any statute or law to the contrary, any claim or cause of action arising out of or related to use of the Sitrion Products or this Agreement must be filed within one (1) year after such claim or cause of action arose or such claim or cause of action will be barred. The United Nations Convention on Contracts for the International Sale of Goods shall not apply to this Agreement.  The failure of Sitrion to exercise or enforce any right or provision of this Agreement shall not constitute a waiver of such right or provision.  In the event that any provision of this Agreement is found to be contrary to law, then such provision shall be construed as nearly as possible to reflect the intention of the parties, with the other provisions remaining in full force and effect.  Any notice intended to have legal effect: (1) from Sitrion to you may be provided by email, postal mail, or custom feed, (2) from you to Sitrion must be sent by postal mail to Sitrion Technologies, Inc.; Attn: Chief Financial Officer; 950 17th Street, Suite 2500, Denver, Colorado, 80202.  This Agreement and your Order constitute the entire agreement between the parties pertaining to the subject matter hereof, and any and all written or oral agreements previously existing between the parties are expressly canceled. 
+ 
+QUESTIONS OR ADDITIONAL INFORMATION.  If you have questions regarding this Agreement, or wish to obtain additional information, please send an e-mail to info@sitrion.com.
+ 
+THE SITRION PRODUCTS ARE PROTECTED BY UNITED STATES COPYRIGHT LAW 
+AND INTERNATIONAL TREATY.  
+UNAUTHORIZED REPRODUCTION OR DISTRIBUTION IS SUBJECT TO CIVIL AND CRIMINAL PENALTIES.</value>
+  </data>
+  <data name="LicenseAgreementTitle" xml:space="preserve">
+    <value>License Agreement</value>
+  </data>
+  <data name="LicenseKeyRequired" xml:space="preserve">
+    <value>A License Key is required.</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading</value>
+  </data>
+  <data name="LocatingServiceApplicationProxy" xml:space="preserve">
+    <value>Locating Service Application Proxy</value>
+  </data>
+  <data name="ManagementShell" xml:space="preserve">
+    <value>Management Shell</value>
+  </data>
+  <data name="MicrosoftSharePoint" xml:space="preserve">
+    <value>Microsoft SharePoint</value>
+  </data>
+  <data name="MicrosoftSharePointServer" xml:space="preserve">
+    <value>{0} Server</value>
+    <comment>{MicrosoftSharePoint} Server</comment>
+  </data>
+  <data name="MicrosoftSharePointServer2010" xml:space="preserve">
+    <value>{0} 2010</value>
+    <comment>{MicrosoftSharePointServer} 2010</comment>
+  </data>
+  <data name="MicrosoftSharePointServer2013" xml:space="preserve">
+    <value>{0} 2013</value>
+    <comment>{MicrosoftSharePointServer} 2013</comment>
+  </data>
+  <data name="ModuleEnrich" xml:space="preserve">
+    <value>Enrich</value>
+  </data>
+  <data name="ModuleEnrichVideoScenarios" xml:space="preserve">
+    <value>Enrich Video Scenarios</value>
+  </data>
+  <data name="ModuleIdeas" xml:space="preserve">
+    <value>Idea Stream</value>
+  </data>
+  <data name="ModuleInnovation" xml:space="preserve">
+    <value>Innovation Solution</value>
+  </data>
+  <data name="ModuleInterComm" xml:space="preserve">
+    <value>Internal Communications</value>
+  </data>
+  <data name="ModuleMobile" xml:space="preserve">
+    <value>Lookout Mobile</value>
+  </data>
+  <data name="ModuleNews" xml:space="preserve">
+    <value>News Stream</value>
+  </data>
+  <data name="ModuleOffice365" xml:space="preserve">
+    <value>Office 365 SkyDrive Pro Integration</value>
+  </data>
+  <data name="ModulePivotViewer" xml:space="preserve">
+    <value>Activity Feed Pivot Viewer</value>
+  </data>
+  <data name="ModuleScreenCast" xml:space="preserve">
+    <value>Video Stream ScreenCast</value>
+  </data>
+  <data name="ModuleSearch" xml:space="preserve">
+    <value>Social Search BDC Connector</value>
+  </data>
+  <data name="ModuleSpotlight" xml:space="preserve">
+    <value>Spotlight</value>
+  </data>
+  <data name="ModuleVideo" xml:space="preserve">
+    <value>Video Stream</value>
+  </data>
+  <data name="NotSpecified" xml:space="preserve">
+    <value>Not Specified</value>
+  </data>
+  <data name="Optional" xml:space="preserve">
+    <value>Optional</value>
+  </data>
+  <data name="OptionEmailWebUrl" xml:space="preserve">
+    <value>Email Handler Lists Web Url</value>
+  </data>
+  <data name="OptionEnableLookout" xml:space="preserve">
+    <value>Enable Lookout</value>
+  </data>
+  <data name="OptionLicenseKey" xml:space="preserve">
+    <value>Sitrion Social License Key</value>
+  </data>
+  <data name="OptionLookoutHomePage" xml:space="preserve">
+    <value>Set Lookout as My Site Home Page</value>
+  </data>
+  <data name="OptionMySiteUrl" xml:space="preserve">
+    <value>SharePoint My Site Host Url</value>
+  </data>
+  <data name="OptionReplaceMySiteWebParts" xml:space="preserve">
+    <value>Replace SharePoint My Site Newsfeed Web Parts with the Sitrion Social Activity Stream</value>
+  </data>
+  <data name="OptionsEnrichGlobalKb" xml:space="preserve">
+    <value>Enrich Global Knowledge Base Url (Optional)</value>
+  </data>
+  <data name="OptionsVideoEncodingInputFolder" xml:space="preserve">
+    <value>Video Encoding Input Folder</value>
+  </data>
+  <data name="OptionsVideoEncodingOutputFolder" xml:space="preserve">
+    <value>Video Encoding Output Folder</value>
+  </data>
+  <data name="OptionsVideoStreamingServerFolder" xml:space="preserve">
+    <value>Video Streaming Server Folder</value>
+  </data>
+  <data name="OptionsVideoStreamingServerUrlCustomZone" xml:space="preserve">
+    <value>Video Streaming Server Url Custom Zone</value>
+  </data>
+  <data name="OptionsVideoStreamingServerUrlDefaultZone" xml:space="preserve">
+    <value>Video Streaming Server Url Default Zone</value>
+  </data>
+  <data name="OptionsVideoStreamingServerUrlExtranetZone" xml:space="preserve">
+    <value>Video Streaming Server Url Extranet Zone</value>
+  </data>
+  <data name="OptionsVideoStreamingServerUrlInternetZone" xml:space="preserve">
+    <value>Video Streaming Server Url Internet Zone</value>
+  </data>
+  <data name="OptionsVideoStreamingServerUrlIntranetZone" xml:space="preserve">
+    <value>Video Streaming Server Url Intranet Zone</value>
+  </data>
+  <data name="OptionsVideoUploadFolder" xml:space="preserve">
+    <value>Video Upload Folder</value>
+  </data>
+  <data name="PowerShell_CopyExecutable" xml:space="preserve">
+    <value>Copying PowerShell Executable</value>
+  </data>
+  <data name="PowerShell_WritingConfigurationFile" xml:space="preserve">
+    <value>Writing PowerShell Configuration File</value>
+  </data>
+  <data name="PrerequisiteAssembliesNotLocked" xml:space="preserve">
+    <value>Sitrion Social Assembly Files Not Locked: If one or more of the Sitrion Social Assembly Files are locked by a SharePoint process, setup may continue, however it is advisable to restart the SharePoint servers before continuing.</value>
+  </data>
+  <data name="PrerequisiteCheckDescription" xml:space="preserve">
+    <value>Checking to ensure that the prerequisites to install Sitrion Social are met.  </value>
+  </data>
+  <data name="PrerequisiteCheckTitle" xml:space="preserve">
+    <value>Check Prerequisites</value>
+  </data>
+  <data name="PrerequisiteMySiteHostAvailable" xml:space="preserve">
+    <value>SharePoint My Site host is configured and available</value>
+  </data>
+  <data name="PrerequisiteNewerVersionNotInstalled" xml:space="preserve">
+    <value>Newer version of Sitrion Social is not installed on the local SharePoint farm</value>
+  </data>
+  <data name="PrerequisiteSharePointVersion" xml:space="preserve">
+    <value>Installation of SharePoint is at least SharePoint 2010 Service Pack 1, SharePoint 2013, or SharePoint 2016.</value>
+  </data>
+  <data name="PrerequisiteUpgradeVersion" xml:space="preserve">
+    <value>Sitrion Social older than version 2.6 is not installed on the local SharePoint farm</value>
+  </data>
+  <data name="PrerequisiteUserIsFarmAdmin" xml:space="preserve">
+    <value>Current user is a SharePoint farm administrator</value>
+  </data>
+  <data name="PrerequisiteUserIsLocalAdmin" xml:space="preserve">
+    <value>Current user is local machine administrator</value>
+  </data>
+  <data name="PrerequisiteUserProfileAccess" xml:space="preserve">
+    <value>Current user can access the User Profile Service Application</value>
+  </data>
+  <data name="PrerequisiteUserProfileAdmin" xml:space="preserve">
+    <value>Current user is a User Profile Service Application administrator</value>
+  </data>
+  <data name="PrerequisiteUserProfileAvailable" xml:space="preserve">
+    <value>User Profile Service Application is configured and available</value>
+  </data>
+  <data name="PrerequisiteWebApplicationServiceIsStarted" xml:space="preserve">
+    <value>Microsoft SharePoint Foundation Web Application Service is started on the local SharePoint server</value>
+  </data>
+  <data name="ProductName" xml:space="preserve">
+    <value>Sitrion Social</value>
+  </data>
+  <data name="ProductsConfigurationWizard" xml:space="preserve">
+    <value>Products Configuration Wizard</value>
+  </data>
+  <data name="ProgressAddingOrUpdatingSolutions" xml:space="preserve">
+    <value>Adding or Updating {0}</value>
+  </data>
+  <data name="ProgressApplicationPools" xml:space="preserve">
+    <value>Getting or Creating Service Application Pools</value>
+  </data>
+  <data name="ProgressCheckingPrerequisites" xml:space="preserve">
+    <value>Checking Prerequisites</value>
+  </data>
+  <data name="ProgressCleanupFiles" xml:space="preserve">
+    <value>Cleaning Up Extracted Files</value>
+  </data>
+  <data name="ProgressComplete" xml:space="preserve">
+    <value>Complete</value>
+  </data>
+  <data name="ProgressCopyAppBinContent" xml:space="preserve">
+    <value>Invoking SharePoint administration to apply BIN folder changes.</value>
+  </data>
+  <data name="ProgressDebuggerDisable" xml:space="preserve">
+    <value>Disable Just-In-Time Debugger (If Enabled)</value>
+  </data>
+  <data name="ProgressDebuggerEnable" xml:space="preserve">
+    <value>Enable Just-In-Time Debugger (If Previously Enabled)</value>
+  </data>
+  <data name="ProgressDeploying" xml:space="preserve">
+    <value>Deploying {0}</value>
+  </data>
+  <data name="ProgressDisableFeatures" xml:space="preserve">
+    <value>Disabling Sitrion Social Features</value>
+  </data>
+  <data name="ProgressDisableJobs" xml:space="preserve">
+    <value>Disabling Sitrion Social Jobs</value>
+  </data>
+  <data name="ProgressDisableWebApplications" xml:space="preserve">
+    <value>Disabling Web Applications</value>
+  </data>
+  <data name="ProgressEnableJobs" xml:space="preserve">
+    <value>Enabling Sitrion Social Jobs</value>
+  </data>
+  <data name="ProgressEnablingWebApplications" xml:space="preserve">
+    <value>Enabling Web Applications</value>
+  </data>
+  <data name="ProgressEnrichServiceApplication" xml:space="preserve">
+    <value>Provisioning Enrich Service Application</value>
+  </data>
+  <data name="ProgressEnsuringApplicationPools" xml:space="preserve">
+    <value>Ensuring Application Pools are Started</value>
+  </data>
+  <data name="ProgressGetWebApplications" xml:space="preserve">
+    <value>Getting Web Applications</value>
+  </data>
+  <data name="ProgressInitializingSetup" xml:space="preserve">
+    <value>Initializing Setup</value>
+  </data>
+  <data name="ProgressInnovationServiceApplication" xml:space="preserve">
+    <value>Provisioning Innovation Service Application</value>
+  </data>
+  <data name="ProgressInProgress" xml:space="preserve">
+    <value>In Progress</value>
+  </data>
+  <data name="ProgressInstallingUpdatingCoreSolutions" xml:space="preserve">
+    <value>Installing or Updating Sitrion Social Core Solutions</value>
+  </data>
+  <data name="ProgressInstallingUpdatingModuleSolutions" xml:space="preserve">
+    <value>Installing or Updating Sitrion Social Module Solutions</value>
+  </data>
+  <data name="ProgressInstallingUpdatingOtherSolutions" xml:space="preserve">
+    <value>Installing or Updating Other Solutions</value>
+  </data>
+  <data name="ProgressInterCommServiceApplication" xml:space="preserve">
+    <value>Provisioning Internal Communications Service Application</value>
+  </data>
+  <data name="ProgressLookout" xml:space="preserve">
+    <value>Enabling Lookout on My Site</value>
+  </data>
+  <data name="ProgressLookoutHomePage" xml:space="preserve">
+    <value>Setting Lookout as My Site Home Page</value>
+  </data>
+  <data name="ProgressMySiteFeatures" xml:space="preserve">
+    <value>Enabling My Site Features</value>
+  </data>
+  <data name="ProgressMySiteWebParts" xml:space="preserve">
+    <value>Apply Sitrion Social Web Parts to My Site</value>
+  </data>
+  <data name="ProgressNewsServiceApplication" xml:space="preserve">
+    <value>Provisioning News Manager Service Application</value>
+  </data>
+  <data name="ProgressRemoveEventReceivers" xml:space="preserve">
+    <value>Removing Sitrion Social Event Receivers</value>
+  </data>
+  <data name="ProgressRemoveOrphanedFeatures" xml:space="preserve">
+    <value>Remove Orphaned Features</value>
+  </data>
+  <data name="ProgressRemoveServiceApplications" xml:space="preserve">
+    <value>Removing Sitrion Social Service Applications</value>
+  </data>
+  <data name="ProgressRemoveSolutions" xml:space="preserve">
+    <value>Removing Sitrion Social Solutions</value>
+  </data>
+  <data name="ProgressRemovingSolution" xml:space="preserve">
+    <value>Removing {0}</value>
+  </data>
+  <data name="ProgressRestartingServices" xml:space="preserve">
+    <value>Restarting SharePoint Services</value>
+  </data>
+  <data name="ProgressSocialServiceApplication" xml:space="preserve">
+    <value>Provisioning Sitrion Social Platform Service Application</value>
+  </data>
+  <data name="ProgressStarting" xml:space="preserve">
+    <value>Starting</value>
+  </data>
+  <data name="ProgressUpgradeFeatures" xml:space="preserve">
+    <value>Upgrade Features</value>
+  </data>
+  <data name="ProgressUpgradeServiceApps" xml:space="preserve">
+    <value>Upgrade Service Applications and Databases</value>
+  </data>
+  <data name="ProgressUpgradingModuleFeaturesCa" xml:space="preserve">
+    <value>Reactivating Features</value>
+  </data>
+  <data name="ProgressVideoServiceApplication" xml:space="preserve">
+    <value>Provisioning Video Stream Service Application</value>
+  </data>
+  <data name="ProvisionEnrichServiceApplication" xml:space="preserve">
+    <value>Provision Enrich Service Application</value>
+  </data>
+  <data name="ProvisioningActivityTemplates" xml:space="preserve">
+    <value>Provisioning Activity Templates.</value>
+  </data>
+  <data name="ProvisioningEmailHandler" xml:space="preserve">
+    <value>Provisioning Email Handler</value>
+  </data>
+  <data name="ProvisioningServiceApplication" xml:space="preserve">
+    <value>Provisioning Service Application.</value>
+  </data>
+  <data name="ProvisioningServiceApplicationPool" xml:space="preserve">
+    <value>Provisioning Service Application Pool: {0}</value>
+  </data>
+  <data name="ProvisioningServiceApplicationPoolComplete" xml:space="preserve">
+    <value>Service Application Pool Provisioned: {0}</value>
+  </data>
+  <data name="ProvisioningServiceApplicationPoolComplete1" xml:space="preserve">
+    <value>Service Application Pool Provisioned: {0}</value>
+  </data>
+  <data name="ProvisionInnovationServiceApplication" xml:space="preserve">
+    <value>Provision Innovation Service Application</value>
+  </data>
+  <data name="ProvisionInterCommServiceApplication" xml:space="preserve">
+    <value>Provision Internal Communications Service Application</value>
+  </data>
+  <data name="ProvisionNewsgatorCustomUserProfileProperties" xml:space="preserve">
+    <value>Provisioning User Profile Properties.</value>
+  </data>
+  <data name="ProvisionNewsServiceApplication" xml:space="preserve">
+    <value>Provision News Stream Service Application</value>
+  </data>
+  <data name="ProvisionServiceApplicationComplete" xml:space="preserve">
+    <value>Service Application Provisioned.</value>
+  </data>
+  <data name="ProvisionServiceApplicationStart" xml:space="preserve">
+    <value>Starting Provisioning Service Application.</value>
+  </data>
+  <data name="ProvisionSocialServiceApplication" xml:space="preserve">
+    <value>Provision Social Service Application</value>
+  </data>
+  <data name="ProvisionVideoServiceApplication" xml:space="preserve">
+    <value>Provision Video Stream Service Application</value>
+  </data>
+  <data name="ReactivatingFeature" xml:space="preserve">
+    <value>Reactivating Feature: {0}</value>
+  </data>
+  <data name="RegistryKeyUpdate" xml:space="preserve">
+    <value>Updating Registry Key 'HKEY_LOCAL_MACHINE\{0}': Old Value ({1}), New Value ({2})</value>
+  </data>
+  <data name="RemovingSolution" xml:space="preserve">
+    <value>Removing Solution '{0}'.</value>
+  </data>
+  <data name="ReportingDatabaseNotUpgraded" xml:space="preserve">
+    <value>Reporting database wasn't upgraded, version is {0}, should be {1}, upgrading...</value>
+  </data>
+  <data name="Required" xml:space="preserve">
+    <value>Required</value>
+  </data>
+  <data name="RestartAnalytics" xml:space="preserve">
+    <value>Restarting Web Analytics Service...</value>
+  </data>
+  <data name="RestartAnalyticsComplete" xml:space="preserve">
+    <value>Web Analytics Service Restarted.</value>
+  </data>
+  <data name="RestartAnalyticsCompleteOnServer" xml:space="preserve">
+    <value>Web Analytics Service Restarted on '{0}'.</value>
+  </data>
+  <data name="RestartAnalyticsOnServer" xml:space="preserve">
+    <value>Restarting Web Analytics Service on '{0}'...</value>
+  </data>
+  <data name="RestartForefront" xml:space="preserve">
+    <value>Restarting Forefront Identity Manager Service...</value>
+  </data>
+  <data name="RestartForefrontComplete" xml:space="preserve">
+    <value>Forefront Identity Manager Service Restarted.</value>
+  </data>
+  <data name="RestartForefrontCompleteOnServer" xml:space="preserve">
+    <value>Forefront Identity Manager Service Restarted on '{0}'.</value>
+  </data>
+  <data name="RestartForefrontOnServer" xml:space="preserve">
+    <value>Restarting Forefront Identity Manager Service on '{0}'...</value>
+  </data>
+  <data name="RestartingSearchServices" xml:space="preserve">
+    <value>Restarting Search Services</value>
+  </data>
+  <data name="RestartingServiceOnServer" xml:space="preserve">
+    <value>Restarting '{0}' Service on '{1}'</value>
+  </data>
+  <data name="RetractingSolution" xml:space="preserve">
+    <value>Retracting Solution '{0}'.</value>
+  </data>
+  <data name="RunningCommand" xml:space="preserve">
+    <value>Running Command: {0} {1}</value>
+  </data>
+  <data name="RunningCommandComplete" xml:space="preserve">
+    <value>Running Command Complete: {0} {1}</value>
+  </data>
+  <data name="RunningCommandOutput" xml:space="preserve">
+    <value>Command ('{0} {1}') Output: {2}</value>
+  </data>
+  <data name="SavingSolutionVersion" xml:space="preserve">
+    <value>Saving Solution Version For '{0}'</value>
+  </data>
+  <data name="SectionCore" xml:space="preserve">
+    <value>Social Sites</value>
+  </data>
+  <data name="SectionEnrich" xml:space="preserve">
+    <value>Enrich</value>
+  </data>
+  <data name="SectionInnovation" xml:space="preserve">
+    <value>Innovation</value>
+  </data>
+  <data name="SectionInterComm" xml:space="preserve">
+    <value>Internal Communications</value>
+  </data>
+  <data name="SectionNewsManager" xml:space="preserve">
+    <value>News Stream</value>
+  </data>
+  <data name="SectionVideo" xml:space="preserve">
+    <value>Video Stream</value>
+  </data>
+  <data name="SecurityReportDatabase" xml:space="preserve">
+    <value>Setting Security on Report Database.</value>
+  </data>
+  <data name="SecuritySocialDatabase" xml:space="preserve">
+    <value>Setting Security on Social Database.</value>
+  </data>
+  <data name="ServiceApplicationEnrich" xml:space="preserve">
+    <value>Enrich Service Application</value>
+  </data>
+  <data name="ServiceApplicationInnovation" xml:space="preserve">
+    <value>Innovation Service Application</value>
+  </data>
+  <data name="ServiceApplicationInterComm" xml:space="preserve">
+    <value>Internal Communications Service Application</value>
+  </data>
+  <data name="ServiceApplicationNews" xml:space="preserve">
+    <value>News Manager Service Application</value>
+  </data>
+  <data name="ServiceApplicationPoolEnrich" xml:space="preserve">
+    <value>Enrich Service Application Pool</value>
+  </data>
+  <data name="ServiceApplicationPoolInnovation" xml:space="preserve">
+    <value>Innovation Service Application Pool</value>
+  </data>
+  <data name="ServiceApplicationPoolInterComm" xml:space="preserve">
+    <value>Internal Communications Service Application Pool</value>
+  </data>
+  <data name="ServiceApplicationPoolNewName" xml:space="preserve">
+    <value>New Service Application Pool Name</value>
+  </data>
+  <data name="ServiceApplicationPoolNewPassword" xml:space="preserve">
+    <value>New Service Application Pool Service Account Password</value>
+  </data>
+  <data name="ServiceApplicationPoolNews" xml:space="preserve">
+    <value>News Service Application Pool</value>
+  </data>
+  <data name="ServiceApplicationPoolNewUsername" xml:space="preserve">
+    <value>New Service Application Pool Service Account Username (domain\username)</value>
+  </data>
+  <data name="ServiceApplicationPoolSameForEnrich" xml:space="preserve">
+    <value>Use Social Service Application Pool for Enrich</value>
+  </data>
+  <data name="ServiceApplicationPoolSameForInnovation" xml:space="preserve">
+    <value>Use Social Service Application Pool for Innovation</value>
+  </data>
+  <data name="ServiceApplicationPoolSameForInterComm" xml:space="preserve">
+    <value>Use Social Service Application Pool for Internal Communications</value>
+  </data>
+  <data name="ServiceApplicationPoolSameForNews" xml:space="preserve">
+    <value>Use Social Service Application Pool for News Manager</value>
+  </data>
+  <data name="ServiceApplicationPoolSameForVideo" xml:space="preserve">
+    <value>Use Social Service Application Pool for Video</value>
+  </data>
+  <data name="ServiceApplicationPoolSocial" xml:space="preserve">
+    <value>Social Service Application Pool</value>
+  </data>
+  <data name="ServiceApplicationPoolUsername" xml:space="preserve">
+    <value>Service Application Pool Username</value>
+  </data>
+  <data name="ServiceApplicationPoolVideo" xml:space="preserve">
+    <value>Video Service Application Pool</value>
+  </data>
+  <data name="ServiceApplicationProvisioned" xml:space="preserve">
+    <value>Service Application Provisioned.</value>
+  </data>
+  <data name="ServiceApplicationProxyProvisioned" xml:space="preserve">
+    <value>Service Application Proxy Provisioned.</value>
+  </data>
+  <data name="ServiceApplicationRemoving" xml:space="preserve">
+    <value>Removing Sitrion Social Service Application: {0}</value>
+  </data>
+  <data name="ServiceApplicationRemovingAll" xml:space="preserve">
+    <value>Removing All Sitrion Social Service Applications</value>
+  </data>
+  <data name="ServiceApplicationRemovingAllComplete" xml:space="preserve">
+    <value>Sitrion Social Service Applications Removed</value>
+  </data>
+  <data name="ServiceApplicationRemovingComplete" xml:space="preserve">
+    <value>Sitrion Social Service Application Removal Complete: {0}</value>
+  </data>
+  <data name="ServiceApplicationSocial" xml:space="preserve">
+    <value>Social Platform Service Application</value>
+  </data>
+  <data name="ServiceApplicationVideo" xml:space="preserve">
+    <value>Video Stream Service Application</value>
+  </data>
+  <data name="ServiceDoesNotExistAttemptingToCreate" xml:space="preserve">
+    <value>Service Does Not Exist, Attempting To Create.</value>
+  </data>
+  <data name="ServiceOnServerRestarted" xml:space="preserve">
+    <value>'{0}' Service on '{1}' Restarted</value>
+  </data>
+  <data name="ServiceOnServerStarted" xml:space="preserve">
+    <value>'{0}' Service on '{1}' Started</value>
+  </data>
+  <data name="ServiceOnServerStopped" xml:space="preserve">
+    <value>'{0}' Service on '{1}' Stopped</value>
+  </data>
+  <data name="ServiceProvisioningComplete" xml:space="preserve">
+    <value>Service Provisioning Complete.</value>
+  </data>
+  <data name="ServiceProxyDoesNotExistAttemptingToCreate" xml:space="preserve">
+    <value>Service Proxy Does Not Exist, Attempting To Create.</value>
+  </data>
+  <data name="ServiceStarted" xml:space="preserve">
+    <value>'{0}' Started on '{1}'</value>
+  </data>
+  <data name="SocialDatabaseNotUpgraded" xml:space="preserve">
+    <value>Social Service database wasn't upgraded, version is {0}, should be {1}, upgrading...</value>
+  </data>
+  <data name="SocialSitesIsOfflineMessage" xml:space="preserve">
+    <value>Please wait while Sitrion Social for SharePoint is being installed...</value>
+  </data>
+  <data name="SocialSitesIsOfflineMessageHowToFix" xml:space="preserve">
+    <value>If this screen persists after install terminates, delete app_offline.htm from the IIS root folders on each server in your farm.</value>
+  </data>
+  <data name="SolutionDeployTimeOut" xml:space="preserve">
+    <value>Solution deployment job has taken longer that 10 minutes, restarting services.</value>
+  </data>
+  <data name="SolutionDeployTimeOutAborting" xml:space="preserve">
+    <value>Solution deployment job has taken longer than 20 minutes, aborting.  </value>
+  </data>
+  <data name="SolutionManifestCheck" xml:space="preserve">
+    <value>Checking Solution Manifest Version for '{0}'</value>
+  </data>
+  <data name="SolutionManifestCheckComplete" xml:space="preserve">
+    <value>Solution Manifest Version for '{0}' Identified as '{1}'</value>
+  </data>
+  <data name="SolutionsSetCanada" xml:space="preserve">
+    <value>CA Common (Used by Video / Enrich / Innovation) Component Solutions</value>
+  </data>
+  <data name="SolutionsSetChecking" xml:space="preserve">
+    <value>Checking Solution Set: {0}</value>
+  </data>
+  <data name="SolutionsSetCore" xml:space="preserve">
+    <value>Core Solutions</value>
+  </data>
+  <data name="SolutionsSetFound" xml:space="preserve">
+    <value>Solutions Set Found: {0}</value>
+  </data>
+  <data name="SolutionsSetFoundMissingPrerequisiteSet" xml:space="preserve">
+    <value>Solutions Set Found: {0}, Missing Prerequisite Solutions Set: {1}</value>
+  </data>
+  <data name="SolutionsSetIdeas" xml:space="preserve">
+    <value>Ideas Module Solutions</value>
+  </data>
+  <data name="SolutionsSetIncomplete" xml:space="preserve">
+    <value>Incomplete Solutions Set Found: {0}</value>
+  </data>
+  <data name="SolutionsSetInnovation" xml:space="preserve">
+    <value>Innovation Solutions</value>
+  </data>
+  <data name="SolutionsSetInterComm" xml:space="preserve">
+    <value>Internal Communications Solutions</value>
+  </data>
+  <data name="SolutionsSetLearning" xml:space="preserve">
+    <value>Enrich (Learning) Module Solutions</value>
+  </data>
+  <data name="SolutionsSetMobile" xml:space="preserve">
+    <value>Mobile Module Solutions</value>
+  </data>
+  <data name="SolutionsSetNews" xml:space="preserve">
+    <value>News Stream Module Solutions</value>
+  </data>
+  <data name="SolutionsSetNotFound" xml:space="preserve">
+    <value>Solutions Set Not Found: {0}</value>
+  </data>
+  <data name="SolutionsSetOffice365" xml:space="preserve">
+    <value>Office 365 SkyDrive Pro Integration Solutions</value>
+  </data>
+  <data name="SolutionsSetPivotViewer" xml:space="preserve">
+    <value>Pivot Viewer Module Solutions</value>
+  </data>
+  <data name="SolutionsSetsChecking" xml:space="preserve">
+    <value>Checking Solution Sets</value>
+  </data>
+  <data name="SolutionsSetsCheckingComplete" xml:space="preserve">
+    <value>Solution Sets Check Complete</value>
+  </data>
+  <data name="SolutionsSetScreenCast" xml:space="preserve">
+    <value>Video Stream ScreenCast Module Solutions</value>
+  </data>
+  <data name="SolutionsSetSearch" xml:space="preserve">
+    <value>Social Search BDC Connector Solutions</value>
+  </data>
+  <data name="SolutionsSetSpotlight" xml:space="preserve">
+    <value>Spotlight Module Solutions</value>
+  </data>
+  <data name="SolutionsSetVideo" xml:space="preserve">
+    <value>Video Stream Module Solutions</value>
+  </data>
+  <data name="SolutionsSetVideoLearning" xml:space="preserve">
+    <value>Enrich Video Scenarios Module Solutions</value>
+  </data>
+  <data name="StartingSearchServices" xml:space="preserve">
+    <value>Starting Search Services</value>
+  </data>
+  <data name="StartingServiceOnServer" xml:space="preserve">
+    <value>Starting '{0}' Service on '{1}'</value>
+  </data>
+  <data name="StepDatabasesDescription" xml:space="preserve">
+    <value>Specify the database servers and names to install Sitrion Social.</value>
+  </data>
+  <data name="StepDatabasesTitle" xml:space="preserve">
+    <value>Databases</value>
+  </data>
+  <data name="StepInstallComplete" xml:space="preserve">
+    <value>Installation Complete</value>
+  </data>
+  <data name="StepInstallCompleteDescription" xml:space="preserve">
+    <value>See log file or Windows Event Viewer for more details.</value>
+  </data>
+  <data name="StepInstallCompleteWithErrors" xml:space="preserve">
+    <value>Installation Complete with Errors</value>
+  </data>
+  <data name="StepInstallCompleteWithWarnings" xml:space="preserve">
+    <value>Installation Complete with Warnings</value>
+  </data>
+  <data name="StepInstallingDescription" xml:space="preserve">
+    <value>Sitrion Social is currently installing.  Installation details will appear in the area below.</value>
+  </data>
+  <data name="StepInstallingTitle" xml:space="preserve">
+    <value>Installing Sitrion Social</value>
+  </data>
+  <data name="StepModuleOptionsDescription" xml:space="preserve">
+    <value>Configure the Sitrion Social Module Service Application options.</value>
+  </data>
+  <data name="StepModuleOptionsTitle" xml:space="preserve">
+    <value>Social Sites Module Options</value>
+  </data>
+  <data name="StepModulesDescription" xml:space="preserve">
+    <value>Select which Sitrion Social Modules to install.</value>
+  </data>
+  <data name="StepModulesTitle" xml:space="preserve">
+    <value>Social Sites Modules</value>
+  </data>
+  <data name="StepOptionsDescription" xml:space="preserve">
+    <value>Configure the Sitrion Social Platform Service Application options.</value>
+  </data>
+  <data name="StepOptionsTitle" xml:space="preserve">
+    <value>Social Sites Options</value>
+  </data>
+  <data name="StepServiceAppsDescription" xml:space="preserve">
+    <value>Configure the SharePoint Service Applications for Sitrion Social.</value>
+  </data>
+  <data name="StepServiceAppsTitle" xml:space="preserve">
+    <value>Service Applications</value>
+  </data>
+  <data name="StepSummaryDescription" xml:space="preserve">
+    <value>Confirm the Sitrion Social configuration options and select Install to proceed with the installation.</value>
+  </data>
+  <data name="StepSummaryTitle" xml:space="preserve">
+    <value>Installation Summary</value>
+  </data>
+  <data name="StepUninstallComplete" xml:space="preserve">
+    <value>Uninstall Complete</value>
+  </data>
+  <data name="StepUninstallCompleteWithErrors" xml:space="preserve">
+    <value>Uninstall Complete with Errors</value>
+  </data>
+  <data name="StepUninstallCompleteWithWarnings" xml:space="preserve">
+    <value>Uninstall Complete with Warnings</value>
+  </data>
+  <data name="StepUninstallingDescription" xml:space="preserve">
+    <value>Sitrion Social is currently uninstalling, details will appear in the area below.</value>
+  </data>
+  <data name="StepUninstallingTitle" xml:space="preserve">
+    <value>Uninstalling Sitrion Social</value>
+  </data>
+  <data name="StepUninstallSummary" xml:space="preserve">
+    <value>Uninstalling Sitrion Social will disable Sitrion Social features, remove Sitrion Social service applications, and remove Sitrion Social solutions from the SharePoint farm. </value>
+  </data>
+  <data name="StepUninstallSummaryDescription" xml:space="preserve">
+    <value>Select Uninstall to proceed with Uninstalling Sitrion Social.</value>
+  </data>
+  <data name="StepUninstallSummaryTitle" xml:space="preserve">
+    <value>Uninstall Summary</value>
+  </data>
+  <data name="StepUpgradeComplete" xml:space="preserve">
+    <value>Upgrade Complete</value>
+  </data>
+  <data name="StepUpgradeCompleteWithErrors" xml:space="preserve">
+    <value>Upgrade Complete with Errors</value>
+  </data>
+  <data name="StepUpgradeCompleteWithWarnings" xml:space="preserve">
+    <value>Upgrade Complete with Warnings</value>
+  </data>
+  <data name="StepUpgradeSummaryDescription" xml:space="preserve">
+    <value>Confirm the Sitrion Social configuration options and select Upgrade to proceed with the upgrade.</value>
+  </data>
+  <data name="StepUpgradeSummaryTitle" xml:space="preserve">
+    <value>Upgrade Summary</value>
+  </data>
+  <data name="StepUpgradingDescription" xml:space="preserve">
+    <value>Sitrion Social is currently upgrading, details will appear in the area below.</value>
+  </data>
+  <data name="StepUpgradingTitle" xml:space="preserve">
+    <value>Upgrading Sitrion Social</value>
+  </data>
+  <data name="StepWebAppsDescription" xml:space="preserve">
+    <value>Sitrion Social will be installed to the SharePoint Web Applications selected below:</value>
+  </data>
+  <data name="StepWebAppsTitle" xml:space="preserve">
+    <value>Web Applications</value>
+  </data>
+  <data name="StopIis" xml:space="preserve">
+    <value>Stop Internet Information Services </value>
+  </data>
+  <data name="StopIisDescription" xml:space="preserve">
+    <value>Stopping IIS for the duration of this process will decrease the time this process takes to complete.  However, users attempting to access the sites on this SharePoint farm will see messages similar to "Page Cannot Be Displayed" instead of the friendly Social Sites is installing message.</value>
+  </data>
+  <data name="StoppingSearchServices" xml:space="preserve">
+    <value>Stopping Search Services</value>
+  </data>
+  <data name="StoppingServiceOnServer" xml:space="preserve">
+    <value>Stopping '{0}' Service on '{1}'</value>
+  </data>
+  <data name="SummaryDatabases" xml:space="preserve">
+    <value>Databases</value>
+  </data>
+  <data name="SummaryDetailFormat" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
+  <data name="SummaryEmailWebUrl" xml:space="preserve">
+    <value>Email Handler: {0}</value>
+  </data>
+  <data name="SummaryLicenseKey" xml:space="preserve">
+    <value>License Key: {0}</value>
+  </data>
+  <data name="SummaryLineFormat" xml:space="preserve">
+    <value>{0} \r\n</value>
+  </data>
+  <data name="SummaryModules" xml:space="preserve">
+    <value>Modules</value>
+  </data>
+  <data name="SummaryMySiteUrl" xml:space="preserve">
+    <value>My Site Host: {0}</value>
+  </data>
+  <data name="SummaryOptions" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="SummaryServiceApplications" xml:space="preserve">
+    <value>Service Application Pools</value>
+  </data>
+  <data name="SummaryTitle" xml:space="preserve">
+    <value>Installation Summary</value>
+  </data>
+  <data name="SummaryWebApps" xml:space="preserve">
+    <value>Web Applications</value>
+  </data>
+  <data name="TimerServiceStarted" xml:space="preserve">
+    <value>SharePoint Timer Service Started On {0}.</value>
+  </data>
+  <data name="TitleError" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="TitleInformation" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="TitleQuestion" xml:space="preserve">
+    <value>Question</value>
+  </data>
+  <data name="TitleWarning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="UIOutput" xml:space="preserve">
+    <value>Output Display:</value>
+  </data>
+  <data name="UIOutputErrors" xml:space="preserve">
+    <value>Errors ({0})</value>
+  </data>
+  <data name="UIOutputOff" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="UIOutputVerbose" xml:space="preserve">
+    <value>Verbose</value>
+  </data>
+  <data name="UIOutputWarnings" xml:space="preserve">
+    <value>Warnings ({0})</value>
+  </data>
+  <data name="UnblockingFile" xml:space="preserve">
+    <value>Unblocking File: {0}</value>
+  </data>
+  <data name="UnblockingFiles" xml:space="preserve">
+    <value>Unblocking Solution Files.</value>
+  </data>
+  <data name="UnblockingFilesComplete" xml:space="preserve">
+    <value>Solution Files Unblocked.</value>
+  </data>
+  <data name="UnknownSolutionFound" xml:space="preserve">
+    <value>Other Solution Found: '{0}'</value>
+  </data>
+  <data name="UnprovisioningEmailWeb" xml:space="preserve">
+    <value>Removing Email Web Handlers</value>
+  </data>
+  <data name="UnprovisioningUserProfileDigestEmailProperty" xml:space="preserve">
+    <value>Removing User Profile Email Digest Property</value>
+  </data>
+  <data name="UnprovisioningUserProfileEmailNotificationProperty" xml:space="preserve">
+    <value>Removing User Profile Email Notification Property</value>
+  </data>
+  <data name="UpdateFeatureOnSite" xml:space="preserve">
+    <value>Updating Sitrion Social Social Sites Features on '{0}'</value>
+  </data>
+  <data name="UpgradeEnrichApp" xml:space="preserve">
+    <value>Updating Enrich Service Application</value>
+  </data>
+  <data name="UpgradeEnrichProxy" xml:space="preserve">
+    <value>Updating Enrich Service Application Proxy</value>
+  </data>
+  <data name="UpgradeGettingServiceApplicationProxies" xml:space="preserve">
+    <value>Getting Service Application Proxies</value>
+  </data>
+  <data name="UpgradeGettingServiceApplications" xml:space="preserve">
+    <value>Getting Service Applications</value>
+  </data>
+  <data name="UpgradeGettingServiceApplicationTypes" xml:space="preserve">
+    <value>Getting Service Application Types</value>
+  </data>
+  <data name="UpgradeInnovationApp" xml:space="preserve">
+    <value>Updating Innovation Service Application</value>
+  </data>
+  <data name="UpgradeInnovationProxy" xml:space="preserve">
+    <value>Updating Innovation Service Application Proxy</value>
+  </data>
+  <data name="UpgradeInterCommApp" xml:space="preserve">
+    <value>Updating Internal Communications Service Application</value>
+  </data>
+  <data name="UpgradeInterCommProxy" xml:space="preserve">
+    <value>Updating Internal Communications Service Application Proxy</value>
+  </data>
+  <data name="UpgradeNewsApp" xml:space="preserve">
+    <value>Updating News Stream Service Application</value>
+  </data>
+  <data name="UpgradeNewsProxy" xml:space="preserve">
+    <value>Updating News Stream Service Application Proxy</value>
+  </data>
+  <data name="UpgradeSocialApp" xml:space="preserve">
+    <value>Updating Social Service Application</value>
+  </data>
+  <data name="UpgradeSocialDatabases" xml:space="preserve">
+    <value>Updating Social Databases</value>
+  </data>
+  <data name="UpgradeSocialJobs" xml:space="preserve">
+    <value>Updating Social Jobs</value>
+  </data>
+  <data name="UpgradeSocialNotifications" xml:space="preserve">
+    <value>Updating Social Notifications</value>
+  </data>
+  <data name="UpgradeSocialProxies" xml:space="preserve">
+    <value>Updating Social Proxies</value>
+  </data>
+  <data name="UpgradeSocialProxy" xml:space="preserve">
+    <value>Updating Social Service Application Proxy</value>
+  </data>
+  <data name="UpgradeSocialSolutions" xml:space="preserve">
+    <value>Updating Social Solutions</value>
+  </data>
+  <data name="UpgradeUserProfileProperties" xml:space="preserve">
+    <value>Updating User Profile Properties</value>
+  </data>
+  <data name="UpgradeVideoApp" xml:space="preserve">
+    <value>Updating Video Stream Service Application</value>
+  </data>
+  <data name="UpgradeVideoProxy" xml:space="preserve">
+    <value>Updating Video Stream Service Application Proxy</value>
+  </data>
+  <data name="UpgradingFeature" xml:space="preserve">
+    <value>Upgrading Feature: {0}</value>
+  </data>
+  <data name="UpgradingFeatures" xml:space="preserve">
+    <value>Upgrading Features</value>
+  </data>
+  <data name="UpgradingFeaturesComplete" xml:space="preserve">
+    <value>Upgrading Features Complete</value>
+  </data>
+  <data name="VersionInstalling" xml:space="preserve">
+    <value>Installing Version: {0}</value>
+  </data>
+  <data name="VersionPrevious" xml:space="preserve">
+    <value>Previous Version: {0}</value>
+  </data>
+  <data name="VersionUpgrade" xml:space="preserve">
+    <value>Updating to Version: {0}</value>
+  </data>
+  <data name="WarningCount" xml:space="preserve">
+    <value>Warnings: {0}</value>
+  </data>
+  <data name="ScriptOutput" xml:space="preserve">
+    <value>To complete this operation using PowerShell, the following commands may be used: \r\n\r\n{0}\r\n\r\n</value>
+  </data>
+  <data name="ScriptOutputMessage" xml:space="preserve">
+    <value>The PowerShell script to complete this operation has been written to the log file generating by this operation.  See the log file for the details.</value>
+  </data>
+  <data name="ScriptOnlyCopyright" xml:space="preserve">
+    <value># (c) Sitrion, Inc \r\n</value>
+  </data>
+  <data name="ScriptOutputFile" xml:space="preserve">
+    <value>The PowerShell script has also been saved to the following file: {0}</value>
+  </data>
+  <data name="ButtonInstallOrUpgrade" xml:space="preserve">
+    <value>INSTALL OR UPGRADE</value>
+  </data>
+  <data name="LauncherActionAdvanced" xml:space="preserve">
+    <value>Advanced Options</value>
+  </data>
+  <data name="LauncherActionAdvancedDesc" xml:space="preserve">
+    <value>Display advanced options and tools for installing, upgrading, configuring, or uninstalling Sitrion Social.</value>
+  </data>
+  <data name="LauncherActionAdvancedDetailsDesc" xml:space="preserve">
+    <value>Advanced options and tools for installing, upgrading, configuring, or uninstalling Sitrion Social.  For normal installations or upgrades it is recommended to use the standard installation or upgrade process.</value>
+  </data>
+  <data name="LauncherActionConfigurationExplorerDesc" xml:space="preserve">
+    <value>Launch the Sitrion Social Configuration Explorer to collect, view, and export detailed information about the local SharePoint farm and Sitrion Social installation.</value>
+  </data>
+  <data name="LauncherActionInstallAdvanced" xml:space="preserve">
+    <value>Install or Upgrade Sitrion Social with Advanced Options</value>
+  </data>
+  <data name="LauncherActionInstallAdvancedDesc" xml:space="preserve">
+    <value>Install or upgrade Sitrion Social using the graphical user interface install utility with advanced configuration options, including logging, consumer farms, and installation checks.</value>
+  </data>
+  <data name="LauncherActionInstallOrUpdateDesc" xml:space="preserve">
+    <value>Perform a standard installation or upgrade of Sitrion Social on the local SharePoint farm using the graphical user interface install utility.</value>
+  </data>
+  <data name="LauncherActionManagementShell" xml:space="preserve">
+    <value>Launch Sitrion Social Management Shell</value>
+  </data>
+  <data name="LauncherActionManagementShellDesc" xml:space="preserve">
+    <value>Open a Windows PowerShell command prompt with Sitrion Social Cmdlets available to perform advanced installation and configuration operations.</value>
+  </data>
+  <data name="LauncherActionUninstallDesc" xml:space="preserve">
+    <value>Uninstall Sitrion Social from the local SharePoint farm.  Do not uninstall Sitrion Social unless permanently doing so.</value>
+  </data>
+  <data name="LauncherOptionConsumerFarm" xml:space="preserve">
+    <value>Install or Upgrade on a Consumer Farm</value>
+  </data>
+  <data name="LauncherOptionConsumerFarmDesc" xml:space="preserve">
+    <value>For multi-farm environments, use this option to install or upgrade Sitrion Social on the local SharePoint farm without provisioning or updating service applications.</value>
+  </data>
+  <data name="LauncherOptionIgnoreMissingModules" xml:space="preserve">
+    <value>Ignore Missing Module Solutions for Upgrades</value>
+  </data>
+  <data name="LauncherOptionIgnoreMissingModulesDesc" xml:space="preserve">
+    <value>Standard upgrades of Sitrion Social require all installed solutions to be available.  Ignoring missing module solutions skips this check during the upgrade process.</value>
+  </data>
+  <data name="LauncherOptionLog" xml:space="preserve">
+    <value>Log Location</value>
+  </data>
+  <data name="LauncherOptionLogDesc" xml:space="preserve">
+    <value>Operations performed by the graphical user interface utility generate text-based log files with verbose details of the operation.  By default this log is generated in the same folder as the install utility.</value>
+  </data>
+  <data name="LauncherOptionScriptOnly" xml:space="preserve">
+    <value>Script Only</value>
+  </data>
+  <data name="LauncherOptionScriptOnlyDesc" xml:space="preserve">
+    <value>Each of the operations performed by the graphical user interface install utility may also be performed in the Sitrion Social Management Shell (PowerShell). Use this option to generate a PowerShell script of operations to perform rather then performing them in interface.</value>
+  </data>
+  <data name="LauncherOptionSkipPreReq" xml:space="preserve">
+    <value>Skip Prerequisite Check</value>
+  </data>
+  <data name="LauncherOptionSkipPreReqDesc" xml:space="preserve">
+    <value>Standard installations or upgrades of Sitrion Social check to ensure each of the prerequisites are met. This check can be skipped for expediency, however not meeting the prerequisites will likely results in a failed installation or upgrade. </value>
+  </data>
+  <data name="PSOutput" xml:space="preserve">
+    <value>Output from PowerShell command: \r\n{0}\r\n\r\n{1}</value>
+  </data>
+  <data name="UIOutputTasks" xml:space="preserve">
+    <value>Tasks</value>
+  </data>
+  <data name="PrerequisiteShellAdmin" xml:space="preserve">
+    <value>Current user is a SharePoint shell administrator</value>
+  </data>
+  <data name="ButtonGenerateScript" xml:space="preserve">
+    <value>GENERATE SCRIPT</value>
+  </data>
+  <data name="DisasterRecoverWarning" xml:space="preserve">
+    <value>It is strongly recommended that you have a backup or other recovery mechanism in place prior to making any major changes to your SharePoint farm, including installing or upgrading Sitrion Social.  Consult the Sitrion Social Installation Guide for more details.</value>
+  </data>
+  <data name="UninstallModuleWarning" xml:space="preserve">
+    <value>Uninstalling the Sitrion Social module will affect the web parts and site templates for at least {0} sites on the local SharePoint farm (the list of sites has been added to the installer log file).  Sites using the Sitrion Social module web parts and site templates may no longer function after the uninstall process completes.  Do not complete this process unless you are intending to permanently uninstall the Sitrion Social module.  Are you sure you want to continue?</value>
+  </data>
+  <data name="UninstallSitesLog" xml:space="preserve">
+    <value>Uninstalling Sitrion Social or the Sitrion Social Module would affect the following sites: </value>
+  </data>
+  <data name="UninstallWarning" xml:space="preserve">
+    <value>Uninstalling Sitrion Social will affect the web parts and site templates for at least {0} sites on the local SharePoint farm (the list of sites has been added to the installer log file).  Sites using Sitrion Social web parts and site templates may no longer function after the uninstall process completes.  Do not complete this process unless you are intending to permanently uninstall Sitrion Social.  Are you sure you want to continue?</value>
+  </data>
+  <data name="RunningCommandOn" xml:space="preserve">
+    <value>Starting '{0}' on '{1}'.</value>
+  </data>
+  <data name="LauncherOptionUseTimerJobs" xml:space="preserve">
+    <value>Use Installer Timer Jobs for Server Tasks</value>
+  </data>
+  <data name="LauncherOptionUseTimerJobsDesc" xml:space="preserve">
+    <value>During install and upgrade operations server-specific tasks, such as restarting SharePoint services, are executed remotely on each server from the server running the install utility.  If a firewall, server configuration, or network configuration is preventing direct communication between servers, use this option to execute these tasks in SharePoint timer jobs.</value>
+  </data>
+  <data name="InitializingSearchFeatures" xml:space="preserve">
+    <value>Initializing features.</value>
+  </data>
+  <data name="ModuleScorecard" xml:space="preserve">
+    <value>Engagement Scorecard</value>
+  </data>
+  <data name="SolutionsSetScorecard" xml:space="preserve">
+    <value>Engagement Scorecard Module Solutions</value>
+  </data>
+  <data name="PrerequisiteModuleVersions" xml:space="preserve">
+    <value>Modules solutions that share code are the same version</value>
+  </data>
+  <data name="PrerequisiteWMIAvailable" xml:space="preserve">
+    <value>Windows Management Instrumentation (WMI) is accessible on all SharePoint servers</value>
+  </data>
+  <data name="MicrosoftSharePointServer2016" xml:space="preserve">
+    <value>{0} 2016</value>
+    <comment>{MicrosoftSharePointServer} 2016</comment>
+  </data>
+  <data name="PrerequisiteServerRoleSupported" xml:space="preserve">
+    <value>The SharePoint Server Role of this server is Application (2010, 2013, or 2016) or SingleServerFarm (2016 only).</value>
+  </data>
+  <data name="ServerRoleOutput" xml:space="preserve">
+    <value>Server Role: {0}</value>
+  </data>
+</root>

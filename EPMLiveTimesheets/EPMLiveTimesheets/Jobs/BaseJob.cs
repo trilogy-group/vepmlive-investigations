@@ -17,6 +17,11 @@ namespace TimeSheets
         public string sErrors = "";
         public bool bErrors = false;
 
+        private const int MAXFAILEDCOUNT = 2;
+        private const int FINISHJOBSTATUS = 3;
+        private const int RESTARTJOBSTATUS = 0;
+        private static Dictionary<Guid, int> failedjobs = new Dictionary<Guid, int>();
+
         public int userid;
         public Guid WebAppId = Guid.Empty;
         protected SqlConnection CreateConnection()
@@ -24,7 +29,7 @@ namespace TimeSheets
             string strConn = string.Empty;
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
-               strConn = EPMLiveCore.CoreFunctions.getConnectionString(WebAppId);
+                strConn = EPMLiveCore.CoreFunctions.getConnectionString(WebAppId);
             });
             return new SqlConnection(strConn);
         }
@@ -88,13 +93,16 @@ namespace TimeSheets
 
                     //if (!tempJob)
                     {
-                        using (SqlCommand cmd = new SqlCommand("update TSQUEUE set status =  3, PERCENTCOMPLETE = 100, dtfinished=GETDATE(),result=@result,resulttext=@resulttext where TSQUEUE_ID=@queueuid", cn))
+                        using (SqlCommand cmd = new SqlCommand("update TSQUEUE set status =  @status, PERCENTCOMPLETE = 100, dtfinished=GETDATE(),result=@result,resulttext=@resulttext where TSQUEUE_ID=@queueuid", cn))
                         {
+                            var param = getStatusParam();
                             cmd.Parameters.AddWithValue("@queueuid", QueueUid);
                             if (bErrors)
                                 cmd.Parameters.AddWithValue("@result", "Errors");
                             else
                                 cmd.Parameters.AddWithValue("@result", "No Errors");
+
+                            cmd.Parameters.AddWithValue("@status", param);
                             cmd.Parameters.AddWithValue("@resulttext", sErrors);
                             cmd.ExecuteNonQuery();
                         }
@@ -115,6 +123,40 @@ namespace TimeSheets
 
             }
 
+        }
+
+        private Object LockFailedIds = new Object();
+        private int getStatusParam()
+        {
+            lock (LockFailedIds)
+            {
+                if (bErrors)
+                {
+                    if (failedjobs.ContainsKey(QueueUid))
+                    {
+                        if (failedjobs[QueueUid] <= MAXFAILEDCOUNT)
+                        {
+                            failedjobs.Remove(QueueUid);
+                            return FINISHJOBSTATUS;
+                        }
+                        failedjobs[QueueUid] += 1;
+                        return RESTARTJOBSTATUS;
+                    }
+                    else
+                    {
+                        failedjobs.Add(QueueUid, 1);
+                        return RESTARTJOBSTATUS;
+                    }
+                }
+                else
+                {
+                    if (failedjobs.ContainsKey(QueueUid))
+                    {
+                        failedjobs.Remove(QueueUid);
+                    }
+                    return FINISHJOBSTATUS;
+                }
+            }
         }
     }
 }

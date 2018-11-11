@@ -5,6 +5,7 @@ using System.Security.Principal;
 using PortfolioEngineCore;
 using System.Reflection;
 using System.Diagnostics;
+using PortfolioEngineCore.Services;
 
 namespace WorkEnginePPM
 {
@@ -86,99 +87,92 @@ namespace WorkEnginePPM
                         //    rk.Close();
 
                         //    if (sWResID != "")
+                        {
+                            IntPtr token = ((WindowsIdentity)Context.User.Identity).Token;
+                            //if (token != IntPtr.Zero)
+                            //    xEPKServer.CreateString("IdentityToken", token.ToString());
+
+                            switch (sContext)
                             {
-                                IntPtr token = ((WindowsIdentity) Context.User.Identity).Token;
-                                //if (token != IntPtr.Zero)
-                                //    xEPKServer.CreateString("IdentityToken", token.ToString());
-
-                                switch (sContext)
-                                {
-                                    case "EPKRequest":
-                                    case "EPKCSRequest":
-                                    case "DBARequest":
+                                case "EPKRequest":
+                                case "EPKCSRequest":
+                                case "DBARequest":
+                                    {
+                                        string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                                        PortfolioEngineCore.PfEInterface pfeif = new PortfolioEngineCore.PfEInterface(sBaseInfo);
+                                        try
                                         {
-                                            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-                                            PortfolioEngineCore.PfEInterface pfeif = new PortfolioEngineCore.PfEInterface(sBaseInfo);
-                                            try
-                                            {
-                                                pfeif.HandleRequest(sContext, sRequest, out s);
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                s = HandleException(ex, sContext);
-                                            }
-                                            break;
+                                            pfeif.HandleRequest(sContext, sRequest, out s);
                                         }
-
-                                    case "ManageQueue":
+                                        catch (Exception ex)
                                         {
-                                            try
-                                            {
-                                                // check the queue for .net items before using RSVP
-                                                string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-                                                PortfolioEngineCore.QueueManager qm = new QueueManager(sBaseInfo);
-                                                if (qm.ReadNextQueuedItem() == true)
-                                                {
-                                                    // we have a queued item - try to handle it in portfolioenginecore first
-                                                    if (qm.ManageQueue() == false) // false means not handled
-                                                    {
-                                                        switch (qm.Context)
-                                                        {
-                                                            case 200:
-                                                                PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
-                                                                pFeAPI.Execute("RefreshRoles", "");
-                                                                pFeAPI.Dispose();
-                                                                qm.SetJobCompleted();
-                                                                break;
-                                                            default:
-                                                                qm.HandleRequest("ManageQueue", sRequest, out s);
-                                                                break;
-                                                        }
-                                                    }
-                                                    qm = null;
-                                                }
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                s = HandleException(ex, sContext);
-                                            }
-                                            break;
+                                            s = HandleException(ex, sContext);
                                         }
-
-                                    case "ManageTimerJobs":
-                                        {
-                                            try
-                                            {
-                                                string basePath, username, pid, company, dbcnstring;
-                                                PortfolioEngineCore.SecurityLevels secLevel;
-                                                WebAdmin.CapturePFEBaseInfo(out basePath, out username, out pid, out company, out dbcnstring, out secLevel);
-                                                Type comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
-                                                object comObject = Activator.CreateInstance(comObjectType);
-                                                object[] myparams = new object[] {"ManageTimerJobs", basePath};
-                                                s = (string) comObjectType.InvokeMember("RSVPRequest",
-                                                                                        BindingFlags.InvokeMethod,
-                                                                                        null,
-                                                                                        comObject,
-                                                                                        myparams);
-
-                                                comObject = null;
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                s = HandleException(ex, sContext);
-                                            }
-                                            break;
-                                        }
-
-                                    case "Ping":
-                                        {
-                                            s = HandlePing(Context);
-                                            break;
-                                        }
-                                    default:
                                         break;
-                                }
+                                    }
+
+                                case "ManageQueue":
+                                    {
+                                        try
+                                        {
+                                            // check the queue for .net items before using RSVP
+                                            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                                            PortfolioEngineCore.QueueManager qm = new QueueManager(sBaseInfo);
+                                            if (qm.ReadNextQueuedItem() == true)
+                                            {
+                                                // we have a queued item - try to handle it in portfolioenginecore first
+                                                if (qm.ManageQueue() == false) // false means not handled
+                                                {
+                                                    switch (qm.Context)
+                                                    {
+                                                        case 200:
+                                                            PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
+                                                            pFeAPI.Execute("RefreshRoles", "");
+                                                            pFeAPI.Dispose();
+                                                            qm.SetJobCompleted();
+                                                            break;
+                                                        default:
+                                                            qm.HandleRequest("ManageQueue", sRequest, out s);
+                                                            break;
+                                                    }
+                                                }
+                                                qm = null;
+                                            }
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            s = HandleException(ex, sContext);
+                                        }
+                                        break;
+                                    }
+
+                                case "ManageTimerJobs":
+                                    {
+                                        try
+                                        {
+                                            string basePath, username, pid, company, dbcnstring;
+                                            PortfolioEngineCore.SecurityLevels secLevel;
+                                            WebAdmin.CapturePFEBaseInfo(out basePath, out username, out pid, out company, out dbcnstring, out secLevel);
+
+                                            WSSAdmin wssadmin = new WSSAdmin();
+                                            s = wssadmin.RSVPRequest("ManageTimerJobs", basePath);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            s = HandleException(ex, sContext);
+                                        }
+                                        break;
+                                    }
+
+                                case "Ping":
+                                    {
+                                        s = HandlePing(Context);
+                                        break;
+                                    }
+                                default:
+                                    break;
                             }
+                        }
                         //}
                         //WebAdmin.DBTrace((StatusEnum) 0, TraceChannelEnum.WebServices, "WebService.XMLRequest", "Reply",
                         //                 sContext, s);
@@ -209,7 +203,7 @@ namespace WorkEnginePPM
                 //    s += WebAdmin.GetSPSessionString(Context,"userName");
                 //    break;
                 case "SessionInfo":
-                    s += WebAdmin.GetSPSessionString(Context,"SessionInfo");
+                    s += WebAdmin.GetSPSessionString(Context, "SessionInfo");
                     break;
                 //case "IsAuthenticated":
                 //    if (IsAuthenticated) s += "true"; else s += "false";
@@ -255,7 +249,7 @@ namespace WorkEnginePPM
 
             string s = xReply.XML();
             //WebAdmin.DBTrace((StatusEnum)91111, TraceChannelEnum.WebServices, "WebService.HandleError", "Reply", sContext, s);
-            Microsoft.SharePoint.SPSecurity.RunWithElevatedPrivileges(delegate()
+            Microsoft.SharePoint.SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 try
                 {
@@ -276,7 +270,7 @@ namespace WorkEnginePPM
 
             string s = xReply.XML();
             //WebAdmin.DBTrace((StatusEnum)99812, TraceChannelEnum.WebServices, "WebService.HandleException", "Reply", sContext, s);
-            Microsoft.SharePoint.SPSecurity.RunWithElevatedPrivileges(delegate()
+            Microsoft.SharePoint.SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 try
                 {

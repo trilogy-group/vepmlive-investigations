@@ -76,6 +76,15 @@ namespace WorkEnginePPM.Layouts.ppm {
         protected global::System.Web.UI.WebControls.TextBox txtCompany;
         
         /// <summary>
+        /// txtAdminAccount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtAdminAccount;
+        
+        /// <summary>
         /// txtDBServer control.
         /// </summary>
         /// <remarks>

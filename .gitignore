@@ -285,3 +285,4 @@ paket-files/
 /output/binaries
 /Saas/BillingSite/_vti_pvt
 /BuildTeamCity/SilentInstaller/*.zip
+/EPMLive.TestFakes/FakesAssemblies/EPM Live Core.Fakes.dll

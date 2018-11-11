@@ -138,6 +138,10 @@ namespace EPMLiveReportsAdmin.Jobs
 
                 foreach (SPWeb w in site.AllWebs)
                 {
+                    // indicates whether the site is the top-level Web site of the site collection and skip the workspace sites.
+                    if (!w.IsRootWeb)
+                        continue;
+                
                     // IGNORE spdispose 130, w is being disposed 
                     var dt = new DataTable();
                     try
@@ -196,7 +200,8 @@ namespace EPMLiveReportsAdmin.Jobs
                 sbErrors = null;
                 var refreshLists = new RefreshLists(web, "");
                 refreshLists.SaveResults(dtListResults, base.JobUid);
-                finishJob();
+                //Already Called in TimerClass.cs
+                //finishJob();
 
                 hshMessages = null;
                 if (dtListResults != null)

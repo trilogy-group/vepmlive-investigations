@@ -202,6 +202,78 @@ namespace AdminSite {
         protected global::System.Web.UI.WebControls.Label txtEditPhone;
         
         /// <summary>
+        /// secondaryOwnerUserNameField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label secondaryOwnerUserNameField;
+        
+        /// <summary>
+        /// secondaryOwnerFirstNameField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label secondaryOwnerFirstNameField;
+        
+        /// <summary>
+        /// secondaryOwnerLastNameField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label secondaryOwnerLastNameField;
+        
+        /// <summary>
+        /// secondaryOwnerEmailField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label secondaryOwnerEmailField;
+        
+        /// <summary>
+        /// secondaryOwnerCompanyField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label secondaryOwnerCompanyField;
+        
+        /// <summary>
+        /// secondaryOwnerTitleField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label secondaryOwnerTitleField;
+        
+        /// <summary>
+        /// secondaryOwnerDepartmentField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label secondaryOwnerDepartmentField;
+        
+        /// <summary>
+        /// secondaryOwnerPhoneField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label secondaryOwnerPhoneField;
+        
+        /// <summary>
         /// btnSave control.
         /// </summary>
         /// <remarks>

@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Web.UI;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using System.Web.UI;
 
 namespace EPMLiveCore
 {
@@ -49,6 +49,21 @@ namespace EPMLiveCore
             mainPanel.Controls.Add(new LiteralControl("document.getElementById('loadinggrid" + this.UniqueID + "').style.display = " + "'none'" + ";"));
             mainPanel.Controls.Add(new LiteralControl("}"));
             mainPanel.Controls.Add(new LiteralControl("</script>"));
+        }
+
+        public override void Dispose()
+        {
+            if (mainPanel != null)
+            {
+                for (var i = mainPanel.Controls.Count - 1; i >= 0; i--)
+                {
+                    mainPanel.Controls[i]?.Dispose();
+                }
+
+                mainPanel.Dispose();
+            }
+
+            base.Dispose();
         }
     }
 }

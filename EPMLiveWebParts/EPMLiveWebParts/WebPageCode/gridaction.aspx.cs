@@ -1,28 +1,27 @@
 using System;
-using System.Data;
-using System.Configuration;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Reflection;
+using System.Text;
 using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
+using System.Xml;
 using EPMLiveCore;
+using EPMLiveCore.API;
+using EPMLiveCore.API.ProjectArchiver;
 using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
-using System.Text.RegularExpressions;
-using System.Xml;
-using System.Text;
-using System.Data.SqlClient;
-using EPMLiveCore.API;
-using System.Reflection;
 
 namespace EPMLiveWebParts
 {
     public partial class gridaction : System.Web.UI.Page
     {
+        private const string SuccessMessage = "Success";
+        private const string ArhiveRestoreListIdRequestParameter = "listid";
+        private const string ArchiveRestoreItemIdRequestParameter = "id";
+        private const string ArchiveProjectAction = "archiveproject";
+        private const string RestoreProjectAction = "restoreproject";
+
         protected string data;
         
 
@@ -812,6 +811,15 @@ namespace EPMLiveWebParts
                             }
                             catch { }
                             break;
+                        case ArchiveProjectAction:
+                            data = ArchiveRestoreProject(site, true);
+                            break;
+                        case RestoreProjectAction:
+                            data = ArchiveRestoreProject(site, false);
+                            break;
+                        case "errormessage":
+                            data = Request["message"];
+                            break;
                         default:
                             data = "Unknown Action";
                             break;
@@ -849,9 +857,16 @@ namespace EPMLiveWebParts
                 }
                 try
                 {
-                    //EPML-5263, EPML-5224 - Code Change: Rather then using Equals, at some of the places, it returns value for isDlg as isDlg=1,1. Hence, used Contains which worked in all the cases.
-                    if (Request["action"].ToLower() != "workspace" && (Request["isDlg"] != null && Convert.ToString(Request["isDlg"]).Contains("1") || HttpContext.Current.Request.UrlReferrer.OriginalString.ToLower().Contains("&isdlg=1")))
-                        url += "&IsDlg=1";
+                    // EPML-5263, EPML-5224 - Code Change: Rather then using Equals, at some of the places, it returns value for isDlg as isDlg=1,1. Hence, used first value which worked in all the cases.
+                    var isDialog = Request["isDlg"];
+                    if (!string.IsNullOrWhiteSpace(isDialog) && isDialog.Contains(",")) isDialog = isDialog.Split(',')[0];
+                    if (Request["action"].ToLower() != "workspace" && isDialog != null)
+                    {
+                        if (isDialog == "1" || isDialog == "0")
+                        {
+                            url += "&IsDlg=" + isDialog;
+                        }
+                    }
                 }
                 catch { }
                 Response.Redirect(url);
@@ -859,6 +874,36 @@ namespace EPMLiveWebParts
             if (script != "")
             {
 
+            }
+        }
+
+        private string ArchiveRestoreProject(SPSite site, bool archive)
+        {
+            if (site == null)
+            {
+                throw new ArgumentNullException(nameof(site));
+            }
+
+            using (var web = GetWeb(site))
+            {
+                SPGroup group = web.Groups.GetByName("Administrators");
+
+                if (!web.IsCurrentUserMemberOfGroup(group.ID) && !web.CurrentUser.IsSiteAdmin)
+                    throw new UnauthorizedAccessException();
+
+                var list = web.Lists[new Guid(Request[ArhiveRestoreListIdRequestParameter])];
+                var listItem = list.GetItemById(int.Parse(Request[ArchiveRestoreItemIdRequestParameter]));
+                var service = new ProjectArchiverService();
+
+                if (archive)
+                {
+                    service.ArchiveProject(listItem);
+                }
+                else
+                {
+                    service.RestoreProject(listItem);
+                }
+                return SuccessMessage;
             }
         }
     }
