@@ -67,7 +67,6 @@ describe(SuiteNames.endToEndSuite, () => {
             CommonPageConstants.pageHeaders.projects.changes,
             changesTitle,
             ChangeItemPageConstants.columnNames.linkTitleNoMenu);
-        await MyWorkPageHelper.verifyCreateItem(changesTitle);
 
         StepLogger.verification('Newly created Change displayed in "Changes" page');
         await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(changesTitle), changesTitle);
