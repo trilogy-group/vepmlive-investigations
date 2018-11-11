@@ -10,7 +10,7 @@ pipeline {
         timestamps()
     }
     parameters {
-        string(name: 'Version', defaultValue: '7.0.0.x', description: 'Version to set (x is replaced with current build number)')
+        string(name: 'Version', defaultValue: '7.0.1.x', description: 'Version to set (x is replaced with current build number)')
     }
     stages {
         stage('Prepare for build') {
@@ -26,6 +26,9 @@ pipeline {
                 }
                 powershell "Write-Host 'Disk space usage:'(Get-PSDrive C | Select-Object Used,Free)"
                 
+				echo "Writing '${env.BUILD_VERSION}' to build_version.txt"
+                bat "echo ${env.BUILD_VERSION}>> build_version.txt"
+					
                 echo 'Checkout SCM..'
                 checkout scm
             }
@@ -33,13 +36,14 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Executing build...'
-                powershell "${env.WORKSPACE}/BuildJenkins/RC/build.ps1 ${env.BUILD_VERSION} \"${env.WORKSPACE}\" \"${env.WORKSPACE}/finalBuild\""
+                powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/RC/build.ps1 ${env.BUILD_VERSION} \"${env.WORKSPACE}\" \"${env.WORKSPACE}/finalBuild\""
             }
         }
     }
     post {
         success {
             echo 'Publishing artifacts...'
+			archiveArtifacts "build_version.txt"
             zip(zipFile: "EPMLive_${env.BUILD_VERSION}.zip", dir: "${env.WORKSPACE}/finalBuild", archive: true)
         }
         cleanup {
