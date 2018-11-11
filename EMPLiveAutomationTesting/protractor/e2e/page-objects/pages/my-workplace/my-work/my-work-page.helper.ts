@@ -1031,6 +1031,7 @@ export class MyWorkPageHelper {
             selectColumnsPopupItems.showAll,
             CommonPageConstants.selectColumnsPopup.showAll,
         );
+        await WaitHelper.waitForElementToBeHidden(selectColumnsPopupItems.eachSelectedColumn);
         await ExpectationHelper.verifyNotDisplayedStatus(
             selectColumnsPopupItems.eachSelectedColumn,
             MyWorkPageConstants.selectedCheckboxLabel,
@@ -1043,6 +1044,7 @@ export class MyWorkPageHelper {
     }
 
     static async verifyShowAllFunctionality() {
+        await WaitHelper.waitForElementToBeHidden(MyWorkPage.selectColumnsPopup.columnUnchecked);
         await ExpectationHelper.verifyNotDisplayedStatus(
             MyWorkPage.selectColumnsPopup.columnUnchecked,
             MyWorkPageConstants.unSelectedCheckboxLabel,
@@ -1053,13 +1055,13 @@ export class MyWorkPageHelper {
         const selectColumnPopupItems = MyWorkPage.selectColumnsPopup;
         // unselecting the columns which has images
         let i, j: number;
-        for (i = 0; i < 2; i++) {
+        for (i = 0; i < (await selectColumnPopupItems.columnNameWithImages.count()); i++) {
             await PageHelper.click(selectColumnPopupItems.columnNameWithImages.get(i));
         }
         await PageHelper.click(MyWorkPage.getColumnByNameOnSelectColumnsPopup('CommentCount'));
         // Getting the selected columns dynamically
         const allSelectedColumns: string[] = [];
-        const count = await selectColumnPopupItems.allSelectedColumn.count();
+        const count = await selectColumnPopupItems.allSelectedColumn.count() - 1;
         for (j = 0; j < count; j++) {
             const eachColumnName = await PageHelper.getText(selectColumnPopupItems.allSelectedColumn.get(j));
             allSelectedColumns.push(eachColumnName);
