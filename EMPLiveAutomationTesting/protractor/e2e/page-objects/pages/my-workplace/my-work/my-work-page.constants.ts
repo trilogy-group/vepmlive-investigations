@@ -44,6 +44,7 @@ export class MyWorkPageConstants {
     static readonly selectColumnsPopupLabel = 'Select Columns Popup';
     static readonly selectedCheckboxLabel = 'Selected Checkbox';
     static readonly unSelectedCheckboxLabel = 'Unselected Checkbox';
+    static readonly editPage = 'Edit Page';
 
     static get pageName() {
         return {

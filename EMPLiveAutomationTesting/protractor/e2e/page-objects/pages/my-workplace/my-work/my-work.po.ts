@@ -303,4 +303,8 @@ export class MyWorkPage {
     static get topBar() {
         return element(By.css('div.ms-cui-topBar2'));
     }
+
+    static get editPageOptionInsideDropDown() {
+        return element(By.cssContainingText('span.ms-cui-ctl-mediumlabel.ms-cui-btn-title', MyWorkPageConstants.editPage));
+    }
 }

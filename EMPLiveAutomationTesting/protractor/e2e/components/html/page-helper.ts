@@ -371,8 +371,11 @@ export class PageHelper {
     }
 
     static async dismissAlert() {
-        await PageHelper.waitForAlertToBePresent();
-        return await browser.switchTo().alert().dismiss();
+        const isPresent = await PageHelper.waitForAlertToBePresent(PageHelper.timeout.xxxxl);
+        if (!isPresent) {
+            await WaitHelper.staticWait(PageHelper.timeout.m);
+        }
+        await browser.switchTo().alert().dismiss();
     }
 
     static async closeAlertIfPresent() {

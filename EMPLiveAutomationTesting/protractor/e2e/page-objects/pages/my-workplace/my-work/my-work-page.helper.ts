@@ -113,6 +113,7 @@ export class MyWorkPageHelper {
         StepLogger.step(`click on "Edit Page" dropdown`);
         await PageHelper.click(MyWorkPage.editPageDropdown);
     }
+
     static  async verifyStopEditingOptionDisabled() {
         StepLogger.verification(`verify "Stop Editing" option is shown as disabled`);
         const stopEditingDisplayed = await PageHelper.isElementDisplayed(

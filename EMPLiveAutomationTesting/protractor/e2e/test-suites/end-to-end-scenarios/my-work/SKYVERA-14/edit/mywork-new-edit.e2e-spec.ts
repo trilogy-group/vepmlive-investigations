@@ -11,6 +11,8 @@ import {CommonPageConstants} from '../../../../../page-objects/pages/common/comm
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {IssueItemPageConstants} from '../../../../../page-objects/pages/items-page/issue-item/issue-item-page.constants';
 import {ChangeItemPageConstants} from '../../../../../page-objects/pages/items-page/change-item/change-item-page.constants';
+import {MyWorkPage} from '../../../../../page-objects/pages/my-workplace/my-work/my-work.po';
+import {ElementHelper} from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.endToEndSuite, () => {
 
@@ -205,6 +207,7 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.stepId(4);
         StepLogger.step(`Click on "Edit page" option`);
+        await ElementHelper.clickUsingJs(MyWorkPage.editPageOptionInsideDropDown);
         await MyWorkPageHelper.clickOnEditItem();
 
         StepLogger.verification(`The page should be editable mode. `);
