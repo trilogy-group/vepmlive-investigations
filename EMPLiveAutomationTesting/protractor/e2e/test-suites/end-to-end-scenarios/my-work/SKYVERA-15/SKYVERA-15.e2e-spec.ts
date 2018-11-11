@@ -42,7 +42,7 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.stepId(5);
         await MyWorkPageHelper.clickCancelButton();
-        await MyWorkPageHelper.verifyChangesNotReflected(editedItemTitleForCancel);
+        await MyWorkPageHelper.verifyChangesNotReflected(editedItemTitleForCancel[1]);
     });
 
     it('"Close the Edit item pop-up via Close button/icon. - [745095]', async () => {
@@ -59,7 +59,7 @@ describe(SuiteNames.endToEndSuite, () => {
         StepLogger.stepId(3);
         const editedItemTitleForCancel = await MyWorkPageHelper.editTitle();
         await MyWorkPageHelper.clickCancelIcon();
-        await MyWorkPageHelper.verifyChangesNotReflected(editedItemTitleForCancel);
+        await MyWorkPageHelper.verifyChangesNotReflected(editedItemTitleForCancel[1]);
     });
 
     it('Edit the comments. - [745098]', async () => {

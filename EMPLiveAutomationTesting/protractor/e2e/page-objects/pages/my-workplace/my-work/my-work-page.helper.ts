@@ -278,11 +278,11 @@ export class MyWorkPageHelper {
         await PageHelper.clickAndWaitForElementToHide(MyWorkPage.buttonsOnPopup.save);
     }
 
-    static async verifyCreateItem(itemTitle: string) {
-        await TextboxHelper.sendKeys(MyWorkPage.searchItem, itemTitle, true);
+    static async verifyCreateItem(itemTitle: Array<string>) {
+        await TextboxHelper.sendKeys(MyWorkPage.searchItem, itemTitle[0], true);
         await ExpectationHelper.verifyDisplayedStatus(
-            MyWorkPage.getItemByName(itemTitle),
-            itemTitle,
+            MyWorkPage.getItemByName(itemTitle[1]),
+            itemTitle[1],
         );
     }
 
@@ -426,7 +426,7 @@ export class MyWorkPageHelper {
         const itemEditedTitle = `${MyWorkPageConstants.editItemLabel} ${uniqueId}`;
         await CommonPageHelper.switchToFirstContentFrame();
         await TextboxHelper.sendKeys(MyWorkPage.inputs.title, itemEditedTitle);
-        return itemEditedTitle;
+        return [uniqueId, itemEditedTitle];
     }
 
     static async verifyChangesNotReflected(editedItemTitleForCancel: string) {
