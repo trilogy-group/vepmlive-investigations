@@ -1,0 +1,103 @@
+pipeline {
+    agent {
+        node {
+            label 'skyvera-jenkins-win-build'
+            customWorkspace "c:\\jenkins\\build"
+        }
+    }
+    options {
+        skipDefaultCheckout true
+        timestamps()
+    }
+    parameters {
+        string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')
+        string(name: 'UserName', defaultValue: 'epmldev\\farmadmin', description: 'Name of the user to use when connecting PowerShell to the target host')
+        string(name: 'Password', defaultValue: 'Pass@word1', description: 'Password used along with the User name')
+        string(name: 'PackageTarget', defaultValue: 'c:\\SilentInstaller', description: 'Folder on the target host to copy packages to')
+        string(name: 'FullRcBranch', defaultValue: '', description: 'Full RC branch to get artifacts from (leave empty to use the same branch name as this build, replace "/" with "%2F")')
+        string(name: 'FullRcBranchBuild', defaultValue: '', description: 'Full RC build number to get artifacts from (leave empty to get latest successful build)')
+		string(name: 'HostName', defaultValue: 'sp2016', description: 'Target host name')
+		string(name: 'fullHostName', defaultValue: 'http://tenant01.epmldev.com', description: 'Target full host name')
+		string(name: 'siteCollection', defaultValue: 'http://tenant01.epmldev.com/epm', description: 'Target full host name')
+	
+    }
+    stages {
+        stage('Prepare to build') {
+            steps {
+                echo 'Cleanup previous build workspace...'
+                dir ("${env.WORKSPACE}") {
+                    deleteDir()
+                }
+                powershell "Write-Host 'Disk space usage:'(Get-PSDrive C | Select-Object Used,Free)"
+                
+                echo 'Checkout SCM...'
+                checkout scm
+            }
+        }
+        stage('Downloading artifacts') {
+            steps {
+                script {
+                    def rootProjectName = '../'
+
+                    if (params.FullRcBranch?.trim()) {
+                        echo 'Getting artifacts from manually specified Release branch'
+                        env.FULLRC_BRANCH_NAME = params.FullRcBranch
+                        env.FULLRC_JOB_NAME = makeJobName(rootProjectName, 'EPML-RC', env.FULLRC_BRANCH_NAME)
+                        readArtifactsFromBranch(env.FULLRC_JOB_NAME, params.FullRcBranchBuild?.trim())
+                    } else {
+                        echo 'Getting artifacts from Release branch with the same name as this branch'
+                        env.FULLRC_BRANCH_NAME = currentBuild.getProjectName()
+                        env.FULLRC_JOB_NAME = makeJobName(rootProjectName, 'EPML-RC', env.FULLRC_BRANCH_NAME)
+                        readArtifactsFromBranch(env.FULLRC_JOB_NAME, params.FullRcBranchBuild?.trim())
+                    }
+					echo 'Extracting build version...'
+                    env.BUILD_VERSION = readFile("${env.WORKSPACE}/Packages/build_version.txt").readLines()[0]
+                    echo "Build version is ${env.BUILD_VERSION}"
+                }
+            }
+        }
+        stage('Deploying') {
+            steps {
+                echo 'Executing deploy (upgrade) script...'
+                powershell "${env.WORKSPACE}/BuildTeamcity/DeployRemotely.ps1 \"${params.UserName}\" \"${params.Password}\" \"${params.fullHostName}\" \"${params.siteCollection}\"  ${env.BUILD_VERSION} \"${params.TargetHost}\" "
+            }
+        }
+    }
+    post {
+       
+        cleanup {
+           
+            powershell "Write-Host 'Disk space usage before cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
+            echo 'Cleanup workspace...'
+            dir ("${env.WORKSPACE}") {
+                deleteDir()
+            }
+            powershell "Write-Host 'Disk space usage after cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
+        }
+    }
+}
+
+def readArtifactsFromBranch(jobName, buildNumber) {
+    if (buildNumber) {
+        echo "Reading artifacts from ${jobName} (build #${buildNumber})"
+        buildSelector = [$class: 'hudson.plugins.copyartifact.SpecificBuildSelector', buildNumber: "#${buildNumber}"]
+    } else {
+        echo "Reading artifacts from ${jobName} (latest successful build)"
+        buildSelector = [$class: 'hudson.plugins.copyartifact.StatusBuildSelector', stable: true] // Selects latest successful build
+    }
+    try {
+        step (
+            [$class: "CopyArtifact",
+            projectName: jobName,
+            filter: "build_version.txt, SilentInstaller*.zip",
+            target: "${env.WORKSPACE}/Packages",
+            selector: buildSelector])
+    } catch (ex) {
+        echo ex.toString()
+        throw ex
+    }
+}
+
+def makeJobName(rootProjectName, parentJobName, branchName) {
+    return rootProjectName + parentJobName + '/' + branchName
+}

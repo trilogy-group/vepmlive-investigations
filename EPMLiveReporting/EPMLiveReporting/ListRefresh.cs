@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using EPMLiveCore;
 using Microsoft.SharePoint;
 using EPMLiveCore.ReportHelper;
@@ -299,33 +300,7 @@ namespace EPMLiveReportsAdmin
                                         bool error;
                                         string sErrMsg;
                                         AddItems_MyWork(timerjobguid, list.Title, list.ID, out error, out sErrMsg);
-                                        if (error)
-                                        {
-                                            DataRow[] dr = dt.Select("ListName='" + list.Title + "'");
-                                            if (sErrMsg.ToLower().Contains("does not exist at site with url"))
-                                            {
-                                                if (dr[0]["ResultText"] == null)
-                                                {
-                                                    dr[0]["ResultText"] = "&nbsp;" + "List not present.";
-                                                }
-                                                else
-                                                {
-                                                    dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" +
-                                                                          "List not present.";
-                                                }
-                                            }
-                                            else
-                                            {
-                                                if (dr[0]["ResultText"] == null)
-                                                {
-                                                    dr[0]["ResultText"] = "&nbsp;" + sErrMsg;
-                                                }
-                                                else
-                                                {
-                                                    dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" + sErrMsg;
-                                                }
-                                            }
-                                        }
+                                        HandleError(error, dt, list, sErrMsg);
                                     }
                                     catch (Exception ex)
                                     {
@@ -365,33 +340,7 @@ namespace EPMLiveReportsAdmin
                                         string sErrMsg;
                                         AddItems(timerjobguid, list.Title, out error, out sErrMsg);
                                         //Add all current list items to the database (from the corresponding sharepoint list)
-                                        if (error)
-                                        {
-                                            DataRow[] dr = dt.Select("ListName='" + list.Title + "'");
-                                            if (sErrMsg.ToLower().Contains("does not exist at site with url"))
-                                            {
-                                                if (dr[0]["ResultText"] == null)
-                                                {
-                                                    dr[0]["ResultText"] = "&nbsp;" + "List not present.";
-                                                }
-                                                else
-                                                {
-                                                    dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" +
-                                                                          "List not present.";
-                                                }
-                                            }
-                                            else
-                                            {
-                                                if (dr[0]["ResultText"] == null)
-                                                {
-                                                    dr[0]["ResultText"] = "&nbsp;" + sErrMsg;
-                                                }
-                                                else
-                                                {
-                                                    dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" + sErrMsg;
-                                                }
-                                            }
-                                        }
+                                        HandleError(error, dt, list, sErrMsg);
                                     }
                                     catch (Exception ex)
                                     {
@@ -659,6 +608,36 @@ namespace EPMLiveReportsAdmin
 
             _DAO.Dispose();
             dtResults = dt;
+        }
+
+        private static void HandleError(bool error, DataTable dataTable, SPList list, string errorMessage)
+        {
+            if (error)
+            {
+                var dataRows = dataTable.Select(string.Format("ListName='{0}'", list.Title));
+                if (CultureInfo.InvariantCulture.CompareInfo.IndexOf(errorMessage , "does not exist at site with url", CompareOptions.IgnoreCase) >=0 )
+                {
+                    if (dataRows[0]["ResultText"] == null)
+                    {
+                        dataRows[0]["ResultText"] = "&nbsp;List not present.";
+                    }
+                    else
+                    {
+                        dataRows[0]["ResultText"] = string.Format("{0}&nbsp;" + "List not present.", dataRows[0]["ResultText"]);
+                    }
+                }
+                else
+                {
+                    if (dataRows[0]["ResultText"] == null)
+                    {
+                        dataRows[0]["ResultText"] = string.Format("&nbsp;{0}", errorMessage);
+                    }
+                    else
+                    {
+                        dataRows[0]["ResultText"] = string.Format("{0}&nbsp;{1}", dataRows[0]["ResultText"], errorMessage);
+                    }
+                }
+            }
         }
 
         private bool IsReportingList(string sListName)
