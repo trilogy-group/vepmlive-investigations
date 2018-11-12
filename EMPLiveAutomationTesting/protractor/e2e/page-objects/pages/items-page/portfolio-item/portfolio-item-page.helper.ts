@@ -33,6 +33,7 @@ export class PortfolioItemPageHelper {
 
         StepLogger.step('Portfolio Type: Select a value from the drop down [Ex: Customer]');
         await PageHelper.sendKeysToInputField(PortfolioItemPage.inputs.portfolioType, portfolioTypeValue);
+        await PageHelper.enterPressForBrowser();
 
         StepLogger.verification('Required values entered/selected in portfolioType Field');
         await expect(await ElementHelper.hasSelectedOption(PortfolioItemPage.inputs.portfolioType, portfolioTypeValue))
@@ -41,6 +42,7 @@ export class PortfolioItemPageHelper {
 
         StepLogger.step('Portfolio Type: Select a value from the drop down [Ex: Customer]');
         await PageHelper.sendKeysToInputField(PortfolioItemPage.inputs.state, stateValue);
+        await PageHelper.enterPressForBrowser();
 
         StepLogger.verification('Required values entered/selected in portfolioType Field');
         await expect(await ElementHelper.hasSelectedOption(PortfolioItemPage.inputs.state, stateValue))
