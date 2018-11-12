@@ -90,10 +90,14 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.step('Enter details for Task (Name, Finish Date, Hours)');
         await PageHelper.actionSendKeys(uniqueId);
+        await ElementHelper.actionHoverOver(ProjectItemPageHelper.newTasksFields.date);
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.date);
         await ElementHelper.actionDoubleClick(ProjectItemPageHelper.newTasksFields.date);
         await TextboxHelper.sendKeys(MyTimeOffPage.dateEditBox, finishDate);
-        await PageHelper.click(ProjectItemPageHelper.newTasksFields.work);
+        await WaitHelper.staticWait(PageHelper.timeout.xs);
+        await ElementHelper.actionHoverOver(ProjectItemPageHelper.newTasksFields.work);
+        await ElementHelper.actionClick(ProjectItemPageHelper.newTasksFields.work);
+        await ElementHelper.actionDoubleClick(ProjectItemPageHelper.newTasksFields.work);
         await PageHelper.actionSendKeys(CommonPageConstants.costData.firstData);
         await PageHelper.click(CommonPage.pageTitle);
 
@@ -145,6 +149,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
+        await ElementHelper.actionHoverOver(ProjectItemPage.selectTaskName);
         await PageHelper.click(ProjectItemPage.selectTaskName);
         await expect(await ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title,

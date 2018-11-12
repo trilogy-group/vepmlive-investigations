@@ -1,21 +1,7 @@
 import {StepLogger} from '../../../../../../../core/logger/step-logger';
-import {CommonPage} from '../../../../../../page-objects/pages/common/common.po';
 import {PageHelper} from '../../../../../../components/html/page-helper';
 import {SuiteNames} from '../../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../../page-objects/pages/login/login.po';
-import {CommonPageHelper} from '../../../../../../page-objects/pages/common/common-page.helper';
-import {HomePage} from '../../../../../../page-objects/pages/homepage/home.po';
-import {CommonPageConstants} from '../../../../../../page-objects/pages/common/common-page.constants';
-import {TaskPageHelper} from '../../../../../../page-objects/pages/my-workplace/task/task-page.helper';
-import {TaskPageConstants} from '../../../../../../page-objects/pages/my-workplace/task/task-page.constants';
-import {ProjectItemPage} from '../../../../../../page-objects/pages/items-page/project-item/project-item.po';
-import {ElementHelper} from '../../../../../../components/html/element-helper';
-import {browser} from 'protractor';
-import {WaitHelper} from '../../../../../../components/html/wait-helper';
-import {ProjectItemPageConstants} from '../../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import {ProjectItemPageHelper} from '../../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import {ValidationsHelper} from '../../../../../../components/misc-utils/validation-helper';
-import {TextboxHelper} from '../../../../../../components/html/textbox-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -31,6 +17,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
+    /* #UNSTABLE
     it('Decrease Task1\'s Duration (Respective Links=ON, Start ASAP =ON) - [1035340]', async () => {
         StepLogger.caseId = 1035340;
         StepLogger.preCondition('Execute steps# 1 to 4 in test case C743761 and add 2 tasks in the project ' +
@@ -46,7 +33,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await TaskPageHelper.navigateToPlannerAndDeleteTask();
         await TaskPageHelper.increaseAndDecreaseTaskDuration(uniqueId, hours, operation);
     });
+    */
 
+    /* #UNSTABLE
     it('Increase Task1\'s Duration (Respective Links=ON, \'Start ASAP\'=ON - [1035334])', async () => {
         StepLogger.caseId = 1035334;
         StepLogger.preCondition('Execute steps# 1 to 4 in test case C743761 and add 2 tasks in the project ' +
@@ -62,7 +51,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await TaskPageHelper.navigateToPlannerAndDeleteTask();
         await TaskPageHelper.increaseAndDecreaseTaskDuration(uniqueId, hours, operation);
     });
+    */
 
+    /* #UNSTABLE
     it('Check the functionality of Cancel button for "Add Link" pop-up - [1035432])', async () => {
         StepLogger.caseId = 1035432;
         StepLogger.preCondition('Execute steps# 1 to 4 in test case C743761 and add 2 tasks in the project created in' +
@@ -82,6 +73,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.step('Enter details for Task (Name, Hours)');
         StepLogger.step('Click on Save button from ribbon panel in the Project Planner page');
         await CommonPageHelper.enterTaskNameAndData(CommonPageConstants.hours.durationHours3, uniqueId);
+        await WaitHelper.waitForElementToBePresent(ProjectItemPage.save);
         await ElementHelper.clickUsingJs(ProjectItemPage.save);
 
         StepLogger.verification('Third Task is created and required details entered [Ex: New Task 3]');
@@ -140,4 +132,5 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
             CommonPageConstants.predecessorsData.predecessorsNull));
     });
+    */
 });

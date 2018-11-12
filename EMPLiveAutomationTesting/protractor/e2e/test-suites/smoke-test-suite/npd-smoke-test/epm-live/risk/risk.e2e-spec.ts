@@ -131,6 +131,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await RiskItemPageHelper.editRisk();
     });
 
+    /* #UNSTABLE
     it('Edit view in Risk - [1176329]', async () => {
         StepLogger.caseId = 1176329;
         StepLogger.stepId(1);
@@ -146,6 +147,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await RiskItemPageHelper.editRisk();
     });
+    */
 
     it('Search Risk - [1176333]', async () => {
         StepLogger.caseId = 1176333;

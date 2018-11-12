@@ -12,6 +12,7 @@ import {SuiteNames} from '../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
+import { ElementHelper } from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -48,6 +49,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(1);
         StepLogger.step('Click on Project tab');
+        await ElementHelper.actionHoverOver(CommonPage.projectTab);
         await PageHelper.click(CommonPage.projectTab);
 
         StepLogger.step('Click on "Associated Items" icon from the button menu');

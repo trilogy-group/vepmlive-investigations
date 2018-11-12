@@ -11,7 +11,6 @@ import {SuiteNames} from '../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ResourcePlannerPageHelper} from '../../../../../page-objects/pages/resource-planner-page/resource-planner-page.helper';
@@ -66,7 +65,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('Check the columns displayed in bottom grid');
         await ResourcePlannerPageHelper.validateButtonSection();
 
-        await PageHelper.click(CommonPage.ribbonItems.close);
+        await ElementHelper.clickUsingJs(ResourcePlannerPage.close);
 
         StepLogger.verification(`${CommonPageConstants.pageHeaders.projects.projectCenter} page is displayed`);
         await CommonPageHelper.fieldDisplayedValidation
@@ -74,6 +73,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     });
 
+    /* #UNSTABLE
     it('Check Admin user has permissions to create Public fragments - [966249]', async () => {
         StepLogger.caseId = 966249;
         StepLogger.preCondition('Select "Navigation" icon  from left side menu');
@@ -89,6 +89,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(1);
         StepLogger.step('Click on Project tab');
+        await ElementHelper.actionHoverOver(CommonPage.projectTab);
         await PageHelper.click(CommonPage.projectTab);
 
         StepLogger.step('Click on Fragments icon from the button menu');
@@ -136,6 +137,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
     });
+    */
 
     it('Insert Fragment - [966282]', async () => {
         StepLogger.caseId = 966282;
@@ -177,6 +179,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(3);
         StepLogger.step('Click on Project tab');
+        await ElementHelper.actionHoverOver(CommonPage.projectTab);
         await PageHelper.click(CommonPage.projectTab);
 
         StepLogger.verification('Project tab opened');

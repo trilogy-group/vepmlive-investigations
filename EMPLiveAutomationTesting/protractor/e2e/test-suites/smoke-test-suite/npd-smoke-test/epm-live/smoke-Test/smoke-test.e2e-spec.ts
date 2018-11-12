@@ -1,18 +1,7 @@
-import {browser} from 'protractor';
-import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
-import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
-import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {PageHelper} from '../../../../../components/html/page-helper';
-import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import {WaitHelper} from '../../../../../components/html/wait-helper';
-import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
-import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-import {ElementHelper} from '../../../../../components/html/element-helper';
-import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -28,6 +17,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
+    /* #UNSTABLE
     it('Creating New Task and Assigning Task to resource functionality - [1124259]', async () => {
         StepLogger.caseId = 1124259;
         const uniqueId = PageHelper.getUniqueId();
@@ -44,7 +34,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         );
 
         StepLogger.verification('Project Center page is displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter, true))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
@@ -85,6 +75,9 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(5);
         StepLogger.step('Click on "Assigned To" column');
+        await WaitHelper.staticWait(PageHelper.timeout.s);
+        await WaitHelper.waitForElementToBePresent(ProjectItemPage.assignToDropDown);
+        await ElementHelper.actionHoverOver(ProjectItemPage.assignToDropDown);
         await PageHelper.click(ProjectItemPage.assignToDropDown);
 
         StepLogger.verification('List of users drop down with a check box on Right side of user name is displayed');
@@ -157,4 +150,5 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getDisplayedValidation(uniqueId));
 
     });
+    */
 });

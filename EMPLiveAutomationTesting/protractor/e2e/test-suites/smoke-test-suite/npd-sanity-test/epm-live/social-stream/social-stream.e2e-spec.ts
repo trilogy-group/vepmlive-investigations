@@ -119,7 +119,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(3);
         StepLogger.step('Login with another user [Example: PM user] and check that the status posted by Admin get display here');
         await SocialStreamPage.logout();
-        await await loginPage.goToAndLoginAsTeamMember();
+        await loginPage.goToAndLoginAsTeamMember();
 
         StepLogger.verification('Status added by Admin should display here');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(status))).toBe(true,

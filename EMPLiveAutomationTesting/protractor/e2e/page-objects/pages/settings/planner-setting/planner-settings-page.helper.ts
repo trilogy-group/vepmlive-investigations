@@ -148,11 +148,12 @@ export class PlannerSettingsPageHelper {
 
         StepLogger.stepId(9);
         StepLogger.step('Click Close button in Project Planner window [Ex: Smoke Test Planner 1]');
+        await WaitHelper.waitForElementToBePresent(ProjectItemPage.close);
+        await ElementHelper.actionHoverOver(ProjectItemPage.close);
         await PageHelper.click(ProjectItemPage.close);
 
         StepLogger.stepId(10);
         StepLogger.step('Click on Leave button in the confirmation dialog');
-        await browser.switchTo().alert().accept();
 
         StepLogger.verification('Project Planner window [Ex: Smoke Test Planner 1] is closed');
         await WaitHelper.waitForElementToBeClickable(CommonPage.editPlan);

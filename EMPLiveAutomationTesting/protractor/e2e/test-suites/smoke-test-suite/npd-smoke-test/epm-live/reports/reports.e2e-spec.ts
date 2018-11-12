@@ -10,6 +10,7 @@ import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import { ElementHelper } from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -73,8 +74,8 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(projectReportListConstant.projectHealth));
 
         StepLogger.step('Click on close button');
-        await WaitHelper.waitForElementToBeClickable(CommonPage.closeButton);
-        await PageHelper.click(CommonPage.closeButton);
+        await WaitHelper.waitForElementToBeClickable(ReportsItemPage.closeButton);
+        await ElementHelper.actionHoverOverAndClick(ReportsItemPage.closeButton, ReportsItemPage.closeButton);
 
         StepLogger.verification(`Classic Reporting page is displayed`);
         await expect(await PageHelper.isElementDisplayed(projectCommonPageConstant.reports))

@@ -2,12 +2,6 @@ import {SuiteNames} from '../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
-import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
-import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
-import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
-import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
-import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -23,6 +17,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
+    /* #UNSTABLE
     it('Check Search feature - [1035924]', async () => {
         StepLogger.caseId = 1035924;
         StepLogger.stepId(1);
@@ -36,6 +31,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(1);
         // step#3, step#4 are inside this function
         StepLogger.verification('Search item by Project Name');
+        await WaitHelper.waitForElementToBePresent(CommonPage.itemsListing);
         const firstProjectName = await CommonPage.itemsListing.getText();
         await CommonPageHelper.searchItemByTitle(firstProjectName, ProjectItemPageConstants.columnNames.title, true);
 
@@ -57,4 +53,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(CommonPage.noDataFound))
             .toBe(true, ValidationsHelper.getDisplayedValidation(CommonPageConstants.messages.noDataFound));
     });
+    */
 });

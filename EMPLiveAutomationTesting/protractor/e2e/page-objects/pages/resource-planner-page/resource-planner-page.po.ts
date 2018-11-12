@@ -119,4 +119,8 @@ export class ResourcePlannerPage extends BasePage {
     static getButtomGridItemsByText(title: string) {
         return element(By.xpath(`//*[@id="g_Res"]//td[contains(text(),"${title}")]`));
     }
+
+    static get close() {
+        return element(By.id('CloseBtn'));
+    }
 }

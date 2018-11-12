@@ -12,10 +12,6 @@ import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/proj
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-import {ItemSettingsPageHelper} from '../../../../../page-objects/pages/items-page/item-settings/item-settings-page.helper';
-import {ItemSettingsPage} from '../../../../../page-objects/pages/items-page/item-settings/item-settings.po';
-import {ItemSettingsPageConstants} from '../../../../../page-objects/pages/items-page/item-settings/item-settings-page.constants';
-import {EditCostHelper} from '../../../../../page-objects/pages/items-page/project-item/edit-cost-page/edit-cost.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -91,6 +87,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
     });
 
+    /* #UNSTABLE
     it('Edit Project Functionality - [1124173]', async () => {
         StepLogger.caseId = 1124173;
         StepLogger.stepId(1);
@@ -185,6 +182,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     });
+    */
 
     it('Add resources under "Current Team" - [743144]', async () => {
         StepLogger.caseId = 743144;
@@ -205,6 +203,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ProjectItemPageHelper.addResourceAndVerifyUserMovedUnderCurrentTeam(uniqueId);
     });
 
+    /* #UNSTABLE
     it('Validate Edit Cost Functionality in Cost Planner - [743932]', async () => {
         StepLogger.caseId = 743932;
         const cost = 4;
@@ -254,4 +253,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(9);
         await EditCostHelper.validateEditCostFunctionality(cost);
     });
+    */
 });

@@ -1,7 +1,7 @@
 import {CommonPageConstants} from '../../common/common-page.constants';
 
 export class DiscussionsPageConstants {
-    static readonly newDiscussion = 'new discussion';
+    static readonly newDiscussion = 'New Item';
     static readonly pagePrefix = 'Discussions';
     static readonly pageName = `${DiscussionsPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
     static readonly discussionPage = `${DiscussionsPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.subject}`;

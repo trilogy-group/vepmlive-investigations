@@ -4,6 +4,7 @@ import {PageHelper} from '../../../../components/html/page-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {SocialStreamPageHelper} from './social-stream-page.helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
+import { LoginPage } from '../../login/login.po';
 
 export class SocialStreamPage {
 
@@ -107,7 +108,8 @@ export class SocialStreamPage {
     }
 
     static async logout() {
-        await browser.get(SocialStreamPageConstants.logoutURL);
+        const loginPage = new LoginPage();
+        await loginPage.logOutPage();
     }
 
 }

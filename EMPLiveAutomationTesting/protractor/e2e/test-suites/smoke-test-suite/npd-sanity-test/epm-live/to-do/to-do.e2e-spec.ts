@@ -12,7 +12,6 @@ import {ToDoPageConstants} from '../../../../../page-objects/pages/my-workplace/
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-do.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-import {ElementHelper} from '../../../../../components/html/element-helper';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {SocialStreamPage} from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
 import {SocialStreamPageConstants} from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.constants';
@@ -121,6 +120,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.checkItemCreated(title, label);
     });
 
+    /* #UNSTABLE
     it('To Do - Attach File - [852049]', async () => {
         StepLogger.caseId = 1176340;
         StepLogger.stepId(1);
@@ -207,6 +207,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
     });
+    */
 
     it('Add Grid/Gantt web part - [785834]', async () => {
         StepLogger.caseId = 785834;

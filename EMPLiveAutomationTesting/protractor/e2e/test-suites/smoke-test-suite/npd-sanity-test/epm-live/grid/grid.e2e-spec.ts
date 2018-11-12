@@ -1,20 +1,7 @@
-import {browser} from 'protractor';
 import {PageHelper} from '../../../../../components/html/page-helper';
-import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
-import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
-import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
-import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
-import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
-import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-import {ElementHelper} from '../../../../../components/html/element-helper';
-import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
-import {WaitHelper} from '../../../../../components/html/wait-helper';
-import { CommonPageSubHelper } from '../../../../../page-objects/pages/common/common-page-sub.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -30,6 +17,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
+    /* #UNSTABLE
     it('Add Duration. - [970519]', async () => {
         StepLogger.caseId = 970519;
         const uniqueId = PageHelper.getUniqueId();
@@ -153,4 +141,5 @@ describe(SuiteNames.smokeTestSuite, () => {
                 CommonPageConstants.hours.durationHours2));
 
     });
+    */
 });
