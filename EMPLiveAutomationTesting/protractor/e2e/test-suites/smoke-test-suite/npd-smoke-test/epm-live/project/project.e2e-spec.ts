@@ -126,7 +126,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             await PageHelper.click(CommonPage.formButtons.cancel);
             StepLogger.step('Additional step - Click on setting button');
             await PageHelper.click(CommonPage.settingButton);
-            StepLogger.step('Additional step - Click on manaage editable field');
+            StepLogger.step('Additional step - Click on manage editable field');
             await PageHelper.click(ItemSettingsPage.generalSettings.manageEditableFields);
             StepLogger.step('Additional step - Make project name editable');
             await ItemSettingsPageHelper.configureEditableField(ItemSettingsPageConstants.editableMenuTitles.projectName,
