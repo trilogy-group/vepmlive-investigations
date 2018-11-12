@@ -1,26 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Generic.Fakes;
+﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Data.Common.Fakes;
 using System.Data.SqlClient.Fakes;
-using System.IO;
-using System.IO.Fakes;
 using System.Linq;
 using System.Resources.Fakes;
 using System.Web.Fakes;
 using System.Xml;
 using System.Xml.Linq;
+using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.ReportingProxy.Fakes;
 using EPMLiveWorkPlanner.Fakes;
-using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
-using static EPMLiveWorkPlanner.PlannerCore;
 using static EPMLiveWorkPlanner.WorkPlannerAPI;
 
 namespace EPMLiveWorkPlanner.Tests.ISAPI
@@ -29,6 +24,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
     {
         private const string ReOrderAndSaveItemMethodName = "ReOrderAndSaveItem";
         private const string GetKanBanBoardMethodName = "GetKanBanBoard";
+        private const string GetProjectInfoMethodName = "GetProjectInfo";
 
         [TestMethod]
         public void ReOrderAndSaveItem_WhenCalled_ReturnsString()
@@ -194,13 +190,41 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                     spWeb.Instance
                 }))
                 .Replace("&nbsp;", string.Empty);
+
             outputXmlDocument.LoadXml(outputString);
             var actual = XDocument.Parse(outputString);
-            var tdOne = actual.Element("table").Element("tbody").Element("tr").Elements("td").FirstOrDefault(x => x.Attribute("id") != null);
-            var tdTwo = actual.Element("table").Element("tbody").Element("tr").Elements("td").FirstOrDefault(x => x.Attribute("id") == null);
-            var sortableListOne = tdOne.Element("div").Elements("div").FirstOrDefault(x => x.Attribute("class").Value.Equals("sortable-list"));
-            var sortableListTwo = tdTwo.Element("div").Elements("div").FirstOrDefault(x => x.Attribute("class").Value.Equals("sortable-list"));
-            var sortableItem = sortableListOne.Elements("div").FirstOrDefault(x => x.Attribute("class").Value.Equals("sortable-item"));
+            var sortableListOne = default(XElement);
+            var sortableListTwo = default(XElement);
+            var sortableItem = default(XElement);
+
+            var tdOne = actual.Element("table")
+                .Element("tbody")
+                .Element("tr")
+                .Elements("td")
+                .FirstOrDefault(x => x.Attribute("id") != null);
+            var tdTwo = actual.Element("table")
+                .Element("tbody")
+                .Element("tr")
+                .Elements("td")
+                .FirstOrDefault(x => x.Attribute("id") == null);
+            if (tdOne != null)
+            {
+                sortableListOne = tdOne
+                    .Element("div")
+                    .Elements("div")
+                    .FirstOrDefault(x => x.Attribute("class").Value.Equals("sortable-list"));
+            }
+            if (tdTwo != null)
+            {
+                sortableListTwo = tdTwo.Element("div")
+                    .Elements("div")
+                    .FirstOrDefault(x => x.Attribute("class").Value.Equals("sortable-list"));
+            }
+            if (sortableListOne != null)
+            {
+                sortableItem = sortableListOne.Elements("div")
+                    .FirstOrDefault(x => x.Attribute("class").Value.Equals("sortable-item"));
+            }
 
             // Assert
             actual.ShouldSatisfyAllConditions(
@@ -242,6 +266,116 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                     .FirstOrDefault(x => x.Attribute("class").Value.Equals("stageContainerTitle"))
                     .Value
                     .ShouldBe(kanBanBoardName));
+        }
+
+        [TestMethod]
+        public void GetProjectInfo_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            var dataXmlString = $@"
+                <xmlcfg Planner=""1"" ID=""1"">
+                    <B/>
+                </xmlcfg>";
+            var data = new XmlDocument();
+            var plannerProps = new PlannerProps()
+            {
+                sListProjectCenter = DummyString
+            };
+
+            data.LoadXml(dataXmlString);
+            spField.SchemaXmlGet = () => dataXmlString;
+            spField.TypeGet = () => SPFieldType.User;
+
+            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => dataXmlString;
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_, __) =>
+            {
+                validations += 1;
+                return plannerProps;
+            };
+            ShimWorkPlannerAPI.SetupProjectCenterListSPListString = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlannerAPI.GetResourceTableWorkPlannerAPIPlannerPropsGuidStringSPWeb = (_1, _2, _3, _4) =>
+            {
+                validations += 1;
+                return default(DataSet);
+            };
+            ShimListCommands.GetGridGanttSettingsSPList = _ =>
+            {
+                validations += 1;
+                return new ShimGridGanttSettings();
+            };
+            ShimListDisplayUtils.ConvertFromStringString = _ =>
+            {
+                validations += 1;
+                return new Dictionary<string, Dictionary<string, string>>();
+            };
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPField>()
+            {
+                spField
+            }.GetEnumerator();
+            ShimWorkPlannerAPI.isValidFieldStringBoolean = (_, __) =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimWorkPlannerAPI.getFieldValueSPListItemSPFieldDataSet = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+            {
+                validations += 1;
+                EditFormat = DummyString;
+                return DummyString;
+            };
+            ShimEditableFieldDisplay.isEditableSPListItemSPFieldDictionaryOfStringDictionaryOfStringString = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return false;
+            };
+            ShimWorkPlannerAPI.setEnumFieldSPFieldXmlNodeRefXmlDocumentXmlDocumentSPWebBooleanStringDataSet = (SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources) =>
+            {
+                validations += 1;
+            };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(
+                GetProjectInfoMethodName,
+                publicStatic,
+                new object[]
+                {
+                    data,
+                    spWeb.Instance
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("B")
+                    .Element("I")
+                    .Attribute("id")
+                    .Value
+                    .ShouldBe(DummyString),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("B")
+                    .Element("I")
+                    .Attribute("CanEdit")
+                    .Value
+                    .ShouldBe("0"),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("B")
+                    .Element("I")
+                    .Attribute("NoColorState")
+                    .Value
+                    .ShouldBe("1"),
+                () => validations
+                    .ShouldBe(10));
         }
     }
 }
