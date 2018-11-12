@@ -16,9 +16,9 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
     [TestClass, ExcludeFromCodeCoverage]
     public class O365ServiceTests
     {
-        private IDisposable shimContext;
-        private PrivateObject privateObject;
-        private O365Service o365Service;
+        private IDisposable _shimContext;
+        private PrivateObject _privateObject;
+        private O365Service _o365Service;
         private readonly AESCryptographyService _cryptographyService = new AESCryptographyService();
 
         private const string MessageFromAppInstalled = "List 'EPMLiveIntegrations' does not exist";
@@ -27,27 +27,27 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
         private const string DummyUserName = "DummyUserName";
         private const string DummySiteUrl = "http://tempuri.org";
         private const string DummyApiUrl = "http://tempapi.org";
-        private readonly SecureString DummySecurePassword = "DummyPassword".ToSecureString();
         private const string DummyTitle = "DummyTitle";
         private const string DummyTitleStartWithA = "ADummyTitle";
+        private const string DummyListName = "DummyListName";
         private const string DummyString = "DummyString";
         private const string GroupHidden = "_Hidden";
         private const string GroupAny = "Any";
         private const string DummyColumn = "DummyColumn";
         private const string DummyIntegrationKey = "DummyIntegrationKey";
-        private const string ExceptionMessageRemoteName = "The remote name could not be resolved";
         private const string DummyEmail = "dummy@email.com";
         private const int DummyInt = 1;
-        private readonly Guid guidGroupAny = Guid.NewGuid();
-        private readonly Guid guidGroupHidden = Guid.NewGuid();
-        private readonly Guid integrationId = Guid.NewGuid();
+        private readonly static SecureString DummySecurePassword = "DummyPassword".ToSecureString();
+        private readonly static Guid GuidGroupAny = Guid.NewGuid();
+        private readonly static Guid GuidGroupHidden = Guid.NewGuid();
+        private readonly static Guid IntegrationId = Guid.NewGuid();
 
         [TestInitialize]
         public void Initialize()
         {
-            shimContext = ShimsContext.Create();
-            o365Service = new O365Service(DummyUserName, DummySecurePassword, DummySiteUrl);
-            privateObject = new PrivateObject(o365Service);
+            _shimContext = ShimsContext.Create();
+            _o365Service = new O365Service(DummyUserName, DummySecurePassword, DummySiteUrl);
+            _privateObject = new PrivateObject(_o365Service);
 
             ShimClientContext.AllInstances.WebGet = sender => new ShimWeb()
             {
@@ -76,42 +76,40 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
         [TestCleanup]
         public void Cleanup()
         {
-            shimContext?.Dispose();
+            _shimContext?.Dispose();
         }
 
         [TestMethod]
         public void DeleteListItemsById_ArrayId_ReturnsO365Result()
         {
             // Arrange
-            var itemsId = new string[]
+            var itemsId = new[]
             {
                 DummyItemId.ToString()
             };
-            var listName = "DummyListName";
 
             // Act
-            var actualResult = (List<O365Result>)o365Service.DeleteListItemsById(itemsId, listName);
+            var actualResult = (List<O365Result>)_o365Service.DeleteListItemsById(itemsId, DummyListName);
 
             // Assert
             this.ShouldSatisfyAllConditions(
-             () => actualResult.ShouldNotBeNull(),
-             () => actualResult.Count.ShouldBe(1),
-             () => actualResult[0].ShouldNotBeNull(),
-             () => actualResult[0].Success.ShouldBeTrue(),
-             () => actualResult[0].TransactionType.ShouldBe(EPMLiveIntegration.TransactionType.DELETE),
-             () => actualResult[0].ItemId.ShouldBe(DummyItemId),
-             () => actualResult[0].Error.ShouldBeNullOrEmpty());
+                () => actualResult.ShouldNotBeNull(),
+                () => actualResult.Count.ShouldBe(1),
+                () => actualResult[0].ShouldNotBeNull(),
+                () => actualResult[0].Success.ShouldBeTrue(),
+                () => actualResult[0].TransactionType.ShouldBe(EPMLiveIntegration.TransactionType.DELETE),
+                () => actualResult[0].ItemId.ShouldBe(DummyItemId),
+                () => actualResult[0].Error.ShouldBeNullOrEmpty());
         }
 
         [TestMethod]
         public void DeleteListItemsById__ReturnsO365ResultFailDelete_ReturnsO365Result()
         {
             // Arrange
-            var itemsId = new string[]
+            var itemsId = new[]
             {
                 DummyItemId.ToString()
             };
-            var listName = "DummyListName";
 
             ShimClientContext.AllInstances.WebGet = sender => new ShimWeb()
             {
@@ -128,56 +126,50 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
             };
 
             // Act
-            var actualResult = (List<O365Result>)o365Service.DeleteListItemsById(itemsId, listName);
+            var actualResult = (List<O365Result>)_o365Service.DeleteListItemsById(itemsId, DummyListName);
 
             // Assert
             this.ShouldSatisfyAllConditions(
-             () => actualResult.ShouldNotBeNull(),
-             () => actualResult.Count.ShouldBe(1),
-             () => actualResult[0].ShouldNotBeNull(),
-             () => actualResult[0].Success.ShouldBeFalse(),
-             () => actualResult[0].TransactionType.ShouldBe(EPMLiveIntegration.TransactionType.DELETE),
-             () => actualResult[0].ItemId.ShouldBe(DummyItemId),
-             () => actualResult[0].Error.ShouldNotBeNullOrEmpty());
+                () => actualResult.ShouldNotBeNull(),
+                () => actualResult.Count.ShouldBe(1),
+                () => actualResult[0].ShouldNotBeNull(),
+                () => actualResult[0].Success.ShouldBeFalse(),
+                () => actualResult[0].TransactionType.ShouldBe(EPMLiveIntegration.TransactionType.DELETE),
+                () => actualResult[0].ItemId.ShouldBe(DummyItemId),
+                () => actualResult[0].Error.ShouldNotBeNullOrEmpty());
         }
 
         [TestMethod]
         public void EnsureEPMLiveAppInstalled_LoadList_ReturnsTrue()
         {
             // Arrange, Act
-            var actualresult = o365Service.EnsureEPMLiveAppInstalled();
+            var actualResult = _o365Service.EnsureEPMLiveAppInstalled();
 
             // Assert
-            actualresult.ShouldBeTrue();
+            actualResult.ShouldBeTrue();
         }
 
         [TestMethod]
         public void EnsureEPMLiveAppInstalled_LoadListDoesNotExists_ReturnsFalse()
         {
             // Arrange
-            ShimClientRuntimeContext.AllInstances.LoadOf1M0ExpressionOfFuncOfM0ObjectArray<List>((sender, client, retrievals) =>
-            {
-                throw new Exception(MessageFromAppInstalled);
-            });
+            ShimClientRuntimeContext.AllInstances.LoadOf1M0ExpressionOfFuncOfM0ObjectArray<List>((sender, client, retrievals) => { throw new Exception(MessageFromAppInstalled); });
 
             // Act
-            var actualresult = o365Service.EnsureEPMLiveAppInstalled();
+            var actualResult = _o365Service.EnsureEPMLiveAppInstalled();
 
             // Assert
-            actualresult.ShouldBeFalse();
+            actualResult.ShouldBeFalse();
         }
 
         [TestMethod]
         public void EnsureEPMLiveAppInstalled_LoadListException_ThrowsException()
         {
             // Arrange
-            ShimClientRuntimeContext.AllInstances.LoadOf1M0ExpressionOfFuncOfM0ObjectArray<List>((sender, client, retrievals) =>
-            {
-                throw new Exception();
-            });
+            ShimClientRuntimeContext.AllInstances.LoadOf1M0ExpressionOfFuncOfM0ObjectArray<List>((sender, client, retrievals) => { throw new Exception(); });
 
             // Act
-            Action action = () => o365Service.EnsureEPMLiveAppInstalled();
+            Action action = () => _o365Service.EnsureEPMLiveAppInstalled();
 
             // Assert
             action.ShouldThrow<Exception>().Message.ShouldBe("Exception of type 'System.Exception' was thrown.");
@@ -198,32 +190,33 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
                             DeleteObject = () => { }
                         }
                     }
-                }.Bind(new List<List>()
-                {
-                    new ShimList()
+                }.Bind(
+                    new List<List>()
                     {
-                        HiddenGet = () => false,
-                        TitleGet = () => DummyTitle
-                    },
-                    new ShimList()
-                    {
-                        HiddenGet = () => false,
-                        TitleGet = () => DummyTitleStartWithA
-                    }
-                })
+                        new ShimList()
+                        {
+                            HiddenGet = () => false,
+                            TitleGet = () => DummyTitle
+                        },
+                        new ShimList()
+                        {
+                            HiddenGet = () => false,
+                            TitleGet = () => DummyTitleStartWithA
+                        }
+                    })
             };
 
             // Act
-            var actualresult = o365Service.GetIntegratableLists();
+            var actualResult = _o365Service.GetIntegratableLists();
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => actualresult.ShouldNotBeNull(),
-                () => actualresult.Count.ShouldBe(2),
-                () => actualresult.ContainsKey(DummyTitle).ShouldBeTrue(),
-                () => actualresult[DummyTitle].ShouldBe(DummyTitle),
-                () => actualresult.ContainsKey(DummyTitleStartWithA).ShouldBeTrue(),
-                () => actualresult[DummyTitleStartWithA].ShouldBe(DummyTitleStartWithA));
+                () => actualResult.ShouldNotBeNull(),
+                () => actualResult.Count.ShouldBe(2),
+                () => actualResult.ContainsKey(DummyTitle).ShouldBeTrue(),
+                () => actualResult[DummyTitle].ShouldBe(DummyTitle),
+                () => actualResult.ContainsKey(DummyTitleStartWithA).ShouldBeTrue(),
+                () => actualResult[DummyTitleStartWithA].ShouldBe(DummyTitleStartWithA));
         }
 
         [TestMethod]
@@ -242,38 +235,39 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
                             {
                                 HiddenGet = () => false,
                                 GroupGet = () => GroupAny,
-                                IdGet = () => guidGroupAny,
+                                IdGet = () => GuidGroupAny
                             },
                             new ShimField()
                             {
                                 HiddenGet = () => false,
                                 GroupGet = () => GroupHidden,
-                                IdGet = () => guidGroupHidden,
-                            },
+                                IdGet = () => GuidGroupHidden
+                            }
                         })
                     }
                 }
             };
 
             // Act
-            var actualResult = (List<Field>)o365Service.GetListFields(DummyString);
+            var actualResult = (List<Field>)_o365Service.GetListFields(DummyString);
 
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => actualResult.ShouldNotBeNull(),
                 () => actualResult.Count.ShouldBe(1),
-                () => actualResult.Find(x => x.Id == guidGroupAny).ShouldNotBeNull(),
-                () => actualResult.Find(x => x.Id == guidGroupHidden).ShouldBeNull());
+                () => actualResult.Find(x => x.Id == GuidGroupAny).ShouldNotBeNull(),
+                () => actualResult.Find(x => x.Id == GuidGroupHidden).ShouldBeNull());
         }
 
         [TestMethod]
         public void GetListItems_Should_AddRowsInDataTable()
         {
             // Arrange
-            var userField = new ShimField(new ShimFieldLookup(new ShimFieldUser())
-            {
-                AllowMultipleValuesGet = () => false
-            })
+            var userField = new ShimField(
+                new ShimFieldLookup(new ShimFieldUser())
+                {
+                    AllowMultipleValuesGet = () => false
+                })
             {
                 InternalNameGet = () => "UserField",
                 FieldTypeKindGet = () => FieldType.User
@@ -322,21 +316,29 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
                             {
                                 FieldValuesGet = () =>
                                 {
-                                    var fieldsValues = new Dictionary<string, object>();
-                                    fieldsValues.Add("UserField", new FieldUserValue() { LookupId = 123 });
-                                    fieldsValues.Add("LookupField", new FieldLookupValue() { });
+                                    var fieldsValues = new Dictionary<string, object>
+                                    {
+                                        {
+                                            "UserField", new FieldUserValue()
+                                            {
+                                                LookupId = 123
+                                            }
+                                        },
+                                        { "LookupField", new FieldLookupValue() }
+                                    };
 
                                     return fieldsValues;
                                 }
                             }
                         }),
-                        FieldsGet = () => new ShimFieldCollection().Bind(new List<Field>()
-                        {
-                           userField,
-                           lookupUser,
-                           userFieldAllowMultipleValues,
-                           lookupUserAllowMultipleValues
-                        })
+                        FieldsGet = () => new ShimFieldCollection().Bind(
+                            new List<Field>()
+                            {
+                                userField,
+                                lookupUser,
+                                userFieldAllowMultipleValues,
+                                lookupUserAllowMultipleValues
+                            })
                     }
                 }
             };
@@ -351,7 +353,7 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
             var lastSynchDate = new DateTime(2018, 2, 2);
 
             // Act
-            o365Service.GetListItems(listName, items, lastSynchDate);
+            _o365Service.GetListItems(listName, items, lastSynchDate);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -363,10 +365,11 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
         public void GetListItemsById_Should_AddRowsInDataTable()
         {
             // Arrange
-            var userField = new ShimField(new ShimFieldLookup(new ShimFieldUser())
-            {
-                AllowMultipleValuesGet = () => false
-            })
+            var userField = new ShimField(
+                new ShimFieldLookup(new ShimFieldUser())
+                {
+                    AllowMultipleValuesGet = () => false
+                })
             {
                 InternalNameGet = () => "UserField",
                 FieldTypeKindGet = () => FieldType.User
@@ -382,16 +385,24 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
                         {
                             FieldValuesGet = () =>
                             {
-                                var fieldsValues = new Dictionary<string, object>();
-                                fieldsValues.Add("UserField", new FieldUserValue() { LookupId = 123 });
+                                var fieldsValues = new Dictionary<string, object>
+                                {
+                                    {
+                                        "UserField", new FieldUserValue()
+                                        {
+                                            LookupId = 123
+                                        }
+                                    }
+                                };
 
                                 return fieldsValues;
                             }
                         },
-                        FieldsGet = () => new ShimFieldCollection().Bind(new List<Field>()
-                        {
-                           userField
-                        })
+                        FieldsGet = () => new ShimFieldCollection().Bind(
+                            new List<Field>()
+                            {
+                                userField
+                            })
                     }
                 }
             };
@@ -404,14 +415,14 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
             items.Rows.Add(dataRow);
 
             var itemIds = "1";
+
             // Act
-            o365Service.GetListItemsById(listName, itemIds, items);
+            _o365Service.GetListItemsById(listName, itemIds, items);
 
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => items.Rows.Count.ShouldBe(2),
                 () => ((string)items.Rows[1][0]).ShouldBeNullOrEmpty());
-
         }
 
         [TestMethod]
@@ -424,12 +435,12 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
             var actualAllowOutgoing = false;
             var actualAllowDeletion = false;
             var actualActive = false;
-            var actualIntID = string.Empty;
+            var actualIntId = string.Empty;
             var actualControlButtons = string.Empty;
-            var actualAPIEndpoint = string.Empty;
+            var actualApiEndpoint = string.Empty;
             var actualIntKey = string.Empty;
-            var actualEPMWeb = string.Empty;
-            var actualEPMWebUrl = string.Empty;
+            var actualEpmWeb = string.Empty;
+            var actualEpmWebUrl = string.Empty;
 
             ShimClientContext.AllInstances.WebGet = sender => new ShimWeb()
             {
@@ -463,22 +474,22 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
                                         actualActive = (bool)newValue;
                                         break;
                                     case "IntID":
-                                        actualIntID = (string)newValue;
+                                        actualIntId = (string)newValue;
                                         break;
                                     case "ControlButtons":
                                         actualControlButtons = (string)newValue;
                                         break;
                                     case "APIEndpoint":
-                                        actualAPIEndpoint = (string)newValue;
+                                        actualApiEndpoint = (string)newValue;
                                         break;
                                     case "IntKey":
                                         actualIntKey = (string)newValue;
                                         break;
                                     case "EPMWeb":
-                                        actualEPMWeb = (string)newValue;
+                                        actualEpmWeb = (string)newValue;
                                         break;
                                     case "EPMWebUrl":
-                                        actualEPMWebUrl = (string)newValue;
+                                        actualEpmWebUrl = (string)newValue;
                                         break;
                                     default:
                                         break;
@@ -495,22 +506,32 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
             var apiUrl = DummyApiUrl;
             var webTitle = DummyTitle;
             var webUrl = DummySiteUrl;
-            var enabledFeatures = new ArrayList();
-            enabledFeatures.Add("workplan");
-            enabledFeatures.Add("comments");
-            enabledFeatures.Add("associated");
-            enabledFeatures.Add("costplan");
-            enabledFeatures.Add("resplan");
-            enabledFeatures.Add("team");
+            var enabledFeatures = new ArrayList
+            {
+                "workplan",
+                "comments",
+                "associated",
+                "costplan",
+                "resplan",
+                "team"
+            };
             var listName = DummyString;
             var allowIncoming = true;
             var allowOutgoing = true;
             var allowDeletion = true;
 
             // Act
-            o365Service.InstallIntegration(integrationId, integrationKey, apiUrl, webTitle,
-            webUrl, enabledFeatures, listName, allowIncoming,
-            allowOutgoing, allowDeletion);
+            _o365Service.InstallIntegration(
+                integrationId,
+                integrationKey,
+                apiUrl,
+                webTitle,
+                webUrl,
+                enabledFeatures,
+                listName,
+                allowIncoming,
+                allowOutgoing,
+                allowDeletion);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -520,19 +541,19 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
                 () => actualAllowOutgoing.ShouldBeTrue(),
                 () => actualAllowDeletion.ShouldBeTrue(),
                 () => actualActive.ShouldBeTrue(),
-                () => actualIntID.ShouldBe(integrationId.ToString()),
+                () => actualIntId.ShouldBe(integrationId.ToString()),
                 () => actualControlButtons.ShouldBe("WorkPlan,Comments,Associated,CostPlan,ResPlan,Team"),
-                () => actualAPIEndpoint.ShouldBe(DummyApiUrl),
+                () => actualApiEndpoint.ShouldBe(DummyApiUrl),
                 () => actualIntKey.ShouldBe(DummyIntegrationKey),
-                () => actualEPMWeb.ShouldBe(DummyTitle),
-                () => actualEPMWebUrl.ShouldBe(DummySiteUrl));
+                () => actualEpmWeb.ShouldBe(DummyTitle),
+                () => actualEpmWebUrl.ShouldBe(DummySiteUrl));
         }
 
         [TestMethod]
         public void UninstallIntegration_PassParameters_DeleteListItem()
         {
             // Arrange
-            var actualDeleteOBject = false;
+            var actualDeleteObject = false;
             var integrationKey = DummyIntegrationKey;
             var integrationId = Guid.NewGuid();
 
@@ -552,13 +573,15 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
                                     {
                                         return _cryptographyService.Encrypt(DummyIntegrationKey);
                                     }
-                                    if  ( item == "IntID")
+
+                                    if (item == "IntID")
                                     {
                                         return _cryptographyService.Encrypt(integrationId.ToString());
                                     }
+
                                     return null;
                                 },
-                                DeleteObject = () => { actualDeleteOBject = true; }
+                                DeleteObject = () => actualDeleteObject = true
                             },
                         })
                     }
@@ -566,17 +589,17 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
             };
 
             // Act
-            o365Service.UninstallIntegration(integrationKey, integrationId);
+            _o365Service.UninstallIntegration(integrationKey, integrationId);
 
             // Assert
-            actualDeleteOBject.ShouldBeTrue();
+            actualDeleteObject.ShouldBeTrue();
         }
 
         [TestMethod]
-        public void UpsertItems_OnSucess_ReturnsIEnumerableO365Result()
+        public void UpsertItems_OnSuccess_ReturnsIEnumerableO365Result()
         {
             // Arrange
-            var actualCountupdated = 0;
+            var actualCountUpdated = 0;
 
             var listName = DummyTitle;
             var dataTable = new DataTable();
@@ -613,7 +636,7 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
 
                                 return null;
                             },
-                            Update = () => { actualCountupdated++; },
+                            Update = () => actualCountUpdated++,
                             DeleteObject = () => { }
                         }
                     }
@@ -621,22 +644,22 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
             };
 
             // Act
-            var actualResult = (List<O365Result>)o365Service.UpsertItems(listName, integrationId, dataTable);
+            var actualResult = (List<O365Result>)_o365Service.UpsertItems(listName, IntegrationId, dataTable);
 
             // Assert
             this.ShouldSatisfyAllConditions(
-             () => actualResult.ShouldNotBeNull(),
-             () => actualResult.Count.ShouldBe(2),
-             () => actualResult[0].ShouldNotBeNull(),
-             () => actualResult[0].Success.ShouldBeTrue(),
-             () => actualResult[0].TransactionType.ShouldBe(EPMLiveIntegration.TransactionType.INSERT),
-             () => actualResult[0].ItemId.ShouldBe(20),
-             () => actualResult[0].Error.ShouldBeNullOrEmpty(),
-             () => actualResult[1].ShouldNotBeNull(),
-             () => actualResult[1].Success.ShouldBeTrue(),
-             () => actualResult[1].TransactionType.ShouldBe(EPMLiveIntegration.TransactionType.UPDATE),
-             () => actualResult[1].ItemId.ShouldBe(20),
-             () => actualResult[1].Error.ShouldBeNullOrEmpty());
+                () => actualResult.ShouldNotBeNull(),
+                () => actualResult.Count.ShouldBe(2),
+                () => actualResult[0].ShouldNotBeNull(),
+                () => actualResult[0].Success.ShouldBeTrue(),
+                () => actualResult[0].TransactionType.ShouldBe(EPMLiveIntegration.TransactionType.INSERT),
+                () => actualResult[0].ItemId.ShouldBe(20),
+                () => actualResult[0].Error.ShouldBeNullOrEmpty(),
+                () => actualResult[1].ShouldNotBeNull(),
+                () => actualResult[1].Success.ShouldBeTrue(),
+                () => actualResult[1].TransactionType.ShouldBe(EPMLiveIntegration.TransactionType.UPDATE),
+                () => actualResult[1].ItemId.ShouldBe(20),
+                () => actualResult[1].Error.ShouldBeNullOrEmpty());
         }
 
         [TestMethod]
@@ -656,27 +679,27 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
             };
 
             // Act
-            var actualResult = (List<O365Result>)o365Service.UpsertItems(listName, integrationId, dataTable);
+            var actualResult = (List<O365Result>)_o365Service.UpsertItems(listName, IntegrationId, dataTable);
 
             // Assert
             this.ShouldSatisfyAllConditions(
-             () => actualResult.ShouldNotBeNull(),
-             () => actualResult.Count.ShouldBe(1),
-             () => actualResult[0].ShouldNotBeNull(),
-             () => actualResult[0].Success.ShouldBeFalse(),
-             () => actualResult[0].TransactionType.ShouldBe(EPMLiveIntegration.TransactionType.INSERT),
-             () => actualResult[0].ItemId.ShouldBeNull(),
-             () => actualResult[0].Error.ShouldNotBeNullOrEmpty());
+                () => actualResult.ShouldNotBeNull(),
+                () => actualResult.Count.ShouldBe(1),
+                () => actualResult[0].ShouldNotBeNull(),
+                () => actualResult[0].Success.ShouldBeFalse(),
+                () => actualResult[0].TransactionType.ShouldBe(EPMLiveIntegration.TransactionType.INSERT),
+                () => actualResult[0].ItemId.ShouldBeNull(),
+                () => actualResult[0].Error.ShouldNotBeNullOrEmpty());
         }
 
         [TestMethod]
-        public void GetClientContext_ExeceptionNotMessageRemoteName_throwsException()
+        public void GetClientContext_ExceptionNotMessageRemoteName_throwsException()
         {
             // Arrange
             ShimSharePointOnlineCredentials.ConstructorStringSecureString = (sender, userName, password) => { throw new Exception(DummyString); };
 
             // Act
-            Action action = () => privateObject.Invoke("GetClientContext", DummySiteUrl);
+            Action action = () => _privateObject.Invoke("GetClientContext", DummySiteUrl);
 
             // Assert
             action.ShouldThrow<Exception>().Message.ShouldBe(DummyString);
@@ -686,24 +709,24 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
         public void GetFieldValue_LookupFields_ReturnsValues()
         {
             // Arrange
-            ListItem listItem = new ShimListItem()
+            var listItem = new ShimListItem()
             {
                 FieldValuesGet = () =>
-                new Dictionary<string, object>()
-                {
-                    {DummyColumn, DummyInt }
-                }
+                    new Dictionary<string, object>()
+                    {
+                        { DummyColumn, DummyInt }
+                    }
             };
             var userFields = new List<string>();
             var multiUserFields = new List<string>();
             var lookupFields = new List<string>()
             {
-                { DummyColumn }
+                DummyColumn
             };
             var multiLookupFields = new List<string>();
 
             // Act
-            var actualResult = privateObject.Invoke("GetFieldValue", listItem, DummyColumn, userFields, multiUserFields, lookupFields, multiLookupFields);
+            var actualResult = _privateObject.Invoke("GetFieldValue", listItem.Instance, DummyColumn, userFields, multiUserFields, lookupFields, multiLookupFields);
 
             // Assert
             actualResult.ShouldBe(DummyInt);
@@ -713,18 +736,18 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
         public void GetFieldValue_MultiUserFields_ReturnsValues()
         {
             // Arrange
-            ListItem listItem = new ShimListItem()
+            var listItem = new ShimListItem()
             {
                 FieldValuesGet = () =>
-                new Dictionary<string, object>()
-                {
-                    {DummyColumn, new object[] { new ShimFieldUserValue() { }.Instance } }
-                }
+                    new Dictionary<string, object>()
+                    {
+                        { DummyColumn, new object[] { new ShimFieldUserValue().Instance } }
+                    }
             };
             var userFields = new List<string>();
             var multiUserFields = new List<string>()
             {
-             { DummyColumn }
+                DummyColumn
             };
             var lookupFields = new List<string>();
             var multiLookupFields = new List<string>();
@@ -744,25 +767,24 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
                         {
                             DeleteObject = () => { }
                         },
-                        GetItemsCamlQuery = query =>
-
-                        new ShimListItemCollection()
+                        GetItemsCamlQuery = query => new ShimListItemCollection()
                         {
                             GetByIdInt32 = id => new ShimListItem()
-                        }.Bind(new List<ListItem>()
-                        {
-                            new ShimListItem()
+                        }.Bind(
+                            new List<ListItem>()
                             {
-                                ItemGetString = item => DummyEmail
-                            }
-                        }),
+                                new ShimListItem()
+                                {
+                                    ItemGetString = item => DummyEmail
+                                }
+                            }),
                         ItemCountGet = () => 1
                     }
                 }
             };
 
             // Act
-            var actualResult = privateObject.Invoke("GetFieldValue", listItem, DummyColumn, userFields, multiUserFields, lookupFields, multiLookupFields);
+            var actualResult = _privateObject.Invoke("GetFieldValue", listItem.Instance, DummyColumn, userFields, multiUserFields, lookupFields, multiLookupFields);
 
             // Assert
             actualResult.ShouldBe(DummyEmail);
@@ -772,17 +794,19 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
         public void GetFieldValue_MultiLookupFields_ReturnsValues()
         {
             // Arrange
-            ListItem listItem = new ShimListItem()
+            var listItem = new ShimListItem()
             {
                 FieldValuesGet = () =>
-                new Dictionary<string, object>()
-                {
-                    {DummyColumn, new object[] {
-                        new ShimFieldLookupValue() { LookupIdGet = () => 1 }.Instance,
-                        new ShimFieldLookupValue() { LookupIdGet = () => 2 }.Instance
+                    new Dictionary<string, object>()
+                    {
+                        {
+                            DummyColumn, new object[]
+                            {
+                                new ShimFieldLookupValue() { LookupIdGet = () => 1 }.Instance,
+                                new ShimFieldLookupValue() { LookupIdGet = () => 2 }.Instance
+                            }
+                        }
                     }
-                    }
-                }
             };
             var userFields = new List<string>();
             var multiUserFields = new List<string>();
@@ -802,32 +826,31 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
                         {
                             DeleteObject = () => { }
                         },
-                        GetItemsCamlQuery = query =>
-
-                        new ShimListItemCollection()
+                        GetItemsCamlQuery = query => new ShimListItemCollection()
                         {
                             GetByIdInt32 = id => new ShimListItem()
-                        }.Bind(new List<ListItem>()
-                        {
-                            new ShimListItem()
+                        }.Bind(
+                            new List<ListItem>()
                             {
-                                ItemGetString = item => DummyEmail
-                            }
-                        }),
+                                new ShimListItem()
+                                {
+                                    ItemGetString = item => DummyEmail
+                                }
+                            }),
                         ItemCountGet = () => 1
                     }
                 }
             };
 
             // Act
-            var actualResult = privateObject.Invoke("GetFieldValue", listItem, DummyColumn, userFields, multiUserFields, lookupFields, multiLookupFields);
+            var actualResult = _privateObject.Invoke("GetFieldValue", listItem.Instance, DummyColumn, userFields, multiUserFields, lookupFields, multiLookupFields);
 
             // Assert
             actualResult.ShouldBe("1,2");
         }
 
         [TestMethod]
-        public void FillListFields_DatatableWithColumns_AddColumnsOnListExceptId()
+        public void FillListFields_DataTableWithColumns_AddColumnsOnListExceptId()
         {
             // Arrange
             var dataTable = new DataTable();
@@ -840,7 +863,7 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
             var fields = new List<string>();
 
             // Act
-            privateObject.Invoke("FillListFields", dataTable, fields);
+            _privateObject.Invoke("FillListFields", dataTable, fields);
 
             // Assert
             this.ShouldSatisfyAllConditions(
