@@ -135,9 +135,7 @@ FROM            dbo.TSTIMESHEET AS TSTIMESHEET_1 INNER JOIN
 					{
 						epmLiveCn.Open();
 
-
 						#region ViewCode
-
 						epmLiveCn.ExecuteNonQuery($@"ALTER PROCEDURE [dbo].[spNGetNotifications] 
       -- Add the parameters for the stored procedure here
       @UserName NVARCHAR(255),
