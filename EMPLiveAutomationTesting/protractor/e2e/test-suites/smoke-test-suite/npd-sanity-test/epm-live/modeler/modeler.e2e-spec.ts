@@ -1,15 +1,6 @@
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
-import {StepLogger} from '../../../../../../core/logger/step-logger';
-import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
-import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
-import {EditCostHelper} from '../../../../../page-objects/pages/items-page/project-item/edit-cost-page/edit-cost.helper';
-import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
-import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
-import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import {IssueItemPageHelper} from '../../../../../page-objects/pages/items-page/issue-item/issue-item-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -21,6 +12,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
+    /* #UNSTABLE
     it('Validate Edit Cost Functionality in Cost Planner - [783206]', async () => {
         StepLogger.caseId = 783206;
         const cost = 4;
@@ -73,4 +65,5 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await EditCostHelper.verifyValueInVariousCategories(cost);
     });
+    */
 });

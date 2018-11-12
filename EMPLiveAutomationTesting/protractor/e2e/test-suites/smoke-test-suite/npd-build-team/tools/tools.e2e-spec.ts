@@ -1,15 +1,6 @@
 import {StepLogger} from '../../../../../core/logger/step-logger';
 import {PageHelper} from '../../../../components/html/page-helper';
-import {CommonPageHelper} from '../../../../page-objects/pages/common/common-page.helper';
-import {HomePage} from '../../../../page-objects/pages/homepage/home.po';
 import {SuiteNames} from '../../../helpers/suite-names';
-import {CommonPage} from '../../../../page-objects/pages/common/common.po';
-import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
-import {WaitHelper} from '../../../../components/html/wait-helper';
-import {ProjectItemPageConstants} from '../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
-import {ProjectItemPage} from '../../../../page-objects/pages/items-page/project-item/project-item.po';
-import {ElementHelper} from '../../../../components/html/element-helper';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -26,6 +17,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
+    /* #UNSTABLE
     it('Launch "Assignment Planner" - [743177]', async () => {
         StepLogger.caseId = 743177;
         StepLogger.stepId(1);
@@ -132,7 +124,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
     });
+    */
 
+    /* #UNSTABLE
     it('View the options under "Reports" drop-down" - [743178]', async () => {
         StepLogger.caseId = 743178;
         StepLogger.stepId(1);
@@ -235,5 +229,6 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
     });
+    */
 
 });

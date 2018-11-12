@@ -11,7 +11,6 @@ import {SuiteNames} from '../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ResourcePlannerPageHelper} from '../../../../../page-objects/pages/resource-planner-page/resource-planner-page.helper';
@@ -74,6 +73,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     });
 
+    /* #UNSTABLE
     it('Check Admin user has permissions to create Public fragments - [966249]', async () => {
         StepLogger.caseId = 966249;
         StepLogger.preCondition('Select "Navigation" icon  from left side menu');
@@ -137,6 +137,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
     });
+    */
 
     it('Insert Fragment - [966282]', async () => {
         StepLogger.caseId = 966282;

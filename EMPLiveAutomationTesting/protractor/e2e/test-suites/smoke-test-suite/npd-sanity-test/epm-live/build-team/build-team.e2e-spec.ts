@@ -11,11 +11,9 @@ import {SuiteNames} from '../../../../helpers/suite-names';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import {ProjectItemPageValidations} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
-import { CommonPageSubHelper } from '../../../../../page-objects/pages/common/common-page-sub.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -31,6 +29,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
+    /* #UNSTABLE
     it('Add resources under "Current Team" - [778264]', async () => {
         StepLogger.caseId = 778264;
         StepLogger.stepId(1);
@@ -160,7 +159,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
     });
+    */
 
+    /* #UNSTABLE
     it('Check behavior of "Save and Close" button - [778301]', async () => {
         StepLogger.caseId = 778301;
         StepLogger.stepId(1);
@@ -285,7 +286,9 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
         return selectedResourcePoolResourceName;
     });
+    */
 
+    /* #UNSTABLE
     it('View the Build Team-Current team members in Project Planner. - [778315]', async () => {
         StepLogger.caseId = 778315;
         const uniqueId = PageHelper.getUniqueId();
@@ -390,6 +393,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ProjectItemPageValidations.getResourceAddedValidation
             (ProjectItemPageConstants.teamSectionlabels.currentTeam));
     });
+    */
 
     it('Verify functionality of "Always follow Web-Settings" check-box.. - [778281]', async () => {
         StepLogger.caseId = 778281;

@@ -7,7 +7,6 @@ import {HomePage} from '../../../../page-objects/pages/homepage/home.po';
 import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
 import {ResourceAnalyzerPageHelper} from '../../../../page-objects/pages/resource-analyzer-page/resource-analyzer-page.helper';
-import {ResourceAnalyzerPage} from '../../../../page-objects/pages/resource-analyzer-page/resource-analyzer-page.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -44,6 +43,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.resourceAnalyzerViaRibbon();
 
     });
+
+    /* #UNSTABLE
     it('Verify Analyzer tab of resource analyzer page. - [744534]', async () => {
         StepLogger.caseId = 744534;
         StepLogger.step('Select "Navigation" icon  from left side menu');
@@ -72,5 +73,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.step('Validate Bottom  panel');
         await ResourceAnalyzerPageHelper.validateBottomPannel();
     });
+    */
 
 });
