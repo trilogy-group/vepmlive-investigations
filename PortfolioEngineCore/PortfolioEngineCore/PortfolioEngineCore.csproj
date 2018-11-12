@@ -103,6 +103,7 @@
     <Compile Include="Base\DBAccess.cs" />
     <Compile Include="Base\DBAccess\AdminPages.cs" />
     <Compile Include="Base\DBAccess\Calendars.cs" />
+    <Compile Include="Base\DBAccess\CalenderCleaner.cs" />
     <Compile Include="Base\DBAccess\CostCategories.cs" />
     <Compile Include="Base\DBAccess\Costs.cs" />
     <Compile Include="Base\DBAccess\CostTypes.cs" />
@@ -301,12 +302,12 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>regsvr32 /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_RSVP.dll"
-regsvr32 /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_PDSExt.dll"
-regsvr32 /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_DBASvr.dll"
-regsvr32 /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_RSVP.dll"
-regsvr32 /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_PDSExt.dll"
-regsvr32 /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_DBASvr.dll"
+    <PreBuildEvent>C:\Windows\syswow64\regsvr32.exe /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_RSVP.dll"
+C:\Windows\syswow64\regsvr32.exe /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_PDSExt.dll"
+C:\Windows\syswow64\regsvr32.exe /u /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_DBASvr.dll"
+C:\Windows\syswow64\regsvr32.exe /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_RSVP.dll"
+C:\Windows\syswow64\regsvr32.exe /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_PDSExt.dll"
+C:\Windows\syswow64\regsvr32.exe /s "$(ProjectDir)..\..\InstallShield\Build Dependencies\ServerFiles\WE_DBASvr.dll"
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

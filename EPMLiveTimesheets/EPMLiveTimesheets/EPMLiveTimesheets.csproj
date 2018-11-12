@@ -87,7 +87,6 @@
     <Compile Include="API\TimesheetAPI.cs" />
     <Compile Include="ApprovalsBase.cs" />
     <Compile Include="ApprovalsBase.RenderWebPart.cs" />
-    <Compile Include="DAO\MyTimesheetRepository.cs" />
     <Compile Include="Jobs\ApprovalJob.cs" />
     <Compile Include="Jobs\BaseJob.cs" />
     <Compile Include="Jobs\SaveDataJob.cs" />
@@ -136,8 +135,6 @@
     </Compile>
     <Compile Include="Models\TimeSheetItem.cs" />
     <Compile Include="Logger\Logger.cs" />
-    <Compile Include="MyTimesheetProperties.cs" />
-    <Compile Include="MyTimesheetRenderer.cs" />
     <Compile Include="MyTimesheet\MyTimesheet.cs" />
     <Compile Include="PMApprovals\PMApprovals.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

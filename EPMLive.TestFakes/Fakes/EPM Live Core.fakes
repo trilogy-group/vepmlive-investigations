@@ -114,6 +114,12 @@
     <Add FullName="EPMLiveCore.ApplicationStore.AppStore!"/>
     <Add FullName="EPMLiveCore.API.Reporting!"/>
     <Add FullName="EPMLiveCore.addusers!"/>
+    <Add FullName="EPMLiveCore.SocialEngine.Entities.Activity!"/>
     <Add Namespace="EPMLiveCore.Integrations.Salesforce!"/>
+    <Add FullName="EPMLiveCore.CascadingLookupField!"/>
+    <Add FullName="EPMLiveCore.CascadingLookupFieldSettings!"/>
+    <Add FullName="EPMLiveCore.ViewPermissionPage!"/>
+    <Add FullName="EPMLiveCore.ViewPermissionUtil!"/>
+    <Add FullName="EPMLiveCore.tpreport!"/>
   </ShimGeneration>
 </Fakes>
