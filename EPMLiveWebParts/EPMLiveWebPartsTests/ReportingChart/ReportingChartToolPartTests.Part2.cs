@@ -13,7 +13,7 @@ using EPMLiveWebParts.ReportingChart.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
-namespace EPMLiveWebParts.Tests.ReportingChart
+namespace EPMLiveWebParts.Tests.ReportingChartTests
 {
     partial class ReportingChartToolPartTests
     {
