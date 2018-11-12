@@ -137,6 +137,7 @@
     <Compile Include="GetTsTests.PageLoad.cs" />
     <Compile Include="GetTsTests.cs" />
     <Compile Include="Jobs\SaveJobTests.cs" />
+    <Compile Include="Layouts\epmlive\TimesheetadminTests.cs" />
     <Compile Include="Layouts\WorkLogTest.cs" />
     <Compile Include="MyTimesheetTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
