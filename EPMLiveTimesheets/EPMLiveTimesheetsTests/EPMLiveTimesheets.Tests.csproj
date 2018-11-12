@@ -157,6 +157,7 @@
     <Compile Include="WebPageCode\GetTSApprovalsTests.cs" />
     <Compile Include="PMApprovalsTest.cs" />
     <Compile Include="WebPageCode\GetTimesheetTest.cs" />
+    <Compile Include="WebPageCode\SavetimesheetTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
