@@ -259,7 +259,8 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.step('Verify Reporting Services page will be displayed with below fields');
         StepLogger.step('Verify "Period Start"');
-        await PageHelper.switchToNewTabIfAvailable(2);
+        await WaitHelper.staticWait(PageHelper.timeout.s);
+        await PageHelper.switchToNewTabIfAvailable();
         await WaitHelper.waitForElementToBePresent(ProjectItemPage.reportParameters.periodStart);
         await expect(await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.reportParameters.periodStart))
             .toBe(true,

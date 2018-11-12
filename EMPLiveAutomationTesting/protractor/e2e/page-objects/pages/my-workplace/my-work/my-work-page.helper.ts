@@ -113,6 +113,7 @@ export class MyWorkPageHelper {
         StepLogger.step(`click on "Edit Page" dropdown`);
         await PageHelper.click(MyWorkPage.editPageDropdown);
     }
+
     static  async verifyStopEditingOptionDisabled() {
         StepLogger.verification(`verify "Stop Editing" option is shown as disabled`);
         const stopEditingDisplayed = await PageHelper.isElementDisplayed(
@@ -275,15 +276,14 @@ export class MyWorkPageHelper {
         if (switchToFrame) {
             await CommonPageHelper.switchToFirstContentFrame();
         }
-        await PageHelper.click(MyWorkPage.buttonsOnPopup.save);
+        await PageHelper.clickAndWaitForElementToHide(MyWorkPage.buttonsOnPopup.save);
     }
 
-    static async verifyCreateItem(itemTitle: string) {
-        await browser.sleep(PageHelper.timeout.s);
-        await TextboxHelper.sendKeys(MyWorkPage.searchItem, itemTitle, true);
+    static async verifyCreateItem(itemTitle: Array<string>) {
+        await TextboxHelper.sendKeys(MyWorkPage.searchItem, itemTitle[0], true);
         await ExpectationHelper.verifyDisplayedStatus(
-            MyWorkPage.getItemByName(itemTitle),
-            itemTitle,
+            MyWorkPage.getItemByName(itemTitle[1]),
+            itemTitle[1],
         );
     }
 
@@ -427,7 +427,7 @@ export class MyWorkPageHelper {
         const itemEditedTitle = `${MyWorkPageConstants.editItemLabel} ${uniqueId}`;
         await CommonPageHelper.switchToFirstContentFrame();
         await TextboxHelper.sendKeys(MyWorkPage.inputs.title, itemEditedTitle);
-        return itemEditedTitle;
+        return [uniqueId, itemEditedTitle];
     }
 
     static async verifyChangesNotReflected(editedItemTitleForCancel: string) {
@@ -572,7 +572,11 @@ export class MyWorkPageHelper {
     static async selectViewFromCurrentView() {
         StepLogger.step('Select some other view apart from Default view ');
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
-        await browser.sleep(PageHelper.timeout.xs);
+        const isOpened = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.selectViewNameOtherThanDefault, PageHelper.timeout.s);
+        if (!isOpened) {
+            await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
+            await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.selectViewNameOtherThanDefault);
+        }
         await PageHelper.click(MyWorkPage.selectViewNameOtherThanDefault);
         // sometimes - stale exception
         await browser.sleep(PageHelper.timeout.s);
@@ -609,6 +613,10 @@ export class MyWorkPageHelper {
 
     static async clickDeleteView() {
         StepLogger.step('Click on Delete View button.');
+        const isPresent = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.getViewRibbonOptions.deleteView, PageHelper.timeout.s);
+        if (!isPresent) {
+            await this.clickViewsTab();
+        }
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.deleteView);
     }
 
@@ -813,11 +821,13 @@ export class MyWorkPageHelper {
         const ellipseMyWorkPageItems = MyWorkPage.ellipsesDropdown;
         await ElementHelper.actionHoverOver(ellipseMyWorkPageItems.workTypes);
         const workType = await PageHelper.getText(ellipseMyWorkPageItems.workTypeSubmenuItem);
-        await ElementHelper.actionHoverOverAndClick(ellipseMyWorkPageItems.workTypes, ellipseMyWorkPageItems.workTypeSubmenuItem);
+        await ElementHelper.actionHoverOver(ellipseMyWorkPageItems.workTypes);
+        await PageHelper.click(ellipseMyWorkPageItems.workTypeSubmenuItem);
         return workType;
     }
 
     static async verifySearchResults(workType: string) {
+        await WaitHelper.staticWait(PageHelper.timeout.xs);
         const rowCount = await MyWorkPage.gridDetails.workType.count();
         for (let i = 0; i < rowCount; i++) {
             await ExpectationHelper.verifyText(
@@ -1024,6 +1034,7 @@ export class MyWorkPageHelper {
             selectColumnsPopupItems.showAll,
             CommonPageConstants.selectColumnsPopup.showAll,
         );
+        await WaitHelper.waitForElementToBeHidden(selectColumnsPopupItems.eachSelectedColumn);
         await ExpectationHelper.verifyNotDisplayedStatus(
             selectColumnsPopupItems.eachSelectedColumn,
             MyWorkPageConstants.selectedCheckboxLabel,
@@ -1036,6 +1047,7 @@ export class MyWorkPageHelper {
     }
 
     static async verifyShowAllFunctionality() {
+        await WaitHelper.waitForElementToBeHidden(MyWorkPage.selectColumnsPopup.columnUnchecked);
         await ExpectationHelper.verifyNotDisplayedStatus(
             MyWorkPage.selectColumnsPopup.columnUnchecked,
             MyWorkPageConstants.unSelectedCheckboxLabel,
@@ -1046,13 +1058,13 @@ export class MyWorkPageHelper {
         const selectColumnPopupItems = MyWorkPage.selectColumnsPopup;
         // unselecting the columns which has images
         let i, j: number;
-        for (i = 0; i < 2; i++) {
+        for (i = 0; i < (await selectColumnPopupItems.columnNameWithImages.count()); i++) {
             await PageHelper.click(selectColumnPopupItems.columnNameWithImages.get(i));
         }
         await PageHelper.click(MyWorkPage.getColumnByNameOnSelectColumnsPopup('CommentCount'));
         // Getting the selected columns dynamically
         const allSelectedColumns: string[] = [];
-        const count = await selectColumnPopupItems.allSelectedColumn.count();
+        const count = await selectColumnPopupItems.allSelectedColumn.count() - 1;
         for (j = 0; j < count; j++) {
             const eachColumnName = await PageHelper.getText(selectColumnPopupItems.allSelectedColumn.get(j));
             allSelectedColumns.push(eachColumnName);

@@ -3,6 +3,16 @@ import {PageHelper} from '../../../../../components/html/page-helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {MyWorkPageHelper} from '../../../../../page-objects/pages/my-workplace/my-work/my-work-page.helper';
+import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
+import {RiskItemPageConstants} from '../../../../../page-objects/pages/items-page/risk-item/risk-item-page.constants';
+import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
+import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
+import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
+import {AnchorHelper} from '../../../../../components/html/anchor-helper';
+import {IssueItemPageConstants} from '../../../../../page-objects/pages/items-page/issue-item/issue-item-page.constants';
+import {ChangeItemPageConstants} from '../../../../../page-objects/pages/items-page/change-item/change-item-page.constants';
+import {MyWorkPage} from '../../../../../page-objects/pages/my-workplace/my-work/my-work.po';
+import {ElementHelper} from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.endToEndSuite, () => {
 
@@ -54,7 +64,14 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.stepId(4);
         const changesTitle = await MyWorkPageHelper.fillNewItemFormForChanges();
-        await MyWorkPageHelper.verifyCreateItem(changesTitle);
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.changes,
+            CommonPage.pageHeaders.projects.changes,
+            CommonPageConstants.pageHeaders.projects.changes,
+            changesTitle,
+            ChangeItemPageConstants.columnNames.linkTitleNoMenu);
+
+        StepLogger.verification('Newly created Change displayed in "Changes" page');
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(changesTitle), changesTitle);
     });
 
     it('Create New "Issues" Item. - [745085]', async () => {
@@ -70,7 +87,15 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.stepId(4);
         const issuesTitle = await MyWorkPageHelper.fillNewItemFormForIssues();
-        await MyWorkPageHelper.verifyCreateItem(issuesTitle);
+        await PageHelper.switchToDefaultContent();
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.issues,
+            CommonPage.pageHeaders.projects.issues,
+            CommonPageConstants.pageHeaders.projects.issues,
+            issuesTitle,
+            IssueItemPageConstants.columnNames.title);
+
+        StepLogger.verification('Newly created Issue displayed in "Issues" page');
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(issuesTitle), issuesTitle);
     });
 
     it('Create New "Risks" Item. - [745086]', async () => {
@@ -86,7 +111,13 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.stepId(4);
         const risksTitle = await MyWorkPageHelper.fillNewItemFormForRisks();
-        await MyWorkPageHelper.verifyCreateItem(risksTitle);
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
+            risksTitle,
+            RiskItemPageConstants.columnNames.title);
+        StepLogger.verification('Newly created Risk displayed in "Risks" page');
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(risksTitle), risksTitle);
     });
 
     it('Check validation while creating new item. - [745089]', async () => {
@@ -176,6 +207,7 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.stepId(4);
         StepLogger.step(`Click on "Edit page" option`);
+        await ElementHelper.clickUsingJs(MyWorkPage.editPageOptionInsideDropDown);
         await MyWorkPageHelper.clickOnEditItem();
 
         StepLogger.verification(`The page should be editable mode. `);
