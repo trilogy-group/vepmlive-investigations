@@ -127,8 +127,10 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             ShimSqlConnection.AllInstances.Close = _ => { };
             ShimSPFieldLookupValueCollection.Constructor = _ => new ShimSPFieldLookupValueCollection();
             ShimSPFieldLookupValue.ConstructorString = (_, __) => new ShimSPFieldLookupValue();
+            ShimSPSite.ConstructorString = (_, __) => new ShimSPSite();
             ShimSPSite.ConstructorGuid = (_, __) => new ShimSPSite();
             ShimSPSite.AllInstances.OpenWeb = _ => spWeb;
+            ShimSPSite.AllInstances.OpenWebString = (_, __) => spWeb;
             ShimSPSite.AllInstances.OpenWebGuid = (_, __) => spWeb;
             ShimSPSite.AllInstances.Dispose = _ => { };
             ShimSPWeb.AllInstances.Dispose = _ => { };
@@ -136,6 +138,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => DummyString;
             ShimCoreFunctions.getListSettingStringSPList = (_, __) => DummyString;
             ShimCoreFunctions.getConnectionStringGuid = _ => DummyString;
+            ShimCoreFunctions.getLockConfigSettingSPWebStringBoolean = (_1, _2, _3) => DummyString;
             ShimSPList.AllInstances.RootFolderGet = _ => spFolder;
             ShimSPList.AllInstances.GetItemsSPQuery = (_, __) => spListItemCollection;
             ShimSPPersistedObject.AllInstances.IdGet = _ => guid;
@@ -175,6 +178,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 IDGet = () => guid,
                 FieldsGet = () => spFieldCollection,
                 GetItemByIdInt32 = _ => spListItem,
+                ItemsGet = () => spListItemCollection,
                 GetItemsSPQuery = _ => spListItemCollection,
                 RootFolderGet = () => spFolder,
                 ParentWebGet = () => spWeb,

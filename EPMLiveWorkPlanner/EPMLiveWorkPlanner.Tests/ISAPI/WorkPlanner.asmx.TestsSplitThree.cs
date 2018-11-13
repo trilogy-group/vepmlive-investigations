@@ -7,11 +7,13 @@ using System.Linq;
 using System.Resources.Fakes;
 using System.Web.Fakes;
 using System.Xml;
+using System.Xml.Fakes;
 using System.Xml.Linq;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.ReportingProxy.Fakes;
 using EPMLiveWorkPlanner.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -25,6 +27,11 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private const string ReOrderAndSaveItemMethodName = "ReOrderAndSaveItem";
         private const string GetKanBanBoardMethodName = "GetKanBanBoard";
         private const string GetProjectInfoMethodName = "GetProjectInfo";
+        private const string GetAssignmentLayoutMethodName = "GetAssignmentLayout";
+        private const string GetLinksLayoutMethodName = "GetLinksLayout";
+        private const string GetAllocationLayoutMethodName = "GetAllocationLayout";
+        private const string GetAddLinksLayoutMethodName = "GetAddLinksLayout";
+        private const string ProcessAllocationResourcesColsMethodName = "ProcessAllocationResourcesCols";
 
         [TestMethod]
         public void ReOrderAndSaveItem_WhenCalled_ReturnsString()
@@ -272,7 +279,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         public void GetProjectInfo_WhenCalled_ReturnsString()
         {
             // Arrange
-            var dataXmlString = $@"
+            const string dataXmlString = @"
                 <xmlcfg Planner=""1"" ID=""1"">
                     <B/>
                 </xmlcfg>";
@@ -376,6 +383,374 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                     .ShouldBe("1"),
                 () => validations
                     .ShouldBe(10));
+        }
+
+        [TestMethod]
+        public void SetEnumField_SPFieldTypeChoice_EditsNode()
+        {
+            // Arrange
+            const string expected = "|  | CHOICE1| CHOICE2";
+            const string dataXmlString = @"<xmlcfg/>";
+            const string fieldDocXmlString = @"
+                <xmlcfg>
+                    <CHOICES>
+                        <CHOICE>CHOICE1</CHOICE>
+                        <CHOICE>CHOICE2</CHOICE>
+                    </CHOICES>
+                </xmlcfg>";
+            var dataXml = new XmlDocument();
+            var fieldDocXml = new XmlDocument();
+            var node = default(XmlNode);
+
+            dataXml.LoadXml(dataXmlString);
+            fieldDocXml.LoadXml(fieldDocXmlString);
+            node = dataXml.FirstChild;
+
+            spField.TypeGet = () => SPFieldType.Choice;
+            spField.RequiredGet = () => false;
+
+            // Act
+            WorkPlannerAPI.setEnumField(spField.Instance, ref node, fieldDocXml, dataXml, spWeb.Instance, true, DummyString, null);
+
+            // Assert
+            node.ShouldSatisfyAllConditions(
+                () => node.Attributes.GetNamedItem($"{DummyString}IconAlign").Value.ShouldBe("Right"),
+                () => node.Attributes.GetNamedItem($"{DummyString}Enum").Value.ShouldBe(expected));
+        }
+
+        [TestMethod]
+        public void SetEnumField_SPFieldTypeMultiChoice_EditsNode()
+        {
+            // Arrange
+            const string expected = "|CHOICE1|CHOICE2";
+            const string dataXmlString = @"<xmlcfg/>";
+            const string fieldDocXmlString = @"
+                <xmlcfg>
+                    <CHOICES>
+                        <CHOICE>CHOICE1</CHOICE>
+                        <CHOICE>CHOICE2</CHOICE>
+                    </CHOICES>
+                </xmlcfg>";
+            var dataXml = new XmlDocument();
+            var fieldDocXml = new XmlDocument();
+            var node = default(XmlNode);
+
+            dataXml.LoadXml(dataXmlString);
+            fieldDocXml.LoadXml(fieldDocXmlString);
+            node = dataXml.FirstChild;
+
+            spField.TypeGet = () => SPFieldType.MultiChoice;
+            spField.RequiredGet = () => false;
+
+            // Act
+            WorkPlannerAPI.setEnumField(spField.Instance, ref node, fieldDocXml, dataXml, spWeb.Instance, true, DummyString, null);
+
+            // Assert
+            node.ShouldSatisfyAllConditions(
+                () => node.Attributes.GetNamedItem($"{DummyString}IconAlign").Value.ShouldBe("Right"),
+                () => node.Attributes.GetNamedItem($"{DummyString}Enum").Value.ShouldBe(expected),
+                () => node.Attributes.GetNamedItem($"{DummyString}Range").Value.ShouldBe("1"));
+        }
+
+        [TestMethod]
+        public void SetEnumField_SPFieldTypeLookup_EditsNode()
+        {
+            // Arrange
+            const string LookupMultiString = "LookupMulti";
+            const string dataXmlString = @"<xmlcfg/>";
+            var fieldDocXmlString = $@"<xmlcfg List=""{SampleGuidString1}""/>";
+            var expectedEnumKey = $"|{DummyInt}|{DummyInt}";
+            var expectedEnum = $"|{DummyString}|{DummyString}";
+            var dataXml = new XmlDocument();
+            var fieldDocXml = new XmlDocument();
+            var node = default(XmlNode);
+
+            dataXml.LoadXml(dataXmlString);
+            fieldDocXml.LoadXml(fieldDocXmlString);
+            node = dataXml.FirstChild;
+
+            spField.TypeGet = () => SPFieldType.Lookup;
+            spField.RequiredGet = () => false;
+            spField.TypeAsStringGet = () => LookupMultiString;
+
+            ShimSPListItemCollection.AllInstances.GetEnumerator = _ => new List<SPListItem>()
+            {
+                spListItem,
+                spListItem
+            }.GetEnumerator();
+
+            // Act
+            WorkPlannerAPI.setEnumField(spField.Instance, ref node, fieldDocXml, dataXml, spWeb.Instance, true, DummyString, null);
+
+            // Assert
+            node.ShouldSatisfyAllConditions(
+                () => node.Attributes.GetNamedItem($"{DummyString}IconAlign").Value.ShouldBe("Right"),
+                () => node.Attributes.GetNamedItem($"{DummyString}Enum").Value.ShouldBe(expectedEnum),
+                () => node.Attributes.GetNamedItem($"{DummyString}EnumKeys").Value.ShouldBe(expectedEnumKey),
+                () => node.Attributes.GetNamedItem($"{DummyString}Range").Value.ShouldBe("1"));
+        }
+
+        [TestMethod]
+        public void SetEnumField_SPFieldTypeUser_EditsNode()
+        {
+            // Arrange
+            const string UserMultiString = "UserMulti";
+            const string dataXmlString = @"<xmlcfg/>";
+            var fieldDocXmlString = $@"<xmlcfg List=""{SampleGuidString1}""/>";
+            var expectedEnumKey = $"|{DummyInt}|{DummyInt}";
+            var expectedEnum = $"|{DummyString}|{DummyString}";
+            var dataXml = new XmlDocument();
+            var fieldDocXml = new XmlDocument();
+            var node = default(XmlNode);
+            var dataSet = new DataSet();
+            var row = default(DataRow);
+
+            dataXml.LoadXml(dataXmlString);
+            fieldDocXml.LoadXml(fieldDocXmlString);
+            node = dataXml.FirstChild;
+
+            spField.TypeGet = () => SPFieldType.User;
+            spField.RequiredGet = () => false;
+            spField.TypeAsStringGet = () => UserMultiString;
+
+            dataSet.Tables.Add(new DataTable());
+            dataSet.Tables.Add(new DataTable());
+            dataSet.Tables.Add(new DataTable());
+
+            dataSet.Tables[2].Columns.Add(TitleString);
+            dataSet.Tables[2].Columns.Add(IDStringCaps);
+            row = dataSet.Tables[2].NewRow();
+            row[TitleString] = DummyString;
+            row[IDStringCaps] = DummyInt;
+            dataSet.Tables[2].Rows.Add(row);
+            row = dataSet.Tables[2].NewRow();
+            row[TitleString] = DummyString;
+            row[IDStringCaps] = DummyInt;
+            dataSet.Tables[2].Rows.Add(row);
+
+            ShimSPListItemCollection.AllInstances.GetEnumerator = _ => new List<SPListItem>()
+            {
+                spListItem,
+                spListItem
+            }.GetEnumerator();
+
+            // Act
+            WorkPlannerAPI.setEnumField(spField.Instance, ref node, fieldDocXml, dataXml, spWeb.Instance, true, DummyString, dataSet);
+
+            // Assert
+            node.ShouldSatisfyAllConditions(
+                () => node.Attributes.GetNamedItem($"{DummyString}IconAlign").Value.ShouldBe("Right"),
+                () => node.Attributes.GetNamedItem($"{DummyString}Enum").Value.ShouldBe(expectedEnum),
+                () => node.Attributes.GetNamedItem($"{DummyString}EnumKeys").Value.ShouldBe(expectedEnumKey),
+                () => node.Attributes.GetNamedItem($"{DummyString}Range").Value.ShouldBe("1"));
+        }
+
+        [TestMethod]
+        public void GetAssignmentLayout_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string dataXmlString = @"<xmlcfg Planner=""1""/>";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_, __) =>
+            {
+                validations += 1;
+                return default(PlannerProps);
+            };
+            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) =>
+            {
+                validations += 1;
+                return dataXmlString;
+            };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(
+                GetAssignmentLayoutMethodName,
+                publicStatic,
+                new object[]
+                {
+                    data,
+                    spWeb.Instance
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("xmlcfg")
+                    .Attribute("Planner")
+                    .Value
+                    .ShouldBe("1"),
+                () => validations
+                    .ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetLinksLayout_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string dataXmlString = @"<xmlcfg Planner=""1""/>";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_, __) =>
+            {
+                validations += 1;
+                return default(PlannerProps);
+            };
+            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) =>
+            {
+                validations += 1;
+                return dataXmlString;
+            };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(
+                GetLinksLayoutMethodName,
+                publicStatic,
+                new object[]
+                {
+                    data,
+                    spWeb.Instance
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("xmlcfg")
+                    .Attribute("Planner")
+                    .Value
+                    .ShouldBe("1"),
+                () => validations
+                    .ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetAllocationLayout_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string dataXmlString = @"<xmlcfg Planner=""1""/>";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_, __) =>
+            {
+                validations += 1;
+                return default(PlannerProps);
+            };
+            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) =>
+            {
+                validations += 1;
+                return dataXmlString;
+            };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetAllocationLayoutMethodName, publicStatic, new object[] { data, spWeb.Instance }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("xmlcfg")
+                    .Attribute("Planner")
+                    .Value
+                    .ShouldBe("1"),
+                () => validations
+                    .ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetAddLinksLayout_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string dataXmlString = @"<xmlcfg Planner=""1""/>";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_, __) =>
+            {
+                validations += 1;
+                return default(PlannerProps);
+            };
+            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) =>
+            {
+                validations += 1;
+                return dataXmlString;
+            };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(
+                GetAddLinksLayoutMethodName,
+                publicStatic,
+                new object[]
+                {
+                    data,
+                    spWeb.Instance
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("xmlcfg")
+                    .Attribute("Planner")
+                    .Value
+                    .ShouldBe("1"),
+                () => validations
+                    .ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void ProcessAllocationResourcesCols_WhenCalled_AppendsChild()
+        {
+            // Arrange
+            const string dataXmlString = @"
+                <xmlcfg>
+                    <Cols/>
+                </xmlcfg>";
+            var data = new XmlDocument();
+            var colsNode = default(XmlNode);
+
+            data.LoadXml(dataXmlString);
+            colsNode = data.FirstChild.SelectSingleNode("//Cols");
+            spField.ReorderableGet = () => true;
+
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPField>()
+            {
+                spField,
+                spField
+            }.GetEnumerator();
+            ShimXmlNode.AllInstances.AppendChildXmlNode = (parentNode, childNode) =>
+            {
+                if (childNode.Name.Equals("C"))
+                {
+                    validations += 1;
+                    if (childNode.Attributes.GetNamedItem("Name").Value.Equals(DummyString))
+                    {
+                        validations += 1;
+                    }
+                }
+                ShimsContext.ExecuteWithoutShims(() =>
+                {
+                    parentNode.AppendChild(childNode);
+                });
+                return childNode;
+            };
+
+            // Act
+            var actual = privateObject.Invoke(
+                ProcessAllocationResourcesColsMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    colsNode,
+                    spWeb.Instance
+                });
+
+            // Assert
+            validations.ShouldBe(4);
         }
     }
 }
