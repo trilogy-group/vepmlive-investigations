@@ -34,6 +34,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         private bool _allowUnsafeUpdates;
         private ShimSPWeb _shimSpWeb;
         private string _fieldValue;
+        private string _status;
 
         [TestInitialize]
         public void TestInitialize()
@@ -45,6 +46,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             _objectAddedToList = null;
             _contentType = string.Empty;
             _fieldValue = string.Empty;
+            _status = One;
             _responseWriter = new StringWriter();
             _allowUnsafeUpdates = false;
 
@@ -330,7 +332,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             };
             listItem.ParentListGet = () => list;
             ShimSPSite.AllInstances.OpenWebGuid = (_, __) => new ShimSPWeb
-                    {
+            {
                 IDGet = () => Guid.NewGuid(),
                 ListsGet = () => new ShimSPListCollection
                 {
@@ -343,7 +345,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
                 {
                     if (key.Contains("_status"))
                     {
-                        //return "deleted";
+                        return _status;
                     }
                     else if (key.Equals("columns"))
                     {
