@@ -1,15 +1,15 @@
-import {browser} from 'protractor';
+// import {browser} from 'protractor';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
-import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
+// import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-import {HomePageConstants} from '../../../../../page-objects/pages/homepage/home-page.constants';
+// import {HomePageConstants} from '../../../../../page-objects/pages/homepage/home-page.constants';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
-import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
-import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
+// import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
+// import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
+// import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
 import {DocumentPageHelper} from '../../../../../page-objects/pages/documents/document-page.helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 
@@ -48,7 +48,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.file)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
     });
-
+/*
     it('Add Project Documents Functionality-New version of existing document-[1175281]', async () => {
         StepLogger.caseId = 1175281;
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
@@ -115,5 +115,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('Project Document uploaded [Ex: Testwordfile.docx] is displayed under the Project Node');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.file)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
-    });
+    }); */
 });
