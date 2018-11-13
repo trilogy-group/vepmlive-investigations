@@ -260,6 +260,7 @@
     <Compile Include="Layouts\epmlive\SolutionStoreProxyTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsRemTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsTests.cs" />
+    <Compile Include="Layouts\epmlive\TotalFieldsTests.cs" />
     <Compile Include="Layouts\epmlive\Upgraders\WE432UpgraderTests.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
     <Compile Include="Layouts\Reporting\IZenda\AddTests.cs" />
