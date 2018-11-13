@@ -12,7 +12,6 @@ import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
 import {WaitHelper} from '../../../components/html/wait-helper';
 import {DocumentPage} from './document-page.po';
 import {CommonPageHelper} from '../common/common-page.helper';
-import { DocumentPageConstants } from './document-page.constants';
 
 export class DocumentPageHelper {
 
@@ -83,7 +82,7 @@ export class DocumentPageHelper {
 
         StepLogger.verification('Home Page is displayed');
         await expect(await browser.getTitle())
-            .toBe(DocumentPageConstants.pageName, ValidationsHelper.getPageDisplayedValidation(DocumentPageConstants.pageName));
+            .toBe(HomePageConstants.homePage, ValidationsHelper.getPageDisplayedValidation(HomePageConstants.homePage));
     }
 
     static async verifyCreatedDocument() {
