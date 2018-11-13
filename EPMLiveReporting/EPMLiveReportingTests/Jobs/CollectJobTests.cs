@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Fakes;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common.Fakes;
@@ -9,7 +8,6 @@ using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.Infrastructure.Fakes;
@@ -31,18 +29,17 @@ namespace EPMLiveReporting.Tests.Jobs
     [ExcludeFromCodeCoverage]
     public class CollectJobTests
     {
+        private const string DummyString = "dummyString";
+        private const string CheckReqSPMethodName = "CheckReqSP";
+        private const string CheckSchemaMethodName = "CheckSchema";
+        private const string GetReportingConnectionMethodName = "getReportingConnection";
+        private const string SetRPTSettingsMethodName = "setRPTSettings";
+        private readonly Guid DummyGuid = Guid.NewGuid();
         private IDisposable shimsContext;
         private CollectJob collectJob;
         private PrivateObject privateObject;
-        private const string DummyString = "dummyString";
-        private readonly Guid DummyGuid = Guid.NewGuid();
-        private static bool ReturnValue;
-        private static string ErrorMessage;
+        private bool ReturnValue;
         private bool RefreshTimeSheetWasCalled = false;
-        private string CheckReqSPMethodName = "CheckReqSP";
-        private string CheckSchemaMethodName = "CheckSchema";
-        private string getReportingConnectionMethodName = "getReportingConnection";
-        private string setRPTSettingsMethodName = "setRPTSettings";
 
         [TestInitialize]
         public void Initialize()
@@ -54,12 +51,18 @@ namespace EPMLiveReporting.Tests.Jobs
             collectJob.JobUid = DummyGuid;
         }
 
+        [TestCleanup]
+        public void Cleanup()
+        {
+            shimsContext?.Dispose();
+        }
+
         private void SetupShims()
         {
             ShimEPMData.ConstructorGuid = (_, guid) => { };
-            ShimEPMData.AllInstances.LogStatusStringStringStringStringInt32Int32String = 
+            ShimEPMData.AllInstances.LogStatusStringStringStringStringInt32Int32String =
                 (_, listId, listName, shortMessage, longMessage, level, type, job) => true;
-            ShimWEIntegration.ConstructorStringStringStringStringStringBoolean = 
+            ShimWEIntegration.ConstructorStringStringStringStringStringBoolean =
                 (_, basePath, username, pid, compnay, db, debug) => { };
             ShimSPProcessIdentity.AllInstances.UsernameGet = _ => DummyString;
             ShimEPMData.AllInstances.GetClientReportingConnectionGet = _ => new SqlConnection();
@@ -67,16 +70,6 @@ namespace EPMLiveReporting.Tests.Jobs
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
             ShimCollectJob.AllInstances.getReportingConnectionSPWeb = (_, web) => DummyString;
             ShimDbDataAdapter.AllInstances.FillDataSet = (_, ds) => 1;
-
-
-
-
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            shimsContext?.Dispose();
         }
 
         [TestMethod]
@@ -108,12 +101,12 @@ namespace EPMLiveReporting.Tests.Jobs
             {
                 Dispose = () => { }
             };
-            var data = string.Empty;
             ShimProcessSecurity.ProcessSecurityGroupsSPSiteSqlConnectionString = 
                 (site, conn, users) => processSecurityGroupsWasCalled = true;
             ShimCollectJob.AllInstances.setRPTSettingsEPMDataSPSite = 
                 (_, epmData, site) => setRPTSettingsWasCalled = true;
             ShimCoreFunctions.getConfigSettingSPWebString = (web, setting) => bool.TrueString;
+            ReturnValue = true;
             ShimEPMData.AllInstances.RefreshTimesheetsStringOutGuidBoolean = RefreshTimesheets;
             ShimWEIntegration.AllInstances.ExecuteReportExtractString = (_, dataToExtract) =>
             {
@@ -146,7 +139,7 @@ namespace EPMLiveReporting.Tests.Jobs
                 (_, url, category, key) => removeSafelyWasCalled = true;
 
             // Act
-            collectJob.execute(spSite, spWeb, data);
+            collectJob.execute(spSite, spWeb, string.Empty);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -164,6 +157,7 @@ namespace EPMLiveReporting.Tests.Jobs
         public void Execute_ParamDataNotEmpty_ExecutesCorrectly()
         {
             // Arrange
+            const string Error = "err";
             var processSecurityGroupsWasCalled = false;
             var setRPTSettingsWasCalled = false;
             var executeReportExtractWasCalled = false;
@@ -190,10 +184,19 @@ namespace EPMLiveReporting.Tests.Jobs
                 Dispose = () => { },
                 ListsGet = () => new ShimSPListCollection
                 {
-                    ItemGetString = name => new ShimSPList()
+                    ItemGetString = name =>
+                    {
+                        if (name == DummyString)
+                        {
+                            return new ShimSPList();
+                        }
+                        else
+                        {
+                            throw new Exception();
+                        }
+                    }
                 }
             };
-            const string Data = "Dummy,Dummy";
             ShimProcessSecurity.ProcessSecurityGroupsSPSiteSqlConnectionString =
                 (site, conn, users) => processSecurityGroupsWasCalled = true;
             ShimCollectJob.AllInstances.setRPTSettingsEPMDataSPSite =
@@ -206,6 +209,18 @@ namespace EPMLiveReporting.Tests.Jobs
                 executeReportExtractWasCalled = true;
                 return DummyString;
             };
+            ShimSqlParameterCollection.AllInstances.AddWithValueStringObject = 
+                (_, name, value) => 
+                {
+                    if (value.ToString() == Error)
+                    {
+                        throw new Exception();
+                    }
+                    else
+                    {
+                        return new SqlParameter();
+                    }
+                };
             ShimCollectJob.AllInstances.CheckReqSPSqlConnection =
                 (_, connection) => checkReqSPWasCalled = true;
             ShimCollectJob.AllInstances.CheckSchemaSqlConnection =
@@ -234,9 +249,10 @@ namespace EPMLiveReporting.Tests.Jobs
             };
             ShimCacheStore.AllInstances.RemoveSafelyStringStringString =
                 (_, url, category, key) => removeSafelyWasCalled = true;
+            var data = $"{DummyString},err";
 
             // Act
-            collectJob.execute(spSite, spWeb, Data);
+            collectJob.execute(spSite, spWeb, data);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -250,10 +266,8 @@ namespace EPMLiveReporting.Tests.Jobs
                 () => RefreshTimeSheetWasCalled.ShouldBeTrue());
         }
 
-
-
         [TestMethod]
-        public void Execute_()
+        public void Execute_WithExceptions_LogErrorMessages()
         {
             // Arrange
             const string DummyError = "Dummy Error";
@@ -349,97 +363,7 @@ namespace EPMLiveReporting.Tests.Jobs
         }
 
         [TestMethod]
-        public void Execute_Errors2()
-        {
-            // Arrange
-            const string DummyError = "Dummy Error";
-            var expectedLogMEssages = new List<string>
-            {
-                "Updating reporting settings failed for site",
-
-            };
-            var logMessages = new List<string>();
-            ShimEPMData.AllInstances.LogStatusStringStringStringStringInt32Int32String =
-                (_, listId, listName, shortMessage, longMessage, level, type, job) =>
-                {
-                    logMessages.Add(shortMessage);
-                    logMessages.Add(longMessage);
-                    return true;
-                };
-            var spSite = new ShimSPSite
-            {
-                IDGet = () => DummyGuid,
-                UrlGet = () => DummyString,
-                AllWebsGet = () => null,
-                FeaturesGet = () => new ShimSPFeatureCollection
-                {
-                    ItemGetGuid = guid => new ShimSPFeature()
-                },
-                WebApplicationGet = () => new ShimSPWebApplication
-                {
-                    ApplicationPoolGet = () => new ShimSPApplicationPool()
-                }
-            }.Instance;
-            var spWeb = new ShimSPWeb
-            {
-                Dispose = () => { },
-                ListsGet = () => new ShimSPListCollection
-                {
-                    ItemGetString = name => new ShimSPList()
-                }
-            };
-            ShimProcessSecurity.ProcessSecurityGroupsSPSiteSqlConnectionString =
-                (site, conn, users) =>
-                {
-                    throw new Exception(DummyError);
-                };
-            ShimCollectJob.AllInstances.setRPTSettingsEPMDataSPSite =
-                (_, epmData, site) =>
-                {
-                    throw new Exception(DummyError);
-                };
-            ShimCoreFunctions.getConfigSettingSPWebString = (web, setting) => bool.TrueString;
-            ReturnValue = true;
-            ShimEPMData.AllInstances.RefreshTimesheetsStringOutGuidBoolean = RefreshTimesheetsException;
-            ShimWEIntegration.AllInstances.ExecuteReportExtractString =
-                (_, dataToExtract) =>
-                {
-                    throw new Exception(DummyError);
-                };
-            ShimCollectJob.AllInstances.CheckReqSPSqlConnection =
-                (_, connection) =>
-                {
-                    throw new Exception(DummyError);
-                };
-            ShimCollectJob.AllInstances.CheckSchemaSqlConnection =
-                (_, connection) =>
-                {
-                    throw new Exception(DummyError);
-                };
-            ShimDataScrubber.CleanTablesSPSiteEPMData =
-                (site, epmData) =>
-                {
-                    throw new Exception(DummyError);
-                };
-            ShimDataSet.AllInstances.TablesGet = _ => null;
-            ShimCacheStore.AllInstances.RemoveSafelyStringStringString =
-                (_, url, category, key) =>
-                {
-                    throw new Exception(DummyError);
-                };
-
-            // Act
-            collectJob.execute(spSite, spWeb, string.Empty);
-
-            // Assert
-            this.ShouldSatisfyAllConditions(
-                () => collectJob.sErrors.ShouldNotBeNullOrEmpty(),
-                () => expectedLogMEssages.ForEach(err => logMessages.Any(log => log.Contains(err))));
-        }
-
-
-        [TestMethod]
-        public void CheckReqSP()
+        public void CheckReqSP_Should_ExecuteCorrectly()
         {
             // Arrange
             const string ExpectedCommand = "IF NOT EXISTS (SELECT routine_name FROM " +
@@ -486,7 +410,8 @@ namespace EPMLiveReporting.Tests.Jobs
         public void GetReportingConnection_Should_ReturnExpectedValue()
         {
             // Arrange
-            const string ExpectedValue = "Data Source=dummyString;Initial Catalog=dummyString;User ID=dummyString;Password=dummyString";
+            const string ExpectedValue = "Data Source=dummyString;Initial Catalog=dummyString;" + 
+                "User ID=dummyString;Password=dummyString";
             var spWeb = new ShimSPWeb
             {
                 SiteGet = () => new ShimSPSite()
@@ -504,7 +429,7 @@ namespace EPMLiveReporting.Tests.Jobs
             };
 
             // Act
-            var result = privateObject.Invoke(getReportingConnectionMethodName, spWeb) as string;
+            var result = privateObject.Invoke(GetReportingConnectionMethodName, spWeb) as string;
 
             // Assert
             result.ShouldSatisfyAllConditions(
@@ -534,7 +459,7 @@ namespace EPMLiveReporting.Tests.Jobs
             };
 
             // Act
-            var result = privateObject.Invoke(getReportingConnectionMethodName, spWeb) as string;
+            var result = privateObject.Invoke(GetReportingConnectionMethodName, spWeb) as string;
 
             // Assert
             result.ShouldSatisfyAllConditions(
@@ -559,9 +484,10 @@ namespace EPMLiveReporting.Tests.Jobs
             {
                 throw new Exception();
             };
+            privateObject.SetFieldOrProperty("sbErrors", new StringBuilder());
 
             // Act
-            var result = privateObject.Invoke(getReportingConnectionMethodName, spWeb) as string;
+            var result = privateObject.Invoke(GetReportingConnectionMethodName, spWeb) as string;
 
             // Assert
             result.ShouldSatisfyAllConditions(
@@ -591,7 +517,7 @@ namespace EPMLiveReporting.Tests.Jobs
             privateObject.SetFieldOrProperty("sbErrors", new StringBuilder());
 
             // Act
-            privateObject.Invoke(setRPTSettingsMethodName, epm, spSite);
+            privateObject.Invoke(SetRPTSettingsMethodName, epm, spSite);
             var errors = privateObject.GetFieldOrProperty("sbErrors") as StringBuilder;
 
             // Assert
@@ -622,7 +548,7 @@ namespace EPMLiveReporting.Tests.Jobs
             privateObject.SetFieldOrProperty("sbErrors", new StringBuilder());
 
             // Act
-            privateObject.Invoke(setRPTSettingsMethodName, epm, spSite);
+            privateObject.Invoke(SetRPTSettingsMethodName, epm, spSite);
             var errors = privateObject.GetFieldOrProperty("sbErrors") as StringBuilder;
 
             // Assert
@@ -632,6 +558,9 @@ namespace EPMLiveReporting.Tests.Jobs
                 () => errors.ToString().ShouldContain("Error Updating RPTSettings"));
         }
 
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
         private bool UpdateRPTSettings(
             EPMData epmData, 
             string nonWorkingDays, 
@@ -652,7 +581,7 @@ namespace EPMLiveReporting.Tests.Jobs
             bool consolidationDone)
         {
             RefreshTimeSheetWasCalled = true;
-            message = ErrorMessage;
+            message = DummyString;
             return ReturnValue;
         }
 
@@ -667,6 +596,5 @@ namespace EPMLiveReporting.Tests.Jobs
         {
             throw new Exception();
         }
-        
     }
 }
