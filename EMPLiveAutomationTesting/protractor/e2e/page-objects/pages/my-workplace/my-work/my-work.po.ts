@@ -166,7 +166,7 @@ export class MyWorkPage {
             cc: element(By.name(commentsPopUpLabels.cc)),
             commentTextArea: element(By.id(commentsPopUpLabels.commentTextArea)),
             post: element(By.id(commentsPopUpLabels.post)),
-            edit: element(By.css(`${commentLinksSection}:first-child`)),
+            edit: element.all(By.cssContainingText('td>span.socialcomment-cmdlink>a', 'Edit')).last(),
             delete: element(By.css(`${commentLinksSection}:last-child`)),
             editCommentTextArea: element(By.css('.commentsContainer [id*="socialCommentInputBox"]')),
             editPost: element(By.css(`${editCommentSection} [title="${commentsPopUpLabels.editPost}"]`)),
