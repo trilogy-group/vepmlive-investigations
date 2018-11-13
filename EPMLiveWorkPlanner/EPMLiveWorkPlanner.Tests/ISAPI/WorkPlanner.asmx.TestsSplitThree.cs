@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Data.Common.Fakes;
 using System.Data.SqlClient.Fakes;
+using System.Globalization;
 using System.Linq;
 using System.Resources.Fakes;
 using System.Web.Fakes;
@@ -32,6 +35,18 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private const string GetAllocationLayoutMethodName = "GetAllocationLayout";
         private const string GetAddLinksLayoutMethodName = "GetAddLinksLayout";
         private const string ProcessAllocationResourcesColsMethodName = "ProcessAllocationResourcesCols";
+        private const string GetFormatMethodName = "getFormat";
+        private const string AddFieldNodeToDefMethodName = "addFieldNodeToDef";
+        private const string ProcessIndividualFieldMethodName = "processIndividualField";
+        private const string GetRealFieldMethodName = "getRealField";
+        private const string ProcessFieldMethodName = "processField";
+        private const string GetSettingsMethodName = "getSettings";
+        private const string GetKanBanPlannersMethodName = "GetKanBanPlanners";
+        private const string GetKanBanFilter1MethodName = "GetKanBanFilter1";
+        private const string TableNameString = "TableName";
+        private const string SharePointTypeString = "SharePointType";
+        private const string ColumnNameString = "ColumnName";
+        private const string ValueString = "Value";
 
         [TestMethod]
         public void ReOrderAndSaveItem_WhenCalled_ReturnsString()
@@ -137,17 +152,17 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
 
             data.LoadXml(dataXmlString);
 
-            columnsDataTable.Columns.Add("ColumnName");
-            columnsDataTable.Columns.Add("SharePointType");
+            columnsDataTable.Columns.Add(ColumnNameString);
+            columnsDataTable.Columns.Add(SharePointTypeString);
 
             row = columnsDataTable.NewRow();
-            row["ColumnName"] = DummyString;
-            row["SharePointType"] = DummyString;
+            row[ColumnNameString] = DummyString;
+            row[SharePointTypeString] = DummyString;
             columnsDataTable.Rows.Add(row);
 
             row = columnsDataTable.NewRow();
-            row["ColumnName"] = $"{DummyString}id";
-            row["SharePointType"] = "lookup";
+            row[ColumnNameString] = $"{DummyString}id";
+            row[SharePointTypeString] = "lookup";
             columnsDataTable.Rows.Add(row);
 
             sourceListData.Columns.Add("ID");
@@ -751,6 +766,1161 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
 
             // Assert
             validations.ShouldBe(4);
+        }
+
+        [TestMethod]
+        public void GetFormat_SPFieldTypeDateTime_ReturnsString()
+        {
+            // Arrange
+            const string dataXmlString = @"<xmlcfg/>";
+            var data = new XmlDocument();
+            var expected = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+
+            data.LoadXml(dataXmlString);
+            spField.TypeGet = () => SPFieldType.DateTime;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFormatMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    spField.Instance,
+                    data,
+                    string.Empty,
+                    spWeb.Instance
+                });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetFormat_SPFieldTypeNumberPercentageTrue_ReturnsString()
+        {
+            // Arrange
+            const string dataXmlString = @"<xmlcfg Percentage=""true""/>";
+            const string expected = "0\\%;;0\\%";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+            spField.TypeGet = () => SPFieldType.Number;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFormatMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    spField.Instance,
+                    data,
+                    string.Empty,
+                    spWeb.Instance
+                });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetFormat_SPFieldTypeNumberPercentageFalse_ReturnsString()
+        {
+            // Arrange
+            const string dataXmlString = @"<xmlcfg Percentage=""false"" Decimals=""5""/>";
+            const string expected = ",0.00000";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+            spField.TypeGet = () => SPFieldType.Number;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFormatMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    spField.Instance,
+                    data,
+                    string.Empty,
+                    spWeb.Instance
+                });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetFormat_SPFieldTypeCurrency_ReturnsString()
+        {
+            // Arrange
+            const string dataXmlString = @"<xmlcfg/>";
+            var expected = $"{CultureInfo.CurrentCulture.NumberFormat.CurrencySymbol},0.00";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+            spField.TypeGet = () => SPFieldType.Currency;
+            spWeb.LocaleGet = () => CultureInfo.CurrentCulture;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFormatMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    spField.Instance,
+                    data,
+                    string.Empty,
+                    spWeb.Instance
+                });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetFormat_SPFieldTypeCalculatedResultTypeCurrency_ReturnsString()
+        {
+            // Arrange
+            const string dataXmlString = @"<xmlcfg ResultType=""Currency"" Decimals=""5""/>";
+            var expected = $"{CultureInfo.CurrentCulture.NumberFormat.CurrencySymbol},0.00";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+            spField.TypeGet = () => SPFieldType.Calculated;
+            spWeb.LocaleGet = () => CultureInfo.CurrentCulture;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFormatMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    spField.Instance,
+                    data,
+                    string.Empty,
+                    spWeb.Instance
+                });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetFormat_SPFieldTypeCalculatedResultTypeNumber_ReturnsString()
+        {
+            // Arrange
+            const string dataXmlString = @"<xmlcfg ResultType=""Number"" Decimals=""5""/>";
+            const string expected = ",0.00000";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+            spField.TypeGet = () => SPFieldType.Calculated;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFormatMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    spField.Instance,
+                    data,
+                    string.Empty,
+                    spWeb.Instance
+                });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void AddFieldNodeToDef_WhenCalled_ReturnsXmlNode()
+        {
+            // Arrange
+            const string xmlString = @"<xmlcfg/>";
+            var data = new XmlDocument();
+
+            data.LoadXml(xmlString);
+
+            // Act
+            var actual = (XmlNode)privateObject.Invoke(
+                AddFieldNodeToDefMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    data,
+                    DummyString,
+                    DummyString
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Name.ShouldBe("D"),
+                () => actual.Attributes.GetNamedItem("Name").Value.ShouldBe(DummyString),
+                () => actual.Attributes.GetNamedItem($"{DummyString}CanEdit").Value.ShouldBe("0"));
+        }
+
+        [TestMethod]
+        public void ProcessIndividualField_WhenCalled_Returns()
+        {
+            // Arrange
+            var dataXmlString = $@"
+                <xmlcfg>
+                    <Def/>
+                    <{DummyString} {DummyString}CanEdit=""0""/>
+                </xmlcfg>";
+            var data = new XmlDocument();
+            var plannerProps = new PlannerProps()
+            {
+                oTaskFields = spFieldLinkCollection,
+                oFolderFields = spFieldLinkCollection,
+                oIterationFields = spFieldLinkCollection,
+                bAgile = true,
+                rollups = new ArrayList(),
+                rolldowns = new ArrayList(),
+                StatusFields = new SortedList()
+                {
+                    [DummyString] = DummyString
+                }
+            };
+
+            data.LoadXml(dataXmlString);
+
+            ShimWorkPlannerAPI.addFieldNodeToDefXmlDocumentRefStringString = (ref XmlDocument docOut, string defName, string field) =>
+            {
+                return docOut.FirstChild.SelectSingleNode($"//{DummyString}");
+            };
+            ShimXmlNode.AllInstances.AppendChildXmlNode = (parentNode, childNode) =>
+            {
+                if (parentNode.Name.Equals("Def"))
+                {
+                    if (childNode.Attributes[$"{DummyString}CanEdit"].Value.Equals("1"))
+                    {
+                        validations += 1;
+                    }
+                }
+                ShimsContext.ExecuteWithoutShims(() =>
+                {
+                    parentNode.AppendChild(childNode);
+                });
+                return childNode;
+            };
+
+            // Act
+            privateObject.Invoke(
+                ProcessIndividualFieldMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    data,
+                    spField.Instance,
+                    data,
+                    plannerProps
+                });
+
+            // Assert
+            validations.ShouldBe(6);
+        }
+
+        [TestMethod]
+        public void GetRealField_WhenCalled_Returns()
+        {
+            // Arrange
+            const string schemaXml = @"<xmlcfg DisplayNameSrcField=""DisplayNameSrcField""/>";
+
+            spField.TypeGet = () => SPFieldType.Computed;
+            spField.SchemaXmlGet = () => schemaXml;
+
+            // Act
+            var actual = (SPField)privateObject.Invoke(GetRealFieldMethodName, nonPublicStatic, new object[] { spField.Instance });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.SchemaXml.ShouldBe(schemaXml),
+                () => actual.Type.ShouldBe(SPFieldType.Computed));
+        }
+
+        [TestMethod]
+        public void ProcessField_SPFieldTypeText_AddsAttributes()
+        {
+            // Arrange
+            const string dataXmlString = @"
+                <xmlcfg>
+                    <cols/>
+                    <header/>
+                </xmlcfg>";
+            const string visible = "visible";
+            var dataXml = new XmlDocument();
+            var colsNode = default(XmlNode);
+            var headerNode = default(XmlNode);
+            var plannerProps = new PlannerProps();
+
+            dataXml.LoadXml(dataXmlString);
+            colsNode = dataXml.FirstChild.SelectSingleNode("//cols");
+            headerNode = dataXml.FirstChild.SelectSingleNode("//header");
+
+            spField.SchemaXmlGet = () => dataXmlString;
+            spField.TypeGet = () => SPFieldType.Text;
+            spField.InternalNameGet = () => TitleString;
+
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+            {
+                validations += 1;
+                EditFormat = DummyString;
+                return DummyString;
+            };
+
+            // Act
+            privateObject.Invoke(
+                ProcessFieldMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    dataXml,
+                    spField.Instance,
+                    visible,
+                    colsNode,
+                    headerNode,
+                    plannerProps,
+                    spWeb.Instance,
+                    default(DataSet)
+                });
+            var actual = colsNode.SelectSingleNode("//C");
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Attributes["Name"].Value.ShouldBe(TitleString),
+                () => actual.Attributes["CanEdit"].Value.ShouldBe("1"),
+                () => actual.Attributes["Width"].Value.ShouldBe("200"),
+                () => actual.Attributes["Type"].Value.ShouldBe("Text"),
+                () => actual.Attributes["CanFilter"].Value.ShouldBe("1"),
+                () => actual.Attributes["CanSort"].Value.ShouldBe("1"),
+                () => actual.Attributes["Visible"].Value.ShouldBe(visible),
+                () => actual.Attributes["Format"].Value.ShouldBe(DummyString),
+                () => actual.Attributes["EditFormat"].Value.ShouldBe(DummyString),
+                () => headerNode.Attributes[TitleString].Value.ShouldBe(DummyString),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void ProcessField_SPFieldTypeNumber_AddsAttributes()
+        {
+            // Arrange
+            const string summaryString = "Summary";
+            const string dataXmlString = @"
+                <xmlcfg>
+                    <cols/>
+                    <header/>
+                </xmlcfg>";
+            const string visible = "visible";
+            var dataXml = new XmlDocument();
+            var colsNode = default(XmlNode);
+            var headerNode = default(XmlNode);
+            var plannerProps = new PlannerProps();
+
+            dataXml.LoadXml(dataXmlString);
+            colsNode = dataXml.FirstChild.SelectSingleNode("//cols");
+            headerNode = dataXml.FirstChild.SelectSingleNode("//header");
+
+            spField.SchemaXmlGet = () => dataXmlString;
+            spField.TypeGet = () => SPFieldType.Number;
+            spField.InternalNameGet = () => summaryString;
+            spField.ReadOnlyFieldGet = () => true;
+
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+            {
+                validations += 1;
+                EditFormat = DummyString;
+                return DummyString;
+            };
+
+            // Act
+            privateObject.Invoke(
+                ProcessFieldMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    dataXml,
+                    spField.Instance,
+                    visible,
+                    colsNode,
+                    headerNode,
+                    plannerProps,
+                    spWeb.Instance,
+                    default(DataSet)
+                });
+            var actual = colsNode.SelectSingleNode("//C");
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Attributes["Align"].Value.ShouldBe("Right"),
+                () => actual.Attributes["CanEdit"].Value.ShouldBe("0"),
+                () => actual.Attributes["Width"].Value.ShouldBe("100"),
+                () => actual.Attributes["Type"].Value.ShouldBe("Float"),
+                () => headerNode.Attributes[summaryString].Value.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void ProcessField_SPFieldTypeCalculated_AddsAttributes()
+        {
+            // Arrange
+            const string summaryString = "Summary";
+            const string indicatorString = "Indicator";
+            const string dataXmlString = @"
+                <xmlcfg ResultType=""ResultType"">
+                    <cols/>
+                    <header/>
+                    <Formula>=Formula</Formula>
+                </xmlcfg>";
+            const string visible = "visible";
+            var dataXml = new XmlDocument();
+            var colsNode = default(XmlNode);
+            var headerNode = default(XmlNode);
+            var plannerProps = new PlannerProps();
+
+            dataXml.LoadXml(dataXmlString);
+            colsNode = dataXml.FirstChild.SelectSingleNode("//cols");
+            headerNode = dataXml.FirstChild.SelectSingleNode("//header");
+
+            spField.SchemaXmlGet = () => dataXmlString;
+            spField.TypeGet = () => SPFieldType.Calculated;
+            spField.InternalNameGet = () => summaryString;
+            spField.ReadOnlyFieldGet = () => true;
+            spField.DescriptionGet = () => indicatorString;
+
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+            {
+                validations += 1;
+                EditFormat = DummyString;
+                return DummyString;
+            };
+
+            // Act
+            privateObject.Invoke(
+                ProcessFieldMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    dataXml,
+                    spField.Instance,
+                    visible,
+                    colsNode,
+                    headerNode,
+                    plannerProps,
+                    spWeb.Instance,
+                    default(DataSet)
+                });
+            var actual = colsNode.SelectSingleNode("//C");
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Attributes["Formula"].Value.ShouldBe("Formula"),
+                () => actual.Attributes["Align"].Value.ShouldBe("Center"),
+                () => actual.Attributes["CanEdit"].Value.ShouldBe("0"),
+                () => actual.Attributes["Width"].Value.ShouldBe("100"),
+                () => actual.Attributes["Type"].Value.ShouldBe("Html"),
+                () => headerNode.Attributes[summaryString].Value.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void ProcessField_SPFieldTypeChoice_AddsAttributes()
+        {
+            // Arrange
+            const string expectedType = "Enum";
+            const string expectedWidth = "150";
+            const string summaryString = "Summary";
+            const string dataXmlString = @"
+                <xmlcfg>
+                    <cols/>
+                    <header/>
+                </xmlcfg>";
+            const string visible = "visible";
+            var dataXml = new XmlDocument();
+            var colsNode = default(XmlNode);
+            var headerNode = default(XmlNode);
+            var plannerProps = new PlannerProps();
+
+            dataXml.LoadXml(dataXmlString);
+            colsNode = dataXml.FirstChild.SelectSingleNode("//cols");
+            headerNode = dataXml.FirstChild.SelectSingleNode("//header");
+
+            spField.SchemaXmlGet = () => dataXmlString;
+            spField.TypeGet = () => SPFieldType.Choice;
+            spField.InternalNameGet = () => summaryString;
+            spField.ReadOnlyFieldGet = () => true;
+
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+            {
+                validations += 1;
+                EditFormat = DummyString;
+                return DummyString;
+            };
+            ShimWorkPlannerAPI.setEnumFieldSPFieldXmlNodeRefXmlDocumentXmlDocumentSPWebBooleanStringDataSet =
+                (SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources) =>
+                {
+                    validations += 1;
+                };
+
+            // Act
+            privateObject.Invoke(
+                ProcessFieldMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    dataXml,
+                    spField.Instance,
+                    visible,
+                    colsNode,
+                    headerNode,
+                    plannerProps,
+                    spWeb.Instance,
+                    default(DataSet)
+                });
+            var actual = colsNode.SelectSingleNode("//C");
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Attributes["CanEdit"].Value.ShouldBe("0"),
+                () => actual.Attributes["Width"].Value.ShouldBe(expectedWidth),
+                () => actual.Attributes["Type"].Value.ShouldBe(expectedType),
+                () => headerNode.Attributes[summaryString].Value.ShouldBe(DummyString),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void ProcessField_SPFieldTypeLookup_AddsAttributes()
+        {
+            // Arrange
+            const string expectedType = "Enum";
+            const string expectedWidth = "150";
+            const string summaryString = "Summary";
+            const string dataXmlString = @"
+                <xmlcfg>
+                    <cols/>
+                    <header/>
+                </xmlcfg>";
+            const string visible = "visible";
+            var dataXml = new XmlDocument();
+            var colsNode = default(XmlNode);
+            var headerNode = default(XmlNode);
+            var plannerProps = new PlannerProps();
+
+            dataXml.LoadXml(dataXmlString);
+            colsNode = dataXml.FirstChild.SelectSingleNode("//cols");
+            headerNode = dataXml.FirstChild.SelectSingleNode("//header");
+
+            spField.SchemaXmlGet = () => dataXmlString;
+            spField.TypeGet = () => SPFieldType.Lookup;
+            spField.InternalNameGet = () => summaryString;
+            spField.ReadOnlyFieldGet = () => true;
+
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+            {
+                validations += 1;
+                EditFormat = DummyString;
+                return DummyString;
+            };
+            ShimWorkPlannerAPI.setEnumFieldSPFieldXmlNodeRefXmlDocumentXmlDocumentSPWebBooleanStringDataSet =
+                (SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources) =>
+                {
+                    validations += 1;
+                };
+
+            // Act
+            privateObject.Invoke(
+                ProcessFieldMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    dataXml,
+                    spField.Instance,
+                    visible,
+                    colsNode,
+                    headerNode,
+                    plannerProps,
+                    spWeb.Instance,
+                    default(DataSet)
+                });
+            var actual = colsNode.SelectSingleNode("//C");
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Attributes["CanEdit"].Value.ShouldBe("0"),
+                () => actual.Attributes["Width"].Value.ShouldBe(expectedWidth),
+                () => actual.Attributes["Type"].Value.ShouldBe(expectedType),
+                () => headerNode.Attributes[summaryString].Value.ShouldBe(DummyString),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void ProcessField_SPFieldTypeMultiChoice_AddsAttributes()
+        {
+            // Arrange
+            const string expectedType = "Enum";
+            const string expectedWidth = "150";
+            const string summaryString = "Summary";
+            const string dataXmlString = @"
+                <xmlcfg>
+                    <cols/>
+                    <header/>
+                </xmlcfg>";
+            const string visible = "visible";
+            var dataXml = new XmlDocument();
+            var colsNode = default(XmlNode);
+            var headerNode = default(XmlNode);
+            var plannerProps = new PlannerProps();
+
+            dataXml.LoadXml(dataXmlString);
+            colsNode = dataXml.FirstChild.SelectSingleNode("//cols");
+            headerNode = dataXml.FirstChild.SelectSingleNode("//header");
+
+            spField.SchemaXmlGet = () => dataXmlString;
+            spField.TypeGet = () => SPFieldType.MultiChoice;
+            spField.InternalNameGet = () => summaryString;
+            spField.ReadOnlyFieldGet = () => true;
+
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+            {
+                validations += 1;
+                EditFormat = DummyString;
+                return DummyString;
+            };
+            ShimWorkPlannerAPI.setEnumFieldSPFieldXmlNodeRefXmlDocumentXmlDocumentSPWebBooleanStringDataSet =
+                (SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources) =>
+                {
+                    validations += 1;
+                };
+
+            // Act
+            privateObject.Invoke(
+                ProcessFieldMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    dataXml,
+                    spField.Instance,
+                    visible,
+                    colsNode,
+                    headerNode,
+                    plannerProps,
+                    spWeb.Instance,
+                    default(DataSet)
+                });
+            var actual = colsNode.SelectSingleNode("//C");
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Attributes["CanEdit"].Value.ShouldBe("0"),
+                () => actual.Attributes["Width"].Value.ShouldBe(expectedWidth),
+                () => actual.Attributes["Type"].Value.ShouldBe(expectedType),
+                () => headerNode.Attributes[summaryString].Value.ShouldBe(DummyString),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void ProcessField_SPFieldTypeUser_AddsAttributes()
+        {
+            // Arrange
+            const string expectedType = "Enum";
+            const string expectedWidth = "150";
+            const string summaryString = "Summary";
+            const string dataXmlString = @"
+                <xmlcfg>
+                    <cols/>
+                    <header/>
+                </xmlcfg>";
+            const string visible = "visible";
+            var dataXml = new XmlDocument();
+            var colsNode = default(XmlNode);
+            var headerNode = default(XmlNode);
+            var plannerProps = new PlannerProps();
+
+            dataXml.LoadXml(dataXmlString);
+            colsNode = dataXml.FirstChild.SelectSingleNode("//cols");
+            headerNode = dataXml.FirstChild.SelectSingleNode("//header");
+
+            spField.SchemaXmlGet = () => dataXmlString;
+            spField.TypeGet = () => SPFieldType.User;
+            spField.InternalNameGet = () => summaryString;
+            spField.ReadOnlyFieldGet = () => true;
+
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+            {
+                validations += 1;
+                EditFormat = DummyString;
+                return DummyString;
+            };
+            ShimWorkPlannerAPI.setEnumFieldSPFieldXmlNodeRefXmlDocumentXmlDocumentSPWebBooleanStringDataSet =
+                (SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources) =>
+                {
+                    validations += 1;
+                };
+
+            // Act
+            privateObject.Invoke(
+                ProcessFieldMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    dataXml,
+                    spField.Instance,
+                    visible,
+                    colsNode,
+                    headerNode,
+                    plannerProps,
+                    spWeb.Instance,
+                    default(DataSet)
+                });
+            var actual = colsNode.SelectSingleNode("//C");
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Attributes["CanEdit"].Value.ShouldBe("0"),
+                () => actual.Attributes["Width"].Value.ShouldBe(expectedWidth),
+                () => actual.Attributes["Type"].Value.ShouldBe(expectedType),
+                () => headerNode.Attributes[summaryString].Value.ShouldBe(DummyString),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void ProcessField_SPFieldTypeURL_AddsAttributes()
+        {
+            // Arrange
+            const string expectedType = "Link";
+            const string expectedWidth = "150";
+            const string summaryString = "Summary";
+            const string dataXmlString = @"
+                <xmlcfg>
+                    <cols/>
+                    <header/>
+                </xmlcfg>";
+            const string visible = "visible";
+            var dataXml = new XmlDocument();
+            var colsNode = default(XmlNode);
+            var headerNode = default(XmlNode);
+            var plannerProps = new PlannerProps();
+
+            dataXml.LoadXml(dataXmlString);
+            colsNode = dataXml.FirstChild.SelectSingleNode("//cols");
+            headerNode = dataXml.FirstChild.SelectSingleNode("//header");
+
+            spField.SchemaXmlGet = () => dataXmlString;
+            spField.TypeGet = () => SPFieldType.URL;
+            spField.InternalNameGet = () => summaryString;
+            spField.ReadOnlyFieldGet = () => true;
+
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+            {
+                validations += 1;
+                EditFormat = DummyString;
+                return DummyString;
+            };
+            ShimWorkPlannerAPI.setEnumFieldSPFieldXmlNodeRefXmlDocumentXmlDocumentSPWebBooleanStringDataSet =
+                (SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources) =>
+                {
+                    validations += 1;
+                };
+
+            // Act
+            privateObject.Invoke(
+                ProcessFieldMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    dataXml,
+                    spField.Instance,
+                    visible,
+                    colsNode,
+                    headerNode,
+                    plannerProps,
+                    spWeb.Instance,
+                    default(DataSet)
+                });
+            var actual = colsNode.SelectSingleNode("//C");
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Attributes["CanEdit"].Value.ShouldBe("0"),
+                () => actual.Attributes["Width"].Value.ShouldBe(expectedWidth),
+                () => actual.Attributes["Type"].Value.ShouldBe(expectedType),
+                () => headerNode.Attributes[summaryString].Value.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void ProcessField_SPFieldTypeNote_AddsAttributes()
+        {
+            // Arrange
+            const string expectedType = "Html";
+            const string expectedWidth = "200";
+            const string summaryString = "Summary";
+            const string dataXmlString = @"
+                <xmlcfg>
+                    <cols/>
+                    <header/>
+                </xmlcfg>";
+            const string visible = "visible";
+            var dataXml = new XmlDocument();
+            var colsNode = default(XmlNode);
+            var headerNode = default(XmlNode);
+            var plannerProps = new PlannerProps();
+
+            dataXml.LoadXml(dataXmlString);
+            colsNode = dataXml.FirstChild.SelectSingleNode("//cols");
+            headerNode = dataXml.FirstChild.SelectSingleNode("//header");
+
+            spField.SchemaXmlGet = () => dataXmlString;
+            spField.TypeGet = () => SPFieldType.Note;
+            spField.InternalNameGet = () => summaryString;
+            spField.ReadOnlyFieldGet = () => true;
+
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+            {
+                validations += 1;
+                EditFormat = DummyString;
+                return DummyString;
+            };
+            ShimWorkPlannerAPI.setEnumFieldSPFieldXmlNodeRefXmlDocumentXmlDocumentSPWebBooleanStringDataSet =
+                (SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources) =>
+                {
+                    validations += 1;
+                };
+
+            // Act
+            privateObject.Invoke(
+                ProcessFieldMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    dataXml,
+                    spField.Instance,
+                    visible,
+                    colsNode,
+                    headerNode,
+                    plannerProps,
+                    spWeb.Instance,
+                    default(DataSet)
+                });
+            var actual = colsNode.SelectSingleNode("//C");
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Attributes["CanEdit"].Value.ShouldBe("0"),
+                () => actual.Attributes["Width"].Value.ShouldBe(expectedWidth),
+                () => actual.Attributes["Type"].Value.ShouldBe(expectedType),
+                () => headerNode.Attributes[summaryString].Value.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetSettings_LockWebEmpty_ReturnsPlannerProps()
+        {
+            // Arrange
+            const string suffix = "EPMLivePlanner";
+            const string plannerString = "planner";
+            const string fields = "1|RollDown\n2|RollUp";
+            var expectedQuery = $"<Where><Eq><FieldRef Name='HolidaySchedule' LookupId='True'/><Value Type='Lookup'>{DummyString}</Value></Eq></Where>";
+            var configSettings = new Dictionary<string, string>()
+            {
+                [$"{suffix}{plannerString}UseFolders"] = bool.TrueString,
+                [$"{suffix}{plannerString}EnableAgile"] = bool.TrueString,
+                [$"{suffix}{plannerString}CalcWork"] = bool.TrueString,
+                [$"{suffix}{plannerString}CalcCost"] = bool.TrueString,
+                [$"{suffix}{plannerString}EnableLink"] = bool.TrueString,
+                [$"{suffix}{plannerString}StartSoon"] = bool.TrueString,
+                [$"{suffix}{plannerString}TaskType"] = DummyInt.ToString(),
+                [$"{suffix}{plannerString}LunchStart"] = DummyInt.ToString(),
+                [$"{suffix}{plannerString}LunchEnd"] = DummyInt.ToString(),
+                [$"{suffix}{plannerString}Fields"] = fields,
+            };
+
+            spWeb.RegionalSettingsGet = () => new ShimSPRegionalSettings()
+            {
+                WorkDaysGet = () => 5,
+                WorkDayStartHourGet = () => 9,
+                WorkDayEndHourGet = () => 18,
+            };
+            spListItemCollection.GetDataTable = () => new DataTable();
+            spListItemCollection.CountGet = () => One;
+
+            ShimCoreFunctions.getLockedWebSPWeb = _ => Guid.Empty;
+            ShimCoreFunctions.getConfigSettingSPWebString = (_1, input) =>
+            {
+                if (configSettings.ContainsKey(input))
+                {
+                    return configSettings[input];
+                }
+                return DummyString;
+            };
+            ShimSPQuery.AllInstances.QuerySetString = (_, query) =>
+            {
+                if (query.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+            };
+
+            // Act
+            var actual = (PlannerProps)privateObject.Invoke(
+                GetSettingsMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spWeb.Instance,
+                    plannerString
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.rolldowns.Count.ShouldBe(1),
+                () => actual.rollups.Count.ShouldBe(1),
+                () => actual.bUseFolders.ShouldBeTrue(),
+                () => actual.bAgile.ShouldBeTrue(),
+                () => actual.bCalcWork.ShouldBeTrue(),
+                () => actual.bStartSoon.ShouldBeTrue(),
+                () => actual.Holidays.ShouldNotBeNull(),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetSettings_LockWebNotEmpty_ReturnsPlannerProps()
+        {
+            // Arrange
+            const string suffix = "EPMLivePlanner";
+            const string plannerString = "planner";
+            const string fields = "1|RollDown\n2|RollUp";
+            var expectedQuery = $"<Where><Eq><FieldRef Name='HolidaySchedule' LookupId='True'/><Value Type='Lookup'>{DummyString}</Value></Eq></Where>";
+            var configSettings = new Dictionary<string, string>()
+            {
+                [$"{suffix}{plannerString}UseFolders"] = bool.TrueString,
+                [$"{suffix}{plannerString}EnableAgile"] = bool.TrueString,
+                [$"{suffix}{plannerString}CalcWork"] = bool.TrueString,
+                [$"{suffix}{plannerString}CalcCost"] = bool.TrueString,
+                [$"{suffix}{plannerString}EnableLink"] = bool.TrueString,
+                [$"{suffix}{plannerString}StartSoon"] = bool.TrueString,
+                [$"{suffix}{plannerString}TaskType"] = DummyInt.ToString(),
+                [$"{suffix}{plannerString}LunchStart"] = DummyInt.ToString(),
+                [$"{suffix}{plannerString}LunchEnd"] = DummyInt.ToString(),
+                [$"{suffix}{plannerString}Fields"] = fields,
+            };
+
+            spWeb.RegionalSettingsGet = () => new ShimSPRegionalSettings()
+            {
+                WorkDaysGet = () => 5,
+                WorkDayStartHourGet = () => 9,
+                WorkDayEndHourGet = () => 18,
+            };
+            spListItemCollection.GetDataTable = () => new DataTable();
+            spListItemCollection.CountGet = () => One;
+
+            ShimCoreFunctions.getLockedWebSPWeb = _ => Guid.Parse(SampleGuidString2);
+            ShimCoreFunctions.getConfigSettingSPWebString = (_1, input) =>
+            {
+                if (configSettings.ContainsKey(input))
+                {
+                    return configSettings[input];
+                }
+                return DummyString;
+            };
+            ShimSPQuery.AllInstances.QuerySetString = (_, query) =>
+            {
+                if (query.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+            };
+
+            // Act
+            var actual = (PlannerProps)privateObject.Invoke(
+                GetSettingsMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spWeb.Instance,
+                    plannerString
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.rolldowns.Count.ShouldBe(1),
+                () => actual.rollups.Count.ShouldBe(1),
+                () => actual.bUseFolders.ShouldBeTrue(),
+                () => actual.bAgile.ShouldBeTrue(),
+                () => actual.bCalcWork.ShouldBeTrue(),
+                () => actual.bStartSoon.ShouldBeTrue(),
+                () => actual.Holidays.ShouldNotBeNull(),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetKanBanPlanners_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string plannerKey = "EPMLivePlannerPlanners";
+            const string plannerString = "1|2,3|4";
+            var jsonData = $"{{\"id\":\"{1}\",\"text\":\"{2}\"}},{{\"id\":\"{3}\",\"text\":\"{4}\"}}";
+            var expected = $"{{ \"kanbanplanners\": [{jsonData}] }}";
+            const string dataXmlString = @"<xmlcfg/>";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, input) =>
+            {
+                if (input.Equals(plannerKey))
+                {
+                    return plannerString;
+                }
+                return bool.TrueString;
+            };
+            ShimHttpUtility.HtmlEncodeString = input =>
+            {
+                validations += 1;
+                return input;
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetKanBanPlannersMethodName,
+                publicStatic,
+                new object[]
+                {
+                    data,
+                    spWeb.Instance
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(expected),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetKanBanFilter1_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string lookupString = "Lookup";
+            const string dataXmlString = @"
+                <xmlcfg>
+                    <ID>1</ID>
+                    <KanBanBoardName>KanBanBoardName</KanBanBoardName>
+                </xmlcfg>";
+            var data = new XmlDocument();
+            var plannerProps = new PlannerProps()
+            {
+                sListTaskCenter = DummyString,
+                sProjectField = DummyString,
+                KanBanFilterColumn = DummyString,
+                KanBanStatusColumn = DummyString,
+                KanBanItemStatusFieldsAvailable = "1,2"
+            };
+            var methodHit = 0;
+            var tableName = new DataTable();
+            var filterColumns = new DataTable();
+            var filterColumnValues = new DataTable();
+            var row = default(DataRow);
+            var jsonData = $"{{\"id\":\"{1}\",\"text\":\"{1}\"}},{{\"id\":\"{2}\",\"text\":\"{2}\"}}";
+            var jsonBacklogStatus = $"{{\"id\":\"{1}\"}},{{\"id\":\"{2}\"}}";
+            var kanbanNewItemUrl = $"{DummyString}?LookupField={DummyString}&LookupValue={1}";
+            var expected = $"{{ \"kanbannewitemurl\": \"{kanbanNewItemUrl}\", \"kanbanitemname\": \"{DummyString}\", \"kanbanstatuscolumn\": \"{DummyString}\", \"kanbanstatusvalues\": [{jsonBacklogStatus}], \"kanbanerror\": \"\", \"kanbanfilter1name\": \"{DummyString}\", \"kanbanfilter1\": [{jsonData}] }}";
+
+            data.LoadXml(dataXmlString);
+
+            tableName.Columns.Add(TableNameString);
+            row = tableName.NewRow();
+            row[TableNameString] = DummyString;
+            tableName.Rows.Add(row);
+
+            filterColumns.Columns.Add(SharePointTypeString);
+            filterColumns.Columns.Add(ColumnNameString);
+            row = filterColumns.NewRow();
+            row[SharePointTypeString] = lookupString;
+            row[ColumnNameString] = DummyString;
+            filterColumns.Rows.Add(row);
+            row = filterColumns.NewRow();
+            row[SharePointTypeString] = lookupString;
+            row[ColumnNameString] = DummyString;
+            filterColumns.Rows.Add(row);
+
+            filterColumnValues.Columns.Add(ValueString);
+            row = filterColumnValues.NewRow();
+            row[ValueString] = 1;
+            filterColumnValues.Rows.Add(row);
+            row = filterColumnValues.NewRow();
+            row[ValueString] = 2;
+            filterColumnValues.Rows.Add(row);
+
+            spList.DefaultNewFormUrlGet = () => DummyString;
+            ShimHttpUtility.HtmlEncodeString = input => input;
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_, __) => plannerProps;
+            ShimQueryExecutor.AllInstances.ExecuteReportingDBQueryStringIDictionaryOfStringObject = (_, _1, _2) =>
+            {
+                methodHit += 1;
+                if (methodHit.Equals(1))
+                {
+                    return tableName;
+                }
+                else if (methodHit.Equals(2))
+                {
+                    return filterColumns;
+                }
+                else
+                {
+                    return filterColumnValues;
+                }
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetKanBanFilter1MethodName,
+                publicStatic,
+                new object[]
+                {
+                    data,
+                    spWeb.Instance
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(expected),
+                () => methodHit.ShouldBe(3));
         }
     }
 }

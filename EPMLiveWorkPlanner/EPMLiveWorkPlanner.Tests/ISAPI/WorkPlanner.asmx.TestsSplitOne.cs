@@ -145,6 +145,8 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
             ShimSPFieldUserValueCollection.ConstructorSPWebString = (_, _1, _2) => new ShimSPFieldUserValueCollection();
             ShimQueryExecutor.ConstructorSPWeb = (_, __) => new ShimQueryExecutor();
+            ShimSPQuery.Constructor = _ => new ShimSPQuery();
+            ShimQueryExecutor.ConstructorSPWeb = (_, __) => new ShimQueryExecutor();
         }
 
         private void SetupVariables()
@@ -165,7 +167,8 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spSite = new ShimSPSite()
             {
                 IDGet = () => guid,
-                WebApplicationGet = () => new ShimSPWebApplication()
+                WebApplicationGet = () => new ShimSPWebApplication(),
+                RootWebGet = () => spWeb
             };
             spListCollection = new ShimSPListCollection()
             {
@@ -259,6 +262,10 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spContentType = new ShimSPContentType()
             {
                 FieldLinksGet = () => spFieldLinkCollection
+            };
+            spFieldLinkCollection = new ShimSPFieldLinkCollection()
+            {
+                ItemGetGuid = _ => new ShimSPFieldLink()
             };
         }
 
