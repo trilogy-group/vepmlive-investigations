@@ -540,6 +540,7 @@ export class MyWorkPageHelper {
     }
 
     static async verifySaveViewPopupDisplayed() {
+        await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.viewsPopup.name);
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.viewsPopup.name,
             MyWorkPageConstants.saveViewPopupLabel,
