@@ -276,7 +276,7 @@ export class MyWorkPageHelper {
         if (switchToFrame) {
             await CommonPageHelper.switchToFirstContentFrame();
         }
-        await PageHelper.clickAndWaitForElementToHide(MyWorkPage.buttonsOnPopup.save);
+        await PageHelper.click(MyWorkPage.buttonsOnPopup.save);
     }
 
     static async verifyCreateItem(itemTitle: Array<string>) {
