@@ -154,6 +154,7 @@
     <Compile Include="ReportViewerTest.cs" />
     <Compile Include="WebPageCode\getgriditemsTests.cs" />
     <Compile Include="WebPageCode\getgriditemsTests.IsEditable.cs" />
+    <Compile Include="WebPageCode\SavegridTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
