@@ -12,6 +12,7 @@ import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
 import {WaitHelper} from '../../../components/html/wait-helper';
 import {DocumentPage} from './document-page.po';
 import {CommonPageHelper} from '../common/common-page.helper';
+import { DocumentPageConstants } from './document-page.constants';
 
 export class DocumentPageHelper {
 
@@ -74,16 +75,15 @@ export class DocumentPageHelper {
         StepLogger.step('Click Save button in Add a document window');
         await PageHelper.click(CommonPage.formButtons.save);
 
-        StepLogger.verification('Home Page is displayed');
-        await expect(await browser.getTitle())
-            .toBe(HomePageConstants.homePage, ValidationsHelper.getPageDisplayedValidation(HomePageConstants.pageName));
-
         StepLogger.verification('Add a document window to update the properties of the document is closed');
         // Sleep required to let it save
         await browser.sleep(PageHelper.timeout.s);
         await expect(await CommonPage.UpdatePropertyDocument.isPresent()).toBe(false,
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 
+        StepLogger.verification('Home Page is displayed');
+        await expect(await browser.getTitle())
+            .toBe(DocumentPageConstants.pageName, ValidationsHelper.getPageDisplayedValidation(DocumentPageConstants.pageName));
     }
 
     static async verifyCreatedDocument() {
@@ -94,6 +94,8 @@ export class DocumentPageHelper {
 
         StepLogger.step('Select Projects -> Documents from the options displayed');
         await PageHelper.click(HomePage.navigation.projects.documents);
+        // wait is needed for next page to load
+        await PageHelper.sleepForXSec(5000);
 
         StepLogger.verification('Project Documents page is displayed');
         await expect(await browser.getTitle()).toBe(HomePageConstants.documentPage,
