@@ -189,10 +189,11 @@ export class MyWorkPageHelper {
     static async clickStopEditing() {
         StepLogger.step('Click on Stop Editing button available');
         await this.clickOnPageTab();
-        await PageHelper.click(MyWorkPage.stopEditing);
+        await PageHelper.clickAndWaitForElementToHide(MyWorkPage.stopEditing);
     }
 
     static async verifyManageTabDisplayed() {
+        await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.newItem);
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.newItem,
             MyWorkPageConstants.manage,
