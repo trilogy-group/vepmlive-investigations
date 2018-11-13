@@ -508,12 +508,14 @@ export class MyWorkPageHelper {
         );
     }
 
-    static async clickViewsTab() {
+    static async clickViewsTab(checkRow = true) {
         StepLogger.step('Click on View tab.');
         await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.topBar);
         let isViewTabDisplayed = await PageHelper.isElementPresent(MyWorkPage.selectRibbonTabs.views);
-        if (!isViewTabDisplayed) {
-            await this.clickOnAnyCreatedItem();
+        if (checkRow) {
+            if (!isViewTabDisplayed) {
+                await this.clickOnAnyCreatedItem();
+            }
         }
         await PageHelper.click(MyWorkPage.selectRibbonTabs.views);
         isViewTabDisplayed = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.getViewRibbonOptions.selectColumns, PageHelper.timeout.m);
@@ -672,7 +674,7 @@ export class MyWorkPageHelper {
         StepLogger.step('Click on "Select Columns".');
         const isDisplayed = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.getViewRibbonOptions.selectColumns, PageHelper.timeout.s);
         if (!isDisplayed) {
-            await this.clickViewsTab();
+            await this.clickViewsTab(false);
         }
         await ElementHelper.click(MyWorkPage.getViewRibbonOptions.selectColumns);
     }
