@@ -473,6 +473,8 @@ export class CommonPageHelper {
             await WaitHelper.waitForElementToBeClickable(ProjectItemPage.deleteTask);
             await ElementHelper.actionHoverOver(ProjectItemPage.deleteTask);
             await PageHelper.click(ProjectItemPage.deleteTask);
+            // wait for alert to open
+            await PageHelper.sleepForXSec(3000);
             await browser.switchTo().alert().accept();
             await ElementHelper.clickUsingJs(ProjectItemPage.save);
             // After save It need static wait(5 sec) and no element found which get change after save.
@@ -723,8 +725,7 @@ export class CommonPageHelper {
 
     static async switchToContentFrame() {
         StepLogger.step('Switch to content frame');
-        await WaitHelper.waitForElementToBePresent(CommonPage.contentFrame);
-        await PageHelper.switchToFrame(CommonPage.contentFrame.getWebElement());
+        await PageHelper.switchToiFrame(CommonPage.contentFrame);
         await browser.sleep(PageHelper.timeout.xs);
     }
 

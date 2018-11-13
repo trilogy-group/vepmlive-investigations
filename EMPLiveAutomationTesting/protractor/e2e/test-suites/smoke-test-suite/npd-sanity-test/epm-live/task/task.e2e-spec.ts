@@ -31,7 +31,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    it('Save the changes by Save button - [965680]', async () => {
+    fit('Save the changes by Save button - [965680]', async () => {
         StepLogger.caseId = 965680;
         const uniqueId = PageHelper.getUniqueId();
         const input = MyTimeOffPageConstants.inputValues;
@@ -77,6 +77,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
         await CommonPageHelper.deleteTask();
+        await PageHelper.acceptAlertIfPresent();
         await expect(await ProjectItemPage.selectTaskName.isPresent()).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
 
@@ -112,7 +113,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await ProjectItemPageHelper.newTasksFields.work.getText()).toBe(CommonPageConstants.costData.firstData,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.work,
                 CommonPageConstants.pageHeaders.projects.workHours));
-
         StepLogger.stepId(6);
         StepLogger.step('Click on "Close" button from ribbon panel');
         // After save It need static wait(5 sec) and no element found which get change after save.
@@ -151,6 +151,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
         await ElementHelper.actionHoverOver(ProjectItemPage.selectTaskName);
         await PageHelper.click(ProjectItemPage.selectTaskName);
+        await browser.sleep(PageHelper.timeout.m);
         await expect(await ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title,
                 CommonPageConstants.pageHeaders.projects.tasks));

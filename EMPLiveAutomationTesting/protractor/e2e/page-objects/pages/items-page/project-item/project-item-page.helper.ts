@@ -321,11 +321,14 @@ export class ProjectItemPageHelper {
     }
 
     static async selectPlannerIfPopUpAppears(planner: ElementFinder) {
-        if (await element.all(By.tagName('iframe')).count() >= 1) {
+        try {
             await CommonPageHelper.switchToContentFrame();
-            await PageHelper.click(planner);
+            await ElementHelper.clickUsingJs(planner);
             await PageHelper.switchToDefaultContent();
+        } catch {
+            StepLogger.subStep('Pop up did not appear');
         }
+
     }
 
     static getReportParametersByTitle(title: string) {

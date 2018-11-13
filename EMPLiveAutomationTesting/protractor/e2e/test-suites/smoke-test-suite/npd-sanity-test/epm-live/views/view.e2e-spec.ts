@@ -93,7 +93,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(3);
         StepLogger.step('Click OK button in Create Column pop up');
         await ElementHelper.scrollToElement(CommonPage.okButton);
-        await PageHelper.click(CommonPage.okButton);
+        await ElementHelper.clickUsingJs(CommonPage.okButton);
 
         StepLogger.verification('Create Column window is Closed');
         await WaitHelper.waitForElementToBeHidden(CommonPage.okButton);
@@ -107,6 +107,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(4);
         StepLogger.step('Click Close button in Project Planner window');
         await ElementHelper.clickUsingJs(ProjectItemPage.close);
+        await PageHelper.waitForAlertToBePresent();
+        await PageHelper.acceptAlert();
 
         StepLogger.verification('Project Planner window is Closed');
         await expect(await CommonPage.pageHeaders.projects.projectPlanner.isPresent()).toBe(false,

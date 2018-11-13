@@ -27,7 +27,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    it('Add Documents Functionality-Project Document - [1124284]', async () => {
+    fit('Add Documents Functionality-Project Document - [1124284]', async () => {
         StepLogger.caseId = 1124284;
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
 

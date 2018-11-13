@@ -93,7 +93,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.settingItems.page));
     });
 
-    it('Post Status - [907973]', async () => {
+    fit('Post Status - [907973]', async () => {
         StepLogger.caseId = 907973;
         StepLogger.stepId(1);
         const uniqueId = PageHelper.getUniqueId();

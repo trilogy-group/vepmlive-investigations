@@ -161,11 +161,11 @@ export class ElementHelper {
     }
 
     static async scrollToElement(elementt: ElementFinder) {
-        browser.executeScript('arguments[0].scrollIntoView();', elementt);
+        await browser.executeScript('arguments[0].scrollIntoView();', elementt);
     }
 
     static async scrollToBottomOfPage() {
-        browser.executeScript('window.scrollTo(0, document.body.scrollHeight)');
+        await browser.executeScript('window.scrollTo(0, document.body.scrollHeight)');
     }
 
     static async getAttributeValue(elem: ElementFinder, attribute: string) {
