@@ -25,84 +25,12 @@ namespace EPMLiveWorkPlanner
         protected Panel pnlAdmin;
         protected HyperLink hlAdmin;
 
-        static WorkPlannerProperties wps;
+        static PlannerCore.WorkPlannerProperties wps;
 
         protected CheckBox chkEnableWP;
         protected DropDownList ddlProjectCenter;
         protected DropDownList ddlTaskCenter;
         protected CheckBox chkWPResPool;
-
-        protected class WorkPlannerProperty
-        {
-            public string field;
-            public string val;
-        }
-
-        protected class WorkPlannerProperties
-        {
-
-            SortedList hshProperties = new SortedList();
-
-            public int count()
-            {
-                return hshProperties.Count;
-            }
-            public WorkPlannerProperties(string data)
-            {
-                if (data != null && data != "")
-                {
-                    string[] sProps = data.Split('\n');
-                    foreach (string sProp in sProps)
-                    {
-                        string[] sField = sProp.Split('|');
-                        hshProperties.Add(sField[0], sField[1]);
-                    }
-                }
-            }
-            public void set(string key, string val)
-            {
-                if (hshProperties.Contains(key))
-                    hshProperties[key] = val;
-                else
-                    hshProperties.Add(key, val);
-            }
-            public void delete(string key)
-            {
-                if (hshProperties.Contains(key))
-                    hshProperties.Remove(key);
-            }
-            public WorkPlannerProperty get(string key)
-            {
-                WorkPlannerProperty wp = null;
-                if (hshProperties.Contains("key"))
-                {
-                    wp = new WorkPlannerProperty();
-                    wp.field = key;
-                    wp.val = hshProperties[key].ToString();
-                }
-                return wp;
-            }
-            public WorkPlannerProperty GetByIndex(int i)
-            {
-                WorkPlannerProperty wp = new WorkPlannerProperty();
-                wp.field = hshProperties.GetKey(i).ToString();
-                wp.val = hshProperties.GetByIndex(i).ToString();
-                return wp;
-            }
-            public override string ToString()
-            {
-                string output = "";
-                foreach (DictionaryEntry de in hshProperties)
-                {
-                    output += "\n" + de.Key + "|" + de.Value;
-                }
-                if (output.Length > 1)
-                    output = output.Substring(1);
-                return output;
-            }
-
-        }
-
         protected void Page_Load(object sender, EventArgs e)
         {
 
@@ -111,7 +39,7 @@ namespace EPMLiveWorkPlanner
 
                 SPWeb web = SPContext.Current.Web;
 
-                wps = new WorkPlannerProperties(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveWorkPlannerFields"));
+                wps = new PlannerCore.WorkPlannerProperties(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveWorkPlannerFields"));
 
                 Guid lWeb = EPMLiveCore.CoreFunctions.getLockedWeb(web);
 
@@ -242,7 +170,7 @@ namespace EPMLiveWorkPlanner
 
             for (int i = 0; i < wps.count(); i++)
             {
-                WorkPlannerProperty wp = wps.GetByIndex(i);
+                PlannerCore.WorkPlannerProperty wp = wps.GetByIndex(i);
                 if (wp.field == "PercentComplete")
                 {
                     try
