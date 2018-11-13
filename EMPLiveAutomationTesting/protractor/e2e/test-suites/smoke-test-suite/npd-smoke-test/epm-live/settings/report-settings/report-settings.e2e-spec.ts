@@ -1,13 +1,9 @@
-import {browser} from 'protractor';
 import {SuiteNames} from '../../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../../page-objects/pages/login/login.po';
 import {PageHelper} from '../../../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../../../core/logger/step-logger';
 import {CommonPage} from '../../../../../../page-objects/pages/common/common.po';
 import {SettingsPage} from '../../../../../../page-objects/pages/settings/settings.po';
-import {Constants} from '../../../../../../components/misc-utils/constants';
-import {ValidationsHelper} from '../../../../../../components/misc-utils/validation-helper';
-import {WaitHelper} from '../../../../../../components/html/wait-helper';
 // tslint:disable-next-line:max-line-length
 import {ReportingSettingsPage} from '../../../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/reporting-settings.po';
 // tslint:disable-next-line:max-line-length
@@ -18,6 +14,10 @@ import {ReportManagerPageConstants} from '../../../../../../page-objects/pages/s
 import {ReportManagerPageValidation} from '../../../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/report-manager/report-manager-page.validation';
 // tslint:disable-next-line:max-line-length
 import {ReportingSettingsPageConstants} from '../../../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/reporting-settings-page.constants';
+import {ExpectationHelper} from '../../../../../../components/misc-utils/expectation-helper';
+import {Constants} from '../../../../../../components/misc-utils/constants';
+import {WaitHelper} from '../../../../../../components/html/wait-helper';
+import {ElementHelper} from '../../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -60,9 +60,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(SettingsPage.menuItems.enterpriseReporting.childMenus.reportingSettings);
 
         StepLogger.verification('"Mapped Lists" page is displayed');
-        await expect((await CommonPage.title.getText()).trim())
-            .toBe(ReportingSettingsPageConstants.pageName,
-                ValidationsHelper.getPageDisplayedValidation(ReportingSettingsPageConstants.pageName));
+        await ExpectationHelper.verifyText(CommonPage.title, ReportingSettingsPageConstants.pageName, ReportingSettingsPageConstants.pageName);
 
         StepLogger.stepId(4);
         StepLogger.step(`Click on 'Settings' link displayed on top of the page`);
@@ -71,10 +69,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(ReportingSettingsPage.topMenus.settings.childMenu.refreshSchedule);
 
         StepLogger.verification('"Report Manager" Page is displayed');
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
-        await expect((await CommonPage.title.getText()).trim())
-            .toBe(ReportManagerPageConstants.pageName,
-                ValidationsHelper.getPageDisplayedValidation(ReportManagerPageConstants.pageName));
+        await ExpectationHelper.verifyText(CommonPage.title, ReportManagerPageConstants.pageName, ReportManagerPageConstants.pageName);
 
         StepLogger.stepId(5);
         StepLogger.step('Click on "Run Now" button');
@@ -82,18 +77,16 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.step('Refresh the page using browser Refresh button');
         const lastRunLabel = ReportManagerPage.formControls.lastRun;
-        const lastRunValue = await lastRunLabel.getText();
+        const lastRunValue = await ElementHelper.getText(lastRunLabel);
         let maxAttempts = 0;
-        while ((await lastRunLabel.getText()).trim() === Constants.EMPTY_STRING && maxAttempts < 10) {
-            await browser.sleep(PageHelper.timeout.s);
-            maxAttempts++;
-            await browser.refresh();
+        while ((await ElementHelper.getText(lastRunLabel) === Constants.EMPTY_STRING && maxAttempts++ < 10)) {
+            await WaitHelper.staticWait(PageHelper.timeout.m);
+            await PageHelper.refreshPage();
         }
 
         StepLogger.verification('Last Result - commonly "No Errors" displayed (Note: Can display other results]');
-        await expect((await ReportManagerPage.formControls.messages.getText()).trim())
-            .toBe(ReportManagerPageConstants.noErrorMessage,
-                ReportManagerPageValidation.lastResultValidation);
+        await ExpectationHelper.verifyText(ReportManagerPage.formControls.messages,
+            ReportManagerPageValidation.lastResultValidation, ReportManagerPageConstants.noErrorMessage);
 
         StepLogger.verification(`Log - 'View Log' link displayed`);
         await expect(await PageHelper.isElementDisplayed(ReportManagerPage.formControls.viewLog))
@@ -102,6 +95,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('Last Run - the date and time stamp display the date and the time the report is run');
         await expect((await lastRunLabel.getText()).trim())
             .not.toBe(lastRunValue, ReportManagerPageValidation.lastRunValidation);
-
     });
 });

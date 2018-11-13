@@ -189,10 +189,11 @@ export class MyWorkPageHelper {
     static async clickStopEditing() {
         StepLogger.step('Click on Stop Editing button available');
         await this.clickOnPageTab();
-        await PageHelper.click(MyWorkPage.stopEditing);
+        await PageHelper.clickAndWaitForElementToHide(MyWorkPage.stopEditing);
     }
 
     static async verifyManageTabDisplayed() {
+        await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.newItem);
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.newItem,
             MyWorkPageConstants.manage,
@@ -201,7 +202,11 @@ export class MyWorkPageHelper {
 
     static async clickOnManageTab() {
         StepLogger.step('Click on "Manage" tab.');
-        await browser.sleep(PageHelper.timeout.s);
+        const isDisplayed = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.selectRibbonTabs.manage);
+        if (!isDisplayed) {
+            await PageHelper.refreshPage();
+            await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.selectRibbonTabs.manage);
+        }
         await PageHelper.click(MyWorkPage.selectRibbonTabs.manage);
     }
 
@@ -268,6 +273,7 @@ export class MyWorkPageHelper {
         await TextboxHelper.sendKeys(MyWorkPage.inputs.assignedTo, assignedTo);
         await PageHelper.click(MyWorkPage.assignedToSuggestions);
         await this.clickSaveButton();
+        await WaitHelper.waitForElementToBeHidden(MyWorkPage.buttonsOnPopup.save);
         return itemTitle;
     }
 
@@ -276,7 +282,7 @@ export class MyWorkPageHelper {
         if (switchToFrame) {
             await CommonPageHelper.switchToFirstContentFrame();
         }
-        await PageHelper.clickAndWaitForElementToHide(MyWorkPage.buttonsOnPopup.save);
+        await PageHelper.click(MyWorkPage.buttonsOnPopup.save);
     }
 
     static async verifyCreateItem(itemTitle: Array<string>) {
@@ -508,12 +514,14 @@ export class MyWorkPageHelper {
         );
     }
 
-    static async clickViewsTab() {
+    static async clickViewsTab(checkRow = true) {
         StepLogger.step('Click on View tab.');
         await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.topBar);
         let isViewTabDisplayed = await PageHelper.isElementPresent(MyWorkPage.selectRibbonTabs.views);
-        if (!isViewTabDisplayed) {
-            await this.clickOnAnyCreatedItem();
+        if (checkRow) {
+            if (!isViewTabDisplayed) {
+                await this.clickOnAnyCreatedItem();
+            }
         }
         await PageHelper.click(MyWorkPage.selectRibbonTabs.views);
         isViewTabDisplayed = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.getViewRibbonOptions.selectColumns, PageHelper.timeout.m);
@@ -533,10 +541,15 @@ export class MyWorkPageHelper {
     static async clickSaveView() {
         StepLogger.step('Click on Save View');
         await this.clickOnAnyCreatedItem();
+        await this.clickViewsTab(false);
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.saveView);
     }
 
     static async verifySaveViewPopupDisplayed() {
+        const isDisplayed = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.viewsPopup.name, PageHelper.timeout.s);
+        if (!isDisplayed) {
+            await this.goToSaveView();
+        }
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.viewsPopup.name,
             MyWorkPageConstants.saveViewPopupLabel,
@@ -571,6 +584,7 @@ export class MyWorkPageHelper {
 
     static async selectViewFromCurrentView() {
         StepLogger.step('Select some other view apart from Default view ');
+        await this.clickViewsTab(false);
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
         const isOpened = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.selectViewNameOtherThanDefault, PageHelper.timeout.s);
         if (!isOpened) {
@@ -618,6 +632,14 @@ export class MyWorkPageHelper {
             await this.clickViewsTab();
         }
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.deleteView);
+        const alertOpened  = await PageHelper.waitForAlertToBePresent(PageHelper.timeout.xl);
+        if (!alertOpened) {
+            try {
+                await PageHelper.click(MyWorkPage.getViewRibbonOptions.deleteView);
+            } catch (e) {
+                console.log(e);
+            }
+        }
     }
 
     static async dismissDeletePopup() {
@@ -672,7 +694,7 @@ export class MyWorkPageHelper {
         StepLogger.step('Click on "Select Columns".');
         const isDisplayed = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.getViewRibbonOptions.selectColumns, PageHelper.timeout.s);
         if (!isDisplayed) {
-            await this.clickViewsTab();
+            await this.clickViewsTab(false);
         }
         await ElementHelper.click(MyWorkPage.getViewRibbonOptions.selectColumns);
     }
@@ -719,6 +741,14 @@ export class MyWorkPageHelper {
         await PageHelper.click(saveViewPopupItems.name);
         await TextboxHelper.clearText(saveViewPopupItems.name);
         await PageHelper.click(saveViewPopupItems.ok);
+        const alertOpened  = await PageHelper.waitForAlertToBePresent(PageHelper.timeout.xl);
+        if (!alertOpened) {
+            try {
+                await PageHelper.click(MyWorkPage.getViewRibbonOptions.deleteView);
+            } catch (e) {
+                console.log(e);
+            }
+        }
     }
 
     static async verifyEmptyNameMessage() {
@@ -736,6 +766,7 @@ export class MyWorkPageHelper {
 
     static async clickEllipsesIcon() {
         StepLogger.step('Click on ellipses icon.');
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.pageHeaders.myWorkplace.myWork);
         await browser.sleep(PageHelper.timeout.s);
         await ElementHelper.clickUsingJsNoWait(MyWorkPage.headerOptions.ellipses);
     }
@@ -881,6 +912,7 @@ export class MyWorkPageHelper {
     }
 
     static async verifyEllipsesDropdownForItemDisplayed() {
+        await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.ellipsesDropdownForItem.deleteItem);
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.ellipsesDropdownForItem.deleteItem,
             MyWorkPageConstants.ellipsesDropdownLabel,
@@ -890,6 +922,13 @@ export class MyWorkPageHelper {
     static async clickOnDeleteItem() {
         StepLogger.step('Click on "Delete Item" option.');
         await PageHelper.click(MyWorkPage.ellipsesDropdownForItem.deleteItem);
+        if (!(await PageHelper.waitForAlertToBePresent(PageHelper.timeout.xl))) {
+            try {
+                await PageHelper.click(MyWorkPage.ellipsesDropdownForItem.deleteItem);
+            } catch (e) {
+                console.log(e);
+            }
+        }
     }
 
     static async verifyDeleteItemPopup() {
@@ -950,6 +989,7 @@ export class MyWorkPageHelper {
     }
 
     static async verifyExtraRowAdded() {
+        await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.gridDetails.filter);
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.gridDetails.filter,
             MyWorkPageConstants.filterRowLabel,
@@ -975,6 +1015,7 @@ export class MyWorkPageHelper {
     }
 
     static async verifyColumnSortedDisplayed() {
+        await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.gridDetails.sorted);
         await ExpectationHelper.verifyDisplayedStatus(
             MyWorkPage.gridDetails.sorted,
             MyWorkPageConstants.sortedColumnsLabel,
@@ -983,6 +1024,10 @@ export class MyWorkPageHelper {
 
     static async clickOnRemoveSorting() {
         StepLogger.step('Click on remove sorting button');
+        const isDisplayed = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.getViewRibbonOptions.removeSorting, PageHelper.timeout.s);
+        if (!isDisplayed) {
+            await this.clickViewsTab(false);
+        }
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.removeSorting);
     }
 

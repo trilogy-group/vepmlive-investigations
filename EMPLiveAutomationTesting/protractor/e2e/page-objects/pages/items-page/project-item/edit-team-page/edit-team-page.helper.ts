@@ -2,6 +2,7 @@ import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {EditTeamPage} from './edit-team-page.po';
 import {CommonPage} from '../../../common/common.po';
+import {WaitHelper} from '../../../../../components/html/wait-helper';
 
 export class EditTeamPageHelper {
     static async clickviewReport() {
@@ -34,4 +35,12 @@ export class EditTeamPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.close);
     }
 
+    static async closeEditTeamPopUpAndSwitchToDefaultContent() {
+        StepLogger.subStep('Click "Close" button in "Edit Team" window');
+        await PageHelper.click(CommonPage.ribbonItems.close);
+
+        StepLogger.subStep('Switch to default content');
+        await WaitHelper.waitForElementToBeHidden(CommonPage.ribbonItems.close);
+        await PageHelper.switchToDefaultContent();
+    }
 }
