@@ -366,7 +366,7 @@ export class PageHelper {
     }
 
     static async acceptAlert() {
-        await PageHelper.waitForAlertToBePresent();
+        await PageHelper.waitForAlertToBePresent(PageHelper.timeout.xxxxl);
         return await browser.switchTo().alert().accept();
     }
 
@@ -402,7 +402,7 @@ export class PageHelper {
     }
 
     public static async getAlertText() {
-        await this.waitForAlertToBePresent();
+        await this.waitForAlertToBePresent(PageHelper.timeout.xxxl);
         return await browser.switchTo().alert().getText();
     }
 
