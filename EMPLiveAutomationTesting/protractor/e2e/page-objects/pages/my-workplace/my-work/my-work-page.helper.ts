@@ -170,14 +170,18 @@ export class MyWorkPageHelper {
         const viewNewName = `${MyWorkPageConstants.renameView}${uniqueId}`;
         await TextboxHelper.sendKeys(MyWorkPage.viewsPopup.newName, viewNewName);
         await PageHelper.click(MyWorkPage.viewsPopup.ok);
+
         return viewNewName;
     }
 
     static async verifyAndAcceptRenameConfirmationPopup(viewName: string) {
-        const renamePopUpText = await PageHelper.getAlertText();
-        const expectedPopUpText = `Would you like to rename the "${viewName}" view?`;
-        await ExpectationHelper.verifyStringEqualTo(renamePopUpText, expectedPopUpText);
-        await PageHelper.acceptAlert();
+        const isPresent = await PageHelper.waitForAlertToBePresent();
+        if (isPresent) {
+            const renamePopUpText = await PageHelper.getAlertText();
+            const expectedPopUpText = `Would you like to rename the "${viewName}" view?`;
+            await ExpectationHelper.verifyStringEqualTo(renamePopUpText, expectedPopUpText);
+            await PageHelper.acceptAlert();
+        }
     }
     static async navigateToMyWork() {
         const pageHeader = CommonPage.pageHeaders;

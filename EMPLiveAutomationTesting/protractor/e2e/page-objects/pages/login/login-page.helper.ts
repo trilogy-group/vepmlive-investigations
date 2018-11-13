@@ -4,6 +4,7 @@ import {PageHelper} from '../../../components/html/page-helper';
 import {LoginPage} from './login.po';
 import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
+import {HomePage} from '../homepage/home.po';
 
 export class LoginPageHelper {
     static get adminEmailId(): string {
@@ -44,5 +45,12 @@ export class LoginPageHelper {
 
     static getFormControlById(partialId: string) {
         return element(By.css(`[id*='signInControl_${partialId}']`));
+    }
+
+    static async logout() {
+        await PageHelper.sleepForXSec(PageHelper.timeout.xs);
+        await PageHelper.click(HomePage.userMenu.menu);
+        await PageHelper.click(HomePage.userMenu.signOutLink);
+        await PageHelper.deleteCookies();
     }
 }

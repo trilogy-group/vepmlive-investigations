@@ -81,4 +81,10 @@ export class HomePage extends BasePage {
         return element(By.css('#epm-se-status-update-box div.epm-se-comment-input'));
     }
 
+    static get userMenu() {
+        return {
+            menu: element(By.css('a.ms-core-menu-root')),
+            signOutLink: element(By.cssContainingText('a.ms-core-menu-link', 'Sign Out'))
+        };
+    }
 }

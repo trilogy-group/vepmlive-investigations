@@ -451,4 +451,9 @@ export class PageHelper {
             console.log('Alert is not present');
         }
     }
+
+    static async deleteCookies() {
+        await browser.driver.manage().deleteAllCookies();
+    }
+
 }

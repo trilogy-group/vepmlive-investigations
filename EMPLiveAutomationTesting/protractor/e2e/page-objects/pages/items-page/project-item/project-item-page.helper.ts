@@ -121,7 +121,7 @@ export class ProjectItemPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName));
     }
 
-    static async navigateAndOpenProjectPage(projectNameValue: string) {
+    static async navigateAndOpenProjectPage(projectNameValue: string, toOpen = true) {
         StepLogger.verification('Navigate to page');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -151,7 +151,9 @@ export class ProjectItemPageHelper {
         StepLogger.step('Click on Project record');
         await PageHelper.sleepForXSec(PageHelper.timeout.xs);
         await ElementHelper.actionHoverOver(CommonPageHelper.getRowForTableData(firstTableColumns));
-        await PageHelper.click(CommonPageHelper.getRowForTableData(firstTableColumns));
+        if (toOpen) {
+            await PageHelper.click(CommonPageHelper.getRowForTableData(firstTableColumns));
+        }
     }
 
     static async createNewProject(uniqueId: string) {
@@ -243,7 +245,7 @@ export class ProjectItemPageHelper {
         const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId);
 
         StepLogger.subStep('Navigate and open specific project page');
-        await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue);
+        await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue, false);
 
         StepLogger.subStep('Click on "Items" tab');
         await PageHelper.click(CommonPage.ribbonTitles.items);
@@ -276,10 +278,12 @@ export class ProjectItemPageHelper {
         StepLogger.subStep('Click on Save & Close button');
         await PageHelper.click(CommonPage.ribbonItems.saveAndClose);
 
+        StepLogger.subStep('Switch to default content');
+        await WaitHelper.waitForElementToBeHidden(CommonPage.ribbonItems.saveAndClose);
         await PageHelper.switchToDefaultContent();
 
         StepLogger.subStep('Navigate and open specific project page');
-        await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue);
+        await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue, false);
 
         StepLogger.subStep('Click on "Items" tab');
         await PageHelper.click(CommonPage.ribbonTitles.items);
