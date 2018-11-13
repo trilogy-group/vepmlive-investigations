@@ -119,7 +119,10 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
                     {
                         GetItemByIdInt32 = id => new ShimListItem()
                         {
-                            DeleteObject = () => { throw new Exception(); }
+                            DeleteObject = () =>
+                            {
+                                throw new Exception();
+                            }
                         }
                     }
                 }
@@ -153,7 +156,11 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
         public void EnsureEPMLiveAppInstalled_LoadListDoesNotExists_ReturnsFalse()
         {
             // Arrange
-            ShimClientRuntimeContext.AllInstances.LoadOf1M0ExpressionOfFuncOfM0ObjectArray<List>((sender, client, retrievals) => { throw new Exception(MessageFromAppInstalled); });
+            ShimClientRuntimeContext.AllInstances.LoadOf1M0ExpressionOfFuncOfM0ObjectArray<List>(
+                (sender, client, retrievals) =>
+                {
+                    throw new Exception(MessageFromAppInstalled);
+                });
 
             // Act
             var actualResult = _o365Service.EnsureEPMLiveAppInstalled();
@@ -166,7 +173,11 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
         public void EnsureEPMLiveAppInstalled_LoadListException_ThrowsException()
         {
             // Arrange
-            ShimClientRuntimeContext.AllInstances.LoadOf1M0ExpressionOfFuncOfM0ObjectArray<List>((sender, client, retrievals) => { throw new Exception(); });
+            ShimClientRuntimeContext.AllInstances.LoadOf1M0ExpressionOfFuncOfM0ObjectArray<List>(
+                (sender, client, retrievals) =>
+                {
+                    throw new Exception();
+                });
 
             // Act
             Action action = () => _o365Service.EnsureEPMLiveAppInstalled();
@@ -696,7 +707,10 @@ namespace EPMLiveCore.Tests.Integrations.Office365.Infrastructure
         public void GetClientContext_ExceptionNotMessageRemoteName_throwsException()
         {
             // Arrange
-            ShimSharePointOnlineCredentials.ConstructorStringSecureString = (sender, userName, password) => { throw new Exception(DummyString); };
+            ShimSharePointOnlineCredentials.ConstructorStringSecureString = (sender, userName, password) =>
+            {
+                throw new Exception(DummyString);
+            };
 
             // Act
             Action action = () => _privateObject.Invoke("GetClientContext", DummySiteUrl);
