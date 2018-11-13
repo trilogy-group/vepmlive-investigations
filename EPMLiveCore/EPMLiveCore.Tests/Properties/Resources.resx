@@ -182,7 +182,6 @@ function cleanupfields(){
 }
 function InitFields(){
 cleanupfields();
-try { setLicenseType(); }catch(e){}
 $(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
 }_spBodyOnLoadFunctionNames.push("InitFields");
 &lt;/script&gt;
@@ -237,7 +236,6 @@ function cleanupfields(){
 }
 function InitFields(){
 cleanupfields();
-try { setLicenseType(); }catch(e){}
 $(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
 }_spBodyOnLoadFunctionNames.push("InitFields");
 &lt;/script&gt;
@@ -333,6 +331,7 @@ function cleanupfields(){
       }
   }catch(e){}
   if(document.getElementById('Generic').checked){
+setLicenseType();
       try{document.getElementById('FirstNameId').parentNode.parentNode.parentNode.style.display='none';}catch(e){}
       try{document.getElementById('LastNameId').parentNode.parentNode.parentNode.style.display='none';}catch(e){}
       try{document.getElementById('EmailId').parentNode.parentNode.parentNode.style.display='none';}catch(e){}
@@ -359,7 +358,6 @@ function InitFields(){
 document.getElementById('Generic').onclick = function() {cleanupfields();};
 document.getElementById('CanLoginId').onclick = function() {cleanupfields();};
 cleanupfields();
-try { setLicenseType(); }catch(e){}
 $(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
 }_spBodyOnLoadFunctionNames.push("InitFields");
 function CustomPreSaveAction(){
@@ -447,7 +445,6 @@ function cleanupfields(){
 function InitFields(){
 document.getElementById('CanLogin_00000000-0000-0000-0000-000000000000_$Field').onclick = function() {cleanupfields();};
 cleanupfields();
-try { setLicenseType(); }catch(e){}
 $(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
 }_spBodyOnLoadFunctionNames.push("InitFields");
 &lt;/script&gt;
@@ -508,7 +505,6 @@ function cleanupfields(){
 }
 function InitFields(){
 cleanupfields();
-try { setLicenseType(); }catch(e){}
 $(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
 }_spBodyOnLoadFunctionNames.push("InitFields");
 &lt;/script&gt;
@@ -569,7 +565,6 @@ function cleanupfields(){
 }
 function InitFields(){
 cleanupfields();
-try { setLicenseType(); }catch(e){}
 $(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
 }_spBodyOnLoadFunctionNames.push("InitFields");
 &lt;/script&gt;
@@ -632,7 +627,6 @@ function cleanupfields(){
 }
 function InitFields(){
 cleanupfields();
-try { setLicenseType(); }catch(e){}
 $(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 0 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
 }_spBodyOnLoadFunctionNames.push("InitFields");
 &lt;/script&gt;
@@ -715,7 +709,6 @@ function cleanupfields(){
 }
 function InitFields(){
 cleanupfields();
-try { setLicenseType(); }catch(e){}
 $(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 1 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 0 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
 }_spBodyOnLoadFunctionNames.push("InitFields");
 &lt;/script&gt;
@@ -776,7 +769,6 @@ function cleanupfields(){
 }
 function InitFields(){
 cleanupfields();
-try { setLicenseType(); }catch(e){}
 $(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
 }_spBodyOnLoadFunctionNames.push("InitFields");
 &lt;/script&gt;
@@ -837,7 +829,6 @@ function cleanupfields(){
 }
 function InitFields(){
 cleanupfields();
-try { setLicenseType(); }catch(e){}
 $(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
 }_spBodyOnLoadFunctionNames.push("InitFields");
 &lt;/script&gt;
@@ -898,7 +889,6 @@ function cleanupfields(){
 }
 function InitFields(){
 cleanupfields();
-try { setLicenseType(); }catch(e){}
 $(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
 }_spBodyOnLoadFunctionNames.push("InitFields");
 &lt;/script&gt;
@@ -961,7 +951,6 @@ function cleanupfields(){
 }
 function InitFields(){
 cleanupfields();
-try { setLicenseType(); }catch(e){}
 $(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
 }_spBodyOnLoadFunctionNames.push("InitFields");
 &lt;/script&gt;
@@ -1019,7 +1008,6 @@ function cleanupfields(){
 }
 function InitFields(){
 cleanupfields();
-try { setLicenseType(); }catch(e){}
 $(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
 }_spBodyOnLoadFunctionNames.push("InitFields");
 &lt;/script&gt;
@@ -1080,7 +1068,6 @@ function cleanupfields(){
 }
 function InitFields(){
 cleanupfields();
-try { setLicenseType(); }catch(e){}
 $(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
 }_spBodyOnLoadFunctionNames.push("InitFields");
 &lt;/script&gt;
@@ -1141,7 +1128,6 @@ function cleanupfields(){
 }
 function InitFields(){
 cleanupfields();
-try { setLicenseType(); }catch(e){}
 $(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' &amp;&amp; 0 == '0') {if('' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' &amp;&amp; 1 == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});
 }_spBodyOnLoadFunctionNames.push("InitFields");
 &lt;/script&gt;

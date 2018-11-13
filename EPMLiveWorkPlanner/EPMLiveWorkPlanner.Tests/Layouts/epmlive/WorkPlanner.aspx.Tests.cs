@@ -16,7 +16,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
 {
     [TestClass]
     [ExcludeFromCodeCoverage]
-    public class WorkPlannerTests
+    public partial class WorkPlannerTests
     {
         private WorkPlanner testObject;
         private PrivateObject privateObject;
