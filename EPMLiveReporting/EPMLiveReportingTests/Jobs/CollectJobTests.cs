@@ -34,6 +34,7 @@ namespace EPMLiveReporting.Tests.Jobs
         private const string CheckSchemaMethodName = "CheckSchema";
         private const string GetReportingConnectionMethodName = "getReportingConnection";
         private const string SetRPTSettingsMethodName = "setRPTSettings";
+        private const string StringBuilderFieldName = "sbErrors";
         private readonly Guid DummyGuid = Guid.NewGuid();
         private IDisposable shimsContext;
         private CollectJob collectJob;
@@ -484,7 +485,7 @@ namespace EPMLiveReporting.Tests.Jobs
             {
                 throw new Exception();
             };
-            privateObject.SetFieldOrProperty("sbErrors", new StringBuilder());
+            privateObject.SetFieldOrProperty(StringBuilderFieldName, new StringBuilder());
 
             // Act
             var result = privateObject.Invoke(GetReportingConnectionMethodName, spWeb) as string;
@@ -514,11 +515,11 @@ namespace EPMLiveReporting.Tests.Jobs
             }.Instance;
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code => code();
             ShimEPMData.AllInstances.UpdateRPTSettingsStringInt32StringOut = UpdateRPTSettings;
-            privateObject.SetFieldOrProperty("sbErrors", new StringBuilder());
+            privateObject.SetFieldOrProperty(StringBuilderFieldName, new StringBuilder());
 
             // Act
             privateObject.Invoke(SetRPTSettingsMethodName, epm, spSite);
-            var errors = privateObject.GetFieldOrProperty("sbErrors") as StringBuilder;
+            var errors = privateObject.GetFieldOrProperty(StringBuilderFieldName) as StringBuilder;
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -545,11 +546,11 @@ namespace EPMLiveReporting.Tests.Jobs
             }.Instance;
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code => code();
             ShimEPMData.AllInstances.UpdateRPTSettingsStringInt32StringOut = UpdateRPTSettings;
-            privateObject.SetFieldOrProperty("sbErrors", new StringBuilder());
+            privateObject.SetFieldOrProperty(StringBuilderFieldName, new StringBuilder());
 
             // Act
             privateObject.Invoke(SetRPTSettingsMethodName, epm, spSite);
-            var errors = privateObject.GetFieldOrProperty("sbErrors") as StringBuilder;
+            var errors = privateObject.GetFieldOrProperty(StringBuilderFieldName) as StringBuilder;
 
             // Assert
             this.ShouldSatisfyAllConditions(
