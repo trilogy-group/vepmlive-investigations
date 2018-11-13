@@ -435,11 +435,31 @@ namespace WorkEnginePPM.WebServices.Core
         /// <returns></returns>
         internal string ReadResourceCostCategoryRole(string data)
         {
+            return PerformResourcesAction(
+                data,
+                (id, extId, username, resourceElement, resultElement, resourceCore) =>
+                {
+
+                    var role = resourceCore.GetResourceCostCategoryRole(id, extId, username);
+
+                    resourceElement.Add(
+                        new XElement(
+                            "CostCategoryRole",
+                            new XAttribute("Id", role.Id),
+                            new XAttribute("CostCategoryRoleId", role.CostCategoryRoleId),
+                            new XAttribute("Name", role.Name),
+                            new XAttribute("Status", (int)Response.ExecutionStatus.Success)));
+                },
+                APIError.ReadResourceCostCategoryRole);
+        }
+
+        private string PerformResourcesAction(string data, Action<int?, string, string, XElement, XElement, Resources> resourceAction, APIError apiErrorCode)
+        {
             try
             {
-                DataTable requestedResources = GetRequestedResources(data);
+                var requestedResources = GetRequestedResources(data);
 
-                Resources resourceCore = GetResourceCore(SecurityLevels.Base);
+                var resourceCore = GetResourceCore(SecurityLevels.Base);
 
                 var dataElement = new XElement("Data");
 
@@ -456,23 +476,19 @@ namespace WorkEnginePPM.WebServices.Core
                         var extId = dataRow["ExtId"] as string;
                         var username = dataRow["Username"] as string;
 
-                        resourceElement.Add(new XAttribute("Id",
-                                                           id.HasValue
-                                                               ? (id.Value == 0
-                                                                      ? string.Empty
-                                                                      : id.Value.ToString(CultureInfo.InvariantCulture))
-                                                               : string.Empty));
+                        resourceElement.Add(
+                            new XAttribute(
+                                "Id",
+                                id.HasValue
+                                    ? id.Value == 0
+                                        ? string.Empty
+                                        : id.Value.ToString(CultureInfo.InvariantCulture)
+                                    : string.Empty));
 
                         resourceElement.Add(new XAttribute("ExtId", extId ?? string.Empty));
                         resourceElement.Add(new XAttribute("Username", username ?? string.Empty));
 
-                        Role role = resourceCore.GetResourceCostCategoryRole(id, extId, username);
-
-                        resourceElement.Add(
-                            new XElement("CostCategoryRole", new XAttribute("Id", role.Id),
-                                         new XAttribute("CostCategoryRoleId", role.CostCategoryRoleId),
-                                         new XAttribute("Name", role.Name),
-                                         new XAttribute("Status", (int) Response.ExecutionStatus.Success)));
+                        resourceAction?.Invoke(id, extId, username, resourceElement, resultElement, resourceCore);
                     }
                     catch (Exception exception)
                     {
@@ -491,7 +507,7 @@ namespace WorkEnginePPM.WebServices.Core
             }
             catch (Exception exception)
             {
-                return Response.Failure((int) APIError.ReadResourceCostCategoryRole, exception);
+                return Response.Failure((int)apiErrorCode, exception);
             }
         }
 
@@ -502,70 +518,24 @@ namespace WorkEnginePPM.WebServices.Core
         /// <returns></returns>
         internal string ReadResourcePermissionGroups(string data)
         {
-            try
-            {
-                DataTable requestedResources = GetRequestedResources(data);
-
-                Resources resourceCore = GetResourceCore(SecurityLevels.Base);
-
-                var dataElement = new XElement("Data");
-
-                foreach (DataRow dataRow in requestedResources.Rows)
+            return PerformResourcesAction(
+                data,
+                (id, extId, username, resourceElement, resultElement, resourceCore) =>
                 {
-                    var resourceElement = new XElement("Resource");
-                    resourceElement.Add(new XAttribute("DataId", dataRow["DataId"]));
+                    var resourcePermissionGroups = resourceCore.GetResourcePermissionGroups(id, extId, username);
 
-                    var resultElement = new XElement("Result");
-
-                    try
+                    foreach (var resourcePermissionGroup in resourcePermissionGroups)
                     {
-                        var id = dataRow["Id"] as int?;
-                        var extId = dataRow["ExtId"] as string;
-                        var username = dataRow["Username"] as string;
+                        var groupElement = new XElement("PermissionGroup");
+                        groupElement.Add(new XAttribute("Id", resourcePermissionGroup.Id));
+                        groupElement.Add(new XAttribute("Name", resourcePermissionGroup.Name));
 
-                        resourceElement.Add(new XAttribute("Id",
-                                                           id.HasValue
-                                                               ? (id.Value == 0
-                                                                      ? string.Empty
-                                                                      : id.Value.ToString(CultureInfo.InvariantCulture))
-                                                               : string.Empty));
-
-                        resourceElement.Add(new XAttribute("ExtId", extId ?? string.Empty));
-                        resourceElement.Add(new XAttribute("Username", username ?? string.Empty));
-
-                        IList<Group> resourcePermissionGroups =
-                            resourceCore.GetResourcePermissionGroups(id, extId, username);
-
-                        foreach (Group resourcePermissionGroup in resourcePermissionGroups)
-                        {
-                            var groupElement = new XElement("PermissionGroup");
-                            groupElement.Add(new XAttribute("Id", resourcePermissionGroup.Id));
-                            groupElement.Add(new XAttribute("Name", resourcePermissionGroup.Name));
-
-                            resourceElement.Add(groupElement);
-                        }
-
-                        resultElement.Add(new XAttribute("Status", (int) Response.ExecutionStatus.Success));
-                    }
-                    catch (Exception exception)
-                    {
-                        Utils.SetResultError(exception, ref resultElement);
+                        resourceElement.Add(groupElement);
                     }
 
-                    resourceElement.Add(resultElement);
-                    dataElement.Add(resourceElement);
-                }
-
-                return Response.Success(dataElement.ToString());
-            }
-            catch (PFEException pfeException)
-            {
-                return Response.PfEFailure(pfeException);
-            }
-            catch (Exception exception)
-            {
-                return Response.Failure((int) APIError.ReadResourcePermissionGroups, exception);
-            }
+                    resultElement.Add(new XAttribute("Status", (int)Response.ExecutionStatus.Success));
+                },
+                APIError.ReadResourcePermissionGroups);
         }
 
         /// <summary>
