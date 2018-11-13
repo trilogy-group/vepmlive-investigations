@@ -26,11 +26,11 @@ namespace EPMLiveCore.Tests.Jobs
         private TimerFix timerFix;
         private IDisposable shimsContext;
         private PrivateObject privateObject;
-        private string processResPlanMethodName = "processResPlan";
+        private const string processResPlanMethodName = "processResPlan";
         private const string DummyString = "DummyString";
-        private string storeResPlanInfoMethodName = "storeResPlanInfo";
-        private string ProcessWebMethodName = "processWeb";
-        private string getListItemCountMethodName = "getListItemCount";
+        private const string storeResPlanInfoMethodName = "storeResPlanInfo";
+        private const string ProcessWebMethodName = "processWeb";
+        private const string getListItemCountMethodName = "getListItemCount";
 
         [TestInitialize]
         public void Initialize()
