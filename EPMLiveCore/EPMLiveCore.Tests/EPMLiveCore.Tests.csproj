@@ -38,6 +38,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EPMLiveIntegration.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPMLiveIntegration.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="PortfolioEngineCore.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\PortfolioEngineCore.Fakes.dll</HintPath>
     </Reference>
@@ -221,6 +224,7 @@
     <Compile Include="Infrastructure\ResourceManagment\ResourcePoolManagerTests.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
     <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
+    <Compile Include="Integrations\Salesforce\IntegratorTests.cs" />
     <Compile Include="Integrations\Salesforce\SfServiceTests.cs" />
     <Compile Include="ISAPI\WorkEngineAPITests.cs" />
     <Compile Include="ISAPI\WorkEngineAPITests.RemainingMethods.cs" />

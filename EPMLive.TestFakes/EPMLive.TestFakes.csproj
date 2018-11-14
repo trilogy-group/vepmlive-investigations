@@ -54,6 +54,9 @@
     <Reference Include="EPMLiveEnterprise.Fakes">
       <HintPath>FakesAssemblies\EPMLiveEnterprise.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="EPMLiveIntegration.Fakes">
+      <HintPath>FakesAssemblies\EPMLiveIntegration.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="EPMLiveIntegrationService.Fakes">
       <HintPath>FakesAssemblies\EPMLiveIntegrationService.Fakes.dll</HintPath>
     </Reference>
@@ -186,6 +189,10 @@
       <Project>{e7043f73-7633-4476-b33d-222ec3ac1c8b}</Project>
       <Name>EPMLiveIntegrationService</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EPMLiveIntegration\EPMLiveIntegration\EPMLiveIntegration.csproj">
+      <Project>{4c63f23f-463c-409b-89ad-adc2e138b8e3}</Project>
+      <Name>EPMLiveIntegration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLivePS\EPMLivePS\EPMLivePS.csproj">
       <Project>{1121d2ff-7eaa-4532-a1ce-473de551dd70}</Project>
       <Name>EPMLivePS</Name>
@@ -263,6 +270,7 @@
     <Fakes Include="Fakes\System.Web.Services.fakes" />
     <Fakes Include="Fakes\Microsoft.Office.Project.Server.Library.fakes" />
     <Fakes Include="Fakes\Dashboard.fakes" />
+    <Fakes Include="Fakes\EPMLiveIntegration.fakes" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
