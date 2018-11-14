@@ -165,7 +165,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     });
 
-    it('Create new Links from Workplace - [1175272]', async () => {
+    fit('Create new Links from Workplace - [1175272]', async () => {
         StepLogger.caseId = 1175272;
         StepLogger.stepId(1);
 
@@ -210,7 +210,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         );
     });
 
-    it('Add Time Off From My Workplace - [1124447]', async () => {
+    fit('Add Time Off From My Workplace - [1124447]', async () => {
         StepLogger.caseId = 1124447;
 
         StepLogger.step('Navigate to My Time Off page');
