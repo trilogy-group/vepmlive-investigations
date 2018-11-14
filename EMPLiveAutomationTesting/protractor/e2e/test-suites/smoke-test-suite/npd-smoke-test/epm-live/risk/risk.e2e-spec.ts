@@ -16,6 +16,7 @@ import {CommonPageConstants} from '../../../../../page-objects/pages/common/comm
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import { ExpectationHelper } from '../../../../../components/misc-utils/expectation-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -196,9 +197,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.viewViaItems();
 
         StepLogger.verification('Verify that item is available in View page mode');
-        await expect(await CommonPage.contentTitleInViewMode.getText())
-            .toBe(titleValue,
-                ValidationsHelper.getLabelDisplayedValidation(titleValue));
+        await ExpectationHelper.verifyTextContains(CommonPage.contentTitleInViewMode, titleValue, titleValue);
     });
 
     it('Add attachment in Risk - [1176340]', async () => {
