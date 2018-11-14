@@ -12,12 +12,13 @@ using PortfolioEngineCore;
 using EPMLiveCore;
 using System.Data.SqlClient;
 using System.Transactions;
+using System.Text.RegularExpressions;
 
 namespace WorkEnginePPM
 {
     public class EPKIntegrationEvents : SPItemEventReceiver
     {
-        
+
         private const string ProjectGroupVisitor = "Visitor";
         private const string ProjectGroupMember = "Member";
         private const string ProjectGroupOwner = "Owner";
@@ -25,6 +26,18 @@ namespace WorkEnginePPM
         {
             processItem(properties);
         }
+        public override void ItemAdding(SPItemEventProperties properties)
+        {
+            try
+            {
+                properties.AfterProperties["Title"] = CoreFunctions.GetSafeTitle(properties.AfterProperties["Title"]?.ToString());
+            }
+            catch (Exception ex)
+            {
+                properties.ErrorMessage = "Error Adding Title : " + ex.Message;
+            }
+        }
+
 
         public override void ItemDeleting(SPItemEventProperties properties)
         {
@@ -66,7 +79,14 @@ namespace WorkEnginePPM
         public override void ItemUpdating(SPItemEventProperties properties)
         {
             processItem(properties);
-           
+            try
+            {
+                properties.AfterProperties["Title"] = CoreFunctions.GetSafeTitle(properties.AfterProperties["Title"]?.ToString());
+            }
+            catch (Exception ex)
+            {
+                properties.ErrorMessage = "Error Updating Title: " + ex.Message;
+            }
             if (properties.ListTitle?.ToUpper().Trim() == PROJECT_CENTER_TITLE)
                 CheckProjectNameChange(properties);
         }
@@ -92,12 +112,12 @@ namespace WorkEnginePPM
                         if (reader.Read())
                             projectNameDB = reader["Title"]?.ToString();
                     }
-                    
+
                     if (!string.IsNullOrWhiteSpace(projectNameNew) &&
                         !string.IsNullOrWhiteSpace(projectNameDB) &&
                         projectNameDB != projectNameNew)
                     {
-                        UpdateGroupsNames(properties, projectNameDB, projectNameNew);                        
+                        UpdateGroupsNames(properties, projectNameDB, projectNameNew);
                         UpdateMicrosoftProject(properties, projectNameDB, projectNameNew);
                         UpdateDB(properties, con, projectNameNew);
                     }
@@ -173,9 +193,9 @@ namespace WorkEnginePPM
                 properties.Web.AllowUnsafeUpdates = true;
                 projectItem.File.CheckOut();
                 projectItem["Name"] = $"{projectNameNew}.mpp";
-                projectItem["Title"] = projectNameNew;                
+                projectItem["Title"] = projectNameNew;
                 projectItem.Update();
-                projectItem.File.CheckIn("File name has been changed.");                
+                projectItem.File.CheckIn("File name has been changed.");
             }
         }
         private void UpdateGroupsNames(SPItemEventProperties properties, string projectNameDB, string projectNameNew)
@@ -198,7 +218,7 @@ namespace WorkEnginePPM
                 }
             });
         }
-       
+
         private void processItem(SPItemEventProperties properties)
         {
             //WorkEnginePPM.WebAdmin.SimpleDBTrace(properties.SiteId, 99900, "WorkEnginePPM", "processItem", "Entry", "");

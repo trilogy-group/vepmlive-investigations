@@ -815,12 +815,14 @@ namespace EPMLiveCore
             return username;
         }
 
-        public static string GetSafeGroupTitle(string sRawGrpName)
+        public static string GetSafeTitle(string sRawGrpName)
         {
             var safeGroupTitle = string.Empty;
-            Regex rgx = new Regex("[^a-zA-Z 0-9]");
+            Regex rgx = new Regex("[^a-zA-Z 0-9 !#$%^&()_{}~`-]");
             safeGroupTitle = rgx.Replace(sRawGrpName, "");
-
+            //This is to handle Extra spaces in name after removing Invalid characters
+            //A group name cannot contain any of the following characters: | \ " ' / [ ] : < > + = , ; ? * @
+            safeGroupTitle = safeGroupTitle.Replace("  ", "");
             return safeGroupTitle;
         }
 
@@ -2588,7 +2590,7 @@ namespace EPMLiveCore
                                     var item = itemList.GetItemById(itemId);
                                     var raColl = item.RoleAssignments;
 
-                                    var safeGroupTitle = GetSafeGroupTitle(finalTitle);
+                                    var safeGroupTitle = GetSafeTitle(finalTitle);
 
                                     // find owner
                                     iowner = (from SPRoleAssignment owner in raColl
