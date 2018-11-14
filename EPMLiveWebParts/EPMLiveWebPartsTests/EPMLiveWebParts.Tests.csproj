@@ -138,6 +138,7 @@
     <Compile Include="Layouts\epmlive\TlwizardTests.cs" />
     <Compile Include="Layouts\epmlive\UpdateWebPartTests.cs" />
     <Compile Include="ListReportView\ListReportViewTest.cs" />
+    <Compile Include="MyWorkWebPart\MyWorkToolpartTests.cs" />
     <Compile Include="ReportingChart\ReportingChartTests.cs" />
     <Compile Include="ReportingChart\ReportingChartToolPartTests.cs" />
     <Compile Include="ReportingChart\ReportingChartToolPartTests.Part2.cs" />
