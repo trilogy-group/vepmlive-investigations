@@ -171,7 +171,5 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getPageDisplayedValidation(LinkPageConstants.pagePrefix));
 
         await LinkPageHelper.verifyNewLinkAdded(details);
-
     });
-
 });
