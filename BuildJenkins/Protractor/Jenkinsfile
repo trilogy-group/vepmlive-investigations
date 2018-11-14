@@ -4,7 +4,7 @@ pipeline {
     }
 	parameters {
         string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')
-		string(name: 'fullHostName', defaultValue: 'tenant01.epmdev.com', description: 'Target full host name')
+		string(name: 'fullHostName', defaultValue: 'tenant01.epmldev.com', description: 'Target full host name')
     }
     stages {
         stage('Preparing for UI tests execution') {
