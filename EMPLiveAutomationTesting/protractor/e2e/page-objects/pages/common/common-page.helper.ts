@@ -683,14 +683,13 @@ export class CommonPageHelper {
         await PageHelper.uploadFile(CommonPage.browseButton, newFile.fullFilePath);
 
         StepLogger.step('Click "OK" button');
-        await PageHelper.click(CommonPage.formButtons.ok);
+        await PageHelper.clickAndWaitForElementToHide(CommonPage.formButtons.ok);
 
         await PageHelper.switchToDefaultContent();
+        await WaitHelper.staticWait(PageHelper.timeout.xs);
 
         StepLogger.verification(`"${addWindowTitle}" window is closed`);
-        await expect(await CommonPage.dialogTitle.isDisplayed())
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(addWindowTitle));
+        await ExpectationHelper.verifyNotDisplayedStatus(CommonPage.dialogTitle, addWindowTitle);
 
         StepLogger.verification(`${pageName} page is displayed`);
         await expect(await PageHelper.isElementDisplayed(page))
