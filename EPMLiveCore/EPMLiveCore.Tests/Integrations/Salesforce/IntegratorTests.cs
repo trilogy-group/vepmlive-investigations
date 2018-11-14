@@ -328,7 +328,7 @@ namespace EPMLiveCore.Tests.Integrations.Salesforce
 
             ShimSfService.AllInstances.GetObjectItemsByIdStringStringDataTable = (sender, objectName, itemIds, itemsDataTable) =>
             {
-                foreach (string sId in itemIds.Split(','))
+                foreach (var sId in itemIds.Split(','))
                 {
                     var dataRow = itemsDataTable.NewRow();
                     dataRow[0] = sId;
