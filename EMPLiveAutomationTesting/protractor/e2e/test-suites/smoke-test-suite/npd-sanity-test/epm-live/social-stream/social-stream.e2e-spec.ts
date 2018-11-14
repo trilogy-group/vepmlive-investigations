@@ -1,4 +1,4 @@
-// import {browser} from 'protractor';
+import {browser} from 'protractor';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {PageHelper} from '../../../../../components/html/page-helper';
@@ -7,7 +7,7 @@ import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {SocialStreamPage} from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
 import {SocialStreamPageConstants} from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.constants';
-/* import {TextboxHelper} from '../../../../../components/html/textbox-helper';
+import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
@@ -16,7 +16,7 @@ import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
 import {DocumentPageHelper} from '../../../../../page-objects/pages/documents/document-page.helper';
- */
+
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
 
@@ -92,7 +92,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(SocialStreamPage.socialStreamPage)).toBe(true,
             ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.settingItems.page));
     });
-/*
+
     it('Post Status - [907973] [BUG:SKYVERA-1406]', async () => {
         StepLogger.caseId = 907973;
         StepLogger.stepId(1);
@@ -216,5 +216,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('Project Documents (Add a document) window displayed');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.file)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.newFileName));
-    }); */
+    });
 });
