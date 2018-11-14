@@ -91,7 +91,7 @@
     </Reference>
     <Reference Include="TimeSheets.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\EPMLive.TestFakes\bin\Debug\TimeSheets.Fakes.dll</HintPath>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\TimeSheets.Fakes.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Choose>
