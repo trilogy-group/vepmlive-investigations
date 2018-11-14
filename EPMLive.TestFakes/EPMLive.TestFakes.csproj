@@ -87,6 +87,14 @@
     <Reference Include="Microsoft.SharePoint.16.0.0.0.Fakes">
       <HintPath>FakesAssemblies\Microsoft.SharePoint.16.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.SharePoint.Client, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint.Client.16.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\Microsoft.SharePoint.Client.16.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.Runtime, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint.Client.Runtime.16.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\Microsoft.SharePoint.Client.Runtime.16.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.SharePoint.Security, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint.Security\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.Security.dll</HintPath>
@@ -263,9 +271,14 @@
     <Fakes Include="Fakes\System.Web.Services.fakes" />
     <Fakes Include="Fakes\Microsoft.Office.Project.Server.Library.fakes" />
     <Fakes Include="Fakes\Dashboard.fakes" />
+    <Fakes Include="Fakes\Microsoft.SharePoint.Client.fakes" />
+    <Fakes Include="Fakes\Microsoft.SharePoint.Client.Runtime.fakes" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
