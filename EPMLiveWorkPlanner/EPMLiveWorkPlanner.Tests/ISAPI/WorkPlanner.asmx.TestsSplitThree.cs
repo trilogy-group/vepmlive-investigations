@@ -47,6 +47,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private const string SharePointTypeString = "SharePointType";
         private const string ColumnNameString = "ColumnName";
         private const string ValueString = "Value";
+        private const string RootNodeString = "xmlcfg";
 
         [TestMethod]
         public void ReOrderAndSaveItem_WhenCalled_ReturnsString()
@@ -125,6 +126,8 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         {
             // Arrange
             const string kanBanBoardName = "KanBanBoardName";
+            const string lookupString = "lookup";
+            const string randomString = "RandomString";
             var dataXmlString = $@"
                 <xmlcfg>
                     <KanBanBoardName>{kanBanBoardName}</KanBanBoardName>
@@ -162,15 +165,15 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
 
             row = columnsDataTable.NewRow();
             row[ColumnNameString] = $"{DummyString}id";
-            row[SharePointTypeString] = "lookup";
+            row[SharePointTypeString] = lookupString;
             columnsDataTable.Rows.Add(row);
 
-            sourceListData.Columns.Add("ID");
+            sourceListData.Columns.Add(IDStringCaps);
             sourceListData.Columns.Add(DummyString);
 
             row = sourceListData.NewRow();
-            row["ID"] = DummyInt;
-            row[DummyString] = "RandomString";
+            row[IDStringCaps] = DummyInt;
+            row[DummyString] = randomString;
             sourceListData.Rows.Add(row);
 
             spField.TypeGet = () => SPFieldType.User;
@@ -358,10 +361,11 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 validations += 1;
                 return false;
             };
-            ShimWorkPlannerAPI.setEnumFieldSPFieldXmlNodeRefXmlDocumentXmlDocumentSPWebBooleanStringDataSet = (SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources) =>
-            {
-                validations += 1;
-            };
+            ShimWorkPlannerAPI.setEnumFieldSPFieldXmlNodeRefXmlDocumentXmlDocumentSPWebBooleanStringDataSet =
+                (SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources) =>
+                {
+                    validations += 1;
+                };
 
             // Act
             var actual = XDocument.Parse((string)privateObject.Invoke(
@@ -376,21 +380,21 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual
-                    .Element("xmlcfg")
+                    .Element(RootNodeString)
                     .Element("B")
                     .Element("I")
                     .Attribute("id")
                     .Value
                     .ShouldBe(DummyString),
                 () => actual
-                    .Element("xmlcfg")
+                    .Element(RootNodeString)
                     .Element("B")
                     .Element("I")
                     .Attribute("CanEdit")
                     .Value
                     .ShouldBe("0"),
                 () => actual
-                    .Element("xmlcfg")
+                    .Element(RootNodeString)
                     .Element("B")
                     .Element("I")
                     .Attribute("NoColorState")
@@ -593,7 +597,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual
-                    .Element("xmlcfg")
+                    .Element(RootNodeString)
                     .Attribute("Planner")
                     .Value
                     .ShouldBe("1"),
@@ -634,7 +638,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual
-                    .Element("xmlcfg")
+                    .Element(RootNodeString)
                     .Attribute("Planner")
                     .Value
                     .ShouldBe("1"),
@@ -663,12 +667,19 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             };
 
             // Act
-            var actual = XDocument.Parse((string)privateObject.Invoke(GetAllocationLayoutMethodName, publicStatic, new object[] { data, spWeb.Instance }));
+            var actual = XDocument.Parse((string)privateObject.Invoke(
+                GetAllocationLayoutMethodName,
+                publicStatic,
+                new object[]
+                {
+                    data,
+                    spWeb.Instance
+                }));
 
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual
-                    .Element("xmlcfg")
+                    .Element(RootNodeString)
                     .Attribute("Planner")
                     .Value
                     .ShouldBe("1"),
@@ -709,7 +720,7 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual
-                    .Element("xmlcfg")
+                    .Element(RootNodeString)
                     .Attribute("Planner")
                     .Value
                     .ShouldBe("1"),
@@ -1062,10 +1073,11 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spField.TypeGet = () => SPFieldType.Text;
             spField.InternalNameGet = () => TitleString;
 
-            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
-            {
-                validations += 1;
-            };
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps =
+                (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+                {
+                    validations += 1;
+                };
             ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
             {
                 validations += 1;
@@ -1130,10 +1142,11 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spField.InternalNameGet = () => summaryString;
             spField.ReadOnlyFieldGet = () => true;
 
-            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
-            {
-                validations += 1;
-            };
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps =
+                (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+                {
+                    validations += 1;
+                };
             ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
             {
                 validations += 1;
@@ -1196,10 +1209,11 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spField.ReadOnlyFieldGet = () => true;
             spField.DescriptionGet = () => indicatorString;
 
-            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
-            {
-                validations += 1;
-            };
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps =
+                (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+                {
+                    validations += 1;
+                };
             ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
             {
                 validations += 1;
@@ -1262,10 +1276,11 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spField.InternalNameGet = () => summaryString;
             spField.ReadOnlyFieldGet = () => true;
 
-            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
-            {
-                validations += 1;
-            };
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps =
+                (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+                {
+                    validations += 1;
+                };
             ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
             {
                 validations += 1;
@@ -1331,16 +1346,18 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spField.InternalNameGet = () => summaryString;
             spField.ReadOnlyFieldGet = () => true;
 
-            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
-            {
-                validations += 1;
-            };
-            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
-            {
-                validations += 1;
-                EditFormat = DummyString;
-                return DummyString;
-            };
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps =
+                (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+                {
+                    validations += 1;
+                };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb =
+                (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+                {
+                    validations += 1;
+                    EditFormat = DummyString;
+                    return DummyString;
+                };
             ShimWorkPlannerAPI.setEnumFieldSPFieldXmlNodeRefXmlDocumentXmlDocumentSPWebBooleanStringDataSet =
                 (SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources) =>
                 {
@@ -1400,16 +1417,18 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spField.InternalNameGet = () => summaryString;
             spField.ReadOnlyFieldGet = () => true;
 
-            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
-            {
-                validations += 1;
-            };
-            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
-            {
-                validations += 1;
-                EditFormat = DummyString;
-                return DummyString;
-            };
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps =
+                (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+                {
+                    validations += 1;
+                };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb =
+                (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+                {
+                    validations += 1;
+                    EditFormat = DummyString;
+                    return DummyString;
+                };
             ShimWorkPlannerAPI.setEnumFieldSPFieldXmlNodeRefXmlDocumentXmlDocumentSPWebBooleanStringDataSet =
                 (SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources) =>
                 {
@@ -1469,16 +1488,18 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spField.InternalNameGet = () => summaryString;
             spField.ReadOnlyFieldGet = () => true;
 
-            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
-            {
-                validations += 1;
-            };
-            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
-            {
-                validations += 1;
-                EditFormat = DummyString;
-                return DummyString;
-            };
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps =
+                (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+                {
+                    validations += 1;
+                };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb =
+                (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+                {
+                    validations += 1;
+                    EditFormat = DummyString;
+                    return DummyString;
+                };
             ShimWorkPlannerAPI.setEnumFieldSPFieldXmlNodeRefXmlDocumentXmlDocumentSPWebBooleanStringDataSet =
                 (SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources) =>
                 {
@@ -1538,16 +1559,18 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spField.InternalNameGet = () => summaryString;
             spField.ReadOnlyFieldGet = () => true;
 
-            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
-            {
-                validations += 1;
-            };
-            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
-            {
-                validations += 1;
-                EditFormat = DummyString;
-                return DummyString;
-            };
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps =
+                (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+                {
+                    validations += 1;
+                };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb =
+                (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+                {
+                    validations += 1;
+                    EditFormat = DummyString;
+                    return DummyString;
+                };
             ShimWorkPlannerAPI.setEnumFieldSPFieldXmlNodeRefXmlDocumentXmlDocumentSPWebBooleanStringDataSet =
                 (SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources) =>
                 {
@@ -1607,16 +1630,18 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             spField.InternalNameGet = () => summaryString;
             spField.ReadOnlyFieldGet = () => true;
 
-            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps = (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
-            {
-                validations += 1;
-            };
-            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
-            {
-                validations += 1;
-                EditFormat = DummyString;
-                return DummyString;
-            };
+            ShimWorkPlannerAPI.processIndividualFieldXmlDocumentRefSPFieldXmlDocumentWorkPlannerAPIPlannerProps =
+                (ref XmlDocument docOut, SPField oField, XmlDocument docF, PlannerProps p) =>
+                {
+                    validations += 1;
+                };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb =
+                (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+                {
+                    validations += 1;
+                    EditFormat = DummyString;
+                    return DummyString;
+                };
             ShimWorkPlannerAPI.setEnumFieldSPFieldXmlNodeRefXmlDocumentXmlDocumentSPWebBooleanStringDataSet =
                 (SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources) =>
                 {
