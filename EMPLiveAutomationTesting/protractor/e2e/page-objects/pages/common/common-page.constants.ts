@@ -76,7 +76,8 @@ export class CommonPageConstants {
 
     static get ribbonIds() {
         return {
-            editTeamIdSubstr: 'Ribbon.ListItem.EPMLive.BuildTeam'
+            editTeamIdSubstr: 'Ribbon.ListItem.EPMLive.BuildTeam',
+            deleteItemIdSubstr: 'Ribbon.ListItem.Manage.Delete'
         };
     }
 

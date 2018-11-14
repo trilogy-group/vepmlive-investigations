@@ -165,7 +165,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     });
 
-    it('Create new Links from Workplace - [1175272]', async () => {
+    fit('Create new Links from Workplace - [1175272]', async () => {
         StepLogger.caseId = 1175272;
         StepLogger.stepId(1);
 
@@ -190,6 +190,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const details = await LinkPageHelper.fillNewLinkFormAndVerification();
 
         await LinkPageHelper.verifyNewLinkAdded(details);
+        await LinkPageHelper.deleteLinkByText(details.description);
     });
 
     it('Create new Pictures from Workplace - [1175271]', async () => {
@@ -209,10 +210,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         );
     });
 
-    it('Add Time Off From My Workplace - [1124447]', async () => {
+    fit('Add Time Off From My Workplace - [1124447]', async () => {
         StepLogger.caseId = 1124447;
 
         StepLogger.step('Navigate to My Time Off page');
+        await PageHelper.switchToDefaultContent();
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.myTimeOff,
             CommonPage.pageHeaders.myWorkplace.timeOff,
@@ -238,10 +240,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         const startDate = input.startDate;
         const finishDate = input.finishDate;
         await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate);
-
-        StepLogger.verification('Newly created Time Off item details displayed in read only mode');
-        await expect(await CommonPage.contentTitleInViewMode.getText())
-            .toBe(title, ValidationsHelper.getLabelDisplayedValidation(title));
 
         StepLogger.verification('Navigate to page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
