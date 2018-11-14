@@ -1,3 +1,5 @@
+import { browser } from 'protractor';
+
 export class SocialStreamPageConstants {
 
     static get validations() {
@@ -8,7 +10,7 @@ export class SocialStreamPageConstants {
     }
 
     static get logoutURL() {
-        return `http://qaepmlive6/sites/devtestautomation/_layouts/15/SignOut.aspx`;
+        return `${browser.baseUrl.replace('/epm', '')}/_layouts/15/SignOut.aspx`;
     }
 
     static get settingItems() {

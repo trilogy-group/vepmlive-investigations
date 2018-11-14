@@ -82,8 +82,7 @@ export class DocumentPageHelper {
 
         StepLogger.verification('Home Page is displayed');
         await expect(await browser.getTitle())
-            .toBe(HomePageConstants.homePage, ValidationsHelper.getPageDisplayedValidation(HomePageConstants.pageName));
-
+            .toBe(HomePageConstants.homePage, ValidationsHelper.getPageDisplayedValidation(HomePageConstants.homePage));
     }
 
     static async verifyCreatedDocument() {
@@ -94,6 +93,8 @@ export class DocumentPageHelper {
 
         StepLogger.step('Select Projects -> Documents from the options displayed');
         await PageHelper.click(HomePage.navigation.projects.documents);
+        // wait is needed for next page to load
+        await PageHelper.sleepForXSec(5000);
 
         StepLogger.verification('Project Documents page is displayed');
         await expect(await browser.getTitle()).toBe(HomePageConstants.documentPage,
