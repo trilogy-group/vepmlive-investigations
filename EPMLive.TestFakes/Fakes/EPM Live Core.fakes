@@ -121,5 +121,6 @@
     <Add FullName="EPMLiveCore.ViewPermissionPage!"/>
     <Add FullName="EPMLiveCore.ViewPermissionUtil!"/>
     <Add FullName="EPMLiveCore.tpreport!"/>
+    <Add FullName="EPMLiveCore.adsyncadmin!"/>
   </ShimGeneration>
 </Fakes>
