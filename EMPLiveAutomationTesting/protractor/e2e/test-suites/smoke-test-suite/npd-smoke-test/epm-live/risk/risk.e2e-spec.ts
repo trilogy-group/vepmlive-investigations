@@ -2,20 +2,20 @@ import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
-// import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-// import {TextboxHelper} from '../../../../../components/html/textbox-helper';
+import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
+import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
-// import {AnchorHelper} from '../../../../../components/html/anchor-helper';
-// import {CreateNewPage} from '../../../../../page-objects/pages/items-page/create-new.po';
-// import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
-// import {RiskItemPageConstants} from '../../../../../page-objects/pages/items-page/risk-item/risk-item-page.constants';
+import {AnchorHelper} from '../../../../../components/html/anchor-helper';
+import {CreateNewPage} from '../../../../../page-objects/pages/items-page/create-new.po';
+import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
+import {RiskItemPageConstants} from '../../../../../page-objects/pages/items-page/risk-item/risk-item-page.constants';
 import {RiskItemPage} from '../../../../../page-objects/pages/items-page/risk-item/risk-item.po';
-// import {RiskItemPageHelper} from '../../../../../page-objects/pages/items-page/risk-item/risk-item-page.helper';
+import {RiskItemPageHelper} from '../../../../../page-objects/pages/items-page/risk-item/risk-item-page.helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-// import {ElementHelper} from '../../../../../components/html/element-helper';
+import {ElementHelper} from '../../../../../components/html/element-helper';
 import { ExpectationHelper } from '../../../../../components/misc-utils/expectation-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -31,7 +31,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     afterEach(async () => {
         await StepLogger.takeScreenShot();
     });
-/*
+
     it('Add Risks Functionality - [1124271]', async () => {
         StepLogger.caseId = 1124271;
         StepLogger.stepId(1);
@@ -131,7 +131,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         // Common functionality to edit risk
         await RiskItemPageHelper.editRisk();
     });
- */
+
     /* #UNSTABLE
     it('Edit view in Risk - [1176329]', async () => {
         StepLogger.caseId = 1176329;
@@ -150,7 +150,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
     */
 
-/*     it('Search Risk - [1176333]', async () => {
+    it('Search Risk - [1176333]', async () => {
         StepLogger.caseId = 1176333;
         StepLogger.stepId(1);
 
@@ -179,7 +179,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getOnlyOneRecordShouldBeDisplayedInGrid(titleValue));
 
     });
- */
+
     it('View Item in Risk - [1176338]', async () => {
         StepLogger.caseId = 1176338;
         StepLogger.stepId(1);
@@ -199,7 +199,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('Verify that item is available in View page mode');
         await ExpectationHelper.verifyTextContains(CommonPage.contentTitleInViewMode, titleValue, titleValue);
     });
-/*
+
     it('Add attachment in Risk - [1176340]', async () => {
         StepLogger.caseId = 1176340;
         StepLogger.stepId(1);
@@ -308,5 +308,5 @@ describe(SuiteNames.smokeTestSuite, () => {
             ' and the data in table appears sort by Title ascending from z-a');
         await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.title.ascending))
         .toBe(true, ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.sortingOrder.ascending));
-    }); */
+    });
 });
