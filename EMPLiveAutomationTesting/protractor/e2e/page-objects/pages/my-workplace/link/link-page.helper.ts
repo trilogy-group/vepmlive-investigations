@@ -1,12 +1,14 @@
-import {By, element} from 'protractor';
-import {StepLogger} from '../../../../../core/logger/step-logger';
-import {TextboxHelper} from '../../../../components/html/textbox-helper';
-import {PageHelper} from '../../../../components/html/page-helper';
-import {CommonPage} from '../../common/common.po';
-import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
-import {LinkPageConstants} from './link-page.constants';
-import {LinkPage} from './link.po';
-import {WaitHelper} from '../../../../components/html/wait-helper';
+import { By, element } from 'protractor';
+
+import { StepLogger } from '../../../../../core/logger/step-logger';
+import { TextboxHelper } from '../../../../components/html/textbox-helper';
+import { PageHelper } from '../../../../components/html/page-helper';
+import { ExpectationHelper } from '../../../../components/misc-utils/expectation-helper';
+import { CommonPage } from '../../common/common.po';
+import { ValidationsHelper } from '../../../../components/misc-utils/validation-helper';
+import { LinkPageConstants } from './link-page.constants';
+import { LinkPage } from './link.po';
+import { WaitHelper } from '../../../../components/html/wait-helper';
 
 export class LinkPageHelper {
 
@@ -62,8 +64,9 @@ export class LinkPageHelper {
     static async verifyNewLinkAdded(details: { description: string; url: string; }) {
         StepLogger.verification('Newly added Link details are displayed in the list');
         const item = element(By.linkText(details.description));
-        await expect(await PageHelper.isElementDisplayed(item, true))
-            .toBe(true, ValidationsHelper.getDisplayedValidation(details.url));
+        while (await PageHelper.isElementPresent(LinkPage.nextButton, false) && !await PageHelper.isElementPresent(item, false)) {
+            await PageHelper.clickAndWaitForElementToHide(LinkPage.nextButton);
+        }
+        await ExpectationHelper.verifyDisplayedStatus(item, details.url);
     }
-
 }

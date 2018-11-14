@@ -53,9 +53,7 @@ export class ToDoPageHelper {
         if (await ToDoPage.menueLink.first().isPresent() === true) {
             await PageHelper.click(ToDoPage.menueLink.first());
             await PageHelper.click(ToDoPage.delete);
-            await browser.switchTo().alert().accept();
-            // After save It need static wait(5 sec) and no element found which get change after save.
-            await browser.sleep(PageHelper.timeout.m);
+            await PageHelper.acceptAlert();
 
             if (await ToDoPage.menueLink.first().isPresent() === true) {
                 await this.deleteGridGantt();

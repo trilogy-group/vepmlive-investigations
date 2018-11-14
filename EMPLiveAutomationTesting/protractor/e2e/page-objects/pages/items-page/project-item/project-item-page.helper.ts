@@ -327,12 +327,12 @@ export class ProjectItemPageHelper {
     static async selectPlannerIfPopUpAppears(planner: ElementFinder) {
         try {
             await CommonPageHelper.switchToContentFrame();
-            await ElementHelper.clickUsingJs(planner);
+            await WaitHelper.staticWait(PageHelper.timeout.xs);
+            await PageHelper.clickAndWaitForElementToHide(planner);
             await PageHelper.switchToDefaultContent();
         } catch {
             StepLogger.subStep('Pop up did not appear');
         }
-
     }
 
     static getReportParametersByTitle(title: string) {
