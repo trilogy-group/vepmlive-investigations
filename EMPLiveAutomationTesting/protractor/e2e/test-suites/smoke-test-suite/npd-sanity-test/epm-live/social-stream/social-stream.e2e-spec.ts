@@ -92,8 +92,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(SocialStreamPage.socialStreamPage)).toBe(true,
             ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.settingItems.page));
     });
-
-    xit('Post Status - [907973] [BUG:SKYVERA-1406]', async () => {
+/*
+    it('Post Status - [907973] [BUG:SKYVERA-1406]', async () => {
         StepLogger.caseId = 907973;
         StepLogger.stepId(1);
         const uniqueId = PageHelper.getUniqueId();
@@ -146,7 +146,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('Comment added by another user should be displayed to admin user');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(comment))).toBe(true,
             ValidationsHelper.getDisplayedValidation(comment));
-    });
+    }); */
 
     it('Add Shared Document - [907964]', async () => {
         StepLogger.caseId = 907964;
