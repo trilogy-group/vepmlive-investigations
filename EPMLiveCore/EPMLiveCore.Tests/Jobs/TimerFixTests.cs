@@ -54,7 +54,7 @@ namespace EPMLiveCore.Tests.Jobs
             ShimTimerFix.AllInstances.storeResPlanInfo = _ => { };
             ShimCoreFunctions.getConfigSettingSPWebString = (web, setting) => DummyString;
             ShimSPPersistedObject.AllInstances.IdGet = _ => Guid.NewGuid();
-            ShimCoreFunctions.getConfigSettingSPWebString = (spWeb, setting) => "";
+            ShimCoreFunctions.getConfigSettingSPWebString = (spWeb, setting) => string.Empty;
             ShimBaseJob.AllInstances.CreateConnection = _ => new SqlConnection();
             ShimSqlConnection.AllInstances.Open = _ => { };
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code => code();
@@ -86,7 +86,7 @@ namespace EPMLiveCore.Tests.Jobs
                         WorkDaysGet = () => 2
                     }
                 },
-                AllWebsGet = () => 
+                AllWebsGet = () =>
                 {
                     var list = new List<SPWeb>
                     {
@@ -97,7 +97,7 @@ namespace EPMLiveCore.Tests.Jobs
             };
             var web = new ShimSPWeb();
             ShimTimerFix.AllInstances.processWebSPWebStringSingleRef = ProcessWeb;
-            ShimTimerFix.AllInstances.processResPlanSPWebStringGuidInt32String = 
+            ShimTimerFix.AllInstances.processResPlanSPWebStringGuidInt32String =
                 (_, spWeb, lists, id, hours, days) => { };
             ShimSPWebCollection.AllInstances.CountGet = _ => 1;
             ShimSqlConnection.AllInstances.Open = _ => { };
@@ -155,7 +155,7 @@ namespace EPMLiveCore.Tests.Jobs
             ShimTimerFix.AllInstances.processResPlanSPWebStringGuidInt32String =
                 (_, spWeb, lists, id, hours, days) => { };
             ShimSPWebCollection.AllInstances.CountGet = _ => 1;
-            ShimSqlConnection.AllInstances.Open = _ => 
+            ShimSqlConnection.AllInstances.Open = _ =>
             {
                 throw new Exception();
             };
@@ -241,7 +241,7 @@ namespace EPMLiveCore.Tests.Jobs
             ShimTimerFix.AllInstances.processResPlanSPWebStringGuidInt32String =
                 (_, spWeb, lists, id, hours, days) => { };
             ShimSPWebCollection.AllInstances.CountGet = _ => 1;
-            
+
             ShimSqlCommand.AllInstances.ExecuteNonQuery = command =>
             {
                 executedCommands.Add(command.CommandText);
@@ -274,7 +274,7 @@ namespace EPMLiveCore.Tests.Jobs
             var siteId = Guid.NewGuid();
             var args = new object[]
             {
-                web, string.Empty, siteId, 1, string.Empty 
+                web, string.Empty, siteId, 1, string.Empty
             };
             ShimCoreFunctions.getConfigSettingSPWebString = (spWeb, setting) => "https://dummy.org/url";
             ShimResourcePlan.ProcessResourcePlanStringSPWebStringGuidInt32String =
@@ -290,7 +290,7 @@ namespace EPMLiveCore.Tests.Jobs
             privateObject.SetFieldOrProperty("dtResLink", new DataTable());
             privateObject.SetFieldOrProperty("dtResInfo", new DataTable());
             privateObject.SetFieldOrProperty("sbErrors", builder);
-            ShimDataRowCollection.AllInstances.AddObjectArray = (_, values) => 
+            ShimDataRowCollection.AllInstances.AddObjectArray = (_, values) =>
             {
                 rowsCount++;
                 return new ShimDataRow();
@@ -310,18 +310,19 @@ namespace EPMLiveCore.Tests.Jobs
         public void StoreResPlanInfo_OnSuccess_ExecuteCorrectly()
         {
             // Arrange
+            const int RowCount = 501;
             var writeToServerWasCalled = false;
             ShimTimerFix.AllInstances.storeResPlanInfo = null;
             var dataTable = new ShimDataTable
             {
                 RowsGet = () => new ShimDataRowCollection
                 {
-                    CountGet = () => 501
+                    CountGet = () => RowCount
                 }
             }.Instance;
             privateObject.SetFieldOrProperty("dtResInfo", dataTable);
             privateObject.SetFieldOrProperty("dtResLink", dataTable);
-            ShimSqlBulkCopy.AllInstances.WriteToServerDataTable = 
+            ShimSqlBulkCopy.AllInstances.WriteToServerDataTable =
                 (_, dt) => writeToServerWasCalled = true;
 
             // Act
@@ -335,13 +336,14 @@ namespace EPMLiveCore.Tests.Jobs
         public void StoreResPlanInfo_OnException_ShouldLogMessage()
         {
             // Arrange
+            const int RowCount = 501;
             const string ErrorMessage = "Error Message";
             ShimTimerFix.AllInstances.storeResPlanInfo = null;
             var dataTable = new ShimDataTable
             {
                 RowsGet = () => new ShimDataRowCollection
                 {
-                    CountGet = () => 501
+                    CountGet = () => RowCount
                 }
             }.Instance;
             privateObject.SetFieldOrProperty("dtResInfo", dataTable);
@@ -781,9 +783,9 @@ namespace EPMLiveCore.Tests.Jobs
         /// This is a fake method. All the parameters are required, even though not all of them are used
         /// </summary>
         private void ProcessWeb(
-            TimerFix timer, 
-            SPWeb web, 
-            string fixLists, 
+            TimerFix timer,
+            SPWeb web,
+            string fixLists,
             ref float counter)
         {
             counter++;
