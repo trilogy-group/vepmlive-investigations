@@ -1,28 +1,31 @@
-import {browser, By, element, ElementFinder, protractor} from 'protractor';
-import {ProjectItemPage} from './project-item.po';
-import {ProjectItemPageConstants} from './project-item-page.constants';
-import {StepLogger} from '../../../../../core/logger/step-logger';
-import {TextboxHelper} from '../../../../components/html/textbox-helper';
-import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
-import {PageHelper} from '../../../../components/html/page-helper';
-import {ElementHelper} from '../../../../components/html/element-helper';
-import {WaitHelper} from '../../../../components/html/wait-helper';
-import {CommonPageHelper} from '../../common/common-page.helper';
-import {CommonPage} from '../../common/common.po';
-import {AnchorHelper} from '../../../../components/html/anchor-helper';
-import {CommonPageConstants} from '../../common/common-page.constants';
-import {HomePage} from '../../homepage/home.po';
-import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
-import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
-import {MyTimeOffPage} from '../../my-workplace/my-time-off/my-time-off.po';
-import {ResourcePlannerConstants} from '../../resource-planner-page/resource-planner-page.constants';
-import {EditCost} from './edit-cost-page/edit-cost.po';
+import { browser, By, element, ElementFinder, protractor } from 'protractor';
+import { ExpectationHelper } from '../../../../components/misc-utils/expectation-helper';
+
+import { LoginPageHelper } from '../../login/login-page.helper';
+import { ProjectItemPage } from './project-item.po';
+import { ProjectItemPageConstants } from './project-item-page.constants';
+import { StepLogger } from '../../../../../core/logger/step-logger';
+import { TextboxHelper } from '../../../../components/html/textbox-helper';
+import { ValidationsHelper } from '../../../../components/misc-utils/validation-helper';
+import { PageHelper } from '../../../../components/html/page-helper';
+import { ElementHelper } from '../../../../components/html/element-helper';
+import { WaitHelper } from '../../../../components/html/wait-helper';
+import { CommonPageHelper } from '../../common/common-page.helper';
+import { CommonPage } from '../../common/common.po';
+import { AnchorHelper } from '../../../../components/html/anchor-helper';
+import { CommonPageConstants } from '../../common/common-page.constants';
+import { HomePage } from '../../homepage/home.po';
+import { CheckboxHelper } from '../../../../components/html/checkbox-helper';
+import { ComponentHelpers } from '../../../../components/devfactory/component-helpers/component-helpers';
+import { MyTimeOffPage } from '../../my-workplace/my-time-off/my-time-off.po';
+import { ResourcePlannerConstants } from '../../resource-planner-page/resource-planner-page.constants';
+import { EditCost } from './edit-cost-page/edit-cost.po';
 
 export class ProjectItemPageHelper {
     static get getlink() {
         return {
             myLanguageAndRegion: ElementHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
-            adminUser: ElementHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
+            adminUser: element(By.css(`td.GMCell>a[href*=${LoginPageHelper.adminEmailId}]`)),
             region: ElementHelper.getElementByText(ProjectItemPageConstants.region),
         };
     }
@@ -382,13 +385,12 @@ export class ProjectItemPageHelper {
     }
 
     static async verifyGanttChart() {
-        const isBarChartPresent = await ProjectItemPage.ganttChartBars.isPresent();
-        await expect(isBarChartPresent).toBe(false,
-            ValidationsHelper.getNotDisplayedValidation(ProjectItemPageConstants.ganttChart));
+        await WaitHelper.waitForElementToBeHidden(ProjectItemPage.ganttChartBars);
+        await ExpectationHelper.verifyNotDisplayedStatus(ProjectItemPage.ganttChartBars, ProjectItemPageConstants.ganttChart);
     }
 
     static async verifyAlertMessage() {
-        await expect(await browser.switchTo().alert().getText()).toContain(ProjectItemPageConstants.baseLineMessage.clear,
+        await expect(await PageHelper.getAlertText()).toContain(ProjectItemPageConstants.baseLineMessage.clear,
             ValidationsHelper.getRecordContainsMessage(ProjectItemPageConstants.baseLineMessage.clear));
     }
 
