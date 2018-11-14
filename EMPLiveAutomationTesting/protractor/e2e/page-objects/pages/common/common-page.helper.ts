@@ -986,6 +986,7 @@ export class CommonPageHelper {
 
     static async clickEditResourcePlan() {
         StepLogger.step('Click on Edit Resource Plan');
-        await CommonPageHelper.getContextMenuItemByText(CommonPageConstants.contextMenuOptions.editResource);
+        const editLink = await CommonPageHelper.getContextMenuItemByText(CommonPageConstants.contextMenuOptions.editResource);
+        await PageHelper.click(editLink);
     }
 }

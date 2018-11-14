@@ -512,7 +512,7 @@ export class ProjectItemPageHelper {
     static async verifyProjectDetailsDisplayed() {
         StepLogger.verification('Project Details opened ');
         await CommonPageHelper.labelDisplayedValidation
-        (CommonPage.pageHeaders.projects.projectDetails, CommonPageConstants.pageHeaders.projects.projectDetails);
+        (CommonPage.contentTitleInViewMode, CommonPageConstants.pageHeaders.projects.projectDetails);
     }
 
     static async validateProjectOpenInNewTab() {
