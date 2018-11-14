@@ -10,12 +10,12 @@ import {CreateNewPage} from '../../../../../page-objects/pages/items-page/create
 import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
 import {RiskItemPageConstants} from '../../../../../page-objects/pages/items-page/risk-item/risk-item-page.constants';
 import {RiskItemPage} from '../../../../../page-objects/pages/items-page/risk-item/risk-item.po';
-// import {RiskItemPageHelper} from '../../../../../page-objects/pages/items-page/risk-item/risk-item-page.helper';
+import {RiskItemPageHelper} from '../../../../../page-objects/pages/items-page/risk-item/risk-item-page.helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-// import {ElementHelper} from '../../../../../components/html/element-helper';
+import {ElementHelper} from '../../../../../components/html/element-helper';
 import { ExpectationHelper } from '../../../../../components/misc-utils/expectation-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -114,7 +114,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
-/*
+
     it('Edit Risks Functionality - [1124272]', async () => {
         StepLogger.caseId = 1124272;
         StepLogger.stepId(1);
@@ -132,7 +132,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         // Common functionality to edit risk
         await RiskItemPageHelper.editRisk();
     });
- */
+
     /* #UNSTABLE
     it('Edit view in Risk - [1176329]', async () => {
         StepLogger.caseId = 1176329;
@@ -150,7 +150,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await RiskItemPageHelper.editRisk();
     });
     */
-/*
+
     it('Search Risk - [1176333]', async () => {
         StepLogger.caseId = 1176333;
         StepLogger.stepId(1);
@@ -311,5 +311,5 @@ describe(SuiteNames.smokeTestSuite, () => {
             ' and the data in table appears sort by Title ascending from z-a');
         await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.title.ascending))
         .toBe(true, ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.sortingOrder.ascending));
-    }); */
+    });
 });
