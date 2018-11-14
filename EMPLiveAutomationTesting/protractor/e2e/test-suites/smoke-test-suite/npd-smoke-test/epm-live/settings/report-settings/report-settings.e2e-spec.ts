@@ -80,7 +80,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const lastRunValue = await ElementHelper.getText(lastRunLabel);
         let maxAttempts = 0;
         while ((await ElementHelper.getText(lastRunLabel) === Constants.EMPTY_STRING && maxAttempts++ < 10)) {
-            await WaitHelper.staticWait(PageHelper.timeout.m);
+            await WaitHelper.staticWait(PageHelper.timeout.l);
             await PageHelper.refreshPage();
         }
 
