@@ -16,6 +16,7 @@ import {CommonPageConstants} from '../../../../../page-objects/pages/common/comm
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import { ExpectationHelper } from '../../../../../components/misc-utils/expectation-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -31,7 +32,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    it('Add Risks Functionality - [1124271]', async () => {
+    fit('Add Risks Functionality - [1124271]', async () => {
         StepLogger.caseId = 1124271;
         StepLogger.stepId(1);
         StepLogger.step('Select "Create New" icon  from left side menu');
@@ -77,9 +78,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(RiskItemPage.inputs.project);
 
         StepLogger.verification('Required values entered/selected in Project Field');
-        await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
+        await ExpectationHelper.verifyPresentStatus(CommonPageHelper.getAutoCompleteItemByDescription(projectName), projectName);
+        /* await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
             .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.project, projectName));
+                ValidationsHelper.getFieldShouldHaveValueValidation(labels.project, projectName)); */
 
         StepLogger.stepId(4);
         StepLogger.step('Click on "Save" button in "Risks - New Item" window');
