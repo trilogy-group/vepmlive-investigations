@@ -483,30 +483,31 @@ BEGIN
                   CLOSE NotificationCursor
                   DEALLOCATE NotificationCursor
             
-                  SELECT ID, Title, Message, CAST(Type AS INT) AS Type, CAST(CreatedBy AS INT) AS CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, 
-                           PersonalizationSiteID, UserName 
-                  FROM
-                  (
-                        SELECT            TOP (COALESCE(@Limit, @MaxInt)) ROW_NUMBER() OVER(ORDER BY CreatedAt) AS Row, ID, Title, Message, Type, CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, 
-                                          PersonalizationSiteID, UserName
-                        FROM        (SELECT           ID, Title, Message, Type, CreatedBy, SiteCreationDateTime AS SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, 
-                                                            NotificationRead, PersonalizationID, PersonalizationSiteID, UserName
-                                          FROM       dbo.vwNotifications
-                                          WHERE            (Type = 0) AND ((UserName = @UserName) OR (UserName = @UserId)) AND 
-                                                                  (SiteID = ''00000000-0000-0000-0000-000000000000'' OR SiteID IS NULL OR SiteID = @SiteId) AND 
-                                                                  (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) OR
-                                                            (Type = 1) AND ((UserName = @UserName) OR (UserName = @UserId)) AND 
-                                                                  (SiteID = ''00000000-0000-0000-0000-000000000000'' OR SiteID IS NULL OR SiteID = @SiteId) AND 
-                                                                  (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) OR
-                                                            (Type > 1) AND 
-                                                                  (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) AND 
-                                                                  ((UserName = @UserName) OR (UserName = @UserId)) AND 
-                                                                  (PersonalizationSiteID = ''00000000-0000-0000-0000-000000000000'' OR PersonalizationSiteID IS NULL OR PersonalizationSiteID = @SiteId)) AS Notifications
-                        WHERE       (@GetRead = 0) AND (NotificationRead = 0 OR NotificationRead IS NULL) OR
-                                          (@GetRead = 1) AND (NotificationRead = 1) OR 
-                                          (@GetRead IS NULL) AND (NotificationRead IN (0, 1) OR NotificationRead IS NULL)
-                  ) AS Notifications
-                  WHERE Row BETWEEN COALESCE(@FirstPage, 0) AND COALESCE(@LastPage, @MaxInt)
+                  DECLARE @sqlStatement NVARCHAR(MAX);
+
+				 SET @sqlStatement = ''SELECT ID, Title, Message, CAST(Type AS INT) AS Type, CAST(CreatedBy AS INT) AS CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID,PersonalizationSiteID, UserName FROM (''
+				 SET @sqlStatement =    @sqlStatement  + '' SELECT TOP (COALESCE(@Limit, @MaxInt)) ROW_NUMBER() OVER(ORDER BY CreatedAt) AS Row, ID, Title, Message, Type, CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, PersonalizationSiteID, UserName''
+				 SET @sqlStatement =    @sqlStatement  + '' FROM (SELECT           ID, Title, Message, Type, CreatedBy, SiteCreationDateTime AS SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, PersonalizationSiteID, UserName FROM dbo.vwNotifications WHERE''
+				 SET @sqlStatement =    @sqlStatement  + '' (Type = 0) AND ((UserName = @UserName) OR (UserName = @UserId)) AND ''
+				 SET @sqlStatement =    @sqlStatement  + '' (SiteID = ''''00000000-0000-0000-0000-000000000000'''' OR SiteID IS NULL OR SiteID = @SiteId) AND ''
+				 SET @sqlStatement =    @sqlStatement  + '' (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) OR ''
+				 SET @sqlStatement =    @sqlStatement  + '' (Type = 1) AND ((UserName = @UserName) OR (UserName = @UserId)) AND ''
+				 SET @sqlStatement =    @sqlStatement  + '' (SiteID = ''''00000000-0000-0000-0000-000000000000'''' OR SiteID IS NULL OR SiteID = @SiteId) AND ''
+				 SET @sqlStatement =    @sqlStatement  + '' (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) OR ''
+				 SET @sqlStatement =    @sqlStatement  + '' (Type > 1) AND ''
+				 SET @sqlStatement =    @sqlStatement  + '' (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) AND ''
+				 SET @sqlStatement =    @sqlStatement  + '' ((UserName = @UserName) OR (UserName = @UserId)) AND ''
+				 SET @sqlStatement =    @sqlStatement  + '' (PersonalizationSiteID = ''''00000000-0000-0000-0000-000000000000'''' OR PersonalizationSiteID IS NULL OR PersonalizationSiteID = @SiteId)) AS Notifications ''
+				IF (@GetRead = 0) 
+				 SET @sqlStatement =    @sqlStatement  + '' WHERE (NotificationRead = 0 OR NotificationRead IS NULL) ''
+				IF (@GetRead = 1) 
+				 SET @sqlStatement =    @sqlStatement  + '' WHERE (NotificationRead = 1) ''
+				IF (@GetRead IS NULL) 
+				 SET @sqlStatement =    @sqlStatement  + '' WHERE (NotificationRead IN (0, 1) OR NotificationRead IS NULL) ''
+				SET @sqlStatement =    @sqlStatement  + '' ) AS Notifications WHERE Row BETWEEN COALESCE(@FirstPage, 0) AND COALESCE(@LastPage, @MaxInt)''
+
+				EXEC sp_executesql @sqlStatement, N''@Limit int, @MaxInt int, @FirstPage int,  @LastPage int, @UserName nvarchar, @UserId int, @SiteId uniqueidentifier, @SiteCreationDate datetime '', @Limit, @MaxInt, @FirstPage,  @LastPage, @UserName, @UserId,  @SiteId, @SiteCreationDate
+
             END
       ELSE
             BEGIN
@@ -530,27 +531,29 @@ BEGIN
                   CLOSE NotificationCursor
                   DEALLOCATE NotificationCursor
                   
-                  SELECT ID, Title, Message, CAST(Type AS INT) AS Type, CAST(CreatedBy AS INT) AS CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, 
-                           PersonalizationSiteID, UserName 
-                  FROM
-                  (
-                        SELECT            TOP (COALESCE(@Limit, 2147483647)) ROW_NUMBER() OVER(ORDER BY CreatedAt) AS Row, ID, Title, Message, Type, CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, 
-                                          PersonalizationSiteID, UserName
-                        FROM        (SELECT           ID, Title, Message, Type, CreatedBy, SiteCreationDateTime AS SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, 
-                                                            NotificationRead, PersonalizationID, PersonalizationSiteID, UserName
-                                          FROM       dbo.vwNotifications
-                                          WHERE            (Type = 0) AND ((UserName = @UserName) OR (UserName = @UserId)) AND 
-                                                                  (SiteID = ''00000000-0000-0000-0000-000000000000'' OR SiteID IS NULL OR SiteID = @SiteId) AND 
-                                                                  (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) OR
-                                                            (Type > 1) AND 
-                                                                  (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) AND 
-                                                                  ((UserName = @UserName) OR (UserName = @UserId)) AND 
-                                                                  (PersonalizationSiteID = ''00000000-0000-0000-0000-000000000000'' OR PersonalizationSiteID IS NULL OR PersonalizationSiteID = @SiteId)) AS Notifications
-                        WHERE       (@GetRead = 0) AND (NotificationRead = 0 OR NotificationRead IS NULL) OR
-                                          (@GetRead = 1) AND (NotificationRead = 1) OR 
-                                          (@GetRead IS NULL) AND (NotificationRead IN (0, 1) OR NotificationRead IS NULL)
-                        ) AS Notifications
-                  WHERE Row BETWEEN COALESCE(@FirstPage, 0) AND COALESCE(@LastPage, @MaxInt)
+
+					SET @sqlStatement = ''SELECT ID, Title, Message, CAST(Type AS INT) AS Type, CAST(CreatedBy AS INT) AS CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, PersonalizationSiteID, UserName FROM ( ''
+					SET @sqlStatement =    @sqlStatement  + '' SELECT TOP (COALESCE(@Limit, 2147483647)) ROW_NUMBER() OVER(ORDER BY CreatedAt) AS Row, ID, Title, Message, Type, CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, PersonalizationSiteID, UserName FROM ( ''
+					SET @sqlStatement =    @sqlStatement  + '' SELECT ID, Title, Message, Type, CreatedBy, SiteCreationDateTime AS SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, PersonalizationSiteID, UserName FROM       dbo.vwNotifications WHERE ''
+					SET @sqlStatement =    @sqlStatement  + '' (Type = 0) AND ((UserName = @UserName) OR (UserName = @UserId)) AND ''
+					SET @sqlStatement =    @sqlStatement  + '' (SiteID = ''''00000000-0000-0000-0000-000000000000'''' OR SiteID IS NULL OR SiteID = @SiteId) AND ''
+					SET @sqlStatement =    @sqlStatement  + '' (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) OR ''
+					SET @sqlStatement =    @sqlStatement  + '' (Type > 1) AND (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) AND ''
+					SET @sqlStatement =    @sqlStatement  + '' ((UserName = @UserName) OR (UserName = @UserId)) AND ''
+					SET @sqlStatement =    @sqlStatement  + '' (PersonalizationSiteID = ''''00000000-0000-0000-0000-000000000000'''' OR PersonalizationSiteID IS NULL OR PersonalizationSiteID = @SiteId)) AS Notifications ''
+					IF (@GetRead = 0) 
+					SET @sqlStatement =    @sqlStatement  + '' WHERE (NotificationRead = 0 OR NotificationRead IS NULL) ''
+					IF (@GetRead = 1) 
+					SET @sqlStatement =    @sqlStatement  + '' WHERE (NotificationRead = 1) ''
+					IF (@GetRead IS NULL) 
+					SET @sqlStatement =    @sqlStatement  + '' WHERE (NotificationRead IN (0, 1) OR NotificationRead IS NULL) ''
+					SET @sqlStatement =    @sqlStatement  + '' ) AS Notifications WHERE Row BETWEEN COALESCE(@FirstPage, 0) AND COALESCE(@LastPage, @MaxInt)''
+					PRINT @sqlStatement
+
+					EXEC sp_executesql @sqlStatement, N''@Limit int, @MaxInt int, @FirstPage int,  @LastPage int, @UserName nvarchar, @UserId int, @SiteId uniqueidentifier, @SiteCreationDate datetime '', @Limit, @MaxInt, @FirstPage,  @LastPage, @UserName, @UserId,  @SiteId, @SiteCreationDate
+
+
+
             END
 END
 ')
