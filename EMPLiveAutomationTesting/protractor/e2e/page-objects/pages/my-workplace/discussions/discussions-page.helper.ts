@@ -12,7 +12,6 @@ import {WaitHelper} from '../../../../components/html/wait-helper';
 import {MyWorkplacePage} from '../my-workplace.po';
 import {CommonPageConstants} from '../../common/common-page.constants';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
-import {LabelHelper} from '../../../../components/html/label-helper';
 
 export class DiscussionsPageHelper {
 
@@ -110,12 +109,6 @@ export class DiscussionsPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(DiscussionsPageConstants.editPageName));
     }
 
-    static getDiscussionField(textValue: string) {
-        return LabelHelper.getSpanByTextInsideListByClassXpath(
-            DiscussionsPageConstants.classLabel.postListItemClass,
-            textValue);
-    }
-
     static async deleteGridGantt() {
         await browser.sleep(PageHelper.timeout.m);
         if (await DiscussionsPage.menueLink.first().isPresent() === true) {
@@ -136,5 +129,10 @@ export class DiscussionsPageHelper {
             subject: CommonPageHelper.getDivByText(text),
             body: CommonPageHelper.getDivByText(text)
         };
+    }
+
+    static async search(titleToSearch: string) {
+        await CommonPageHelper.searchItemByTitle(titleToSearch, 'Subject');
+        await WaitHelper.waitForElementToBePresent(DiscussionsPage.getDiscussionField(titleToSearch));
     }
 }
