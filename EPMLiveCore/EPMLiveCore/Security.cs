@@ -13,7 +13,7 @@ namespace EPMLiveCore
         public static Dictionary<string, SPRoleType> AddBasicSecurityToWorkspace(SPWeb eleWeb, string safeTitle, SPUser owner)
         {
             var safeGroupTitle = string.Empty;
-            safeGroupTitle = CoreFunctions.GetSafeTitle(safeTitle);
+            safeGroupTitle = CoreFunctions.GetSafeGroupTitle(safeTitle);
 
             eleWeb.AllowUnsafeUpdates = true;
             Dictionary<string, SPRoleType> pNewGroups = new Dictionary<string, SPRoleType>();

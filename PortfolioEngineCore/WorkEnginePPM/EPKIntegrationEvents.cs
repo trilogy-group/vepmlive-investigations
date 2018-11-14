@@ -30,7 +30,7 @@ namespace WorkEnginePPM
         {
             try
             {
-                properties.AfterProperties["Title"] = CoreFunctions.GetSafeTitle(properties.AfterProperties["Title"]?.ToString());
+                properties.AfterProperties["Title"] = CoreFunctions.GetSafeGroupTitle(properties.AfterProperties["Title"]?.ToString());
             }
             catch (Exception ex)
             {
@@ -81,7 +81,7 @@ namespace WorkEnginePPM
             processItem(properties);
             try
             {
-                properties.AfterProperties["Title"] = CoreFunctions.GetSafeTitle(properties.AfterProperties["Title"]?.ToString());
+                properties.AfterProperties["Title"] = CoreFunctions.GetSafeGroupTitle(properties.AfterProperties["Title"]?.ToString());
             }
             catch (Exception ex)
             {

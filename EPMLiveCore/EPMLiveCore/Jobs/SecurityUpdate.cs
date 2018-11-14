@@ -553,7 +553,7 @@ namespace EPMLiveCore.Jobs
             if (!string.IsNullOrEmpty(grpName))
             {
                 result = grpName;
-                result = CoreFunctions.GetSafeTitle(grpName);
+                result = CoreFunctions.GetSafeGroupTitle(grpName);
             }
 
             return result;

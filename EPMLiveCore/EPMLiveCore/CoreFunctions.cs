@@ -815,7 +815,7 @@ namespace EPMLiveCore
             return username;
         }
 
-        public static string GetSafeTitle(string sRawGrpName)
+        public static string GetSafeGroupTitle(string sRawGrpName)
         {
             var safeGroupTitle = string.Empty;
             Regex rgx = new Regex("[^a-zA-Z 0-9 !#$%^&()_{}~`-]");
@@ -2590,7 +2590,7 @@ namespace EPMLiveCore
                                     var item = itemList.GetItemById(itemId);
                                     var raColl = item.RoleAssignments;
 
-                                    var safeGroupTitle = GetSafeTitle(finalTitle);
+                                    var safeGroupTitle = GetSafeGroupTitle(finalTitle);
 
                                     // find owner
                                     iowner = (from SPRoleAssignment owner in raColl
