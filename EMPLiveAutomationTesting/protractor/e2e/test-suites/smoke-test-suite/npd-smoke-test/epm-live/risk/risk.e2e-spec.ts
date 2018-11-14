@@ -79,9 +79,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.verification('Required values entered/selected in Project Field');
         await ExpectationHelper.verifyPresentStatus(CommonPageHelper.getAutoCompleteItemByDescription(projectName), projectName);
-        /* await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.project, projectName)); */
 
         StepLogger.stepId(4);
         StepLogger.step('Click on "Save" button in "Risks - New Item" window');
