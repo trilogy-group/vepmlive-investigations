@@ -93,7 +93,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.settingItems.page));
     });
 
-    xit('Post Status - [907973] [BUG:SKYVERA-1406]', async () => {
+    it('Post Status - [907973] [BUG:SKYVERA-1406]', async () => {
         StepLogger.caseId = 907973;
         StepLogger.stepId(1);
         const uniqueId = PageHelper.getUniqueId();
