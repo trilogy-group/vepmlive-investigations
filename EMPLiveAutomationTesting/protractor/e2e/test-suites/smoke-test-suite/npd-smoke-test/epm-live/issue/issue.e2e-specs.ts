@@ -6,12 +6,12 @@ import {ValidationsHelper} from '../../../../../components/misc-utils/validation
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
-import {ElementHelper} from '../../../../../components/html/element-helper';
+// import {ElementHelper} from '../../../../../components/html/element-helper';
 import {CreateNewPage} from '../../../../../page-objects/pages/items-page/create-new.po';
 import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
 import {IssueItemPageConstants} from '../../../../../page-objects/pages/items-page/issue-item/issue-item-page.constants';
 import {IssueItemPage} from '../../../../../page-objects/pages/items-page/issue-item/issue-item.po';
-import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
+// import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
@@ -32,7 +32,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    fit('Add Issues Functionality - [1124274]', async () => {
+    it('Add Issues Functionality - [1124274]', async () => {
         StepLogger.caseId = 1124274;
 
         StepLogger.stepId(1);
@@ -118,8 +118,8 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
-
-    it('Edit Issues Functionality - [1124275]', async () => {
+/*
+    it('Edit Issues Functionality - [1124275][BUG:SKYVERA-1444]', async () => {
         StepLogger.caseId = 1124275;
         StepLogger.stepId(1);
 
@@ -216,5 +216,5 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     });
-
+ */
 });
