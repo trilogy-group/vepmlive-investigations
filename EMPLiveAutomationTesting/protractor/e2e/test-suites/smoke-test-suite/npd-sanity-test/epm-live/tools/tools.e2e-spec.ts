@@ -137,7 +137,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
     */
 
-    it('Insert Fragment - [966282]', async () => {
+    it('Insert Fragment - [966282] [BUG:SKYVERA-1519]', async () => {
         StepLogger.caseId = 966282;
         StepLogger.preCondition('Select "Navigation" icon  from left side menu');
         StepLogger.preCondition('Select Projects -> Projects from the options displayed');
