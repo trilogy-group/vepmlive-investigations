@@ -753,7 +753,7 @@ export class CommonPageHelper {
 
     static getCellText(column: string) {
         // it is a part of a object "getCell", object created below
-        return element.all(By.xpath(`//td[contains(@class,'GMClassEdit GMFloat GMCell')][contains(@class,"${column}")]`)).first();
+        return element.all(By.xpath(`//td[contains(@class,'GMClassEdit')][contains(@class,'GMFloat GMCell')][contains(@class,"${column}")]`)).first();
     }
 
     static getColumnElement(columnName: string) {

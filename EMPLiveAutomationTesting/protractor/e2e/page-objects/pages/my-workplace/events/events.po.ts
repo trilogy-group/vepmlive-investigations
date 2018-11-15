@@ -113,4 +113,11 @@ export class EventsPage {
         return CommonPageHelper.getElementUsingTextContent(title, true);
     }
 
+    static get dialog() {
+        return element(By.css('.ms-dlgTitle'));
+    }
+
+    static get seeMoreLinks() {
+        return element.all(By.css('a.ms-cal-nav'));
+    }
 }

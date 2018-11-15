@@ -1,6 +1,6 @@
 import { browser, By, element, ElementFinder, protractor } from 'protractor';
-import { ExpectationHelper } from '../../../../components/misc-utils/expectation-helper';
 
+import { ExpectationHelper } from '../../../../components/misc-utils/expectation-helper';
 import { LoginPageHelper } from '../../login/login-page.helper';
 import { ProjectItemPage } from './project-item.po';
 import { ProjectItemPageConstants } from './project-item-page.constants';

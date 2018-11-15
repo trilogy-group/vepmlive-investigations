@@ -1,7 +1,8 @@
-import {ElementFinder} from 'protractor';
-import {WaitHelper} from './wait-helper';
-import {ComponentHelpers} from '../devfactory/component-helpers/component-helpers';
-import {HtmlHelper} from '../misc-utils/html-helper';
+import { ElementFinder } from 'protractor';
+import { ElementHelper } from './element-helper';
+import { WaitHelper } from './wait-helper';
+import { ComponentHelpers } from '../devfactory/component-helpers/component-helpers';
+import { HtmlHelper } from '../misc-utils/html-helper';
 
 export class CheckboxHelper {
     /**
@@ -28,11 +29,11 @@ export class CheckboxHelper {
     }
 
     static async markCheckbox(elementt: ElementFinder, markChecked: boolean) {
-        await WaitHelper.waitForElementToBeClickable(elementt);
+        await WaitHelper.waitForElementToBeDisplayed(elementt);
 
         const isSelected = await elementt.isSelected();
         if (isSelected !== markChecked) {
-            await elementt.click();
+            await ElementHelper.clickUsingJsNoWait(elementt);
         }
         return;
     }

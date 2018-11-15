@@ -1,18 +1,20 @@
-import {browser} from 'protractor';
-import {SuiteNames} from '../../../../helpers/suite-names';
-import {PageHelper} from '../../../../../components/html/page-helper';
-import {StepLogger} from '../../../../../../core/logger/step-logger';
-import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
-import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
-import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
-import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
-import {EventsPageHelper} from '../../../../../page-objects/pages/my-workplace/events/events-page.helper';
-import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-import {EventsPage} from '../../../../../page-objects/pages/my-workplace/events/events.po';
-import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-import {TextboxHelper} from '../../../../../components/html/textbox-helper';
-import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
-import {ElementHelper} from '../../../../../components/html/element-helper';
+import { browser } from 'protractor';
+
+import { WaitHelper } from '../../../../../components/html/wait-helper';
+import { SuiteNames } from '../../../../helpers/suite-names';
+import { PageHelper } from '../../../../../components/html/page-helper';
+import { StepLogger } from '../../../../../../core/logger/step-logger';
+import { CommonPage } from '../../../../../page-objects/pages/common/common.po';
+import { CommonPageHelper } from '../../../../../page-objects/pages/common/common-page.helper';
+import { MyWorkplacePage } from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
+import { CommonPageConstants } from '../../../../../page-objects/pages/common/common-page.constants';
+import { EventsPageHelper } from '../../../../../page-objects/pages/my-workplace/events/events-page.helper';
+import { ValidationsHelper } from '../../../../../components/misc-utils/validation-helper';
+import { EventsPage } from '../../../../../page-objects/pages/my-workplace/events/events.po';
+import { LoginPage } from '../../../../../page-objects/pages/login/login.po';
+import { TextboxHelper } from '../../../../../components/html/textbox-helper';
+import { CheckboxHelper } from '../../../../../components/html/checkbox-helper';
+import { ElementHelper } from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -92,7 +94,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(2);
         StepLogger.step('Click on Create Column from ribbon panel');
-        await PageHelper.click(EventsPage.createColumn);
+        await ElementHelper.clickUsingJs(EventsPage.createColumn);
+        await WaitHelper.waitForElementToBeDisplayed(EventsPage.dialog);
 
         StepLogger.verification('Create Column popup should be displayed');
         await CommonPageHelper.switchToContentFrame();
@@ -122,16 +125,14 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(5);
         StepLogger.step('Click on Ok button');
         await ElementHelper.scrollToElement(CommonPage.okButton);
-        await PageHelper.click(CommonPage.okButton);
+        await PageHelper.clickAndWaitForElementToHide(CommonPage.okButton);
 
         StepLogger.verification('Newly added column should be displayed in events page while user select ' +
             'standard view from current view drop down ');
-        await browser.sleep(PageHelper.timeout.m);
+        await browser.sleep(PageHelper.timeout.xs);
         await ElementHelper.clickUsingJs(EventsPage.createViews);
-        await PageHelper.click(EventsPage.standardViewType);
-        await ElementHelper.scrollToElement(ElementHelper.getElementByText(uniqueId));
+        await PageHelper.clickAndWaitForElementToHide(EventsPage.standardViewType);
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId))).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.column));
-
     });
 });
