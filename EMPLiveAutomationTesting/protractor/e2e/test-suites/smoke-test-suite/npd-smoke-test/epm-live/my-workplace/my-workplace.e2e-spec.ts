@@ -210,7 +210,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         );
     });
 
-    fit('Add Time Off From My Workplace - [1124447]', async () => {
+    it('Add Time Off From My Workplace - [1124447]', async () => {
         StepLogger.caseId = 1124447;
 
         StepLogger.step('Navigate to My Time Off page');
