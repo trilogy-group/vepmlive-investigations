@@ -2,10 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Generic.Fakes;
+using System.Collections.Specialized;
 using System.Data;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Resources.Fakes;
+using System.Text;
 using System.Web.Fakes;
 using System.Web.UI.Fakes;
 using System.Web.UI.WebControls;
@@ -20,6 +23,7 @@ using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.WebControls.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Web.CommandUI.Fakes;
 using Shouldly;
 using static EPMLiveWorkPlanner.WorkPlannerAPI;
 
@@ -79,6 +83,9 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         private const string GetResourceListMethodName = "GetResourceList";
         private const string PageLoadMethodName = "Page_Load";
         private const string AddTabEventsMethodName = "AddTabEvents";
+        private const string OnPreRenderMethodName = "OnPreRender";
+        private const string AddRibbonTabMethodName = "AddRibbonTab";
+        private const string CreateOrGetPlannerFragmentListMethodName = "CreateOrGetPlannerFragmentList";
 
         [TestInitialize]
         public void Setup()
@@ -140,6 +147,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
             ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => DummyInt;
             ShimSPRibbonCommand.ConstructorStringStringString = (_, _1, _2, _3) => new ShimSPRibbonCommand();
             ShimSPRibbonScriptManager.Constructor = _ => new ShimSPRibbonScriptManager();
+            ShimSPRibbon.GetCurrentPage = _ => new ShimSPRibbon();
         }
 
         private void SetupVariables()
@@ -164,7 +172,11 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
             {
                 IDGet = () => guid,
                 WebApplicationGet = () => new ShimSPWebApplication(),
-                RootWebGet = () => spWeb
+                RootWebGet = () => spWeb,
+                FeaturesGet = () => new ShimSPFeatureCollection()
+                {
+                    ItemGetGuid = _ => new ShimSPFeature()
+                }
             };
             spListCollection = new ShimSPListCollection()
             {
@@ -1348,6 +1360,10 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 {
                     return string.Empty;
                 }
+                else if (configDictionary.ContainsKey(input))
+                {
+                    return configDictionary[input];
+                }
                 return DummyString;
             };
 
@@ -1629,6 +1645,314 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
             actual.ShouldSatisfyAllConditions(
                 () => actual.Count.ShouldBe(79),
                 () => validations.ShouldBe(4));
+        }
+
+        [TestMethod]
+        public void PageLoad_Case10_SetsFieldsAndProperties()
+        {
+            // Arrange
+            const string plannerId = "DummyString";
+            const string menus = "costs|resplan";
+            const string dataXmlString = @"
+                <xmlcfg>
+                    <%=sPlannerLayoutParam%>
+                    <%=sPlannerDataParam%>
+                </xmlcfg>";
+            const string defaultView = "defaultView";
+            var viewList = $"{defaultView}|`|;#{DummyString}|`|";
+            var now = DateTime.Now;
+            var planners = $"{plannerId}|{DummyString}";
+            var plannerProps = new PlannerProps()
+            {
+                sListProjectCenter = DummyString,
+                bAgile = true
+            };
+            var configDictionary = new Dictionary<string, string>()
+            {
+                ["EPKMenus"] = menus,
+                ["epknonactivexs"] = menus,
+                [$"EPMLivePlanner{plannerId}Views"] = viewList
+            };
+
+            requestDictionary.Add("setdefault", bool.TrueString);
+            requestDictionary.Add("ID", DummyInt.ToString());
+            requestDictionary.Add("isDlg", One.ToString());
+            requestDictionary["Planner"] = DummyString;
+
+            spUser.IsSiteAdminGet = () => true;
+            spListItem.ItemGetString = input =>
+            {
+                if (input.Equals($"{plannerId}BD"))
+                {
+                    return now;
+                }
+                return DummyString;
+            };
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            ShimSPSecurableObject.AllInstances.DoesUserHavePermissionsSPBasePermissions = (_, __) => true;
+            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) =>
+            {
+                validations += 1;
+                return dataXmlString;
+            };
+            ShimAct.AllInstances.CheckFeatureLicenseActFeature = (_, __) =>
+            {
+                validations += 1;
+                return 0;
+            };
+            ShimWorkPlanner.AllInstances.setDefaultSPWeb = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlanner.AllInstances.checkParentChildSPWebStringString = (_, _1, _2, _3) =>
+            {
+                validations += 1;
+                return false;
+            };
+            ShimWorkPlanner.AllInstances.checkParamsSPWeb = (_, __) =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_1, _2) =>
+            {
+                validations += 1;
+                return plannerProps;
+            };
+            ShimCoreFunctions.getLockConfigSettingSPWebStringBoolean = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return planners;
+            };
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, input) =>
+            {
+                if (input.EndsWith("_menus") || input.EndsWith("_nonactivexs"))
+                {
+                    return string.Empty;
+                }
+                else if (configDictionary.ContainsKey(input))
+                {
+                    return configDictionary[input];
+                }
+                return DummyString;
+            };
+            ShimWorkPlanner.AllInstances.GetResourceListSPWeb = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlanner.AllInstances.getFieldsSPWeb = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlanner.AllInstances.processRollupsWorkPlannerAPIPlannerProps = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlanner.AllInstances.getAttachedListsSPWebString = (_, _1, _2) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlanner.AllInstances.GetViewStringStringArrayStringArray = (_, _1, _2) =>
+            {
+                validations += 1;
+                return new StringBuilder(DummyString);
+            };
+
+            privateObject.SetFieldOrProperty("sProjectType", "NotProject");
+            privateObject.SetFieldOrProperty("sPlannerID", DummyString);
+            privateObject.SetFieldOrProperty("sItemID", DummyInt.ToString());
+
+            // Act
+            privateObject.Invoke(PageLoadMethodName, nonPublicInstance, new object[] { default(object), EventArgs.Empty });
+            var summaryRollup = (string)privateObject.GetFieldOrProperty("sSummaryRollup");
+            var viewObject = (string)privateObject.GetFieldOrProperty("sViewObject");
+
+            // Assert
+            summaryRollup.ShouldSatisfyAllConditions(
+                () => summaryRollup.ShouldBe("true"),
+                () => viewObject.ShouldBe($"{DummyString},{DummyString}"),
+                () => validations.ShouldBe(13));
+        }
+
+        [TestMethod]
+        public void OnPreRender_WhenCalled_AddsRibbonTabsAndTabEvents()
+        {
+            // Arrange
+            var mainPanel = new Panel()
+            {
+                Visible = true
+            };
+
+            ShimUnsecuredLayoutsPageBase.AllInstances.OnPreRenderEventArgs = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlanner.AllInstances.AddRibbonTab = _ =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlanner.AllInstances.AddTabEvents = _ =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty("activation", 0);
+            privateObject.SetFieldOrProperty("sItemID", One.ToString());
+            privateObject.SetFieldOrProperty("sPlannerID", DummyString);
+            privateObject.SetFieldOrProperty("pnlMain", mainPanel);
+
+            // Act
+            privateObject.Invoke(OnPreRenderMethodName, nonPublicInstance, new object[] { EventArgs.Empty });
+
+            // Assert
+            validations.ShouldBe(3);
+        }
+
+        [TestMethod]
+        public void AddRibbonTab_WhenCalled_AddsRibbons()
+        {
+            // Arrange
+            const string expected = "Ribbon.WorkPlanner";
+            const string dataXmlString = @"<xmlcfg/>";
+            var spRibbon = new ShimSPRibbon()
+            {
+                CommandUIVisibleSetBoolean = input =>
+                {
+                    if (input)
+                    {
+                        validations += 1;
+                    }
+                }
+            };
+
+            ShimSPRibbon.GetCurrentPage = _ =>
+            {
+                validations += 1;
+                return spRibbon;
+            };
+            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) =>
+            {
+                validations += 1;
+                return dataXmlString;
+            };
+            ShimCoreFunctions.DoesCurrentUserHaveFullControlSPWeb = _ =>
+            {
+                validations += 1;
+                return false;
+            };
+            ShimRibbon.AllInstances.RegisterDataExtensionXmlNodeString = (_, _1, _2) =>
+            {
+                validations += 1;
+            };
+            ShimRibbon.AllInstances.MinimizedSetBoolean = (_, input) =>
+            {
+                if (!input)
+                {
+                    validations += 1;
+                }
+            };
+            ShimRibbon.AllInstances.IsTabAvailableString = (_, __) =>
+            {
+                validations += 1;
+                return false;
+            };
+            ShimRibbon.AllInstances.MakeTabAvailableString = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimRibbon.AllInstances.TrimByIdString = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimRibbon.AllInstances.InitialTabIdSetString = (_, input) =>
+            {
+                if (input.Equals(expected))
+                {
+                    validations += 1;
+                }
+            };
+
+            privateObject.SetFieldOrProperty("bAgile", true);
+
+            // Act
+            privateObject.Invoke(AddRibbonTabMethodName, nonPublicInstance, new object[] { });
+
+            // Assert
+            validations.ShouldBe(28);
+        }
+
+        [TestMethod]
+        public void CreateOrGetPlannerFragmentList_WhenCalled_ReturnsSPList()
+        {
+            // Arrange
+            const string expected = "Private";
+            var fieldChoice = new ShimSPFieldChoice();
+
+            spWeb.AllowUnsafeUpdatesSetBoolean = input =>
+            {
+                if (input)
+                {
+                    validations += 1;
+                }
+            };
+            spListCollection.TryGetListString = _ =>
+            {
+                validations += 1;
+                return null;
+            };
+            spListCollection.AddStringStringSPListTemplateType = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return guid;
+            };
+            spFieldCollection.AddStringSPFieldTypeBoolean = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            spFieldCollection.ItemGetString = _ =>
+            {
+                validations += 1;
+                return fieldChoice;
+            };
+            spViewFieldCollection.AddString = _ =>
+            {
+                validations += 1;
+            };
+            spList.Update = () =>
+            {
+                validations += 1;
+            };
+            spView.Update = () =>
+            {
+                validations += 1;
+            };
+            spWeb.Update = () =>
+            {
+                validations += 1;
+            };
+
+            ShimSPFieldMultiChoice.AllInstances.ChoicesGet = _ => new StringCollection();
+            ShimSPField.AllInstances.DefaultValueSetString = (_, input) =>
+            {
+                if (input.Equals(expected))
+                {
+                    validations += 1;
+                }
+            };
+            ShimSPFieldMultiChoice.AllInstances.Update = _ =>
+            {
+                validations += 1;
+            };
+
+            // Act
+            var actual = (SPList)privateObject.Invoke(CreateOrGetPlannerFragmentListMethodName, nonPublicInstance, new object[] { });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldNotBeNull(),
+                () => validations.ShouldBe(19));
         }
     }
 }
