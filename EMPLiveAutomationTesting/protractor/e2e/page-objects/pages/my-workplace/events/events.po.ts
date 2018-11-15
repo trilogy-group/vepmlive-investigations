@@ -113,6 +113,20 @@ export class EventsPage {
         return CommonPageHelper.getElementUsingTextContent(title, true);
     }
 
+    static get endDate() {
+        return element(By.xpath(`//input[@title='${EventsPageConstants.endTimeField}']`));
+    }
+
+    static get editItem() {
+        return element(By.id('Ribbon.ListForm.Display.Manage.EditItem2-Large'));
+    }
+
+    static get getTomorrowDate() {
+        const currentDate = Date.now();
+        const tomorrow = moment(currentDate).add(1, 'days');
+        return  moment(tomorrow).format('MM/DD/YYYY');
+    }
+
     static get dialog() {
         return element(By.css('.ms-dlgTitle'));
     }

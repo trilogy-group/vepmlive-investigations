@@ -122,6 +122,7 @@ export class DiscussionsPageHelper {
             await PageHelper.click(DiscussionsPage.menueLink.first());
             await PageHelper.click(DiscussionsPage.delete);
             await PageHelper.acceptAlert();
+
             if (await DiscussionsPage.menueLink.first().isPresent() === true) {
                 await this.deleteGridGantt();
             }

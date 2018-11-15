@@ -25,6 +25,7 @@ export class EventsPageHelper {
             .toBe(true,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.inputLabels.title));
         await TextboxHelper.sendKeys(EventsPage.titleTextField, title);
+        await TextboxHelper.sendKeys(EventsPage.endDate, EventsPage.getTomorrowDate);
 
         StepLogger.step(`Select Category *: New Event 1`);
         await expect(await PageHelper.isElementDisplayed(EventsPage.categoryField)).toBe(true,
@@ -36,13 +37,14 @@ export class EventsPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.categoryOption.meeting));
 
         await PageHelper.click(EventsPage.categoryOption);
+        // selection of category in not refelcted immediately.
+        await PageHelper.sleepForXSec(3000);
 
         StepLogger.stepId(4);
         StepLogger.step('Click on save');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.saveNewEvent)).toBe(true,
-            ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.formLabels.save));
-
-        await PageHelper.clickAndWaitForElementToHide(CommonPage.saveNewEvent);
+        await ExpectationHelper.verifyDisplayedStatus(CommonPage.saveNewEvent, CommonPageConstants.formLabels.save);
+        await PageHelper.click(CommonPage.saveNewEvent);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.saveNewEvent);
     }
 
     static async verifyNewEventCreated(titleNewEvent: string) {

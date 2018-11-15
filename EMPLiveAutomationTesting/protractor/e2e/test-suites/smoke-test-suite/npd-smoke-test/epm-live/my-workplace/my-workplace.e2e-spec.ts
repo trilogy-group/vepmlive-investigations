@@ -20,6 +20,7 @@ import {EventsPageConstants} from '../../../../../page-objects/pages/my-workplac
 import {EventsPage} from '../../../../../page-objects/pages/my-workplace/events/events.po';
 import {EventsPageHelper} from '../../../../../page-objects/pages/my-workplace/events/events-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import { ExpectationHelper } from '../../../../../components/misc-utils/expectation-helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 // tslint:disable-next-line:max-line-length
 import {SharedDocumentsPageConstants} from '../../../../../page-objects/pages/my-workplace/shared-documents/shared-documents-page.constants';
@@ -328,12 +329,9 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(4);
         StepLogger.step('Click on the "Edit Item" button menu displayed in "View" tab on top of the page');
-        await PageHelper.click(CommonPage.contextMenuOptions.editTeam);
+        await PageHelper.click(EventsPage.editItem);
         StepLogger.verification('"Edit Event" page is displayed');
-        await WaitHelper.waitForElementToBeDisplayed(CommonPageHelper.getElementUsingText('Save', false));
-        await expect(await CommonPage.title.getText())
-            .toBe(EventsPageConstants.pagePrefix,
-                ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.editPageName));
+        await ExpectationHelper.verifyDisplayedStatus(CommonPage.saveNewEvent, CommonPageConstants.formLabels.save);
 
         // steps 5,6 are verified here
         const labels = EventsPageConstants.inputLabels;
