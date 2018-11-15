@@ -40,9 +40,9 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         private const string KeyVal = "key:val";
         private const string KeyVal4 = "key:val|key1:val1|key2:val2|key3:val3";
         private const string TrimString = " ";
-        private bool responseRedirected = false;
-        private bool getListsAndFields = false;
-        private bool adminPanelVisible = false;
+        private bool responseRedirected;
+        private bool getListsAndFields;
+        private bool adminPanelVisible;
         private bool settingSaved;
         private bool executeReaderCalled;
         private bool readMethodSwitcher;
@@ -131,9 +131,13 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             {
                 getListsAndFields = true;
                 if (y.StartsWith(EPMLiveMyWorkGeneralSettingsWorkDayFilters) || y.StartsWith(EPMLiveMyWorkGeneralSettingsNewItemIndicator))
+                {
                     return KeyVal4;
+                }
                 else
+                {
                     return TrimString;
+                }
             };
 
             // Act
@@ -273,11 +277,11 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             };
 
             shimSqlDataReader.FieldCountGet = () => fieldsCount;
-            shimSqlDataReader.GetGuidInt32 = (columnIndex) => DummyGuid;
-            shimSqlDataReader.GetStringInt32 = (columnIndex) => DummyString;
+            shimSqlDataReader.GetGuidInt32 = columnIndex => DummyGuid;
+            shimSqlDataReader.GetStringInt32 = columnIndex => DummyString;
             shimSqlDataReader.Read = () => readMethodSwitcher = !readMethodSwitcher;
 
-            ShimSqlCommand.AllInstances.ExecuteReader = (instance) =>
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
             {
                 executeReaderCalled = true;
                 foreach (SqlParameter param in instance.Parameters)
