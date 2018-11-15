@@ -314,7 +314,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageHelper.uniqueDocumentFilePath);
     });
 
-    fit('Edit Event from Workplace - [1175266]', async () => {
+    it('Edit Event from Workplace - [1175266]', async () => {
         StepLogger.caseId = 1175266;
 
         StepLogger.step('preCondition: Create a New Event using steps in test case C1124296');
