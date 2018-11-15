@@ -196,6 +196,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 IDGet = () => DummyInt,
                 TitleGet = () => DummyString,
                 ItemGetString = _ => DummyString,
+                ItemGetGuid = _ => DummyString,
                 ItemSetGuidObject = (_, __) => { },
                 Update = () => { },
                 FileGet = () => spFile,
@@ -1308,6 +1309,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
             requestDictionary["Planner"] = DummyString;
 
             spListItem.ItemGetString = _ => string.Empty;
+            spListItem.ItemGetGuid = _ => string.Empty;
             spUser.IsSiteAdminGet = () => false;
             spUser.IDGet = () => DummyInt + 10;
 
@@ -1460,6 +1462,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
             PageLoadCase8Setup();
 
             spListItem.ItemGetString = _ => DummyString;
+            spListItem.ItemGetGuid = _ => DummyString;
 
             ShimSPSecurableObject.AllInstances.DoesUserHavePermissionsSPBasePermissions = (_, __) => false;
 
@@ -1504,6 +1507,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
             PageLoadCase8Setup();
 
             spListItem.ItemGetString = _ => DummyString;
+            spListItem.ItemGetGuid = _ => DummyString;
 
             ShimSPSecurableObject.AllInstances.DoesUserHavePermissionsSPBasePermissions = (_, __) =>
             {
@@ -1556,6 +1560,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
             PageLoadCase8Setup();
 
             spListItem.ItemGetString = _ => DummyString;
+            spListItem.ItemGetGuid = _ => DummyString;
 
             ShimSPSecurableObject.AllInstances.DoesUserHavePermissionsSPBasePermissions = (_, __) =>
             {
