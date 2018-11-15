@@ -52,68 +52,71 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyOptimizerTabContents();
     });
 
-    it('Verify the content of Optimizer configuration screen. - [744407]', async () => {
-        StepLogger.caseId = 744407;
-        // Step 1 is inside the below function
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
-        );
-        await CommonPageHelper.verifyProjectCenterDisplayed();
-        // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid();
-        StepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer();
-        await OptimizerPageHelper.verifyOptimizerPageOpened();
-        StepLogger.stepId(4);
-        await OptimizerPageHelper.clickConfigure();
-        await OptimizerPageHelper.verifyConfigureScreen();
-    });
+    // #REJECTED
+    // it('Verify the content of Optimizer configuration screen. - [744407]', async () => {
+    //     StepLogger.caseId = 744407;
+    //     // Step 1 is inside the below function
+    //     await CommonPageHelper.navigateToItemPageUnderNavigation(
+    //         HomePage.navigation.projects.projects,
+    //         CommonPage.pageHeaders.projects.projectsCenter,
+    //         CommonPageConstants.pageHeaders.projects.projectCenter,
+    //     );
+    //     await CommonPageHelper.verifyProjectCenterDisplayed();
+    //     // Step 2 is inside the below function
+    //     await CommonPageHelper.selectTwoRecordsFromGrid();
+    //     StepLogger.stepId(3);
+    //     await CommonPageHelper.goToOptimizer();
+    //     await OptimizerPageHelper.verifyOptimizerPageOpened();
+    //     StepLogger.stepId(4);
+    //     await OptimizerPageHelper.clickConfigure();
+    //     await OptimizerPageHelper.verifyConfigureScreen();
+    // });
 
-    it('Verify the Add button of the Optimizer configuration screen. - [744408]', async () => {
-        StepLogger.caseId = 744408;
-        // Step 1 is inside the below function
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
-        );
-        await CommonPageHelper.verifyProjectCenterDisplayed();
-        // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid();
-        StepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer();
-        await OptimizerPageHelper.verifyOptimizerPageOpened();
-        StepLogger.stepId(4);
-        await OptimizerPageHelper.clickConfigure();
-        await OptimizerPageHelper.verifyOptimizerConfigurationPopupOpened();
-        StepLogger.stepId(5);
-        const fieldName = await OptimizerPageHelper.selectAvailableFieldAndAdd();
-        await OptimizerPageHelper.verifyAddedFieldInSelectedFields(fieldName);
-    });
+    // #REJECTED
+    // it('Verify the Add button of the Optimizer configuration screen. - [744408]', async () => {
+    //     StepLogger.caseId = 744408;
+    //     // Step 1 is inside the below function
+    //     await CommonPageHelper.navigateToItemPageUnderNavigation(
+    //         HomePage.navigation.projects.projects,
+    //         CommonPage.pageHeaders.projects.projectsCenter,
+    //         CommonPageConstants.pageHeaders.projects.projectCenter,
+    //     );
+    //     await CommonPageHelper.verifyProjectCenterDisplayed();
+    //     // Step 2 is inside the below function
+    //     await CommonPageHelper.selectTwoRecordsFromGrid();
+    //     StepLogger.stepId(3);
+    //     await CommonPageHelper.goToOptimizer();
+    //     await OptimizerPageHelper.verifyOptimizerPageOpened();
+    //     StepLogger.stepId(4);
+    //     await OptimizerPageHelper.clickConfigure();
+    //     await OptimizerPageHelper.verifyOptimizerConfigurationPopupOpened();
+    //     StepLogger.stepId(5);
+    //     const fieldName = await OptimizerPageHelper.selectAvailableFieldAndAdd();
+    //     await OptimizerPageHelper.verifyAddedFieldInSelectedFields(fieldName);
+    // });
 
-    it('Verify the Remove button of the Optimizer configuration screen. - [744409]', async () => {
-        StepLogger.caseId = 744409;
-        // Step 1 is inside the below function
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
-        );
-        await CommonPageHelper.verifyProjectCenterDisplayed();
-        // Step 2 is inside the below function
-        await CommonPageHelper.selectTwoRecordsFromGrid();
-        StepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer();
-        await OptimizerPageHelper.verifyOptimizerPageOpened();
-        StepLogger.stepId(4);
-        await OptimizerPageHelper.clickConfigure();
-        await OptimizerPageHelper.verifyOptimizerConfigurationPopupOpened();
-        StepLogger.stepId(5);
-        const fieldName = await OptimizerPageHelper.selectSelectedFieldAndRemove();
-        await OptimizerPageHelper.verifyRemovedFieldInAvailableFields(fieldName);
-    });
+    // #REJECTED
+    // it('Verify the Remove button of the Optimizer configuration screen. - [744409]', async () => {
+    //     StepLogger.caseId = 744409;
+    //     // Step 1 is inside the below function
+    //     await CommonPageHelper.navigateToItemPageUnderNavigation(
+    //         HomePage.navigation.projects.projects,
+    //         CommonPage.pageHeaders.projects.projectsCenter,
+    //         CommonPageConstants.pageHeaders.projects.projectCenter,
+    //     );
+    //     await CommonPageHelper.verifyProjectCenterDisplayed();
+    //     // Step 2 is inside the below function
+    //     await CommonPageHelper.selectTwoRecordsFromGrid();
+    //     StepLogger.stepId(3);
+    //     await CommonPageHelper.goToOptimizer();
+    //     await OptimizerPageHelper.verifyOptimizerPageOpened();
+    //     StepLogger.stepId(4);
+    //     await OptimizerPageHelper.clickConfigure();
+    //     await OptimizerPageHelper.verifyOptimizerConfigurationPopupOpened();
+    //     StepLogger.stepId(5);
+    //     const fieldName = await OptimizerPageHelper.selectSelectedFieldAndRemove();
+    //     await OptimizerPageHelper.verifyRemovedFieldInAvailableFields(fieldName);
+    // });
 
     it('Verify the content of Save Strategy button. - [744410]', async () => {
         StepLogger.caseId = 744410;
