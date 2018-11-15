@@ -818,9 +818,11 @@ namespace EPMLiveCore
         public static string GetSafeGroupTitle(string sRawGrpName)
         {
             var safeGroupTitle = string.Empty;
-            Regex rgx = new Regex("[^a-zA-Z 0-9]");
+            Regex rgx = new Regex("[^a-zA-Z 0-9 !#$%^&()_{}~`-]");
             safeGroupTitle = rgx.Replace(sRawGrpName, "");
-
+            //This is to handle Extra spaces in name after removing Invalid characters
+            //A group name cannot contain any of the following characters: | \ " ' / [ ] : < > + = , ; ? * @
+            safeGroupTitle = safeGroupTitle.Replace("  ", "");
             return safeGroupTitle;
         }
 
