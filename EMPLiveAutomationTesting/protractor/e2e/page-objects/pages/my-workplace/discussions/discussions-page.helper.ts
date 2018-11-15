@@ -12,7 +12,6 @@ import {WaitHelper} from '../../../../components/html/wait-helper';
 import {MyWorkplacePage} from '../my-workplace.po';
 import {CommonPageConstants} from '../../common/common-page.constants';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
-// import {LinkPage} from "../link/link.po";
 import {ExpectationHelper} from '../../../../components/misc-utils/expectation-helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
 
