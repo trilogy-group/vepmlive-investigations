@@ -34,18 +34,18 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         private readonly DropDownList DropDownListScheduleType = new DropDownList();
         private readonly DropDownList DropDownListDays = new DropDownList();
         private readonly DropDownList DropDownListTime = new DropDownList();
-        private readonly Label lbl_domain = new Label();
-        private readonly Label lblMessages = new Label();
-        private readonly Label lblLastRun = new Label();
-        private readonly ListBox lb_options = new ListBox();
-        private readonly ListBox lb_selections = new ListBox();
-        private readonly HiddenField selections = new HiddenField();
-        private readonly Panel pnl_fieldMappings = new Panel();
-        private readonly Table tbl_fieldMappings = new Table();
-        private readonly HtmlTextArea txtArea_entityExclusions = new HtmlTextArea();
-        private readonly Button btnRunManually = new Button();
-        private readonly CheckBoxList CheckBoxList_days = new CheckBoxList();
-        private readonly CheckBox cbDelete = new CheckBox();
+        private readonly Label LblDomain = new Label();
+        private readonly Label LblMessages = new Label();
+        private readonly Label LblLastRun = new Label();
+        private readonly ListBox LbOptions = new ListBox();
+        private readonly ListBox LbSelections = new ListBox();
+        private readonly HiddenField Selections = new HiddenField();
+        private readonly Panel PnlFieldMappings = new Panel();
+        private readonly Table TblFieldMappings = new Table();
+        private readonly HtmlTextArea TxtAreaEntityExclusions = new HtmlTextArea();
+        private readonly Button BtnRunManually = new Button();
+        private readonly CheckBoxList CheckBoxListDays = new CheckBoxList();
+        private readonly CheckBox CbDelete = new CheckBox();
         private readonly InputFormControl FrequencyOptions = new InputFormControlTestable();
         private readonly TextBox SizeLimitTextBox = new TextBox();
         private const string PageInitMethodName = "Page_Init";
@@ -63,7 +63,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         private const string GetOptionsMethodName = "GetOptions";
         private const string InitScheduleMethodName = "InitSchedule";
         private const string DisposeTableMethodName = "DisposeTable";
-        private const string btnRunManually_ClickMethodName = "btnRunManually_Click";
+        private const string BtnRunManuallyClickMethodName = "btnRunManually_Click";
         private const string InitSavedFieldMappingsMethodName = "InitSavedFieldMappings";
         private const string DropDownListScheduleType_SelectedIndexChangedMethodName = "DropDownListScheduleType_SelectedIndexChanged";
         private const string GetActiveDirectorySizeLimitMethodName = "GetActiveDirectorySizeLimit";
@@ -71,8 +71,8 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         private const string InitActiveDirectorySizeLimitTextBoxMethodName = "InitActiveDirectorySizeLimitTextBox";
         private const string InitDeleteMethodName = "InitDelete";
         private const string InitExclusionsMethodName = "InitExclusions";
-        private const string Submit_ClickMethodName = "Submit_Click";
-        private const string Page_LoadCompleteMethodName = "Page_LoadComplete";
+        private const string SubmitClickMethodName = "Submit_Click";
+        private const string PageLoadCompleteMethodName = "Page_LoadComplete";
 
         [TestInitialize]
         public void Initialize()
@@ -85,18 +85,18 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             privateObject.SetFieldOrProperty("DropDownListScheduleType", DropDownListScheduleType);
             privateObject.SetFieldOrProperty("DropDownListDays", DropDownListDays);
             privateObject.SetFieldOrProperty("DropDownListTime", DropDownListTime);
-            privateObject.SetFieldOrProperty("lbl_domain", lbl_domain);
-            privateObject.SetFieldOrProperty("lblMessages", lblMessages);
-            privateObject.SetFieldOrProperty("lblLastRun", lblLastRun);
-            privateObject.SetFieldOrProperty("lb_options", lb_options);
-            privateObject.SetFieldOrProperty("lb_selections", lb_selections);
-            privateObject.SetFieldOrProperty("selections", selections);
-            privateObject.SetFieldOrProperty("pnl_fieldMappings", pnl_fieldMappings);
-            privateObject.SetFieldOrProperty("tbl_fieldMappings", tbl_fieldMappings);
-            privateObject.SetFieldOrProperty("txtArea_entityExclusions", txtArea_entityExclusions);
-            privateObject.SetFieldOrProperty("btnRunManually", btnRunManually);
-            privateObject.SetFieldOrProperty("CheckBoxList_days", CheckBoxList_days);
-            privateObject.SetFieldOrProperty("cbDelete", cbDelete);
+            privateObject.SetFieldOrProperty("lbl_domain", LblDomain);
+            privateObject.SetFieldOrProperty("lblMessages", LblMessages);
+            privateObject.SetFieldOrProperty("lblLastRun", LblLastRun);
+            privateObject.SetFieldOrProperty("lb_options", LbOptions);
+            privateObject.SetFieldOrProperty("lb_selections", LbSelections);
+            privateObject.SetFieldOrProperty("selections", Selections);
+            privateObject.SetFieldOrProperty("pnl_fieldMappings", PnlFieldMappings);
+            privateObject.SetFieldOrProperty("tbl_fieldMappings", TblFieldMappings);
+            privateObject.SetFieldOrProperty("txtArea_entityExclusions", TxtAreaEntityExclusions);
+            privateObject.SetFieldOrProperty("btnRunManually", BtnRunManually);
+            privateObject.SetFieldOrProperty("CheckBoxList_days", CheckBoxListDays);
+            privateObject.SetFieldOrProperty("cbDelete", CbDelete);
             privateObject.SetFieldOrProperty("FrequencyOptions", FrequencyOptions);
             privateObject.SetFieldOrProperty("_htDropdownIds", new Hashtable());
             privateObject.SetFieldOrProperty("SizeLimitTextBox", SizeLimitTextBox);
@@ -111,18 +111,18 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             DropDownListScheduleType?.Dispose();
             DropDownListDays?.Dispose();
             DropDownListTime?.Dispose();
-            lbl_domain?.Dispose();
-            lblMessages?.Dispose();
-            lblLastRun?.Dispose();
-            lb_options?.Dispose();
-            lb_selections?.Dispose();
-            selections?.Dispose();
-            pnl_fieldMappings?.Dispose();
-            tbl_fieldMappings?.Dispose();
-            txtArea_entityExclusions?.Dispose();
-            btnRunManually?.Dispose();
-            CheckBoxList_days?.Dispose();
-            cbDelete?.Dispose();
+            LblDomain?.Dispose();
+            LblMessages?.Dispose();
+            LblLastRun?.Dispose();
+            LbOptions?.Dispose();
+            LbSelections?.Dispose();
+            Selections?.Dispose();
+            PnlFieldMappings?.Dispose();
+            TblFieldMappings?.Dispose();
+            TxtAreaEntityExclusions?.Dispose();
+            BtnRunManually?.Dispose();
+            CheckBoxListDays?.Dispose();
+            CbDelete?.Dispose();
             FrequencyOptions?.Dispose();
             adsyncadmin?.Dispose();
             SizeLimitTextBox?.Dispose();
@@ -220,8 +220,8 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => lbl_domain.Text.ShouldNotBeNullOrEmpty(),
-                () => lbl_domain.Text.ShouldBe(Domain));
+                () => LblDomain.Text.ShouldNotBeNullOrEmpty(),
+                () => LblDomain.Text.ShouldBe(Domain));
         }
 
         [TestMethod]
@@ -260,9 +260,9 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => lblMessages.Text.ShouldNotBeNullOrEmpty(),
-                () => lblMessages.Text.ShouldBe(ExpectedValue),
-                () => btnRunManually.Enabled.ShouldBeFalse());
+                () => LblMessages.Text.ShouldNotBeNullOrEmpty(),
+                () => LblMessages.Text.ShouldBe(ExpectedValue),
+                () => BtnRunManually.Enabled.ShouldBeFalse());
         }
 
         [TestMethod]
@@ -282,9 +282,9 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => lblMessages.Text.ShouldNotBeNullOrEmpty(),
-                () => lblMessages.Text.ShouldBe(ExpectedValue),
-                () => btnRunManually.Enabled.ShouldBeFalse());
+                () => LblMessages.Text.ShouldNotBeNullOrEmpty(),
+                () => LblMessages.Text.ShouldBe(ExpectedValue),
+                () => BtnRunManually.Enabled.ShouldBeFalse());
         }
 
         [TestMethod]
@@ -304,8 +304,8 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => lblMessages.Text.ShouldNotBeNullOrEmpty(),
-                () => lblMessages.Text.ShouldBe(DummyValue));
+                () => LblMessages.Text.ShouldNotBeNullOrEmpty(),
+                () => LblMessages.Text.ShouldBe(DummyValue));
         }
 
         [TestMethod]
@@ -328,10 +328,10 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => lblMessages.Text.ShouldNotBeNullOrEmpty(),
-                () => lblMessages.Text.ShouldBe(ExpectedValue),
-                () => lblLastRun.Text.ShouldNotBeNullOrEmpty(),
-                () => lblLastRun.Text.ShouldBe(dummyDate.ToString()));
+                () => LblMessages.Text.ShouldNotBeNullOrEmpty(),
+                () => LblMessages.Text.ShouldBe(ExpectedValue),
+                () => LblLastRun.Text.ShouldNotBeNullOrEmpty(),
+                () => LblLastRun.Text.ShouldBe(dummyDate.ToString()));
         }
 
         [TestMethod]
@@ -375,7 +375,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             privateObject.Invoke(InitGroupsMethodName);
 
             // Assert
-            lb_selections.Items.Count.ShouldBeGreaterThan(0);
+            LbSelections.Items.Count.ShouldBeGreaterThan(0);
         }
 
         [TestMethod]
@@ -494,7 +494,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             // Arrange
             const string ExpectedPage = "main.aspx";
             var redirectPage = string.Empty;
-            Shimadsyncadmin.AllInstances.GetOptions = _ => "";
+            Shimadsyncadmin.AllInstances.GetOptions = _ => string.Empty;
             ShimListControl.AllInstances.SelectedValueGet = _ => "1";
             Shimadsyncadmin.AllInstances.GetGroups = _ => DummyValue;
             Shimadsyncadmin.AllInstances.GetFieldMappings = _ => DummyValue;
@@ -530,7 +530,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             // Arrange
             const string ExpectedPage = "settings.aspx";
             var redirectPage = string.Empty;
-            Shimadsyncadmin.AllInstances.GetOptions = _ => "";
+            Shimadsyncadmin.AllInstances.GetOptions = _ => string.Empty;
             ShimListControl.AllInstances.SelectedValueGet = _ => "1";
             Shimadsyncadmin.AllInstances.GetGroups = _ => DummyValue;
             Shimadsyncadmin.AllInstances.GetFieldMappings = _ => DummyValue;
@@ -659,7 +659,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             // Arrange
             var expectedValue = $"{DummyValue};{DummyValue};";
             ShimADSync.AllInstances.GetUserSIDByCNStringString = (_, cn, domain) => DummyValue;
-            txtArea_entityExclusions.Value = $"{DummyValue};";
+            TxtAreaEntityExclusions.Value = $"{DummyValue};";
             ShimCoreFunctions.setConfigSettingSPWebStringString = (web, setting, value) => { };
 
             // Act
@@ -677,7 +677,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             // Arrange
             var expectedValue = $"{DummyValue};";
             ShimADSync.AllInstances.GetUserSIDByCNStringString = (_, cn, domain) => string.Empty;
-            txtArea_entityExclusions.Value = string.Empty;
+            TxtAreaEntityExclusions.Value = string.Empty;
             ShimCoreFunctions.setConfigSettingSPWebStringString = (web, setting, value) => { };
 
             // Act
@@ -695,7 +695,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         public void GetDelete_CheckBoxDeleteChecked_ReturnsTrue()
         {
             // Arrange
-            cbDelete.Checked = true;
+            CbDelete.Checked = true;
 
             // Act
             var result = privateObject.Invoke(GetDeleteMethodName) as string;
@@ -710,7 +710,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         public void GetDelete_CheckBoxDeleteNotChecked_ReturnsFalse()
         {
             // Arrange
-            cbDelete.Checked = false;
+            CbDelete.Checked = false;
 
             // Act
             var result = privateObject.Invoke(GetDeleteMethodName) as string;
@@ -726,7 +726,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         {
             // Arrange
             ShimListControl.AllInstances.SelectedValueGet = _ => "2";
-            CheckBoxList_days.Items.Add(new ListItem()
+            CheckBoxListDays.Items.Add(new ListItem()
             {
                 Value = DummyValue,
                 Selected = true
@@ -746,7 +746,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         {
             // Arrange
             ShimListControl.AllInstances.SelectedValueGet = _ => DummyValue;
-            CheckBoxList_days.Items.Add(new ListItem()
+            CheckBoxListDays.Items.Add(new ListItem()
             {
                 Value = DummyValue,
                 Selected = true
@@ -770,7 +770,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             {
                 Selected = false
             };
-            CheckBoxList_days.Items.Add(item);
+            CheckBoxListDays.Items.Add(item);
 
             // Act
             privateObject.Invoke(InitScheduleMethodName);
@@ -781,7 +781,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
 
         [TestMethod]
         public void DisposeTable_Should_DisposeCell()
-        { 
+        {
             // Arrange
             var table = new ShimTable
             {
@@ -846,7 +846,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             var redirectUrl = string.Empty;
             Shimadsyncadmin.AllInstances.GetOptions = _ => DummyValue;
             ShimListControl.AllInstances.SelectedValueGet = _ => "1";
-            ShimADSync.AllInstances.AddTimerJobSPWebInt32Int32StringBoolean = 
+            ShimADSync.AllInstances.AddTimerJobSPWebInt32Int32StringBoolean =
                 (_, web, time, schedule, days, run) => true;
             ShimSPSite.AllInstances.ServerRelativeUrlGet = _ => Url;
             ShimPage.AllInstances.ResponseGet = _ => new ShimHttpResponse
@@ -855,7 +855,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             };
 
             // Act
-            privateObject.Invoke(btnRunManually_ClickMethodName, new object(), EventArgs.Empty);
+            privateObject.Invoke(BtnRunManuallyClickMethodName, new object(), EventArgs.Empty);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -898,7 +898,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => DropDownListDays.Visible.ShouldBeTrue(),
-                () => CheckBoxList_days.Visible.ShouldBeFalse(),
+                () => CheckBoxListDays.Visible.ShouldBeFalse(),
                 () => FrequencyOptions.LabelText.ShouldBe(ExpectedLabel));
         }
 
@@ -918,7 +918,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => DropDownListDays.Visible.ShouldBeFalse(),
-                () => CheckBoxList_days.Visible.ShouldBeTrue(),
+                () => CheckBoxListDays.Visible.ShouldBeTrue(),
                 () => FrequencyOptions.LabelText.ShouldBe(ExpectedLabel));
         }
 
@@ -931,9 +931,9 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                 (_, index) => new ShimTable { };
             var disposeTableWasCalled = false;
             var controlDisposed = false;
-            Shimadsyncadmin.AllInstances.DisposeTableTable = 
+            Shimadsyncadmin.AllInstances.DisposeTableTable =
                 (_, table) => disposeTableWasCalled = true;
-            ShimControl.AllInstances.Dispose = _ => 
+            ShimControl.AllInstances.Dispose = _ =>
             controlDisposed = true;
 
             // Act
@@ -981,7 +981,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         public void GetGroups_Should_ReturnExpectedValue()
         {
             // Arrange
-            selections.Value = DummyValue;
+            Selections.Value = DummyValue;
 
             // Act
             var result = privateObject.Invoke(GetGroupsMethodName) as string;
@@ -1016,21 +1016,21 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             privateObject.Invoke(InitDeleteMethodName);
 
             // Assert
-            cbDelete.Checked.ShouldBeTrue();
+            CbDelete.Checked.ShouldBeTrue();
         }
 
         [TestMethod]
         public void InitExclusions_Should_ExecuteCorrectly()
         {
             // Arrange
-            ShimCoreFunctions.getConfigSettingSPWebString = 
+            ShimCoreFunctions.getConfigSettingSPWebString =
                 (web, setting) => DummyValue;
 
             // Act
             privateObject.Invoke(InitExclusionsMethodName);
 
             // Assert
-            txtArea_entityExclusions.Value.ShouldBe(DummyValue);
+            TxtAreaEntityExclusions.Value.ShouldBe(DummyValue);
         }
 
         [TestMethod]
@@ -1041,7 +1041,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             Shimadsyncadmin.AllInstances.SaveAll = _ => saveAllWasCalled = true;
 
             // Act
-            privateObject.Invoke(Submit_ClickMethodName, new object(), EventArgs.Empty);
+            privateObject.Invoke(SubmitClickMethodName, new object(), EventArgs.Empty);
 
             // Assert
             saveAllWasCalled.ShouldBeTrue();
@@ -1051,7 +1051,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         public void PageLoadComplete_Should_ExecuteCorrectly()
         {
             // Arrange, Act
-            privateObject.Invoke(Page_LoadCompleteMethodName, new object(), EventArgs.Empty);
+            privateObject.Invoke(PageLoadCompleteMethodName, new object(), EventArgs.Empty);
             var adSync = privateObject.GetFieldOrProperty("_ADSync") as ADSync;
 
             // Assert
