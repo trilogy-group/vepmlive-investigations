@@ -16,6 +16,7 @@ import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import { ExpectationHelper } from '../../../../../components/misc-utils/expectation-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -79,9 +80,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(IssueItemPage.inputs.project);
 
         StepLogger.verification('Required values entered/selected in Project Field');
-        await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.project, projectName));
+        await ExpectationHelper.verifyPresentStatus(CommonPageHelper.getAutoCompleteItemByDescription(projectName), projectName);
 
         StepLogger.stepId(4);
         StepLogger.step('Click on "Save" button in "Issues - New Item" window');
@@ -117,7 +116,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
 
-    it('Edit Issues Functionality - [1124275]', async () => {
+    it('Edit Issues Functionality - [1124275][BUG:SKYVERA-1444]', async () => {
         StepLogger.caseId = 1124275;
         StepLogger.stepId(1);
 

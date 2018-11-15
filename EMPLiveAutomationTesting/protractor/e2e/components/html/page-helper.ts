@@ -187,7 +187,7 @@ export class PageHelper {
     static async click(targetElement: ElementFinder) {
         await WaitHelper.waitForElementToBeClickable(targetElement);
         try {
-            targetElement.click();
+            await targetElement.click();
         } catch (e) {
             await ElementHelper.clickUsingJs(targetElement);
         }

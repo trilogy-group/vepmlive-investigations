@@ -1,19 +1,20 @@
-import {browser} from 'protractor';
-import {StepLogger} from '../../../../../core/logger/step-logger';
-import {TextboxHelper} from '../../../../components/html/textbox-helper';
-import {PageHelper} from '../../../../components/html/page-helper';
-import {CommonPage} from '../../common/common.po';
-import {CommonPageConstants} from '../../common/common-page.constants';
-import {EventsPageConstants} from './events-page.constants';
-import {EventsPage} from './events.po';
-import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
-import {CommonPageHelper} from '../../common/common-page.helper';
-import {MyWorkplacePage} from '../my-workplace.po';
-import {WaitHelper} from '../../../../components/html/wait-helper';
-import {ElementHelper} from '../../../../components/html/element-helper';
-import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
-import {MyWorkplaceConstants} from '../my-workplace.constants';
+import { browser } from 'protractor';
+
+import { StepLogger } from '../../../../../core/logger/step-logger';
+import { TextboxHelper } from '../../../../components/html/textbox-helper';
+import { PageHelper } from '../../../../components/html/page-helper';
 import { ExpectationHelper } from '../../../../components/misc-utils/expectation-helper';
+import { CommonPage } from '../../common/common.po';
+import { CommonPageConstants } from '../../common/common-page.constants';
+import { EventsPageConstants } from './events-page.constants';
+import { EventsPage } from './events.po';
+import { ValidationsHelper } from '../../../../components/misc-utils/validation-helper';
+import { CommonPageHelper } from '../../common/common-page.helper';
+import { MyWorkplacePage } from '../my-workplace.po';
+import { WaitHelper } from '../../../../components/html/wait-helper';
+import { ElementHelper } from '../../../../components/html/element-helper';
+import { CheckboxHelper } from '../../../../components/html/checkbox-helper';
+import { MyWorkplaceConstants } from '../my-workplace.constants';
 
 export class EventsPageHelper {
 
@@ -50,10 +51,9 @@ export class EventsPageHelper {
 
         await PageHelper.switchToDefaultContent();
         StepLogger.verification('"Verificaion: New Event" page is closed');
-        await expect(await CommonPage.saveNewEvent.isPresent())
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.editPageName));
+        await ExpectationHelper.verifyNotDisplayedStatus(CommonPage.saveNewEvent, EventsPageConstants.editPageName);
 
+        await this.expandAllItems();
         StepLogger.verification(`verify "New Event" got created which is: ${titleNewEvent}`);
         await expect(await PageHelper.isElementDisplayed(EventsPage.getNewEventAdded(titleNewEvent)))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(titleNewEvent));
@@ -108,8 +108,7 @@ export class EventsPageHelper {
 
         StepLogger.verification('"Events - New Item" window is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
-        await expect(await CommonPage.dialogTitles.first().getText())
-            .toBe(EventsPageConstants.pageName, ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
+        await ExpectationHelper.verifyText(CommonPage.dialogTitles.first(), EventsPageConstants.pageName, EventsPageConstants.pageName);
 
         StepLogger.step('Switch to frame');
         await CommonPageHelper.switchToFirstContentFrame();
@@ -181,5 +180,14 @@ export class EventsPageHelper {
         StepLogger.verification('Created view should be displayed in the list');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(CommonPageConstants.createdView));
+    }
+
+    static async expandAllItems() {
+        const count = await EventsPage.seeMoreLinks.count();
+        let i = 0;
+        while (i < count) {
+            await PageHelper.click(EventsPage.seeMoreLinks.get(i));
+            i++;
+        }
     }
 }
