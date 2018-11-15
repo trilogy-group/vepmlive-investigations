@@ -313,7 +313,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageHelper.uniqueDocumentFilePath);
     });
 
-    it('Edit Event from Workplace - [1175266]', async () => {
+    fit('Edit Event from Workplace - [1175266]', async () => {
         StepLogger.caseId = 1175266;
 
         StepLogger.step('preCondition: Create a New Event using steps in test case C1124296');
@@ -330,7 +330,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(4);
         StepLogger.step('Click on the "Edit Item" button menu displayed in "View" tab on top of the page');
-        await PageHelper.click(CommonPage.contextMenuOptions.editTeam);
+        await PageHelper.click(EventsPage.editItem);
         StepLogger.verification('"Edit Event" page is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPageHelper.getElementUsingText('Save', false));
         await expect(await CommonPage.title.getText())

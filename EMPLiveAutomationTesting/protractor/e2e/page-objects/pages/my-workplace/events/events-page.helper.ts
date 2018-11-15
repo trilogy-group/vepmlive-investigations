@@ -23,6 +23,7 @@ export class EventsPageHelper {
             .toBe(true,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.inputLabels.title));
         await TextboxHelper.sendKeys(EventsPage.titleTextField, title);
+        await TextboxHelper.sendKeys(EventsPage.endDate, EventsPage.getTomorrowDate);
 
         StepLogger.step(`Select Category *: New Event 1`);
         await expect(await PageHelper.isElementDisplayed(EventsPage.categoryField)).toBe(true,
@@ -178,6 +179,5 @@ export class EventsPageHelper {
         StepLogger.verification('Created view should be displayed in the list');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(CommonPageConstants.createdView));
-
     }
 }
