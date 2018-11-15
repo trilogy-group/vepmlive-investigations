@@ -512,7 +512,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         }
 
         [TestMethod]
-        public void HasChildParent_ChildItemNotEmpty_ReturnsBoolean()
+        public void HasChildParent_ChildItemNotEmpty_ReturnsTrue()
         {
             // Arrange
             const string expected = "ChildItem";
@@ -545,7 +545,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         }
 
         [TestMethod]
-        public void HasChildParent_ParentItemNotEmpty_ReturnsBoolean()
+        public void HasChildParent_ParentItemNotEmpty_ReturnsTrue()
         {
             // Arrange
             const string expected = "ParentItem";
@@ -578,7 +578,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         }
 
         [TestMethod]
-        public void HasChildParent_ItemEmpty_ReturnsBoolean()
+        public void HasChildParent_ItemEmpty_ReturnsFalse()
         {
             // Arrange
             spListItem.ItemGetString = input =>
@@ -605,7 +605,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         }
 
         [TestMethod]
-        public void CheckParentChild_WhenCalled_ReturnsBoolean()
+        public void CheckParentChild_WhenCalled_ReturnsTrue()
         {
             // Arrange
             const string expected = "Choose Item";
@@ -636,7 +636,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         }
 
         [TestMethod]
-        public void ShowPlannerPopup_WhenCalled_Returns()
+        public void ShowPlannerPopup_WhenCalled_ReturnsFalse()
         {
             // Arrange and Act
             privateObject.Invoke(ShowPlannerPopupMethodName, nonPublicInstance, new object[] { });
@@ -668,7 +668,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         }
 
         [TestMethod]
-        public void ICheckParams_Case1_ReturnsBoolean()
+        public void ICheckParams_Case1_ReturnsTrue()
         {
             // Arrange
             const string plannerId = "MPP";
@@ -707,7 +707,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         }
 
         [TestMethod]
-        public void ICheckParams_Case2_ReturnsBoolean()
+        public void ICheckParams_Case2_ReturnsTrue()
         {
             // Arrange
             var methodHit = 0;
@@ -764,7 +764,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         }
 
         [TestMethod]
-        public void PopulateTemplates_Count0_ReturnsBoolean()
+        public void PopulateTemplates_Count0_ReturnsFalse()
         {
             // Arrange
             const string projectType = "Project";
@@ -795,7 +795,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         }
 
         [TestMethod]
-        public void PopulateTemplates_Count1_ReturnsBoolean()
+        public void PopulateTemplates_Count1_ReturnsFalse()
         {
             // Arrange
             const string projectType = "Project";
@@ -833,7 +833,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         }
 
         [TestMethod]
-        public void PopulateTemplates_CountGreaterThan1_ReturnsBoolean()
+        public void PopulateTemplates_CountGreaterThan1_ReturnsTrue()
         {
             // Arrange
             const string projectType = "Project";
@@ -867,7 +867,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         }
 
         [TestMethod]
-        public void CheckParams_Case1_ReturnsBoolean()
+        public void CheckParams_Case1_ReturnsTrue()
         {
             // Arrange
             const string plannerString = "MPP";
@@ -881,7 +881,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         }
 
         [TestMethod]
-        public void CheckParams_Case2_ReturnsBoolean()
+        public void CheckParams_Case2_ReturnsFalse()
         {
             // Arrange
             requestDictionary[PlannerKeyString] = DummyString;
@@ -902,7 +902,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         }
 
         [TestMethod]
-        public void CheckParams_Case3_ReturnsBoolean()
+        public void CheckParams_Case3_ReturnsTrue()
         {
             // Arrange
             requestDictionary[PlannerKeyString] = DummyString;
@@ -933,7 +933,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         }
 
         [TestMethod]
-        public void CheckParams_Case4_ReturnsBoolean()
+        public void CheckParams_Case4_ReturnsTrue()
         {
             // Arrange
             requestDictionary[PlannerKeyString] = DummyString;
