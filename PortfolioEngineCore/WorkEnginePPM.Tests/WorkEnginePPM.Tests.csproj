@@ -120,6 +120,13 @@
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="ConfigFunctionsTest.cs" />
     <Compile Include="DataServiceModules\DSMCostPlannerTests.cs" />
+    <Compile Include="EditableFieldDisplayTests.cs" />
+    <Compile Include="EditableFieldDisplayTestsWhereFieldsSplitFive.cs" />
+    <Compile Include="EditableFieldDisplayTestsWhereFieldsSplitFour.cs" />
+    <Compile Include="EditableFieldDisplayTestsWhereFieldsSplitOne.cs" />
+    <Compile Include="EditableFieldDisplayTestsWhereFieldsSplitSix.cs" />
+    <Compile Include="EditableFieldDisplayTestsWhereFieldsSplitThree.cs" />
+    <Compile Include="EditableFieldDisplayTestsWhereFieldsSplitTwo.cs" />
     <Compile Include="Events\ResourceManagementEvent\ResourceManagementEventTests.cs" />
     <Compile Include="Layouts\ppm\GroupPermissionsTests.cs" />
     <Compile Include="WebServices\IntegrationBuildTasksTests.cs" />
