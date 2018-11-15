@@ -7,6 +7,7 @@ import {PageHelper} from '../../../../components/html/page-helper';
 import {MyTimeOffPage} from './my-time-off.po';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {StepLogger} from '../../../../../core/logger/step-logger';
+import {ExpectationHelper} from '../../../../components/misc-utils/expectation-helper';
 
 export class MyTimeOffPageHelper {
 
@@ -63,8 +64,8 @@ export class MyTimeOffPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyTimeOffPageConstants.editPageName));
 
         StepLogger.subVerification('Newly created Time Off item details displayed in read only mode');
-        await expect(await CommonPage.contentTitleInViewMode.getText())
-            .toBe(title, ValidationsHelper.getLabelDisplayedValidation(title));
+        await ExpectationHelper.verifyText(CommonPage.contentTitleInViewMode,
+            ValidationsHelper.getLabelDisplayedValidation(title), title);
 
         StepLogger.step(`click on Close button`);
         await PageHelper.clickIfDisplayed(MyTimeOffPage.closeButton);
