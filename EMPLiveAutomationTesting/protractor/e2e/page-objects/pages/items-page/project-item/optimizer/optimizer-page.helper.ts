@@ -8,6 +8,7 @@ import {CommonPageHelper} from '../../../common/common-page.helper';
 import {OptimizerPageConstants} from './optimizer-page.constants';
 import {CommonPageConstants} from '../../../common/common-page.constants';
 import {CommonPage} from '../../../common/common.po';
+import { ExpectationHelper } from '../../../../../components/misc-utils/expectation-helper';
 
 export class OptimizerPageHelper {
     static async clickConfigrationButton() {
@@ -110,8 +111,8 @@ export class OptimizerPageHelper {
 
     static async verifyConfigrationPopUpClosed() {
         StepLogger.verification('Optimizer Configuration Popup closed');
-        await CommonPageHelper.labelDisplayedValidation
-        (CommonPage.pageHeaders.projects.optimizerConfiguration, CommonPageConstants.pageHeaders.projects.projectDetails, false);
+        await ExpectationHelper.verifyHiddenStatus(
+            CommonPage.pageHeaders.projects.optimizerConfiguration, CommonPageConstants.pageHeaders.projects.projectDetails);
     }
 
     static async verifyConfigrationPopUPDisplayed() {
