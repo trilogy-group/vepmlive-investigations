@@ -33,7 +33,7 @@ export class DiscussionsPage {
     }
 
     static get openDiscussionLinkByText() {
-        return (text: string) => element(By.cssContainingText(`div.ms-comm-postMainContainer.ms-comm-postSubjectColumn > a`, text));
+        return (text: string) => element(By.cssContainingText('div.ms-comm-postMainContainer.ms-comm-postSubjectColumn > a', text));
     }
 
     static get discussionTitle() {
