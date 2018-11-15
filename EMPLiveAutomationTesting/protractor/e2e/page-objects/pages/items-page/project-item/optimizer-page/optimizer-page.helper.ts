@@ -1,4 +1,5 @@
 import { browser } from 'protractor';
+
 import { OptimizerPage } from './optimizer.po';
 import { StepLogger } from '../../../../../../core/logger/step-logger';
 import { PageHelper } from '../../../../../components/html/page-helper';
@@ -321,6 +322,13 @@ export class OptimizerPageHelper {
         StepLogger.step('Click on Configure button.');
         await browser.sleep(PageHelper.timeout.xs);
         await PageHelper.click(OptimizerPage.getConfigure);
+        if (!await PageHelper.waitForAlertToBePresent(PageHelper.timeout.xl)) {
+            try {
+                await PageHelper.click(OptimizerPage.getConfigure);
+            } catch (e) {
+                console.log(e);
+            }
+        }
     }
 
     static async verifyOptimizerConfigurationPopupOpened() {
