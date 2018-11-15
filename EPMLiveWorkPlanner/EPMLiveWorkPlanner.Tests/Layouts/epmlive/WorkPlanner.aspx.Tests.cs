@@ -36,9 +36,6 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         private WorkPlanner testObject;
         private PrivateObject privateObject;
         private IDisposable shimsContext;
-        private BindingFlags publicStatic;
-        private BindingFlags nonPublicStatic;
-        private BindingFlags publicInstance;
         private BindingFlags nonPublicInstance;
         private ShimSPWeb spWeb;
         private ShimSPSite spSite;
@@ -69,6 +66,33 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         private const string DummyString = "DummyString";
         private const string IDStringCaps = "ID";
         private const string SampleUrl = "http://www.sampleurl.com";
+        private const string AgileString = "bAgile";
+        private const string ChildParentDDLName = "ddlChildParent";
+        private const string PlannerNameFieldName = "sPlannerName";
+        private const string MainPanelFieldName = "pnlMain";
+        private const string PopupPanelFieldName = "pnlPopup";
+        private const string PlannerIdFieldName = "sPlannerID";
+        private const string ProjectTypeFieldName = "sProjectType";
+        private const string ProjectListIdFieldName = "sProjectListId";
+        private const string ItemIdFieldName = "sItemID";
+        private const string TaskListIdFieldName = "sTaskListId";
+        private const string PlannerKeyString = "Planner";
+        private const string ResourceListFieldName = "sResourceList";
+        private const string ActLabelName = "lblAct";
+        private const string ActPanelName = "pnlAct";
+        private const string SetDefaultKeyString = "setdefault";
+        private const string ListProjectCenterFieldName = "sListProjectCenter";
+        private const string ProjectNameFieldName = "sProjectName";
+        private const string ProjectPanelName = "pnlProject";
+        private const string SourceFieldName = "sSource";
+        private const string MSProjectPanelName = "pnlMSProject";
+        private const string OldUrlFieldName = "OldUrl";
+        private const string OldPlannerPanelName = "pnlOldPlanner";
+        private const string PermsLabelName = "lblPerms";
+        private const string PermsPanelName = "pnlPerms";
+        private const string SummaryRollupFieldName = "sSummaryRollup";
+        private const string ViewObjectFieldName = "sViewObject";
+        private const string ActivationFieldName = "activation";
         private const string OnInitMethodName = "OnInit";
         private const string GetFieldsMethodName = "getFields";
         private const string GetAttachedListsMethodName = "getAttachedLists";
@@ -153,9 +177,6 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         private void SetupVariables()
         {
             validations = 0;
-            publicStatic = BindingFlags.Static | BindingFlags.Public;
-            nonPublicStatic = BindingFlags.Static | BindingFlags.NonPublic;
-            publicInstance = BindingFlags.Instance | BindingFlags.Public;
             nonPublicInstance = BindingFlags.Instance | BindingFlags.NonPublic;
             guid = Guid.Parse(SampleGuidString1);
             spWeb = new ShimSPWeb()
@@ -289,25 +310,25 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 ["listid"] = SampleGuidString1,
                 ["id"] = DummyInt.ToString(),
                 ["PCSelected"] = string.Empty,
-                ["Planner"] = string.Empty
+                [PlannerKeyString] = string.Empty
             };
 
-            privateObject.SetFieldOrProperty("ddlChildParent", new DropDownList());
-            privateObject.SetFieldOrProperty("pnlMain", new Panel());
-            privateObject.SetFieldOrProperty("pnlPopup", new Panel());
-            privateObject.SetFieldOrProperty("pnlAct", new Panel());
-            privateObject.SetFieldOrProperty("pnlProject", new Panel());
-            privateObject.SetFieldOrProperty("pnlMSProject", new Panel());
-            privateObject.SetFieldOrProperty("pnlOldPlanner", new Panel());
-            privateObject.SetFieldOrProperty("pnlPerms", new Panel());
+            privateObject.SetFieldOrProperty(ChildParentDDLName, new DropDownList());
+            privateObject.SetFieldOrProperty(MainPanelFieldName, new Panel());
+            privateObject.SetFieldOrProperty(PopupPanelFieldName, new Panel());
+            privateObject.SetFieldOrProperty(ActPanelName, new Panel());
+            privateObject.SetFieldOrProperty(ProjectPanelName, new Panel());
+            privateObject.SetFieldOrProperty(MSProjectPanelName, new Panel());
+            privateObject.SetFieldOrProperty(OldPlannerPanelName, new Panel());
+            privateObject.SetFieldOrProperty(PermsPanelName, new Panel());
             privateObject.SetFieldOrProperty("pnlParentChild", new Panel());
-            privateObject.SetFieldOrProperty("sPlannerName", DummyString);
-            privateObject.SetFieldOrProperty("sItemID", nonPublicInstance, DummyInt.ToString());
-            privateObject.SetFieldOrProperty("sProjectListId", nonPublicInstance, SampleGuidString1);
-            privateObject.SetFieldOrProperty("sTaskListId", nonPublicInstance, SampleGuidString1);
-            privateObject.SetFieldOrProperty("sPlannerID", nonPublicInstance, DummyString);
-            privateObject.SetFieldOrProperty("lblAct", nonPublicInstance, new Label());
-            privateObject.SetFieldOrProperty("lblPerms", nonPublicInstance, new Label());
+            privateObject.SetFieldOrProperty(PlannerNameFieldName, DummyString);
+            privateObject.SetFieldOrProperty(ItemIdFieldName, nonPublicInstance, DummyInt.ToString());
+            privateObject.SetFieldOrProperty(ProjectListIdFieldName, nonPublicInstance, SampleGuidString1);
+            privateObject.SetFieldOrProperty(TaskListIdFieldName, nonPublicInstance, SampleGuidString1);
+            privateObject.SetFieldOrProperty(PlannerIdFieldName, nonPublicInstance, DummyString);
+            privateObject.SetFieldOrProperty(ActLabelName, nonPublicInstance, new Label());
+            privateObject.SetFieldOrProperty(PermsLabelName, nonPublicInstance, new Label());
         }
 
         [TestCleanup]
@@ -414,7 +435,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                     }.GetEnumerator();
             };
 
-            privateObject.SetFieldOrProperty("sListProjectCenter", BindingFlags.Instance | BindingFlags.NonPublic, DummyString);
+            privateObject.SetFieldOrProperty(ListProjectCenterFieldName, BindingFlags.Instance | BindingFlags.NonPublic, DummyString);
             privateObject.SetFieldOrProperty("sListTaskCenter", BindingFlags.Instance | BindingFlags.NonPublic, DummyString);
             privateObject.SetFieldOrProperty("sAttachedDocLibs", BindingFlags.Instance | BindingFlags.NonPublic, DummyString);
             privateObject.SetFieldOrProperty("sAttachedLists", BindingFlags.Instance | BindingFlags.NonPublic, DummyString);
@@ -494,10 +515,12 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         public void HasChildParent_ChildItemNotEmpty_ReturnsBoolean()
         {
             // Arrange
+            const string expected = "ChildItem";
+
             spListItem.ItemGetString = input =>
             {
                 validations += 1;
-                if (input.Equals("ChildItem"))
+                if (input.Equals(expected))
                 {
                     return DummyString;
                 }
@@ -525,10 +548,12 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         public void HasChildParent_ParentItemNotEmpty_ReturnsBoolean()
         {
             // Arrange
+            const string expected = "ParentItem";
+
             spListItem.ItemGetString = input =>
             {
                 validations += 1;
-                if (input.Equals("ParentItem"))
+                if (input.Equals(expected))
                 {
                     return DummyString;
                 }
@@ -600,8 +625,8 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                     SampleGuidString1,
                     DummyInt.ToString()
                 });
-            var dropDownList = (DropDownList)privateObject.GetFieldOrProperty("ddlChildParent", nonPublicInstance);
-            var plannerName = (string)privateObject.GetFieldOrProperty("sPlannerName");
+            var dropDownList = (DropDownList)privateObject.GetFieldOrProperty(ChildParentDDLName, nonPublicInstance);
+            var plannerName = (string)privateObject.GetFieldOrProperty(PlannerNameFieldName);
 
             // Assert
             actual.ShouldSatisfyAllConditions(
@@ -615,8 +640,8 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         {
             // Arrange and Act
             privateObject.Invoke(ShowPlannerPopupMethodName, nonPublicInstance, new object[] { });
-            var mainPanel = (Panel)privateObject.GetFieldOrProperty("pnlMain", nonPublicInstance);
-            var popupPanel = (Panel)privateObject.GetFieldOrProperty("pnlPopup", nonPublicInstance);
+            var mainPanel = (Panel)privateObject.GetFieldOrProperty(MainPanelFieldName, nonPublicInstance);
+            var popupPanel = (Panel)privateObject.GetFieldOrProperty(PopupPanelFieldName, nonPublicInstance);
 
             // Assert
             mainPanel.ShouldSatisfyAllConditions(
@@ -635,8 +660,8 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
 
             // Act
             privateObject.Invoke(LoadDefaultsMethodName, nonPublicInstance, new object[] { spList.Instance });
-            var plannerId = (string)privateObject.GetFieldOrProperty("sPlannerID", nonPublicInstance);
-            var projectType = (string)privateObject.GetFieldOrProperty("sProjectType", nonPublicInstance);
+            var plannerId = (string)privateObject.GetFieldOrProperty(PlannerIdFieldName, nonPublicInstance);
+            var projectType = (string)privateObject.GetFieldOrProperty(ProjectTypeFieldName, nonPublicInstance);
 
             // Assert
             plannerId.ShouldBe(expectedPlannerId);
@@ -666,11 +691,11 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 return spFile;
             };
 
-            privateObject.SetFieldOrProperty("sProjectListId", nonPublicInstance, string.Empty);
-            privateObject.SetFieldOrProperty("sPlannerID", nonPublicInstance, plannerId);
-            privateObject.SetFieldOrProperty("sProjectType", nonPublicInstance, string.Empty);
-            privateObject.SetFieldOrProperty("sItemID", nonPublicInstance, string.Empty);
-            privateObject.SetFieldOrProperty("sTaskListId", nonPublicInstance, string.Empty);
+            privateObject.SetFieldOrProperty(ProjectListIdFieldName, nonPublicInstance, string.Empty);
+            privateObject.SetFieldOrProperty(PlannerIdFieldName, nonPublicInstance, plannerId);
+            privateObject.SetFieldOrProperty(ProjectTypeFieldName, nonPublicInstance, string.Empty);
+            privateObject.SetFieldOrProperty(ItemIdFieldName, nonPublicInstance, string.Empty);
+            privateObject.SetFieldOrProperty(TaskListIdFieldName, nonPublicInstance, string.Empty);
 
             // Act
             var actual = (bool)privateObject.Invoke(ICheckParamsMethodName, nonPublicInstance, new object[] { spWeb.Instance, spWeb.Instance });
@@ -722,11 +747,11 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 return false;
             };
 
-            privateObject.SetFieldOrProperty("sProjectListId", nonPublicInstance, SampleGuidString1);
-            privateObject.SetFieldOrProperty("sTaskListId", nonPublicInstance, SampleGuidString1);
-            privateObject.SetFieldOrProperty("sPlannerID", nonPublicInstance, string.Empty);
-            privateObject.SetFieldOrProperty("sProjectType", nonPublicInstance, string.Empty);
-            privateObject.SetFieldOrProperty("sItemID", nonPublicInstance, string.Empty);
+            privateObject.SetFieldOrProperty(ProjectListIdFieldName, nonPublicInstance, SampleGuidString1);
+            privateObject.SetFieldOrProperty(TaskListIdFieldName, nonPublicInstance, SampleGuidString1);
+            privateObject.SetFieldOrProperty(PlannerIdFieldName, nonPublicInstance, string.Empty);
+            privateObject.SetFieldOrProperty(ProjectTypeFieldName, nonPublicInstance, string.Empty);
+            privateObject.SetFieldOrProperty(ItemIdFieldName, nonPublicInstance, string.Empty);
 
             // Act
             var actual = (bool)privateObject.Invoke(ICheckParamsMethodName, nonPublicInstance, new object[] { spWeb.Instance, spWeb.Instance });
@@ -758,7 +783,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 }
             };
 
-            privateObject.SetFieldOrProperty("sProjectType", nonPublicInstance, projectType);
+            privateObject.SetFieldOrProperty(ProjectTypeFieldName, nonPublicInstance, projectType);
 
             // Act
             var actual = (bool)privateObject.Invoke(PopulateTemplatesMethodName, nonPublicInstance, new object[] { spWeb.Instance });
@@ -795,8 +820,8 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 }
             };
 
-            privateObject.SetFieldOrProperty("sProjectType", nonPublicInstance, projectType);
-            privateObject.SetFieldOrProperty("sPlannerID", nonPublicInstance, projectType);
+            privateObject.SetFieldOrProperty(ProjectTypeFieldName, nonPublicInstance, projectType);
+            privateObject.SetFieldOrProperty(PlannerIdFieldName, nonPublicInstance, projectType);
 
             // Act
             var actual = (bool)privateObject.Invoke(PopulateTemplatesMethodName, nonPublicInstance, new object[] { spWeb.Instance });
@@ -829,8 +854,8 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 return templates;
             };
 
-            privateObject.SetFieldOrProperty("sProjectType", nonPublicInstance, projectType);
-            privateObject.SetFieldOrProperty("sPlannerID", nonPublicInstance, projectType);
+            privateObject.SetFieldOrProperty(ProjectTypeFieldName, nonPublicInstance, projectType);
+            privateObject.SetFieldOrProperty(PlannerIdFieldName, nonPublicInstance, projectType);
 
             // Act
             var actual = (bool)privateObject.Invoke(PopulateTemplatesMethodName, nonPublicInstance, new object[] { spWeb.Instance });
@@ -846,7 +871,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         {
             // Arrange
             const string plannerString = "MPP";
-            requestDictionary["Planner"] = plannerString;
+            requestDictionary[PlannerKeyString] = plannerString;
 
             // Act
             var actual = (bool)privateObject.Invoke(CheckParamsMethodName, nonPublicInstance, new object[] { spWeb.Instance });
@@ -859,7 +884,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         public void CheckParams_Case2_ReturnsBoolean()
         {
             // Arrange
-            requestDictionary["Planner"] = DummyString;
+            requestDictionary[PlannerKeyString] = DummyString;
 
             ShimWorkPlanner.AllInstances.hasChildParentSPWebStringString = (_, _1, _2, _3) =>
             {
@@ -880,7 +905,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         public void CheckParams_Case3_ReturnsBoolean()
         {
             // Arrange
-            requestDictionary["Planner"] = DummyString;
+            requestDictionary[PlannerKeyString] = DummyString;
 
             ShimWorkPlanner.AllInstances.hasChildParentSPWebStringString = (_, _1, _2, _3) =>
             {
@@ -911,7 +936,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         public void CheckParams_Case4_ReturnsBoolean()
         {
             // Arrange
-            requestDictionary["Planner"] = DummyString;
+            requestDictionary[PlannerKeyString] = DummyString;
 
             ShimWorkPlanner.AllInstances.hasChildParentSPWebStringString = (_, _1, _2, _3) =>
             {
@@ -950,13 +975,13 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 return expected;
             };
 
-            privateObject.SetFieldOrProperty("sResourceList", DummyString);
-            privateObject.SetFieldOrProperty("sProjectListId", DummyString);
-            privateObject.SetFieldOrProperty("sItemID", DummyString);
+            privateObject.SetFieldOrProperty(ResourceListFieldName, DummyString);
+            privateObject.SetFieldOrProperty(ProjectListIdFieldName, DummyString);
+            privateObject.SetFieldOrProperty(ItemIdFieldName, DummyString);
 
             // Act
             privateObject.Invoke(GetResourceListMethodName, nonPublicInstance, new object[] { spWeb.Instance });
-            var actual = (string)privateObject.GetFieldOrProperty("sResourceList");
+            var actual = (string)privateObject.GetFieldOrProperty(ResourceListFieldName);
 
             // Assert
             actual.ShouldSatisfyAllConditions(
@@ -981,9 +1006,9 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
 
             // Act
             privateObject.Invoke(PageLoadMethodName, nonPublicInstance, new object[] { default(object), EventArgs.Empty });
-            var actual = (Label)privateObject.GetFieldOrProperty("lblAct");
-            var mainPanel = (Panel)privateObject.GetFieldOrProperty("pnlMain");
-            var actPanel = (Panel)privateObject.GetFieldOrProperty("pnlAct");
+            var actual = (Label)privateObject.GetFieldOrProperty(ActLabelName);
+            var mainPanel = (Panel)privateObject.GetFieldOrProperty(MainPanelFieldName);
+            var actPanel = (Panel)privateObject.GetFieldOrProperty(ActPanelName);
 
             // Assert
             actual.ShouldSatisfyAllConditions(
@@ -997,7 +1022,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         public void PageLoad_Case2_SetsFieldsAndProperties()
         {
             // Arrange
-            requestDictionary.Add("setdefault", bool.TrueString);
+            requestDictionary.Add(SetDefaultKeyString, bool.TrueString);
 
             ShimAct.AllInstances.CheckFeatureLicenseActFeature = (_, __) =>
             {
@@ -1025,13 +1050,13 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
 
             // Act
             privateObject.Invoke(PageLoadMethodName, nonPublicInstance, new object[] { default(object), EventArgs.Empty });
-            var plannerId = (string)privateObject.GetFieldOrProperty("sPlannerID");
-            var plannerName = (string)privateObject.GetFieldOrProperty("sPlannerName");
+            var plannerId = (string)privateObject.GetFieldOrProperty(PlannerIdFieldName);
+            var plannerName = (string)privateObject.GetFieldOrProperty(PlannerNameFieldName);
 
             // Assert
             plannerId.ShouldSatisfyAllConditions(
                 () => plannerId.ShouldBe(string.Empty),
-                () => plannerName.ShouldBe("Planner"),
+                () => plannerName.ShouldBe(PlannerKeyString),
                 () => validations.ShouldBe(5));
         }
 
@@ -1045,7 +1070,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 sListProjectCenter = DummyString
             };
 
-            requestDictionary.Add("setdefault", bool.TrueString);
+            requestDictionary.Add(SetDefaultKeyString, bool.TrueString);
 
             ShimAct.AllInstances.CheckFeatureLicenseActFeature = (_, __) =>
             {
@@ -1077,18 +1102,18 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 return plannerProps;
             };
 
-            privateObject.SetFieldOrProperty("sProjectType", "Project");
-            privateObject.SetFieldOrProperty("sPlannerID", DummyString);
-            privateObject.SetFieldOrProperty("sItemID", DummyInt.ToString());
+            privateObject.SetFieldOrProperty(ProjectTypeFieldName, "Project");
+            privateObject.SetFieldOrProperty(PlannerIdFieldName, DummyString);
+            privateObject.SetFieldOrProperty(ItemIdFieldName, DummyInt.ToString());
 
             // Act
             privateObject.Invoke(PageLoadMethodName, nonPublicInstance, new object[] { default(object), EventArgs.Empty });
-            var plannerId = (string)privateObject.GetFieldOrProperty("sPlannerID");
-            var plannerName = (string)privateObject.GetFieldOrProperty("sPlannerName");
-            var projectCenter = (string)privateObject.GetFieldOrProperty("sListProjectCenter");
-            var projectName = (string)privateObject.GetFieldOrProperty("sProjectName");
-            var mainPanel = (Panel)privateObject.GetFieldOrProperty("pnlMain");
-            var projectPanel = (Panel)privateObject.GetFieldOrProperty("pnlProject");
+            var plannerId = (string)privateObject.GetFieldOrProperty(PlannerIdFieldName);
+            var plannerName = (string)privateObject.GetFieldOrProperty(PlannerNameFieldName);
+            var projectCenter = (string)privateObject.GetFieldOrProperty(ListProjectCenterFieldName);
+            var projectName = (string)privateObject.GetFieldOrProperty(ProjectNameFieldName);
+            var mainPanel = (Panel)privateObject.GetFieldOrProperty(MainPanelFieldName);
+            var projectPanel = (Panel)privateObject.GetFieldOrProperty(ProjectPanelName);
 
             // Assert
             plannerId.ShouldSatisfyAllConditions(
@@ -1105,10 +1130,10 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         public void PageLoad_Case4_SetsFieldsAndProperties()
         {
             // Arrange
-            requestDictionary.Add("setdefault", bool.TrueString);
+            requestDictionary.Add(SetDefaultKeyString, bool.TrueString);
             requestDictionary.Add("Source", string.Empty);
             requestDictionary.Add("ID", DummyInt.ToString());
-            requestDictionary["Planner"] = "MSProject";
+            requestDictionary[PlannerKeyString] = "MSProject";
 
             ShimAct.AllInstances.CheckFeatureLicenseActFeature = (_, __) =>
             {
@@ -1135,16 +1160,16 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 return DummyString;
             };
 
-            privateObject.SetFieldOrProperty("sProjectType", "NotProject");
-            privateObject.SetFieldOrProperty("sPlannerID", DummyString);
+            privateObject.SetFieldOrProperty(ProjectTypeFieldName, "NotProject");
+            privateObject.SetFieldOrProperty(PlannerIdFieldName, DummyString);
 
             // Act
             privateObject.Invoke(PageLoadMethodName, nonPublicInstance, new object[] { default(object), EventArgs.Empty });
-            var projectListId = (string)privateObject.GetFieldOrProperty("sProjectListId");
-            var source = (string)privateObject.GetFieldOrProperty("sSource");
-            var itemId = (string)privateObject.GetFieldOrProperty("sItemID");
-            var mainPanel = (Panel)privateObject.GetFieldOrProperty("pnlMain");
-            var msProjectPanel = (Panel)privateObject.GetFieldOrProperty("pnlMSProject");
+            var projectListId = (string)privateObject.GetFieldOrProperty(ProjectListIdFieldName);
+            var source = (string)privateObject.GetFieldOrProperty(SourceFieldName);
+            var itemId = (string)privateObject.GetFieldOrProperty(ItemIdFieldName);
+            var mainPanel = (Panel)privateObject.GetFieldOrProperty(MainPanelFieldName);
+            var msProjectPanel = (Panel)privateObject.GetFieldOrProperty(MSProjectPanelName);
 
             // Assert
             projectListId.ShouldSatisfyAllConditions(
@@ -1160,9 +1185,9 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         public void PageLoad_Case5_SetsFieldsAndProperties()
         {
             // Arrange
-            requestDictionary.Add("setdefault", bool.TrueString);
-            requestDictionary.Add("ID", DummyInt.ToString());
-            requestDictionary["Planner"] = "WEWorkPlanner";
+            requestDictionary.Add(SetDefaultKeyString, bool.TrueString);
+            requestDictionary.Add(IDStringCaps, DummyInt.ToString());
+            requestDictionary[PlannerKeyString] = "WEWorkPlanner";
 
             ShimAct.AllInstances.CheckFeatureLicenseActFeature = (_, __) =>
             {
@@ -1184,15 +1209,15 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 return true;
             };
 
-            privateObject.SetFieldOrProperty("sProjectType", "NotProject");
-            privateObject.SetFieldOrProperty("sPlannerID", DummyString);
+            privateObject.SetFieldOrProperty(ProjectTypeFieldName, "NotProject");
+            privateObject.SetFieldOrProperty(PlannerIdFieldName, DummyString);
 
             // Act
             privateObject.Invoke(PageLoadMethodName, nonPublicInstance, new object[] { default(object), EventArgs.Empty });
-            var oldUrl = (string)privateObject.GetFieldOrProperty("OldUrl");
-            var itemId = (string)privateObject.GetFieldOrProperty("sItemID");
-            var mainPanel = (Panel)privateObject.GetFieldOrProperty("pnlMain");
-            var oldPlannerPanel = (Panel)privateObject.GetFieldOrProperty("pnlOldPlanner");
+            var oldUrl = (string)privateObject.GetFieldOrProperty(OldUrlFieldName);
+            var itemId = (string)privateObject.GetFieldOrProperty(ItemIdFieldName);
+            var mainPanel = (Panel)privateObject.GetFieldOrProperty(MainPanelFieldName);
+            var oldPlannerPanel = (Panel)privateObject.GetFieldOrProperty(OldPlannerPanelName);
 
             // Assert
             oldUrl.ShouldSatisfyAllConditions(
@@ -1207,9 +1232,9 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         public void PageLoad_Case6_SetsFieldsAndProperties()
         {
             // Arrange
-            requestDictionary.Add("setdefault", bool.TrueString);
+            requestDictionary.Add(SetDefaultKeyString, bool.TrueString);
             requestDictionary.Add("ID", DummyInt.ToString());
-            requestDictionary["Planner"] = "WEAgilePlanner";
+            requestDictionary[PlannerKeyString] = "WEAgilePlanner";
 
             ShimAct.AllInstances.CheckFeatureLicenseActFeature = (_, __) =>
             {
@@ -1231,15 +1256,15 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 return true;
             };
 
-            privateObject.SetFieldOrProperty("sProjectType", "NotProject");
-            privateObject.SetFieldOrProperty("sPlannerID", DummyString);
+            privateObject.SetFieldOrProperty(ProjectTypeFieldName, "NotProject");
+            privateObject.SetFieldOrProperty(PlannerIdFieldName, DummyString);
 
             // Act
             privateObject.Invoke(PageLoadMethodName, nonPublicInstance, new object[] { default(object), EventArgs.Empty });
-            var oldUrl = (string)privateObject.GetFieldOrProperty("OldUrl");
-            var itemId = (string)privateObject.GetFieldOrProperty("sItemID");
-            var mainPanel = (Panel)privateObject.GetFieldOrProperty("pnlMain");
-            var oldPlannerPanel = (Panel)privateObject.GetFieldOrProperty("pnlOldPlanner");
+            var oldUrl = (string)privateObject.GetFieldOrProperty(OldUrlFieldName);
+            var itemId = (string)privateObject.GetFieldOrProperty(ItemIdFieldName);
+            var mainPanel = (Panel)privateObject.GetFieldOrProperty(MainPanelFieldName);
+            var oldPlannerPanel = (Panel)privateObject.GetFieldOrProperty(OldPlannerPanelName);
 
             // Assert
             oldUrl.ShouldSatisfyAllConditions(
@@ -1259,9 +1284,9 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 sListProjectCenter = DummyString
             };
 
-            requestDictionary.Add("setdefault", bool.TrueString);
+            requestDictionary.Add(SetDefaultKeyString, bool.TrueString);
             requestDictionary.Add("ID", DummyInt.ToString());
-            requestDictionary["Planner"] = DummyString;
+            requestDictionary[PlannerKeyString] = DummyString;
 
             ShimAct.AllInstances.CheckFeatureLicenseActFeature = (_, __) =>
             {
@@ -1292,8 +1317,8 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 validations += 1;
             };
 
-            privateObject.SetFieldOrProperty("sProjectType", "NotProject");
-            privateObject.SetFieldOrProperty("sPlannerID", DummyString);
+            privateObject.SetFieldOrProperty(ProjectTypeFieldName, "NotProject");
+            privateObject.SetFieldOrProperty(PlannerIdFieldName, DummyString);
 
             // Act
             privateObject.Invoke(PageLoadMethodName, nonPublicInstance, new object[] { default(object), EventArgs.Empty });
@@ -1316,9 +1341,9 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 ["epknonactivexs"] = menus
             };
 
-            requestDictionary.Add("setdefault", bool.TrueString);
-            requestDictionary.Add("ID", DummyInt.ToString());
-            requestDictionary["Planner"] = DummyString;
+            requestDictionary.Add(SetDefaultKeyString, bool.TrueString);
+            requestDictionary.Add(IDStringCaps, DummyInt.ToString());
+            requestDictionary[PlannerKeyString] = DummyString;
 
             spListItem.ItemGetString = _ => string.Empty;
             spListItem.ItemGetGuid = _ => string.Empty;
@@ -1367,9 +1392,9 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 return DummyString;
             };
 
-            privateObject.SetFieldOrProperty("sProjectType", "NotProject");
-            privateObject.SetFieldOrProperty("sPlannerID", DummyString);
-            privateObject.SetFieldOrProperty("sItemID", DummyInt.ToString());
+            privateObject.SetFieldOrProperty(ProjectTypeFieldName, "NotProject");
+            privateObject.SetFieldOrProperty(PlannerIdFieldName, DummyString);
+            privateObject.SetFieldOrProperty(ItemIdFieldName, DummyInt.ToString());
         }
 
         [TestMethod]
@@ -1384,9 +1409,9 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
 
             // Act
             privateObject.Invoke(PageLoadMethodName, nonPublicInstance, new object[] { default(object), EventArgs.Empty });
-            var actual = (Label)privateObject.GetFieldOrProperty("lblPerms");
-            var mainPanel = (Panel)privateObject.GetFieldOrProperty("pnlMain");
-            var permsPanel = (Panel)privateObject.GetFieldOrProperty("pnlPerms");
+            var actual = (Label)privateObject.GetFieldOrProperty(PermsLabelName);
+            var mainPanel = (Panel)privateObject.GetFieldOrProperty(MainPanelFieldName);
+            var permsPanel = (Panel)privateObject.GetFieldOrProperty(PermsPanelName);
 
             // Assert
             actual.ShouldSatisfyAllConditions(
@@ -1417,9 +1442,9 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
 
             // Act
             privateObject.Invoke(PageLoadMethodName, nonPublicInstance, new object[] { default(object), EventArgs.Empty });
-            var actual = (Label)privateObject.GetFieldOrProperty("lblPerms");
-            var mainPanel = (Panel)privateObject.GetFieldOrProperty("pnlMain");
-            var permsPanel = (Panel)privateObject.GetFieldOrProperty("pnlPerms");
+            var actual = (Label)privateObject.GetFieldOrProperty(PermsLabelName);
+            var mainPanel = (Panel)privateObject.GetFieldOrProperty(MainPanelFieldName);
+            var permsPanel = (Panel)privateObject.GetFieldOrProperty(PermsPanelName);
 
             // Assert
             actual.ShouldSatisfyAllConditions(
@@ -1450,9 +1475,9 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
 
             // Act
             privateObject.Invoke(PageLoadMethodName, nonPublicInstance, new object[] { default(object), EventArgs.Empty });
-            var actual = (Label)privateObject.GetFieldOrProperty("lblPerms");
-            var mainPanel = (Panel)privateObject.GetFieldOrProperty("pnlMain");
-            var permsPanel = (Panel)privateObject.GetFieldOrProperty("pnlPerms");
+            var actual = (Label)privateObject.GetFieldOrProperty(PermsLabelName);
+            var mainPanel = (Panel)privateObject.GetFieldOrProperty(MainPanelFieldName);
+            var permsPanel = (Panel)privateObject.GetFieldOrProperty(PermsPanelName);
 
             // Assert
             actual.ShouldSatisfyAllConditions(
@@ -1494,9 +1519,9 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
 
             // Act
             privateObject.Invoke(PageLoadMethodName, nonPublicInstance, new object[] { default(object), EventArgs.Empty });
-            var actual = (Label)privateObject.GetFieldOrProperty("lblPerms");
-            var mainPanel = (Panel)privateObject.GetFieldOrProperty("pnlMain");
-            var permsPanel = (Panel)privateObject.GetFieldOrProperty("pnlPerms");
+            var actual = (Label)privateObject.GetFieldOrProperty(PermsLabelName);
+            var mainPanel = (Panel)privateObject.GetFieldOrProperty(MainPanelFieldName);
+            var permsPanel = (Panel)privateObject.GetFieldOrProperty(PermsPanelName);
 
             // Assert
             actual.ShouldSatisfyAllConditions(
@@ -1547,9 +1572,9 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
 
             // Act
             privateObject.Invoke(PageLoadMethodName, nonPublicInstance, new object[] { default(object), EventArgs.Empty });
-            var actual = (Label)privateObject.GetFieldOrProperty("lblPerms");
-            var mainPanel = (Panel)privateObject.GetFieldOrProperty("pnlMain");
-            var permsPanel = (Panel)privateObject.GetFieldOrProperty("pnlPerms");
+            var actual = (Label)privateObject.GetFieldOrProperty(PermsLabelName);
+            var mainPanel = (Panel)privateObject.GetFieldOrProperty(MainPanelFieldName);
+            var permsPanel = (Panel)privateObject.GetFieldOrProperty(PermsPanelName);
 
             // Assert
             actual.ShouldSatisfyAllConditions(
@@ -1600,9 +1625,9 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
 
             // Act
             privateObject.Invoke(PageLoadMethodName, nonPublicInstance, new object[] { default(object), EventArgs.Empty });
-            var actual = (Label)privateObject.GetFieldOrProperty("lblPerms");
-            var mainPanel = (Panel)privateObject.GetFieldOrProperty("pnlMain");
-            var permsPanel = (Panel)privateObject.GetFieldOrProperty("pnlPerms");
+            var actual = (Label)privateObject.GetFieldOrProperty(PermsLabelName);
+            var mainPanel = (Panel)privateObject.GetFieldOrProperty(MainPanelFieldName);
+            var permsPanel = (Panel)privateObject.GetFieldOrProperty(PermsPanelName);
 
             // Assert
             actual.ShouldSatisfyAllConditions(
@@ -1674,10 +1699,10 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 [$"EPMLivePlanner{plannerId}Views"] = viewList
             };
 
-            requestDictionary.Add("setdefault", bool.TrueString);
-            requestDictionary.Add("ID", DummyInt.ToString());
+            requestDictionary.Add(SetDefaultKeyString, bool.TrueString);
+            requestDictionary.Add(IDStringCaps, DummyInt.ToString());
             requestDictionary.Add("isDlg", One.ToString());
-            requestDictionary["Planner"] = DummyString;
+            requestDictionary[PlannerKeyString] = DummyString;
 
             spUser.IsSiteAdminGet = () => true;
             spListItem.ItemGetString = input =>
@@ -1759,14 +1784,14 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 return new StringBuilder(DummyString);
             };
 
-            privateObject.SetFieldOrProperty("sProjectType", "NotProject");
-            privateObject.SetFieldOrProperty("sPlannerID", DummyString);
-            privateObject.SetFieldOrProperty("sItemID", DummyInt.ToString());
+            privateObject.SetFieldOrProperty(ProjectTypeFieldName, "NotProject");
+            privateObject.SetFieldOrProperty(PlannerIdFieldName, DummyString);
+            privateObject.SetFieldOrProperty(ItemIdFieldName, DummyInt.ToString());
 
             // Act
             privateObject.Invoke(PageLoadMethodName, nonPublicInstance, new object[] { default(object), EventArgs.Empty });
-            var summaryRollup = (string)privateObject.GetFieldOrProperty("sSummaryRollup");
-            var viewObject = (string)privateObject.GetFieldOrProperty("sViewObject");
+            var summaryRollup = (string)privateObject.GetFieldOrProperty(SummaryRollupFieldName);
+            var viewObject = (string)privateObject.GetFieldOrProperty(ViewObjectFieldName);
 
             // Assert
             summaryRollup.ShouldSatisfyAllConditions(
@@ -1797,10 +1822,10 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 validations += 1;
             };
 
-            privateObject.SetFieldOrProperty("activation", 0);
-            privateObject.SetFieldOrProperty("sItemID", One.ToString());
-            privateObject.SetFieldOrProperty("sPlannerID", DummyString);
-            privateObject.SetFieldOrProperty("pnlMain", mainPanel);
+            privateObject.SetFieldOrProperty(ActivationFieldName, 0);
+            privateObject.SetFieldOrProperty(ItemIdFieldName, One.ToString());
+            privateObject.SetFieldOrProperty(PlannerIdFieldName, DummyString);
+            privateObject.SetFieldOrProperty(MainPanelFieldName, mainPanel);
 
             // Act
             privateObject.Invoke(OnPreRenderMethodName, nonPublicInstance, new object[] { EventArgs.Empty });
@@ -1873,7 +1898,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 }
             };
 
-            privateObject.SetFieldOrProperty("bAgile", true);
+            privateObject.SetFieldOrProperty(AgileString, true);
 
             // Act
             privateObject.Invoke(AddRibbonTabMethodName, nonPublicInstance, new object[] { });
