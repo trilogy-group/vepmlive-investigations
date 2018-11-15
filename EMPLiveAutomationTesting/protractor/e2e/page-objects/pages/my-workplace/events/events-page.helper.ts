@@ -36,12 +36,14 @@ export class EventsPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.categoryOption.meeting));
 
         await PageHelper.click(EventsPage.categoryOption);
+        // selection of category in not refelcted immediately.
+        await PageHelper.sleepForXSec(3000);
 
         StepLogger.stepId(4);
         StepLogger.step('Click on save');
         await ExpectationHelper.verifyDisplayedStatus(CommonPage.saveNewEvent, CommonPageConstants.formLabels.save);
-
         await PageHelper.click(CommonPage.saveNewEvent);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.saveNewEvent);
     }
 
     static async verifyNewEventCreated(titleNewEvent: string) {

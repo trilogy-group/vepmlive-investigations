@@ -333,12 +333,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.step('Click on the "Edit Item" button menu displayed in "View" tab on top of the page');
         await PageHelper.click(EventsPage.editItem);
         StepLogger.verification('"Edit Event" page is displayed');
-        // await WaitHelper.waitForElementToBeDisplayed(CommonPageHelper.getElementUsingText('Save', false));
         await ExpectationHelper.verifyDisplayedStatus(CommonPage.saveNewEvent, CommonPageConstants.formLabels.save);
-        /*         await expect(await CommonPage.title.getText())
-            .toBe(EventsPageConstants.pagePrefix,
-                ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.editPageName));
- */
+
         // steps 5,6 are verified here
         const labels = EventsPageConstants.inputLabels;
         const uniqueId = PageHelper.getUniqueId();
