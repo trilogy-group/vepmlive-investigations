@@ -51,6 +51,7 @@ export class EventsPageHelper {
         StepLogger.verification('"Verificaion: New Event" page is closed');
         await ExpectationHelper.verifyNotDisplayedStatus(CommonPage.saveNewEvent, EventsPageConstants.editPageName);
 
+        await this.expandAllItems();
         StepLogger.verification(`verify "New Event" got created which is: ${titleNewEvent}`);
         await expect(await PageHelper.isElementDisplayed(EventsPage.getNewEventAdded(titleNewEvent)))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(titleNewEvent));
@@ -177,6 +178,14 @@ export class EventsPageHelper {
         StepLogger.verification('Created view should be displayed in the list');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(CommonPageConstants.createdView));
+    }
 
+    static async expandAllItems() {
+        const count = await EventsPage.seeMoreLinks.count();
+        let i = 0;
+        while (i < count) {
+            await PageHelper.click(EventsPage.seeMoreLinks.get(i));
+            i++;
+        }
     }
 }
