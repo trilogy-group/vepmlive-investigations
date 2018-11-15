@@ -171,8 +171,10 @@ namespace EPMLiveCore.Tests.API
             var actualResult = (ListPlannerProps)_privateType.InvokeStatic("iGetListPlannerInfo", list.Instance);
 
             // Assert
-            actualResult.PlannerV2CurPlanner.ShouldBe(DummyId);
-            actualResult.PlannerV2Menu.ShouldBe("<Button Id=\"Ribbon.ListItem.EPMLive.Planner\" Sequence=\"33\" Command=\"TaskPlanner\" LabelText=\"Edit Plan\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/planner32.png\"/>");
+            this.ShouldSatisfyAllConditions(
+                () => actualResult.PlannerV2CurPlanner.ShouldBe(DummyId),
+                () => actualResult.PlannerV2Menu.ShouldBe(
+                    "<Button Id=\"Ribbon.ListItem.EPMLive.Planner\" Sequence=\"33\" Command=\"TaskPlanner\" LabelText=\"Edit Plan\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/planner32.png\"/>"));
         }
 
         [TestMethod]
@@ -707,7 +709,13 @@ namespace EPMLiveCore.Tests.API
             };
 
             // Act
-            var actualResult = (bool)_privateType.InvokeStatic("TryAddField", list.Instance, DummyInternalName, SPFieldType.Text, DummyTitle, false);
+            var actualResult = (bool)_privateType.InvokeStatic(
+                "TryAddField",
+                list.Instance,
+                DummyInternalName,
+                SPFieldType.Text,
+                DummyTitle,
+                false);
 
             // Assert
             actualResult.ShouldBeTrue();
@@ -742,7 +750,13 @@ namespace EPMLiveCore.Tests.API
             };
 
             // Act
-            var actualResult = (bool)_privateType.InvokeStatic("TryAddField", list.Instance, DummyInternalName, SPFieldType.Text, DummyTitle, false);
+            var actualResult = (bool)_privateType.InvokeStatic(
+                "TryAddField",
+                list.Instance,
+                DummyInternalName,
+                SPFieldType.Text,
+                DummyTitle,
+                false);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -781,7 +795,13 @@ namespace EPMLiveCore.Tests.API
             };
 
             // Act
-            var actualResult = (bool)_privateType.InvokeStatic("TryAddField", list.Instance, DummyInternalName, SPFieldType.Text, DummyTitle, false);
+            var actualResult = (bool)_privateType.InvokeStatic(
+                "TryAddField",
+                list.Instance,
+                DummyInternalName,
+                SPFieldType.Text,
+                DummyTitle,
+                false);
 
             // Assert
             actualResult.ShouldBeFalse();
