@@ -114,7 +114,7 @@ export class EventsPage {
     }
 
     static get endDate() {
-        return element(By.xpath(`//input[@title='End Time Required Field']`));
+        return element(By.xpath(`//input[@title='${EventsPageConstants.endTimeField}']`));
     }
 
     static get editItem() {
