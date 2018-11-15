@@ -1,15 +1,16 @@
-import {browser} from 'protractor';
-import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
-import {StepLogger} from '../../../../../../core/logger/step-logger';
-import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
-import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
-import {PageHelper} from '../../../../../components/html/page-helper';
-import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import {WaitHelper} from '../../../../../components/html/wait-helper';
-import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
-import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
-import {SuiteNames} from '../../../../helpers/suite-names';
-import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import { browser } from 'protractor';
+
+import { CommonPageHelper } from '../../../../../page-objects/pages/common/common-page.helper';
+import { StepLogger } from '../../../../../../core/logger/step-logger';
+import { CommonPage } from '../../../../../page-objects/pages/common/common.po';
+import { ProjectItemPage } from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
+import { PageHelper } from '../../../../../components/html/page-helper';
+import { ProjectItemPageHelper } from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import { WaitHelper } from '../../../../../components/html/wait-helper';
+import { CommonPageConstants } from '../../../../../page-objects/pages/common/common-page.constants';
+import { HomePage } from '../../../../../page-objects/pages/homepage/home.po';
+import { SuiteNames } from '../../../../helpers/suite-names';
+import { LoginPage } from '../../../../../page-objects/pages/login/login.po';
 import { ElementHelper } from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -68,8 +69,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.waitForElementToBePresent(CommonPage.setBaselineTab);
         await ElementHelper.actionHoverOver(CommonPage.setBaselineTab);
         await PageHelper.click(CommonPage.setBaselineTab);
-        // accept alert required to set new base line
-        await browser.switchTo().alert().accept();
+        await PageHelper.acceptAlert();
 
         StepLogger.stepId(3);
         StepLogger.step('Change Duration of any task [Ex: Task One Duration changed from 5 to 10]' +
@@ -89,7 +89,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(5);
         StepLogger.step('Click in "OK" button in the message');
-        await browser.switchTo().alert().accept();
-        // unable to verify baseline, its a chart, nothing is changing in dom.
+        await PageHelper.acceptAlert();
     });
 });
