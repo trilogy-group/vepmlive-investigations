@@ -15,6 +15,13 @@ export class LinkPage {
         return element(By.id('idHomePageNewLink'));
     }
 
+    static get linkInList() {
+        return {
+            linkInListTd: (text: string) => element(By.xpath(`//*/td[@role="gridcell" and contains((.),"${text}")]//parent::tr`))
+        };
+
+    }
+
     static get nextButton() {
         return element(By.css('a[title="Next"]'));
     }

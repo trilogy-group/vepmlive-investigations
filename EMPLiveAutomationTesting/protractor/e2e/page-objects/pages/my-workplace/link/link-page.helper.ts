@@ -69,4 +69,21 @@ export class LinkPageHelper {
         }
         await ExpectationHelper.verifyDisplayedStatus(item, details.url);
     }
+
+    static async deleteLinkByText(text: string) {
+        StepLogger.subStep('Select link in list');
+        await PageHelper.click(LinkPage.linkInList.linkInListTd(text));
+
+        StepLogger.subStep('Click on "Items" tab');
+        await PageHelper.click(CommonPage.ribbonTitles.items);
+
+        StepLogger.subStep('Click on "Delete Item" button');
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.deleteItemButton);
+        await PageHelper.click(CommonPage.ribbonItems.deleteItemButton);
+
+        StepLogger.subStep('Accept alert');
+        await PageHelper.acceptAlertIfPresent();
+
+        await WaitHelper.waitForElementToBeHidden(LinkPage.linkInList.linkInListTd(text));
+    }
 }
