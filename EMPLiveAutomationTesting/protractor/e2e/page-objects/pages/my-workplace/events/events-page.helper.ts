@@ -13,6 +13,7 @@ import {WaitHelper} from '../../../../components/html/wait-helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {MyWorkplaceConstants} from '../my-workplace.constants';
+import { ExpectationHelper } from '../../../../components/misc-utils/expectation-helper';
 
 export class EventsPageHelper {
 
@@ -38,8 +39,7 @@ export class EventsPageHelper {
 
         StepLogger.stepId(4);
         StepLogger.step('Click on save');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.saveNewEvent)).toBe(true,
-            ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.formLabels.save));
+        await ExpectationHelper.verifyDisplayedStatus(CommonPage.saveNewEvent, CommonPageConstants.formLabels.save);
 
         await PageHelper.click(CommonPage.saveNewEvent);
     }
