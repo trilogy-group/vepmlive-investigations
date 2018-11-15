@@ -62,6 +62,10 @@ export class MyTimeOffPageHelper {
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyTimeOffPageConstants.editPageName));
 
+        StepLogger.subVerification('Newly created Time Off item details displayed in read only mode');
+        await expect(await CommonPage.contentTitleInViewMode.getText())
+            .toBe(title, ValidationsHelper.getLabelDisplayedValidation(title));
+
         StepLogger.step(`click on Close button`);
         await PageHelper.clickIfDisplayed(MyTimeOffPage.closeButton);
     }

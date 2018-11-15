@@ -12,6 +12,9 @@ import {WaitHelper} from '../../../../components/html/wait-helper';
 import {MyWorkplacePage} from '../my-workplace.po';
 import {CommonPageConstants} from '../../common/common-page.constants';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
+// import {LinkPage} from "../link/link.po";
+import {ExpectationHelper} from '../../../../components/misc-utils/expectation-helper';
+import {ElementHelper} from '../../../../components/html/element-helper';
 
 export class DiscussionsPageHelper {
 
@@ -22,14 +25,19 @@ export class DiscussionsPageHelper {
         StepLogger.step('Click on save');
         await PageHelper.click(CommonPage.formButtons.save);
 
+        StepLogger.subStep('Click on Close button');
+        await PageHelper.click(CommonPage.formButtons.close);
+
         StepLogger.verification('"New Discussion" page is closed');
+        await WaitHelper.waitForElementToBeHidden(CommonPage.formButtons.close);
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(DiscussionsPageConstants.editPageName));
 
-        const label = DiscussionsPage.allDiscussionItems;
+        // const label = DiscussionsPage.allDiscussionItems;
         StepLogger.step(`Newly created Discussion [Ex: Discussion 1] displayed in "Discussions" page`);
-        await CommonPageHelper.checkItemCreated(subject, label);
+        await this.verifyNewDiscussionAdded(subject);
+        // await CommonPageHelper.checkItemCreated(subject, label);
     }
 
     static async addDiscussion() {
@@ -53,6 +61,8 @@ export class DiscussionsPageHelper {
         const subject = `${labels.subject} ${uniqueId}`;
         const body = `${labels.body} ${uniqueId}`;
         await DiscussionsPageHelper.fillNewDiscussionFormAndVerify(subject, body, false);
+
+        return subject;
     }
 
     static discussionsItems(classAttribute: string, text: string) {
@@ -135,4 +145,14 @@ export class DiscussionsPageHelper {
         await CommonPageHelper.searchItemByTitle(titleToSearch, 'Subject');
         await WaitHelper.waitForElementToBePresent(DiscussionsPage.getDiscussionField(titleToSearch));
     }
+
+    static async verifyNewDiscussionAdded(subject: string) {
+        StepLogger.subVerification('Newly added Discussion is displayed in the list');
+        const item = DiscussionsPage.discussionInList.trTag(subject);
+        await PageHelper.click(CommonPage.lastButton);
+        await WaitHelper.waitForElementToBeDisplayed(item);
+        await ElementHelper.scrollToElement(item);
+        await ExpectationHelper.verifyDisplayedStatus(item, subject);
+    }
+
 }
