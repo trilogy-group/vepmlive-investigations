@@ -98,6 +98,8 @@
     <Compile Include="ISAPI\WorkPlanner.asmx.TestsSplitThree.cs" />
     <Compile Include="ISAPI\WorkPlanner.asmx.TestsSplitTwo.cs" />
     <Compile Include="Layouts\epmlive\WorkPlanner.aspx.Tests.cs" />
+    <Compile Include="Layouts\epmlive\WorkPlannerWizard.aspx.Tests.cs" />
+    <Compile Include="Layouts\epmlive\WorkPlannerWizard.aspx.Tests.ICheckParams.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebPageCode\TaskCenterCalculateTests.cs" />
     <Compile Include="WebPageCode\GettasksTests.RemainingTests.cs" />
