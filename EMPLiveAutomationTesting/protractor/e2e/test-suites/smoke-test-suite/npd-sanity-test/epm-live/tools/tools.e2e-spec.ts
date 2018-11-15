@@ -15,6 +15,7 @@ import {ElementHelper} from '../../../../../components/html/element-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ResourcePlannerPageHelper} from '../../../../../page-objects/pages/resource-planner-page/resource-planner-page.helper';
 import {ResourcePlannerPage} from '../../../../../page-objects/pages/resource-planner-page/resource-planner-page.po';
+import { ExpectationHelper } from '../../../../../components/misc-utils/expectation-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -63,14 +64,11 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(5);
         StepLogger.verification('Check the columns displayed in bottom grid');
-        await ResourcePlannerPageHelper.validateButtonSection();
-
-        await ElementHelper.clickUsingJs(ResourcePlannerPage.close);
+        await PageHelper.click(ResourcePlannerPage.close);
+        await PageHelper.switchToDefaultContent();
 
         StepLogger.verification(`${CommonPageConstants.pageHeaders.projects.projectCenter} page is displayed`);
-        await CommonPageHelper.fieldDisplayedValidation
-        (CommonPage.pageHeaders.projects.projectsCenter, CommonPageConstants.pageHeaders.projects.projectCenter);
-
+        await ExpectationHelper.verifyDisplayedStatus(CommonPage.pageHeaders.projects.projectsCenter, CommonPageConstants.pageHeaders.projects.projectCenter);
     });
 
     /* #UNSTABLE
