@@ -34,10 +34,8 @@ export class DiscussionsPageHelper {
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(DiscussionsPageConstants.editPageName));
 
-        // const label = DiscussionsPage.allDiscussionItems;
         StepLogger.step(`Newly created Discussion [Ex: Discussion 1] displayed in "Discussions" page`);
         await this.verifyNewDiscussionAdded(subject);
-        // await CommonPageHelper.checkItemCreated(subject, label);
     }
 
     static async addDiscussion() {
