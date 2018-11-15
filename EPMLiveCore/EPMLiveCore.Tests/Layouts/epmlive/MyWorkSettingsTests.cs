@@ -58,7 +58,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             _shimsObject = ShimsContext.Create();
             _testObj = new myworksettings();
             _privateObj = new PrivateObject(_testObj);
-
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = action => action();
             InitializeUIControls();
         }
 
