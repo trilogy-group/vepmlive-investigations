@@ -603,4 +603,8 @@ export class CommonPage extends BasePage {
     static get rowsFirstColumn() {
         return element.all(By.css('tr.GMDataRow td.GMCellPanel'));
     }
+
+    static get rowsDataFirstColumn() {
+        return element.all(By.css('table.GMSection tr.GMDataRow  td.GMCellPanel'));
+    }
 }

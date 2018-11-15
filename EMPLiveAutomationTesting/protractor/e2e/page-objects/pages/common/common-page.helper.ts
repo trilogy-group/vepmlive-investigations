@@ -371,7 +371,9 @@ export class CommonPageHelper {
     static async viewViaItems() {
         StepLogger.stepId(2);
         StepLogger.step('Select the check box for record');
-        await PageHelper.click(CommonPage.rowsFirstColumn.get(1));
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dataRows.get(1));
+        await ElementHelper.actionHoverOver(CommonPage.dataRows.get(1));
+        await PageHelper.click(CommonPage.rowsDataFirstColumn.get(1));
 
         StepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.itemsMenu);
