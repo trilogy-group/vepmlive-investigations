@@ -115,6 +115,7 @@ export class CommonPage extends BasePage {
             addTask: CommonPageHelper.getRibbonButtonById(labels.addTask),
             editTeam: CommonPageHelper.getRibbonSmallButtonByTitle(labels.editTeam),
             editTeamButton: CommonPageHelper.getRibbonSmallButtonById(ids.editTeamIdSubstr),
+            deleteItemButton: CommonPageHelper.getRibbonSmallButtonById(ids.deleteItemIdSubstr),
             close: CommonPageHelper.getRibbonButtonByText(labels.close),
             saveAndClose: CommonPageHelper.getRibbonButtonByText(labels.saveAndClose),
             assignmentPlanner: CommonPageHelper.getRibbonMediumButtonByTitle(labels.assignmentPlanner),

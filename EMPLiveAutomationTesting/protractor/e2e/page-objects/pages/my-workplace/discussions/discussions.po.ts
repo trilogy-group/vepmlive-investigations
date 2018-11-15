@@ -32,8 +32,8 @@ export class DiscussionsPage {
             DiscussionsPageConstants.inputLabels.subject);
     }
 
-    static get openDiscussionLink() {
-        return element(By.css(`div.ms-comm-postMainContainer.ms-comm-postSubjectColumn > a`));
+    static get openDiscussionLinkByText() {
+        return (text: string) => element(By.cssContainingText('div.ms-comm-postMainContainer.ms-comm-postSubjectColumn > a', text));
     }
 
     static get discussionTitle() {
@@ -80,5 +80,11 @@ export class DiscussionsPage {
 
     static getRowByDot(textValue: string) {
         return element(By.xpath(`//td[normalize-space(.)='${textValue}']`));
+    }
+
+    static get discussionInList() {
+        return {
+            trTag: (subject: string) => element(By.xpath(`//*/tr[@class='GMDataRow ' and contains((.),'${subject}')]`))
+        };
     }
 }

@@ -107,7 +107,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.myWorkplace.discussions,
             CommonPageConstants.pageHeaders.myWorkplace.discussions,
         );
+        StepLogger.subStep('Click on setting');
         await PageHelper.click(CommonPage.sidebarMenus.settings);
+        StepLogger.subStep('Click edit page icone');
         await PageHelper.click(SocialStreamPage.settingItems.editPage);
         await DiscussionsPageHelper.deleteGridGantt();
 

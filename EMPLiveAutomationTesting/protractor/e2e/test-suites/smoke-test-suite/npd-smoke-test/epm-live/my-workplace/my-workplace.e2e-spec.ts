@@ -191,12 +191,13 @@ describe(SuiteNames.smokeTestSuite, () => {
         const details = await LinkPageHelper.fillNewLinkFormAndVerification();
 
         await LinkPageHelper.verifyNewLinkAdded(details);
+        await LinkPageHelper.deleteLinkByText(details.description);
     });
 
     it('Create new Pictures from Workplace - [1175271]', async () => {
         StepLogger.caseId = 1175271;
         StepLogger.stepId(1);
-
+        await PageHelper.switchToDefaultContent();
         // Step #1 and #2 Inside this function
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.pictures,
@@ -214,6 +215,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.caseId = 1124447;
 
         StepLogger.step('Navigate to My Time Off page');
+        await PageHelper.switchToDefaultContent();
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.myTimeOff,
             CommonPage.pageHeaders.myWorkplace.timeOff,
@@ -239,10 +241,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         const startDate = input.startDate;
         const finishDate = input.finishDate;
         await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate);
-
-        StepLogger.verification('Newly created Time Off item details displayed in read only mode');
-        await expect(await CommonPage.contentTitleInViewMode.getText())
-            .toBe(title, ValidationsHelper.getLabelDisplayedValidation(title));
 
         StepLogger.verification('Navigate to page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
@@ -355,17 +353,17 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(newTitle));
     });
 
-    it('Reply to a Discussion - [785614]', async () => {
+    it('Reply to a Discussion - [785614] [BUG:SKYVERA-1508]', async () => {
         StepLogger.caseId = 785614;
 
         // steps 1,2,3 are inside this function
         StepLogger.step('preCondition: Create new Discussion');
-        await DiscussionsPageHelper.addDiscussion();
+        const subject = await DiscussionsPageHelper.addDiscussion();
 
         StepLogger.stepId(4);
         StepLogger.step(`Click on 'Discussion' added by Admin User`);
-        const title = await ElementHelper.getText(DiscussionsPage.openDiscussionLink);
-        await PageHelper.click(DiscussionsPage.openDiscussionLink);
+        const title = await ElementHelper.getText(DiscussionsPage.openDiscussionLinkByText(subject));
+        await PageHelper.click(DiscussionsPage.openDiscussionLinkByText(subject));
 
         StepLogger.verification('the Discussion should get selected');
         await expect(await DiscussionsPage.discussionTitle.getText())
