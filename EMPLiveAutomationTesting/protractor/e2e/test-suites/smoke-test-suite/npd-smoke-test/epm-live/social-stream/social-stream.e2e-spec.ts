@@ -1,6 +1,6 @@
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
-// import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
+import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {HomePageConstants} from '../../../../../page-objects/pages/homepage/home-page.constants';
@@ -9,12 +9,12 @@ import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {ElementHelper} from '../../../../../components/html/element-helper';
-/* import {TextboxHelper} from '../../../../../components/html/textbox-helper';
+import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
 import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
-import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper'; */
+import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -91,7 +91,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
-/*
+
     it('Validate the Comments Section & the Ability to add a Project from the Social Stream - [743926]', async () => {
         StepLogger.caseId = 743926;
 
@@ -171,5 +171,5 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getPageDisplayedValidation(LinkPageConstants.pagePrefix));
 
         await LinkPageHelper.verifyNewLinkAdded(details);
-    }); */
+    });
 });

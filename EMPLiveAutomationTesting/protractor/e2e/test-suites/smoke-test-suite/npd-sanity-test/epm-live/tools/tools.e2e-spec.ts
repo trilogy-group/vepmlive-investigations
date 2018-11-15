@@ -1,17 +1,17 @@
-// import {browser} from 'protractor';
+import {browser} from 'protractor';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
-// import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
+import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {PageHelper} from '../../../../../components/html/page-helper';
-// import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-// import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-// import {ElementHelper} from '../../../../../components/html/element-helper';
+import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
+import {ElementHelper} from '../../../../../components/html/element-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ResourcePlannerPageHelper} from '../../../../../page-objects/pages/resource-planner-page/resource-planner-page.helper';
 import {ResourcePlannerPage} from '../../../../../page-objects/pages/resource-planner-page/resource-planner-page.po';
@@ -136,7 +136,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
     });
     */
-/*
+
     it('Insert Fragment - [966282]', async () => {
         StepLogger.caseId = 966282;
         StepLogger.preCondition('Select "Navigation" icon  from left side menu');
@@ -224,5 +224,5 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.itemOptions.publish));
         // not change done on UI so not able to verify inserted fragment
 
-    }); */
+    });
 });
