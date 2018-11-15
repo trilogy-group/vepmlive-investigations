@@ -7,12 +7,12 @@ import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-
 import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.helper';
-// import {WaitHelper} from '../../../../../components/html/wait-helper';
-// import {ToDoPageConstants} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.constants';
+import {WaitHelper} from '../../../../../components/html/wait-helper';
+import {ToDoPageConstants} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.constants';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-do.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-// import {AnchorHelper} from '../../../../../components/html/anchor-helper';
+import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {SocialStreamPage} from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
 import {SocialStreamPageConstants} from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.constants';
 
@@ -29,7 +29,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     afterEach(async () => {
         await StepLogger.takeScreenShot();
     });
-/*
+
     it('Navigate to To Do page - [785576]', async () => {
         StepLogger.caseId = 785576;
         StepLogger.stepId(1);
@@ -118,7 +118,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const label = AnchorHelper.getElementsByTextInsideGrid(labels.title, true);
         StepLogger.step(`Modified Title of ToDo [Ex: Title 1] displayed in "ToDo" page`);
         await CommonPageHelper.checkItemCreated(title, label);
-    }); */
+    });
 
     /* #UNSTABLE
     it('To Do - Attach File - [852049]', async () => {
@@ -209,7 +209,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
     */
 
-    fit('Add Grid/Gantt web part - [785834]', async () => {
+    it('Add Grid/Gantt web part - [785834]', async () => {
         StepLogger.caseId = 785834;
         // Delete previous created Grid/Gantt
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(

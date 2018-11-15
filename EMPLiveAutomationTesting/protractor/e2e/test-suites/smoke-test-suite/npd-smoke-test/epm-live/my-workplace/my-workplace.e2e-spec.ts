@@ -1,13 +1,13 @@
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
-// import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
+import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
-// import {WaitHelper} from '../../../../../components/html/wait-helper';
+import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-/* import {AnchorHelper} from '../../../../../components/html/anchor-helper';
+import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-do.po';
 import {ToDoPageConstants} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.constants';
 import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
@@ -15,20 +15,20 @@ import {LinkPage} from '../../../../../page-objects/pages/my-workplace/link/link
 import {PicturePageConstants} from '../../../../../page-objects/pages/my-workplace/picture/picture-page.constants';
 import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.helper';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
-import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper'; */
+import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 import {EventsPageConstants} from '../../../../../page-objects/pages/my-workplace/events/events-page.constants';
 import {EventsPage} from '../../../../../page-objects/pages/my-workplace/events/events.po';
 import {EventsPageHelper} from '../../../../../page-objects/pages/my-workplace/events/events-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import { ExpectationHelper } from '../../../../../components/misc-utils/expectation-helper';
-/* import {ElementHelper} from '../../../../../components/html/element-helper';
+import {ElementHelper} from '../../../../../components/html/element-helper';
 // tslint:disable-next-line:max-line-length
 import {SharedDocumentsPageConstants} from '../../../../../page-objects/pages/my-workplace/shared-documents/shared-documents-page.constants';
 import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
 import {DiscussionsPageHelper} from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.helper';
 import {DiscussionsPage} from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
 import {DiscussionsPageConstants} from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.constants';
-import {TextboxHelper} from '../../../../../components/html/textbox-helper'; */
+import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -43,7 +43,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     afterEach(async () => {
         await StepLogger.takeScreenShot();
     });
-/*
+
     it('Create A New To Do From Workplace - [1124261]', async () => {
         StepLogger.caseId = 1124261;
         StepLogger.stepId(1);
@@ -312,7 +312,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.myWorkplace.sharedDocuments,
 
             CommonPageHelper.uniqueDocumentFilePath);
-    }); */
+    });
 
     fit('Edit Event from Workplace - [1175266]', async () => {
         StepLogger.caseId = 1175266;
@@ -354,7 +354,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementPresent(newEventTitle))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(newTitle));
     });
-/*
+
     it('Reply to a Discussion - [785614]', async () => {
         StepLogger.caseId = 785614;
 
@@ -383,5 +383,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.waitForElementToBeDisplayed(DiscussionsPage.replyBody);
         await expect(await DiscussionsPage.replyBody.getText())
             .toBe(message, ValidationsHelper.getLabelDisplayedValidation(message));
-    }); */
+    });
 });
