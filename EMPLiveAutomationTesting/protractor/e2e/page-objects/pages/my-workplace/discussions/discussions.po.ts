@@ -1,13 +1,13 @@
-import { By, element } from 'protractor';
-
-import { CommonPageHelper } from '../../common/common-page.helper';
-import { DiscussionsPageConstants } from './discussions-page.constants';
-import { HtmlHelper } from '../../../../components/misc-utils/html-helper';
-import { DiscussionsPageHelper } from './discussions-page.helper';
-import { ButtonHelper } from '../../../../components/html/button-helper';
-import { CommonPageConstants } from '../../common/common-page.constants';
-import { AnchorHelper } from '../../../../components/html/anchor-helper';
-import { SocialStreamPageConstants } from '../../settings/social-stream/social-stream-page.constants';
+import {element} from 'protractor';
+import {CommonPageHelper} from '../../common/common-page.helper';
+import {DiscussionsPageConstants} from './discussions-page.constants';
+import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
+import {DiscussionsPageHelper} from './discussions-page.helper';
+import {By} from 'selenium-webdriver';
+import {ButtonHelper} from '../../../../components/html/button-helper';
+import {CommonPageConstants} from '../../common/common-page.constants';
+import {AnchorHelper} from '../../../../components/html/anchor-helper';
+import {SocialStreamPageConstants} from '../../settings/social-stream/social-stream-page.constants';
 
 export class DiscussionsPage {
 
@@ -74,11 +74,4 @@ export class DiscussionsPage {
         return element(By.id('GanttGrid0Main'));
     }
 
-    static getDiscussionField(textValue: string) {
-        return element(By.xpath(`//td[normalize-space(.)='${textValue}']//following-sibling::td[contains(@class, GMCell)]`));
-    }
-
-    static getRowByDot(textValue: string) {
-        return element(By.xpath(`//td[normalize-space(.)='${textValue}']`));
-    }
 }

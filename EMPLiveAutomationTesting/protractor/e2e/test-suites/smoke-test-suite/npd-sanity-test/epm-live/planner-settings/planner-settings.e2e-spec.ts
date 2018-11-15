@@ -62,7 +62,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(3);
         StepLogger.step('Click on + Add New Planner button link');
-        await PageHelper.clickAndWaitForElementToHide(PlannerSettingsPageHelper.menu.menuTitles.newPlanner);
+        await PageHelper.click(PlannerSettingsPageHelper.menu.menuTitles.newPlanner);
 
         StepLogger.verification('Planner Settings page is displayed');
         await expect(await browser.getTitle()).toBe(PlannerSettingsPageConstants.plannerPage,

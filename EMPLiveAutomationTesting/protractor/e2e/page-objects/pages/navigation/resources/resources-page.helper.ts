@@ -156,7 +156,6 @@ export class ResourcesPageHelper {
     static async clickSave() {
         StepLogger.step('Click on save');
         await PageHelper.click(CommonPage.formButtons.save);
-        await PageHelper.sleepForXSec(PageHelper.timeout.s);
     }
 
     static async verifyResourceSaved(displayName: string) {
@@ -186,9 +185,9 @@ export class ResourcesPageHelper {
 
     static async clickOnEllipsis() {
         StepLogger.step('Click on Ellipsis');
-        await PageHelper.click(ResourcesPage.gridDetails.ellipses.get(0));
-        await PageHelper.sleepForXSec(PageHelper.timeout.s);
-        await PageHelper.click(CommonPage.iconEllipsisHorizontal);
+      //  await WaitHelper.waitForElementToBeDisplayed(ResourcesPage.gridDetails.ellipses.get(0));
+        await ElementHelper.actionHoverOverAndClick(ResourcesPage.gridDetails.ellipses.get(0),
+        ResourcesPage.gridDetails.ellipses.get(0));
     }
 
     static async verifyMenuItemDisplayed() {
@@ -227,7 +226,7 @@ export class ResourcesPageHelper {
 
     static async getDisplayNameInEditResourcePage() {
         StepLogger.step('Returns title of resource name');
-        const displayName = await PageHelper.getAttributeValue(ResourcesPage.inputs.displayName, HtmlHelper.attributes.value);
+        const displayName = await PageHelper.getAttributeValue(ResourcesPage.inputs.firstName, HtmlHelper.attributes.value);
         return displayName;
     }
 }

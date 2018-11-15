@@ -77,7 +77,7 @@ export class PlannerSettingsPageHelper {
         await ElementHelper.scrollToBottomOfPage();
 
         StepLogger.step('Click on Save Settings button');
-        await PageHelper.clickAndWaitForElementToHide(PlannerSettingPage.saveButton);
+        await PageHelper.click(PlannerSettingPage.saveButton);
 
         StepLogger.verification('"Planner Settings" page is closed');
         await expect(await browser.getTitle()).not.toBe(PlannerSettingsPageConstants.plannerPage,
@@ -114,7 +114,7 @@ export class PlannerSettingsPageHelper {
 
         StepLogger.step('Click on the ITEMS tab above the grid\n' +
             'From the ITEMS ribbon menu, click on Edit Plan');
-        await PageHelper.clickAndWaitForElementToHide(CommonPage.editPlan);
+        await PageHelper.click(CommonPage.editPlan);
 
         StepLogger.verification('Select Planner pop-up displays with different planner options to select');
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle)).toBe(true,
@@ -135,9 +135,11 @@ export class PlannerSettingsPageHelper {
 
         StepLogger.stepId(8);
         StepLogger.step('Select the newly added planner [Ex: Smoke Test Planner 1] in Select Planner pop up');
-        await ProjectItemPageHelper.selectPlannerIfPopUpAppears(CommonPageHelper.getSpanByText(name));
+        await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ElementHelper.getElementByText(name));
 
         StepLogger.verification('Selected Project is opened using the Newly created Planner [Ex: Smoke Test Planner 1]');
+        // After select project Planner wait required, not element found which can use with waitHelper.
+        await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
         await expect(await browser.getTitle()).toContain(projectName,
             ValidationsHelper.getDisplayedValidation(PlannerSettingsPageConstants.validation.project));
@@ -146,11 +148,12 @@ export class PlannerSettingsPageHelper {
 
         StepLogger.stepId(9);
         StepLogger.step('Click Close button in Project Planner window [Ex: Smoke Test Planner 1]');
+        await WaitHelper.waitForElementToBePresent(ProjectItemPage.close);
+        await ElementHelper.actionHoverOver(ProjectItemPage.close);
         await PageHelper.click(ProjectItemPage.close);
 
         StepLogger.stepId(10);
         StepLogger.step('Click on Leave button in the confirmation dialog');
-        await PageHelper.acceptAlert();
 
         StepLogger.verification('Project Planner window [Ex: Smoke Test Planner 1] is closed');
         await WaitHelper.waitForElementToBeClickable(CommonPage.editPlan);

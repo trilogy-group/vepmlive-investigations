@@ -1,12 +1,11 @@
-import { browser, By, element } from 'protractor';
-
-import { ProjectItemPageConstants } from './project-item-page.constants';
-import { BasePage } from '../../base-page';
-import { CommonPageHelper } from '../../common/common-page.helper';
-import { ProjectItemPageHelper } from './project-item-page.helper';
-import { CommonPageConstants } from '../../common/common-page.constants';
-import { ElementHelper } from '../../../../components/html/element-helper';
-import { CommonPage } from '../../common/common.po';
+import {browser, By, element} from 'protractor';
+import {ProjectItemPageConstants} from './project-item-page.constants';
+import {BasePage} from '../../base-page';
+import {CommonPageHelper} from '../../common/common-page.helper';
+import {ProjectItemPageHelper} from './project-item-page.helper';
+import {CommonPageConstants} from '../../common/common-page.constants';
+import {ElementHelper} from '../../../../components/html/element-helper';
+import {CommonPage} from '../../common/common.po';
 
 export class ProjectItemPage extends BasePage {
     static get inputs() {
@@ -402,9 +401,5 @@ export class ProjectItemPage extends BasePage {
 
     static get frame() {
         return element(By.css('.ms-dlgContent iframe'));
-    }
-
-    static get userInformationPopUp() {
-        return element(By.css(`div.ms-dlgTitle h1[title='${ProjectItemPageConstants.userInformation.title}']`));
     }
 }

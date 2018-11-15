@@ -15,7 +15,4 @@ export class LinkPage {
         return element(By.id('idHomePageNewLink'));
     }
 
-    static get nextButton() {
-        return element(By.css('a[title="Next"]'));
-    }
 }

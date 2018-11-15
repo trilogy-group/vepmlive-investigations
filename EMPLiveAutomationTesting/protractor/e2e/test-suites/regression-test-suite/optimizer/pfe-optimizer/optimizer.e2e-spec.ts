@@ -93,23 +93,22 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyDeleteStrategyPopup();
     });
 
-    // #REJECTED
-    // it('Verify the content of label name "Which fields will be used as filters? of Optimizer configuration screen. - [744356]',
-    //     async () => {
-    //         StepLogger.caseId = 744356;
-    //         // Step 1 is inside the below function
-    //         await CommonPageHelper.navigateToItemPageUnderNavigation(
-    //             HomePage.navigation.projects.projects,
-    //             CommonPage.pageHeaders.projects.projectsCenter,
-    //             CommonPageConstants.pageHeaders.projects.projectCenter,
-    //         );
-    //         await CommonPageHelper.verifyProjectCenterDisplayed();
-    //         // Step 2 is inside the below function
-    //         await CommonPageHelper.selectTwoRecordsFromGrid();
-    //         StepLogger.stepId(3);
-    //         await OptimizerPageHelper.gotoConfigureSection();
-    //         await OptimizerPageHelper.verifyFilterSectionLabels();
-    //     });
+    it('Verify the content of label name "Which fields will be used as filters? of Optimizer configuration screen. - [744356]',
+        async () => {
+            StepLogger.caseId = 744356;
+            // Step 1 is inside the below function
+            await CommonPageHelper.navigateToItemPageUnderNavigation(
+                HomePage.navigation.projects.projects,
+                CommonPage.pageHeaders.projects.projectsCenter,
+                CommonPageConstants.pageHeaders.projects.projectCenter,
+            );
+            await CommonPageHelper.verifyProjectCenterDisplayed();
+            // Step 2 is inside the below function
+            await CommonPageHelper.selectTwoRecordsFromGrid();
+            StepLogger.stepId(3);
+            await OptimizerPageHelper.gotoConfigureSection();
+            await OptimizerPageHelper.verifyFilterSectionLabels();
+        });
 
     it('Verify that Strategy should be Deleted.  - [744370]', async () => {
         StepLogger.caseId = 744370;
@@ -203,23 +202,22 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.clickOKonSaveViewPopup();
     });
 
-    // #REJECTED
-    // it('Verify the message display on the bottom of the Optimizer configuration page. - [744360]', async () => {
-    //     StepLogger.caseId = 744360;
-    //     // Step 1 is inside the below function
-    //     await CommonPageHelper.navigateToItemPageUnderNavigation(
-    //         HomePage.navigation.projects.projects,
-    //         CommonPage.pageHeaders.projects.projectsCenter,
-    //         CommonPageConstants.pageHeaders.projects.projectCenter,
-    //     );
-    //     await CommonPageHelper.verifyProjectCenterDisplayed();
-    //     // Step 2 is inside the below function
-    //     await CommonPageHelper.selectTwoRecordsFromGrid();
-    //     // Step 3 and 4 are inside this function
-    //     StepLogger.stepId(3);
-    //     await OptimizerPageHelper.gotoConfigureSection();
-    //     await OptimizerPageHelper.verifyMessageOnConfiguration();
-    // });
+    it('Verify the message display on the bottom of the Optimizer configuration page. - [744360]', async () => {
+        StepLogger.caseId = 744360;
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        // Step 3 and 4 are inside this function
+        StepLogger.stepId(3);
+        await OptimizerPageHelper.gotoConfigureSection();
+        await OptimizerPageHelper.verifyMessageOnConfiguration();
+    });
 
     it('Verify that Current strategy drop down. - [744372]', async () => {
         StepLogger.caseId = 744372;

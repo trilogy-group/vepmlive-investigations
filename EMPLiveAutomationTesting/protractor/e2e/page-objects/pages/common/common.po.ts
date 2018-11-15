@@ -1,5 +1,4 @@
 import { browser, By, element } from 'protractor';
-
 import { BasePage } from '../base-page';
 import { CommonPageConstants } from './common-page.constants';
 import { CommonPageHelper } from './common-page.helper';
@@ -180,7 +179,8 @@ export class CommonPage extends BasePage {
     }
 
     static get userInfoFrame() {
-        return element.all(By.css('.ms-dlgFrame')).last().getWebElement();
+        // element(By.css('.ms-dlgFrame')) never works in case of iframe
+        return browser.driver.findElement(By.css('[src*="listform"]'));
     }
 
     static get resourceGrid() {
@@ -601,6 +601,6 @@ export class CommonPage extends BasePage {
     }
 
     static get rowsFirstColumn() {
-        return element.all(By.css('tr.GMDataRow td.GMCellPanel'));
+        return element.all(By.css('tr.GMDataRow td'));
     }
 }

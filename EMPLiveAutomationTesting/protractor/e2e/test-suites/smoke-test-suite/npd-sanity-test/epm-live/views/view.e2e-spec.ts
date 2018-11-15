@@ -210,7 +210,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(3);
         StepLogger.step('Check the boxes on the right side of column to be added to the "View" and un-check columns you wish' +
             ' to exclude from the view');
-        await PageHelper.clickAndWaitForElementToHide(ProjectItemPage.selectColumnLabel.ok);
+        await PageHelper.click(ProjectItemPage.selectColumnLabel.ok);
 
         StepLogger.verification('"Select columns to display" pop up is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.actuallCostColumn))

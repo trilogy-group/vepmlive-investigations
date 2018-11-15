@@ -53,86 +53,83 @@ describe(SuiteNames.regressionTestSuite, () => {
         await ModelerPageHelper.verifyModelerPopupContent();
     });
 
-    // #REJECTED
-    // it('Verify the content of View Modeler page. - [744260]', async () => {
-    //     StepLogger.caseId = 744260;
-    //     // Step 1 is inside the below function
-    //     await CommonPageHelper.navigateToItemPageUnderNavigation(
-    //         HomePage.navigation.projects.projects,
-    //         CommonPage.pageHeaders.projects.projectsCenter,
-    //         CommonPageConstants.pageHeaders.projects.projectCenter,
-    //     );
-    //
-    //     await CommonPageHelper.verifyProjectCenterDisplayed();
-    //     // Step 2 is inside the below function
-    //     await CommonPageHelper.selectTwoRecordsFromGrid();
-    //
-    //     StepLogger.stepId(3);
-    //     await CommonPageHelper.gotoModeler();
-    //     await ModelerPageHelper.verifyModelerPopupDisplayed();
-    //
-    //     StepLogger.stepId(4);
-    //     await ModelerPageHelper.clickOkButtonOnPopup();
-    //     await ModelerPageHelper.modelerPageDisplayed();
-    //
-    //     StepLogger.stepId(5);
-    //     await ModelerPageHelper.verifyDisplayTabSelectedDefault();
-    //
-    //     StepLogger.stepId(6);
-    //     await ModelerPageHelper.clickViewTab();
-    //     await ModelerPageHelper.verifyViewTabDisplayed();
-    // });
+    it('Verify the content of View Modeler page. - [744260]', async () => {
+        StepLogger.caseId = 744260;
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+        );
 
-    // #REJECTED
-    // it('Verify the search setting button. - [744262]', async () => {
-    //     StepLogger.caseId = 744262;
-    //     // Step 1 is inside the below function
-    //     await CommonPageHelper.navigateToItemPageUnderNavigation(
-    //         HomePage.navigation.projects.projects,
-    //         CommonPage.pageHeaders.projects.projectsCenter,
-    //         CommonPageConstants.pageHeaders.projects.projectCenter,
-    //     );
-    //
-    //     await CommonPageHelper.verifyProjectCenterDisplayed();
-    //     // Step 2 is inside the below function
-    //     await CommonPageHelper.selectTwoRecordsFromGrid();
-    //
-    //     StepLogger.stepId(3);
-    //     await CommonPageHelper.gotoModeler();
-    //     await ModelerPageHelper.verifyModelerPopupDisplayed();
-    //
-    //     StepLogger.stepId(4);
-    //     await ModelerPageHelper.clickOkButtonOnPopup();
-    //     await ModelerPageHelper.modelerPageDisplayed();
-    //
-    //     StepLogger.stepId(5);
-    //     await ModelerPageHelper.clicksSearchSettings();
-    //     await ModelerPageHelper.verifySearchSettingsPopup();
-    // });
+        await CommonPageHelper.verifyProjectCenterDisplayed();
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid();
 
-    // #REJECTED
-    // it('Verify the Find next button - [744263]', async () => {
-    //     StepLogger.caseId = 744263;
-    //     // Step 1 is inside the below function
-    //     await CommonPageHelper.navigateToItemPageUnderNavigation(
-    //         HomePage.navigation.projects.projects,
-    //         CommonPage.pageHeaders.projects.projectsCenter,
-    //         CommonPageConstants.pageHeaders.projects.projectCenter,
-    //     );
-    //
-    //     await CommonPageHelper.verifyProjectCenterDisplayed();
-    //     // Step 2 is inside the below function
-    //     await CommonPageHelper.selectTwoRecordsFromGrid();
-    //
-    //     StepLogger.stepId(3);
-    //     await CommonPageHelper.gotoModeler();
-    //     await ModelerPageHelper.verifyModelerPopupDisplayed();
-    //
-    //     StepLogger.stepId(4);
-    //     await ModelerPageHelper.clickOkButtonOnPopup();
-    //     await ModelerPageHelper.modelerPageDisplayed();
-    //
-    //     StepLogger.stepId(5);
-    //     await ModelerPageHelper.verifyFindNext();
-    // });
+        StepLogger.stepId(3);
+        await CommonPageHelper.gotoModeler();
+        await ModelerPageHelper.verifyModelerPopupDisplayed();
+
+        StepLogger.stepId(4);
+        await ModelerPageHelper.clickOkButtonOnPopup();
+        await ModelerPageHelper.modelerPageDisplayed();
+
+        StepLogger.stepId(5);
+        await ModelerPageHelper.verifyDisplayTabSelectedDefault();
+
+        StepLogger.stepId(6);
+        await ModelerPageHelper.clickViewTab();
+        await ModelerPageHelper.verifyViewTabDisplayed();
+    });
+
+    it('Verify the search setting button. - [744262]', async () => {
+        StepLogger.caseId = 744262;
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+        );
+
+        await CommonPageHelper.verifyProjectCenterDisplayed();
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+
+        StepLogger.stepId(3);
+        await CommonPageHelper.gotoModeler();
+        await ModelerPageHelper.verifyModelerPopupDisplayed();
+
+        StepLogger.stepId(4);
+        await ModelerPageHelper.clickOkButtonOnPopup();
+        await ModelerPageHelper.modelerPageDisplayed();
+
+        StepLogger.stepId(5);
+        await ModelerPageHelper.clicksSearchSettings();
+        await ModelerPageHelper.verifySearchSettingsPopup();
+    });
+
+    it('Verify the Find next button - [744263]', async () => {
+        StepLogger.caseId = 744263;
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+        );
+
+        await CommonPageHelper.verifyProjectCenterDisplayed();
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+
+        StepLogger.stepId(3);
+        await CommonPageHelper.gotoModeler();
+        await ModelerPageHelper.verifyModelerPopupDisplayed();
+
+        StepLogger.stepId(4);
+        await ModelerPageHelper.clickOkButtonOnPopup();
+        await ModelerPageHelper.modelerPageDisplayed();
+
+        StepLogger.stepId(5);
+        await ModelerPageHelper.verifyFindNext();
+    });
 });

@@ -440,20 +440,16 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(4);
         StepLogger.step('Click on the "Title" link for the user name who is logged into application from the Current Team' +
             ' grid displayed on left side');
-        await WaitHelper.waitForElementToBeDisplayed(ProjectItemPageHelper.getlink.adminUser);
-        await ElementHelper.clickUsingJsNoWait(ProjectItemPageHelper.getlink.adminUser);
+        await PageHelper.click(ProjectItemPageHelper.getlink.adminUser);
         await PageHelper.switchToDefaultContent();
-        await WaitHelper.staticWait(PageHelper.timeout.xs);
 
         StepLogger.verification('User Information pop-up is displayed');
-        await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.userInformationPopUp);
         await PageHelper.switchToFrame(CommonPage.userInfoFrame);
 
         StepLogger.stepId(5);
         StepLogger.step('Click on "My Language And Region" link displayed on top of "User Information" pop-up');
         await PageHelper.click(ProjectItemPageHelper.getlink.myLanguageAndRegion);
-        await WaitHelper.staticWait(PageHelper.timeout.xs);
-        await PageHelper.switchToNewTabIfAvailable();
+        await PageHelper.switchToNewTabIfAvailable(1);
 
         StepLogger.verification('New tab is opened and "Language and Region" page is displayed');
         await expect(await browser.getTitle()).toBe(ProjectItemPageConstants.languageAndRegion,
@@ -474,4 +470,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await CommonPage.timeZone.isPresent()).toBe(false,
             ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.timeZone));
     });
+
 });

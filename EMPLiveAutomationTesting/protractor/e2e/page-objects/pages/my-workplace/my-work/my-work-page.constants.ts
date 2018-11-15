@@ -193,8 +193,7 @@ export class MyWorkPageConstants {
     static get ellipsesDropdownForItem() {
         return {
             viewItem: 'View Item',
-            deleteItem: 'Delete Item',
-            editItem: 'Edit Item'
+            deleteItem: 'Delete Item'
         };
     }
 }

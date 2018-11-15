@@ -205,8 +205,7 @@ export class ProjectItemPageConstants {
         return {
             myLanguageAndRegion: 'My Language And Region',
             editItem: 'Edit Item',
-            myAlerts: 'My Alerts',
-            title: 'User Information'
+            myAlerts: 'My Alerts'
         };
     }
 

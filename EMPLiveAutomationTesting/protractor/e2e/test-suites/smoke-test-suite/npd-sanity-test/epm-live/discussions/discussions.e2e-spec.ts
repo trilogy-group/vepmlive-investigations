@@ -1,23 +1,19 @@
-import { browser } from 'protractor';
-
-import { ElementHelper } from '../../../../../components/html/element-helper';
-import { ExpectationHelper } from '../../../../../components/misc-utils/expectation-helper';
-import { MyWorkPage } from '../../../../../page-objects/pages/my-workplace/my-work/my-work.po';
-import { SuiteNames } from '../../../../helpers/suite-names';
-import { PageHelper } from '../../../../../components/html/page-helper';
-import { StepLogger } from '../../../../../../core/logger/step-logger';
-import { CommonPage } from '../../../../../page-objects/pages/common/common.po';
-import { CommonPageHelper } from '../../../../../page-objects/pages/common/common-page.helper';
-import { MyWorkplacePage } from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
-import { CommonPageConstants } from '../../../../../page-objects/pages/common/common-page.constants';
-import { DiscussionsPageHelper } from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.helper';
-import { LoginPage } from '../../../../../page-objects/pages/login/login.po';
-import { DiscussionsPageConstants } from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.constants';
-import { ValidationsHelper } from '../../../../../components/misc-utils/validation-helper';
-import { DiscussionsPage } from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
-import { SocialStreamPageConstants } from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.constants';
-import { SocialStreamPage } from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
-import { ToDoPage } from '../../../../../page-objects/pages/my-workplace/to-do/to-do.po';
+import {browser} from 'protractor';
+import {SuiteNames} from '../../../../helpers/suite-names';
+import {PageHelper} from '../../../../../components/html/page-helper';
+import {StepLogger} from '../../../../../../core/logger/step-logger';
+import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
+import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
+import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
+import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
+import {DiscussionsPageHelper} from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.helper';
+import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import {DiscussionsPageConstants} from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.constants';
+import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
+import {DiscussionsPage} from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
+import {SocialStreamPageConstants} from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.constants';
+import {SocialStreamPage} from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
+import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-do.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -72,9 +68,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(3);
         StepLogger.step('Mouse over the Discussion created as per pre requisites that need to be ' +
             'edited Click on the Ellipses button (...) and select Edit Item from the options displayed');
-        await DiscussionsPageHelper.search(subject);
-        await ElementHelper.click(DiscussionsPage.getDiscussionField(subject));
-        await PageHelper.click(MyWorkPage.ellipsesDropdownForItem.editItem);
+        await PageHelper.click(DiscussionsPageHelper.getDiscussionField(subject));
+        await PageHelper.click(DiscussionsPage.buttonSelector.edit);
 
         StepLogger.stepId(4);
         StepLogger.step('Enter/Select below details in Edit Discussion page Subject *: Updated New Discussion 1 Body: Update ' +
@@ -89,14 +84,13 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.step('Click save button');
         await DiscussionsPageHelper.saveDiscussionForm();
 
-        await DiscussionsPageHelper.search(newSubject);
         StepLogger.verification('Updated Discussion item details subject displayed in the list');
-        await ExpectationHelper.verifyDisplayedStatus(DiscussionsPage.getDiscussionField(newSubject),
-            DiscussionsPageConstants.inputLabels.subject);
+        await expect(await PageHelper.isElementDisplayed(DiscussionsPageHelper.getDiscussionFieldSelector(newSubject).subject))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(DiscussionsPageConstants.inputLabels.subject));
 
         StepLogger.verification('Updated Discussion item details body displayed in the list');
-        await ExpectationHelper.verifyDisplayedStatus(DiscussionsPage.getRowByDot(newBody),
-            DiscussionsPageConstants.inputLabels.body);
+        await expect(await PageHelper.isElementDisplayed(DiscussionsPageHelper.getDiscussionFieldSelector(newBody).body))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(DiscussionsPageConstants.inputLabels.body));
     });
 
     it('Add Grid/Gantt web part - [785832]', async () => {

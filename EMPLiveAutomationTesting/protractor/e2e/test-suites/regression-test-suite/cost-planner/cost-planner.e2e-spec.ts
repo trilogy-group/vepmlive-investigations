@@ -8,8 +8,6 @@ import {CommonPageHelper} from '../../../page-objects/pages/common/common-page.h
 import {CommonPage} from '../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../page-objects/pages/common/common-page.constants';
 import {ProjectItemPageHelper} from '../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import {WaitHelper} from '../../../components/html/wait-helper';
-import {EditCost} from '../../../page-objects/pages/items-page/project-item/edit-cost-page/edit-cost.po';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
@@ -37,13 +35,11 @@ describe(SuiteNames.regressionTestSuite, () => {
 
         StepLogger.stepId(2);
         await EditCostHelper.clickEditCostFromContextMenu();
-        await CommonPageHelper.switchToFirstContentFrame();
-        await EditCostHelper.validateEditCostWebElements();
-        await EditCostHelper.clickCloseCostPlanner();
-        await WaitHelper.waitForElementToBeHidden(EditCost.close);
-        await PageHelper.switchToDefaultContent();
-    });
 
+        await CommonPageHelper.switchToFirstContentFrame();
+
+        await EditCostHelper.validateEditCostWebElements();
+    });
     it('Launch Cost Planner from "View Item" page for Project. - [743217]', async () => {
         StepLogger.caseId = 743217;
         StepLogger.stepId(1);
@@ -61,10 +57,9 @@ describe(SuiteNames.regressionTestSuite, () => {
 
         StepLogger.stepId(3);
         await CommonPageHelper.clickEditCost();
+
         await CommonPageHelper.switchToFirstContentFrame();
+
         await EditCostHelper.validateEditCostWebElements();
-        await EditCostHelper.clickCloseCostPlanner();
-        await WaitHelper.waitForElementToBeHidden(EditCost.close);
-        await PageHelper.switchToDefaultContent();
     });
 });

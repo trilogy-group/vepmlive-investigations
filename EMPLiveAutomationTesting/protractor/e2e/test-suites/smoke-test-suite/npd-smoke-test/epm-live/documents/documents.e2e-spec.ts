@@ -12,8 +12,6 @@ import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
 import {DocumentPageHelper} from '../../../../../page-objects/pages/documents/document-page.helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
-import {ExpectationHelper} from '../../../../../components/misc-utils/expectation-helper';
-import {WaitHelper} from '../../../../../components/html/wait-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -113,12 +111,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.verification('Project Documents page is displayed');
         await expect(await browser.getTitle()).toBe(HomePageConstants.documentPage,
             ValidationsHelper.getPageDisplayedValidation(HomePageConstants.navigationLabels.projects.documents));
-        const isDisplayed = await WaitHelper.waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.file));
-        if (!isDisplayed) {
-            await DocumentPageHelper.sortOnModified();
-        }
 
         StepLogger.verification('Project Document uploaded [Ex: Testwordfile.docx] is displayed under the Project Node');
-        await ExpectationHelper.verifyDisplayedStatus(ElementHelper.getElementByText(newFile.file), newFile.file);
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.file)))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
     });
 });

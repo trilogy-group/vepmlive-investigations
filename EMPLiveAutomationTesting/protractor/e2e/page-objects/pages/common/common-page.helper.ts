@@ -1,26 +1,26 @@
+import {browser, By, element, ElementArrayFinder, ElementFinder} from 'protractor';
+import {ComponentHelpers} from '../../../components/devfactory/component-helpers/component-helpers';
+import {HtmlHelper} from '../../../components/misc-utils/html-helper';
+import {PageHelper} from '../../../components/html/page-helper';
+import {CommonPageConstants} from './common-page.constants';
+import {WaitHelper} from '../../../components/html/wait-helper';
+import {ElementHelper} from '../../../components/html/element-helper';
+import {StepLogger} from '../../../../core/logger/step-logger';
+import {CheckboxHelper} from '../../../components/html/checkbox-helper';
+import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
+import {TextboxHelper} from '../../../components/html/textbox-helper';
+import {CommonPage} from './common.po';
 import * as path from 'path';
-import { browser, By, element, ElementArrayFinder, ElementFinder } from 'protractor';
-
-import { ComponentHelpers } from '../../../components/devfactory/component-helpers/component-helpers';
-import { HtmlHelper } from '../../../components/misc-utils/html-helper';
-import { PageHelper } from '../../../components/html/page-helper';
-import { CommonPageConstants } from './common-page.constants';
-import { WaitHelper } from '../../../components/html/wait-helper';
-import { ElementHelper } from '../../../components/html/element-helper';
-import { StepLogger } from '../../../../core/logger/step-logger';
-import { CheckboxHelper } from '../../../components/html/checkbox-helper';
-import { ValidationsHelper } from '../../../components/misc-utils/validation-helper';
-import { TextboxHelper } from '../../../components/html/textbox-helper';
-import { CommonPage } from './common.po';
-import { AnchorHelper } from '../../../components/html/anchor-helper';
-import { ProjectItemPage } from '../items-page/project-item/project-item.po';
-import { ProjectItemPageHelper } from '../items-page/project-item/project-item-page.helper';
-import { ProjectItemPageConstants } from '../items-page/project-item/project-item-page.constants';
-import { ResourceAnalyzerPageHelper } from '../resource-analyzer-page/resource-analyzer-page.helper';
-import { ResourceAnalyzerPage } from '../resource-analyzer-page/resource-analyzer-page.po';
-import { IssueItemPageHelper } from '../items-page/issue-item/issue-item-page.helper';
-import { ExpectationHelper } from '../../../components/misc-utils/expectation-helper';
-import { HomePage } from '../homepage/home.po';
+import {HomePageConstants} from '../homepage/home-page.constants';
+import {AnchorHelper} from '../../../components/html/anchor-helper';
+import {ProjectItemPage} from '../items-page/project-item/project-item.po';
+import {ProjectItemPageHelper} from '../items-page/project-item/project-item-page.helper';
+import {ProjectItemPageConstants} from '../items-page/project-item/project-item-page.constants';
+import {ResourceAnalyzerPageHelper} from '../resource-analyzer-page/resource-analyzer-page.helper';
+import {ResourceAnalyzerPage} from '../resource-analyzer-page/resource-analyzer-page.po';
+import {IssueItemPageHelper} from '../items-page/issue-item/issue-item-page.helper';
+import {ExpectationHelper} from '../../../components/misc-utils/expectation-helper';
+import {HomePage} from '../homepage/home.po';
 
 const fs = require('fs');
 
@@ -371,6 +371,8 @@ export class CommonPageHelper {
     static async viewViaItems() {
         StepLogger.stepId(2);
         StepLogger.step('Select the check box for record');
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dataRows.get(1));
+        await ElementHelper.actionHoverOver(CommonPage.dataRows.get(1));
         await PageHelper.click(CommonPage.rowsFirstColumn.get(1));
 
         StepLogger.step('Click on ITEMS on ribbon');
@@ -637,8 +639,9 @@ export class CommonPageHelper {
         await PageHelper.click(attachmentFileButton);
 
         StepLogger.verification('The popup appears with Choose Files option');
-        await ExpectationHelper.verifyText(CommonPage.dialogTitle, CommonPageConstants.attachFilePopupTitle,
-            CommonPageConstants.attachFilePopupTitle);
+        await expect(await CommonPage.dialogTitle.getText())
+            .toBe(CommonPageConstants.attachFilePopupTitle,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
         StepLogger.stepId(7);
         await CommonPageHelper.switchToContentFrame();
@@ -680,13 +683,14 @@ export class CommonPageHelper {
         await PageHelper.uploadFile(CommonPage.browseButton, newFile.fullFilePath);
 
         StepLogger.step('Click "OK" button');
-        await PageHelper.clickAndWaitForElementToHide(CommonPage.formButtons.ok);
+        await PageHelper.click(CommonPage.formButtons.ok);
 
         await PageHelper.switchToDefaultContent();
-        await WaitHelper.staticWait(PageHelper.timeout.xs);
 
         StepLogger.verification(`"${addWindowTitle}" window is closed`);
-        await ExpectationHelper.verifyNotDisplayedStatus(CommonPage.dialogTitle, addWindowTitle);
+        await expect(await CommonPage.dialogTitle.isDisplayed())
+            .toBe(false,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(addWindowTitle));
 
         StepLogger.verification(`${pageName} page is displayed`);
         await expect(await PageHelper.isElementDisplayed(page))
@@ -983,7 +987,6 @@ export class CommonPageHelper {
 
     static async clickEditResourcePlan() {
         StepLogger.step('Click on Edit Resource Plan');
-        const editLink = await CommonPageHelper.getContextMenuItemByText(CommonPageConstants.contextMenuOptions.editResource);
-        await PageHelper.click(editLink);
+        await CommonPageHelper.getContextMenuItemByText(CommonPageConstants.contextMenuOptions.editResource);
     }
 }
