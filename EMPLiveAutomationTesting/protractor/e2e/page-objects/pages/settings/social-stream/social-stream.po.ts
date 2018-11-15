@@ -97,7 +97,9 @@ export class SocialStreamPage {
         if (await SocialStreamPage.menueLink.first().isPresent() === true) {
             await PageHelper.click(SocialStreamPage.menueLink.first());
             await PageHelper.click(SocialStreamPage.delete);
-            await browser.switchTo().alert().accept();
+            // added wait for pop up to appear
+            await PageHelper.sleepForXSec(2000);
+            await PageHelper.acceptAlertIfPresent();
             // After save It need static wait(5 sec) and no element found which get change after save.
             await browser.sleep(PageHelper.timeout.m);
 

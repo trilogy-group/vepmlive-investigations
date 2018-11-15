@@ -195,9 +195,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.viewViaItems();
 
         StepLogger.verification('Verify that item is available in View page mode');
-        await expect(await CommonPage.contentTitleInViewMode.getText())
-            .toBe(titleValue,
-                ValidationsHelper.getLabelDisplayedValidation(titleValue));
+        await ExpectationHelper.verifyTextContains(CommonPage.contentTitleInViewMode, titleValue, titleValue);
     });
 
     it('Add attachment in Risk - [1176340]', async () => {

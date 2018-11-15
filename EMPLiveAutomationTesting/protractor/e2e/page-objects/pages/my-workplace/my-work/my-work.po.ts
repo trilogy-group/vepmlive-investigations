@@ -192,6 +192,7 @@ export class MyWorkPage {
         return {
             viewItem: ElementHelper.getElementByText(ellipsesDropdownForItemLabels.viewItem),
             deleteItem: ElementHelper.getElementByText(ellipsesDropdownForItemLabels.deleteItem),
+            editItem: ElementHelper.getElementByText(ellipsesDropdownForItemLabels.editItem)
         };
     }
 

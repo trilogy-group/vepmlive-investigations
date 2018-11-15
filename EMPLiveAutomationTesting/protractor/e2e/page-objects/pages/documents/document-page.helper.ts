@@ -194,4 +194,8 @@ export class DocumentPageHelper {
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 
     }
+
+    static async sortOnModified() {
+        await PageHelper.click(DocumentPage.modifiedHeaderLink);
+    }
 }
