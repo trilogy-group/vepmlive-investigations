@@ -23,12 +23,13 @@ using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
+using Microsoft.SharePoint.WebControls.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
 namespace EPMLiveWebParts.Tests.ControlTemplates.MyWork
 {
-    [TestClass]
+    [TestClass, ExcludeFromCodeCoverage]
     public class MyWorkControlTests
     {
         private const int Id = 1;
@@ -121,9 +122,11 @@ namespace EPMLiveWebParts.Tests.ControlTemplates.MyWork
 
             // Assert
             var newItemButtonLists = _privateObject.GetFieldOrProperty(FieldNewItemButtonLists);
+            var lists = newItemButtonLists.ShouldBeOfType<string>();
             this.ShouldSatisfyAllConditions(
-                () => newItemButtonLists.ShouldNotBeNull(),
-                () => newItemButtonLists.ShouldBe(DummyString));
+                () => lists.ShouldNotBeNull(),
+                () => lists.ShouldContainWithoutWhitespace($"{{Name:'{DummyString}',ListID:'{_listId.ToString().ToLower()}',UsePopUp:'False',Rollup:false}}"),
+                () => lists.ShouldContainWithoutWhitespace($"{{Name:'{OtherDummyString}',ListID:'{_listId.ToString().ToLower()}',UsePopUp:'False',Rollup:false}}"));
         }
 
         [TestMethod]
@@ -148,10 +151,12 @@ namespace EPMLiveWebParts.Tests.ControlTemplates.MyWork
         public void PageLoad_LoadGridSettings_SetsFields()
         {
             // Arrange
+            _testObject = new EPMLiveWebParts.CONTROLTEMPLATES.MyWork.MyWorkControl();
+            _testObject.UseCentralizedSettings = true;
+            _privateObject = new PrivateObject(_testObject, new PrivateType(typeof(EPMLiveWebParts.CONTROLTEMPLATES.MyWork.MyWorkControl)));
 
             // Act
             _privateObject.Invoke(MethodPageLoad, new object[] { _testObject, EventArgs.Empty });
-            //_testObject.GetType().GetMethod("LoadGridSettings", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
             // Assert
             var isNewItemIndicatorEnabled = _privateObject.GetFieldOrProperty("IsNewItemIndicatorEnabled");
@@ -183,17 +188,51 @@ namespace EPMLiveWebParts.Tests.ControlTemplates.MyWork
                 () => _testObject.GroupSeparator.ShouldBe(ThousandSeparator));
         }
 
-        //[TestMethod]
-        //public void NonCompleteQuery_()
-        //{
-        //    // Arrange
-        //    _privateObject.Invoke(MethodPageLoad, new object[] { _testObject, EventArgs.Empty });
+        [TestMethod]
+        public void NonCompleteQuery_Get_ReturnsEscapedHtml()
+        {
+            // Arrange
+            _testObject.UseCentralizedSettings = false;
+            _privateObject.SetFieldOrProperty("DaysAgoEnabled", true);
+            _privateObject.SetFieldOrProperty("DaysAfterEnabled", true);
+            _privateObject.SetFieldOrProperty("DaysAgo", 1);
+            _privateObject.SetFieldOrProperty("DaysAfter", 2);
+            _privateObject.SetFieldOrProperty("WebPartId", One);
 
-        //    // Act
-        //    var result = _privateObject.GetFieldOrProperty(FieldNonCompleteQuery);
+            // Act
+            var result = _privateObject.GetFieldOrProperty(FieldNonCompleteQuery) as string;
 
-        //    // Assert
-        //}
+            // Assert
+            result.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldContainWithoutWhitespace("&amp;lt;FieldRef Name=&amp;quot;Complete&amp;quot; /&amp;gt;"),
+                () => result.ShouldContainWithoutWhitespace("&amp;lt;Value Type=&amp;quot;Boolean&amp;quot;&amp;gt;1&amp;lt;/Value&amp;gt;"),
+                () => result.ShouldContainWithoutWhitespace("&amp;lt;FieldRef Name=&amp;quot;DueDate&amp;quot; /&amp;gt;"),
+                () => result.ShouldContainWithoutWhitespace("&amp;lt;Value IncludeTimeValue=&amp;quot;TRUE&amp;quot; Type=&amp;quot;DateTime&amp;quot;&amp;gt;"),
+                () => result.ShouldContainWithoutWhitespace("&amp;lt;CompleteItemsQuery&amp;gt;False&amp;lt;/CompleteItemsQuery&amp;gt;"),
+                () => result.ShouldContainWithoutWhitespace($"&amp;lt;WebPart ID=&amp;quot;{One}&amp;quot; /&amp;gt;"),
+                () => result.ShouldContainWithoutWhitespace("&amp;lt;DateRange From=&amp;quot;"),
+                () => result.ShouldContainWithoutWhitespace($"&amp;lt;ListId&amp;gt;{DummyString}&amp;lt;/ListId&amp;gt;"));
+        }
+
+        [TestMethod]
+        public void OnPreRender_Invoke_RegistersScripts()
+        {
+            // Arrange
+            var didRegisterStyle = false;
+            var didRegisterScript = false;
+            ShimSPPageContentManager.RegisterStyleFileString = _ => didRegisterStyle = true;
+            ShimSPPageContentManager.RegisterScriptFilePageStringBooleanBooleanStringString =
+                (a, b, c, d, e, f) => didRegisterScript = true;
+
+            // Act
+            _privateObject.Invoke("OnPreRender", new object[] { EventArgs.Empty });
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => didRegisterStyle.ShouldBeTrue(),
+                () => didRegisterScript.ShouldBeTrue());
+        }
 
         private void CreateSPContextShims()
         {
@@ -249,8 +288,6 @@ namespace EPMLiveWebParts.Tests.ControlTemplates.MyWork
                         return $"{DummyString},{OtherDummyString}";
                 }
             };
-
-            ShimGridGanttSettings.ConstructorSPList = (_, __) => { };
         }
 
         private void CreateSqlConnectionShims()
