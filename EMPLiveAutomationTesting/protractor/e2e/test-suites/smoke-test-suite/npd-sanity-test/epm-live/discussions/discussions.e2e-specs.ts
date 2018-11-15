@@ -1,8 +1,8 @@
 import { browser } from 'protractor';
 
-import { ElementHelper } from '../../../../../components/html/element-helper';
+/* import { ElementHelper } from '../../../../../components/html/element-helper';
 import { ExpectationHelper } from '../../../../../components/misc-utils/expectation-helper';
-import { MyWorkPage } from '../../../../../page-objects/pages/my-workplace/my-work/my-work.po';
+import { MyWorkPage } from '../../../../../page-objects/pages/my-workplace/my-work/my-work.po'; */
 import { SuiteNames } from '../../../../helpers/suite-names';
 import { PageHelper } from '../../../../../components/html/page-helper';
 import { StepLogger } from '../../../../../../core/logger/step-logger';
@@ -14,7 +14,7 @@ import { DiscussionsPageHelper } from '../../../../../page-objects/pages/my-work
 import { LoginPage } from '../../../../../page-objects/pages/login/login.po';
 import { DiscussionsPageConstants } from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.constants';
 import { ValidationsHelper } from '../../../../../components/misc-utils/validation-helper';
-import { DiscussionsPage } from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
+// import { DiscussionsPage } from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
 import { SocialStreamPageConstants } from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.constants';
 import { SocialStreamPage } from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
 import { ToDoPage } from '../../../../../page-objects/pages/my-workplace/to-do/to-do.po';
@@ -32,7 +32,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     afterEach(async () => {
         await StepLogger.takeScreenShot();
     });
-
+/*
     it('Navigate to Discussions page - [785609]', async () => {
         StepLogger.caseId = 785609;
         StepLogger.stepId(1);
@@ -98,7 +98,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ExpectationHelper.verifyDisplayedStatus(DiscussionsPage.getRowByDot(newBody),
             DiscussionsPageConstants.inputLabels.body);
     });
-
+ */
     it('Add Grid/Gantt web part - [785832]', async () => {
         StepLogger.caseId = 785832;
         // Delete previous created Grid/Gantt
