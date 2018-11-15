@@ -40,6 +40,7 @@ export class HomePageConstants {
             chooseFiles: 'Choose Files',
             overwriteExistingFilesLabel: 'Overwrite existing files',
             addADocumentPropertyTitle: 'Add A Document Property Title',
+            modified: 'Modified'
         };
     }
 }
