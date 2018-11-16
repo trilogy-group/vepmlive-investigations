@@ -5,16 +5,22 @@ using System.Data.Common.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
+using System.IO.Fakes;
 using System.Reflection;
 using System.Web.Fakes;
+using System.Xml;
 using EPMLiveCore.Fakes;
+using EPMLiveWorkPlanner.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
+using Microsoft.SharePoint.Client.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.SharePoint.WebControls.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
+using static EPMLiveWorkPlanner.WorkPlannerAPI;
 
 namespace EPMLiveWorkPlanner.Tests.Jobs
 {
@@ -58,6 +64,9 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
         private const string IDStringCaps = "ID";
         private const string SampleUrl = "http://www.sampleurl.com";
         private const string MoveListItemToFolderMethodName = "MoveListItemToFolder";
+        private const string SetupTaskCenterMethodName = "setupTaskCenter";
+        private const string EnsureFolderMethodName = "ensureFolder";
+        private const string StartPublishMethodName = "StartPublish";
 
         [TestInitialize]
         public void Setup()
@@ -109,6 +118,8 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             ShimSPFieldLookupValueCollection.ConstructorString = (_, __) => new ShimSPFieldLookupValueCollection();
             ShimSPFieldLookupValue.ConstructorString = (_, __) => new ShimSPFieldLookupValue();
             ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => DummyInt;
+            ShimDisabledItemEventScope.Constructor = _ => new ShimDisabledItemEventScope();
+            ShimDisabledItemEventScope.AllInstances.Dispose = _ => { };
         }
 
         private void SetupVariables()
@@ -158,7 +169,9 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
                 DefaultViewGet = () => spView,
                 ViewsGet = () => spViewCollection,
                 ContentTypesGet = () => spContentTypeCollection,
-                TitleGet = () => DummyString
+                TitleGet = () => DummyString,
+                EventReceiversGet = () => new ShimSPEventReceiverDefinitionCollection(),
+                DefaultViewUrlGet = () => SampleUrl
             };
             spListItemCollection = new ShimSPListItemCollection()
             {
@@ -242,6 +255,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             };
             spContentType = new ShimSPContentType()
             {
+                IdGet = () => default(SPContentTypeId),
                 FieldLinksGet = () => spFieldLinkCollection
             };
             spFieldLinkCollection = new ShimSPFieldLinkCollection()
@@ -278,7 +292,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             };
             ShimSqlCommand.AllInstances.ExecuteNonQuery = command =>
             {
-                if(expectedCommands.Contains(command.CommandText))
+                if (expectedCommands.Contains(command.CommandText))
                 {
                     validations += 1;
                 }
@@ -297,6 +311,186 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
 
             // Assert
             validations.ShouldBe(3);
+        }
+
+        [TestMethod]
+        public void SetupTaskCenter_WhenCalled_AddsEventReceiver()
+        {
+            // Arrange
+            var textField = new ShimSPFieldText();
+
+            spFieldCollection.ContainsFieldString = _ =>
+            {
+                validations += 1;
+                return false;
+            };
+            spFieldCollection.AddStringSPFieldTypeBoolean = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            spFieldCollection.AddSPField = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            spFieldCollection.CreateNewFieldStringString = (_, __) =>
+            {
+                validations += 1;
+                return textField;
+            };
+            spField.RequiredSetBoolean = input =>
+            {
+                if (!input)
+                {
+                    validations += 1;
+                }
+            };
+            spField.HiddenSetBoolean = input =>
+            {
+                if (input)
+                {
+                    validations += 1;
+                }
+            };
+            spField.TitleSetString = input =>
+            {
+                validations += 1;
+            };
+            spField.Update = () =>
+            {
+                validations += 1;
+            };
+            spList.Update = () =>
+            {
+                validations += 1;
+            };
+
+            ShimSPField.AllInstances.HiddenSetBoolean = (_, input) =>
+            {
+                if (input)
+                {
+                    validations += 1;
+                }
+            };
+            ShimSPField.AllInstances.RequiredSetBoolean = (_, input) =>
+            {
+                if (!input)
+                {
+                    validations += 1;
+                }
+            };
+            ShimSPField.AllInstances.Update = _ =>
+            {
+                validations += 1;
+            };
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPEventReceiverDefinition>()
+            {
+                new ShimSPEventReceiverDefinition()
+                {
+                    TypeGet = () => SPEventReceiverType.ItemAdding,
+                    ClassGet = () => DummyString
+                }
+            }.GetEnumerator();
+            ShimSPEventReceiverDefinitionCollection.AllInstances.AddSPEventReceiverTypeStringString = (_, _1, _2, _3) =>
+            {
+                validations += 1;
+            };
+
+            // Act
+            privateObject.Invoke(SetupTaskCenterMethodName, nonPublicInstance, new object[] { spList.Instance });
+
+            // Assert
+            validations.ShouldBe(19);
+        }
+
+        [TestMethod]
+        public void EnsureFolder_WhenCalled_UpdatesListItem()
+        {
+            // Arrange
+            spList.AddItemStringSPFileSystemObjectTypeString = (fullFolder, objectType, folder) =>
+            {
+                if (fullFolder.Equals(SampleUrl) && folder.Equals(DummyString))
+                {
+                    validations += 1;
+                }
+                return spListItem;
+            };
+            spListItem.ItemSetStringObject = (_, __) =>
+            {
+                validations += 1;
+            };
+            spListItem.Update = () =>
+            {
+                validations += 1;
+            };
+
+            ShimPath.GetDirectoryNameString = input => input;
+
+            // Act
+            var actual = privateObject.Invoke(EnsureFolderMethodName, nonPublicInstance, new object[] { spList.Instance, DummyString });
+
+            // Assert
+            validations.ShouldBe(4);
+        }
+
+        [TestMethod]
+        public void StartPublish_WhenCalled_PublishesTasks()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Task/>
+                    <Task/>
+                    <Task/>
+                    <Task/>
+                    <Task/>
+                </xmlcfg>";
+            var document = new XmlDocument();
+            var plannerProps = new PlannerProps();
+            var methodHit = 0;
+
+            document.LoadXml(xmlString);
+
+            spListItem.Update = () =>
+            {
+                methodHit += 1;
+                validations += 1;
+                if (methodHit.Equals(1))
+                {
+                    throw new Exception();
+                }
+            };
+
+            ShimPublishJob.AllInstances.getPrefixSPSite = (_, __) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimPublishJob.AllInstances.publishTasksXmlDocumentSPListStringHashtableStringStringWorkPlannerAPIPlannerPropsString = 
+                (_, _1, _2, _3, _4, _5, _6, _7, _8) =>
+                {
+                    validations += 1;
+                };
+
+            // Act
+            var actual = privateObject.Invoke(
+                StartPublishMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    document,
+                    spSite.Instance,
+                    spWeb.Instance,
+                    spList.Instance,
+                    spList.Instance,
+                    DummyInt.ToString(),
+                    plannerProps,
+                    DummyString
+                });
+
+            // Assert
+            validations.ShouldBe(4);
         }
     }
 }
