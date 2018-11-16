@@ -6,8 +6,6 @@ using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortfolioEngineCore.Fakes;
@@ -20,9 +18,19 @@ namespace PortfolioEngineCore.Tests.Resources
     {
         private ResourceAnalyzer resourceAnalyzer;
         private IDisposable shimsContext;
+        private PrivateObject privateObect;
         private const string DummyString = "DummyString";
         private const string BaseInfo = "<main></main>";
-        private PrivateObject privateObect;
+        private const string CB_ID = "CB_ID";
+        private const string CB_NAME = "CB_NAME";
+        private const string PRD_ID = "PRD_ID";
+        private const string PRD_NAME = "PRD_NAME";
+        private const string PRD_START_DATE = "PRD_START_DATE";
+        private const string PRD_FINISH_DATE = "PRD_FINISH_DATE";
+        private const string UINF_XML = "UINF_XML";
+        private const string VIEW_DATA = "VIEW_DATA";
+        private const string VIEW_DEFAULT = "VIEW_DEFAULT";
+        private const string SqlConnectionField = "_sqlConnection";
 
         [TestInitialize]
         public void Initialize()
@@ -31,7 +39,6 @@ namespace PortfolioEngineCore.Tests.Resources
             SetupShims();
             resourceAnalyzer = new ResourceAnalyzer(BaseInfo);
             privateObect = new PrivateObject(resourceAnalyzer);
-
         }
 
         [TestCleanup]
@@ -42,14 +49,12 @@ namespace PortfolioEngineCore.Tests.Resources
 
         private void SetupShims()
         {
-            //ShimPFEBase.ConstructorStringSecurityLevelsBoolean = (_, baseInfo, level, debug) => { };
-            //ShimPFEBase.ConstructorStringStringStringStringStringSecurityLevelsBoolean =
-            //    (_, basePath, username, pid, company, db, level, debug) => { };
-            //ShimCstruct
             ShimActivation.ConstructorDebugger = (_, debugger) => { };
-            ShimActivation.AllInstances.checkActivationStringStringString = (_, basePath, pid, company) => { };
+            ShimActivation.AllInstances.checkActivationStringStringString = 
+                (_, basePath, pid, company) => { };
             ShimDatabase.ConstructorDebugger = (_, debugger) => { };
-            ShimDatabase.AllInstances.OpenDatabaseStringString = (_, path, pid) => new SqlConnection();
+            ShimDatabase.AllInstances.OpenDatabaseStringString = 
+                (_, path, pid) => new SqlConnection();
             ShimSqlConnection.AllInstances.Open = _ => { };
             ShimSqlConnection.AllInstances.Close = _ => { };
             ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
@@ -59,19 +64,17 @@ namespace PortfolioEngineCore.Tests.Resources
             ShimDBAccess.ConstructorStringSqlConnection = (_, connectionString, connection) => { };
             ShimSqlDataReader.AllInstances.ItemGetString = (_, name) => DBNull.Value;
             ShimBaseSecurity.ConstructorDebuggerSqlConnection = (_, debugger, connection) => { };
-            ShimBaseSecurity.AllInstances.ChecksScurityStringSecurityLevels = (_, username, level) => true;
+            ShimBaseSecurity.AllInstances.ChecksScurityStringSecurityLevels = 
+                (_, username, level) => true;
         }
 
         [TestMethod]
         public void ConstructorBaseInfo_Should_ExecutesCorrectly()
         {
-            // Arrange
-            var baseInfo = "<main></main>";
-
-            // Act
-            var instance = new ResourceAnalyzer(baseInfo);
+            // Arrange, Act
+            var instance = new ResourceAnalyzer(BaseInfo);
             privateObect = new PrivateObject(instance);
-            var connection = privateObect.GetFieldOrProperty("_sqlConnection") as SqlConnection;
+            var connection = privateObect.GetFieldOrProperty(SqlConnectionField) as SqlConnection;
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -83,14 +86,19 @@ namespace PortfolioEngineCore.Tests.Resources
         public void Constructor_Should_ExecutesCorrectly()
         {
             // Arrange
-            var baseInfo = "<main></main>";
             ShimUtilities.ResolveNTNameintoWResIDSqlConnectionString = (sqlConnection, username) => 1;
 
             // Act
-            var instance = new ResourceAnalyzer(baseInfo, DummyString, DummyString, DummyString, 
-                DummyString, SecurityLevels.AdminCalc, true);
+            var instance = new ResourceAnalyzer(
+                BaseInfo, 
+                DummyString, 
+                DummyString, 
+                DummyString, 
+                DummyString, 
+                SecurityLevels.AdminCalc,
+                true);
             privateObect = new PrivateObject(instance);
-            var connection = privateObect.GetFieldOrProperty("_sqlConnection") as SqlConnection;
+            var connection = privateObect.GetFieldOrProperty(SqlConnectionField) as SqlConnection;
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -295,7 +303,6 @@ namespace PortfolioEngineCore.Tests.Resources
                 () => reply.ShouldBe(BaseInfo));
         }
 
-
         [TestMethod]
         public void GetResourceAnalyzerViewsXML_Should_ExecuteCorrectly()
         {
@@ -307,8 +314,8 @@ namespace PortfolioEngineCore.Tests.Resources
                 Read = () => ++count <= 1,
                 ItemGetString = GetValue(new Hashtable
                 {
-                    ["VIEW_DATA"] = BaseInfo,
-                    ["VIEW_DEFAULT"] = true
+                    [VIEW_DATA] = BaseInfo,
+                    [VIEW_DEFAULT] = true
                 })
             };
 
@@ -331,7 +338,7 @@ namespace PortfolioEngineCore.Tests.Resources
                 Read = () => ++count <= 1,
                 ItemGetString = GetValue(new Hashtable
                 {
-                    ["UINF_XML"] = string.Empty
+                    [UINF_XML] = string.Empty
                 })
             };
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
@@ -341,6 +348,98 @@ namespace PortfolioEngineCore.Tests.Resources
 
             // Assert
             result.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void GetResourceAnalyzerUserCalendarSettingsXML_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            const int Id = 16;
+            var reply = string.Empty;
+            var count = 0;
+            var expectedValue = $"<LastUserData lastCalID=\"{Id}\" lastStartPerID=\"{Id}\" lastFinishPerID=\"{Id}\" />";
+            ShimSecurity.CheckUserGlobalPermissionDBAccessInt32GlobalPermissionsEnum = (dba, id, permissions) => true;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () =>
+                {
+                    if (++count <= 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        count = 0;
+                        return false;
+                    }
+                },
+                ItemGetString = GetValue(new Hashtable
+                {
+                    [CB_ID] = Id,
+                    [CB_NAME] = DummyString,
+                    [PRD_ID] = Id,
+                    [PRD_NAME] = DummyString,
+                    [PRD_START_DATE] = DateTime.Now.AddDays(-1),
+                    [PRD_FINISH_DATE] = DateTime.Now.AddDays(1),
+                })
+            };
+
+            // Act
+            var result = resourceAnalyzer.GetResourceAnalyzerUserCalendarSettingsXML(out reply);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldBeTrue(),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContain(expectedValue));
+        }
+
+        [TestMethod]
+        public void GetResourceAnalyzerUserCalendarSettingsXML_WithInfXml_ExecutesCorrectly()
+        {
+            // Arrange
+            const int Id = 16;
+            var reply = string.Empty;
+            var count = 0;
+            var expectedValue = $"<LastUserData lastCalID=\"{Id}\" lastStartPerID=\"{Id}\" lastFinishPerID=\"{Id}\" />";
+            ShimSecurity.CheckUserGlobalPermissionDBAccessInt32GlobalPermissionsEnum = (dba, id, permissions) => true;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () =>
+                {
+                    if (++count <= 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        count = 0;
+                        return false;
+                    }
+                },
+                ItemGetString = GetValue(new Hashtable
+                {
+                    [CB_ID] = Id,
+                    [CB_NAME] = DummyString,
+                    [PRD_ID] = Id,
+                    [PRD_NAME] = DummyString,
+                    [PRD_START_DATE] = DateTime.Now.AddDays(-1),
+                    [PRD_FINISH_DATE] = DateTime.Now.AddDays(1),
+                    [UINF_XML] = BaseInfo
+                })
+            };
+            ShimCStruct.AllInstances.GetSubStructString = (_, name) => new CStruct();
+            ShimCStruct.AllInstances.GetIntString = (_, name) => Id;
+            ShimCStruct.AllInstances.GetSubStructString = (_, name) => new CStruct();
+
+            // Act
+            var result = resourceAnalyzer.GetResourceAnalyzerUserCalendarSettingsXML(out reply);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldBeTrue(),
+                () => reply.ShouldNotBeNullOrEmpty(),
+                () => reply.ShouldContain(expectedValue));
         }
 
         private FakesDelegates.Func<string, object> GetValue(Hashtable hashtable)
