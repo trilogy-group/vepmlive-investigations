@@ -439,3 +439,6 @@ Rename-Item -Path "$SourcesDirectory\InstallShield\WorkEngine5\Product Configura
 
 Stop-Process -Name MSBuild -Force -ErrorAction SilentlyContinue  
 
+Write-Host 'Done building installer'
+
+
