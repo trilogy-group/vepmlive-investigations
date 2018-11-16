@@ -433,7 +433,7 @@ if (!$SkipInstallShield)
 {
 #Run Installshield project to generate product .exe
 $setupProcess = Start-Process -PassThru -Wait -FilePath "C:\Program Files (x86)\InstallShield\2015\System\IsCmdBld.exe" -ArgumentList "-p \"$SourcesDirectory\InstallShield\WorkEngine5\WorkEngine5.ism\" -y $NewReleaseNumber -a \"Product Configuration 1\" -r \"PrimaryRelease\" -l PATH_TO_BUILDDDEPENDENC_FILES=\"$BuildDependenciesFolder\" -l PATH_TO_PRODUCTOUTPUT_FILES=\"$ProductOutput\""
-If($setupProcess.Exitcode -ne 0) {      Write-Host 'An error occurred generating setup file; by passing' } ; \
+If($setupProcess.Exitcode -ne 0) {      Write-Host 'An error occurred generating setup file; by passing' } 
 Rename-Item -Path "$SourcesDirectory\InstallShield\WorkEngine5\Product Configuration 1\PrimaryRelease\DiskImages\DISK1\Setup.exe" -NewName "WorkEngine$NewReleaseNumber.exe"
 }
 
