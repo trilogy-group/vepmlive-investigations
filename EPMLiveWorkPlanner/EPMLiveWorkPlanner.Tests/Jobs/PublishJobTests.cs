@@ -9,12 +9,12 @@ using System.IO.Fakes;
 using System.Reflection;
 using System.Web.Fakes;
 using System.Xml;
+using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveWorkPlanner.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
-using Microsoft.SharePoint.Client.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.SharePoint.WebControls.Fakes;
@@ -67,6 +67,12 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
         private const string SetupTaskCenterMethodName = "setupTaskCenter";
         private const string EnsureFolderMethodName = "ensureFolder";
         private const string StartPublishMethodName = "StartPublish";
+        private const string ExecuteMethodName = "execute";
+        private const string UserIdFieldName = "userid";
+        private const string KeyFieldName = "key";
+        private const string ErrorBooleanFieldName = "bErrors";
+        private const string ErrorStringFieldName = "sErrors";
+        private const string TotalCountFieldName = "totalCount";
 
         [TestInitialize]
         public void Setup()
@@ -120,6 +126,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => DummyInt;
             ShimDisabledItemEventScope.Constructor = _ => new ShimDisabledItemEventScope();
             ShimDisabledItemEventScope.AllInstances.Dispose = _ => { };
+            ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => spUser;
         }
 
         private void SetupVariables()
@@ -138,7 +145,8 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
                 GetFileString = _ => spFile,
                 FoldersGet = () => spFolderCollection,
                 CurrentUserGet = () => spUser,
-                ServerRelativeUrlGet = () => SampleUrl
+                ServerRelativeUrlGet = () => SampleUrl,
+                AllUsersGet = () => new ShimSPUserCollection()
             };
             spSite = new ShimSPSite()
             {
@@ -187,7 +195,8 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
                 ItemSetGuidObject = (_, __) => { },
                 Update = () => { },
                 FileGet = () => spFile,
-                ParentListGet = () => spList
+                ParentListGet = () => spList,
+                NameGet = () => DummyString
             };
             spFieldCollection = new ShimSPFieldCollection()
             {
@@ -467,7 +476,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
                 validations += 1;
                 return DummyString;
             };
-            ShimPublishJob.AllInstances.publishTasksXmlDocumentSPListStringHashtableStringStringWorkPlannerAPIPlannerPropsString = 
+            ShimPublishJob.AllInstances.publishTasksXmlDocumentSPListStringHashtableStringStringWorkPlannerAPIPlannerPropsString =
                 (_, _1, _2, _3, _4, _5, _6, _7, _8) =>
                 {
                     validations += 1;
@@ -488,9 +497,92 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
                     plannerProps,
                     DummyString
                 });
+            var totalCount = (float)privateObject.GetFieldOrProperty(TotalCountFieldName, nonPublicInstance);
 
             // Assert
-            validations.ShouldBe(4);
+            validations.ShouldSatisfyAllConditions(
+                () => totalCount.ShouldBe(5),
+                () => validations.ShouldBe(4));
+        }
+
+        [TestMethod]
+        public void Execute_UserIdzero_Enqueues()
+        {
+            // Arrange
+            const string key = "msproject";
+            var id = $"1.{guid}.{DummyInt}";
+            var data = $@"<xmlcfg Key=""{key}"" ID=""{id}""/>";
+            var fieldMappings = $"{DummyString},{DummyString}";
+            var expectedErrorMessage = $"Error Publishing: {DummyString}";
+            var plannerProps = new PlannerProps()
+            {
+                sListTaskCenter = string.Empty,
+                sProjectField = string.Empty,
+                sFieldMappings = fieldMappings
+            };
+
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_, __) =>
+            {
+                validations += 1;
+                return plannerProps;
+            };
+            ShimPublishJob.AllInstances.setupProjectCenterSPList = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimPublishJob.AllInstances.setupTaskCenterSPList = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimPublishJob.AllInstances.StartPublishXmlDocumentSPSiteSPWebSPListSPListStringWorkPlannerAPIPlannerPropsString =
+                (_, _1, _2, _3, _4, _5, _6, _7, _8) =>
+                {
+                    validations += 1;
+                };
+            ShimTimer.AddTimerJobGuidGuidGuidInt32StringInt32StringStringInt32Int32String =
+                (_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11) =>
+                {
+                    validations += 1;
+                    return guid;
+                };
+            ShimTimer.EnqueueGuidInt32SPSite =
+                (_1, _2, _3) =>
+                {
+                    validations += 1;
+                    throw new Exception(DummyString);
+                };
+            ShimAPIEmail.QueueItemMessageInt32BooleanHashtableStringArrayStringArrayBooleanBooleanSPWebSPUserBoolean =
+                (_1, _2, _3, _4, _5, _6, _7, _8, _9, _10) =>
+                {
+                    validations += 1;
+                };
+            ShimPublishJob.AllInstances.FormatPFEWorkJobXmlXmlDocument = (_, __) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            privateObject.SetFieldOrProperty(UserIdFieldName, publicInstance, 0);
+            privateObject.SetFieldOrProperty(KeyFieldName, publicInstance, key);
+
+            // Act
+            privateObject.Invoke(
+                ExecuteMethodName,
+                publicInstance,
+                new object[]
+                {
+                    spSite.Instance,
+                    spWeb.Instance,
+                    data
+                });
+            var isError = (bool)privateObject.GetFieldOrProperty(ErrorBooleanFieldName, publicInstance);
+            var errorMessage = (string)privateObject.GetFieldOrProperty(ErrorStringFieldName, publicInstance);
+
+            // Assert
+            validations.ShouldSatisfyAllConditions(
+                () => isError.ShouldBeTrue(),
+                () => errorMessage.ShouldBe(expectedErrorMessage),
+                () => validations.ShouldBe(8));
         }
     }
 }
