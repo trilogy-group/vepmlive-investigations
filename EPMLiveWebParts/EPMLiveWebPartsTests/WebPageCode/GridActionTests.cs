@@ -562,7 +562,6 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         public void PageLoad_ActionCreateWorkspace_ExecutesCorrectly()
         {
             // Arrange
-            //const string ExpectedValue = "Unknown Action";
             var expectedUrl = $"{DummyUrl}_layouts/epmlive/requestworkspace.aspx?id={DummyId}&list={DummyId}";
             var redirectUrl = string.Empty;
             ShimHttpRequest.AllInstances.ItemGetString = GetItem(new Dictionary<string, string>
@@ -579,7 +578,6 @@ namespace EPMLiveWebParts.Tests.WebPageCode
 
             // Act
             privateObject.Invoke(PageLoadMethodName, new object(), EventArgs.Empty);
-            //var data = privateObject.GetFieldOrProperty("data") as string;
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -591,7 +589,6 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         public void PageLoad_ActionEpkMultiPage_ExecutesCorrectly()
         {
             // Arrange
-            //const string ExpectedValue = "Unknown Action";
             var expectedUrl = $"{DummyUrl}_layouts/ppm/{DummyString}.aspx?dataid={DummyId}&epkurl={HttpUtility.UrlEncode(DummyUrl)}&view={DummyString}";
             var redirectUrl = string.Empty;
             ShimHttpRequest.AllInstances.ItemGetString = GetItem(new Dictionary<string, string>
@@ -619,7 +616,6 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         public void PageLoad_ActionEpkSinglePage_ExecutesCorrectly()
         {
             // Arrange
-            //const string ExpectedValue = "Unknown Action";
             var expectedUrl = $"{DummyUrl}_layouts/ppm/{DummyString}.aspx?itemid={DummyId}&listid={DummyId}";
             var redirectUrl = string.Empty;
             ShimHttpRequest.AllInstances.ItemGetString = GetItem(new Dictionary<string, string>
