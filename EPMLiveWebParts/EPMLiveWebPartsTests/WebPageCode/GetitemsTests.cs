@@ -22,6 +22,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         private const int Id = 1;
         private const string One = "1";
         private const string DummyString = "DummyString";
+        private const string DescriptionIndicator = "Indicator";
         private const string ExampleUrl = "http://example.com";
         private const string MethodPageLoad = "Page_Load";
         private const string FieldData = "data";
@@ -106,7 +107,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             // Arrange
             _fieldXml = "<field ResultType='Text'></field>";
             ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Calculated;
-            ShimSPField.AllInstances.DescriptionGet = _ => "Indicator";
+            ShimSPField.AllInstances.DescriptionGet = _ => DescriptionIndicator;
 
             // Act
             _privateObject.Invoke(MethodPageLoad, new object[] { _testObject, EventArgs.Empty });
@@ -134,7 +135,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             _fieldXml = "<field ResultType='Currency'></field>";
             _value = One;
             ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Calculated;
-            ShimSPField.AllInstances.DescriptionGet = _ => "Indicator";
+            ShimSPField.AllInstances.DescriptionGet = _ => DescriptionIndicator;
 
             // Act
             _privateObject.Invoke(MethodPageLoad, new object[] { _testObject, EventArgs.Empty });
@@ -163,7 +164,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             _fieldXml = $"<field ResultType='Number' Decimals='{One}'></field>";
             _value = One;
             ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Calculated;
-            ShimSPField.AllInstances.DescriptionGet = _ => "Indicator";
+            ShimSPField.AllInstances.DescriptionGet = _ => DescriptionIndicator;
 
             // Act
             _privateObject.Invoke(MethodPageLoad, new object[] { _testObject, EventArgs.Empty });
@@ -277,7 +278,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
                     ItemGetString = __ => list
                 },
             };
-            ShimSPField.AllInstances.DescriptionGet = _ => "Indicator";
+            ShimSPField.AllInstances.DescriptionGet = _ => DescriptionIndicator;
             ShimSPListItem.AllInstances.FieldsGet = _ => fields;
             ShimSPList.AllInstances.FieldsGet = _ => fields;
             ShimSPList.AllInstances.ParentWebGet = _ => web;
