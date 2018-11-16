@@ -102,6 +102,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             ShimHttpUtility.HtmlEncodeString = input => input;
             ShimSPSite.ConstructorString = (_, __) => new ShimSPSite();
             ShimSPSite.ConstructorGuid = (_, __) => new ShimSPSite();
+            ShimSPSite.ConstructorGuidSPUserToken = (_, _1, _2) => new ShimSPSite();
             ShimSPSite.AllInstances.OpenWeb = _ => spWeb;
             ShimSPSite.AllInstances.OpenWebString = (_, __) => spWeb;
             ShimSPSite.AllInstances.OpenWebGuid = (_, __) => spWeb;
@@ -146,7 +147,8 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
                 FoldersGet = () => spFolderCollection,
                 CurrentUserGet = () => spUser,
                 ServerRelativeUrlGet = () => SampleUrl,
-                AllUsersGet = () => new ShimSPUserCollection()
+                AllUsersGet = () => new ShimSPUserCollection(),
+                SiteUsersGet = () => new ShimSPUserCollection(),
             };
             spSite = new ShimSPSite()
             {
@@ -218,7 +220,8 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             spUser = new ShimSPUser()
             {
                 IDGet = () => DummyInt,
-                IsSiteAdminGet = () => true
+                IsSiteAdminGet = () => true,
+                UserTokenGet = () => new ShimSPUserToken()
             };
             spFolderCollection = new ShimSPFolderCollection()
             {
@@ -563,6 +566,86 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             };
 
             privateObject.SetFieldOrProperty(UserIdFieldName, publicInstance, 0);
+            privateObject.SetFieldOrProperty(KeyFieldName, publicInstance, key);
+
+            // Act
+            privateObject.Invoke(
+                ExecuteMethodName,
+                publicInstance,
+                new object[]
+                {
+                    spSite.Instance,
+                    spWeb.Instance,
+                    data
+                });
+            var isError = (bool)privateObject.GetFieldOrProperty(ErrorBooleanFieldName, publicInstance);
+            var errorMessage = (string)privateObject.GetFieldOrProperty(ErrorStringFieldName, publicInstance);
+
+            // Assert
+            validations.ShouldSatisfyAllConditions(
+                () => isError.ShouldBeTrue(),
+                () => errorMessage.ShouldBe(expectedErrorMessage),
+                () => validations.ShouldBe(8));
+        }
+
+        [TestMethod]
+        public void Execute_UserIdNotzero_Enqueues()
+        {
+            // Arrange
+            const string key = "msproject";
+            var id = $"1.{guid}.{DummyInt}";
+            var data = $@"<xmlcfg Key=""{key}"" ID=""{id}""/>";
+            var fieldMappings = $"{DummyString},{DummyString}";
+            var expectedErrorMessage = $"Error Publishing: {DummyString}";
+            var plannerProps = new PlannerProps()
+            {
+                sListTaskCenter = string.Empty,
+                sProjectField = string.Empty,
+                sFieldMappings = fieldMappings
+            };
+
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_, __) =>
+            {
+                validations += 1;
+                return plannerProps;
+            };
+            ShimPublishJob.AllInstances.setupProjectCenterSPList = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimPublishJob.AllInstances.setupTaskCenterSPList = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimPublishJob.AllInstances.StartPublishXmlDocumentSPSiteSPWebSPListSPListStringWorkPlannerAPIPlannerPropsString =
+                (_, _1, _2, _3, _4, _5, _6, _7, _8) =>
+                {
+                    validations += 1;
+                };
+            ShimTimer.AddTimerJobGuidGuidGuidInt32StringInt32StringStringInt32Int32String =
+                (_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11) =>
+                {
+                    validations += 1;
+                    return guid;
+                };
+            ShimTimer.EnqueueGuidInt32SPSite =
+                (_1, _2, _3) =>
+                {
+                    validations += 1;
+                    throw new Exception(DummyString);
+                };
+            ShimAPIEmail.QueueItemMessageInt32BooleanHashtableStringArrayStringArrayBooleanBooleanSPWebSPUserBoolean =
+                (_1, _2, _3, _4, _5, _6, _7, _8, _9, _10) =>
+                {
+                    validations += 1;
+                };
+            ShimPublishJob.AllInstances.FormatPFEWorkJobXmlXmlDocument = (_, __) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            privateObject.SetFieldOrProperty(UserIdFieldName, publicInstance, One);
             privateObject.SetFieldOrProperty(KeyFieldName, publicInstance, key);
 
             // Act
