@@ -102,7 +102,7 @@ export class MyWorkPageHelper {
     }
 
     static async verifyMyWorkPageDisplayed() {
-        StepLogger.verification(`verify "My Work"  page is displayed`);
+        StepLogger.subVerification(`verify "My Work"  page is displayed`);
         const panelHeadingDisplayed = await PageHelper.isElementDisplayed(
             CommonPage.pageHeaders.myWorkplace.myWork);
         await expect(panelHeadingDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
@@ -576,9 +576,11 @@ export class MyWorkPageHelper {
         await PageHelper.click(MyWorkPage.viewsPopup.cancel);
     }
 
-    static async verifyViewName(currentView: string) {
+    static async verifyViewName(currentView: string, toClickOnAnyItem = true) {
         await browser.sleep(PageHelper.timeout.s);
-        await this.clickOnAnyCreatedItem();
+        if (toClickOnAnyItem) {
+            await this.clickOnAnyCreatedItem();
+        }
         await ExpectationHelper.verifyText(
             MyWorkPage.getCurrentView,
             MyWorkPageConstants.currentView,
@@ -590,21 +592,24 @@ export class MyWorkPageHelper {
         StepLogger.step('Select some other view apart from Default view ');
         await this.clickViewsTab(false);
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
-        const isOpened = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.selectViewNameOtherThanDefault, PageHelper.timeout.s);
+        const isOpened = await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.secondItemInViewsDropdown, PageHelper.timeout.s);
         if (!isOpened) {
             await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
-            await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.selectViewNameOtherThanDefault);
+            await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.secondItemInViewsDropdown);
         }
-        await PageHelper.click(MyWorkPage.selectViewNameOtherThanDefault);
+        await PageHelper.click(MyWorkPage.secondItemInViewsDropdown);
         // sometimes - stale exception
         await browser.sleep(PageHelper.timeout.s);
-        await this.clickViewsTab();
+        await PageHelper.click(MyWorkPage.searchItem);
+        await this.clickViewsTab(false);
         const viewName = PageHelper.getText(MyWorkPage.getCurrentView);
         return viewName;
     }
 
-    static async clickRenameView() {
-        await this.clickOnAnyCreatedItem();
+    static async clickRenameView(toClickOnAnyItem = true) {
+        if (toClickOnAnyItem) {
+            await this.clickOnAnyCreatedItem();
+        }
         StepLogger.step('click on Rename view');
         await ElementHelper.clickUsingJsNoWait(MyWorkPage.getViewRibbonOptions.renameView);
     }
@@ -635,7 +640,6 @@ export class MyWorkPageHelper {
         if (!isPresent) {
             await this.clickViewsTab();
         }
-        await PageHelper.click(MyWorkPage.getViewRibbonOptions.deleteView);
         const alertOpened  = await PageHelper.waitForAlertToBePresent(PageHelper.timeout.xl);
         if (!alertOpened) {
             try {
@@ -954,9 +958,18 @@ export class MyWorkPageHelper {
 
     static async selectDefaultView() {
         StepLogger.step('Select Default View');
+        await this.clickViewsTab(false);
+
+        const defaultView = MyWorkPage.getCurrentViewByName(MyWorkPageConstants.defaultViewLabel);
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
+        const isOpened = await WaitHelper.waitForElementToBeDisplayed(defaultView, PageHelper.timeout.s);
+        if (!isOpened) {
+            await PageHelper.click(MyWorkPage.getViewRibbonOptions.currentViewDropdown);
+            await WaitHelper.waitForElementToBeDisplayed(defaultView);
+        }
+
         await browser.sleep(PageHelper.timeout.xs);
-        await ElementHelper.clickUsingJsNoWait(MyWorkPage.getCurrentViewByName(MyWorkPageConstants.defaultViewLabel));
+        await ElementHelper.clickUsingJsNoWait(defaultView);
     }
 
     static async verifyDeleletViewMessageForDefaultView() {
@@ -989,6 +1002,7 @@ export class MyWorkPageHelper {
 
     static async clickOnShowFilters() {
         StepLogger.step('Click on Show Filters button.');
+        await this.clickViewsTab(false);
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.showFilters);
     }
 
@@ -1014,8 +1028,13 @@ export class MyWorkPageHelper {
     }
 
     static async clickOnAnyColumnHeader() {
-        StepLogger.step('Click on any of the column header.');
-        await PageHelper.click(MyWorkPage.gridDetails.workTypeHeader);
+        await PageHelper.click(MyWorkPage.selectRibbonTabs.hide);
+        await PageHelper.sleepForXSec(PageHelper.timeout.s);
+        await this.clickViewsTab(false);
+
+        StepLogger.subStep('Click on any of the column header.');
+        await PageHelper.sleepForXSec(PageHelper.timeout.s);
+        await PageHelper.click(MyWorkPage.gridDetails.workTypeColumnHeader('Work Type'));
     }
 
     static async verifyColumnSortedDisplayed() {

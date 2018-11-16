@@ -255,17 +255,16 @@ export class CommonPageHelper {
                                                     pageHeader: ElementFinder,
                                                     pageName: string
     ) {
-        StepLogger.step('Select "My Workplace" icon  from left side menu');
+        StepLogger.subStep('Select "My Workplace" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.myWorkplace);
-        StepLogger.stepId(2);
         await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader);
     }
 
     static async navigateToSubPage(pageName: string, linkOfThePage: ElementFinder, pageHeader: ElementFinder) {
-        StepLogger.step(`Select Project -> ${pageName} from the left side menu options displayed`);
+        StepLogger.subStep(`Select Project -> ${pageName} from the left side menu options displayed`);
         await PageHelper.click(linkOfThePage);
 
-        StepLogger.verification(`${pageName} page is displayed`);
+        StepLogger.subVerification(`${pageName} page is displayed`);
         await expect(await PageHelper.isElementDisplayed(pageHeader, true))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(pageName));

@@ -13,6 +13,7 @@ describe(SuiteNames.endToEndSuite, () => {
         StepLogger.preCondition('User should be on "My Work" page.');
         await MyWorkPageHelper.navigateToMyWork();
         await MyWorkPageHelper.verifyMyWorkPageDisplayed();
+        await PageHelper.sleepForXSec(PageHelper.timeout.s);
     });
 
     afterEach(async () => {
@@ -63,7 +64,6 @@ describe(SuiteNames.endToEndSuite, () => {
         StepLogger.caseId = 745115;
 
         StepLogger.stepId(1);
-        await MyWorkPageHelper.clickViewsTab();
         await MyWorkPageHelper.clickOnAnyColumnHeader();
         await MyWorkPageHelper.verifyColumnSortedDisplayed();
 

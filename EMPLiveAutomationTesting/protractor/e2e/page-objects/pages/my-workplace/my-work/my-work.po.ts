@@ -178,6 +178,10 @@ export class MyWorkPage {
         return element(By.xpath('//div[text()="Personal Views"]/following-sibling::ul[1]'));
     }
 
+    static get secondItemInViewsDropdown() {
+        return element.all(By.xpath(`//li[@class='ms-cui-menusection-items'][2]`)).get(0);
+    }
+
     static get headerOptions() {
         const headerOptionLabels = MyWorkPageConstants.headerOptions;
         return {
@@ -233,6 +237,7 @@ export class MyWorkPage {
             filter: element(By.css(`.${gridLabels.filter}`)),
             workTypeFilter: element(By.css(`.${gridLabels.workType}.${gridLabels.filter}`)),
             workTypeHeader: element(By.css(`.${gridLabels.workType}.${gridLabels.header}`)),
+            workTypeColumnHeader: (label: string) => element(By.cssContainingText(`td.${gridLabels.workType}`, label)),
             sorted: element(By.css(`.${gridLabels.workType} + td > u.${gridLabels.sorted}`)),
             scroll: element(By.css(`.${gridLabels.scroll}`)),
             workTypeValues: element.all(By.css(`.${gridLabels.workType}.${gridLabels.cell}>div`)),

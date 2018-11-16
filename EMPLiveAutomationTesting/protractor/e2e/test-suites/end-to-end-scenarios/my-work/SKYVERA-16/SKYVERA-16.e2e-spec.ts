@@ -89,13 +89,13 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.stepId(4);
         const currentViewName = await MyWorkPageHelper.selectViewFromCurrentView();
-        await MyWorkPageHelper.clickRenameView();
+        await MyWorkPageHelper.clickRenameView(false);
         await MyWorkPageHelper.verifyRenameViewDisplayed();
 
         StepLogger.stepId(5);
         await MyWorkPageHelper.enterNewName();
         await MyWorkPageHelper.clickCancelButtonViewsPopup();
-        await MyWorkPageHelper.verifyViewName(currentViewName);
+        await MyWorkPageHelper.verifyViewName(currentViewName, false);
     });
 
     it('Delete View. - [745109]', async () => {
@@ -122,6 +122,7 @@ describe(SuiteNames.endToEndSuite, () => {
         StepLogger.caseId = 745110;
 
         StepLogger.stepId(1);
+        await PageHelper.switchToDefaultContent();
         await MyWorkPageHelper.clickViewsTab();
         await MyWorkPageHelper.verifyViewRibbonDisplayed();
 
@@ -131,6 +132,6 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.stepId(3);
         await MyWorkPageHelper.dismissDeletePopup();
-        await MyWorkPageHelper.verifyViewName(currentViewName);
+        await MyWorkPageHelper.verifyViewName(currentViewName, false);
     });
 });
