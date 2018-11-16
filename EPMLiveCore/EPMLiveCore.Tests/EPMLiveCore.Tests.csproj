@@ -260,7 +260,6 @@
     <Compile Include="Layouts\epmlive\TimerSettingsRemTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsTests.cs" />
     <Compile Include="Layouts\epmlive\Upgraders\WE432UpgraderTests.cs" />
-    <Compile Include="Layouts\epmlive\WebSettingsTest.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
     <Compile Include="Layouts\Reporting\IZenda\AddTests.cs" />
     <Compile Include="Layouts\Reporting\EditTests.cs" />
