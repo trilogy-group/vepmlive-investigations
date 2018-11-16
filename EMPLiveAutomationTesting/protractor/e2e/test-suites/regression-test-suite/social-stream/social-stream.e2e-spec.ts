@@ -47,7 +47,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         const requestor = input.requestorValue;
         const startDate = input.startDate;
         const finishDate = input.finishDate;
-        await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate);
+        await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate, false);
 
         StepLogger.verification('Newly created Time off displayed in Home page');
         await WaitHelper.waitForElementToBeDisplayed(ElementHelper.getElementByText(title));

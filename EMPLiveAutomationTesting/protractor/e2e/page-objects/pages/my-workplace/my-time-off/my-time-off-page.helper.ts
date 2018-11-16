@@ -1,18 +1,18 @@
-import {By, element} from 'protractor';
-import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
-import {CommonPage} from '../../common/common.po';
-import {TextboxHelper} from '../../../../components/html/textbox-helper';
-import {MyTimeOffPageConstants} from './my-time-off-page.constants';
-import {PageHelper} from '../../../../components/html/page-helper';
-import {MyTimeOffPage} from './my-time-off.po';
-import {WaitHelper} from '../../../../components/html/wait-helper';
-import {StepLogger} from '../../../../../core/logger/step-logger';
-import {ExpectationHelper} from '../../../../components/misc-utils/expectation-helper';
+import { By, element } from 'protractor';
+
+import { ValidationsHelper } from '../../../../components/misc-utils/validation-helper';
+import { CommonPage } from '../../common/common.po';
+import { TextboxHelper } from '../../../../components/html/textbox-helper';
+import { MyTimeOffPageConstants } from './my-time-off-page.constants';
+import { PageHelper } from '../../../../components/html/page-helper';
+import { MyTimeOffPage } from './my-time-off.po';
+import { StepLogger } from '../../../../../core/logger/step-logger';
+import { ExpectationHelper } from '../../../../components/misc-utils/expectation-helper';
 
 export class MyTimeOffPageHelper {
 
     static async fillFormAndVerify(title: string, timeOffType: string, requestor: string, startDate: string,
-                                   finishDate: string) {
+                                   finishDate: string, toVerify = true) {
         const labels = MyTimeOffPageConstants.inputLabels;
         const inputs = MyTimeOffPage.inputs;
 
@@ -54,21 +54,19 @@ export class MyTimeOffPageHelper {
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.finish, finishDate));
 
         StepLogger.step('Click on save');
-        await PageHelper.click(CommonPage.formButtons.save);
-        // Wait for the page to close after clicking on save. This is to reduce window close synchronization issues
-        await WaitHelper.staticWait(PageHelper.timeout.m);
+        await PageHelper.clickAndWaitForElementToHide(CommonPage.formButtons.save);
 
         StepLogger.verification('"New Time Off" page is closed');
-        await expect(await CommonPage.formButtons.save.isPresent())
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyTimeOffPageConstants.editPageName));
+        await ExpectationHelper.verifyNotDisplayedStatus(CommonPage.formButtons.save, MyTimeOffPageConstants.editPageName);
 
-        StepLogger.subVerification('Newly created Time Off item details displayed in read only mode');
-        await ExpectationHelper.verifyText(CommonPage.contentTitleInViewMode,
-            ValidationsHelper.getLabelDisplayedValidation(title), title);
+        if (toVerify) {
+            StepLogger.subVerification('Newly created Time Off item details displayed in read only mode');
+            await ExpectationHelper.verifyText(CommonPage.contentTitleInViewMode,
+                ValidationsHelper.getLabelDisplayedValidation(title), title);
 
-        StepLogger.step(`click on Close button`);
-        await PageHelper.clickIfDisplayed(MyTimeOffPage.closeButton);
+            StepLogger.step(`click on Close button`);
+            await PageHelper.clickIfDisplayed(MyTimeOffPage.closeButton);
+        }
     }
 
     static getXpathForInputByLabel(type: string, title: string) {
