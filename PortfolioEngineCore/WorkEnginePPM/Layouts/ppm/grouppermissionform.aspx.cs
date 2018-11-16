@@ -139,34 +139,7 @@ namespace WorkEnginePPM.Layouts.ppm2
             CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
             xToolbar.CreateIntAttr("Visible", 0);
 
-            CStruct xPanel = xGrid.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 0);
-            xPanel.CreateIntAttr("Delete", 0);
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-            xCfg.CreateIntAttr("SuppressCfg", 3);
-            xCfg.CreateIntAttr("InEditMode", 0);
-            xCfg.CreateIntAttr("Sorting", 0);
-            xCfg.CreateIntAttr("Selecting", 0);
-            xCfg.CreateIntAttr("Dragging", 0);
-            xCfg.CreateIntAttr("Dropping", 0);
-            xCfg.CreateIntAttr("ColsMoving", 0);
-            xCfg.CreateIntAttr("ColsPostLap", 0);
-            xCfg.CreateIntAttr("ColsLap", 0);
-            xCfg.CreateBooleanAttr("NoTreeLines", true);
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateBooleanAttr("ShowDeleted", true);
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            xCfg.CreateIntAttr("LastId", 1);
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-            xCfg.CreateIntAttr("SelectingCells", 1);
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "RPEditor");
+            var xCfg = BuildConfig(xGrid);
 
             xCfg.CreateStringAttr("MainCol", "Permission");
 
@@ -202,6 +175,45 @@ namespace WorkEnginePPM.Layouts.ppm2
 
             return xGrid;
         }
+
+        internal static CStruct BuildConfig(CStruct grid)
+        {
+            if (grid == null)
+            {
+                throw new ArgumentNullException(nameof(grid));
+            }
+
+            var panel = grid.CreateSubStruct("Panel");
+            panel.CreateIntAttr("Visible", 0);
+            panel.CreateIntAttr("Delete", 0);
+            var config = grid.CreateSubStruct("Cfg");
+            config.CreateStringAttr("Code", "GTACCNPSQEBSLC");
+            config.CreateIntAttr("SuppressCfg", 3);
+            config.CreateIntAttr("InEditMode", 0);
+            config.CreateIntAttr("Sorting", 0);
+            config.CreateIntAttr("Selecting", 0);
+            config.CreateIntAttr("Dragging", 0);
+            config.CreateIntAttr("Dropping", 0);
+            config.CreateIntAttr("ColsMoving", 0);
+            config.CreateIntAttr("ColsPostLap", 0);
+            config.CreateIntAttr("ColsLap", 0);
+            config.CreateBooleanAttr("NoTreeLines", true);
+            config.CreateIntAttr("MaxHeight", 0);
+            config.CreateBooleanAttr("ShowDeleted", true);
+            config.CreateBooleanAttr("DateStrings", true);
+            config.CreateIntAttr("MaxWidth", 1);
+            config.CreateIntAttr("AppendId", 0);
+            config.CreateIntAttr("FullId", 0);
+            config.CreateStringAttr("IdChars", "0123456789");
+            config.CreateIntAttr("NumberId", 1);
+            config.CreateIntAttr("LastId", 1);
+            config.CreateIntAttr("CaseSensitiveId", 0);
+            config.CreateIntAttr("SelectingCells", 1);
+            config.CreateStringAttr("Style", "GM");
+            config.CreateStringAttr("CSS", "RPEditor");
+            return config;
+        }
+
         private CStruct BuildGridData(DataTable dt)
         {
             CStruct[] xLevels = new CStruct[2];
