@@ -84,6 +84,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, name) => new ShimSPField();
             ShimXmlNode.AllInstances.FirstChildGet = _ => new ShimXmlNode(new XmlDocument());
             ShimXmlNode.AllInstances.AttributesGet = _ => new ShimXmlAttributeCollection();
+            ShimQueryExecutor.ConstructorSPWeb = (_, web) => { };
         }
 
         [TestMethod]
