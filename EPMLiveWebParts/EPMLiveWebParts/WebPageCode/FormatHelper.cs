@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Xml;
@@ -25,7 +26,7 @@ namespace EPMLiveWebParts
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                Trace.TraceError("Exception Suppressed {0}", ex);
             }
             if (spField.SchemaXml.Contains("Percentage=\"TRUE\""))
             {
