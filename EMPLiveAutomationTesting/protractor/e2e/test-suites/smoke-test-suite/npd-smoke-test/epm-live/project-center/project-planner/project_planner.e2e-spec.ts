@@ -1,19 +1,7 @@
-import {browser} from 'protractor';
-import {CommonPageHelper} from '../../../../../../page-objects/pages/common/common-page.helper';
 import {StepLogger} from '../../../../../../../core/logger/step-logger';
-import {CommonPage} from '../../../../../../page-objects/pages/common/common.po';
-import {ValidationsHelper} from '../../../../../../components/misc-utils/validation-helper';
-import {ProjectItemPage} from '../../../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {PageHelper} from '../../../../../../components/html/page-helper';
-import {ProjectItemPageHelper} from '../../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import {WaitHelper} from '../../../../../../components/html/wait-helper';
-import {CommonPageConstants} from '../../../../../../page-objects/pages/common/common-page.constants';
-import {HomePage} from '../../../../../../page-objects/pages/homepage/home.po';
 import {SuiteNames} from '../../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../../page-objects/pages/login/login.po';
-import {ElementHelper} from '../../../../../../components/html/element-helper';
-import {ProjectItemPageConstants} from '../../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import {SocialStreamPage} from '../../../../../../page-objects/pages/settings/social-stream/social-stream.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -29,6 +17,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
+    /* UNSTABLE
     it('Validate project planner and create and assign task to resources - [743933]', async () => {
         StepLogger.caseId = 743933;
         const uniqueId = PageHelper.getUniqueId();
@@ -183,4 +172,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         // Notification verification is not possible because its take lot of time to visible.
 
     });
+    */
 });

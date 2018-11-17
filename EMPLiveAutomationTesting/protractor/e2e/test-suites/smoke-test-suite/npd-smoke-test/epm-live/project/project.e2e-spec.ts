@@ -8,7 +8,6 @@ import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
@@ -184,6 +183,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
     */
 
+    /* #UNSTABLE
     it('Add resources under "Current Team" - [743144]', async () => {
         StepLogger.caseId = 743144;
         const uniqueId = PageHelper.getUniqueId();
@@ -202,6 +202,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.step('Add resource to Current team and verify');
         await ProjectItemPageHelper.addResourceAndVerifyUserMovedUnderCurrentTeam(uniqueId);
     });
+    */
 
     /* #UNSTABLE
     it('Validate Edit Cost Functionality in Cost Planner - [743932]', async () => {

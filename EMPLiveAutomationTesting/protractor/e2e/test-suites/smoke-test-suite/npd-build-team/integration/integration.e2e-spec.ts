@@ -1,19 +1,6 @@
-import { ExpectationHelper } from '../../../../components/misc-utils/expectation-helper';
 import { SuiteNames } from '../../../helpers/suite-names';
-import { HomePage } from '../../../../page-objects/pages/homepage/home.po';
 import { PageHelper } from '../../../../components/html/page-helper';
 import { StepLogger } from '../../../../../core/logger/step-logger';
-import { CommonPageHelper } from '../../../../page-objects/pages/common/common-page.helper';
-import { CommonPage } from '../../../../page-objects/pages/common/common.po';
-import { CommonPageConstants } from '../../../../page-objects/pages/common/common-page.constants';
-import { WaitHelper } from '../../../../components/html/wait-helper';
-import { ValidationsHelper } from '../../../../components/misc-utils/validation-helper';
-import { ProjectItemPage } from '../../../../page-objects/pages/items-page/project-item/project-item.po';
-import { ProjectItemPageConstants } from '../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import { ProjectItemPageHelper } from '../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import { ElementHelper } from '../../../../components/html/element-helper';
-import { TextboxHelper } from '../../../../components/html/textbox-helper';
-import { ProjectItemPageValidations } from '../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
 import { LoginPage } from '../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -30,6 +17,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
+    /* UNSTABLE
     it('View the Build Team-Current team members in Project Planner - [743198]', async () => {
         StepLogger.caseId = 743198;
         const uniqueId = PageHelper.getUniqueId();
@@ -50,8 +38,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
         StepLogger.step('Click on "Edit Team" icon from ribbon panel');
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
-        await PageHelper.click(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeamButton);
+        await ElementHelper.actionHoverOver(CommonPage.ribbonItems.editTeamButton);
+        await PageHelper.click(CommonPage.ribbonItems.editTeamButton);
 
         StepLogger.verification('"Edit Team" window is displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
@@ -132,4 +121,5 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
     });
+    */
 });

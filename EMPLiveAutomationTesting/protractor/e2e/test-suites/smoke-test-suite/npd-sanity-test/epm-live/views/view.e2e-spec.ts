@@ -31,7 +31,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    it('Create Column - [970069]', async () => {
+    it('Create Column - [970069] [BUG: SKYVERA-1597]', async () => {
         StepLogger.caseId = 970069;
         const uniqueId = PageHelper.getUniqueId();
         StepLogger.preCondition('Select "Navigation" icon  from left side menu');
@@ -159,7 +159,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
     });
 
-    it('Create View - [970043]', async () => {
+    it('Create View - [970043] [BUG: SKYVERA-1597]', async () => {
         StepLogger.caseId = 970043;
         const uniqueId = PageHelper.getUniqueId();
         StepLogger.preCondition('Select "Navigation" icon  from left side menu');

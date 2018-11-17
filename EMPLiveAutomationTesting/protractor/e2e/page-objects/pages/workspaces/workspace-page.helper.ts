@@ -147,7 +147,7 @@ export class WorkspacePageHelper {
         await CommonPageHelper.labelContainValidation(modifiedTitle);
     }
 
-    static async verifyWorkSpaceCreated(title: string, maxCount = 10) {
+    static async verifyWorkSpaceCreated(title: string, maxCount = 15) {
         for (let i = 0; i < maxCount; i++) {
             const message = await CommonPage.latestNotification.getText();
             if (message.includes(title)) {

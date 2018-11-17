@@ -31,7 +31,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    it('Save the changes by Save button - [965680]', async () => {
+    it('Save the changes by Save button - [965680] [BUG: SKYVERA-1585]', async () => {
         StepLogger.caseId = 965680;
         const uniqueId = PageHelper.getUniqueId();
         const input = MyTimeOffPageConstants.inputValues;

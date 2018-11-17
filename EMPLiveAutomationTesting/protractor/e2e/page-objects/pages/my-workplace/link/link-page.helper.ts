@@ -9,6 +9,7 @@ import { ValidationsHelper } from '../../../../components/misc-utils/validation-
 import { LinkPageConstants } from './link-page.constants';
 import { LinkPage } from './link.po';
 import { WaitHelper } from '../../../../components/html/wait-helper';
+import { ElementHelper } from '../../../../components/html/element-helper';
 
 export class LinkPageHelper {
 
@@ -79,6 +80,7 @@ export class LinkPageHelper {
 
         StepLogger.subStep('Click on "Delete Item" button');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.deleteItemButton);
+        await ElementHelper.actionHoverOver(CommonPage.ribbonItems.deleteItemButton);
         await PageHelper.click(CommonPage.ribbonItems.deleteItemButton);
 
         StepLogger.subStep('Accept alert');

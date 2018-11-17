@@ -148,7 +148,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getDisplayedValidation(comment));
     });
 
-    it('Add Shared Document - [907964]', async () => {
+    it('Add Shared Document - [907964] [BUG: SKYVERA-1584]', async () => {
         StepLogger.caseId = 907964;
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
 

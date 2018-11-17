@@ -611,6 +611,7 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.addTask);
         await PageHelper.actionSendKeys(title);
         await WaitHelper.staticWait(PageHelper.timeout.xs);
+        await WaitHelper.waitForElementToBePresent(ProjectItemPageHelper.newTasksFields.duration);
         await ElementHelper.actionHoverOver(ProjectItemPageHelper.newTasksFields.duration);
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
         await PageHelper.actionSendKeys(hours);

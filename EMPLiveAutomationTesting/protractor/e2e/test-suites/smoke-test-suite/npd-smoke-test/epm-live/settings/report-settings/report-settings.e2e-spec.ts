@@ -2,22 +2,6 @@ import {SuiteNames} from '../../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../../page-objects/pages/login/login.po';
 import {PageHelper} from '../../../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../../../core/logger/step-logger';
-import {CommonPage} from '../../../../../../page-objects/pages/common/common.po';
-import {SettingsPage} from '../../../../../../page-objects/pages/settings/settings.po';
-// tslint:disable-next-line:max-line-length
-import {ReportingSettingsPage} from '../../../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/reporting-settings.po';
-// tslint:disable-next-line:max-line-length
-import {ReportManagerPage} from '../../../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/report-manager/report-manager.po';
-// tslint:disable-next-line:max-line-length
-import {ReportManagerPageConstants} from '../../../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/report-manager/report-manager-page.constants';
-// tslint:disable-next-line:max-line-length
-import {ReportManagerPageValidation} from '../../../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/report-manager/report-manager-page.validation';
-// tslint:disable-next-line:max-line-length
-import {ReportingSettingsPageConstants} from '../../../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/reporting-settings-page.constants';
-import {ExpectationHelper} from '../../../../../../components/misc-utils/expectation-helper';
-import {Constants} from '../../../../../../components/misc-utils/constants';
-import {WaitHelper} from '../../../../../../components/html/wait-helper';
-import {ElementHelper} from '../../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -33,6 +17,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
+    /* #UNSTABLE
     it('Run Refresh Schedule Functionality - [1124280]', async () => {
         StepLogger.caseId = 1124280;
         StepLogger.stepId(1);
@@ -96,4 +81,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect((await lastRunLabel.getText()).trim())
             .not.toBe(lastRunValue, ReportManagerPageValidation.lastRunValidation);
     });
+    */
 });

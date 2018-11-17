@@ -28,7 +28,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    it('Navigate to Associated Items page - [966382]', async () => {
+    it('Navigate to Associated Items page - [966382] [BUG: SKYVERA-1597]', async () => {
         StepLogger.caseId = 966382;
         StepLogger.preCondition('Select "Navigation" icon  from left side menu');
         StepLogger.preCondition('Select Projects -> Projects from the options displayed');

@@ -27,7 +27,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    it('Set and Clear Baseline - [970398]', async () => {
+    it('Set and Clear Baseline - [970398] [BUG: SKYVERA-1585]', async () => {
         StepLogger.caseId = 970398;
         StepLogger.preCondition('Select "Navigation" icon  from left side menu');
         StepLogger.preCondition('Select Projects -> Projects from the options displayed');

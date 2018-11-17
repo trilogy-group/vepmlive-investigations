@@ -255,6 +255,7 @@ export class ProjectItemPageHelper {
 
         StepLogger.subStep('Select "Edit Team" from the options displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeamButton);
+        await ElementHelper.actionHoverOver(CommonPage.ribbonItems.editTeamButton);
         await PageHelper.click(CommonPage.ribbonItems.editTeamButton);
 
         StepLogger.subStep('Wait for Build Team Page to open');

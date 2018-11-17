@@ -8,10 +8,7 @@ import {CommonPageConstants} from '../../../../../page-objects/pages/common/comm
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
-import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-do.po';
 import {ToDoPageConstants} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.constants';
-import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
-import {LinkPage} from '../../../../../page-objects/pages/my-workplace/link/link.po';
 import {PicturePageConstants} from '../../../../../page-objects/pages/my-workplace/picture/picture-page.constants';
 import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.helper';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
@@ -24,7 +21,6 @@ import { ExpectationHelper } from '../../../../../components/misc-utils/expectat
 import {ElementHelper} from '../../../../../components/html/element-helper';
 // tslint:disable-next-line:max-line-length
 import {SharedDocumentsPageConstants} from '../../../../../page-objects/pages/my-workplace/shared-documents/shared-documents-page.constants';
-import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
 import {DiscussionsPageHelper} from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.helper';
 import {DiscussionsPage} from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
 import {DiscussionsPageConstants} from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.constants';
@@ -96,6 +92,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getLabelDisplayedValidation(title));
     });
 
+    /* #UNSTABLE
     it('Edit To Do from Workplace - [1175263]', async () => {
         StepLogger.caseId = 1175263;
         StepLogger.stepId(1);
@@ -165,7 +162,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     });
+    */
 
+    /* #UNSTABLE
     it('Create new Links from Workplace - [1175272]', async () => {
         StepLogger.caseId = 1175272;
         StepLogger.stepId(1);
@@ -193,6 +192,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await LinkPageHelper.verifyNewLinkAdded(details);
         await LinkPageHelper.deleteLinkByText(details.description);
     });
+    */
 
     it('Create new Pictures from Workplace - [1175271]', async () => {
         StepLogger.caseId = 1175271;
