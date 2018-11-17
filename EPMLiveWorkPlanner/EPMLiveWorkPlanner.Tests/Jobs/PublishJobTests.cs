@@ -1,14 +1,18 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Fakes;
+using System.Data;
 using System.Data.Common.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Fakes;
+using System.Linq;
 using System.Reflection;
 using System.Web.Fakes;
 using System.Xml;
+using System.Xml.Linq;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveWorkPlanner.Fakes;
@@ -58,21 +62,32 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
         private int validations;
         private const int DummyInt = 1;
         private const int One = 1;
+        private const int Two = 2;
+        private const int Three = 3;
+        private const int Four = 4;
+        private const int Five = 5;
         private const string SampleGuidString1 = "83e81819-0112-4c22-bb70-d8ba101e9e0c";
         private const string SampleGuidString2 = "83e81819-0104-4c22-bb70-d8ba101e9e0c";
         private const string DummyString = "DummyString";
         private const string IDStringCaps = "ID";
         private const string SampleUrl = "http://www.sampleurl.com";
-        private const string MoveListItemToFolderMethodName = "MoveListItemToFolder";
-        private const string SetupTaskCenterMethodName = "setupTaskCenter";
-        private const string EnsureFolderMethodName = "ensureFolder";
-        private const string StartPublishMethodName = "StartPublish";
-        private const string ExecuteMethodName = "execute";
         private const string UserIdFieldName = "userid";
         private const string KeyFieldName = "key";
         private const string ErrorBooleanFieldName = "bErrors";
         private const string ErrorStringFieldName = "sErrors";
         private const string TotalCountFieldName = "totalCount";
+        private const string HashLinksFieldName = "hshLinks";
+        private const string TaskUidColumnName = "taskuid";
+        private const string IsPublishedColumnName = "IsPublished";
+        private const string UpdateScheduledWorkNodeName = "UpdateScheduledWork";
+        private const string MoveListItemToFolderMethodName = "MoveListItemToFolder";
+        private const string SetupTaskCenterMethodName = "setupTaskCenter";
+        private const string EnsureFolderMethodName = "ensureFolder";
+        private const string StartPublishMethodName = "StartPublish";
+        private const string ExecuteMethodName = "execute";
+        private const string FormatPFEWorkJobXmlMethodName = "FormatPFEWorkJobXml";
+        private const string ProcessTaskMethodName = "processTask";
+        private const string PublishTasksMethodName = "publishTasks";
 
         [TestInitialize]
         public void Setup()
@@ -128,6 +143,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             ShimDisabledItemEventScope.Constructor = _ => new ShimDisabledItemEventScope();
             ShimDisabledItemEventScope.AllInstances.Dispose = _ => { };
             ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => spUser;
+            ShimSPSiteDataQuery.Constructor = _ => new ShimSPSiteDataQuery();
         }
 
         private void SetupVariables()
@@ -666,6 +682,270 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
                 () => isError.ShouldBeTrue(),
                 () => errorMessage.ShouldBe(expectedErrorMessage),
                 () => validations.ShouldBe(8));
+        }
+
+        [TestMethod]
+        public void FormatPFEWorkJobXml_WhenCalled_ReturnsXmlString()
+        {
+            // Arrange
+            const string xmlString = @"
+                <Project>
+                    <UpdateScheduledWork>
+                        <node/>
+                        <node/>
+                        <node/>
+                        <node/>
+                        <node/>
+                    </UpdateScheduledWork>
+                </Project>";
+            var data = new XmlDocument();
+
+            data.LoadXml(xmlString);
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(
+                FormatPFEWorkJobXmlMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    data
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element(UpdateScheduledWorkNodeName)
+                    .Elements("node")
+                    .Count()
+                    .ShouldBe(5));
+        }
+
+        [TestMethod]
+        public void ProcessTask_WhenCalled_UpdatesListItem()
+        {
+            // Arrange
+            const string linkedTask = "LinkedTask";
+            const string descendants = "Descendants";
+            const string predecessors = "Predecessors";
+            const string externalLink = "ExternalLink";
+            const string isExternal = "IsExternal";
+            const string dueDate = "DueDate";
+            var xmlString = $@"
+                <xmlcfg>
+                    <Task UID=""{DummyInt}"" ID=""{DummyInt}"">
+                        <Field Name=""{isExternal}"">{One}</Field>
+                        <Field Name=""{externalLink}"">{SampleUrl}</Field>
+                        <Field Name=""{predecessors}"">{DummyInt}</Field>
+                        <Field Name=""{descendants}"">{DummyInt}</Field>
+                        <Field Name=""{linkedTask}""></Field>
+                        <Field Name=""{DummyString}""></Field>
+                        <Field Name=""{DummyString}"">{DummyString}</Field>
+                    </Task>
+                </xmlcfg>";
+            var data = new XmlDocument();
+            var taskNode = default(XmlNode);
+            var taskFields = new Hashtable()
+            {
+                [linkedTask] = linkedTask,
+                [descendants] = descendants,
+                [predecessors] = predecessors,
+            };
+
+            data.LoadXml(xmlString);
+            taskNode = data.FirstChild.SelectSingleNode("//Task");
+            spFieldCollection.GetFieldByInternalNameString = input =>
+            {
+                spField.TypeGet = () => SPFieldType.Computed;
+                spField.InternalNameGet = () => DummyString;
+
+                if (input.Equals(descendants) || input.Equals(isExternal))
+                {
+                    spField.TypeGet = () => SPFieldType.User;
+                }
+                if (input.Equals(externalLink))
+                {
+                    spField.InternalNameGet = () => dueDate;
+                }
+
+                return spField;
+            };
+            spListItem.ItemGetString = _ => 0;
+            spListItem.ItemSetGuidObject = (_, __) =>
+            {
+                validations += 1;
+            };
+            spListItem.Update = () =>
+            {
+                validations += 1;
+            };
+
+            ShimCoreFunctions.getUserStringStringSPWebString = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            var actual = privateObject.Invoke(
+                ProcessTaskMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    taskNode,
+                    spListItem.Instance,
+                    taskFields,
+                    spWeb.Instance,
+                    DummyString,
+                    DummyString
+                });
+
+            // Assert
+            validations.ShouldBe(10);
+        }
+
+        [TestMethod]
+        public void PublishTasks_WhenCalled_PublishesTasks()
+        {
+            // Arrange
+            const string randomDestination = "1.2.3.4.5";
+            const string randomSource = "1.2.3";
+            var xmlString = $@"
+                <xmlcfg>
+                    <Task UID=""0"" SPID=""0"" SPUID=""0"" Folder=""{DummyString}"" ID=""0"" Title=""{DummyString}"" Iteration=""{One}""/>
+                    <Task UID=""{One}"" SPID=""{One}"" SPUID=""{One}"" Folder=""{DummyString}"" ID=""{One}"" Title=""{DummyString}"" Iteration=""{One}"">
+                        <Field Name=""CT{DummyString}"">0</Field>
+                        <Title>{One}</Title>
+                    </Task>
+                    <Task UID=""{Two}"" SPID=""{Two}"" Folder=""{DummyString}"" ID=""{Two}"" Title=""{DummyString}"" Iteration=""{One}"">
+                        <Field Name=""CT{DummyString}"">0</Field>
+                        <Title>{Two}</Title>
+                    </Task>
+                    <Task UID=""{Three}"" SPID=""{Three}"" Folder="""" ID=""{Three}"" Title=""{DummyString}"" Iteration=""{One}"">
+                        <Field Name=""CT{DummyString}"">0</Field>
+                        <Title>{Three}</Title>
+                    </Task>
+                    <Task UID=""{Five}"" SPID=""{Five}"" Folder="""" ID=""{Five}"" Title=""{DummyString}"" Iteration=""{One}"">
+                        <Field Name=""CT{DummyString}"">0</Field>
+                        <Title>{Five}</Title>
+                    </Task>
+                </xmlcfg>";
+            var document = new XmlDocument();
+            var dataTable = new DataTable();
+            var row = default(DataRow);
+            var plannerProps = new PlannerProps()
+            {
+                sIterationCT = DummyString,
+                bAgile = true
+            };
+            var hashLinks = new Hashtable()
+            {
+                [randomSource] = randomDestination,
+                [randomDestination] = randomDestination,
+            };
+
+            document.LoadXml(xmlString);
+            dataTable.Columns.Add(TaskUidColumnName);
+            dataTable.Columns.Add(IDStringCaps);
+            dataTable.Columns.Add(IDStringCaps.ToLower());
+            dataTable.Columns.Add(IsPublishedColumnName);
+
+            row = dataTable.NewRow();
+            row[TaskUidColumnName] = Four;
+            row[IDStringCaps] = One;
+            row[IDStringCaps.ToLower()] = One;
+            row[IsPublishedColumnName] = One;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[TaskUidColumnName] = Four;
+            row[IDStringCaps] = Four;
+            row[IDStringCaps.ToLower()] = Four;
+            row[IsPublishedColumnName] = One;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[TaskUidColumnName] = Five;
+            row[IDStringCaps] = Five;
+            row[IDStringCaps.ToLower()] = Five;
+            row[IsPublishedColumnName] = 0;
+            dataTable.Rows.Add(row);
+
+            spWeb.GetSiteDataSPSiteDataQuery = _ => dataTable;
+            spContentType.NameGet = () => DummyString;
+            spList.AddItem = () =>
+            {
+                validations += 1;
+                return spListItem;
+            };
+            spList.AddItemStringSPFileSystemObjectTypeString = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return spListItem;
+            };
+            spListItem.ItemSetStringObject = (_, __) =>
+            {
+                validations += 1;
+            };
+            spListItem.ItemSetGuidObject = (_, __) =>
+            {
+                validations += 1;
+            };
+            spListItem.Recycle = () =>
+            {
+                validations += 1;
+                return guid;
+            };
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            ShimPath.GetDirectoryNameString = input => input;
+            ShimSPUrlUtility.CombineUrlStringString = (_, __) => SampleUrl;
+            ShimSPUtility.GetUrlDirectoryString = _ => SampleUrl;
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPContentType>()
+            {
+                spContentType
+            }.GetEnumerator();
+            ShimPublishJob.AllInstances.ensureFolderSPListString = (_, _1, _2) =>
+            {
+                validations += 1;
+            };
+            ShimPublishJob.MoveListItemToFolderSPListItemSPFolder = (_1, _2) =>
+            {
+                validations += 1;
+            };
+            ShimPublishJob.AllInstances.processTaskXmlNodeSPListItemHashtableSPWebStringString = (_, _1, _2, _3, _4, _5, _6) =>
+            {
+                validations += 1;
+            };
+            ShimBaseJob.AllInstances.updateProgressSingle = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            {
+                validations += 1;
+                return DummyInt;
+            };
+
+            privateObject.SetFieldOrProperty(HashLinksFieldName, nonPublicInstance, hashLinks);
+
+            // Act
+            privateObject.Invoke(
+                PublishTasksMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    document,
+                    spList.Instance,
+                    DummyInt.ToString(),
+                    default(Hashtable),
+                    DummyString,
+                    DummyString,
+                    plannerProps,
+                    DummyInt.ToString()
+                });
+
+            // Assert
+            validations.ShouldBe(37);
         }
     }
 }
