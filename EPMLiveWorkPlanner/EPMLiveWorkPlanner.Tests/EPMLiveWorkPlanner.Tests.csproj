@@ -53,8 +53,9 @@
     <Reference Include="Microsoft.SharePoint.16.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\Microsoft.SharePoint.16.0.0.0.Fakes.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.SharePoint.Client.16.0.0.0.Fakes">
-      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\Microsoft.SharePoint.Client.16.0.0.0.Fakes.dll</HintPath>
+    <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Web.CommandUI.16.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\Microsoft.Web.CommandUI.16.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -100,7 +101,6 @@
     <Compile Include="ISAPI\WorkPlanner.asmx.TestsSplitOne.cs" />
     <Compile Include="ISAPI\WorkPlanner.asmx.TestsSplitThree.cs" />
     <Compile Include="ISAPI\WorkPlanner.asmx.TestsSplitTwo.cs" />
-    <Compile Include="Jobs\PublishJobTests.cs" />
     <Compile Include="Layouts\epmlive\WorkPlanner.aspx.Tests.cs" />
     <Compile Include="Layouts\epmlive\WorkPlannerWizard.aspx.Tests.cs" />
     <Compile Include="Layouts\epmlive\WorkPlannerWizard.aspx.Tests.ICheckParams.cs" />
