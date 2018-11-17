@@ -24,7 +24,9 @@ using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.SharePoint.WebControls.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ResourceValues;
 using RPADataCache;
+using RPADataCache.Fakes;
 using Shouldly;
 
 namespace WorkEnginePPM.Tests.WebServices
@@ -73,6 +75,13 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string IDStringCaps = "ID";
         private const string SampleUrl = "http://www.sampleurl.com";
         private const string StashCSRoleModeMethodName = "StashCSRoleMode";
+        private const string IsCSRoleAllowedMethodName = "IsCSRoleAllowed";
+        private const string SetMajorCatListlookupMethodName = "SetMajorCatListlookup";
+        private const string ItemListAddItemMethodName = "ItemListAddItem";
+        private const string GrabRADataMethodName = "GrabRAData";
+        private const string ResourceValuesFieldName = "m_cResVals";
+        private const string RolesAllowedFieldName = "m_CSRoleAllowed";
+        private const string CatLookupFieldName = "m_maj_Cat_lookup";
 
         [TestInitialize]
         public void Setup()
@@ -294,14 +303,180 @@ namespace WorkEnginePPM.Tests.WebServices
             // Arrange
             const bool expected = true;
 
-            privateObject.SetFieldOrProperty("m_CSRoleAllowed", nonPublicInstance, false);
+            privateObject.SetFieldOrProperty(RolesAllowedFieldName, nonPublicInstance, false);
 
             // Act
             privateObject.Invoke(StashCSRoleModeMethodName, publicInstance, new object[] { expected });
-            var roleAllowed = (bool)privateObject.GetFieldOrProperty("m_CSRoleAllowed", nonPublicInstance);
+            var roleAllowed = (bool)privateObject.GetFieldOrProperty(RolesAllowedFieldName, nonPublicInstance);
 
             // Assert
             roleAllowed.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void IsCSRoleAllowed_WhenCalled_SetsRoleAllowedField()
+        {
+            // Arrange
+            const bool expected = true;
+
+            privateObject.SetFieldOrProperty(RolesAllowedFieldName, nonPublicInstance, expected);
+
+            // Act
+            privateObject.Invoke(IsCSRoleAllowedMethodName, publicInstance, new object[] { });
+            var roleAllowed = (bool)privateObject.GetFieldOrProperty(RolesAllowedFieldName, nonPublicInstance);
+
+            // Assert
+            roleAllowed.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void SetMajorCatListlookup_WhenCalled_SetsCatLookupField()
+        {
+            // Arrange
+            var resourceValues = new clsResourceValues()
+            {
+                MajorCategoryFieldID = Two,
+                Lookups = new Dictionary<int, clsLookupList>()
+                {
+                    [One] = new clsLookupList()
+                    {
+                        FieldID = One
+                    },
+                    [Two] = new clsLookupList()
+                    {
+                        FieldID = Two
+                    }
+                }
+            };
+
+            privateObject.SetFieldOrProperty(ResourceValuesFieldName, nonPublicInstance, resourceValues);
+
+            // Act
+            privateObject.Invoke(SetMajorCatListlookupMethodName, nonPublicInstance, new object[] { });
+            var actual = (clsLookupList)privateObject.GetFieldOrProperty(CatLookupFieldName, nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldNotBeNull(),
+                () => actual.FieldID.ShouldBe(Two));
+        }
+
+        [TestMethod]
+        public void ItemListAddItem_WhenCalled_AddsNewItem()
+        {
+            // Arrange
+            var itemList = new List<clsEPKItem>();
+
+            // Act
+            privateObject.Invoke(
+                ItemListAddItemMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    itemList,
+                    DummyInt,
+                    DummyString,
+                    DummyString
+                });
+
+            // Assert
+            itemList.ShouldSatisfyAllConditions(
+                () => itemList.Count.ShouldBe(1),
+                () => itemList[0].ID.ShouldBe(DummyInt),
+                () => itemList[0].Name.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void GrabRAData_WhenCalled_SetsResourceValuesAndOtherFields()
+        {
+            // Arrange
+            const string xmlString = @"<xmlcfg/>";
+            var resourceValues = new clsResourceValues()
+            {
+                MajorCategoryFieldID = Two,
+                gpPMOAdmin = DummyInt,
+                CommitmentsOpMode = 0,
+                CommitmentHours = new List<clsCommitmentHours>(),
+                Lookups = new Dictionary<int, clsLookupList>()
+                {
+                    [One] = new clsLookupList()
+                    {
+                        FieldID = One
+                    },
+                    [Two] = new clsLookupList()
+                    {
+                        FieldID = Two
+                    }
+                },
+                Commitments = new Dictionary<int, clsCommitment>()
+                {
+                    [One] = new clsCommitment()
+                    {
+                        UID = One
+                    }
+                },
+                OpenReqs = new Dictionary<int, clsCommitment>()
+                {
+                    [Two] = new clsCommitment()
+                    {
+                        UID = Two
+                    }
+                },
+                OpenReqHours = new List<clsCommitmentHours>()
+                {
+                    new clsCommitmentHours()
+                    {
+                        UID = Three
+                    }
+                }
+            };
+
+            ShimRPAData.AllInstances.SetMajorCatListlookup = _ =>
+            {
+                validations += 1;
+            };
+            ShimRPAData.AllInstances.PopulateInternalsStringOut = (RPAData instance, out string serrlog) =>
+            {
+                validations += 1;
+                serrlog = DummyString;
+            };
+            ShimRPAData.AllInstances.setupdispcolnsStringOut = (RPAData instance, out string errlog) =>
+            {
+                validations += 1;
+                errlog = DummyString;
+            };
+            ShimRPAData.AllInstances.DoUserDepts = _ =>
+            {
+                validations += 1;
+            };
+            ShimRPAData.AllInstances.ReDrawGrid = _ =>
+            {
+                validations += 1;
+            };
+
+            // Act
+            privateObject.Invoke(
+                GrabRADataMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    resourceValues,
+                    DummyString,
+                    DummyString,
+                    DummyInt,
+                    DummyInt,
+                    xmlString,
+                    DummyString
+                });
+            resourceValues = (clsResourceValues)privateObject.GetFieldOrProperty(ResourceValuesFieldName, nonPublicInstance);
+
+            // Assert
+            resourceValues.ShouldSatisfyAllConditions(
+                () => resourceValues.Commitments.Count.ShouldBe(2),
+                () => resourceValues.Commitments[100003].Status.ShouldBe(RPConstants.CONST_OPENREQUEST),
+                () => resourceValues.Commitments[100003].UID.ShouldBe(100003),
+                () => resourceValues.CommitmentHours.Count.ShouldBe(1),
+                () => resourceValues.CommitmentHours[0].UID.ShouldBe(100004));
         }
     }
 }
