@@ -48,3 +48,10 @@ $installerDir = Join-Path $buildRoot "SilentInstaller"
 Copy-Item -Path (Join-Path $installerDir "*") -Destination $outputDir -Recurse
 
 Write-Host "Done. Installer is located at $outputDir"
+
+
+$e = $_.Exception
+$line = $_.InvocationInfo.ScriptLineNumber
+$msg = $e.Message 
+
+Write-Host -ForegroundColor Red "caught exception: $e at $line"
