@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.DirectoryServices;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.Fakes;
-using System.Text;
-using System.Threading.Tasks;
 using EPMLive.TestFakes.Utility;
 using EPMLiveCore.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
+using Microsoft.SharePoint.Navigation.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EPMLiveCore.Tests
@@ -33,6 +33,13 @@ namespace EPMLiveCore.Tests
         private string _useWbs;
         private string _listTitlePattern;
         private IList<string> _groupByFieldNames;
+        private ShimSPListCollection _spListCollectionShim;
+        private IList<ShimSPList> _spLists;
+        private SPWeb spWeb;
+        private bool isRunWithElevatedPriveleges;
+        private Guid DummyGuid = Guid.NewGuid();
+        private string DummyUrl = "http://xyz.com";
+        private string DummyString = "DummyString";
 
         [TestInitialize]
         public void SetUp()
@@ -57,6 +64,45 @@ namespace EPMLiveCore.Tests
         public void TearDown()
         {
             _shimsContext.Dispose();
+        }
+
+        [TestMethod]
+        public void createSite_BoolTrue_returnString()
+        {
+            // Arrange
+            SetupSPWeb();
+
+            // Act
+            CoreFunctions.createSite(DummyString, DummyUrl, DummyString, DummyString, true, true, spWeb);
+
+            // Assert
+            Assert.IsTrue(isRunWithElevatedPriveleges);
+        }
+
+        [TestMethod]
+        public void createSite_UniqueTrue_returnString()
+        {
+            // Arrange
+            SetupSPWeb();
+
+            // Act
+            CoreFunctions.createSite(DummyString, DummyString, DummyUrl, DummyString, DummyString, true, true, spWeb, out DummyGuid, out DummyUrl, out DummyUrl, out DummyString);
+
+            // Assert
+            Assert.IsTrue(isRunWithElevatedPriveleges);
+        }
+
+        [TestMethod]
+        public void createSite_UniqueFalse_returnString()
+        {
+            // Arrange
+            SetupSPWeb();
+
+            // Act
+            CoreFunctions.createSite(DummyString, DummyString, DummyUrl, DummyString, DummyString, false, false, spWeb, out DummyGuid, out DummyUrl, out DummyUrl, out DummyString);
+
+            // Assert
+            Assert.IsTrue(isRunWithElevatedPriveleges);
         }
 
         [TestMethod]
@@ -914,6 +960,61 @@ namespace EPMLiveCore.Tests
             // Assert
             Assert.AreEqual(1, _cryptographyShims.DecryptorsCreated.Count);
             Assert.IsTrue(_cryptographyShims.CheckIfAllEncryptorsDisposed());
+        }
+
+        private void SetupSPWeb()
+        {
+            isRunWithElevatedPriveleges = false;
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = action =>
+            {
+                isRunWithElevatedPriveleges = true;
+            };
+            _spLists = new[] {
+                new ShimSPList {
+                    IDGet = () => Guid.NewGuid()
+                }
+            };
+            _spListCollectionShim = new ShimSPListCollection()
+            {
+                TryGetListString = _ => null,
+                ItemGetString = name => new ShimSPList
+                {
+                    FieldsGet = () =>
+                    {
+                        var list = new List<SPField>
+                            {
+                                new ShimSPField()
+                                {
+                                    HiddenGet = () => false,
+                                    InternalNameGet = () => DummyString
+                                }
+                            };
+                        return new ShimSPFieldCollection().Bind(list);
+                    }
+                }
+            };
+            _spListCollectionShim.Bind(_spLists.Select(shim => shim.Instance));
+            spWeb = new ShimSPWeb
+            {
+                IDGet = () => DummyGuid,
+                ServerRelativeUrlGet = () => DummyUrl,
+                ListsGet = () => _spListCollectionShim,
+                SiteGet = () => new ShimSPSite
+                {
+                    IDGet = () => DummyGuid
+                },
+                SiteGroupsGet = () => null,
+                AssociatedOwnerGroupGet = () => null,
+                RolesGet = () => null,
+                AllUsersGet = () => new ShimSPUserCollection { },
+                WebsGet = () => new ShimSPWebCollection { },
+                NavigationGet = () => new ShimSPNavigation
+                {
+                    TopNavigationBarGet = () => null
+                },
+                AllowUnsafeUpdatesGet = () => false
+            };
+            ShimSPWebCollection.AllInstances.AddStringStringStringUInt32StringBooleanBoolean = (a, b, c, d, e, f, g, h) => spWeb;
         }
     }
 }
