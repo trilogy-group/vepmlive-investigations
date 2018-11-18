@@ -74,14 +74,24 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string DummyString = "DummyString";
         private const string IDStringCaps = "ID";
         private const string SampleUrl = "http://www.sampleurl.com";
+        private const string ResourceValuesFieldName = "m_cResVals";
+        private const string RolesAllowedFieldName = "m_CSRoleAllowed";
+        private const string CatLookupFieldName = "m_maj_Cat_lookup";
+        private const string UserDeptsFieldName = "UserDepts";
+        private const string CostCategoryRoleMappingFieldName = "m_CCR_Role_Mapping";
+        private const string TotalMasterColumnFieldName = "m_totmastercln";
+        private const string DetMasterColumnFieldName = "m_detmastercln";
+        private const string TotalDisplayColumnFieldName = "m_totdispcln";
+        private const string DetDisplayColumnFieldName = "m_detdispcln";
         private const string StashCSRoleModeMethodName = "StashCSRoleMode";
         private const string IsCSRoleAllowedMethodName = "IsCSRoleAllowed";
         private const string SetMajorCatListlookupMethodName = "SetMajorCatListlookup";
         private const string ItemListAddItemMethodName = "ItemListAddItem";
         private const string GrabRADataMethodName = "GrabRAData";
-        private const string ResourceValuesFieldName = "m_cResVals";
-        private const string RolesAllowedFieldName = "m_CSRoleAllowed";
-        private const string CatLookupFieldName = "m_maj_Cat_lookup";
+        private const string DoUserDeptsMethodName = "DoUserDepts";
+        private const string BuileCCR2RoleMapMethodName = "BuileCCR2RoleMap";
+        private const string MapCCR2RoleMethodName = "MapCCR2Role";
+        private const string setupdispcolnsMethodName = "setupdispcolns";
 
         [TestInitialize]
         public void Setup()
@@ -477,6 +487,227 @@ namespace WorkEnginePPM.Tests.WebServices
                 () => resourceValues.Commitments[100003].UID.ShouldBe(100003),
                 () => resourceValues.CommitmentHours.Count.ShouldBe(1),
                 () => resourceValues.CommitmentHours[0].UID.ShouldBe(100004));
+        }
+
+        [TestMethod]
+        public void DoUserDepts_WhenCalled_AddsUserDepts()
+        {
+            // Arrange
+            const string expected = "All Departments";
+            var resourceValues = new clsResourceValues()
+            {
+                UserDepartments = new List<int>()
+                {
+                    One,
+                    Two,
+                    Three
+                },
+                Departments = new Dictionary<int, clsEPKItem>()
+                {
+                    [Three] = new clsEPKItem()
+                    {
+                        Name = Three.ToString()
+                    },
+                    [One] = new clsEPKItem()
+                    {
+                        Name = One.ToString()
+                    }
+                }
+            };
+
+            privateObject.SetFieldOrProperty(ResourceValuesFieldName, nonPublicInstance, resourceValues);
+
+            // Act
+            privateObject.Invoke(DoUserDeptsMethodName, nonPublicInstance, new object[] { });
+            var userDepts = (List<clsEPKItem>)privateObject.GetFieldOrProperty(UserDeptsFieldName, nonPublicInstance);
+
+            // Assert
+            userDepts.ShouldSatisfyAllConditions(
+                () => userDepts.Count.ShouldBe(3),
+                () => userDepts.Any(x => x.ID.Equals(One) && x.Name.Equals(One.ToString())),
+                () => userDepts.Any(x => x.ID.Equals(Three) && x.Name.Equals(Three.ToString())),
+                () => userDepts.Any(x => x.ID.Equals(0) && x.Name.Equals(expected)));
+        }
+
+        [TestMethod]
+        public void BuileCCR2RoleMap_WhenCalled_AddsCostCategoryRoleMapping()
+        {
+            // Arrange
+            var resourceValues = new clsResourceValues()
+            {
+                CostCategories = new Dictionary<int, clsCatItem>()
+                {
+                    [One] = new clsCatItem()
+                    {
+                        UID = One,
+                        Name = One.ToString()
+                    },
+                    [Two] = new clsCatItem()
+                    {
+                        UID = Two,
+                        Name = Two.ToString()
+                    },
+                    [Three] = new clsCatItem()
+                    {
+                        UID = Three,
+                        Name = Three.ToString()
+                    }
+                },
+                Roles = new Dictionary<int, clsListItem>()
+                {
+                    [One] = new clsListItem()
+                    {
+                        ID = One,
+                        Name = One.ToString()
+                    },
+                    [Three] = new clsListItem()
+                    {
+                        ID = Three,
+                        Name = Three.ToString()
+                    }
+                }
+            };
+
+            privateObject.SetFieldOrProperty(ResourceValuesFieldName, nonPublicInstance, resourceValues);
+
+            // Act
+            privateObject.Invoke(BuileCCR2RoleMapMethodName, nonPublicInstance, new object[] { });
+            var mapping = (Dictionary<int, int>)privateObject.GetFieldOrProperty(CostCategoryRoleMappingFieldName, nonPublicInstance);
+
+            // Assert
+            mapping.ShouldSatisfyAllConditions(
+                () => mapping.Count.ShouldBe(3),
+                () => mapping[One].ShouldBe(One),
+                () => mapping[Two].ShouldBe(0),
+                () => mapping[Three].ShouldBe(Three));
+        }
+
+        [TestMethod]
+        public void MapCCR2Role_KeyPresent_ReturnsProperInteger()
+        {
+            // Arrange
+            const int category = One;
+            var mapping = new Dictionary<int, int>()
+            {
+                [One] = DummyInt
+            };
+
+            privateObject.SetFieldOrProperty(CostCategoryRoleMappingFieldName, nonPublicInstance, mapping);
+
+            // Act
+            var actual = (int)privateObject.Invoke(MapCCR2RoleMethodName, nonPublicInstance, new object[] { category });
+
+            // Assert
+            actual.ShouldBe(DummyInt);
+        }
+
+        [TestMethod]
+        public void MapCCR2Role_KeyNotPresent_ReturnsZero()
+        {
+            // Arrange
+            const int category = Two;
+            var mapping = new Dictionary<int, int>()
+            {
+                [One] = DummyInt
+            };
+
+            privateObject.SetFieldOrProperty(CostCategoryRoleMappingFieldName, nonPublicInstance, mapping);
+
+            // Act
+            var actual = (int)privateObject.Invoke(MapCCR2RoleMethodName, nonPublicInstance, new object[] { category });
+
+            // Assert
+            actual.ShouldBe(0);
+        }
+
+        [TestMethod]
+        public void MapCCR2Role_MappingNull_ReturnsZero()
+        {
+            // Arrange
+            const int category = Two;
+            var mapping = default(Dictionary<int, int>);
+
+            privateObject.SetFieldOrProperty(CostCategoryRoleMappingFieldName, nonPublicInstance, mapping);
+
+            // Act
+            var actual = (int)privateObject.Invoke(MapCCR2RoleMethodName, nonPublicInstance, new object[] { category });
+
+            // Assert
+            actual.ShouldBe(0);
+        }
+
+        [TestMethod]
+        public void setupdispcolns_WhenCalled_SetsColumns()
+        {
+            // Arrange
+            var resourceValues = new clsResourceValues()
+            {
+                ResFields = new List<clsPortField>()
+                {
+                    new clsPortField()
+                    {
+                        ID = 1111,
+                        GivenName = One.ToString(),
+                        Name = One.ToString()
+                    },
+                    new clsPortField()
+                    {
+                        ID = 1112,
+                        GivenName = string.Empty,
+                        Name = Two.ToString()
+                    }
+                },
+                PlanFields = new List<clsPortField>()
+                {
+                    new clsPortField()
+                    {
+                        ID = 1113,
+                        GivenName = One.ToString(),
+                        Name = One.ToString()
+                    },
+                    new clsPortField()
+                    {
+                        ID = 1114,
+                        GivenName = string.Empty,
+                        Name = Two.ToString()
+                    }
+                },
+                PIFields = new List<clsPortField>()
+                {
+                    new clsPortField()
+                    {
+                        ID = 1115,
+                        GivenName = One.ToString(),
+                        Name = One.ToString()
+                    },
+                    new clsPortField()
+                    {
+                        ID = 1116,
+                        GivenName = string.Empty,
+                        Name = Two.ToString()
+                    }
+                }
+            };
+
+            privateObject.SetFieldOrProperty(ResourceValuesFieldName, nonPublicInstance, resourceValues);
+
+            // Act
+            privateObject.Invoke(setupdispcolnsMethodName, nonPublicInstance, new object[] { DummyString });
+            var totalMasterColumns = (List<clsRXDisp>)privateObject.GetFieldOrProperty(TotalMasterColumnFieldName, nonPublicInstance);
+            var totalDispColumns = (List<clsRXDisp>)privateObject.GetFieldOrProperty(TotalDisplayColumnFieldName, nonPublicInstance);
+            var detMasterColumns = (Dictionary<int, clsRXDisp>)privateObject.GetFieldOrProperty(DetMasterColumnFieldName, nonPublicInstance);
+            var detDispColumns = (List<clsRXDisp>)privateObject.GetFieldOrProperty(DetDisplayColumnFieldName, nonPublicInstance);
+
+            // Assert
+            totalMasterColumns.ShouldSatisfyAllConditions(
+                () => totalMasterColumns.Count.ShouldBe(8),
+                () => totalMasterColumns.Count(x => x.m_dispname.Equals(One.ToString()) || x.m_dispname.Equals(Two.ToString())).ShouldBe(2),
+                () => totalDispColumns.Count.ShouldBe(8),
+                () => totalDispColumns.Count(x => x.m_dispname.Equals(One.ToString()) || x.m_dispname.Equals(Two.ToString())).ShouldBe(2),
+                () => detMasterColumns.Count.ShouldBe(32),
+                () => detMasterColumns.Count(x => x.Value.m_dispname.Equals(One.ToString()) || x.Value.m_dispname.Equals(Two.ToString())).ShouldBe(6),
+                () => detDispColumns.Count.ShouldBe(32),
+                () => detDispColumns.Count(x => x.m_dispname.Equals(One.ToString()) || x.m_dispname.Equals(Two.ToString())).ShouldBe(6));
         }
     }
 }
