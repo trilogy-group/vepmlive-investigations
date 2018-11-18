@@ -428,6 +428,8 @@ Copy-Item $BinariesDirectory\EPMLiveIntegration.dll $BuildDependenciesFolder -Fo
 
 New-Item $BuildDependenciesFolder\PS -type directory -Force
 Copy-Item $SourcesDirectory\EPMLiveCore\EPMLiveCore\Resources\*.sql $BuildDependenciesFolder\PS -Force  
+
+Write-Host "Logged Error )$global:LASTEXITCODE("
 $loggedError = $global:LASTEXITCODE
 
 if (!$SkipInstallShield)
@@ -442,4 +444,5 @@ if (!$SkipInstallShield)
 }
 Stop-Process -Name MSBuild -Force -ErrorAction Ignore  
 
+Write-Host "Logged Error )$global:LASTEXITCODE("
 $global:LASTEXITCODE = $loggedError
