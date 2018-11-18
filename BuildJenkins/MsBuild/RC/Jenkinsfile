@@ -40,19 +40,5 @@ pipeline {
             }
         }
     }
-    post {
-        success {
-            echo 'Publishing artifacts...'
-			archiveArtifacts "build_version.txt"
-            zip(zipFile: "EPMLive_${env.BUILD_VERSION}.zip", dir: "${env.WORKSPACE}/finalBuild", archive: true)
-        }
-        cleanup {
-            powershell "Write-Host 'Disk space usage before cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
-            echo 'Cleanup workspace...'
-            dir ("${env.WORKSPACE}") {
-                deleteDir()
-            }
-            powershell "Write-Host 'Disk space usage after cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
-        }
-    }
+   
 }
