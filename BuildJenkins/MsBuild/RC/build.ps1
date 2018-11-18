@@ -32,11 +32,11 @@ Get-ChildItem -Include *.dll -Recurse | Where-Object {$_.FullName -like '*\Fakes
 Write-Host "Execute builds"
 Write-Host "Executing tl_buildCode.ps1"
 & .\BuildTeamCity\tl_buildCode.ps1 -ConfigurationToBuild Release
-Write-Host "Error: )$LASTEXITCODE.("
+
 
 Write-Host "Executing tl_buildInstaller.ps1"
 & .\BuildTeamCity\tl_buildInstaller.ps1 
-Write-Host "Error: )$LASTEXITCODE.("
+
 
 $buildRoot = Join-Path $rootDir "BuildTeamCity"
 Set-Location -Path $buildRoot
@@ -44,7 +44,7 @@ Set-Location -Path $buildRoot
 # Execute ps1 for EPM Live (generates config.json and other required wsp or dll files)
 Write-Host "Executing tl_buildSilentInstaller.ps1"
 & .\tl_buildSilentInstaller.ps1
-Write-Host "Error: )$LASTEXITCODE.("
+
 
 Write-Host "Copy Silent installer to output dir"
 $installerDir = Join-Path $buildRoot "SilentInstaller"
@@ -52,4 +52,4 @@ Copy-Item -Path (Join-Path $installerDir "*") -Destination $outputDir -Recurse
 
 Write-Host "Done. Installer is located at $outputDir"
 
-Write-Host "Error: )$LASTEXITCODE.("
+
