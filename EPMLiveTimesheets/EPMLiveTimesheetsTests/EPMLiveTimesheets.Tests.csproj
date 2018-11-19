@@ -147,8 +147,6 @@
     <Compile Include="SheetTestBase.cs" />
     <Compile Include="TimesheetApprovalsTest.cs" />
     <Compile Include="TimesheetTest.cs" />
-    <Compile Include="WebPageCode\GetPMApprovalsTests.cs" />
-    <Compile Include="WebPageCode\GetTSApprovalsTests.cs" />
     <Compile Include="PMApprovalsTest.cs" />
     <Compile Include="WebPageCode\GetTimesheetTest.cs" />
   </ItemGroup>
