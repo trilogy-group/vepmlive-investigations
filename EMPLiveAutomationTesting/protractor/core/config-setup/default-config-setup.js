@@ -38,11 +38,11 @@ const configSetup = {
     }],
     allScriptsTimeout: 300000,
     suites: {
-        //health_tests: './e2e/test-suites/health-check-test-suite/**/*.e2e-spec.ts',
-        //api_tests: './e2e/test-suites/api-test-suite/**/*.e2e-spec.ts',
-        smoke_tests: 'e2e/test-suites/smoke-test-suite/**/*.e2e-specs.ts',
-        //regression_tests: './e2e/test-suites/regression-test-suite/**/*.e2e-spec.ts',
-        //end_to_end_tests: './e2e/test-suites/end-to-end-scenarios/**/*.e2e-spec.ts'
+        health_tests: './e2e/test-suites/health-check-test-suite/**/*.e2e-spec.ts',
+        api_tests: './e2e/test-suites/api-test-suite/**/*.e2e-spec.ts',
+        smoke_tests: 'e2e/test-suites/smoke-test-suite/**/*.e2e-spec.ts',
+        regression_tests: './e2e/test-suites/regression-test-suite/**/*.e2e-spec.ts',
+        end_to_end_tests: './e2e/test-suites/end-to-end-scenarios/**/*.e2e-spec.ts'
     },
     capabilities: {
         "browserName": "chrome",
