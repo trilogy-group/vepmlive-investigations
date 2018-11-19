@@ -48,6 +48,9 @@
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="WorkEnginePPM.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="EPMLiveWebParts.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPMLiveWebParts.Fakes.dll</HintPath>
@@ -158,6 +161,7 @@
     <Compile Include="WebPageCode\getgriditemsTests.cs" />
     <Compile Include="WebPageCode\getgriditemsTests.IsEditable.cs" />
     <Compile Include="WebPageCode\GetitemsTests.cs" />
+    <Compile Include="WebPageCode\GridActionTests.cs" />
     <Compile Include="WebPageCode\SavegridTests.cs" />
   </ItemGroup>
   <ItemGroup>

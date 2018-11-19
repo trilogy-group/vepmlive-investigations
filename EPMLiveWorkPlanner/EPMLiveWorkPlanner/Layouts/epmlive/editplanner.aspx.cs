@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using EPMLiveCore.Layouts.epmlive;
 
 namespace EPMLiveWorkPlanner
 {
@@ -428,42 +429,14 @@ namespace EPMLiveWorkPlanner
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "PJuseres", chkUseRes.Checked.ToString());
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "PJLock", chkLockPublisher.Checked.ToString());
 
-                    string locked = "";
-                    if (chkLockPublisher.Checked)
-                    {
-                        if (ddlPubType.SelectedValue != "")
-                            locked = "1";
-                        else
-                            locked = "0";
-
-                        if (ddlSummary.SelectedValue != "")
-                            locked += ",1";
-                        else
-                            locked += ",0";
-
-                        if (ddlTimePhased.SelectedValue != "")
-                            locked += ",1";
-                        else
-                            locked += ",0";
-
-                        if (ddlPubStatus.SelectedValue != "")
-                            locked += ",1";
-                        else
-                            locked += ",0";
-
-                        if (ddlResourceLink.SelectedValue != "")
-                            locked += ",1";
-                        else
-                            locked += ",0";
-
-                        if (ddlSynchFields.SelectedValue != "")
-                            locked += ",1";
-                        else
-                            locked += ",0";
-                    }
-                    else
-                        locked = "0,0,0,0,0,0";
-
+                    var locked = publishersettings.GetLocked(
+                        chkLockPublisher,
+                        ddlPubType,
+                        ddlSummary,
+                        ddlTimePhased,
+                        ddlPubStatus,
+                        ddlResourceLink,
+                        ddlSynchFields);
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "PJLockItems", locked);
 
                     //Agile
