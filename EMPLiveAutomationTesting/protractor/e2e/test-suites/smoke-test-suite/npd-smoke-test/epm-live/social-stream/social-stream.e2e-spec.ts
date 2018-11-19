@@ -31,6 +31,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
+    /* Eng Problem SKYVERA-1584: #UNSTABLE
     it('To Verify My Shared Documents Upload Functionality from Social Stream - [743927]', async () => {
         StepLogger.caseId = 743927;
 
@@ -91,6 +92,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
+    */
 
     it('Validate the Comments Section & the Ability to add a Project from the Social Stream - [743926]', async () => {
         StepLogger.caseId = 743926;
