@@ -51,7 +51,7 @@ pipeline {
                         readArtifactsFromBranch(env.FULLRC_JOB_NAME, params.FullRcBranchBuild?.trim())
                     }
 					echo 'Extracting build version...'
-                    env.BUILD_VERSION = readFile("${env.WORKSPACE}/Packages/build_version.txt").readLines()[0]
+                    env.BUILD_VERSION = readFile("${env.WORKSPACE}/build_version.txt").readLines()[0]
                     echo "Build version is ${env.BUILD_VERSION}"
                 }
             }
@@ -90,7 +90,7 @@ def readArtifactsFromBranch(jobName, buildNumber) {
             [$class: "CopyArtifact",
             projectName: jobName,
             filter: "build_version.txt, SilentInstaller*.zip",
-            target: "${env.WORKSPACE}/Packages",
+            target: "${env.WORKSPACE}",
             selector: buildSelector])
     } catch (ex) {
         echo ex.toString()

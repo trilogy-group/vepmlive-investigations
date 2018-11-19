@@ -292,6 +292,8 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
 }
 
 Log-Section "Building WiX Projects . . ."
+Write-Host "Logged Error )$global:LASTEXITCODE("
+$loggedError = $global:LASTEXITCODE
 
 $platforms = @("x64", "x86")
 
@@ -428,18 +430,15 @@ Copy-Item $BinariesDirectory\EPMLiveIntegration.dll $BuildDependenciesFolder -Fo
 
 New-Item $BuildDependenciesFolder\PS -type directory -Force
 Copy-Item $SourcesDirectory\EPMLiveCore\EPMLiveCore\Resources\*.sql $BuildDependenciesFolder\PS -Force  
-$ScriptBlock = 
+
+if (!$SkipInstallShield)
 {
-	if (!$SkipInstallShield)
-	{
-		#Run Installshield project to generate product .exe
-		& "C:\Program Files (x86)\InstallShield\2015\System\IsCmdBld.exe" -p "$SourcesDirectory\InstallShield\WorkEngine5\WorkEngine5.ism" -y $NewReleaseNumber -a "Product Configuration 1" -r "PrimaryRelease" -l PATH_TO_BUILDDDEPENDENC_FILES="$BuildDependenciesFolder" -l PATH_TO_PRODUCTOUTPUT_FILES="$ProductOutput"
-		Rename-Item -Path "$SourcesDirectory\InstallShield\WorkEngine5\Product Configuration 1\PrimaryRelease\DiskImages\DISK1\Setup.exe" -NewName "WorkEngine$NewReleaseNumber.exe"
-	}
-
-	Stop-Process -Name MSBuild -Force -ErrorAction SilentlyContinue  
+	#Run Installshield project to generate product .exe
+	& "C:\Program Files (x86)\InstallShield\2015\System\IsCmdBld.exe" -p "$SourcesDirectory\InstallShield\WorkEngine5\WorkEngine5.ism" -y $NewReleaseNumber -a "Product Configuration 1" -r "PrimaryRelease" -l PATH_TO_BUILDDDEPENDENC_FILES="$BuildDependenciesFolder" -l PATH_TO_PRODUCTOUTPUT_FILES="$ProductOutput"
+	Rename-Item -Path "$SourcesDirectory\InstallShield\WorkEngine5\Product Configuration 1\PrimaryRelease\DiskImages\DISK1\Setup.exe" -NewName "WorkEngine$NewReleaseNumber.exe"
 }
-Invoke-Command -ScriptBlock $scriptBlock -ComputerName localhost
+Stop-Process -Name MSBuild -Force -ErrorAction Ignore  
 
 
-
+Write-Host "Logged Error )$global:LASTEXITCODE("
+$global:LASTEXITCODE = $loggedError
