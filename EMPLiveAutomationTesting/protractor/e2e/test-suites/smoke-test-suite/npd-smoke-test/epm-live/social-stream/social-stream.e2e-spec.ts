@@ -31,8 +31,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    /* Eng Problem SKYVERA-1584: #UNSTABLE
-    it('To Verify My Shared Documents Upload Functionality from Social Stream - [743927]', async () => {
+    it('To Verify My Shared Documents Upload Functionality from Social Stream - [743927] [BUG:SKYVERA-1584]', async () => {
         StepLogger.caseId = 743927;
 
         StepLogger.step('Click on +new document link under My Shared Documents on the right side bottom of the page');
@@ -92,7 +91,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
-    */
 
     it('Validate the Comments Section & the Ability to add a Project from the Social Stream - [743926]', async () => {
         StepLogger.caseId = 743926;
