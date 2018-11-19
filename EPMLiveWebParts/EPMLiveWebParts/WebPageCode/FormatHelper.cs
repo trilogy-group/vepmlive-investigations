@@ -82,7 +82,12 @@ namespace EPMLiveWebParts
             val = parsedValue.ToString("c");
         }
 
-        public static string GetFormat(SPField field, XmlDocument xmlDoc, SPWeb web, Func<NumberFormatInfo, string> setCurrencyFormatFunc, string numberFormat)
+        public static string GetFormat(
+            SPField field,
+            XmlDocument xmlDoc,
+            SPWeb web,
+            Func<NumberFormatInfo, string> setCurrencyFormatFunc,
+            string numberFormat)
         {
             var format = string.Empty;
 
@@ -108,16 +113,9 @@ namespace EPMLiveWebParts
                     }
                     else
                     {
-                        var decCount = 0;
+                        int decCount;
                         var decimals = string.Empty;
-                        try
-                        {
-                            decCount = int.Parse(xmlDoc.FirstChild.Attributes["Decimals"].Value);
-                        }
-                        catch (Exception ex)
-                        {
-                            Trace.TraceError("Exception Suppressed {0}", ex);
-                        }
+                        int.TryParse(xmlDoc.FirstChild.Attributes["Decimals"].Value, out decCount);
 
                         var stringBuilder = new StringBuilder(decimals);
                         for (var i = 0; i < decCount; i++)
