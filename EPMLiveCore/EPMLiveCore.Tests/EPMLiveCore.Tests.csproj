@@ -245,6 +245,7 @@
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AddListDataTests.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePoolTests.cs" />
+    <Compile Include="Layouts\epmlive\AdsyncAdminTests.cs" />
     <Compile Include="Layouts\epmlive\CreateNewAjaxDataHostTests.cs" />
     <Compile Include="Layouts\epmlive\AddUsersTests.cs" />
     <Compile Include="Layouts\epmlive\CreateNewWorkspaceTest.cs" />
@@ -260,6 +261,7 @@
     <Compile Include="Layouts\epmlive\TimerSettingsRemTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsTests.cs" />
     <Compile Include="Layouts\epmlive\Upgraders\WE432UpgraderTests.cs" />
+    <Compile Include="Layouts\epmlive\WebSettingsTest.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
     <Compile Include="Layouts\Reporting\IZenda\AddTests.cs" />
     <Compile Include="Layouts\Reporting\EditTests.cs" />
@@ -287,6 +289,9 @@
     <Compile Include="SocialEngine\Core\ThreadManagerTest.cs" />
     <Compile Include="SocialEngine\Modules\ListItemTests.cs" />
     <Compile Include="SPUtilities\SPListUtilityTest.cs" />
+    <Compile Include="Testables\InputFormControlTestable.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Testables\InputFormSectionTestable.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

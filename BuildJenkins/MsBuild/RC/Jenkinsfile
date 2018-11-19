@@ -10,7 +10,7 @@ pipeline {
         timestamps()
     }
     parameters {
-        string(name: 'Version', defaultValue: '7.0.1.x', description: 'Version to set (x is replaced with current build number)')
+        string(name: 'Version', defaultValue: '7.0.2.x', description: 'Version to set (x is replaced with current build number)')
     }
     stages {
         stage('Prepare for build') {
@@ -26,11 +26,11 @@ pipeline {
                 }
                 powershell "Write-Host 'Disk space usage:'(Get-PSDrive C | Select-Object Used,Free)"
                 
-				echo "Writing '${env.BUILD_VERSION}' to build_version.txt"
-                bat "echo ${env.BUILD_VERSION}>> build_version.txt"
-					
                 echo 'Checkout SCM..'
                 checkout scm
+				
+				echo "Writing '${env.BUILD_VERSION}' to build_version.txt"
+                bat "echo ${env.BUILD_VERSION}>> build_version.txt"
             }
         }
         stage('Build') {
@@ -44,7 +44,11 @@ pipeline {
         success {
             echo 'Publishing artifacts...'
 			archiveArtifacts "build_version.txt"
-            zip(zipFile: "EPMLive_${env.BUILD_VERSION}.zip", dir: "${env.WORKSPACE}/finalBuild", archive: true)
+			archiveArtifacts "InstallShield/Build Dependencies/PublisherSetup2016*.zip"
+			archiveArtifacts "InstallShield/WorkEngine5/Product Configuration 1/PrimaryRelease/DiskImages/DISK1/WorkEngine*.exe"
+			archiveArtifacts "output/binaries/_PublishedWebsites/AdminSite_Package/AdminSite.zip"
+			archiveArtifacts "output/binaries/_PublishedWebsites/BillingSite_Package/BillingSite.zip"
+            zip(zipFile: "SilentInstaller.zip", dir: "${env.WORKSPACE}/finalBuild", archive: true)
         }
         cleanup {
             powershell "Write-Host 'Disk space usage before cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
