@@ -122,7 +122,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     /* #UNSTABLE
     it('To Do - Attach File - [852049]', async () => {
-        StepLogger.caseId = 1176340;
+        StepLogger.caseId = 852049;
         StepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function

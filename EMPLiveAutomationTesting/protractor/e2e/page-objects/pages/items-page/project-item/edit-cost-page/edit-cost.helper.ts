@@ -91,12 +91,14 @@ export class EditCostHelper {
 
     static async validateEditCostIsDisabled() {
         StepLogger.verification('Validate Edit Cost Is Disabled ');
-        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.editCost);
+        await ExpectationHelper.verifyAttributeContains(CommonPage.ribbonItems.editCost, 'class', 'ms-cui-disabled');
     }
 
     static async validateEditCostIsEnable() {
         StepLogger.verification('Validate Edit Cost Is Enabled');
-        await ExpectationHelper.verifyAttributeValue(CommonPage.ribbonItems.editCost, 'aria-disabled', '');
+        // Static wait is needed as after selecting the project it takes a while for element to be enabled
+        await PageHelper.sleepForXSec(PageHelper.timeout.m);
+        await ExpectationHelper.verifyAttributeValue(CommonPage.ribbonItems.editCost, 'class', 'ms-cui-ctl-large');
     }
 
     static async validateSaveButtonDisabled() {
