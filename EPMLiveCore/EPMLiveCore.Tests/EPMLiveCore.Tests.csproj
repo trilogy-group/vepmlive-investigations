@@ -237,6 +237,7 @@
     <Compile Include="Integrations\Office365\Infrastructure\O365ServiceTests.cs" />
     <Compile Include="Integrations\Salesforce\IntegratorTests.cs" />
     <Compile Include="Integrations\Salesforce\SfServiceTests.cs" />
+    <Compile Include="ISAPI\Lic\LicensingTests.cs" />
     <Compile Include="ISAPI\WorkEngineAPITests.cs" />
     <Compile Include="ISAPI\WorkEngineAPITests.RemainingMethods.cs" />
     <Compile Include="Jobs\NotificationsTests.cs" />
