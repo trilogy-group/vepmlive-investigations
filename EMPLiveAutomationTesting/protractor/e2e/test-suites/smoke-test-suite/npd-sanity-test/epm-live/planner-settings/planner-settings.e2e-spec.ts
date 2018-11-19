@@ -1,7 +1,18 @@
-import {SuiteNames} from '../../../../helpers/suite-names';
-import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-import {PageHelper} from '../../../../../components/html/page-helper';
-import {StepLogger} from '../../../../../../core/logger/step-logger';
+import { browser } from 'protractor';
+
+import { CheckboxHelper } from '../../../../../components/html/checkbox-helper';
+import { ElementHelper } from '../../../../../components/html/element-helper';
+import { TextboxHelper } from '../../../../../components/html/textbox-helper';
+import { ValidationsHelper } from '../../../../../components/misc-utils/validation-helper';
+import { CommonPage } from '../../../../../page-objects/pages/common/common.po';
+import { PlannerSettingPage } from '../../../../../page-objects/pages/settings/planner-setting/planner-setting.po';
+import { PlannerSettingsPageConstants } from '../../../../../page-objects/pages/settings/planner-setting/planner-settings-page.constants';
+import { PlannerSettingsPageHelper } from '../../../../../page-objects/pages/settings/planner-setting/planner-settings-page.helper';
+import { SettingsPage } from '../../../../../page-objects/pages/settings/settings.po';
+import { SuiteNames } from '../../../../helpers/suite-names';
+import { LoginPage } from '../../../../../page-objects/pages/login/login.po';
+import { PageHelper } from '../../../../../components/html/page-helper';
+import { StepLogger } from '../../../../../../core/logger/step-logger';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -17,8 +28,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    /* Eng Problem SKYVERA-1584: #UNSTABLE
-    it('Add new planner - [1032747]', async () => {
+    it('Add new planner - [1032747] [BUG:SKYVERA-1584]', async () => {
         StepLogger.caseId = 1032747;
         StepLogger.stepId(1);
         const uniqueId = PageHelper.getUniqueId();
@@ -77,10 +87,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         // To Verify "Required values Entered/Selected in 'Planner Settings' page" is not posible
         await PlannerSettingsPageHelper.saveAndVerifyCreatePlanner(plannerName, true);
     });
-    */
 
-    /* Eng Problem SKYVERA-1584: #UNSTABLE
-    it('Edit Planner name - [1032780]', async () => {
+    it('Edit Planner name - [1032780] [BUG:SKYVERA-1584]', async () => {
         StepLogger.caseId = 1032780;
         const uniqueId = PageHelper.getUniqueId();
         StepLogger.preCondition('Add new planner');
@@ -131,7 +139,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         // Required changes done in 'Planner Settings' page verify is not posible
         // Step from 4 Inside the function
         await PlannerSettingsPageHelper.saveAndVerifyCreatePlanner(plannerUpdatedName, true);
-
     });
-    */
 });
