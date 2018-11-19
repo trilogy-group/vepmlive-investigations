@@ -148,9 +148,6 @@
     <Compile Include="TimesheetsAssemblyInfo.cs" />
     <Compile Include="TimesheetSettings.cs" />
     <Compile Include="Timesheet\Timesheet.cs" />
-    <Compile Include="WebPageCode\ApprovalBase.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="WebPageCode\DataSetUtils.cs" />
     <Compile Include="WebPageCode\gettimesheet.AddItem.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -168,12 +165,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="WebPageCode\getts.addHeader.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="WebPageCode\gettsapprovals.outputXml.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="WebPageCode\gettsapprovals.populateGroups.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="WebPageCode\timesheetapprovalpage.cs">
@@ -225,7 +216,6 @@
     <Compile Include="Worklog\WorkLog.FieldControl.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bundleconfig.json" />
     <None Include="CONTROLTEMPLATES\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{888a2922-b8a3-4660-8197-3c2f40c95f52}</SharePointProjectItemId>
     </None>

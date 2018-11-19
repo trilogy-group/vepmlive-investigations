@@ -442,6 +442,7 @@
     <Compile Include="WebPageCode\contextualslideout.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebPageCode\FormatHelper.cs" />
     <Compile Include="WebPageCode\getedititem.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
