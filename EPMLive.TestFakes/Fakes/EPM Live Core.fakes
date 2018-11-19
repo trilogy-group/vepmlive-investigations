@@ -121,6 +121,7 @@
     <Add FullName="EPMLiveCore.ViewPermissionUtil!"/>
     <Add FullName="EPMLiveCore.tpreport!"/>
     <Add FullName="EPMLiveCore.Jobs.TimerFix!"/>
+    <Add FullName="EPMLiveCore.Helpers.WebServicesHelper!"/>
     <Add FullName="EPMLiveCore.adsyncadmin!"/>
   </ShimGeneration>
 </Fakes>

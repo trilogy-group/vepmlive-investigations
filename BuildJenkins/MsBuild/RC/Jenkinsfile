@@ -44,6 +44,10 @@ pipeline {
         success {
             echo 'Publishing artifacts...'
 			archiveArtifacts "build_version.txt"
+			archiveArtifacts "InstallShield/Build Dependencies/PublisherSetup2016*.zip"
+			archiveArtifacts "InstallShield/WorkEngine5/Product Configuration 1/PrimaryRelease/DiskImages/DISK1/WorkEngine*.exe"
+			archiveArtifacts "output/binaries/_PublishedWebsites/AdminSite_Package/AdminSite.zip"
+			archiveArtifacts "output/binaries/_PublishedWebsites/BillingSite_Package/BillingSite.zip"
             zip(zipFile: "SilentInstaller.zip", dir: "${env.WORKSPACE}/finalBuild", archive: true)
         }
         cleanup {
