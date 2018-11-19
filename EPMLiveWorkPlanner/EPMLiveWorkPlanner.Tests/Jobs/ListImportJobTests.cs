@@ -4,6 +4,8 @@ using System.Collections.Generic.Fakes;
 using System.Data;
 using System.Data.Fakes;
 using System.Diagnostics.CodeAnalysis;
+using EPMLiveCore.API.Fakes;
+using EPMLiveWorkPlanner.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
@@ -23,6 +25,15 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
         private const double DummyDouble = 10.20;
         private const int DummyInt = 1;
         private const int DummyId = 5;
+        private const string DummyListField = "DummyListField";
+        private const string PlannerField = "PlannerField";
+        private const string DummyTitle = "DummyTitle";
+        private static readonly Guid DummyGuid = new Guid("6452bd43-ada2-4246-8f8b-1f4fcab2c87a");
+        private static readonly Guid DummyGuidParentList = new Guid("6452bd43-ada3-4246-8f8b-1f4fcab2c87a");
+        private static readonly Guid DummyGuidListItem = new Guid("6452bd43-ada4-4246-8f8b-1f4fcab2c87a");
+        private const string DummyListProjectCenter = "DummyListProjectCenter";
+        private const string DummyListTaskCenter = "DummyListTaskCenter";
+        private const string DummyInternalName = "DummyInternalName";
 
         [TestInitialize]
         public void TestInitialize()
@@ -529,6 +540,258 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
 
             // Assert
             actualResult.ShouldBe(string.Empty);
+        }
+
+        [TestMethod]
+        public void Execute_ListNull_FillErrorString()
+        {
+            // Arrange
+            var data = $@"<Data List=""{DummyString}""><Columns><Column ListField=""{DummyListField}"" PlannerField=""{PlannerField}""></Column></Columns></Data>";
+
+            var site = new ShimSPSite();
+            var web = new ShimSPWeb()
+            {
+                ListsGet = () => new ShimSPListCollection()
+                {
+                    TryGetListString = listTitle => null
+                }
+            };
+
+            // Act
+            _testEntity.execute(site, web, data);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _testEntity.sErrors.ShouldBe("List could not be found."),
+                () => _testEntity.bErrors.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void Execute_LisFoundedAttachedItemOnlyTruePlannerNotFound_FillErrorString()
+        {
+            // Arrange
+            var data = $@"<Data List=""{DummyString}""><Columns><Column ListField=""{DummyListField}"" PlannerField=""{PlannerField}""></Column></Columns></Data>";
+
+            var oList = new ShimSPList()
+            {
+                TitleGet = () => DummyListProjectCenter,
+                FieldsGet = () => new ShimSPFieldCollection()
+                {
+                    ContainsFieldString = fieldName => true
+                },
+                GetItemsSPQuery = query => new ShimSPListItemCollection().Bind(
+                    new SPListItem[]
+                    {
+                        new ShimSPListItem()
+                        {
+                            ParentListGet = () => new ShimSPList()
+                            {
+                                IDGet = () => DummyGuidParentList,
+                                FieldsGet = () => new ShimSPFieldCollection().Bind(
+                                    new SPField[]
+                                    {
+                                        new ShimSPField()
+                                        {
+                                            ReorderableGet = () => true,
+                                            InternalNameGet = () => DummyInternalName
+                                        },
+                                        new ShimSPField()
+                                        {
+                                            ReorderableGet = () => true,
+                                            InternalNameGet = () => DummyListField
+                                        }
+                                    })
+                            },
+                            IDGet = () => DummyId
+                        }
+                    })
+            };
+
+            ShimSPQuery.Constructor = sender => new ShimSPQuery();
+
+            var site = new ShimSPSite();
+            var web = new ShimSPWeb()
+            {
+                ListsGet = () => new ShimSPListCollection()
+                {
+                    TryGetListString = listTitle => oList,
+                    ItemGetString = itemName => new ShimSPList()
+                    {
+                        IDGet = () => DummyGuid
+                    }
+                }
+            };
+
+            var plannerProps = new ShimWorkPlannerAPI.ShimPlannerProps();
+
+            plannerProps.Instance.sListProjectCenter = DummyListProjectCenter;
+            plannerProps.Instance.sListTaskCenter = DummyListTaskCenter;
+
+            ShimWorkPlannerAPI.getSettingsSPWebString = (oWeb, sPlanner) => plannerProps;
+            ShimWorkPlannerAPI.GetResourceTableWorkPlannerAPIPlannerPropsGuidStringSPWeb = (props, listId, itemId, webParam) => new ShimDataSet();
+
+            ShimWorkPlannerAPI.GetTasksXmlDocumentSPWeb = (dataPlanInfo, webParam) => "<xmlcfg><I id=\"1\" Predecessors=\"Predecessors;myString\" Descendants=\"Descendants;myString\" /></xmlcfg>";
+
+            ShimBaseJob.AllInstances.updateProgressSingle = (sender, newCount) => { };
+
+            // Act
+            _testEntity.execute(site, web, data);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _testEntity.sErrors.ShouldBe("<Result Status=\"1\">Planner Not Specified</Result>"),
+                () => _testEntity.bErrors.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void Execute_LisFoundedAttachedItemOnlyFalsePlannerNotFound_FillErrorString()
+        {
+            // Arrange
+            var data = $@"<Data List=""{DummyString}"" AttachedItemsOnly=""false""><Columns><Column ListField=""{DummyListField}"" PlannerField=""{PlannerField}""></Column></Columns></Data>";
+
+            var oList = new ShimSPList()
+            {
+                TitleGet = () => DummyListTaskCenter,
+                FieldsGet = () => new ShimSPFieldCollection()
+                {
+                    ContainsFieldString = fieldName => true
+                },
+                ItemsGet = () => new ShimSPListItemCollection().Bind(
+                    new SPListItem[]
+                    {
+                        new ShimSPListItem()
+                        {
+                            ParentListGet = () => new ShimSPList()
+                            {
+                                IDGet = () => DummyGuidParentList,
+                                FieldsGet = () => new ShimSPFieldCollection().Bind(
+                                    new SPField[]
+                                    {
+                                        new ShimSPField()
+                                        {
+                                            ReorderableGet = () => true,
+                                            InternalNameGet = () => DummyInternalName
+                                        },
+                                        new ShimSPField()
+                                        {
+                                            ReorderableGet = () => true,
+                                            InternalNameGet = () => DummyListField
+                                        }
+                                    })
+                            },
+                            IDGet = () => DummyId
+                        }
+                    })
+            };
+
+            ShimSPQuery.Constructor = sender => new ShimSPQuery();
+
+            var site = new ShimSPSite();
+            var web = new ShimSPWeb()
+            {
+                ListsGet = () => new ShimSPListCollection()
+                {
+                    TryGetListString = listTitle => oList,
+                    ItemGetString = itemName => new ShimSPList()
+                    {
+                        IDGet = () => DummyGuid
+                    }
+                }
+            };
+
+            var plannerProps = new ShimWorkPlannerAPI.ShimPlannerProps();
+
+            plannerProps.Instance.sListProjectCenter = DummyListProjectCenter;
+            plannerProps.Instance.sListTaskCenter = DummyListTaskCenter;
+
+            ShimWorkPlannerAPI.getSettingsSPWebString = (oWeb, sPlanner) => plannerProps;
+            ShimWorkPlannerAPI.GetResourceTableWorkPlannerAPIPlannerPropsGuidStringSPWeb = (props, listId, itemId, webParam) => new ShimDataSet();
+
+            ShimWorkPlannerAPI.GetTasksXmlDocumentSPWeb = (dataPlanInfo, webParam) => "<xmlcfg><I id=\"1\" Predecessors=\"Predecessors;myString\" Descendants=\"Descendants;myString\" /></xmlcfg>";
+
+            ShimBaseJob.AllInstances.updateProgressSingle = (sender, newCount) => { };
+
+            // Act
+            _testEntity.execute(site, web, data);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _testEntity.sErrors.ShouldBe("<Result Status=\"1\">Planner Not Specified</Result>"),
+                () => _testEntity.bErrors.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void Execute_NoPlannerSpecified_FillErrorString()
+        {
+            // Arrange
+            var data = $@"<Data List=""{DummyString}"" AttachedItemsOnly=""false""><Columns><Column ListField=""{DummyListField}"" PlannerField=""{PlannerField}""></Column></Columns></Data>";
+
+            var site = new ShimSPSite();
+            var web = new ShimSPWeb()
+            {
+                ListsGet = () => new ShimSPListCollection()
+                {
+                    //TryGetListString = listTitle => oList,
+                    ItemGetString = itemName => new ShimSPList()
+                    {
+                        IDGet = () => DummyGuid
+                    }
+                }
+            };
+
+            _testEntity.key = string.Empty;
+
+            // Act
+            _testEntity.execute(site, web, data);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _testEntity.sErrors.ShouldBe("No Planner Specified"),
+                () => _testEntity.bErrors.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void Execute_NoListSpecified_FillErrorString()
+        {
+            // Arrange
+            var data = $@"<Data AttachedItemsOnly=""false""><Columns><Column ListField=""{DummyListField}"" PlannerField=""{PlannerField}"" ></Column></Columns></Data>";
+
+            var site = new ShimSPSite();
+            var web = new ShimSPWeb()
+            {
+                ListsGet = () => new ShimSPListCollection()
+                {
+                    ItemGetString = itemName => new ShimSPList()
+                    {
+                        IDGet = () => DummyGuid
+                    }
+                }
+            };
+
+            // Act
+            _testEntity.execute(site, web, data);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _testEntity.sErrors.ShouldBe("No List Specified"),
+                () => _testEntity.bErrors.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void Execute_FailLoadXml_FillErrorString()
+        {
+            // Arrange
+            var data = string.Empty;
+            var site = new ShimSPSite();
+            var web = new ShimSPWeb();
+
+            // Act
+            _testEntity.execute(site, web, data);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _testEntity.sErrors.ShouldContain("Error importing list: "),
+                () => _testEntity.bErrors.ShouldBeTrue());
         }
     }
 }
