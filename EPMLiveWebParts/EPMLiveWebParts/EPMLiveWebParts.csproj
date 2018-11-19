@@ -442,6 +442,7 @@
     <Compile Include="WebPageCode\contextualslideout.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebPageCode\FormatHelper.cs" />
     <Compile Include="WebPageCode\getedititem.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -493,6 +494,7 @@
     <Compile Include="WebPageCode\savegrid.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebPageCode\SaveHelper.cs" />
     <Compile Include="WebPageCode\saveresplan.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

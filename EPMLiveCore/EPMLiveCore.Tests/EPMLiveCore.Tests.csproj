@@ -237,6 +237,7 @@
     <Compile Include="Integrations\Office365\Infrastructure\O365ServiceTests.cs" />
     <Compile Include="Integrations\Salesforce\IntegratorTests.cs" />
     <Compile Include="Integrations\Salesforce\SfServiceTests.cs" />
+    <Compile Include="ISAPI\Lic\LicensingTests.cs" />
     <Compile Include="ISAPI\WorkEngineAPITests.cs" />
     <Compile Include="ISAPI\WorkEngineAPITests.RemainingMethods.cs" />
     <Compile Include="Jobs\NotificationsTests.cs" />
@@ -261,6 +262,7 @@
     <Compile Include="Layouts\epmlive\TimerSettingsRemTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsTests.cs" />
     <Compile Include="Layouts\epmlive\Upgraders\WE432UpgraderTests.cs" />
+    <Compile Include="Layouts\epmlive\WebSettingsTest.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
     <Compile Include="Layouts\Reporting\IZenda\AddTests.cs" />
     <Compile Include="Layouts\Reporting\EditTests.cs" />

@@ -6439,58 +6439,15 @@ namespace EPMLiveWebParts
                         case "Text":
                             break;
                         case "Currency":
-                            {
-                                double fval = double.Parse(val, providerEn);
-                                val = fval.ToString("c");
-                            }
+                            FormatHelper.FormatCurrency(ref val, providerEn);
                             break;
                         case "DateTime":
-                            if (DateTime.Parse(val).ToString() == DateTime.MaxValue.ToString() || DateTime.Parse(val).ToString() == DateTime.MinValue.ToString())
-                            {
-                                val = "";
-                            }
-                            else
-                            {
-                                try
-                                {
-                                    format = fieldXml.ChildNodes[0].Attributes["Format"].Value;
-                                }
-                                catch { }
-                                if (format == "DateOnly")
-                                    val = DateTime.Parse(val).ToShortDateString();
-                            }
+                            FormatHelper.FormatDateTime(ref val, format, fieldXml);
                             break;
                         case "Number":
-                            int decimals = 0;
-                            try
-                            {
-                                decimals = int.Parse(fieldXml.ChildNodes[0].Attributes["Decimals"].Value);
-                                for (int j = 0; j < decimals; j++)
-                                {
-                                    format += "0";
-                                }
-                                if (format.Length > 0)
-                                    format = "#,##0." + format;
-                                else
-                                    format = "#,##0";
-                            }
-                            catch { }
-                            if (spfield.SchemaXml.Contains("Percentage=\"TRUE\""))
-                            {
-                                double fval = double.Parse(val, providerEn) * 100;
-                                val = fval.ToString(format, providerEn);
-                                val += "%";
-                            }
-                            else
-                            {
-                                try
-                                {
-                                    double fval = double.Parse(val, providerEn);
-                                    val = fval.ToString(format, providerEn);
-
-                                }
-                                catch { }
-                            }
+                            FormatHelper.FormatNumber(ref val, fieldXml, format, spfield, providerEn, true);
+                            break;
+                        default:
                             break;
                     };
                     break;
