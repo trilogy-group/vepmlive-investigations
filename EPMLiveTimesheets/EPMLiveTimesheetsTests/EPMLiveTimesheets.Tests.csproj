@@ -154,8 +154,6 @@
     <Compile Include="SheetTestBase.cs" />
     <Compile Include="TimesheetApprovalsTest.cs" />
     <Compile Include="TimesheetTest.cs" />
-    <Compile Include="WebPageCode\GetPMApprovalsTests.cs" />
-    <Compile Include="WebPageCode\GetTSApprovalsTests.cs" />
     <Compile Include="PMApprovalsTest.cs" />
     <Compile Include="WebPageCode\GetTimesheetTest.cs" />
     <Compile Include="WebPageCode\SavetimesheetTests.cs" />
@@ -182,7 +180,6 @@
     <None Include="EPMLiveTimesheets.Tests.snk" />
     <Compile Include="GetTsTests.addHeader.cs" />
     <None Include="packages.config" />
-    <Compile Include="WebPageCode\GetTsApprovalsTests.getParams.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

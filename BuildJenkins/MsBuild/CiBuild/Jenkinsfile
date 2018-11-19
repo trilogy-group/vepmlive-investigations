@@ -10,7 +10,7 @@ pipeline {
         timestamps()
     }
     parameters {
-        string(name: 'Version', defaultValue: '7.0.0.x', description: 'Version to set (x is replaced with current build number)')
+        string(name: 'Version', defaultValue: '7.0.2.x', description: 'Version to set (x is replaced with current build number)')
     }
     stages {
         stage('Prepare for build') {
