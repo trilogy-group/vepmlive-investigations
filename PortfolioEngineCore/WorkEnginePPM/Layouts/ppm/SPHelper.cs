@@ -8,7 +8,6 @@ namespace WorkEnginePPM
     {
         internal static bool ExecuteProcess(string context, string xmlRequest, out XmlNode node)
         {
-            node = null;
             return ExecuteProcessEx(context, xmlRequest, out node);
         }
 
@@ -30,7 +29,7 @@ namespace WorkEnginePPM
             Label logLabel = null)
         {
             XmlNode statusNode;
-            if (ExecuteProcess("GetTimerStatus", "<Status Schedule=\"10\"/>", out statusNode) == false)
+            if (!ExecuteProcess("GetTimerStatus", "<Status Schedule=\"10\"/>", out statusNode))
             {
                 if(errorLabel == null)
                 {
@@ -57,6 +56,8 @@ namespace WorkEnginePPM
                                 break;
                             case "2":
                                 statusLabel.Text = "Complete";
+                                break;
+                            default:
                                 break;
                         }
                     }
