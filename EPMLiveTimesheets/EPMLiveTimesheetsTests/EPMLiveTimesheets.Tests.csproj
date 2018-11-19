@@ -137,6 +137,7 @@
     <Compile Include="GetTsTests.PageLoad.cs" />
     <Compile Include="GetTsTests.cs" />
     <Compile Include="Jobs\SaveJobTests.cs" />
+    <Compile Include="Layouts\epmlive\TimesheetadminTests.cs" />
     <Compile Include="Layouts\WorkLogTest.cs" />
     <Compile Include="MyTimesheetTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -153,10 +154,9 @@
     <Compile Include="SheetTestBase.cs" />
     <Compile Include="TimesheetApprovalsTest.cs" />
     <Compile Include="TimesheetTest.cs" />
-    <Compile Include="WebPageCode\GetPMApprovalsTests.cs" />
-    <Compile Include="WebPageCode\GetTSApprovalsTests.cs" />
     <Compile Include="PMApprovalsTest.cs" />
     <Compile Include="WebPageCode\GetTimesheetTest.cs" />
+    <Compile Include="WebPageCode\SavetimesheetTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
@@ -180,7 +180,6 @@
     <None Include="EPMLiveTimesheets.Tests.snk" />
     <Compile Include="GetTsTests.addHeader.cs" />
     <None Include="packages.config" />
-    <Compile Include="WebPageCode\GetTsApprovalsTests.getParams.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

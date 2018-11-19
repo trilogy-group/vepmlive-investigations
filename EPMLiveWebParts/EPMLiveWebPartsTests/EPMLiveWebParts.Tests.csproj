@@ -48,6 +48,9 @@
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="WorkEnginePPM.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="EPMLiveWebParts.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPMLiveWebParts.Fakes.dll</HintPath>
@@ -126,23 +129,28 @@
   </Choose>
   <ItemGroup>
     <Compile Include="API\WPAPITest.cs" />
+    <Compile Include="ChartControl\ChartControlTests.cs" />
     <Compile Include="ChartControl\ChartControlToolpartBaseTests.cs" />
     <Compile Include="ChartControl\EpmChartTests.cs" />
     <Compile Include="ChartControl\VfChartTests.cs" />
+    <Compile Include="ControlTemplates\SocialStreamTests.cs" />
     <Compile Include="GridListView\GridListViewTests.AddContextualTab.cs" />
     <Compile Include="GridListView\GridListViewTests.RemainingMethods.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderActionMenu.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderGantt.cs" />
     <Compile Include="IntegrationModuleDisplay\IntegrationModuleDisplayTest.cs" />
+    <Compile Include="Layouts\epmlive\Admin\SSLogsTests.cs" />
     <Compile Include="Layouts\epmlive\TlwizardTests.cs" />
     <Compile Include="Layouts\epmlive\UpdateWebPartTests.cs" />
     <Compile Include="ListReportView\ListReportViewTest.cs" />
+    <Compile Include="MyWorkWebPart\MyWorkToolpartTests.cs" />
     <Compile Include="ReportingChart\ReportingChartTests.cs" />
     <Compile Include="ReportingChart\ReportingChartToolPartTests.cs" />
     <Compile Include="ReportingChart\ReportingChartToolPartTests.Part2.cs" />
     <Compile Include="ResourcePlanningTest.cs" />
     <Compile Include="ReportingFilter\ReportingFilterTests.cs" />
     <Compile Include="UserProfileDisplay\DisplayProfilePicturesTests.cs" />
+    <Compile Include="WebPageCode\GetGanttItemsTests.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.cs" />
     <Compile Include="GridListView\GridListViewTests.cs" />
     <Compile Include="Helpers\SpListItemDefinition.cs" />
@@ -152,6 +160,8 @@
     <Compile Include="ReportViewerTest.cs" />
     <Compile Include="WebPageCode\getgriditemsTests.cs" />
     <Compile Include="WebPageCode\getgriditemsTests.IsEditable.cs" />
+    <Compile Include="WebPageCode\GridActionTests.cs" />
+    <Compile Include="WebPageCode\SavegridTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">

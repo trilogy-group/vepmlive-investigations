@@ -4,7 +4,7 @@ pipeline {
     }
 	parameters {
         string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')
-		string(name: 'fullHostName', defaultValue: 'tenant01.epmdev.com', description: 'Target full host name')
+		string(name: 'fullHostName', defaultValue: 'tenant01.epmldev.com', description: 'Target full host name')
     }
     stages {
         stage('Preparing for UI tests execution') {
@@ -13,12 +13,12 @@ pipeline {
                 sh "chmod +x ${env.WORKSPACE}/BuildJenkins/Protractor/*.sh"
                 
                 echo 'Installing dependencies...'
-                dir ("${env.WORKSPACE}/TestSuite.Protractor") {
+                dir ("${env.WORKSPACE}/EMPLiveAutomationTesting/protractor") {
                     sh "${env.WORKSPACE}/BuildJenkins/Protractor/install-dependencies.sh"
                 }
                 
                 echo 'Updating hosts file...'
-                dir ("${env.WORKSPACE}/TestSuite.Protractor") {
+                dir ("${env.WORKSPACE}/EMPLiveAutomationTesting/protractor") {
                     sh "${env.WORKSPACE}/BuildJenkins/Protractor/update-hosts-file.sh ${params.TargetHost} ${params.fullHostName}"
                 }
             }
@@ -26,7 +26,7 @@ pipeline {
         stage('Executing UI tests') {
             steps {
                 echo 'Run tests...'
-                dir ("${env.WORKSPACE}/TestSuite.Protractor") {
+                dir ("${env.WORKSPACE}/EMPLiveAutomationTesting/protractor") {
                     sh "npm run e2e-tc -- --params.headlessBrowser=true"
                 }
             }
@@ -41,7 +41,7 @@ pipeline {
                     jdk: '',
                     properties: [],
                     reportBuildPolicy: 'ALWAYS',
-                    results: [[path: "TestSuite.Protractor/auto-generated/allure-results"]]
+                    results: [[path: "EMPLiveAutomationTesting/protractor/auto-generated/allure-results"]]
                 ])
             }
         }
