@@ -97,7 +97,7 @@ export class EditCostHelper {
     static async validateEditCostIsEnable() {
         StepLogger.verification('Validate Edit Cost Is Enabled');
         // Static wait is needed as after selecting the project it takes a while for element to be enabled
-        await PageHelper.sleepForXSec(10000);
+        await PageHelper.sleepForXSec(PageHelper.timeout.m);
         await ExpectationHelper.verifyAttributeValue(CommonPage.ribbonItems.editCost, 'class', 'ms-cui-ctl-large');
     }
 
