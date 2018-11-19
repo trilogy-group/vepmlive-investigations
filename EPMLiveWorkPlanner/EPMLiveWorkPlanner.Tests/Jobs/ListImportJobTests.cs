@@ -572,7 +572,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             // Arrange
             var data = $@"<Data List=""{DummyString}""><Columns><Column ListField=""{DummyListField}"" PlannerField=""{PlannerField}""></Column></Columns></Data>";
 
-            var oList = new ShimSPList()
+            var spList = new ShimSPList()
             {
                 TitleGet = () => DummyListProjectCenter,
                 FieldsGet = () => new ShimSPFieldCollection()
@@ -614,7 +614,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             {
                 ListsGet = () => new ShimSPListCollection()
                 {
-                    TryGetListString = listTitle => oList,
+                    TryGetListString = listTitle => spList,
                     ItemGetString = itemName => new ShimSPList()
                     {
                         IDGet = () => DummyGuid
@@ -649,7 +649,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             // Arrange
             var data = $@"<Data List=""{DummyString}"" AttachedItemsOnly=""false""><Columns><Column ListField=""{DummyListField}"" PlannerField=""{PlannerField}""></Column></Columns></Data>";
 
-            var oList = new ShimSPList()
+            var spList = new ShimSPList()
             {
                 TitleGet = () => DummyListTaskCenter,
                 FieldsGet = () => new ShimSPFieldCollection()
@@ -691,7 +691,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             {
                 ListsGet = () => new ShimSPListCollection()
                 {
-                    TryGetListString = listTitle => oList,
+                    TryGetListString = listTitle => spList,
                     ItemGetString = itemName => new ShimSPList()
                     {
                         IDGet = () => DummyGuid
@@ -731,7 +731,6 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             {
                 ListsGet = () => new ShimSPListCollection()
                 {
-                    //TryGetListString = listTitle => oList,
                     ItemGetString = itemName => new ShimSPList()
                     {
                         IDGet = () => DummyGuid
