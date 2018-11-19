@@ -396,7 +396,7 @@ export class ProjectItemPage extends BasePage {
     }
 
     static async getCurrentTeamUserLabelLinkByText(text: string) {
-        const xpathForLink = `//*table[@id='TeamGrid']//tr[@class='GMDataRow ']//a[contains((.),'${text}')]`;
+        const xpathForLink = `//*/table[@id='TeamGrid']//*/tr[@class='GMDataRow ']//*/a[contains((.),'${text}')]`;
         return element(By.xpath(xpathForLink));
     }
 
