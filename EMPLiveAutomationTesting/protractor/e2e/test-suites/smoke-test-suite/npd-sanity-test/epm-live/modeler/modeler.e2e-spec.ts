@@ -25,7 +25,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.caseId = 783206;
         const cost = 4;
 
-        await StepLogger.preCondition('Create a project').;
+        await StepLogger.preCondition('Create a project');
         const uniqueId = PageHelper.getUniqueId();
         const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId);
 
