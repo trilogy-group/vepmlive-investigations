@@ -4,6 +4,7 @@ using System.Data;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint.WebControls;
 using PortfolioEngineCore;
+using WorkEnginePPM.Layouts.ppm2;
 
 namespace WorkEnginePPM
 {
@@ -136,34 +137,7 @@ namespace WorkEnginePPM
             CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
             xToolbar.CreateIntAttr("Visible", 0);
 
-            CStruct xPanel = xGrid.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 0);
-            xPanel.CreateIntAttr("Delete", 0);
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-            xCfg.CreateIntAttr("SuppressCfg", 3);
-            xCfg.CreateIntAttr("InEditMode", 0);
-            xCfg.CreateIntAttr("Sorting", 0);
-            xCfg.CreateIntAttr("Selecting", 0);
-            xCfg.CreateIntAttr("Dragging", 0);
-            xCfg.CreateIntAttr("Dropping", 0);
-            xCfg.CreateIntAttr("ColsMoving", 0);
-            xCfg.CreateIntAttr("ColsPostLap", 0);
-            xCfg.CreateIntAttr("ColsLap", 0);
-            xCfg.CreateBooleanAttr("NoTreeLines", true);
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateBooleanAttr("ShowDeleted", true);
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            xCfg.CreateIntAttr("LastId", 1);
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-            xCfg.CreateIntAttr("SelectingCells", 1);
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "RPEditor");
+            grouppermissionform.BuildConfig(xGrid);
 
             CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
             CStruct xCols = xGrid.CreateSubStruct("Cols");

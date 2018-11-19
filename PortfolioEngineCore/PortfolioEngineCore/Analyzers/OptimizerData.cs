@@ -395,48 +395,68 @@ namespace PortfolioEngineCore
 
         public bool RenameOptimizerViewXML(Guid guidView, string sName)
         {
-            string sCommand;
-            CStruct xView = null;
-            if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
-            _sqlConnection.Open();
+            const string InitialCommand = "SELECT VIEW_DATA FROM EPG_VIEWS WHERE VIEW_CONTEXT=32100 AND VIEW_GUID=@guid";
+            return RenameViewXml(guidView, sName, InitialCommand, _sqlConnection);
+        }
 
-            sCommand = "SELECT VIEW_DATA FROM EPG_VIEWS WHERE VIEW_CONTEXT=32100 AND VIEW_GUID=@guid";
-            //string sCommand = "SELECT WAU_UID,UINF_VIEWNAME,UINF_XML FROM EPGT_LOCALVIEWS WHERE UINF_VIEWNAME=" + _dba.PrepareText(sViewName) + " ORDER BY UINF_VIEWNAME";
+        internal static bool RenameViewXml(Guid guidView, string name, string initialCommand, SqlConnection sqlConnection)
+        {
+            if (sqlConnection == null)
+            {
+                throw new ArgumentNullException(nameof(sqlConnection));
+            }
 
-            SqlCommand oCommand = new SqlCommand(sCommand, _sqlConnection);
-            oCommand.Parameters.AddWithValue("@guid", guidView);
-            SqlDataReader reader = oCommand.ExecuteReader();
+            CStruct view = null;
+            if (sqlConnection.State == ConnectionState.Open)
+            {
+                sqlConnection.Close();
+            }
+            sqlConnection.Open();
+
+            var command = initialCommand;
+
+            SqlDataReader reader;
+            
+            using (var sqlCommand = new SqlCommand(command, sqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@guid", guidView);
+                reader = sqlCommand.ExecuteReader();
+            }
 
             if (reader.Read())
             {
-                string sXML = DBAccess.ReadStringValue(reader["VIEW_DATA"]);
-                if (sXML != string.Empty)
+                var xml = SqlDb.ReadStringValue(reader["VIEW_DATA"]);
+                if (xml != string.Empty)
                 {
-                    xView = new CStruct();
-                    xView.LoadXML(sXML);
+                    view = new CStruct();
+                    view.LoadXML(xml);
                 }
             }
             reader.Close();
 
-            if (xView == null)
+            if (view == null)
+            {
                 return false;
+            }
 
-            xView.SetStringAttr("Name", sName);
+            view.SetStringAttr("Name", name);
 
-            sCommand = "UPDATE EPG_VIEWS SET VIEW_NAME=@name,VIEW_DATA = @vdata WHERE VIEW_GUID=@guid";
-            SqlCommand cmd = new SqlCommand(sCommand, _sqlConnection);
-            cmd.Parameters.AddWithValue("@name", sName);
-            cmd.Parameters.AddWithValue("@vdata", xView.XML());
-            cmd.Parameters.AddWithValue("@guid", guidView);
-            int nRowsAffected = cmd.ExecuteNonQuery();
+            command = "UPDATE EPG_VIEWS SET VIEW_NAME=@name,VIEW_DATA = @vdata WHERE VIEW_GUID=@guid";
+            int nRowsAffected;
+            using (var sqlCommand = new SqlCommand(command, sqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@name", name);
+                sqlCommand.Parameters.AddWithValue("@vdata", view.XML());
+                sqlCommand.Parameters.AddWithValue("@guid", guidView);
+                nRowsAffected = sqlCommand.ExecuteNonQuery();
+            }
 
             if (nRowsAffected == 0)
             {
                 return false;
             }
 
-
-            return true; // (_dba.Status == StatusEnum.rsSuccess);
+            return true;
         }
 
         public bool GetOptimizerStratagiesXML(string ListID, out string sReply)
