@@ -295,6 +295,9 @@ export class CommonPageHelper {
 
         StepLogger.step('Enter search title');
         await TextboxHelper.sendKeys(CommonPage.searchControls.text, titleValue, true);
+        // Wait is needed as after pressing enter below element appears again
+        await PageHelper.sleepForXSec(1000);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.searchControls.text);
     }
 
     static async showColumns(columnNames: string[]) {
@@ -528,7 +531,6 @@ export class CommonPageHelper {
     }
 
     static async clickItemTab() {
-
         StepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
@@ -987,5 +989,11 @@ export class CommonPageHelper {
         StepLogger.step('Click on Edit Resource Plan');
         const editLink = await CommonPageHelper.getContextMenuItemByText(CommonPageConstants.contextMenuOptions.editResource);
         await PageHelper.click(editLink);
+    }
+
+    static async clicOnEditCost() {
+        StepLogger.step('Select "Edit Cost" from the options displayed');
+        await PageHelper.click(CommonPage.ribbonItems.editCost);
+
     }
 }
