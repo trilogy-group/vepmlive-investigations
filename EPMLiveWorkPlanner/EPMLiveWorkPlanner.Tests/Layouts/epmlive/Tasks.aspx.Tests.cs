@@ -146,7 +146,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
                 {
                     ItemGetGuid = guidParam => guidParam.ToString(),
                     TitleGet = () => DummyTitle,
-                    ItemGetString = itemName => "True"
+                    ItemGetString = itemName => bool.TrueString
                 },
                 FieldsGet = () => new ShimSPFieldCollection()
                 {
@@ -874,7 +874,6 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
             _privateObject.Invoke(LoadViewsMethod, web.Instance);
 
             // Assert
-
             var minValues = _privateObject.GetField("minValues");
             var defaultValues = _privateObject.GetField("defaultValues");
             var maxValues = _privateObject.GetField("maxValues");
@@ -964,7 +963,6 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
             _privateObject.Invoke(LoadViewsMethod, web.Instance);
 
             // Assert
-
             var minValues = _privateObject.GetField("minValues");
             var defaultValues = _privateObject.GetField("defaultValues");
             var maxValues = _privateObject.GetField("maxValues");
@@ -1055,7 +1053,6 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
             _privateObject.Invoke(LoadViewsMethod, web.Instance);
 
             // Assert
-
             var minValues = _privateObject.GetField("minValues");
             var defaultValues = _privateObject.GetField("defaultValues");
             var maxValues = _privateObject.GetField("maxValues");
@@ -1143,7 +1140,6 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
             _privateObject.Invoke(LoadViewsMethod, web.Instance);
 
             // Assert
-
             var minValues = _privateObject.GetField("minValues");
             var defaultValues = _privateObject.GetField("defaultValues");
             var maxValues = _privateObject.GetField("maxValues");

@@ -101,7 +101,7 @@
     <Compile Include="HelperClasses\ToolBarButtonFake.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="HelperClasses\ToolBarFake .cs">
+    <Compile Include="HelperClasses\ToolBarFake.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="ISAPI\WorkPlanner.asmx.TestsSplitOne.cs" />
