@@ -1,5 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Web.Script.Serialization;
+using EPMLiveCore;
+using Microsoft.SharePoint;
 
 namespace EPMLiveWebParts.Utilities
 {
@@ -29,6 +35,56 @@ namespace EPMLiveWebParts.Utilities
             }
 
             return returnVal;
+        }
+
+        public static string GetCurrentUserTimeZone(SPWeb web, SPContext context, Dictionary<string, string> replaceDisplayName)
+        {
+            var currentUserTimeZone = "null";
+
+            try
+            {
+                var spTimeZone = (web.CurrentUser.RegionalSettings ?? context.RegionalSettings).TimeZone;
+                var spTzName = spTimeZone.Description.Replace(" and ", " & ");
+
+                var timeZone = (from tempTimeZone in TimeZoneInfo.GetSystemTimeZones()
+                    let tzName = ReplaceStringsFromDictionary(tempTimeZone.DisplayName, replaceDisplayName)
+                    where tzName.Equals(spTzName)
+                    select tempTimeZone).First();
+
+                var timeZoneInfo = new
+                {
+                    id = timeZone.Id,
+                    displayName = timeZone.DisplayName,
+                    olsonName = timeZone.OlsonName(),
+                    standardName = timeZone.StandardName,
+                    daylightName = timeZone.DaylightName,
+                    baseUtcOffset = timeZone.BaseUtcOffset,
+                    supportsDaylightSavingTime = timeZone.SupportsDaylightSavingTime
+                };
+
+                currentUserTimeZone = new JavaScriptSerializer().Serialize(timeZoneInfo);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+
+            return currentUserTimeZone;
+        }
+
+        private static string ReplaceStringsFromDictionary(string replaceableString, Dictionary<string, string> replaceDictionary)
+        {
+            if (replaceableString == null)
+            {
+                return replaceableString;
+            }
+
+            foreach (var replace in replaceDictionary)
+            {
+                replaceableString = replaceableString.Replace(replace.Key, replace.Value);
+            }
+
+            return replaceableString;
         }
     }
 }

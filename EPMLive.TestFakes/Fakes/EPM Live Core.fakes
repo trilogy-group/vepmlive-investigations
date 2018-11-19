@@ -114,7 +114,6 @@
     <Add FullName="EPMLiveCore.ApplicationStore.AppStore!"/>
     <Add FullName="EPMLiveCore.API.Reporting!"/>
     <Add FullName="EPMLiveCore.addusers!"/>
-    <Add FullName="EPMLiveCore.SocialEngine.Entities.Activity!"/>
     <Add Namespace="EPMLiveCore.Integrations.Salesforce!"/>
     <Add FullName="EPMLiveCore.CascadingLookupField!"/>
     <Add FullName="EPMLiveCore.CascadingLookupFieldSettings!"/>
@@ -122,5 +121,6 @@
     <Add FullName="EPMLiveCore.ViewPermissionUtil!"/>
     <Add FullName="EPMLiveCore.tpreport!"/>
     <Add FullName="EPMLiveCore.Jobs.TimerFix!"/>
+    <Add FullName="EPMLiveCore.adsyncadmin!"/>
   </ShimGeneration>
 </Fakes>
