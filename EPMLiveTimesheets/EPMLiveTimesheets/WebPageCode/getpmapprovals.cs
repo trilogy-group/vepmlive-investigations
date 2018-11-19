@@ -69,20 +69,25 @@ namespace TimeSheets
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     da.Fill(dsTimesheetMeta);
 
-                    foreach(DataRow drProjects in dtData.Rows)
-                    {
-                        cmd = new SqlCommand("select web_uid, list_uid,item_id,username,resourcename from vwTSTasks where web_uid=@webuid and (project=@project or (title=@project and list_uid=@listid)) and period_id=@period_id and totalhours > 0", cn);
-                        cmd.Parameters.AddWithValue("@webuid", drProjects["WebId"].ToString());
-                        cmd.Parameters.AddWithValue("@project", drProjects["Title"].ToString());
-                        cmd.Parameters.AddWithValue("@listid", drProjects["ListId"].ToString());
-                        cmd.Parameters.AddWithValue("@period_id", period);
-                        da = new SqlDataAdapter(cmd);
-                        DataSet ds = new DataSet();
-                        da.Fill(ds);
+                    cmd = new SqlCommand("select web_uid, list_uid,item_id,username,resourcename,project,title,list_uid from vwTSTasks where web_uid=@webuid and period_id=@period_id and totalhours > 0", cn);
+                    cmd.Parameters.AddWithValue("@webuid", curWeb.ID.ToString());
+                    cmd.Parameters.AddWithValue("@period_id", period);
+                    da = new SqlDataAdapter(cmd);
+                    DataSet ds = new DataSet();
+                    da.Fill(ds);
 
-                        dtItems.Merge(ds.Tables[0], false);
-                        
+                    DataTable dtFilteredRecords = new DataTable();
+                    foreach (DataRow drProjects in dtData.Rows)
+                    {
+                        DataView dv = new DataView(ds.Tables[0]);
+                        string filterquery = string.Format("(project='{0}' or (title='{0}' and list_uid='{1}'))", drProjects["Title"].ToString(), drProjects["ListId"].ToString());
+                        dv.RowFilter = filterquery;
+                        if (dv.Count > 0)
+                        {
+                            dtFilteredRecords.Merge(dv.ToTable(), false);
+                        }
                     }
+                    dtItems.Merge(dtFilteredRecords, false);
 
 
                     cmd = new SqlCommand("select title,project,ts_uid,web_uid,list_uid,item_id,ts_item_uid,approval_status,resourcename,username from vwTSTasks where period_id=@period_id and site_uid=@siteid order by project", cn);
