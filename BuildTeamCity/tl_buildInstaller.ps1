@@ -434,7 +434,7 @@ Copy-Item $SourcesDirectory\EPMLiveCore\EPMLiveCore\Resources\*.sql $BuildDepend
 if (!$SkipInstallShield)
 {
 	#Run Installshield project to generate product .exe
-	& 'C:\Program Files (x86)\InstallShield\2015\System\IsCmdBld.exe' -p '$SourcesDirectory\InstallShield\WorkEngine5\WorkEngine5.ism' -y $NewReleaseNumber -a 'Product Configuration 1' -r 'PrimaryRelease' -l PATH_TO_BUILDDDEPENDENC_FILES='$BuildDependenciesFolder' -l PATH_TO_PRODUCTOUTPUT_FILES='$ProductOutput'
+	& "C:\Program Files (x86)\InstallShield\2015\System\IsCmdBld.exe" -p "$SourcesDirectory\InstallShield\WorkEngine5\WorkEngine5.ism" -y $NewReleaseNumber -a "Product Configuration 1" -r "PrimaryRelease" -l PATH_TO_BUILDDDEPENDENC_FILES="$BuildDependenciesFolder" -l PATH_TO_PRODUCTOUTPUT_FILES="$ProductOutput"
 	Rename-Item -Path '$SourcesDirectory\InstallShield\WorkEngine5\Product Configuration 1\PrimaryRelease\DiskImages\DISK1\Setup.exe' -NewName 'WorkEngine$NewReleaseNumber.exe'
 }
 Stop-Process -Name MSBuild -Force -ErrorAction Ignore  
