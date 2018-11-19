@@ -251,7 +251,7 @@ export class MyWorkPageHelper {
         const requestor = input.requestorValue;
         const startDate = input.startDate;
         const finishDate = input.finishDate;
-        await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate);
+        await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate, false);
         return title;
     }
 
