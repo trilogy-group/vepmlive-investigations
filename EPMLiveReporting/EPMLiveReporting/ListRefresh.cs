@@ -615,26 +615,36 @@ namespace EPMLiveReportsAdmin
             if (error)
             {
                 var dataRows = dataTable.Select(string.Format("ListName='{0}'", list.Title));
-                if (CultureInfo.InvariantCulture.CompareInfo.IndexOf(errorMessage , "does not exist at site with url", CompareOptions.IgnoreCase) >=0 )
+                var index = CultureInfo.InvariantCulture.CompareInfo.IndexOf(
+                    errorMessage,
+                    "does not exist at site with url",
+                    CompareOptions.IgnoreCase);
+                const string ColumnName = "ResultText";
+                if (index >= 0)
                 {
-                    if (dataRows[0]["ResultText"] == null)
+                    if (dataRows[0][ColumnName] == null)
                     {
-                        dataRows[0]["ResultText"] = "&nbsp;List not present.";
+                        dataRows[0][ColumnName] = "&nbsp;List not present.";
                     }
                     else
                     {
-                        dataRows[0]["ResultText"] = string.Format("{0}&nbsp;" + "List not present.", dataRows[0]["ResultText"]);
+                        dataRows[0][ColumnName] = string.Format(
+                            "{0}&nbsp;" + "List not present.",
+                            dataRows[0][ColumnName]);
                     }
                 }
                 else
                 {
-                    if (dataRows[0]["ResultText"] == null)
+                    if (dataRows[0][ColumnName] == null)
                     {
-                        dataRows[0]["ResultText"] = string.Format("&nbsp;{0}", errorMessage);
+                        dataRows[0][ColumnName] = string.Format("&nbsp;{0}", errorMessage);
                     }
                     else
                     {
-                        dataRows[0]["ResultText"] = string.Format("{0}&nbsp;{1}", dataRows[0]["ResultText"], errorMessage);
+                        dataRows[0][ColumnName] = string.Format(
+                            "{0}&nbsp;{1}",
+                            dataRows[0][ColumnName],
+                            errorMessage);
                     }
                 }
             }
