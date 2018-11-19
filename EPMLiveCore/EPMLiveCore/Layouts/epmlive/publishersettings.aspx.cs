@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Web;
@@ -78,41 +79,14 @@ namespace EPMLiveCore.Layouts.epmlive
             web.Site.CatchAccessDeniedException = false;
             web.AllowUnsafeUpdates = true;
 
-            string locked = "";
-            if (chkLockPublisher.Checked)
-            {
-                if (ddlPubType.SelectedValue != "")
-                    locked = "1";
-                else
-                    locked = "0";
-
-                if (ddlSummary.SelectedValue != "")
-                    locked += ",1";
-                else
-                    locked += ",0";
-
-                if (ddlTimePhased.SelectedValue != "")
-                    locked += ",1";
-                else
-                    locked += ",0";
-
-                if (ddlPubStatus.SelectedValue != "")
-                    locked += ",1";
-                else
-                    locked += ",0";
-
-                if (ddlResourceLink.SelectedValue != "")
-                    locked += ",1";
-                else
-                    locked += ",0";
-
-                if (ddlSynchFields.SelectedValue != "")
-                    locked += ",1";
-                else
-                    locked += ",0";
-            }
-            else
-                locked = "0,0,0,0,0,0";
+            var locked = GetLocked(
+                chkLockPublisher,
+                ddlPubType,
+                ddlSummary,
+                ddlTimePhased,
+                ddlPubStatus,
+                ddlResourceLink,
+                ddlSynchFields);
 
             CoreFunctions.setConfigSetting(web, "epmlivepub-lockpub", chkLockPublisher.Checked.ToString());
             CoreFunctions.setConfigSetting(web, "epmlivepub-lock", locked);
@@ -136,6 +110,55 @@ namespace EPMLiveCore.Layouts.epmlive
             {
                 Microsoft.SharePoint.Utilities.SPUtility.Redirect("settings.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
             }
+        }
+
+        public static string GetLocked(
+            CheckBox lockPublisher,
+            DropDownList pubType,
+            DropDownList summary,
+            DropDownList timePhased,
+            DropDownList pubStatus,
+            DropDownList resourceLink,
+            DropDownList synchFields)
+        {
+            var locked = new StringBuilder();
+            if (lockPublisher.Checked)
+            {
+                locked.Append(
+                    !string.IsNullOrWhiteSpace(pubType?.SelectedValue)
+                        ? "1"
+                        : "0");
+
+                locked.Append(
+                    !string.IsNullOrWhiteSpace(summary?.SelectedValue)
+                        ? ",1"
+                        : ",0");
+
+                locked.Append(
+                    !string.IsNullOrWhiteSpace(timePhased?.SelectedValue)
+                        ? ",1"
+                        : ",0");
+
+                locked.Append(
+                    !string.IsNullOrWhiteSpace(pubStatus?.SelectedValue)
+                        ? ",1"
+                        : ",0");
+
+                locked.Append(
+                    !string.IsNullOrWhiteSpace(resourceLink?.SelectedValue)
+                        ? ",1"
+                        : ",0");
+
+                locked.Append(
+                    !string.IsNullOrWhiteSpace(synchFields?.SelectedValue)
+                        ? ",1"
+                        : ",0");
+            }
+            else
+            {
+                locked.Append("0,0,0,0,0,0");
+            }
+            return locked.ToString();
         }
     }
 }
