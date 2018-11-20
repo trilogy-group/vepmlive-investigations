@@ -62,7 +62,8 @@ namespace EPMLiveCore
 
                     var farm = SPFarm.Local;
 
-                    retVal = featureId == 1000
+                    const int ExpectedFeatureId = 1000;
+                    retVal = featureId == ExpectedFeatureId
                         ? UpdateUserFeature1000(username, featureId, farm)
                         : UpdateUsersOnOtherFeatures(username, featureId, farm);
                 });
@@ -93,15 +94,8 @@ namespace EPMLiveCore
 
             if (availableLevels.Contains(newFeatureId) || newFeatureId == 0)
             {
-                var max = 0;
-                try
-                {
-                    max = int.Parse(availableLevels[newFeatureId].ToString());
-                }
-                catch (Exception ex)
-                {
-                    Trace.TraceError("Exception Suppressed {0}", ex);
-                }
+                int max;
+                int.TryParse(availableLevels[newFeatureId].ToString(), out max);
 
                 if (max != 0 || newFeatureId == 0)
                 {
@@ -205,7 +199,7 @@ namespace EPMLiveCore
                 }
                 var lstUsers = _chrono.UserList;
 
-                if (lstUsers.Count == 1 && lstUsers[0].ToString() == "")
+                if (lstUsers.Count == 1 && lstUsers[0].ToString() == string.Empty)
                 {
                     lstUsers = new ArrayList();
                 }
