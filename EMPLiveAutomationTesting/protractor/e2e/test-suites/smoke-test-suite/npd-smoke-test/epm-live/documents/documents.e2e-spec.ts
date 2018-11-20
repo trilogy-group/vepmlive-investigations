@@ -49,6 +49,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.file)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
+
+        await DocumentPageHelper.deleteUploadedDocument(newFile.newFileName);
     });
 
     it('Add Project Documents Functionality-New version of existing document-[1175281]', async () => {
@@ -89,6 +91,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(CommonPageConstants.versionComment.second, ValidationsHelper.getDisplayedValidation
             (CommonPageConstants.versionComment.second));
 
+        await DocumentPageHelper.deleteUploadedDocument(newFile.newFileName);
     });
 
     it('Add Project Document - [907962]', async () => {
@@ -120,5 +123,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.verification('Project Document uploaded [Ex: Testwordfile.docx] is displayed under the Project Node');
         await ExpectationHelper.verifyDisplayedStatus(ElementHelper.getElementByText(newFile.file), newFile.file);
+
+        await DocumentPageHelper.deleteUploadedDocument(newFile.newFileName);
     });
 });

@@ -20,6 +20,10 @@ describe(SuiteNames.regressionTestSuite, () => {
         await new LoginPage().goToAndLogin();
     });
 
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
+    });
+
     it('Verify that View should be saved - [744288]', async () => {
         StepLogger.caseId = 744288;
         // Step 1 and Step 2 are inside below function

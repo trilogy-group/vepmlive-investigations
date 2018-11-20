@@ -12,6 +12,7 @@ import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
 import {WaitHelper} from '../../../components/html/wait-helper';
 import {DocumentPage} from './document-page.po';
 import {CommonPageHelper} from '../common/common-page.helper';
+import { ElementHelper } from '../../../components/html/element-helper';
 
 export class DocumentPageHelper {
 
@@ -128,10 +129,6 @@ export class DocumentPageHelper {
         await expect(await browser.getTitle())
             .toBe(HomePageConstants.homePage, ValidationsHelper.getPageDisplayedValidation(HomePageConstants.pageName));
 
-        StepLogger.verification('Social Stream web part is shown on the Home Page');
-        await expect(await PageHelper.isElementPresent(HomePage.toolBarMenuItems.socialStream))
-            .toBe(true, ValidationsHelper.getDisplayedValidation(CreateNewPageConstants.navigationLabels.libraryApps.socialStream));
-
         StepLogger.stepId(3);
         StepLogger.step('Click on + More button displayed in CREATE options in social stream');
         // Sleep required because of bug of two "More" buttons
@@ -197,5 +194,18 @@ export class DocumentPageHelper {
 
     static async sortOnModified() {
         await PageHelper.click(DocumentPage.modifiedHeaderLink);
+    }
+
+    static async deleteUploadedDocument(fileName: string) {
+        const nameArray = fileName.split('.');
+        const name = nameArray[0];
+        await ElementHelper.actionHoverOver(ElementHelper.getElementByText(name));
+        await PageHelper.click(DocumentPage.selectDeselectCheckBox(name));
+        await ElementHelper.clickUsingJs(DocumentPage.moreButton);
+        await ElementHelper.clickUsingJs(DocumentPage.deleteButton);
+        await PageHelper.acceptAlert();
+        // wait is needed as delete action does not reflect immidiatly.
+        await PageHelper.sleepForXSec(PageHelper.timeout.s);
+        await WaitHelper.waitForPageToStable();
     }
 }

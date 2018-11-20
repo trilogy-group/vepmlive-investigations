@@ -13,10 +13,13 @@ describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
 
     beforeEach(async () => {
-
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
+    });
+
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
     });
 
     it('Check behavior of "Save and Close" button - [743175]', async () => {

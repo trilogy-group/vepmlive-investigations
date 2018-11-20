@@ -151,4 +151,13 @@ export class WaitHelper {
         return await browser.wait(targetElement.isSelected(), timeout,
             targetElement.locator().toString() + message);
     }
+
+    static async waitForPageToStable() {
+        while (true) {
+            const result = await browser.executeScript('return document.readyState === "complete"');
+            if (result) {
+                return;
+            }
+        }
+    }
 }

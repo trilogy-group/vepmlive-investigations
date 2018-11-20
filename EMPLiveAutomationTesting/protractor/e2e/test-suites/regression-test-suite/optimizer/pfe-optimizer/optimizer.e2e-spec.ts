@@ -12,10 +12,13 @@ describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
 
     beforeEach(async () => {
-
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
+    });
+
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
     });
 
     it('Verify the Close button of the Optimizer page  - [744351]', async () => {
