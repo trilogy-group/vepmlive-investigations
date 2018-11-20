@@ -40,7 +40,6 @@ namespace WorkEnginePPM.Tests.WebServices
             var createdStrAttributes = new Dictionary<string, string>();
             var createdBoolAttributes = new Dictionary<string, bool>();
 
-
             ShimCStruct.Constructor = cStruct => new ShimCStruct(cStruct);
             ShimCStruct.AllInstances.InitializeString = (_1, _2) => initializeWasCalled = true;
             ShimCStruct.AllInstances.CreateSubStructString = (_1, str) =>
