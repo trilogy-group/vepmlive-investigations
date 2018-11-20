@@ -26,8 +26,7 @@ using static EPMLiveWorkPlanner.WorkPlannerAPI;
 
 namespace EPMLiveWorkPlanner.Tests.Jobs
 {
-    [TestClass]
-    [ExcludeFromCodeCoverage]
+    [TestClass, ExcludeFromCodeCoverage]
     public class PublishJobTests
     {
         private PublishJob testObject;
