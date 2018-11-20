@@ -1,0 +1,85 @@
+pipeline {
+    agent {
+        node {
+            label 'skyvera-non-docker-jenkins-win-build'
+            customWorkspace "c:\\jenkins\\build"
+        }
+    }
+    options {
+        skipDefaultCheckout true
+        timestamps()
+    }
+    parameters {
+        string(name: 'Version', defaultValue: '7.0.0.x', description: 'Version to set (x is replaced with current build number)')
+    }
+    stages {
+        stage('Prepare for build') {
+            steps {
+                echo 'Setting parameters...'
+                script {
+                    env.BUILD_VERSION = params.Version.replace('x', env.BUILD_NUMBER)
+                }
+                
+                echo 'Cleanup previous build workspace...'
+                dir ("${env.WORKSPACE}") {
+                    deleteDir()
+                }
+                powershell "Write-Host 'Disk space usage:'(Get-PSDrive C | Select-Object Used,Free)"
+                
+                echo 'Checkout SCM..'
+                checkout scm
+				
+				echo 'Updating modification time of fakes assemblies to make them be not regenerated during build...'
+				dir ("${env.WORKSPACE}/EPMLive.TestFakes/FakesAssemblies") {
+					powershell "ls *.dll | ForEach-Object { \$_.LastWriteTime = [System.DateTime]::Now }"
+				}
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Executing build...'
+                powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/CiBuild/build.ps1 ${env.BUILD_VERSION} \"${env.WORKSPACE}\""
+            }
+        }
+		stage('Unit tests') {
+            steps {
+                timestamps {
+                    echo 'Run unit tests...'
+                    dir ("${env.WORKSPACE}") {
+                        powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/CiBuild/unittests.ps1" 
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+		
+			
+            echo 'Publishing unit tests results...'
+			step([$class: 'JUnitResultArchiver', allowEmptyResults: true, testResults: "TestResults/JUnitLikeResultsOutputFile1.xml"])
+		
+			echo 'Publishing coverage report...'
+			publishHTML (
+				target: [
+					allowMissing: false,
+					alwaysLinkToLastBuild: false,
+					keepAll: true,
+					reportDir: 'TestResults/CoverageReport',
+					reportFiles: 'summary.htm',
+					reportName: 'Coverage Report'
+				]
+			)
+			
+        }
+		cleanup {
+            powershell "Write-Host 'Disk space usage before cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
+            echo 'Cleanup workspace...'
+            dir ("${env.WORKSPACE}") {
+                deleteDir()
+            }
+            powershell "Write-Host 'Disk space usage after cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
+        }
+        
+    }
+}
