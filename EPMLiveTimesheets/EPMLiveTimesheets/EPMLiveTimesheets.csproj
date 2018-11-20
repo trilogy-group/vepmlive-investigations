@@ -205,7 +205,6 @@
     </Compile>
     <Compile Include="WebPageCode\SharedFunctions.cs" />
     <Compile Include="WebPageCode\TimesheetMenu.cs" />
-    <Compile Include="Worklog\DataQueryFactory.cs" />
     <Compile Include="Worklog\DaySettings.cs" />
     <Compile Include="Worklog\EPMData.cs" />
     <Compile Include="Worklog\TSBiz.cs" />

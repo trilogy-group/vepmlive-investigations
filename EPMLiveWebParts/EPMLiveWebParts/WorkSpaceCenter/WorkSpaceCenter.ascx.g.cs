@@ -8,35 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace EPMLiveWebParts.WorkSpaceCenter {
-    using System.Web.UI.WebControls.Expressions;
-    using System.Web.UI.HtmlControls;
-    using System.Collections;
-    using System.Text;
-    using System.Web.UI;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Xml.Linq;
-    using Microsoft.SharePoint.WebPartPages;
-    using System.Web.SessionState;
-    using System.Configuration;
-    using Microsoft.SharePoint;
-    using System.Web;
-    using System.Web.DynamicData;
-    using System.Web.Caching;
-    using System.Web.Profile;
-    using System.ComponentModel.DataAnnotations;
-    using System.Web.UI.WebControls;
-    using System.Web.Security;
-    using System;
-    using Microsoft.SharePoint.Utilities;
-    using System.Text.RegularExpressions;
-    using System.Collections.Specialized;
-    using System.Web.UI.WebControls.WebParts;
-    using Microsoft.SharePoint.WebControls;
+namespace EPMLiveWebParts.WorkSpaceCenter
+{
     using System.CodeDom.Compiler;
-    
-    
+
     public partial class WorkSpaceCenter {
         
         [GeneratedCodeAttribute("Microsoft.VisualStudio.SharePoint.ProjectExtensions.CodeGenerators.SharePointWebPartCodeGenerator", "14.0.0.0")]
