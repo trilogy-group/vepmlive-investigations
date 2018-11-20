@@ -298,17 +298,7 @@ namespace TimeSheets
                                 //newCol1.Attributes.Append(attrStyle);
 
                                 docXml.SelectSingleNode("//head").AppendChild(newCol1);
-
-
-
-
-                                //XmlNode callNode = docXml.CreateNode(XmlNodeType.Element, "call", docXml.NamespaceURI);
-                                //XmlAttribute attr = docXml.CreateAttribute("command");
-                                //attr.Value = "attachFooter";
-                                //callNode.Attributes.Append(attr);
-                                //callNode.InnerXml = "<param>" + footer + "</param>";
-
-                                //docXml.SelectSingleNode("//head/beforeInit").AppendChild(callNode);
+                                
                             }
                         }
                     }
@@ -642,12 +632,7 @@ namespace TimeSheets
                         XmlAttribute attrStyle = docXml.CreateAttribute("style");
                         attrStyle.Value = "background: #" + bgcolor;
                         newCol.Attributes.Append(attrStyle);
-
-                        //attrType = docXml.CreateAttribute("type");
-                        //attrType.Value = "ro";
-                        //newCol.Attributes.Append(attrType);
-
-                        //nd.AppendChild(newCol);
+                       
                         nd.InsertAfter(newCol, nd.SelectNodes("cell")[nd.SelectNodes("cell").Count - 1]);
                     }
 
@@ -656,11 +641,7 @@ namespace TimeSheets
                     XmlAttribute attrStyle2 = docXml.CreateAttribute("style");
                     attrStyle2.Value = "background: #" + bgcolor + ";font-weight: bold;";
                     newCol2.Attributes.Append(attrStyle2);
-
-                    //XmlAttribute attrType2 = docXml.CreateAttribute("type");
-                    //attrType2.Value = "ro";
-                    //newCol2.Attributes.Append(attrType2);
-
+                    
                     nd.InsertAfter(newCol2, nd.SelectNodes("cell")[nd.SelectNodes("cell").Count - 1]);
                 }
                 nd.Attributes["id"].Value = rowCounter.ToString();
@@ -712,20 +693,6 @@ namespace TimeSheets
                     ndNewCols[i].Attributes["type"].Value = "ro";
                 }
             }
-
-            //XmlNode ndAfterInit = docXml.SelectSingleNode("//head/afterInit");
-            //if (ndAfterInit != null)
-            //{
-            //    XmlNode nd = docXml.CreateNode(XmlNodeType.Element, "call", docXml.NamespaceURI);
-            //    nd.InnerXml = "<param>3</param>";
-            //    XmlAttribute attrCommand = docXml.CreateAttribute("command");
-            //    attrCommand.Value = "splitAt";
-            //    nd.Attributes.Append(attrCommand);
-            //    ndAfterInit.AppendChild(nd);
-            //}
-            //XmlNode ndBeforeInit = docXml.SelectSingleNode("//head/beforeInit");
-            //XmlNode ndfooter = ndBeforeInit.SelectSingleNode("call[@command='attachFooter']");
-            //ndBeforeInit.RemoveChild(ndfooter); 
             
             data = docXml.OuterXml;
         }
