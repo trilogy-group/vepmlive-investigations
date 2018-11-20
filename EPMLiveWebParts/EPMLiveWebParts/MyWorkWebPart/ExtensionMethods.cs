@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using LiveCoreExtensions = EPMLiveCore.ExtensionMethods;
 
 namespace EPMLiveWebParts
 {
@@ -29,50 +30,7 @@ namespace EPMLiveWebParts
         /// <returns></returns>
         public static string ToPrettierName(this string internalName)
         {
-            #region Character Map
-
-            var charMap = new Dictionary<string, string>
-                              {
-                                  {" ", "_x0020_"},
-                                  {"`", "_x0060_"},
-                                  {"/", "_x002f_"},
-                                  {".", "_x002e_"},
-                                  {",", "_x002c_"},
-                                  {"?", "_x003f_"},
-                                  {">", "_x003e_"},
-                                  {"<", "_x003c_"},
-                                  {"\\", "_x005c_"},
-                                  {"'", "_x0027_"},
-                                  {";", "_x003b_"},
-                                  {"|", "_x007c_"},
-                                  {"\"", "_x0022_"},
-                                  {":", "_x003a_"},
-                                  {"}", "_x007d_"},
-                                  {"{", "_x007b_"},
-                                  {"=", "_x003d_"},
-                                  {"-", "_x002d_"},
-                                  {"+", "_x002b_"},
-                                  {")", "_x0029_"},
-                                  {"(", "_x0028_"},
-                                  {"*", "_x002a_"},
-                                  {"&", "_x0026_"},
-                                  {"^", "_x005e_"},
-                                  {"%", "_x0025_"},
-                                  {"$", "_x0024_"},
-                                  {"#", "_x0023_"},
-                                  {"@", "_x0040_"},
-                                  {"!", "_x0021_"},
-                                  {"~", "_x007e_"}
-                              };
-
-            #endregion
-
-            internalName = charMap.Aggregate(internalName, (current, pair) => current.Replace(pair.Value, pair.Key.ToString()));
-            internalName = Regex.Replace(Regex.Replace(internalName, @"(\P{Ll})(\P{Ll}\p{Ll})", "$1 $2"), @"(\p{Ll})(\P{Ll})", "$1 $2");
-
-            var regex = new Regex(@"[ ]{2,}", RegexOptions.None);
-
-            return regex.Replace(internalName, @" ");
+            return LiveCoreExtensions.ToPrettierName(internalName);
         }
 
         /// <summary>
