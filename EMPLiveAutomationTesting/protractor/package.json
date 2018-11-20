@@ -43,6 +43,8 @@
     "request-promise-native": "^1.0.5",
     "rxjs": "^6.3.2",
     "shortid": "^2.2.8",
+    "testrail-api": "^1.2.0",
+    "testrail-promise": "^0.1.18",
     "underscore": "^1.8.3",
     "unirest": "^0.5.1"
   },
