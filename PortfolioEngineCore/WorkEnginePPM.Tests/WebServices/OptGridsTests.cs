@@ -23,6 +23,12 @@ namespace WorkEnginePPM.Tests.WebServices
         private static readonly DateTime DummyDateTime = new DateTime(2018, 1, 1, 0, 0, 0);
         private const int DummyInt = 1;
         private const int DummyId = 10;
+        private const string NodeHeader1 = "m_xHeader1";
+        private const string NodeDefTree = "m_xDefTree";
+        private const string NodeDefNode = "m_xDefNode";
+        private const string NodeDef = "m_xDef";
+        private const string NodeMiddleCols = "m_xMiddleCols";
+        private const string NodeLevels = "m_xLevels";
 
         [TestInitialize]
         public void TestInitialize()
@@ -121,11 +127,11 @@ namespace WorkEnginePPM.Tests.WebServices
             _testEntity.InitializeGridLayout(fieldDef, currentPos, currentDigits, currentSym);
 
             // Assert
-            var nodeHeader1 = ((CStruct)_privateObject.GetField("m_xHeader1")).GetXMLNode();
-            var nodeDefTree = ((CStruct)_privateObject.GetField("m_xDefTree")).GetXMLNode();
-            var nodeDefNode = ((CStruct)_privateObject.GetField("m_xDefNode")).GetXMLNode();
-            var nodeDef = ((CStruct)_privateObject.GetField("m_xDef")).GetXMLNode();
-            var nodeMiddleCols = ((CStruct)_privateObject.GetField("m_xMiddleCols")).GetXMLNode();
+            var nodeHeader1 = ((CStruct)_privateObject.GetField(NodeHeader1)).GetXMLNode();
+            var nodeDefTree = ((CStruct)_privateObject.GetField(NodeDefTree)).GetXMLNode();
+            var nodeDefNode = ((CStruct)_privateObject.GetField(NodeDefNode)).GetXMLNode();
+            var nodeDef = ((CStruct)_privateObject.GetField(NodeDef)).GetXMLNode();
+            var nodeMiddleCols = ((CStruct)_privateObject.GetField(NodeMiddleCols)).GetXMLNode();
 
             this.ShouldSatisfyAllConditions(
                 () => ExpectedDefaultHeader().ForEach(content => nodeHeader1.Attributes[content.Item1].Value.ShouldBe(content.Item2)),
@@ -170,11 +176,11 @@ namespace WorkEnginePPM.Tests.WebServices
             _testEntity.InitializeGridLayout(fieldDef, currentPos, currentDigits, currentSym);
 
             // Assert
-            var nodeHeader1 = ((CStruct)_privateObject.GetField("m_xHeader1")).GetXMLNode();
-            var nodeDefTree = ((CStruct)_privateObject.GetField("m_xDefTree")).GetXMLNode();
-            var nodeDefNode = ((CStruct)_privateObject.GetField("m_xDefNode")).GetXMLNode();
-            var nodeDef = ((CStruct)_privateObject.GetField("m_xDef")).GetXMLNode();
-            var nodeMiddleCols = ((CStruct)_privateObject.GetField("m_xMiddleCols")).GetXMLNode();
+            var nodeHeader1 = ((CStruct)_privateObject.GetField(NodeHeader1)).GetXMLNode();
+            var nodeDefTree = ((CStruct)_privateObject.GetField(NodeDefTree)).GetXMLNode();
+            var nodeDefNode = ((CStruct)_privateObject.GetField(NodeDefNode)).GetXMLNode();
+            var nodeDef = ((CStruct)_privateObject.GetField(NodeDef)).GetXMLNode();
+            var nodeMiddleCols = ((CStruct)_privateObject.GetField(NodeMiddleCols)).GetXMLNode();
 
             this.ShouldSatisfyAllConditions(
                 () => ExpectedDefaultHeader().ForEach(content => nodeHeader1.Attributes[content.Item1].Value.ShouldBe(content.Item2)),
@@ -217,11 +223,11 @@ namespace WorkEnginePPM.Tests.WebServices
             _testEntity.InitializeGridLayout(fieldDef, currentPos, currentDigits, currentSym);
 
             // Assert
-            var nodeHeader1 = ((CStruct)_privateObject.GetField("m_xHeader1")).GetXMLNode();
-            var nodeDefTree = ((CStruct)_privateObject.GetField("m_xDefTree")).GetXMLNode();
-            var nodeDefNode = ((CStruct)_privateObject.GetField("m_xDefNode")).GetXMLNode();
-            var nodeDef = ((CStruct)_privateObject.GetField("m_xDef")).GetXMLNode();
-            var nodeMiddleCols = ((CStruct)_privateObject.GetField("m_xMiddleCols")).GetXMLNode();
+            var nodeHeader1 = ((CStruct)_privateObject.GetField(NodeHeader1)).GetXMLNode();
+            var nodeDefTree = ((CStruct)_privateObject.GetField(NodeDefTree)).GetXMLNode();
+            var nodeDefNode = ((CStruct)_privateObject.GetField(NodeDefNode)).GetXMLNode();
+            var nodeDef = ((CStruct)_privateObject.GetField(NodeDef)).GetXMLNode();
+            var nodeMiddleCols = ((CStruct)_privateObject.GetField(NodeMiddleCols)).GetXMLNode();
 
             this.ShouldSatisfyAllConditions(
                 () => ExpectedDefaultHeader().ForEach(content => nodeHeader1.Attributes[content.Item1].Value.ShouldBe(content.Item2)),
@@ -264,11 +270,11 @@ namespace WorkEnginePPM.Tests.WebServices
             _testEntity.InitializeGridLayout(fieldDef, currentPos, currentDigits, currentSym);
 
             // Assert
-            var nodeHeader1 = ((CStruct)_privateObject.GetField("m_xHeader1")).GetXMLNode();
-            var nodeDefTree = ((CStruct)_privateObject.GetField("m_xDefTree")).GetXMLNode();
-            var nodeDefNode = ((CStruct)_privateObject.GetField("m_xDefNode")).GetXMLNode();
-            var nodeDef = ((CStruct)_privateObject.GetField("m_xDef")).GetXMLNode();
-            var nodeMiddleCols = ((CStruct)_privateObject.GetField("m_xMiddleCols")).GetXMLNode();
+            var nodeHeader1 = ((CStruct)_privateObject.GetField(NodeHeader1)).GetXMLNode();
+            var nodeDefTree = ((CStruct)_privateObject.GetField(NodeDefTree)).GetXMLNode();
+            var nodeDefNode = ((CStruct)_privateObject.GetField(NodeDefNode)).GetXMLNode();
+            var nodeDef = ((CStruct)_privateObject.GetField(NodeDef)).GetXMLNode();
+            var nodeMiddleCols = ((CStruct)_privateObject.GetField(NodeMiddleCols)).GetXMLNode();
 
             this.ShouldSatisfyAllConditions(
                 () => ExpectedDefaultHeader().ForEach(content => nodeHeader1.Attributes[content.Item1].Value.ShouldBe(content.Item2)),
@@ -290,9 +296,9 @@ namespace WorkEnginePPM.Tests.WebServices
             var actualResult = _testEntity.InitializeGridData();
 
             // Assert
-            var structLevel0 = ((CStruct[])_privateObject.GetField("m_xLevels"))[0];
-            var structLevel1 = ((CStruct[])_privateObject.GetField("m_xLevels"))[1];
-            var structLevel2 = ((CStruct[])_privateObject.GetField("m_xLevels"))[2];
+            var structLevel0 = ((CStruct[])_privateObject.GetField(NodeLevels))[0];
+            var structLevel1 = ((CStruct[])_privateObject.GetField(NodeLevels))[1];
+            var structLevel2 = ((CStruct[])_privateObject.GetField(NodeLevels))[2];
 
             this.ShouldSatisfyAllConditions(
                 () => actualResult.ShouldBeTrue(),
@@ -330,7 +336,7 @@ namespace WorkEnginePPM.Tests.WebServices
             _testEntity.AddDetailRow(optimizeData, DummyId, fieldDef);
 
             // Assert
-            var structLevel2 = ((CStruct[])_privateObject.GetField("m_xLevels"))[2];
+            var structLevel2 = ((CStruct[])_privateObject.GetField(NodeLevels))[2];
 
             structLevel2.GetXMLNode().InnerXml.ShouldBe($"<I id=\"{DummyId}\" rowid=\"r{DummyId}\" pid=\"{DummyId}\" Color=\"white\" Def=\"Leaf\" NoColorState=\"1\" CanEdit=\"0\" PIName=\"{DummyName}\" PIStatus=\"In\" PISelected=\" \" PIStatusButton=\"Defaults\" PIStart=\"\" PIFinish=\"\" zXDummyName=\"{DummyString}\" />");
         }
@@ -364,7 +370,7 @@ namespace WorkEnginePPM.Tests.WebServices
             _testEntity.AddDetailRow(optimizeData, DummyId, fieldDef);
 
             // Assert
-            var structLevel1 = ((CStruct[])_privateObject.GetField("m_xLevels"))[1];
+            var structLevel1 = ((CStruct[])_privateObject.GetField(NodeLevels))[1];
 
             structLevel1.GetXMLNode().InnerXml.ShouldBe($"<I id=\"{DummyId}\" rowid=\"r{DummyId}\" pid=\"{DummyId}\" Color=\"white\" Def=\"Leaf\" NoColorState=\"1\" CanEdit=\"0\" PIName=\"{DummyName}\" PIStatus=\"Out\" PISelected=\" \" PIStatusButton=\"Defaults\" PIStart=\"{DummyDateTime.ToString("MM/dd/yyyy")}\" PIFinish=\"{DummyDateTime.ToString("MM/dd/yyyy")}\" zXDummyName=\"{DummyString}\" />");
         }
@@ -398,7 +404,7 @@ namespace WorkEnginePPM.Tests.WebServices
             _testEntity.AddDetailRow(optimizeData, DummyId, fieldDef);
 
             // Assert
-            var structLevel1 = ((CStruct[])_privateObject.GetField("m_xLevels"))[1];
+            var structLevel1 = ((CStruct[])_privateObject.GetField(NodeLevels))[1];
 
             structLevel1.GetXMLNode().InnerXml.ShouldBe($"<I id=\"{DummyId}\" rowid=\"r{DummyId}\" pid=\"{DummyId}\" Color=\"white\" Def=\"Leaf\" NoColorState=\"1\" CanEdit=\"0\" PIName=\"{DummyName}\" PIStatus=\"Auto\" PISelected=\" \" PIStatusButton=\"Defaults\" PIStart=\"{DummyDateTime.ToString("MM/dd/yyyy")}\" PIFinish=\"{DummyDateTime.ToString("MM/dd/yyyy")}\" />");
         }
