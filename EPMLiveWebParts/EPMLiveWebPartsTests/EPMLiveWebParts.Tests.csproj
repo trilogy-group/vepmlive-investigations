@@ -134,7 +134,6 @@
     <Compile Include="ChartControl\EpmChartTests.cs" />
     <Compile Include="ChartControl\VfChartTests.cs" />
     <Compile Include="ControlTemplates\SocialStreamTests.cs" />
-    <Compile Include="CONTROLTEMPLATES\MyWork\MyWorkControlTests.cs" />
     <Compile Include="GridListView\GridListViewTests.AddContextualTab.cs" />
     <Compile Include="GridListView\GridListViewTests.RemainingMethods.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderActionMenu.cs" />
@@ -161,8 +160,10 @@
     <Compile Include="ReportViewerTest.cs" />
     <Compile Include="WebPageCode\getgriditemsTests.cs" />
     <Compile Include="WebPageCode\getgriditemsTests.IsEditable.cs" />
+    <Compile Include="WebPageCode\GetitemsTests.cs" />
     <Compile Include="WebPageCode\GridActionTests.cs" />
     <Compile Include="WebPageCode\SavegridTests.cs" />
+    <Compile Include="CONTROLTEMPLATES\MyWork\MyWorkControlTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
