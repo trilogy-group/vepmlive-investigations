@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using System.Diagnostics;
+using EPMLiveCore.WorkEngineSolutionStoreListSvc;
+using static System.Diagnostics.Trace;
 
 namespace EPMLiveCore
 {
@@ -25,6 +27,13 @@ namespace EPMLiveCore
 
         private const string WEB_SVC_NAME = "WebSvcName";
         private const string WEB_SVC_METHOD = "WebSvcMethod";
+        private const string ListNameProperty = "ListName";
+        private const string ViewNameProperty = "ViewName";
+        private const string QueryPropertyName = "Query";
+        private const string ViewFieldsPropertyName = "ViewFields";
+        private const string RowLimitPropertyName = "RowLimit";
+        private const string QueryOptionsPropertyName = "QueryOptions";
+        private const string WebIdPropertyName = "WebID";
 
         private void InitializePropAndFlds()
         {
@@ -111,115 +120,78 @@ namespace EPMLiveCore
 
         private void List_GetListItems_InXml(bool inJSON)
         {
-            // link to web service documentation
-            // http://msdn.microsoft.com/en-us/library/lists.lists.getlistitems%28v=office.12%29.aspx
-
-            System.Xml.XmlNode data = null;
-            string listName = _dataManager.GetPropVal("ListName");
-            string viewName = _dataManager.GetPropVal("ViewName");
-
-            XmlDocument xDoc = new XmlDocument();
-
-            // create query param
-            XmlNode ndQuery = xDoc.CreateNode(XmlNodeType.Element, "Query", "");
-            ndQuery.InnerXml = _dataManager.GetPropVal("Query");
-
-            // create view fields param
-            XmlNode ndViewFields = xDoc.CreateNode(XmlNodeType.Element, "ViewFields", "");
-            ndViewFields.InnerXml = _dataManager.GetPropVal("ViewFields");
-
-            string rowLimit = _dataManager.GetPropVal("RowLimit");
-
-            // create query options param
-            XmlNode ndQueryOptions = xDoc.CreateNode(XmlNodeType.Element, "QueryOptions", "");
-            string queryOptions = _dataManager.GetPropVal("QueryOptions");
-            queryOptions = !string.IsNullOrEmpty(queryOptions) ? queryOptions.Replace(@"\\", @"\") : string.Empty;
-            //ndQueryOptions.InnerXml = !string.IsNullOrEmpty(queryOptions) ? queryOptions : "<queryOptions xmlns:SOAPSDK9=\"http://schemas.microsoft.com/sharepoint/soap/\" ><QueryOptions/></queryOptions>";
-
-            ndQueryOptions.InnerXml = !string.IsNullOrEmpty(queryOptions) ? queryOptions : "<Folder>Solutions/" + CoreFunctions.GetAssemblyVersion() + "</Folder>";
-            string webId = _dataManager.GetPropVal("WebID");
-
-            using (var listSvc = new WorkEngineSolutionStoreListSvc.Lists())
-            {
-                // TODO: write a function to get user name and password 
-                listSvc.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
-                listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "_vti_bin/Lists.asmx";
-                //listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
-                try
-                {
-                    System.Net.ServicePointManager.ServerCertificateValidationCallback =
-                    ((sender, certificate, chain, sslPolicyErrors) => true);
-
-                    data = listSvc.GetListItems(listName, null, ndQuery, null, rowLimit, ndQueryOptions, null);
-                }
-                catch (Exception x)
-                {
-                    Response.Write("{ error : \"" + x.Message + "\" }");
-                    return;
-                }
-            }
-
-            if (!inJSON)
-            {
-                Response.Write(HttpUtility.HtmlEncode(data.OuterXml));
-            }
-            else
-            {
-                Response.Write(HttpUtility.HtmlEncode(JSONUtil.ConvertXmlToJson(SimplifySPGetListItemsXml(data), "")));
-            }
+            GetListItem(
+                data => !inJSON
+                    ? HttpUtility.HtmlEncode(data.OuterXml)
+                    : HttpUtility.HtmlEncode(
+                        JSONUtil.ConvertXmlToJson(SimplifySPGetListItemsXml(data), string.Empty)));
+            
         }
 
         private void List_GetListItems_InXml()
         {
+            GetListItem(SimplifySPGetListItemsXml);
+        }
+        
+
+        private void GetListItem(Func<XmlNode, string> deserializeFunc)
+        {
             // link to web service documentation
             // http://msdn.microsoft.com/en-us/library/lists.lists.getlistitems%28v=office.12%29.aspx
 
-            System.Xml.XmlNode data = null;
-            string listName = _dataManager.GetPropVal("ListName");
-            string viewName = _dataManager.GetPropVal("ViewName");
+            XmlNode data;
+            var listName = _dataManager.GetPropVal(ListNameProperty);
+            var viewName = _dataManager.GetPropVal(ViewNameProperty);
 
-            XmlDocument xDoc = new XmlDocument();
+            var xmlDocument = new XmlDocument();
 
-            // create query param
-            XmlNode ndQuery = xDoc.CreateNode(XmlNodeType.Element, "Query", "");
-            ndQuery.InnerXml = _dataManager.GetPropVal("Query");
+            var query = xmlDocument.CreateNode(XmlNodeType.Element, QueryPropertyName, string.Empty);
+            query.InnerXml = _dataManager.GetPropVal(QueryPropertyName);
 
-            // create view fields param
-            XmlNode ndViewFields = xDoc.CreateNode(XmlNodeType.Element, "ViewFields", "");
-            ndViewFields.InnerXml = _dataManager.GetPropVal("ViewFields");
+            var viewFields = xmlDocument.CreateNode(XmlNodeType.Element, ViewFieldsPropertyName, string.Empty);
+            viewFields.InnerXml = _dataManager.GetPropVal(ViewFieldsPropertyName);
 
-            string rowLimit = _dataManager.GetPropVal("RowLimit");
+            var rowLimit = _dataManager.GetPropVal(RowLimitPropertyName);
 
-            // create query options param
-            XmlNode ndQueryOptions = xDoc.CreateNode(XmlNodeType.Element, "QueryOptions", "");
-            string queryOptions = _dataManager.GetPropVal("QueryOptions");
-            queryOptions = !string.IsNullOrEmpty(queryOptions) ? queryOptions.Replace(@"\\", @"\") : string.Empty;
-            //ndQueryOptions.InnerXml = !string.IsNullOrEmpty(queryOptions) ? queryOptions : "<queryOptions xmlns:SOAPSDK9=\"http://schemas.microsoft.com/sharepoint/soap/\" ><QueryOptions/></queryOptions>";
+            var ndQueryOptions = xmlDocument.CreateNode(XmlNodeType.Element, QueryOptionsPropertyName, string.Empty);
+            var queryOptions = _dataManager.GetPropVal(QueryOptionsPropertyName);
+            queryOptions = !string.IsNullOrWhiteSpace(queryOptions)
+                ? queryOptions.Replace(@"\\", @"\")
+                : string.Empty;
 
-            ndQueryOptions.InnerXml = !string.IsNullOrEmpty(queryOptions) ? queryOptions : "<Folder>Solutions/" + CoreFunctions.GetAssemblyVersion() + "</Folder>";
-            string webId = _dataManager.GetPropVal("WebID");
 
-            using (var listSvc = new WorkEngineSolutionStoreListSvc.Lists())
+            ndQueryOptions.InnerXml = !string.IsNullOrWhiteSpace(queryOptions)
+                ? queryOptions
+                : string.Format("<Folder>Solutions/{0}</Folder>", CoreFunctions.GetAssemblyVersion());
+            var webId = _dataManager.GetPropVal(WebIdPropertyName);
+
+            using (var listSvc = new Lists())
             {
                 // TODO: write a function to get user name and password 
-                listSvc.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
-                listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "_vti_bin/Lists.asmx";
-                //listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
+                const string UserName = "Solution1";
+                const string Password = @"J@(Djkhldk2";
+                const string Domain = "EPM";
+                const string WorkEngineStoreSetting = "WorkEngineStore";
+
+                listSvc.Credentials = new NetworkCredential(UserName, Password, Domain);
+                listSvc.Url = string.Format("{0}_vti_bin/Lists.asmx", CoreFunctions.getFarmSetting(WorkEngineStoreSetting));
+
                 try
                 {
-                    System.Net.ServicePointManager.ServerCertificateValidationCallback =
-                    ((sender, certificate, chain, sslPolicyErrors) => true);
+                    ServicePointManager.ServerCertificateValidationCallback =
+                        (sender, certificate, chain, sslPolicyErrors) => true;
 
-                    data = listSvc.GetListItems(listName, null, ndQuery, null, rowLimit, ndQueryOptions, null);
+                    data = listSvc.GetListItems(listName, null, query, null, rowLimit, ndQueryOptions, null);
                 }
-                catch (Exception x)
+                catch (Exception ex)
                 {
-                    Response.Write("{ error : \"" + x.Message + "\" }");
+                    TraceError("Exception Suppressed {0}", ex);
+                    Response.Write(string.Format("{{ error : \"{0}\" }}", ex.Message));
                     return;
                 }
             }
 
-            Response.Write(SimplifySPGetListItemsXml(data));
+            Response.Write(deserializeFunc?.Invoke(data));
         }
 
         private void List_GetList_InXml(bool inJSON)
@@ -239,7 +211,7 @@ namespace EPMLiveCore
                 try
                 {
                     System.Net.ServicePointManager.ServerCertificateValidationCallback =
-                    ((sender, certificate, chain, sslPolicyErrors) => true);
+                        ((sender, certificate, chain, sslPolicyErrors) => true);
 
                     data = listSvc.GetList(listName);
                 }
