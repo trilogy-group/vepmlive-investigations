@@ -163,6 +163,7 @@
     <Compile Include="WebPageCode\GetitemsTests.cs" />
     <Compile Include="WebPageCode\GridActionTests.cs" />
     <Compile Include="WebPageCode\SavegridTests.cs" />
+    <Compile Include="CONTROLTEMPLATES\MyWork\MyWorkControlTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
