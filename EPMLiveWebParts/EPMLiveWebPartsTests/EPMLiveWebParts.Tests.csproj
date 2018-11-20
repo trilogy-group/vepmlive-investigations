@@ -160,6 +160,7 @@
     <Compile Include="ReportViewerTest.cs" />
     <Compile Include="WebPageCode\getgriditemsTests.cs" />
     <Compile Include="WebPageCode\getgriditemsTests.IsEditable.cs" />
+    <Compile Include="WebPageCode\GetitemsTests.cs" />
     <Compile Include="WebPageCode\GridActionTests.cs" />
     <Compile Include="WebPageCode\SavegridTests.cs" />
   </ItemGroup>
