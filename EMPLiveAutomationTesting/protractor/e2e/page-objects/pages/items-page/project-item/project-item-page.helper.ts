@@ -15,7 +15,6 @@ import { CommonPage } from '../../common/common.po';
 import { AnchorHelper } from '../../../../components/html/anchor-helper';
 import { CommonPageConstants } from '../../common/common-page.constants';
 import { HomePage } from '../../homepage/home.po';
-import { CheckboxHelper } from '../../../../components/html/checkbox-helper';
 import { ComponentHelpers } from '../../../../components/devfactory/component-helpers/component-helpers';
 import { MyTimeOffPage } from '../../my-workplace/my-time-off/my-time-off.po';
 import { ResourcePlannerConstants } from '../../resource-planner-page/resource-planner-page.constants';
@@ -151,10 +150,10 @@ export class ProjectItemPageHelper {
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
-        StepLogger.step('Click on Project record');
-        await PageHelper.sleepForXSec(PageHelper.timeout.xs);
-        await ElementHelper.actionHoverOver(CommonPageHelper.getRowForTableData(firstTableColumns));
         if (toOpen) {
+            StepLogger.step('Click on Project record');
+            await PageHelper.sleepForXSec(PageHelper.timeout.xs);
+            await ElementHelper.actionHoverOver(CommonPageHelper.getRowForTableData(firstTableColumns));
             await PageHelper.click(CommonPageHelper.getRowForTableData(firstTableColumns));
         }
     }
@@ -248,13 +247,17 @@ export class ProjectItemPageHelper {
         const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId);
 
         StepLogger.subStep('Navigate and open specific project page');
-        await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue, false);
+        await ProjectItemPageHelper.navigateAndSearchPage(projectNameValue);
 
         StepLogger.subStep('Click on "Items" tab');
         await PageHelper.click(CommonPage.ribbonTitles.items);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeamButton);
+        await ProjectItemPageHelper.clickOnSearchedRecord();
 
         StepLogger.subStep('Select "Edit Team" from the options displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeamButton);
+        // button enabling take a while
+        await PageHelper.sleepForXSec(PageHelper.timeout.m);
         await ElementHelper.actionHoverOver(CommonPage.ribbonItems.editTeamButton);
         await PageHelper.click(CommonPage.ribbonItems.editTeamButton);
 
@@ -269,7 +272,8 @@ export class ProjectItemPageHelper {
         StepLogger.subStep('Select a user from resource pool and add');
         const userCheckBoxForResourcePool = ProjectItemPage.getResourcePoolFirstUserCheckBox;
         const userNameForResourcePool = await PageHelper.getText(ProjectItemPage.getResourcePoolFirstUserLabelLink);
-        await CheckboxHelper.markCheckbox(userCheckBoxForResourcePool, true);
+        await ElementHelper.actionHoverOver(userCheckBoxForResourcePool);
+        await ElementHelper.actionClick(userCheckBoxForResourcePool);
 
         StepLogger.subStep('Click on Add resource');
         await PageHelper.click(CommonPage.formButtons.add);
@@ -287,13 +291,18 @@ export class ProjectItemPageHelper {
         await PageHelper.switchToDefaultContent();
 
         StepLogger.subStep('Navigate and open specific project page');
-        await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue, false);
+        await ProjectItemPageHelper.navigateAndSearchPage(projectNameValue);
 
         StepLogger.subStep('Click on "Items" tab');
         await PageHelper.click(CommonPage.ribbonTitles.items);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeamButton);
+        await PageHelper.sleepForXSec(PageHelper.timeout.s);
+        await ProjectItemPageHelper.clickOnSearchedRecord();
 
         StepLogger.subStep('Select "Edit Team" from the options displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeamButton);
+        // wait is needed as button enabling takes time
+        await PageHelper.sleepForXSec(PageHelper.timeout.m);
         await PageHelper.click(CommonPage.ribbonItems.editTeamButton);
 
         StepLogger.subStep('Wait for Build Team Page to open');
@@ -533,5 +542,35 @@ export class ProjectItemPageHelper {
         await ElementHelper.openLinkInNewTab(ProjectItemPage.clickProjectLink);
 
         await this.validateProjectOpenInNewTab();
+    }
+
+    static async navigateAndSearchPage(projectNameValue: string) {
+        StepLogger.verification('Navigate to page');
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+        );
+
+        StepLogger.verification('Search item by title');
+        await CommonPageHelper.searchItemByTitle(projectNameValue,
+            ProjectItemPageConstants.columnNames.title,
+        );
+
+        StepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(projectNameValue)))
+            .toBe(true,
+                ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
+
+        StepLogger.verification('Verify record by title');
+        const firstTableColumns = [projectNameValue];
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(firstTableColumns)))
+            .toBe(true,
+                ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
+    }
+
+    static async clickOnSearchedRecord() {
+        StepLogger.step('Click on searched record');
+        await PageHelper.click(CommonPage.record);
     }
 }

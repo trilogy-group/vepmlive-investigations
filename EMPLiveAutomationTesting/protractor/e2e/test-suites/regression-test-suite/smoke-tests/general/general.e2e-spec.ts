@@ -37,7 +37,7 @@ describe(SuiteNames.regressionTestSuite, () => {
                 ProjectItemPageConstants.messageText.saveAndCloseDisabled);
 
         StepLogger.step('Add resource to Current team and verify');
-        await ProjectItemPageHelper.addResourceAndVerifyUserMovedUnderCurrentTeam(uniqueId, );
+        await ProjectItemPageHelper.addResourceAndVerifyUserMovedUnderCurrentTeam(uniqueId);
     });
 
 });
