@@ -512,7 +512,7 @@ namespace WorkEnginePPM.Tests.WebServices
         }
 
         [TestMethod]
-        public void GetMexPeriods_Should_ReturnsMaxPeriods()
+        public void GetMaxPeriods_Should_ReturnsMaxPeriods()
         {
             // Arrange
             _testEntity.GrabCAData(CreateCostData());
