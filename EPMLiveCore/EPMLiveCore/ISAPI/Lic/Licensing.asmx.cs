@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Reflection;
+using System.Web;
 using System.Web.Script.Services;
 using System.Web.Services;
 using System.Xml;
@@ -46,156 +48,189 @@ namespace EPMLiveCore
         {
             username = CoreFunctions.GetRealUserName(username);
 
-            int retVal = -1;
+            var retVal = -1;
 
-            if(System.Web.HttpContext.Current != null)
-                System.Web.HttpContext.Current.Items["FormDigestValidated"] = true;
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            if (HttpContext.Current != null)
             {
-                
+                HttpContext.Current.Items["FormDigestValidated"] = true;
+            }
 
-                ArrayList arrUsers = GetFarmFeatureUsers(featureId);
-
-                SPFarm farm = SPFarm.Local;
-
-                if(featureId == 1000)
+            SPSecurity.RunWithElevatedPrivileges(
+                delegate
                 {
-                    UserManager _chrono = farm.GetChild<UserManager>("UserManager" + featureId);
-                    if(_chrono == null)
-                    {
-                        _chrono = new UserManager("UserManager" + featureId, farm, Guid.NewGuid());
-                        _chrono.Update();
-                        farm.Update();
-                    }
-                    ArrayList lstUsers = _chrono.UserList;
+                    var arrUsers = GetFarmFeatureUsers(featureId);
 
-                    if(lstUsers.Count == 1 && lstUsers[0].ToString() == "")
-                        lstUsers = new ArrayList();
+                    var farm = SPFarm.Local;
 
-                    int actType = 0;
-                    
-                    
+                    const int ExpectedFeatureId = 1000;
+                    retVal = featureId == ExpectedFeatureId
+                        ? UpdateUserFeature1000(username, featureId, farm)
+                        : UpdateUsersOnOtherFeatures(username, featureId, farm);
+                });
+            return retVal;
+        }
 
-                    SortedList sl = Act.GetAllAvailableLevels(out actType);
+        private static int UpdateUserFeature1000(string username, int featureId, SPFarm farm)
+        {
+            var retVal = -1;
+            var _chrono = farm.GetChild<UserManager>("UserManager" + featureId);
+            if (_chrono == null)
+            {
+                _chrono = new UserManager("UserManager" + featureId, farm, Guid.NewGuid());
+                _chrono.Update();
+                farm.Update();
+            }
+            var lstUsers = _chrono.UserList;
 
-                    string[] sInUserInfo = username.Replace("i:0#.w|","").Split(':');
+            if (lstUsers.Count == 1 && lstUsers[0].ToString() == string.Empty)
+            {
+                lstUsers = new ArrayList();
+            }
 
-                    int newfeatureid = int.Parse(sInUserInfo[1]);
+            var actType = 0;
+            var availableLevels = Act.GetAllAvailableLevels(out actType);
+            var userInfos = username.Replace("i:0#.w|", "").Split(':');
+            var newFeatureId = int.Parse(userInfos[1]);
 
-                    if(sl.Contains(newfeatureid) || newfeatureid == 0)
-                    {
-                        int max = 0;
-                        try
-                        {
-                            max = int.Parse(sl[newfeatureid].ToString());
-                        }
-                        catch { }
+            if (availableLevels.Contains(newFeatureId) || newFeatureId == 0)
+            {
+                int max;
+                int.TryParse(availableLevels[newFeatureId].ToString(), out max);
 
-                        if(max == 0 && newfeatureid != 0)
-                        {
+                if (max != 0 || newFeatureId == 0)
+                {
+                    var counter = 0;
 
-                        }
-                        else
-                        {
-                            int counter = 0;
+                    var newUsers = new ArrayList();
 
-                            
+                    var already = false;
 
-                            ArrayList newUsers = new ArrayList();
+                    ProcessUsers(username, lstUsers, newFeatureId, ref counter, userInfos, newUsers, ref already);
 
-                            bool already = false;
+                    retVal = UpdateFarm(username, farm, counter, max, newFeatureId, already, newUsers, _chrono);
+                }
+            }
+            else
+            {
+                retVal = 2;
+            }
+            return retVal;
+        }
 
-                            foreach(string user in lstUsers)
-                            {
-                                string[] sUserInfo = user.Split(':');
+        private static void ProcessUsers(
+            string username,
+            ArrayList lstUsers,
+            int newFeatureId,
+            ref int counter,
+            string[] userInfos,
+            ArrayList newUsers,
+            ref bool already)
+        {
+            foreach (string user in lstUsers)
+            {
+                var sUserInfo = user.Split(':');
 
-                                if(sUserInfo[1] == newfeatureid.ToString())
-                                    counter++;
+                if (sUserInfo[1] == newFeatureId.ToString())
+                {
+                    counter++;
+                }
 
-                                if(user == username)
-                                {
-                                    already = true;
-                                    break;
-                                }
+                if (user == username)
+                {
+                    already = true;
+                    break;
+                }
 
-                                if(sUserInfo[0] != sInUserInfo[0])
-                                    newUsers.Add(user);
-                            }
+                if (sUserInfo[0] != userInfos[0])
+                {
+                    newUsers.Add(user);
+                }
+            }
+        }
 
-                            if(counter < max || newfeatureid == 0)
-                            {
-                                if(!already)
-                                {
-                                    newUsers.Add(username);
+        private static int UpdateFarm(
+            string username,
+            SPFarm farm,
+            int counter,
+            int max,
+            int newFeatureId,
+            bool already,
+            ArrayList newUsers,
+            UserManager _chrono)
+        {
+            int retVal;
+            if (counter < max || newFeatureId == 0)
+            {
+                if (!already)
+                {
+                    newUsers.Add(username);
 
-                                    _chrono.UserList = newUsers;
+                    _chrono.UserList = newUsers;
 
-                                    _chrono.Update();
+                    _chrono.Update();
 
-                                    farm.Update();
-                                }
-                                retVal = 0;
-                            }
-                            else if(!already)
-                                retVal = 1;
-                            else
-                                retVal = 0;
-                        }
-                    }
-                    else
-                    {
-                        retVal = 2;
-                    }
+                    farm.Update();
+                }
+                retVal = 0;
+            }
+            else
+            {
+                retVal = !already
+                    ? 1
+                    : 0;
+            }
+            return retVal;
+        }
+
+        private static int UpdateUsersOnOtherFeatures(string username, int featureId, SPFarm farm)
+        {
+            int retVal;
+            var userCount = CoreFunctions.getFeatureLicenseUserCount(featureId);
+            if (userCount != "Unlimited")
+            {
+                var count = 0;
+                int.TryParse(userCount, out count);
+                var _chrono = farm.GetChild<UserManager>("UserManager" + featureId);
+                if (_chrono == null)
+                {
+                    _chrono = new UserManager("UserManager" + featureId, farm, Guid.NewGuid());
+                    _chrono.Update();
+                    farm.Update();
+                }
+                var lstUsers = _chrono.UserList;
+
+                if (lstUsers.Count == 1 && lstUsers[0].ToString() == string.Empty)
+                {
+                    lstUsers = new ArrayList();
+                }
+
+                if (lstUsers.Contains(username) && lstUsers.Count <= count)
+                {
+                    retVal = 0;
                 }
                 else
                 {
-                    string scount = CoreFunctions.getFeatureLicenseUserCount(featureId);
-                    if(scount != "Unlimited")
+                    if (lstUsers.Count >= count)
                     {
-                        int count = 0;
-                        int.TryParse(scount, out count);
-                        UserManager _chrono = farm.GetChild<UserManager>("UserManager" + featureId);
-                        if(_chrono == null)
-                        {
-                            _chrono = new UserManager("UserManager" + featureId, farm, Guid.NewGuid());
-                            _chrono.Update();
-                            farm.Update();
-                        }
-                        ArrayList lstUsers = _chrono.UserList;
-
-                        if(lstUsers.Count == 1 && lstUsers[0].ToString() == "")
-                            lstUsers = new ArrayList();
-
-                        if(lstUsers.Contains(username) && lstUsers.Count <= count)
-                        {
-                            retVal = 0;
-                        }
-                        else
-                        {
-                            if(lstUsers.Count >= count)
-                            {
-                                retVal = 1;
-                            }
-                            else
-                            {
-                                lstUsers.Add(username);
-                                _chrono.UserList = lstUsers;
-
-                                _chrono.Update();
-
-                                farm.Update();
-
-
-                                retVal = 0;
-                            }
-                        }
+                        retVal = 1;
                     }
                     else
-                        retVal = 0;
-                }
+                    {
+                        lstUsers.Add(username);
+                        _chrono.UserList = lstUsers;
 
-            });
+                        _chrono.Update();
+
+                        farm.Update();
+
+                        retVal = 0;
+                    }
+                }
+            }
+            else
+            {
+                retVal = 0;
+            }
             return retVal;
         }
 
