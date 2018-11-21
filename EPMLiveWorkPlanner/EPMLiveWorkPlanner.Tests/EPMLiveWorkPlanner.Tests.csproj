@@ -98,10 +98,17 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="HelperClasses\ToolBarButtonFake.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="HelperClasses\ToolBarFake.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="ISAPI\WorkPlanner.asmx.TestsSplitOne.cs" />
     <Compile Include="ISAPI\WorkPlanner.asmx.TestsSplitThree.cs" />
     <Compile Include="ISAPI\WorkPlanner.asmx.TestsSplitTwo.cs" />
     <Compile Include="Jobs\ListImportJobTests.cs" />
+    <Compile Include="Layouts\epmlive\Tasks.aspx.Tests.cs" />
     <Compile Include="Layouts\epmlive\WorkPlanner.aspx.Tests.cs" />
     <Compile Include="Layouts\epmlive\WorkPlannerWizard.aspx.Tests.cs" />
     <Compile Include="Layouts\epmlive\WorkPlannerWizard.aspx.Tests.ICheckParams.cs" />
