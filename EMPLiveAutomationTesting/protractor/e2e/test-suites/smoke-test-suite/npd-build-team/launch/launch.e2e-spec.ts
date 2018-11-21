@@ -107,7 +107,12 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.step('Click on the Ellipses button (...)');
         await PageHelper.click(CommonPage.ellipse);
         StepLogger.step('select "Edit Team" from the options displayed');
-        await PageHelper.click(CommonPage.contextMenuOptions.editTeam);
+        try {
+            await PageHelper.click(CommonPage.contextMenuOptions.editTeam);
+        } catch (e) {
+            await PageHelper.click(CommonPage.ellipse);
+            await PageHelper.click(CommonPage.contextMenuOptions.editTeam);
+        }
 
         StepLogger.verification('"Edit Team" window is displayed');
         await ProjectItemPageHelper.waitForBuildTeamPageToOpenAndSwitchToPage();

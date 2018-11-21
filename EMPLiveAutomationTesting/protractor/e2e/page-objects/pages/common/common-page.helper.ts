@@ -684,7 +684,8 @@ export class CommonPageHelper {
         await PageHelper.uploadFile(CommonPage.browseButton, newFile.fullFilePath);
 
         StepLogger.step('Click "OK" button');
-        await PageHelper.clickAndWaitForElementToHide(CommonPage.formButtons.ok);
+        await PageHelper.click(CommonPage.formButtons.ok);
+        await WaitHelper.staticWait(PageHelper.timeout.xs);
 
         await PageHelper.switchToDefaultContent();
         await WaitHelper.staticWait(PageHelper.timeout.xs);
