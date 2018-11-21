@@ -27,7 +27,7 @@ pipeline {
             steps {
                 echo 'Run tests...'
                 dir ("${env.WORKSPACE}/EMPLiveAutomationTesting/protractor") {
-                    sh "npm run e2e-tc -- --params.headlessBrowser=true"
+                    sh "npm install; npm run e2e-tc -- --params.headlessBrowser=true"
                 }
             }
         }
