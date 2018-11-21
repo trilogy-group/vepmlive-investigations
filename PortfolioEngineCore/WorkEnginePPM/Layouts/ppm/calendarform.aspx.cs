@@ -112,13 +112,10 @@ namespace WorkEnginePPM.Layouts.ppm3
         {
             DBAccess dba = null;
 
-            try
+            int id;
+            if (int.TryParse(txtId.Text, out id))
             {
-                BasicDialogProperties.Id = int.Parse(txtId.Text);
-            }
-            catch (Exception ex) when (ex is ArgumentNullException || ex is OverflowException || ex is FormatException)
-            {
-                System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                BasicDialogProperties.Id = id;
             }
 
             string basePath = hiddenData.Value;
@@ -153,13 +150,10 @@ namespace WorkEnginePPM.Layouts.ppm3
                 return;
             }
 
-            try
+            int id;
+            if (int.TryParse(txtId.Text, out id))
             {
-                BasicDialogProperties.Id = int.Parse(txtId.Text);
-            }
-            catch (Exception ex) when (ex is ArgumentNullException || ex is OverflowException || ex is FormatException)
-            {
-                System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                BasicDialogProperties.Id = id;
             }
 
             BasicDialogProperties.Name = txtName.Text;
