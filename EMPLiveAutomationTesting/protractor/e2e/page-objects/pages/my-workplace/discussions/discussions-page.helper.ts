@@ -144,7 +144,9 @@ export class DiscussionsPageHelper {
     static async verifyNewDiscussionAdded(subject: string) {
         StepLogger.subVerification('Newly added Discussion is displayed in the list');
         const item = DiscussionsPage.discussionInList.trTag(subject);
-        await PageHelper.click(CommonPage.lastButton);
+        if (await WaitHelper.waitForElementToBeDisplayed(CommonPage.lastButton, PageHelper.timeout.s)) {
+            await PageHelper.click(CommonPage.lastButton);
+        }
         await WaitHelper.waitForElementToBeDisplayed(item);
         await ElementHelper.scrollToElement(item);
         await ExpectationHelper.verifyDisplayedStatus(item, subject);
