@@ -131,7 +131,8 @@ namespace EPMLiveTimerService.Tests
             Assert.AreEqual(resultBody, mailMessage.Body);
             Assert.AreEqual(resultSubject, mailMessage.Subject);
             Assert.IsTrue(mailMessage.IsBodyHtml);
-        }
+			smtpClient.Dispose();
+		}
 
         [TestMethod]
         public void SendFullEmail_WhenHideFromIsFalseAndFromUserEmailIsEmpty_SendEmail()
@@ -168,7 +169,8 @@ namespace EPMLiveTimerService.Tests
             Assert.AreEqual(resultBody, mailMessage.Body);
             Assert.AreEqual(resultSubject, mailMessage.Subject);
             Assert.IsTrue(mailMessage.IsBodyHtml);
-        }
+			smtpClient.Dispose();
+		}
 
         [TestMethod]
         public void SendFullEmail_WhenHideFromIsFalseAndFromUserEmailIsNotEmpty_SendEmail()
@@ -198,7 +200,9 @@ namespace EPMLiveTimerService.Tests
             Assert.AreEqual(resultBody, mailMessage.Body);
             Assert.AreEqual(resultSubject, mailMessage.Subject);
             Assert.IsTrue(mailMessage.IsBodyHtml);
-        }
+			smtpClient.Dispose();
+
+		}
 
         private static ShimSPUser CreateShimForSpUser()
         {

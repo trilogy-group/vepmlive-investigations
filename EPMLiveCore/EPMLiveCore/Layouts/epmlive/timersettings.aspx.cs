@@ -144,7 +144,7 @@ namespace EPMLiveCore
         {
             cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 cn.Open();
             });
@@ -328,7 +328,7 @@ namespace EPMLiveCore
                 {
                     url = currWeb.ServerRelativeUrl;
 
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         using (SPSite site = new SPSite(currWeb.Site.ID))
                         {
@@ -368,25 +368,29 @@ namespace EPMLiveCore
 
             SPWeb web = SPContext.Current.Web;
             {
-                cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                using (cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
                 {
-                    cn.Open();
-                });
 
-                Guid timerjobguid;
-                //=======================Timer Job==========================
-                using (var sqlCommand = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=2", cn))
-                {
-                    sqlCommand.Parameters.AddWithValue("@siteguid", currWeb.Site.ID.ToString());
-
-                    using (var dataReader = sqlCommand.ExecuteReader())
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        if (dataReader.Read())
-                        {
-                            timerjobguid = dataReader.GetGuid(0);
+                        cn.Open();
+                    });
 
+                    Guid timerjobguid = Guid.Empty;
+                    //=======================Timer Job==========================
+                    using (var sqlCommand = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=2", cn))
+                    {
+                        sqlCommand.Parameters.AddWithValue("@siteguid", currWeb.Site.ID.ToString());
+
+                        using (var dataReader = sqlCommand.ExecuteReader())
+                        {
+                            if (dataReader.Read())
+                            {
+                                timerjobguid = dataReader.GetGuid(0);
+                            }
+                        }
+                        if (timerjobguid != Guid.Empty)
+                        {
                             using (var sqlUpdateCommand = new SqlCommand(
                                 "UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and jobtype=2",
                                 cn))
@@ -413,8 +417,6 @@ namespace EPMLiveCore
                         }
                     }
                 }
-
-                cn.Close();
             }
         }
 
