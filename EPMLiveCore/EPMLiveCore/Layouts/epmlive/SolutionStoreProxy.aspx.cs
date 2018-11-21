@@ -145,7 +145,9 @@ namespace EPMLiveCore
             var nodeQueryOptions = xmlDoc.CreateNode(XmlNodeType.Element, "QueryOptions", string.Empty);
             var queryOptions = _dataManager.GetPropVal("QueryOptions");
             queryOptions = !string.IsNullOrWhiteSpace(queryOptions) ? queryOptions.Replace(@"\\", @"\") : string.Empty;
-            nodeQueryOptions.InnerXml = !string.IsNullOrWhiteSpace(queryOptions) ? queryOptions : "<Folder>Solutions/" + CoreFunctions.GetAssemblyVersion() + "</Folder>";
+            nodeQueryOptions.InnerXml = !string.IsNullOrWhiteSpace(queryOptions) 
+                ? queryOptions 
+                : "<Folder>Solutions/" + CoreFunctions.GetAssemblyVersion() + "</Folder>";
             var webId = _dataManager.GetPropVal("WebID");
 
             using (var listSvc = new WorkEngineSolutionStoreListSvc.Lists())

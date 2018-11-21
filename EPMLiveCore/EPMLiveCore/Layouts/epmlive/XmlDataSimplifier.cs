@@ -10,7 +10,7 @@ namespace EPMLiveCore
 {
     internal static class XmlDataSimplifier
     {
-        internal static List<string> CompLevels;
+        internal static IList<string> CompLevels;
         internal static string SolutionType;
 
         internal static string SimplifySPGetListItemsXml(XmlNode data)
