@@ -4,7 +4,7 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore.API
 {
-    internal static class DALQueries
+    internal static class WorkspaceQueries
     {
         internal static string EnsureRptWebScript => 
             "IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[RPTWEBGROUPS]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1) " +

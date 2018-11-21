@@ -23,7 +23,7 @@ namespace EPMLiveCore.API
                     using (var con = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
                     {
                         con.Open();
-                        using (var cmd = new SqlCommand(DALQueries.GetFirstAttemptQuery(siteId, web, listId, itemId)))
+                        using (var cmd = new SqlCommand(WorkspaceQueries.GetFirstAttemptQuery(siteId, web, listId, itemId)))
                         {
                             cmd.Connection = con;
                             iRecs = int.Parse(cmd.ExecuteScalar().ToString());
@@ -60,7 +60,7 @@ namespace EPMLiveCore.API
                     {
                         con.Open();
 
-                        using (var cmd = new SqlCommand(DALQueries.GetSendCompletedSignalsQuery(
+                        using (var cmd = new SqlCommand(WorkspaceQueries.GetSendCompletedSignalsQuery(
                             siteId,
                             itemWeb.ID,
                             parentWeb,
@@ -102,7 +102,7 @@ namespace EPMLiveCore.API
                     {
                         con.Open();
 
-                        using (var cmd = new SqlCommand(DALQueries.GetSendCompletedSignalsQuery(
+                        using (var cmd = new SqlCommand(WorkspaceQueries.GetSendCompletedSignalsQuery(
                             siteId,
                             Guid.Empty,
                             parentWeb,
@@ -146,7 +146,7 @@ namespace EPMLiveCore.API
                         con.Open();
                         using (var cmd = new SqlCommand
                         {
-                            CommandText = DALQueries.GetAddToFRFQuery(
+                            CommandText = WorkspaceQueries.GetAddToFRFQuery(
                                 siteId,
                                 createdWebId,
                                 siteTitle,
@@ -186,7 +186,7 @@ namespace EPMLiveCore.API
                         con.Open();
                         using (var cmd = new SqlCommand
                         {
-                            CommandText = DALQueries.GetAddToFRFQuery(
+                            CommandText = WorkspaceQueries.GetAddToFRFQuery(
                                 siteId,
                                 createdWebId,
                                 siteTitle,
@@ -266,7 +266,7 @@ namespace EPMLiveCore.API
 
         private static void WriteTableToServer(SPSite spSite, SPWeb spWeb, SqlConnection con)
         {
-            using (var cmd = new SqlCommand(DALQueries.EnsureRptWebScript) { Connection = con })
+            using (var cmd = new SqlCommand(WorkspaceQueries.EnsureRptWebScript) { Connection = con })
             {
                 cmd.ExecuteNonQuery();
             }
@@ -320,7 +320,7 @@ namespace EPMLiveCore.API
                     {
                         con.Open();
 
-                        using (var cmd = new SqlCommand(DALQueries.GetDoesWorkSpaceExistQuery(siteId, webId, listId, itemId)))
+                        using (var cmd = new SqlCommand(WorkspaceQueries.GetDoesWorkSpaceExistQuery(siteId, webId, listId, itemId)))
                         using (var rdr = cmd.ExecuteReader())
                         {
                             while (rdr.Read())
