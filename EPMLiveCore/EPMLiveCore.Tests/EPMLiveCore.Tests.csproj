@@ -290,6 +290,7 @@
     <Compile Include="SocialEngine\Core\ThreadManagerTest.cs" />
     <Compile Include="SocialEngine\Modules\ListItemTests.cs" />
     <Compile Include="SPUtilities\SPListUtilityTest.cs" />
+    <Compile Include="StatusingEventTests.cs" />
     <Compile Include="Testables\InputFormControlTestable.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
