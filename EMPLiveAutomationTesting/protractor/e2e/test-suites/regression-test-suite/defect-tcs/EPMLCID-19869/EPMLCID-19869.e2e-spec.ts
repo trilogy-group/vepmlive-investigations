@@ -8,9 +8,12 @@ import {PageHelper} from '../../../../components/html/page-helper';
 describe(SuiteNames.regressionTestSuite, () => {
 
     beforeEach(async () => {
-
         await PageHelper.maximizeWindow();
         await new LoginPage().goToAndLogin();
+    });
+
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
     });
 
     it('Create a new department - [15438965]', async () => {

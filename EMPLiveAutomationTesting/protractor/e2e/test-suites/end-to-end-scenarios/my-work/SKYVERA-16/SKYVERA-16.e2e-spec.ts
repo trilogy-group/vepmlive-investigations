@@ -3,11 +3,19 @@ import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../core/logger/step-logger';
 import {MyWorkPageHelper} from '../../../../page-objects/pages/my-workplace/my-work/my-work-page.helper';
+import { LoginPageHelper } from '../../../../page-objects/pages/login/login-page.helper';
 
 describe(SuiteNames.endToEndSuite, () => {
 
-    beforeEach(async () => {
+    let item = '';
+    beforeAll(async () => {
+        await new LoginPage().goToAndLogin();
+        item = await MyWorkPageHelper.createToDoItem();
+        console.log(item);
+        await LoginPageHelper.logout();
+    });
 
+    beforeEach(async () => {
         await PageHelper.maximizeWindow();
         await new LoginPage().goToAndLogin();
         StepLogger.preCondition('User should be on "My Work" page.');
@@ -17,6 +25,13 @@ describe(SuiteNames.endToEndSuite, () => {
 
     afterEach(async () => {
         await StepLogger.takeScreenShot();
+    });
+
+    afterAll(async () => {
+        await new LoginPage().goToAndLogin();
+        console.log(item);
+        await MyWorkPageHelper.deleteToDoItem(item);
+        await LoginPageHelper.logout();
     });
 
     it('Save View via Save View button. - [745105]', async () => {

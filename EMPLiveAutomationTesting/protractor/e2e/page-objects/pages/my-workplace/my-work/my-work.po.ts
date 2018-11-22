@@ -313,4 +313,12 @@ export class MyWorkPage {
     static get editPageOptionInsideDropDown() {
         return element(By.cssContainingText('span.ms-cui-ctl-mediumlabel.ms-cui-btn-title', MyWorkPageConstants.editPage));
     }
+
+    static itemCreated(item: string) {
+        return element(By.xpath(`//a[contains(text(),'${item}')]//ancestor::tr[contains(@class,'GMDataRow')]`));
+    }
+
+    static ellipsisIconOfItem(item: string) {
+        return element(By.xpath(`//a[contains(text(),'${item}')]//ancestor::tr//span[@class='epm-menu-btn']`));
+    }
 }
