@@ -549,142 +549,12 @@ namespace EPMLiveWebParts
                                 {
                                     for (int iSeries = iStartCol; iSeries < dtSPSiteDataQueryData.Columns.Count; iSeries++)
                                     {
-                                        string sFieldName = dtSPSiteDataQueryData.Columns[iSeries].ColumnName;
-                                        fldYaxis = oTopList.Fields.GetFieldByInternalName(sFieldName);
-                                        sSeriesName = fldYaxis.Title;
-                                        sYaxisFldVal = dr.ItemArray[iSeries].ToString();
-                                        if (sYaxisFldVal.Length > 0)
-                                        {
-                                            if (sYaxisFldVal.Contains(";#"))
-                                            {
-                                                sYaxisFldVal =
-                                                    GetCleanNumberValue(
-                                                        sYaxisFldVal.Substring(sYaxisFldVal.IndexOf(";#") + 2)).ToString
-                                                        ();
-                                            }
-                                            if (GetFieldSchemaAttribValue(fldYaxis.SchemaXml, "Percentage").ToUpper() ==
-                                                "TRUE")
-                                            {
-                                                try
-                                                {
-                                                    var flTempVal = double.Parse(sYaxisFldVal, providerEn);
-                                                    flTempVal = flTempVal * 100;
-                                                    sYaxisFldVal = flTempVal.ToString();
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    HandleException(ex);
-
-                                                }
-                                            }
-                                        }
-
-                                        if (PropChartZaxisField.Trim().Length != 0 &&
-                                            !PropChartZaxisField.Contains("None Selected"))
-                                        {
-                                            if (zAxisFieldValue.Trim().Length == 0) zAxisFieldValue = "No Value";
-
-                                            if (SeriesExistsInChartDataTable(zAxisFieldValue))
-                                            {
-                                                UpdateCellValue(zAxisFieldValue, xAxisFieldValue, sYaxisFldVal,
-                                                                PropChartAggregationType);
-                                                _numberOfRowsInChartDataTable++;
-                                            }
-                                            else
-                                            {
-                                                //AddNewRowToChartDataTable(fldZaxis.GetFieldValueAsText(sZaxisFldVal));
-                                                AddNewRowToChartDataTable(zAxisFieldValue);
-                                                _numberOfRowsInChartDataTable++;
-                                                UpdateCellValue(zAxisFieldValue, xAxisFieldValue, sYaxisFldVal,
-                                                                PropChartAggregationType);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (SeriesExistsInChartDataTable(sSeriesName))
-                                            {
-                                                UpdateCellValue(sSeriesName, xAxisFieldValue, sYaxisFldVal,
-                                                                PropChartAggregationType);
-                                                _numberOfRowsInChartDataTable++;
-                                            }
-                                            else
-                                            {
-                                                AddNewRowToChartDataTable(sSeriesName);
-                                                _numberOfRowsInChartDataTable++;
-                                                UpdateCellValue(sSeriesName, xAxisFieldValue, sYaxisFldVal,
-                                                                PropChartAggregationType);
-                                            }
-                                        }
+                                        SetGraphData(iSeries, dr, zAxisFieldValue, xAxisFieldValue);
                                     }
                                 }
                                 else
                                 {
-                                    string sFieldName = dtSPSiteDataQueryData.Columns[iStartCol].ColumnName;
-                                    fldYaxis = oTopList.Fields.GetFieldByInternalName(sFieldName);
-                                    sSeriesName = fldYaxis.Title;
-                                    sYaxisFldVal = dr.ItemArray[iStartCol].ToString();
-                                    if (sYaxisFldVal.Length > 0)
-                                    {
-                                        if (sYaxisFldVal.Contains(";#"))
-                                        {
-                                            sYaxisFldVal =
-                                                GetCleanNumberValue(
-                                                    sYaxisFldVal.Substring(sYaxisFldVal.IndexOf(";#") + 2)).ToString
-                                                    ();
-                                        }
-                                        if (GetFieldSchemaAttribValue(fldYaxis.SchemaXml, "Percentage").ToUpper() ==
-                                            "TRUE")
-                                        {
-                                            try
-                                            {
-                                                var flTempVal = double.Parse(sYaxisFldVal, providerEn);
-                                                flTempVal = flTempVal * 100;
-                                                sYaxisFldVal = flTempVal.ToString();
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                HandleException(ex);
-
-                                            }
-                                        }
-                                    }
-
-                                    if (PropChartZaxisField.Trim().Length != 0 &&
-                                        !PropChartZaxisField.Contains("None Selected"))
-                                    {
-                                        if (zAxisFieldValue.Trim().Length == 0) zAxisFieldValue = "No Value";
-
-                                        if (SeriesExistsInChartDataTable(zAxisFieldValue))
-                                        {
-                                            UpdateCellValue(zAxisFieldValue, xAxisFieldValue, sYaxisFldVal,
-                                                            PropChartAggregationType);
-                                            _numberOfRowsInChartDataTable++;
-                                        }
-                                        else
-                                        {
-                                            //AddNewRowToChartDataTable(fldZaxis.GetFieldValueAsText(sZaxisFldVal));
-                                            AddNewRowToChartDataTable(zAxisFieldValue);
-                                            _numberOfRowsInChartDataTable++;
-                                            UpdateCellValue(zAxisFieldValue, xAxisFieldValue, sYaxisFldVal,
-                                                            PropChartAggregationType);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (SeriesExistsInChartDataTable(sSeriesName))
-                                        {
-                                            UpdateCellValue(sSeriesName, xAxisFieldValue, sYaxisFldVal,
-                                                            PropChartAggregationType);
-                                            _numberOfRowsInChartDataTable++;
-                                        }
-                                        else
-                                        {
-                                            AddNewRowToChartDataTable(sSeriesName);
-                                            _numberOfRowsInChartDataTable++;
-                                            UpdateCellValue(sSeriesName, xAxisFieldValue, sYaxisFldVal,
-                                                            PropChartAggregationType);
-                                        }
-                                    }
+                                    SetGraphData(iStartCol, dr, zAxisFieldValue, xAxisFieldValue);
                                 }
                             }
                             break;
@@ -697,6 +567,69 @@ namespace EPMLiveWebParts
             {
                 HandleException(ex);
 
+            }
+        }
+
+        private void SetGraphData(int idx, DataRow dataRow, string zAxisFieldValue, string xAxisFieldValue)
+        {
+            var fieldName = dtSPSiteDataQueryData.Columns[idx].ColumnName;
+            var yAxis = oTopList.Fields.GetFieldByInternalName(fieldName);
+            var seriesName = yAxis.Title;
+            var yAxisFieldValue = dataRow.ItemArray[idx].ToString();
+            if (yAxisFieldValue.Length > 0)
+            {
+                if (yAxisFieldValue.Contains(";#"))
+                {
+                    yAxisFieldValue = GetCleanNumberValue(yAxisFieldValue.Substring(yAxisFieldValue.IndexOf(";#") + 2))
+                        .ToString();
+                }
+                if (GetFieldSchemaAttribValue(yAxis.SchemaXml, "Percentage").ToUpper() == "TRUE")
+                {
+                    try
+                    {
+                        var flTempVal = double.Parse(yAxisFieldValue, providerEn);
+                        flTempVal = flTempVal * 100;
+                        yAxisFieldValue = flTempVal.ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        HandleException(ex);
+                    }
+                }
+            }
+
+            if (PropChartZaxisField.Trim().Length != 0 && !PropChartZaxisField.Contains("None Selected"))
+            {
+                if (zAxisFieldValue.Trim().Length == 0)
+                {
+                    zAxisFieldValue = "No Value";
+                }
+
+                if (SeriesExistsInChartDataTable(zAxisFieldValue))
+                {
+                    UpdateCellValue(zAxisFieldValue, xAxisFieldValue, yAxisFieldValue, PropChartAggregationType);
+                    _numberOfRowsInChartDataTable++;
+                }
+                else
+                {
+                    AddNewRowToChartDataTable(zAxisFieldValue);
+                    _numberOfRowsInChartDataTable++;
+                    UpdateCellValue(zAxisFieldValue, xAxisFieldValue, yAxisFieldValue, PropChartAggregationType);
+                }
+            }
+            else
+            {
+                if (SeriesExistsInChartDataTable(seriesName))
+                {
+                    UpdateCellValue(seriesName, xAxisFieldValue, yAxisFieldValue, PropChartAggregationType);
+                    _numberOfRowsInChartDataTable++;
+                }
+                else
+                {
+                    AddNewRowToChartDataTable(seriesName);
+                    _numberOfRowsInChartDataTable++;
+                    UpdateCellValue(seriesName, xAxisFieldValue, yAxisFieldValue, PropChartAggregationType);
+                }
             }
         }
 
