@@ -3,15 +3,15 @@ import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../core/logger/step-logger';
 import {MyWorkPageHelper} from '../../../../page-objects/pages/my-workplace/my-work/my-work-page.helper';
-import { LoginPageHelper } from '../../../../page-objects/pages/login/login-page.helper';
+import {LoginPageHelper} from '../../../../page-objects/pages/login/login-page.helper';
+import {MyWorkPageSubHelper} from '../../../../page-objects/pages/my-workplace/my-work/my-work-page.subhelper';
 
 describe(SuiteNames.endToEndSuite, () => {
 
     let item = '';
     beforeAll(async () => {
         await new LoginPage().goToAndLogin();
-        item = await MyWorkPageHelper.createToDoItem();
-        console.log(item);
+        item = await MyWorkPageSubHelper.createToDoItem();
         await LoginPageHelper.logout();
     });
 
@@ -29,8 +29,7 @@ describe(SuiteNames.endToEndSuite, () => {
 
     afterAll(async () => {
         await new LoginPage().goToAndLogin();
-        console.log(item);
-        await MyWorkPageHelper.deleteToDoItem(item);
+        await MyWorkPageSubHelper.deleteToDoItem(item);
         await LoginPageHelper.logout();
     });
 

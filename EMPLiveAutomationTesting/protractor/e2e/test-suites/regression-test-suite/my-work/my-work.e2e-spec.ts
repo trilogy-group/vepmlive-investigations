@@ -12,13 +12,14 @@ import {MyWorkPageConstants} from '../../../page-objects/pages/my-workplace/my-w
 import {MyWorkPageHelper} from '../../../page-objects/pages/my-workplace/my-work/my-work-page.helper';
 import {ExpectationHelper} from '../../../components/misc-utils/expectation-helper';
 import {LoginPageHelper} from '../../../page-objects/pages/login/login-page.helper';
+import {MyWorkPageSubHelper} from '../../../page-objects/pages/my-workplace/my-work/my-work-page.subhelper';
 
 describe(SuiteNames.regressionTestSuite, () => {
 
     let itemCreated = '';
     beforeAll(async () => {
         await new LoginPage().goToAndLogin();
-        itemCreated = await MyWorkPageHelper.createToDoItem();
+        itemCreated = await MyWorkPageSubHelper.createToDoItem();
         console.log(itemCreated);
         await LoginPageHelper.logout();
     });
@@ -26,7 +27,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     afterAll(async () => {
         await new LoginPage().goToAndLogin();
         console.log(itemCreated);
-        await MyWorkPageHelper.deleteToDoItem(itemCreated);
+        await MyWorkPageSubHelper.deleteToDoItem(itemCreated);
         await LoginPageHelper.logout();
     });
 

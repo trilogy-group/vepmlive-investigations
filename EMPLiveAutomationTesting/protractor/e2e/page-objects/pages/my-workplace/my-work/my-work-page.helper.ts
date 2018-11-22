@@ -20,6 +20,7 @@ import {ToDoPageHelper} from '../to-do/to-do-page.helper';
 import {TextComponentSelectors} from '../../../../components/component-types/text-component/text-component-selectors';
 import {MyTimeOffPageHelper} from '../my-time-off/my-time-off-page.helper';
 import {MyTimeOffPageConstants} from '../my-time-off/my-time-off-page.constants';
+import { MyWorkPageSubHelper } from './my-work-page.subhelper';
 
 export class MyWorkPageHelper {
 
@@ -428,7 +429,7 @@ export class MyWorkPageHelper {
 
     static async clickOnEditItem(item: string) {
         StepLogger.step('Click on "Edit Item" button.');
-        await this.verifyItemPresent(item);
+        await MyWorkPageSubHelper.verifyItemPresent(item);
         await PageHelper.click(MyWorkPage.manageTabRibbonItems.editItem);
     }
 
@@ -1152,66 +1153,5 @@ export class MyWorkPageHelper {
                 selectedColNames[i],
             );
         }
-    }
-
-    static async createToDoItem() {
-        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
-            MyWorkplacePage.navigation.myWork,
-            CommonPage.pageHeaders.myWorkplace.myWork,
-            CommonPageConstants.pageHeaders.myWorkplace.myWork,
-        );
-        await PageHelper.click(MyWorkPage.newItem);
-        await PageHelper.click(MyWorkPage.newItemMenu.toDoItem);
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
-        await ExpectationHelper.verifyDisplayedStatus(MyWorkPage.widowTitleName.toDo, MyWorkPageConstants.title.toDo);
-        await CommonPageHelper.switchToFirstContentFrame();
-        const uniqueId = PageHelper.getUniqueId();
-        const labels = MyWorkPageConstants.inputLabels;
-        const titleValue = `${labels.title} ${uniqueId}`;
-        await TextboxHelper.sendKeys(MyWorkPage.inputs.title, titleValue);
-        await TextboxHelper.sendKeys(MyWorkPage.inputs.assignedTo, LoginPageHelper.adminEmailId);
-        await PageHelper.click(MyWorkPage.assignedToSuggestions);
-        await PageHelper.click(CommonPage.formButtons.save);
-        await WaitHelper.staticWait(PageHelper.timeout.s);
-        await ExpectationHelper.verifyNotDisplayedStatus(CommonPage.formButtons.save, CommonPageConstants.formLabels.save);
-        return titleValue;
-    }
-
-    static async clickOnItem(item: string) {
-        StepLogger.step('Click on newly created item in the grid.');
-        await this.verifyItemPresent(item);
-        await PageHelper.click(MyWorkPage.itemCreated(item));
-    }
-
-    static async verifyItemPresent(item: string) {
-        StepLogger.step('Click on newly created item in the grid.');
-        await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.itemCreated(item));
-        await ExpectationHelper.verifyDisplayedStatus(MyWorkPage.itemCreated(item), item);
-    }
-
-    static async clickOnEllipsesForItem(item: string) {
-        StepLogger.step('Expand the ellipsis icon for a grid item.');
-        await ElementHelper.actionHoverOver(MyWorkPage.itemCreated(item));
-        await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.ellipsisIconOfItem(item));
-        await PageHelper.click(MyWorkPage.ellipsisIconOfItem(item));
-        await MyWorkPageHelper.verifyEllipsesDropdownForItemDisplayed();
-    }
-
-    static async deleteToDoItem(item: string) {
-        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
-            MyWorkplacePage.navigation.myWork,
-            CommonPage.pageHeaders.myWorkplace.myWork,
-            CommonPageConstants.pageHeaders.myWorkplace.myWork,
-        );
-        await this.verifyItemPresent(item);
-        await MyWorkPageHelper.clickOnEllipsesForItem(item);
-        await PageHelper.click(MyWorkPage.ellipsesDropdownForItem.deleteItem);
-        await PageHelper.acceptAlert();
-        await MyWorkPageHelper.verifyItemDeleted(item);
-    }
-
-    static async clickOnAnyEditItem() {
-        StepLogger.step('Click on "Edit Item" button.');
-        await PageHelper.click(MyWorkPage.manageTabRibbonItems.editItem);
     }
 }
