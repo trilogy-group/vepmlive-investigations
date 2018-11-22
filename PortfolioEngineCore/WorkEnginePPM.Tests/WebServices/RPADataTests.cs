@@ -795,8 +795,8 @@ namespace WorkEnginePPM.Tests.WebServices
         public void ConvFTEs_WhenCalled_ReturnsDouble()
         {
             // Arrange
-            var parameter = 111d;
-            var expected = 1.1d;
+            const double parameter = 111d;
+            const double expected = 1.1d;
 
             // Act
             var actual = (double)privateObject.Invoke(ConvFTEsMethodName, nonPublicInstance, new object[] { parameter });
@@ -809,8 +809,8 @@ namespace WorkEnginePPM.Tests.WebServices
         public void ConvHRs_WhenCalled_ReturnsDouble()
         {
             // Arrange
-            var parameter = 19.117589d;
-            var expected = 19.12d;
+            const double parameter = 19.117589d;
+            const double expected = 19.12d;
 
             // Act
             var actual = (double)privateObject.Invoke(ConvHRsMethodName, nonPublicInstance, new object[] { parameter });
