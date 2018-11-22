@@ -94,37 +94,36 @@ describe(SuiteNames.regressionTestSuite, () => {
     //         MyWorkPageConstants.currentView, viewNewName);
     // });
 
-    // #UNSTABLE
-    // it('Message while renaming the default view - [744293]', async () => {
-    //     StepLogger.caseId = 744293;
-    //     // preConditions are inside below function
-    //     StepLogger.step('preCondition - click on My Workplace>> Click on My Work >> Views tab');
-    //     await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
-    //         MyWorkplacePage.navigation.myWork,
-    //         CommonPage.pageHeaders.myWorkplace.myWork,
-    //         CommonPageConstants.pageHeaders.myWorkplace.myWork,
-    //     );
-    //     const item = CommonPage.recordWithoutGreenTicket;
-    //     await PageHelper.click(item);
-    //     await PageHelper.click(MyWorkPage.selectRibbonTabs.views);
-    //     StepLogger.stepId(1);
-    //     StepLogger.step('Verify the default view name get display in "Current View" drop down');
-    //     await ExpectationHelper.verifyDisplayedStatus(MyWorkPage.getCurrentView, MyWorkPageConstants.currentView);
-    //     StepLogger.stepId(2);
-    //     StepLogger.step('Click on rename View button.> provide new name >click on ok');
-    //     const currentViewName = await PageHelper.getText(MyWorkPage.getCurrentView);
-    //     await PageHelper.click(MyWorkPage.getViewRibbonOptions.renameView);
-    //     // Step 2 and 3 are inside the below function
-    //     const viewNewName = await MyWorkPageHelper.fillAndSubmitRenameView();
-    //     await MyWorkPageHelper.verifyAndAcceptRenameConfirmationPopup(currentViewName);
-    //     // Takes time update current view
-    //     await browser.sleep(PageHelper.timeout.xs);
-    //     await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
-    //         MyWorkplacePage.navigation.myWork,
-    //         CommonPage.pageHeaders.myWorkplace.myWork,
-    //         CommonPageConstants.pageHeaders.myWorkplace.myWork,
-    //     );
-    //     await ExpectationHelper.verifyText(MyWorkPage.getCurrentView,
-    //         MyWorkPageConstants.currentView, viewNewName);
-    // });
+    it('Message while renaming the default view - [744293]', async () => {
+        StepLogger.caseId = 744293;
+        // preConditions are inside below function
+        StepLogger.step('preCondition - click on My Workplace>> Click on My Work >> Views tab');
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.myWork,
+            CommonPage.pageHeaders.myWorkplace.myWork,
+            CommonPageConstants.pageHeaders.myWorkplace.myWork,
+        );
+        const item = CommonPage.recordWithoutGreenTicket;
+        await PageHelper.click(item);
+        await PageHelper.click(MyWorkPage.selectRibbonTabs.views);
+        StepLogger.stepId(1);
+        StepLogger.step('Verify the default view name get display in "Current View" drop down');
+        await ExpectationHelper.verifyDisplayedStatus(MyWorkPage.getCurrentView, MyWorkPageConstants.currentView);
+        StepLogger.stepId(2);
+        StepLogger.step('Click on rename View button.> provide new name >click on ok');
+        const currentViewName = await PageHelper.getText(MyWorkPage.getCurrentView);
+        await PageHelper.click(MyWorkPage.getViewRibbonOptions.renameView);
+        // Step 2 and 3 are inside the below function
+        const viewNewName = await MyWorkPageHelper.fillAndSubmitRenameView();
+        await MyWorkPageHelper.verifyAndAcceptRenameConfirmationPopup(currentViewName);
+        // Takes time update current view
+        await browser.sleep(PageHelper.timeout.xs);
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.myWork,
+            CommonPage.pageHeaders.myWorkplace.myWork,
+            CommonPageConstants.pageHeaders.myWorkplace.myWork,
+        );
+        await ExpectationHelper.verifyText(MyWorkPage.getCurrentView,
+            MyWorkPageConstants.currentView, viewNewName);
+    });
 });

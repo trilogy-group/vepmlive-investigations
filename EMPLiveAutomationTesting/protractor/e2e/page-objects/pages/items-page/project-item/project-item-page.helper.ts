@@ -476,11 +476,10 @@ export class ProjectItemPageHelper {
             projectNameValue,
             ProjectItemPageConstants.columnNames.title);
         await CommonPageHelper.editOptionViaRibbon();
-        projectNameValue = projectNameValue + 'Edited';
         StepLogger.verification('"Edit Project" page is displayed');
         await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
 
-        await TextboxHelper.sendKeys(ProjectItemPage.inputs.projectName, projectNameValue);
+        await TextboxHelper.sendKeys(ProjectItemPage.inputs.projectDescription, projectNameValue);
 
         await PageHelper.clickAndWaitForElementToHide(CommonPage.formButtons.save);
 
@@ -494,7 +493,6 @@ export class ProjectItemPageHelper {
         StepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
         await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(projectNameValue), projectNameValue);
         return projectNameValue;
-
     }
 
     static async deleteOptionViaRibbon(item = CommonPage.record) {
@@ -503,7 +501,7 @@ export class ProjectItemPageHelper {
         StepLogger.step('Select "Delete" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.delete);
 
-        await PageHelper.acceptAlertIfPresent();
+        await PageHelper.acceptAlert();
     }
 
     static async deleteProjectAndValidateIt(projectNameValue: string) {

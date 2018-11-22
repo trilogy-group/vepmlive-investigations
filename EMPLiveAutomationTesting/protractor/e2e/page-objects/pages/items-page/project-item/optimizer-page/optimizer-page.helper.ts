@@ -110,6 +110,8 @@ export class OptimizerPageHelper {
     static async verifySaveStrtegyPopupDisplayed() {
         await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getOptimierSaveStrategyPopup.strategyName,
             'Save Strategy popup');
+        // wait is need for all the elements to load.
+        await PageHelper.sleepForXSec(3000);
     }
 
     static async enterNewStrategyNameAndSubmit() {
