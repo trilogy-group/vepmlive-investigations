@@ -1,13 +1,8 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
 using System.Web;
-using System.Web.Security;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
+using EPMLiveCore.Helpers;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.WebPartPages;
@@ -28,23 +23,7 @@ namespace EPMLiveWorkPlanner
             webUrl = SPContext.Current.Web.Url;
             if (Request["close"] != "1")
             {
-                Button closebutton = new Button();
-                closebutton.Text = "Close";
-                closebutton.CssClass = "ms-ButtonHeightWidth";
-                closebutton.OnClientClick = "closePage();";
-
-                Button closebutton2 = new Button();
-                closebutton2.Text = "Close";
-                closebutton2.CssClass = "ms-ButtonHeightWidth";
-                closebutton2.OnClientClick = "closePage();";
-                ListFormWebPart1.Controls[0].FindControl("toolBarTbltop").FindControl("RightRptControls").Controls.AddAt(4, closebutton);
-                ListFormWebPart1.Controls[0].FindControl("toolBarTbl").FindControl("RightRptControls").Controls.AddAt(2, closebutton2);
-
-                GoBackButton btn = (GoBackButton)ListFormWebPart1.Controls[0].FindControl("toolBarTbltop").FindControl("RightRptControls").FindControl("ctl02");
-
-                btn.Visible = false;
-                btn = (GoBackButton)ListFormWebPart1.Controls[0].FindControl("toolBarTbl").FindControl("RightRptControls").FindControl("ctl01");
-                btn.Visible = false;
+                ItemHelper.SetCloseAndBackButtons(ListFormWebPart1);
             }
         }
 
