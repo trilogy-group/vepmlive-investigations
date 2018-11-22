@@ -20,13 +20,11 @@ describe(SuiteNames.regressionTestSuite, () => {
     beforeAll(async () => {
         await new LoginPage().goToAndLogin();
         itemCreated = await MyWorkPageSubHelper.createToDoItem();
-        console.log(itemCreated);
         await LoginPageHelper.logout();
     });
 
     afterAll(async () => {
         await new LoginPage().goToAndLogin();
-        console.log(itemCreated);
         await MyWorkPageSubHelper.deleteToDoItem(itemCreated);
         await LoginPageHelper.logout();
     });
