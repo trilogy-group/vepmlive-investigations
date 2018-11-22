@@ -165,6 +165,14 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string ReplaceCSDataMethodName = "ReplaceCSData";
         private const string UpdateCSDataModeMethodName = "UpdateCSDataMode";
         private const string ResolvePINameMethodName = "ResolvePIName";
+        private const string GetRoleScrenarioDataMethodName = "GetRoleScrenarioData";
+        private const string GetCSDeptUIDsMethodName = "GetCSDeptUIDs";
+        private const string GetCSDeptListMethodName = "GetCSDeptList";
+        private const string SetAllChecksMethodName = "SetAllChecks";
+        private const string GetEditResPlanPIListMethodName = "GetEditResPlanPIList";
+        private const string GetEditResPlanResListMethodName = "GetEditResPlanResList";
+        private const string GetEditResPlanTicketMethodName = "GetEditResPlanTicket";
+        private const string AddElementMethodName = "AddElement";
 
         [TestInitialize]
         public void Setup()
@@ -2716,6 +2724,462 @@ namespace WorkEnginePPM.Tests.WebServices
             resourceValues.ShouldSatisfyAllConditions(
                 () => resourceValues.CapacityTargets.Count.ShouldBe(One),
                 () => resourceValues.CapacityTargets[One].level.ShouldBe(One));
+        }
+
+        [TestMethod]
+        public void ResolvePIName_PIDataFound_ReturnsPIName()
+        {
+            // Arrange
+            var pisColumns = new Dictionary<int, clsPIData>()
+            {
+                [One] = new clsPIData()
+                {
+                    PIName = DummyString
+                }
+            };
+
+            privateObject.SetFieldOrProperty(PisColumnFieldName, nonPublicInstance, pisColumns);
+
+            // Act
+            var actual = (string)privateObject.Invoke(ResolvePINameMethodName, nonPublicInstance, new object[] { One });
+
+            // Assert
+            actual.ShouldBe(DummyString);
+        }
+
+        [TestMethod]
+        public void ResolvePIName_PIDataFound_ReturnsEmptyString()
+        {
+            // Arrange
+            var pisColumns = new Dictionary<int, clsPIData>()
+            {
+                [One] = new clsPIData()
+                {
+                    PIName = DummyString
+                }
+            };
+
+            privateObject.SetFieldOrProperty(PisColumnFieldName, nonPublicInstance, pisColumns);
+
+            // Act
+            var actual = privateObject.Invoke(ResolvePINameMethodName, nonPublicInstance, new object[] { Three });
+
+            // Assert
+            actual.ShouldBe(string.Empty);
+        }
+
+        [TestMethod]
+        public void GetRoleScrenarioData_RoleBasedTrue_Returns()
+        {
+            // Arrange
+            const string xmlString = @"
+                <data>
+                    <CostCategoryRoles>
+                        <CostCategoryRole ID=""1""/>
+                    </CostCategoryRoles>
+                </data>";
+            var doubleArray = new double[]
+            {
+                One,
+                Two,
+                Three
+            };
+            var resxData = new clsResXData()
+            {
+                bTotalize = true,
+                bFilteredOut = false,
+                ProjectID = One,
+                ProjectName = DummyString
+            };
+            resxData.SetUpPeriods(Two);
+            var totalResxData = new clsResXData()
+            {
+                bTotalize = true,
+                bFilteredOut = false,
+                ProjectID = One,
+                ProjectName = DummyString
+            };
+            totalResxData.SetUpPeriods(Two);
+            var actualResxData = new clsResXData()
+            {
+                bTotalize = true,
+                bFilteredOut = false,
+                ProjectID = One,
+                ProjectName = DummyString
+            };
+            actualResxData.SetUpPeriods(Two);
+            actualResxData.WrkHours = doubleArray;
+            actualResxData.FTEVals = doubleArray;
+            var fullData = new clsResFullDAta()
+            {
+                tot_Totals = totalResxData,
+                tot_actual = resxData,
+                actual = new List<clsResXData>()
+                {
+                    actualResxData
+                },
+                PIList = new Dictionary<int, string>()
+                {
+                    [One] = DummyString
+                }
+            };
+            var roleList = new Dictionary<int, clsResFullDAta>()
+            {
+                [One] = fullData
+            };
+            var resourceValues = new clsResourceValues()
+            {
+                CapacityTargets = new Dictionary<int, clsEPKItem>()
+                {
+                    [One] = new clsEPKItem()
+                    {
+                        ID = One,
+                        Name = DummyString,
+                        Flag = One
+                    },
+                    [Two] = new clsEPKItem()
+                    {
+                        ID = Two,
+                        Name = DummyString,
+                        Flag = Zero
+                    }
+                }
+            };
+            var actual = new XmlDocument();
+
+            privateObject.SetFieldOrProperty(CostCategoryRoleListFieldName, nonPublicInstance, roleList);
+            privateObject.SetFieldOrProperty(RoleListFieldName, nonPublicInstance, roleList);
+            privateObject.SetFieldOrProperty(ResourceValuesFieldName, nonPublicInstance, resourceValues);
+            privateObject.SetFieldOrProperty(NumPerFieldName, nonPublicInstance, One);
+            privateObject.SetFieldOrProperty(CheckCommitFieldName, nonPublicInstance, true);
+            privateObject.SetFieldOrProperty(CheckNonWorkFieldName, nonPublicInstance, true);
+            privateObject.SetFieldOrProperty(CheckMspfFieldName, nonPublicInstance, true);
+            privateObject.SetFieldOrProperty(CheckActualFieldName, nonPublicInstance, true);
+            privateObject.SetFieldOrProperty(CheckOpenRequestFieldName, nonPublicInstance, true);
+            privateObject.SetFieldOrProperty(CheckOpenRequireFieldName, nonPublicInstance, true);
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GetRoleScrenarioDataMethodName, publicInstance, new object[] { xmlString, DummyString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.SelectSingleNode("//CS_Value").Attributes["Per_ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//CS_Value").Attributes["Role_ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//CS_Value").Attributes["Hours"].Value.ShouldBe(Two.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//CS_Value").Attributes["FTEs"].Value.ShouldBe("200"));
+        }
+
+        [TestMethod]
+        public void GetRoleScrenarioData_RoleBasedFalse_Returns()
+        {
+            // Arrange
+            const string xmlString = @"
+                <data>
+                    <CostCategoryRoles>
+                        <CostCategoryRole ID=""1""/>
+                    </CostCategoryRoles>
+                </data>";
+            var doubleArray = new double[]
+            {
+                One,
+                Two,
+                Three
+            };
+            var resxData = new clsResXData()
+            {
+                bTotalize = true,
+                bFilteredOut = false,
+                ProjectID = One,
+                ProjectName = DummyString
+            };
+            resxData.SetUpPeriods(Two);
+            var totalResxData = new clsResXData()
+            {
+                bTotalize = true,
+                bFilteredOut = false,
+                ProjectID = One,
+                ProjectName = DummyString
+            };
+            totalResxData.SetUpPeriods(Two);
+            var actualResxData = new clsResXData()
+            {
+                bTotalize = true,
+                bFilteredOut = false,
+                ProjectID = One,
+                ProjectName = DummyString
+            };
+            actualResxData.SetUpPeriods(Two);
+            actualResxData.WrkHours = doubleArray;
+            actualResxData.FTEVals = doubleArray;
+            var fullData = new clsResFullDAta()
+            {
+                tot_Totals = totalResxData,
+                tot_actual = resxData,
+                actual = new List<clsResXData>()
+                {
+                    actualResxData
+                },
+                PIList = new Dictionary<int, string>()
+                {
+                    [One] = DummyString
+                }
+            };
+            var roleList = new Dictionary<int, clsResFullDAta>()
+            {
+                [One] = fullData
+            };
+            var resourceValues = new clsResourceValues()
+            {
+                CapacityTargets = new Dictionary<int, clsEPKItem>()
+                {
+                    [One] = new clsEPKItem()
+                    {
+                        ID = One,
+                        Name = DummyString,
+                        Flag = Zero
+                    },
+                    [Two] = new clsEPKItem()
+                    {
+                        ID = Two,
+                        Name = DummyString,
+                        Flag = Zero
+                    }
+                }
+            };
+            var actual = new XmlDocument();
+
+            privateObject.SetFieldOrProperty(CostCategoryRoleListFieldName, nonPublicInstance, roleList);
+            privateObject.SetFieldOrProperty(RoleListFieldName, nonPublicInstance, roleList);
+            privateObject.SetFieldOrProperty(ResourceValuesFieldName, nonPublicInstance, resourceValues);
+            privateObject.SetFieldOrProperty(NumPerFieldName, nonPublicInstance, One);
+            privateObject.SetFieldOrProperty(CheckCommitFieldName, nonPublicInstance, true);
+            privateObject.SetFieldOrProperty(CheckNonWorkFieldName, nonPublicInstance, true);
+            privateObject.SetFieldOrProperty(CheckMspfFieldName, nonPublicInstance, true);
+            privateObject.SetFieldOrProperty(CheckActualFieldName, nonPublicInstance, true);
+            privateObject.SetFieldOrProperty(CheckOpenRequestFieldName, nonPublicInstance, true);
+            privateObject.SetFieldOrProperty(CheckOpenRequireFieldName, nonPublicInstance, true);
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GetRoleScrenarioDataMethodName, publicInstance, new object[] { xmlString, DummyString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.SelectSingleNode("//CS_Value").Attributes["Per_ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//CS_Value").Attributes["Role_ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//CS_Value").Attributes["Hours"].Value.ShouldBe(Two.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//CS_Value").Attributes["FTEs"].Value.ShouldBe("200"));
+        }
+
+        [TestMethod]
+        public void GetCSDeptUIDs_WhenCalled_ReturnsIDsSeparatedByCommas()
+        {
+            // Arrange
+            const string expected = "1,2,3";
+            var userDepts = new List<clsEPKItem>()
+            {
+                new clsEPKItem()
+                {
+                    ID = One
+                },
+                new clsEPKItem()
+                {
+                    ID = Two
+                },
+                new clsEPKItem()
+                {
+                    ID = Three
+                }
+            };
+
+            privateObject.SetFieldOrProperty(UserDeptsFieldName, nonPublicInstance, userDepts);
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetCSDeptUIDsMethodName, publicInstance, new object[] { });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetCSDeptList_WhenCalled_ReturnsDeptListXmlString()
+        {
+            // Arrange
+            var userDepts = new List<clsEPKItem>()
+            {
+                new clsEPKItem()
+                {
+                    ID = One,
+                    Name = One.ToString()
+                },
+                new clsEPKItem()
+                {
+                    ID = Two,
+                    Name = Two.ToString()
+                }
+            };
+            var actual = new XmlDocument();
+
+            privateObject.SetFieldOrProperty(UserDeptsFieldName, nonPublicInstance, userDepts);
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GetCSDeptListMethodName, publicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.SelectNodes("//CSDept").Count.ShouldBe(Two),
+                () => actual.FirstChild.SelectSingleNode($"//CSDept[@DEPTUID='{One}']").Attributes["DEPTNAME"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode($"//CSDept[@DEPTUID='{Two}']").Attributes["DEPTNAME"].Value.ShouldBe(Two.ToString()));
+        }
+
+        [TestMethod]
+        public void SetAllChecks_WhenCalled_SetsAllChecks()
+        {
+            // Arrange
+            var sortColumns = new List<clsResXData>()
+            {
+                new clsResXData()
+                {
+                    bTotalize = false
+                },
+                new clsResXData()
+                {
+                    bTotalize = false
+                }
+            };
+
+            ShimRPAData.AllInstances.NewRedrawTotals = _ =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty(SortColumnFieldName, nonPublicInstance, sortColumns);
+
+            // Act
+            privateObject.Invoke(SetAllChecksMethodName, publicInstance, new object[] { true });
+            sortColumns = (List<clsResXData>)privateObject.GetFieldOrProperty(SortColumnFieldName, nonPublicInstance);
+
+            // Assert
+            sortColumns.ShouldSatisfyAllConditions(
+                () => sortColumns.Count.ShouldBe(2),
+                () => sortColumns.Count(x => x.bTotalize).ShouldBe(2),
+                () => validations.ShouldBe(One));
+        }
+
+        [TestMethod]
+        public void GetEditResPlanPIList_WhenCalled_ReturnsProjectIdsSeparatedByCommas()
+        {
+            // Arrange
+            const string expected = "1,3";
+            var sortColumns = new List<clsResXData>()
+            {
+                new clsResXData()
+                {
+                    bTotalize = true,
+                    ProjectID = One
+                },
+                new clsResXData()
+                {
+                    bTotalize = false,
+                    ProjectID = Two
+                },
+                new clsResXData()
+                {
+                    bTotalize = true,
+                    ProjectID = Three
+                }
+            };
+
+            privateObject.SetFieldOrProperty(SortColumnFieldName, nonPublicInstance, sortColumns);
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetEditResPlanPIListMethodName, publicInstance, new object[] { });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetEditResPlanResList_WhenCalled_ReturnsResIdsSeparatedByCommas()
+        {
+            // Arrange
+            const string expected = "1,3";
+            var sortColumns = new List<clsResXData>()
+            {
+                new clsResXData()
+                {
+                    bTotalize = true,
+                    WResID = One
+                },
+                new clsResXData()
+                {
+                    bTotalize = false,
+                    WResID = Two
+                },
+                new clsResXData()
+                {
+                    bTotalize = true,
+                    WResID = Three
+                }
+            };
+
+            privateObject.SetFieldOrProperty(SortColumnFieldName, nonPublicInstance, sortColumns);
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetEditResPlanResListMethodName, publicInstance, new object[] { });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetEditResPlanTicket_WhenCalled_ReturnsTicketXmlString()
+        {
+            // Arrange
+            const string expected = "Ticket";
+            var actual = new XmlDocument();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GetEditResPlanTicketMethodName, publicInstance, new object[] { DummyString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(expected),
+                () => actual.FirstChild.Attributes[ValueString].Value.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void AddElement_WhenCalled_AppendsElementToTheEnd()
+        {
+            // Arrange
+            const string childNodeName = "childNodeName";
+            const string childNodeValue = "childNodeValue";
+            const string xmlString = @"
+                <xmlcfg>
+                    <Parent/>
+                </xmlcfg>";
+            var xmlDocument = new XmlDocument();
+            var parentNode = default(XmlNode);
+
+            xmlDocument.LoadXml(xmlString);
+            parentNode = xmlDocument.FirstChild.SelectSingleNode("//Parent");
+
+            var parameters = new object[]
+            {
+                xmlDocument,
+                parentNode,
+                childNodeName,
+                childNodeValue
+            };
+
+            // Act
+            privateObject.Invoke(AddElementMethodName, nonPublicInstance, parameters);
+            var actual = (XmlNode)parameters[1];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ChildNodes.Count.ShouldBe(1),
+                () => actual.ChildNodes[0].Name.ShouldBe(childNodeName),
+                () => actual.ChildNodes[0].InnerText.ShouldBe(childNodeValue));
         }
     }
 }
