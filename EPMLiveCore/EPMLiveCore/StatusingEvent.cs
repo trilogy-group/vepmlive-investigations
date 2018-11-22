@@ -152,7 +152,8 @@ namespace EPMLiveCore
             {
                 if (newComplete != null)
                 {
-                    if (newComplete == "1" || string.Equals(newComplete, "true", StringComparison.OrdinalIgnoreCase))
+                    const string CompleteFlag = "1";
+                    if (newComplete == CompleteFlag || string.Equals(newComplete, bool.TrueString, StringComparison.OrdinalIgnoreCase))
                     {
                         newStatus = "Completed";
                     }
