@@ -86,13 +86,16 @@ describe(SuiteNames.regressionTestSuite, () => {
         const item = CommonPage.recordWithoutGreenTicket;
         await PageHelper.click(item);
         await PageHelper.click(MyWorkPage.selectRibbonTabs.views);
+
         StepLogger.stepId(3);
         StepLogger.step('Click on rename View button.');
         const currentViewName = await PageHelper.getText(MyWorkPage.getCurrentView);
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.renameView);
+
         StepLogger.stepId(4);
         StepLogger.step('Enter the Title of the new view name. > Click on "OK" button');
         const viewNewName = await MyWorkPageHelper.fillAndSubmitRenameView();
+
         StepLogger.stepId(5);
         StepLogger.step('Click on Ok in the pop-up.');
         await MyWorkPageHelper.verifyAndAcceptRenameConfirmationPopup(currentViewName);

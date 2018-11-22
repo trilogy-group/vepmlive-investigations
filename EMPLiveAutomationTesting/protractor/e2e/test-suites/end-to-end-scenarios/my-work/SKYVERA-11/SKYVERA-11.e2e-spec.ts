@@ -3,8 +3,8 @@ import {StepLogger} from '../../../../../core/logger/step-logger';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 import {MyWorkPageHelper} from '../../../../page-objects/pages/my-workplace/my-work/my-work-page.helper';
-import { LoginPageHelper } from '../../../../page-objects/pages/login/login-page.helper';
-import { MyWorkPageSubHelper } from '../../../../page-objects/pages/my-workplace/my-work/my-work-page.subhelper';
+import {LoginPageHelper} from '../../../../page-objects/pages/login/login-page.helper';
+import {MyWorkPageSubHelper} from '../../../../page-objects/pages/my-workplace/my-work/my-work-page.subhelper';
 
 describe(SuiteNames.endToEndSuite, () => {
 

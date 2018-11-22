@@ -41,6 +41,7 @@ export class MyWorkPageSubHelper {
         StepLogger.subStep('Click on save button');
         await PageHelper.click(CommonPage.formButtons.save);
         await WaitHelper.staticWait(PageHelper.timeout.s);
+        StepLogger.subVerification('Verify Save button is not displayed anymore');
         await ExpectationHelper.verifyNotDisplayedStatus(CommonPage.formButtons.save, CommonPageConstants.formLabels.save);
         return titleValue;
     }
@@ -55,6 +56,7 @@ export class MyWorkPageSubHelper {
     static async verifyItemPresent(item: string) {
         StepLogger.subStep('Verify item created');
         await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.itemCreated(item));
+        StepLogger.subVerification('Verify Created item is displayed');
         await ExpectationHelper.verifyDisplayedStatus(MyWorkPage.itemCreated(item), item);
     }
 
@@ -63,6 +65,7 @@ export class MyWorkPageSubHelper {
         await ElementHelper.actionHoverOver(MyWorkPage.itemCreated(item));
         await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.ellipsisIconOfItem(item));
         await PageHelper.click(MyWorkPage.ellipsisIconOfItem(item));
+        StepLogger.subVerification('Verify Dropdown is displayed');
         await MyWorkPageHelper.verifyEllipsesDropdownForItemDisplayed();
     }
 
@@ -78,6 +81,7 @@ export class MyWorkPageSubHelper {
         StepLogger.subStep('Click on delete item');
         await PageHelper.click(MyWorkPage.ellipsesDropdownForItem.deleteItem);
         await PageHelper.acceptAlert();
+        StepLogger.subVerification('Verify Item deleted');
         await MyWorkPageHelper.verifyItemDeleted(item);
     }
 
