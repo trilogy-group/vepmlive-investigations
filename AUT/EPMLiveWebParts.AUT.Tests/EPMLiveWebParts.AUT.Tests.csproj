@@ -562,24 +562,6 @@
     <Compile Include="Web References\SSRS2010\ValidValueTest.cs" />
     <Compile Include="Web References\SSRS2010\WarningTest.cs" />
     <Compile Include="Web References\SSRS2010\WeeklyRecurrenceTest.cs" />
-    <Compile Include="WebPageCode\AjaxpostTest.cs" />
-    <Compile Include="WebPageCode\CheckresganttTest.cs" />
-    <Compile Include="WebPageCode\GetgriditemsTest.cs" />
-    <Compile Include="WebPageCode\GetitemsTest.cs" />
-    <Compile Include="WebPageCode\GetlistinfoTest.cs" />
-    <Compile Include="WebPageCode\GetlistreportitemsTest.cs" />
-    <Compile Include="WebPageCode\GetplanlistTest.cs" />
-    <Compile Include="WebPageCode\GetresourcecheckplanTest.cs" />
-    <Compile Include="WebPageCode\GetresourceplanTest.cs" />
-    <Compile Include="WebPageCode\GetresourcepoolTest.cs" />
-    <Compile Include="WebPageCode\GetsingleitemTest.cs" />
-    <Compile Include="WebPageCode\GetworkspacelistTest.cs" />
-    <Compile Include="WebPageCode\GridactionTest.cs" />
-    <Compile Include="WebPageCode\ListedititemTest.cs" />
-    <Compile Include="WebPageCode\RibbonjsTest.cs" />
-    <Compile Include="WebPageCode\SavegridTest.cs" />
-    <Compile Include="WebPageCode\SaveresplanTest.cs" />
-    <Compile Include="WebPageCode\ShowlisterrorTest.cs" />
     <Compile Include="WorkEngineAccountManagement\WorkEngineAccountManagementTest.cs" />
     <Compile Include="WorkspaceList\WorkspaceListTest.cs" />
   </ItemGroup>
