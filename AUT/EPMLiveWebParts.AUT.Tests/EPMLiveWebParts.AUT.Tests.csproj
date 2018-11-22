@@ -564,7 +564,6 @@
     <Compile Include="Web References\SSRS2010\WeeklyRecurrenceTest.cs" />
     <Compile Include="WebPageCode\AjaxpostTest.cs" />
     <Compile Include="WebPageCode\CheckresganttTest.cs" />
-    <Compile Include="WebPageCode\GetgantttasksTest.cs" />
     <Compile Include="WebPageCode\GetgriditemsTest.cs" />
     <Compile Include="WebPageCode\GetitemsTest.cs" />
     <Compile Include="WebPageCode\GetlistinfoTest.cs" />
