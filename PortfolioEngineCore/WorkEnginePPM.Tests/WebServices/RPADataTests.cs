@@ -173,6 +173,7 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string GetEditResPlanResListMethodName = "GetEditResPlanResList";
         private const string GetEditResPlanTicketMethodName = "GetEditResPlanTicket";
         private const string AddElementMethodName = "AddElement";
+        private const string PopulateInternalsMethodName = "PopulateInternals";
 
         [TestInitialize]
         public void Setup()
@@ -3180,6 +3181,264 @@ namespace WorkEnginePPM.Tests.WebServices
                 () => actual.ChildNodes.Count.ShouldBe(1),
                 () => actual.ChildNodes[0].Name.ShouldBe(childNodeName),
                 () => actual.ChildNodes[0].InnerText.ShouldBe(childNodeValue));
+        }
+
+        [TestMethod]
+        public void PopulateInternals_WhenCalled_Returns()
+        {
+            // Arrange
+            var parameters = new object[]
+            {
+                DummyString
+            };
+            var resourceValues = new clsResourceValues()
+            {
+                CostCategories = new Dictionary<int, clsCatItem>()
+                {
+                    [One] = new clsCatItem()
+                    {
+                        UID = One,
+                        Role_UID = One,
+                        Name = One.ToString(),
+                        RoleName = One.ToString(),
+                    },
+                    [Two] = new clsCatItem()
+                    {
+                        UID = Two,
+                        Role_UID = Two,
+                        Name = Two.ToString(),
+                        RoleName = Two.ToString()
+                    },
+                    [Three] = new clsCatItem()
+                    {
+                        UID = Three,
+                        Role_UID = Three,
+                        Name = Three.ToString(),
+                        RoleName = Three.ToString()
+                    }
+                },
+                Periods = new Dictionary<int, CPeriod>()
+                {
+                    [One] = new CPeriod(),
+                    [Two] = new CPeriod(),
+                    [Three] = new CPeriod()
+                },
+                FTEConvData = new List<clsFTEConv>()
+                {
+                    new clsFTEConv()
+                    {
+                        Cat_UID = One,
+                        PeriodID = One,
+                        FTEConv = One
+                    }
+                },
+                PIs = new Dictionary<int, clsPIData>()
+                {
+                    [One] = new clsPIData()
+                    {
+                        ProjectID = One
+                    }
+                },
+                NWItems = new Dictionary<int, clsEPKItem>()
+                {
+                    [One] = new clsEPKItem()
+                    {
+                        ID = One,
+                        Name = One.ToString()
+                    }
+                },
+                Departments = new Dictionary<int, clsEPKItem>()
+                {
+                    [One] = new clsEPKItem()
+                    {
+                        ID = One,
+                        Name = One.ToString()
+                    }
+                },
+                Resources = new Dictionary<int, clsResCap>()
+                {
+                    [One] = new clsResCap()
+                    {
+                        ID = One,
+                        Name = One.ToString(),
+                        RoleUID = One,
+                        DeptUID = One,
+                        BC_UID_CC = One,
+                        BC_UID_Role = One,
+                        IsResource = true,
+                        CustomFields = new List<string>()
+                        {
+                            DummyString
+                        }
+                    }
+                },
+                ResAvail = new List<clsResAvail>()
+                {
+                    new clsResAvail()
+                    {
+                        WResID = One,
+                        PeriodID = One,
+                        Hours = One,
+                        FTES = One
+                    }
+                },
+                Commitments = new Dictionary<int, clsCommitment>()
+                {
+                    [One] = new clsCommitment()
+                    {
+                        UID = One,
+                        WResID = One,
+                        DeptUID = One,
+                        Dragable = One,
+                        ProjectID = One,
+                        RoleUID = One,
+                        BC_UID_CC = One,
+                        BC_UID_Role = One,
+                        MajorCategory = DummyString,
+                        Rate = One,
+                        Status = RPConstants.CONST_Commitment,
+                        CustomFields = new List<string>()
+                        {
+                            DummyString
+                        }
+                    }
+                },
+                CommitmentHours = new List<clsCommitmentHours>()
+                {
+                    new clsCommitmentHours()
+                    {
+                        UID = One,
+                        PeriodID = One,
+                        Hours = One,
+                        FTES = One
+                    }
+                },
+                ResNWValues = new List<clsNWValue>()
+                {
+                    new clsNWValue()
+                    {
+                        WResID = One,
+                        UID = One,
+                        PeriodID = One,
+                        Hours = One,
+                        FTES = One
+                    }
+                },
+                SchedWorkHours = new List<clsSchedWork>()
+                {
+                    new clsSchedWork()
+                    {
+                        WResID = One,
+                        PeriodID = One,
+                        ProjectID = One,
+                        MajorCategory = One.ToString(),
+                    }
+                },
+                ActualWorkHours = new List<clsSchedWork>()
+                {
+                    new clsSchedWork()
+                    {
+                        WResID = One,
+                        PeriodID = One,
+                        ProjectID = One,
+                        MajorCategory = One.ToString(),
+                    }
+                },
+                Roles = new Dictionary<int, clsListItem>()
+                {
+                    [One] = new clsListItem()
+                    {
+                        ID = One,
+                        Name = One.ToString()
+                    }
+                },
+                CapacityTargets = new Dictionary<int, clsEPKItem>()
+                {
+                    [One] = new clsEPKItem()
+                    {
+                        ID = One,
+                        Name = One.ToString(),
+                        UID = One,
+                        Flag = Zero
+                    },
+                    [Two] = new clsEPKItem()
+                    {
+                        ID = Two,
+                        Name = Two.ToString(),
+                        UID = Two,
+                        Flag = One
+                    }
+                },
+                CapacityTargetValues = new List<clsCapacityValue>()
+                {
+                    new clsCapacityValue()
+                    {
+                        ID = One,
+                        RoleUID = One,
+                        DeptUID = One,
+                        PeriodID = One,
+                        Hours = One,
+                        FTES = One,
+                    },
+                    new clsCapacityValue()
+                    {
+                        ID = Two,
+                        RoleUID = One,
+                        DeptUID = Two,
+                        PeriodID = Two,
+                        Hours = Two,
+                        FTES = Two,
+                    }
+                }
+            };
+            var grow = new RPATGRow()
+            {
+                fid = One,
+                Name = DummyString
+            };
+            var growList = new List<RPATGRow>()
+            {
+                grow
+            };
+
+            ShimRPAData.AllInstances.BuileCCR2RoleMap = _ =>
+            {
+                validations += 1;
+            };
+            ShimRPAData.AllInstances.MapCCR2RoleInt32 = (_, __) =>
+            {
+                validations += 1;
+                return One;
+            };
+
+            privateObject.SetFieldOrProperty(ResourceValuesFieldName, nonPublicInstance, resourceValues);
+            privateObject.SetFieldOrProperty("m_firstperiod_data", nonPublicInstance, Zero);
+            privateObject.SetFieldOrProperty(TotGeneralFieldName, nonPublicInstance, growList);
+
+            // Act
+            privateObject.Invoke(PopulateInternalsMethodName, nonPublicInstance, parameters);
+            var roles = (Dictionary<int, clsEPKItem>)privateObject.GetFieldOrProperty("m_roles", nonPublicInstance);
+            var pisColumns = (Dictionary<int, clsPIData>)privateObject.GetFieldOrProperty(PisColumnFieldName, nonPublicInstance);
+            var deptColumns = (Dictionary<int, clsRXDept>)privateObject.GetFieldOrProperty("m_cln_depts", nonPublicInstance);
+            var resAvail = (Dictionary<int, clsResxAvail>)privateObject.GetFieldOrProperty("m_resavail", nonPublicInstance);
+            var resData = (Dictionary<int, clsResXData>)privateObject.GetFieldOrProperty(ResDataFieldName, nonPublicInstance);
+
+            // Assert
+            roles.ShouldSatisfyAllConditions(
+                () => roles.Count.ShouldBe(3),
+                () => roles[One].Name.ShouldBe(One.ToString()),
+                () => pisColumns.Count.ShouldBe(2),
+                () => pisColumns[One].ProjectID.ShouldBe(One),
+                () => pisColumns[12].ProjectID.ShouldBe(12),
+                () => deptColumns.Count.ShouldBe(2),
+                () => deptColumns[One].ID.ShouldBe(One),
+                () => deptColumns[Zero].ID.ShouldBe(Zero),
+                () => resAvail.Count.ShouldBe(2),
+                () => resAvail[One].ID.ShouldBe(One),
+                () => resAvail[Zero].ID.ShouldBe(Zero),
+                () => resData.Count.ShouldBe(4),
+                () => resData[One].ID.ShouldBe(One),
+                () => validations.ShouldBe(2));
         }
     }
 }
