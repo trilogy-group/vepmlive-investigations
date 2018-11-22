@@ -46,7 +46,7 @@ export class MyWorkPageSubHelper {
     }
 
     static async clickOnItem(item: string) {
-        StepLogger.step('Click on newly created item in the grid.');
+        StepLogger.subStep('Click on newly created item in the grid.');
         await this.verifyItemPresent(item);
         StepLogger.subStep(`Click on item ${item}`);
         await PageHelper.click(MyWorkPage.itemCreated(item));
@@ -82,7 +82,7 @@ export class MyWorkPageSubHelper {
     }
 
     static async clickOnAnyEditItem() {
-        StepLogger.step('Click on "Edit Item" button.');
+        StepLogger.subStep('Click on "Edit Item" button.');
         await PageHelper.click(MyWorkPage.manageTabRibbonItems.editItem);
     }
 }
