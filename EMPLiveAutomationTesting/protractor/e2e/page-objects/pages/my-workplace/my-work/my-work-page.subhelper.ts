@@ -11,7 +11,7 @@ import {CommonPageConstants} from '../../common/common-page.constants';
 import {ExpectationHelper} from '../../../../components/misc-utils/expectation-helper';
 import {MyWorkplacePage} from '../my-workplace.po';
 import {ElementHelper} from '../../../../components/html/element-helper';
-import { MyWorkPageHelper } from './my-work-page.helper';
+import {MyWorkPageHelper} from './my-work-page.helper';
 
 export class MyWorkPageSubHelper {
 
