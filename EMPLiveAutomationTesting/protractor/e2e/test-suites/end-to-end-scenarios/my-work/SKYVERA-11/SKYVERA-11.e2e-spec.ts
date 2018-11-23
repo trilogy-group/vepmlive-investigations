@@ -3,11 +3,19 @@ import {StepLogger} from '../../../../../core/logger/step-logger';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 import {MyWorkPageHelper} from '../../../../page-objects/pages/my-workplace/my-work/my-work-page.helper';
+import {LoginPageHelper} from '../../../../page-objects/pages/login/login-page.helper';
+import {MyWorkPageSubHelper} from '../../../../page-objects/pages/my-workplace/my-work/my-work-page.subhelper';
 
 describe(SuiteNames.endToEndSuite, () => {
 
-    beforeEach(async () => {
+    let item = '';
+    beforeAll(async () => {
+        await new LoginPage().goToAndLogin();
+        item = await MyWorkPageSubHelper.createToDoItem();
+        await LoginPageHelper.logout();
+    });
 
+    beforeEach(async () => {
         await PageHelper.maximizeWindow();
         await new LoginPage().goToAndLogin();
         StepLogger.preCondition('User should be on "My Work" page.');
@@ -17,6 +25,12 @@ describe(SuiteNames.endToEndSuite, () => {
 
     afterEach(async () => {
         await StepLogger.takeScreenShot();
+    });
+
+    afterAll(async () => {
+        await new LoginPage().goToAndLogin();
+        await MyWorkPageSubHelper.deleteToDoItem(item);
+        await LoginPageHelper.logout();
     });
 
     it('Check the ellipsis icon (…) on the grid.- [745063]', async () => {

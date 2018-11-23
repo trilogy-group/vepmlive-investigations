@@ -12,8 +12,22 @@ import {MyWorkPageConstants} from '../../../page-objects/pages/my-workplace/my-w
 import {MyWorkPageHelper} from '../../../page-objects/pages/my-workplace/my-work/my-work-page.helper';
 import {ExpectationHelper} from '../../../components/misc-utils/expectation-helper';
 import {LoginPageHelper} from '../../../page-objects/pages/login/login-page.helper';
+import {MyWorkPageSubHelper} from '../../../page-objects/pages/my-workplace/my-work/my-work-page.subhelper';
 
 describe(SuiteNames.regressionTestSuite, () => {
+
+    let itemCreated = '';
+    beforeAll(async () => {
+        await new LoginPage().goToAndLogin();
+        itemCreated = await MyWorkPageSubHelper.createToDoItem();
+        await LoginPageHelper.logout();
+    });
+
+    afterAll(async () => {
+        await new LoginPage().goToAndLogin();
+        await MyWorkPageSubHelper.deleteToDoItem(itemCreated);
+        await LoginPageHelper.logout();
+    });
 
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
@@ -58,41 +72,43 @@ describe(SuiteNames.regressionTestSuite, () => {
         await LoginPageHelper.logout();
     });
 
-    // #UNSTABLE
-    // it('Verify that View should be renamed - [744291]', async () => {
-    //     StepLogger.caseId = 744291;
-    //     // Step 1 are inside below function
-    //     StepLogger.stepId(1);
-    //     await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
-    //         MyWorkplacePage.navigation.myWork,
-    //         CommonPage.pageHeaders.myWorkplace.myWork,
-    //         CommonPageConstants.pageHeaders.myWorkplace.myWork,
-    //     );
-    //     StepLogger.stepId(2);
-    //     StepLogger.step('Click on My work page > Click on View Tab');
-    //     const item = CommonPage.recordWithoutGreenTicket;
-    //     await PageHelper.click(item);
-    //     await PageHelper.click(MyWorkPage.selectRibbonTabs.views);
-    //     StepLogger.stepId(3);
-    //     StepLogger.step('Click on rename View button.');
-    //     const currentViewName = await PageHelper.getText(MyWorkPage.getCurrentView);
-    //     await PageHelper.click(MyWorkPage.getViewRibbonOptions.renameView);
-    //     StepLogger.stepId(4);
-    //     StepLogger.step('Enter the Title of the new view name. > Click on "OK" button');
-    //     const viewNewName = await MyWorkPageHelper.fillAndSubmitRenameView();
-    //     StepLogger.stepId(5);
-    //     StepLogger.step('Click on Ok in the pop-up.');
-    //     await MyWorkPageHelper.verifyAndAcceptRenameConfirmationPopup(currentViewName);
-    //     // Takes time update current view
-    //     await browser.sleep(PageHelper.timeout.xs);
-    //     await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
-    //         MyWorkplacePage.navigation.myWork,
-    //         CommonPage.pageHeaders.myWorkplace.myWork,
-    //         CommonPageConstants.pageHeaders.myWorkplace.myWork,
-    //     );
-    //     await ExpectationHelper.verifyText(MyWorkPage.getCurrentView,
-    //         MyWorkPageConstants.currentView, viewNewName);
-    // });
+    it('Verify that View should be renamed - [744291]', async () => {
+        StepLogger.caseId = 744291;
+        // Step 1 are inside below function
+        StepLogger.stepId(1);
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.myWork,
+            CommonPage.pageHeaders.myWorkplace.myWork,
+            CommonPageConstants.pageHeaders.myWorkplace.myWork,
+        );
+        StepLogger.stepId(2);
+        StepLogger.step('Click on My work page > Click on View Tab');
+        const item = CommonPage.recordWithoutGreenTicket;
+        await PageHelper.click(item);
+        await PageHelper.click(MyWorkPage.selectRibbonTabs.views);
+
+        StepLogger.stepId(3);
+        StepLogger.step('Click on rename View button.');
+        const currentViewName = await PageHelper.getText(MyWorkPage.getCurrentView);
+        await PageHelper.click(MyWorkPage.getViewRibbonOptions.renameView);
+
+        StepLogger.stepId(4);
+        StepLogger.step('Enter the Title of the new view name. > Click on "OK" button');
+        const viewNewName = await MyWorkPageHelper.fillAndSubmitRenameView();
+
+        StepLogger.stepId(5);
+        StepLogger.step('Click on Ok in the pop-up.');
+        await MyWorkPageHelper.verifyAndAcceptRenameConfirmationPopup(currentViewName);
+        // Takes time update current view
+        await browser.sleep(PageHelper.timeout.xs);
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.myWork,
+            CommonPage.pageHeaders.myWorkplace.myWork,
+            CommonPageConstants.pageHeaders.myWorkplace.myWork,
+        );
+        await ExpectationHelper.verifyText(MyWorkPage.getCurrentView,
+            MyWorkPageConstants.currentView, viewNewName);
+    });
 
     it('Message while renaming the default view - [744293]', async () => {
         StepLogger.caseId = 744293;

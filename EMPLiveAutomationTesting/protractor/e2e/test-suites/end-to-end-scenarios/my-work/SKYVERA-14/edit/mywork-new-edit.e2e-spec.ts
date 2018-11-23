@@ -208,7 +208,7 @@ describe(SuiteNames.endToEndSuite, () => {
         StepLogger.stepId(4);
         StepLogger.step(`Click on "Edit page" option`);
         await ElementHelper.clickUsingJs(MyWorkPage.editPageOptionInsideDropDown);
-        await MyWorkPageHelper.clickOnEditItem();
+        await MyWorkPageHelper.clickOnAnyEditItem();
 
         StepLogger.verification(`The page should be editable mode. `);
         await  MyWorkPageHelper.verifyEditPageOpened();
