@@ -20,7 +20,7 @@ import {ToDoPageHelper} from '../to-do/to-do-page.helper';
 import {TextComponentSelectors} from '../../../../components/component-types/text-component/text-component-selectors';
 import {MyTimeOffPageHelper} from '../my-time-off/my-time-off-page.helper';
 import {MyTimeOffPageConstants} from '../my-time-off/my-time-off-page.constants';
-import { MyWorkPageSubHelper } from './my-work-page.subhelper';
+import {MyWorkPageSubHelper} from './my-work-page.subhelper';
 
 export class MyWorkPageHelper {
 
