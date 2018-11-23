@@ -161,7 +161,7 @@ namespace EPMLiveCore
 
         private static string GetInfoStartsWith(List<string> infos, string token)
         {
-            var rawData = infos.Where(s => s.StartsWith(token)).SingleOrDefault();
+            var rawData = infos.SingleOrDefault(s => s.StartsWith(token));
             return !string.IsNullOrWhiteSpace(rawData)
                 ? rawData.Split('|')[1]
                 : string.Empty;

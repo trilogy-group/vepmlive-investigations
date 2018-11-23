@@ -132,18 +132,21 @@ namespace EPMLiveCore
             var xmlDoc = new XmlDocument();
 
             // create query param
-            var nodeQuery = xmlDoc.CreateNode(XmlNodeType.Element, "Query", string.Empty);
-            nodeQuery.InnerXml = _dataManager.GetPropVal("Query");
+            const string queryNodeName = "Query";
+            var nodeQuery = xmlDoc.CreateNode(XmlNodeType.Element, queryNodeName, string.Empty);
+            nodeQuery.InnerXml = _dataManager.GetPropVal(queryNodeName);
 
             // create view fields param
-            var nodeViewFields = xmlDoc.CreateNode(XmlNodeType.Element, "ViewFields", string.Empty);
-            nodeViewFields.InnerXml = _dataManager.GetPropVal("ViewFields");
+            const string viewFieldsName = "ViewFields";
+            var nodeViewFields = xmlDoc.CreateNode(XmlNodeType.Element, viewFieldsName, string.Empty);
+            nodeViewFields.InnerXml = _dataManager.GetPropVal(viewFieldsName);
 
             var rowLimit = _dataManager.GetPropVal("RowLimit");
 
             // create query options param
-            var nodeQueryOptions = xmlDoc.CreateNode(XmlNodeType.Element, "QueryOptions", string.Empty);
-            var queryOptions = _dataManager.GetPropVal("QueryOptions");
+            const string queryOptionsName = "QueryOptions";
+            var nodeQueryOptions = xmlDoc.CreateNode(XmlNodeType.Element, queryOptionsName, string.Empty);
+            var queryOptions = _dataManager.GetPropVal(queryOptionsName);
             queryOptions = !string.IsNullOrWhiteSpace(queryOptions) ? queryOptions.Replace(@"\\", @"\") : string.Empty;
             nodeQueryOptions.InnerXml = !string.IsNullOrWhiteSpace(queryOptions) 
                 ? queryOptions 
