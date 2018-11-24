@@ -687,12 +687,12 @@ namespace EPMLiveCore.API
                 }
                 catch (Exception ex)
                 {
-                    WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                    WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.High, ex.ToString());
                 }
             }
             catch (Exception ex)
             {
-                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.High, ex.ToString());
                 throw new APIException(3010, ex.Message);
             }
 
@@ -884,7 +884,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception ex)
             {
-                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.High, ex.ToString());
                 userValueCollection = new SPFieldUserValueCollection();
             }
 
