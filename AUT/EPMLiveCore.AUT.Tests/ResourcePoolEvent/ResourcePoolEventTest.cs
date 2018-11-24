@@ -996,7 +996,7 @@ namespace EPMLiveCore
         {
             // Arrange
             var methodInfo = GetMethodInfo(MethodProcessLevel, 0);
-            const int parametersCount = 1;
+            const int parametersCount = 2;
 
             // Act
             var parameters = methodInfo.GetParameters();
