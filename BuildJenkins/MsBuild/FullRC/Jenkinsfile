@@ -1,0 +1,110 @@
+pipeline {
+    agent {
+        node {
+            label 'skyvera-jenkins-win-build'
+            customWorkspace "c:\\jenkins\\build"
+        }
+    }
+    options {
+        skipDefaultCheckout true
+    }
+	triggers {
+		cron(env.BRANCH_NAME == 'develop' ? '@midnight' : '')
+	}
+    parameters {
+        string(name: 'Version', defaultValue: '7.0.2.x', description: 'Version to set if new Release build is going to be triggered (x is replaced with new Release build number)')
+        string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')
+        string(name: 'UserName', defaultValue: 'epmldev\\farmadmin', description: 'Name of the user to use when connecting PowerShell to the target host')
+        string(name: 'Password', defaultValue: 'Pass@word1', description: 'Password used along with the User name')
+        string(name: 'ReleaseBranch', defaultValue: '', description: 'Release branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
+        string(name: 'ReleaseBranchBuild', defaultValue: '', description: 'Release build number to get artifacts from instead of triggering new build (leave empty to trigger new build)')
+        string(name: 'DeployBranch', defaultValue: '', description: 'Deploy branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
+        string(name: 'ProtractorBranch', defaultValue: '', description: 'Protractor UI tests branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
+        
+        string(name: 'CoreBranch', defaultValue: '', description: 'Core branch to build (leave empty to use the Release branch name, replace "/" with "%2F")')
+        string(name: 'CoreBranchBuild', defaultValue: '', description: 'Core build number to copy artifacts from (leave empty to trigger new build and use its artifacts)')
+        
+		string(name: 'HostName', defaultValue: 'qaepmlive6', description: 'Target host name')
+		string(name: 'fullHostName', defaultValue: 'tenant02.epmldev.com', description: 'Target full host name')
+		
+		string(name: 'siteCollection', defaultValue: 'tenant02epmldev.com/epm', description: 'Site collection url to upgrade')
+    }
+    stages {
+        stage('Preparing Release') {
+            steps {
+                timestamps {
+                    script {
+                        env.RELEASE_BRANCH = currentBuild.getProjectName()
+                        if (params.ReleaseBranch?.trim()) {
+                            env.RELEASE_BRANCH = params.ReleaseBranch
+                        }
+                        
+                        if (params.ReleaseBranchBuild?.trim()) {
+                            echo 'Using existing Release build...'
+                            env.RELEASE_BRANCH_BUILD = params.ReleaseBranchBuild
+                        } else {
+                            echo 'Triggering Release build job...'
+                            def releaseBuild = build(
+                                job: "../EPML-RC/${env.RELEASE_BRANCH}",
+                                wait: true,
+                                parameters: [
+                                    [$class: 'StringParameterValue', name: 'Version', value: params.Version.replace('x', env.BUILD_NUMBER)]
+                                ]
+                            )
+                            env.RELEASE_BRANCH_BUILD = releaseBuild.getNumber()
+                        }
+                        echo "Release Branch Build #${env.RELEASE_BRANCH_BUILD}"
+                    }
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                timestamps {
+                    script {
+                        echo 'Triggering Deploy job...'
+                        env.DEPLOY_BRANCH = currentBuild.getProjectName()
+                        if (params.DeployBranch?.trim()) {
+                            env.DEPLOY_BRANCH = params.DeployBranch
+                        }
+                        build(
+                            job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
+                            wait: true,
+                            parameters: [
+                                [$class: 'StringParameterValue', name: 'TargetHost', value: params.TargetHost],
+                                [$class: 'StringParameterValue', name: 'UserName', value: params.UserName],
+                                [$class: 'StringParameterValue', name: 'Password', value: params.Password],
+                                [$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
+                                [$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD],
+								[$class: 'StringParameterValue', name: 'HostName', value: params.HostName],
+                                [$class: 'StringParameterValue', name: 'fullHostName', value: params.fullHostName],
+                                [$class: 'StringParameterValue', name: 'siteCollection', value: params.siteCollection]
+                            ]
+                        )
+                    }
+                }
+            }
+        }
+        stage('Protractor UI tests') {
+            steps {
+                timestamps {
+                    script {
+                        echo 'Triggering Protractor UI tests job...'
+                        env.PROTRACTOR_BRANCH = currentBuild.getProjectName()
+                        if (params.ProtractorBranch?.trim()) {
+                            env.PROTRACTOR_BRANCH = params.ProtractorBranch
+                        }
+                        build(
+                            job: "../EPML-Regression/${env.PROTRACTOR_BRANCH}", 
+                            wait: true,
+                            parameters: [
+                                [$class: 'StringParameterValue', name: 'TargetHost', value: params.TargetHost],
+								[$class: 'StringParameterValue', name: 'fullHostName', value: params.fullHostName]
+                            ]
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
