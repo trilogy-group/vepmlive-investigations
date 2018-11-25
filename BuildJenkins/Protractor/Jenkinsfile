@@ -6,6 +6,9 @@ pipeline {
         string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')
 		string(name: 'fullHostName', defaultValue: 'tenant02.epmldev.com', description: 'Target full host name')
     }
+	triggers {
+    cron(env.BRANCH_NAME == 'TestAutomation' ? '@midnight' : '')
+    }	
     stages {
         stage('Preparing for UI tests execution') {
             steps {
