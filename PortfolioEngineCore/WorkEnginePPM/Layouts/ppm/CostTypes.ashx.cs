@@ -270,10 +270,10 @@ namespace WorkEnginePPM
                 var first = true;
                 foreach (DataRow dataRow in dataTable.Rows)
                 {
-                    var component = SqlDb.ReadStringValue(dataRow["CT_NAME"], "");
+                    var component = SqlDb.ReadStringValue(dataRow["CT_NAME"], string.Empty);
                     var clOp = SqlDb.ReadIntValue(dataRow["CL_OP"]);
 
-                    if (first == false)
+                    if (!first)
                     {
                         switch (clOp)
                         {
@@ -311,7 +311,8 @@ namespace WorkEnginePPM
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 var field = fields.CreateSubStruct("field");
-                field.CreateInt("CT_ID", SqlDb.ReadIntValue(dataRow["CT_ID"]));
+                const string CtId = "CT_ID";
+                field.CreateInt(CtId, SqlDb.ReadIntValue(dataRow[CtId]));
                 field.CreateString("CT_NAME", SqlDb.ReadStringValue(dataRow["CT_NAME"], ""));
             }
         }
