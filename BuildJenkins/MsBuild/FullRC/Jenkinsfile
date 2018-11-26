@@ -25,6 +25,8 @@ pipeline {
         string(name: 'AppUrl', defaultValue: 'http://qaepmlive6', description: 'SharePoint application url for deployment')
 		
 		string(name: 'StagingTargetHost', defaultValue: '10.25.2.85, 10.25.2.54', description: 'Staging Target hosts to deploy to')
+		string(name: 'StagingUserName', defaultValue: 'epm\\apps22', description: 'Name of the user to use when connecting PowerShell to the target host')
+        string(name: 'StagingPassword', defaultValue: 'QpklZg35D6', description: 'Password used along with the User name')
 		string(name: 'StagingAppUrl', defaultValue: 'https://apps22.epmlive.com', description: 'Staging SharePoint application url for deployment')
 		
     	string(name: 'ProtractorHostsName', defaultValue: 'tenant02.epmldev.com', description: 'Target full host name for protractor')
@@ -97,8 +99,8 @@ pipeline {
                             wait: true,
                             parameters: [
                                 [$class: 'StringParameterValue', name: 'TargetHost', value: params.StagingTargetHost],
-                                [$class: 'StringParameterValue', name: 'UserName', value: params.UserName],
-                                [$class: 'StringParameterValue', name: 'Password', value: params.Password],
+                                [$class: 'StringParameterValue', name: 'UserName', value: params.StagingUserName],
+                                [$class: 'StringParameterValue', name: 'Password', value: params.StagingPassword],
                                 [$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
                                 [$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD],
                                 [$class: 'StringParameterValue', name: 'FullHostName', value: params.StagingAppUrl]
