@@ -24,7 +24,7 @@ pipeline {
         string(name: 'CoreBranchBuild', defaultValue: '', description: 'Core build number to copy artifacts from (leave empty to trigger new build and use its artifacts)')
         string(name: 'AppUrl', defaultValue: 'http://qaepmlive6', description: 'SharePoint application url for deployment')
 		
-		string(name: 'StagingTargetHost', defaultValue: '10.25.2.85, 10.25.2.54', description: 'Staging Target hosts to deploy to')
+		string(name: 'StagingTargetHost', defaultValue: '10.25.2.85 10.25.2.54', description: 'Staging Target hosts to deploy to')
 		string(name: 'StagingUserName', defaultValue: 'epm\\apps22', description: 'Name of the user to use when connecting PowerShell to the target host')
         string(name: 'StagingPassword', defaultValue: 'QpklZg35D6', description: 'Password used along with the User name')
 		string(name: 'StagingAppUrl', defaultValue: 'https://apps22.epmlive.com', description: 'Staging SharePoint application url for deployment')
