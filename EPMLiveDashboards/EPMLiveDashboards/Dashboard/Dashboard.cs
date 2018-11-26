@@ -923,6 +923,21 @@ namespace Dashboard
             }
             return taskCount;
         }
+
+        private bool _disposed;
+
+        public override void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            ddl?.Dispose();
+            ddlProject?.Dispose();
+
+            _disposed = true;
+        }
     }
 
 

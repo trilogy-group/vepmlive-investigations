@@ -15,7 +15,7 @@ using Shouldly;
 namespace EPMLiveWorkPlanner.Tests.WebPageCode
 {
     [TestClass, ExcludeFromCodeCoverage]
-    public class UpdatetaskTests
+    public partial class UpdatetaskTests
     {
         private IDisposable _shimsObject;
         private updatetask _testObj;

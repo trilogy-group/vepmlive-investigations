@@ -4,7 +4,7 @@ using EPMLiveCore.SocialEngine.Core;
 
 namespace EPMLiveCore.SocialEngine.Entities
 {
-    public class Activity : IDisposable
+    public class Activity
     {
         #region Fields (2) 
 
@@ -59,21 +59,5 @@ namespace EPMLiveCore.SocialEngine.Entities
         }
 
         #endregion Methods 
-
-        private bool _disposed = false;
-
-        public void Dispose()
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            _data = null;
-            _key = null;
-            Thread = null;
-
-            _disposed = true;
-        }
     }
 }

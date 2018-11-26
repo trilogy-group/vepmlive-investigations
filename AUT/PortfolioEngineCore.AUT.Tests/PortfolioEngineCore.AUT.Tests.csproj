@@ -105,7 +105,6 @@
     <Compile Include="Analyzers\ClsCostDataTest.cs" />
     <Compile Include="Analyzers\ClsCustomFieldDataTest.cs" />
     <Compile Include="Analyzers\ClsDataItemTest.cs" />
-    <Compile Include="Analyzers\ClsDetailRowDataTest.cs" />
     <Compile Include="Analyzers\ClsListItemDataTest.cs" />
     <Compile Include="Analyzers\ClsPeriodDataTest.cs" />
     <Compile Include="Analyzers\ClsPIDataTest.cs" />
@@ -131,7 +130,6 @@
     <Compile Include="Resources\CapacityScenariosTest.cs" />
     <Compile Include="Resources\CapacityTest.cs" />
     <Compile Include="Resources\ComponentWeightTest.cs" />
-    <Compile Include="Resources\EPKClass01Test.cs" />
     <Compile Include="Resources\EPKPriFormulaTest.cs" />
     <Compile Include="Resources\ResourceAnalyzerTest.cs" />
     <Compile Include="Resources\ResourcePlanNotificationsTest.cs" />

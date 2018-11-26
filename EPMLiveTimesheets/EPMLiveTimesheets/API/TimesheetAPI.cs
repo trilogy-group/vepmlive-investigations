@@ -508,22 +508,7 @@ namespace TimeSheets
                         connection.Open();
                     });
 
-                    var userid = 0;
-                    using (var command = new SqlCommand(
-                        @"SELECT dbo.TSUSER.USER_ID FROM dbo.TSUSER 
-                        INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID 
-                        WHERE TS_UID=@tsuid",
-                        connection))
-                    {
-                        command.Parameters.AddWithValue("@tsuid", tsuid);
-                        using (var reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                userid = reader.GetInt32(0);
-                            }
-                        }
-                    }
+                    var userid = ReadSelectCommand(connection, tsuid);
 
                     if (userid != 0)
                     {
@@ -612,32 +597,7 @@ namespace TimeSheets
                 using (var connection =
                     GetOpenedConnection(EpmCoreFunctions.getConnectionString(sharepointWeb.Site.WebApplication.Id)))
                 {
-                    var userid = 0;
-                    using (var command = new SqlCommand("SELECT dbo.TSUSER.USER_ID " +
-                                            "FROM dbo.TSUSER INNER JOIN dbo.TSTIMESHEET " +
-                                            "    ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID " +
-                                            "WHERE TS_UID=@tsuid",
-                                            connection))
-                    {
-                        command.Parameters.AddWithValue("@tsuid", timesheetGuid);
-                        using (var reader = command.ExecuteReader())
-                        {
-                            try
-                            {
-                                if (reader.Read())
-                                {
-                                    userid = reader.GetInt32(0);
-                                }
-                            }
-                            catch(Exception exception)
-                            {
-                                Logger.WriteLog(
-                                    Logger.Category.Unexpected,
-                                    "Timesheet SubmitTimesheet",
-                                    exception.ToString());
-                            }
-                        }
-                    }
+                    var userid = ReadSelectCommand(connection, timesheetGuid);
 
                     if (userid != 0)
                     {
@@ -719,6 +679,35 @@ namespace TimeSheets
             {
                 return "<SubmitTimesheet Status=\"1\">Error: " + ex.Message + "</SubmitTimesheet>";
             }
+        }
+
+        private static int ReadSelectCommand(SqlConnection connection, string timesheetGuid)
+        {
+            var userid = 0;
+            using (var command = new SqlCommand(
+                "SELECT dbo.TSUSER.USER_ID "
+                + "FROM dbo.TSUSER INNER JOIN dbo.TSTIMESHEET "
+                + "    ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID "
+                + "WHERE TS_UID=@tsuid",
+                connection))
+            {
+                command.Parameters.AddWithValue("@tsuid", timesheetGuid);
+                using (var reader = command.ExecuteReader())
+                {
+                    try
+                    {
+                        if (reader.Read())
+                        {
+                            userid = reader.GetInt32(0);
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        Logger.WriteLog(Logger.Category.Unexpected, "Timesheet SubmitTimesheet", exception.ToString());
+                    }
+                }
+            }
+            return userid;
         }
 
         public static void ProcessFullMeta(SPSite site, SqlConnection cn, string ts_uid)

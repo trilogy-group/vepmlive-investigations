@@ -54,6 +54,9 @@
     <Reference Include="mscorlib.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="PortfolioEngineCore.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\PortfolioEngineCore.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="Shouldly, Version=3.0.0.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Shouldly.3.0.0\lib\net40\Shouldly.dll</HintPath>
     </Reference>
@@ -87,6 +90,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Jobs\CollectJobTests.cs" />
     <Compile Include="ParentItemUpdateTests.cs" />
     <Compile Include="ViewLogDetailTests.cs" />
     <Compile Include="AllSnapshotsTests.cs" />
@@ -106,6 +110,10 @@
     <ProjectReference Include="..\..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
       <Project>{C773AE44-F066-446A-9CBD-D24AFA794E34}</Project>
       <Name>EPMLiveCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PortfolioEngineCore\PortfolioEngineCore\PortfolioEngineCore.csproj">
+      <Project>{bb86b09c-cb35-4888-8639-c047a40a9c0c}</Project>
+      <Name>PortfolioEngineCore</Name>
     </ProjectReference>
     <ProjectReference Include="..\EPMLiveReporting\EPMLiveReporting.csproj">
       <Project>{b56160fe-490c-462a-bc9a-feffd2f1487c}</Project>
