@@ -2,7 +2,6 @@ Param(
 	[string]$username = '%epmlive.qa.farmadmin.username%',
 	[string]$password = '%epmlive.qa.farmadmin.password%',
 	[string]$webAppName = '%epmlive.qa.webAppName%',
-	[string]$siteCollectionToUpgrade = '%epmlive.qa.UpgradeSiteCollection%',
 	[string]$buildNumber = '%build.number%',
 	[string[]]$serverIPs = '%epmlive.qa.ip%'
 )
@@ -21,7 +20,7 @@ $serverIndex = 0;
 foreach ($serverIP in $serverIPs)
 {
 		
-	Write-Host "Connecting to $serverIP, $webAppName, $siteCollectionToUpgrade, $buildNumber"
+	Write-Host "Connecting to $serverIP, $webAppName, $buildNumber"
 	$session = New-PSSession -ComputerName $serverIP -Credential $cred 
 
 	Write-Host "Configuring WSMAN remotely: $serverIP"
@@ -50,7 +49,7 @@ foreach ($serverIP in $serverIPs)
 		#Register-PSSessionConfiguration -Name Microsoft.ipam -Path .\ipam.pssc -RunAsCredential $cred
 		$scriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("
 		Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
-		C:\SilentInstaller\deploy.ps1 $username $password $webAppName $siteCollectionToUpgrade $buildNumber -deploySolutions
+		C:\SilentInstaller\deploy.ps1 $username $password $webAppName $buildNumber -deploySolutions
 		")
 		Invoke-Command -ComputerName $serverIP -Credential $cred -ScriptBlock $scriptBlock -ConfigurationName Microsoft.ipam
 	}
@@ -58,7 +57,7 @@ foreach ($serverIP in $serverIPs)
 	{
 		$scriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("
 		Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
-		C:\SilentInstaller\deploy.ps1 $username $password $webAppName $siteCollectionToUpgrade $buildNumber
+		C:\SilentInstaller\deploy.ps1 $username $password $webAppName $buildNumber
 		")
 		Invoke-Command -ComputerName $serverIP -Credential $cred -ScriptBlock $scriptBlock
 	}
