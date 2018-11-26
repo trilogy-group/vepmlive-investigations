@@ -12,9 +12,9 @@ Remove-Item (Join-Path "C:\SilentInstaller" $buildNumber) -Force -Recurse -Error
 Write-Host 'Removed old folder'
 [io.compression.zipfile]::ExtractToDirectory("C:\SilentInstaller\SilentInstaller.zip", "C:\SilentInstaller\$buildNumber")
 Write-Host 'Extracted new folder'
-Move-Item "C:\SilentInstaller\routines.ps1" (Join-Path "C:\SilentInstaller" $buildNumber | Join-Path -ChildPath "routines.ps1")
-Move-Item "C:\SilentInstaller\epmliveSilentInstaller.ps1" (Join-Path "C:\SilentInstaller" $buildNumber | Join-Path -ChildPath "epmliveSilentInstaller.ps1")
-Copy-Item "C:\SilentInstaller\SitesList.xml" (Join-Path "C:\SilentInstaller" $buildNumber | Join-Path -ChildPath "SitesList.xml")
+Move-Item "C:\SilentInstaller\routines.ps1" (Join-Path "C:\SilentInstaller" $buildNumber | Join-Path -ChildPath "routines.ps1") -Force
+Move-Item "C:\SilentInstaller\epmliveSilentInstaller.ps1" (Join-Path "C:\SilentInstaller" $buildNumber | Join-Path -ChildPath "epmliveSilentInstaller.ps1") -Force
+Copy-Item "C:\SilentInstaller\SitesList.xml" (Join-Path "C:\SilentInstaller" $buildNumber | Join-Path -ChildPath "SitesList.xml") -Force
 
 CD "C:\SilentInstaller\$buildNumber"
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
