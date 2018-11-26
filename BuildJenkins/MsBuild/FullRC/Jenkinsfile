@@ -26,8 +26,7 @@ pipeline {
         
 		string(name: 'HostName', defaultValue: 'qaepmlive6', description: 'Target host name')
 		string(name: 'fullHostName', defaultValue: 'tenant02.epmldev.com', description: 'Target full host name')
-		
-		string(name: 'siteCollection', defaultValue: 'tenant02epmldev.com/epm', description: 'Site collection url to upgrade')
+		string(name: 'httpScheme', defaultValue: 'http', description: 'Target http scheme')
     }
     stages {
         stage('Preparing Release') {
@@ -77,8 +76,7 @@ pipeline {
                                 [$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
                                 [$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD],
 								[$class: 'StringParameterValue', name: 'HostName', value: params.HostName],
-                                [$class: 'StringParameterValue', name: 'fullHostName', value: params.fullHostName],
-                                [$class: 'StringParameterValue', name: 'siteCollection', value: params.siteCollection]
+                                [$class: 'StringParameterValue', name: 'fullHostName', value: "${params.httpScheme}://${params.HostName}"]
                             ]
                         )
                     }
