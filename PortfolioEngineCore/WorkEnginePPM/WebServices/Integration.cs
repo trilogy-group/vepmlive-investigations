@@ -16,6 +16,7 @@ using System.DirectoryServices;
 using System.Globalization;
 using System.Text;
 using EPMLiveCore;
+using EPMLiveCore.API;
 
 namespace WorkEnginePPM
 {
@@ -285,38 +286,7 @@ namespace WorkEnginePPM
                         cmd.Parameters.AddWithValue("@webguid", project[0]);
                         cmd.Parameters.AddWithValue("@listguid", project[1]);
                         cmd.Parameters.AddWithValue("@itemid", project[2]);
-                        SqlDataReader dr = cmd.ExecuteReader();
-
-                        Guid tJob = Guid.Empty;
-
-                        if (dr.Read())
-                        {
-                            string status = "";
-                            string result = (dr.IsDBNull(3)) ? "" : dr.GetString(3);
-                            string resulttext = (dr.IsDBNull(4)) ? "" : dr.GetString(4);
-                            string dtfinish = (dr.IsDBNull(2)) ? "" : dr.GetDateTime(2).ToString();
-
-                            switch (dr.GetInt32(1))
-                            {
-                                case 0:
-                                    status = "Queued";
-                                    break;
-                                case 1:
-                                    status = "Processing";
-                                    break;
-                                case 2:
-                                    status = "Complete";
-                                    break;
-                            };
-                            if (showresults.ToLower() == "true")
-                                message = "<PublishStatus Status=\"" + status + "\" PercentComplete=\"" + dr.GetInt32(0) + "\" TimeFinished=\"" + dtfinish + "\" Result=\"" + result + "\"><![CDATA[" + resulttext + "]]></PublishStatus>";
-                            else
-                                message = "<PublishStatus Status=\"" + status + "\" PercentComplete=\"" + dr.GetInt32(0) + "\" TimeFinished=\"" + dtfinish + "\" Result=\"" + result + "\"/>";
-                        }
-                        else
-                        {
-                            message = "<PublishStatus/>";
-                        }
+                        message = PublishHelper.ParseResults(cmd, showresults);
 
                         cn.Close();
                     }

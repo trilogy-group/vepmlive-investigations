@@ -2,10 +2,13 @@ pipeline {
     agent {
         label 'skyvera-jenkins-protractor'
     }
-	parameters {
+	  parameters {
         string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')
-		string(name: 'fullHostName', defaultValue: 'tenant01.epmldev.com', description: 'Target full host name')
+		string(name: 'FullHostName', defaultValue: 'tenant01.epmldev.com', description: 'Target full host name')
     }
+	  triggers {
+    cron(env.BRANCH_NAME == 'TestAutomation' ? '@midnight' : '')
+    }	
     stages {
         stage('Preparing for UI tests execution') {
             steps {
@@ -19,7 +22,7 @@ pipeline {
                 
                 echo 'Updating hosts file...'
                 dir ("${env.WORKSPACE}/EMPLiveAutomationTesting/protractor") {
-                    sh "${env.WORKSPACE}/BuildJenkins/Protractor/update-hosts-file.sh ${params.TargetHost} ${params.fullHostName}"
+                    sh "${env.WORKSPACE}/BuildJenkins/Protractor/update-hosts-file.sh ${params.TargetHost} ${params.FullHostName}"
                 }
             }
         }
