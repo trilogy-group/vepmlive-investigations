@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "postinstall": "webdriver-manager update",
+    "postinstall": "webdriver-manager update && npm run clean",
     "lint": "tslint \"e2e/**/*.ts\" --fix",
     "clean": "rm -rf auto-generated/allure-results *.log",
     "test": "protractor protractor.conf.js",
