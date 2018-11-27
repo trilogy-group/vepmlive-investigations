@@ -4272,10 +4272,70 @@ namespace EPMLiveWorkPlanner
             return dsResources;
         }
 
+        private static void AddResourceToTeam(List<string> resources, SPList projectCenter, SPListItem pItem)
+        {
+            string resourceToAdd = string.Empty;
+            if (projectCenter != null)
+            {
+                SPFieldUserValueCollection assignedTo = null;
+                try
+                {
+                    assignedTo = new SPFieldUserValueCollection(SPContext.Current.Web, pItem["AssignedTo"].ToString());
+                }
+                catch { }
+
+                if (assignedTo == null)
+                    assignedTo = new SPFieldUserValueCollection();
+
+                foreach (string resource in resources)
+                {
+                    if (!assignedTo.ToString().Contains(resource))
+                    {
+                        resourceToAdd += "'" + resource + "',";
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(resourceToAdd))
+                {
+                    resourceToAdd = resourceToAdd.Substring(0, resourceToAdd.Length - 1);
+
+                    string sqlGetResources = "SELECT ID, Title, SharePointAccountID, SharePointAccountText FROM LSTResourcepool WHERE Title IN(" + resourceToAdd + ")";
+                    DataTable dtResources = null;
+
+                    try
+                    {
+                        var queryExecutor = new QueryExecutor(SPContext.Current.Web);
+                        dtResources = queryExecutor.ExecuteReportingDBQuery(sqlGetResources, new Dictionary<string, object> { });
+                    }
+                    catch { }
+
+                    if (dtResources != null && dtResources.Rows.Count > 0)
+                    {
+                        for (int row = 0; row < dtResources.Rows.Count; row++)
+                        {
+                            assignedTo.Add(new SPFieldUserValue(SPContext.Current.Web, Convert.ToInt32(dtResources.Rows[row]["SharePointAccountID"]), Convert.ToString(dtResources.Rows[row]["SharePointAccountText"])));
+                        }
+
+                        pItem["AssignedTo"] = assignedTo;
+
+                        SPContext.Current.Web.AllowUnsafeUpdates = true;
+
+                        try
+                        {
+                            pItem.Update();
+                            projectCenter.Update();
+                        }
+                        finally
+                        {
+                            SPContext.Current.Web.AllowUnsafeUpdates = false;
+                        }
+                    }
+                }
+            }
+        }
+
         public static string GetProjectInfo(XmlDocument data, SPWeb oWeb)
         {
-
-
             string sPlanner = data.FirstChild.Attributes["Planner"].Value;
 
             PlannerProps p = getSettings(oWeb, sPlanner);
@@ -4288,6 +4348,18 @@ namespace EPMLiveWorkPlanner
             SetupProjectCenterList(oListProjectCenter, sPlanner);
 
             SPListItem liProject = oListProjectCenter.GetItemById(int.Parse(data.FirstChild.Attributes["ID"].Value));
+
+            try
+            {
+                var planners = liProject["Planners"] as SPFieldUserValueCollection;
+                List<string> resources = new List<string>();
+                foreach (var uvc in planners)
+                {
+                    resources.Add(uvc.User.Name);
+                }
+                AddResourceToTeam(resources, oListProjectCenter, liProject);
+            }
+            catch { }
 
             XmlNode ndBody = docOut.SelectSingleNode("//B");
 
