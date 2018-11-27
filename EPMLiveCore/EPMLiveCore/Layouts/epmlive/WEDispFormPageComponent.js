@@ -105,7 +105,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
             case 'Ribbon.ListForm.Edit.Actions.RestoreProject':
                 return true;
             default:
-                return false;
+                return commandEnabled(commandId);
         };
 
        
