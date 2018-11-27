@@ -24,6 +24,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.JSGrid;
+using Microsoft.SharePoint.JSGrid.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.SharePoint.WebControls.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -83,6 +84,8 @@ namespace EPMLiveWebParts.Tests
         private const string InitGanttParamsMethodName = "InitGanttParams";
         private const string InitializeReqdFieldsMethodName = "InitializeReqdFields";
         private const string AddColumnsMethodName = "AddColumns";
+        private const string GetGridFieldsMethodName = "GetGridFields";
+        private const string FormatGridFieldMethodName = "formatGridField";
 
         [TestInitialize]
         public void Setup()
@@ -448,7 +451,490 @@ namespace EPMLiveWebParts.Tests
             var actual = (DataTable)privateObject.Invoke(AddColumnsMethodName, nonPublicInstance, new object[] { dataTable });
 
             // Assert
-            actual.Columns.Count.ShouldBe(25);
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Columns.Count.ShouldBe(25),
+                () => actual.Rows.Count.ShouldBe(21));
+        }
+
+        [TestMethod]
+        public void GetGridFields_WhenCalled_ReturnsGridFieldsList()
+        {
+            // Arrange
+            var imageColumns = new List<string>()
+            {
+                One.ToString(),
+                Two.ToString(),
+                Three.ToString(),
+            };
+            var formatGridHit = 0;
+            var ganttImageHit = 0;
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            dataTable.Columns.Add(One.ToString());
+            dataTable.Columns.Add(Two.ToString());
+            dataTable.Columns.Add(Three.ToString());
+            row = dataTable.NewRow();
+            dataTable.Rows.Add(row);
+
+            ShimGridData.AllInstances.formatGridFieldGridFieldDataColumn = (_, _1, _2) =>
+            {
+                formatGridHit += 1;
+                var result = new GridField()
+                {
+                    FieldKey = formatGridHit.ToString()
+                };
+                if (formatGridHit.Equals(One))
+                {
+                    result.DefaultCellStyleId = DummyString;
+                }
+                else if (formatGridHit.Equals(Three))
+                {
+                    result.DefaultCellStyleId = null;
+                }
+                return result;
+            };
+            ShimGanttUtilities.GanttImageHashtableListOfString = (_1, _2) =>
+            {
+                ganttImageHit += 1;
+                if (ganttImageHit.Equals(One) || ganttImageHit.Equals(Four))
+                {
+                    return null;
+                }
+                return new LookupTypeInfo(DummyString, new List<LookupTypeItem>());
+            };
+            ShimGridField.AllInstances.AssociateWithLookupTypeInfoLookupTypeInfo = (_, _1) =>
+            {
+                validations += 1;
+            };
+            ShimGridData.AllInstances.GetInternalNameString = (_, input) =>
+            {
+                validations += 1;
+                return input;
+            };
+
+            privateObject.SetFieldOrProperty("_imageColumns", nonPublicInstance, imageColumns);
+
+            // Act
+            var actual = (List<GridField>)privateObject.Invoke(GetGridFieldsMethodName, publicInstance, new object[] { dataTable });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Count.ShouldBe(Three),
+                () => actual.FirstOrDefault(x => x.FieldKey.Equals(One.ToString())).DefaultCellStyleId.ShouldBe("ralign"),
+                () => actual.FirstOrDefault(x => x.FieldKey.Equals(Two.ToString())).DefaultCellStyleId.ShouldBe("halign"),
+                () => actual.FirstOrDefault(x => x.FieldKey.Equals(Three.ToString())).DefaultCellStyleId.ShouldBe("ralign"),
+                () => formatGridHit.ShouldBe(Three),
+                () => ganttImageHit.ShouldBe(Four),
+                () => validations.ShouldBe(Four));
+        }
+
+        [TestMethod]
+        public void FormatGridField_ColumnDataTypeString_ReturnsGridField()
+        {
+            // Arrange
+            const string expected = "String";
+            const string columnName = "Quarter";
+            var columnType = typeof(String);
+            var dataTable = new DataTable();
+            var dataColumn = default(DataColumn);
+            var field = new GridField()
+            {
+                DefaultCellStyleId = DummyString
+            };
+            var fieldNames = new List<string>()
+            {
+                "master_checkbox2"
+            };
+            var viewFields = new StringCollection()
+            {
+                "linktitle",
+                "LinkTitleVersionNoMenu"
+            };
+
+            dataTable.Columns.Add(DummyString, columnType);
+            dataTable.Columns.Add(columnName, columnType);
+            dataColumn = dataTable.Columns[One];
+
+            ShimGridData.AllInstances.GetInternalNameString = (_, input) =>
+            {
+                validations += 1;
+                return input;
+            };
+
+            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+
+            // Act
+            var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.DefaultCellStyleId.ShouldBe("link"),
+                () => actual.EditMode.ShouldBe(EditMode.ReadOnly),
+                () => actual.TextDirection.ShouldBe(TextDirection.LeftToRight),
+                () => actual.PropertyTypeId.ShouldBe(expected),
+                () => actual.FieldKey.ShouldBe(columnName),
+                () => actual.SerializeLocalizedValue.ShouldBeTrue(),
+                () => actual.SerializeDataValue.ShouldBeTrue(),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void FormatGridField_ColumnDataTypeInt_ReturnsGridField()
+        {
+            // Arrange
+            const string expected = "JSNumber";
+            const string columnName = "costq";
+            var columnType = typeof(Int32);
+            var dataTable = new DataTable();
+            var dataColumn = default(DataColumn);
+            var field = new GridField()
+            {
+                DefaultCellStyleId = DummyString
+            };
+            var fieldNames = new List<string>()
+            {
+                "master_checkbox2"
+            };
+            var viewFields = new StringCollection()
+            {
+                "linktitle",
+                "LinkTitleVersionNoMenu"
+            };
+
+            dataTable.Columns.Add(DummyString, columnType);
+            dataTable.Columns.Add(columnName, columnType);
+            dataColumn = dataTable.Columns[One];
+
+            ShimGridData.AllInstances.GetInternalNameString = (_, input) =>
+            {
+                validations += 1;
+                return input;
+            };
+
+            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+
+            // Act
+            var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.DefaultCellStyleId.ShouldBe("link"),
+                () => actual.EditMode.ShouldBe(EditMode.ReadOnly),
+                () => actual.TextDirection.ShouldBe(TextDirection.LeftToRight),
+                () => actual.PropertyTypeId.ShouldBe(expected),
+                () => actual.FieldKey.ShouldBe(columnName),
+                () => actual.SerializeLocalizedValue.ShouldBeTrue(),
+                () => actual.SerializeDataValue.ShouldBeTrue(),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void FormatGridField_ColumnDataTypeLookupTypeItem_ReturnsGridField()
+        {
+            // Arrange
+            const string expected = "GanttImage";
+            const string columnName = "Quarter";
+            var columnType = typeof(LookupTypeItem);
+            var dataTable = new DataTable();
+            var dataColumn = default(DataColumn);
+            var field = new GridField()
+            {
+                DefaultCellStyleId = DummyString
+            };
+            var fieldNames = new List<string>()
+            {
+                "master_checkbox2"
+            };
+            var viewFields = new StringCollection()
+            {
+                "linktitle",
+                "LinkTitleVersionNoMenu"
+            };
+
+            dataTable.Columns.Add(DummyString, columnType);
+            dataTable.Columns.Add(columnName, columnType);
+            dataColumn = dataTable.Columns[One];
+
+            ShimGridData.AllInstances.GetInternalNameString = (_, input) =>
+            {
+                validations += 1;
+                return input;
+            };
+
+            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+
+            // Act
+            var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.DefaultCellStyleId.ShouldBe("link"),
+                () => actual.EditMode.ShouldBe(EditMode.ReadOnly),
+                () => actual.TextDirection.ShouldBe(TextDirection.LeftToRight),
+                () => actual.PropertyTypeId.ShouldBe(expected),
+                () => actual.FieldKey.ShouldBe(columnName),
+                () => actual.SerializeLocalizedValue.ShouldBeTrue(),
+                () => actual.SerializeDataValue.ShouldBeTrue(),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void FormatGridField_ColumnDataTypeHyperlink_ReturnsGridField()
+        {
+            // Arrange
+            const string expected = "Hyperlink";
+            const string columnName = "Quarter";
+            var columnType = typeof(Hyperlink);
+            var dataTable = new DataTable();
+            var dataColumn = default(DataColumn);
+            var field = new GridField()
+            {
+                DefaultCellStyleId = DummyString
+            };
+            var fieldNames = new List<string>()
+            {
+                "master_checkbox2"
+            };
+            var viewFields = new StringCollection()
+            {
+                "linktitle",
+                "LinkTitleVersionNoMenu"
+            };
+
+            dataTable.Columns.Add(DummyString, columnType);
+            dataTable.Columns.Add(columnName, columnType);
+            dataColumn = dataTable.Columns[One];
+
+            ShimGridData.AllInstances.GetInternalNameString = (_, input) =>
+            {
+                validations += 1;
+                return input;
+            };
+
+            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+
+            // Act
+            var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.DefaultCellStyleId.ShouldBe("link"),
+                () => actual.EditMode.ShouldBe(EditMode.ReadOnly),
+                () => actual.TextDirection.ShouldBe(TextDirection.LeftToRight),
+                () => actual.PropertyTypeId.ShouldBe(expected),
+                () => actual.FieldKey.ShouldBe(columnName),
+                () => actual.SerializeLocalizedValue.ShouldBeFalse(),
+                () => actual.SerializeDataValue.ShouldBeTrue(),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void FormatGridField_ColumnDataTypeBoolean_ReturnsGridField()
+        {
+            // Arrange
+            const string expected = "CheckBoxBoolean";
+            const string columnName = "Quarter";
+            var columnType = typeof(bool);
+            var dataTable = new DataTable();
+            var dataColumn = default(DataColumn);
+            var field = new GridField()
+            {
+                DefaultCellStyleId = DummyString
+            };
+            var fieldNames = new List<string>()
+            {
+                "master_checkbox2"
+            };
+            var viewFields = new StringCollection()
+            {
+                "linktitle",
+                "LinkTitleVersionNoMenu"
+            };
+
+            dataTable.Columns.Add(DummyString, columnType);
+            dataTable.Columns.Add(columnName, columnType);
+            dataColumn = dataTable.Columns[One];
+
+            ShimGridData.AllInstances.GetInternalNameString = (_, input) =>
+            {
+                validations += 1;
+                return input;
+            };
+
+            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+
+            // Act
+            var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.DefaultCellStyleId.ShouldBe("link"),
+                () => actual.EditMode.ShouldBe(EditMode.ReadOnly),
+                () => actual.TextDirection.ShouldBe(TextDirection.LeftToRight),
+                () => actual.PropertyTypeId.ShouldBe(expected),
+                () => actual.FieldKey.ShouldBe(columnName),
+                () => actual.SerializeLocalizedValue.ShouldBeFalse(),
+                () => actual.SerializeDataValue.ShouldBeTrue(),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void FormatGridField_ColumnDataTypeDateTime_ReturnsGridField()
+        {
+            // Arrange
+            const string expected = "JSDateTime";
+            const string columnName = "Quarter";
+            var columnType = typeof(DateTime);
+            var dataTable = new DataTable();
+            var dataColumn = default(DataColumn);
+            var field = new GridField()
+            {
+                DefaultCellStyleId = DummyString
+            };
+            var fieldNames = new List<string>()
+            {
+                "master_checkbox2"
+            };
+            var viewFields = new StringCollection()
+            {
+                "linktitle",
+                "LinkTitleVersionNoMenu"
+            };
+
+            dataTable.Columns.Add(DummyString, columnType);
+            dataTable.Columns.Add(columnName, columnType);
+            dataColumn = dataTable.Columns[One];
+
+            ShimGridData.AllInstances.GetInternalNameString = (_, input) =>
+            {
+                validations += 1;
+                return input;
+            };
+
+            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+
+            // Act
+            var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.DefaultCellStyleId.ShouldBe("link"),
+                () => actual.EditMode.ShouldBe(EditMode.ReadOnly),
+                () => actual.TextDirection.ShouldBe(TextDirection.LeftToRight),
+                () => actual.PropertyTypeId.ShouldBe(expected),
+                () => actual.FieldKey.ShouldBe(columnName),
+                () => actual.SerializeLocalizedValue.ShouldBeTrue(),
+                () => actual.SerializeDataValue.ShouldBeTrue(),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void FormatGridField_ColumnDataTypeGuid_ReturnsGridField()
+        {
+            // Arrange
+            const string expected = "String";
+            const string columnName = "Quarter";
+            var columnType = typeof(Guid);
+            var dataTable = new DataTable();
+            var dataColumn = default(DataColumn);
+            var field = new GridField()
+            {
+                DefaultCellStyleId = DummyString
+            };
+            var fieldNames = new List<string>()
+            {
+                "master_checkbox2"
+            };
+            var viewFields = new StringCollection()
+            {
+                "linktitle",
+                "LinkTitleVersionNoMenu"
+            };
+
+            dataTable.Columns.Add(DummyString, columnType);
+            dataTable.Columns.Add(columnName, columnType);
+            dataColumn = dataTable.Columns[One];
+
+            ShimGridData.AllInstances.GetInternalNameString = (_, input) =>
+            {
+                validations += 1;
+                return input;
+            };
+
+            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+
+            // Act
+            var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.DefaultCellStyleId.ShouldBe("link"),
+                () => actual.EditMode.ShouldBe(EditMode.ReadOnly),
+                () => actual.TextDirection.ShouldBe(TextDirection.LeftToRight),
+                () => actual.PropertyTypeId.ShouldBe(expected),
+                () => actual.FieldKey.ShouldBe(columnName),
+                () => actual.SerializeLocalizedValue.ShouldBeTrue(),
+                () => actual.SerializeDataValue.ShouldBeFalse(),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void FormatGridField_ColumnDataTypeDouble_ReturnsGridField()
+        {
+            // Arrange
+            const string expected = "JSNumber";
+            const string columnName = "Quarter";
+            var columnType = typeof(Double);
+            var dataTable = new DataTable();
+            var dataColumn = default(DataColumn);
+            var field = new GridField()
+            {
+                DefaultCellStyleId = DummyString
+            };
+            var fieldNames = new List<string>()
+            {
+                "master_checkbox2"
+            };
+            var viewFields = new StringCollection()
+            {
+                "linktitle",
+                "LinkTitleVersionNoMenu"
+            };
+
+            dataTable.Columns.Add(DummyString, columnType);
+            dataTable.Columns.Add(columnName, columnType);
+            dataColumn = dataTable.Columns[One];
+
+            ShimGridData.AllInstances.GetInternalNameString = (_, input) =>
+            {
+                validations += 1;
+                return input;
+            };
+
+            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+
+            // Act
+            var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.DefaultCellStyleId.ShouldBe("link"),
+                () => actual.EditMode.ShouldBe(EditMode.ReadOnly),
+                () => actual.TextDirection.ShouldBe(TextDirection.LeftToRight),
+                () => actual.PropertyTypeId.ShouldBe(expected),
+                () => actual.FieldKey.ShouldBe(columnName),
+                () => actual.SerializeLocalizedValue.ShouldBeTrue(),
+                () => actual.SerializeDataValue.ShouldBeFalse(),
+                () => validations.ShouldBe(1));
         }
     }
 }
