@@ -82,6 +82,11 @@ WEDispFormPageComponent.PageComponent.prototype = {
     },
     canHandleCommand: function (commandId) {
         ULS_SP();
+
+        try {
+            this.updateRibbonLinks(commandId);
+        } catch (e) { if (window.console) window.console.log(e); };
+        
         switch (commandId) {
             case "Ribbon.ListForm.Display.Manage.EditItem2":
             case "Ribbon.ListForm.Display.Associated.LinkedItems":
@@ -100,9 +105,12 @@ WEDispFormPageComponent.PageComponent.prototype = {
             case 'Ribbon.ListForm.Edit.Actions.RestoreProject':
                 return true;
             default:
-                return commandEnabled(commandId);
+                return false;
         };
+
+       
     },
+
     handleCommand: function (commandId, properties, sequence) {
         ULS_SP();
         if (commandId === 'Ribbon.ListForm.Display.Manage.EditItem2') {
@@ -245,7 +253,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
 
                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
             }
-            else{
+            else {
                 alert('The Resource Planner cannot be opened because there is an active resource import job running.');
             }
         }
@@ -339,7 +347,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
         }
     },
 
-    ShowConfirmActionDialog: function(message, callback) {
+    ShowConfirmActionDialog: function (message, callback) {
         var viewDiv = document.createElement('div');
         viewDiv.innerHTML = '<div>' +
             '<div style="width: 290px; padding: 0px;">' +
@@ -409,7 +417,60 @@ WEDispFormPageComponent.PageComponent.prototype = {
 
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
     },
-    
+    updateRibbonLinks: function (commandId) {
+        var weburl = "";
+        var supportedCommands = {
+            "Ribbon.ListForm.Display.Manage.EPMLivePlanner": { id: "Ribbon.ListItem.EPMLive.Planner", type: 'Large' },
+            "Ribbon.ListForm.Display.Manage.EPKCost": { id: "Ribbon.ListItem.Manage.EPKCosts", type: 'Large' },
+            "Ribbon.ListForm.Display.Manage.EPKRP": { id: "Ribbon.ListItem.Manage.EPKResourcePlanner", type: 'Large' },
+            "Ribbon.ListForm.Display.Manage.BuildTeam": { id: "Ribbon.ListItem.EPMLive.BuildTeam", type: 'Medium' },
+            "Ribbon.ListForm.Display.Manage.EditItem2": { id: "Ribbon.ListForm.Display.Manage.EditItem2", type: 'Large' },
+        };
+        
+        var command = supportedCommands[commandId].id;
+        var buttontype = supportedCommands[commandId].type;
+        if (command === 'Ribbon.ListForm.Display.Manage.EditItem2') {
+            var weburl = "";
+            if (WEExtraParams != "")
+                weburl = WEEditForm + "?ID=" + WEItemId + "&" + WEExtraParams + "&Source=" + WESource;
+            else
+                weburl = WEEditForm + "?ID=" + WEItemId + "&Source=" + WESource + "&isdlg=1";
+        }
+        else if (command === 'Ribbon.ListItem.EPMLive.Planner') {
+            try {
+                weburl = WEWebUrl + "/_layouts/epmlive/workplanner.aspx?listid=" + WEListId + "&id=" + WEItemId + "&Source=" + WESource + "&isdlg=1";
+            } catch (e) { }
+        }
+        else if (command === 'Ribbon.ListItem.EPMLive.BuildTeam') {
+            weburl = WEWebUrl + "/_layouts/epmlive/buildteam.aspx?listid=" + WEListId + "&id=" + WEItemId + "&isdlg=1";
+        }
+        else if (command === 'Ribbon.ListItem.Manage.EPKCosts') {
+            var FullId = WEWebId + "." + WEListId + "." + WEItemId;
+            weburl = WEWebUrl + "/_layouts/ppm/costs.aspx?itemid=" + FullId + "&listid=" + WEListId + "&view=" + "&isdlg=1";
+        }
+        else if (command === 'Ribbon.ListItem.Manage.EPKResourcePlanner') {
+            var FullId = WEWebId + "." + WEListId + "." + WEItemId;
+
+            weburl = WEWebUrl + "/_layouts/ppm/rpeditor.aspx?itemid=" + FullId + "&isdlg=1";
+        }
+        if (weburl != "") {
+            this.updateRibbonLink(command, weburl, buttontype);
+        }
+    },
+    updateRibbonLink: function (controlId, weburl, buttontype) {
+        var buttonId = controlId + '-' + buttontype;
+        var hrefValue = 'javascript:;';
+
+        if (weburl) {
+            hrefValue = weburl;
+        };
+
+        var element = document.getElementById(buttonId);
+        if (element) {
+            element.setAttribute('href', hrefValue);
+        }
+    },
+
 }
 
 
