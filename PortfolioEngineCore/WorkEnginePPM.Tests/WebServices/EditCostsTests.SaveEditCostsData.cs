@@ -28,7 +28,7 @@ namespace WorkEnginePPM.Tests.WebServices
             // Act
             var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
 
-            // Arrange
+            // Assert
             actualResult.ShouldBe("<Grid><IO Result=\"0\"/></Grid>");
         }
 
@@ -38,7 +38,7 @@ namespace WorkEnginePPM.Tests.WebServices
             // Arrange, Act
             var actualResult = _testEntity.SaveEditCostsData(string.Empty, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
 
-            // Arrange
+            // Assert
             actualResult.ShouldBe("<Grid><IO Result=\"-10\" Message=\"Error saving Cost data&#xA;&#xA;Unable to load XML\" /></Grid>");
         }
 
@@ -57,7 +57,7 @@ namespace WorkEnginePPM.Tests.WebServices
             // Act
             var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
 
-            // Arrange
+            // Assert
             actualResult.ShouldBe($"<Grid><IO Result=\"-10\" Message=\"Error saving Cost data&#xA;&#xA;Unable to convert wepid '{wepId}' to ProjectID\" /></Grid>");
         }
 
@@ -72,7 +72,7 @@ namespace WorkEnginePPM.Tests.WebServices
             // Act
             var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
 
-            // Arrange
+            // Assert
             actualResult.ShouldBe("<Grid><IO Result=\"-10\" Message=\"Error saving Cost data&#xA;&#xA;Invalid ProjectID\" /></Grid>");
         }
 
@@ -93,7 +93,7 @@ namespace WorkEnginePPM.Tests.WebServices
             // Act
             var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
 
-            // Arrange
+            // Assert
             actualResult.ShouldBe("<Grid><IO Result=\"-10\" Message=\"Error saving Cost data&#xA;&#xA;Invalid Calendar\" /></Grid>");
         }
 
@@ -116,7 +116,7 @@ namespace WorkEnginePPM.Tests.WebServices
             // Act
             var actualResult = _testEntity.SaveEditCostsData(data, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
 
-            // Arrange
+            // Assert
             actualResult.ShouldBe($"<Grid><IO Result=\"-10\" Message=\"Error saving Cost data&#xA;&#xA;{DummyCustomFieldName}{CustomFieldId11801} is a required code field&#xA;&#xA;Category = &quot;&quot;;&#xA;\" /></Grid>");
         }
 
@@ -139,7 +139,7 @@ namespace WorkEnginePPM.Tests.WebServices
             // Act
             var actualResult = _testEntity.SaveEditCostsData(data, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
 
-            // Arrange
+            // Assert
             actualResult.ShouldBe($"<Grid><IO Result=\"-10\" Message=\"Error saving Cost data&#xA;&#xA;{DummyCustomFieldName}{CustomFieldId11811} is a required text field&#xA;&#xA;Category = &quot;&quot;;&#xA;\" /></Grid>");
         }
 
@@ -162,7 +162,7 @@ namespace WorkEnginePPM.Tests.WebServices
             // Act
             var actualResult = _testEntity.SaveEditCostsData(data, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
 
-            // Arrange
+            // Assert
             actualResult.ShouldBe("<Grid><IO Result=\"-10\" Message=\"Error saving Cost data&#xA;&#xA;Two or more rows found with the same identity:&#xA;&#xA;Category = &quot;&quot;;&#xA;DummyCustomFieldName11801 = &quot;&quot;;&#xA;\" /></Grid>");
         }
 
@@ -193,7 +193,7 @@ namespace WorkEnginePPM.Tests.WebServices
             // Act
             var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
 
-            // Arrange
+            // Assert
             this.ShouldSatisfyAllConditions(
                 () => actualResult.ShouldBe("<Grid><IO Result=\"-11\" Message=\"DBAccess Status Exception in EditCosts.asmx.cs&#xA;&#xA;Context=SaveEditCostsData&#xA;&#xA;Text=;\" /></Grid>"),
                 () => _currentStatus.ShouldBe((StatusEnum)99836),
@@ -211,7 +211,7 @@ namespace WorkEnginePPM.Tests.WebServices
             // Act
             var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
 
-            // Arrange
+            // Assert
             this.ShouldSatisfyAllConditions(
                 () => actualResult.ShouldBe("<Grid><IO Result=\"-11\" Message=\"DBAccess Status Exception in EditCosts.asmx.cs&#xA;&#xA;Context=SaveEditCostsData&#xA;&#xA;Text=;\" /></Grid>"),
                 () => _currentStatus.ShouldBe((StatusEnum)99835),
@@ -237,7 +237,7 @@ namespace WorkEnginePPM.Tests.WebServices
             // Act
             var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
 
-            // Arrange
+            // Assert
             this.ShouldSatisfyAllConditions(
                 () => actualResult.ShouldBe(XmlInvalid),
                 () => _currentStatus.ShouldBe((StatusEnum)99832),
@@ -260,7 +260,7 @@ namespace WorkEnginePPM.Tests.WebServices
             // Act
             var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
 
-            // Arrange
+            // Assert
             this.ShouldSatisfyAllConditions(
                 () => actualResult.ShouldBe("<Grid><IO Result=\"-11\" Message=\"DBAccess Status Exception in EditCosts.asmx.cs&#xA;&#xA;Context=SaveEditCostsData&#xA;&#xA;Text=;\" /></Grid>"),
                 () => _currentStatus.ShouldBe((StatusEnum)99999),
@@ -283,7 +283,7 @@ namespace WorkEnginePPM.Tests.WebServices
             // Act
             var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
 
-            // Arrange
+            // Assert
             this.ShouldSatisfyAllConditions(
                 () => actualResult.ShouldBe("<Grid><IO Result=\"-11\" Message=\"DBAccess Status Exception in EditCosts.asmx.cs&#xA;&#xA;Context=SaveEditCostsData&#xA;&#xA;Text=;\" /></Grid>"),
                 () => _currentStatus.ShouldBe((StatusEnum)99999),
@@ -306,7 +306,7 @@ namespace WorkEnginePPM.Tests.WebServices
             // Act
             var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
 
-            // Arrange
+            // Assert
             this.ShouldSatisfyAllConditions(
                 () => actualResult.ShouldBe("<Grid><IO Result=\"-11\" Message=\"DBAccess Status Exception in EditCosts.asmx.cs&#xA;&#xA;Context=SaveEditCostsData&#xA;&#xA;Text=;\" /></Grid>"),
                 () => _currentStatus.ShouldBe((StatusEnum)99833),

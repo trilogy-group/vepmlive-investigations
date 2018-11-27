@@ -265,7 +265,13 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.GetEditCostsLayout(DefaultProjectId, DefaultCostTypeId, viewUid, DefaultFteMode, wepId, tryCheckout);
+            var actualResult = _testEntity.GetEditCostsLayout(
+                DefaultProjectId,
+                DefaultCostTypeId,
+                viewUid,
+                DefaultFteMode,
+                wepId,
+                tryCheckout);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -285,7 +291,7 @@ namespace WorkEnginePPM.Tests.WebServices
 
             SetupShimDbaEditCosts();
 
-            ShimViewData.GetViewXmlByNameDBAccessViewDataContextString = (dbAccessParam, contextParam, viewName) => new string[]
+            ShimViewData.GetViewXmlByNameDBAccessViewDataContextString = (dbAccessParam, contextParam, viewName) => new[]
             {
                 $"<Node AutoAdjustPeriods=\"1\" StartPeriodDelta=\"{DummyPeriodId1}\" FinishPeriodDelta=\"{DummyPeriodId2}\"></Node>"
             };
@@ -296,7 +302,13 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = (string)_testEntity.GetEditCostsLayout(DefaultProjectId, DefaultCostTypeId, viewUid, DefaultFteMode, wepId, tryCheckout);
+            var actualResult = (string)_testEntity.GetEditCostsLayout(
+                DefaultProjectId,
+                DefaultCostTypeId,
+                viewUid,
+                DefaultFteMode,
+                wepId,
+                tryCheckout);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -327,7 +339,13 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = (string)_testEntity.GetEditCostsLayout(DefaultProjectId, DefaultCostTypeId, viewUid, DefaultFteMode, wepId, tryCheckout);
+            var actualResult = (string)_testEntity.GetEditCostsLayout(
+                DefaultProjectId,
+                DefaultCostTypeId,
+                viewUid,
+                DefaultFteMode,
+                wepId,
+                tryCheckout);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -358,7 +376,13 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = (string)_testEntity.GetEditCostsLayout(DefaultProjectId, DefaultCostTypeId, viewUid, DefaultFteMode, wepId, tryCheckout);
+            var actualResult = (string)_testEntity.GetEditCostsLayout(
+                DefaultProjectId,
+                DefaultCostTypeId,
+                viewUid,
+                DefaultFteMode,
+                wepId,
+                tryCheckout);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -393,7 +417,13 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = (string)_testEntity.GetEditCostsLayout(DefaultProjectId, DefaultCostTypeId, viewUid, DefaultFteMode, wepId, tryCheckout);
+            var actualResult = (string)_testEntity.GetEditCostsLayout(
+                DefaultProjectId,
+                DefaultCostTypeId,
+                viewUid,
+                DefaultFteMode,
+                wepId,
+                tryCheckout);
 
             // Assert
             actualResult.ShouldBe("<Grid><IO Result=\"-10\" Message=\"GetEditCostsLayout&#xA;&#xA;\" /></Grid>");
@@ -413,7 +443,13 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = (string)_testEntity.GetEditCostsLayout(DefaultProjectId, DefaultCostTypeId, viewUid, DefaultFteMode, wepId, tryCheckout);
+            var actualResult = (string)_testEntity.GetEditCostsLayout(
+                DefaultProjectId,
+                DefaultCostTypeId,
+                viewUid,
+                DefaultFteMode,
+                wepId,
+                tryCheckout);
 
             // Assert
             actualResult.ShouldBe($"<Grid><IO Result=\"-10\" Message=\"GetEditCostsLayout&#xA;&#xA;User Authentication Failed. Stage={DummyString}\" /></Grid>");
@@ -443,7 +479,13 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = (string)_testEntity.GetEditCostsLayout(DefaultProjectId, DefaultCostTypeId, viewUid, DefaultFteMode, wepId, tryCheckout);
+            var actualResult = (string)_testEntity.GetEditCostsLayout(
+                DefaultProjectId,
+                DefaultCostTypeId,
+                viewUid,
+                DefaultFteMode,
+                wepId,
+                tryCheckout);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -474,7 +516,14 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.GetEditCostsData(DefaultProjectId, DefaultCostTypeId, viewUid, DefaultFteMode, wepId, tryCheckout, loadAllCostCategories);
+            var actualResult = _testEntity.GetEditCostsData(
+                DefaultProjectId,
+                DefaultCostTypeId,
+                viewUid,
+                DefaultFteMode,
+                wepId,
+                tryCheckout,
+                loadAllCostCategories);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -502,7 +551,14 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.GetEditCostsData(DefaultProjectId, DefaultCostTypeId, viewUid, DefaultFteMode, wepId, tryCheckout, loadAllCostCategories);
+            var actualResult = _testEntity.GetEditCostsData(
+                DefaultProjectId,
+                DefaultCostTypeId,
+                viewUid,
+                DefaultFteMode,
+                wepId,
+                tryCheckout,
+                loadAllCostCategories);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -532,7 +588,14 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.GetEditCostsData(DefaultProjectId, DefaultCostTypeId, viewUid, DefaultFteMode, wepId, tryCheckout, loadAllCostCategories);
+            var actualResult = _testEntity.GetEditCostsData(
+                DefaultProjectId,
+                DefaultCostTypeId,
+                viewUid,
+                DefaultFteMode,
+                wepId,
+                tryCheckout,
+                loadAllCostCategories);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -555,7 +618,14 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.GetEditCostsData(DefaultProjectId, DefaultCostTypeId, viewUid, DefaultFteMode, wepId, tryCheckout, loadAllCostCategories);
+            var actualResult = _testEntity.GetEditCostsData(
+                DefaultProjectId,
+                DefaultCostTypeId,
+                viewUid,
+                DefaultFteMode,
+                wepId,
+                tryCheckout,
+                loadAllCostCategories);
 
             // Assert
             actualResult.ShouldBe($"<Grid><IO Result=\"-10\" Message=\"GetEditCostsData&#xA;&#xA;User Authentication Failed. Stage={DummyString}\" /></Grid>");
@@ -573,7 +643,14 @@ namespace WorkEnginePPM.Tests.WebServices
             SetupShimDbaEditCosts();
 
             // Act
-            var actualResult = _testEntity.GetEditCostsData(DefaultProjectId, DefaultCostTypeId, viewUid, DefaultFteMode, wepId, tryCheckout, loadAllCostCategories);
+            var actualResult = _testEntity.GetEditCostsData(
+                DefaultProjectId,
+                DefaultCostTypeId,
+                viewUid,
+                DefaultFteMode,
+                wepId,
+                tryCheckout,
+                loadAllCostCategories);
 
             // Assert
             actualResult.ShouldBe($"<Grid><IO Result=\"-10\" Message=\"GetEditCostsData&#xA;&#xA;Invalid Project ID:{DefaultProjectId}; wepid:;\" /></Grid>");
@@ -596,7 +673,14 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.GetEditCostsData(DefaultProjectId, DefaultCostTypeId, viewUid, DefaultFteMode, wepId, tryCheckout, loadAllCostCategories);
+            var actualResult = _testEntity.GetEditCostsData(
+                DefaultProjectId,
+                DefaultCostTypeId,
+                viewUid,
+                DefaultFteMode,
+                wepId,
+                tryCheckout,
+                loadAllCostCategories);
 
             // Assert
             actualResult.ShouldBe($"<Grid><IO Result=\"-10\" Message=\"GetEditCostsData&#xA;&#xA;\" /></Grid>");
