@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "postinstall": "webdriver-manager update",
+    "postinstall": "webdriver-manager update && npm run clean",
     "lint": "tslint \"e2e/**/*.ts\" --fix",
-    "clean": "rm -rf allure-reporter *.log",
+    "clean": "rm -rf auto-generated/allure-results *.log",
     "test": "protractor protractor.conf.js",
     "e2e": "protractor protractor.conf.js",
     "e2e:bs": "protractor protractor.browserstack.conf.js",
