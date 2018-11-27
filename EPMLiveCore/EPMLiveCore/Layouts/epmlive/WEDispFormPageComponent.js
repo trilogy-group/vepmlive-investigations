@@ -418,7 +418,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
     },
     updateRibbonLinks: function (commandId) {
-        var weburl = "";
+        var weburl = '';
         var supportedCommands = {
             "Ribbon.ListForm.Display.Manage.EPMLivePlanner": { id: "Ribbon.ListItem.EPMLive.Planner", type: 'Large' },
             "Ribbon.ListForm.Display.Manage.EPKCost": { id: "Ribbon.ListItem.Manage.EPKCosts", type: 'Large' },
@@ -430,11 +430,12 @@ WEDispFormPageComponent.PageComponent.prototype = {
         var command = supportedCommands[commandId].id;
         var buttontype = supportedCommands[commandId].type;
         if (command === 'Ribbon.ListForm.Display.Manage.EditItem2') {
-            var weburl = '';
-            if (WEExtraParams !== '')
+            if (WEExtraParams !== '') {
                 weburl = WEEditForm + "?ID=" + WEItemId + "&" + WEExtraParams + "&Source=" + WESource;
-            else
+            }
+            else {
                 weburl = WEEditForm + "?ID=" + WEItemId + "&Source=" + WESource;
+            }
         }
         else if (command === 'Ribbon.ListItem.EPMLive.Planner') {
             try {
