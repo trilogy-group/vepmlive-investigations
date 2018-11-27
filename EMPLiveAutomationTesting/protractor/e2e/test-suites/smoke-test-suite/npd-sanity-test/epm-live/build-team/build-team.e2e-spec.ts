@@ -14,6 +14,7 @@ import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-pag
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
+import { CommonSubPageHelper } from '../../../../../page-objects/pages/common/common-page.subhelper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -410,9 +411,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         StepLogger.stepId(3);
         StepLogger.step('Select check-box for any Project [Ex: Smoke Test Project 2]');
         await PageHelper.click(CommonPage.record);
-
         StepLogger.step('Click on "Items" tab');
-        await PageHelper.click(CommonPage.ribbonTitles.items);
+        await CommonSubPageHelper.clickOnItemsTab();
 
         StepLogger.step('Click on "Edit Team" icon from ribbon panel');
         await PageHelper.click(CommonPage.ribbonItems.editTeam);

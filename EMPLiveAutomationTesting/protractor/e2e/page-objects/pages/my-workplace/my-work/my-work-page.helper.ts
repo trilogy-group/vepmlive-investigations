@@ -171,7 +171,7 @@ export class MyWorkPageHelper {
         const viewNewName = `${MyWorkPageConstants.renameView}${uniqueId}`;
         await TextboxHelper.sendKeys(MyWorkPage.viewsPopup.newName, viewNewName);
         await PageHelper.click(MyWorkPage.viewsPopup.ok);
-
+        await PageHelper.acceptAlert();
         return viewNewName;
     }
 

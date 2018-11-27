@@ -21,6 +21,7 @@ import { ResourceAnalyzerPage } from '../resource-analyzer-page/resource-analyze
 import { IssueItemPageHelper } from '../items-page/issue-item/issue-item-page.helper';
 import { ExpectationHelper } from '../../../components/misc-utils/expectation-helper';
 import { HomePage } from '../homepage/home.po';
+import { CommonSubPageHelper } from './common-page.subhelper';
 
 const fs = require('fs');
 
@@ -346,9 +347,7 @@ export class CommonPageHelper {
 
     static async editOptionViaRibbon(item = CommonPage.record) {
         await this.selectRecordFromGrid(item);
-
         await this.refreshPageIfRibbonElementIsDisable(CommonPage.ribbonItems.editItem);
-
         StepLogger.step('Select "Edit Item" from the options displayed');
         await ElementHelper.clickUsingJsNoWait(CommonPage.ribbonItems.editItem);
 
@@ -362,9 +361,7 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.rowsFirstColumn.get(1));
 
         StepLogger.step('Click on ITEMS on ribbon');
-        await WaitHelper.waitForElementToBePresent(CommonPage.itemsMenu);
-        await PageHelper.click(CommonPage.itemsMenu);
-
+        await CommonSubPageHelper.clickOnItemsTab();
         StepLogger.step('Select "Edit Item" from the options displayed');
         await WaitHelper.waitForElementToBePresent(CommonPage.ribbonItems.editItem);
         await PageHelper.click(CommonPage.ribbonItems.editItem);
@@ -378,8 +375,7 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.rowsDataFirstColumn.get(1));
 
         StepLogger.step('Click on ITEMS on ribbon');
-        await PageHelper.click(CommonPage.itemsMenu);
-
+        await CommonSubPageHelper.clickOnItemsTab();
         StepLogger.step('Select "Edit Item" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.viewItem);
     }
@@ -458,7 +454,7 @@ export class CommonPageHelper {
             await ElementHelper.browserRefresh();
             await PageHelper.click(CommonPage.projectCheckbox);
             await browser.sleep(PageHelper.timeout.m);
-            await PageHelper.click(CommonPage.ribbonTitles.items);
+            await CommonSubPageHelper.clickOnItemsTab();
             await browser.sleep(PageHelper.timeout.s);
             if (await CommonPage.editPlan.isPresent() !== true) {
                 await this.clickOnEditPlan();
@@ -509,11 +505,7 @@ export class CommonPageHelper {
         await PageHelper.click(item);
 
         StepLogger.step('Click on ITEMS on ribbon');
-        await PageHelper.click(CommonPage.ribbonTitles.items);
-        const isClicked = await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editItem, PageHelper.timeout.s);
-        if (!isClicked) {
-            await PageHelper.click(CommonPage.ribbonTitles.items);
-        }
+        await CommonSubPageHelper.clickOnItemsTab();
     }
 
     static async selectTwoRecordFromGrid() {
@@ -527,12 +519,12 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.getNthRecord(2));
 
         StepLogger.step('Click on ITEMS on ribbon');
-        await PageHelper.click(CommonPage.ribbonTitles.items);
+        await CommonSubPageHelper.clickOnItemsTab();
     }
 
     static async clickItemTab() {
         StepLogger.step('Click on ITEMS on ribbon');
-        await PageHelper.click(CommonPage.ribbonTitles.items);
+        await CommonSubPageHelper.clickOnItemsTab();
     }
 
     static async selectTwoRecordsFromGrid() {

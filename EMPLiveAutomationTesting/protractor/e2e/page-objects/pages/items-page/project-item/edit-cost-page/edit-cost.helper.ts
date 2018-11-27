@@ -10,6 +10,8 @@ import {ExpectationHelper} from '../../../../../components/misc-utils/expectatio
 import {CommonPageConstants} from '../../../common/common-page.constants';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
+import { ProjectItemPageHelper } from '../project-item-page.helper';
+import { ProjectItemPageConstants } from '../project-item-page.constants';
 
 export class EditCostHelper {
 
@@ -224,5 +226,35 @@ export class EditCostHelper {
 
         StepLogger.verification('Validate that Actual  Cost is Present ');
         await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.actualCostsTab, EditCostConstants.costTabs.actualCostsTab);
+    }
+
+    static async createProjectWithCost() {
+        const cost = 4;
+        StepLogger.subStep('Create a project');
+        const uniqueId = PageHelper.getUniqueId();
+
+        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, );
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            projectNameValue,
+            ProjectItemPageConstants.columnNames.title);
+
+        StepLogger.subStep('Select created project');
+        await CommonPageHelper.selectProjectAndClickEllipsisButton();
+        await CommonPageHelper.verifyVariousOptionsOnContextMenu();
+        StepLogger.subStep('Click on edit cost');
+        await CommonPageHelper.clickEditCost();
+        await CommonPageHelper.switchToFirstContentFrame();
+        StepLogger.subVerification('verify Edit cost pop up');
+        await EditCostHelper.validateEditCostWebElements();
+        StepLogger.subStep('Enter values in categories');
+        await EditCostHelper.enterValueInVariousCategories(cost);
+        StepLogger.subVerification('verify categories entered');
+        await EditCostHelper.verifyValueInVariousCategories(cost);
+        StepLogger.subStep('Click on save');
+        await EditCostHelper.clickSaveCostPlanner();
+        await EditCostHelper.verifyValueInVariousCategories(cost);
+        return projectNameValue;
     }
 }

@@ -2,7 +2,6 @@ import {PageHelper} from '../../../components/html/page-helper';
 import {SuiteNames} from '../../helpers/suite-names';
 import {LoginPage} from '../../../page-objects/pages/login/login.po';
 import {StepLogger} from '../../../../core/logger/step-logger';
-
 import {IssueItemPageHelper} from '../../../page-objects/pages/items-page/issue-item/issue-item-page.helper';
 
 describe(SuiteNames.healthCheckTestSuite, () => {
