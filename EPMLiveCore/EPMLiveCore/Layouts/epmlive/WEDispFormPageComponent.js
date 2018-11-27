@@ -430,15 +430,15 @@ WEDispFormPageComponent.PageComponent.prototype = {
         var command = supportedCommands[commandId].id;
         var buttontype = supportedCommands[commandId].type;
         if (command === 'Ribbon.ListForm.Display.Manage.EditItem2') {
-            var weburl = "";
-            if (WEExtraParams != "")
+            var weburl = '';
+            if (WEExtraParams !== '')
                 weburl = WEEditForm + "?ID=" + WEItemId + "&" + WEExtraParams + "&Source=" + WESource;
             else
-                weburl = WEEditForm + "?ID=" + WEItemId + "&Source=" + WESource + "&isdlg=1";
+                weburl = WEEditForm + "?ID=" + WEItemId + "&Source=" + WESource;
         }
         else if (command === 'Ribbon.ListItem.EPMLive.Planner') {
             try {
-                weburl = WEWebUrl + "/_layouts/epmlive/workplanner.aspx?listid=" + WEListId + "&id=" + WEItemId + "&Source=" + WESource + "&isdlg=1";
+                weburl = WEWebUrl + "/_layouts/epmlive/workplanner.aspx?listid=" + WEListId + "&id=" + WEItemId + "&Source=" + WESource;
             } catch (e) { }
         }
         else if (command === 'Ribbon.ListItem.EPMLive.BuildTeam') {
@@ -453,7 +453,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
 
             weburl = WEWebUrl + "/_layouts/ppm/rpeditor.aspx?itemid=" + FullId + "&isdlg=1";
         }
-        if (weburl != "") {
+        if (weburl !== '') {
             this.updateRibbonLink(command, weburl, buttontype);
         }
     },
