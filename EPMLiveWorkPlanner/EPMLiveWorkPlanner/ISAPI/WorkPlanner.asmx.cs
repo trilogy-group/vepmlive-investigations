@@ -120,9 +120,9 @@ namespace EPMLiveWorkPlanner
                     using (SPWeb iweb = site.OpenWeb(oWeb.ID))
                     {
                         Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(iweb);
-                        if (lockWeb == Guid.Empty || lockWeb == oWeb.ID)
+                        if (lockWeb == Guid.Empty || lockWeb == iweb.ID)
                         {
-                            sListTaskCenter = EPMLiveCore.CoreFunctions.getConfigSetting(oWeb, "EPMLivePlanner" + PlannerID + "TaskCenter");
+                            sListTaskCenter = EPMLiveCore.CoreFunctions.getConfigSetting(iweb, "EPMLivePlanner" + PlannerID + "TaskCenter");
                         }
                         else
                         {
@@ -351,9 +351,9 @@ namespace EPMLiveWorkPlanner
                     using (SPWeb iweb = site.OpenWeb(oWeb.ID))
                     {
                         Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(iweb);
-                        if (lockWeb == Guid.Empty || lockWeb == oWeb.ID)
+                        if (lockWeb == Guid.Empty || lockWeb == iweb.ID)
                         {
-                            sListProjectCenter = EPMLiveCore.CoreFunctions.getConfigSetting(oWeb, "EPMLivePlanner" + PlannerID + "ProjectCenter");
+                            sListProjectCenter = EPMLiveCore.CoreFunctions.getConfigSetting(iweb, "EPMLivePlanner" + PlannerID + "ProjectCenter");
                         }
                         else
                         {
@@ -868,19 +868,32 @@ namespace EPMLiveWorkPlanner
                     {
                         using (SPWeb rweb = rsite.OpenWeb(web.ID))
                         {
-                            Guid lwebGuid = EPMLiveCore.CoreFunctions.getLockedWeb(web);
-
-                            using (SPWeb lweb = rsite.OpenWeb(lwebGuid))
-                            {
-                                if (lweb.Lists.TryGetList("Planner Templates") == null)
-                                {
-                                    arrPlanners.Add("MPP", "Microsoft Office Project");
-                                }
-                                else if (EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "useoldeditinproject") == "true")
-                                {
-                                    arrPlanners.Add("MPP", "Microsoft Office Project");
-                                }
-                            }
+                            Guid lwebGuid = EPMLiveCore.CoreFunctions.getLockedWeb(rweb);
+							if (lwebGuid == Guid.Empty || lwebGuid == rweb.ID)
+							{
+								if (rweb.Lists.TryGetList("Planner Templates") == null)
+								{
+									arrPlanners.Add("MPP", "Microsoft Office Project");
+								}
+								else if (EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "useoldeditinproject") == "true")
+								{
+									arrPlanners.Add("MPP", "Microsoft Office Project");
+								}
+							}
+							else
+							{
+								using (SPWeb lweb = rsite.OpenWeb(lwebGuid))
+								{
+									if (lweb.Lists.TryGetList("Planner Templates") == null)
+									{
+										arrPlanners.Add("MPP", "Microsoft Office Project");
+									}
+									else if (EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "useoldeditinproject") == "true")
+									{
+										arrPlanners.Add("MPP", "Microsoft Office Project");
+									}
+								}
+							}
                         }
                     }
 
@@ -1389,15 +1402,15 @@ namespace EPMLiveWorkPlanner
                     using (SPWeb iweb = site.OpenWeb(web.ID))
                     {
                         Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(iweb);
-                        if (lockWeb == Guid.Empty || lockWeb == web.ID)
+                        if (lockWeb == Guid.Empty || lockWeb == iweb.ID)
                         {
-                            iApplyNewTemplate(web, web, planner, templateid, itemid, type, projectname);
+                            iApplyNewTemplate(iweb, iweb, planner, templateid, itemid, type, projectname);
                         }
                         else
                         {
                             using (SPWeb w = site.OpenWeb(lockWeb))
                             {
-                                iApplyNewTemplate(web, w, planner, templateid, itemid, type, projectname);
+                                iApplyNewTemplate(iweb, w, planner, templateid, itemid, type, projectname);
                             }
 
                         }
@@ -1595,9 +1608,9 @@ namespace EPMLiveWorkPlanner
                     using (SPWeb iweb = site.OpenWeb(web.ID))
                     {
                         Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(iweb);
-                        if (lockWeb == Guid.Empty || lockWeb == web.ID)
+                        if (lockWeb == Guid.Empty || lockWeb == iweb.ID)
                         {
-                            dt = iGetTemplates(web, planner, type);
+                            dt = iGetTemplates(iweb, planner, type);
                         }
                         else
                         {
@@ -4537,24 +4550,24 @@ namespace EPMLiveWorkPlanner
 
             SPList resList = null;
 
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
-            {
-                try
-                {
-                    using (SPSite site = new SPSite(oWeb.Url))
-                    {
-                        using (SPWeb web = site.OpenWeb())
-                        {
-                            string resurl = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "EPMLiveResourceURL", true);
-                            using (SPWeb newweb = site.OpenWeb(resurl))
-                            {
-                                //ProcessAllocationResourcesCols(ndCols, newweb);
-                            }
-                        }
-                    }
-                }
-                catch { }
-            });
+            //SPSecurity.RunWithElevatedPrivileges(delegate ()
+            //{
+            //    try
+            //    {
+            //        using (SPSite site = new SPSite(oWeb.Url))
+            //        {
+            //            using (SPWeb web = site.OpenWeb())
+            //            {
+            //                string resurl = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "EPMLiveResourceURL", true);
+            //                using (SPWeb newweb = site.OpenWeb(resurl))
+            //                {
+            //                    //ProcessAllocationResourcesCols(ndCols, newweb);
+            //                }
+            //            }
+            //        }
+            //    }
+            //    catch { }
+            //});
 
             return docOut.OuterXml;
         }
