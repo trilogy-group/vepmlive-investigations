@@ -6,6 +6,7 @@ using System.Collections.Generic.Fakes;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.DirectoryServices.ActiveDirectory.Fakes;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,7 +23,6 @@ using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Workflow;
 using Microsoft.SharePoint.Workflow.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using Shouldly;
 
 namespace EPMLiveWebParts.Tests
@@ -936,7 +936,24 @@ namespace EPMLiveWebParts.Tests
 
         private void ShimSharePoint(string internalname, SPFieldType fieldType, string listId, string webId)
         {
+            Shimgetgriditems.AllInstances.addMenusXmlNodeSPListString = (a, ndNewItem, b, c) => GetMenus(ndNewItem);
+
+            ShimSPView.AllInstances.UrlGet = _ => ExampleUrl;
+            ShimSPContentTypeCollection.AllInstances.ItemGetInt32 = (_, __) => new ShimSPContentType { NameGet = () => TypeTextPlain };
+            ShimSPFormCollection.AllInstances.ItemGetPAGETYPE = (_, __) => new ShimSPForm();
+            ShimSPForm.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
+
+            PrepareSpListRelatedShims(listId);
+            PrepareSpFieldRelatedShims(internalname, fieldType);
+            PrepareSpWebRelatedShims(webId);
+            PrepareSpFileRelatedShims();
+            PrepareSpUserRelatedShims();
+        }
+
+        private static void PrepareSpListRelatedShims(string listId = null)
+        {
             ShimSPListCollection.AllInstances.ItemGetString = (_, __) => new ShimSPList();
+            ShimSPListCollection.AllInstances.ItemGetGuid = (_, __) => new ShimSPList();
             ShimSPListItem.AllInstances.IDGet = _ => 1;
             ShimSPListItem.AllInstances.ParentListGet = _ => new ShimSPList();
             ShimSPListItem.AllInstances.FieldsGet = _ => new ShimSPFieldCollection();
@@ -956,7 +973,7 @@ namespace EPMLiveWebParts.Tests
                 }
             };
             ShimSPListItem.AllInstances.ItemGetGuid = (_, __) => DummyVal;
-            ShimSPList.AllInstances.IDGet = _ => new Guid(listId);
+            ShimSPList.AllInstances.IDGet = _ => listId == null ? Guid.NewGuid() : new Guid(listId);
             ShimSPList.AllInstances.TitleGet = _ => DummyVal;
             ShimSPList.AllInstances.ImageUrlGet = _ => $"image.png";
             ShimSPList.AllInstances.ParentWebGet = _ => new ShimSPWeb();
@@ -966,25 +983,37 @@ namespace EPMLiveWebParts.Tests
             ShimSPList.AllInstances.FieldsGet = _ => new ShimSPFieldCollection();
             ShimSPList.AllInstances.EnableVersioningGet = _ => true;
             ShimSPList.AllInstances.EnableModerationGet = _ => true;
+            ShimSPList.AllInstances.ViewsGet = _ => new ShimSPViewCollection { ItemGetGuid = __ => new ShimSPView() };
 
-            Shimgetgriditems.AllInstances.addMenusXmlNodeSPListString = (a, ndNewItem, b, c) => GetMenus(ndNewItem);
+            var itemCollection = new ShimSPListItemCollection();
+            itemCollection.Bind(new List<SPListItem>
+            {
+                new ShimSPListItem()
+            });
+            ShimSPList.AllInstances.GetItemsSPQuery = (_, __) => itemCollection.Instance;
+            ShimSPList.AllInstances.GetItemsSPView = (_, __) => itemCollection.Instance;
+        }
 
-            ShimSPView.AllInstances.UrlGet = _ => ExampleUrl;
+        private void PrepareSpUserRelatedShims()
+        {
+            ShimSPUser.AllInstances.IDGet = _ => 1;
+            ShimSPUser.AllInstances.LoginNameGet = _ => DummyText;
+            ShimSPUser.AllInstances.NameGet = _ => DummyText;
+        }
 
-            ShimSPContentTypeCollection.AllInstances.ItemGetInt32 = (_, __) => new ShimSPContentType { NameGet = () => TypeTextPlain };
-
-            ShimSPFormCollection.AllInstances.ItemGetPAGETYPE = (_, __) => new ShimSPForm();
-            ShimSPForm.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
-
+        private void PrepareSpFieldRelatedShims(string internalname, SPFieldType fieldType)
+        {
             ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPField();
             ShimSPFieldCollection.AllInstances.ContainsFieldWithStaticNameString = (_, __) => true;
             ShimSPField.AllInstances.IdGet = _ => Guid.NewGuid();
             ShimSPField.AllInstances.InternalNameGet = _ => internalname;
+            ShimSPField.AllInstances.TypeAsStringGet = _ => internalname;
             ShimSPField.AllInstances.TypeGet = _ => fieldType;
             ShimSPField.AllInstances.ReadOnlyFieldGet = _ => false;
             ShimSPField.AllInstances.ShowInEditFormGet = _ => true;
             ShimSPField.AllInstances.SchemaXmlGet = _ => "<root>1</root>";
             ShimSPField.AllInstances.ParentListGet = _ => new ShimSPList();
+            ShimSPField.AllInstances.TitleGet = _ => DummyText;
             ShimSPFieldLookupValue.ConstructorString = (_, __) => { };
             ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => 1;
             ShimSPFieldLookupValue.AllInstances.LookupValueGet = _ => DummyVal;
@@ -1007,8 +1036,20 @@ namespace EPMLiveWebParts.Tests
                 var enumerator = list.GetEnumerator();
                 ShimList<SPFieldUserValue>.AllInstances.GetEnumerator = x => enumerator;
             };
+        }
 
-            ShimSPWeb.AllInstances.IDGet = _ => new Guid(webId);
+        private void PrepareSpFileRelatedShims()
+        {
+            ShimSPFolderCollection.AllInstances.ItemGetString = (_, __) => new ShimSPFolder();
+            ShimSPFolder.AllInstances.SubFoldersGet = _ => new ShimSPFolderCollection();
+            ShimSPFolder.AllInstances.FilesGet = _ => new ShimSPFileCollection();
+            ShimSPFileCollection.AllInstances.ItemGetInt32 = (_, __) => new ShimSPFile();
+            ShimSPFile.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
+        }
+
+        private void PrepareSpWebRelatedShims(string webId = null)
+        {
+            ShimSPWeb.AllInstances.IDGet = _ => webId == null ? Guid.NewGuid() : new Guid(webId);
             ShimSPWeb.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
             ShimSPWeb.AllInstances.UrlGet = _ => ExampleUrl;
             ShimSPWeb.AllInstances.ListsGet = _ => new ShimSPListCollection();
@@ -1017,17 +1058,8 @@ namespace EPMLiveWebParts.Tests
             ShimSPWeb.AllInstances.FoldersGet = _ => new ShimSPFolderCollection();
             ShimSPWeb.AllInstances.TitleGet = _ => "1";
             ShimSPWeb.AllInstances.SiteGet = _ => new ShimSPSite();
+            ShimSPWeb.AllInstances.LocaleGet = _ => CultureInfo.InvariantCulture;
             ShimSPSite.AllInstances.UrlGet = _ => ExampleUrl;
-
-            ShimSPFolderCollection.AllInstances.ItemGetString = (_, __) => new ShimSPFolder();
-            ShimSPFolder.AllInstances.SubFoldersGet = _ => new ShimSPFolderCollection();
-            ShimSPFolder.AllInstances.FilesGet = _ => new ShimSPFileCollection();
-            ShimSPFileCollection.AllInstances.ItemGetInt32 = (_, __) => new ShimSPFile();
-            ShimSPFile.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
-
-            ShimSPUser.AllInstances.IDGet = _ => 1;
-            ShimSPUser.AllInstances.LoginNameGet = _ => DummyText;
-            ShimSPUser.AllInstances.NameGet = _ => DummyText;
         }
 
         private XmlNode GetMenus(XmlNode ndNewItem)
