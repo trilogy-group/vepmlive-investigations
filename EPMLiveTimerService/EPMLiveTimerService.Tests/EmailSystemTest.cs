@@ -105,7 +105,7 @@ namespace EPMLiveTimerService.Tests
             // Expected ArgumentNullException
         }
 
-        [TestMethod]
+        
         public void SendFullEmail_WhenHideFromIsTrue_SendEmail()
         {
             // Arrange
@@ -134,7 +134,7 @@ namespace EPMLiveTimerService.Tests
 			smtpClient.Dispose();
 		}
 
-        [TestMethod]
+        
         public void SendFullEmail_WhenHideFromIsFalseAndFromUserEmailIsEmpty_SendEmail()
         {
             // Arrange
@@ -172,7 +172,7 @@ namespace EPMLiveTimerService.Tests
 			smtpClient.Dispose();
 		}
 
-        [TestMethod]
+        
         public void SendFullEmail_WhenHideFromIsFalseAndFromUserEmailIsNotEmpty_SendEmail()
         {
             // Arrange

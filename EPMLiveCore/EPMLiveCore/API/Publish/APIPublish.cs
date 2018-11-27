@@ -547,52 +547,7 @@ namespace EPMLiveCore.API
                                         command.Parameters.AddWithValue("@itemid", sID);
                                         command.Parameters.AddWithValue("@key", sPlannerID);
 
-                                        using (var dataReader = command.ExecuteReader())
-                                        {
-                                            if (dataReader.Read())
-                                            {
-                                                var status = string.Empty;
-                                                var result = (dataReader.IsDBNull(3)) ? string.Empty : dataReader.GetString(3);
-                                                var resulttext = (dataReader.IsDBNull(4)) ? string.Empty : dataReader.GetString(4);
-                                                var dtfinish = (dataReader.IsDBNull(2)) ? string.Empty : dataReader.GetDateTime(2).ToString();
-
-                                                switch (dataReader.GetInt32(1))
-                                                {
-                                                    case 0:
-                                                        status = "Queued";
-                                                        break;
-                                                    case 1:
-                                                        status = "Processing";
-                                                        break;
-                                                    case 2:
-                                                        status = "Complete";
-                                                        break;
-                                                    default:
-                                                        status = string.Empty;
-                                                        break;
-                                                }
-
-                                                var parseResult = false;
-                                                if (bool.TryParse(showresults, out parseResult)
-                                                    && parseResult)
-                                                {
-                                                    message = "<PublishStatus Status=\"" + status + "\" PercentComplete=\"" +
-                                                              dataReader.GetInt32(0) +
-                                                              "\" TimeFinished=\"" + dtfinish + "\" Result=\"" + result + "\"><![CDATA[" +
-                                                              resulttext + "]]></PublishStatus>";
-                                                }
-                                                else
-                                                {
-                                                    message = "<PublishStatus Status=\"" + status + "\" PercentComplete=\"" +
-                                                              dataReader.GetInt32(0) +
-                                                              "\" TimeFinished=\"" + dtfinish + "\" Result=\"" + result + "\"/>";
-                                                }
-                                            }
-                                            else
-                                            {
-                                                message = "<PublishStatus/>";
-                                            }
-                                        }
+                                        message = PublishHelper.ParseResults(command, showresults);
                                     }
                                 }
                             }

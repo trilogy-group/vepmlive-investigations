@@ -178,6 +178,7 @@
     <Compile Include="API\Comments\CommentManager.Utils.cs" />
     <Compile Include="API\Comments\XmlDataManager.cs" />
     <Compile Include="API\CreateWorkspace\DAL.cs" />
+    <Compile Include="API\CreateWorkspace\WorkspaceQueries.cs" />
     <Compile Include="API\CreateWorkspace\WorkspaceController.cs" />
     <Compile Include="API\CreateWorkspace\WorkspaceFactory.cs" />
     <Compile Include="API\CreateWorkspace\WorkspaceTimerjobAgent.cs" />
@@ -214,6 +215,7 @@
     <Compile Include="API\ProjectDiscountRate\ProjectDiscountRateService.cs" />
     <Compile Include="API\PropertyHash.cs" />
     <Compile Include="API\Publish\APIPublish.cs" />
+    <Compile Include="API\Publish\PublishHelper.cs" />
     <Compile Include="API\Reporting\Reporting.cs" />
     <Compile Include="API\ResourceGrid\ResourceExporter.cs" />
     <Compile Include="API\ResourceGrid\ResourceGrid.cs" />
