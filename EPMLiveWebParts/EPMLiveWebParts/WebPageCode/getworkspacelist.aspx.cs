@@ -23,6 +23,7 @@ using System.Xml;
 using System.Data.SqlClient;
 using System.Collections;
 using System.Text.RegularExpressions;
+using EPMLiveCore;
 
 namespace EPMLiveWebparts
 {
@@ -96,42 +97,14 @@ namespace EPMLiveWebparts
             else
             {
                 SPSite site = SPContext.Current.Site;
-                
-                SPWeb web = site.RootWeb;
-                if (strSite == "false")
-                    web = SPContext.Current.Web;
-                web.Site.CatchAccessDeniedException = false;
 
-                doc.LoadXml("<rows></rows>");
-
-                XmlNode mainNode = doc.ChildNodes[0];
-                XmlNode headNode = doc.CreateNode(XmlNodeType.Element, "head", doc.NamespaceURI);
-                XmlNode ndSettings = doc.CreateNode(XmlNodeType.Element, "settings", doc.NamespaceURI);
-                XmlNode ndColwith = doc.CreateNode(XmlNodeType.Element, "colwidth", doc.NamespaceURI);
-                ndColwith.InnerText = "%";
-                ndSettings.AppendChild(ndColwith);
-                headNode.AppendChild(ndSettings);
-
-                mainNode.AppendChild(headNode);
-
-                XmlAttribute attrType = doc.CreateAttribute("type");
-                attrType.Value = "tree";
-                XmlAttribute attrWidth = doc.CreateAttribute("width");
-                attrWidth.Value = "100";
-                XmlNode newNode = doc.CreateNode(XmlNodeType.Element, "column", doc.NamespaceURI);
-                newNode.Attributes.Append(attrType);
-                newNode.Attributes.Append(attrWidth);
-                newNode.InnerText = "Sites";
-
-                headNode.AppendChild(newNode);
-
-                try
-                {
-                    addWebs(web, mainNode);
-                }
-                catch { }
-                data = doc.OuterXml;
-
+                GetWorkspaceListTree.AddMainNode(
+                    site,
+                    strSite,
+                    "Sites",
+                    doc,
+                    addWebs,
+                    ref data);
             }
         }
 
