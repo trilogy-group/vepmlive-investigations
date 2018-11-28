@@ -84,6 +84,12 @@ namespace PortfolioEngineCore.Tests
         private const string GetResourceDisplayFieldsMethodName = "GetResourceDisplayFields";
         private const string BuildResourceSelectQueryMethodName = "BuildResourceSelectQuery";
         private const string GetPIResourcesXMLMethodName = "GetPIResourcesXML";
+        private const string GetCustomFieldNameFromIDMethodName = "GetCustomFieldNameFromID";
+        private const string GetCostCategoryRolesMethodName = "GetCostCategoryRoles";
+        private const string GetCFFieldNameMethodName = "GetCFFieldName";
+        private const string GetPeriodsMethodName = "GetPeriods";
+        private const string ReadUserInfoMethodName = "ReadUserInfo";
+        private const string BuildPortfolioResourcesSelectQueryMethodName = "BuildPortfolioResourcesSelectQuery";
 
         [TestInitialize]
         public void Setup()
@@ -860,6 +866,287 @@ namespace PortfolioEngineCore.Tests
                 () => actual.ShouldBeTrue(),
                 () => parameters[3].ShouldBe(xmlString),
                 () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetCustomFieldNameFromID_WhenCalled_ReturnsTableNameAndFieldName()
+        {
+            // Arrange
+            var parameters = new object[]
+            {
+                new DBAccess(DummyString, new SqlConnection()),
+                One,
+                DummyString,
+                DummyString
+            };
+
+            ShimResourceSelector.GetCFFieldNameInt32Int32StringOutStringOut =
+                (int lTableID, int lFieldID, out string sTable, out string sField) =>
+                {
+                    sTable = DummyString;
+                    sField = DummyString;
+                    if (lTableID.Equals(One) && lFieldID.Equals(One))
+                    {
+                        validations += 1;
+                    }
+                };
+
+            // Act
+            var actual = (StatusEnum)privateObject.Invoke(GetCustomFieldNameFromIDMethodName, nonPublicStatic, parameters);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(StatusEnum.rsSuccess),
+                () => validations.ShouldBe(1),
+                () => parameters[2].ShouldBe(DummyString),
+                () => parameters[3].ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void GetCostCategoryRoles_WhenCalled_Returns()
+        {
+            // Arrange
+            var parameters = new object[]
+            {
+                new DBAccess(DummyString, new SqlConnection()),
+                One,
+                One,
+                new Dictionary<string, CStruct>()
+            };
+            var readHit = 0;
+
+            dataReader.Read = () =>
+            {
+                readHit += 1;
+                return readHit <= One;
+            };
+            ShimSqlCommand.AllInstances.ExecuteReader = _ =>
+            {
+                readHit = 0;
+                return dataReader;
+            };
+            ShimCommon.AddIDToListStringRefInt32 = (ref string sList, int lID) =>
+            {
+                sList = One.ToString();
+                return true;
+            };
+            ShimCommon.AppendItemToListStringString = (_, _1) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            var actual = (StatusEnum)privateObject.Invoke(GetCostCategoryRolesMethodName, nonPublicStatic, parameters);
+            var ccroles = (Dictionary<string, CStruct>)parameters[3];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(StatusEnum.rsSuccess),
+                () => ccroles.Count.ShouldBe(One),
+                () => ccroles[One.ToString()].GetIntAttr("ID").ShouldBe(One),
+                () => ccroles[One.ToString()].GetIntAttr("Level").ShouldBe(One),
+                () => ccroles[One.ToString()].GetIntAttr("RoleUID").ShouldBe(One),
+                () => ccroles[One.ToString()].GetStringAttr("Name").ShouldBe(DummyString),
+                () => validations.ShouldBe(Two));
+        }
+
+        [TestMethod]
+        public void GetCFFieldName_WhenCalled_ReturnsTableNameAndFieldName()
+        {
+            // Arrange
+            var format = Five.ToString("000");
+            var fieldId = Five.ToString("0");
+            var expectedTableNames = new Dictionary<CustomFieldDBTable, string>()
+            {
+                [CustomFieldDBTable.ResourceINT] = "EPGC_RESOURCE_INT_VALUES",
+                [CustomFieldDBTable.ResourceTEXT] = "EPGC_RESOURCE_TEXT_VALUES",
+                [CustomFieldDBTable.ResourceDEC] = "EPGC_RESOURCE_DEC_VALUES",
+                [CustomFieldDBTable.ResourceNTEXT] = "EPGC_RESOURCE_NTEXT_VALUES",
+                [CustomFieldDBTable.ResourceDATE] = "EPGC_RESOURCE_DATE_VALUES",
+                [CustomFieldDBTable.ResourceMV] = "EPGC_RESOURCE_MV_VALUES",
+                [CustomFieldDBTable.PortfolioINT] = "EPGP_PROJECT_INT_VALUES",
+                [CustomFieldDBTable.PortfolioTEXT] = "EPGP_PROJECT_TEXT_VALUES",
+                [CustomFieldDBTable.PortfolioDEC] = "EPGP_PROJECT_DEC_VALUES",
+                [CustomFieldDBTable.PortfolioNTEXT] = "EPGP_PROJECT_NTEXT_VALUES",
+                [CustomFieldDBTable.PortfolioDATE] = "EPGP_PROJECT_DATE_VALUES",
+                [CustomFieldDBTable.Program] = "EPGP_PI_PROGS",
+                [(CustomFieldDBTable)301] = "EPGX_PROJ_INT_VALUES",
+                [(CustomFieldDBTable)302] = "EPGX_PROJ_TEXT_VALUES",
+                [(CustomFieldDBTable)303] = "EPGX_PROJ_DEC_VALUES",
+                [(CustomFieldDBTable)304] = "EPGX_PROJ_NTEXT_VALUES",
+                [(CustomFieldDBTable)305] = "EPGX_PROJ_DATE_VALUES",
+                [(CustomFieldDBTable)402] = "EPGP_PI_PROGS",
+                [(CustomFieldDBTable)801] = "EPGP_PI_WORKITEMS",
+                [(CustomFieldDBTable)802] = "EPGP_PI_WORKITEMS",
+                [(CustomFieldDBTable)803] = "EPGP_PI_WORKITEMS",
+                [(CustomFieldDBTable)999] = "Unknown Table"
+            };
+            var expectedFieldNames = new Dictionary<CustomFieldDBTable, string>()
+            {
+                [CustomFieldDBTable.ResourceINT] = $"RI_{format}",
+                [CustomFieldDBTable.ResourceTEXT] = $"RT_{format}",
+                [CustomFieldDBTable.ResourceDEC] = $"RC_{format}",
+                [CustomFieldDBTable.ResourceNTEXT] = $"RN_{format}",
+                [CustomFieldDBTable.ResourceDATE] = $"RD_{format}",
+                [CustomFieldDBTable.ResourceMV] = "MVR_UID",
+                [CustomFieldDBTable.PortfolioINT] = $"PI_{format}",
+                [CustomFieldDBTable.PortfolioTEXT] = $"PT_{format}",
+                [CustomFieldDBTable.PortfolioDEC] = $"PC_{format}",
+                [CustomFieldDBTable.PortfolioNTEXT] = $"PN_{format}",
+                [CustomFieldDBTable.PortfolioDATE] = $"PD_{format}",
+                [CustomFieldDBTable.Program] = "PROG_UID",
+                [(CustomFieldDBTable)301] = $"XI_{format}",
+                [(CustomFieldDBTable)302] = $"XT_{format}",
+                [(CustomFieldDBTable)303] = $"XC_{format}",
+                [(CustomFieldDBTable)304] = $"XN_{format}",
+                [(CustomFieldDBTable)305] = $"XD_{format}",
+                [(CustomFieldDBTable)402] = $"PROG_PI_TEXT{fieldId}",
+                [(CustomFieldDBTable)801] = $"WORKITEM_FLAG{fieldId}",
+                [(CustomFieldDBTable)802] = $"WORKITEM_CTEXT{fieldId}",
+                [(CustomFieldDBTable)803] = $"WORKITEM_NUMBER{fieldId}",
+                [(CustomFieldDBTable)999] = string.Empty
+            };
+            var parameters = new object[]
+            {
+                One,
+                Five,
+                DummyString,
+                DummyString
+            };
+
+            // Act
+            foreach (var key in expectedTableNames.Keys)
+            {
+                parameters[0] = key;
+                privateObject.Invoke(GetCFFieldNameMethodName, nonPublicStatic, parameters);
+                if (parameters[2].Equals(expectedTableNames[key]) && parameters[3].Equals(expectedFieldNames[key]))
+                {
+                    validations += 1;
+                }
+            }
+
+            // Assert
+            validations.ShouldBe(22);
+        }
+
+        [TestMethod]
+        public void GetPeriods_WhenCalled_ReturnsPeriodsList()
+        {
+            // Arrange
+            var parameters = new object[]
+            {
+                new DBAccess(DummyString, new SqlConnection()),
+                One,
+                default(List<CPeriod>)
+            };
+            var readHit = 0;
+
+            dataReader.Read = () =>
+            {
+                readHit += 1;
+                return readHit <= Three;
+            };
+            ShimSqlCommand.AllInstances.ExecuteReader = _ =>
+            {
+                readHit = 0;
+                return dataReader;
+            };
+
+            // Act
+            var actual = (StatusEnum)privateObject.Invoke(GetPeriodsMethodName, nonPublicStatic, parameters);
+            var periods = (List<CPeriod>)parameters[2];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(StatusEnum.rsSuccess),
+                () => readHit.ShouldBe(4),
+                () => periods.Count.ShouldBe(3),
+                () => periods.Count(x => x.PeriodID.Equals(DummyInt)).ShouldBe(3),
+                () => periods.Count(x => x.PeriodName.Equals(DummyString)).ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void ReadUserInfo_WhenCalled_ReturnsDataAndXml()
+        {
+            // Arrange
+            var parameters = new object[]
+            {
+                new DBAccess(DummyString, new SqlConnection()),
+                One,
+                UserInfoContextsEnum.siEVEditorPISettings,
+                Zero,
+                string.Empty
+            };
+
+            // Act
+            var actual = (StatusEnum)privateObject.Invoke(ReadUserInfoMethodName, nonPublicStatic, parameters);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(StatusEnum.rsSuccess),
+                () => parameters[3].ShouldBe(DummyInt),
+                () => parameters[4].ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void BuildPortfolioResourcesSelectQuery_WhenCalled_ReturnsSelectQuery()
+        {
+            // Arrange
+            const string displayFieldsXml = @"
+                <xmlcfg>
+                    <RowLimit>0</RowLimit>
+                    <Items>
+                        <Item FieldFormat=""4"" FieldID=""1"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""4"" FieldID=""9005"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""4"" FieldID=""9015"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""9"" FieldID=""9004""/>
+                        <Item FieldFormat=""9"" FieldID=""1""/>
+                        <Item FieldFormat=""96"" FieldID=""9020""/>
+                    </Items>
+                </xmlcfg>";
+            var expected = new List<string>()
+            {
+                "C2.LV_VALUE AS Field1",
+                "TSDEPT3.LV_VALUE AS Field9005",
+                "RPDEPT4.LV_VALUE AS Field9015",
+                "T5.DummyString AS Field1",
+                "C7.RT_NAME AS Field9020",
+                "LEFT JOIN DummyString C1 ON WR.WRES_ID = C1.WRES_ID",
+                "LEFT JOIN EPGP_LOOKUP_VALUES C2 ON C2.LV_UID = C1.DummyString",
+                "LEFT JOIN DummyString T5 ON WR.WRES_ID = T5.WRES_ID",
+                "LEFT JOIN EPGP_COST_RATES C6 ON WR.WRES_ID = C6.WRES_ID",
+                "LEFT JOIN EPG_RATES C7 ON C7.RT_UID = C6.RT_UID",
+                $"INNER JOIN dbo.EPG_FN_ConvertListToTable(N'{One}') LT on WR.WRES_ID=LT.TokenVal"
+            };
+            var displayFields = new CStruct();
+
+            displayFields.LoadXML(displayFieldsXml);
+
+            ShimResourceSelector.GetCustomFieldNameFromIDDBAccessInt32StringOutStringOut =
+                (DBAccess dba, int lFieldID, out string sTableName, out string sFieldName) =>
+                {
+                    sTableName = DummyString;
+                    sFieldName = DummyString;
+                    return StatusEnum.rsSuccess;
+                };
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                BuildPortfolioResourcesSelectQueryMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    new DBAccess(DummyString, new SqlConnection()),
+                    One,
+                    displayFields.GetSubStruct("Items").GetList("Item"),
+                    One.ToString(),
+                    One,
+                    One
+                });
+
+            // Assert
+            expected.Any(x => !actual.Contains(x)).ShouldBeFalse();
         }
     }
 }
