@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Globalization;
 using System.Text;
 using System.Web;
 using System.Xml;
@@ -634,161 +635,7 @@ namespace EPMLiveWorkPlanner
                     }
                     else if (field.InternalName != "LinkTitle" && field.InternalName != "Title")
                     {
-                        string displayValue = "";
-                        switch (field.Type)
-                        {
-                            case SPFieldType.User:
-
-                                if (useResourcePool)
-                                {
-                                    SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(data);
-                                    data = "";
-                                    foreach (SPFieldLookupValue lv in lvc)
-                                    {
-                                        data += "," + lv.LookupValue;
-                                    }
-                                    if (data.Length > 1)
-                                        data = data.Substring(1);
-                                    sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                }
-                                else
-                                {
-                                    SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(li.Web, data);
-
-                                    foreach (SPFieldUserValue uv in uvc)
-                                    {
-                                        displayValue += "\n" + uv.User.LoginName + "\n" + uv.User.Name;
-                                    }
-                                    if (displayValue.Length > 1)
-                                        displayValue = displayValue.Substring(1);
-
-                                    //displayValue += "\t";
-
-                                    //if (hshComboCells.Contains(field.InternalName + "-" + li.Web.ID.ToString()))
-                                    //{
-                                    //    displayValue += hshComboCells[field.InternalName + "-" + li.Web.ID.ToString()].ToString();
-                                    //}
-                                    //else
-                                    //{
-                                    //    string mode = "";
-                                    //    try
-                                    //    {
-                                    //        mode = fieldXml.FirstChild.Attributes["UserSelectionMode"].Value;
-                                    //    }
-                                    //    catch { }
-
-                                    //    string userList = getMultiUser(mode, li.Web);
-                                    //    hshComboCells[field.InternalName + "-" + li.Web.ID.ToString()] = userList;
-                                    //    displayValue += userList;
-                                    //}
-                                    sb.Append("<cell><![CDATA[" + displayValue + "]]></cell>");
-                                }
-                                break;
-                            case SPFieldType.Currency:
-                                try
-                                {
-                                    float fl = float.Parse(data);
-                                    data = fl.ToString(nf); 
-                                }
-                                catch {  }
-                                sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                break;
-                            case SPFieldType.DateTime:
-                                try
-                                {
-                                    data = DateTime.Parse(data).ToShortDateString();
-                                }
-                                catch { }
-                                sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                break;
-                            case SPFieldType.Number:
-                                if (field.SchemaXml.Contains("Percentage=\"TRUE\""))
-                                {
-                                    try
-                                    {
-                                        float val = float.Parse(data) * 100;
-                                        data = val.ToString(nf);
-
-                                    }
-                                    catch { }
-                                    sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        float val = float.Parse(data);
-                                        data = val.ToString(nf);
-
-                                    }
-                                    catch { }
-                                    sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                }
-                                break;
-                            case SPFieldType.Calculated:
-                                data = li.Fields.GetFieldByInternalName(f).GetFieldValueAsText(data);
-                                try
-                                {
-                                    data = data.Replace(";#", "\n").Split('\n')[1];
-                                }
-                                catch { }
-                                if (field.Description == "Indicator")
-                                {
-                                    sb.Append("<cell><![CDATA[<img src=\"" + li.Web.Url + "/_layouts/images/" + data + "\">]]></cell>");
-                                }
-                                else
-                                {
-                                    sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                }
-
-                                break;
-                            case SPFieldType.MultiChoice:
-                                //try
-                                //{
-                                //    data = data.Replace(";#", ",");
-                                //    data = data.Substring(1, data.Length - 2);
-                                //}
-                                //catch { }
-                                //sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                //string cval;
-                                if (data != "")
-                                {
-                                    SPFieldMultiChoiceValue mcv = new SPFieldMultiChoiceValue(data);
-
-                                    //string choices = data;
-                                    //choices = choices.Replace(";#", "\n");
-                                    for (int i = 0; i < mcv.Count; i++)
-                                    {
-                                        string choice = mcv[i];
-                                        displayValue += "\n" + choice + ";#" + choice;
-                                    }
-                                    if (displayValue.Length > 1)
-                                        displayValue = displayValue.Substring(1);
-                                }
-                                sb.Append("<cell><![CDATA[" + displayValue + "]]></cell>");
-                                break;
-                            case SPFieldType.Lookup:
-                                if (field.TypeAsString == "LookupMulti")
-                                {
-                                    sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                }
-                                else
-                                {
-                                    data = data.Replace(";#", "\n").Split('\n')[0];
-                                    sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                }
-
-                                break;
-                            case SPFieldType.Boolean:
-                                if (data == "True")
-                                    sb.Append("<cell>1</cell>");
-                                else
-                                    sb.Append("<cell>0</cell>");
-                                break;
-                            default:
-                                sb.Append("<cell><![CDATA[" + HttpUtility.HtmlEncode(data) + "]]></cell>");
-                                break;
-                        }
+                        ProcessFieldType(useResourcePool, li, field, data, sb, nf, f, li.Web.Url);
                     }
                     else
                     {
@@ -798,6 +645,172 @@ namespace EPMLiveWorkPlanner
                 catch { sb.Append("<cell/>"); }
             }
             return sb.ToString();
+        }
+
+        internal static void ProcessFieldType(
+            bool useResourcePool,
+            SPListItem listItem,
+            SPField field,
+            string data,
+            StringBuilder stringBuilder,
+            NumberFormatInfo numberFormatInfo,
+            string fieldInternalName,
+            string webUrl)
+        {
+            var displayValue = string.Empty;
+            switch (field.Type)
+            {
+                case SPFieldType.User:
+
+                    if (useResourcePool)
+                    {
+                        var lookupValueCollection = new SPFieldLookupValueCollection(data);
+                        data = string.Empty;
+                        var dataStringBuilder = new StringBuilder(data);
+                        foreach (var lookupValue in lookupValueCollection)
+                        {
+                            dataStringBuilder.Append(string.Format(",{0}", lookupValue.LookupValue));
+                        }
+                        data = dataStringBuilder.ToString();
+
+                        if (data.Length > 1)
+                        {
+                            data = data.Substring(1);
+                        }
+                        stringBuilder.AppendFormat("<cell><![CDATA[{0}]]></cell>", data);
+                    }
+                    else
+                    {
+                        var userValueCollection = new SPFieldUserValueCollection(listItem.Web, data);
+
+                        var displayValueStringBuilder = new StringBuilder(displayValue);
+                        foreach (var userValue in userValueCollection)
+                        {
+                            displayValueStringBuilder.Append(string.Format("\n{0}\n{1}", userValue.User.LoginName, userValue.User.Name));
+                        }
+                        displayValue = displayValueStringBuilder.ToString();
+                        if (displayValue.Length > 1)
+                        {
+                            displayValue = displayValue.Substring(1);
+                        }
+                        stringBuilder.AppendFormat("<cell><![CDATA[{0}]]></cell>", displayValue);
+                    }
+                    break;
+                case SPFieldType.Currency:
+                    try
+                    {
+                        var parsedData = float.Parse(data);
+                        data = parsedData.ToString(numberFormatInfo);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Trace.TraceError("Expression Suppressed {0}", ex);
+                    }
+                    stringBuilder.AppendFormat("<cell><![CDATA[{0}]]></cell>", data);
+                    break;
+                case SPFieldType.DateTime:
+                    try
+                    {
+                        data = DateTime.Parse(data).ToShortDateString();
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Trace.TraceError("Expression Suppressed {0}", ex);
+                    }
+                    stringBuilder.AppendFormat("<cell><![CDATA[{0}]]></cell>", data);
+                    break;
+                case SPFieldType.Number:
+                    if (field.SchemaXml.Contains("Percentage=\"TRUE\""))
+                    {
+                        try
+                        {
+                            var parsedData = float.Parse(data) * 100;
+                            data = parsedData.ToString(numberFormatInfo);
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Trace.TraceError("Expression Suppressed {0}", ex);
+                        }
+                        stringBuilder.AppendFormat("<cell><![CDATA[{0}]]></cell>", data);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            var parsedData = float.Parse(data);
+                            data = parsedData.ToString(numberFormatInfo);
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Trace.TraceError("Expression Suppressed {0}", ex);
+                        }
+                        stringBuilder.AppendFormat("<cell><![CDATA[{0}]]></cell>", data);
+                    }
+                    break;
+                case SPFieldType.Calculated:
+                    data = listItem.Fields.GetFieldByInternalName(fieldInternalName).GetFieldValueAsText(data);
+                    try
+                    {
+                        data = data.Replace(";#", "\n").Split('\n')[1];
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Trace.TraceError("Expression Suppressed {0}", ex);
+                    }
+                    if (field.Description == "Indicator")
+                    {
+                        stringBuilder.AppendFormat(
+                            "<cell><![CDATA[<img src=\"{0}/_layouts/images/{1}\">]]></cell>",
+                            webUrl,
+                            data);
+                    }
+                    else
+                    {
+                        stringBuilder.AppendFormat("<cell><![CDATA[{0}]]></cell>", data);
+                    }
+
+                    break;
+                case SPFieldType.MultiChoice:
+                    if (data != string.Empty)
+                    {
+                        var multiChoiceValue = new SPFieldMultiChoiceValue(data);
+                        var displayValueStringBuilder = new StringBuilder(displayValue);
+                        for (var i = 0; i < multiChoiceValue.Count; i++)
+                        {
+                            var choice = multiChoiceValue[i];
+                            displayValueStringBuilder.Append(string.Format("\n{0};#{0}", choice));
+                        }
+                        displayValue = displayValueStringBuilder.ToString();
+
+                        if (displayValue.Length > 1)
+                        {
+                            displayValue = displayValue.Substring(1);
+                        }
+                    }
+                    stringBuilder.AppendFormat("<cell><![CDATA[{0}]]></cell>", displayValue);
+                    break;
+                case SPFieldType.Lookup:
+                    if (field.TypeAsString == "LookupMulti")
+                    {
+                        stringBuilder.AppendFormat("<cell><![CDATA[{0}]]></cell>", data);
+                    }
+                    else
+                    {
+                        data = data.Replace(";#", "\n").Split('\n')[0];
+                        stringBuilder.AppendFormat("<cell><![CDATA[{0}]]></cell>", data);
+                    }
+
+                    break;
+                case SPFieldType.Boolean:
+                    stringBuilder.Append(
+                        string.Equals(data, bool.TrueString, StringComparison.OrdinalIgnoreCase)
+                            ? "<cell>1</cell>"
+                            : "<cell>0</cell>");
+                    break;
+                default:
+                    stringBuilder.AppendFormat("<cell><![CDATA[{0}]]></cell>", HttpUtility.HtmlEncode(data));
+                    break;
+            }
         }
     }
 }
