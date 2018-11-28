@@ -7,9 +7,13 @@ import {HomePage} from '../../../../page-objects/pages/homepage/home.po';
 import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
 import {ResourceAnalyzerPageHelper} from '../../../../page-objects/pages/resource-analyzer-page/resource-analyzer-page.helper';
+import {ProjectItemPageHelper} from '../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import {LoginPageHelper} from '../../../../page-objects/pages/login/login-page.helper';
+import { ProjectItemSubPageHelper } from '../../../../page-objects/pages/items-page/project-item/project-item-page.subhelper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
+    let projectName = '';
 
     beforeEach(async () => {
 
@@ -20,6 +24,24 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     afterEach(async () => {
         await StepLogger.takeScreenShot();
+    });
+
+    beforeAll(async () => {
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
+        const uniqueId = PageHelper.getUniqueId();
+        projectName = await ProjectItemSubPageHelper.createProjectIfNoProjectCreated(uniqueId);
+        await LoginPageHelper.logout();
+    });
+
+    afterAll(async () => {
+        if (projectName !== '') {
+            loginPage = new LoginPage();
+            await loginPage.goToAndLogin();
+            await ProjectItemSubPageHelper.navigateToProjectPage();
+            await ProjectItemPageHelper.deleteProjectAndValidateIt(projectName);
+            await LoginPageHelper.logout();
+        }
     });
 
     it('Resource Analyzer period popup window. - [744532]', async () => {
