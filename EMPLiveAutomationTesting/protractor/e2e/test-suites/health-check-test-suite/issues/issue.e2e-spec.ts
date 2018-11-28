@@ -6,6 +6,7 @@ import {IssueItemPageHelper} from '../../../page-objects/pages/items-page/issue-
 import {ProjectItemPageHelper} from '../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {LoginPageHelper} from '../../../page-objects/pages/login/login-page.helper';
 import {ProjectItemSubPageHelper} from '../../../page-objects/pages/items-page/project-item/project-item-page.subhelper';
+import {Constants} from '../../../components/misc-utils/constants';
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;
@@ -31,7 +32,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
     });
 
     afterAll(async () => {
-        if (projectName !== '') {
+        if (projectName !== Constants.EMPTY_STRING) {
             loginPage = new LoginPage();
             await loginPage.goToAndLogin();
             await ProjectItemSubPageHelper.navigateToProjectPage();
