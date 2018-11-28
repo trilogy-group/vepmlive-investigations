@@ -3,12 +3,23 @@ import {StepLogger} from '../../../../core/logger/step-logger';
 import {SuiteNames} from '../../helpers/suite-names';
 import {LoginPage} from '../../../page-objects/pages/login/login.po';
 import {ChangeItemPageHelper} from '../../../page-objects/pages/items-page/change-item/change-item-page.helper';
+import {ProjectItemPageHelper} from '../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import {LoginPageHelper} from '../../../page-objects/pages/login/login-page.helper';
+import { ProjectItemSubPageHelper } from '../../../page-objects/pages/items-page/project-item/project-item-page.subhelper';
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;
+    let projectName = '';
+
+    beforeAll(async () => {
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
+        const uniqueId = PageHelper.getUniqueId();
+        projectName = await ProjectItemSubPageHelper.createProjectIfNoProjectCreated(uniqueId);
+        await LoginPageHelper.logout();
+    });
 
     beforeEach(async () => {
-
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
@@ -16,6 +27,16 @@ describe(SuiteNames.healthCheckTestSuite, () => {
 
     afterEach(async () => {
         await StepLogger.takeScreenShot();
+    });
+
+    afterAll(async () => {
+        if (projectName !== '') {
+            loginPage = new LoginPage();
+            await loginPage.goToAndLogin();
+            await ProjectItemSubPageHelper.navigateToProjectPage();
+            await ProjectItemPageHelper.deleteProjectAndValidateIt(projectName);
+            await LoginPageHelper.logout();
+        }
     });
 
     it('Add, Edit and Delete Change - [829742]', async () => {
