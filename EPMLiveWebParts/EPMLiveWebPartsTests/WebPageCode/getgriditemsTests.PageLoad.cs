@@ -5,6 +5,7 @@ using System.Collections.Fakes;
 using System.Collections.Generic;
 using System.Collections.Generic.Fakes;
 using System.Data;
+using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.DirectoryServices.ActiveDirectory.Fakes;
 using System.Globalization;
@@ -14,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Fakes;
+using System.Web.SessionState.Fakes;
 using System.Web.UI.Fakes;
 using System.Xml;
 using System.Xml.Fakes;
@@ -39,6 +41,7 @@ namespace EPMLiveWebParts.Tests
     {
         private const string Other = "Other";
         private const string MethodPageLoad = "Page_Load";
+        private string[] _rollupLists;
 
         [TestMethod]
         public void PageLoad_DocIcon_()
@@ -509,14 +512,57 @@ namespace EPMLiveWebParts.Tests
         public void PageLoad_ItemNodesNoAggregation_()
         {
             // Arrange
-            PrepareForPageLoad(Other, SPFieldType.Text);
-            ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><result></result></root>";
+            PrepareForPageLoad(Other, SPFieldType.Lookup);
+            ShimSPField.AllInstances.SchemaXmlGet = _ => $"<result List='{Guid.NewGuid().ToString()}' ShowField='field'></result>";
             SetItemNodes();
+
+            var listId = Guid.NewGuid();
+            FillParams(listId);
+            FillSpList(listId);
 
             // Act
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+        }
+
+        private static void FillSpList(Guid listId)
+        {
+            ShimSPList.AllInstances.FieldsGet = list =>
+            {
+                var fields = new List<SPFieldLookup>
+                {
+                    new ShimSPFieldLookup
+                    {
+                        LookupListGet = () => listId.ToString()
+                    }.Instance
+                };
+                var fieldCollection = new ShimSPFieldCollection();
+                fieldCollection.Bind(fields);
+                return fieldCollection.Instance;
+            };
+
+            var items = new List<SPListItem>
+            {
+                new ShimSPListItem().Instance
+            };
+            var itemCollection = new ShimSPListItemCollection();
+            itemCollection.Bind(items);
+            ShimSPList.AllInstances.ItemsGet = _ => itemCollection.Instance;
+        }
+
+        private void FillParams(Guid listId)
+        {
+            _privateObj.SetField("DifferentGroups", "User,Admin");
+            _privateObj.SetField("ReportID", "1");
+            _privateObj.SetField("filterfield", string.Empty);
+            _privateObj.SetField("LookupFilterField", DummyFieldName);
+            _privateObj.SetField("lookupFilterField", DummyFieldName);
+            _privateObj.SetField("lookupFilterFieldList", "1,2");
+            _privateObj.SetField("sSearchType", "2");
+            _privateObj.SetField("sSearchField", DummyFieldName);
+            _privateObj.SetField("sSearchValue", DummyVal);
+            CreateSqlConnection(listId);
         }
 
         private void SetItemNodes()
@@ -544,6 +590,22 @@ namespace EPMLiveWebParts.Tests
             var arrAggregationVals = new SortedList();
             arrAggregationVals.Add($"{DummyText}\nTitle", ",1,2");
             _privateObj.SetField("arrAggregationVals", arrAggregationVals);
+        }
+
+        private void CreateSqlConnection(Guid listId)
+        {
+            ShimSqlConnection.ConstructorString = (_, __) => { };
+            ShimSqlConnection.AllInstances.Open = _ => { };
+            ShimSqlConnection.AllInstances.Close = _ => { };
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            {
+                Read = () => true,
+                GetStringInt32 = x => "1",
+                GetGuidInt32 = x => listId,
+                Close = () => { }
+            };
         }
 
         private void AddUsersAndGroups()
@@ -579,10 +641,58 @@ namespace EPMLiveWebParts.Tests
             _privateObj.SetFieldOrProperty("DueDateField", "DueDateField");
             _privateObj.SetFieldOrProperty("ProgressField", "ProgressField");
 
+            SetupResponse();
+            SetupData();
+
+            ShimGridGanttSettings.ConstructorSPList = (_, __) => { };
+            var sets = new GridGanttSettings(new ShimSPList());
+            var privateSets = new PrivateObject(sets);
+            privateSets.SetField("TotalSettings", string.Empty);
+            ShimListCommands.GetGridGanttSettingsSPList = _ => sets;
+            ShimCoreFunctions.getConnectionStringGuid = _ => DummyText;
+
+            _rollupLists = new string[] { DummyVal };
+
+            PrepareSPContext();
+
+            GetParameters();
+            Shimgetgriditems.AllInstances.addItemSPListItemString = (a, b, c) => { };
+            Shimgetgriditems.AllInstances.addItemDataRow = (_, __) => { };
+
+            PrepareSpFieldRelatedShims(internalName, fieldType);
+            ShimSPView.AllInstances.QueryGet = _ => "<GroupBy><By Name='Title' Ascending='true'></By></GroupBy>";
+        }
+
+        private static void SetupData()
+        {
+            var columns = new string[]
+            {
+                DummyFieldName, "User", "UserText", "Admin", "AdminText", "WebID", "ListID", "ID"
+            };
+            var row = new object[]
+            {
+                DummyVal, DummyVal, DummyVal, DummyVal, DummyVal, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()
+            };
+
+            var dataTable = new DataTable();
+            dataTable.Columns.AddRange(columns.Select(x => new DataColumn(x)).ToArray());
+            dataTable.LoadDataRow(row, true);
+
+            ShimEPMData.SAccountInfoGuidGuid = (_, __) => dataTable.NewRow();
+            ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
+                (a, b, c, d, e) => dataTable;
+        }
+
+        private void SetupResponse()
+        {
             _responseWriter = new StringWriter();
             _response = new HttpResponse(_responseWriter);
             ShimPage.AllInstances.RequestGet = _ => new HttpRequest(string.Empty, ExampleUrl, string.Empty);
             ShimPage.AllInstances.ResponseGet = _ => _response;
+            ShimPage.AllInstances.SessionGet = _ => new ShimHttpSessionState()
+            {
+                ItemSetStringObject = (x, y) => { }
+            };
             ShimHttpRequest.AllInstances.ItemGetString = (_, key) =>
             {
                 switch (key)
@@ -594,25 +704,13 @@ namespace EPMLiveWebParts.Tests
                 }
             };
             ShimHttpResponse.AllInstances.ExpiresSetInt32 = (_, __) => { };
-            var row = new DataTable().NewRow();
-            ShimEPMData.SAccountInfoGuidGuid = (_, __) => row;
-
-            ShimGridGanttSettings.ConstructorSPList = (_, __) => { };
-            var sets = new GridGanttSettings(new ShimSPList());
-            var privateSets = new PrivateObject(sets);
-            privateSets.SetField("TotalSettings", string.Empty);
-            ShimListCommands.GetGridGanttSettingsSPList = _ => sets;
-            ShimCoreFunctions.getConnectionStringGuid = _ => DummyText;
-
-            PrepareSPContext();
-            GetParameters();
-            PrepareSpFieldRelatedShims(internalName, fieldType);
         }
 
         private void PrepareSPContext()
         {
             ShimSPContext.CurrentGet = () => new ShimSPContext();
             ShimSPContext.AllInstances.WebGet = _ => new ShimSPWeb();
+            ShimSPContext.AllInstances.SiteGet = _ => new ShimSPSite();
 
             PrepareSpWebRelatedShims();
             PrepareSpListRelatedShims();
@@ -652,7 +750,7 @@ namespace EPMLiveWebParts.Tests
                 _privateObj.SetField("arrColumns", arrColumns);
                 _privateObj.SetField("aHiddenViewFields", new ArrayList());
                 _privateObj.SetField("hshLists", hshLists);
-                _privateObj.SetField("rolluplists", new string[] { DummyVal });
+                _privateObj.SetField("rolluplists", _rollupLists);
                 _privateObj.SetField("inEditMode", true);
                 _privateObj.SetField("showCheckboxes", true);
                 _privateObj.SetField("isTimesheet", false);

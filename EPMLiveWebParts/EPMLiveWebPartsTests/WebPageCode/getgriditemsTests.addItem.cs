@@ -986,7 +986,9 @@ namespace EPMLiveWebParts.Tests
             ShimSPList.AllInstances.EnableVersioningGet = _ => true;
             ShimSPList.AllInstances.EnableModerationGet = _ => true;
             ShimSPList.AllInstances.ViewsGet = _ => new ShimSPViewCollection { ItemGetGuid = __ => new ShimSPView() };
+            ShimSPList.AllInstances.ItemsGet = _ => new ShimSPListItemCollection();
 
+            ShimSPListItemCollection.AllInstances.Add = _ => new ShimSPListItem();
             var itemCollection = new ShimSPListItemCollection();
             itemCollection.Bind(new List<SPListItem>
             {
