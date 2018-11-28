@@ -7,7 +7,6 @@ import {HomePage} from '../../../../page-objects/pages/homepage/home.po';
 import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
 import {ModelerPageHelper} from '../../../../page-objects/pages/items-page/project-item/modeler-page/modeler-page.helper';
-// import {ProjectItemPageHelper} from '../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {LoginPageHelper} from '../../../../page-objects/pages/login/login-page.helper';
 import {EditCostHelper} from '../../../../page-objects/pages/items-page/project-item/edit-cost-page/edit-cost.helper';
 
@@ -32,8 +31,10 @@ describe(SuiteNames.regressionTestSuite, () => {
         );
         id = PageHelper.getUniqueId();
         project1 = await EditCostHelper.createProjectWithCost(`${id} 1`);
+        StepLogger.subStep(`${project1} is created`);
         await EditCostHelper.clickCloseCostPlanner();
         project2 = await EditCostHelper.createProjectWithCost(`${id} 2`);
+        StepLogger.subStep(`${project2} is created`);
         await EditCostHelper.clickCloseCostPlanner();
         await LoginPageHelper.logout();
     });
@@ -220,8 +221,6 @@ describe(SuiteNames.regressionTestSuite, () => {
         await EditCostHelper.searchByName(id);
         // Step 2 is inside the below function
         await CommonPageHelper.selectTwoRecordsFromGrid();
-        // await CommonSubPageHelper.selectProject(project1);
-        // await CommonSubPageHelper.selectProject(project2);
         StepLogger.stepId(3);
         await CommonPageHelper.clickItemTab();
         await CommonPageHelper.gotoModeler();

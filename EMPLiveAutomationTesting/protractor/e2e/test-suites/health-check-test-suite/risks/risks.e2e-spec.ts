@@ -3,9 +3,9 @@ import {StepLogger} from '../../../../core/logger/step-logger';
 import {SuiteNames} from '../../helpers/suite-names';
 import {LoginPage} from '../../../page-objects/pages/login/login.po';
 import {RiskItemPageHelper} from '../../../page-objects/pages/items-page/risk-item/risk-item-page.helper';
-import { ProjectItemPageHelper } from '../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import { LoginPageHelper } from '../../../page-objects/pages/login/login-page.helper';
-import { ProjectItemSubPageHelper } from '../../../page-objects/pages/items-page/project-item/project-item-page.subhelper';
+import {ProjectItemPageHelper} from '../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import {LoginPageHelper} from '../../../page-objects/pages/login/login-page.helper';
+import {ProjectItemSubPageHelper} from '../../../page-objects/pages/items-page/project-item/project-item-page.subhelper';
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let loginPage: LoginPage;

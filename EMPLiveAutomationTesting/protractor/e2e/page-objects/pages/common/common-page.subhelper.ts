@@ -29,6 +29,7 @@ export class CommonSubPageHelper {
     static async selectCheckBox() {
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.dataRows.get(1));
         await ElementHelper.actionHoverOver(CommonPage.dataRows.get(1));
+        StepLogger.subStep('Cliick on checkbox');
         await PageHelper.click(CommonPage.rowsFirstColumn.get(1));
     }
 

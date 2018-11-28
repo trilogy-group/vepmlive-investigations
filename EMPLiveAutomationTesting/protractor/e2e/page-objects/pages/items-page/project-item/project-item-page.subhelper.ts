@@ -10,7 +10,7 @@ import { ProjectItemPageHelper } from './project-item-page.helper';
 export class ProjectItemSubPageHelper {
 
     static async navigateToProjectPage() {
-        StepLogger.verification('Navigate to page');
+        StepLogger.subVerification('Navigate to page');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,

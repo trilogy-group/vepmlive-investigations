@@ -9,7 +9,7 @@ import {CommonPageConstants} from '../../../../page-objects/pages/common/common-
 import {ResourceAnalyzerPageHelper} from '../../../../page-objects/pages/resource-analyzer-page/resource-analyzer-page.helper';
 import {ProjectItemPageHelper} from '../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {LoginPageHelper} from '../../../../page-objects/pages/login/login-page.helper';
-import { ProjectItemSubPageHelper } from '../../../../page-objects/pages/items-page/project-item/project-item-page.subhelper';
+import {ProjectItemSubPageHelper} from '../../../../page-objects/pages/items-page/project-item/project-item-page.subhelper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;

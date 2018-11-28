@@ -267,8 +267,11 @@ export class EditCostHelper {
 
     static async clickEditByCostFromEllipsis() {
         await ElementHelper.actionMouseMove(CommonPage.record);
+        StepLogger.subStep('Click on Ellipsis icon');
         await CommonPageHelper.clickIconEllipsisHorizontal();
+        StepLogger.subVerification('Verify all context menu options');
         await CommonPageHelper.verifyVariousOptionsOnContextMenu();
+        StepLogger.subStep('Click on Edit Cost link');
         await PageHelper.click(EditCost.editCostLinkViaEllipse);
     }
 }
