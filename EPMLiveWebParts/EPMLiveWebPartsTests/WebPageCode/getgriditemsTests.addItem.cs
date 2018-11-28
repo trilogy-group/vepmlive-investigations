@@ -32,6 +32,7 @@ namespace EPMLiveWebParts.Tests
         private const string ExampleUrl = "http://example.com";
         private const string TypeTextXml = "text/xml";
         private const string TypeTextPlain = "text/plain";
+        private const string TitleField = "Title";
         private const string AddItemMethod = "addItem";
         private bool _inEditmode;
         private bool _timesheet;
@@ -1131,17 +1132,17 @@ namespace EPMLiveWebParts.Tests
             _privateObj.SetField("aViewFields", aViewFields);
 
             var hshItemNodes = new Hashtable();
-            hshItemNodes.Add("Title", DummyVal);
-            hshItemNodes.Add("SiteUrl", "");
-            hshItemNodes.Add("List", "");
-            hshItemNodes.Add("Site", "");
+            hshItemNodes.Add(TitleField, DummyVal);
+            hshItemNodes.Add("SiteUrl", string.Empty);
+            hshItemNodes.Add("List", string.Empty);
+            hshItemNodes.Add("Site", string.Empty);
             hshItemNodes.Add(internalname + "Text", "Text");
-            hshItemNodes.Add("ItemID", "");
-            hshItemNodes.Add("Work", "");
-            hshItemNodes.Add("WorkspaceUrl", "");
+            hshItemNodes.Add("ItemID", string.Empty);
+            hshItemNodes.Add("Work", string.Empty);
+            hshItemNodes.Add("WorkspaceUrl", string.Empty);
             if (!hshItemNodes.ContainsKey(internalname))
             {
-                hshItemNodes.Add(internalname, "");
+                hshItemNodes.Add(internalname, string.Empty);
             }
             _privateObj.SetField("hshColumnSelectFilter", hshItemNodes);
             _privateObj.SetField("hshItemNodes", hshItemNodes);
@@ -1270,19 +1271,11 @@ namespace EPMLiveWebParts.Tests
 
         private XmlNode GetMenus(XmlNode ndNewItem)
         {
-            var viewMenus = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
-            string strViewMenus = "";
-
-            foreach (int v in viewMenus)
-            {
-                strViewMenus += "," + v.ToString();
-            }
-            strViewMenus = strViewMenus.Substring(1);
-            XmlNode ndUserData = _xmlDocument.CreateNode(XmlNodeType.Element, "userdata", _xmlDocument.NamespaceURI);
+            var strViewMenus = string.Join(',', Enumerable.Repeat("0", 14));
+            var ndUserData = _xmlDocument.CreateNode(XmlNodeType.Element, "userdata", _xmlDocument.NamespaceURI);
             ndUserData.InnerText = strViewMenus;
 
-            XmlAttribute attrName = _xmlDocument.CreateAttribute("name");
+            var attrName = _xmlDocument.CreateAttribute("name");
             attrName.Value = "viewMenus";
             ndUserData.Attributes.Append(attrName);
 
