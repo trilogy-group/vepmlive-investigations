@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Fakes;
 using System.Collections.Generic;
 using System.Collections.Generic.Fakes;
+using System.Collections.Specialized;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.DirectoryServices.ActiveDirectory.Fakes;
@@ -20,6 +21,7 @@ using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Fakes;
+using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.SharePoint.Workflow;
 using Microsoft.SharePoint.Workflow.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -1059,6 +1061,11 @@ namespace EPMLiveWebParts.Tests
             ShimSPWeb.AllInstances.TitleGet = _ => "1";
             ShimSPWeb.AllInstances.SiteGet = _ => new ShimSPSite();
             ShimSPWeb.AllInstances.LocaleGet = _ => CultureInfo.InvariantCulture;
+
+            var properties = new StringDictionary { { "reportingV2", bool.TrueString } };
+            var propertyBag = new ShimSPPropertyBag();
+            propertyBag.Bind(properties);
+            ShimSPWeb.AllInstances.PropertiesGet = _ => propertyBag.Instance;
             ShimSPSite.AllInstances.UrlGet = _ => ExampleUrl;
         }
 

@@ -20,11 +20,13 @@ using System.Xml.Fakes;
 using EPMLiveCore;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
+using EPMLiveCore.ReportHelper.Fakes;
 using EPMLiveWebParts;
 using EPMLiveWebParts.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
+using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Workflow;
 using Microsoft.SharePoint.Workflow.Fakes;
@@ -458,6 +460,92 @@ namespace EPMLiveWebParts.Tests
             // Assert
         }
 
+        [TestMethod]
+        public void PageLoad_ItemNodesAvg_()
+        {
+            // Arrange
+            PrepareForPageLoad(Other, SPFieldType.Text);
+            ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><result></result></root>";
+            SetItemNodes();
+            SetAggregationDef("AVG");
+
+            // Act
+            _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
+
+            // Assert
+        }
+
+        [TestMethod]
+        public void PageLoad_ItemNodesStdev_()
+        {
+            // Arrange
+            PrepareForPageLoad(Other, SPFieldType.Text);
+            ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><result></result></root>";
+            SetItemNodes();
+            SetAggregationDef("STDEV");
+
+            // Act
+            _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
+
+            // Assert
+        }
+
+        [TestMethod]
+        public void PageLoad_ItemNodesCount_()
+        {
+            // Arrange
+            PrepareForPageLoad(Other, SPFieldType.Text);
+            ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><result></result></root>";
+            SetItemNodes();
+            SetAggregationDef("COUNT");
+
+            // Act
+            _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
+
+            // Assert
+        }
+
+        [TestMethod]
+        public void PageLoad_ItemNodesNoAggregation_()
+        {
+            // Arrange
+            PrepareForPageLoad(Other, SPFieldType.Text);
+            ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><result></result></root>";
+            SetItemNodes();
+
+            // Act
+            _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
+
+            // Assert
+        }
+
+        private void SetItemNodes()
+        {
+            var document = new XmlDocument();
+            var node = document.CreateNode(XmlNodeType.Element, "root", document.NamespaceURI);
+            node.InnerXml = "<cell id='Title'></cell>";
+            _privateObj.SetField("hshItemNodes", new Hashtable
+            {
+                {
+                    DummyText,
+                    node
+                }
+            });
+
+            ShimCoreFunctions.setConfigSettingSPWebStringString = (a, b, c) => { };
+        }
+
+        private void SetAggregationDef(string value)
+        {
+            var arrAggregationDef = new SortedList();
+            arrAggregationDef.Add("Title", value);
+            _privateObj.SetField("arrAggregationDef", arrAggregationDef);
+
+            var arrAggregationVals = new SortedList();
+            arrAggregationVals.Add($"{DummyText}\nTitle", ",1,2");
+            _privateObj.SetField("arrAggregationVals", arrAggregationVals);
+        }
+
         private void AddUsersAndGroups()
         {
             var userCollection = new ShimSPUserCollection();
@@ -506,12 +594,15 @@ namespace EPMLiveWebParts.Tests
                 }
             };
             ShimHttpResponse.AllInstances.ExpiresSetInt32 = (_, __) => { };
+            var row = new DataTable().NewRow();
+            ShimEPMData.SAccountInfoGuidGuid = (_, __) => row;
 
             ShimGridGanttSettings.ConstructorSPList = (_, __) => { };
             var sets = new GridGanttSettings(new ShimSPList());
             var privateSets = new PrivateObject(sets);
             privateSets.SetField("TotalSettings", string.Empty);
             ShimListCommands.GetGridGanttSettingsSPList = _ => sets;
+            ShimCoreFunctions.getConnectionStringGuid = _ => DummyText;
 
             PrepareSPContext();
             GetParameters();
@@ -526,12 +617,15 @@ namespace EPMLiveWebParts.Tests
             PrepareSpWebRelatedShims();
             PrepareSpListRelatedShims();
 
+            ShimSPSite.ConstructorGuid = (_, __) => { };
             ShimSPSite.ConstructorString = (_, __) => { };
             ShimSPSite.AllInstances.UrlGet = _ => ExampleUrl;
             ShimSPSite.AllInstances.CatchAccessDeniedExceptionSetBoolean = (_, __) => { };
             ShimSPSite.AllInstances.OpenWeb = _ => new ShimSPWeb().Instance;
             ShimSPSite.AllInstances.OpenWebGuid = (_, __) => new ShimSPWeb().Instance;
             ShimSPSite.AllInstances.OpenWebString = (_, __) => new ShimSPWeb().Instance;
+            ShimSPSite.AllInstances.RootWebGet = _ => new ShimSPWeb().Instance;
+            ShimSPSite.AllInstances.WebApplicationGet = _ => new ShimSPWebApplication();
             ShimSPView.AllInstances.QueryGet = _ => "<Child></Child>";
             ShimSPView.AllInstances.AggregationsStatusGet = _ => "Off";
 
@@ -547,10 +641,15 @@ namespace EPMLiveWebParts.Tests
                 {
                     "Gantt", string.Empty
                 };
+                var arrColumns = new ArrayList
+                {
+                    "Title", string.Empty
+                };
                 var hshLists = new Hashtable { { DummyListId, DummyText } };
                 var hshColumnSelectFilter = new Hashtable { { DummyListId, DummyText } };
 
                 _privateObj.SetField("aViewFields", aViewFields);
+                _privateObj.SetField("arrColumns", arrColumns);
                 _privateObj.SetField("aHiddenViewFields", new ArrayList());
                 _privateObj.SetField("hshLists", hshLists);
                 _privateObj.SetField("rolluplists", new string[] { DummyVal });
