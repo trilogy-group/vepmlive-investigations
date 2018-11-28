@@ -21,8 +21,6 @@ describe(SuiteNames.regressionTestSuite, () => {
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
-        console.log(project1);
-        console.log(project2);
     });
 
     beforeAll(async () => {
