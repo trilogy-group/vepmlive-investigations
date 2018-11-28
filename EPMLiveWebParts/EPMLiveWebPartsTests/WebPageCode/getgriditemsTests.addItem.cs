@@ -1271,7 +1271,14 @@ namespace EPMLiveWebParts.Tests
 
         private XmlNode GetMenus(XmlNode ndNewItem)
         {
-            var strViewMenus = string.Join(',', Enumerable.Repeat("0", 14));
+            var viewMenus = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            string strViewMenus = string.Empty;
+            foreach (int v in viewMenus)
+            {
+                strViewMenus += "," + v.ToString();
+            }
+            strViewMenus = strViewMenus.Substring(1);
+
             var ndUserData = _xmlDocument.CreateNode(XmlNodeType.Element, "userdata", _xmlDocument.NamespaceURI);
             ndUserData.InnerText = strViewMenus;
 
