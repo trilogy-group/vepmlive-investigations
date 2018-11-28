@@ -6,7 +6,7 @@ pipeline {
 		string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')
 		string(name: 'FullHostName', defaultValue: 'tenant02.epmldev.com', description: 'Target full host name')
 		string(name: 'BaseUrl', defaultValue: 'http://tenant02.epmldev.com/epm', description: 'Protractor baseUrl')
-		string(name: 'Username', defaultValue: 'epmldev\farmadmin', description: 'Protractor username')
+		string(name: 'Username', defaultValue: 'epmldev\\farmadmin', description: 'Protractor username')
 		string(name: 'Password', defaultValue: 'Pass@word1', description: 'Protractor password')
 	}
 	  triggers {
