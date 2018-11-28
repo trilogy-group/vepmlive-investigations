@@ -12,6 +12,11 @@ namespace WorkEnginePPM
 
     public partial class Models : IHttpHandler, System.Web.SessionState.IRequiresSessionState
     {
+        private const string ModelUIdAttribute = "MODEL_UID";
+        private const string ModelNameAttribute = "MODEL_NAME";
+        private const string ModelDescAttribute = "MODEL_DESC";
+        private const string ModelCbIdAttribute = "MODEL_CB_ID";
+
         #region IHttpHandler Members
 
         public bool IsReusable
@@ -101,11 +106,11 @@ namespace WorkEnginePPM
             return reply;
         }
 
-        private static string ReadModelInfo(HttpContext Context, CStruct xData)
+        private static string ReadModelInfo(HttpContext context, CStruct xData)
         {
-            string reply = string.Empty;
+            var reply = string.Empty;
             var viewId = int.Parse(xData.InnerText);
-            var baseInfo = WebAdmin.BuildBaseInfo(Context);
+            var baseInfo = WebAdmin.BuildBaseInfo(context);
             using (var dataAccess = new DataAccess(baseInfo))
             {
                 var dbAccess = dataAccess.dba;
@@ -140,6 +145,9 @@ namespace WorkEnginePPM
 
         private static void CreateModel(DataTable dataTable, out CStruct models, out int selectedFlagField)
         {
+            const string ModelSelectedFieldId = "MODEL_SELECTED_FIELD_ID";
+            const string NewModelValue = "New Model";
+
             models = new CStruct();
             models.Initialize("Model");
 
@@ -148,19 +156,19 @@ namespace WorkEnginePPM
             if (dataTable.Rows.Count == 1)
             {
                 var row = dataTable.Rows[0];
-                models.CreateIntAttr("MODEL_UID", SqlDb.ReadIntValue(row["MODEL_UID"]));
-                models.CreateStringAttr("MODEL_NAME", SqlDb.ReadStringValue(row["MODEL_NAME"]));
-                models.CreateStringAttr("MODEL_DESC", SqlDb.ReadStringValue(row["MODEL_DESC"]));
-                selectedCalendar = SqlDb.ReadIntValue(row["MODEL_CB_ID"]);
-                models.CreateIntAttr("MODEL_CB_ID", selectedCalendar);
-                selectedFlagField = SqlDb.ReadIntValue(row["MODEL_SELECTED_FIELD_ID"]);
+                models.CreateIntAttr(ModelUIdAttribute, SqlDb.ReadIntValue(row[ModelUIdAttribute]));
+                models.CreateStringAttr(ModelNameAttribute, SqlDb.ReadStringValue(row[ModelNameAttribute]));
+                models.CreateStringAttr(ModelDescAttribute, SqlDb.ReadStringValue(row[ModelDescAttribute]));
+                selectedCalendar = SqlDb.ReadIntValue(row[ModelCbIdAttribute]);
+                models.CreateIntAttr(ModelCbIdAttribute, selectedCalendar);
+                selectedFlagField = SqlDb.ReadIntValue(row[ModelSelectedFieldId]);
             }
             else
             {
-                models.CreateIntAttr("MODEL_UID", 0);
-                models.CreateStringAttr("MODEL_NAME", "New Model");
-                models.CreateStringAttr("MODEL_DESC", "");
-                models.CreateIntAttr("MODEL_CB_ID", selectedCalendar);
+                models.CreateIntAttr(ModelUIdAttribute, 0);
+                models.CreateStringAttr(ModelNameAttribute, NewModelValue);
+                models.CreateStringAttr(ModelDescAttribute, string.Empty);
+                models.CreateIntAttr(ModelCbIdAttribute, selectedCalendar);
             }
         }
 
