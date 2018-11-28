@@ -559,32 +559,37 @@ namespace EPMLiveWebParts.Tests
             _privateObject.SetField(PeopleDetailsFieldsCountFieldName, 5);
             var fieldValue = $"{DummyId1};#{DummyId2};#{DummyId3}";
 
-            ShimQueryExecutor.AllInstances.ExecuteReportingDBQueryStringIDictionaryOfStringObject = (sender, query, parameters) =>
+            ShimQueryExecutor.ConstructorSPWeb = (instance, spweb) =>
             {
-                var dtUsers = new DataTable();
-                dtUsers.Columns.Add("ID");
-                dtUsers.Columns.Add("Title");
-                dtUsers.Columns.Add("Picture");
+                ShimQueryExecutor moledInstance = new ShimQueryExecutor(instance);
+                moledInstance.ExecuteReportingDBQueryStringIDictionaryOfStringObject =
+                (query, dict) =>
+                {
+                    var dtUsers = new DataTable();
+                    dtUsers.Columns.Add("ID");
+                    dtUsers.Columns.Add("Title");
+                    dtUsers.Columns.Add("Picture");
 
-                var drUser1 = dtUsers.NewRow();
-                drUser1["ID"] = DummyId1;
-                drUser1["Title"] = DummyUserTitle1;
-                drUser1["Picture"] = string.Empty;
-                dtUsers.Rows.Add(drUser1);
+                    var drUser1 = dtUsers.NewRow();
+                    drUser1["ID"] = DummyId1;
+                    drUser1["Title"] = DummyUserTitle1;
+                    drUser1["Picture"] = string.Empty;
+                    dtUsers.Rows.Add(drUser1);
 
-                var drUser2 = dtUsers.NewRow();
-                drUser2["ID"] = DummyId2;
-                drUser2["Title"] = DummyUserTitle2;
-                drUser2["Picture"] = DummyUserPictureWithComma;
-                dtUsers.Rows.Add(drUser2);
+                    var drUser2 = dtUsers.NewRow();
+                    drUser2["ID"] = DummyId2;
+                    drUser2["Title"] = DummyUserTitle2;
+                    drUser2["Picture"] = DummyUserPictureWithComma;
+                    dtUsers.Rows.Add(drUser2);
 
-                var drUser3 = dtUsers.NewRow();
-                drUser3["ID"] = DummyId3;
-                drUser3["Title"] = DummyUserTitle3;
-                drUser3["Picture"] = DummyUserPictureWithoutComma;
-                dtUsers.Rows.Add(drUser3);
+                    var drUser3 = dtUsers.NewRow();
+                    drUser3["ID"] = DummyId3;
+                    drUser3["Title"] = DummyUserTitle3;
+                    drUser3["Picture"] = DummyUserPictureWithoutComma;
+                    dtUsers.Rows.Add(drUser3);
 
-                return dtUsers;
+                    return dtUsers;
+                };
             };
 
             var expectedPeopleDetailsShowAllRegion = new List<string>()
@@ -619,32 +624,37 @@ namespace EPMLiveWebParts.Tests
             _privateObject.SetField(PeopleDetailsFieldsCountFieldName, 3);
             var fieldValue = $"{DummyId1};#{DummyId2};#{DummyId3}";
 
-            ShimQueryExecutor.AllInstances.ExecuteReportingDBQueryStringIDictionaryOfStringObject = (sender, query, parameters) =>
+            ShimQueryExecutor.ConstructorSPWeb = (instance, spweb) =>
             {
-                var dtUsers = new DataTable();
-                dtUsers.Columns.Add("ID");
-                dtUsers.Columns.Add("Title");
-                dtUsers.Columns.Add("Picture");
+                ShimQueryExecutor moledInstance = new ShimQueryExecutor(instance);
+                moledInstance.ExecuteReportingDBQueryStringIDictionaryOfStringObject =
+                (query, dict) =>
+                {
+                    var dtUsers = new DataTable();
+                    dtUsers.Columns.Add("ID");
+                    dtUsers.Columns.Add("Title");
+                    dtUsers.Columns.Add("Picture");
 
-                var drUser1 = dtUsers.NewRow();
-                drUser1["ID"] = DummyId1;
-                drUser1["Title"] = DummyUserTitle1;
-                drUser1["Picture"] = string.Empty;
-                dtUsers.Rows.Add(drUser1);
+                    var drUser1 = dtUsers.NewRow();
+                    drUser1["ID"] = DummyId1;
+                    drUser1["Title"] = DummyUserTitle1;
+                    drUser1["Picture"] = string.Empty;
+                    dtUsers.Rows.Add(drUser1);
 
-                var drUser2 = dtUsers.NewRow();
-                drUser2["ID"] = DummyId2;
-                drUser2["Title"] = DummyUserTitle2;
-                drUser2["Picture"] = DummyUserPictureWithComma;
-                dtUsers.Rows.Add(drUser2);
+                    var drUser2 = dtUsers.NewRow();
+                    drUser2["ID"] = DummyId2;
+                    drUser2["Title"] = DummyUserTitle2;
+                    drUser2["Picture"] = DummyUserPictureWithComma;
+                    dtUsers.Rows.Add(drUser2);
 
-                var drUser3 = dtUsers.NewRow();
-                drUser3["ID"] = DummyId3;
-                drUser3["Title"] = DummyUserTitle3;
-                drUser3["Picture"] = DummyUserPictureWithoutComma;
-                dtUsers.Rows.Add(drUser3);
+                    var drUser3 = dtUsers.NewRow();
+                    drUser3["ID"] = DummyId3;
+                    drUser3["Title"] = DummyUserTitle3;
+                    drUser3["Picture"] = DummyUserPictureWithoutComma;
+                    dtUsers.Rows.Add(drUser3);
 
-                return dtUsers;
+                    return dtUsers;
+                };
             };
 
             var expectedPeopleDetailsContent = new List<string>()
