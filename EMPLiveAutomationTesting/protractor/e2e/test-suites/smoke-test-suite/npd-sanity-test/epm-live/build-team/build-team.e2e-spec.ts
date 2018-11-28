@@ -14,7 +14,7 @@ import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-pag
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
-import { CommonSubPageHelper } from '../../../../../page-objects/pages/common/common-page.subhelper';
+import {CommonSubPageHelper} from '../../../../../page-objects/pages/common/common-page.subhelper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -177,7 +177,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(3);
         StepLogger.step('Select check-box for any Project');
-        await CommonPageSubHelper.selectOneRecordFromGrid();
+        await CommonSubPageHelper.selectOneRecordFromGrid();
 
         StepLogger.step('Click on "Items" tab');
         await PageHelper.click(CommonPage.ribbonTitles.items);
@@ -299,7 +299,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects, CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter, );
-        await CommonPageSubHelper.selectOneRecordFromGrid();
+        await CommonSubPageHelper.selectOneRecordFromGrid();
         await PageHelper.click(CommonPage.ribbonTitles.items);
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
@@ -326,7 +326,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(2);
         StepLogger.step('Select check-box for any Project');
-        await CommonPageSubHelper.selectOneRecordFromGrid();
+        await CommonSubPageHelper.selectOneRecordFromGrid();
 
         StepLogger.step('Click on "Items" tab');
         await browser.sleep(PageHelper.timeout.m);
