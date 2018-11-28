@@ -66,6 +66,7 @@ namespace PortfolioEngineCore.Tests
         private ShimSqlDataReader dataReader;
         private Guid guid;
         private int validations;
+        private DateTime currentDate;
         private const int DummyInt = 1;
         private const int Zero = 0;
         private const int One = 1;
@@ -80,6 +81,8 @@ namespace PortfolioEngineCore.Tests
         private const string SampleUrl = "http://www.sampleurl.com";
         private const string ReadResourcesMethodName = "ReadResources";
         private const string GetResourceDisplayFieldsMethodName = "GetResourceDisplayFields";
+        private const string BuildResourceSelectQueryMethodName = "BuildResourceSelectQuery";
+        private const string GetPIResourcesXMLMethodName = "GetPIResourcesXML";
 
         [TestInitialize]
         public void Setup()
@@ -155,7 +158,14 @@ namespace PortfolioEngineCore.Tests
             //ShimPFEBase.ConstructorStringSecurityLevelsBoolean = (_, _1, _2, _3) => new ShimPFEBase();
             ShimSqlDb.AllInstances.TransactionGet = _ => transaction;
             ShimSqlDb.ReadIntValueObject = _ => DummyInt;
+            ShimSqlDb.ReadIntValueObjectBooleanOut = (object input, out bool output) =>
+            {
+                output = false;
+                return DummyInt;
+            };
             ShimSqlDb.ReadStringValueObject = _ => DummyString;
+            ShimSqlDb.ReadBoolValueObject = _ => true;
+            ShimSqlDb.ReadDateValueObject = _ => currentDate;
             ShimActivation.AllInstances.checkActivationStringStringString = (_, _1, _2, _3) => { };
             ShimPFEEncrypt.DecryptStringString = (_, input) => input;
             ShimDatabase.AllInstances.OpenDatabaseStringString = (_, _1, _2) => new SqlConnection();
@@ -165,6 +175,7 @@ namespace PortfolioEngineCore.Tests
         private void SetupVariables()
         {
             validations = 0;
+            currentDate = DateTime.Now;
             publicStatic = BindingFlags.Static | BindingFlags.Public;
             nonPublicStatic = BindingFlags.Static | BindingFlags.NonPublic;
             publicInstance = BindingFlags.Instance | BindingFlags.Public;
@@ -471,6 +482,383 @@ namespace PortfolioEngineCore.Tests
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldBe(StatusEnum.rsSuccess),
                 () => itemList.Count.ShouldBe(17));
+        }
+
+        [TestMethod]
+        public void BuildResourceSelectQuery_SearchModeZero_ReturnsQueryString()
+        {
+            // Arrange
+            const int searchMode = 0;
+            const bool includeUsers = false;
+            const bool includeInactive = false;
+            const IncludeGenericsEnum includeGenerics = IncludeGenericsEnum.igExclusive;
+            const string displayFieldsXml = @"
+                <xmlcfg>
+                    <RowLimit>0</RowLimit>
+                    <Items>
+                        <Item FieldFormat=""4"" FieldID=""1"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""4"" FieldID=""9005"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""4"" FieldID=""9015"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""9"" FieldID=""9004""/>
+                        <Item FieldFormat=""9"" FieldID=""1""/>
+                        <Item FieldFormat=""96"" FieldID=""9020""/>
+                    </Items>
+                </xmlcfg>";
+            const string queryXml = @"<xmlcfg/>";
+            var dbAccess = new DBAccess(DummyString, new SqlConnection());
+            var queryNode = new CStruct();
+            var displayFields = new CStruct();
+
+            displayFields.LoadXML(displayFieldsXml);
+            queryNode.LoadXML(queryXml);
+
+            var parameters = new object[]
+            {
+                dbAccess,
+                searchMode,
+                queryNode,
+                One,
+                displayFields.GetSubStruct("Items").GetList("Item"),
+                One.ToString(),
+                includeUsers,
+                includeInactive,
+                includeGenerics
+            };
+            var expected = new List<string>()
+            {
+                $"LEFT join EPG_MY_RESOURCES MR ON WR.WRES_ID = MR.WRES_ID AND MR.MR_WRES_ID = {One}",
+                $"DEPT.LV_VALUE AS Field9005",
+                $"RPDEPT.LV_VALUE AS Field9015",
+                "LEFT JOIN EPGP_LOOKUP_VALUES DEPT ON (DEPT.LV_UID = WR.WRES_DEPT)",
+                "LEFT JOIN EPGP_LOOKUP_VALUES RPDEPT ON (RPDEPT.LV_UID = WR.WRES_RP_DEPT)",
+                "WR.WRES_IS_GENERIC <> 0",
+                "WR.WRES_INACTIVE = 0",
+                $"MR_WRES_ID = {One} ORDER BY MR_SEQ"
+            };
+
+            ShimResourceSelector.GetCustomFieldNameFromIDDBAccessInt32StringOutStringOut =
+                (DBAccess dba, int lFieldID, out string sTableName, out string sFieldName) =>
+                {
+                    sTableName = DummyString;
+                    sFieldName = DummyString;
+                    return StatusEnum.rsSuccess;
+                };
+
+            // Act
+            var actual = (string)privateObject.Invoke(BuildResourceSelectQueryMethodName, nonPublicInstance, parameters);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldNotBe(string.Empty),
+                () => expected.Any(x => !actual.Contains(x)).ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void BuildResourceSelectQuery_SearchModeThree_ReturnsQueryString()
+        {
+            // Arrange
+            const int searchMode = 3;
+            const bool includeUsers = false;
+            const bool includeInactive = false;
+            const IncludeGenericsEnum includeGenerics = IncludeGenericsEnum.igNo;
+            const string displayFieldsXml = @"
+                <xmlcfg>
+                    <RowLimit>0</RowLimit>
+                    <Items>
+                        <Item FieldFormat=""4"" FieldID=""1"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""4"" FieldID=""9005"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""4"" FieldID=""9015"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""9"" FieldID=""9004""/>
+                        <Item FieldFormat=""9"" FieldID=""1""/>
+                        <Item FieldFormat=""96"" FieldID=""9020""/>
+                    </Items>
+                </xmlcfg>";
+            const string queryXml = @"<xmlcfg/>";
+            var dbAccess = new DBAccess(DummyString, new SqlConnection());
+            var queryNode = new CStruct();
+            var displayFields = new CStruct();
+
+            displayFields.LoadXML(displayFieldsXml);
+            queryNode.LoadXML(queryXml);
+
+            var parameters = new object[]
+            {
+                dbAccess,
+                searchMode,
+                queryNode,
+                One,
+                displayFields.GetSubStruct("Items").GetList("Item"),
+                One.ToString(),
+                includeUsers,
+                includeInactive,
+                includeGenerics
+            };
+            var expected = new List<string>()
+            {
+                $"LEFT join EPG_MY_RESOURCES MR ON WR.WRES_ID = MR.WRES_ID AND MR.MR_WRES_ID = {One}",
+                $"DEPT.LV_VALUE AS Field9005",
+                $"RPDEPT.LV_VALUE AS Field9015",
+                "LEFT JOIN EPGP_LOOKUP_VALUES DEPT ON (DEPT.LV_UID = WR.WRES_DEPT)",
+                "LEFT JOIN EPGP_LOOKUP_VALUES RPDEPT ON (RPDEPT.LV_UID = WR.WRES_RP_DEPT)",
+                "AND WR.WRES_IS_RESOURCE <> 0",
+                "WR.WRES_INACTIVE = 0",
+                $"INNER JOIN dbo.EPG_FN_ConvertListToTable(N'{One}') LT on WR.WRES_ID=LT.TokenVal"
+            };
+
+            ShimResourceSelector.GetCustomFieldNameFromIDDBAccessInt32StringOutStringOut =
+                (DBAccess dba, int lFieldID, out string sTableName, out string sFieldName) =>
+                {
+                    sTableName = DummyString;
+                    sFieldName = DummyString;
+                    return StatusEnum.rsSuccess;
+                };
+
+            // Act
+            var actual = (string)privateObject.Invoke(BuildResourceSelectQueryMethodName, nonPublicInstance, parameters);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldNotBe(string.Empty),
+                () => expected.Any(x => !actual.Contains(x)).ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void BuildResourceSelectQuery_SearchModeFour_ReturnsQueryString()
+        {
+            // Arrange
+            const int searchMode = 4;
+            const bool includeUsers = true;
+            const bool includeInactive = false;
+            const IncludeGenericsEnum includeGenerics = IncludeGenericsEnum.igNo;
+            const string displayFieldsXml = @"
+                <xmlcfg>
+                    <RowLimit>0</RowLimit>
+                    <Items>
+                        <Item FieldFormat=""4"" FieldID=""1"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""4"" FieldID=""9005"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""4"" FieldID=""9015"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""9"" FieldID=""9004""/>
+                        <Item FieldFormat=""9"" FieldID=""1""/>
+                        <Item FieldFormat=""96"" FieldID=""9020""/>
+                    </Items>
+                </xmlcfg>";
+            const string queryXml = @"
+                <xmlcfg>
+                    <QueryRow Value=""1""/>
+                    <QueryRow Value=""2""/>
+                </xmlcfg>";
+            var dbAccess = new DBAccess(DummyString, new SqlConnection());
+            var queryNode = new CStruct();
+            var displayFields = new CStruct();
+
+            displayFields.LoadXML(displayFieldsXml);
+            queryNode.LoadXML(queryXml);
+
+            var parameters = new object[]
+            {
+                dbAccess,
+                searchMode,
+                queryNode,
+                One,
+                displayFields.GetSubStruct("Items").GetList("Item"),
+                One.ToString(),
+                includeUsers,
+                includeInactive,
+                includeGenerics
+            };
+            var expected = new List<string>()
+            {
+                $"LEFT join EPG_MY_RESOURCES MR ON WR.WRES_ID = MR.WRES_ID AND MR.MR_WRES_ID = {One}",
+                $"DEPT.LV_VALUE AS Field9005",
+                $"RPDEPT.LV_VALUE AS Field9015",
+                "LEFT JOIN EPGP_LOOKUP_VALUES DEPT ON (DEPT.LV_UID = WR.WRES_DEPT)",
+                "LEFT JOIN EPGP_LOOKUP_VALUES RPDEPT ON (RPDEPT.LV_UID = WR.WRES_RP_DEPT)",
+                "AND WR.WRES_IS_GENERIC = 0",
+                "WR.WRES_INACTIVE = 0",
+                $"AND ( RES_NAME LIKE '%1%' OR  RES_NAME LIKE '%2%' )"
+            };
+
+            ShimResourceSelector.GetCustomFieldNameFromIDDBAccessInt32StringOutStringOut =
+                (DBAccess dba, int lFieldID, out string sTableName, out string sFieldName) =>
+                {
+                    sTableName = DummyString;
+                    sFieldName = DummyString;
+                    return StatusEnum.rsSuccess;
+                };
+
+            // Act
+            var actual = (string)privateObject.Invoke(BuildResourceSelectQueryMethodName, nonPublicInstance, parameters);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldNotBe(string.Empty),
+                () => expected.Any(x => !actual.Contains(x)).ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void BuildResourceSelectQuery_SearchModeDefault_ReturnsQueryString()
+        {
+            // Arrange
+            const int searchMode = 1;
+            const bool includeUsers = false;
+            const bool includeInactive = false;
+            const IncludeGenericsEnum includeGenerics = IncludeGenericsEnum.igYes;
+            const string displayFieldsXml = @"
+                <xmlcfg>
+                    <RowLimit>0</RowLimit>
+                    <Items>
+                        <Item FieldFormat=""4"" FieldID=""1"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""4"" FieldID=""9005"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""4"" FieldID=""9015"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""9"" FieldID=""9004""/>
+                        <Item FieldFormat=""9"" FieldID=""1""/>
+                        <Item FieldFormat=""96"" FieldID=""9020""/>
+                    </Items>
+                </xmlcfg>";
+            const string queryXml = @"
+                <xmlcfg>
+                    <QueryRow Operator=""1"" Value=""1"" FieldID=""9005"" FieldFormat=""4""/>
+                    <QueryRow Operator=""6"" Value=""1"" FieldID=""9005"" FieldFormat=""4""/>
+                    <QueryRow Operator=""2"" Value=""1"" FieldID=""9015"" FieldFormat=""4""/>
+                    <QueryRow Operator=""5"" Value=""1"" FieldID=""9015"" FieldFormat=""4""/>
+                    <QueryRow Operator=""5"" Value=""1"" FieldID=""1"" FieldFormat=""4""/>
+                    <QueryRow Operator=""1"" Value=""1"" FieldID=""1"" FieldFormat=""40""/>
+                    <QueryRow Operator=""2"" Value=""1"" FieldID=""1"" FieldFormat=""40""/>
+                    <QueryRow Operator=""3"" Value=""1"" FieldID=""1"" FieldFormat=""40""/>
+                    <QueryRow Operator=""4"" Value=""1"" FieldID=""1"" FieldFormat=""40""/>
+                    <QueryRow Operator=""1"" Value=""1"" FieldID=""1"" FieldFormat=""98""/>
+                    <QueryRow Operator=""2"" Value=""1"" FieldID=""1"" FieldFormat=""98""/>
+                    <QueryRow Operator=""3"" Value=""1"" FieldID=""1"" FieldFormat=""98""/>
+                    <QueryRow Operator=""4"" Value=""1"" FieldID=""1"" FieldFormat=""98""/>
+                    <QueryRow Operator=""1"" Value=""1"" FieldID=""9004"" FieldFormat=""9""/>
+                    <QueryRow Operator=""2"" Value=""1"" FieldID=""9004"" FieldFormat=""9""/>
+                    <QueryRow Operator=""3"" Value=""1"" FieldID=""9004"" FieldFormat=""9""/>
+                    <QueryRow Operator=""4"" Value=""1"" FieldID=""9004"" FieldFormat=""9""/>
+                    <QueryRow Operator=""1"" Value=""1"" FieldID=""9006"" FieldFormat=""9""/>
+                    <QueryRow Operator=""2"" Value=""1"" FieldID=""9006"" FieldFormat=""9""/>
+                    <QueryRow Operator=""3"" Value=""1"" FieldID=""9006"" FieldFormat=""9""/>
+                    <QueryRow Operator=""4"" Value=""1"" FieldID=""9006"" FieldFormat=""9""/>
+                    <QueryRow Operator=""1"" Value=""1"" FieldID=""1"" FieldFormat=""9""/>
+                    <QueryRow Operator=""2"" Value=""1"" FieldID=""1"" FieldFormat=""9""/>
+                    <QueryRow Operator=""3"" Value=""1"" FieldID=""1"" FieldFormat=""9""/>
+                    <QueryRow Operator=""4"" Value=""1"" FieldID=""1"" FieldFormat=""9""/>
+                    <QueryRow Operator=""1"" Value=""2"" FieldID=""9018"" FieldFormat=""96""/>
+                    <QueryRow Operator=""2"" Value=""2"" FieldID=""9018"" FieldFormat=""96""/>
+                    <QueryRow Operator=""1"" Value=""1"" FieldID=""9018"" FieldFormat=""96""/>
+                    <QueryRow Operator=""2"" Value=""1"" FieldID=""9018"" FieldFormat=""96""/>
+                    <QueryRow Operator=""1"" Value=""1"" FieldID=""9020"" FieldFormat=""96""/>
+                    <QueryRow Operator=""2"" Value=""1"" FieldID=""9020"" FieldFormat=""96""/>
+                    <QueryRow Operator=""5"" Value=""1"" FieldID=""9020"" FieldFormat=""96""/>
+                    <QueryRow Operator=""6"" Value=""1"" FieldID=""9020"" FieldFormat=""96""/>
+                    <QueryRow Operator=""1"" Value=""1"" FieldID=""9021"" FieldFormat=""96""/>
+                    <QueryRow Operator=""2"" Value=""1"" FieldID=""9021"" FieldFormat=""96""/>
+                    <QueryRow Operator=""1"" Value=""2"" FieldID=""9021"" FieldFormat=""96""/>
+                    <QueryRow Operator=""2"" Value=""2"" FieldID=""9021"" FieldFormat=""96""/>
+                </xmlcfg>";
+            var dbAccess = new DBAccess(DummyString, new SqlConnection());
+            var queryNode = new CStruct();
+            var displayFields = new CStruct();
+
+            displayFields.LoadXML(displayFieldsXml);
+            queryNode.LoadXML(queryXml);
+
+            var parameters = new object[]
+            {
+                dbAccess,
+                searchMode,
+                queryNode,
+                One,
+                displayFields.GetSubStruct("Items").GetList("Item"),
+                One.ToString(),
+                includeUsers,
+                includeInactive,
+                includeGenerics
+            };
+            var expected = new List<string>()
+            {
+                $"LEFT join EPG_MY_RESOURCES MR ON WR.WRES_ID = MR.WRES_ID AND MR.MR_WRES_ID = {One}",
+                $"DEPT.LV_VALUE AS Field9005",
+                $"RPDEPT.LV_VALUE AS Field9015",
+                "LEFT JOIN EPGP_LOOKUP_VALUES DEPT ON (DEPT.LV_UID = WR.WRES_DEPT)",
+                "LEFT JOIN EPGP_LOOKUP_VALUES RPDEPT ON (RPDEPT.LV_UID = WR.WRES_RP_DEPT)",
+                "AND (WR.WRES_IS_RESOURCE <> 0 OR WR.WRES_IS_GENERIC <> 0)",
+                "WR.WRES_INACTIVE = 0",
+                "AND RES_NAME LIKE '1'",
+                "AND RES_NAME LIKE '%1%'",
+                "AND RES_NAME LIKE '1%'",
+                "AND RES_NAME NOT LIKE '1'",
+                "AND CAT.BC_NAME LIKE '1'",
+                "AND CAT.BC_NAME LIKE '%1%'",
+                "AND CAT.BC_NAME LIKE '1%'",
+                "AND CAT.BC_NAME NOT LIKE '1'",
+                "AND WRES_IS_RESOURCE <> 0",
+                "AND WRES_IS_RESOURCE = 0",
+                "AND WRES_CAN_LOGIN <> 0",
+                "AND WRES_CAN_LOGIN = 0"
+            };
+
+            ShimResourceSelector.GetCustomFieldNameFromIDDBAccessInt32StringOutStringOut =
+                (DBAccess dba, int lFieldID, out string sTableName, out string sFieldName) =>
+                {
+                    sTableName = DummyString;
+                    sFieldName = DummyString;
+                    return StatusEnum.rsSuccess;
+                };
+
+            // Act
+            var actual = (string)privateObject.Invoke(BuildResourceSelectQueryMethodName, nonPublicInstance, parameters);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldNotBe(string.Empty),
+                () => expected.Any(x => !actual.Contains(x)).ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void GetPIResourcesXML_WhenCalled_ReturnsResourceXmlString()
+        {
+            // Arrange
+            const string xmlString = "<xmlcfg />";
+            var parameters = new object[]
+            {
+                One,
+                DummyString,
+                false,
+                DummyString
+            };
+
+            ShimResourceSelector.GetPeriodsDBAccessInt32ListOfCPeriodOut =
+                (DBAccess dba, int iCal, out List<CPeriod> clnPeriods) =>
+                {
+                    validations += 1;
+                    clnPeriods = new List<CPeriod>()
+                    {
+                        new CPeriod()
+                        {
+                            PeriodID = One,
+                            StartDate = currentDate.AddDays(-1),
+                            FinishDate = currentDate.AddDays(1)
+                        }
+                    };
+                    return StatusEnum.rsSuccess;
+                };
+            ShimResourceSelector.GetPIResourcesStructDBAccessInt32StringStringListOfCPeriodCAdminInt32CStructOut =
+                (DBAccess dba, int lUserWResId, string sProjectIDs, string sWResIDs, List<CPeriod> clnPeriods, CAdmin oAdmin, int lStartPeriodID, out CStruct xReply) =>
+                {
+                    validations += 1;
+                    xReply = new CStruct();
+                    xReply.LoadXML(xmlString);
+                    return StatusEnum.rsSuccess;
+                };
+
+            // Act
+            var actual = (bool)privateObject.Invoke(GetPIResourcesXMLMethodName, publicInstance, parameters);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBeTrue(),
+                () => parameters[3].ShouldBe(xmlString),
+                () => validations.ShouldBe(2));
         }
     }
 }
