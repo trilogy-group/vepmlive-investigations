@@ -64,6 +64,7 @@ namespace PortfolioEngineCore.Tests
         private ShimSPContentType spContentType;
         private ShimSqlTransaction transaction;
         private ShimSqlDataReader dataReader;
+        private SqlCommand sqlCommand;
         private Guid guid;
         private int validations;
         private DateTime currentDate;
@@ -115,7 +116,7 @@ namespace PortfolioEngineCore.Tests
             ShimSqlConnection.AllInstances.Close = _ => { };
             ShimSqlConnection.AllInstances.BeginTransaction = _ => transaction;
             ShimDbTransaction.AllInstances.Dispose = _ => { };
-            ShimSqlConnection.AllInstances.CreateCommand = _ => new SqlCommand();
+            ShimSqlConnection.AllInstances.CreateCommand = _ => sqlCommand;
             ShimSqlCommand.ConstructorStringSqlConnectionSqlTransaction = (_, _1, _2, _3) => new SqlCommand();
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => DummyInt;
             ShimSqlCommand.AllInstances.ExecuteReader = _ => dataReader;
@@ -154,8 +155,6 @@ namespace PortfolioEngineCore.Tests
             ShimDisabledItemEventScope.AllInstances.Dispose = _ => { };
             ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => spUser;
             ShimSPSiteDataQuery.Constructor = _ => new ShimSPSiteDataQuery();
-            //ShimPFEBase.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimPFEBase();
-            //ShimPFEBase.ConstructorStringSecurityLevelsBoolean = (_, _1, _2, _3) => new ShimPFEBase();
             ShimSqlDb.AllInstances.TransactionGet = _ => transaction;
             ShimSqlDb.ReadIntValueObject = _ => DummyInt;
             ShimSqlDb.ReadIntValueObjectBooleanOut = (object input, out bool output) =>
@@ -181,6 +180,7 @@ namespace PortfolioEngineCore.Tests
             publicInstance = BindingFlags.Instance | BindingFlags.Public;
             nonPublicInstance = BindingFlags.Instance | BindingFlags.NonPublic;
             guid = Guid.Parse(SampleGuidString1);
+            sqlCommand = new SqlCommand();
             spWeb = new ShimSPWeb()
             {
                 IDGet = () => guid,
@@ -336,6 +336,7 @@ namespace PortfolioEngineCore.Tests
         public void TearDown()
         {
             shimsContext?.Dispose();
+            sqlCommand?.Dispose();
         }
 
         [TestMethod]
