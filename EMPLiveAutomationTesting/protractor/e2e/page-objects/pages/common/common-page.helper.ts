@@ -531,12 +531,12 @@ export class CommonPageHelper {
         StepLogger.stepId(2);
         StepLogger.step('Select the check box for two records');
         StepLogger.subStep('Select the first record');
-        await ElementHelper.actionHoverOver(CommonPage.getNthRecord());
-        await PageHelper.click(CommonPage.getNthRecord());
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord(1));
+        await PageHelper.click(CommonPage.getNthRecord(1));
 
         await browser.sleep(PageHelper.timeout.xs);
         StepLogger.subStep('Select the Second record');
-        await ElementHelper.actionHoverOver(CommonPage.getNthRecord(3));
+        await ElementHelper.actionHoverOver(CommonPage.getNthRecord(2));
         await PageHelper.click(CommonPage.getNthRecord(2));
         await this.clickItemTab();
     }
@@ -906,7 +906,7 @@ export class CommonPageHelper {
 
     static async selectProjectAndClickEllipsisButton(item = CommonPage.record) {
         await CommonPageHelper.selectRecordFromGrid(item);
-
+        await CommonPageHelper.clickItemTab();
         await ElementHelper.actionMouseMove(item);
 
         await CommonPageHelper.clickIconEllipsisHorizontal();

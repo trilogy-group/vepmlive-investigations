@@ -7,17 +7,37 @@ import {HomePage} from '../../../../page-objects/pages/homepage/home.po';
 import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
 import {ModelerPageHelper} from '../../../../page-objects/pages/items-page/project-item/modeler-page/modeler-page.helper';
-// import { WaitHelper } from '../../../../components/html/wait-helper';
-// import { ModelerPage } from '../../../../page-objects/pages/items-page/project-item/modeler-page/modeler.po';
+// import {ProjectItemPageHelper} from '../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import {LoginPageHelper} from '../../../../page-objects/pages/login/login-page.helper';
+import {EditCostHelper} from '../../../../page-objects/pages/items-page/project-item/edit-cost-page/edit-cost.helper';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
+    let project1 = '';
+    let project2 = '';
+    let id = '';
 
     beforeEach(async () => {
-
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
+        console.log(project1);
+        console.log(project2);
+    });
+
+    beforeAll(async () => {
+        await new LoginPage().goToAndLogin();
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+        );
+        id = PageHelper.getUniqueId();
+        project1 = await EditCostHelper.createProjectWithCost(`${id} 1`);
+        await EditCostHelper.clickCloseCostPlanner();
+        project2 = await EditCostHelper.createProjectWithCost(`${id} 2`);
+        await EditCostHelper.clickCloseCostPlanner();
+        await LoginPageHelper.logout();
     });
 
     it('Verify the select Version(s) Selection box. - [744210]', async () => {
@@ -189,32 +209,33 @@ describe(SuiteNames.regressionTestSuite, () => {
     //     await ModelerPageHelper.verifyBothRibbonsCollapsed();
     // });
 
-    // #REJECTED
-    // it('Verify the Apply Target button. - [744229]', async () => {
-    //     StepLogger.caseId = 744229;
-    //     // Step 1 is inside the below function
-    //     await CommonPageHelper.navigateToItemPageUnderNavigation(
-    //         HomePage.navigation.projects.projects,
-    //         CommonPage.pageHeaders.projects.projectsCenter,
-    //         CommonPageConstants.pageHeaders.projects.projectCenter,
-    //     );
-    //     await CommonPageHelper.verifyProjectCenterDisplayed();
-    //
-    //     // Step 2 is inside the below function
-    //     await CommonPageHelper.selectTwoRecordsFromGrid();
-    //
-    //     StepLogger.stepId(3);
-    //     await CommonPageHelper.gotoModeler();
-    //     await ModelerPageHelper.verifyModelerPopupDisplayed();
-    //
-    //     StepLogger.stepId(4);
-    //     await ModelerPageHelper.clickOkButtonOnPopup();
-    //     await ModelerPageHelper.modelerPageDisplayed();
-    //
-    //     StepLogger.stepId(5);
-    //     await ModelerPageHelper.clickApplyTarget();
-    //     await ModelerPageHelper.verifyNoTargetsAlert();
-    // });
+    it('Verify the Apply Target button. - [744229]', async () => {
+        StepLogger.caseId = 744229;
+        StepLogger.preCondition('Enter valid user name and password. Create 2 projects by following 783206');
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+        );
+        await CommonPageHelper.verifyProjectCenterDisplayed();
+        await EditCostHelper.searchByName(id);
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        // await CommonSubPageHelper.selectProject(project1);
+        // await CommonSubPageHelper.selectProject(project2);
+        StepLogger.stepId(3);
+        await CommonPageHelper.clickItemTab();
+        await CommonPageHelper.gotoModeler();
+        await ModelerPageHelper.verifyModelerPopupDisplayed();
+        StepLogger.stepId(4);
+        await ModelerPageHelper.clickOkButtonOnPopup();
+        await ModelerPageHelper.modelerPageDisplayed();
+        StepLogger.stepId(5);
+        await ModelerPageHelper.clickApplyTarget();
+        await ModelerPageHelper.verifyNoTargetsAlert();
+        await PageHelper.acceptAlert();
+    });
 
     // #REJECTED
     // it('Verify the content of View Tab - [744239]', async () => {
