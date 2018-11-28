@@ -28,7 +28,7 @@ pipeline {
 					sh "${env.WORKSPACE}/BuildJenkins/Protractor/update-hosts-file.sh ${params.TargetHost} ${params.FullHostName}"
 				}
 				script{
-					env.VERSION = "(${env.BRANCH_NAME$}#{env.BUILD_NUMBER})"
+					env.VERSION = "(${env.BRANCH_NAME}#${env.BUILD_NUMBER})"
 				}
 			}
 		}
