@@ -583,7 +583,10 @@ namespace EPMLiveWebParts
                     yAxisFieldValue = GetCleanNumberValue(yAxisFieldValue.Substring(yAxisFieldValue.IndexOf(";#") + 2))
                         .ToString();
                 }
-                if (GetFieldSchemaAttribValue(yAxis.SchemaXml, "Percentage").ToUpper() == "TRUE")
+                if (string.Equals(
+                    GetFieldSchemaAttribValue(yAxis.SchemaXml, "Percentage"),
+                    bool.TrueString,
+                    StringComparison.OrdinalIgnoreCase))
                 {
                     try
                     {
