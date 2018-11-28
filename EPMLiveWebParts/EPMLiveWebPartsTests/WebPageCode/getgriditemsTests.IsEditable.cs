@@ -34,6 +34,8 @@ namespace EPMLiveWebParts.Tests
             _usepopup = false;
             _cleanValues = false;
             _workspaceUrl = true;
+
+            _newItemNode = null;
         }
 
         [TestCleanup]

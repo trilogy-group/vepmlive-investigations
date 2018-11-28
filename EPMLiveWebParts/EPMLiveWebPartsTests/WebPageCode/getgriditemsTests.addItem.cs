@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Fakes;
 using System.Collections.Generic;
@@ -25,6 +25,7 @@ using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.SharePoint.Workflow;
 using Microsoft.SharePoint.Workflow.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Shouldly;
 
 namespace EPMLiveWebParts.Tests
@@ -34,6 +35,7 @@ namespace EPMLiveWebParts.Tests
         private const string ExampleUrl = "http://example.com";
         private const string TypeTextXml = "text/xml";
         private const string TypeTextPlain = "text/plain";
+        private const string TitleField = "Title";
         private const string AddItemMethod = "addItem";
         private bool _inEditmode;
         private bool _timesheet;
@@ -44,9 +46,10 @@ namespace EPMLiveWebParts.Tests
         private bool _cleanValues;
         private bool _workspaceUrl;
         private XmlDocument _xmlDocument;
+        private XmlNode _newItemNode;
 
         [TestMethod]
-        public void AddItem_EditNotInEditMode_()
+        public void AddItem_EditNotInEditMode_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
@@ -56,10 +59,18 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.Attributes["locked"].ShouldNotBeNull(),
+                () => _newItemNode.Attributes["locked"].Value.ShouldContainWithoutWhitespace("1"),
+                () => _newItemNode.Attributes["id"].ShouldNotBeNull(),
+                () => _newItemNode.Attributes["id"].Value.ShouldContainWithoutWhitespace(indexer),
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[#roweditid#]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_DocIcon_()
+        public void AddItem_DocIcon_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
@@ -69,10 +80,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_WorkspaceUrl_()
+        public void AddItem_WorkspaceUrl_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
@@ -82,10 +97,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"{DummyVal}\"><img src=\"{ExampleUrl}/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_ContentType_()
+        public void AddItem_ContentType_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
@@ -95,10 +114,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{TypeTextXml};#{TypeTextXml}\t{DummyVal}]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_ContentTypeNoListItemId_()
+        public void AddItem_ContentTypeNoListItemId_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
@@ -109,10 +132,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{TypeTextPlain};#{TypeTextPlain}\t{DummyVal}]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_FileLeafRefView_()
+        public void AddItem_FileLeafRefView_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
@@ -123,10 +150,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<A onfocus=\"OnLink(this)\" HREF=\"http://example.com\" onclick=\"return DispEx(this,event,'TRUE','FALSE','TRUE','SharePoint.OpenDocuments.3','0','SharePoint.OpenDocuments','','','','1','0','0','ows_PermMask')\">ows_BaseName</A>]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_FileLeafRefEdit_()
+        public void AddItem_FileLeafRefEdit_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
@@ -137,10 +168,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<A onfocus=\"OnLink(this)\" HREF=\"http://example.com\" onclick=\"return DispEx(this,event,'TRUE','FALSE','FALSE','SharePoint.OpenDocuments.3','0','SharePoint.OpenDocuments','','','','1','0','0','ows_PermMask')\">ows_BaseName<img src=\"/_layouts/images/blank.gif\" class=\"ms-hidden\" border=1 width=1 height=26 alt=\"Use SHIFT+ENTER to open the menu (new window).\"></A><img src=\"/_layouts/images/blank.gif\" width=13 style=\"visibility:hidden\" alt=\"\">]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_FileLeafRefEditLinkFilenameNoMenu_()
+        public void AddItem_FileLeafRefEditLinkFilenameNoMenu_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
@@ -151,10 +186,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<A onfocus=\"OnLink(this)\" HREF=\"http://example.com\" onclick=\"return DispEx(this,event,'TRUE','FALSE','TRUE','SharePoint.OpenDocuments.3','0','SharePoint.OpenDocuments','','','','1','0','0','ows_PermMask')\">ows_BaseName</A>]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_FileLeafRefEditLinkFilename_()
+        public void AddItem_FileLeafRefEditLinkFilename_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
@@ -165,10 +204,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<A onfocus=\"OnLink(this)\" HREF=\"http://example.com\" onclick=\"return DispEx(this,event,'TRUE','FALSE','FALSE','SharePoint.OpenDocuments.3','0','SharePoint.OpenDocuments','','','','1','0','0','ows_PermMask')\">ows_BaseName<img src=\"/_layouts/images/blank.gif\" class=\"ms-hidden\" border=1 width=1 height=26 alt=\"Use SHIFT+ENTER to open the menu (new window).\"></A><img src=\"/_layouts/images/blank.gif\" width=13 style=\"visibility:hidden\" alt=\"\">]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_TitleCleanValues_()
+        public void AddItem_TitleCleanValues_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
@@ -180,10 +223,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_TitleViewNotEditMode_()
+        public void AddItem_TitleViewNotEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -196,10 +243,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'view');return false;\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_TitleViewEditMode_()
+        public void AddItem_TitleViewEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -212,10 +263,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_TitleEditNotEditMode_()
+        public void AddItem_TitleEditNotEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -228,10 +283,17 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'edit');return false;\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_TitleEditEditMode_()
+        public void AddItem_TitleEditEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -244,10 +306,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_TitleLinkTitleNoMenuNotEditMode_()
+        public void AddItem_TitleLinkTitleNoMenuNotEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -260,10 +326,17 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'view');return false;\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_TitleLinkTitleNoMenuEditMode_()
+        public void AddItem_TitleLinkTitleNoMenuEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -276,10 +349,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_TitleLinkTitleNotEditMode_()
+        public void AddItem_TitleLinkTitleNotEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -292,10 +369,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'edit');return false;\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_TitleLinkTitleEditMode_()
+        public void AddItem_TitleLinkTitleEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -309,10 +390,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_TitleWorkspace_()
+        public void AddItem_TitleWorkspace_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -323,10 +408,16 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_TitleWorkplan_()
+        public void AddItem_TitleWorkplan_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -337,10 +428,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/tasks.aspx?ID=1\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"));
         }
 
         [TestMethod]
-        public void AddItem_TitlePlanner_()
+        public void AddItem_TitlePlanner_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -351,10 +446,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/workplanner.aspx?ID=1&Source=DummyVal\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_TitleTasks_()
+        public void AddItem_TitleTasks_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -365,10 +464,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/http://example.com?FilterField1=Project&FilterValue1=\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesCalculatedIndicator_()
+        public void AddItem_CleanValuesCalculatedIndicator_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
@@ -379,10 +482,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<img src=\"/_layouts/images/dummyfieldname\">]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesCalculatedNonIndicator_()
+        public void AddItem_CleanValuesCalculatedNonIndicator_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
@@ -393,10 +500,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesUserFieldUserValue_()
+        public void AddItem_CleanValuesUserFieldUserValue_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
@@ -407,10 +518,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a Title=\"{DummyText}\"href=\"http://example.com/_layouts/userdisp.aspx?ID=1\">{DummyText}</a>]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesUserFieldUserValueCollection_()
+        public void AddItem_CleanValuesUserFieldUserValueCollection_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
@@ -428,10 +543,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a Title=\"{DummyText}\"href=\"http://example.com/_layouts/userdisp.aspx?ID=1\">{DummyText}</a>]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesMultiChoice_()
+        public void AddItem_CleanValuesMultiChoice_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
@@ -445,10 +564,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyVal}]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesLookup_()
+        public void AddItem_CleanValuesLookup_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
@@ -458,10 +581,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyVal}]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesDateTime_()
+        public void AddItem_CleanValuesDateTime_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
@@ -474,10 +601,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DateTime.Today.ToString("MM/dd/yyyy")} 12:00:00 AM]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesText_()
+        public void AddItem_CleanValuesText_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
@@ -488,10 +619,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_InEditModeNumber_()
+        public void AddItem_InEditModeNumber_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -505,10 +640,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"edn\"><![CDATA[100]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_InEditModeUserFieldUserValue_()
+        public void AddItem_InEditModeUserFieldUserValue_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -520,10 +659,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"usereditor\"><![CDATA[{DummyText}\n{DummyText}\t]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_InEditModeUserFieldUserValueCollection_()
+        public void AddItem_InEditModeUserFieldUserValueCollection_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -543,10 +686,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"usereditorm\"><![CDATA[{DummyText}\n{DummyText}\t]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_InEditModeMultiChoice_()
+        public void AddItem_InEditModeMultiChoice_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -560,10 +707,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"mchoice\"><![CDATA[{DummyFieldName};#{DummyFieldName}\t1;#1]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_InEditModeChoice_()
+        public void AddItem_InEditModeChoice_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -576,10 +727,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"choice\"><![CDATA[{DummyFieldName};#{DummyFieldName}	1;#1]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_InEditModeLookupMulti_()
+        public void AddItem_InEditModeLookupMulti_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -593,10 +748,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"mchoice\"><![CDATA[\n]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_InEditModeLookup_()
+        public void AddItem_InEditModeLookup_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -609,10 +768,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"ro\"><![CDATA[1;#{DummyVal}\t]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_InEditModeCalculated_()
+        public void AddItem_InEditModeCalculated_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -624,10 +787,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<img src=\"/_layouts/images/dummyfieldname\">]]></cell"));
         }
 
         [TestMethod]
-        public void AddItem_InEditModeCurrency_()
+        public void AddItem_InEditModeCurrency_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -638,10 +805,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"edn\"><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_InEditModeAttachmentsEmpty_()
+        public void AddItem_InEditModeAttachmentsEmpty_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -654,10 +825,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_InEditModeAttachmentsNotEmpty_()
+        public void AddItem_InEditModeAttachmentsNotEmpty_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -670,10 +845,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"{ExampleUrl}\"></a>]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_InEditModeText_()
+        public void AddItem_InEditModeText_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -686,10 +865,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"ed\"><![CDATA[]]></cell>"));
         }
         
         [TestMethod]
-        public void AddItem_InEditModeBooleanTrue_()
+        public void AddItem_InEditModeBooleanTrue_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -703,10 +886,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"ch\"><![CDATA[0]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_InEditModeBooleanFalse_()
+        public void AddItem_InEditModeBooleanFalse_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -719,10 +906,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"ch\"><![CDATA[0]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_InEditModeDateTime_()
+        public void AddItem_InEditModeDateTime_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -735,10 +926,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"dhxCalendarA\"><![CDATA[{DateTime.Today.ToString("MM/dd/yyyy")} 12:00:00 AM]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_InEditModeInteger_()
+        public void AddItem_InEditModeInteger_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -750,10 +945,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_NotInEditModeAttachmentsEmpty_()
+        public void AddItem_NotInEditModeAttachmentsEmpty_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -766,10 +965,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_NotInEditModeAttachmentsNotEmpty_()
+        public void AddItem_NotInEditModeAttachmentsNotEmpty_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -782,10 +985,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"{ExampleUrl}\"></a>]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_NotInEditModeUser_()
+        public void AddItem_NotInEditModeUser_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -797,10 +1004,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a Title=\"{DummyText}\"href=\"http://example.com/_layouts/userdisp.aspx?ID=1\">{DummyText}</a>]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_NotInEditModeCalculated_()
+        public void AddItem_NotInEditModeCalculated_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -812,10 +1023,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<img src=\"/_layouts/images/dummyfieldname\">]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_NotInEditModeMultiChoice_()
+        public void AddItem_NotInEditModeMultiChoice_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -827,10 +1042,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<![CDATA[<input type=\"checkbox\" style=\"display:none;\" onClick=\"(arguments[0]||event).cancelBubble=true;CheckBoxSelectRow(this);\">]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_NotInEditModeChoice_()
+        public void AddItem_NotInEditModeChoice_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -842,10 +1061,14 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<![CDATA[<input type=\"checkbox\" style=\"display:none;\" onClick=\"(arguments[0]||event).cancelBubble=true;CheckBoxSelectRow(this);\">]]></cell>"));
         }
 
         [TestMethod]
-        public void AddItem_NotInEditModeLookup_()
+        public void AddItem_NotInEditModeLookup_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -857,6 +1080,10 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
 
             // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"ro\"><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         private string PrepareForAddItem(string fieldName, string internalname, string linkType = "", SPFieldType fieldType = SPFieldType.Text, bool editable = true)
@@ -908,17 +1135,17 @@ namespace EPMLiveWebParts.Tests
             _privateObj.SetField("aViewFields", aViewFields);
 
             var hshItemNodes = new Hashtable();
-            hshItemNodes.Add("Title", DummyVal);
-            hshItemNodes.Add("SiteUrl", "");
-            hshItemNodes.Add("List", "");
-            hshItemNodes.Add("Site", "");
+            hshItemNodes.Add(TitleField, DummyVal);
+            hshItemNodes.Add("SiteUrl", string.Empty);
+            hshItemNodes.Add("List", string.Empty);
+            hshItemNodes.Add("Site", string.Empty);
             hshItemNodes.Add(internalname + "Text", "Text");
-            hshItemNodes.Add("ItemID", "");
-            hshItemNodes.Add("Work", "");
-            hshItemNodes.Add("WorkspaceUrl", "");
+            hshItemNodes.Add("ItemID", string.Empty);
+            hshItemNodes.Add("Work", string.Empty);
+            hshItemNodes.Add("WorkspaceUrl", string.Empty);
             if (!hshItemNodes.ContainsKey(internalname))
             {
-                hshItemNodes.Add(internalname, "");
+                hshItemNodes.Add(internalname, string.Empty);
             }
             _privateObj.SetField("hshColumnSelectFilter", hshItemNodes);
             _privateObj.SetField("hshItemNodes", hshItemNodes);
@@ -932,6 +1159,19 @@ namespace EPMLiveWebParts.Tests
 
             ShimPage.AllInstances.RequestGet = _ => new ShimHttpRequest();
             ShimHttpRequest.AllInstances.ItemGetString = (_, __) => DummyVal;
+
+            ShimXmlDocument.AllInstances.CreateNodeXmlNodeTypeStringString =
+            (docXml, type, name, ns) =>
+            {
+                var node = ShimsContext.ExecuteWithoutShims(() => docXml.CreateNode(type, name, ns));
+
+                if (type == XmlNodeType.Element && name == "row" && _newItemNode == null)
+                {
+                    _newItemNode = node;
+                }
+
+                return node;
+            };
 
             return indexer;
         }
@@ -1074,18 +1314,17 @@ namespace EPMLiveWebParts.Tests
         private XmlNode GetMenus(XmlNode ndNewItem)
         {
             var viewMenus = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
-            string strViewMenus = "";
-
+            var strViewMenus = string.Empty;
             foreach (int v in viewMenus)
             {
                 strViewMenus += "," + v.ToString();
             }
             strViewMenus = strViewMenus.Substring(1);
-            XmlNode ndUserData = _xmlDocument.CreateNode(XmlNodeType.Element, "userdata", _xmlDocument.NamespaceURI);
+
+            var ndUserData = _xmlDocument.CreateNode(XmlNodeType.Element, "userdata", _xmlDocument.NamespaceURI);
             ndUserData.InnerText = strViewMenus;
 
-            XmlAttribute attrName = _xmlDocument.CreateAttribute("name");
+            var attrName = _xmlDocument.CreateAttribute("name");
             attrName.Value = "viewMenus";
             ndUserData.Attributes.Append(attrName);
 
