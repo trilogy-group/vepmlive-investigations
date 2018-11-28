@@ -27,7 +27,9 @@ pipeline {
 				dir ("${env.WORKSPACE}/EMPLiveAutomationTesting/protractor") {
 					sh "${env.WORKSPACE}/BuildJenkins/Protractor/update-hosts-file.sh ${params.TargetHost} ${params.FullHostName}"
 				}
-				env.VERSION = "(${env.BRANCH_NAME$}#{env.BUILD_NUMBER})"
+				script{
+					env.VERSION = "(${env.BRANCH_NAME$}#{env.BUILD_NUMBER})"
+				}
 			}
 		}
 		stage('Executing UI tests') {
