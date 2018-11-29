@@ -1,62 +1,55 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Fakes;
 using System.Collections.Generic;
 using System.Collections.Generic.Fakes;
-using System.Collections.Specialized;
 using System.Data;
+using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.DirectoryServices.ActiveDirectory.Fakes;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Fakes;
+using System.Web.SessionState.Fakes;
 using System.Web.UI.Fakes;
 using System.Xml;
 using System.Xml.Fakes;
+using EPMLiveCore;
+using EPMLiveCore.API.Fakes;
+using EPMLiveCore.Fakes;
+using EPMLiveCore.Infrastructure;
+using EPMLiveCore.Infrastructure.Fakes;
+using EPMLiveCore.ReportHelper.Fakes;
 using EPMLiveWebParts;
 using EPMLiveWebParts.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
+using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
-using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.SharePoint.Workflow;
 using Microsoft.SharePoint.Workflow.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using Shouldly;
 
 namespace EPMLiveWebParts.Tests
 {
     public partial class getgriditemsTests
     {
-        private const string ExampleUrl = "http://example.com";
-        private const string TypeTextXml = "text/xml";
-        private const string TypeTextPlain = "text/plain";
-        private const string TitleField = "Title";
-        private const string AddItemMethod = "addItem";
-        private bool _inEditmode;
-        private bool _timesheet;
-        private bool _showCheckboxes;
-        private bool _isTimesheet;
-        private bool _titleFieldFound;
-        private bool _usepopup;
-        private bool _cleanValues;
-        private bool _workspaceUrl;
-        private XmlDocument _xmlDocument;
-        private XmlNode _newItemNode;
 
         [TestMethod]
-        public void AddItem_EditNotInEditMode_SetsNewItemRow()
+        public void AddItem_DataRowEditNotInEditMode_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
             var indexer = PrepareForAddItem("Edit", "DocIcon");
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("DocIcon") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -70,14 +63,14 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_DocIcon_SetsNewItemRow()
+        public void AddItem_DataRowDocIcon_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
             var indexer = PrepareForAddItem("Title", "DocIcon");
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("DocIcon") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -87,14 +80,14 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_WorkspaceUrl_SetsNewItemRow()
+        public void AddItem_DataRowWorkspaceUrl_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
             var indexer = PrepareForAddItem("Title", "WorkspaceUrl");
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("WorkspaceUrl") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -104,14 +97,14 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_ContentType_SetsNewItemRow()
+        public void AddItem_DataRowContentType_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
             var indexer = PrepareForAddItem("Title", "ContentType");
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ContentType") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -121,7 +114,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_ContentTypeNoListItemId_SetsNewItemRow()
+        public void AddItem_DataRowContentTypeNoListItemId_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
@@ -129,7 +122,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.IDGet = _ => 0;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ContentType") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -139,7 +132,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_FileLeafRefView_SetsNewItemRow()
+        public void AddItem_DataRowFileLeafRefView_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
@@ -147,7 +140,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("FileLeafRef") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -157,7 +150,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_FileLeafRefEdit_SetsNewItemRow()
+        public void AddItem_DataRowFileLeafRefEdit_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
@@ -165,7 +158,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("FileLeafRef") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -175,7 +168,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_FileLeafRefEditLinkFilenameNoMenu_SetsNewItemRow()
+        public void AddItem_DataRowFileLeafRefEditLinkFilenameNoMenu_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
@@ -183,7 +176,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("FileLeafRef") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -193,7 +186,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_FileLeafRefEditLinkFilename_SetsNewItemRow()
+        public void AddItem_DataRowFileLeafRefEditLinkFilename_SetsNewItemRow()
         {
             // Arrange
             _inEditmode = false;
@@ -201,7 +194,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("FileLeafRef") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -211,7 +204,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_TitleCleanValues_SetsNewItemRow()
+        public void AddItem_DataRowTitleCleanValues_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
@@ -220,7 +213,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -230,7 +223,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_TitleViewNotEditMode_SetsNewItemRow()
+        public void AddItem_DataRowTitleViewNotEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -240,7 +233,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -250,7 +243,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_TitleViewEditMode_SetsNewItemRow()
+        public void AddItem_DataRowTitleViewEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -260,7 +253,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -270,7 +263,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_TitleEditNotEditMode_SetsNewItemRow()
+        public void AddItem_DataRowTitleEditNotEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -280,7 +273,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -293,7 +286,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_TitleEditEditMode_SetsNewItemRow()
+        public void AddItem_DataRowTitleEditEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -303,7 +296,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -313,7 +306,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_TitleLinkTitleNoMenuNotEditMode_SetsNewItemRow()
+        public void AddItem_DataRowTitleLinkTitleNoMenuNotEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -323,7 +316,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -336,7 +329,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_TitleLinkTitleNoMenuEditMode_SetsNewItemRow()
+        public void AddItem_DataRowTitleLinkTitleNoMenuEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -346,7 +339,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -356,7 +349,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_TitleLinkTitleNotEditMode_SetsNewItemRow()
+        public void AddItem_DataRowTitleLinkTitleNotEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -366,7 +359,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -376,7 +369,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_TitleLinkTitleEditMode_SetsNewItemRow()
+        public void AddItem_DataRowTitleLinkTitleEditMode_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -387,7 +380,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -397,7 +390,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_TitleWorkspace_SetsNewItemRow()
+        public void AddItem_DataRowTitleWorkspace_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -405,7 +398,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -417,7 +410,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_TitleWorkplan_SetsNewItemRow()
+        public void AddItem_DataRowTitleWorkplan_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -425,7 +418,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -435,7 +428,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_TitlePlanner_SetsNewItemRow()
+        public void AddItem_DataRowTitlePlanner_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -443,7 +436,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -453,7 +446,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_TitleTasks_SetsNewItemRow()
+        public void AddItem_DataRowTitleTasks_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -461,7 +454,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -471,15 +464,16 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesCalculatedIndicator_SetsNewItemRow()
+        public void AddItem_DataRowCleanValuesCalculatedIndicator_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Calculated);
             ShimSPField.AllInstances.DescriptionGet = _ => "Indicator";
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldCalculated().Instance;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -489,15 +483,16 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesCalculatedNonIndicator_SetsNewItemRow()
+        public void AddItem_DataRowCleanValuesCalculatedNonIndicator_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Calculated);
             ShimSPField.AllInstances.DescriptionGet = _ => DummyVal;
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldCalculated().Instance;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -507,7 +502,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesUserFieldUserValue_SetsNewItemRow()
+        public void AddItem_DataRowCleanValuesUserFieldUserValue_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
@@ -515,7 +510,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPField.AllInstances.GetFieldValueString = (_, __) => new ShimSPFieldUserValue().Instance;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -525,7 +520,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesUserFieldUserValueCollection_SetsNewItemRow()
+        public void AddItem_DataRowCleanValuesUserFieldUserValueCollection_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
@@ -540,7 +535,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPField.AllInstances.GetFieldValueString = (_, __) => shimFields.Instance;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -550,7 +545,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesMultiChoice_SetsNewItemRow()
+        public void AddItem_DataRowCleanValuesMultiChoice_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
@@ -561,7 +556,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPFieldMultiChoiceValue.AllInstances.ItemGetInt32 = (_, __) => DummyVal;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -571,14 +566,15 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesLookup_SetsNewItemRow()
+        public void AddItem_DataRowCleanValuesLookup_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Lookup);
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldLookup { LookupListGet = () => Guid.NewGuid().ToString() }.Instance;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -588,7 +584,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesDateTime_SetsNewItemRow()
+        public void AddItem_DataRowCleanValuesDateTime_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
@@ -598,7 +594,7 @@ namespace EPMLiveWebParts.Tests
                 (a, b, c, d) => DateTime.Today.ToString();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID", DateTime.Today.ToString()) });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -608,7 +604,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_CleanValuesText_SetsNewItemRow()
+        public void AddItem_DataRowCleanValuesText_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = true;
@@ -616,7 +612,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPListItem.AllInstances.ItemGetString = (_, __) => DummyText;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -626,18 +622,19 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_InEditModeNumber_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeNumber_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
             _inEditmode = true;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Number, editable: true);
             ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><value Percentage=\"TRUE\">1</value></root>";
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldNumber { ShowAsPercentageGet = () => true }.Instance;
             Shimgetgriditems.AllInstances.getFieldSPListItemStringBoolean =
                 (a, b, c, d) => "1";
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -647,7 +644,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_InEditModeUserFieldUserValue_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeUserFieldUserValue_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -656,7 +653,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPField.AllInstances.GetFieldValueString = (_, __) => new ShimSPFieldUserValue().Instance;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -666,7 +663,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_InEditModeUserFieldUserValueCollection_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeUserFieldUserValueCollection_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -683,7 +680,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><value Type=\"UserMulti\">1</value></root>";
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -693,7 +690,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_InEditModeMultiChoice_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeMultiChoice_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -704,7 +701,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><CHOICE>1</CHOICE></root>";
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -714,7 +711,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_InEditModeChoice_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeChoice_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -724,7 +721,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><CHOICE>1</CHOICE></root>";
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -734,7 +731,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_InEditModeLookupMulti_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeLookupMulti_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -745,7 +742,7 @@ namespace EPMLiveWebParts.Tests
             _privateObj.SetField("hshComboCells", new Hashtable());
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("LookupMulti") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -755,17 +752,18 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_InEditModeLookup_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeLookup_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
             _inEditmode = true;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Lookup, editable: true);
             ShimSPField.AllInstances.SchemaXmlGet = _ => "<root List='1' ShowField='1'></root>";
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldLookup { LookupListGet = () => Guid.NewGuid().ToString() }.Instance;
             _privateObj.SetField("hshComboCells", new Hashtable());
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -775,16 +773,17 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_InEditModeCalculated_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeCalculated_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
             _inEditmode = true;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Calculated, editable: true);
             ShimSPField.AllInstances.DescriptionGet = _ => "Indicator";
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldCalculated().Instance;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -794,7 +793,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_InEditModeCurrency_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeCurrency_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -802,7 +801,7 @@ namespace EPMLiveWebParts.Tests
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Currency, editable: true);
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -812,7 +811,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_InEditModeAttachmentsEmpty_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeAttachmentsEmpty_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -822,7 +821,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPAttachmentCollection.AllInstances.CountGet = _ => 0;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -832,7 +831,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_InEditModeAttachmentsNotEmpty_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeAttachmentsNotEmpty_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -842,7 +841,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPAttachmentCollection.AllInstances.CountGet = _ => 1;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -852,7 +851,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_InEditModeText_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeText_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -862,7 +861,7 @@ namespace EPMLiveWebParts.Tests
                 (a, b, c, d) => $"{DummyText}.{DummyVal}";
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -870,9 +869,9 @@ namespace EPMLiveWebParts.Tests
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
                 () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"ed\"><![CDATA[]]></cell>"));
         }
-        
+
         [TestMethod]
-        public void AddItem_InEditModeBooleanTrue_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeBooleanTrue_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -883,7 +882,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPList.AllInstances.TitleGet = _ => "Project Center";
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -893,7 +892,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_InEditModeBooleanFalse_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeBooleanFalse_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -903,7 +902,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPWeb.AllInstances.TitleGet = _ => "false";
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -913,7 +912,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_InEditModeDateTime_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeDateTime_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -923,7 +922,7 @@ namespace EPMLiveWebParts.Tests
                 (a, b, c, d) => DateTime.Today.ToString();
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID", DateTime.Today.ToString()) });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -933,7 +932,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_InEditModeInteger_SetsNewItemRow()
+        public void AddItem_DataRowInEditModeInteger_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -942,7 +941,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPField.AllInstances.TypeAsStringGet = _ => "Integer";
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -952,7 +951,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_NotInEditModeAttachmentsEmpty_SetsNewItemRow()
+        public void AddItem_DataRowNotInEditModeAttachmentsEmpty_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -962,7 +961,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPAttachmentCollection.AllInstances.CountGet = _ => 0;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -972,7 +971,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_NotInEditModeAttachmentsNotEmpty_SetsNewItemRow()
+        public void AddItem_DataRowNotInEditModeAttachmentsNotEmpty_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -982,7 +981,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPAttachmentCollection.AllInstances.CountGet = _ => 1;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -992,16 +991,17 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_NotInEditModeUser_SetsNewItemRow()
+        public void AddItem_DataRowNotInEditModeUser_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
             _inEditmode = false;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.User, editable: false);
             ShimSPField.AllInstances.GetFieldValueString = (_, __) => new ShimSPFieldUserValue().Instance;
+            _privateObj.SetField("hshWBS", new Hashtable());
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -1011,16 +1011,17 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_NotInEditModeCalculated_SetsNewItemRow()
+        public void AddItem_DataRowNotInEditModeCalculated_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
             _inEditmode = false;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Calculated, editable: false);
             ShimSPField.AllInstances.DescriptionGet = _ => "Indicator";
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldCalculated().Instance;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -1030,7 +1031,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_NotInEditModeMultiChoice_SetsNewItemRow()
+        public void AddItem_DataRowNotInEditModeMultiChoice_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -1039,7 +1040,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPWeb.AllInstances.TitleGet = _ => "1,2";
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -1049,7 +1050,7 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_NotInEditModeChoice_SetsNewItemRow()
+        public void AddItem_DataRowNotInEditModeChoice_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
@@ -1058,7 +1059,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPWeb.AllInstances.TitleGet = _ => "1,2";
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -1068,16 +1069,17 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
-        public void AddItem_NotInEditModeLookup_SetsNewItemRow()
+        public void AddItem_DataRowNotInEditModeLookup_SetsNewItemRow()
         {
             // Arrange
             _cleanValues = false;
             _inEditmode = true;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Lookup, editable: false);
             ShimSPWeb.AllInstances.TitleGet = _ => "1,2";
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldLookup { LookupListGet = () => Guid.NewGuid().ToString() }.Instance;
 
             // Act
-            _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
 
             // Assert
             _newItemNode.ShouldNotBeNull();
@@ -1086,282 +1088,109 @@ namespace EPMLiveWebParts.Tests
                 () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"ro\"><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
-        private string PrepareForAddItem(string fieldName, string internalname, string linkType = "", SPFieldType fieldType = SPFieldType.Text, bool editable = true)
+        private DataRow GetRow(string internalname, string itemID = "2")
         {
-            _xmlDocument = new XmlDocument();
+            var listId = "F316E11-C842-4440-9918-39A8F1C12DA9";
+            var webID = "1A8F7946-CCA1-4A24-8785-CE8E32D012BE";
+            var ID = "5D592B57-C072-4B36-8809-11262120484D";
 
-            var listId = Guid.NewGuid().ToString();
-            var webId = Guid.NewGuid().ToString();
-            var iD = Guid.NewGuid().ToString();
-            var indexer = $"{webId}.{listId}.{iD}";
+            ResetFields(listId, webID, ID);
 
-            var hshWBS = new Hashtable();
-            hshWBS.Add($"Admin\n{DummyText}", _xmlDocument.CreateNode(XmlNodeType.Element, DummyFieldName, _xmlDocument.NamespaceURI));
+            var dt = new DataTable();
+            var newRow = dt.NewRow();
+            var newColumn = new DataColumn("CustomerID");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn("SiteUrl");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn("ItemID");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn("Work");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn("TestColumn");
+            dt.Columns.Add(newColumn);
 
-            var hshFieldProperties = new Hashtable();
-            hshFieldProperties.Add(listId, new Dictionary<string, Dictionary<string, string>>());
+            newColumn = new DataColumn("WebID");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn("ListID");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn("List");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn("ID");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn("siteid");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn("ParentItem");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn("Created");
+            dt.Columns.Add(newColumn);
 
+            newColumn = new DataColumn("CommentCount");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn("TSDisableItem");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn("Commenters");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn("Author");
+            dt.Columns.Add(newColumn);
+            if (!dt.Columns.Contains(internalname))
+            {
+                newColumn = new DataColumn(internalname);
+                dt.Columns.Add(newColumn);
+            }
+            newColumn = new DataColumn("AssignedTo");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn("CommentersRead");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn(internalname + "ID");
+            dt.Columns.Add(newColumn);
+            newColumn = new DataColumn(internalname + "Text");
+            dt.Columns.Add(newColumn);
+            if (internalname != "WorkspaceUrl")
+            {
+                newColumn = new DataColumn("WorkspaceUrl");
+                dt.Columns.Add(newColumn);
+            }
+            if (internalname != "Title")
+            {
+                newColumn = new DataColumn("Title");
+                dt.Columns.Add(newColumn);
+            }
+            newRow["SiteUrl"] = "";
+            newRow["ItemID"] = itemID;
+            newRow["Created"] = DateTime.Now;
+            newRow[internalname + "ID"] = "13,14,15,16,17";
+            newRow[internalname + "Text"] = "A,B,C,D,E";
+            newRow["Title"] = "First Project";
+            newRow["Work"] = "";
+            if (internalname != "WorkspaceUrl")
+                newRow["WorkspaceUrl"] = "http://testURL";
+            newRow["WebID"] = webID;
+            newRow["ListID"] = listId;
+            newRow["ID"] = ID;
+            newRow["siteid"] = "";
+            newRow["ParentItem"] = "";
+            if (newRow[internalname] == null)
+            {
+                newRow[internalname] = DummyVal;
+            }
+            newRow["CommentCount"] = "20";
+            newRow["TSDisableItem"] = "";
+            newRow["Commenters"] = "";
+            newRow["Author"] = "";
+            newRow["AssignedTo"] = "2";
+            newRow["CommentersRead"] = "";
+            newRow["List"] = "ICON";
+            newRow["TestColumn"] = $"{DummyText}.{DummyText}";
+
+            return newRow;
+        }
+
+        private void ResetFields(string listId, string webID, string iD)
+        {
             var arrItems = new SortedList();
-            arrItems.Add(indexer, new string[] { "Admin" });
-
-            var hshLists = new Hashtable();
-            hshLists.Add("ICON", "test.png");
-
-            _privateObj.SetField("hshWBS", hshWBS);
-            _privateObj.SetField("hshFieldProperties", hshFieldProperties);
+            arrItems.Add(webID + "." + listId + "." + iD, new string[] { "Admin" });
             _privateObj.SetField("arrItems", arrItems);
-            _privateObj.SetField("hshLists", hshLists);
-            _privateObj.SetField("docXml", _xmlDocument);
-            _privateObj.SetField("inEditMode", _inEditmode);
-            _privateObj.SetField("isTimesheet", _timesheet);
-            _privateObj.SetField("showCheckboxes", _showCheckboxes);
-            _privateObj.SetField("isTimesheet", _isTimesheet);
-            _privateObj.SetField("titleFieldFound", _titleFieldFound);
-            _privateObj.SetField("bUseReporting", true);
-            _privateObj.SetField("DoesUserHavePermissionsApproveItems", true);
-            _privateObj.SetField("usePopup", _usepopup);
-            _privateObj.SetField("bCleanValues", _cleanValues);
-            _privateObj.SetField("bWorkspaceUrl", _workspaceUrl);
-            _privateObj.SetField("rolluplists", new string[] { DummyVal });
-            _privateObj.SetField("linktype", linkType);
-            _privateObj.SetField("list", new ShimSPList().Instance);
-
-            var hshComboCells = new Hashtable
-            {
-                { $"{internalname}-{listId}-{webId}", DummyVal }
-            };
-            _privateObj.SetField("hshComboCells", hshComboCells);
-
-            var aViewFields = new ArrayList();
-            aViewFields.Add(fieldName);
-            _privateObj.SetField("aViewFields", aViewFields);
-
-            var hshItemNodes = new Hashtable();
-            hshItemNodes.Add(TitleField, DummyVal);
-            hshItemNodes.Add("SiteUrl", string.Empty);
-            hshItemNodes.Add("List", string.Empty);
-            hshItemNodes.Add("Site", string.Empty);
-            hshItemNodes.Add(internalname + "Text", "Text");
-            hshItemNodes.Add("ItemID", string.Empty);
-            hshItemNodes.Add("Work", string.Empty);
-            hshItemNodes.Add("WorkspaceUrl", string.Empty);
-            if (!hshItemNodes.ContainsKey(internalname))
-            {
-                hshItemNodes.Add(internalname, string.Empty);
-            }
-            _privateObj.SetField("hshColumnSelectFilter", hshItemNodes);
-            _privateObj.SetField("hshItemNodes", hshItemNodes);
-
-            ShimSharePoint(internalname, fieldType, listId, webId);
-
-            Shimgetgriditems.AllInstances.getFieldSPListItemStringBoolean =
-                (a, b, c, d) => DummyFieldName;
-            Shimgetgriditems.AllInstances.isEditableSPListItemSPFieldDictionaryOfStringDictionaryOfStringString =
-                (a, b, c, d) => editable;
-
-            ShimPage.AllInstances.RequestGet = _ => new ShimHttpRequest();
-            ShimHttpRequest.AllInstances.ItemGetString = (_, __) => DummyVal;
-
-            ShimXmlDocument.AllInstances.CreateNodeXmlNodeTypeStringString =
-            (docXml, type, name, ns) =>
-            {
-                var node = ShimsContext.ExecuteWithoutShims(() => docXml.CreateNode(type, name, ns));
-
-                if (type == XmlNodeType.Element && name == "row" && _newItemNode == null)
-                {
-                    _newItemNode = node;
-                }
-
-                return node;
-            };
-
-            return indexer;
-        }
-
-        private void ShimSharePoint(string internalname, SPFieldType fieldType, string listId, string webId)
-        {
-            Shimgetgriditems.AllInstances.addMenusXmlNodeSPListString = (a, ndNewItem, b, c) => GetMenus(ndNewItem);
-
-            ShimSPView.AllInstances.UrlGet = _ => ExampleUrl;
-            ShimSPContentTypeCollection.AllInstances.ItemGetInt32 = (_, __) => new ShimSPContentType { NameGet = () => TypeTextPlain };
-            ShimSPFormCollection.AllInstances.ItemGetPAGETYPE = (_, __) => new ShimSPForm();
-            ShimSPForm.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
-
-            ShimSPContext.CurrentGet = () => new ShimSPContext();
-            ShimSPContext.AllInstances.WebGet = _ => new ShimSPWeb();
-
-            PrepareSpListRelatedShims(listId);
-            PrepareSpFieldRelatedShims(internalname, fieldType);
-            PrepareSpWebRelatedShims(webId);
-            PrepareSpFileRelatedShims();
-            PrepareSpUserRelatedShims();
-        }
-
-        private static void PrepareSpListRelatedShims(string listId = null)
-        {
-            ShimSPListCollection.AllInstances.ItemGetString = (_, key) =>
-            {
-                switch (key)
-                {
-                    case "Project Schedules":
-                        return new ShimSPDocumentLibrary().Instance;
-                    default:
-                        return new ShimSPList();
-                }
-            };
-            ShimSPListCollection.AllInstances.ItemGetGuid = (_, __) => new ShimSPList();
-            ShimSPListItem.AllInstances.IDGet = _ => 1;
-            ShimSPListItem.AllInstances.ParentListGet = _ => new ShimSPList();
-            ShimSPListItem.AllInstances.FieldsGet = _ => new ShimSPFieldCollection();
-            ShimSPListItem.AllInstances.WebGet = _ => new ShimSPWeb();
-            ShimSPListItem.AllInstances.ContentTypeGet = _ => new ShimSPContentType { NameGet = () => TypeTextXml };
-            ShimSPListItem.AllInstances.XmlGet = _ => "<root ows_FileDirRef='ows_FileDirRef' ows_DocIcon='ows_DocIcon' ows_BaseName='ows_BaseName' ows_ContentTypeId='ows_ContentTypeId' ows_PermMask='ows_PermMask'></root>";
-            ShimSPListItem.AllInstances.ItemGetString = (_, key) =>
-            {
-                switch (key)
-                {
-                    case "Created":
-                        return DateTime.Today.ToString();
-                    case "CommentCount":
-                        return 2;
-                    default:
-                        return DummyVal;
-                }
-            };
-            ShimSPListItem.AllInstances.ItemGetGuid = (_, __) => DummyVal;
-
-            var listGuid = listId == null ? Guid.NewGuid() : new Guid(listId);
-            ShimSPList.AllInstances.IDGet = _ => listGuid;
-            ShimSPList.AllInstances.TitleGet = _ => DummyVal;
-            ShimSPList.AllInstances.ImageUrlGet = _ => $"image.png";
-            ShimSPList.AllInstances.ParentWebGet = _ => new ShimSPWeb();
-            ShimSPList.AllInstances.ContentTypesGet = _ => new ShimSPContentTypeCollection();
-            ShimSPList.AllInstances.FormsGet = _ => new ShimSPFormCollection();
-            ShimSPList.AllInstances.DefaultViewGet = _ => new ShimSPView();
-            ShimSPList.AllInstances.FieldsGet = _ => new ShimSPFieldCollection();
-            ShimSPList.AllInstances.EnableVersioningGet = _ => true;
-            ShimSPList.AllInstances.EnableModerationGet = _ => true;
-            ShimSPList.AllInstances.ViewsGet = _ => new ShimSPViewCollection { ItemGetGuid = __ => new ShimSPView() };
-            ShimSPList.AllInstances.ItemsGet = _ => new ShimSPListItemCollection();
-            ShimSPList.AllInstances.RootFolderGet = _ => new ShimSPFolder();
-            ShimSPFolder.AllInstances.NameGet = _ => "Project Center";
-
-            ShimSPListItemCollection.AllInstances.Add = _ => new ShimSPListItem();
-            var itemCollection = new ShimSPListItemCollection();
-            itemCollection.Bind(new List<SPListItem>
-            {
-                new ShimSPListItem()
-            });
-            ShimSPList.AllInstances.GetItemsSPQuery = (_, __) => itemCollection.Instance;
-            ShimSPList.AllInstances.GetItemsSPView = (_, __) => itemCollection.Instance;
-            ShimSPList.AllInstances.GetItemByIdInt32 = (_, __) => new ShimSPListItem();
-        }
-
-        private void PrepareSpUserRelatedShims()
-        {
-            ShimSPUser.AllInstances.IDGet = _ => 1;
-            ShimSPUser.AllInstances.LoginNameGet = _ => DummyText;
-            ShimSPUser.AllInstances.NameGet = _ => DummyText;
-        }
-
-        private void PrepareSpFieldRelatedShims(string internalname, SPFieldType fieldType)
-        {
-            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPField();
-            ShimSPFieldCollection.AllInstances.ContainsFieldWithStaticNameString = (_, __) => true;
-            ShimSPFieldCollection.AllInstances.ItemGetGuid = (_, __) => new ShimSPField();
-
-            var fieldId = Guid.NewGuid();
-            ShimSPField.AllInstances.IdGet = _ => fieldId;
-            ShimSPField.AllInstances.InternalNameGet = _ => internalname;
-            ShimSPField.AllInstances.TypeAsStringGet = _ => internalname;
-            ShimSPField.AllInstances.TypeGet = _ => fieldType;
-            ShimSPField.AllInstances.ReadOnlyFieldGet = _ => false;
-            ShimSPField.AllInstances.ShowInEditFormGet = _ => true;
-            ShimSPField.AllInstances.SchemaXmlGet = _ => "<root>1</root>";
-            ShimSPField.AllInstances.ParentListGet = _ => new ShimSPList();
-            ShimSPField.AllInstances.TitleGet = _ => DummyText;
-            ShimSPField.AllInstances.GetFieldValueString = (_, __) => DummyVal;
-            ShimSPField.AllInstances.GetFieldValueAsTextObject = (_, __) => DummyVal;
-            ShimSPField.AllInstances.GetFieldValueAsHtmlObject = (_, val) => val as string;
-            ShimSPFieldLookupValue.ConstructorString = (_, __) => { };
-            ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => 1;
-            ShimSPFieldLookupValue.AllInstances.LookupValueGet = _ => DummyVal;
-            ShimSPFieldLookupValueCollection.ConstructorString = (instance, _) =>
-            {
-                var shimFields = new ShimSPFieldLookupValueCollection(instance);
-                var list = new List<SPFieldLookupValue> { new ShimSPFieldLookupValue().Instance };
-                shimFields.Bind(list as IList<SPFieldLookupValue>);
-                var enumerator = list.GetEnumerator();
-                ShimList<SPFieldLookupValue>.AllInstances.GetEnumerator = x => enumerator;
-            };
-            ShimSPFieldUserValue.ConstructorSPWebString = (a, b, c) => { };
-            ShimSPFieldUserValue.AllInstances.LookupValueGet = _ => DummyText;
-            ShimSPFieldUserValue.AllInstances.UserGet = _ => new ShimSPUser();
-            ShimSPFieldUserValueCollection.ConstructorSPWebString = (instance, _, __) =>
-            {
-                var shimFields = new ShimSPFieldUserValueCollection(instance);
-                var list = new List<SPFieldUserValue> { new ShimSPFieldUserValue().Instance };
-                shimFields.Bind(list as IList<SPFieldUserValue>);
-                var enumerator = list.GetEnumerator();
-                ShimList<SPFieldUserValue>.AllInstances.GetEnumerator = x => enumerator;
-            };
-        }
-
-        private void PrepareSpFileRelatedShims()
-        {
-            ShimSPFolderCollection.AllInstances.ItemGetString = (_, __) => new ShimSPFolder();
-            ShimSPFolder.AllInstances.SubFoldersGet = _ => new ShimSPFolderCollection();
-            ShimSPFolder.AllInstances.FilesGet = _ => new ShimSPFileCollection();
-            ShimSPFileCollection.AllInstances.ItemGetInt32 = (_, __) => new ShimSPFile();
-            ShimSPFile.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
-        }
-
-        private void PrepareSpWebRelatedShims(string webId = null)
-        {
-            var webGuid = webId == null ? Guid.NewGuid() : new Guid(webId);
-            ShimSPWeb.AllInstances.IDGet = _ => webGuid;
-            ShimSPWeb.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
-            ShimSPWeb.AllInstances.UrlGet = _ => ExampleUrl;
-            ShimSPWeb.AllInstances.ListsGet = _ => new ShimSPListCollection();
-            ShimSPWeb.AllInstances.LanguageGet = _ => 1;
-            ShimSPWeb.AllInstances.CurrentUserGet = _ => new ShimSPUser();
-            ShimSPWeb.AllInstances.FoldersGet = _ => new ShimSPFolderCollection();
-            ShimSPWeb.AllInstances.TitleGet = _ => "1";
-            ShimSPWeb.AllInstances.SiteGet = _ => new ShimSPSite();
-            ShimSPWeb.AllInstances.LocaleGet = _ => CultureInfo.InvariantCulture;
-            ShimSPWeb.AllInstances.AllUsersGet = _ => new ShimSPUserCollection();
-            ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => new ShimSPUser
-            {
-                NameGet = () => DummyText
-            };
-
-            var properties = new StringDictionary { { "reportingV2", bool.TrueString } };
-            var propertyBag = new ShimSPPropertyBag();
-            propertyBag.Bind(properties);
-            ShimSPWeb.AllInstances.PropertiesGet = _ => propertyBag.Instance;
-            ShimSPSite.AllInstances.UrlGet = _ => ExampleUrl;
-        }
-
-        private XmlNode GetMenus(XmlNode ndNewItem)
-        {
-            var viewMenus = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            var strViewMenus = string.Empty;
-            foreach (int v in viewMenus)
-            {
-                strViewMenus += "," + v.ToString();
-            }
-            strViewMenus = strViewMenus.Substring(1);
-
-            var ndUserData = _xmlDocument.CreateNode(XmlNodeType.Element, "userdata", _xmlDocument.NamespaceURI);
-            ndUserData.InnerText = strViewMenus;
-
-            var attrName = _xmlDocument.CreateAttribute("name");
-            attrName.Value = "viewMenus";
-            ndUserData.Attributes.Append(attrName);
-
-            ndNewItem.AppendChild(ndUserData);
-
-            return ndNewItem;
+            _privateObj.SetField("usewbs", "TestColumn");
         }
     }
 }
