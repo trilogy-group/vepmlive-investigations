@@ -3496,30 +3496,38 @@ namespace TimeSheets
         {
             ArrayList arrPeriods = new ArrayList();
 
-            SqlCommand cmd = new SqlCommand("SELECT period_start,period_end FROM TSPERIOD WHERE SITE_ID=@siteid and PERIOD_ID=@periodid", cn);
-            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-            cmd.Parameters.AddWithValue("@periodid", sPeriod);
-
-            SqlDataReader dr = cmd.ExecuteReader();
-
-            string[] dayDefs = settings.DayDef.Split('|');
-
-            if (dr.Read())
+            const string Command =
+                "SELECT period_start,period_end FROM TSPERIOD WHERE SITE_ID=@siteid and PERIOD_ID=@periodid";
+            using (var sqlCommand = new SqlCommand(Command, cn))
             {
-                DateTime dtStart = dr.GetDateTime(0);
-                DateTime dtEnd = dr.GetDateTime(1);
+                sqlCommand.Parameters.AddWithValue("@siteid", web.Site.ID);
+                sqlCommand.Parameters.AddWithValue("@periodid", sPeriod);
 
-                while (dtStart <= dtEnd)
+                using (var dataReader = sqlCommand.ExecuteReader())
                 {
-                    if (dayDefs[(int)dtStart.DayOfWeek * 3].ToLower() == "true")
-                    {
-                        arrPeriods.Add(dtStart);
-                    }
+                    var dayDefs = settings.DayDef.Split('|');
 
-                    dtStart = dtStart.AddDays(1);
+                    if (dataReader.Read())
+                    {
+                        var start = dataReader.GetDateTime(0);
+                        var end = dataReader.GetDateTime(1);
+
+                        while (start <= end)
+                        {
+                            const int DayMultiplier = 3;
+                            if (string.Equals(
+                                dayDefs[(int)start.DayOfWeek * DayMultiplier].ToLower(),
+                                bool.TrueString,
+                                StringComparison.OrdinalIgnoreCase))
+                            {
+                                arrPeriods.Add(start);
+                            }
+
+                            start = start.AddDays(1);
+                        }
+                    }
                 }
             }
-            dr.Close();
 
             return arrPeriods;
 
