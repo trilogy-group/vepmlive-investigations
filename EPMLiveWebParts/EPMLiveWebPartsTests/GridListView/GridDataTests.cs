@@ -68,6 +68,7 @@ namespace EPMLiveWebParts.Tests
         private DateTime currentDateTime;
         private int validations;
         private const int DummyInt = 1;
+        private const int Zero = 0;
         private const int One = 1;
         private const int Two = 2;
         private const int Three = 3;
@@ -78,6 +79,10 @@ namespace EPMLiveWebParts.Tests
         private const string DummyString = "DummyString";
         private const string IDStringCaps = "ID";
         private const string SampleUrl = "http://www.sampleurl.com";
+        private const string HierarchyParentKeyString = "HierarchyParentKey";
+        private const string KeyString = "Key";
+        private const string IdNumberString = "idno";
+        private const string RowIdString = "rowid";
         private const string GetListIDMethodName = "GetListID";
         private const string UsePopupMethodName = "UsePopup";
         private const string GetActionMethodName = "GetAction";
@@ -92,6 +97,11 @@ namespace EPMLiveWebParts.Tests
         private const string InitRoutineMethodName = "InitRoutine";
         private const string ConvertXmlToDatatableMethodName = "ConvertXmlToDatatable";
         private const string InitializeGanttStartAndFinishMethodName = "InitializeGanttStartAndFinish";
+        private const string FinalizeDataMethodName = "FinalizeData";
+        private const string AddRowHierarchyMethodName = "AddRowHierarchy";
+        private const string AddReqdFieldsToViewMethodName = "AddReqdFieldsToView";
+        private const string RemoveReqdFieldsFromViewMethodName = "RemoveReqdFieldsFromView";
+        private const string InitializeColumnDefsMethodName = "InitializeColumnDefs";
 
         [TestInitialize]
         public void Setup()
@@ -173,9 +183,11 @@ namespace EPMLiveWebParts.Tests
                 FoldersGet = () => spFolderCollection,
                 CurrentUserGet = () => spUser,
                 ServerRelativeUrlGet = () => SampleUrl,
+                UrlGet = () => SampleUrl,
                 AllUsersGet = () => new ShimSPUserCollection(),
                 SiteUsersGet = () => new ShimSPUserCollection(),
-                GetListFromUrlString = _ => spList
+                GetListFromUrlString = _ => spList,
+                Update = () => { }
             };
             spSite = new ShimSPSite()
             {
@@ -208,7 +220,8 @@ namespace EPMLiveWebParts.Tests
                 ContentTypesGet = () => spContentTypeCollection,
                 TitleGet = () => DummyString,
                 EventReceiversGet = () => new ShimSPEventReceiverDefinitionCollection(),
-                DefaultViewUrlGet = () => SampleUrl
+                DefaultViewUrlGet = () => SampleUrl,
+                Update = () => { }
             };
             spListItemCollection = new ShimSPListItemCollection()
             {
@@ -242,7 +255,8 @@ namespace EPMLiveWebParts.Tests
                 ReadOnlyFieldGet = () => false,
                 HiddenGet = () => false,
                 ReorderableGet = () => true,
-                TypeAsStringGet = () => DummyString
+                TypeAsStringGet = () => DummyString,
+                DescriptionGet = () => DummyString
             };
             spUser = new ShimSPUser()
             {
@@ -285,7 +299,8 @@ namespace EPMLiveWebParts.Tests
             spView = new ShimSPView()
             {
                 ViewFieldsGet = () => spViewFieldCollection,
-                ServerRelativeUrlGet = () => SampleUrl
+                ServerRelativeUrlGet = () => SampleUrl,
+                Update = () => { }
             };
             spViewFieldCollection = new ShimSPViewFieldCollection()
             {
@@ -1314,6 +1329,292 @@ namespace EPMLiveWebParts.Tests
             startDate.ShouldSatisfyAllConditions(
                 () => startDate.ShouldBe(currentDateTime.AddDays(-2)),
                 () => finishDate.ShouldBe(currentDateTime.AddDays(2)));
+        }
+
+        [TestMethod]
+        public void FinalizeData_WhenCalled_FinalizesData()
+        {
+            // Arrange
+            const string expected = "1,2,3";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var nodeData = new Hashtable()
+            {
+                [Zero] = default(XmlNode),
+                [One] = default(XmlNode)
+            };
+            var addRowPredecessors = 0;
+            var images = new List<string>()
+            {
+                One.ToString(),
+                Two.ToString(),
+                Three.ToString(),
+            };
+
+            dataTable.Columns.Add(HierarchyParentKeyString, typeof(int));
+            dataTable.Columns.Add(KeyString, typeof(int));
+
+            row = dataTable.NewRow();
+            row[HierarchyParentKeyString] = Zero;
+            row[KeyString] = One;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[HierarchyParentKeyString] = One;
+            row[KeyString] = Two;
+            dataTable.Rows.Add(row);
+
+            ShimGridData.AllInstances.AddRowHierarchyDataRowDataTableXmlNode = (_, rowInput, table, node) =>
+            {
+                validations += 1;
+            };
+            ShimGridData.AllInstances.AddRowPredecessorsDataRowDataTable = (_, rowInput, table) =>
+            {
+                addRowPredecessors += 1;
+                if ((int)rowInput[HierarchyParentKeyString] == (int)rowInput[KeyString])
+                {
+                    validations += 1;
+                }
+            };
+            ShimGanttUtilities.ImageNamesSetListOfString = _ =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty("_htNodeData", nonPublicInstance, nodeData);
+            privateObject.SetFieldOrProperty("_images", nonPublicInstance, images);
+            privateObject.SetFieldOrProperty("_imagesClientSide", nonPublicInstance, string.Empty);
+
+            // Act
+            privateObject.Invoke(FinalizeDataMethodName, nonPublicInstance, new object[] { dataTable });
+            var actual = privateObject.GetFieldOrProperty("_imagesClientSide", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(expected),
+                () => addRowPredecessors.ShouldBe(2),
+                () => validations.ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void AddRowHierarchy_ParentNotRows_EditsDataRow()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg id=""2"">
+                    <row/>
+                </xmlcfg>";
+            var dataXml = new XmlDocument();
+            var node = default(XmlNode);
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            dataTable.Columns.Add(HierarchyParentKeyString, typeof(int));
+            dataTable.Columns.Add(KeyString, typeof(int));
+            dataTable.Columns.Add(IdNumberString, typeof(int));
+            dataTable.Columns.Add(RowIdString, typeof(int));
+
+            row = dataTable.NewRow();
+            row[HierarchyParentKeyString] = Zero;
+            row[KeyString] = Two;
+            row[IdNumberString] = Two;
+            row[RowIdString] = Two;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[HierarchyParentKeyString] = Zero;
+            row[KeyString] = One;
+            row[IdNumberString] = One;
+            row[RowIdString] = One;
+
+            dataXml.LoadXml(xmlString);
+            node = dataXml.FirstChild.FirstChild;
+
+            var parameters = new object[]
+            {
+                row,
+                dataTable,
+                node
+            };
+
+            // Act
+            privateObject.Invoke(AddRowHierarchyMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual[HierarchyParentKeyString].ToString().ShouldBe(Two.ToString());
+        }
+
+        [TestMethod]
+        public void AddRowHierarchy_ParentRows_EditsDataRow()
+        {
+            // Arrange
+            const string xmlString = @"
+                <rows id=""2"">
+                    <row/>
+                </rows>";
+            var dataXml = new XmlDocument();
+            var node = default(XmlNode);
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            dataTable.Columns.Add(HierarchyParentKeyString, typeof(int));
+            dataTable.Columns.Add(KeyString, typeof(int));
+            dataTable.Columns.Add(IdNumberString, typeof(int));
+            dataTable.Columns.Add(RowIdString, typeof(int));
+
+            row = dataTable.NewRow();
+            row[HierarchyParentKeyString] = Zero;
+            row[KeyString] = Two;
+            row[IdNumberString] = Two;
+            row[RowIdString] = Two;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[HierarchyParentKeyString] = Zero;
+            row[KeyString] = One;
+            row[IdNumberString] = One;
+            row[RowIdString] = One;
+
+            dataXml.LoadXml(xmlString);
+            node = dataXml.FirstChild.FirstChild;
+
+            var parameters = new object[]
+            {
+                row,
+                dataTable,
+                node
+            };
+
+            // Act
+            privateObject.Invoke(AddRowHierarchyMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual[HierarchyParentKeyString].ToString().ShouldBe(One.ToString());
+        }
+
+        [TestMethod]
+        public void AddReqdFieldsToView_WhenCalled_ReturnsSPWeb()
+        {
+            // Arrange
+            var stringCollection = new StringCollection()
+            {
+                DummyString
+            };
+            var requiredFields = new List<string>()
+            {
+                DummyString,
+                One.ToString()
+            };
+
+            GanttParameters.Add("List", DummyString);
+            GanttParameters.Add("View", DummyString);
+
+            spFieldCollection.ContainsFieldString = _ => true;
+            spWeb.AllowUnsafeUpdatesSetBoolean = input =>
+            {
+                validations += 1;
+            };
+            spViewFieldCollection.DeleteAll = () =>
+            {
+                validations += 1;
+            };
+            spViewFieldCollection.ToStringCollection = () =>
+            {
+                validations += 1;
+                return stringCollection;
+            };
+            spViewFieldCollection.AddString = _ =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty("_htGanttParams", nonPublicInstance, GanttParameters);
+            privateObject.SetFieldOrProperty("_reqdfields", nonPublicInstance, requiredFields);
+
+            // Act
+            var actual = (SPWeb)privateObject.Invoke(AddReqdFieldsToViewMethodName, nonPublicInstance, new object[] { });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldNotBeNull(),
+                () => validations.ShouldBe(7));
+        }
+
+        [TestMethod]
+        public void RemoveReqdFieldsFromView_WhenCalled_RemovesFieldsFromView()
+        {
+            // Arrange
+            var requiredFields = new List<string>()
+            {
+                DummyString,
+                One.ToString()
+            };
+
+            GanttParameters.Add("View", DummyString);
+
+            spFieldCollection.ContainsFieldString = _ => true;
+            spWeb.AllowUnsafeUpdatesSetBoolean = input =>
+            {
+                validations += 1;
+            };
+            spViewFieldCollection.DeleteString = _ =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty("_htGanttParams", nonPublicInstance, GanttParameters);
+            privateObject.SetFieldOrProperty("_reqdfields", nonPublicInstance, requiredFields);
+            privateObject.SetFieldOrProperty("_fieldsAddedToView", nonPublicInstance, requiredFields);
+
+            // Act
+            privateObject.Invoke(RemoveReqdFieldsFromViewMethodName, nonPublicInstance, new object[] { });
+
+            // Assert
+            validations.ShouldBe(4);
+        }
+
+        [TestMethod]
+        public void InitializeColumnDefs_WhenCalled_InitializeColumnDefinitions()
+        {
+            // Arrange
+            const string xmlString = @"<xmlcfg/>";
+            var fieldNames = new List<string>()
+            {
+                $"1|2",
+                DummyString,
+                "master_checkbox2"
+            };
+            var viewFields = new StringCollection()
+            {
+                DummyString
+            };
+
+            spFieldCollection.ContainsFieldString = _ => true;
+            spField.DescriptionGet = () => "indicator";
+
+            ShimGridData.AllInstances.IsHyperLinkStringInt32 = (_, _1, _2) => true;
+            ShimGridData.AllInstances.InitViewFieldNames = _ =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
+
+            // Act
+            privateObject.Invoke(InitializeColumnDefsMethodName, nonPublicInstance, new object[] { xmlString });
+            var actual = (DataTable)privateObject.GetFieldOrProperty("_columnDefinitions", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Rows.Count.ShouldBe(3),
+                () => actual.Rows[0]["DisplayName"].ToString().ShouldBe(fieldNames[0]),
+                () => actual.Rows[0]["InternalName"].ToString().ShouldBe(DummyString),
+                () => actual.Rows[0]["IsHyperLink"].ToString().ShouldBe("true"),
+                () => actual.Rows[0]["IsImage"].ToString().ShouldBe("true"),
+                () => validations.ShouldBe(1));
         }
     }
 }
