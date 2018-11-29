@@ -46,12 +46,11 @@ namespace WorkEnginePPM.Events.DataSync
         {
             if (!ValidateRequest(properties)) return;
 
-            string rbs = properties.AfterProperties["RBS"] as string ?? string.Empty;
-
-            if (properties.ListItemId > 0)
+            if (properties.ListItemId > 0) // This will true if item recovered from recycle otherwise it will be 0
             {
                 return;
             }
+            string rbs = properties.AfterProperties["RBS"] as string ?? string.Empty;
 
             try
             {
@@ -66,18 +65,18 @@ namespace WorkEnginePPM.Events.DataSync
 
                 SPWeb spWeb = properties.Web;
 
-                var spFieldLookupValueCollection = new SPFieldLookupValueCollection((string) rawManagers);
+                var spFieldLookupValueCollection = new SPFieldLookupValueCollection((string)rawManagers);
 
                 object managers = spFieldLookupValueCollection.Count == 0
-                                      ? (object) new SPFieldLookupValue((string) rawManagers)
+                                      ? (object)new SPFieldLookupValue((string)rawManagers)
                                       : spFieldLookupValueCollection;
 
-                var rawExecutives = (string) properties.AfterProperties["Executives"];
+                var rawExecutives = (string)properties.AfterProperties["Executives"];
 
                 spFieldLookupValueCollection = new SPFieldLookupValueCollection(rawExecutives);
 
                 object executives = spFieldLookupValueCollection.Count == 0
-                                        ? (object) new SPFieldLookupValue(rawExecutives)
+                                        ? (object)new SPFieldLookupValue(rawExecutives)
                                         : spFieldLookupValueCollection;
                 Guid uniqueId = Guid.NewGuid();
 
@@ -86,18 +85,19 @@ namespace WorkEnginePPM.Events.DataSync
                 SPQuery query = new SPQuery();
                 query.Query = "<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>" + sTitle + "</Value></Eq></Where>";
                 SPListItemCollection items = properties.List.GetItems(query);
-                if (items.Count > 0) {
+                if (items.Count > 0)
+                {
                     properties.Cancel = true;
                     properties.ErrorMessage = "Department with title '" + sTitle + "' already exists.";
                     return;
                 }
                 // ---
-                
+
                 using (var departmentManager = new DepartmentManager(spWeb))
                 {
 
                     DataTable dataTable = departmentManager.GetDataTable(properties.List.Items);
-                 
+
                     DataRow dataRow = dataTable.NewRow();
 
                     dataRow["Title"] = title;
@@ -134,20 +134,20 @@ namespace WorkEnginePPM.Events.DataSync
 
                         spListItem["Title"] = properties.AfterProperties["Title"];
 
-                        var rawManagers = (string) properties.AfterProperties["Managers"];
+                        var rawManagers = (string)properties.AfterProperties["Managers"];
 
                         var spFieldLookupValueCollection = new SPFieldLookupValueCollection(rawManagers);
 
                         object managers = spFieldLookupValueCollection.Count == 0
-                                              ? (object) new SPFieldLookupValue(rawManagers)
+                                              ? (object)new SPFieldLookupValue(rawManagers)
                                               : spFieldLookupValueCollection;
 
-                        var rawExecutives = (string) properties.AfterProperties["Executives"];
+                        var rawExecutives = (string)properties.AfterProperties["Executives"];
 
                         spFieldLookupValueCollection = new SPFieldLookupValueCollection(rawExecutives);
 
                         object executives = spFieldLookupValueCollection.Count == 0
-                                                ? (object) new SPFieldLookupValue(rawExecutives)
+                                                ? (object)new SPFieldLookupValue(rawExecutives)
                                                 : spFieldLookupValueCollection;
 
                         spListItem["Managers"] = new SPFieldLookupValueCollection(managers.ToString());
@@ -187,22 +187,22 @@ namespace WorkEnginePPM.Events.DataSync
         {
             if (!ValidateRequest(properties)) return;
             string Errmsg;
-            
+
             try
-            {                
+            {
                 using (var departmentManager = new DepartmentManager(properties.Web))
                 {
                     bool Isdel = departmentManager.PerformDepartmentDeleteCheck(properties, out Errmsg);
                     if (Isdel)
                     {
-                        departmentManager.Delete(properties.ListItem.ID, (string)properties.ListItem["EXTID"]);                        
+                        departmentManager.Delete(properties.ListItem.ID, (string)properties.ListItem["EXTID"]);
                     }
                     else
                     {
                         base.EventFiringEnabled = false;
                         properties.Cancel = true;
                         properties.ErrorMessage = Errmsg != string.Empty ? Errmsg : "There are resources related to this department. Please remove related resources from this Department before deleting.";
-                        properties.Status = SPEventReceiverStatus.CancelWithError;                        
+                        properties.Status = SPEventReceiverStatus.CancelWithError;
                     }
                 }
             }
@@ -233,23 +233,23 @@ namespace WorkEnginePPM.Events.DataSync
 
             try
             {
-                title = (string) (properties.AfterProperties["Title"] ?? properties.ListItem["Title"]);
+                title = (string)(properties.AfterProperties["Title"] ?? properties.ListItem["Title"]);
                 if (string.IsNullOrEmpty(title)) throw new Exception("Title cannot be empty.");
 
-                extId = (string) (properties.AfterProperties["EXTID"] ?? properties.ListItem["EXTID"]);
+                extId = (string)(properties.AfterProperties["EXTID"] ?? properties.ListItem["EXTID"]);
                 if (string.IsNullOrEmpty(extId)) throw new Exception("External ID cannot be empty.");
 
-                var managers = (string) (properties.AfterProperties["Managers"] ?? properties.ListItem["Managers"]);
+                var managers = (string)(properties.AfterProperties["Managers"] ?? properties.ListItem["Managers"]);
                 if (string.IsNullOrEmpty(managers))
                     throw new Exception("Please provide at least one department manager.");
 
                 managementUsers = new SPFieldLookupValueCollection(managers);
 
-                var executives = (string) properties.AfterProperties["Executives"];
+                var executives = (string)properties.AfterProperties["Executives"];
                 if (string.IsNullOrEmpty(executives)) executives = string.Empty;
                 executiveUsers = new SPFieldLookupValueCollection(executives);
 
-                rbs = new SPFieldLookupValue((string) properties.AfterProperties["RBS"]);
+                rbs = new SPFieldLookupValue((string)properties.AfterProperties["RBS"]);
 
                 using (var departmentManager = new DepartmentManager(properties.Web))
                 {
@@ -270,7 +270,8 @@ namespace WorkEnginePPM.Events.DataSync
                         "</And>" +
                         "</Where>";
                     SPListItemCollection items = properties.List.GetItems(query);
-                    if (items.Count > 0) {
+                    if (items.Count > 0)
+                    {
                         properties.Cancel = true;
                         properties.ErrorMessage = "Department with title '" + sTitle + "' already exists.";
                         return;
@@ -367,11 +368,11 @@ namespace WorkEnginePPM.Events.DataSync
 
                 foreach (DataRow dataRow in pfeDepartments.Rows)
                 {
-                    var title = (string) dataRow["Title"];
+                    var title = (string)dataRow["Title"];
 
                     try
                     {
-                        SPListItem spListItem = properties.List.GetItemById((int) dataRow["Id"]);
+                        SPListItem spListItem = properties.List.GetItemById((int)dataRow["Id"]);
 
                         if (spListItem["Title"].Equals(title)) continue;
 
@@ -402,7 +403,7 @@ namespace WorkEnginePPM.Events.DataSync
 
                 foreach (DataRow dataRow in pfeDepartments.Rows)
                 {
-                    var id = (int) dataRow["Id"];
+                    var id = (int)dataRow["Id"];
 
                     if (properties.ListItem != null)
                     {
@@ -415,7 +416,7 @@ namespace WorkEnginePPM.Events.DataSync
 
                     SPListItem spListItem = properties.List.GetItemById(id);
 
-                    var parent = (string) dataRow["Parent"];
+                    var parent = (string)dataRow["Parent"];
 
                     if (parent.Equals("-1"))
                     {
@@ -471,7 +472,7 @@ namespace WorkEnginePPM.Events.DataSync
 
             foreach (DataRow row in dataTable.Rows)
             {
-                var itemUniqueId = (Guid) row["UniqueId"];
+                var itemUniqueId = (Guid)row["UniqueId"];
 
                 if (itemUniqueId == uniqueId) continue;
 
