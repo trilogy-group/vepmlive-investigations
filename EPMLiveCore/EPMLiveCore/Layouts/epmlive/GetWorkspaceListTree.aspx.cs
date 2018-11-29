@@ -8,6 +8,7 @@ using Microsoft.SharePoint.WebControls;
 using EPMLiveCore.Infrastructure.Logging;
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 using Microsoft.SharePoint.Administration;
+using static System.Diagnostics.Trace;
 
 namespace EPMLiveCore
 {
@@ -91,47 +92,75 @@ namespace EPMLiveCore
                 {
                     using (SPSite tSite = new SPSite(siteid))
                     {
-                        SPWeb web = tSite.RootWeb;
-                        if (strSite == "false")
-                            web = SPContext.Current.Web;
-                        web.Site.CatchAccessDeniedException = false;
-
-                        doc.LoadXml("<rows></rows>");
-
-                        XmlNode mainNode = doc.ChildNodes[0];
-                        XmlNode headNode = doc.CreateNode(XmlNodeType.Element, "head", doc.NamespaceURI);
-                        XmlNode ndSettings = doc.CreateNode(XmlNodeType.Element, "settings", doc.NamespaceURI);
-                        XmlNode ndColwith = doc.CreateNode(XmlNodeType.Element, "colwidth", doc.NamespaceURI);
-                        ndColwith.InnerText = "%";
-                        ndSettings.AppendChild(ndColwith);
-                        headNode.AppendChild(ndSettings);
-
-                        mainNode.AppendChild(headNode);
-
-                        XmlAttribute attrType = doc.CreateAttribute("type");
-                        attrType.Value = "tree";
-                        XmlAttribute attrWidth = doc.CreateAttribute("width");
-                        attrWidth.Value = "100";
-                        XmlNode newNode = doc.CreateNode(XmlNodeType.Element, "column", doc.NamespaceURI);
-                        newNode.Attributes.Append(attrType);
-                        newNode.Attributes.Append(attrWidth);
-                        newNode.InnerText = "";
-
-                        headNode.AppendChild(newNode);
-
-                        try
-                        {
-                            addWebs(web, mainNode);
-                        }
-                        catch { }
-
-                        XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "iso-8859-1", null);
-                        doc.InsertBefore(xmlDeclaration, doc.DocumentElement);
-                        data = doc.OuterXml;
+                        AddMainNode(
+                            tSite,
+                            strSite,
+                            string.Empty,
+                            doc,
+                            (web, mainNode) => addWebs(web, mainNode),
+                            ref data,
+                            document =>
+                            {
+                                var xmlDeclaration = document.CreateXmlDeclaration("1.0", "iso-8859-1", null);
+                                document.InsertBefore(xmlDeclaration, doc.DocumentElement);
+                            });
                     }
                 });
 
             }
+        }
+
+        public static void AddMainNode(
+            SPSite spSite,
+            string site,
+            string innerNodeText,
+            XmlDocument xmlDocument,
+            Action<SPWeb, XmlNode> AddWebsFunc,
+            ref string data,
+            Action<XmlDocument> insertDeclarationAction = null)
+        {
+            var web = spSite.RootWeb;
+            if (string.Equals(site, "false", StringComparison.OrdinalIgnoreCase))
+            {
+                web = SPContext.Current.Web;
+            }
+            web.Site.CatchAccessDeniedException = false;
+
+            xmlDocument.LoadXml("<rows></rows>");
+
+            var mainNode = xmlDocument.ChildNodes[0];
+            var headNode = xmlDocument.CreateNode(XmlNodeType.Element, "head", xmlDocument.NamespaceURI);
+            var settings = xmlDocument.CreateNode(XmlNodeType.Element, "settings", xmlDocument.NamespaceURI);
+            var colWidth = xmlDocument.CreateNode(XmlNodeType.Element, "colwidth", xmlDocument.NamespaceURI);
+            colWidth.InnerText = "%";
+            settings.AppendChild(colWidth);
+            headNode.AppendChild(settings);
+
+            mainNode.AppendChild(headNode);
+
+            var attrType = xmlDocument.CreateAttribute("type");
+            attrType.Value = "tree";
+            var width = xmlDocument.CreateAttribute("width");
+            width.Value = "100";
+            var newNode = xmlDocument.CreateNode(XmlNodeType.Element, "column", xmlDocument.NamespaceURI);
+            newNode.Attributes.Append(attrType);
+            newNode.Attributes.Append(width);
+            newNode.InnerText = innerNodeText;
+
+            headNode.AppendChild(newNode);
+
+            try
+            {
+                AddWebsFunc?.Invoke(web, mainNode);
+            }
+            catch (Exception ex)
+            {
+                TraceError("Exception Suppressed {0}",ex);
+            }
+
+            insertDeclarationAction?.Invoke(xmlDocument);
+
+            data = xmlDocument.OuterXml;
         }
 
         /***********************************************

@@ -20,13 +20,16 @@ pipeline {
         string(name: 'ReleaseBranchBuild', defaultValue: '', description: 'Release build number to get artifacts from instead of triggering new build (leave empty to trigger new build)')
         string(name: 'DeployBranch', defaultValue: '', description: 'Deploy branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
         string(name: 'ProtractorBranch', defaultValue: '', description: 'Protractor UI tests branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
-        
         string(name: 'CoreBranch', defaultValue: '', description: 'Core branch to build (leave empty to use the Release branch name, replace "/" with "%2F")')
         string(name: 'CoreBranchBuild', defaultValue: '', description: 'Core build number to copy artifacts from (leave empty to trigger new build and use its artifacts)')
-        
-		string(name: 'HostName', defaultValue: 'qaepmlive6', description: 'Target host name')
-		string(name: 'fullHostName', defaultValue: 'tenant02.epmldev.com', description: 'Target full host name')
-		string(name: 'httpScheme', defaultValue: 'http', description: 'Target http scheme')
+        string(name: 'AppUrl', defaultValue: 'http://qaepmlive6', description: 'SharePoint application url for deployment')
+		
+		string(name: 'StagingTargetHost', defaultValue: '10.25.2.85,10.25.2.54', description: 'Staging Target hosts to deploy to')
+		string(name: 'StagingUserName', defaultValue: 'epm\\apps22', description: 'Name of the user to use when connecting PowerShell to the target host')
+        string(name: 'StagingPassword', defaultValue: 'QpklZg35D6', description: 'Password used along with the User name')
+		string(name: 'StagingAppUrl', defaultValue: 'https://apps22.epmlive.com', description: 'Staging SharePoint application url for deployment')
+		
+    	string(name: 'ProtractorHostsName', defaultValue: 'tenant02.epmldev.com', description: 'Target full host name for protractor')
     }
     stages {
         stage('Preparing Release') {
@@ -57,52 +60,84 @@ pipeline {
                 }
             }
         }
-        stage('Deploy') {
-            steps {
-                timestamps {
-                    script {
-                        echo 'Triggering Deploy job...'
-                        env.DEPLOY_BRANCH = currentBuild.getProjectName()
-                        if (params.DeployBranch?.trim()) {
-                            env.DEPLOY_BRANCH = params.DeployBranch
-                        }
-                        build(
-                            job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
-                            wait: true,
-                            parameters: [
-                                [$class: 'StringParameterValue', name: 'TargetHost', value: params.TargetHost],
-                                [$class: 'StringParameterValue', name: 'UserName', value: params.UserName],
-                                [$class: 'StringParameterValue', name: 'Password', value: params.Password],
-                                [$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
-                                [$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD],
-								[$class: 'StringParameterValue', name: 'HostName', value: params.HostName],
-                                [$class: 'StringParameterValue', name: 'fullHostName', value: "${params.httpScheme}://${params.HostName}"]
-                            ]
-                        )
-                    }
-                }
-            }
-        }
-        stage('Protractor UI tests') {
-            steps {
-                timestamps {
-                    script {
-                        echo 'Triggering Protractor UI tests job...'
-                        env.PROTRACTOR_BRANCH = currentBuild.getProjectName()
-                        if (params.ProtractorBranch?.trim()) {
-                            env.PROTRACTOR_BRANCH = params.ProtractorBranch
-                        }
-                        build(
-                            job: "../EPML-Regression/${env.PROTRACTOR_BRANCH}", 
-                            wait: true,
-                            parameters: [
-                                [$class: 'StringParameterValue', name: 'TargetHost', value: params.TargetHost],
-								[$class: 'StringParameterValue', name: 'fullHostName', value: params.fullHostName]
-                            ]
-                        )
-                    }
-                }
-            }
-        }
+		stage('Deploy') {
+			parallel {
+				stage('Handle Quality') {
+					stages {
+						stage('Deploy Quality') {
+							steps {
+								timestamps {
+									script {
+										echo 'Triggering Deploy job...'
+										env.DEPLOY_BRANCH = currentBuild.getProjectName()
+										if (params.DeployBranch?.trim()) {
+											env.DEPLOY_BRANCH = params.DeployBranch
+										}
+										build(
+											job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
+											wait: true,
+											parameters: [
+												[$class: 'StringParameterValue', name: 'TargetHost', value: params.TargetHost],
+												[$class: 'StringParameterValue', name: 'UserName', value: params.UserName],
+												[$class: 'StringParameterValue', name: 'Password', value: params.Password],
+												[$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
+												[$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD],
+												[$class: 'StringParameterValue', name: 'FullHostName', value: params.AppUrl]
+											]
+										)
+									}
+								}
+							}
+						}
+						stage('Protractor UI Tests') {
+							steps {
+								timestamps {
+									script {
+										echo 'Triggering Protractor UI tests job...'
+										env.PROTRACTOR_BRANCH = currentBuild.getProjectName()
+										if (params.ProtractorBranch?.trim()) {
+											env.PROTRACTOR_BRANCH = params.ProtractorBranch
+										}
+										build(
+											job: "../EPML-Regression/${env.PROTRACTOR_BRANCH}", 
+											wait: true,
+											parameters: [
+												[$class: 'StringParameterValue', name: 'TargetHost', value: params.TargetHost],
+												[$class: 'StringParameterValue', name: 'FullHostName', value: params.ProtractorHostsName]
+											]
+										)
+									}
+								}
+							}
+						}
+					}
+				}
+				stage('Deploy Staging') {
+					steps {
+						timestamps {
+							script {
+								echo 'Triggering Deploy job...'
+								env.DEPLOY_BRANCH = currentBuild.getProjectName()
+								if (params.DeployBranch?.trim()) {
+									env.DEPLOY_BRANCH = params.DeployBranch
+								}
+								build(
+									job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
+									wait: true,
+									parameters: [
+										[$class: 'StringParameterValue', name: 'TargetHost', value: params.StagingTargetHost],
+										[$class: 'StringParameterValue', name: 'UserName', value: params.StagingUserName],
+										[$class: 'StringParameterValue', name: 'Password', value: params.StagingPassword],
+										[$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
+										[$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD],
+										[$class: 'StringParameterValue', name: 'FullHostName', value: params.StagingAppUrl]
+									]
+								)
+							}
+						}
+					}
+				}
+			}
+		}
     }
 }

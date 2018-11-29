@@ -113,34 +113,26 @@ namespace PortfolioEngineCore
                               + " WHERE (PROJECT_EXT_UID IS NOT NULL OR PROJECT_EXT_UID <> '')"
                               + " AND (PROJECT_ARCHIVED IS NULL OR PROJECT_ARCHIVED = 0)"
                               + " ORDER BY PROJECT_NAME";
-            SqlCommand oCommand = new SqlCommand(sCommand, dba.Connection);
-            SqlDataReader reader = null;
-            reader = oCommand.ExecuteReader();
-            while (reader.Read())
-            {
-                CStruct xPI = xPIs.CreateSubStruct("PI");
-                int lUID = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
-                if (sProjectIDs == "")
-                    sProjectIDs = lUID.ToString();
-                else
-                    sProjectIDs += "," + lUID.ToString();
-                string wepid = DBAccess.ReadStringValue(reader["PROJECT_EXT_UID"]);
-                xPI.CreateIntAttr("id", lUID);
-                xPI.CreateStringAttr("wepid", wepid);
-                xPI.CreateStringAttr("name", DBAccess.ReadStringValue(reader["PROJECT_NAME"]));
-            }
-            reader.Close();
-            reader = null;
+
+            SqlCommand oCommand;
+            SqlDataReader reader;
+            ResourcePlans.CreateProjectIds(sCommand, xPIs, dba, ref sProjectIDs);
 
             if (bSuperPIM == false)
             {
                 xPIs = new CStruct();
                 xPIs.Initialize("PIs");
 
-                sCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS" +
-                " LEFT JOIN EPG_DELEGATES SU ON SURR_CONTEXT = 4 AND SURR_CONTEXT_VALUE = PROJECT_ID" +
-                " WHERE PROJECT_MARKED_DELETION = 0 AND (PROJECT_MANAGER = " + dba.UserWResID.ToString("0") + " OR SU.SURR_WRES_ID = " + dba.UserWResID.ToString("0") + ")" +
-                " AND PROJECT_ID in (" + sProjectIDs + ")  ORDER BY PROJECT_NAME";
+                sCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS"
+                    + " LEFT JOIN EPG_DELEGATES SU ON SURR_CONTEXT = 4 AND SURR_CONTEXT_VALUE = PROJECT_ID"
+                    + " WHERE PROJECT_MARKED_DELETION = 0 AND (PROJECT_MANAGER = "
+                    + dba.UserWResID.ToString("0")
+                    + " OR SU.SURR_WRES_ID = "
+                    + dba.UserWResID.ToString("0")
+                    + ")"
+                    + " AND PROJECT_ID in ("
+                    + sProjectIDs
+                    + ")  ORDER BY PROJECT_NAME";
 
                 oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
                 reader = oCommand.ExecuteReader();

@@ -61,7 +61,7 @@ foreach ($serverIP in $serverIPs)
 		")
 		Invoke-Command -ComputerName $serverIP -Credential $cred -ScriptBlock $scriptBlock
 	}
-	Write-Host 'Run complete $serverIP'
+	Write-Host "Run complete $serverIP"
 	$serverIndex = $serverIndex + 1;
 }
 
