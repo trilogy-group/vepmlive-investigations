@@ -90,6 +90,7 @@ namespace PortfolioEngineCore.Tests
         private const string GetPeriodsMethodName = "GetPeriods";
         private const string ReadUserInfoMethodName = "ReadUserInfo";
         private const string BuildPortfolioResourcesSelectQueryMethodName = "BuildPortfolioResourcesSelectQuery";
+        private const string GetPIResourcesStructMethodName = "GetPIResourcesStruct";
 
         [TestInitialize]
         public void Setup()
@@ -163,6 +164,7 @@ namespace PortfolioEngineCore.Tests
             ShimSPSiteDataQuery.Constructor = _ => new ShimSPSiteDataQuery();
             ShimSqlDb.AllInstances.TransactionGet = _ => transaction;
             ShimSqlDb.ReadIntValueObject = _ => DummyInt;
+            ShimSqlDb.ReadDoubleValueObject = _ => DummyInt;
             ShimSqlDb.ReadIntValueObjectBooleanOut = (object input, out bool output) =>
             {
                 output = false;
@@ -171,6 +173,7 @@ namespace PortfolioEngineCore.Tests
             ShimSqlDb.ReadStringValueObject = _ => DummyString;
             ShimSqlDb.ReadBoolValueObject = _ => true;
             ShimSqlDb.ReadDateValueObject = _ => currentDate;
+            ShimSqlDb.AllInstances.HandleExceptionStringStatusEnumExceptionBoolean = (_, _1, _2, _3, _4) => StatusEnum.rsRequestInvalid;
             ShimActivation.AllInstances.checkActivationStringStringString = (_, _1, _2, _3) => { };
             ShimPFEEncrypt.DecryptStringString = (_, input) => input;
             ShimDatabase.AllInstances.OpenDatabaseStringString = (_, _1, _2) => new SqlConnection();
@@ -1147,6 +1150,145 @@ namespace PortfolioEngineCore.Tests
 
             // Assert
             expected.Any(x => !actual.Contains(x)).ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void GetPIResourcesStruct_WhenCalled_Returns()
+        {
+            // Arrange
+            const string displayFieldsXml = @"
+                <xmlcfg>
+                    <RowLimit>0</RowLimit>
+                    <Items>
+                        <Item FieldFormat=""4"" FieldID=""1"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""4"" FieldID=""9015"" CCRoleUID=""1""/>
+                        <Item FieldFormat=""9"" FieldID=""9004""/>
+                        <Item FieldFormat=""9"" FieldID=""9006""/>
+                        <Item FieldFormat=""9"" FieldID=""9019""/>
+                        <Item FieldFormat=""9"" FieldID=""1""/>
+                        <Item FieldFormat=""96"" FieldID=""1""/>
+                        <Item FieldFormat=""40"" FieldID=""1""/>
+                        <Item FieldFormat=""98"" FieldID=""1""/>
+                    </Items>
+                </xmlcfg>";
+            const string categoryListXml = @"
+                <categories>
+                    <category/>
+                </categories>";
+            var readHit = 0;
+            var methodHit = 0;
+            var clnPeriods = new List<CPeriod>()
+            {
+                new CPeriod()
+                {
+                    PeriodID = One,
+                    StartDate = currentDate.AddDays(-1),
+                    FinishDate = currentDate.AddDays(1)
+                }
+            };
+            var parameters = new object[]
+            {
+                new DBAccess(DummyString, new SqlConnection()),
+                One,
+                One.ToString(),
+                One.ToString(),
+                clnPeriods,
+                new CAdmin(),
+                One,
+                default(CStruct)
+            };
+
+            dataReader.Read = () =>
+            {
+                readHit += 1;
+                return readHit <= One;
+            };
+            ShimSqlCommand.AllInstances.ExecuteReader = _ =>
+            {
+                readHit = 0;
+                return dataReader;
+            };
+            PortfolioFakes.ShimSecurity.CheckUserGlobalPermissionDBAccessInt32GlobalPermissionsEnum = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return false;
+            };
+            ShimCommon.AddIDToListStringRefInt32 = (ref string sList, int lID) =>
+            {
+                sList = One.ToString();
+                return true;
+            };
+            ShimResourceSelector.GetResourceDisplayFieldsDBAccessCStructOut = (DBAccess dba, out CStruct xReply) =>
+            {
+                xReply = new CStruct();
+                xReply.LoadXML(displayFieldsXml);
+                return StatusEnum.rsSuccess;
+            };
+            ShimDBCommon.GetLookupListXMLDBAccessInt32CStructOut = (DBAccess dba, int lLookupID, out CStruct xReply) =>
+            {
+                xReply = new CStruct();
+                xReply.LoadXML(categoryListXml);
+                return StatusEnum.rsSuccess;
+            };
+            ShimResourceSelector.BuildPortfolioResourcesSelectQueryDBAccessInt32ListOfCStructStringInt32Int32 = (_1, _2, _3, _4, _5, _6) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimResourceSelector.GetCostCategoryRolesDBAccessInt32Int32DictionaryOfStringCStructOut =
+                (DBAccess dba, int lPortfolioCommitmentsCalendarUID, int lStartPeriodID, out Dictionary<string, CStruct> dicCostCategoryRolesOut) =>
+                {
+                    const string ccrolesString = @"<ccrole RoleUID=""1"" ParentID=""1""/>";
+                    var ccroles = new CStruct();
+                    ccroles.LoadXML(ccrolesString);
+                    dicCostCategoryRolesOut = new Dictionary<string, CStruct>()
+                    {
+                        [One.ToString()] = ccroles
+                    };
+                    return StatusEnum.rsSuccess;
+                };
+            ShimDataTable.AllInstances.LoadIDataReader = (DataTable instance, IDataReader input) =>
+            {
+                instance.Columns.Add("WRES_ID");
+                instance.Columns.Add("RES_NAME");
+                instance.Columns.Add("WRES_EMAIL");
+                instance.Columns.Add("MR_NOTES");
+                instance.Columns.Add("RPDeptUID");
+                instance.Columns.Add("WRES_INACTIVE");
+                instance.Columns.Add("WRES_IS_GENERIC");
+                instance.Columns.Add("WRES_IS_RESOURCE");
+                instance.Columns.Add("CCRoleUID");
+                instance.Columns.Add("Field1");
+                instance.Columns.Add("Field9004");
+                instance.Columns.Add("Field9019");
+                instance.Columns.Add("Field9006");
+                instance.Columns.Add("Field9015");
+                var row = instance.NewRow();
+                foreach (DataColumn column in instance.Columns)
+                {
+                    row[column.ColumnName] = One;
+                }
+                instance.Rows.Add(row);
+            };
+            ShimCommon.GetFirstItemFromListStringRef = (ref string input) =>
+            {
+                methodHit += 1;
+                return methodHit == 1 ? One.ToString() : Zero.ToString();
+            };
+
+            // Act
+            var actual = (StatusEnum)privateObject.Invoke(GetPIResourcesStructMethodName, publicStatic, parameters);
+            var reply = ((CStruct)parameters[7]).GetXMLNode();
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(StatusEnum.rsSuccess),
+                () => reply.SelectSingleNode("//ProjectIDs").InnerText.ShouldBe(One.ToString()),
+                () => reply.SelectSingleNode("//Calendar").Attributes["CalID"].Value.ShouldBe(Zero.ToString()),
+                () => reply.SelectSingleNode("//Resources/Resource").Attributes["WResID"].Value.ShouldBe(One.ToString()),
+                () => reply.SelectSingleNode("//Resources/Resource/CCRoleUID").InnerText.ShouldBe(One.ToString()),
+                () => reply.SelectSingleNode("//Resources/Resource/DeptName").InnerText.ShouldBe(DummyString),
+                () => validations.ShouldBe(2));
         }
     }
 }
