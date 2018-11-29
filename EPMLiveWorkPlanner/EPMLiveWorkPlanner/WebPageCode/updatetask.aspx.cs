@@ -5,6 +5,7 @@ using System.Text;
 using System.Web;
 using System.Xml;
 using Microsoft.SharePoint;
+using static System.Diagnostics.Trace;
 
 namespace EPMLiveWorkPlanner
 {
@@ -699,23 +700,30 @@ namespace EPMLiveWorkPlanner
                 case SPFieldType.Currency:
                     try
                     {
-                        var parsedData = float.Parse(data);
-                        data = parsedData.ToString(numberFormatInfo);
+                        float parsedData;
+                        if (float.TryParse(data, out parsedData))
+                        {
+                            data = parsedData.ToString(numberFormatInfo);
+                        }
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Trace.TraceError("Expression Suppressed {0}", ex);
+                        TraceError("Expression Suppressed {0}", ex);
                     }
                     stringBuilder.AppendFormat("<cell><![CDATA[{0}]]></cell>", data);
                     break;
                 case SPFieldType.DateTime:
                     try
                     {
-                        data = DateTime.Parse(data).ToShortDateString();
+                        DateTime parsedData;
+                        if (DateTime.TryParse(data, out parsedData))
+                        {
+                            data = parsedData.ToShortDateString();
+                        }
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Trace.TraceError("Expression Suppressed {0}", ex);
+                        TraceError("Expression Suppressed {0}", ex);
                     }
                     stringBuilder.AppendFormat("<cell><![CDATA[{0}]]></cell>", data);
                     break;
@@ -729,7 +737,7 @@ namespace EPMLiveWorkPlanner
                         }
                         catch (Exception ex)
                         {
-                            System.Diagnostics.Trace.TraceError("Expression Suppressed {0}", ex);
+                            TraceError("Expression Suppressed {0}", ex);
                         }
                         stringBuilder.AppendFormat("<cell><![CDATA[{0}]]></cell>", data);
                     }
@@ -737,12 +745,15 @@ namespace EPMLiveWorkPlanner
                     {
                         try
                         {
-                            var parsedData = float.Parse(data);
-                            data = parsedData.ToString(numberFormatInfo);
+                            float parsedData;
+                            if (float.TryParse(data, out parsedData))
+                            {
+                                data = parsedData.ToString(numberFormatInfo);
+                            }
                         }
                         catch (Exception ex)
                         {
-                            System.Diagnostics.Trace.TraceError("Expression Suppressed {0}", ex);
+                            TraceError("Expression Suppressed {0}", ex);
                         }
                         stringBuilder.AppendFormat("<cell><![CDATA[{0}]]></cell>", data);
                     }
@@ -755,7 +766,7 @@ namespace EPMLiveWorkPlanner
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Trace.TraceError("Expression Suppressed {0}", ex);
+                        TraceError("Expression Suppressed {0}", ex);
                     }
                     if (field.Description == "Indicator")
                     {
