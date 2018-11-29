@@ -48,6 +48,11 @@ namespace WorkEnginePPM.Events.DataSync
 
             string rbs = properties.AfterProperties["RBS"] as string ?? string.Empty;
 
+            if (properties.ListItemId > 0)
+            {
+                return;
+            }
+
             try
             {
                 if (!properties.List.Fields.ContainsFieldWithInternalName("EXTID")) return;
