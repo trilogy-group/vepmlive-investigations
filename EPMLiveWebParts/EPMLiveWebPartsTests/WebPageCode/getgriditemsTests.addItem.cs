@@ -1215,7 +1215,9 @@ namespace EPMLiveWebParts.Tests
                 }
             };
             ShimSPListItem.AllInstances.ItemGetGuid = (_, __) => DummyVal;
-            ShimSPList.AllInstances.IDGet = _ => listId == null ? Guid.NewGuid() : new Guid(listId);
+
+            var listGuid = listId == null ? Guid.NewGuid() : new Guid(listId);
+            ShimSPList.AllInstances.IDGet = _ => listGuid;
             ShimSPList.AllInstances.TitleGet = _ => DummyVal;
             ShimSPList.AllInstances.ImageUrlGet = _ => $"image.png";
             ShimSPList.AllInstances.ParentWebGet = _ => new ShimSPWeb();
@@ -1294,7 +1296,8 @@ namespace EPMLiveWebParts.Tests
 
         private void PrepareSpWebRelatedShims(string webId = null)
         {
-            ShimSPWeb.AllInstances.IDGet = _ => webId == null ? Guid.NewGuid() : new Guid(webId);
+            var webGuid = webId == null ? Guid.NewGuid() : new Guid(webId);
+            ShimSPWeb.AllInstances.IDGet = _ => webGuid;
             ShimSPWeb.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
             ShimSPWeb.AllInstances.UrlGet = _ => ExampleUrl;
             ShimSPWeb.AllInstances.ListsGet = _ => new ShimSPListCollection();

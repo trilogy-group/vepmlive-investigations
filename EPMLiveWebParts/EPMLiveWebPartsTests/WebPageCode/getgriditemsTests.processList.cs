@@ -41,6 +41,7 @@ namespace EPMLiveWebParts.Tests
     public partial class getgriditemsTests
     {
         private const string MethodProcessList = "processList";
+        private const string MethodAddMenus = "addMenus";
         private const string FieldPage = "iPage";
         private const string FieldPageSize = "iPageSize";
         private int _idsCount;
@@ -156,6 +157,64 @@ namespace EPMLiveWebParts.Tests
                 () => _afterInit.InnerXml.ShouldBe("<call command=\"setuppaging\"><param>0|1|1|false</param></call>"));
         }
 
+        [TestMethod]
+        public void AddMenus_Invoke_FillsNode()
+        {
+            // Arrange
+            var list = new ShimSPList().Instance;
+            PrepareForAddMenus(list);
+            var node = SetXmlDocument();
+            ShimCoreFunctions.getLockedWebSPWeb = _ => Guid.NewGuid();
+
+            // Act
+            var result = _privateObj.Invoke(MethodAddMenus, new object[] { node, list, bool.TrueString });
+
+            // Assert
+            node.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => node.InnerXml.ShouldNotBeNullOrEmpty(),
+                () => node.InnerXml.ShouldBe("<userdata name=\"viewMenus\">1,1,1,1,1,1,1,0,1,0,1,1,0,1</userdata>"));
+        }
+
+        [TestMethod]
+        public void AddMenus_EmptyLockWeb_FillsNode()
+        {
+            // Arrange
+            var list = new ShimSPList().Instance;
+            PrepareForAddMenus(list);
+            var node = SetXmlDocument();
+            ShimCoreFunctions.getLockedWebSPWeb = _ => Guid.Empty;
+
+            // Act
+            var result = _privateObj.Invoke(MethodAddMenus, new object[] { node, list, bool.TrueString });
+
+            // Assert
+            node.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => node.InnerXml.ShouldNotBeNullOrEmpty(),
+                () => node.InnerXml.ShouldBe("<userdata name=\"viewMenus\">1,1,1,1,1,1,1,0,1,0,1,1,0,1</userdata>"));
+        }
+
+        private ArrayList GetFilterIdsArray()
+        {
+            var ids = new ArrayList();
+            for (int i = 0; i < _idsCount; i++)
+            {
+                ids.Add(i.ToString());
+            }
+            ids.Add(DummyVal);
+            return ids;
+        }
+
+        private XmlNode SetXmlDocument()
+        {
+            _xmlDocument = new XmlDocument();
+            var node = _xmlDocument.CreateNode(XmlNodeType.Element, DummyFieldName, _xmlDocument.NamespaceURI);
+            _xmlDocument.AppendChild(node);
+            _privateObj.SetField("docXml", _xmlDocument);
+            return node;
+        }
+
         private void PrepareForProcessList()
         {
             PrepareSpListRelatedShims();
@@ -191,15 +250,44 @@ namespace EPMLiveWebParts.Tests
             _privateObj.SetField("list", new ShimSPList().Instance);
         }
 
-        private ArrayList GetFilterIdsArray()
+        private void PrepareForAddMenus(SPList list)
         {
-            var ids = new ArrayList();
-            for (int i = 0; i < _idsCount; i++)
+            PrepareSPContext();
+
+            var assembly = typeof(SPWorkflowAssociationCollection).Assembly;
+            var type = assembly.GetType("Microsoft.SharePoint.Workflow.SPListWorkflowAssociationCollection");
+
+            var listWorkflow = Activator.CreateInstance(type, new object[] { list });
+
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, key) =>
             {
-                ids.Add(i.ToString());
-            }
-            ids.Add(DummyVal);
-            return ids;
+                switch (key)
+                {
+                    case "EPMLiveWPEnable":
+                    case "EPMLiveAgileEnable":
+                        return bool.TrueString;
+                    default:
+                        return DummyVal;
+                }
+            };
+            ShimSPListCollection.AllInstances.ItemGetString = (_, key) =>
+            {
+                switch (key)
+                {
+                    case "Project Schedules":
+                        return new ShimSPDocumentLibrary().Instance;
+                    default:
+                        return new ShimSPList();
+                }
+            };
+            ShimSPList.AllInstances.WorkflowAssociationsGet = _ => (SPWorkflowAssociationCollection)listWorkflow;
+
+            _privateObj.SetField("DoesUserHavePermissionsViewListItems", true);
+            _privateObj.SetField("DoesUserHavePermissionsEditListItems", true);
+            _privateObj.SetField("DoesUserHavePermissionsManagePermissions", true);
+            _privateObj.SetField("DoesUserHavePermissionsDeleteListItems", true);
+            _privateObj.SetField("DoesUserHavePermissionsViewVersions", true);
+            _privateObj.SetField("DoesUserHavePermissionsApproveItems", true);
         }
     }
 }
