@@ -65,6 +65,7 @@ namespace EPMLiveWebParts.Tests
         private ShimSqlTransaction transaction;
         private Guid guid;
         private Hashtable GanttParameters;
+        private DateTime currentDateTime;
         private int validations;
         private const int DummyInt = 1;
         private const int One = 1;
@@ -86,6 +87,11 @@ namespace EPMLiveWebParts.Tests
         private const string AddColumnsMethodName = "AddColumns";
         private const string GetGridFieldsMethodName = "GetGridFields";
         private const string FormatGridFieldMethodName = "formatGridField";
+        private const string GetInternalNameMethodName = "GetInternalName";
+        private const string GetOrderByFieldMethodName = "GetOrderByField";
+        private const string InitRoutineMethodName = "InitRoutine";
+        private const string ConvertXmlToDatatableMethodName = "ConvertXmlToDatatable";
+        private const string InitializeGanttStartAndFinishMethodName = "InitializeGanttStartAndFinish";
 
         [TestInitialize]
         public void Setup()
@@ -96,6 +102,7 @@ namespace EPMLiveWebParts.Tests
             SetupShims();
 
             privateObject.SetFieldOrProperty("_spList", nonPublicInstance, spList.Instance);
+            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, spView.Instance);
         }
 
         private void SetupShims()
@@ -155,6 +162,7 @@ namespace EPMLiveWebParts.Tests
             publicInstance = BindingFlags.Instance | BindingFlags.Public;
             nonPublicInstance = BindingFlags.Instance | BindingFlags.NonPublic;
             guid = Guid.Parse(SampleGuidString1);
+            currentDateTime = DateTime.Now;
             spWeb = new ShimSPWeb()
             {
                 IDGet = () => guid,
@@ -167,6 +175,7 @@ namespace EPMLiveWebParts.Tests
                 ServerRelativeUrlGet = () => SampleUrl,
                 AllUsersGet = () => new ShimSPUserCollection(),
                 SiteUsersGet = () => new ShimSPUserCollection(),
+                GetListFromUrlString = _ => spList
             };
             spSite = new ShimSPSite()
             {
@@ -278,7 +287,10 @@ namespace EPMLiveWebParts.Tests
                 ViewFieldsGet = () => spViewFieldCollection,
                 ServerRelativeUrlGet = () => SampleUrl
             };
-            spViewFieldCollection = new ShimSPViewFieldCollection();
+            spViewFieldCollection = new ShimSPViewFieldCollection()
+            {
+                ToStringCollection = () => new StringCollection()
+            };
             spContentTypeCollection = new ShimSPContentTypeCollection()
             {
                 ItemGetString = _ => spContentType
@@ -935,6 +947,373 @@ namespace EPMLiveWebParts.Tests
                 () => actual.SerializeLocalizedValue.ShouldBeTrue(),
                 () => actual.SerializeDataValue.ShouldBeFalse(),
                 () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetInternalName_WhenCalled_ReturnsInternalName()
+        {
+            // Arrange
+            spFieldCollection.ContainsFieldString = _ =>
+            {
+                validations += 1;
+                return true;
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetInternalNameMethodName, nonPublicInstance, new object[] { string.Empty });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetOrderByField_WbsFieldEqualsWBS_ReturnsWbs()
+        {
+            // Arrange
+            const string wbs = "WBS";
+            const string title = "Task Center";
+
+            spList.TitleGet = () =>
+            {
+                validations += 1;
+                return title;
+            };
+            spView.QueryGet = () =>
+            {
+                validations += 1;
+                return string.Empty;
+            };
+
+            privateObject.SetFieldOrProperty("_spList", nonPublicInstance, spList.Instance);
+            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, spView.Instance);
+            privateObject.SetFieldOrProperty("_wbs", nonPublicInstance, wbs);
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetOrderByFieldMethodName, nonPublicInstance, new object[] { });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(wbs),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetOrderByField_WbsFieldNotEqualsWBS_ReturnsWbs()
+        {
+            // Arrange
+            const string wbs = "NotWBS";
+            const string title = "Task Center";
+            const string expected = "Outline Number";
+            const string query = @"
+                <OrderBy>
+                    <Field Name=""FieldName""/>
+                </OrderBy>";
+
+            spList.TitleGet = () =>
+            {
+                validations += 1;
+                return title;
+            };
+
+            spView.QueryGet = () =>
+            {
+                validations += 1;
+                return query;
+            };
+
+            privateObject.SetFieldOrProperty("_spList", nonPublicInstance, spList.Instance);
+            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, spView.Instance);
+            privateObject.SetFieldOrProperty("_wbs", nonPublicInstance, wbs);
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetOrderByFieldMethodName, nonPublicInstance, new object[] { });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(expected),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetOrderByField_WbsFieldEmpty_ReturnsWbs()
+        {
+            // Arrange
+            const string expected = "Task ID";
+            const string title = "Task Center";
+
+            spList.TitleGet = () =>
+            {
+                validations += 1;
+                return title;
+            };
+            spView.QueryGet = () =>
+            {
+                validations += 1;
+                return string.Empty;
+            };
+
+            privateObject.SetFieldOrProperty("_spList", nonPublicInstance, spList.Instance);
+            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, spView.Instance);
+            privateObject.SetFieldOrProperty("_wbs", nonPublicInstance, string.Empty);
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetOrderByFieldMethodName, nonPublicInstance, new object[] { });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(expected),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void InitRoutine_UrlPresent_InitiaizesRoutine()
+        {
+            // Arrange
+            var stringArray = new string[]
+            {
+                SampleUrl
+            };
+            var parameters = new object[]
+            {
+                true
+            };
+
+            GanttParameters.Add("List", DummyString);
+            GanttParameters.Add("View", DummyString);
+
+            spSite.UrlGet = () => SampleUrl;
+
+            ShimGridData.AllInstances.InitGanttParamsString = (_, __) =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty("_spList", nonPublicInstance, null);
+            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, null);
+            privateObject.SetFieldOrProperty("_htGanttParams", nonPublicInstance, GanttParameters);
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, stringArray);
+            privateObject.SetFieldOrProperty("_rollupSites", nonPublicInstance, stringArray);
+
+            // Act
+            privateObject.Invoke(InitRoutineMethodName, publicInstance, parameters);
+            var list = privateObject.GetFieldOrProperty("_spList", nonPublicInstance);
+            var view = privateObject.GetFieldOrProperty("_spView", nonPublicInstance);
+
+            // Assert
+            validations.ShouldSatisfyAllConditions(
+                () => list.ShouldNotBeNull(),
+                () => view.ShouldNotBeNull(),
+                () => ((bool)parameters[0]).ShouldBeTrue(),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void InitRoutine_UrlNotPresent_InitiaizesRoutine()
+        {
+            // Arrange
+            var stringArray = new string[]
+            {
+                DummyString
+            };
+            var parameters = new object[]
+            {
+                true
+            };
+
+            GanttParameters.Add("List", DummyString);
+            GanttParameters.Add("View", DummyString);
+
+            spSite.UrlGet = () => SampleUrl;
+
+            ShimGridData.AllInstances.InitGanttParamsString = (_, __) =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty("_spList", nonPublicInstance, null);
+            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, null);
+            privateObject.SetFieldOrProperty("_htGanttParams", nonPublicInstance, GanttParameters);
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, stringArray);
+            privateObject.SetFieldOrProperty("_rollupSites", nonPublicInstance, stringArray);
+
+            // Act
+            privateObject.Invoke(InitRoutineMethodName, publicInstance, parameters);
+            var list = privateObject.GetFieldOrProperty("_spList", nonPublicInstance);
+            var view = privateObject.GetFieldOrProperty("_spView", nonPublicInstance);
+
+            // Assert
+            validations.ShouldSatisfyAllConditions(
+                () => list.ShouldNotBeNull(),
+                () => view.ShouldNotBeNull(),
+                () => ((bool)parameters[0]).ShouldBeTrue(),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void InitRoutine_RollUpSitesNull_InitiaizesRoutine()
+        {
+            // Arrange
+            var stringArray = new string[]
+            {
+                DummyString
+            };
+            var parameters = new object[]
+            {
+                true
+            };
+
+            GanttParameters.Add("List", DummyString);
+            GanttParameters.Add("View", DummyString);
+
+            spSite.UrlGet = () => SampleUrl;
+
+            ShimGridData.AllInstances.InitGanttParamsString = (_, __) =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty("_spList", nonPublicInstance, null);
+            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, null);
+            privateObject.SetFieldOrProperty("_htGanttParams", nonPublicInstance, GanttParameters);
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, stringArray);
+            privateObject.SetFieldOrProperty("_rollupSites", nonPublicInstance, null);
+            privateObject.SetFieldOrProperty("_useCurrent", nonPublicInstance, false);
+
+            // Act
+            privateObject.Invoke(InitRoutineMethodName, publicInstance, parameters);
+            var list = privateObject.GetFieldOrProperty("_spList", nonPublicInstance);
+            var view = privateObject.GetFieldOrProperty("_spView", nonPublicInstance);
+            var rollupSites = (string[])privateObject.GetFieldOrProperty("_rollupSites", nonPublicInstance);
+            var useCurrent = (bool)privateObject.GetFieldOrProperty("_useCurrent", nonPublicInstance);
+
+            // Assert
+            validations.ShouldSatisfyAllConditions(
+                () => list.ShouldNotBeNull(),
+                () => view.ShouldNotBeNull(),
+                () => ((bool)parameters[0]).ShouldBeTrue(),
+                () => rollupSites.Length.ShouldBe(1),
+                () => rollupSites[0].ShouldBe(SampleUrl),
+                () => useCurrent.ShouldBeTrue(),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void InitRoutine_RollupListsNull_InitiaizesRoutine()
+        {
+            // Arrange
+            var stringArray = new string[]
+            {
+                DummyString
+            };
+            var parameters = new object[]
+            {
+                true
+            };
+
+            GanttParameters.Add("List", DummyString);
+            GanttParameters.Add("View", DummyString);
+
+            spSite.UrlGet = () => SampleUrl;
+
+            ShimGridData.AllInstances.InitGanttParamsString = (_, __) =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty("_spList", nonPublicInstance, null);
+            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, null);
+            privateObject.SetFieldOrProperty("_htGanttParams", nonPublicInstance, GanttParameters);
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, null);
+            privateObject.SetFieldOrProperty("_rollupSites", nonPublicInstance, null);
+
+            // Act
+            privateObject.Invoke(InitRoutineMethodName, publicInstance, parameters);
+            var list = privateObject.GetFieldOrProperty("_spList", nonPublicInstance);
+            var view = privateObject.GetFieldOrProperty("_spView", nonPublicInstance);
+
+            // Assert
+            validations.ShouldSatisfyAllConditions(
+                () => list.ShouldNotBeNull(),
+                () => view.ShouldNotBeNull(),
+                () => ((bool)parameters[0]).ShouldBeFalse(),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void ConvertXmlToDatatable_WhenCalled_ReturnsDataTable()
+        {
+            // Arrange
+            ShimGridData.AllInstances.InitializeColumnDefsString = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimGridData.AllInstances.AddColumnsDataTable = (_, input) =>
+            {
+                validations += 1;
+                return input;
+            };
+            ShimGridData.AllInstances.LoadDataDataTable = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimGridData.AllInstances.FinalizeDataDataTable = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimGridData.AllInstances.InitializeGanttStartAndFinishDataTable = (_, __) =>
+            {
+                validations += 1;
+            };
+
+            // Act
+            var actual = (DataTable)privateObject.Invoke(ConvertXmlToDatatableMethodName, nonPublicInstance, new object[] { DummyString });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldNotBeNull(),
+                () => validations.ShouldBe(5));
+        }
+
+        [TestMethod]
+        public void InitializeGanttStartAndFinish_WhenCalled_InitializesGanttStartAndFinish()
+        {
+            // Arrange
+            currentDateTime = currentDateTime.Date;
+
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var rows = new string[]
+            {
+                currentDateTime.AddDays(-1).ToString(),
+                currentDateTime.AddDays(-2).ToString(),
+                currentDateTime.ToString(),
+                currentDateTime.AddDays(1).ToString(),
+                currentDateTime.AddDays(2).ToString()
+            };
+
+            dataTable.Columns.Add(DummyString);
+            foreach (var item in rows)
+            {
+                row = dataTable.NewRow();
+                row[DummyString] = item;
+                dataTable.Rows.Add(row);
+            }
+
+            spFieldCollection.ContainsFieldString = _ => true;
+            privateObject.SetFieldOrProperty("GanttStartField", publicInstance, DummyString);
+            privateObject.SetFieldOrProperty("GanttFinishField", publicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(InitializeGanttStartAndFinishMethodName, nonPublicInstance, new object[] { dataTable });
+            var startDate = privateObject.GetFieldOrProperty("_ganttStartDate", nonPublicInstance);
+            var finishDate = privateObject.GetFieldOrProperty("_ganttFinishDate", nonPublicInstance);
+
+            // Assert
+            startDate.ShouldSatisfyAllConditions(
+                () => startDate.ShouldBe(currentDateTime.AddDays(-2)),
+                () => finishDate.ShouldBe(currentDateTime.AddDays(2)));
         }
     }
 }
