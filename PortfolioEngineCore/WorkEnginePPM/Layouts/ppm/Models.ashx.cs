@@ -3,6 +3,7 @@ using System.Web;
 using System.IO;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Reflection;
 using PortfolioEngineCore;
 
@@ -11,6 +12,11 @@ namespace WorkEnginePPM
 
     public partial class Models : IHttpHandler, System.Web.SessionState.IRequiresSessionState
     {
+        private const string ModelUIdAttribute = "MODEL_UID";
+        private const string ModelNameAttribute = "MODEL_NAME";
+        private const string ModelDescAttribute = "MODEL_DESC";
+        private const string ModelCbIdAttribute = "MODEL_CB_ID";
+
         #region IHttpHandler Members
 
         public bool IsReusable
@@ -69,224 +75,262 @@ namespace WorkEnginePPM
 
         public static string ModelsRequest(HttpContext Context, string sRequestContext, CStruct xData)
         {
-            string sReply = "";
+            var reply = string.Empty;
             try
             {
                 switch (sRequestContext)
                 {
                     case "ReadModelInfo":
                     {
-                        int nViewId = Int32.Parse(xData.InnerText);
-                        string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-                        DataAccess da = new DataAccess(sBaseInfo);
-                        DBAccess dba = da.dba;
-                        if (dba.Open() == StatusEnum.rsSuccess)
-                        {
-                            DataTable dt;
-                            if (dbaModels.SelectModel(dba, nViewId, out dt) != StatusEnum.rsSuccess)
-                            {
-                                sReply = WebAdmin.FormatError("exception", "Models.ReadModelInfo", dba.StatusText);
-                            }
-                            else
-                            {
-                                CStruct xModels = new CStruct();
-                                xModels.Initialize("Model");
-
-                                int nSelectedCalendar = -1;
-                                int nSelectedFlagField = 0;
-                                if (dt.Rows.Count == 1)
-                                {
-                                    DataRow row = dt.Rows[0];
-                                    xModels.CreateIntAttr("MODEL_UID", DBAccess.ReadIntValue(row["MODEL_UID"]));
-                                    xModels.CreateStringAttr("MODEL_NAME", DBAccess.ReadStringValue(row["MODEL_NAME"]));
-                                    xModels.CreateStringAttr("MODEL_DESC", DBAccess.ReadStringValue(row["MODEL_DESC"]));
-                                    nSelectedCalendar = DBAccess.ReadIntValue(row["MODEL_CB_ID"]);
-                                    xModels.CreateIntAttr("MODEL_CB_ID", nSelectedCalendar);
-                                    nSelectedFlagField = DBAccess.ReadIntValue(row["MODEL_SELECTED_FIELD_ID"]);
-                                }
-                                else
-                                {
-                                    xModels.CreateIntAttr("MODEL_UID", 0);
-                                    xModels.CreateStringAttr("MODEL_NAME", "New Model");
-                                    xModels.CreateStringAttr("MODEL_DESC", "");
-                                    xModels.CreateIntAttr("MODEL_CB_ID", nSelectedCalendar);
-                                }
-
-                                CStruct xCalendars = xModels.CreateSubStruct("calendars");
-                                {
-                                    CStruct xItem = xCalendars.CreateSubStruct("item");
-                                    xItem.CreateIntAttr("id", -1);
-                                    xItem.CreateStringAttr("name", "[None]");
-                                    dbaCalendars.SelectCalendars(dba, out dt);
-                                    foreach (DataRow row in dt.Rows)
-                                    {
-                                        xItem = xCalendars.CreateSubStruct("item");
-                                        int nCalendar = DBAccess.ReadIntValue(row["CB_ID"]);
-                                        xItem.CreateIntAttr("id", nCalendar);
-                                        xItem.CreateStringAttr("name", DBAccess.ReadStringValue(row["CB_NAME"]));
-                                    }
-                                }
-
-                                CStruct xCosttypes = xModels.CreateSubStruct("costtypes");
-                                {
-                                    dbaModels.SelectCostTypesForModel(dba, nViewId, out dt);
-                                    foreach (DataRow row in dt.Rows)
-                                    {
-                                        CStruct xItem = xCosttypes.CreateSubStruct("item");
-                                        int nCosttype = DBAccess.ReadIntValue(row["CT_ID"]);
-                                        xItem.CreateIntAttr("id", nCosttype);
-                                        xItem.CreateStringAttr("name", DBAccess.ReadStringValue(row["CT_NAME"]));
-                                        xItem.CreateIntAttr("used", DBAccess.ReadIntValue(row["used"]));
-                                    }
-                                }
-                                CStruct xFlagCustomFields = xModels.CreateSubStruct("flagcustomfields");
-                                {
-                                    dbaModels.SelectCustomFields_Flags(dba, out dt);
-                                    CStruct xItem = xFlagCustomFields.CreateSubStruct("item");
-                                    xItem.CreateIntAttr("id", -1);
-                                    xItem.CreateStringAttr("name", "[None]");
-                                    foreach (DataRow row in dt.Rows)
-                                    {
-                                        xItem = xFlagCustomFields.CreateSubStruct("item");
-                                        int nfieldid = DBAccess.ReadIntValue(row["FA_FIELD_ID"]);
-                                        xItem.CreateIntAttr("id", nfieldid);
-                                        xItem.CreateStringAttr("name", DBAccess.ReadStringValue(row["FA_NAME"]));
-                                        if (nSelectedFlagField == nfieldid)
-                                            xItem.CreateIntAttr("selected", 1);
-                                        else
-                                            xItem.CreateIntAttr("selected", 0);
-                                    }
-                                }
-                                //CStruct xGroups = xModels.CreateSubStruct("groups");
-                                //{
-                                //    dbaGroups.SelectGroups(dba, out dt);
-                                //    foreach (DataRow row in dt.Rows)
-                                //    {
-                                //        CStruct xItem = xGroups.CreateSubStruct("item");
-                                //        int nfieldid = DBAccess.ReadIntValue(row["GROUP_ID"]);
-                                //        xItem.CreateIntAttr("id", nfieldid);
-                                //        xItem.CreateStringAttr("name", DBAccess.ReadStringValue(row["GROUP_NAME"]));
-                                //    }
-                                //}
-
-                                {
-                                    dbaGroups.SelectEmptyCostTypeSecurityGroups(dba, out dt);
-                                    _TGrid tg = new _TGrid();
-                                    InitializeSecurityColumns(tg);
-                                    tg.SetDataTable(dt);
-                                    string tgridSecurity = "";
-                                    tg.Build(out tgridSecurity);
-                                    xModels.CreateString("tgridSecurity", tgridSecurity);
-                                }
-
-                                {
-                                    dbaModels.SelectModelVersions(dba, nViewId, out dt);
-
-                                    // build up new data table with permissions info
-                                    int prevversionid = 0;
-                                    DataTable dtVersions = new DataTable();
-                                    dtVersions.Columns.Add("MODEL_VERSION_UID", System.Type.GetType("System.Int32"));
-                                    dtVersions.Columns.Add("MODEL_VERSION_NAME", System.Type.GetType("System.String"));
-                                    dtVersions.Columns.Add("MODEL_VERSION_DESC", System.Type.GetType("System.String"));
-                                    dtVersions.Columns.Add("MODEL_VERSION_PERMISSIONS", System.Type.GetType("System.String"));
-                                    dtVersions.Columns.Add("MODEL_VERSION_PERMISSIONS_HIDDEN", System.Type.GetType("System.String"));
-                                    int nRowCount = dt.Rows.Count;
-                                    int nRow = 0;
-                                    DataRow versionrow = null;
-                                    string sPerms = "";
-                                    string sPermsHidden = "";
-                                    foreach (DataRow row in dt.Rows)
-                                    {
-                                        nRow++;
-                                        int versionid = DBAccess.ReadIntValue(row["MODEL_VERSION_UID"]);
-                                        if (versionid != prevversionid || nRow == 1)
-                                        {
-                                            if (versionrow != null)
-                                            {
-                                                versionrow["MODEL_VERSION_PERMISSIONS"] = sPerms;
-                                                versionrow["MODEL_VERSION_PERMISSIONS_HIDDEN"] = sPermsHidden;
-                                            }
-                                            sPerms = "";
-                                            sPermsHidden = "";
-                                            versionrow = dtVersions.Rows.Add();
-                                            versionrow["MODEL_VERSION_UID"] = row["MODEL_VERSION_UID"];
-                                            versionrow["MODEL_VERSION_NAME"] = row["MODEL_VERSION_NAME"];
-                                            versionrow["MODEL_VERSION_DESC"] = row["MODEL_VERSION_DESC"];
-                                        }
-                                        //mv.MODEL_VERSION_UID, mv.MODEL_VERSION_NAME, mv.MODEL_VERSION_DESC, mgs.GROUP_ID, g.GROUP_NAME, mgs.VIEW_PERMISSION, mgs.EDIT_PERMISSION"
-                                        var s = "No Access";
-                                        if (!row["GROUP_NAME"].Equals(System.DBNull.Value))
-                                        {
-                                            if ((int)row["EDIT_PERMISSION"] == 1)
-                                                s = "Read/Write";
-                                            else if ((int)row["VIEW_PERMISSION"] == 1)
-                                                s = "Read Only";
-                                            if (sPerms != "")
-                                                sPerms += ",";
-                                            sPerms += row["GROUP_NAME"].ToString() + "(" + s + ")";
-                                            if (sPermsHidden != "")
-                                                sPermsHidden += ",";
-                                            sPermsHidden += row["GROUP_ID"].ToString() + "::" + row["GROUP_NAME"].ToString() + "::" + row["VIEW_PERMISSION"].ToString() + "::" + row["EDIT_PERMISSION"].ToString();
-                                        }
-
-                                        if (nRow == nRowCount && versionrow != null)
-                                        {
-                                            versionrow["MODEL_VERSION_PERMISSIONS"] = sPerms;
-                                            versionrow["MODEL_VERSION_PERMISSIONS_HIDDEN"] = sPermsHidden;
-                                            versionrow = null;
-                                        }
-                                        prevversionid = versionid;
-                                    }
-                                    _DGrid dg = new _DGrid();
-                                    //dg.AddColumn(title: "ID", width: 50, name: "MODEL_VERSION_UID", isId: true, hidden: true);
-                                    //dg.AddColumn(title: "Deleted", width: 50, name: "Deleted", type:_DGrid.Type.checkbox, editable: true, hidden: false);
-                                    //dg.AddColumn(title: "Name", width: 150, name: "MODEL_VERSION_NAME");
-                                    //dg.AddColumn(title: "Description", width: 150, name: "MODEL_VERSION_DESC");
-                                    //dg.AddColumn(title: "Permissions", width: 250, name: "MODEL_VERSION_PERMISSIONS");
-                                    //dg.AddColumn(title: "PermissionsHidden", width: 180, name: "MODEL_VERSION_PERMISSIONS_HIDDEN");
-                                    dg.AddColumn(title: "ID", width: 50, name: "MODEL_VERSION_UID", isId: true, hidden: true);
-                                    dg.AddColumn(title: "Deleted", width: 50, name: "Deleted", type: _DGrid.Type.checkbox, editable: false, hidden: true);
-                                    dg.AddColumn(title: "Name", width: 150, name: "MODEL_VERSION_NAME", editable: false);
-                                    dg.AddColumn(title: "Description", width: 150, name: "MODEL_VERSION_DESC", editable: false);
-                                    dg.AddColumn(title: "Permissions", width: 250, name: "MODEL_VERSION_PERMISSIONS", editable: false);
-                                    dg.AddColumn(title: "PermissionsHidden", width: 180, name: "MODEL_VERSION_PERMISSIONS_HIDDEN", editable: false, hidden: true);
-                                    dg.SetDataTable(dtVersions);
-                                    string columnData;
-                                    string tableData;
-                                    dg.Build(out columnData, out tableData);
-                                    xModels.CreateString("dgridVersionsColumnData", columnData);
-                                    xModels.CreateString("dgridVersionsTableData", tableData);
-                                }
-                                dba.Close();
-                                sReply = xModels.XML();
-                            }
-                        }
+                        reply = ReadModelInfo(Context, xData);
                         break;
                     }
-                    //case "ReadCalendarInfo":
-                    //    sReply = ReadCalendarInfo(Context, xData);
-                    //    break;
                     case "UpdateModelInfo":
                     {
-                        sReply = UpdateModelInfo(Context, xData);
+                        reply = UpdateModelInfo(Context, xData);
                         break;
                     }
                     case "DeleteModelInfo":
                     {
-                        sReply = DeleteModelInfo(Context, xData);
+                        reply = DeleteModelInfo(Context, xData);
                         break;
                     }
-                    default:
-                        break;
                 }
             }
             catch (Exception ex)
             {
-                sReply = WebAdmin.FormatError("exception", "Models.ModelsRequest", ex.Message);
+                Trace.TraceError("Exception Suppressed {0}", ex);
+                reply = WebAdmin.FormatError("exception", "Models.ModelsRequest", ex.Message);
             }
 
-            return sReply;
+            return reply;
         }
+
+        private static string ReadModelInfo(HttpContext context, CStruct xData)
+        {
+            var reply = string.Empty;
+            var viewId = int.Parse(xData.InnerText);
+            var baseInfo = WebAdmin.BuildBaseInfo(context);
+            using (var dataAccess = new DataAccess(baseInfo))
+            {
+                var dbAccess = dataAccess.dba;
+                if (dbAccess.Open() == StatusEnum.rsSuccess)
+                {
+                    DataTable dataTable;
+                    if (dbaModels.SelectModel(dbAccess, viewId, out dataTable) != StatusEnum.rsSuccess)
+                    {
+                        reply = WebAdmin.FormatError("exception", "Models.ReadModelInfo", dbAccess.StatusText);
+                    }
+                    else
+                    {
+                        CStruct models;
+                        int selectedFlagField;
+
+                        CreateModel(dataTable, out models, out selectedFlagField);
+                        CreateCalendars(models, dbAccess);
+                        CreateCostTypes(models, dbAccess, viewId);
+                        CreateFlagCustomFields(models, dbAccess, selectedFlagField);
+                        SelectAndUpdateSecurity(dbAccess, models);
+                        dbaModels.SelectModelVersions(dbAccess, viewId, out dataTable);
+                        var versions = BuildNewDataTableWithPermissions(dataTable);
+                        var dGrid = UpdateGrid(versions);
+                        PopulateModels(dGrid, models);
+
+                        reply = models.XML();
+                    }
+                }
+            }
+            return reply;
+        }
+
+        private static void CreateModel(DataTable dataTable, out CStruct models, out int selectedFlagField)
+        {
+            const string ModelSelectedFieldId = "MODEL_SELECTED_FIELD_ID";
+            const string NewModelValue = "New Model";
+
+            models = new CStruct();
+            models.Initialize("Model");
+
+            var selectedCalendar = -1;
+            selectedFlagField = 0;
+            if (dataTable.Rows.Count == 1)
+            {
+                var row = dataTable.Rows[0];
+                models.CreateIntAttr(ModelUIdAttribute, SqlDb.ReadIntValue(row[ModelUIdAttribute]));
+                models.CreateStringAttr(ModelNameAttribute, SqlDb.ReadStringValue(row[ModelNameAttribute]));
+                models.CreateStringAttr(ModelDescAttribute, SqlDb.ReadStringValue(row[ModelDescAttribute]));
+                selectedCalendar = SqlDb.ReadIntValue(row[ModelCbIdAttribute]);
+                models.CreateIntAttr(ModelCbIdAttribute, selectedCalendar);
+                selectedFlagField = SqlDb.ReadIntValue(row[ModelSelectedFieldId]);
+            }
+            else
+            {
+                models.CreateIntAttr(ModelUIdAttribute, 0);
+                models.CreateStringAttr(ModelNameAttribute, NewModelValue);
+                models.CreateStringAttr(ModelDescAttribute, string.Empty);
+                models.CreateIntAttr(ModelCbIdAttribute, selectedCalendar);
+            }
+        }
+
+        private static void CreateCalendars(CStruct models, DBAccess dbAccess)
+        {
+            DataTable dataTable;
+            var calendars = models.CreateSubStruct("calendars");
+            var item = calendars.CreateSubStruct("item");
+            item.CreateIntAttr("id", -1);
+            item.CreateStringAttr("name", "[None]");
+            dbaCalendars.SelectCalendars(dbAccess, out dataTable);
+            foreach (DataRow row in dataTable.Rows)
+            {
+                item = calendars.CreateSubStruct("item");
+                var nCalendar = SqlDb.ReadIntValue(row["CB_ID"]);
+                item.CreateIntAttr("id", nCalendar);
+                item.CreateStringAttr("name", SqlDb.ReadStringValue(row["CB_NAME"]));
+            }
+        }
+
+        private static void CreateCostTypes(CStruct models, DBAccess dbAccess, int viewId)
+        {
+            DataTable dataTable;
+            var costTypes = models.CreateSubStruct("costtypes");
+            dbaModels.SelectCostTypesForModel(dbAccess, viewId, out dataTable);
+            foreach (DataRow row in dataTable.Rows)
+            {
+                var item = costTypes.CreateSubStruct("item");
+                var costType = SqlDb.ReadIntValue(row["CT_ID"]);
+                item.CreateIntAttr("id", costType);
+                item.CreateStringAttr("name", SqlDb.ReadStringValue(row["CT_NAME"]));
+                item.CreateIntAttr("used", SqlDb.ReadIntValue(row["used"]));
+            }
+        }
+
+        private static void CreateFlagCustomFields(CStruct models, DBAccess dbAccess, int selectedFlagField)
+        {
+            DataTable dataTable;
+            var flagCustomFields = models.CreateSubStruct("flagcustomfields");
+            dbaModels.SelectCustomFields_Flags(dbAccess, out dataTable);
+            var item = flagCustomFields.CreateSubStruct("item");
+            item.CreateIntAttr("id", -1);
+            item.CreateStringAttr("name", "[None]");
+            foreach (DataRow row in dataTable.Rows)
+            {
+                item = flagCustomFields.CreateSubStruct("item");
+                var fieldId = SqlDb.ReadIntValue(row["FA_FIELD_ID"]);
+                item.CreateIntAttr("id", fieldId);
+                item.CreateStringAttr("name", SqlDb.ReadStringValue(row["FA_NAME"]));
+                item.CreateIntAttr(
+                    "selected",
+                    selectedFlagField == fieldId
+                        ? 1
+                        : 0);
+            }
+        }
+
+        private static void SelectAndUpdateSecurity(DBAccess dbAccess, CStruct models)
+        {
+            DataTable dataTable;
+            dbaGroups.SelectEmptyCostTypeSecurityGroups(dbAccess, out dataTable);
+            var tGrid = new _TGrid();
+            InitializeSecurityColumns(tGrid);
+            tGrid.SetDataTable(dataTable);
+            string tGridSecurity;
+            tGrid.Build(out tGridSecurity);
+            models.CreateString("tgridSecurity", tGridSecurity);
+        }
+
+        private static void PopulateModels(_DGrid dGrid, CStruct models)
+        {
+            string columnData;
+            string tableData;
+            dGrid.Build(out columnData, out tableData);
+            models.CreateString("dgridVersionsColumnData", columnData);
+            models.CreateString("dgridVersionsTableData", tableData);
+        }
+
+        private static _DGrid UpdateGrid(DataTable versions)
+        {
+            var dGrid = new _DGrid();
+            dGrid.AddColumn("ID", 50, name: "MODEL_VERSION_UID", isId: true, hidden: true);
+            dGrid.AddColumn("Deleted", 50, name: "Deleted", type: _DGrid.Type.checkbox, editable: false, hidden: true);
+            dGrid.AddColumn("Name", 150, name: "MODEL_VERSION_NAME", editable: false);
+            dGrid.AddColumn("Description", 150, name: "MODEL_VERSION_DESC", editable: false);
+            dGrid.AddColumn("Permissions", 250, name: "MODEL_VERSION_PERMISSIONS", editable: false);
+            dGrid.AddColumn("PermissionsHidden", 180, name: "MODEL_VERSION_PERMISSIONS_HIDDEN", editable: false, hidden: true);
+            dGrid.SetDataTable(versions);
+            return dGrid;
+        }
+
+        private static DataTable BuildNewDataTableWithPermissions(DataTable dataTable)
+        {
+            var prevVersionId = 0;
+            var versions = new DataTable();
+            versions.Columns.Add("MODEL_VERSION_UID", Type.GetType("System.Int32"));
+            versions.Columns.Add("MODEL_VERSION_NAME", Type.GetType("System.String"));
+            versions.Columns.Add("MODEL_VERSION_DESC", Type.GetType("System.String"));
+            versions.Columns.Add("MODEL_VERSION_PERMISSIONS", Type.GetType("System.String"));
+            versions.Columns.Add("MODEL_VERSION_PERMISSIONS_HIDDEN", Type.GetType("System.String"));
+            var rowCount = dataTable.Rows.Count;
+            var rowIndex = 0;
+            DataRow versionRow = null;
+            var permissions = string.Empty;
+            var hiddenPermissions = string.Empty;
+            foreach (DataRow row in dataTable.Rows)
+            {
+                rowIndex++;
+                var versionId = SqlDb.ReadIntValue(row["MODEL_VERSION_UID"]);
+                if (versionId != prevVersionId || rowIndex == 1)
+                {
+                    if (versionRow != null)
+                    {
+                        versionRow["MODEL_VERSION_PERMISSIONS"] = permissions;
+                        versionRow["MODEL_VERSION_PERMISSIONS_HIDDEN"] = hiddenPermissions;
+                    }
+                    permissions = string.Empty;
+                    hiddenPermissions = string.Empty;
+                    versionRow = versions.Rows.Add();
+                    versionRow["MODEL_VERSION_UID"] = row["MODEL_VERSION_UID"];
+                    versionRow["MODEL_VERSION_NAME"] = row["MODEL_VERSION_NAME"];
+                    versionRow["MODEL_VERSION_DESC"] = row["MODEL_VERSION_DESC"];
+                }
+                var permissionGranded = "No Access";
+                if (!row["GROUP_NAME"].Equals(DBNull.Value))
+                {
+                    if ((int)row["EDIT_PERMISSION"] == 1)
+                    {
+                        permissionGranded = "Read/Write";
+                    }
+                    else if ((int)row["VIEW_PERMISSION"] == 1)
+                    {
+                        permissionGranded = "Read Only";
+                    }
+                    if (!string.IsNullOrWhiteSpace(permissions))
+                    {
+                        permissions += ",";
+                    }
+                    permissions += string.Format("{0}({1})", row["GROUP_NAME"], permissionGranded);
+                    if (!string.IsNullOrWhiteSpace(hiddenPermissions))
+                    {
+                        hiddenPermissions += ",";
+                    }
+                    hiddenPermissions += string.Format(
+                        "{0}::{1}::{2}::{3}",
+                        row["GROUP_ID"],
+                        row["GROUP_NAME"],
+                        row["VIEW_PERMISSION"],
+                        row["EDIT_PERMISSION"]);
+                }
+
+                if (rowIndex == rowCount && versionRow != null)
+                {
+                    versionRow["MODEL_VERSION_PERMISSIONS"] = permissions;
+                    versionRow["MODEL_VERSION_PERMISSIONS_HIDDEN"] = hiddenPermissions;
+                    versionRow = null;
+                }
+                prevVersionId = versionId;
+            }
+            return versions;
+        }
+
         //private static string ReadCalendarInfo(HttpContext Context, CStruct xData)
         //{
         //    string sReply = "";

@@ -21,51 +21,26 @@ namespace EPMLiveWebParts
 
         public override void getParams(SPWeb curWeb)
         {
-            try
-            {
-                isResourcePlan = true;
-                byte[] encodedDataAsBytes = System.Convert.FromBase64String(Request["data"]);
-                string[] data = System.Text.ASCIIEncoding.ASCII.GetString(encodedDataAsBytes).Split('\n');
-                strlist = data[0];
-                strview = data[1];
-                start = data[2];
-                finish = data[3];
-                progress = data[4];
-                wbsfield = data[5];
-                milestone = data[6];
-                executive = "on";
-                information = data[8];
-                linktype = data[9];
-                if (data[10] != "")
-                {
-                    string[] tRollupLists = data[10].Split(',');
-                    rolluplists = new string[tRollupLists.Length];
-                    for (int i = 0; i < tRollupLists.Length; i++)
-                    {
-                        string[] tRlist = tRollupLists[i].Split('|');
-                        rolluplists[i] = tRlist[0];
-                        string icon = "";
-                        try
-                        {
-                            icon = tRlist[1];
-                        }
-                        catch { }
-                        hshLists.Add(rolluplists[i], icon);
-                    }
-                }
-
-
-                filterfield = data[11];
-                filtervalue = data[12];
-
-                if (data[13] != "")
-                {
-                    rollupsites = data[13].Split(',');
-                }
-                resources = data[14];
-
-            }
-            catch { }
+            getresourceplan.GetParams(
+                null,
+                Request,
+                hshLists,
+                ref isResourcePlan,
+                ref strlist,
+                ref strview,
+                ref start,
+                ref finish,
+                ref progress,
+                ref wbsfield,
+                ref milestone,
+                ref executive,
+                ref information,
+                ref linktype,
+                ref rolluplists,
+                ref filterfield,
+                ref filtervalue,
+                ref rollupsites,
+                ref resources);
         }
         protected override void outputData()
         {
