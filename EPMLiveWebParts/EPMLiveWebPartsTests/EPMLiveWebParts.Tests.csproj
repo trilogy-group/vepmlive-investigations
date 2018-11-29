@@ -134,6 +134,9 @@
     <Compile Include="ChartControl\EpmChartTests.cs" />
     <Compile Include="ChartControl\VfChartTests.cs" />
     <Compile Include="ControlTemplates\SocialStreamTests.cs" />
+    <Compile Include="FancyDisplayForm.Tests.cs" />
+    <Compile Include="FancyDisplayForm.Tests.FillMethods.cs" />
+    <Compile Include="FancyDisplayForm.Tests.LoadFancyFormData.cs" />
     <Compile Include="GridListView\GridListViewTests.AddContextualTab.cs" />
     <Compile Include="GridListView\GridListViewTests.RemainingMethods.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderActionMenu.cs" />
