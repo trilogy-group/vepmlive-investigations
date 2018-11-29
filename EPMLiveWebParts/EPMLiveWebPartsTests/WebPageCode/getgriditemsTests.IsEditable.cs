@@ -36,6 +36,7 @@ namespace EPMLiveWebParts.Tests
             _workspaceUrl = true;
 
             _newItemNode = null;
+            _idsCount = 1;
         }
 
         [TestCleanup]

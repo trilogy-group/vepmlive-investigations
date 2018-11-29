@@ -1258,6 +1258,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPField.AllInstances.SchemaXmlGet = _ => "<root>1</root>";
             ShimSPField.AllInstances.ParentListGet = _ => new ShimSPList();
             ShimSPField.AllInstances.TitleGet = _ => DummyText;
+            ShimSPField.AllInstances.GetFieldValueAsTextObject = (_, __) => DummyVal;
             ShimSPFieldLookupValue.ConstructorString = (_, __) => { };
             ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => 1;
             ShimSPFieldLookupValue.AllInstances.LookupValueGet = _ => DummyVal;
