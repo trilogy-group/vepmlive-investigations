@@ -268,7 +268,7 @@ namespace EPMLiveWorkPlanner
             {
                 try
                 {
-                    stringBuilder.Append( string.Format("<userdata name=\"ActualDuration\">{0}</userdata>", listItem["ActualDuration"]));
+                    stringBuilder.Append(string.Format("<userdata name=\"ActualDuration\">{0}</userdata>", listItem["ActualDuration"]));
                     innerXml = stringBuilder.ToString();
                 }
                 catch (Exception ex)
