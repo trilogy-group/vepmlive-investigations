@@ -1,30 +1,30 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EPMLiveWebParts;
-using System;
+﻿using System;
+using System.Collections;
+using System.Collections.Fakes;
 using System.Collections.Generic;
+using System.Collections.Generic.Fakes;
+using System.Data;
+using System.Diagnostics.CodeAnalysis;
+using System.DirectoryServices.ActiveDirectory.Fakes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data;
-using System.Collections;
-using System.Collections.Fakes;
-using System.Collections.Generic.Fakes;
-using System.DirectoryServices.ActiveDirectory.Fakes;
-using Microsoft.SharePoint.Fakes;
-using System.Xml;
-using Microsoft.SharePoint;
-
 using System.Web.Fakes;
 using System.Web.UI.Fakes;
-using Microsoft.SharePoint.Administration;
-using EPMLiveWebParts.Fakes;
+using System.Xml;
 using System.Xml.Fakes;
+using EPMLiveWebParts;
+using EPMLiveWebParts.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
+using Microsoft.SharePoint.Fakes;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
 namespace EPMLiveWebParts.Tests
 {
-    [TestClass()]
+    [TestClass(), ExcludeFromCodeCoverage]
     public partial class getgriditemsTests
     {
         private const string NewGroupString = "Group1\nAtt1\nAtt2";

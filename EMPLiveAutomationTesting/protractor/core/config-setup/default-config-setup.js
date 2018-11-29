@@ -92,40 +92,40 @@ const configSetup = {
         },
         login: {
             admin: {
-                user: "farmadmin",
-                password: "Pass@word1"
+                user: setupUtilities.getParam("farmadmin", "--params.login.admin.user", false),
+                password: setupUtilities.getParam("Pass@word1", "--params.login.admin.password", false)
             },
             projectManager: {
-                user: "project.manager",
-                password: "Pass@word1"
+                user: setupUtilities.getParam("project.manager", "--params.login.projectManager.user", false),
+                password: setupUtilities.getParam("Pass@word1",  "--params.login.projectManager.password", false)
             },
             teamMember: {
-                user: "team.member",
-                password: "Pass@word1"
+                user: setupUtilities.getParam("team.member", "--params.login.teamMember.user", false),
+                password: setupUtilities.getParam("Pass@word1", "--params.login.teamMember.password", false)
             },
             portfolioManager: {
-                user: "portfolio.manager",
-                password: "Pass@word1"
+                user: setupUtilities.getParam("portfolio.manager", "--params.login.portfolioManager.user", false),
+                password: setupUtilities.getParam("Pass@word1", "--params.login.portfolioManager.password", false)
             },
             reportViewer: {
-                user: "report.viewer",
-                password: "Pass@word1"
+                user: setupUtilities.getParam("report.viewer", "--params.login.reportViewer.user", false),
+                password: setupUtilities.getParam("Pass@word1", "--params.login.reportViewer.password", false)
             },
             reportWriter: {
-                user: "report.writer",
-                password: "Pass@word1"
+                user: setupUtilities.getParam("report.writer", "--params.login.reportWriter.user", false),
+                password: setupUtilities.getParam("Pass@word1", "--params.login.reportWriter.password", false)
             },
             resourceManager: {
-                user: "resource.manager",
-                password: "Pass@word1"
+                user: setupUtilities.getParam("resource.manager", "--params.login.resourceManager.user", false),
+                password: setupUtilities.getParam("Pass@word1", "--params.login.resourceManager.password", false)
             },
             executiveUser: {
-                user: "executive.user",
-                password: "Pass@word1"
+                user: setupUtilities.getParam("executive.user", "--params.login.executiveUser.user", false),
+                password: setupUtilities.getParam("Pass@word1", "--params.login.executiveUser.password", false)
             }
         }
     },
-    baseUrl: 'http://tenant02.epmldev.com/epm',
+    baseUrl: setupUtilities.getParam('http://tenant02.epmldev.com/epm', "--baseUrl", false),
     framework: 'jasmine',
     jasmineNodeOpts: {
         showColors: true,

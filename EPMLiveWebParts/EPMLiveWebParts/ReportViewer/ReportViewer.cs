@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -10,6 +11,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Xml;
 using System.Xml.Serialization;
+using EPMLiveCore;
 using EPMLiveWebParts.SSRS2005;
 using EPMLiveWebParts.SSRS2006;
 using Microsoft.SharePoint;
@@ -80,34 +82,19 @@ namespace EPMLiveWebParts
 
         protected override void RenderWebPart(HtmlTextWriter output)
         {
-            EPMLiveCore.Act act = new EPMLiveCore.Act(SPContext.Current.Web);
-            int activation = act.CheckFeatureLicense(EPMLiveCore.ActFeature.WebParts);
-
-            if (activation != 0)
+            if (!CheckActivationStatus(output))
             {
-                output.Write(act.translateStatus(activation));
                 return;
             }
 
-
-            if (UseDefaults)
-            {
-                ReportingServicesURL = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
-                try
-                {
-                    Integrated = bool.Parse(EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportsUseIntegrated"));
-                }
-                catch { }
-            }
-            else
-            {
-                ReportingServicesURL = PropSRSUrl;
-                Integrated = IsIntegratedMode;
-            }
-
-            ReportsRootFolderName = PropReportsPath;
-            if (ReportsRootFolderName == "")
-                ReportsRootFolderName = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportsRootFolder");
+            SetReportsLinksAndPaths(
+                PropReportsPath,
+                IsIntegratedMode,
+                PropSRSUrl,
+                UseDefaults,
+                ref ReportingServicesURL,
+                ref Integrated,
+                ref ReportsRootFolderName);
 
             if (ReportingServicesURL == null || ReportingServicesURL == "")
             {
@@ -293,6 +280,62 @@ namespace EPMLiveWebParts
                 output.WriteLine("</script>");
             }
         }
+
+        internal static void SetReportsLinksAndPaths(
+            string propReportsPath,
+            bool isIntegratedMode,
+            string propSrsUrl,
+            bool useDefaults,
+            ref string reportingServiceUrl,
+            ref bool integrated,
+            ref string reportsRootFolderName)
+        {
+            if (useDefaults)
+            {
+                reportingServiceUrl = CoreFunctions.getWebAppSetting(
+                    SPContext.Current.Site.WebApplication.Id,
+                    "ReportingServicesURL");
+                try
+                {
+                    bool.TryParse(
+                        CoreFunctions.getWebAppSetting(
+                            SPContext.Current.Site.WebApplication.Id,
+                            "ReportsUseIntegrated"),
+                        out integrated);
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex);
+                }
+            }
+            else
+            {
+                reportingServiceUrl = propSrsUrl;
+                integrated = isIntegratedMode;
+            }
+
+            reportsRootFolderName = propReportsPath;
+            if (string.IsNullOrWhiteSpace(reportsRootFolderName))
+            {
+                reportsRootFolderName = CoreFunctions.getWebAppSetting(
+                    SPContext.Current.Site.WebApplication.Id,
+                    "ReportsRootFolder");
+            }
+        }
+
+        internal static bool CheckActivationStatus(HtmlTextWriter output)
+        {
+            var act = new Act(SPContext.Current.Web);
+            var activation = act.CheckFeatureLicense(ActFeature.WebParts);
+
+            if (activation != 0)
+            {
+                output.Write(act.translateStatus(activation));
+                return false;
+            }
+            return true;
+        }
+
         private void BuildTree(SSRS2005.CatalogItem[] catalogItems)
         {
             sbRptList.Append("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" height=\"100%\" ><tr><td id=\"coltohide\" style=\"vertical-align:top\" width=\"250\" height=\"100%\"><img src=\"/_layouts/images/blank.gif\" height=\"1\" width=\"250\">");

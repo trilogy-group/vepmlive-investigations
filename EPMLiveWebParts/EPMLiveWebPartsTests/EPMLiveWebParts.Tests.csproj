@@ -134,7 +134,9 @@
     <Compile Include="ChartControl\EpmChartTests.cs" />
     <Compile Include="ChartControl\VfChartTests.cs" />
     <Compile Include="ControlTemplates\SocialStreamTests.cs" />
-    <Compile Include="GridListView\GridDataTests.cs" />
+    <Compile Include="FancyDisplayForm.Tests.cs" />
+    <Compile Include="FancyDisplayForm.Tests.FillMethods.cs" />
+    <Compile Include="FancyDisplayForm.Tests.LoadFancyFormData.cs" />
     <Compile Include="GridListView\GridListViewTests.AddContextualTab.cs" />
     <Compile Include="GridListView\GridListViewTests.RemainingMethods.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderActionMenu.cs" />
@@ -159,6 +161,7 @@
     <Compile Include="ReportsCenterTest.cs" />
     <Compile Include="ReportWebPartsTestBase.cs" />
     <Compile Include="ReportViewerTest.cs" />
+    <Compile Include="WebPageCode\getgriditemsTests.addItem.cs" />
     <Compile Include="WebPageCode\getgriditemsTests.cs" />
     <Compile Include="WebPageCode\getgriditemsTests.IsEditable.cs" />
     <Compile Include="WebPageCode\GetitemsTests.cs" />
