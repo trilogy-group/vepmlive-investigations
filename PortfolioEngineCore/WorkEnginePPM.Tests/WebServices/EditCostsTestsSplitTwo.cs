@@ -79,7 +79,7 @@ namespace WorkEnginePPM.Tests.WebServices
             {
                 var xPIs = new CStruct();
                 xPIs.Initialize("PIs");
-                CStruct xPi = xPIs.CreateSubStruct("PI");
+                var xPi = xPIs.CreateSubStruct("PI");
                 xPi.CreateIntAttr("id", DummyInt);
                 xPi.CreateStringAttr("name", DummyProjectResourceName);
 
@@ -178,7 +178,7 @@ namespace WorkEnginePPM.Tests.WebServices
             ShimdbaEditCosts.CheckCostTypeSecurityDBAccessInt32Int32Ref = (DBAccess dbAccess, int costTypeId, ref int costTypeEditMode) => true;
 
             // Act
-            var actualResult = _testEntity.GetCostTypes(wepId);
+            var actualResult = _testEntity.GetCostTypes(WepId);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -317,7 +317,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.CheckInPI(0, wepId);
+            var actualResult = _testEntity.CheckInPI(0, WepId);
 
             // Assert
             actualResult.ShouldBeNullOrEmpty();
@@ -339,7 +339,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.CheckInPI(0, wepId);
+            var actualResult = _testEntity.CheckInPI(0, WepId);
 
             // Assert
             actualResult.ShouldBeNullOrEmpty();
@@ -361,7 +361,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.CheckInPI(0, wepId);
+            var actualResult = _testEntity.CheckInPI(0, WepId);
 
             // Assert
             actualResult.ShouldBeNullOrEmpty();
@@ -510,7 +510,7 @@ namespace WorkEnginePPM.Tests.WebServices
                     Level = 0,
                     Uid = DummyLookupItemUid4,
                     Name = DummyLookupItemName4
-                },
+                }
             };
 
             var expectedResult = new List<string>()
@@ -521,7 +521,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = (string)_privateObject.Invoke(BuildJSONLookupMethodName, lookupItems, 0, true);
+            var actualResult = (string)_privateObject.Invoke(BuildJsonLookupMethodName, lookupItems, 0, true);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -558,7 +558,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = (string)_privateObject.Invoke(BuildJSONLookupMethodName, lookupItems, 0, true);
+            var actualResult = (string)_privateObject.Invoke(BuildJsonLookupMethodName, lookupItems, 0, true);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -586,7 +586,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = (StatusEnum)_privateType.InvokeStatic(SendXMLToWorkEngineMethodName, parameters);
+            var actualResult = (StatusEnum)_privateType.InvokeStatic(SendXmlToWorkEngineMethodName, parameters);
 
             // Assert
             actualResult.ShouldBe((StatusEnum)99830);

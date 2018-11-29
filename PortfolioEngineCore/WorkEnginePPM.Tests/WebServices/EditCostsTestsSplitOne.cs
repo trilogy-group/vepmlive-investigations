@@ -30,8 +30,8 @@ namespace WorkEnginePPM.Tests.WebServices
 
         private const string MergeCostCategoriesMethodName = "MergeCostCategories";
         private const string MergeCostCategoryValuesMethodName = "MergeCostCategoryValues";
-        private const string BuildJSONLookupMethodName = "BuildJSONLookup";
-        private const string SendXMLToWorkEngineMethodName = "SendXMLToWorkEngine";
+        private const string BuildJsonLookupMethodName = "BuildJSONLookup";
+        private const string SendXmlToWorkEngineMethodName = "SendXMLToWorkEngine";
         private const string BuildCalculatedDataMethodName = "BuildCalculatedData";
         private const string GetCostTypeMethodName = "GetCostType";
 
@@ -176,7 +176,7 @@ namespace WorkEnginePPM.Tests.WebServices
         private const int CustomFieldId11815 = 11815;
         private const int DummyInt = 1;
         private const string DummyError = "DummyError";
-        private const string wepId = "33";
+        private const string WepId = "33";
         private const int DefaultProjectId = 0;
         private const int DefaultCostTypeId = 0;
         private const int DefaultFteMode = 0;
@@ -192,8 +192,8 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string DummyLookupItemName3 = "DummyLookupItemName3";
         private const string DummyLookupItemName4 = "DummyLookupItemName4";
 
-        private readonly string xmlDataSaveEditCostsData = $@"<Root><Body><B><I Visible=""1"" id=""I{DummyCostCategoryUid1}""><I Visible=""0"" id=""I{DummyCostCategoryUid2}S1"" CanWrite=""0""/><I Visible=""1"" id=""I{DummyCostCategoryUid2}S2"" CanWrite=""1"" Changed=""0""/></I><I Visible=""1"" id=""I{DummyCostCategoryUid3}"" Changed=""1"" Y{CustomFieldId11801}=""1""  Y{CustomFieldId11802}=""1""  Y{CustomFieldId11803}=""1""  Y{CustomFieldId11804}=""1""  Y{CustomFieldId11805}=""1"" Y{CustomFieldId11811}=""1""  Y{CustomFieldId11812}=""1""  Y{CustomFieldId11813}=""1""  Y{CustomFieldId11814}=""1""  Y{CustomFieldId11815}=""1"" C{DummyPeriodId1}=""1""></I></B></Body></Root>";
-        private readonly string xmlDataSaveEditCostsSimpleData = $"<Root><Body><B><I Visible=\"1\" id=\"I{DummyCostCategoryUid1}\"/></B></Body></Root>";
+        private readonly string _xmlDataSaveEditCostsData = $@"<Root><Body><B><I Visible=""1"" id=""I{DummyCostCategoryUid1}""><I Visible=""0"" id=""I{DummyCostCategoryUid2}S1"" CanWrite=""0""/><I Visible=""1"" id=""I{DummyCostCategoryUid2}S2"" CanWrite=""1"" Changed=""0""/></I><I Visible=""1"" id=""I{DummyCostCategoryUid3}"" Changed=""1"" Y{CustomFieldId11801}=""1""  Y{CustomFieldId11802}=""1""  Y{CustomFieldId11803}=""1""  Y{CustomFieldId11804}=""1""  Y{CustomFieldId11805}=""1"" Y{CustomFieldId11811}=""1""  Y{CustomFieldId11812}=""1""  Y{CustomFieldId11813}=""1""  Y{CustomFieldId11814}=""1""  Y{CustomFieldId11815}=""1"" C{DummyPeriodId1}=""1""></I></B></Body></Root>";
+        private readonly string _xmlDataSaveEditCostsSimpleData = $"<Root><Body><B><I Visible=\"1\" id=\"I{DummyCostCategoryUid1}\"/></B></Body></Root>";
 
         private StatusEnum _currentStatus = StatusEnum.rsSuccess;
         private string _currentStatusText;
@@ -309,7 +309,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout);
 
             // Assert
@@ -346,7 +346,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout);
 
             // Assert
@@ -383,7 +383,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout);
 
             // Assert
@@ -420,7 +420,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout);
 
             // Assert
@@ -461,7 +461,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout);
 
             // Assert
@@ -487,7 +487,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout);
 
             // Assert
@@ -560,7 +560,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout,
                 loadAllCostCategories);
 
@@ -595,7 +595,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout,
                 loadAllCostCategories);
 
@@ -632,7 +632,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout,
                 loadAllCostCategories);
 
@@ -662,7 +662,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout,
                 loadAllCostCategories);
 
@@ -717,7 +717,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout,
                 loadAllCostCategories);
 

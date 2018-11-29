@@ -26,7 +26,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
+            var actualResult = _testEntity.SaveEditCostsData(_xmlDataSaveEditCostsData, DefaultProjectId, DefaultCostTypeId, string.Empty, WepId);
 
             // Assert
             actualResult.ShouldBe("<Grid><IO Result=\"0\"/></Grid>");
@@ -36,7 +36,7 @@ namespace WorkEnginePPM.Tests.WebServices
         public void SaveEditCostsData_InvalidData_ReturnsStringError()
         {
             // Arrange, Act
-            var actualResult = _testEntity.SaveEditCostsData(string.Empty, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
+            var actualResult = _testEntity.SaveEditCostsData(string.Empty, DefaultProjectId, DefaultCostTypeId, string.Empty, WepId);
 
             // Assert
             actualResult.ShouldBe("<Grid><IO Result=\"-10\" Message=\"Error saving Cost data&#xA;&#xA;Unable to load XML\" /></Grid>");
@@ -55,10 +55,10 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
+            var actualResult = _testEntity.SaveEditCostsData(_xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, WepId);
 
             // Assert
-            actualResult.ShouldBe($"<Grid><IO Result=\"-10\" Message=\"Error saving Cost data&#xA;&#xA;Unable to convert wepid '{wepId}' to ProjectID\" /></Grid>");
+            actualResult.ShouldBe($"<Grid><IO Result=\"-10\" Message=\"Error saving Cost data&#xA;&#xA;Unable to convert wepid '{WepId}' to ProjectID\" /></Grid>");
         }
 
         [TestMethod]
@@ -70,7 +70,7 @@ namespace WorkEnginePPM.Tests.WebServices
             SetupShimDbaEditCosts();
 
             // Act
-            var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
+            var actualResult = _testEntity.SaveEditCostsData(_xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
 
             // Assert
             actualResult.ShouldBe("<Grid><IO Result=\"-10\" Message=\"Error saving Cost data&#xA;&#xA;Invalid ProjectID\" /></Grid>");
@@ -91,7 +91,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
+            var actualResult = _testEntity.SaveEditCostsData(_xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, WepId);
 
             // Assert
             actualResult.ShouldBe("<Grid><IO Result=\"-10\" Message=\"Error saving Cost data&#xA;&#xA;Invalid Calendar\" /></Grid>");
@@ -114,7 +114,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.SaveEditCostsData(data, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
+            var actualResult = _testEntity.SaveEditCostsData(data, DefaultProjectId, DefaultCostTypeId, string.Empty, WepId);
 
             // Assert
             actualResult.ShouldBe($"<Grid><IO Result=\"-10\" Message=\"Error saving Cost data&#xA;&#xA;{DummyCustomFieldName}{CustomFieldId11801} is a required code field&#xA;&#xA;Category = &quot;&quot;;&#xA;\" /></Grid>");
@@ -137,7 +137,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.SaveEditCostsData(data, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
+            var actualResult = _testEntity.SaveEditCostsData(data, DefaultProjectId, DefaultCostTypeId, string.Empty, WepId);
 
             // Assert
             actualResult.ShouldBe($"<Grid><IO Result=\"-10\" Message=\"Error saving Cost data&#xA;&#xA;{DummyCustomFieldName}{CustomFieldId11811} is a required text field&#xA;&#xA;Category = &quot;&quot;;&#xA;\" /></Grid>");
@@ -160,7 +160,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.SaveEditCostsData(data, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
+            var actualResult = _testEntity.SaveEditCostsData(data, DefaultProjectId, DefaultCostTypeId, string.Empty, WepId);
 
             // Assert
             actualResult.ShouldBe("<Grid><IO Result=\"-10\" Message=\"Error saving Cost data&#xA;&#xA;Two or more rows found with the same identity:&#xA;&#xA;Category = &quot;&quot;;&#xA;DummyCustomFieldName11801 = &quot;&quot;;&#xA;\" /></Grid>");
@@ -191,7 +191,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
+            var actualResult = _testEntity.SaveEditCostsData(_xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, WepId);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -209,7 +209,7 @@ namespace WorkEnginePPM.Tests.WebServices
             ShimIntegration.AllInstances.executeStringString = (sender, commandMethod, commandText) => null;
 
             // Act
-            var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
+            var actualResult = _testEntity.SaveEditCostsData(_xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, WepId);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -235,7 +235,7 @@ namespace WorkEnginePPM.Tests.WebServices
             ShimXmlNode.AllInstances.OuterXmlGet = sender => XmlInvalid;
 
             // Act
-            var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
+            var actualResult = _testEntity.SaveEditCostsData(_xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, WepId);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -258,7 +258,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
+            var actualResult = _testEntity.SaveEditCostsData(_xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, WepId);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -281,7 +281,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
+            var actualResult = _testEntity.SaveEditCostsData(_xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, WepId);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -304,7 +304,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var actualResult = _testEntity.SaveEditCostsData(xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, wepId);
+            var actualResult = _testEntity.SaveEditCostsData(_xmlDataSaveEditCostsSimpleData, DefaultProjectId, DefaultCostTypeId, string.Empty, WepId);
 
             // Assert
             this.ShouldSatisfyAllConditions(
