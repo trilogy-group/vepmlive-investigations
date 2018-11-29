@@ -62,9 +62,9 @@ pipeline {
         }
 		stage('Deploy') {
 			parallel {
-				stage('Deploy Quality') {
+				stage('Handle Quality') {
 					stages {
-						stage('Deploy') {
+						stage('Deploy Quality') {
 							steps {
 								timestamps {
 									script {
@@ -89,7 +89,7 @@ pipeline {
 								}
 							}
 						}
-						stage('Protractor UI tests') {
+						stage('Protractor UI Tests') {
 							steps {
 								timestamps {
 									script {
@@ -112,7 +112,7 @@ pipeline {
 						}
 					}
 				}
-				stage('Deploy staging') {
+				stage('Deploy Staging') {
 					steps {
 						timestamps {
 							script {
