@@ -120,21 +120,17 @@ namespace EPMLiveCore
 
         private void List_GetListItems_InXml(bool inJSON)
         {
-            GetListItem(
-                data => !inJSON
-                    ? HttpUtility.HtmlEncode(data.OuterXml)
-                    : HttpUtility.HtmlEncode(
-                        JSONUtil.ConvertXmlToJson(SimplifySPGetListItemsXml(data), string.Empty)));
+            GetListItem(true, inJSON);
             
         }
 
         private void List_GetListItems_InXml()
         {
-            GetListItem(SimplifySPGetListItemsXml);
+            GetListItem(false);
         }
         
 
-        private void GetListItem(Func<XmlNode, string> deserializeFunc)
+        private void GetListItem(bool encode, bool inJson = false)
         {
             // link to web service documentation
             // http://msdn.microsoft.com/en-us/library/lists.lists.getlistitems%28v=office.12%29.aspx
@@ -191,7 +187,18 @@ namespace EPMLiveCore
                 }
             }
 
-            Response.Write(deserializeFunc?.Invoke(data));
+            if (encode)
+            {
+                Response.Write(
+                    !inJson
+                        ? HttpUtility.HtmlEncode(data.OuterXml)
+                        : HttpUtility.HtmlEncode(
+                            JSONUtil.ConvertXmlToJson(SimplifySPGetListItemsXml(data), string.Empty)));
+            }
+            else
+            {
+                Response.Write(SimplifySPGetListItemsXml(data));
+            }
         }
 
         private void List_GetList_InXml(bool inJSON)
