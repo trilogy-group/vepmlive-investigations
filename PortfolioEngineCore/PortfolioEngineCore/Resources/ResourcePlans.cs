@@ -127,24 +127,9 @@ namespace PortfolioEngineCore
                                       + "WHERE (PROJECT_EXT_UID IS NOT NULL OR PROJECT_EXT_UID <> '')"
                                       + " AND (PROJECT_ARCHIVED IS NULL OR PROJECT_ARCHIVED = 0)"
                                       + " ORDER BY PROJECT_NAME";
-                    SqlCommand oCommand = new SqlCommand(sqlCommand, _dba.Connection);
-                    SqlDataReader reader = null;
-                    reader = oCommand.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        CStruct xPI = xPIs.CreateSubStruct("PI");
-                        int lUID = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
-                        if (sProjectIDs == "")
-                            sProjectIDs = lUID.ToString();
-                        else
-                            sProjectIDs += "," + lUID.ToString();
-                        string wepid = DBAccess.ReadStringValue(reader["PROJECT_EXT_UID"]);
-                        xPI.CreateIntAttr("id", lUID);
-                        xPI.CreateStringAttr("wepid", wepid);
-                        xPI.CreateStringAttr("name", DBAccess.ReadStringValue(reader["PROJECT_NAME"]));
-                    }
-                    reader.Close();
-                    reader = null;
+                    SqlCommand oCommand;
+                    SqlDataReader reader;
+                    CreateProjectIds(sqlCommand, xPIs, _dba, ref sProjectIDs);
 
                     if (bSuperPIM == false)
                     {
@@ -152,11 +137,16 @@ namespace PortfolioEngineCore
                         xPIs.Initialize("PIs");
 
                         sqlCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS"
-                                     + " LEFT JOIN EPG_DELEGATES SU ON SURR_CONTEXT = 4 AND SURR_CONTEXT_VALUE = PROJECT_ID"
-                                     + " WHERE PROJECT_MARKED_DELETION = 0 AND (PROJECT_MANAGER = "
-                                     + _userWResID.ToString("0") + " OR SU.SURR_WRES_ID = " + _userWResID.ToString("0") + ")" 
-                                     + " AND (PROJECT_ARCHIVED IS NULL OR PROJECT_ARCHIVED = 0)"
-                                     + " AND PROJECT_ID in (" + sProjectIDs + ") ORDER BY PROJECT_NAME";
+                            + " LEFT JOIN EPG_DELEGATES SU ON SURR_CONTEXT = 4 AND SURR_CONTEXT_VALUE = PROJECT_ID"
+                            + " WHERE PROJECT_MARKED_DELETION = 0 AND (PROJECT_MANAGER = "
+                            + _userWResID.ToString("0")
+                            + " OR SU.SURR_WRES_ID = "
+                            + _userWResID.ToString("0")
+                            + ")"
+                            + " AND (PROJECT_ARCHIVED IS NULL OR PROJECT_ARCHIVED = 0)"
+                            + " AND PROJECT_ID in ("
+                            + sProjectIDs
+                            + ") ORDER BY PROJECT_NAME";
 
                         oCommand = new SqlCommand(sqlCommand, _dba.Connection, _dba.Transaction);
                         reader = oCommand.ExecuteReader();
@@ -198,6 +188,37 @@ namespace PortfolioEngineCore
                 sReply = HandleError("GetPIList", Status, FormatErrorText());
             }
             return bResult;
+        }
+
+        internal static void CreateProjectIds(string sqlCommand, CStruct pis, DBAccess dbAccess, ref string projectIds)
+        {
+            using (var command = new SqlCommand(sqlCommand, dbAccess.Connection))
+            {
+                using (var reader = command.ExecuteReader())
+                {
+                    var stringBuilder = new StringBuilder(projectIds);
+                    while (reader.Read())
+                    {
+                        var pi = pis.CreateSubStruct("PI");
+                        var projectId = SqlDb.ReadIntValue(reader["PROJECT_ID"]);
+                        
+                        if (projectIds == string.Empty)
+                        {
+                            projectIds = projectId.ToString();
+                            stringBuilder = new StringBuilder(projectIds);
+                        }
+                        else
+                        {
+                            stringBuilder.Append(string.Format(",{0}", projectId));
+                            projectIds = stringBuilder.ToString();
+                        }
+                        var wepId = SqlDb.ReadStringValue(reader["PROJECT_EXT_UID"]);
+                        pi.CreateIntAttr("id", projectId);
+                        pi.CreateStringAttr("wepid", wepId);
+                        pi.CreateStringAttr("name", SqlDb.ReadStringValue(reader["PROJECT_NAME"]));
+                    }
+                }
+            }
         }
 
         private bool GetMetaData(string sRequest, out string sReply)

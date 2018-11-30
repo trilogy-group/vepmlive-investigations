@@ -130,7 +130,7 @@ namespace WorkEnginePPM
             return reply;
         }
 
-        private static string ReadCalendarsForCostType(DBAccess dba, int nCTId)
+        internal static string ReadCalendarsForCostType(DBAccess dba, int nCTId)
         {
             string sReply = "";
             DataTable dt;
@@ -185,7 +185,7 @@ namespace WorkEnginePPM
             return dbaQueueManager.PostCostValuesOnProjectRatesChange(dba, basePath, projectId, publish, publishBaseline);
         }
 
-        private static string PostCostValues(DBAccess dba, CStruct xData, string basePath)
+        internal static string PostCostValues(DBAccess dba, CStruct xData, string basePath)
         {
             string sReply = "";
             int nCTId = xData.GetIntAttr("CT_ID");

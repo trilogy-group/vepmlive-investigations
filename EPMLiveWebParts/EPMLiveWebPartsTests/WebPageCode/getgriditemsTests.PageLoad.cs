@@ -44,7 +44,7 @@ namespace EPMLiveWebParts.Tests
         private string[] _rollupLists;
 
         [TestMethod]
-        public void PageLoad_DocIcon_()
+        public void PageLoad_DocIcon_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad("DocIcon");
@@ -53,10 +53,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"60\" id=\"&lt;![CDATA[DocIcon]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_WorkspaceUrl_()
+        public void PageLoad_WorkspaceUrl_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad("WorkspaceUrl");
@@ -65,10 +68,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"60\" id=\"&lt;![CDATA[WorkspaceUrl]]&gt;\" sort=\"str\" align=\"center\"><![CDATA[<div style=\"width:100%; text-align:center;padding-right:4px\"></div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_Edit_()
+        public void PageLoad_Edit_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad("Edit");
@@ -77,10 +83,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"60\" id=\"&lt;![CDATA[Edit]]&gt;\" sort=\"str\" align=\"center\"><![CDATA[<div style=\"width:100%; text-align:center;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_Wbs_()
+        public void PageLoad_Wbs_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad("WBS");
@@ -89,10 +98,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[WBS]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_List_()
+        public void PageLoad_List_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad("List");
@@ -101,10 +113,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[List]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_Title_()
+        public void PageLoad_Title_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad("Title");
@@ -113,10 +128,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"tree\" width=\"376\" id=\"&lt;![CDATA[Title]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_FileLeafRef_()
+        public void PageLoad_FileLeafRef_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad("FileLeafRef");
@@ -125,10 +143,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"tree\" width=\"376\" id=\"&lt;![CDATA[FileLeafRef]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_Url_()
+        public void PageLoad_Url_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad("URL");
@@ -137,10 +158,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"tree\" width=\"376\" id=\"&lt;![CDATA[URL]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_TotalRollup_()
+        public void PageLoad_TotalRollup_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad("TotalRollup");
@@ -149,10 +173,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[TotalRollup]]&gt;\" sort=\"str\" align=\"right\"><![CDATA[<div style=\"width:100%; text-align:right;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_ContentTypeDisabled_()
+        public void PageLoad_ContentTypeDisabled_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad("ContentType");
@@ -162,10 +189,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[ContentType]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_ContentTypeEnabled_()
+        public void PageLoad_ContentTypeEnabled_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad("ContentType");
@@ -180,16 +210,18 @@ namespace EPMLiveWebParts.Tests
                     NameGet = () => DummyText
                 }
             }.GetEnumerator();
-            
 
             // Act
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[ContentType]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_Note_()
+        public void PageLoad_Note_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Note);
@@ -199,10 +231,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"txt\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_CalculatedIndicator_()
+        public void PageLoad_CalculatedIndicator_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Calculated);
@@ -212,10 +247,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"center\"><![CDATA[<div style=\"width:100%; text-align:center;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_CalculatedDateTime_()
+        public void PageLoad_CalculatedDateTime_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Calculated);
@@ -225,10 +263,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"date\" align=\"right\"><![CDATA[<div style=\"width:100%; text-align:right;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_CalculatedText_()
+        public void PageLoad_CalculatedText_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Calculated);
@@ -238,10 +279,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_CalculatedCurrency_()
+        public void PageLoad_CalculatedCurrency_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Calculated);
@@ -251,10 +295,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"int\" align=\"right\"><![CDATA[<div style=\"width:100%; text-align:right;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_CalculatedNumber_()
+        public void PageLoad_CalculatedNumber_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Calculated);
@@ -264,10 +311,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"int\" align=\"right\"><![CDATA[<div style=\"width:100%; text-align:right;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_CalculatedOther_()
+        public void PageLoad_CalculatedOther_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Calculated);
@@ -277,10 +327,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_DateTime_()
+        public void PageLoad_DateTime_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.DateTime);
@@ -290,10 +343,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"dhxCalendarA\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"date\" align=\"right\"><![CDATA[<div style=\"width:100%; text-align:right;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_NumberPercentage_()
+        public void PageLoad_NumberPercentage_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Number);
@@ -303,10 +359,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"edn\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"int\" align=\"right\"><![CDATA[<div style=\"width:100%; text-align:right;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_NumberNonPercentage_()
+        public void PageLoad_NumberNonPercentage_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Number);
@@ -316,10 +375,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"edn\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"int\" align=\"right\"><![CDATA[<div style=\"width:100%; text-align:right;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_Currency_()
+        public void PageLoad_Currency_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Currency);
@@ -329,10 +391,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"edn\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"int\" align=\"right\"><![CDATA[<div style=\"width:100%; text-align:right;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_Attachments_()
+        public void PageLoad_Attachments_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Attachments);
@@ -342,10 +407,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_User_()
+        public void PageLoad_User_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.User);
@@ -356,10 +424,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"usereditor\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_Boolean_()
+        public void PageLoad_Boolean_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Boolean);
@@ -369,10 +440,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ch\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"center\"><![CDATA[<div style=\"width:100%; text-align:center;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_Choice_()
+        public void PageLoad_Choice_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Choice);
@@ -382,10 +456,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"choice\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_MultiChoice_()
+        public void PageLoad_MultiChoice_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.MultiChoice);
@@ -395,10 +472,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"mchoice\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_Lookup_()
+        public void PageLoad_Lookup_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Lookup);
@@ -408,10 +488,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_LookupMulti_()
+        public void PageLoad_LookupMulti_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Lookup);
@@ -422,10 +505,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_Text_()
+        public void PageLoad_Text_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Text);
@@ -435,10 +521,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ed\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_FilteredLookup_()
+        public void PageLoad_FilteredLookup_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, new SPFieldType());
@@ -461,10 +550,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_ItemNodesAvg_()
+        public void PageLoad_ItemNodesAvg_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Text);
@@ -476,10 +568,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ed\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_ItemNodesStdev_()
+        public void PageLoad_ItemNodesStdev_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Text);
@@ -491,10 +586,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ed\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_ItemNodesCount_()
+        public void PageLoad_ItemNodesCount_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Text);
@@ -506,10 +604,13 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"ed\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         [TestMethod]
-        public void PageLoad_ItemNodesNoAggregation_()
+        public void PageLoad_ItemNodesNoAggregation_LoadsXml()
         {
             // Arrange
             PrepareForPageLoad(Other, SPFieldType.Lookup);
@@ -524,6 +625,9 @@ namespace EPMLiveWebParts.Tests
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
 
             // Assert
+            var result = GetResultData();
+            result.ShouldNotBeNull();
+            result.ShouldContain("<column type=\"choice\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
         }
 
         private static void FillSpList(Guid listId)
@@ -758,6 +862,11 @@ namespace EPMLiveWebParts.Tests
                 _privateObj.SetField("additionalgroups", "|");
                 _privateObj.SetField("executive", "on");
             };
+        }
+
+        private string GetResultData()
+        {
+            return _privateObj.GetField("data") as string;
         }
     }
 }
