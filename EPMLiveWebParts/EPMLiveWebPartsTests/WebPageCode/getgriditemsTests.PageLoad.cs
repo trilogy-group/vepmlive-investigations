@@ -210,7 +210,6 @@ namespace EPMLiveWebParts.Tests
                     NameGet = () => DummyText
                 }
             }.GetEnumerator();
-            
 
             // Act
             _privateObj.Invoke(MethodPageLoad, new object[] { _testObj, EventArgs.Empty });
@@ -867,12 +866,7 @@ namespace EPMLiveWebParts.Tests
 
         private string GetResultData()
         {
-            var data = _privateObj.GetField("data") as string;
-
-            var i = data.LastIndexOf("<column ");
-            data = data.Substring(i);
-
-            return data;
+            return _privateObj.GetField("data") as string;
         }
     }
 }
