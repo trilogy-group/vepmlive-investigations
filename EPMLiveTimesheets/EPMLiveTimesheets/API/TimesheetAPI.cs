@@ -3516,7 +3516,7 @@ namespace TimeSheets
                         {
                             const int DayMultiplier = 3;
                             if (string.Equals(
-                                dayDefs[(int)start.DayOfWeek * DayMultiplier].ToLower(),
+                                dayDefs[(int)start.DayOfWeek * DayMultiplier],
                                 bool.TrueString,
                                 StringComparison.OrdinalIgnoreCase))
                             {
