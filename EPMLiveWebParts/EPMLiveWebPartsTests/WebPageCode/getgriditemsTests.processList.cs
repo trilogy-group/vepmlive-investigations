@@ -198,7 +198,7 @@ namespace EPMLiveWebParts.Tests
         private ArrayList GetFilterIdsArray()
         {
             var ids = new ArrayList();
-            for (int i = 0; i < _idsCount; i++)
+            for (var i = 0; i < _idsCount; i++)
             {
                 ids.Add(i.ToString());
             }
