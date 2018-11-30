@@ -135,8 +135,9 @@
     <Compile Include="WebServices\CADataCacheTests.cs" />
     <Compile Include="WebServices\CostAnalyzerDataCacheTests.cs" />
     <Compile Include="WebServices\EditCalendarTests.cs" />
-    <Compile Include="WebServices\EditCostsTests.cs" />
     <Compile Include="WebServices\EditCostsTests.SaveEditCostsData.cs" />
+    <Compile Include="WebServices\EditCostsTestsSplitOne.cs" />
+    <Compile Include="WebServices\EditCostsTestsSplitTwo.cs" />
     <Compile Include="WebServices\IntegrationBuildTasksTests.cs" />
     <Compile Include="WebServices\IntegrationDisableEventsTests.cs" />
     <Compile Include="WebServices\IntegrationEnableEventsTests.cs" />
