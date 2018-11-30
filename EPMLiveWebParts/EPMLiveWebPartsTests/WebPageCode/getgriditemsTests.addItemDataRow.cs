@@ -40,1060 +40,1058 @@ namespace EPMLiveWebParts.Tests
 {
     public partial class getgriditemsTests
     {
-        //[TestMethod]
-        //public void AddItemDataRow_EditNotInEditMode_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("Edit", "DocIcon");
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("DocIcon") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.Attributes["locked"].ShouldNotBeNull(),
-        //        () => _newItemNode.Attributes["locked"].Value.ShouldContainWithoutWhitespace("1"),
-        //        () => _newItemNode.Attributes["id"].ShouldNotBeNull(),
-        //        () => _newItemNode.Attributes["id"].Value.ShouldContainWithoutWhitespace(indexer),
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[#roweditid#]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_DocIcon_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("Title", "DocIcon");
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("DocIcon") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_WorkspaceUrl_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("Title", "WorkspaceUrl");
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("WorkspaceUrl") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"{DummyVal}\"><img src=\"{ExampleUrl}/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_ContentType_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("Title", "ContentType");
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ContentType") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{TypeTextXml};#{TypeTextXml}\t{DummyVal}]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_ContentTypeNoListItemId_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("Title", "ContentType");
-        //    ShimSPListItem.AllInstances.IDGet = _ => 0;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ContentType") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{TypeTextPlain};#{TypeTextPlain}\t{DummyVal}]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_FileLeafRefView_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("Title", "FileLeafRef", "view");
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("FileLeafRef") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<A onfocus=\"OnLink(this)\" HREF=\"http://example.com\" onclick=\"return DispEx(this,event,'TRUE','FALSE','TRUE','SharePoint.OpenDocuments.3','0','SharePoint.OpenDocuments','','','','1','0','0','ows_PermMask')\">ows_BaseName</A>]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_FileLeafRefEdit_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("Title", "FileLeafRef", "edit");
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("FileLeafRef") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<A onfocus=\"OnLink(this)\" HREF=\"http://example.com\" onclick=\"return DispEx(this,event,'TRUE','FALSE','FALSE','SharePoint.OpenDocuments.3','0','SharePoint.OpenDocuments','','','','1','0','0','ows_PermMask')\">ows_BaseName<img src=\"/_layouts/images/blank.gif\" class=\"ms-hidden\" border=1 width=1 height=26 alt=\"Use SHIFT+ENTER to open the menu (new window).\"></A><img src=\"/_layouts/images/blank.gif\" width=13 style=\"visibility:hidden\" alt=\"\">]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_FileLeafRefEditLinkFilenameNoMenu_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("LinkFilenameNoMenu", "FileLeafRef", string.Empty);
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("FileLeafRef") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<A onfocus=\"OnLink(this)\" HREF=\"http://example.com\" onclick=\"return DispEx(this,event,'TRUE','FALSE','TRUE','SharePoint.OpenDocuments.3','0','SharePoint.OpenDocuments','','','','1','0','0','ows_PermMask')\">ows_BaseName</A>]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_FileLeafRefEditLinkFilename_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("LinkFilename", "FileLeafRef", string.Empty);
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("FileLeafRef") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<A onfocus=\"OnLink(this)\" HREF=\"http://example.com\" onclick=\"return DispEx(this,event,'TRUE','FALSE','FALSE','SharePoint.OpenDocuments.3','0','SharePoint.OpenDocuments','','','','1','0','0','ows_PermMask')\">ows_BaseName<img src=\"/_layouts/images/blank.gif\" class=\"ms-hidden\" border=1 width=1 height=26 alt=\"Use SHIFT+ENTER to open the menu (new window).\"></A><img src=\"/_layouts/images/blank.gif\" width=13 style=\"visibility:hidden\" alt=\"\">]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_TitleCleanValues_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = true;
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("Title", "Title", string.Empty);
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_TitleViewNotEditMode_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = false;
-        //    _usepopup = true;
-        //    var indexer = PrepareForAddItem("Title", "Title", "view");
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'view');return false;\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_TitleViewEditMode_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    _usepopup = true;
-        //    var indexer = PrepareForAddItem("Title", "Title", "view");
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_TitleEditNotEditMode_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = false;
-        //    _usepopup = true;
-        //    var indexer = PrepareForAddItem("Title", "Title", "edit");
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'edit');return false;\">"),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\">"),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_TitleEditEditMode_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    _usepopup = true;
-        //    var indexer = PrepareForAddItem("Title", "Title", "edit");
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_TitleLinkTitleNoMenuNotEditMode_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = false;
-        //    _usepopup = true;
-        //    var indexer = PrepareForAddItem("LinkTitleNoMenu", "Title", null);
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'view');return false;\">"),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\">"),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_TitleLinkTitleNoMenuEditMode_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    _usepopup = true;
-        //    var indexer = PrepareForAddItem("LinkTitleNoMenu", "Title", null);
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_TitleLinkTitleNotEditMode_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = false;
-        //    _usepopup = true;
-        //    var indexer = PrepareForAddItem("LinkTitle", "Title", string.Empty);
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'edit');return false;\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_TitleLinkTitleEditMode_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    _usepopup = true;
-        //    _timesheet = true;
-        //    var indexer = PrepareForAddItem("LinkTitle", "Title", string.Empty);
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_TitleWorkspace_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    var indexer = PrepareForAddItem("Title", "Title", "workspace");
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\">"),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_TitleWorkplan_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    var indexer = PrepareForAddItem("Title", "Title", "workplan");
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/tasks.aspx?ID=1\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_TitlePlanner_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    var indexer = PrepareForAddItem("Title", "Title", "planner");
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/workplanner.aspx?ID=1&Source=DummyVal\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_TitleTasks_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    var indexer = PrepareForAddItem("Title", "Title", "tasks");
-        //    ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/http://example.com?FilterField1=Project&FilterValue1=\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_CleanValuesCalculatedIndicator_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Calculated);
-        //    ShimSPField.AllInstances.DescriptionGet = _ => "Indicator";
-        //    ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldCalculated().Instance;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<img src=\"/_layouts/images/dummyfieldname\">]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_CleanValuesCalculatedNonIndicator_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Calculated);
-        //    ShimSPField.AllInstances.DescriptionGet = _ => DummyVal;
-        //    ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldCalculated().Instance;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_CleanValuesUserFieldUserValue_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.User);
-        //    ShimSPField.AllInstances.GetFieldValueString = (_, __) => new ShimSPFieldUserValue().Instance;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a Title=\"{DummyText}\"href=\"http://example.com/_layouts/userdisp.aspx?ID=1\">{DummyText}</a>]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_CleanValuesUserFieldUserValueCollection_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.User);
-
-        //    var shimFields = new ShimSPFieldUserValueCollection();
-        //    var list = new List<SPFieldUserValue> { new ShimSPFieldUserValue() };
-        //    shimFields.Bind(list as IList<SPFieldUserValue>);
-        //    var enumerator = list.GetEnumerator();
-        //    ShimList<SPFieldUserValue>.AllInstances.GetEnumerator = _ => enumerator;
-
-        //    ShimSPField.AllInstances.GetFieldValueString = (_, __) => shimFields.Instance;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a Title=\"{DummyText}\"href=\"http://example.com/_layouts/userdisp.aspx?ID=1\">{DummyText}</a>]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_CleanValuesMultiChoice_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.MultiChoice);
-        //    ShimSPField.AllInstances.DescriptionGet = _ => DummyVal;
-        //    ShimSPFieldMultiChoiceValue.ConstructorString = (instance, _) => { };
-        //    ShimSPFieldMultiChoiceValue.AllInstances.CountGet = _ => 1;
-        //    ShimSPFieldMultiChoiceValue.AllInstances.ItemGetInt32 = (_, __) => DummyVal;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyVal}]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_CleanValuesLookup_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Lookup);
-        //    ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldLookup { LookupListGet = () => Guid.NewGuid().ToString() }.Instance;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyVal}]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_CleanValuesDateTime_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.DateTime);
-        //    ShimSPListItem.AllInstances.ItemGetString = (_, __) => DateTime.Today;
-        //    Shimgetgriditems.AllInstances.getFieldSPListItemStringBoolean =
-        //        (a, b, c, d) => DateTime.Today.ToString();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID", DateTime.Today.ToString()) });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DateTime.Today.ToString("MM/dd/yyyy")} 12:00:00 AM]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_CleanValuesText_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Text);
-        //    ShimSPListItem.AllInstances.ItemGetString = (_, __) => DummyText;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeNumber_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Number, editable: true);
-        //    ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><value Percentage=\"TRUE\">1</value></root>";
-        //    ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldNumber { ShowAsPercentageGet = () => true }.Instance;
-        //    Shimgetgriditems.AllInstances.getFieldSPListItemStringBoolean =
-        //        (a, b, c, d) => "1";
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"edn\"><![CDATA[100]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeUserFieldUserValue_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.User, editable: true);
-        //    ShimSPField.AllInstances.GetFieldValueString = (_, __) => new ShimSPFieldUserValue().Instance;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"usereditor\"><![CDATA[{DummyText}\n{DummyText}\t]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeUserFieldUserValueCollection_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.User, editable: true);
-
-        //    var shimFields = new ShimSPFieldUserValueCollection();
-        //    var list = new List<SPFieldUserValue> { new ShimSPFieldUserValue() };
-        //    shimFields.Bind(list as IList<SPFieldUserValue>);
-        //    var enumerator = list.GetEnumerator();
-        //    ShimList<SPFieldUserValue>.AllInstances.GetEnumerator = _ => enumerator;
-
-        //    ShimSPField.AllInstances.GetFieldValueString = (_, __) => shimFields.Instance;
-        //    ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><value Type=\"UserMulti\">1</value></root>";
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"usereditorm\"><![CDATA[{DummyText}\n{DummyText}\t]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeMultiChoice_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.MultiChoice, editable: true);
-        //    _privateObj.SetField("hshComboCells", new Hashtable());
-        //    ShimSPWeb.AllInstances.TitleGet = _ => "1;#2";
-        //    ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><CHOICE>1</CHOICE></root>";
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"mchoice\"><![CDATA[{DummyFieldName};#{DummyFieldName}\t1;#1]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeChoice_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Choice, editable: true);
-        //    _privateObj.SetField("hshComboCells", new Hashtable());
-        //    ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><CHOICE>1</CHOICE></root>";
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"choice\"><![CDATA[{DummyFieldName};#{DummyFieldName}	1;#1]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeLookupMulti_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    var indexer = PrepareForAddItem("ItemID", "LookupMulti", fieldType: SPFieldType.Lookup, editable: true);
-        //    ShimSPField.AllInstances.SchemaXmlGet = _ => "<root List='1' ShowField='1'></root>";
-        //    ShimSPField.AllInstances.TypeAsStringGet = _ => "LookupMulti";
-        //    _privateObj.SetField("hshComboCells", new Hashtable());
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("LookupMulti") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"mchoice\"><![CDATA[\n]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeLookup_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Lookup, editable: true);
-        //    ShimSPField.AllInstances.SchemaXmlGet = _ => "<root List='1' ShowField='1'></root>";
-        //    ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldLookup { LookupListGet = () => Guid.NewGuid().ToString() }.Instance;
-        //    _privateObj.SetField("hshComboCells", new Hashtable());
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"ro\"><![CDATA[1;#{DummyVal}\t]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeCalculated_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Calculated, editable: true);
-        //    ShimSPField.AllInstances.DescriptionGet = _ => "Indicator";
-        //    ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldCalculated().Instance;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<img src=\"/_layouts/images/dummyfieldname\">]]></cell"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeCurrency_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Currency, editable: true);
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"edn\"><![CDATA[{DummyFieldName}]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeAttachmentsEmpty_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Attachments, editable: true);
-        //    ShimSPListItem.AllInstances.AttachmentsGet = _ => new ShimSPAttachmentCollection();
-        //    ShimSPAttachmentCollection.AllInstances.CountGet = _ => 0;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeAttachmentsNotEmpty_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Attachments, editable: true);
-        //    ShimSPListItem.AllInstances.AttachmentsGet = _ => new ShimSPAttachmentCollection();
-        //    ShimSPAttachmentCollection.AllInstances.CountGet = _ => 1;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"{ExampleUrl}\"></a>]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeText_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Text, editable: true);
-        //    Shimgetgriditems.AllInstances.getFieldSPListItemStringBoolean =
-        //        (a, b, c, d) => $"{DummyText}.{DummyVal}";
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"ed\"><![CDATA[]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeBooleanTrue_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    _isTimesheet = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Boolean, editable: true);
-        //    ShimSPWeb.AllInstances.TitleGet = _ => "true";
-        //    ShimSPList.AllInstances.TitleGet = _ => "Project Center";
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"ch\"><![CDATA[0]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeBooleanFalse_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    _isTimesheet = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Boolean, editable: true);
-        //    ShimSPWeb.AllInstances.TitleGet = _ => "false";
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"ch\"><![CDATA[0]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeDateTime_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.DateTime, editable: true);
-        //    Shimgetgriditems.AllInstances.getFieldSPListItemStringBoolean =
-        //        (a, b, c, d) => DateTime.Today.ToString();
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID", DateTime.Today.ToString()) });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"dhxCalendarA\"><![CDATA[{DateTime.Today.ToString("MM/dd/yyyy")} 12:00:00 AM]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_InEditModeInteger_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Integer, editable: true);
-        //    ShimSPField.AllInstances.TypeAsStringGet = _ => "Integer";
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_NotInEditModeAttachmentsEmpty_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Attachments, editable: false);
-        //    ShimSPListItem.AllInstances.AttachmentsGet = _ => new ShimSPAttachmentCollection();
-        //    ShimSPAttachmentCollection.AllInstances.CountGet = _ => 0;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_NotInEditModeAttachmentsNotEmpty_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Attachments, editable: false);
-        //    ShimSPListItem.AllInstances.AttachmentsGet = _ => new ShimSPAttachmentCollection();
-        //    ShimSPAttachmentCollection.AllInstances.CountGet = _ => 1;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"{ExampleUrl}\"></a>]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_NotInEditModeUser_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.User, editable: false);
-        //    ShimSPField.AllInstances.GetFieldValueString = (_, __) => new ShimSPFieldUserValue().Instance;
-        //    _privateObj.SetField("hshWBS", new Hashtable());
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a Title=\"{DummyText}\"href=\"http://example.com/_layouts/userdisp.aspx?ID=1\">{DummyText}</a>]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_NotInEditModeCalculated_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Calculated, editable: false);
-        //    ShimSPField.AllInstances.DescriptionGet = _ => "Indicator";
-        //    ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldCalculated().Instance;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<img src=\"/_layouts/images/dummyfieldname\">]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_NotInEditModeMultiChoice_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.MultiChoice, editable: false);
-        //    ShimSPWeb.AllInstances.TitleGet = _ => "1,2";
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<![CDATA[<input type=\"checkbox\" style=\"display:none;\" onClick=\"(arguments[0]||event).cancelBubble=true;CheckBoxSelectRow(this);\">]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_NotInEditModeChoice_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = false;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Choice, editable: false);
-        //    ShimSPWeb.AllInstances.TitleGet = _ => "1,2";
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<![CDATA[<input type=\"checkbox\" style=\"display:none;\" onClick=\"(arguments[0]||event).cancelBubble=true;CheckBoxSelectRow(this);\">]]></cell>"));
-        //}
-
-        //[TestMethod]
-        //public void AddItemDataRow_NotInEditModeLookup_SetsNewItemRow()
-        //{
-        //    // Arrange
-        //    _cleanValues = false;
-        //    _inEditmode = true;
-        //    var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Lookup, editable: false);
-        //    ShimSPWeb.AllInstances.TitleGet = _ => "1,2";
-        //    ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldLookup { LookupListGet = () => Guid.NewGuid().ToString() }.Instance;
-
-        //    // Act
-        //    _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
-
-        //    // Assert
-        //    _newItemNode.ShouldNotBeNull();
-        //    this.ShouldSatisfyAllConditions(
-        //        () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-        //        () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"ro\"><![CDATA[{DummyFieldName}]]></cell>"));
-        //}
+        private const string DefaultListId = "F316E11-C842-4440-9918-39A8F1C12DA9";
+        private const string DefaultWebId = "1A8F7946-CCA1-4A24-8785-CE8E32D012BE";
+        private const string DefaultId = "5D592B57-C072-4B36-8809-11262120484D";
+        private static readonly string DefaultIndexer = $"{DefaultWebId}.{DefaultListId}.{DefaultId}";
+
+        [TestMethod]
+        public void AddItemDataRow_EditNotInEditMode_SetsNewItemRow()
+        {
+            // Arrange
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("Edit", "DocIcon");
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("DocIcon") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.Attributes["locked"].ShouldNotBeNull(),
+                () => _newItemNode.Attributes["locked"].Value.ShouldContainWithoutWhitespace("1"),
+                () => _newItemNode.Attributes["id"].ShouldNotBeNull(),
+                () => _newItemNode.Attributes["id"].Value.ShouldBe(DefaultIndexer, StringCompareShould.IgnoreCase),
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[#roweditid#]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_DocIcon_SetsNewItemRow()
+        {
+            // Arrange
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("Title", "DocIcon");
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("DocIcon") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<img src=\"{ExampleUrl}/_layouts/images/test.png\">]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_WorkspaceUrl_SetsNewItemRow()
+        {
+            // Arrange
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("Title", "WorkspaceUrl");
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("WorkspaceUrl") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"\"><img src=\"{ExampleUrl}/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_ContentType_SetsNewItemRow()
+        {
+            // Arrange
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("Title", "ContentType");
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ContentType") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_ContentTypeNoListItemId_SetsNewItemRow()
+        {
+            // Arrange
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("Title", "ContentType");
+            ShimSPListItem.AllInstances.IDGet = _ => 0;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ContentType") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_FileLeafRefView_SetsNewItemRow()
+        {
+            // Arrange
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("Title", "FileLeafRef", "view");
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("FileLeafRef") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_FileLeafRefEdit_SetsNewItemRow()
+        {
+            // Arrange
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("Title", "FileLeafRef", "edit");
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("FileLeafRef") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_FileLeafRefEditLinkFilenameNoMenu_SetsNewItemRow()
+        {
+            // Arrange
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("LinkFilenameNoMenu", "FileLeafRef", string.Empty);
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("FileLeafRef") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_FileLeafRefEditLinkFilename_SetsNewItemRow()
+        {
+            // Arrange
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("LinkFilename", "FileLeafRef", string.Empty);
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("FileLeafRef") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_TitleCleanValues_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = true;
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("Title", "Title", string.Empty);
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[First Project]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_TitleViewNotEditMode_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = false;
+            _usepopup = true;
+            var indexer = PrepareForAddItem("Title", "Title", "view");
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'view');return false;\">First Project</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"http://testURL\"><img src=\"{ExampleUrl}/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_TitleViewEditMode_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            _usepopup = true;
+            var indexer = PrepareForAddItem("Title", "Title", "view");
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[First Project]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_TitleEditNotEditMode_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = false;
+            _usepopup = true;
+            var indexer = PrepareForAddItem("Title", "Title", "edit");
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'edit');return false;\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"http://testURL\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_TitleEditEditMode_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            _usepopup = true;
+            var indexer = PrepareForAddItem("Title", "Title", "edit");
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[First Project]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_TitleLinkTitleNoMenuNotEditMode_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = false;
+            _usepopup = true;
+            var indexer = PrepareForAddItem("LinkTitleNoMenu", "Title", null);
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[First Project &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"http://testURL\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_TitleLinkTitleNoMenuEditMode_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            _usepopup = true;
+            var indexer = PrepareForAddItem("LinkTitleNoMenu", "Title", null);
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[First Project]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_TitleLinkTitleNotEditMode_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = false;
+            _usepopup = true;
+            var indexer = PrepareForAddItem("LinkTitle", "Title", string.Empty);
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'edit');return false;\">First Project</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"http://testURL\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_TitleLinkTitleEditMode_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            _usepopup = true;
+            _timesheet = true;
+            var indexer = PrepareForAddItem("LinkTitle", "Title", string.Empty);
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[First Project]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_TitleWorkspace_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            var indexer = PrepareForAddItem("Title", "Title", "workspace");
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"/_layouts/epmlive/gridaction.aspx?action=workspace&webid={DefaultWebId}\">First Project</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"http://testURL\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_TitleWorkplan_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            var indexer = PrepareForAddItem("Title", "Title", "workplan");
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"/_layouts/epmlive/gridaction.aspx?action=workplan&webid={DefaultWebId}&listid={DefaultListId}&ID={DefaultId}\">First Project</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"http://testURL\"><img src=\"{ExampleUrl}/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_TitlePlanner_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            var indexer = PrepareForAddItem("Title", "Title", "planner");
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"/_layouts/epmlive/gridaction.aspx?action=planner&webid={DefaultWebId}&listid={DefaultListId}&ID={DefaultId}\">First Project</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"http://testURL\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_TitleTasks_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            var indexer = PrepareForAddItem("Title", "Title", "tasks");
+            ShimSPListItem.AllInstances.FileGet = _ => new ShimSPFile();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("Title") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"/_layouts/epmlive/gridaction.aspx?action=tasks&webid={DefaultWebId}&listid={DefaultListId}&ID={DefaultId}&Source={DummyVal}&FilterField1=Project&FilterValue1=First+Project\">First Project</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"http://testURL\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_CleanValuesCalculatedIndicator_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Calculated);
+            ShimSPField.AllInstances.DescriptionGet = _ => "Indicator";
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldCalculated().Instance;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<img src=\"/_layouts/images/2\">]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_CleanValuesCalculatedNonIndicator_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Calculated);
+            ShimSPField.AllInstances.DescriptionGet = _ => DummyVal;
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldCalculated().Instance;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[2]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_CleanValuesUserFieldUserValue_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.User);
+            ShimSPField.AllInstances.GetFieldValueString = (_, __) => new ShimSPFieldUserValue().Instance;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"{ExampleUrl}/_layouts/userdisp.aspx?ID=1\">{DummyText}</a>]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_CleanValuesUserFieldUserValueCollection_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.User);
+
+            var shimFields = new ShimSPFieldUserValueCollection();
+            var list = new List<SPFieldUserValue> { new ShimSPFieldUserValue() };
+            shimFields.Bind(list as IList<SPFieldUserValue>);
+            var enumerator = list.GetEnumerator();
+            ShimList<SPFieldUserValue>.AllInstances.GetEnumerator = _ => enumerator;
+
+            ShimSPField.AllInstances.GetFieldValueString = (_, __) => shimFields.Instance;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"http://example.com/_layouts/userdisp.aspx?ID=1\">{DummyText}</a>]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_CleanValuesMultiChoice_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.MultiChoice);
+            ShimSPField.AllInstances.DescriptionGet = _ => DummyVal;
+            ShimSPFieldMultiChoiceValue.ConstructorString = (instance, _) => { };
+            ShimSPFieldMultiChoiceValue.AllInstances.CountGet = _ => 1;
+            ShimSPFieldMultiChoiceValue.AllInstances.ItemGetInt32 = (_, __) => DummyVal;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[2]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_CleanValuesLookup_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Lookup);
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldLookup { LookupListGet = () => Guid.NewGuid().ToString() }.Instance;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[13;#;#14;#;#15;#;#16;#;#17;#]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_CleanValuesDateTime_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.DateTime);
+            ShimSPListItem.AllInstances.ItemGetString = (_, __) => DateTime.Today;
+            Shimgetgriditems.AllInstances.getFieldSPListItemStringBoolean =
+                (a, b, c, d) => DateTime.Today.ToString();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID", DateTime.Today.ToString()) });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DateTime.Today.ToString("yyyy-MM-dd")} 00:00:00Z]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_CleanValuesText_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Text);
+            ShimSPListItem.AllInstances.ItemGetString = (_, __) => DummyText;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[2]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeNumber_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Number, editable: true);
+            ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><value Percentage=\"TRUE\">1</value></root>";
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldNumber { ShowAsPercentageGet = () => true }.Instance;
+            Shimgetgriditems.AllInstances.getFieldSPListItemStringBoolean =
+                (a, b, c, d) => "1";
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"edn\"><![CDATA[2]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeUserFieldUserValue_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.User, editable: true);
+            ShimSPField.AllInstances.GetFieldValueString = (_, __) => new ShimSPFieldUserValue().Instance;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"usereditor\"><![CDATA[{DummyText}\n{DummyText}\t]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeUserFieldUserValueCollection_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.User, editable: true);
+
+            var shimFields = new ShimSPFieldUserValueCollection();
+            var list = new List<SPFieldUserValue> { new ShimSPFieldUserValue() };
+            shimFields.Bind(list as IList<SPFieldUserValue>);
+            var enumerator = list.GetEnumerator();
+            ShimList<SPFieldUserValue>.AllInstances.GetEnumerator = _ => enumerator;
+
+            ShimSPField.AllInstances.GetFieldValueString = (_, __) => shimFields.Instance;
+            ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><value Type=\"UserMulti\">1</value></root>";
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"usereditor\"><![CDATA[{DummyText}\n{DummyText}\t]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeMultiChoice_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.MultiChoice, editable: true);
+            _privateObj.SetField("hshComboCells", new Hashtable());
+            ShimSPWeb.AllInstances.TitleGet = _ => "1;#2";
+            ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><CHOICE>1</CHOICE></root>";
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"mchoice\"><![CDATA[2;#2\t1;#1]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeChoice_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Choice, editable: true);
+            _privateObj.SetField("hshComboCells", new Hashtable());
+            ShimSPField.AllInstances.SchemaXmlGet = _ => "<root><CHOICE>1</CHOICE></root>";
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"choice\">2;#2\t1;#1</cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeLookupMulti_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            var indexer = PrepareForAddItem("ItemID", "LookupMulti", fieldType: SPFieldType.Lookup, editable: true);
+            ShimSPField.AllInstances.SchemaXmlGet = _ => "<root List='1' ShowField='1'></root>";
+            ShimSPField.AllInstances.TypeAsStringGet = _ => "LookupMulti";
+            _privateObj.SetField("hshComboCells", new Hashtable());
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("LookupMulti") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"mchoice\"><![CDATA[\n]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeLookup_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Lookup, editable: true);
+            ShimSPField.AllInstances.SchemaXmlGet = _ => "<root List='1' ShowField='1'></root>";
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldLookup { LookupListGet = () => Guid.NewGuid().ToString() }.Instance;
+            _privateObj.SetField("hshComboCells", new Hashtable());
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyVal}]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeCalculated_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Calculated, editable: true);
+            ShimSPField.AllInstances.DescriptionGet = _ => "Indicator";
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldCalculated().Instance;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<img src=\"/_layouts/images/2\">]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeCurrency_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Currency, editable: true);
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"edn\"><![CDATA[2]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeAttachmentsEmpty_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Attachments, editable: true);
+            ShimSPListItem.AllInstances.AttachmentsGet = _ => new ShimSPAttachmentCollection();
+            ShimSPAttachmentCollection.AllInstances.CountGet = _ => 0;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeAttachmentsNotEmpty_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Attachments, editable: true);
+            ShimSPListItem.AllInstances.AttachmentsGet = _ => new ShimSPAttachmentCollection();
+            ShimSPAttachmentCollection.AllInstances.CountGet = _ => 1;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeText_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Text, editable: true);
+            Shimgetgriditems.AllInstances.getFieldSPListItemStringBoolean =
+                (a, b, c, d) => $"{DummyText}.{DummyVal}";
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"ed\"><![CDATA[2]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeBooleanTrue_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            _isTimesheet = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Boolean, editable: true);
+            ShimSPWeb.AllInstances.TitleGet = _ => "true";
+            ShimSPList.AllInstances.TitleGet = _ => "Project Center";
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"ch\"><![CDATA[0]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeBooleanFalse_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            _isTimesheet = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Boolean, editable: true);
+            ShimSPWeb.AllInstances.TitleGet = _ => "false";
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"ch\"><![CDATA[0]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeDateTime_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.DateTime, editable: true);
+            Shimgetgriditems.AllInstances.getFieldSPListItemStringBoolean =
+                (a, b, c, d) => DateTime.Today.ToString();
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID", DateTime.Today.ToString()) });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"dhxCalendarA\"><![CDATA[{DateTime.Today.ToString("MM/dd/yyyy")} 12:00:00 AM]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_InEditModeInteger_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Integer, editable: true);
+            ShimSPField.AllInstances.TypeAsStringGet = _ => "Integer";
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[2]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_NotInEditModeAttachmentsEmpty_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Attachments, editable: false);
+            ShimSPListItem.AllInstances.AttachmentsGet = _ => new ShimSPAttachmentCollection();
+            ShimSPAttachmentCollection.AllInstances.CountGet = _ => 0;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_NotInEditModeAttachmentsNotEmpty_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Attachments, editable: false);
+            ShimSPListItem.AllInstances.AttachmentsGet = _ => new ShimSPAttachmentCollection();
+            ShimSPAttachmentCollection.AllInstances.CountGet = _ => 1;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_NotInEditModeUser_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.User, editable: false);
+            ShimSPField.AllInstances.GetFieldValueString = (_, __) => new ShimSPFieldUserValue().Instance;
+            _privateObj.SetField("hshWBS", new Hashtable());
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"/_layouts/userdisp.aspx?ID=1\">{DummyText}</a>]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_NotInEditModeCalculated_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Calculated, editable: false);
+            ShimSPField.AllInstances.DescriptionGet = _ => "Indicator";
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldCalculated().Instance;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<img src=\"/_layouts/images/2\">]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_NotInEditModeMultiChoice_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.MultiChoice, editable: false);
+            ShimSPWeb.AllInstances.TitleGet = _ => "1,2";
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyVal}]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_NotInEditModeChoice_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = false;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Choice, editable: false);
+            ShimSPWeb.AllInstances.TitleGet = _ => "1,2";
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[2]]></cell>"));
+        }
+
+        [TestMethod]
+        public void AddItemDataRow_NotInEditModeLookup_SetsNewItemRow()
+        {
+            // Arrange
+            _cleanValues = false;
+            _inEditmode = true;
+            var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Lookup, editable: false);
+            ShimSPWeb.AllInstances.TitleGet = _ => "1,2";
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldLookup { LookupListGet = () => Guid.NewGuid().ToString() }.Instance;
+
+            // Act
+            _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
+
+            // Assert
+            _newItemNode.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"choice\">1;#{DummyVal}\t{DummyVal}</cell>"));
+        }
 
         private DataRow GetRow(string internalname, string itemID = "2")
         {
-            var listId = "F316E11-C842-4440-9918-39A8F1C12DA9";
-            var webID = "1A8F7946-CCA1-4A24-8785-CE8E32D012BE";
-            var ID = "5D592B57-C072-4B36-8809-11262120484D";
-
-            ResetFields(listId, webID, ID);
+            ResetFields(DefaultListId, DefaultWebId, DefaultId);
 
             var dt = new DataTable();
             var newRow = dt.NewRow();
@@ -1163,9 +1161,9 @@ namespace EPMLiveWebParts.Tests
             newRow["Work"] = "";
             if (internalname != "WorkspaceUrl")
                 newRow["WorkspaceUrl"] = "http://testURL";
-            newRow["WebID"] = webID;
-            newRow["ListID"] = listId;
-            newRow["ID"] = ID;
+            newRow["WebID"] = DefaultWebId;
+            newRow["ListID"] = DefaultListId;
+            newRow["ID"] = DefaultId;
             newRow["siteid"] = "";
             newRow["ParentItem"] = "";
             if (newRow[internalname] == null)
@@ -1187,7 +1185,7 @@ namespace EPMLiveWebParts.Tests
         private void ResetFields(string listId, string webID, string iD)
         {
             var arrItems = new SortedList();
-            arrItems.Add(webID + "." + listId + "." + iD, new string[] { "Admin" });
+            arrItems.Add(DefaultIndexer, new string[] { "Admin" });
             _privateObj.SetField("arrItems", arrItems);
             _privateObj.SetField("usewbs", "TestColumn");
         }

@@ -83,7 +83,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -246,7 +246,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'view');return false;\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'view');return false;\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
@@ -266,7 +266,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -309,7 +309,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -352,7 +352,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -372,7 +372,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'edit');return false;\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'edit');return false;\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
@@ -393,7 +393,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -411,7 +411,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"http://example.com/\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"),
                 () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\">"),
                 () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
@@ -431,7 +431,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/tasks.aspx?ID=1\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/tasks.aspx?ID=1\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"));
         }
 
         [TestMethod]
@@ -449,7 +449,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/workplanner.aspx?ID=1&Source=DummyVal\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/workplanner.aspx?ID=1&Source=DummyVal\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
@@ -467,7 +467,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/http://example.com?FilterField1=Project&FilterValue1=\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"http://example.com/http://example.com?FilterField1=Project&FilterValue1=\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
@@ -868,7 +868,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"ed\"><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"ed\"><![CDATA[{DummyText}.{DummyVal}]]></cell>"));
         }
         
         [TestMethod]
@@ -948,7 +948,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
