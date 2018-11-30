@@ -1092,7 +1092,7 @@ namespace EPMLiveWebParts.Tests
 
         private DataRow GetRow(string internalname, string itemID = "2")
         {
-            ResetFields(DefaultListId, DefaultWebId, DefaultId);
+            ResetFields();
 
             var dt = new DataTable();
             var newRow = dt.NewRow();
