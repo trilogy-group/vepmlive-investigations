@@ -243,6 +243,7 @@
     <Compile Include="Jobs\NotificationsTests.cs" />
     <Compile Include="Jobs\ResourceImportJobTests.cs" />
     <Compile Include="Jobs\ResourcePlanTest.cs" />
+    <Compile Include="Jobs\SecurityUpdatesRemTests.cs" />
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
     <Compile Include="Jobs\TimerFixTests.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AddListDataTests.cs" />
