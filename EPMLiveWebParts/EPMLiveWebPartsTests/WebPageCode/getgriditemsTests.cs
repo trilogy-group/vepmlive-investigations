@@ -6,9 +6,11 @@ using System.Collections.Generic.Fakes;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.DirectoryServices.ActiveDirectory.Fakes;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Fakes;
 using System.Web.UI.Fakes;
 using System.Xml;
@@ -50,6 +52,8 @@ namespace EPMLiveWebParts.Tests
         private string _actualLookupField;
         private string _actualQuery;
         private string _actualListView;
+        private HttpResponse _response;
+        private StringWriter _responseWriter;
 
         [TestMethod()]
         public void addItemTest_WhenFieldType_FilterLookUp()

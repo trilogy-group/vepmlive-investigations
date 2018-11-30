@@ -42,6 +42,7 @@ namespace EPMLiveWebParts.Tests
         public void TestCleanup()
         {
             _shimsObject?.Dispose();
+            _responseWriter?.Dispose();
         }
 
         [TestMethod]
