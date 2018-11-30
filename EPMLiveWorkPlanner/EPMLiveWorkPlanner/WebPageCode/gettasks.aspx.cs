@@ -4,6 +4,7 @@ using System.Text;
 using System.Web;
 using System.Xml;
 using Microsoft.SharePoint;
+using static System.Diagnostics.Trace;
 
 namespace EPMLiveWorkPlanner
 {
@@ -142,47 +143,8 @@ namespace EPMLiveWorkPlanner
                     string parentWbs = wbs.Substring(0, dotLoc);
                     string xpathExpr = "//row[wbs='" + parentWbs + "']";
                     XmlNode parent = nd.SelectSingleNode(xpathExpr);
-                    attr = doc.CreateAttribute("id");
-                    attr.Value = li.ID.ToString();
-                    newNode = doc.CreateNode(XmlNodeType.Element, "row", doc.NamespaceURI);
-                    newNode.Attributes.Append(attr);
-
-                    string innerXml = "<wbs>" + wbs + "</wbs><userdata name=\"wbs\">" + wbs + "</userdata><userdata name=\"taskorder\">" + taskorder + "</userdata><userdata name=\"SharePointId\">" + li.ID + "</userdata>";
-
-                    try
-                    {
-                        if (lstTaskCenter.Fields.GetFieldByInternalName("Predecessors") != null)
-                        {
-                            innerXml += "<userdata name=\"Predecessors\">" + li["Predecessors"] + "</userdata>";
-                        }
-                    }
-                    catch { }
-
-                    try
-                    {
-                        innerXml += "<userdata name=\"" + percentageCalc + "\">" + li[percentageCalc] + "</userdata>";
-                    }
-                    catch { }
-
-                    newNode.InnerXml = innerXml;
-
-                    if (newNode.SelectSingleNode("userdata[@name='Duration']") == null)
-                    {
-                        try
-                        {
-                            innerXml += "<userdata name=\"Duration\">" + li["Duration"] + "</userdata>";
-                        }
-                        catch { }
-                    }
-                    if (newNode.SelectSingleNode("userdata[@name='ActualDuration']") == null)
-                    {
-                        try
-                        {
-                            innerXml += "<userdata name=\"ActualDuration\">" + li["ActualDuration"] + "</userdata>";
-                        }
-                        catch { }
-                    }
-
+                    string innerXml;
+                    CreateNode(doc, li, wbs, taskorder, percentageCalc, out newNode, out innerXml);
 
                     newNode.InnerXml = innerXml;
 
@@ -216,46 +178,8 @@ namespace EPMLiveWorkPlanner
                 }
                 else
                 {
-                    attr = doc.CreateAttribute("id");
-                    attr.Value = li.ID.ToString();
-
-                    newNode = doc.CreateNode(XmlNodeType.Element, "row", doc.NamespaceURI);
-                    newNode.Attributes.Append(attr);
-
-                    string innerXml = "<wbs>" + wbs + "</wbs><userdata name=\"wbs\">" + wbs + "</userdata><userdata name=\"taskorder\">" + taskorder + "</userdata><userdata name=\"SharePointId\">" + li.ID + "</userdata>";
-
-                    try
-                    {
-                        if (lstTaskCenter.Fields.GetFieldByInternalName("Predecessors") != null)
-                        {
-                            innerXml += "<userdata name=\"Predecessors\">" + li["Predecessors"] + "</userdata>";
-                        }
-                    }
-                    catch { }
-                    try
-                    {
-                        innerXml += "<userdata name=\"" + percentageCalc + "\">" + li[percentageCalc] + "</userdata>";
-                    }
-                    catch { }
-
-                    newNode.InnerXml = innerXml;
-
-                    if (newNode.SelectSingleNode("userdata[@name='Duration']") == null)
-                    {
-                        try
-                        {
-                            innerXml += "<userdata name=\"Duration\">" + li["Duration"] + "</userdata>";
-                        }
-                        catch { }
-                    }
-                    if (newNode.SelectSingleNode("userdata[@name='ActualDuration']") == null)
-                    {
-                        try
-                        {
-                            innerXml += "<userdata name=\"ActualDuration\">" + li["ActualDuration"] + "</userdata>";
-                        }
-                        catch { }
-                    }
+                    string innerXml;
+                    CreateNode(doc, li, wbs, taskorder, percentageCalc, out newNode, out innerXml);
 
                     newNode.InnerXml += getCellData(li);
 
@@ -278,6 +202,80 @@ namespace EPMLiveWorkPlanner
             }
 
             data = doc.OuterXml;
+        }
+
+        private void CreateNode(
+            XmlDocument xmlDocument,
+            SPListItem listItem,
+            string wbs,
+            string taskOrder,
+            string percentageCalc,
+            out XmlNode newNode,
+            out string innerXml)
+        {
+            XmlAttribute attribute;
+            attribute = xmlDocument.CreateAttribute("id");
+            attribute.Value = listItem.ID.ToString();
+            newNode = xmlDocument.CreateNode(XmlNodeType.Element, "row", xmlDocument.NamespaceURI);
+            newNode.Attributes.Append(attribute);
+
+            innerXml = string.Format(
+                "<wbs>{0}</wbs><userdata name=\"wbs\">{0}</userdata><userdata name=\"taskorder\">{1}</userdata><userdata name=\"SharePointId\">{2}</userdata>",
+                wbs,
+                taskOrder,
+                listItem.ID);
+
+            var stringBuilder = new StringBuilder(innerXml);
+
+            try
+            {
+                if (lstTaskCenter.Fields.GetFieldByInternalName("Predecessors") != null)
+                {
+                    stringBuilder.Append(string.Format("<userdata name=\"Predecessors\">{0}</userdata>", listItem["Predecessors"]));
+                    innerXml = stringBuilder.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                TraceError("Exception Suppressed {0}", ex);
+            }
+
+            try
+            {
+                stringBuilder.Append(string.Format("<userdata name=\"{0}\">{1}</userdata>", percentageCalc, listItem[percentageCalc]));
+                innerXml = stringBuilder.ToString();
+            }
+            catch (Exception ex)
+            {
+                TraceError("Exception Suppressed {0}", ex);
+            }
+
+            newNode.InnerXml = stringBuilder.ToString();
+
+            if (newNode.SelectSingleNode("userdata[@name='Duration']") == null)
+            {
+                try
+                {
+                    stringBuilder.Append(string.Format("<userdata name=\"Duration\">{0}</userdata>", listItem["Duration"]));
+                    innerXml = stringBuilder.ToString();
+                }
+                catch (Exception ex)
+                {
+                    TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+            if (newNode.SelectSingleNode("userdata[@name='ActualDuration']") == null)
+            {
+                try
+                {
+                    stringBuilder.Append(string.Format("<userdata name=\"ActualDuration\">{0}</userdata>", listItem["ActualDuration"]));
+                    innerXml = stringBuilder.ToString();
+                }
+                catch (Exception ex)
+                {
+                    TraceError("Exception Suppressed {0}", ex);
+                }
+            }
         }
 
         private string getPercentCalc(SPWeb web)
