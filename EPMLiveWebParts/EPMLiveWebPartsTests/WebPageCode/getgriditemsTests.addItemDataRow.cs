@@ -43,6 +43,7 @@ namespace EPMLiveWebParts.Tests
         private const string DefaultListId = "F316E11-C842-4440-9918-39A8F1C12DA9";
         private const string DefaultWebId = "1A8F7946-CCA1-4A24-8785-CE8E32D012BE";
         private const string DefaultId = "5D592B57-C072-4B36-8809-11262120484D";
+        private const string MultiTitle = "1,2";
         private static readonly string DefaultIndexer = $"{DefaultWebId}.{DefaultListId}.{DefaultId}";
 
         [TestMethod]
@@ -1038,7 +1039,7 @@ namespace EPMLiveWebParts.Tests
             _cleanValues = false;
             _inEditmode = false;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.MultiChoice, editable: false);
-            ShimSPWeb.AllInstances.TitleGet = _ => "1,2";
+            ShimSPWeb.AllInstances.TitleGet = _ => MultiTitle;
 
             // Act
             _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
@@ -1057,7 +1058,7 @@ namespace EPMLiveWebParts.Tests
             _cleanValues = false;
             _inEditmode = false;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Choice, editable: false);
-            ShimSPWeb.AllInstances.TitleGet = _ => "1,2";
+            ShimSPWeb.AllInstances.TitleGet = _ => MultiTitle;
 
             // Act
             _privateObj.Invoke(AddItemMethod, new object[] { GetRow("ItemID") });
@@ -1076,7 +1077,7 @@ namespace EPMLiveWebParts.Tests
             _cleanValues = false;
             _inEditmode = true;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Lookup, editable: false);
-            ShimSPWeb.AllInstances.TitleGet = _ => "1,2";
+            ShimSPWeb.AllInstances.TitleGet = _ => MultiTitle;
             ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldLookup { LookupListGet = () => Guid.NewGuid().ToString() }.Instance;
 
             // Act
@@ -1152,37 +1153,37 @@ namespace EPMLiveWebParts.Tests
                 newColumn = new DataColumn("Title");
                 dt.Columns.Add(newColumn);
             }
-            newRow["SiteUrl"] = "";
+            newRow["SiteUrl"] = string.Empty;
             newRow["ItemID"] = itemID;
             newRow["Created"] = DateTime.Now;
             newRow[internalname + "ID"] = "13,14,15,16,17";
             newRow[internalname + "Text"] = "A,B,C,D,E";
             newRow["Title"] = "First Project";
-            newRow["Work"] = "";
+            newRow["Work"] = string.Empty;
             if (internalname != "WorkspaceUrl")
                 newRow["WorkspaceUrl"] = "http://testURL";
             newRow["WebID"] = DefaultWebId;
             newRow["ListID"] = DefaultListId;
             newRow["ID"] = DefaultId;
-            newRow["siteid"] = "";
-            newRow["ParentItem"] = "";
+            newRow["siteid"] = string.Empty;
+            newRow["ParentItem"] = string.Empty;
             if (newRow[internalname] == null)
             {
                 newRow[internalname] = DummyVal;
             }
             newRow["CommentCount"] = "20";
-            newRow["TSDisableItem"] = "";
-            newRow["Commenters"] = "";
-            newRow["Author"] = "";
+            newRow["TSDisableItem"] = string.Empty;
+            newRow["Commenters"] = string.Empty;
+            newRow["Author"] = string.Empty;
             newRow["AssignedTo"] = "2";
-            newRow["CommentersRead"] = "";
+            newRow["CommentersRead"] = string.Empty;
             newRow["List"] = "ICON";
             newRow["TestColumn"] = $"{DummyText}.{DummyText}";
 
             return newRow;
         }
 
-        private void ResetFields(string listId, string webID, string iD)
+        private void ResetFields()
         {
             var arrItems = new SortedList();
             arrItems.Add(DefaultIndexer, new string[] { "Admin" });
