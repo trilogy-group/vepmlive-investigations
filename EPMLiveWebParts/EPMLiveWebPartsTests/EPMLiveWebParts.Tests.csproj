@@ -137,6 +137,7 @@
     <Compile Include="FancyDisplayForm.Tests.cs" />
     <Compile Include="FancyDisplayForm.Tests.FillMethods.cs" />
     <Compile Include="FancyDisplayForm.Tests.LoadFancyFormData.cs" />
+    <Compile Include="GridListView\GridDataTests.cs" />
     <Compile Include="GridListView\GridListViewTests.AddContextualTab.cs" />
     <Compile Include="GridListView\GridListViewTests.RemainingMethods.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderActionMenu.cs" />
