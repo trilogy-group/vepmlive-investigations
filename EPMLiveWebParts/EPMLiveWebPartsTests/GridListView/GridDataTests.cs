@@ -2,33 +2,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel.Fakes;
 using System.Data;
-using System.Data.Common.Fakes;
-using System.Data.SqlClient;
-using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
-using System.IO.Fakes;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Fakes;
 using System.Xml;
-using System.Xml.Linq;
-using EPMLiveCore.API.Fakes;
-using EPMLiveCore.Fakes;
 using EPMLiveWebParts.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.JSGrid;
 using Microsoft.SharePoint.JSGrid.Fakes;
-using Microsoft.SharePoint.Utilities.Fakes;
-using Microsoft.SharePoint.WebControls.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RPADataCache;
 using Shouldly;
 
 namespace EPMLiveWebParts.Tests
@@ -51,18 +36,9 @@ namespace EPMLiveWebParts.Tests
         private ShimSPListItem spListItem;
         private ShimSPFieldCollection spFieldCollection;
         private ShimSPField spField;
-        private ShimSPUser spUser;
-        private ShimSPFolderCollection spFolderCollection;
-        private ShimSPFolder spFolder;
-        private ShimSPFileCollection spFileCollection;
-        private ShimSPFile spFile;
         private ShimSPViewCollection spViewCollection;
         private ShimSPView spView;
         private ShimSPViewFieldCollection spViewFieldCollection;
-        private ShimSPFieldLinkCollection spFieldLinkCollection;
-        private ShimSPContentTypeCollection spContentTypeCollection;
-        private ShimSPContentType spContentType;
-        private ShimSqlTransaction transaction;
         private Guid guid;
         private Hashtable GanttParameters;
         private DateTime currentDateTime;
@@ -83,6 +59,34 @@ namespace EPMLiveWebParts.Tests
         private const string KeyString = "Key";
         private const string IdNumberString = "idno";
         private const string RowIdString = "rowid";
+        private const string SPListFieldName = "_spList";
+        private const string SPViewFieldName = "_spView";
+        private const string GanttParamtetersFieldName = "_htGanttParams";
+        private const string LTypeFieldName = "LType";
+        private const string EditString = "Edit";
+        private const string SPViewFieldsFieldName = "_spvwFields";
+        private const string RequiredFieldsFieldName = "_reqdfields";
+        private const string ImageColumnsFieldName = "_imageColumns";
+        private const string ColumnDefinitionsFieldName = "_columnDefinitions";
+        private const string FieldNamesFieldName = "_fieldNames";
+        private const string WbsFieldName = "_wbs";
+        private const string RollupListsFieldName = "_rollupLists";
+        private const string RollupSitesFieldName = "_rollupSites";
+        private const string UseCurrentFieldName = "_useCurrent";
+        private const string FieldsAddedToViewFieldName = "_fieldsAddedToView";
+        private const string GanttStartFieldPropertyName = "GanttStartField";
+        private const string GanttFinishFieldPropertyName = "GanttFinishField";
+        private const string GanttStartDateFieldName = "_ganttStartDate";
+        private const string GanttFinishDateFieldName = "_ganttFinishDate";
+        private const string NodeDataFieldName = "_htNodeData";
+        private const string ImagesFieldName = "_images";
+        private const string ImagesClientSideFieldName = "_imagesClientSide";
+        private const string DisplayNameColumn = "DisplayName";
+        private const string IsImageColumn = "IsImage";
+        private const string ColumnTypeColumn = "ColumnType";
+        private const string InternalNameColumn = "InternalName";
+        private const string TrueStringLowerCase = "true";
+        private const string IsHyperLinkColumn = "IsHyperLink";
         private const string GetListIDMethodName = "GetListID";
         private const string UsePopupMethodName = "UsePopup";
         private const string GetActionMethodName = "GetAction";
@@ -102,7 +106,7 @@ namespace EPMLiveWebParts.Tests
         private const string AddReqdFieldsToViewMethodName = "AddReqdFieldsToView";
         private const string RemoveReqdFieldsFromViewMethodName = "RemoveReqdFieldsFromView";
         private const string InitializeColumnDefsMethodName = "InitializeColumnDefs";
-
+        
         [TestInitialize]
         public void Setup()
         {
@@ -111,58 +115,26 @@ namespace EPMLiveWebParts.Tests
 
             SetupShims();
 
-            privateObject.SetFieldOrProperty("_spList", nonPublicInstance, spList.Instance);
-            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, spView.Instance);
+            privateObject.SetFieldOrProperty(SPListFieldName, nonPublicInstance, spList.Instance);
+            privateObject.SetFieldOrProperty(SPViewFieldName, nonPublicInstance, spView.Instance);
         }
 
         private void SetupShims()
         {
             shimsContext = ShimsContext.Create();
             SetupVariables();
-
-            ShimSqlConnection.ConstructorString = (_, __) => new ShimSqlConnection();
-            ShimSqlConnection.AllInstances.Open = _ => { };
-            ShimSqlConnection.AllInstances.Close = _ => { };
-            ShimSqlConnection.AllInstances.BeginTransaction = _ => transaction;
-            ShimDbTransaction.AllInstances.Dispose = _ => { };
-            ShimSqlConnection.AllInstances.CreateCommand = _ => new SqlCommand();
-            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => DummyInt;
-            ShimComponent.AllInstances.Dispose = _ => { };
-            ShimSqlCommand.AllInstances.TransactionSetSqlTransaction = (_, __) => { };
-            ShimSPDatabase.AllInstances.DatabaseConnectionStringGet = _ => DummyString;
-            ShimGridGanttSettings.ConstructorSPList = (_, __) => new ShimGridGanttSettings();
-            ShimHttpUtility.HtmlEncodeString = input => input;
+            
             ShimSPSite.ConstructorString = (_, __) => new ShimSPSite();
             ShimSPSite.ConstructorGuid = (_, __) => new ShimSPSite();
-            ShimSPSite.ConstructorGuidSPUserToken = (_, _1, _2) => new ShimSPSite();
             ShimSPSite.AllInstances.AllWebsGet = _ => new ShimSPWebCollection();
             ShimSPSite.AllInstances.OpenWeb = _ => spWeb;
-            ShimSPSite.AllInstances.OpenWebString = (_, __) => spWeb;
-            ShimSPSite.AllInstances.OpenWebGuid = (_, __) => spWeb;
             ShimSPSite.AllInstances.Dispose = _ => { };
             ShimSPWeb.AllInstances.Dispose = _ => { };
             ShimSPWebCollection.AllInstances.ItemGetGuid = (_, __) => spWeb;
-            ShimCoreFunctions.getLockedWebSPWeb = _ => guid;
-            ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => DummyString;
-            ShimCoreFunctions.getListSettingStringSPList = (_, __) => DummyString;
-            ShimCoreFunctions.getConnectionStringGuid = _ => DummyString;
-            ShimCoreFunctions.getLockConfigSettingSPWebStringBoolean = (_1, _2, _3) => DummyString;
-            ShimSPList.AllInstances.GetItemsSPQuery = (_, __) => spListItemCollection;
-            ShimSPPersistedObject.AllInstances.IdGet = _ => guid;
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
-            ShimUnsecuredLayoutsPageBase.AllInstances.SiteGet = _ => spSite;
-            ShimUnsecuredLayoutsPageBase.AllInstances.WebGet = _ => spWeb;
-            ShimAct.ConstructorSPWeb = (_, __) => new ShimAct();
             ShimSPContext.CurrentGet = () => new ShimSPContext();
             ShimSPContext.AllInstances.WebGet = _ => spWeb;
             ShimSPContext.AllInstances.SiteGet = _ => spSite;
-            ShimSPFieldLookupValueCollection.ConstructorString = (_, __) => new ShimSPFieldLookupValueCollection();
-            ShimSPFieldLookupValue.ConstructorString = (_, __) => new ShimSPFieldLookupValue();
-            ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => DummyInt;
-            ShimDisabledItemEventScope.Constructor = _ => new ShimDisabledItemEventScope();
-            ShimDisabledItemEventScope.AllInstances.Dispose = _ => { };
-            ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => spUser;
-            ShimSPSiteDataQuery.Constructor = _ => new ShimSPSiteDataQuery();
         }
 
         private void SetupVariables()
@@ -175,122 +147,33 @@ namespace EPMLiveWebParts.Tests
             currentDateTime = DateTime.Now;
             spWeb = new ShimSPWeb()
             {
-                IDGet = () => guid,
-                SiteGet = () => spSite,
                 ListsGet = () => spListCollection,
-                GetFolderString = _ => spFolder,
-                GetFileString = _ => spFile,
-                FoldersGet = () => spFolderCollection,
-                CurrentUserGet = () => spUser,
-                ServerRelativeUrlGet = () => SampleUrl,
-                UrlGet = () => SampleUrl,
-                AllUsersGet = () => new ShimSPUserCollection(),
-                SiteUsersGet = () => new ShimSPUserCollection(),
                 GetListFromUrlString = _ => spList,
                 Update = () => { }
             };
-            spSite = new ShimSPSite()
-            {
-                IDGet = () => guid,
-                WebApplicationGet = () => new ShimSPWebApplication(),
-                RootWebGet = () => spWeb,
-                FeaturesGet = () => new ShimSPFeatureCollection()
-                {
-                    ItemGetGuid = _ => new ShimSPFeature()
-                },
-                ContentDatabaseGet = () => new ShimSPContentDatabase()
-            };
+            spSite = new ShimSPSite();
             spListCollection = new ShimSPListCollection()
             {
-                TryGetListString = _ => spList,
-                ItemGetString = _ => spList,
-                ItemGetGuid = _ => spList
+                ItemGetString = _ => spList
             };
             spList = new ShimSPList()
             {
                 IDGet = () => guid,
                 FieldsGet = () => spFieldCollection,
-                GetItemByIdInt32 = _ => spListItem,
                 ItemsGet = () => spListItemCollection,
-                GetItemsSPQuery = _ => spListItemCollection,
-                RootFolderGet = () => spFolder,
-                ParentWebGet = () => spWeb,
-                DefaultViewGet = () => spView,
                 ViewsGet = () => spViewCollection,
-                ContentTypesGet = () => spContentTypeCollection,
-                TitleGet = () => DummyString,
-                EventReceiversGet = () => new ShimSPEventReceiverDefinitionCollection(),
-                DefaultViewUrlGet = () => SampleUrl,
                 Update = () => { }
             };
-            spListItemCollection = new ShimSPListItemCollection()
-            {
-                CountGet = () => DummyInt,
-                ItemGetInt32 = _ => spListItem
-            };
-            spListItem = new ShimSPListItem()
-            {
-                IDGet = () => DummyInt,
-                TitleGet = () => DummyString,
-                ItemGetString = _ => DummyString,
-                ItemGetGuid = _ => DummyString,
-                ItemSetGuidObject = (_, __) => { },
-                Update = () => { },
-                FileGet = () => spFile,
-                ParentListGet = () => spList,
-                NameGet = () => DummyString
-            };
+            spListItemCollection = new ShimSPListItemCollection();
+            spListItem = new ShimSPListItem();
             spFieldCollection = new ShimSPFieldCollection()
             {
-                GetFieldByInternalNameString = _ => spField,
-                ContainsFieldString = _ => false,
-                GetFieldString = _ => spField,
-                ItemGetString = _ => spField
+                GetFieldString = _ => spField
             };
             spField = new ShimSPField()
             {
-                IdGet = () => guid,
                 TitleGet = () => DummyString,
-                InternalNameGet = () => DummyString,
-                ReadOnlyFieldGet = () => false,
-                HiddenGet = () => false,
-                ReorderableGet = () => true,
-                TypeAsStringGet = () => DummyString,
-                DescriptionGet = () => DummyString
-            };
-            spUser = new ShimSPUser()
-            {
-                IDGet = () => DummyInt,
-                IsSiteAdminGet = () => true,
-                UserTokenGet = () => new ShimSPUserToken()
-            };
-            spFolderCollection = new ShimSPFolderCollection()
-            {
-                ItemGetString = _ => spFolder,
-                AddString = _ => spFolder
-            };
-            spFolder = new ShimSPFolder()
-            {
-                ExistsGet = () => false,
-                SubFoldersGet = () => spFolderCollection,
-                FilesGet = () => spFileCollection,
-                UrlGet = () => SampleUrl,
-                UniqueIdGet = () => guid,
-                ParentWebGet = () => spWeb
-            };
-            spFileCollection = new ShimSPFileCollection()
-            {
-                CountGet = () => DummyInt,
-                AddStringByteArrayBoolean = (_1, _2, _3) => spFile,
-                AddStringStream = (_1, _2) => spFile,
-                ItemGetString = _ => spFile
-            };
-            spFile = new ShimSPFile()
-            {
-                Delete = () => { },
-                OpenBinaryStream = () => null,
-                NameGet = () => DummyString,
-                GetListItemStringArray = _ => spListItem
+                InternalNameGet = () => DummyString
             };
             spViewCollection = new ShimSPViewCollection()
             {
@@ -299,30 +182,11 @@ namespace EPMLiveWebParts.Tests
             spView = new ShimSPView()
             {
                 ViewFieldsGet = () => spViewFieldCollection,
-                ServerRelativeUrlGet = () => SampleUrl,
                 Update = () => { }
             };
             spViewFieldCollection = new ShimSPViewFieldCollection()
             {
                 ToStringCollection = () => new StringCollection()
-            };
-            spContentTypeCollection = new ShimSPContentTypeCollection()
-            {
-                ItemGetString = _ => spContentType
-            };
-            spContentType = new ShimSPContentType()
-            {
-                IdGet = () => default(SPContentTypeId),
-                FieldLinksGet = () => spFieldLinkCollection
-            };
-            spFieldLinkCollection = new ShimSPFieldLinkCollection()
-            {
-                ItemGetGuid = _ => new ShimSPFieldLink()
-            };
-            transaction = new ShimSqlTransaction()
-            {
-                Commit = () => { },
-                Rollback = () => { }
             };
             GanttParameters = new Hashtable();
         }
@@ -355,8 +219,8 @@ namespace EPMLiveWebParts.Tests
         public void UsePopup_WhenCalled_ReturnsUsePopupValueFromHashTable()
         {
             // Arrange
-            GanttParameters.Add("UsePopup", DummyString);
-            privateObject.SetFieldOrProperty("_htGanttParams", nonPublicInstance, GanttParameters);
+            GanttParameters.Add(UsePopupMethodName, DummyString);
+            privateObject.SetFieldOrProperty(GanttParamtetersFieldName, nonPublicInstance, GanttParameters);
 
             // Act
             var actual = (string)privateObject.Invoke(UsePopupMethodName, publicInstance, new object[] { });
@@ -369,8 +233,8 @@ namespace EPMLiveWebParts.Tests
         public void GetAction_WhenCalled_ReturnsLTypeValueFromHashTable()
         {
             // Arrange
-            GanttParameters.Add("LType", DummyString);
-            privateObject.SetFieldOrProperty("_htGanttParams", nonPublicInstance, GanttParameters);
+            GanttParameters.Add(LTypeFieldName, DummyString);
+            privateObject.SetFieldOrProperty(GanttParamtetersFieldName, nonPublicInstance, GanttParameters);
 
             // Act
             var actual = (string)privateObject.Invoke(GetActionMethodName, publicInstance, new object[] { });
@@ -390,17 +254,17 @@ namespace EPMLiveWebParts.Tests
             var dataTable = new DataTable();
             var gridColumns = new List<GridColumn>();
 
-            dataTable.Columns.Add("Edit");
+            dataTable.Columns.Add(EditString);
             dataTable.Columns.Add(DummyString);
 
             ShimGridData.AllInstances.GetInternalNameString = (_, input) => input;
             ShimGridData.AllInstances.GetDisplayNameString = (_, input) => input;
 
-            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, fields);
+            privateObject.SetFieldOrProperty(SPViewFieldsFieldName, nonPublicInstance, fields);
 
             // Act
             gridColumns.AddRange((IList<GridColumn>)privateObject.Invoke(GetGridColumnsMethodName, publicInstance, new object[] { dataTable }));
-            var editColumn = gridColumns.FirstOrDefault(x => x.FieldKey.Equals("Edit"));
+            var editColumn = gridColumns.FirstOrDefault(x => x.FieldKey.Equals(EditString));
             var dummyColumn = gridColumns.FirstOrDefault(x => x.FieldKey.Equals(DummyString));
 
             // Assert
@@ -425,7 +289,7 @@ namespace EPMLiveWebParts.Tests
             GanttParameters.Add("Milestone", Two);
             GanttParameters.Add("WBS", DummyString);
 
-            privateObject.SetFieldOrProperty("_htGanttParams", nonPublicInstance, GanttParameters);
+            privateObject.SetFieldOrProperty(GanttParamtetersFieldName, nonPublicInstance, GanttParameters);
 
             // Act
             privateObject.Invoke(InitGanttParamsMethodName, nonPublicInstance, new object[] { });
@@ -447,13 +311,13 @@ namespace EPMLiveWebParts.Tests
 
             // Act
             privateObject.Invoke(InitializeReqdFieldsMethodName, nonPublicInstance, new object[] { });
-            var requiredFields = (List<string>)privateObject.GetFieldOrProperty("_reqdfields", nonPublicInstance);
+            var requiredFields = (List<string>)privateObject.GetFieldOrProperty(RequiredFieldsFieldName, nonPublicInstance);
 
             // Assert
             GanttParameters.ShouldSatisfyAllConditions(
                 () => requiredFields.Count.ShouldBe(9),
-                () => requiredFields.Contains("Predecessors").ShouldBeTrue(),
-                () => requiredFields.Contains("Critical").ShouldBeTrue());
+                () => requiredFields.ShouldContain("Predecessors"),
+                () => requiredFields.ShouldContain("Critical"));
         }
 
         [TestMethod]
@@ -463,16 +327,16 @@ namespace EPMLiveWebParts.Tests
             var row = default(DataRow);
             var dataTable = new DataTable();
 
-            dataTable.Columns.Add("DisplayName");
-            dataTable.Columns.Add("IsImage");
-            dataTable.Columns.Add("ColumnType");
-            dataTable.Columns.Add("InternalName");
+            dataTable.Columns.Add(DisplayNameColumn);
+            dataTable.Columns.Add(IsImageColumn);
+            dataTable.Columns.Add(ColumnTypeColumn);
+            dataTable.Columns.Add(InternalNameColumn);
             row = dataTable.NewRow();
-            row["DisplayName"] = DummyString;
-            row["IsImage"] = "true";
+            row[DisplayNameColumn] = DummyString;
+            row[IsImageColumn] = TrueStringLowerCase;
             dataTable.Rows.Add(row);
 
-            privateObject.SetFieldOrProperty("_columnDefinitions", nonPublicInstance, dataTable);
+            privateObject.SetFieldOrProperty(ColumnDefinitionsFieldName, nonPublicInstance, dataTable);
 
             // Act
             var actual = (DataTable)privateObject.Invoke(AddColumnsMethodName, nonPublicInstance, new object[] { dataTable });
@@ -540,7 +404,7 @@ namespace EPMLiveWebParts.Tests
                 return input;
             };
 
-            privateObject.SetFieldOrProperty("_imageColumns", nonPublicInstance, imageColumns);
+            privateObject.SetFieldOrProperty(ImageColumnsFieldName, nonPublicInstance, imageColumns);
 
             // Act
             var actual = (List<GridField>)privateObject.Invoke(GetGridFieldsMethodName, publicInstance, new object[] { dataTable });
@@ -589,8 +453,8 @@ namespace EPMLiveWebParts.Tests
                 return input;
             };
 
-            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
-            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+            privateObject.SetFieldOrProperty(SPViewFieldsFieldName, nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
 
             // Act
             var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
@@ -640,8 +504,8 @@ namespace EPMLiveWebParts.Tests
                 return input;
             };
 
-            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
-            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+            privateObject.SetFieldOrProperty(SPViewFieldsFieldName, nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
 
             // Act
             var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
@@ -691,8 +555,8 @@ namespace EPMLiveWebParts.Tests
                 return input;
             };
 
-            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
-            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+            privateObject.SetFieldOrProperty(SPViewFieldsFieldName, nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
 
             // Act
             var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
@@ -742,8 +606,8 @@ namespace EPMLiveWebParts.Tests
                 return input;
             };
 
-            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
-            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+            privateObject.SetFieldOrProperty(SPViewFieldsFieldName, nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
 
             // Act
             var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
@@ -793,8 +657,8 @@ namespace EPMLiveWebParts.Tests
                 return input;
             };
 
-            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
-            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+            privateObject.SetFieldOrProperty(SPViewFieldsFieldName, nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
 
             // Act
             var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
@@ -844,8 +708,8 @@ namespace EPMLiveWebParts.Tests
                 return input;
             };
 
-            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
-            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+            privateObject.SetFieldOrProperty(SPViewFieldsFieldName, nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
 
             // Act
             var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
@@ -895,8 +759,8 @@ namespace EPMLiveWebParts.Tests
                 return input;
             };
 
-            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
-            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+            privateObject.SetFieldOrProperty(SPViewFieldsFieldName, nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
 
             // Act
             var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
@@ -946,8 +810,8 @@ namespace EPMLiveWebParts.Tests
                 return input;
             };
 
-            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
-            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
+            privateObject.SetFieldOrProperty(SPViewFieldsFieldName, nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
 
             // Act
             var actual = (GridField)privateObject.Invoke(FormatGridFieldMethodName, nonPublicInstance, new object[] { field, dataColumn });
@@ -1001,9 +865,9 @@ namespace EPMLiveWebParts.Tests
                 return string.Empty;
             };
 
-            privateObject.SetFieldOrProperty("_spList", nonPublicInstance, spList.Instance);
-            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, spView.Instance);
-            privateObject.SetFieldOrProperty("_wbs", nonPublicInstance, wbs);
+            privateObject.SetFieldOrProperty(SPListFieldName, nonPublicInstance, spList.Instance);
+            privateObject.SetFieldOrProperty(SPViewFieldName, nonPublicInstance, spView.Instance);
+            privateObject.SetFieldOrProperty(WbsFieldName, nonPublicInstance, wbs);
 
             // Act
             var actual = (string)privateObject.Invoke(GetOrderByFieldMethodName, nonPublicInstance, new object[] { });
@@ -1038,9 +902,9 @@ namespace EPMLiveWebParts.Tests
                 return query;
             };
 
-            privateObject.SetFieldOrProperty("_spList", nonPublicInstance, spList.Instance);
-            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, spView.Instance);
-            privateObject.SetFieldOrProperty("_wbs", nonPublicInstance, wbs);
+            privateObject.SetFieldOrProperty(SPListFieldName, nonPublicInstance, spList.Instance);
+            privateObject.SetFieldOrProperty(SPViewFieldName, nonPublicInstance, spView.Instance);
+            privateObject.SetFieldOrProperty(WbsFieldName, nonPublicInstance, wbs);
 
             // Act
             var actual = (string)privateObject.Invoke(GetOrderByFieldMethodName, nonPublicInstance, new object[] { });
@@ -1069,9 +933,9 @@ namespace EPMLiveWebParts.Tests
                 return string.Empty;
             };
 
-            privateObject.SetFieldOrProperty("_spList", nonPublicInstance, spList.Instance);
-            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, spView.Instance);
-            privateObject.SetFieldOrProperty("_wbs", nonPublicInstance, string.Empty);
+            privateObject.SetFieldOrProperty(SPListFieldName, nonPublicInstance, spList.Instance);
+            privateObject.SetFieldOrProperty(SPViewFieldName, nonPublicInstance, spView.Instance);
+            privateObject.SetFieldOrProperty(WbsFieldName, nonPublicInstance, string.Empty);
 
             // Act
             var actual = (string)privateObject.Invoke(GetOrderByFieldMethodName, nonPublicInstance, new object[] { });
@@ -1105,16 +969,16 @@ namespace EPMLiveWebParts.Tests
                 validations += 1;
             };
 
-            privateObject.SetFieldOrProperty("_spList", nonPublicInstance, null);
-            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, null);
-            privateObject.SetFieldOrProperty("_htGanttParams", nonPublicInstance, GanttParameters);
-            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, stringArray);
-            privateObject.SetFieldOrProperty("_rollupSites", nonPublicInstance, stringArray);
+            privateObject.SetFieldOrProperty(SPListFieldName, nonPublicInstance, null);
+            privateObject.SetFieldOrProperty(SPViewFieldName, nonPublicInstance, null);
+            privateObject.SetFieldOrProperty(GanttParamtetersFieldName, nonPublicInstance, GanttParameters);
+            privateObject.SetFieldOrProperty(RollupListsFieldName, nonPublicInstance, stringArray);
+            privateObject.SetFieldOrProperty(RollupSitesFieldName, nonPublicInstance, stringArray);
 
             // Act
             privateObject.Invoke(InitRoutineMethodName, publicInstance, parameters);
-            var list = privateObject.GetFieldOrProperty("_spList", nonPublicInstance);
-            var view = privateObject.GetFieldOrProperty("_spView", nonPublicInstance);
+            var list = privateObject.GetFieldOrProperty(SPListFieldName, nonPublicInstance);
+            var view = privateObject.GetFieldOrProperty(SPViewFieldName, nonPublicInstance);
 
             // Assert
             validations.ShouldSatisfyAllConditions(
@@ -1147,16 +1011,16 @@ namespace EPMLiveWebParts.Tests
                 validations += 1;
             };
 
-            privateObject.SetFieldOrProperty("_spList", nonPublicInstance, null);
-            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, null);
-            privateObject.SetFieldOrProperty("_htGanttParams", nonPublicInstance, GanttParameters);
-            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, stringArray);
-            privateObject.SetFieldOrProperty("_rollupSites", nonPublicInstance, stringArray);
+            privateObject.SetFieldOrProperty(SPListFieldName, nonPublicInstance, null);
+            privateObject.SetFieldOrProperty(SPViewFieldName, nonPublicInstance, null);
+            privateObject.SetFieldOrProperty(GanttParamtetersFieldName, nonPublicInstance, GanttParameters);
+            privateObject.SetFieldOrProperty(RollupListsFieldName, nonPublicInstance, stringArray);
+            privateObject.SetFieldOrProperty(RollupSitesFieldName, nonPublicInstance, stringArray);
 
             // Act
             privateObject.Invoke(InitRoutineMethodName, publicInstance, parameters);
-            var list = privateObject.GetFieldOrProperty("_spList", nonPublicInstance);
-            var view = privateObject.GetFieldOrProperty("_spView", nonPublicInstance);
+            var list = privateObject.GetFieldOrProperty(SPListFieldName, nonPublicInstance);
+            var view = privateObject.GetFieldOrProperty(SPViewFieldName, nonPublicInstance);
 
             // Assert
             validations.ShouldSatisfyAllConditions(
@@ -1189,19 +1053,19 @@ namespace EPMLiveWebParts.Tests
                 validations += 1;
             };
 
-            privateObject.SetFieldOrProperty("_spList", nonPublicInstance, null);
-            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, null);
-            privateObject.SetFieldOrProperty("_htGanttParams", nonPublicInstance, GanttParameters);
-            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, stringArray);
-            privateObject.SetFieldOrProperty("_rollupSites", nonPublicInstance, null);
-            privateObject.SetFieldOrProperty("_useCurrent", nonPublicInstance, false);
+            privateObject.SetFieldOrProperty(SPListFieldName, nonPublicInstance, null);
+            privateObject.SetFieldOrProperty(SPViewFieldName, nonPublicInstance, null);
+            privateObject.SetFieldOrProperty(GanttParamtetersFieldName, nonPublicInstance, GanttParameters);
+            privateObject.SetFieldOrProperty(RollupListsFieldName, nonPublicInstance, stringArray);
+            privateObject.SetFieldOrProperty(RollupSitesFieldName, nonPublicInstance, null);
+            privateObject.SetFieldOrProperty(UseCurrentFieldName, nonPublicInstance, false);
 
             // Act
             privateObject.Invoke(InitRoutineMethodName, publicInstance, parameters);
-            var list = privateObject.GetFieldOrProperty("_spList", nonPublicInstance);
-            var view = privateObject.GetFieldOrProperty("_spView", nonPublicInstance);
-            var rollupSites = (string[])privateObject.GetFieldOrProperty("_rollupSites", nonPublicInstance);
-            var useCurrent = (bool)privateObject.GetFieldOrProperty("_useCurrent", nonPublicInstance);
+            var list = privateObject.GetFieldOrProperty(SPListFieldName, nonPublicInstance);
+            var view = privateObject.GetFieldOrProperty(SPViewFieldName, nonPublicInstance);
+            var rollupSites = (string[])privateObject.GetFieldOrProperty(RollupSitesFieldName, nonPublicInstance);
+            var useCurrent = (bool)privateObject.GetFieldOrProperty(UseCurrentFieldName, nonPublicInstance);
 
             // Assert
             validations.ShouldSatisfyAllConditions(
@@ -1237,16 +1101,16 @@ namespace EPMLiveWebParts.Tests
                 validations += 1;
             };
 
-            privateObject.SetFieldOrProperty("_spList", nonPublicInstance, null);
-            privateObject.SetFieldOrProperty("_spView", nonPublicInstance, null);
-            privateObject.SetFieldOrProperty("_htGanttParams", nonPublicInstance, GanttParameters);
-            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, null);
-            privateObject.SetFieldOrProperty("_rollupSites", nonPublicInstance, null);
+            privateObject.SetFieldOrProperty(SPListFieldName, nonPublicInstance, null);
+            privateObject.SetFieldOrProperty(SPViewFieldName, nonPublicInstance, null);
+            privateObject.SetFieldOrProperty(GanttParamtetersFieldName, nonPublicInstance, GanttParameters);
+            privateObject.SetFieldOrProperty(RollupListsFieldName, nonPublicInstance, null);
+            privateObject.SetFieldOrProperty(RollupSitesFieldName, nonPublicInstance, null);
 
             // Act
             privateObject.Invoke(InitRoutineMethodName, publicInstance, parameters);
-            var list = privateObject.GetFieldOrProperty("_spList", nonPublicInstance);
-            var view = privateObject.GetFieldOrProperty("_spView", nonPublicInstance);
+            var list = privateObject.GetFieldOrProperty(SPListFieldName, nonPublicInstance);
+            var view = privateObject.GetFieldOrProperty(SPViewFieldName, nonPublicInstance);
 
             // Assert
             validations.ShouldSatisfyAllConditions(
@@ -1317,13 +1181,13 @@ namespace EPMLiveWebParts.Tests
             }
 
             spFieldCollection.ContainsFieldString = _ => true;
-            privateObject.SetFieldOrProperty("GanttStartField", publicInstance, DummyString);
-            privateObject.SetFieldOrProperty("GanttFinishField", publicInstance, DummyString);
+            privateObject.SetFieldOrProperty(GanttStartFieldPropertyName, publicInstance, DummyString);
+            privateObject.SetFieldOrProperty(GanttFinishFieldPropertyName, publicInstance, DummyString);
 
             // Act
             privateObject.Invoke(InitializeGanttStartAndFinishMethodName, nonPublicInstance, new object[] { dataTable });
-            var startDate = privateObject.GetFieldOrProperty("_ganttStartDate", nonPublicInstance);
-            var finishDate = privateObject.GetFieldOrProperty("_ganttFinishDate", nonPublicInstance);
+            var startDate = privateObject.GetFieldOrProperty(GanttStartDateFieldName, nonPublicInstance);
+            var finishDate = privateObject.GetFieldOrProperty(GanttFinishDateFieldName, nonPublicInstance);
 
             // Assert
             startDate.ShouldSatisfyAllConditions(
@@ -1381,13 +1245,13 @@ namespace EPMLiveWebParts.Tests
                 validations += 1;
             };
 
-            privateObject.SetFieldOrProperty("_htNodeData", nonPublicInstance, nodeData);
-            privateObject.SetFieldOrProperty("_images", nonPublicInstance, images);
-            privateObject.SetFieldOrProperty("_imagesClientSide", nonPublicInstance, string.Empty);
+            privateObject.SetFieldOrProperty(NodeDataFieldName, nonPublicInstance, nodeData);
+            privateObject.SetFieldOrProperty(ImagesFieldName, nonPublicInstance, images);
+            privateObject.SetFieldOrProperty(ImagesClientSideFieldName, nonPublicInstance, string.Empty);
 
             // Act
             privateObject.Invoke(FinalizeDataMethodName, nonPublicInstance, new object[] { dataTable });
-            var actual = privateObject.GetFieldOrProperty("_imagesClientSide", nonPublicInstance);
+            var actual = privateObject.GetFieldOrProperty(ImagesClientSideFieldName, nonPublicInstance);
 
             // Assert
             actual.ShouldSatisfyAllConditions(
@@ -1530,8 +1394,8 @@ namespace EPMLiveWebParts.Tests
                 validations += 1;
             };
 
-            privateObject.SetFieldOrProperty("_htGanttParams", nonPublicInstance, GanttParameters);
-            privateObject.SetFieldOrProperty("_reqdfields", nonPublicInstance, requiredFields);
+            privateObject.SetFieldOrProperty(GanttParamtetersFieldName, nonPublicInstance, GanttParameters);
+            privateObject.SetFieldOrProperty(RequiredFieldsFieldName, nonPublicInstance, requiredFields);
 
             // Act
             var actual = (SPWeb)privateObject.Invoke(AddReqdFieldsToViewMethodName, nonPublicInstance, new object[] { });
@@ -1564,9 +1428,9 @@ namespace EPMLiveWebParts.Tests
                 validations += 1;
             };
 
-            privateObject.SetFieldOrProperty("_htGanttParams", nonPublicInstance, GanttParameters);
-            privateObject.SetFieldOrProperty("_reqdfields", nonPublicInstance, requiredFields);
-            privateObject.SetFieldOrProperty("_fieldsAddedToView", nonPublicInstance, requiredFields);
+            privateObject.SetFieldOrProperty(GanttParamtetersFieldName, nonPublicInstance, GanttParameters);
+            privateObject.SetFieldOrProperty(RequiredFieldsFieldName, nonPublicInstance, requiredFields);
+            privateObject.SetFieldOrProperty(FieldsAddedToViewFieldName, nonPublicInstance, requiredFields);
 
             // Act
             privateObject.Invoke(RemoveReqdFieldsFromViewMethodName, nonPublicInstance, new object[] { });
@@ -1580,6 +1444,7 @@ namespace EPMLiveWebParts.Tests
         {
             // Arrange
             const string xmlString = @"<xmlcfg/>";
+            const string IndicatorString = "indicator";
             var fieldNames = new List<string>()
             {
                 $"1|2",
@@ -1592,7 +1457,7 @@ namespace EPMLiveWebParts.Tests
             };
 
             spFieldCollection.ContainsFieldString = _ => true;
-            spField.DescriptionGet = () => "indicator";
+            spField.DescriptionGet = () => IndicatorString;
 
             ShimGridData.AllInstances.IsHyperLinkStringInt32 = (_, _1, _2) => true;
             ShimGridData.AllInstances.InitViewFieldNames = _ =>
@@ -1600,20 +1465,20 @@ namespace EPMLiveWebParts.Tests
                 validations += 1;
             };
 
-            privateObject.SetFieldOrProperty("_fieldNames", nonPublicInstance, fieldNames);
-            privateObject.SetFieldOrProperty("_spvwFields", nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+            privateObject.SetFieldOrProperty(SPViewFieldsFieldName, nonPublicInstance, viewFields);
 
             // Act
             privateObject.Invoke(InitializeColumnDefsMethodName, nonPublicInstance, new object[] { xmlString });
-            var actual = (DataTable)privateObject.GetFieldOrProperty("_columnDefinitions", nonPublicInstance);
+            var actual = (DataTable)privateObject.GetFieldOrProperty(ColumnDefinitionsFieldName, nonPublicInstance);
 
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual.Rows.Count.ShouldBe(3),
-                () => actual.Rows[0]["DisplayName"].ToString().ShouldBe(fieldNames[0]),
-                () => actual.Rows[0]["InternalName"].ToString().ShouldBe(DummyString),
-                () => actual.Rows[0]["IsHyperLink"].ToString().ShouldBe("true"),
-                () => actual.Rows[0]["IsImage"].ToString().ShouldBe("true"),
+                () => actual.Rows[0][DisplayNameColumn].ToString().ShouldBe(fieldNames[0]),
+                () => actual.Rows[0][InternalNameColumn].ToString().ShouldBe(DummyString),
+                () => actual.Rows[0][IsHyperLinkColumn].ToString().ShouldBe(TrueStringLowerCase),
+                () => actual.Rows[0][IsImageColumn].ToString().ShouldBe(TrueStringLowerCase),
                 () => validations.ShouldBe(1));
         }
     }
