@@ -113,6 +113,11 @@ namespace EPMLiveWebParts.Tests
         private const string PopulateViewFieldValuesMethodName = "PopulateViewFieldValues";
         private const string PopulateDefaultFieldValuesMethodName = "PopulateDefaultFieldValues";
         private const string CalcPercentCompleteMethodName = "CalcPercentComplete";
+        private const string GetGanttStartDateMethodName = "GetGanttStartDate";
+        private const string GetGanttFinishDateMethodName = "GetGanttFinishDate";
+        private const string ApplyGanttStyleMethodName = "ApplyGanttStyle";
+        private const string ApplyGanttStylesMethodName = "ApplyGanttStyles";
+        private const string GetNodeByNameMethodName = "GetNodeByName";
 
         [TestInitialize]
         public void Setup()
@@ -1768,6 +1773,626 @@ namespace EPMLiveWebParts.Tests
             actual.ShouldSatisfyAllConditions(
                 () => actual.ShouldBe(currentDateTime.Date.AddDays(100)),
                 () => ((DataRow)parameters[0])["PctComplete"].ToString().ShouldBe("100"));
+        }
+
+        [TestMethod]
+        public void GetGanttStartDate_WhenCalled_ReturnsGanttStartDate()
+        {
+            // Arrange
+            var xmlString = $@"
+                <Fields>
+                    <cell>{DummyString}</cell>
+                    <cell>{currentDateTime.Date}</cell>
+                    <cell>{One}</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var fieldNames = new List<string>()
+            {
+                Zero.ToString(),
+                DummyString,
+                One.ToString(),
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            var actual = (DateTime)privateObject.Invoke(
+                GetGanttStartDateMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    xmlDocument.FirstChild
+                });
+
+            // Assert
+            actual.ShouldBe(currentDateTime.Date);
+        }
+
+        [TestMethod]
+        public void GetGanttFinishDate_WhenCalled_ReturnsGanttStartDate()
+        {
+            // Arrange
+            var xmlString = $@"
+                <Fields>
+                    <cell>{DummyString}</cell>
+                    <cell>{currentDateTime.Date}</cell>
+                    <cell>{One}</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var fieldNames = new List<string>()
+            {
+                Zero.ToString(),
+                DummyString,
+                One.ToString(),
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            var actual = (DateTime)privateObject.Invoke(
+                GetGanttFinishDateMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    xmlDocument.FirstChild
+                });
+
+            // Assert
+            actual.ShouldBe(currentDateTime.Date);
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyle_CaseOne_AppliesGroupHeaderStyle()
+        {
+            // Arrange
+            const string expectedStyle = "groupheader";
+            const string expected = "H1";
+            const string xmlString = @"
+                <Fields style=""font-weight:bold;"">
+                    <cell>1</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            xmlDocument.LoadXml(xmlString);
+
+            dataTable.Columns.Add(IDStringCaps);
+            dataTable.Columns.Add(GridSerializer.DefaultGridRowStyleIdColumnName);
+            row = dataTable.NewRow();
+            row[IDStringCaps] = string.Empty;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                xmlDocument.FirstChild
+            };
+
+            ShimGridData.AllInstances.ApplyGanttStylesDataRowString = (_, _1, input) =>
+            {
+                if (input.Equals(expectedStyle))
+                {
+                    validations += 1;
+                }
+            };
+
+            // Act
+            privateObject.Invoke(ApplyGanttStyleMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual[GridSerializer.DefaultGridRowStyleIdColumnName].ShouldBe(expected),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyle_CaseTwo_AppliesCriticalSummaryStyle()
+        {
+            // Arrange
+            const string expectedStyle = "critical summary";
+            const string expected = "H1";
+            const string xmlString = @"
+                <Fields style=""font-weight:bold;"">
+                    <cell>yes</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var fieldNames = new List<string>()
+            {
+                "Critical"
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            dataTable.Columns.Add(IDStringCaps);
+            dataTable.Columns.Add(GridSerializer.DefaultGridRowStyleIdColumnName);
+            row = dataTable.NewRow();
+            row[IDStringCaps] = One;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                xmlDocument.FirstChild
+            };
+
+            ShimGridData.AllInstances.ApplyGanttStylesDataRowString = (_, _1, input) =>
+            {
+                if (input.Equals(expectedStyle))
+                {
+                    validations += 1;
+                }
+            };
+
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStyleMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual[GridSerializer.DefaultGridRowStyleIdColumnName].ShouldBe(expected),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyle_CaseThree_AppliesSummaryStyle()
+        {
+            // Arrange
+            const string expectedStyle = "summary";
+            const string expected = "H1";
+            const string xmlString = @"
+                <Fields style=""font-weight:bold;"">
+                    <cell>no</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var fieldNames = new List<string>()
+            {
+                "Critical"
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            dataTable.Columns.Add(IDStringCaps);
+            dataTable.Columns.Add(GridSerializer.DefaultGridRowStyleIdColumnName);
+            row = dataTable.NewRow();
+            row[IDStringCaps] = One;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                xmlDocument.FirstChild
+            };
+
+            ShimGridData.AllInstances.ApplyGanttStylesDataRowString = (_, _1, input) =>
+            {
+                if (input.Equals(expectedStyle))
+                {
+                    validations += 1;
+                }
+            };
+
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStyleMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual[GridSerializer.DefaultGridRowStyleIdColumnName].ShouldBe(expected),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyle_CaseFour_AppliesCriticalStyle()
+        {
+            // Arrange
+            const string expectedStyle = "critical";
+            const string xmlString = @"
+                <Fields style=""none"">
+                    <cell>yes</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var fieldNames = new List<string>()
+            {
+                "Critical"
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            dataTable.Columns.Add(IDStringCaps);
+            dataTable.Columns.Add(GridSerializer.DefaultGridRowStyleIdColumnName);
+            row = dataTable.NewRow();
+            row[IDStringCaps] = One;
+            row[GridSerializer.DefaultGridRowStyleIdColumnName] = DummyString;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                xmlDocument.FirstChild
+            };
+
+            ShimGridData.AllInstances.ApplyGanttStylesDataRowString = (_, _1, input) =>
+            {
+                if (input.Equals(expectedStyle))
+                {
+                    validations += 1;
+                }
+            };
+
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStyleMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual[GridSerializer.DefaultGridRowStyleIdColumnName].ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyle_CaseFive_AppliesStandardStyle()
+        {
+            // Arrange
+            const string expectedStyle = "standard";
+            const string xmlString = @"
+                <Fields style=""none"">
+                    <cell>no</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var fieldNames = new List<string>()
+            {
+                "Critical"
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            dataTable.Columns.Add(IDStringCaps);
+            dataTable.Columns.Add(GridSerializer.DefaultGridRowStyleIdColumnName);
+            row = dataTable.NewRow();
+            row[IDStringCaps] = One;
+            row[GridSerializer.DefaultGridRowStyleIdColumnName] = DummyString;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                xmlDocument.FirstChild
+            };
+
+            ShimGridData.AllInstances.ApplyGanttStylesDataRowString = (_, _1, input) =>
+            {
+                if (input.Equals(expectedStyle))
+                {
+                    validations += 1;
+                }
+            };
+
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStyleMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual[GridSerializer.DefaultGridRowStyleIdColumnName].ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyles_TypeGroupHeader_ReturnsCustomBarStyleArray()
+        {
+            // Arrange
+            const string yesString = "yes";
+            const string type = "groupheader";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var expected = new GanttUtilities.CustomBarStyle[]
+            {
+                0
+            };
+
+            dataTable.Columns.Add(DummyString);
+            dataTable.Columns.Add(GridSerializer.DefaultGanttBarStyleIdsColumnName);
+            row = dataTable.NewRow();
+            row[DummyString] = yesString;
+            row[GridSerializer.DefaultGanttBarStyleIdsColumnName] = null;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                type
+            };
+
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            privateObject.SetFieldOrProperty("GanttMilestone", publicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
+            var actual = ((DataRow)parameters[0])[GridSerializer.DefaultGanttBarStyleIdsColumnName];
+
+            // Assert
+            actual.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyles_Typesummary_ReturnsCustomBarStyleArray()
+        {
+            // Arrange
+            const string yesString = "yes";
+            const string type = "summary";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var expected = new GanttUtilities.CustomBarStyle[]
+            {
+                0
+            };
+
+            dataTable.Columns.Add(DummyString);
+            dataTable.Columns.Add(GridSerializer.DefaultGanttBarStyleIdsColumnName);
+            row = dataTable.NewRow();
+            row[DummyString] = yesString;
+            row[GridSerializer.DefaultGanttBarStyleIdsColumnName] = null;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                type
+            };
+
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            privateObject.SetFieldOrProperty("GanttMilestone", publicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
+            var actual = ((DataRow)parameters[0])[GridSerializer.DefaultGanttBarStyleIdsColumnName];
+
+            // Assert
+            actual.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyles_TypestandardMilestoneTrue_ReturnsCustomBarStyleArray()
+        {
+            // Arrange
+            const string yesString = "yes";
+            const string type = "standard";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var expected = new GanttUtilities.CustomBarStyle[]
+            {
+                0
+            };
+
+            dataTable.Columns.Add(DummyString);
+            dataTable.Columns.Add(GridSerializer.DefaultGanttBarStyleIdsColumnName);
+            row = dataTable.NewRow();
+            row[DummyString] = yesString;
+            row[GridSerializer.DefaultGanttBarStyleIdsColumnName] = null;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                type
+            };
+
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            privateObject.SetFieldOrProperty("GanttMilestone", publicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
+            var actual = ((DataRow)parameters[0])[GridSerializer.DefaultGanttBarStyleIdsColumnName];
+
+            // Assert
+            actual.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyles_TypestandardMilestoneFalse_ReturnsCustomBarStyleArray()
+        {
+            // Arrange
+            const string yesString = "no";
+            const string type = "standard";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var expected = new GanttUtilities.CustomBarStyle[]
+            {
+                0
+            };
+
+            dataTable.Columns.Add(DummyString);
+            dataTable.Columns.Add(GridSerializer.DefaultGanttBarStyleIdsColumnName);
+            row = dataTable.NewRow();
+            row[DummyString] = yesString;
+            row[GridSerializer.DefaultGanttBarStyleIdsColumnName] = null;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                type
+            };
+
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            privateObject.SetFieldOrProperty("GanttMilestone", publicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
+            var actual = ((DataRow)parameters[0])[GridSerializer.DefaultGanttBarStyleIdsColumnName];
+
+            // Assert
+            actual.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyles_TypecriticalMilestoneTrue_ReturnsCustomBarStyleArray()
+        {
+            // Arrange
+            const string yesString = "yes";
+            const string type = "critical";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var expected = new GanttUtilities.CustomBarStyle[]
+            {
+                0
+            };
+
+            dataTable.Columns.Add(DummyString);
+            dataTable.Columns.Add(GridSerializer.DefaultGanttBarStyleIdsColumnName);
+            row = dataTable.NewRow();
+            row[DummyString] = yesString;
+            row[GridSerializer.DefaultGanttBarStyleIdsColumnName] = null;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                type
+            };
+
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            privateObject.SetFieldOrProperty("GanttMilestone", publicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
+            var actual = ((DataRow)parameters[0])[GridSerializer.DefaultGanttBarStyleIdsColumnName];
+
+            // Assert
+            actual.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyles_TypecriticalMilestoneFalse_ReturnsCustomBarStyleArray()
+        {
+            // Arrange
+            const string yesString = "no";
+            const string type = "critical";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var expected = new GanttUtilities.CustomBarStyle[]
+            {
+                0
+            };
+
+            dataTable.Columns.Add(DummyString);
+            dataTable.Columns.Add(GridSerializer.DefaultGanttBarStyleIdsColumnName);
+            row = dataTable.NewRow();
+            row[DummyString] = yesString;
+            row[GridSerializer.DefaultGanttBarStyleIdsColumnName] = null;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                type
+            };
+
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            privateObject.SetFieldOrProperty("GanttMilestone", publicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
+            var actual = ((DataRow)parameters[0])[GridSerializer.DefaultGanttBarStyleIdsColumnName];
+
+            // Assert
+            actual.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyles_Typecriticalsummary_ReturnsCustomBarStyleArray()
+        {
+            // Arrange
+            const string yesString = "yes";
+            const string type = "critical summary";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var expected = new GanttUtilities.CustomBarStyle[]
+            {
+                0
+            };
+
+            dataTable.Columns.Add(DummyString);
+            dataTable.Columns.Add(GridSerializer.DefaultGanttBarStyleIdsColumnName);
+            row = dataTable.NewRow();
+            row[DummyString] = yesString;
+            row[GridSerializer.DefaultGanttBarStyleIdsColumnName] = null;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                type
+            };
+
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            privateObject.SetFieldOrProperty("GanttMilestone", publicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
+            var actual = ((DataRow)parameters[0])[GridSerializer.DefaultGanttBarStyleIdsColumnName];
+
+            // Assert
+            actual.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void GetNodeByName_WhenCalled_ReturnsMatchingNode()
+        {
+            // Arrange
+            const string name = "NodeName";
+            var xmlString = $@"
+                <nodes>
+                    <node name=""{name}"" {DummyString}=""{DummyString}""/>
+                    <node name=""{DummyString}"" {DummyString}=""""/>
+                </nodes>";
+            var xmlDocument = new XmlDocument();
+
+            xmlDocument.LoadXml(xmlString);
+
+            // Act
+            var actual = (XmlNode)privateObject.Invoke(
+                GetNodeByNameMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    name,
+                    xmlDocument.FirstChild.ChildNodes
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Attributes["name"].Value.ShouldBe(name),
+                () => actual.Attributes[DummyString].Value.ShouldBe(DummyString));
         }
     }
 }
