@@ -98,10 +98,10 @@ namespace PortfolioEngineCore.Tests.PortfolioItems
             const string expectedsXML = "<PIS><PI ID=\"17\" EXTID=\"18\" NAME=\"19\" /><PI ID=\"20\" EXTID=\"21\" NAME=\"22\" /><PI ID=\"23\" EXTID=\"24\" NAME=\"25\" /><PI ID=\"26\" EXTID=\"27\" NAME=\"28\" /><PI ID=\"29\" EXTID=\"30\" NAME=\"31\" /></PIS>";
 
             // Act
-            string sExtIDList = DummyString;
+            string extIDList;
             string sPIDList = DummyString;
             string sXML = DummyString;
-            _testEntity.ObtainManagedPortfolioItems(out sExtIDList, out sPIDList, out sXML);
+            _testEntity.ObtainManagedPortfolioItems(out extIDList, out sPIDList, out sXML);
 
             // Assert
             var assertions = AssertQueries(expectedQueries);
@@ -324,8 +324,8 @@ namespace PortfolioEngineCore.Tests.PortfolioItems
             var iPID = DummyInt;
             var clnFieldAttr = new Queue<CCustomFieldAttr>();
             var statusText = DummyString;
-            var MissingResNames = DummyString;
-            var parameters = new object[] { xPI, iPID, clnFieldAttr, statusText, MissingResNames };
+            var missingResNames = DummyString;
+            var parameters = new object[] { xPI, iPID, clnFieldAttr, statusText, missingResNames };
 
             // Act
             var result = _privateObject.Invoke(
@@ -552,7 +552,9 @@ namespace PortfolioEngineCore.Tests.PortfolioItems
             var row = dataTable.NewRow();
             foreach (DataColumn column in dataTable.Columns)
             {
-                if (column.ColumnName.Contains("DATE") || column.ColumnName.Contains("PROJECT_CREATED") || column.ColumnName.Contains("PD_150"))
+                if (column.ColumnName.Contains("DATE") 
+                    || column.ColumnName.Contains("PROJECT_CREATED") 
+                    || column.ColumnName.Contains("PD_150"))
                 {
                     row[column.ColumnName] = DateTime.Now;
                 }
