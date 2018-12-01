@@ -83,7 +83,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -246,7 +246,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'view');return false;\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'view');return false;\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
@@ -266,7 +266,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -309,7 +309,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -352,7 +352,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -372,7 +372,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'edit');return false;\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'edit');return false;\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
@@ -393,7 +393,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -411,7 +411,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"http://example.com/\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"),
                 () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\">"),
                 () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
@@ -431,7 +431,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/tasks.aspx?ID=1\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/tasks.aspx?ID=1\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"));
         }
 
         [TestMethod]
@@ -449,7 +449,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/workplanner.aspx?ID=1&Source=DummyVal\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/workplanner.aspx?ID=1&Source=DummyVal\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
@@ -467,7 +467,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/http://example.com?FilterField1=Project&FilterValue1=\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"http://example.com/http://example.com?FilterField1=Project&FilterValue1=\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
@@ -868,7 +868,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"ed\"><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"ed\"><![CDATA[{DummyText}.{DummyVal}]]></cell>"));
         }
         
         [TestMethod]
@@ -948,7 +948,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -1105,7 +1105,7 @@ namespace EPMLiveWebParts.Tests
             arrItems.Add(indexer, new string[] { "Admin" });
 
             var hshLists = new Hashtable();
-            hshLists.Add(DummyVal, "test.png");
+            hshLists.Add("ICON", "test.png");
 
             _privateObj.SetField("hshWBS", hshWBS);
             _privateObj.SetField("hshFieldProperties", hshFieldProperties);
@@ -1117,6 +1117,8 @@ namespace EPMLiveWebParts.Tests
             _privateObj.SetField("showCheckboxes", _showCheckboxes);
             _privateObj.SetField("isTimesheet", _isTimesheet);
             _privateObj.SetField("titleFieldFound", _titleFieldFound);
+            _privateObj.SetField("bUseReporting", true);
+            _privateObj.SetField("DoesUserHavePermissionsApproveItems", true);
             _privateObj.SetField("usePopup", _usepopup);
             _privateObj.SetField("bCleanValues", _cleanValues);
             _privateObj.SetField("bWorkspaceUrl", _workspaceUrl);
@@ -1185,6 +1187,9 @@ namespace EPMLiveWebParts.Tests
             ShimSPFormCollection.AllInstances.ItemGetPAGETYPE = (_, __) => new ShimSPForm();
             ShimSPForm.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
 
+            ShimSPContext.CurrentGet = () => new ShimSPContext();
+            ShimSPContext.AllInstances.WebGet = _ => new ShimSPWeb();
+
             PrepareSpListRelatedShims(listId);
             PrepareSpFieldRelatedShims(internalname, fieldType);
             PrepareSpWebRelatedShims(webId);
@@ -1194,7 +1199,16 @@ namespace EPMLiveWebParts.Tests
 
         private static void PrepareSpListRelatedShims(string listId = null)
         {
-            ShimSPListCollection.AllInstances.ItemGetString = (_, __) => new ShimSPList();
+            ShimSPListCollection.AllInstances.ItemGetString = (_, key) =>
+            {
+                switch (key)
+                {
+                    case "Project Schedules":
+                        return new ShimSPDocumentLibrary().Instance;
+                    default:
+                        return new ShimSPList();
+                }
+            };
             ShimSPListCollection.AllInstances.ItemGetGuid = (_, __) => new ShimSPList();
             ShimSPListItem.AllInstances.IDGet = _ => 1;
             ShimSPListItem.AllInstances.ParentListGet = _ => new ShimSPList();
@@ -1229,6 +1243,8 @@ namespace EPMLiveWebParts.Tests
             ShimSPList.AllInstances.EnableModerationGet = _ => true;
             ShimSPList.AllInstances.ViewsGet = _ => new ShimSPViewCollection { ItemGetGuid = __ => new ShimSPView() };
             ShimSPList.AllInstances.ItemsGet = _ => new ShimSPListItemCollection();
+            ShimSPList.AllInstances.RootFolderGet = _ => new ShimSPFolder();
+            ShimSPFolder.AllInstances.NameGet = _ => "Project Center";
 
             ShimSPListItemCollection.AllInstances.Add = _ => new ShimSPListItem();
             var itemCollection = new ShimSPListItemCollection();
@@ -1238,6 +1254,7 @@ namespace EPMLiveWebParts.Tests
             });
             ShimSPList.AllInstances.GetItemsSPQuery = (_, __) => itemCollection.Instance;
             ShimSPList.AllInstances.GetItemsSPView = (_, __) => itemCollection.Instance;
+            ShimSPList.AllInstances.GetItemByIdInt32 = (_, __) => new ShimSPListItem();
         }
 
         private void PrepareSpUserRelatedShims()
@@ -1251,7 +1268,10 @@ namespace EPMLiveWebParts.Tests
         {
             ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPField();
             ShimSPFieldCollection.AllInstances.ContainsFieldWithStaticNameString = (_, __) => true;
-            ShimSPField.AllInstances.IdGet = _ => Guid.NewGuid();
+            ShimSPFieldCollection.AllInstances.ItemGetGuid = (_, __) => new ShimSPField();
+
+            var fieldId = Guid.NewGuid();
+            ShimSPField.AllInstances.IdGet = _ => fieldId;
             ShimSPField.AllInstances.InternalNameGet = _ => internalname;
             ShimSPField.AllInstances.TypeAsStringGet = _ => internalname;
             ShimSPField.AllInstances.TypeGet = _ => fieldType;
@@ -1260,7 +1280,9 @@ namespace EPMLiveWebParts.Tests
             ShimSPField.AllInstances.SchemaXmlGet = _ => "<root>1</root>";
             ShimSPField.AllInstances.ParentListGet = _ => new ShimSPList();
             ShimSPField.AllInstances.TitleGet = _ => DummyText;
+            ShimSPField.AllInstances.GetFieldValueString = (_, __) => DummyVal;
             ShimSPField.AllInstances.GetFieldValueAsTextObject = (_, __) => DummyVal;
+            ShimSPField.AllInstances.GetFieldValueAsHtmlObject = (_, val) => val as string;
             ShimSPFieldLookupValue.ConstructorString = (_, __) => { };
             ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => 1;
             ShimSPFieldLookupValue.AllInstances.LookupValueGet = _ => DummyVal;
@@ -1307,6 +1329,11 @@ namespace EPMLiveWebParts.Tests
             ShimSPWeb.AllInstances.TitleGet = _ => "1";
             ShimSPWeb.AllInstances.SiteGet = _ => new ShimSPSite();
             ShimSPWeb.AllInstances.LocaleGet = _ => CultureInfo.InvariantCulture;
+            ShimSPWeb.AllInstances.AllUsersGet = _ => new ShimSPUserCollection();
+            ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => new ShimSPUser
+            {
+                NameGet = () => DummyText
+            };
 
             var properties = new StringDictionary { { "reportingV2", bool.TrueString } };
             var propertyBag = new ShimSPPropertyBag();
