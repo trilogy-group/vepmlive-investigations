@@ -20,7 +20,7 @@ namespace EPMLiveWebParts.Tests
 {
     [TestClass]
     [ExcludeFromCodeCoverage]
-    public class GridDataTests
+    public partial class GridDataTests
     {
         private GridData testObject;
         private PrivateObject privateObject;
@@ -90,6 +90,14 @@ namespace EPMLiveWebParts.Tests
         private const string XmlDocFieldName = "_xmlDoc";
         private const string GlobalIndexFieldName = "_globalIndex";
         private const string ImagesHashTableFieldName = "_htImages";
+        private const string GanttMilestonePropertyName = "GanttMilestone";
+        private const string NameString = "name";
+        private const string PctCompletePropertyName = "PctComplete";
+        private const string GanttStartFieldName = "ganttStart";
+        private const string ViewUrlColumnName = "viewUrl";
+        private const string SiteUrlColumnName = "siteUrl";
+        private const string GanttFinishColumnName = "ganttFinish";
+        private const string CompleteThroughColumnName = "completeThrough";
         private const string GetListIDMethodName = "GetListID";
         private const string UsePopupMethodName = "UsePopup";
         private const string GetActionMethodName = "GetAction";
@@ -118,6 +126,9 @@ namespace EPMLiveWebParts.Tests
         private const string ApplyGanttStyleMethodName = "ApplyGanttStyle";
         private const string ApplyGanttStylesMethodName = "ApplyGanttStyles";
         private const string GetNodeByNameMethodName = "GetNodeByName";
+        private const string ProcessChildRowsMethodName = "ProcessChildRows";
+        private const string IsHyperLinkMethodName = "IsHyperLink";
+        private const string InitViewFieldNamesMethodName = "InitViewFieldNames";
 
         [TestInitialize]
         public void Setup()
@@ -1655,12 +1666,12 @@ namespace EPMLiveWebParts.Tests
             dataTable.Columns.Add(DisplayNameColumn);
             dataTable.Columns.Add(ColumnTypeColumn);
             dataTable.Columns.Add(KeyString);
-            dataTable.Columns.Add("viewUrl");
-            dataTable.Columns.Add("siteUrl");
-            dataTable.Columns.Add("rowid");
-            dataTable.Columns.Add("ganttStart");
-            dataTable.Columns.Add("ganttFinish");
-            dataTable.Columns.Add("completeThrough");
+            dataTable.Columns.Add(ViewUrlColumnName);
+            dataTable.Columns.Add(SiteUrlColumnName);
+            dataTable.Columns.Add(RowIdString);
+            dataTable.Columns.Add(GanttStartFieldName);
+            dataTable.Columns.Add(GanttFinishColumnName);
+            dataTable.Columns.Add(CompleteThroughColumnName);
             dataTable.Columns.Add(One.ToString());
             dataTable.Columns.Add(Two.ToString());
             dataTable.Columns.Add(Three.ToString());
@@ -1730,9 +1741,9 @@ namespace EPMLiveWebParts.Tests
                 () => actual[One.ToString()].ToString().ShouldBe($"{guid}"),
                 () => actual[Two.ToString()].ToString().ShouldBe($"{Two}"),
                 () => actual[Three.ToString()].ToString().ShouldBe(DummyString),
-                () => actual["ganttStart"].ToString().ShouldBe($"{currentDateTime}"),
-                () => actual["ganttFinish"].ToString().ShouldBe($"{currentDateTime}"),
-                () => actual["completeThrough"].ToString().ShouldBe($"{currentDateTime}"),
+                () => actual[GanttStartFieldName].ToString().ShouldBe($"{currentDateTime}"),
+                () => actual[GanttFinishColumnName].ToString().ShouldBe($"{currentDateTime}"),
+                () => actual[CompleteThroughColumnName].ToString().ShouldBe($"{currentDateTime}"),
                 () => validations.ShouldBe(7));
         }
 
@@ -1743,11 +1754,11 @@ namespace EPMLiveWebParts.Tests
             var row = default(DataRow);
             var dataTable = new DataTable();
 
-            dataTable.Columns.Add("PctComplete");
+            dataTable.Columns.Add(PctCompletePropertyName);
             dataTable.Columns.Add(GanttStartFieldPropertyName);
             dataTable.Columns.Add(GanttFinishFieldPropertyName);
             row = dataTable.NewRow();
-            row["PctComplete"] = One;
+            row[PctCompletePropertyName] = One;
             row[GanttStartFieldPropertyName] = currentDateTime.Date;
             row[GanttFinishFieldPropertyName] = currentDateTime.Date.AddDays(100);
 
@@ -1762,7 +1773,7 @@ namespace EPMLiveWebParts.Tests
                 return spField;
             };
 
-            privateObject.SetFieldOrProperty("PctComplete", publicInstance, "PctComplete");
+            privateObject.SetFieldOrProperty(PctCompletePropertyName, publicInstance, PctCompletePropertyName);
             privateObject.SetFieldOrProperty(GanttStartFieldPropertyName, publicInstance, GanttStartFieldPropertyName);
             privateObject.SetFieldOrProperty(GanttFinishFieldPropertyName, publicInstance, GanttFinishFieldPropertyName);
 
@@ -1772,7 +1783,7 @@ namespace EPMLiveWebParts.Tests
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual.ShouldBe(currentDateTime.Date.AddDays(100)),
-                () => ((DataRow)parameters[0])["PctComplete"].ToString().ShouldBe("100"));
+                () => ((DataRow)parameters[0])[PctCompletePropertyName].ToString().ShouldBe("100"));
         }
 
         [TestMethod]
@@ -2127,7 +2138,7 @@ namespace EPMLiveWebParts.Tests
 
             spFieldCollection.ContainsFieldString = _ => true;
 
-            privateObject.SetFieldOrProperty("GanttMilestone", publicInstance, DummyString);
+            privateObject.SetFieldOrProperty(GanttMilestonePropertyName, publicInstance, DummyString);
 
             // Act
             privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
@@ -2165,7 +2176,7 @@ namespace EPMLiveWebParts.Tests
 
             spFieldCollection.ContainsFieldString = _ => true;
 
-            privateObject.SetFieldOrProperty("GanttMilestone", publicInstance, DummyString);
+            privateObject.SetFieldOrProperty(GanttMilestonePropertyName, publicInstance, DummyString);
 
             // Act
             privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
@@ -2203,7 +2214,7 @@ namespace EPMLiveWebParts.Tests
 
             spFieldCollection.ContainsFieldString = _ => true;
 
-            privateObject.SetFieldOrProperty("GanttMilestone", publicInstance, DummyString);
+            privateObject.SetFieldOrProperty(GanttMilestonePropertyName, publicInstance, DummyString);
 
             // Act
             privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
@@ -2241,7 +2252,7 @@ namespace EPMLiveWebParts.Tests
 
             spFieldCollection.ContainsFieldString = _ => true;
 
-            privateObject.SetFieldOrProperty("GanttMilestone", publicInstance, DummyString);
+            privateObject.SetFieldOrProperty(GanttMilestonePropertyName, publicInstance, DummyString);
 
             // Act
             privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
@@ -2279,7 +2290,7 @@ namespace EPMLiveWebParts.Tests
 
             spFieldCollection.ContainsFieldString = _ => true;
 
-            privateObject.SetFieldOrProperty("GanttMilestone", publicInstance, DummyString);
+            privateObject.SetFieldOrProperty(GanttMilestonePropertyName, publicInstance, DummyString);
 
             // Act
             privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
@@ -2317,7 +2328,7 @@ namespace EPMLiveWebParts.Tests
 
             spFieldCollection.ContainsFieldString = _ => true;
 
-            privateObject.SetFieldOrProperty("GanttMilestone", publicInstance, DummyString);
+            privateObject.SetFieldOrProperty(GanttMilestonePropertyName, publicInstance, DummyString);
 
             // Act
             privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
@@ -2355,7 +2366,7 @@ namespace EPMLiveWebParts.Tests
 
             spFieldCollection.ContainsFieldString = _ => true;
 
-            privateObject.SetFieldOrProperty("GanttMilestone", publicInstance, DummyString);
+            privateObject.SetFieldOrProperty(GanttMilestonePropertyName, publicInstance, DummyString);
 
             // Act
             privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
@@ -2391,8 +2402,135 @@ namespace EPMLiveWebParts.Tests
 
             // Assert
             actual.ShouldSatisfyAllConditions(
-                () => actual.Attributes["name"].Value.ShouldBe(name),
+                () => actual.Attributes[NameString].Value.ShouldBe(name),
                 () => actual.Attributes[DummyString].Value.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void ProcessChildRows_WhenCalled_ProcessesNodes()
+        {
+            // Arrange
+            const string xmlString = @"
+                <rows>
+                    <row name=""1""/>
+                    <row name=""2""/>
+                    <row name=""3""/>
+                </rows>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            xmlDocument.LoadXml(xmlString);
+            dataTable.Columns.Add(GridSerializer.DefaultGridRowStyleIdColumnName);
+            row = dataTable.NewRow();
+            row[GridSerializer.DefaultGridRowStyleIdColumnName] = "H1";
+            dataTable.Rows.Add(row);
+
+            ShimGridData.AllInstances.ProcessNodeXmlNodeDataTable = (_, _1, _2) =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty(GlobalIndexFieldName, nonPublicInstance, Zero);
+
+            // Act
+            privateObject.Invoke(
+                ProcessChildRowsMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    xmlDocument.FirstChild,
+                    dataTable
+                });
+            var globalIndex = (int)privateObject.GetFieldOrProperty(GlobalIndexFieldName, nonPublicInstance);
+            var nodeData = (Hashtable)privateObject.GetFieldOrProperty(NodeDataFieldName, nonPublicInstance);
+
+            // Assert
+            globalIndex.ShouldSatisfyAllConditions(
+                () => globalIndex.ShouldBe(3),
+                () => nodeData.Count.ShouldBe(3),
+                () => ((XmlNode)nodeData[One]).Attributes[NameString].Value.ShouldBe(One.ToString()),
+                () => ((XmlNode)nodeData[Two]).Attributes[NameString].Value.ShouldBe(Two.ToString()),
+                () => ((XmlNode)nodeData[Three]).Attributes[NameString].Value.ShouldBe(Three.ToString()),
+                () => validations.ShouldBe(Three));
+        }
+
+        [TestMethod]
+        public void IsHyperLink_FieldNameNotEdit_ChecksHyperlink()
+        {
+            // Arrange
+            var fieldsToTest = new Dictionary<string, string>()
+            {
+                ["linktitle"] = "LinkTitle",
+                ["linktitlenomenu"] = "LinkTitleNoMenu",
+                ["linktitleedit"] = "LinkTitleNoMenu",
+                ["workspaceurl"] = "WorkspaceUrl",
+                ["assignedto"] = "AssignedTo",
+            };
+            var fieldNames = new List<string>()
+            {
+                "master_checkbox2"
+            };
+            var isHyperLink = true;
+            var actual = true;
+            var check = string.Empty;
+            var viewFields = new StringCollection();
+            var index = 0;
+
+            viewFields.AddRange(fieldsToTest.Keys.ToArray());
+
+            privateObject.SetFieldOrProperty(SPViewFieldsFieldName, nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            foreach (var pair in fieldsToTest)
+            {
+                index += 1;
+                isHyperLink = isHyperLink && (bool)privateObject.Invoke(IsHyperLinkMethodName, nonPublicInstance, new object[] { DummyString, index });
+                check = (string)privateObject.GetFieldOrProperty(pair.Value, publicInstance);
+                actual = actual && check.Equals(DummyString);
+            }
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBeTrue(),
+                () => isHyperLink.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void InitViewFieldNames_WhenCalled_InitializesFieldNames()
+        {
+            // Arrange
+            var xmlString = $@"
+                <columns>
+                    <column>{One}</column>
+                    <column>{DummyString}</column>
+                </columns>";
+            var xmlDocument = new XmlDocument();
+            var fieldNames = new List<string>()
+            {
+                One.ToString()
+            };
+            var expectedNames = new List<string>()
+            {
+                One.ToString(),
+                $"{One}|{Zero}",
+                DummyString
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            privateObject.SetFieldOrProperty(XmlDocFieldName, nonPublicInstance, xmlDocument);
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            privateObject.Invoke(InitViewFieldNamesMethodName, nonPublicInstance, new object[] { });
+            var actual = (List<string>)privateObject.GetFieldOrProperty(FieldNamesFieldName, nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Count.ShouldBe(3),
+                () => expectedNames.Any(x => !actual.Contains(x)).ShouldBeFalse());
         }
     }
 }
