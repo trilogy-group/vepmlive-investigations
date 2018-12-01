@@ -87,6 +87,9 @@ namespace EPMLiveWebParts.Tests
         private const string InternalNameColumn = "InternalName";
         private const string TrueStringLowerCase = "true";
         private const string IsHyperLinkColumn = "IsHyperLink";
+        private const string XmlDocFieldName = "_xmlDoc";
+        private const string GlobalIndexFieldName = "_globalIndex";
+        private const string ImagesHashTableFieldName = "_htImages";
         private const string GetListIDMethodName = "GetListID";
         private const string UsePopupMethodName = "UsePopup";
         private const string GetActionMethodName = "GetAction";
@@ -106,7 +109,11 @@ namespace EPMLiveWebParts.Tests
         private const string AddReqdFieldsToViewMethodName = "AddReqdFieldsToView";
         private const string RemoveReqdFieldsFromViewMethodName = "RemoveReqdFieldsFromView";
         private const string InitializeColumnDefsMethodName = "InitializeColumnDefs";
-        
+        private const string LoadDataMethodName = "LoadData";
+        private const string PopulateViewFieldValuesMethodName = "PopulateViewFieldValues";
+        private const string PopulateDefaultFieldValuesMethodName = "PopulateDefaultFieldValues";
+        private const string CalcPercentCompleteMethodName = "CalcPercentComplete";
+
         [TestInitialize]
         public void Setup()
         {
@@ -123,7 +130,7 @@ namespace EPMLiveWebParts.Tests
         {
             shimsContext = ShimsContext.Create();
             SetupVariables();
-            
+
             ShimSPSite.ConstructorString = (_, __) => new ShimSPSite();
             ShimSPSite.ConstructorGuid = (_, __) => new ShimSPSite();
             ShimSPSite.AllInstances.AllWebsGet = _ => new ShimSPWebCollection();
@@ -1480,6 +1487,287 @@ namespace EPMLiveWebParts.Tests
                 () => actual.Rows[0][IsHyperLinkColumn].ToString().ShouldBe(TrueStringLowerCase),
                 () => actual.Rows[0][IsImageColumn].ToString().ShouldBe(TrueStringLowerCase),
                 () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void LoadData_WhenCalled_ProcessesNodeData()
+        {
+            // Arrange
+            const string xmlString = @"
+                <Rows>
+                    <row/>
+                    <row/>
+                </Rows>";
+            var xmlDocument = new XmlDocument();
+            var parameters = new object[]
+            {
+                new DataTable()
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            ShimGridData.AllInstances.ProcessChildRowsXmlNodeDataTable = (_, _1, _2) =>
+            {
+                validations += 1;
+            };
+            ShimGridData.AllInstances.PopulateViewFieldValuesXmlNodeDataRow = (_, _1, _2) =>
+            {
+                validations += 1;
+            };
+            ShimGridData.AllInstances.PopulateDefaultFieldValuesXmlNodeDataRowDataTable = (_, _1, _2, _3) =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty(XmlDocFieldName, nonPublicInstance, xmlDocument);
+            privateObject.SetFieldOrProperty(GlobalIndexFieldName, nonPublicInstance, One);
+
+            // Act
+            privateObject.Invoke(LoadDataMethodName, nonPublicInstance, parameters);
+            var actual = (DataTable)parameters[0];
+            var nodeData = (Hashtable)privateObject.GetFieldOrProperty(NodeDataFieldName, nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Rows.Count.ShouldBe(2),
+                () => nodeData.Count.ShouldBe(2),
+                () => validations.ShouldBe(6));
+        }
+
+        [TestMethod]
+        public void PopulateViewFieldValues_WhenCalled_PopulatesViewFieldValues()
+        {
+            // Arrange
+            const string workspaceurlString = "workspaceurl";
+            var xmlString = $@"
+                <Fields>
+                    <cell></cell>
+                    <cell>Field1</cell>
+                    <cell>Field2</cell>
+                    <cell>{workspaceurlString}</cell>
+                    <cell>{DummyString}</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var fieldNames = new List<string>()
+            {
+                workspaceurlString,
+                One.ToString(),
+                Two.ToString(),
+                Three.ToString(),
+                Four.ToString()
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            dataTable.Columns.Add(DisplayNameColumn);
+            dataTable.Columns.Add(IsImageColumn);
+            dataTable.Columns.Add(IsHyperLinkColumn);
+            dataTable.Columns.Add(workspaceurlString);
+            dataTable.Columns.Add(One.ToString());
+            dataTable.Columns.Add(Two.ToString());
+            dataTable.Columns.Add(Three.ToString());
+            dataTable.Columns.Add(Four.ToString());
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = workspaceurlString;
+            row[IsImageColumn] = $"not{TrueStringLowerCase}";
+            row[IsHyperLinkColumn] = $"not{TrueStringLowerCase}";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = One;
+            row[IsImageColumn] = $"not{TrueStringLowerCase}";
+            row[IsHyperLinkColumn] = $"not{TrueStringLowerCase}";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = Two;
+            row[IsImageColumn] = $"not{TrueStringLowerCase}";
+            row[IsHyperLinkColumn] = TrueStringLowerCase;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = Three;
+            row[IsImageColumn] = TrueStringLowerCase;
+            row[IsHyperLinkColumn] = $"not{TrueStringLowerCase}";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = Four;
+            row[IsImageColumn] = TrueStringLowerCase;
+            row[IsHyperLinkColumn] = $"not{TrueStringLowerCase}";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+
+            var parameters = new object[]
+            {
+                xmlDocument.FirstChild,
+                row
+            };
+
+            privateObject.SetFieldOrProperty(ColumnDefinitionsFieldName, nonPublicInstance, dataTable);
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+            privateObject.SetFieldOrProperty(ImagesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            privateObject.Invoke(PopulateViewFieldValuesMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[1];
+            var images = (List<string>)privateObject.GetFieldOrProperty(ImagesFieldName, nonPublicInstance);
+            var imagesHashTable = (Hashtable)privateObject.GetFieldOrProperty(ImagesHashTableFieldName, nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual[fieldNames[0]].ToString().ShouldBe(string.Empty),
+                () => actual[fieldNames[1]].ToString().ShouldBe("Field1"),
+                () => actual[fieldNames[2]].ToString().ShouldBe("Field2"),
+                () => actual[fieldNames[3]].ToString().ShouldBe("0"),
+                () => actual[fieldNames[4]].ToString().ShouldBe("5"),
+                () => images.Count.ShouldBe(6),
+                () => images[5].ShouldBe(DummyString),
+                () => imagesHashTable.Count.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void PopulateDefaultFieldValues_WhenCalled_PopulatesDefaultFieldValues()
+        {
+            // Arrange
+            var xmlString = $@"
+                <Fields id=""{Five}"">
+                    <userdata name=""{One}"">{guid}</userdata>
+                    <userdata name=""{Two}"">{Two}</userdata>
+                    <userdata name=""{Three}"">{DummyString}</userdata>
+                    <userdata name=""{Four}""></userdata>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            xmlDocument.LoadXml(xmlString);
+
+            dataTable.Columns.Add(DisplayNameColumn);
+            dataTable.Columns.Add(ColumnTypeColumn);
+            dataTable.Columns.Add(KeyString);
+            dataTable.Columns.Add("viewUrl");
+            dataTable.Columns.Add("siteUrl");
+            dataTable.Columns.Add("rowid");
+            dataTable.Columns.Add("ganttStart");
+            dataTable.Columns.Add("ganttFinish");
+            dataTable.Columns.Add("completeThrough");
+            dataTable.Columns.Add(One.ToString());
+            dataTable.Columns.Add(Two.ToString());
+            dataTable.Columns.Add(Three.ToString());
+            dataTable.Columns.Add(Four.ToString());
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = One;
+            row[ColumnTypeColumn] = "guid";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = Two;
+            row[ColumnTypeColumn] = "int";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = Three;
+            row[ColumnTypeColumn] = "string";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = Four;
+            row[ColumnTypeColumn] = "datetime";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+
+            spView.UrlGet = () => SampleUrl;
+            spSite.UrlGet = () => SampleUrl;
+
+            ShimGridData.AllInstances.GetGanttStartDateXmlNode = (_, __) =>
+            {
+                validations += 1;
+                return currentDateTime;
+            };
+            ShimGridData.AllInstances.GetGanttFinishDateXmlNode = (_, __) =>
+            {
+                validations += 1;
+                return currentDateTime;
+            };
+            ShimGridData.AllInstances.CalcPercentCompleteDataRow = (_, __) =>
+            {
+                validations += 1;
+                return currentDateTime;
+            };
+            ShimGridData.AllInstances.ApplyGanttStyleDataRowXmlNode = (_, input, _2) =>
+            {
+                validations += 1;
+            };
+
+            var parameters = new object[]
+            {
+                xmlDocument.FirstChild,
+                row,
+                default(DataTable)
+            };
+
+            privateObject.SetFieldOrProperty(SPViewFieldName, nonPublicInstance, spView.Instance);
+            privateObject.SetFieldOrProperty(ColumnDefinitionsFieldName, nonPublicInstance, dataTable);
+
+            // Act
+            privateObject.Invoke(PopulateDefaultFieldValuesMethodName, nonPublicInstance, parameters);
+            var actual = ((DataRow)parameters[1]);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual[One.ToString()].ToString().ShouldBe($"{guid}"),
+                () => actual[Two.ToString()].ToString().ShouldBe($"{Two}"),
+                () => actual[Three.ToString()].ToString().ShouldBe(DummyString),
+                () => actual["ganttStart"].ToString().ShouldBe($"{currentDateTime}"),
+                () => actual["ganttFinish"].ToString().ShouldBe($"{currentDateTime}"),
+                () => actual["completeThrough"].ToString().ShouldBe($"{currentDateTime}"),
+                () => validations.ShouldBe(7));
+        }
+
+        [TestMethod]
+        public void CalcPercentComplete_WhenCalled_ReturnsCompleteThruDateTime()
+        {
+            // Arrange
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            dataTable.Columns.Add("PctComplete");
+            dataTable.Columns.Add(GanttStartFieldPropertyName);
+            dataTable.Columns.Add(GanttFinishFieldPropertyName);
+            row = dataTable.NewRow();
+            row["PctComplete"] = One;
+            row[GanttStartFieldPropertyName] = currentDateTime.Date;
+            row[GanttFinishFieldPropertyName] = currentDateTime.Date.AddDays(100);
+
+            var parameters = new object[]
+            {
+                row
+            };
+
+            spFieldCollection.GetFieldString = input =>
+            {
+                spField.TitleGet = () => input;
+                return spField;
+            };
+
+            privateObject.SetFieldOrProperty("PctComplete", publicInstance, "PctComplete");
+            privateObject.SetFieldOrProperty(GanttStartFieldPropertyName, publicInstance, GanttStartFieldPropertyName);
+            privateObject.SetFieldOrProperty(GanttFinishFieldPropertyName, publicInstance, GanttFinishFieldPropertyName);
+
+            // Act
+            var actual = (DateTime)privateObject.Invoke(CalcPercentCompleteMethodName, nonPublicInstance, parameters);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(currentDateTime.Date.AddDays(100)),
+                () => ((DataRow)parameters[0])["PctComplete"].ToString().ShouldBe("100"));
         }
     }
 }
