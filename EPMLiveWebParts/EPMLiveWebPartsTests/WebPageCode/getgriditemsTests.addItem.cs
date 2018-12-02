@@ -591,11 +591,12 @@ namespace EPMLiveWebParts.Tests
         public void AddItem_CleanValuesDateTime_SetsNewItemRow()
         {
             // Arrange
+            var date = new DateTime(2018, 10, 10);
             _cleanValues = true;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.DateTime);
-            ShimSPListItem.AllInstances.ItemGetString = (_, __) => DateTime.Today;
+            ShimSPListItem.AllInstances.ItemGetString = (_, __) => date;
             Shimgetgriditems.AllInstances.getFieldSPListItemStringBoolean =
-                (a, b, c, d) => DateTime.Today.ToString();
+                (a, b, c, d) => date.ToString();
 
             // Act
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
@@ -604,7 +605,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DateTime.Today.ToString("MM/dd/yyyy")} 12:00:00 AM]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{date.ToString("MM/dd/yyyy")} 12:00:00 AM]]></cell>"));
         }
 
         [TestMethod]
@@ -916,11 +917,12 @@ namespace EPMLiveWebParts.Tests
         public void AddItem_InEditModeDateTime_SetsNewItemRow()
         {
             // Arrange
+            var date = new DateTime(2018, 10, 10);
             _cleanValues = false;
             _inEditmode = true;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.DateTime, editable: true);
             Shimgetgriditems.AllInstances.getFieldSPListItemStringBoolean =
-                (a, b, c, d) => DateTime.Today.ToString();
+                (a, b, c, d) => date.ToString();
 
             // Act
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
@@ -929,7 +931,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"dhxCalendarA\"><![CDATA[{DateTime.Today.ToString("MM/dd/yyyy")} 12:00:00 AM]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"dhxCalendarA\"><![CDATA[{date.ToString("MM/dd/yyyy")} 12:00:00 AM]]></cell>"));
         }
 
         [TestMethod]
