@@ -48,11 +48,8 @@ describe(SuiteNames.regressionTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
         );
         await CommonPageHelper.verifyProjectCenterDisplayed();
-        // Step 2 is inside the below function
-        await EditCostHelper.searchByName(id);
-        await CommonPageHelper.selectTwoRecordsFromGrid();
-        StepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer();
+        // Step 2 and 3 are inside the below function
+        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerTabOptions();
     });
 
@@ -65,17 +62,16 @@ describe(SuiteNames.regressionTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
         );
         await CommonPageHelper.verifyProjectCenterDisplayed();
-        // Step 2 is inside the below function
-        await EditCostHelper.searchByName(id);
-        await CommonPageHelper.selectTwoRecordsFromGrid();
-        StepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer();
+
+        // Step 2 and 3 are inside the below function
+        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
+
         StepLogger.stepId(4);
         await OptimizerPageHelper.verifyOptimizerTabContents();
     });
 
-    it('Verify the content of Optimizer configuration screen. - [744407]', async () => {
+    it('Verify the content of Optimizer configuration screen. - [744407][BUG:SKYVERA-1844]', async () => {
         StepLogger.caseId = 744407;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -84,18 +80,17 @@ describe(SuiteNames.regressionTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
         );
         await CommonPageHelper.verifyProjectCenterDisplayed();
-        // Step 2 is inside the below function
-        await EditCostHelper.searchByName(id);
-        await CommonPageHelper.selectTwoRecordsFromGrid();
-        StepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer();
+
+        // Step 2 and 3 are inside the below function
+        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
+
         StepLogger.stepId(4);
         await OptimizerPageHelper.clickConfigure();
         await OptimizerPageHelper.verifyConfigureScreen();
     });
 
-    it('Verify the Add button of the Optimizer configuration screen. - [744408]', async () => {
+    it('Verify the Add button of the Optimizer configuration screen. - [744408][BUG:SKYVERA-1844]', async () => {
         StepLogger.caseId = 744408;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -104,21 +99,21 @@ describe(SuiteNames.regressionTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
         );
         await CommonPageHelper.verifyProjectCenterDisplayed();
-        // Step 2 is inside the below function
-        await EditCostHelper.searchByName(id);
-        await CommonPageHelper.selectTwoRecordsFromGrid();
-        StepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer();
+
+        // Step 2 and 3 are inside the below function
+        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
+
         StepLogger.stepId(4);
         await OptimizerPageHelper.clickConfigure();
         await OptimizerPageHelper.verifyOptimizerConfigurationPopupOpened();
+
         StepLogger.stepId(5);
         const fieldName = await OptimizerPageHelper.selectAvailableFieldAndAdd();
         await OptimizerPageHelper.verifyAddedFieldInSelectedFields(fieldName);
     });
 
-    it('Verify the Remove button of the Optimizer configuration screen. - [744409]', async () => {
+    it('Verify the Remove button of the Optimizer configuration screen. - [744409][BUG:SKYVERA-1844]', async () => {
         StepLogger.caseId = 744409;
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -127,15 +122,15 @@ describe(SuiteNames.regressionTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
         );
         await CommonPageHelper.verifyProjectCenterDisplayed();
-        // Step 2 is inside the below function
-        await EditCostHelper.searchByName(id);
-        await CommonPageHelper.selectTwoRecordsFromGrid();
-        StepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer();
+
+        // Step 2 and 3 are inside the below function
+        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
+
         StepLogger.stepId(4);
         await OptimizerPageHelper.clickConfigure();
         await OptimizerPageHelper.verifyOptimizerConfigurationPopupOpened();
+
         StepLogger.stepId(5);
         const fieldName = await OptimizerPageHelper.selectSelectedFieldAndRemove();
         await OptimizerPageHelper.verifyRemovedFieldInAvailableFields(fieldName);
@@ -150,12 +145,11 @@ describe(SuiteNames.regressionTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
         );
         await CommonPageHelper.verifyProjectCenterDisplayed();
-        // Step 2 is inside the below function
-        await EditCostHelper.searchByName(id);
-        await CommonPageHelper.selectTwoRecordsFromGrid();
-        StepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer();
+
+        // Step 2 and 3 are inside the below function
+        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
+
         StepLogger.stepId(4);
         await OptimizerPageHelper.openSaveStrategyPopup();
         await OptimizerPageHelper.verifySaveStrategyPopup();
@@ -170,12 +164,11 @@ describe(SuiteNames.regressionTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
         );
         await CommonPageHelper.verifyProjectCenterDisplayed();
-        // Step 2 is inside the below function
-        await EditCostHelper.searchByName(id);
-        await CommonPageHelper.selectTwoRecordsFromGrid();
-        StepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer();
+
+        // Step 2 and 3 are inside the below function
+        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
+
         StepLogger.stepId(4);
         await OptimizerPageHelper.selectStrategyFromCurrentStrategy();
         await OptimizerPageHelper.clickRenameStrategy();
@@ -191,12 +184,11 @@ describe(SuiteNames.regressionTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
         );
         await CommonPageHelper.verifyProjectCenterDisplayed();
-        // Step 2 is inside the below function
-        await EditCostHelper.searchByName(id);
-        await CommonPageHelper.selectTwoRecordsFromGrid();
-        StepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer();
+
+        // Step 2 and 3 are inside the below function
+        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
+
         StepLogger.stepId(4);
         await OptimizerPageHelper.clickViewTab();
         await OptimizerPageHelper.verifyViewTabContent();
@@ -211,12 +203,11 @@ describe(SuiteNames.regressionTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
         );
         await CommonPageHelper.verifyProjectCenterDisplayed();
-        // Step 2 is inside the below function
-        await EditCostHelper.searchByName(id);
-        await CommonPageHelper.selectTwoRecordsFromGrid();
-        StepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer();
+
+        // Step 2 and 3 are inside the below function
+        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
+
         StepLogger.stepId(4);
         await OptimizerPageHelper.clickViewTab();
         await OptimizerPageHelper.clickDeleteView();
@@ -232,12 +223,11 @@ describe(SuiteNames.regressionTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
         );
         await CommonPageHelper.verifyProjectCenterDisplayed();
-        // Step 2 is inside the below function
-        await EditCostHelper.searchByName(id);
-        await CommonPageHelper.selectTwoRecordsFromGrid();
-        StepLogger.stepId(3);
-        await CommonPageHelper.goToOptimizer();
+
+        // Step 2 and 3 are inside the below function
+        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
+
         StepLogger.stepId(4);
         await OptimizerPageHelper.clickViewTab();
         await OptimizerPageHelper.verifyCurrentViewDropdown();

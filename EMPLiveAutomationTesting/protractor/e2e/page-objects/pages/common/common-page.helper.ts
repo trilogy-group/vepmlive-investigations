@@ -22,6 +22,7 @@ import { IssueItemPageHelper } from '../items-page/issue-item/issue-item-page.he
 import { ExpectationHelper } from '../../../components/misc-utils/expectation-helper';
 import { HomePage } from '../homepage/home.po';
 import { CommonSubPageHelper } from './common-page.subhelper';
+import { EditCostHelper } from '../items-page/project-item/edit-cost-page/edit-cost.helper';
 
 const fs = require('fs');
 
@@ -982,5 +983,26 @@ export class CommonPageHelper {
         StepLogger.step('Click on Edit Resource Plan');
         const editLink = await CommonPageHelper.getContextMenuItemByText(CommonPageConstants.contextMenuOptions.editResource);
         await PageHelper.click(editLink);
+    }
+
+    static async searchAndSelectUsingIdThenOpenOptimizer(id: string) {
+        await CommonPageHelper.verifyProjectCenterDisplayed();
+        await EditCostHelper.searchByName(id);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        StepLogger.step('Click on Optimizer button from the items tab.');
+        const classValue = await PageHelper.getAttributeValue(CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer), 'class');
+        if (classValue.includes('ms-cui-disabled')) {
+            await PageHelper.refreshPage();
+            await WaitHelper.waitForPageToStable();
+            await EditCostHelper.searchByName(id);
+            await CommonPageHelper.selectTwoRecordsFromGrid();
+            await PageHelper.sleepForXSec(PageHelper.timeout.m);
+        }
+        await PageHelper.click(this.getOptimizerButton());
+        // Takes time to load the iframe
+        await browser.sleep(PageHelper.timeout.m);
+        StepLogger.step('switch To First Content Frame');
+        await CommonPageHelper.switchToFirstContentFrame();
     }
 }
