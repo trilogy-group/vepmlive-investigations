@@ -10,6 +10,8 @@ import {ExpectationHelper} from '../../../../../components/misc-utils/expectatio
 import {CommonPageConstants} from '../../../common/common-page.constants';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
+import {ProjectItemPageHelper} from '../project-item-page.helper';
+import {ProjectItemPageConstants} from '../project-item-page.constants';
 
 export class EditCostHelper {
 
@@ -184,10 +186,8 @@ export class EditCostHelper {
     static async enterValueInVariousCategories(cost: number) {
         StepLogger.step('Enter Value in Cell1');
         await PageHelper.sendKeysToInputField(CommonPage.getCostCell.cell1, cost.toString());
-
         StepLogger.step('Enter Value in Cell2');
         await PageHelper.sendKeysToInputField(CommonPage.getCostCell.cell2, cost.toString());
-
         await this.enterValueInBudgetCost(cost);
     }
 
@@ -224,5 +224,54 @@ export class EditCostHelper {
 
         StepLogger.verification('Validate that Actual  Cost is Present ');
         await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.actualCostsTab, EditCostConstants.costTabs.actualCostsTab);
+    }
+
+    static async createProjectWithCost(uniqueId = PageHelper.getUniqueId()) {
+        const cost = 4;
+        StepLogger.subStep('Create a project');
+
+        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, );
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            projectNameValue,
+            ProjectItemPageConstants.columnNames.title);
+
+        StepLogger.subStep('Select created project');
+        await CommonPageHelper.selectRecordFromGrid();
+
+        StepLogger.subStep('Click on edit cost');
+        await this.clickEditByCostFromEllipsis();
+        await CommonPageHelper.switchToFirstContentFrame();
+        StepLogger.subVerification('verify Edit cost pop up');
+        await PageHelper.sleepForXSec(PageHelper.timeout.m);
+        await EditCostHelper.validateEditCostWebElements();
+        StepLogger.subStep('Enter values in categories');
+        await EditCostHelper.enterValueInVariousCategories(cost);
+        StepLogger.subVerification('verify categories entered');
+        await EditCostHelper.verifyValueInVariousCategories(cost);
+        StepLogger.subStep('Click on save');
+        await EditCostHelper.clickSaveCostPlanner();
+        await EditCostHelper.verifyValueInVariousCategories(cost);
+        return projectNameValue;
+    }
+
+    static async searchByName(name: string) {
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            name,
+            ProjectItemPageConstants.columnNames.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.getNthRecord(1));
+    }
+
+    static async clickEditByCostFromEllipsis() {
+        await ElementHelper.actionMouseMove(CommonPage.record);
+        StepLogger.subStep('Click on Ellipsis icon');
+        await CommonPageHelper.clickIconEllipsisHorizontal();
+        StepLogger.subVerification('Verify all context menu options');
+        await CommonPageHelper.verifyVariousOptionsOnContextMenu();
+        StepLogger.subStep('Click on Edit Cost link');
+        await PageHelper.click(EditCost.editCostLinkViaEllipse);
     }
 }

@@ -1,7 +1,19 @@
+import {browser} from 'protractor';
 import {StepLogger} from '../../../../../../../core/logger/step-logger';
 import {PageHelper} from '../../../../../../components/html/page-helper';
 import {SuiteNames} from '../../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../../page-objects/pages/login/login.po';
+import {CommonPageHelper} from '../../../../../../page-objects/pages/common/common-page.helper';
+import {HomePage} from '../../../../../../page-objects/pages/homepage/home.po';
+import {CommonPage} from '../../../../../../page-objects/pages/common/common.po';
+import {CommonPageConstants} from '../../../../../../page-objects/pages/common/common-page.constants';
+import {ValidationsHelper} from '../../../../../../components/misc-utils/validation-helper';
+import {ProjectItemPageHelper} from '../../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import {ProjectItemPage} from '../../../../../../page-objects/pages/items-page/project-item/project-item.po';
+import {WaitHelper} from '../../../../../../components/html/wait-helper';
+import {ProjectItemPageConstants} from '../../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
+import {ElementHelper} from '../../../../../../components/html/element-helper';
+import {SocialStreamPage} from '../../../../../../page-objects/pages/settings/social-stream/social-stream.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -17,8 +29,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    /* UNSTABLE
-    it('Validate project planner and create and assign task to resources - [743933]', async () => {
+    it('Validate project planner and create and assign task to resources - [743933][BUG:SKYVERA-1882]', async () => {
         StepLogger.caseId = 743933;
         const uniqueId = PageHelper.getUniqueId();
 
@@ -172,5 +183,4 @@ describe(SuiteNames.smokeTestSuite, () => {
         // Notification verification is not possible because its take lot of time to visible.
 
     });
-    */
 });

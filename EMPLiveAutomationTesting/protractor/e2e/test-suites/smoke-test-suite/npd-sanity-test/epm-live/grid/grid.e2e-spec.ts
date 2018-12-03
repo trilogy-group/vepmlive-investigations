@@ -31,7 +31,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
         );
 
-        await CommonPageSubHelper.selectOneRecordFromGrid();
+        await CommonSubPageHelper.selectOneRecordFromGrid();
         await PageHelper.click(CommonPage.ribbonTitles.items);
         await PageHelper.click(CommonPage.editPlan);
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
