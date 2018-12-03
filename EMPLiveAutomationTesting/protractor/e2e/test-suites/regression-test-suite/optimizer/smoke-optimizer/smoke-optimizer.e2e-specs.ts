@@ -7,14 +7,16 @@ import {HomePage} from '../../../../page-objects/pages/homepage/home.po';
 import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
 import {OptimizerPageHelper} from '../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer-page.helper';
-import {EditCostHelper} from '../../../../page-objects/pages/items-page/project-item/edit-cost-page/edit-cost.helper';
-import {LoginPageHelper} from '../../../../page-objects/pages/login/login-page.helper';
+// import {EditCostHelper} from '../../../../page-objects/pages/items-page/project-item/edit-cost-page/edit-cost.helper';
+// import {LoginPageHelper} from '../../../../page-objects/pages/login/login-page.helper';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
-    let project1 = '';
-    let project2 = '';
-    let id = '';
+    const project1 = 'Project Name * K1CFUoT2 1';
+    const project2 = 'Project Name * K1CFUoT2 2';
+    const id = 'K1CFUoT2';
+    console.log(project1);
+    console.log(project2);
 
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
@@ -22,7 +24,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    beforeAll(async () => {
+/*     beforeAll(async () => {
         await new LoginPage().goToAndLogin();
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -38,7 +40,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await EditCostHelper.clickCloseCostPlanner();
         await LoginPageHelper.logout();
     });
-
+ */
     it('Verify the Optimizer and View Option of the Optimizer page.  - [744404]', async () => {
         StepLogger.caseId = 744404;
         // Step 1 is inside the below function

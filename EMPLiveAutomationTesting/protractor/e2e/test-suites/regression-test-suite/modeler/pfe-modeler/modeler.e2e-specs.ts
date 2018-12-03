@@ -7,23 +7,25 @@ import {HomePage} from '../../../../page-objects/pages/homepage/home.po';
 import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
 import {ModelerPageHelper} from '../../../../page-objects/pages/items-page/project-item/modeler-page/modeler-page.helper';
-import {LoginPageHelper} from '../../../../page-objects/pages/login/login-page.helper';
+// import {LoginPageHelper} from '../../../../page-objects/pages/login/login-page.helper';
 import {EditCostHelper} from '../../../../page-objects/pages/items-page/project-item/edit-cost-page/edit-cost.helper';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {ModelerPage} from '../../../../page-objects/pages/items-page/project-item/modeler-page/modeler.po';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
-    let project1 = '';
-    let project2 = '';
-    let id = '';
+    const project1 = 'Project Name * K1CFUoT2 1';
+    const project2 = 'Project Name * K1CFUoT2 2';
+    const id = 'K1CFUoT2';
+    console.log(project1);
+    console.log(project2);
 
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-
+/*
     beforeAll(async () => {
         await new LoginPage().goToAndLogin();
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -40,7 +42,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await EditCostHelper.clickCloseCostPlanner();
         await LoginPageHelper.logout();
     });
-
+ */
     it('Verify the select Version(s) Selection box. - [744210]', async () => {
         StepLogger.caseId = 744210;
         // Step 1 is inside the below function
