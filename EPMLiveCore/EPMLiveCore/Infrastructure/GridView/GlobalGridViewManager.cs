@@ -76,7 +76,10 @@ namespace EPMLiveCore.Infrastructure
                         if (!string.IsNullOrEmpty(serializedViews))
                         {
                             var xmlSerializer = new XmlSerializer(typeof (List<GridView>));
-                            views = (IEnumerable<GridView>) xmlSerializer.Deserialize(new StringReader(serializedViews));
+                            using (var stringReader = new StringReader(serializedViews))
+                            {
+                                views = xmlSerializer.Deserialize(stringReader) as IEnumerable<GridView>;
+                            }
                         }
                     }
 

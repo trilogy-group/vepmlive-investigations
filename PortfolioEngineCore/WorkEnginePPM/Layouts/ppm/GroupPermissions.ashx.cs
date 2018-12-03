@@ -285,116 +285,135 @@ namespace WorkEnginePPM
 
         private static CStruct BuildGridLayout(DataTable dt)
         {
-            CStruct xGrid = new CStruct();
-            xGrid.Initialize("Grid");
+            var grid = InitializeGrid();
+            AddToolBar(grid);
+            AddPanel(grid);
+            AddConfig(grid);
+            AddDefinition(grid);
+            CStruct cols;
+            CStruct header;
+            var leftCols = AddColumns(grid, out cols, out header);
+            AddFieldIDColumn(leftCols);
+            AddNameColumn(leftCols, header);
+            var levels = AddCbColumn(cols, header, grid);
 
-            CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
-            xToolbar.CreateIntAttr("Visible", 0);
+            if (dt != null)
+            {
+                XmlHelper.FillFieldsXml(dt, levels);
+            }
+            return grid;
+        }
 
-            CStruct xPanel = xGrid.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 0);
-            xPanel.CreateIntAttr("Delete", 0);
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-            xCfg.CreateIntAttr("SuppressCfg", 1);
-            xCfg.CreateIntAttr("InEditMode", 0);
-            //xCfg.CreateIntAttr("Selecting", 0);
+        private static CStruct[] AddCbColumn(CStruct cols, CStruct header, CStruct grid)
+        {
+            var xC = cols.CreateSubStruct("C");
+            xC.CreateStringAttr("Name", "CB");
+            header.CreateStringAttr("CB", "");
+            xC.CreateStringAttr("Type", "Bool");
 
-            xCfg.CreateIntAttr("Dragging", 0);
-            xCfg.CreateIntAttr("Dropping", 0);
-            xCfg.CreateIntAttr("ColsMoving", 0);
-            xCfg.CreateIntAttr("ColsPostLap", 1);
-            xCfg.CreateIntAttr("ColsLap", 1);
-            xCfg.CreateBooleanAttr("ShowDeleted", false);
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            //xCfg.CreateIntAttr("ConstHeight", 1);
-            xCfg.CreateIntAttr("ConstWidth", 2);
-            //xCfg.CreateIntAttr("MaxHeight", 1);
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            //xCfg.CreateIntAttr("NumberId", 1);
-            //xCfg.CreateIntAttr("LastId", 1);
-            //xCfg.CreateIntAttr("CaseSensitiveId", 0);
-            xCfg.CreateIntAttr("SelectingCells", 1);
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "TGrid");
-            xCfg.CreateIntAttr("Sorting", 0);
-            xCfg.CreateIntAttr("FastColumns", 1);
-            xCfg.CreateIntAttr("StaticCursor", 1);
-            xCfg.CreateIntAttr("FocusWholeRow", 1);
-            xCfg.CreateBooleanAttr("NoTreeLines", true);
+            xC.CreateBooleanAttr("CanEdit", true);
+            xC.CreateIntAttr("MinWidth", 30);
 
-            xCfg.CreateStringAttr("MainCol", "Permission");
-            CStruct xDef = xGrid.CreateSubStruct("Def");
-            CStruct xD = xDef.CreateSubStruct("D");
+            var levels = new CStruct[2];
+
+            var body = grid.CreateSubStruct("Body");
+            var xB = body.CreateSubStruct("B");
+            levels[0] = xB;
+            return levels;
+        }
+
+        private static void AddNameColumn(CStruct leftCols, CStruct header)
+        {
+            var xC = leftCols.CreateSubStruct("C");
+            xC.CreateStringAttr("Name", "Permission");
+            header.CreateStringAttr("Permission", "");
+            xC.CreateStringAttr("Type", "Text");
+            xC.CreateBooleanAttr("CanEdit", false);
+            xC.CreateIntAttr("MinWidth", 350);
+        }
+
+        private static void AddFieldIDColumn(CStruct leftCols)
+        {
+            var xC = leftCols.CreateSubStruct("C");
+            xC.CreateStringAttr("Name", "FieldID");
+            xC.CreateStringAttr("Type", "Int");
+            xC.CreateBooleanAttr("CanEdit", false);
+            xC.CreateBooleanAttr("Visible", false);
+        }
+
+        private static CStruct AddColumns(CStruct grid, out CStruct cols, out CStruct header)
+        {
+            var leftCols = grid.CreateSubStruct("LeftCols");
+            cols = grid.CreateSubStruct("Cols");
+            header = grid.CreateSubStruct("Header");
+            header.CreateIntAttr("Visible", 1);
+            header.CreateIntAttr("SortIcons", 0);
+            return leftCols;
+        }
+
+        private static void AddDefinition(CStruct grid)
+        {
+            var definition = grid.CreateSubStruct("Def");
+            var xD = definition.CreateSubStruct("D");
             xD.CreateStringAttr("Name", "R");
             xD.CreateStringAttr("HoverCell", "Color");
             xD.CreateStringAttr("HoverRow", "Color");
             xD.CreateStringAttr("FocusCell", "");
             xD.CreateStringAttr("FocusRow", "Color");
+        }
 
-            CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
-            CStruct xCols = xGrid.CreateSubStruct("Cols");
-            CStruct xHeader = xGrid.CreateSubStruct("Header");
-            xHeader.CreateIntAttr("Visible", 1);
-            xHeader.CreateIntAttr("SortIcons", 0);
+        private static void AddConfig(CStruct grid)
+        {
+            var config = grid.CreateSubStruct("Cfg");
+            config.CreateStringAttr("Code", "GTACCNPSQEBSLC");
+            config.CreateIntAttr("SuppressCfg", 1);
+            config.CreateIntAttr("InEditMode", 0);
 
-            // Add FieldID column
-            CStruct xC = xLeftCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "FieldID");
-            xC.CreateStringAttr("Type", "Int");
-            xC.CreateBooleanAttr("CanEdit", false);
-            xC.CreateBooleanAttr("Visible", false);
+            config.CreateIntAttr("Dragging", 0);
+            config.CreateIntAttr("Dropping", 0);
+            config.CreateIntAttr("ColsMoving", 0);
+            config.CreateIntAttr("ColsPostLap", 1);
+            config.CreateIntAttr("ColsLap", 1);
+            config.CreateBooleanAttr("ShowDeleted", false);
+            config.CreateBooleanAttr("DateStrings", true);
 
-            // Add name column
-            xC = xLeftCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "Permission");
-            xHeader.CreateStringAttr("Permission", "");
-            xC.CreateStringAttr("Type", "Text");
-            xC.CreateBooleanAttr("CanEdit", false);
-            xC.CreateIntAttr("MinWidth", 350);
+            config.CreateIntAttr("ConstWidth", 2);
 
-            //Add cb column
-            xC = xCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "CB");
-            xHeader.CreateStringAttr("CB", "");
-            xC.CreateStringAttr("Type", "Bool");
-            //xC.CreateStringAttr("BoolIcon", "6");  ugly X when checked
-            xC.CreateBooleanAttr("CanEdit", true);
-            xC.CreateIntAttr("MinWidth", 30);
+            config.CreateIntAttr("MaxWidth", 1);
+            config.CreateIntAttr("AppendId", 0);
+            config.CreateIntAttr("FullId", 0);
+            config.CreateStringAttr("IdChars", "0123456789");
 
-            CStruct[] xLevels = new CStruct[2];
+            config.CreateIntAttr("SelectingCells", 1);
+            config.CreateStringAttr("Style", "GM");
+            config.CreateStringAttr("CSS", "TGrid");
+            config.CreateIntAttr("Sorting", 0);
+            config.CreateIntAttr("FastColumns", 1);
+            config.CreateIntAttr("StaticCursor", 1);
+            config.CreateIntAttr("FocusWholeRow", 1);
+            config.CreateBooleanAttr("NoTreeLines", true);
 
+            config.CreateStringAttr("MainCol", "Permission");
+        }
 
-            CStruct xBody = xGrid.CreateSubStruct("Body");
-            CStruct xB = xBody.CreateSubStruct("B");
+        private static void AddPanel(CStruct grid)
+        {
+            var panel = grid.CreateSubStruct("Panel");
+            panel.CreateIntAttr("Visible", 0);
+            panel.CreateIntAttr("Delete", 0);
+        }
 
-            //CStruct xI = xB.CreateSubStruct("I");
-            //xI.CreateStringAttr("Permission", "Totals");
-            //xI.CreateBooleanAttr("CanEdit", false);
-            //xI.CreateStringAttr("Def", "Summary");
-            xLevels[0] = xB;
+        private static void AddToolBar(CStruct grid)
+        {
+            var toolbar = grid.CreateSubStruct("Toolbar");
+            toolbar.CreateIntAttr("Visible", 0);
+        }
 
-            //List<ComponentWeight> Weights = new List<ComponentWeight>();
-            //if (dt_Weights != null)
-            //{
-            //    foreach (DataRow row in dt_Weights.Rows)
-            //    {
-            //        ComponentWeight cw = new ComponentWeight();
-            //        cw.ScenarioId = DBAccess.ReadIntValue(row["CW_RESULT"]);
-            //        cw.ComponentId = DBAccess.ReadIntValue(row["CW_COMPONENT"]);
-            //        cw.Weight = DBAccess.ReadDoubleValue(row["CW_RATIO"]);
-            //        Weights.Add(cw);
-            //    }
-            //}
-
-            if (dt != null)
-            {
-                XmlHelper.FillFieldsXml(dt, xLevels);
-            }
-            return xGrid;
+        private static CStruct InitializeGrid()
+        {
+            var grid = new CStruct();
+            grid.Initialize("Grid");
+            return grid;
         }
 
         #endregion

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Text;
+using static System.Diagnostics.Trace;
 
 namespace EPMLiveCore.Layouts.epmlive
 {
@@ -46,134 +47,172 @@ namespace EPMLiveCore.Layouts.epmlive
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            SPWeb web = SPContext.Current.Web;
+            var web = SPContext.Current.Web;
             {
-                pnlFields.Controls.Add(new LiteralControl("<TABLE border=0 cellPadding=2 cellSpacing=0 width=300><TR><TD class=\"ms-authoringcontrols\" vAlign=top><P><B>Column Name</B></P></td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><TD class=\"ms-authoringcontrols\" noWrap vAlign=top width=\"138px\"><P><B>Total&nbsp;</B></P></TD></TR>"));
+                pnlFields.Controls.Add(
+                    new LiteralControl(
+                        "<TABLE border=0 cellPadding=2 cellSpacing=0 width=300><TR><TD class=\"ms-authoringcontrols\" vAlign=top><P><B>Column Name</B></P></td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><TD class=\"ms-authoringcontrols\" noWrap vAlign=top width=\"138px\"><P><B>Total&nbsp;</B></P></TD></TR>"));
 
-                SPList list = web.Lists[new Guid(Request.QueryString["List"])];
+                var list = web.Lists[new Guid(Request.QueryString["List"])];
 
-                foreach (SPField field in list.Fields)
-                    if (!field.Hidden && (!field.ReadOnlyField || field.Type == SPFieldType.Calculated) && field.Type != SPFieldType.Attachments && field.InternalName != "ContentType")
-                        displayableFields.Add(field.Title, field);
+                GetFieldsToPopulate(list);
+                PopulatePanelFields();
+                HandleNoPostBack(list);
+            }
+        }
 
-                foreach (SPField field in displayableFields.Values)
+        private void GetFieldsToPopulate(SPList list)
+        {
+            foreach (SPField field in list.Fields)
+            {
+                if (!field.Hidden
+                    && (!field.ReadOnlyField || field.Type == SPFieldType.Calculated)
+                    && field.Type != SPFieldType.Attachments
+                    && field.InternalName != "ContentType")
                 {
-
-                    pnlFields.Controls.Add(new LiteralControl("<tr><TD class=ms-authoringcontrols borderColor=#c0c0c0 width=\"100%\" nowrap>" + field.Title + "</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><TD class=\"ms-authoringcontrols\" noWrap>"));
-
-                    DropDownList ddlList = new DropDownList();
-                    ddlList.ID = "ddl" + field.InternalName;
-                    ddlList.Width = 120;
-
-                    if (field.TypeAsString == "TotalRollup")
-                    {
-                        ddlList.Items.Add(new ListItem("None", ""));
-                        ddlList.Items.Add(new ListItem("Count", "COUNT"));
-                        ddlList.Items.Add(new ListItem("Sum", "SUM"));
-                        ddlList.Items.Add(new ListItem("Average", "AVG"));
-                        ddlList.Items.Add(new ListItem("Minimum", "MIN"));
-                        ddlList.Items.Add(new ListItem("Maximum", "MAX"));
-                    }
-                    else
-                    {
-                        switch (field.Type)
-                        {
-                            case SPFieldType.Lookup:
-                            case SPFieldType.Boolean:
-                            case SPFieldType.Choice:
-                            case SPFieldType.MultiChoice:
-                            case SPFieldType.URL:
-                            case SPFieldType.User:
-                            case SPFieldType.Text:
-                            case SPFieldType.Note:
-                                ddlList.Items.Add(new ListItem("None", ""));
-                                ddlList.Items.Add(new ListItem("Count", "COUNT"));
-                                break;
-                            case SPFieldType.Number:
-                            case SPFieldType.Currency:
-                                ddlList.Items.Add(new ListItem("None", ""));
-                                ddlList.Items.Add(new ListItem("Count", "COUNT"));
-                                ddlList.Items.Add(new ListItem("Sum", "SUM"));
-                                ddlList.Items.Add(new ListItem("Average", "AVG"));
-                                ddlList.Items.Add(new ListItem("Minimum", "MIN"));
-                                ddlList.Items.Add(new ListItem("Maximum", "MAX"));
-                                break;
-                            case SPFieldType.DateTime:
-                                ddlList.Items.Add(new ListItem("None", ""));
-                                ddlList.Items.Add(new ListItem("Count", "COUNT"));
-                                ddlList.Items.Add(new ListItem("Minimum", "MIN"));
-                                ddlList.Items.Add(new ListItem("Maximum", "MAX"));
-                                break;
-                            case SPFieldType.Calculated:
-                                XmlDocument doc = new XmlDocument();
-                                doc.LoadXml(field.SchemaXml);
-
-                                string resulttype = "";
-                                try
-                                {
-                                    resulttype = doc.FirstChild.Attributes["ResultType"].Value;
-                                }
-                                catch { }
-                                switch (resulttype)
-                                {
-                                    case "Currency":
-                                    case "Number":
-                                        ddlList.Items.Add(new ListItem("None", ""));
-                                        ddlList.Items.Add(new ListItem("Count", "COUNT"));
-                                        ddlList.Items.Add(new ListItem("Sum", "SUM"));
-                                        ddlList.Items.Add(new ListItem("Average", "AVG"));
-                                        ddlList.Items.Add(new ListItem("Minimum", "MIN"));
-                                        ddlList.Items.Add(new ListItem("Maximum", "MAX"));
-                                        break;
-                                    case "DateTime":
-                                        ddlList.Items.Add(new ListItem("None", ""));
-                                        ddlList.Items.Add(new ListItem("Count", "COUNT"));
-                                        ddlList.Items.Add(new ListItem("Minimum", "MIN"));
-                                        ddlList.Items.Add(new ListItem("Maximum", "MAX"));
-                                        break;
-
-                                    default:
-                                        ddlList.Items.Add(new ListItem("None", ""));
-                                        ddlList.Items.Add(new ListItem("Count", "COUNT"));
-                                        break;
-                                };
-
-                                break;
-                            default:
-                                pnlFields.Controls.Add(new LiteralControl(field.TypeAsString));
-                                break;
-                        }
-                    }
-
-                    pnlFields.Controls.Add(ddlList);
-                    pnlFields.Controls.Add(new LiteralControl("</td></tr>"));
-
+                    displayableFields.Add(field.Title, field);
                 }
-                pnlFields.Controls.Add(new LiteralControl("</table>"));
+            }
+        }
 
-                if (!IsPostBack)
+        private void PopulatePanelFields()
+        {
+            foreach (var field in displayableFields.Values)
+            {
+                pnlFields.Controls.Add(
+                    new LiteralControl(
+                        $"<tr><TD class=ms-authoringcontrols borderColor=#c0c0c0 width=\"100%\" nowrap>{field.Title}</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><TD class=\"ms-authoringcontrols\" noWrap>"));
+
+                var dropDownList = new DropDownList
                 {
-                    Hashtable hshFields = new Hashtable();
+                    ID = "ddl" + field.InternalName,
+                    Width = 120
+                };
 
-                    GridGanttSettings gSettings = new GridGanttSettings(list);
+                ProcessFieldType(field, dropDownList);
 
-                    //if (strTotals == "")
-                    //    strTotals = CoreFunctions.getConfigSetting(web, "epmlivelisttotals-" + System.IO.Path.GetDirectoryName(list.DefaultView.Url));
+                pnlFields.Controls.Add(dropDownList);
+                pnlFields.Controls.Add(new LiteralControl("</td></tr>"));
+            }
+            pnlFields.Controls.Add(new LiteralControl("</table>"));
+        }
 
-                    if (gSettings.TotalSettings != "")
+        private void ProcessFieldType(SPField field, DropDownList dropDownList)
+        {
+            if (field.TypeAsString == "TotalRollup")
+            {
+                ProcessTotalRollupFieldType(dropDownList);
+            }
+            else
+            {
+                ProcessOthersFieldTypes(field, dropDownList);
+            }
+        }
+
+        private static void ProcessTotalRollupFieldType(DropDownList dropDownList)
+        {
+            dropDownList.Items.Add(new ListItem("None", string.Empty));
+            dropDownList.Items.Add(new ListItem("Count", "COUNT"));
+            dropDownList.Items.Add(new ListItem("Sum", "SUM"));
+            dropDownList.Items.Add(new ListItem("Average", "AVG"));
+            dropDownList.Items.Add(new ListItem("Minimum", "MIN"));
+            dropDownList.Items.Add(new ListItem("Maximum", "MAX"));
+        }
+
+        private void ProcessOthersFieldTypes(SPField field, DropDownList dropDownList)
+        {
+            switch (field.Type)
+            {
+                case SPFieldType.Lookup:
+                case SPFieldType.Boolean:
+                case SPFieldType.Choice:
+                case SPFieldType.MultiChoice:
+                case SPFieldType.URL:
+                case SPFieldType.User:
+                case SPFieldType.Text:
+                case SPFieldType.Note:
+                    dropDownList.Items.Add(new ListItem("None", string.Empty));
+                    dropDownList.Items.Add(new ListItem("Count", "COUNT"));
+                    break;
+                case SPFieldType.Number:
+                case SPFieldType.Currency:
+                    dropDownList.Items.Add(new ListItem("None", string.Empty));
+                    dropDownList.Items.Add(new ListItem("Count", "COUNT"));
+                    dropDownList.Items.Add(new ListItem("Sum", "SUM"));
+                    dropDownList.Items.Add(new ListItem("Average", "AVG"));
+                    dropDownList.Items.Add(new ListItem("Minimum", "MIN"));
+                    dropDownList.Items.Add(new ListItem("Maximum", "MAX"));
+                    break;
+                case SPFieldType.DateTime:
+                    dropDownList.Items.Add(new ListItem("None", string.Empty));
+                    dropDownList.Items.Add(new ListItem("Count", "COUNT"));
+                    dropDownList.Items.Add(new ListItem("Minimum", "MIN"));
+                    dropDownList.Items.Add(new ListItem("Maximum", "MAX"));
+                    break;
+                case SPFieldType.Calculated:
+                    var xmlDocument = new XmlDocument();
+                    xmlDocument.LoadXml(field.SchemaXml);
+                    ProcessResultType(xmlDocument, dropDownList);
+                    break;
+                default:
+                    pnlFields.Controls.Add(new LiteralControl(field.TypeAsString));
+                    break;
+            }
+        }
+
+        private static void ProcessResultType(XmlDocument xmlDocument, DropDownList dropDownList)
+        {
+            var resultType = string.Empty;
+            try
+            {
+                resultType = xmlDocument.FirstChild.Attributes["ResultType"].Value;
+            }
+            catch (Exception ex)
+            {
+                TraceError("Exception Suppressed {0}", ex);
+            }
+            switch (resultType)
+            {
+                case "Currency":
+                case "Number":
+                    dropDownList.Items.Add(new ListItem("None", string.Empty));
+                    dropDownList.Items.Add(new ListItem("Count", "COUNT"));
+                    dropDownList.Items.Add(new ListItem("Sum", "SUM"));
+                    dropDownList.Items.Add(new ListItem("Average", "AVG"));
+                    dropDownList.Items.Add(new ListItem("Minimum", "MIN"));
+                    dropDownList.Items.Add(new ListItem("Maximum", "MAX"));
+                    break;
+                case "DateTime":
+                    dropDownList.Items.Add(new ListItem("None", string.Empty));
+                    dropDownList.Items.Add(new ListItem("Count", "COUNT"));
+                    dropDownList.Items.Add(new ListItem("Minimum", "MIN"));
+                    dropDownList.Items.Add(new ListItem("Maximum", "MAX"));
+                    break;
+                default:
+                    dropDownList.Items.Add(new ListItem("None", string.Empty));
+                    dropDownList.Items.Add(new ListItem("Count", "COUNT"));
+                    break;
+            }
+        }
+
+        private void HandleNoPostBack(SPList list)
+        {
+            if (!IsPostBack)
+            {
+                var gSettings = new GridGanttSettings(list);
+
+                if (gSettings.TotalSettings != string.Empty)
+                {
+                    var fieldList = gSettings.TotalSettings.Split('\n');
+                    foreach (var field in fieldList)
                     {
-                        //string fieldTotals = web.Properties["epmlivelisttotals-" + System.IO.Path.GetDirectoryName(list.DefaultView.Url)];
-                        string[] fieldList = gSettings.TotalSettings.Split('\n');
-                        foreach (string field in fieldList)
+                        if (field != string.Empty)
                         {
-                            if (field != "")
+                            var fieldData = field.Split('|');
+                            var dropDownList = (DropDownList)pnlFields.FindControl($"ddl{fieldData[0]}");
+                            if (dropDownList != null)
                             {
-                                string[] fieldData = field.Split('|');
-                                DropDownList ddl = (DropDownList)pnlFields.FindControl("ddl" + fieldData[0]);
-                                if (ddl != null)
-                                {
-                                    ddl.SelectedValue = fieldData[1];
-                                }
+                                dropDownList.SelectedValue = fieldData[1];
                             }
                         }
                     }
