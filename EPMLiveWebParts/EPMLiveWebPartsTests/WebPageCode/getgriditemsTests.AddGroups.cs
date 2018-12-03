@@ -37,7 +37,7 @@ namespace EPMLiveWebParts.Tests
             PrepareForAddGroups(true);
 
             // Act
-            _testObj.addGroups(new ShimSPWeb().Instance, "", new SortedList());
+            _testObj.addGroups(new ShimSPWeb().Instance, string.Empty, new SortedList());
 
             // Assert
             _afterInit.ShouldNotBeNull();
@@ -57,7 +57,7 @@ namespace EPMLiveWebParts.Tests
                 (a, b, c, d, e) => new DataTable();
 
             // Act
-            _testObj.addGroups(new ShimSPWeb().Instance, "", new SortedList());
+            _testObj.addGroups(new ShimSPWeb().Instance, string.Empty, new SortedList());
 
             // Assert
             didProcessList.ShouldBeTrue();
@@ -75,7 +75,7 @@ namespace EPMLiveWebParts.Tests
                 (a, b, c, d, e) => new DataTable();
 
             // Act
-            _testObj.addGroups(new ShimSPWeb().Instance, "", new SortedList());
+            _testObj.addGroups(new ShimSPWeb().Instance, string.Empty, new SortedList());
 
             // Assert
             var globalError = _privateObj.GetField(FieldGlobalError);
@@ -93,7 +93,7 @@ namespace EPMLiveWebParts.Tests
                 (a, b, c, d, e) => didProcessList = true;
 
             // Act
-            _testObj.addGroups(new ShimSPWeb().Instance, "", new SortedList());
+            _testObj.addGroups(new ShimSPWeb().Instance, string.Empty, new SortedList());
 
             // Assert
             didProcessList.ShouldBeTrue();
@@ -127,7 +127,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPWeb.AllInstances.Close = _ => didCloseWeb = true;
 
             // Act
-            _testObj.addGroups(new ShimSPWeb().Instance, "", new SortedList());
+            _testObj.addGroups(new ShimSPWeb().Instance, string.Empty, new SortedList());
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -159,7 +159,7 @@ namespace EPMLiveWebParts.Tests
             };
 
             // Act
-            _testObj.addGroups(new ShimSPWeb().Instance, "", new SortedList());
+            _testObj.addGroups(new ShimSPWeb().Instance, string.Empty, new SortedList());
 
             // Assert
             var globalError = _privateObj.GetField(FieldGlobalError);
@@ -181,7 +181,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPWeb.AllInstances.WebsGet = _ => { throw new InvalidOperationException(DefaultErrorMessage); };
 
             // Act
-            _testObj.addGroups(new ShimSPWeb().Instance, "", new SortedList());
+            _testObj.addGroups(new ShimSPWeb().Instance, string.Empty, new SortedList());
 
             // Assert
             var globalError = _privateObj.GetField(FieldGlobalError);
@@ -214,7 +214,7 @@ namespace EPMLiveWebParts.Tests
                 };
 
             // Act
-            _testObj.addGroups(new ShimSPWeb().Instance, "", new SortedList());
+            _testObj.addGroups(new ShimSPWeb().Instance, string.Empty, new SortedList());
 
             // Assert
             var globalError = _privateObj.GetField(FieldGlobalError);
@@ -232,7 +232,7 @@ namespace EPMLiveWebParts.Tests
             PrepareForAddGroups(false);
 
             // Act
-            _testObj.addGroups(new ShimSPWeb().Instance, "", new SortedList());
+            _testObj.addGroups(new ShimSPWeb().Instance, string.Empty, new SortedList());
 
             // Assert
             _afterInit.ShouldNotBeNull();
@@ -252,7 +252,7 @@ namespace EPMLiveWebParts.Tests
                 (a, b, c, d, e) => { throw new InvalidOperationException(DefaultErrorMessage); };
 
             // Act
-            _testObj.addGroups(new ShimSPWeb().Instance, "", new SortedList());
+            _testObj.addGroups(new ShimSPWeb().Instance, string.Empty, new SortedList());
 
             // Assert
             var globalError = _privateObj.GetField(FieldGlobalError);
@@ -296,19 +296,23 @@ namespace EPMLiveWebParts.Tests
                     strlist.ShouldNotBeNull();
                     strlist.ShouldBe("strlist");
                 },
-                () => {
+                () =>
+                {
                     strview.ShouldNotBeNull();
                     strview.ShouldBe("strview");
                 },
-                () => {
+                () =>
+                {
                     reportId.ShouldNotBeNull();
                     reportId.ShouldBe("ReportID");
                 },
-                () => {
+                () =>
+                {
                     usewbs.ShouldNotBeNull();
                     usewbs.ShouldBe("usewbs");
                 },
-                () => {
+                () =>
+                {
                     executive.ShouldNotBeNull();
                     executive.ShouldBe("executive");
                 });
