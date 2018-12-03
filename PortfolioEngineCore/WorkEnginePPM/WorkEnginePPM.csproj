@@ -431,6 +431,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\Grouppermissions.aspx.designer.cs">
       <DependentUpon>Grouppermissions.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\GroupPermissionsGridHelper.cs" />
     <Compile Include="Layouts\ppm\grouppermissions_NAX.aspx.cs">
       <DependentUpon>grouppermissions_NAX.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
