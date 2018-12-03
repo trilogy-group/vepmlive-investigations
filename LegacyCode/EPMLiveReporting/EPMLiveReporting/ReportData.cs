@@ -1481,9 +1481,9 @@ namespace EPMLiveReportsAdmin
             //string sSQL = "SELECT dbo.RPTColumn.SharePointType, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = '" + sListName + "') AND (ColumnName='" + sColumnName + "')"; - CAT.NET
             string sSQL =
                 "SELECT dbo.RPTColumn.SharePointType, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND (ColumnName=@colName)";
-            _DAO.AddParam("@listName", sListName);
-            _DAO.AddParam("@colName", sColumnName);
-            _DAO.Command = sSQL;
+			_DAO.AddParam("@listName", sListName, sListName.Length);
+			_DAO.AddParam("@colName", sColumnName, sColumnName.Length);
+			_DAO.Command = sSQL;
             objType = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
             if (objType.ToString().ToLower() == "lookup" || objType.ToString().ToLower() == "user" ||
                 objType.ToString().ToLower() == "flookup")

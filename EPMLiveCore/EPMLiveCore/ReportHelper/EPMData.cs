@@ -794,8 +794,14 @@ namespace EPMLiveCore.ReportHelper
         {
             Params.Add(new SqlParameter(name, value));
         }
+		public void AddParam(string name, object value, int size)
+		{
+			var parameter = new SqlParameter(name, value)
+			parameter.Size = size;
+			Params.Add(parameter);
+		}
 
-        public static bool CheckConnection(string cs)
+		public static bool CheckConnection(string cs)
         {
             bool success = true;
             SPSecurity.RunWithElevatedPrivileges(() => { success = TryToConnect(cs); });
