@@ -790,10 +790,11 @@ namespace EPMLiveCore.ReportHelper
             return _DefaultLists;
         }
 
-        public void AddParam(string name, object value)
-        {
-            Params.Add(new SqlParameter(name, value));
-        }
+		public void AddParam(string name, object value)
+		{
+			Params.Add(new SqlParameter(name, value));
+		}
+
 		public void AddParam(string name, object value, int size)
 		{
 			var parameter = new SqlParameter(name, value);
@@ -802,11 +803,11 @@ namespace EPMLiveCore.ReportHelper
 		}
 
 		public static bool CheckConnection(string cs)
-        {
-            bool success = true;
-            SPSecurity.RunWithElevatedPrivileges(() => { success = TryToConnect(cs); });
-            return success;
-        }
+		{
+			bool success = true;
+			SPSecurity.RunWithElevatedPrivileges(() => { success = TryToConnect(cs); });
+			return success;
+		}
 
         public static bool TryToConnect(string connectionString)
         {
