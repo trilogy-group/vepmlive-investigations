@@ -88,71 +88,73 @@ pipeline {
 				}
 			}
 		}
-		parallel {
-			stage('Deploy Staging') {
-				steps {
-					timestamps {
-						script {
-							echo 'Triggering Deploy job...'
-							env.DEPLOY_BRANCH = currentBuild.getProjectName()
-							if (params.DeployBranch?.trim()) {
-								env.DEPLOY_BRANCH = params.DeployBranch
+		stage('Parallel Jobs') {
+			parallel {
+				stage('Deploy Staging') {
+					steps {
+						timestamps {
+							script {
+								echo 'Triggering Deploy job...'
+								env.DEPLOY_BRANCH = currentBuild.getProjectName()
+								if (params.DeployBranch?.trim()) {
+									env.DEPLOY_BRANCH = params.DeployBranch
+								}
+								build(
+									job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
+									wait: true,
+									parameters: [
+										[$class: 'StringParameterValue', name: 'TargetHost', value: params.StagingTargetHost],
+										[$class: 'StringParameterValue', name: 'UserName', value: params.StagingUserName],
+										[$class: 'StringParameterValue', name: 'Password', value: params.StagingPassword],
+										[$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
+										[$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD],
+										[$class: 'StringParameterValue', name: 'FullHostName', value: params.StagingAppUrl]
+									]
+								)
 							}
-							build(
-								job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
-								wait: true,
-								parameters: [
-									[$class: 'StringParameterValue', name: 'TargetHost', value: params.StagingTargetHost],
-									[$class: 'StringParameterValue', name: 'UserName', value: params.StagingUserName],
-									[$class: 'StringParameterValue', name: 'Password', value: params.StagingPassword],
-									[$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
-									[$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD],
-									[$class: 'StringParameterValue', name: 'FullHostName', value: params.StagingAppUrl]
-								]
-							)
 						}
 					}
 				}
-			}
-			stage('Protractor UI Tests') {
-				steps {
-					timestamps {
-						script {
-							echo 'Triggering Protractor UI tests job...'
-							env.PROTRACTOR_BRANCH = currentBuild.getProjectName()
-							if (params.ProtractorBranch?.trim()) {
-								env.PROTRACTOR_BRANCH = params.ProtractorBranch
+				stage('Protractor UI Tests') {
+					steps {
+						timestamps {
+							script {
+								echo 'Triggering Protractor UI tests job...'
+								env.PROTRACTOR_BRANCH = currentBuild.getProjectName()
+								if (params.ProtractorBranch?.trim()) {
+									env.PROTRACTOR_BRANCH = params.ProtractorBranch
+								}
+								build(
+									job: "../EPML-Regression/${env.PROTRACTOR_BRANCH}", 
+									wait: true,
+									parameters: [
+										[$class: 'StringParameterValue', name: 'TargetHost', value: params.TargetHost],
+										[$class: 'StringParameterValue', name: 'FullHostName', value: params.ProtractorHostsName]
+									]
+								)
 							}
-							build(
-								job: "../EPML-Regression/${env.PROTRACTOR_BRANCH}", 
-								wait: true,
-								parameters: [
-									[$class: 'StringParameterValue', name: 'TargetHost', value: params.TargetHost],
-									[$class: 'StringParameterValue', name: 'FullHostName', value: params.ProtractorHostsName]
-								]
-							)
 						}
 					}
 				}
-			}
-			stage('TS-Client Tests') {
-				when {
-					expression { params.RunTSClient == 'true' }
-				}
-				steps {
-					timestamps {
-						script {
-							echo 'Triggering TS-Client tests job...'
-							build(
-								job: "../EPML-TS/EPM-TS", 
-								wait: true,
-								parameters: [
-									[$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
-									[$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD]
-								]
-							)
-						}
-					}		
+				stage('TS-Client Tests') {
+					when {
+						expression { params.RunTSClient == 'true' }
+					}
+					steps {
+						timestamps {
+							script {
+								echo 'Triggering TS-Client tests job...'
+								build(
+									job: "../EPML-TS/EPM-TS", 
+									wait: true,
+									parameters: [
+										[$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
+										[$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD]
+									]
+								)
+							}
+						}		
+					}
 				}
 			}
 		}
