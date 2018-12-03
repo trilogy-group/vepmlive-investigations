@@ -184,7 +184,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
     */
 
-    it('Add resources under "Current Team" - [743144]', async () => {
+    it('Add resources under "Current Team" - [743144] [BUG:SKYVERA-1795]', async () => {
         StepLogger.caseId = 743144;
         const uniqueId = PageHelper.getUniqueId();
 

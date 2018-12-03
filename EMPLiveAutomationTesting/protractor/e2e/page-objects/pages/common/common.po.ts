@@ -581,7 +581,7 @@ export class CommonPage extends BasePage {
     }
 
     static getNthRecord(index = 1) {
-        return element.all(By.xpath(`(${this.selectorForRecordsWithoutGreenTick})//td[contains(@class,'GMCellPanel')]`)).get(index);
+        return element.all(By.xpath(`${this.selectorForRecordsWithoutGreenTick}//td[contains(@class,'GMCellPanel')]`)).get(index);
     }
 
     static getGridRowByTitle(titleName: string) {

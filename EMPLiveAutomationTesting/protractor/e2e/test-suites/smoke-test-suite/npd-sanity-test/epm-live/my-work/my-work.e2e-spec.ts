@@ -366,7 +366,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             StepLogger.step('Select on any of the project created as per pre requisites [Ex: Smoke Test Project 2]');
             StepLogger.step('Click on the ITEMS tab above the grid');
             StepLogger.step('From the ITEMS ribbon menu, click on Edit Plan');
-            await CommonPageSubHelper.selectOneRecordFromGrid();
+            await CommonSubPageHelper.selectOneRecordFromGrid();
             await PageHelper.click(CommonPage.ribbonTitles.items);
             await PageHelper.click(CommonPage.editPlan);
 
