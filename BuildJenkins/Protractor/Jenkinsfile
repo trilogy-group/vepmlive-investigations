@@ -9,9 +9,6 @@ pipeline {
 		string(name: 'Username', defaultValue: 'farmadmin', description: 'Protractor username')
 		string(name: 'Password', defaultValue: 'Pass@word1', description: 'Protractor password')
 	}
-	  triggers {
-		cron(env.BRANCH_NAME == 'TestAutomation' ? '@midnight' : '')
-	}	
 	stages {
 		stage('Preparing for UI tests execution') {
 			steps {

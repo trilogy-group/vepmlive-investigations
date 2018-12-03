@@ -28,7 +28,7 @@ pipeline {
 		stage('Downloading artifacts') {
 			steps {
 				script {
-					def rootProjectName = '../'
+					def rootProjectName = ''
 
 					if (params.FullRcBranch?.trim()) {
 						echo 'Getting artifacts from manually specified Release branch'
@@ -47,10 +47,9 @@ pipeline {
 				}
 			}
 		}
-		stage('Deploying') {
+		stage('Running Tests') {
 			steps {
 				echo 'Executing deploy (upgrade) script...'
-				powershell "${env.WORKSPACE}/BuildTeamcity/DeployRemotely.ps1 -username \"${params.UserName}\" -password \"${params.Password}\" -webAppName \"${params.FullHostName}\" -buildNumber \"${env.BUILD_VERSION}\" -serverIPs ${params.TargetHost} "
 				bat '"C:/Program Files/nodejs/node.exe" C:/ts-client/bin/ts-cli start-job SilentInstaller.zip ${env.BUILD_VERSION}'
 			}
 		}
