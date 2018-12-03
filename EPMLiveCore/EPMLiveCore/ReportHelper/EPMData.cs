@@ -796,7 +796,7 @@ namespace EPMLiveCore.ReportHelper
         }
 		public void AddParam(string name, object value, int size)
 		{
-			var parameter = new SqlParameter(name, value)
+			var parameter = new SqlParameter(name, value);
 			parameter.Size = size;
 			Params.Add(parameter);
 		}
