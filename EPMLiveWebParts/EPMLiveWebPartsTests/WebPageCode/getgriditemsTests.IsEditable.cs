@@ -25,12 +25,25 @@ namespace EPMLiveWebParts.Tests
             _shimsObject = ShimsContext.Create();
             _testObj = new getgriditems();
             _privateObj = new PrivateObject(_testObj);
+
+            _inEditmode = false;
+            _timesheet = false;
+            _showCheckboxes = true;
+            _isTimesheet = false;
+            _titleFieldFound = false;
+            _usepopup = false;
+            _cleanValues = false;
+            _workspaceUrl = true;
+
+            _newItemNode = null;
+            _idsCount = 1;
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
             _shimsObject?.Dispose();
+            _responseWriter?.Dispose();
         }
 
         [TestMethod]

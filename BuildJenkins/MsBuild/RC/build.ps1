@@ -33,8 +33,10 @@ Write-Host "Execute builds"
 Write-Host "Executing tl_buildCode.ps1"
 & .\BuildTeamCity\tl_buildCode.ps1 -ConfigurationToBuild Release
 
+
 Write-Host "Executing tl_buildInstaller.ps1"
 & .\BuildTeamCity\tl_buildInstaller.ps1 
+
 
 $buildRoot = Join-Path $rootDir "BuildTeamCity"
 Set-Location -Path $buildRoot
@@ -43,8 +45,11 @@ Set-Location -Path $buildRoot
 Write-Host "Executing tl_buildSilentInstaller.ps1"
 & .\tl_buildSilentInstaller.ps1
 
+
 Write-Host "Copy Silent installer to output dir"
 $installerDir = Join-Path $buildRoot "SilentInstaller"
 Copy-Item -Path (Join-Path $installerDir "*") -Destination $outputDir -Recurse
 
 Write-Host "Done. Installer is located at $outputDir"
+
+

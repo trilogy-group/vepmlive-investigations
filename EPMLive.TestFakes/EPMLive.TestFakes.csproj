@@ -54,6 +54,9 @@
     <Reference Include="EPMLiveEnterprise.Fakes">
       <HintPath>FakesAssemblies\EPMLiveEnterprise.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="EPMLiveIntegration.Fakes">
+      <HintPath>FakesAssemblies\EPMLiveIntegration.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="EPMLiveIntegrationService.Fakes">
       <HintPath>FakesAssemblies\EPMLiveIntegrationService.Fakes.dll</HintPath>
     </Reference>
@@ -86,6 +89,14 @@
     </Reference>
     <Reference Include="Microsoft.SharePoint.16.0.0.0.Fakes">
       <HintPath>FakesAssemblies\Microsoft.SharePoint.16.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint.Client.16.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\Microsoft.SharePoint.Client.16.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.Runtime, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint.Client.Runtime.16.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\Microsoft.SharePoint.Client.Runtime.16.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.SharePoint.Security, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -186,6 +197,10 @@
       <Project>{e7043f73-7633-4476-b33d-222ec3ac1c8b}</Project>
       <Name>EPMLiveIntegrationService</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EPMLiveIntegration\EPMLiveIntegration\EPMLiveIntegration.csproj">
+      <Project>{4c63f23f-463c-409b-89ad-adc2e138b8e3}</Project>
+      <Name>EPMLiveIntegration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLivePS\EPMLivePS\EPMLivePS.csproj">
       <Project>{1121d2ff-7eaa-4532-a1ce-473de551dd70}</Project>
       <Name>EPMLivePS</Name>
@@ -263,9 +278,15 @@
     <Fakes Include="Fakes\System.Web.Services.fakes" />
     <Fakes Include="Fakes\Microsoft.Office.Project.Server.Library.fakes" />
     <Fakes Include="Fakes\Dashboard.fakes" />
+    <Fakes Include="Fakes\Microsoft.SharePoint.Client.fakes" />
+    <Fakes Include="Fakes\Microsoft.SharePoint.Client.Runtime.fakes" />
+    <Fakes Include="Fakes\EPMLiveIntegration.fakes" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

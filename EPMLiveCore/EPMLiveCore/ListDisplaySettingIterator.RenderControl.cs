@@ -605,7 +605,6 @@ namespace EPMLiveCore
                 RenderOnClick(writer, CanLoginTitle);
 
                 writer.WriteLine("cleanupfields();");
-                writer.WriteLine("try { setLicenseType(); }catch(e){}");
                 // To make default collapsed div, if there isnt any mandatory field in it
                 writer.WriteLine("$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' && " + permissionPanelRequiredCount + " == '0') {if('" + Convert.ToString(this.ListItem[GenericTitle]) + "' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' && " + profilepanelRequiredCount + " == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});");
                 writer.WriteLine("}_spBodyOnLoadFunctionNames.push(\"InitFields\");");
@@ -741,7 +740,8 @@ namespace EPMLiveCore
             }
 
             writer.WriteLine("  if(document.getElementById('" + dControls[GenericTitle] + "').checked){");
-            RenderDisplay(writer, WhitSpaces6, FirstNameKey, None);
+			writer.WriteLine("setLicenseType();");
+			RenderDisplay(writer, WhitSpaces6, FirstNameKey, None);
             RenderDisplay(writer, WhitSpaces6, LastNameKey, None);
             RenderDisplay(writer, WhitSpaces6, EmailKey, None);
             RenderDisplay(writer, WhitSpaces6, "TimesheetAdministrator", None);

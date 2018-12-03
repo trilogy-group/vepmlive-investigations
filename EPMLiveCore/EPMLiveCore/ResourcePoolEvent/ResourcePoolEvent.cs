@@ -298,12 +298,12 @@ namespace EPMLiveCore
 
         }
 
-        private void ProcessLevel(SPItemEventProperties properties)
+        private void ProcessLevel(SPItemEventProperties properties, bool isDelete = false)
         {
             if (properties.Web.CurrentUser.IsSiteAdmin || (isOnline && EPMLiveCore.CoreFunctions.GetRealUserName(properties.Web.CurrentUser.LoginName, properties.Web.Site).ToLower() == ownerusername.ToLower()))
             {
                 string spaccount = GetPropertyBeforeOrAfter(properties, "SharePointAccount");
-                string ResLevel = GetPropertyBeforeOrAfter(properties, "ResourceLevel");
+                string ResLevel = isDelete ? "0" : GetPropertyBeforeOrAfter(properties, "ResourceLevel");
 
                 if (!string.IsNullOrEmpty(spaccount) && !string.IsNullOrEmpty(ResLevel))
                 {
@@ -1009,7 +1009,6 @@ namespace EPMLiveCore
 
                             try
                             {
-
                                 if (!int.TryParse(properties.ListItem["EXTID"] as string, out extId))
                                 {
                                     return;
@@ -1031,6 +1030,11 @@ namespace EPMLiveCore
                                 }
                                 else
                                 {
+                                    if (properties.ListItem != null && properties.ListItem["SharePointAccount"] != null)
+                                    {
+                                        ProcessLevel(properties, true);
+                                    }
+
                                     SPFieldUserValue uv = new SPFieldUserValue(properties.Web, properties.ListItem["SharePointAccount"].ToString());
                                     oWeb.SiteUsers.RemoveByID(uv.LookupId);
                                 }

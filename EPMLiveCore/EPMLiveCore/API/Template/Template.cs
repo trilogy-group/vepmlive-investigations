@@ -86,10 +86,11 @@ namespace EPMLiveCore.API
                     using (SPWeb spWeb = spSite.OpenWeb(spSite.RootWeb.ID))
                     {
                         SPList spList = spWeb.Lists.TryGetList("Template Gallery");
+						SPListItemCollection items = spList.Items;
 
-                        if (spList != null)
+						if (spList != null)
                         {
-                            SPListItem listItem = (from SPListItem spListItem in spList.Items
+                            SPListItem listItem = (from SPListItem spListItem in items
                                                    let spFieldUrlValue =
                                                        new SPFieldUrlValue(spListItem["URL"].ToString())
                                                    where
@@ -113,7 +114,9 @@ namespace EPMLiveCore.API
                                     string templateName =
                                         Path.GetFileName(string.Format("{0}.wsp", web.SafeServerRelativeUrl()));
 
-                                    foreach (SPListItem spListItem in list.Items)
+									SPListItemCollection catalogItems = list.Items;
+
+									foreach (SPListItem spListItem in catalogItems)
                                     {
                                         if (!spListItem.File.Name.Equals(templateName)) continue;
 
