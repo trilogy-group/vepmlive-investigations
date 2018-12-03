@@ -10,7 +10,7 @@ using Shouldly;
 
 namespace EPMLiveWebParts.Tests
 {
-    public partial class getgriditemsTests
+    public partial class GetGridItemsTests
     {
         private const string FieldDue = "Due";
         private const string FieldDaysOverdue = "DaysOverdue";

@@ -8,7 +8,7 @@ using Shouldly;
 
 namespace EPMLiveWebParts.Tests
 {
-    public partial class getgriditemsTests
+    public partial class GetGridItemsTests
     {
         private const string InternalName = "InternalName";
         private const string DummyText = "Dummy";

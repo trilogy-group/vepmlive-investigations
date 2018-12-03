@@ -29,7 +29,7 @@ using Shouldly;
 
 namespace EPMLiveWebParts.Tests
 {
-    public partial class getgriditemsTests
+    public partial class GetGridItemsTests
     {
         private const string ExampleUrl = "http://example.com";
         private const string TypeTextXml = "text/xml";

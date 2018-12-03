@@ -37,7 +37,7 @@ using Shouldly;
 
 namespace EPMLiveWebParts.Tests
 {
-    public partial class getgriditemsTests
+    public partial class GetGridItemsTests
     {
         private const string Other = "Other";
         private const string MethodPageLoad = "Page_Load";

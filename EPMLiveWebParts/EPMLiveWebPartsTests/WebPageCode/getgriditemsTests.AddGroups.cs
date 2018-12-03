@@ -19,7 +19,7 @@ using Shouldly;
 
 namespace EPMLiveWebParts.Tests
 {
-    public partial class getgriditemsTests
+    public partial class GetGridItemsTests
     {
         private const string WorkspaceUrlView = "WorkspaceUrl";
         private const string DefaultErrorMessage = "DefaultErrorMessage";
