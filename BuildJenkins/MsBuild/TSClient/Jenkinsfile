@@ -28,7 +28,7 @@ pipeline {
 		stage('Downloading artifacts') {
 			steps {
 				script {
-					def rootProjectName = ''
+					def rootProjectName = '../'
 
 					if (params.FullRcBranch?.trim()) {
 						echo 'Getting artifacts from manually specified Release branch'
@@ -50,7 +50,7 @@ pipeline {
 		stage('Running Tests') {
 			steps {
 				echo 'Executing deploy (upgrade) script...'
-				bat '"C:/Program Files/nodejs/node.exe" C:/ts-client/bin/ts-cli start-job SilentInstaller.zip ${env.BUILD_VERSION}'
+				bat '"C:/Program Files/nodejs/node.exe" C:/ts-client/bin/ts-cli start-job SilentInstaller.zip %BUILD_VERSION%'
 			}
 		}
 	}
