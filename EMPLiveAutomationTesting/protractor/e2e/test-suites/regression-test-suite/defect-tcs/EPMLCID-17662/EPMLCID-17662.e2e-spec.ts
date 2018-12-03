@@ -11,9 +11,12 @@ describe(SuiteNames.regressionTestSuite, () => {
     let displayName: string;
 
     beforeEach(async () => {
-
         await PageHelper.maximizeWindow();
         await new LoginPage().goToAndLogin();
+    });
+
+    afterEach(async () => {
+        await StepLogger.takeScreenShot();
     });
 
     it('Part-1 Disable one resource - [15377923]', async () => {

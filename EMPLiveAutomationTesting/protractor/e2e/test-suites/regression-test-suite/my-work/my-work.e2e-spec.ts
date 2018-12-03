@@ -89,7 +89,7 @@ describe(SuiteNames.regressionTestSuite, () => {
 
         StepLogger.stepId(3);
         StepLogger.step('Click on rename View button.');
-        const currentViewName = await PageHelper.getText(MyWorkPage.getCurrentView);
+        await PageHelper.getText(MyWorkPage.getCurrentView);
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.renameView);
 
         StepLogger.stepId(4);
@@ -98,7 +98,6 @@ describe(SuiteNames.regressionTestSuite, () => {
 
         StepLogger.stepId(5);
         StepLogger.step('Click on Ok in the pop-up.');
-        await MyWorkPageHelper.verifyAndAcceptRenameConfirmationPopup(currentViewName);
         // Takes time update current view
         await browser.sleep(PageHelper.timeout.xs);
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
@@ -127,11 +126,10 @@ describe(SuiteNames.regressionTestSuite, () => {
         await ExpectationHelper.verifyDisplayedStatus(MyWorkPage.getCurrentView, MyWorkPageConstants.currentView);
         StepLogger.stepId(2);
         StepLogger.step('Click on rename View button.> provide new name >click on ok');
-        const currentViewName = await PageHelper.getText(MyWorkPage.getCurrentView);
+        await PageHelper.getText(MyWorkPage.getCurrentView);
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.renameView);
         // Step 2 and 3 are inside the below function
         const viewNewName = await MyWorkPageHelper.fillAndSubmitRenameView();
-        await MyWorkPageHelper.verifyAndAcceptRenameConfirmationPopup(currentViewName);
         // Takes time update current view
         await browser.sleep(PageHelper.timeout.xs);
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(

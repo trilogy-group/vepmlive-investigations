@@ -47,7 +47,7 @@ export class MyWorkPageSubHelper {
     }
 
     static async clickOnItem(item: string) {
-        StepLogger.subStep('Click on newly created item in the grid.');
+        StepLogger.subVerification('verify created item is present');
         await this.verifyItemPresent(item);
         StepLogger.subStep(`Click on item ${item}`);
         await PageHelper.click(MyWorkPage.itemCreated(item));
@@ -55,6 +55,7 @@ export class MyWorkPageSubHelper {
 
     static async verifyItemPresent(item: string) {
         StepLogger.subStep('Verify item created');
+        await WaitHelper.waitForPageToStable();
         await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.itemCreated(item));
         StepLogger.subVerification('Verify Created item is displayed');
         await ExpectationHelper.verifyDisplayedStatus(MyWorkPage.itemCreated(item), item);

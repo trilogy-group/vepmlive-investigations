@@ -16,6 +16,8 @@ import {RiskItemPageHelper} from '../risk-item/risk-item-page.helper';
 import {ProjectItemPageConstants} from '../project-item/project-item-page.constants';
 import {ProjectItemPage} from '../project-item/project-item.po';
 import {ChangeItemPage} from '../change-item/change-item.po';
+import { ProjectItemPageHelper } from '../project-item/project-item-page.helper';
+import { CommonSubPageHelper } from '../../common/common-page.subhelper';
 
 export class IssueItemPageHelper {
 
@@ -116,7 +118,7 @@ export class IssueItemPageHelper {
     }
 
     static async editItemAndValidateIt(titleValue: string) {
-        titleValue = titleValue + 'Edited';
+        const  titleValueEdited = `${titleValue}Edited`;
 
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.issues,
@@ -124,19 +126,26 @@ export class IssueItemPageHelper {
             CommonPageConstants.pageHeaders.projects.issues,
         );
 
-        await CommonPageHelper.editOptionViaRibbon();
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.issues,
+            CommonPage.pageHeaders.projects.issues,
+            CommonPageConstants.pageHeaders.projects.issues,
+            titleValue,
+            IssueItemPageConstants.columnNames.title);
 
-        await TextboxHelper.sendKeys(IssueItemPage.inputs.title, titleValue);
+        await ProjectItemPageHelper.clickOnSearchedRecord();
+        await CommonSubPageHelper.clickOnItemsTab();
+        await PageHelper.click(CommonPage.ribbonItems.editItem);
+
+        await TextboxHelper.sendKeys(IssueItemPage.inputs.title, titleValueEdited);
 
         await PageHelper.click(CommonPage.formButtons.save);
 
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.issues,
             CommonPage.pageHeaders.projects.issues,
             CommonPageConstants.pageHeaders.projects.issues,
-
-            titleValue,
+            titleValueEdited,
             IssueItemPageConstants.columnNames.title);
-        return titleValue;
+        return titleValueEdited;
     }
 
     static async deleteItemAndValidateIt(titleValue: string) {
