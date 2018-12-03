@@ -25,7 +25,6 @@ using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.SharePoint.Workflow;
 using Microsoft.SharePoint.Workflow.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using Shouldly;
 
 namespace EPMLiveWebParts.Tests
@@ -35,7 +34,7 @@ namespace EPMLiveWebParts.Tests
         private const string ExampleUrl = "http://example.com";
         private const string TypeTextXml = "text/xml";
         private const string TypeTextPlain = "text/plain";
-        private const string TitleField = "Title";
+        private const string FieldTitle = "Title";
         private const string AddItemMethod = "addItem";
         private bool _inEditmode;
         private bool _timesheet;
@@ -1139,7 +1138,7 @@ namespace EPMLiveWebParts.Tests
             _privateObj.SetField("aViewFields", aViewFields);
 
             var hshItemNodes = new Hashtable();
-            hshItemNodes.Add(TitleField, DummyVal);
+            hshItemNodes.Add(FieldTitle, DummyVal);
             hshItemNodes.Add("SiteUrl", string.Empty);
             hshItemNodes.Add("List", string.Empty);
             hshItemNodes.Add("Site", string.Empty);
@@ -1332,6 +1331,8 @@ namespace EPMLiveWebParts.Tests
             ShimSPWeb.AllInstances.SiteGet = _ => new ShimSPSite();
             ShimSPWeb.AllInstances.LocaleGet = _ => CultureInfo.InvariantCulture;
             ShimSPWeb.AllInstances.AllUsersGet = _ => new ShimSPUserCollection();
+            ShimSPWeb.AllInstances.GetListString = (_, __) => new ShimSPList();
+
             ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => new ShimSPUser
             {
                 NameGet = () => DummyText

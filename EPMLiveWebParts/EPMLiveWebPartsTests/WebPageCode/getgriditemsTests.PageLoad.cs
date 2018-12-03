@@ -537,10 +537,10 @@ namespace EPMLiveWebParts.Tests
                     WebId='{Guid.NewGuid().ToString()}'>
                     <Customization>
                         <ArrayOfProperty>
-                            <Property Name='QueryFilterAsString'><Value>X</Value></p>
-                            <Property Name='ListViewFilter'><Value>{Guid.NewGuid().ToString()}</Value></p>
-                            <Property Name='SupportsMultipleValues'><Value>true</Value></p>
-                            <Property Name='IsFilterRecursive'><Value>true</Value></p>
+                            <Property><Name>QueryFilterAsString</Name><Value>X</Value></Property>
+                            <Property><Name>ListViewFilter</Name><Value>{Guid.NewGuid().ToString()}</Value></Property>
+                            <Property><Name>SupportsMultipleValues</Name><Value>true</Value></Property>
+                            <Property><Name>IsFilterRecursive</Name><Value>true</Value></Property>
                         </ArrayOfProperty>
                     </Customization>
                 </result>";
@@ -552,7 +552,11 @@ namespace EPMLiveWebParts.Tests
             // Assert
             var result = GetResultData();
             result.ShouldNotBeNull();
-            result.ShouldContain("<column type=\"ro\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>");
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldContainWithoutWhitespace("<column type=\"ro\" width=\"25\" align=\"center\" color=\"#F0F0F0\"><![CDATA[&nbsp;]]></column>"),
+                () => result.ShouldContainWithoutWhitespace("<column type=\"ro\" width=\"25\" align=\"center\"><![CDATA[#master_checkbox2]]></column>"),
+                () => result.ShouldContainWithoutWhitespace("<column type=\"tree\" width=\"315\"><![CDATA[&nbsp;]]></column>"),
+                () => result.ShouldContainWithoutWhitespace("<column type=\"mchoice\" width=\"157.5\" id=\"&lt;![CDATA[Other]]&gt;\" sort=\"str\" align=\"left\"><![CDATA[<div style=\"width:100%; text-align:left;padding-right:4px\">Dummy</div>]]></column>"));
         }
 
         [TestMethod]
@@ -767,7 +771,7 @@ namespace EPMLiveWebParts.Tests
             ShimSPView.AllInstances.QueryGet = _ => "<GroupBy><By Name='Title' Ascending='true'></By></GroupBy>";
         }
 
-        private static void SetupData()
+        private DataSet SetupData()
         {
             var columns = new string[]
             {
@@ -782,9 +786,18 @@ namespace EPMLiveWebParts.Tests
             dataTable.Columns.AddRange(columns.Select(x => new DataColumn(x)).ToArray());
             dataTable.LoadDataRow(row, true);
 
+            var set = new DataSet();
+            set.Tables.Add(dataTable);
+
             ShimEPMData.SAccountInfoGuidGuid = (_, __) => dataTable.NewRow();
             ShimReportingData.GetReportingDataSPWebStringBooleanStringString =
                 (a, b, c, d, e) => dataTable;
+            ShimCoreFunctions.getSiteItemsSPWebSPViewStringStringStringStringIListOfString =
+                (a, b, c, d, e, f, g) => dataTable;
+            ShimReportingData.GetReportingDataSPWebStringBooleanStringStringInt32Int32 =
+                (a, b, c, d, e, f, g) => set;
+
+            return set;
         }
 
         private void SetupResponse()
@@ -818,9 +831,20 @@ namespace EPMLiveWebParts.Tests
 
             PrepareSpWebRelatedShims();
             PrepareSpListRelatedShims();
+            PrepareSpSiteShims();
+            ShimSPView.AllInstances.QueryGet = _ => "<Child></Child>";
+            ShimSPView.AllInstances.AggregationsStatusGet = _ => "Off";
 
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code => code?.Invoke();
+            ShimSPSecurableObject.AllInstances.DoesUserHavePermissionsSPBasePermissions = (_, __) => true;
+        }
+
+        private void PrepareSpSiteShims()
+        {
             ShimSPSite.ConstructorGuid = (_, __) => { };
             ShimSPSite.ConstructorString = (_, __) => { };
+            ShimSPSite.AllInstances.Dispose = _ => { };
+            ShimSPSite.AllInstances.Close = _ => { };
             ShimSPSite.AllInstances.UrlGet = _ => ExampleUrl;
             ShimSPSite.AllInstances.CatchAccessDeniedExceptionSetBoolean = (_, __) => { };
             ShimSPSite.AllInstances.OpenWeb = _ => new ShimSPWeb().Instance;
@@ -828,11 +852,6 @@ namespace EPMLiveWebParts.Tests
             ShimSPSite.AllInstances.OpenWebString = (_, __) => new ShimSPWeb().Instance;
             ShimSPSite.AllInstances.RootWebGet = _ => new ShimSPWeb().Instance;
             ShimSPSite.AllInstances.WebApplicationGet = _ => new ShimSPWebApplication();
-            ShimSPView.AllInstances.QueryGet = _ => "<Child></Child>";
-            ShimSPView.AllInstances.AggregationsStatusGet = _ => "Off";
-
-            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code => code?.Invoke();
-            ShimSPSecurableObject.AllInstances.DoesUserHavePermissionsSPBasePermissions = (_, __) => true;
         }
 
         private void GetParameters()
