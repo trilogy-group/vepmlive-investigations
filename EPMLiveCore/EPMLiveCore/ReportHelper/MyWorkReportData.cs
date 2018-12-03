@@ -534,7 +534,7 @@ namespace EPMLiveCore.ReportHelper
 			var myWork = "My Work";
 
 			_DAO.AddParam("@listName", myWork, myWork.Length);
-            _DAO.AddParam("@colName", columnName, columnName.Length);
+            _DAO.AddParam("@colName", columnName, columnName?.Length??0);
 
             _DAO.Command = sql;
 

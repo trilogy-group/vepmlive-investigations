@@ -515,8 +515,8 @@ namespace EPMLiveReportsAdmin
             const string sql =
                 "SELECT dbo.RPTColumn.SharePointType, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND (ColumnName=@colName)";
 			var myWork = "My Work";
-			_DAO.AddParam("@listName", myWork, myWork.Length);
-            _DAO.AddParam("@colName", columnName, columnName.Length);
+			_DAO.AddParam("@listName", myWork, myWork?.Length??0);
+            _DAO.AddParam("@colName", columnName, columnName?.Length??0);
 
             _DAO.Command = sql;
 
