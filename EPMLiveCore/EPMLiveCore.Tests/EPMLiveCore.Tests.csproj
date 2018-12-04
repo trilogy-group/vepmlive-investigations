@@ -171,6 +171,7 @@
     <Compile Include="ADSyncTests.cs" />
     <Compile Include="API\Analytics\AnalyticsDataTests.cs" />
     <Compile Include="API\Analytics\FRFQueryFactoryTests.cs" />
+    <Compile Include="API\Analytics\FRFQueryParamFactoryTests.cs" />
     <Compile Include="API\Analytics\RecentItemsTests.cs" />
     <Compile Include="API\APITeamTests.cs" />
     <Compile Include="API\Applications\ApplicationInstallerTestsPartOne.cs" />
@@ -243,7 +244,9 @@
     <Compile Include="Jobs\NotificationsTests.cs" />
     <Compile Include="Jobs\ResourceImportJobTests.cs" />
     <Compile Include="Jobs\ResourcePlanTest.cs" />
+    <Compile Include="Jobs\SecurityUpdatesRemTests.cs" />
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
+    <Compile Include="Jobs\TimerFixTests.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AddListDataTests.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePoolTests.cs" />
     <Compile Include="Layouts\epmlive\AdsyncAdminTests.cs" />
@@ -261,6 +264,7 @@
     <Compile Include="Layouts\epmlive\SolutionStoreProxyTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsRemTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsTests.cs" />
+    <Compile Include="Layouts\epmlive\TotalFieldsTests.cs" />
     <Compile Include="Layouts\epmlive\Upgraders\WE432UpgraderTests.cs" />
     <Compile Include="Layouts\epmlive\WebSettingsTest.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />

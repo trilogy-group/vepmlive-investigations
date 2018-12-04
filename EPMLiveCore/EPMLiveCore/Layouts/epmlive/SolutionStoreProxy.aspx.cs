@@ -4,7 +4,7 @@ using System.Net;
 using System.Web;
 using System.Xml;
 using Microsoft.SharePoint.WebControls;
-using SysTrace = System.Diagnostics.Trace;
+using static System.Diagnostics.Trace;
 
 namespace EPMLiveCore
 {
@@ -14,8 +14,16 @@ namespace EPMLiveCore
         private XMLDataManager _dataManager;
         private string _webSvcName;
         private string _webSvcMethod;
+
         private const string WebSvcName = "WebSvcName";
         private const string WebSvcMethod = "WebSvcMethod";
+        private const string ListNameProperty = "ListName";
+        private const string ViewNameProperty = "ViewName";
+        private const string QueryPropertyName = "Query";
+        private const string ViewFieldsPropertyName = "ViewFields";
+        private const string RowLimitPropertyName = "RowLimit";
+        private const string QueryOptionsPropertyName = "QueryOptions";
+        private const string WebIdPropertyName = "WebID";
 
         private void InitializePropAndFlds()
         {
@@ -167,7 +175,7 @@ namespace EPMLiveCore
                 }
                 catch (Exception ex)
                 {
-                    SysTrace.WriteLine(ex);
+                    WriteLine(ex);
                     Response.Write($"{{ error : \"{ex.Message}\" }}");
                     return false;
                 }
@@ -199,7 +207,7 @@ namespace EPMLiveCore
                 }
                 catch (Exception ex)
                 {
-                    SysTrace.WriteLine(ex);
+                    WriteLine(ex);
                     Response.Write($"{{ error : \"{ex.Message}\" }}");
                     return;
                 }
