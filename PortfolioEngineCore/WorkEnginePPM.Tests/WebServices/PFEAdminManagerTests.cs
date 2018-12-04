@@ -85,6 +85,9 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string DeleteHolidayScheduleMethodName = "DeleteHolidaySchedule";
         private const string DeleteListWorkMethodName = "DeleteListWork";
         private const string DeletePersonalItemsMethodName = "DeletePersonalItems";
+        private const string DeletePIListWorkMethodName = "DeletePIListWork";
+        private const string DeleteResourceTimeoffMethodName = "DeleteResourceTimeoff";
+        private const string DeleteWorkScheduleMethodName = "DeleteWorkSchedule";
 
         [TestInitialize]
         public void Setup()
@@ -605,6 +608,150 @@ namespace WorkEnginePPM.Tests.WebServices
                 () => actual.SelectSingleNode($@"//Data/Item[@DataId=""{One}""]/Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
                 () => actual.SelectSingleNode($@"//Data/Item[@DataId=""{Two}""]/Result").Attributes["Status"].Value.ShouldBe(Zero.ToString()),
                 () => actual.SelectSingleNode($@"//Data/Item[@DataId=""{Three}""]/Result").InnerText.ShouldBe($"Error: {DummyString}"),
+                () => methodHit.ShouldBe(Three));
+        }
+
+        [TestMethod]
+        public void DeletePIListWork_WithoutException_ReturnsResultXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data>
+                        <ListWork Id=""1"" DataId=""1""/>
+                    </Data>
+                </xmlcfg>";
+            const string resultXml = @"<Result Status=""1""/>";
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.DeletePIListWorkStringStringOut = (Admininfos instance, string xml, out string outXml) =>
+            {
+                outXml = resultXml;
+                return true;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(DeletePIListWorkMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(DeletePIListWorkMethodName),
+                () => actual.FirstChild.SelectNodes("//Result").Count.ShouldBe(2),
+                () => actual.FirstChild.SelectSingleNode($"//Result[@Status='{Zero}']").ShouldNotBeNull(),
+                () => actual.FirstChild.SelectSingleNode($"//Result[@Status='{One}']").ShouldNotBeNull());
+        }
+
+        [TestMethod]
+        public void DeletePIListWork_WithException_ReturnsResultXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data>
+                        <ListWork Id=""1"" DataId=""1""/>
+                    </Data>
+                </xmlcfg>";
+            const string resultXml = @"<Result Status=""0""/>";
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.DeletePIListWorkStringStringOut = (Admininfos instance, string xml, out string outXml) =>
+            {
+                outXml = resultXml;
+                throw new Exception(DummyString);
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(DeletePIListWorkMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString));
+        }
+
+        [TestMethod]
+        public void DeleteResourceTimeoff_WhenCalled_ReturnsDataXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data>
+                        <Resource Id=""1"" DataId=""1""/>
+                        <Resource Id=""2"" DataId=""2""/>
+                    </Data>
+                </xmlcfg>";
+            var methodHit = 0;
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.DeleteResourceTimeoffStringStringOut = (Admininfos instance, string xml, out string resultXml) =>
+            {
+                methodHit += 1;
+                resultXml = @"<Result Status=""0""/>";
+                if (methodHit.Equals(Two))
+                {
+                    throw new Exception(DummyString);
+                }
+                return true;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(DeleteResourceTimeoffMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.SelectNodes("//Data/Resource").Count.ShouldBe(One),
+                () => actual.SelectSingleNode($@"//Data/Resource/Result").InnerText.ShouldBe($"Error: {DummyString}"),
+                () => actual.SelectSingleNode($@"//Data/Result").Attributes["Status"].Value.ShouldBe(Zero.ToString()),
+                () => methodHit.ShouldBe(Two));
+        }
+
+        [TestMethod]
+        public void DeleteWorkSchedule_WhenCalled_ReturnsDataXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data>
+                        <WorkSchedule Id=""1"" DataId=""1""/>
+                        <WorkSchedule Id=""2"" DataId=""2""/>
+                        <WorkSchedule Id=""3"" DataId=""3""/>
+                    </Data>
+                </xmlcfg>";
+            var methodHit = 0;
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.CanDeleteWorkScheduleInt32StringOut = (Admininfos instance, int id, out string message) =>
+            {
+                methodHit += 1;
+                message = DummyString;
+
+                if (methodHit.Equals(Three))
+                {
+                    throw new Exception(DummyString);
+                }
+
+                return !methodHit.Equals(One);
+            };
+            ShimAdmininfos.AllInstances.DeleteWorkScheduleStringStringOut = (Admininfos instance, string xml, out string resultXml) =>
+            {
+                resultXml = @"<Result Status=""0""/>";
+                return true;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(DeleteWorkScheduleMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.SelectNodes("//Data/WorkSchedule").Count.ShouldBe(Two),
+                () => actual.SelectSingleNode($@"//Data/WorkSchedule[@DataId=""{One}""]/Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.SelectSingleNode($@"//Data/Result").Attributes["Status"].Value.ShouldBe(Zero.ToString()),
                 () => methodHit.ShouldBe(Three));
         }
     }
