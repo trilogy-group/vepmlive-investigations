@@ -145,7 +145,7 @@ pipeline {
 							script {
 								echo 'Triggering TS-Client tests job...'
 								build(
-									job: "../EPML-TS/EPM-TS", 
+									job: "../EPML-TS/EPML-TS", 
 									wait: true,
 									parameters: [
 										[$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
