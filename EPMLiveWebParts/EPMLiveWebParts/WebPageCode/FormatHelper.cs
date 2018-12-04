@@ -107,7 +107,10 @@ namespace EPMLiveWebParts
                     break;
                 case SPFieldType.Number:
                     if (xmlDoc.FirstChild.Attributes["Percentage"] != null
-                        && xmlDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
+                        && string.Equals(
+                            xmlDoc.FirstChild.Attributes["Percentage"].Value,
+                            bool.TrueString,
+                            StringComparison.OrdinalIgnoreCase))
                     {
                         format = "0\\%;0\\%;0\\%";
                     }
@@ -145,7 +148,10 @@ namespace EPMLiveWebParts
                             break;
                         case "Number":
                             if (xmlDoc.FirstChild.Attributes["Percentage"] != null
-                                && xmlDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
+                                && string.Equals(
+                                    xmlDoc.FirstChild.Attributes["Percentage"].Value,
+                                    bool.TrueString,
+                                    StringComparison.OrdinalIgnoreCase))
                             {
                                 format = numberFormat;
                             }
