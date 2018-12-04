@@ -92,6 +92,17 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string UpdateHolidaySchedulesMethodName = "UpdateHolidaySchedules";
         private const string UpdateListWorkMethodName = "UpdateListWork";
         private const string UpdatePersonalItemsMethodName = "UpdatePersonalItems";
+        private const string UpdateResourceTimeoffMethodName = "UpdateResourceTimeoff";
+        private const string UpdateRolesMethodName = "UpdateRoles";
+        private const string UpdateRolesOLDMethodName = "UpdateRoles_OLD";
+        private const string UpdateScheduledWorkMethodName = "UpdateScheduledWork";
+        private const string UpdateWorkScheduleMethodName = "UpdateWorkSchedule";
+        private const string GetCostCategoryRolesMethodName = "GetCostCategoryRoles";
+        private const string UpdateDepartmentsMethodName = "UpdateDepartments";
+        private const string GetDepartmentsMethodName = "GetDepartments";
+        private const string GetHolidaySchedulesMethodName = "GetHolidaySchedules";
+        private const string GetPersonalItemsMethodName = "GetPersonalItems";
+        private const string GetWorkSchedulesMethodName = "GetWorkSchedules";
 
         [TestInitialize]
         public void Setup()
@@ -1103,6 +1114,644 @@ namespace WorkEnginePPM.Tests.WebServices
                 () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
                 () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
                 () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe($"Error: {DummyString}"));
+        }
+
+        [TestMethod]
+        public void UpdateResourceTimeoff_WhenCalled_ReturnsDataXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data>
+                        <Resource Id=""1"" DataId=""1""/>
+                        <Resource Id=""2"" DataId=""2""/>
+                    </Data>
+                </xmlcfg>";
+            var methodHit = 0;
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.UpdateResourceTimeoffStringStringOut = (Admininfos instance, string xml, out string resultXml) =>
+            {
+                resultXml = @"<Result Status=""5""/>";
+                methodHit += 1;
+                if (methodHit.Equals(Two))
+                {
+                    throw new Exception(DummyString);
+                }
+                return true;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(UpdateResourceTimeoffMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.SelectNodes("//Data/Resource").Count.ShouldBe(One),
+                () => actual.SelectSingleNode($@"//Data/Resource/Result").InnerText.ShouldBe($"Error: {DummyString}"),
+                () => actual.SelectSingleNode($@"//Data/Result").Attributes["Status"].Value.ShouldBe(Five.ToString()),
+                () => methodHit.ShouldBe(Two));
+        }
+
+        [TestMethod]
+        public void UpdateRoles_UpdateOkFalse_ReturnsDataXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data>
+                        <Role Id=""1"" DataId=""1""/>
+                    </Data>
+                </xmlcfg>";
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.UpdateRolesStringStringOut = (Admininfos instance, string xml, out string outXml) =>
+            {
+                validations += 1;
+                outXml = DummyString;
+                return false;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.GetCCRs = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimAdmininfos.AllInstances.UpdateCategoriesFromRoles = _ =>
+            {
+                validations += 1;
+                return true;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(UpdateRolesMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(UpdateRolesMethodName),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void UpdateRoles_UpdateOkTrue_ReturnsDataXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data>
+                        <Role Id=""1"" DataId=""1""/>
+                    </Data>
+                </xmlcfg>";
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.UpdateRolesStringStringOut = (Admininfos instance, string xml, out string outXml) =>
+            {
+                validations += 1;
+                outXml = DummyString;
+                return true;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.GetCCRs = _ =>
+            {
+                validations += 1;
+                return $"<{DummyString}>{DummyString}</{DummyString}>";
+            };
+            ShimAdmininfos.AllInstances.UpdateCategoriesFromRoles = _ =>
+            {
+                validations += 1;
+                return true;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(UpdateRolesMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(UpdateRolesMethodName),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(Zero.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result").InnerText.ShouldBe(string.Empty),
+                () => actual.FirstChild.SelectSingleNode($"//{DummyString}").InnerText.ShouldBe(DummyString),
+                () => validations.ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void UpdateRolesold_UpdateOkFalse_ReturnsDataXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data>
+                        <Role Id=""1"" DataId=""1""/>
+                    </Data>
+                </xmlcfg>";
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.UpdateRoles_OLDStringStringOut = (Admininfos instance, string xml, out string outXml) =>
+            {
+                validations += 1;
+                outXml = DummyString;
+                return false;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.GetCCRs = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimAdmininfos.AllInstances.UpdateCategoriesFromRoles = _ =>
+            {
+                validations += 1;
+                return true;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(UpdateRolesOLDMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void UpdateRolesOld_UpdateOkTrue_ReturnsDataXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data>
+                        <Role Id=""1"" DataId=""1""/>
+                    </Data>
+                </xmlcfg>";
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.UpdateRoles_OLDStringStringOut = (Admininfos instance, string xml, out string outXml) =>
+            {
+                validations += 1;
+                outXml = DummyString;
+                return true;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.GetCCRs = _ =>
+            {
+                validations += 1;
+                return $"<{DummyString}>{DummyString}</{DummyString}>";
+            };
+            ShimAdmininfos.AllInstances.UpdateCategoriesFromRoles = _ =>
+            {
+                validations += 1;
+                return true;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(UpdateRolesOLDMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(UpdateRolesOLDMethodName),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(Zero.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result").InnerText.ShouldBe(string.Empty),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void UpdateScheduledWork_UpdateOkFalse_ReturnsDataXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Params Worktype=""1""/>
+                    <Data>
+                        <Role Id=""1"" DataId=""1""/>
+                    </Data>
+                </xmlcfg>";
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.UpdateScheduledWorkInt32StringStringOut = (Admininfos instance, int workType, string xml, out string outXml) =>
+            {
+                validations += 1;
+                outXml = DummyString;
+                throw new Exception(DummyString);
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(UpdateScheduledWorkMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe($"Error: {DummyString}"),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void UpdateScheduledWork_UpdateOkTrue_ReturnsDataXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Params Worktype=""1""/>
+                    <Data>
+                        <Role Id=""1"" DataId=""1""/>
+                    </Data>
+                </xmlcfg>";
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.UpdateScheduledWorkInt32StringStringOut = (Admininfos instance, int workType, string xml, out string outXml) =>
+            {
+                validations += 1;
+                outXml = $"<{DummyString}>{DummyString}</{DummyString}>";
+                return false;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(UpdateScheduledWorkMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(UpdateScheduledWorkMethodName),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(Zero.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result").InnerText.ShouldBe(string.Empty),
+                () => actual.FirstChild.SelectSingleNode($"//{DummyString}").InnerText.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void UpdateWorkSchedule_WhenCalled_ReturnsDataXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data>
+                        <WorkSchedule Id=""1"" DataId=""1""/>
+                        <WorkSchedule Id=""2"" DataId=""2""/>
+                    </Data>
+                </xmlcfg>";
+            var methodHit = 0;
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.UpdateWorkScheduleStringStringOut = (Admininfos instance, string xml, out string resultXml) =>
+            {
+                resultXml = @"<Result Status=""5""/>";
+                methodHit += 1;
+                if (methodHit.Equals(Two))
+                {
+                    throw new Exception(DummyString);
+                }
+                return true;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(UpdateWorkScheduleMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.SelectNodes("//Data/WorkSchedule").Count.ShouldBe(One),
+                () => actual.SelectSingleNode($@"//Data/WorkSchedule/Result").InnerText.ShouldBe($"Error: {DummyString}"),
+                () => actual.SelectSingleNode($@"//Data/Result").Attributes["Status"].Value.ShouldBe(Five.ToString()),
+                () => methodHit.ShouldBe(Two));
+        }
+
+        [TestMethod]
+        public void GetCostCategoryRoles_WhenCalled_ReturnsCostCategoryRoles()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data>
+                        <WorkSchedule Id=""1"" DataId=""1""/>
+                        <WorkSchedule Id=""2"" DataId=""2""/>
+                    </Data>
+                </xmlcfg>";
+            var actual = new XmlDocument();
+            var childCostCategory = new CostCategory()
+            {
+                Id = Two,
+                Name = "Child",
+                Roles = new List<Role>(),
+                CostCategories = new List<CostCategory>()
+            };
+            var parentCostCategory = new List<CostCategory>()
+            {
+                new CostCategory()
+                {
+                    Id = One,
+                    Name = "Parent",
+                    Roles = new List<Role>()
+                    {
+                        new Role()
+                        {
+                            Id = One,
+                            CostCategoryRoleId = One,
+                            Name = DummyString
+                        }
+                    },
+                    CostCategories = new List<CostCategory>()
+                    {
+                        childCostCategory
+                    }
+                }
+            };
+
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.GetCostCategoryRoles = _ => parentCostCategory;
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GetCostCategoryRolesMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(GetCostCategoryRolesMethodName),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(Zero.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Data/CostCategory").Attributes["Id"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Data/CostCategory").Attributes["Name"].Value.ShouldBe("Parent"),
+                () => actual.FirstChild.SelectSingleNode("//Data/CostCategory/Role").Attributes["CostCategoryRoleId"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Data/CostCategory/CostCategory").Attributes["Name"].Value.ShouldBe("Child"));
+        }
+
+        [TestMethod]
+        public void UpdateDepartments_UpdateOkFalse_ReturnsDataXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Params Worktype=""1""/>
+                    <Data>
+                        <Role Id=""1"" DataId=""1""/>
+                    </Data>
+                </xmlcfg>";
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.UpdateDepartmentsStringStringOut = (Admininfos instance, string xml, out string outXml) =>
+            {
+                validations += 1;
+                outXml = DummyString;
+                return false;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(UpdateDepartmentsMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void UpdateDepartments_UpdateOkTrue_ReturnsDataXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Params Worktype=""1""/>
+                    <Data>
+                        <Role Id=""1"" DataId=""1""/>
+                    </Data>
+                </xmlcfg>";
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.UpdateDepartmentsStringStringOut = (Admininfos instance, string xml, out string outXml) =>
+            {
+                validations += 1;
+                outXml = $"<{DummyString}>{DummyString}</{DummyString}>";
+                return true;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(UpdateDepartmentsMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(UpdateDepartmentsMethodName),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(Zero.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result").InnerText.ShouldBe(string.Empty),
+                () => actual.FirstChild.SelectSingleNode($"//{DummyString}").InnerText.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetDepartments_WithoutException_ReturnsDataXml()
+        {
+            // Arrange
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.GetDepts = _ =>
+            {
+                validations += 1;
+                return $"<{DummyString}>{DummyString}</{DummyString}>";
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GetDepartmentsMethodName, nonPublicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(GetDepartmentsMethodName),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(Zero.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result").InnerText.ShouldBe(string.Empty),
+                () => actual.FirstChild.SelectSingleNode($"//{DummyString}").InnerText.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetDepartments_WithException_ReturnsDataXml()
+        {
+            // Arrange
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.GetDepts = _ =>
+            {
+                validations += 1;
+                throw new Exception(DummyString);
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GetDepartmentsMethodName, nonPublicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(((int)APIError.GetDepartments).ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe($"Error: {DummyString}"),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetHolidaySchedules_WithoutException_ReturnsDataXml()
+        {
+            // Arrange
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.GetHOLs = _ =>
+            {
+                validations += 1;
+                return $"<{DummyString}>{DummyString}</{DummyString}>";
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GetHolidaySchedulesMethodName, nonPublicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(GetHolidaySchedulesMethodName),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(Zero.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result").InnerText.ShouldBe(string.Empty),
+                () => actual.FirstChild.SelectSingleNode($"//{DummyString}").InnerText.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetHolidaySchedules_WithException_ReturnsDataXml()
+        {
+            // Arrange
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.GetHOLs = _ =>
+            {
+                validations += 1;
+                throw new Exception(DummyString);
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GetHolidaySchedulesMethodName, nonPublicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(((int)APIError.GetHolidaySchedules).ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe($"Error: {DummyString}"),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetPersonalItems_WithoutException_ReturnsDataXml()
+        {
+            // Arrange
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.GetPersonalItems = _ =>
+            {
+                validations += 1;
+                return $"<{DummyString}>{DummyString}</{DummyString}>";
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GetPersonalItemsMethodName, nonPublicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(GetPersonalItemsMethodName),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(Zero.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result").InnerText.ShouldBe(string.Empty),
+                () => actual.FirstChild.SelectSingleNode($"//{DummyString}").InnerText.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetPersonalItems_WithException_ReturnsDataXml()
+        {
+            // Arrange
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.GetPersonalItems = _ =>
+            {
+                validations += 1;
+                throw new Exception(DummyString);
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GetPersonalItemsMethodName, nonPublicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(((int)APIError.GetPersonalItems).ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe($"Error: {DummyString}"),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetWorkSchedules_WithoutException_ReturnsDataXml()
+        {
+            // Arrange
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.GetWHs = _ =>
+            {
+                validations += 1;
+                return $"<{DummyString}>{DummyString}</{DummyString}>";
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GetWorkSchedulesMethodName, nonPublicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(GetWorkSchedulesMethodName),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(Zero.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result").InnerText.ShouldBe(string.Empty),
+                () => actual.FirstChild.SelectSingleNode($"//{DummyString}").InnerText.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetWorkSchedules_WithException_ReturnsDataXml()
+        {
+            // Arrange
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.GetWHs = _ =>
+            {
+                validations += 1;
+                throw new Exception(DummyString);
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GetWorkSchedulesMethodName, nonPublicInstance, new object[] { }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(((int)APIError.GetWorkSchedules).ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe($"Error: {DummyString}"),
+                () => validations.ShouldBe(1));
         }
     }
 }
