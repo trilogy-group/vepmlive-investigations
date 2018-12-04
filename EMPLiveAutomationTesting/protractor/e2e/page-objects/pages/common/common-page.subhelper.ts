@@ -50,7 +50,7 @@ export class CommonSubPageHelper {
         await EditCostHelper.searchByName(id);
         await CommonPageHelper.selectTwoRecordsFromGrid();
         StepLogger.stepId(3);
-        StepLogger.step('Click on Optimizer button from the items tab.');
+        StepLogger.subStep('Click on Optimizer button from the items tab.');
         const classValue = await PageHelper.getAttributeValue(CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer), 'class');
         if (classValue.includes('ms-cui-disabled')) {
             await PageHelper.refreshPage();
@@ -62,7 +62,7 @@ export class CommonSubPageHelper {
         await PageHelper.click(CommonPageHelper.getOptimizerButton());
         // Takes time to load the iframe
         await browser.sleep(PageHelper.timeout.m);
-        StepLogger.step('switch To First Content Frame');
+        StepLogger.subStep('switch To First Content Frame');
         await CommonPageHelper.switchToFirstContentFrame();
     }
 }
