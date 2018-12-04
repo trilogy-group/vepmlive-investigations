@@ -512,17 +512,7 @@ namespace EPMLiveReportsAdmin
 		/// </returns>
 		protected override bool IsLookUpField(string listName, string columnName)
 		{
-			const string sql =
-				"SELECT dbo.RPTColumn.SharePointType, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND (ColumnName=@colName)";
-			_DAO.AddParam("@listName", "My Work", 500);
-			_DAO.AddParam("@colName", columnName, 50);
-
-			_DAO.Command = sql;
-
-			object objType = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
-
-			return objType.ToString().ToLower().Equals("lookup") || objType.ToString().ToLower().Equals("user") ||
-				   objType.ToString().ToLower().Equals("flookup");
+			return _DAO.IsLookUpField("My Work", columnName);
 		}
 
         /// <summary>
