@@ -22,7 +22,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    it('Check behavior of "Save and Close" button - [743175]', async () => {
+    it('Check behavior of "Save and Close" button - [743175] [BUG:SKYVERA-1795]', async () => {
         StepLogger.caseId = 743175;
         const uniqueId = PageHelper.getUniqueId();
 
