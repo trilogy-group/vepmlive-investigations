@@ -159,6 +159,7 @@
     <Compile Include="HelperFunctionsTests.cs" />
     <Compile Include="WebServices\OptGridsTests.cs" />
     <Compile Include="WebServices\PortfolioEngineAPITests.cs" />
+    <Compile Include="WebServices\ResPlanAnalyzerTests.cs" />
     <Compile Include="WebServices\RPADataTests.cs" />
   </ItemGroup>
   <ItemGroup>
