@@ -18,7 +18,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    fit('cleanup - [1]', async () => {
+    it('cleanup - [1]', async () => {
         StepLogger.caseId = 829527;
         StepLogger.stepId(1);
         // Step #1 Inside this function

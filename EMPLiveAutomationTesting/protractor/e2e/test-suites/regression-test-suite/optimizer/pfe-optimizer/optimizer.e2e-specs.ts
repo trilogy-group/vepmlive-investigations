@@ -8,23 +8,18 @@ import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
 import {OptimizerPageHelper} from '../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer-page.helper';
 import {EditCostHelper} from '../../../../page-objects/pages/items-page/project-item/edit-cost-page/edit-cost.helper';
-// import {LoginPageHelper} from '../../../../page-objects/pages/login/login-page.helper';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
-    const project1 = 'Project Name * K1CFUoT2 1';
-    const project2 = 'Project Name * K1CFUoT2 2';
-    const id = 'K1CFUoT2';
-    console.log(project1);
-    console.log(project2);
+    let id = '';
 
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-
-/*     beforeAll(async () => {
+/*
+    beforeAll(async () => {
         await new LoginPage().goToAndLogin();
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -47,6 +42,7 @@ describe(SuiteNames.regressionTestSuite, () => {
 
     it('Verify the Close button of the Optimizer page  - [744351]', async () => {
         StepLogger.caseId = 744351;
+        id = await EditCostHelper.createTwoProjectWithCost();
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,

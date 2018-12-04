@@ -12,6 +12,8 @@ import {ElementHelper} from '../../../../../components/html/element-helper';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {ProjectItemPageHelper} from '../project-item-page.helper';
 import {ProjectItemPageConstants} from '../project-item-page.constants';
+import {LoginPage} from '../../../login/login.po';
+import {LoginPageHelper} from '../../../login/login-page.helper';
 
 export class EditCostHelper {
 
@@ -273,5 +275,23 @@ export class EditCostHelper {
         await CommonPageHelper.verifyVariousOptionsOnContextMenu();
         StepLogger.subStep('Click on Edit Cost link');
         await PageHelper.click(EditCost.editCostLinkViaEllipse);
+    }
+
+    static async createTwoProjectWithCost() {
+        await new LoginPage().goToAndLogin();
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+        );
+        const id = PageHelper.getUniqueId();
+        const project1 = await EditCostHelper.createProjectWithCost(`${id} 1`);
+        StepLogger.subStep(`${project1} is created`);
+        await EditCostHelper.clickCloseCostPlanner();
+        const project2 = await EditCostHelper.createProjectWithCost(`${id} 2`);
+        StepLogger.subStep(`${project2} is created`);
+        await EditCostHelper.clickCloseCostPlanner();
+        await LoginPageHelper.logout();
+        return id;
     }
 }
