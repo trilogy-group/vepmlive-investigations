@@ -6,7 +6,7 @@ namespace WorkEnginePPM
 {
     public class GroupPermissionsGridHelper
     {
-        internal static CStruct BuildGridLayout(DataTable dt)
+        internal static CStruct BuildGridLayout(DataTable dataTable)
         {
             var grid = InitializeGrid();
             AddToolBar(grid);
@@ -20,9 +20,9 @@ namespace WorkEnginePPM
             AddNameColumn(leftCols, header);
             var levels = AddCbColumn(cols, header, grid);
 
-            if (dt != null)
+            if (dataTable != null)
             {
-                XmlHelper.FillFieldsXml(dt, levels);
+                XmlHelper.FillFieldsXml(dataTable, levels);
             }
             return grid;
         }
