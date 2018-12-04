@@ -43,6 +43,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     it('Verify the Close button of the Optimizer page  - [744351]', async () => {
         StepLogger.caseId = 744351;
         id = await EditCostHelper.createTwoProjectWithCost();
+        await loginPage.goToAndLogin();
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,

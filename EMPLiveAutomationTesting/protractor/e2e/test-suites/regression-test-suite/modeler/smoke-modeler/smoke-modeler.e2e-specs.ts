@@ -39,6 +39,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     it('Verify the Modeler page. - [744256]', async () => {
         StepLogger.caseId = 744256;
         id = await EditCostHelper.createTwoProjectWithCost();
+        await loginPage.goToAndLogin();
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,

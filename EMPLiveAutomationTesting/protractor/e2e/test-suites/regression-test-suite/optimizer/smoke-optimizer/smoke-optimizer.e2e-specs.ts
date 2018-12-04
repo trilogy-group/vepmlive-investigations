@@ -39,6 +39,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     it('Verify the Optimizer and View Option of the Optimizer page.  - [744404]', async () => {
         StepLogger.caseId = 744404;
         id = await EditCostHelper.createTwoProjectWithCost();
+        await loginPage.goToAndLogin();
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,

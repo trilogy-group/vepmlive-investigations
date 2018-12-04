@@ -24,6 +24,7 @@ describe(SuiteNames.regressionTestSuite, () => {
     it('Verify the select Version(s) Selection box. - [744210]', async () => {
         StepLogger.caseId = 744210;
         id = await EditCostHelper.createTwoProjectWithCost();
+        await loginPage.goToAndLogin();
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
