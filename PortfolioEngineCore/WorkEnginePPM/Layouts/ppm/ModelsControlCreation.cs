@@ -24,10 +24,10 @@ namespace WorkEnginePPM
             if (dataTable.Rows.Count == 1)
             {
                 var row = dataTable.Rows[0];
-                models.CreateIntAttr(ModelUIdAttribute, SqlDb.ReadIntValue(row[(string)ModelUIdAttribute]));
-                models.CreateStringAttr(ModelNameAttribute, SqlDb.ReadStringValue(row[(string)ModelNameAttribute]));
-                models.CreateStringAttr(ModelDescAttribute, SqlDb.ReadStringValue(row[(string)ModelDescAttribute]));
-                selectedCalendar = SqlDb.ReadIntValue(row[(string)ModelCbIdAttribute]);
+                models.CreateIntAttr(ModelUIdAttribute, SqlDb.ReadIntValue(row[ModelUIdAttribute]));
+                models.CreateStringAttr(ModelNameAttribute, SqlDb.ReadStringValue(row[ModelNameAttribute]));
+                models.CreateStringAttr(ModelDescAttribute, SqlDb.ReadStringValue(row[ModelDescAttribute]));
+                selectedCalendar = SqlDb.ReadIntValue(row[ModelCbIdAttribute]);
                 models.CreateIntAttr(ModelCbIdAttribute, selectedCalendar);
                 selectedFlagField = SqlDb.ReadIntValue(row[ModelSelectedFieldId]);
             }
@@ -35,7 +35,7 @@ namespace WorkEnginePPM
             {
                 models.CreateIntAttr(ModelUIdAttribute, 0);
                 models.CreateStringAttr(ModelNameAttribute, NewModelValue);
-                models.CreateStringAttr(ModelDescAttribute, String.Empty);
+                models.CreateStringAttr(ModelDescAttribute, string.Empty);
                 models.CreateIntAttr(ModelCbIdAttribute, selectedCalendar);
             }
         }
@@ -123,7 +123,12 @@ namespace WorkEnginePPM
             dGrid.AddColumn("Name", 150, name: "MODEL_VERSION_NAME", editable: false);
             dGrid.AddColumn("Description", 150, name: "MODEL_VERSION_DESC", editable: false);
             dGrid.AddColumn("Permissions", 250, name: "MODEL_VERSION_PERMISSIONS", editable: false);
-            dGrid.AddColumn("PermissionsHidden", 180, name: "MODEL_VERSION_PERMISSIONS_HIDDEN", editable: false, hidden: true);
+            dGrid.AddColumn(
+                "PermissionsHidden",
+                180,
+                name: "MODEL_VERSION_PERMISSIONS_HIDDEN",
+                editable: false,
+                hidden: true);
             dGrid.SetDataTable(versions);
             return dGrid;
         }
@@ -140,8 +145,8 @@ namespace WorkEnginePPM
             var rowCount = dataTable.Rows.Count;
             var rowIndex = 0;
             DataRow versionRow = null;
-            var permissions = String.Empty;
-            var hiddenPermissions = String.Empty;
+            var permissions = string.Empty;
+            var hiddenPermissions = string.Empty;
             foreach (DataRow row in dataTable.Rows)
             {
                 rowIndex++;
@@ -153,8 +158,8 @@ namespace WorkEnginePPM
                         versionRow["MODEL_VERSION_PERMISSIONS"] = permissions;
                         versionRow["MODEL_VERSION_PERMISSIONS_HIDDEN"] = hiddenPermissions;
                     }
-                    permissions = String.Empty;
-                    hiddenPermissions = String.Empty;
+                    permissions = string.Empty;
+                    hiddenPermissions = string.Empty;
                     versionRow = versions.Rows.Add();
                     versionRow["MODEL_VERSION_UID"] = row["MODEL_VERSION_UID"];
                     versionRow["MODEL_VERSION_NAME"] = row["MODEL_VERSION_NAME"];
@@ -171,16 +176,16 @@ namespace WorkEnginePPM
                     {
                         permissionGranded = "Read Only";
                     }
-                    if (!String.IsNullOrWhiteSpace(permissions))
+                    if (!string.IsNullOrWhiteSpace(permissions))
                     {
                         permissions += ",";
                     }
-                    permissions += String.Format("{0}({1})", row["GROUP_NAME"], permissionGranded);
-                    if (!String.IsNullOrWhiteSpace(hiddenPermissions))
+                    permissions += string.Format("{0}({1})", row["GROUP_NAME"], permissionGranded);
+                    if (!string.IsNullOrWhiteSpace(hiddenPermissions))
                     {
                         hiddenPermissions += ",";
                     }
-                    hiddenPermissions += String.Format(
+                    hiddenPermissions += string.Format(
                         "{0}::{1}::{2}::{3}",
                         row["GROUP_ID"],
                         row["GROUP_NAME"],
