@@ -18,24 +18,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-/*
-    beforeAll(async () => {
-        await new LoginPage().goToAndLogin();
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
-        );
-        id = PageHelper.getUniqueId();
-        project1 = await EditCostHelper.createProjectWithCost(`${id} 1`);
-        StepLogger.subStep(`${project1} is created`);
-        await EditCostHelper.clickCloseCostPlanner();
-        project2 = await EditCostHelper.createProjectWithCost(`${id} 2`);
-        StepLogger.subStep(`${project2} is created`);
-        await EditCostHelper.clickCloseCostPlanner();
-        await LoginPageHelper.logout();
-    });
- */
+
     it('Verify the Modeler page. - [744256]', async () => {
         StepLogger.caseId = 744256;
         id = await EditCostHelper.createTwoProjectWithCost();

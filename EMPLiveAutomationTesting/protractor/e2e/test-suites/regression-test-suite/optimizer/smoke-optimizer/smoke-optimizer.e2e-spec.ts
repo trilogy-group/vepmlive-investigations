@@ -8,6 +8,7 @@ import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
 import {OptimizerPageHelper} from '../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer-page.helper';
 import {EditCostHelper} from '../../../../page-objects/pages/items-page/project-item/edit-cost-page/edit-cost.helper';
+import {CommonSubPageHelper} from '../../../../page-objects/pages/common/common-page.subhelper';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
@@ -18,23 +19,6 @@ describe(SuiteNames.regressionTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-
-/*     beforeAll(async () => {
-        await new LoginPage().goToAndLogin();
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
-        );
-        id = PageHelper.getUniqueId();
-        project1 = await EditCostHelper.createProjectWithCost(`${id} 1`);
-        StepLogger.subStep(`${project1} is created`);
-        await EditCostHelper.clickCloseCostPlanner();
-        project2 = await EditCostHelper.createProjectWithCost(`${id} 2`);
-        StepLogger.subStep(`${project2} is created`);
-        await EditCostHelper.clickCloseCostPlanner();
-        await LoginPageHelper.logout();
-    }); */
 
     it('Verify the Optimizer and View Option of the Optimizer page.  - [744404]', async () => {
         StepLogger.caseId = 744404;
@@ -48,7 +32,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         );
         await CommonPageHelper.verifyProjectCenterDisplayed();
         // Step 2 and 3 are inside the below function
-        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
+        await CommonSubPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerTabOptions();
     });
 
@@ -63,7 +47,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await CommonPageHelper.verifyProjectCenterDisplayed();
 
         // Step 2 and 3 are inside the below function
-        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
+        await CommonSubPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
 
         StepLogger.stepId(4);
@@ -81,7 +65,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await CommonPageHelper.verifyProjectCenterDisplayed();
 
         // Step 2 and 3 are inside the below function
-        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
+        await CommonSubPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
 
         StepLogger.stepId(4);
@@ -100,7 +84,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await CommonPageHelper.verifyProjectCenterDisplayed();
 
         // Step 2 and 3 are inside the below function
-        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
+        await CommonSubPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
 
         StepLogger.stepId(4);
@@ -123,7 +107,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await CommonPageHelper.verifyProjectCenterDisplayed();
 
         // Step 2 and 3 are inside the below function
-        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
+        await CommonSubPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
 
         StepLogger.stepId(4);
@@ -146,7 +130,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await CommonPageHelper.verifyProjectCenterDisplayed();
 
         // Step 2 and 3 are inside the below function
-        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
+        await CommonSubPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
 
         StepLogger.stepId(4);
@@ -165,7 +149,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await CommonPageHelper.verifyProjectCenterDisplayed();
 
         // Step 2 and 3 are inside the below function
-        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
+        await CommonSubPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
 
         StepLogger.stepId(4);
@@ -185,7 +169,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await CommonPageHelper.verifyProjectCenterDisplayed();
 
         // Step 2 and 3 are inside the below function
-        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
+        await CommonSubPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
 
         StepLogger.stepId(4);
@@ -204,7 +188,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await CommonPageHelper.verifyProjectCenterDisplayed();
 
         // Step 2 and 3 are inside the below function
-        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
+        await CommonSubPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
 
         StepLogger.stepId(4);
@@ -224,7 +208,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await CommonPageHelper.verifyProjectCenterDisplayed();
 
         // Step 2 and 3 are inside the below function
-        await CommonPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
+        await CommonSubPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await OptimizerPageHelper.verifyOptimizerPageOpened();
 
         StepLogger.stepId(4);

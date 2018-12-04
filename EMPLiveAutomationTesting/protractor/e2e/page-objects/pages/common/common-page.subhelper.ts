@@ -1,9 +1,14 @@
+import { browser } from 'protractor';
+
 import { PageHelper } from '../../../components/html/page-helper';
 import { WaitHelper } from '../../../components/html/wait-helper';
 import { ElementHelper } from '../../../components/html/element-helper';
 import { StepLogger } from '../../../../core/logger/step-logger';
 import { CommonPage } from './common.po';
 import { CommonSubPage } from './common.subpo';
+import { CommonPageHelper } from './common-page.helper';
+import { EditCostHelper } from '../items-page/project-item/edit-cost-page/edit-cost.helper';
+import { CommonPageConstants } from './common-page.constants';
 
 export class CommonSubPageHelper {
 
@@ -38,5 +43,26 @@ export class CommonSubPageHelper {
         await WaitHelper.waitForElementToBePresent(CommonPage.getNthRecord());
         await ElementHelper.actionHoverOver(CommonPage.getNthRecord());
         await PageHelper.click(CommonPage.getNthRecord());
+    }
+
+    static async searchAndSelectUsingIdThenOpenOptimizer(id: string) {
+        await CommonPageHelper.verifyProjectCenterDisplayed();
+        await EditCostHelper.searchByName(id);
+        await CommonPageHelper.selectTwoRecordsFromGrid();
+        StepLogger.stepId(3);
+        StepLogger.step('Click on Optimizer button from the items tab.');
+        const classValue = await PageHelper.getAttributeValue(CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer), 'class');
+        if (classValue.includes('ms-cui-disabled')) {
+            await PageHelper.refreshPage();
+            await WaitHelper.waitForPageToStable();
+            await EditCostHelper.searchByName(id);
+            await CommonPageHelper.selectTwoRecordsFromGrid();
+            await PageHelper.sleepForXSec(PageHelper.timeout.m);
+        }
+        await PageHelper.click(CommonPageHelper.getOptimizerButton());
+        // Takes time to load the iframe
+        await browser.sleep(PageHelper.timeout.m);
+        StepLogger.step('switch To First Content Frame');
+        await CommonPageHelper.switchToFirstContentFrame();
     }
 }
