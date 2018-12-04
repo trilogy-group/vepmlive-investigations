@@ -88,6 +88,7 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string DeletePIListWorkMethodName = "DeletePIListWork";
         private const string DeleteResourceTimeoffMethodName = "DeleteResourceTimeoff";
         private const string DeleteWorkScheduleMethodName = "DeleteWorkSchedule";
+        private const string DeleteRolesMethodName = "DeleteRoles";
 
         [TestInitialize]
         public void Setup()
@@ -753,6 +754,191 @@ namespace WorkEnginePPM.Tests.WebServices
                 () => actual.SelectSingleNode($@"//Data/WorkSchedule[@DataId=""{One}""]/Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
                 () => actual.SelectSingleNode($@"//Data/Result").Attributes["Status"].Value.ShouldBe(Zero.ToString()),
                 () => methodHit.ShouldBe(Three));
+        }
+
+        [TestMethod]
+        public void DeleteRoles_CaseOne_ReturnsDataXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data>
+                        <Role Id=""1"" DataId=""1""/>
+                    </Data>
+                </xmlcfg>";
+            var errorMessage = $"Cannot delete item, it is used as follows: {DummyString}";
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.CanDeleteLookupValueInt32StringOut = (Admininfos instance, int id, out string message) =>
+            {
+                validations += 1;
+                message = DummyString;
+                return false;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.GetCCRs = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(DeleteRolesMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(DeleteRolesMethodName),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe(errorMessage),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void DeleteRoles_CaseTwo_ReturnsDataXml()
+        {
+            // Arrange
+            const string deletemessage = "Cost Categories: Resource Role\n";
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data>
+                        <Role Id=""1"" DataId=""1""/>
+                    </Data>
+                </xmlcfg>";
+            var errorMessage = $"Cannot delete Role, it is used as follows: {DummyString}";
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.CanDeleteLookupValueInt32StringOut = (Admininfos instance, int id, out string message) =>
+            {
+                validations += 1;
+                message = deletemessage;
+                return false;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.GetCCRs = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimAdmininfos.AllInstances.CountRoleCategoriesInt32 = (_, __) =>
+            {
+                validations += 1;
+                return Zero;
+            };
+            ShimAdmininfos.AllInstances.CanDeleteCostCategoryRoleInt32StringOut = (Admininfos instance, int id, out string message) =>
+            {
+                validations += 1;
+                message = DummyString;
+                return false;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(DeleteRolesMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(DeleteRolesMethodName),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe(errorMessage),
+                () => validations.ShouldBe(4));
+        }
+
+        [TestMethod]
+        public void DeleteRoles_CaseThree_ReturnsDataXml()
+        {
+            // Arrange
+            const string deletemessage = "Cost Categories: Resource Role\n";
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data>
+                        <Role Id=""1"" DataId=""1""/>
+                    </Data>
+                </xmlcfg>";
+            var errorMessage = $"Cannot delete Role, it is used as follows: {DummyString}";
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.CanDeleteLookupValueInt32StringOut = (Admininfos instance, int id, out string message) =>
+            {
+                validations += 1;
+                message = deletemessage;
+                return false;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.GetCCRs = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimAdmininfos.AllInstances.CountRoleCategoriesInt32 = (_, __) =>
+            {
+                validations += 1;
+                return Five;
+            };
+            ShimAdmininfos.AllInstances.CanDeleteCostCategoryRolebyCCRIdInt32Int32StringOut = (Admininfos instance, int ccid, int id, out string message) =>
+            {
+                validations += 1;
+                message = DummyString;
+                return false;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(DeleteRolesMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(DeleteRolesMethodName),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe(errorMessage),
+                () => validations.ShouldBe(4));
+        }
+
+        [TestMethod]
+        public void DeleteRoles_CaseFour_ReturnsDataXml()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data>
+                        <Role Id=""1"" DataId=""1""/>
+                    </Data>
+                </xmlcfg>";
+            const string errorMessage = "Failed to delete item";
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.AllInstances.CanDeleteLookupValueInt32StringOut = (Admininfos instance, int id, out string message) =>
+            {
+                validations += 1;
+                message = DummyString;
+                return true;
+            };
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.GetCCRs = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimAdmininfos.AllInstances.DeleteRoleInt32 = (_, __) =>
+            {
+                validations += 1;
+                return false;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(DeleteRolesMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe(DeleteRolesMethodName),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe(errorMessage),
+                () => validations.ShouldBe(3));
         }
     }
 }
