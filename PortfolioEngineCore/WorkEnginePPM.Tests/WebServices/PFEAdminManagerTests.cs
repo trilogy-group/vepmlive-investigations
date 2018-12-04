@@ -103,6 +103,7 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string GetHolidaySchedulesMethodName = "GetHolidaySchedules";
         private const string GetPersonalItemsMethodName = "GetPersonalItems";
         private const string GetWorkSchedulesMethodName = "GetWorkSchedules";
+        private const string PostCostValuesMethodName = "PostCostValues";
 
         [TestInitialize]
         public void Setup()
@@ -179,6 +180,7 @@ namespace WorkEnginePPM.Tests.WebServices
             ShimConfigFunctions.GetCleanUsernameSPWeb = _ => DummyString;
             //ShimPFEBase.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimPFEBase();
             //ShimResponse.SuccessString = input => input;
+            //ShimDBAccess.ConstructorString = (_, __) => new ShimDBAccess();
         }
 
         private void SetupVariables()
@@ -1752,6 +1754,550 @@ namespace WorkEnginePPM.Tests.WebServices
                 () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
                 () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe($"Error: {DummyString}"),
                 () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void PostCostValues_CaseOne_ReturnsPostCostValues()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data/>
+                </xmlcfg>";
+            const string postInstructionString = @"
+                <PostInstruction>
+                    <IDs Id=""2""/>
+                    <PIs Id=""4""/>
+                </PostInstruction>";
+            var actual = new XmlDocument();
+            var expected = $"PostError0: {(int)StatusEnum.rsDBConnectFailed} - DummyString";
+
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.PostCostValuesStringStringOutStringOut = (Admininfos instance, string xml, out string resultXml, out string postInstruction) =>
+            {
+                validations += 1;
+                resultXml = DummyString;
+                postInstruction = postInstructionString;
+                return true;
+            };
+            ShimWebAdmin.GetConnectionString = () =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimSqlDb.AllInstances.Open = instance =>
+            {
+                validations += 1;
+                instance.Status = StatusEnum.rsDBConnectFailed;
+                return StatusEnum.rsDBConnectFailed;
+            };
+            ShimSqlDb.AllInstances.FormatErrorText = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(PostCostValuesMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe(expected),
+                () => validations.ShouldBe(4));
+        }
+
+        [TestMethod]
+        public void PostCostValues_CaseTwo_ReturnsPostCostValues()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data/>
+                </xmlcfg>";
+            const string postInstructionString = @"
+                <PostInstruction>
+                    <IDs Id=""2""/>
+                    <PIs Id=""4""/>
+                </PostInstruction>";
+            var actual = new XmlDocument();
+
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.PostCostValuesStringStringOutStringOut = (Admininfos instance, string xml, out string resultXml, out string postInstruction) =>
+            {
+                validations += 1;
+                resultXml = DummyString;
+                postInstruction = postInstructionString;
+                return true;
+            };
+            ShimWebAdmin.GetConnectionString = () =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimSqlDb.AllInstances.Open = instance =>
+            {
+                validations += 1;
+                instance.Status = StatusEnum.rsDBConnectFailed;
+                throw new Exception(DummyString);
+            };
+            ShimSqlDb.AllInstances.FormatErrorText = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(PostCostValuesMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe($"Error: {DummyString}"),
+                () => validations.ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void PostCostValues_CaseThree_ReturnsPostCostValues()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data/>
+                </xmlcfg>";
+            const string postInstructionString = @"
+                <PostInstruction>
+                    <IDs Id=""2""/>
+                    <PIs Id=""4""/>
+                </PostInstruction>";
+            var actual = new XmlDocument();
+            var expected = $"PostError1: {(int)StatusEnum.rsInvalidPeriodID} - DummyString";
+
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.PostCostValuesStringStringOutStringOut = (Admininfos instance, string xml, out string resultXml, out string postInstruction) =>
+            {
+                validations += 1;
+                resultXml = DummyString;
+                postInstruction = postInstructionString;
+                return true;
+            };
+            ShimWebAdmin.GetConnectionString = () =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimSqlDb.AllInstances.Open = instance =>
+            {
+                validations += 1;
+                return StatusEnum.rsSuccess;
+            };
+            ShimSqlDb.AllInstances.FormatErrorText = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimdbaUsers.ExportPIInfoDBAccessStringStringOut = (DBAccess dbAccess, string pi, out string xmlRequest) =>
+            {
+                validations += 1;
+                xmlRequest = DummyString;
+                dbAccess.Status = StatusEnum.rsInvalidPeriodID;
+                return StatusEnum.rsInvalidPeriodID;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(PostCostValuesMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe(expected),
+                () => validations.ShouldBe(5));
+        }
+
+        [TestMethod]
+        public void PostCostValues_CaseFour_ReturnsPostCostValues()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data/>
+                </xmlcfg>";
+            const string postInstructionString = @"
+                <PostInstruction>
+                    <IDs Id=""2""/>
+                    <PIs Id=""4""/>
+                </PostInstruction>";
+            var actual = new XmlDocument();
+            var expected = $"PostError3: {(int)StatusEnum.rsInvalidPeriodID} - DummyString";
+
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.PostCostValuesStringStringOutStringOut = (Admininfos instance, string xml, out string resultXml, out string postInstruction) =>
+            {
+                validations += 1;
+                resultXml = DummyString;
+                postInstruction = postInstructionString;
+                return true;
+            };
+            ShimWebAdmin.GetConnectionString = () =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimSqlDb.AllInstances.Open = instance =>
+            {
+                validations += 1;
+                return StatusEnum.rsSuccess;
+            };
+            ShimSqlDb.AllInstances.FormatErrorText = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimdbaUsers.ExportPIInfoDBAccessStringStringOut = (DBAccess dbAccess, string pi, out string xmlRequest) =>
+            {
+                validations += 1;
+                xmlRequest = DummyString;
+                return StatusEnum.rsSuccess;
+            };
+            ShimSqlDb.AllInstances.DBTraceStatusEnumTraceChannelEnumStringStringStringStringBoolean = (instance, _1, _2, _3, _4, _5, _6, _7) =>
+            {
+                validations += 1;
+                instance.Status = StatusEnum.rsInvalidPeriodID;
+            };
+            ShimIntegration.AllInstances.executeStringString = (_, _1, _2) =>
+            {
+                validations += 1;
+                return null;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(PostCostValuesMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe(expected),
+                () => validations.ShouldBe(7));
+        }
+
+        [TestMethod]
+        public void PostCostValues_CaseFive_ReturnsPostCostValues()
+        {
+            // Arrange
+            const string xmlString = @"
+                <xmlcfg>
+                    <Data/>
+                </xmlcfg>";
+            const string postInstructionString = @"
+                <PostInstruction>
+                    <IDs Id=""2""/>
+                    <PIs Id=""4""/>
+                </PostInstruction>";
+            const string expectedStatusText = "No response from WorkEngine WebService";
+            var actual = new XmlDocument();
+            var expected = $"PostError4: {99835} - DummyString";
+
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.PostCostValuesStringStringOutStringOut = (Admininfos instance, string xml, out string resultXml, out string postInstruction) =>
+            {
+                validations += 1;
+                resultXml = DummyString;
+                postInstruction = postInstructionString;
+                return true;
+            };
+            ShimWebAdmin.GetConnectionString = () =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimSqlDb.AllInstances.Open = instance =>
+            {
+                validations += 1;
+                return StatusEnum.rsSuccess;
+            };
+            ShimSqlDb.AllInstances.FormatErrorText = instance =>
+            {
+                if (instance.StatusText.Equals(expectedStatusText))
+                {
+                    validations += 1;
+                }
+                return DummyString;
+            };
+            ShimdbaUsers.ExportPIInfoDBAccessStringStringOut = (DBAccess dbAccess, string pi, out string xmlRequest) =>
+            {
+                validations += 1;
+                xmlRequest = DummyString;
+                return StatusEnum.rsSuccess;
+            };
+            ShimSqlDb.AllInstances.DBTraceStatusEnumTraceChannelEnumStringStringStringStringBoolean = (instance, _1, _2, _3, _4, _5, _6, _7) =>
+            {
+                validations += 1;
+                instance.Status = StatusEnum.rsSuccess;
+            };
+            ShimIntegration.AllInstances.executeStringString = (_, _1, _2) =>
+            {
+                validations += 1;
+                return null;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(PostCostValuesMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe(expected),
+                () => validations.ShouldBe(7));
+        }
+
+        [TestMethod]
+        public void PostCostValues_CaseSix_ReturnsPostCostValues()
+        {
+            // Arrange
+            var xmlString = $@"
+                <xmlcfg>
+                    <Data/>
+                    <Result Status=""1"">
+                        <Error ID=""1"">{DummyString}</Error>
+                    </Result>
+                </xmlcfg>";
+            const string postInstructionString = @"
+                <PostInstruction>
+                    <IDs Id=""2""/>
+                    <PIs Id=""4""/>
+                </PostInstruction>";
+            var expectedStatusText = $"Invalid XML response from WorkEngine WebService. Status=1; Error=1 : {DummyString}";
+            var actual = new XmlDocument();
+            var expected = $"PostError6: {99833} - DummyString";
+            var data = new XmlDocument();
+
+            data.LoadXml(xmlString);
+
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.PostCostValuesStringStringOutStringOut = (Admininfos instance, string xml, out string resultXml, out string postInstruction) =>
+            {
+                validations += 1;
+                resultXml = DummyString;
+                postInstruction = postInstructionString;
+                return true;
+            };
+            ShimWebAdmin.GetConnectionString = () =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimSqlDb.AllInstances.Open = instance =>
+            {
+                validations += 1;
+                return StatusEnum.rsSuccess;
+            };
+            ShimSqlDb.AllInstances.FormatErrorText = instance =>
+            {
+                if (instance.StatusText.Equals(expectedStatusText))
+                {
+                    validations += 1;
+                }
+                return DummyString;
+            };
+            ShimdbaUsers.ExportPIInfoDBAccessStringStringOut = (DBAccess dbAccess, string pi, out string xmlRequest) =>
+            {
+                validations += 1;
+                xmlRequest = DummyString;
+                return StatusEnum.rsSuccess;
+            };
+            ShimSqlDb.AllInstances.DBTraceStatusEnumTraceChannelEnumStringStringStringStringBoolean = (instance, _1, _2, _3, _4, _5, _6, _7) =>
+            {
+                validations += 1;
+                instance.Status = StatusEnum.rsSuccess;
+            };
+            ShimIntegration.AllInstances.executeStringString = (_, _1, _2) =>
+            {
+                validations += 1;
+                return data.FirstChild.SelectSingleNode("//Result");
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(PostCostValuesMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe(expected),
+                () => validations.ShouldBe(8));
+        }
+
+        [TestMethod]
+        public void PostCostValues_CaseSeven_ReturnsPostCostValues()
+        {
+            // Arrange
+            var xmlString = $@"
+                <xmlcfg>
+                    <Data/>
+                    <Result Status=""1"">
+                        <Item Error=""1"">{DummyString}</Item>
+                    </Result>
+                </xmlcfg>";
+            const string postInstructionString = @"
+                <PostInstruction>
+                    <IDs Id=""2""/>
+                    <PIs Id=""4""/>
+                </PostInstruction>";
+            var expectedStatusText = $"Invalid XML response from WorkEngine WebService. Status=1; Error=1 : {DummyString}";
+            var actual = new XmlDocument();
+            var expected = $"PostError7: {99999} - DummyString";
+            var data = new XmlDocument();
+
+            data.LoadXml(xmlString);
+
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.PostCostValuesStringStringOutStringOut = (Admininfos instance, string xml, out string resultXml, out string postInstruction) =>
+            {
+                validations += 1;
+                resultXml = DummyString;
+                postInstruction = postInstructionString;
+                return true;
+            };
+            ShimWebAdmin.GetConnectionString = () =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimSqlDb.AllInstances.Open = instance =>
+            {
+                validations += 1;
+                return StatusEnum.rsSuccess;
+            };
+            ShimSqlDb.AllInstances.FormatErrorText = instance =>
+            {
+                if (instance.StatusText.Equals(expectedStatusText))
+                {
+                    validations += 1;
+                }
+                return DummyString;
+            };
+            ShimdbaUsers.ExportPIInfoDBAccessStringStringOut = (DBAccess dbAccess, string pi, out string xmlRequest) =>
+            {
+                validations += 1;
+                xmlRequest = DummyString;
+                return StatusEnum.rsSuccess;
+            };
+            ShimSqlDb.AllInstances.DBTraceStatusEnumTraceChannelEnumStringStringStringStringBoolean = (instance, _1, _2, _3, _4, _5, _6, _7) =>
+            {
+                validations += 1;
+                instance.Status = StatusEnum.rsSuccess;
+            };
+            ShimIntegration.AllInstances.executeStringString = (_, _1, _2) =>
+            {
+                validations += 1;
+                return data.FirstChild.SelectSingleNode("//Result");
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(PostCostValuesMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe(expected),
+                () => validations.ShouldBe(8));
+        }
+
+        [TestMethod]
+        public void PostCostValues_CaseEight_ReturnsPostCostValues()
+        {
+            // Arrange
+            var xmlString = $@"
+                <xmlcfg>
+                    <Data/>
+                    <Result Status=""1""/>
+                </xmlcfg>";
+            const string postInstructionString = @"
+                <PostInstruction>
+                    <IDs Id=""2""/>
+                    <PIs Id=""4""/>
+                </PostInstruction>";
+            const string expectedStatusText = "XML response from WorkEngine WebService not recognized";
+            var actual = new XmlDocument();
+            var expected = $"PostError8: {99999} - DummyString";
+            var data = new XmlDocument();
+
+            data.LoadXml(xmlString);
+
+            ShimAdmininfos.ConstructorStringStringStringStringStringSecurityLevelsBoolean = (_, _1, _2, _3, _4, _5, _6, _7) => new ShimAdmininfos();
+            ShimAdmininfos.AllInstances.PostCostValuesStringStringOutStringOut = (Admininfos instance, string xml, out string resultXml, out string postInstruction) =>
+            {
+                validations += 1;
+                resultXml = DummyString;
+                postInstruction = postInstructionString;
+                return true;
+            };
+            ShimWebAdmin.GetConnectionString = () =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimSqlDb.AllInstances.Open = instance =>
+            {
+                validations += 1;
+                return StatusEnum.rsSuccess;
+            };
+            ShimSqlDb.AllInstances.FormatErrorText = instance =>
+            {
+                if (instance.StatusText.Equals(expectedStatusText))
+                {
+                    validations += 1;
+                }
+                return DummyString;
+            };
+            ShimdbaUsers.ExportPIInfoDBAccessStringStringOut = (DBAccess dbAccess, string pi, out string xmlRequest) =>
+            {
+                validations += 1;
+                xmlRequest = DummyString;
+                return StatusEnum.rsSuccess;
+            };
+            ShimSqlDb.AllInstances.DBTraceStatusEnumTraceChannelEnumStringStringStringStringBoolean = (instance, _1, _2, _3, _4, _5, _6, _7) =>
+            {
+                validations += 1;
+                instance.Status = StatusEnum.rsSuccess;
+            };
+            ShimIntegration.AllInstances.executeStringString = (_, _1, _2) =>
+            {
+                validations += 1;
+                return data.FirstChild.SelectSingleNode("//Result");
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(PostCostValuesMethodName, nonPublicInstance, new object[] { xmlString }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.SelectSingleNode("//Result").Attributes["Status"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["ID"].Value.ShouldBe(One.ToString()),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").Attributes["PfEFailure"].Value.ShouldBe(bool.FalseString),
+                () => actual.FirstChild.SelectSingleNode("//Result/Error").InnerText.ShouldBe(expected),
+                () => validations.ShouldBe(8));
         }
     }
 }
