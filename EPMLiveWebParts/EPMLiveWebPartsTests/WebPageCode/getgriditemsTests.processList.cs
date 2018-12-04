@@ -38,7 +38,7 @@ using Shouldly;
 
 namespace EPMLiveWebParts.Tests
 {
-    public partial class getgriditemsTests
+    public partial class GetGridItemsTests
     {
         private const string MethodProcessList = "processList";
         private const string MethodAddMenus = "addMenus";
