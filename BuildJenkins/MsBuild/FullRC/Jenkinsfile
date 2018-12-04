@@ -32,7 +32,7 @@ pipeline {
 		
     	string(name: 'ProtractorHostsName', defaultValue: 'tenant02.epmldev.com', description: 'Target full host name for protractor')
 		
-		string(name: 'RunTSClient', defaultValue: 'false', description: 'Execute legacy TS-Client tests')
+		string(name: 'RunTSClient', defaultValue: 'true', description: 'Execute legacy TS-Client tests')
     }
     stages {
         stage('Preparing Release') {
