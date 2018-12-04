@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -20,8 +21,8 @@ using Shouldly;
 
 namespace EPMLiveWebParts.Tests.WebPageCode
 {
-    [TestClass]
-    public class GetGanttTasksTests
+    [TestClass, ExcludeFromCodeCoverage]
+    public partial class GetGanttTasksTests
     {
         private IDisposable _shimContext;
         private SharepointShims _sharepointShims;
