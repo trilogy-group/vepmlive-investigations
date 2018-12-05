@@ -164,6 +164,7 @@
     <Compile Include="ReportsCenterTest.cs" />
     <Compile Include="ReportWebPartsTestBase.cs" />
     <Compile Include="ReportViewerTest.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.Fields.cs" />
     <Compile Include="WebPageCode\GetGridItemsTests.Fields.cs" />
     <Compile Include="WebPageCode\GetGridItemsTests.addItem.cs" />
     <Compile Include="WebPageCode\GetGridItemsTests.addItemDataRow.cs" />
