@@ -56,6 +56,7 @@ namespace EPMLiveCore.Tests.WebPageCode
         public void TestCleanup()
         {
             _shimContext?.Dispose();
+            _testEntity?.Dispose();
         }
 
         [TestMethod]
