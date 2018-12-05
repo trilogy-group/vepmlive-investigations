@@ -1,4 +1,16 @@
-﻿using EPMLiveCore;
+﻿using System;
+using System.Collections;
+using System.Collections.Fakes;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Data;
+using System.Data.SqlClient.Fakes;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using System.Web.Fakes;
+using System.Web.UI;
+using System.Web.UI.Fakes;
+using System.Xml;
 using EPMLiveCore.Fakes;
 using EPMLiveWebParts.Fakes;
 using EPMLiveWebParts.Utilities.Fakes;
@@ -9,25 +21,7 @@ using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.WebPartPages;
 using Microsoft.SharePoint.WebPartPages.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using Shouldly;
-using System;
-using System.Collections;
-using System.Collections.Fakes;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Data;
-using System.Data.SqlClient.Fakes;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.IO.Fakes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Fakes;
-using System.Web.UI;
-using System.Web.UI.Fakes;
-using System.Xml;
 
 namespace EPMLiveWebParts.Tests
 {
