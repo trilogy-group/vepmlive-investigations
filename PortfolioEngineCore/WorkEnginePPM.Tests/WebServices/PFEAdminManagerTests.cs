@@ -671,12 +671,13 @@ namespace WorkEnginePPM.Tests.WebServices
                 validations += 1;
                 return Five;
             };
-            ShimAdmininfos.AllInstances.CanDeleteCostCategoryRolebyCCRIdInt32Int32StringOut = (Admininfos instance, int ccid, int id, out string message) =>
-            {
-                validations += 1;
-                message = DummyString;
-                return false;
-            };
+            ShimAdmininfos.AllInstances.CanDeleteCostCategoryRolebyCCRIdInt32Int32StringOut = 
+                (Admininfos instance, int ccid, int id, out string message) =>
+                {
+                    validations += 1;
+                    message = DummyString;
+                    return false;
+                };
 
             // Act
             actual.LoadXml((string)privateObject.Invoke(DeleteRolesMethodName, nonPublicInstance, new object[] { xmlString }));
