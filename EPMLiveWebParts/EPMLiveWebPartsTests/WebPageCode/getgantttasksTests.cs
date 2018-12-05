@@ -29,9 +29,15 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         private AdoShims _adoShims;
         private getgantttasks _getGanttTasks;
         private PrivateObject _getGanttTasksPrivate;
+        private Hashtable _hshItemNodes;
+        private bool _didAddItemFromList;
+        private bool _didAddItemFromDataRow;
+        private bool _didAddGroups;
         private const string DummyString = "DummyString";
-        private const string PageLoadMethodName = "Page_Load";
         private const string IgnoreListId = "ignorelistid";
+        private const string PageLoadMethodName = "Page_Load";
+        private const string MethodAddItems = "addItems";
+        private readonly static string NewKey = $"{DummyText}\n{DummyString}";
 
         [TestInitialize]
         public void Setup()
@@ -43,6 +49,11 @@ namespace EPMLiveWebParts.Tests.WebPageCode
 
             _getGanttTasks = new getgantttasks();
             _getGanttTasksPrivate = new PrivateObject(_getGanttTasks);
+
+            _hshItemNodes = null;
+            _didAddItemFromList = false;
+            _didAddItemFromDataRow = false;
+            _didAddGroups = false;
         }
 
         [TestCleanup]

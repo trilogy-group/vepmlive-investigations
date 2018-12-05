@@ -155,6 +155,8 @@
     <Compile Include="ReportingFilter\ReportingFilterTests.cs" />
     <Compile Include="UserProfileDisplay\DisplayProfilePicturesTests.cs" />
     <Compile Include="WebPageCode\GetGanttItemsTests.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.AddItems.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.Aggregations.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.cs" />
     <Compile Include="GridListView\GridListViewTests.cs" />
     <Compile Include="Helpers\SpListItemDefinition.cs" />
@@ -163,6 +165,7 @@
     <Compile Include="ReportWebPartsTestBase.cs" />
     <Compile Include="ReportViewerTest.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.Fields.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.GetField.cs" />
     <Compile Include="WebPageCode\GetGridItemsTests.Fields.cs" />
     <Compile Include="WebPageCode\GetGridItemsTests.addItem.cs" />
     <Compile Include="WebPageCode\GetGridItemsTests.addItemDataRow.cs" />
