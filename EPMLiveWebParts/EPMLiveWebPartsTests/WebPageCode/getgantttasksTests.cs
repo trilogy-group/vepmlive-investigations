@@ -37,6 +37,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         private const string IgnoreListId = "ignorelistid";
         private const string PageLoadMethodName = "Page_Load";
         private const string MethodAddItems = "addItems";
+        private const string MethodGetField = "getField";
         private readonly static string NewKey = $"{DummyText}\n{DummyString}";
 
         [TestInitialize]

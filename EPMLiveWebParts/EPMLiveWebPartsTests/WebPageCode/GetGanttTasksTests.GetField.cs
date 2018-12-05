@@ -17,11 +17,6 @@ namespace EPMLiveWebParts.Tests.WebPageCode
 {
     public partial class GetGanttTasksTests
     {
-        private const string FieldDue = "Due";
-        private const string FieldDaysOverdue = "DaysOverdue";
-        private const string FieldScheduleStatus = "ScheduleStatus";
-        private const string MethodGetField = "getField";
-
         [TestMethod]
         public void GetField_Text_ReturnsValue()
         {
