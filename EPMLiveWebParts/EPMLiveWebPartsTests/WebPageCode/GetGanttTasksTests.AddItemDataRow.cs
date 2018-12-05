@@ -32,7 +32,6 @@ namespace EPMLiveWebParts.Tests.WebPageCode
     public partial class GetGanttTasksTests
     {
         private const string TestUrl = "http://testURL";
-        private static readonly string DefaultIndexer = $"{DefaultWebId}.{DefaultListId}.{DefaultId}";
 
         [TestMethod]
         public void AddItemDataRow_DocIcon_SetsNewItemRow()
