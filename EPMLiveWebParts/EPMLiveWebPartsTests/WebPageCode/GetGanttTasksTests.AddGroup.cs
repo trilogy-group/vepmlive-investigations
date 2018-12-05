@@ -34,6 +34,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         {
             // Arrange
             PrepareForAddGroups(false);
+            
             var didProcessList = false;
             Shimgetgantttasks.AllInstances.processListSPWebStringSPListSortedList =
                 (a, b, c, d, e) => didProcessList = true;
