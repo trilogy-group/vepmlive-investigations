@@ -20,7 +20,6 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         private const string DummyListId = "DummyListId";
         private const string WorkspaceUrlView = "WorkspaceUrl";
         private const string DefaultErrorMessage = "DefaultErrorMessage";
-        private const string MethodGetParams = "getParams";
         private const string FieldRollupLists = "rolluplists";
         private const string FieldGlobalError = "globalError";
         private const string FieldUsePerformance = "usePerformance";
@@ -320,7 +319,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             PrepareForAddGroups(false);
             _getGanttTasksPrivate.SetField(FieldFilterField, string.Empty);
             ShimSqlCommand.AllInstances.ExecuteReader =
-                (_) => { throw new InvalidOperationException(DefaultErrorMessage); };
+                _ => { throw new InvalidOperationException(DefaultErrorMessage); };
 
             // Act
             _getGanttTasksPrivate.Invoke(MethodAddGroups, new object[]
@@ -392,7 +391,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             };
 
             var didRead = false;
-            ShimSqlCommand.AllInstances.ExecuteReader = (_) => new ShimSqlDataReader
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
             {
                 Read = () =>
                 {
