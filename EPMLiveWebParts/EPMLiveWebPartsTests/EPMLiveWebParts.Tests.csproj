@@ -48,6 +48,10 @@
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Web.Services.4.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.Services.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="WorkEnginePPM.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
     </Reference>
@@ -178,6 +182,7 @@
     <Compile Include="WebPageCode\GetGridItemsTests.processList.cs" />
     <Compile Include="WebPageCode\GetGridItemsTests.AddGroups.cs" />
     <Compile Include="WebPageCode\GetitemsTests.cs" />
+    <Compile Include="WebPageCode\GetListReportItemsTests.cs" />
     <Compile Include="WebPageCode\GridActionTests.cs" />
     <Compile Include="WebPageCode\SavegridTests.cs" />
     <Compile Include="CONTROLTEMPLATES\MyWork\MyWorkControlTests.cs" />
