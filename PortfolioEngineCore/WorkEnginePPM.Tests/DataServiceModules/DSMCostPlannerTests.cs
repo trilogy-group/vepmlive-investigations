@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Data;
 using System.Data.Common.Fakes;
 using System.Data.Fakes;
@@ -131,7 +130,7 @@ namespace WorkEnginePPM.DataServiceModules.Tests
         public void TestCleanup()
         {
             _shimContext?.Dispose();
-            _testEntity.Dispose();
+            _testEntity?.Dispose();
         }
 
         [TestCategory("DataServiceModules")]
