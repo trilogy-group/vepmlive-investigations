@@ -148,6 +148,7 @@
     <Compile Include="Layouts\epmlive\UpdateWebPartTests.cs" />
     <Compile Include="ListReportView\ListReportViewTest.cs" />
     <Compile Include="ListSummaryTest.cs" />
+    <Compile Include="ListSummary\ListSummaryTests.cs" />
     <Compile Include="MyWorkWebPart\MyWorkToolpartTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
