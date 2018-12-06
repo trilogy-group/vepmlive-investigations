@@ -292,6 +292,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         const uniqueId = PageHelper.getUniqueId();
         const title = `${labels.title} ${uniqueId}`;
         await EventsPageHelper.fillNewEventsFormAndVerifyEventCreated(title);
+        StepLogger.postCondition('Delete created event');
+        await EventsPageHelper.deleteEvent(title);
     });
 
     it('Create new Shared Document from Workplace - [1175269]', async () => {
@@ -351,6 +353,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         const newEventTitle = CommonPageHelper.getElementUsingText(newTitle, true);
         await expect(await PageHelper.isElementPresent(newEventTitle))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(newTitle));
+        StepLogger.postCondition('Delete created event');
+        await EventsPageHelper.deleteEvent(newTitle);
     });
 
     it('Reply to a Discussion - [785614] [BUG:SKYVERA-1508]', async () => {
