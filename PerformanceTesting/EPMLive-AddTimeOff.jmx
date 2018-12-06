@@ -75,7 +75,7 @@
           </elementProp>
           <elementProp name="p_Username" elementType="Argument">
             <stringProp name="Argument.name">p_Username</stringProp>
-            <stringProp name="Argument.value">AdminT01</stringProp>
+            <stringProp name="Argument.value">farmadmin</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="p_Password" elementType="Argument">
@@ -343,7 +343,7 @@
                 <elementProp name="ctl00$PlaceHolderMain$signInControl$UserName" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">true</boolProp>
                   <stringProp name="Argument.name">ctl00$PlaceHolderMain$signInControl$UserName</stringProp>
-                  <stringProp name="Argument.value">AdminT01</stringProp>
+                  <stringProp name="Argument.value">farmadmin</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
