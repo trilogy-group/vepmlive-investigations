@@ -392,7 +392,7 @@
                 <elementProp name="ctl00$PlaceHolderMain$signInControl$UserName" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">true</boolProp>
                   <stringProp name="Argument.name">ctl00$PlaceHolderMain$signInControl$UserName</stringProp>
-                  <stringProp name="Argument.value">AdminT01</stringProp>
+                  <stringProp name="Argument.value">farmadmin</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
               </collectionProp>
@@ -4244,7 +4244,7 @@
                 <elementProp name="ctl00$PlaceHolderMain$signInControl$UserName" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">true</boolProp>
                   <stringProp name="Argument.name">ctl00$PlaceHolderMain$signInControl$UserName</stringProp>
-                  <stringProp name="Argument.value">AdminT01</stringProp>
+                  <stringProp name="Argument.value">farmadmin</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
