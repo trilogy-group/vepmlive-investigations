@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common.Fakes;
+using System.Data.SqlClient.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortfolioEngineCore.Fakes;
-using System.Data.SqlClient.Fakes;
-using System.Data.Common.Fakes;
-using System.Collections.Generic;
-using Microsoft.QualityTools.Testing.Fakes;
 using Shouldly;
-using System.Data;
+
 
 namespace PortfolioEngineCore.Tests.Base
 {
