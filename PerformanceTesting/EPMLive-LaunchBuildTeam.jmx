@@ -15,12 +15,12 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="BASE_URL" elementType="Argument">
             <stringProp name="Argument.name">BASE_URL</stringProp>
-            <stringProp name="Argument.value">tenant01.social.com</stringProp>
+            <stringProp name="Argument.value">tenant01.epmldev.com</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="p_Username" elementType="Argument">
             <stringProp name="Argument.name">p_Username</stringProp>
-            <stringProp name="Argument.value">AdminT01</stringProp>
+            <stringProp name="Argument.value">farmadmin</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="p_Password" elementType="Argument">
@@ -45,12 +45,12 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="BASE_URL_1" elementType="Argument">
             <stringProp name="Argument.name">BASE_URL_1</stringProp>
-            <stringProp name="Argument.value">tenant01.social.com</stringProp>
+            <stringProp name="Argument.value">tenant01.epmldev.com</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="p_Username" elementType="Argument">
             <stringProp name="Argument.name">p_Username</stringProp>
-            <stringProp name="Argument.value">AdminT01</stringProp>
+            <stringProp name="Argument.value">farmadmin</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="p_Password" elementType="Argument">
@@ -90,7 +90,7 @@
           </elementProp>
           <elementProp name="BASE_URL" elementType="Argument">
             <stringProp name="Argument.name">BASE_URL</stringProp>
-            <stringProp name="Argument.value">${__P(envURL,10.25.2.110)}</stringProp>
+            <stringProp name="Argument.value">${__P(envURL,10.25.2.82)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -120,20 +120,16 @@
       <DNSCacheManager guiclass="DNSCachePanel" testclass="DNSCacheManager" testname="DNS Cache Manager" enabled="true">
         <collectionProp name="DNSCacheManager.servers"/>
         <collectionProp name="DNSCacheManager.hosts">
-          <elementProp name="tenant01.social.com" elementType="StaticHost">
-            <stringProp name="StaticHost.Name">tenant01.social.com</stringProp>
-            <stringProp name="StaticHost.Address">10.25.2.110</stringProp>
+          <elementProp name="tenant01.epmldev.com" elementType="StaticHost">
+            <stringProp name="StaticHost.Name">tenant01.epmldev.com</stringProp>
+            <stringProp name="StaticHost.Address">10.25.2.82</stringProp>
           </elementProp>
-          <elementProp name="tenant02.social.com" elementType="StaticHost">
-            <stringProp name="StaticHost.Name">tenant02.social.com</stringProp>
+          <elementProp name="tenant03.epmldev.com" elementType="StaticHost">
+            <stringProp name="StaticHost.Name">tenant02.epmldev.com</stringProp>
             <stringProp name="StaticHost.Address">${BASE_URL}</stringProp>
           </elementProp>
-          <elementProp name="tenant03.social.com" elementType="StaticHost">
-            <stringProp name="StaticHost.Name">tenant03.social.com</stringProp>
-            <stringProp name="StaticHost.Address">${BASE_URL}</stringProp>
-          </elementProp>
-          <elementProp name="sp2016" elementType="StaticHost">
-            <stringProp name="StaticHost.Name">sp2016</stringProp>
+          <elementProp name="qaepmlive6" elementType="StaticHost">
+            <stringProp name="StaticHost.Name">qaepmlive6</stringProp>
             <stringProp name="StaticHost.Address">${BASE_URL}</stringProp>
           </elementProp>
         </collectionProp>
@@ -310,7 +306,7 @@
                 <elementProp name="ctl00$PlaceHolderMain$signInControl$UserName" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">true</boolProp>
                   <stringProp name="Argument.name">ctl00$PlaceHolderMain$signInControl$UserName</stringProp>
-                  <stringProp name="Argument.value">AdminT01</stringProp>
+                  <stringProp name="Argument.value">farmadmin</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
@@ -2473,7 +2469,7 @@
           <boolProp name="TransactionController.parent">true</boolProp>
         </TransactionController>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="http://tenant01.social.com/epm/_layouts/15/SignOut.aspx" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="http://tenant01.epmldev.com/epm/_layouts/15/SignOut.aspx" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments"/>
             </elementProp>

@@ -29,9 +29,34 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         private AdoShims _adoShims;
         private getgantttasks _getGanttTasks;
         private PrivateObject _getGanttTasksPrivate;
+        private XmlDocument _xmlDocument;
+        private XmlNode _newItemNode;
+        private bool _usepopup;
+        private string _wbs;
+        private string _isMilestone;
+        private const string One = "1";
+        private const string DummyVal = "DummyVal";
+        private const string DummyText = "DummyText";
+        private const string DummyFieldName = "DummyFieldName";
         private const string DummyString = "DummyString";
+        private const string FieldTitle = "Title";
+        private const string ExampleUrl = "http://www.example.com";
+        private const string TypeTextXml = "text/xml";
+        private const string TypeTextPlain = "text/plain";
         private const string PageLoadMethodName = "Page_Load";
         private const string IgnoreListId = "ignorelistid";
+        private const string MethodAddItem = "addItem";
+        private const string DummyListId = "DummyListId";
+        private const string WorkspaceUrlView = "WorkspaceUrl";
+        private const string DefaultErrorMessage = "DefaultErrorMessage";
+        private const string FieldRollupLists = "rolluplists";
+        private const string FieldGlobalError = "globalError";
+        private const string FieldUsePerformance = "usePerformance";
+        private const string FieldFilterField = "filterfield";
+        private const string MethodAddGroups = "addGroups";
+        private static readonly Guid DefaultWebId = Guid.NewGuid();
+        private static readonly Guid DefaultListId = Guid.NewGuid();
+        private static readonly Guid DefaultId = Guid.NewGuid();
 
         [TestInitialize]
         public void Setup()
@@ -43,6 +68,12 @@ namespace EPMLiveWebParts.Tests.WebPageCode
 
             _getGanttTasks = new getgantttasks();
             _getGanttTasksPrivate = new PrivateObject(_getGanttTasks);
+
+            _usepopup = false;
+            _wbs = DummyVal;
+            _isMilestone = "False";
+
+            _newItemNode = null;
         }
 
         [TestCleanup]
