@@ -4070,21 +4070,33 @@ namespace TimeSheets
 
             try
             {
+                bool otherWork;
+                DataSet dataSet;
+                ArrayList arrLookups;
+                string userId;
+                Dictionary<string, string> viewInfo;
+                TimesheetSettings settings;
+                int temp;
+                string searchText;
+                string searchField;
+                string TSID;
+                bool nonWork;
+
                 GetAttributes(
                     data,
                     oWeb,
-                    out var nonWork,
-                    out var TSID,
-                    out var searchField,
-                    out var searchText,
-                    out var temp,
-                    out var settings,
-                    out var viewInfo,
-                    out var userId,
-                    out var arrLookups,
-                    out var dataSet,
+                    out nonWork,
+                    out TSID,
+                    out searchField,
+                    out searchText,
+                    out temp,
+                    out settings,
+                    out viewInfo,
+                    out userId,
+                    out arrLookups,
+                    out dataSet,
                     docOut,
-                    out var otherWork);
+                    out otherWork);
 
                 SPSecurity.RunWithElevatedPrivileges(
                     delegate
@@ -4287,7 +4299,7 @@ namespace TimeSheets
 
         private static string GetUserIdFromDb(SPWeb oWeb, string TSID, DataSet dataSet)
         {
-            string userId = string.Empty;
+            var userId = string.Empty;
             using (var connection = GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
             {
                 using (var command = new SqlCommand(
@@ -4314,7 +4326,6 @@ namespace TimeSheets
         {
             if (userId == string.Empty)
             {
-                userId = string.Empty;
                 docOut.LoadXml("<Grid><IO Result=\"-1\" Message=\"Could not determine user\"/></Grid>");
             }
             else
