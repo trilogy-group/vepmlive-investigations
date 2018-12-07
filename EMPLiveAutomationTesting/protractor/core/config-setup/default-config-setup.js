@@ -5,7 +5,7 @@ const browserStackBrowser = browserList[setupUtilities.getParam("chrome", "--par
 const maxBrowserInstances = process.env.MAX_INSTANCES || setupUtilities.getParam(1, "--params.maxInstances", false);
 const useHeadlessBrowser = process.env.HEADLESS_BROWSER || setupUtilities.toBoolean(setupUtilities.getParam(false, "--params.headlessBrowser", false));
 const chromeHeadlessArgs = ['--headless', '--disable-gpu', '--window-size=1280x800', '--disable-dev-shm-usage', '--no-sandbox', '--disable-blink-features=BlockCredentialedSubresources',
-    '--disable-web-security'];
+    '--disable-web-security', '--ignore-certificate-errors'];
 /*  ABOUT --disable-dev-shm-usage:
     By default, Docker runs a container with a /dev/shm shared memory space 64MB.
     This is typically too small for Chrome and will cause Chrome to crash when rendering large pages.
