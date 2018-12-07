@@ -2363,9 +2363,9 @@ namespace TimeSheets
         private static void CreateProgressNode(XmlDocument docLayout, XmlNode nodeRightCols)
         {
             var nodeProgressCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
-            var attr2 = docLayout.CreateAttribute("Name");
-            attr2.Value = "Progress";
-            nodeProgressCol.Attributes.Append(attr2);
+            var attributeName = docLayout.CreateAttribute("Name");
+            attributeName.Value = "Progress";
+            nodeProgressCol.Attributes.Append(attributeName);
 
             CreateAndAppendAttribute(docLayout, nodeProgressCol, "Name", "Progress");
             CreateAndAppendAttribute(docLayout, nodeProgressCol, "Visible", "1");
@@ -2544,7 +2544,11 @@ namespace TimeSheets
             nodeLeftCols.AppendChild(newColumnNode);
         }
 
-        private static void CreateAndAppendAttribute(XmlDocument docLayout, XmlNode nodeToAppend, string attributeName, string attributeValue)
+        private static void CreateAndAppendAttribute(
+            XmlDocument docLayout,
+            XmlNode nodeToAppend,
+            string attributeName,
+            string attributeValue)
         {
             var attribute = docLayout.CreateAttribute(attributeName);
             attribute.Value = attributeValue;
