@@ -222,7 +222,7 @@ namespace EPMLiveTimerService.Tests.WebPageCode
                 });
                 return 0;
             };
-            _privateObject.SetFieldOrProperty("arrGroupFields", new string[] { "" });
+            _privateObject.SetFieldOrProperty("arrGroupFields", new string[] { string.Empty });
             _shimSPFieldCollection.GetFieldByInternalNameString = stringValue => new ShimSPField()
             {
                 TypeGet = () => SPFieldType.DateTime,
