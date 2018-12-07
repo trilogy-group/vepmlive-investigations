@@ -1,19 +1,6 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Web.Fakes;
-using System.Web.UI.Fakes;
 using System.Xml;
-using System.Xml.Fakes;
-using EPMLive.TestFakes.Utility;
-using EPMLiveCore.Fakes;
-using EPMLiveWebParts.Fakes;
-using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -23,13 +10,6 @@ namespace EPMLiveWebParts.Tests.WebPageCode
 {
     public partial class GetGanttTasksTests
     {
-        private const string MethodSetAggVal = "setAggVal";
-        private const string MethodCreateLinks = "createLinks";
-        private const string MethodAddHeader = "addHeader";
-        private const string FieldMainParent = "ndMainParent";
-        private const string TitleSPField = "Title";
-        private const string RootXml = "<root></root>";
-
         [TestMethod]
         public void SetAggVal_Count_ReturnsValue()
         {

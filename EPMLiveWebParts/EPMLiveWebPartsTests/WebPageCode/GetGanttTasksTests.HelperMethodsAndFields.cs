@@ -1,16 +1,108 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Generic.Fakes;
 using System.Collections.Specialized;
 using System.Globalization;
+using System.Xml;
+using EPMLive.TestFakes.Utility;
+using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EPMLiveWebParts.Tests.WebPageCode
 {
     public partial class GetGanttTasksTests
     {
+        private IDisposable _shimContext;
+        private SharepointShims _sharepointShims;
+        private AdoShims _adoShims;
+        private getgantttasks _getGanttTasks;
+        private PrivateObject _getGanttTasksPrivate;
+        private XmlDocument _xmlDocument;
+        private XmlNode _newItemNode;
+        private bool _usepopup;
+        private string _wbs;
+        private string _isMilestone;
+        private Hashtable _hshItemNodes;
+        private bool _didAddItemFromList;
+        private bool _didAddItemFromDataRow;
+        private bool _didAddGroups;
+        private const string One = "1";
+        private const string DummyVal = "DummyVal";
+        private const string DummyText = "DummyText";
+        private const string DummyFieldName = "DummyFieldName";
+        private const string DummyString = "DummyString";
+        private const string FieldTitle = "Title";
+        private const string ExampleUrl = "http://www.example.com";
+        private const string TypeTextXml = "text/xml";
+        private const string TypeTextPlain = "text/plain";
+        private const string IgnoreListId = "ignorelistid";
+        private const string PageLoadMethodName = "Page_Load";
+        private const string MethodAddItems = "addItems";
+        private const string MethodGetField = "getField";
+        private const string MethodAddItem = "addItem";
+        private const string DummyListId = "DummyListId";
+        private const string WorkspaceUrlView = "WorkspaceUrl";
+        private const string DefaultErrorMessage = "DefaultErrorMessage";
+        private const string FieldRollupLists = "rolluplists";
+        private const string FieldGlobalError = "globalError";
+        private const string FieldUsePerformance = "usePerformance";
+        private const string FieldFilterField = "filterfield";
+        private const string MethodAddGroups = "addGroups";
+        private const string MethodSetAggVal = "setAggVal";
+        private const string MethodCreateLinks = "createLinks";
+        private const string MethodAddHeader = "addHeader";
+        private const string FieldMainParent = "ndMainParent";
+        private const string TitleSPField = "Title";
+        private const string RootXml = "<root></root>";
+        private const string FormatDateOnly = "Format='DateOnly'";
+        private const string FormatTwoDecimals = "Decimals=\"2\"";
+        private const string FormatTwoDecimalsPercentage = "Decimals=\"2\" Percentage=\"TRUE\"";
+        private const string TypeText = "Text";
+        private const string TypeCurrency = "Currency";
+        private const string TypeDateTime = "DateTime";
+        private const string TypeNumber = "Number";
+        private const string TypeDefault = "Default";
+        private const string TypeLookupMulti = "LookupMulti";
+        private const string TypeComputed = "Computed";
+        private const string TypeTotalRollup = "TotalRollup";
+        private const string TypeInvalid = "Invalid";
+        private const string MethodFormatField = "formatField";
+        private static readonly Guid DefaultWebId = Guid.NewGuid();
+        private static readonly Guid DefaultListId = Guid.NewGuid();
+        private static readonly Guid DefaultId = Guid.NewGuid();
+        private readonly static string NewKey = $"{DummyText}\n{DummyString}";
+
+        [TestInitialize]
+        public void Setup()
+        {
+            _shimContext = ShimsContext.Create();
+
+            _adoShims = AdoShims.ShimAdoNetCalls();
+            _sharepointShims = SharepointShims.ShimSharepointCalls();
+
+            _getGanttTasks = new getgantttasks();
+            _getGanttTasksPrivate = new PrivateObject(_getGanttTasks);
+
+            _newItemNode = null;
+            _hshItemNodes = null;
+            _wbs = DummyVal;
+            _usepopup = false;
+            _isMilestone = "False";
+            _didAddItemFromList = false;
+            _didAddItemFromDataRow = false;
+            _didAddGroups = false;
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            _shimContext?.Dispose();
+        }
+
         private void PrepareSpListRelatedShims(string listId = null)
         {
             ShimSPListCollection.AllInstances.ItemGetString = (_, key) =>

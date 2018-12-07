@@ -167,7 +167,7 @@
     <Compile Include="WebPageCode\GetGanttItemsTests.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.AddItem.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.AddItemDataRow.cs" />
-    <Compile Include="WebPageCode\GetGanttTasksTests.HelperMethods.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.HelperMethodsAndFields.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.AddItems.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.AddGroup.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.Aggregations.cs" />

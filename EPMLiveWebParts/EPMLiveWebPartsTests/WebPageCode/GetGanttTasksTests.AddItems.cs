@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Data.Fakes;
-using System.Fakes;
 using System.Xml;
-using System.Xml.Fakes;
-using EPMLiveCore.Fakes;
 using EPMLiveWebParts.Fakes;
-using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
-using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
