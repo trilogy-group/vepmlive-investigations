@@ -45,7 +45,7 @@ namespace PortfolioEngineCore.Tests
         public void SetDatabaseVersion_Always_ReturnSuccess()
         {
             // Arrange
-            var data = @"
+            const string data = @"
 <SetDatabaseVersion>
     <Params /> 
     <Data>
@@ -64,7 +64,7 @@ namespace PortfolioEngineCore.Tests
         public void SetDatabaseVersion_Always_ReturnFailed()
         {
             // Arrange
-            var data = @"
+            const string data = @"
 <SetDatabaseVersion>
     <Params /> 
     <Data>
@@ -87,7 +87,7 @@ namespace PortfolioEngineCore.Tests
         public void ExecuteReportExtract_Always_ReturnStatus()
         {
             // Arrange
-            var data = @"
+            const string data = @"
 <SetDatabaseVersion>
     <Params /> 
     <Data>
@@ -106,7 +106,7 @@ namespace PortfolioEngineCore.Tests
         public void PostTimesheetData_Always_ThrowsException()
         {
             // Arrange
-            var data = @"
+            const string data = @"
 <SetDatabaseVersion>
     <Params /> 
     <Data>
@@ -128,7 +128,7 @@ namespace PortfolioEngineCore.Tests
         public void PostTimesheetData_Always_WithResourceNullReturnExpectedValue()
         {
             // Arrange
-            var data = @"
+            const string data = @"
 <SetDatabaseVersion>
     <Params /> 
     <Data>
@@ -149,7 +149,7 @@ namespace PortfolioEngineCore.Tests
         public void PostTimesheetData_Always_WithProjectNullReturnExpectedValue()
         {
             // Arrange
-            var data = @"
+            const string data = @"
 <SetDatabaseVersion>
     <Params /> 
     <Data>
@@ -172,7 +172,7 @@ namespace PortfolioEngineCore.Tests
         public void PostTimesheetData_Always_DateNotBetweenPeriodReturnExpectedValue()
         {
             // Arrange
-            var data = @"
+            const string data = @"
 <SetDatabaseVersion>
     <Params /> 
     <Data>
@@ -195,7 +195,7 @@ namespace PortfolioEngineCore.Tests
         public void PostTimesheetData_Always_DateBetweenPeriodReturnExpectedValue()
         {
             // Arrange
-            var data = @"
+            const string data = @"
 <SetDatabaseVersion>
     <Params /> 
     <Data>
@@ -218,7 +218,7 @@ namespace PortfolioEngineCore.Tests
         public void DisplayProjects_Always_WithErrorReturnExpectedValue()
         {
             // Arrange
-            var data = @"
+            const string data = @"
 <Data SessionId=""00000000-0000-0000-0000-000000000000"">
 </Data>";
             ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
@@ -237,7 +237,7 @@ namespace PortfolioEngineCore.Tests
         public void DisplayProjects_Always_WithoutErrorReturnExpectedValue()
         {
             // Arrange
-            var data = @"
+            const string data = @"
 <Data SessionId=""00000000-0000-0000-0000-000000000000"">
 </Data>";
 
@@ -294,13 +294,13 @@ namespace PortfolioEngineCore.Tests
             ShimSqlCommand.AllInstances.ExecuteScalar = instance => true;
             ShimSqlCommand.AllInstances.ExecuteReader = instance =>
             {
-                int index = 0;
+                var index = 0;
                 return new ShimSqlDataReader
                 {
                     Read = () => index++ < 1,
                     ItemGetString = stringValue =>
                     {
-                        switch(stringValue)
+                        switch (stringValue)
                         {
                             case "WEH_DATE":
                                 return new DateTime(2018, 12, 7);
