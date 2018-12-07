@@ -125,7 +125,8 @@ const configSetup = {
             }
         }
     },
-    baseUrl: setupUtilities.getParam('http://tenant02.epmldev.com/epm', "--baseUrl", false),
+    baseUrl: setupUtilities.getParam('http://tenant02.epmldev.com', "--baseUrl", false),
+    siteCollection: setupUtilities.getParam('/epm', "--siteCollection", false),
     framework: 'jasmine',
     jasmineNodeOpts: {
         showColors: true,
