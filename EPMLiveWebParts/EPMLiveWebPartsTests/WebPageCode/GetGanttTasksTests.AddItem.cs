@@ -31,6 +31,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
 {
     public partial class GetGanttTasksTests
     {
+        private const string MultiChoiceTitle = "1,2";
 
         [TestMethod]
         public void AddItem_DocIcon_SetsNewItemRow()
@@ -831,7 +832,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         {
             // Arrange
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.MultiChoice, editable: false);
-            ShimSPWeb.AllInstances.TitleGet = _ => "1,2";
+            ShimSPWeb.AllInstances.TitleGet = _ => MultiChoiceTitle;
 
             // Act
             var result = _getGanttTasksPrivate.Invoke(MethodAddItem, new object[] { new ShimSPListItem().Instance, _xmlDocument });
@@ -848,7 +849,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         {
             // Arrange
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Choice, editable: false);
-            ShimSPWeb.AllInstances.TitleGet = _ => "1,2";
+            ShimSPWeb.AllInstances.TitleGet = _ => MultiChoiceTitle;
 
             // Act
             var result = _getGanttTasksPrivate.Invoke(MethodAddItem, new object[] { new ShimSPListItem().Instance, _xmlDocument });
@@ -865,7 +866,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         {
             // Arrange
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.Lookup, editable: false);
-            ShimSPWeb.AllInstances.TitleGet = _ => "1,2";
+            ShimSPWeb.AllInstances.TitleGet = _ => MultiChoiceTitle;
 
             // Act
             var result = _getGanttTasksPrivate.Invoke(MethodAddItem, new object[] { new ShimSPListItem().Instance, _xmlDocument });
@@ -877,7 +878,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
                 () => _newItemNode.InnerXml.ShouldBe("<Cell Value=\"DummyVal\" ValueFormat=\"1\" />"));
         }
 
-        private string PrepareForAddItem(string fieldName, string internalname, string linkType = "", SPFieldType fieldType = SPFieldType.Text, bool editable = true)
+        private string PrepareForAddItem(string fieldName, string internalName, string linkType = "", SPFieldType fieldType = SPFieldType.Text, bool editable = true)
         {
             _xmlDocument = new XmlDocument();
 
@@ -927,17 +928,17 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             hshItemNodes.Add("SiteUrl", string.Empty);
             hshItemNodes.Add("List", string.Empty);
             hshItemNodes.Add("Site", string.Empty);
-            hshItemNodes.Add(internalname + "Text", "Text");
+            hshItemNodes.Add(internalName + "Text", "Text");
             hshItemNodes.Add("ItemID", string.Empty);
             hshItemNodes.Add("Work", string.Empty);
             hshItemNodes.Add("WorkspaceUrl", string.Empty);
-            if (!hshItemNodes.ContainsKey(internalname))
+            if (!hshItemNodes.ContainsKey(internalName))
             {
-                hshItemNodes.Add(internalname, string.Empty);
+                hshItemNodes.Add(internalName, string.Empty);
             }
             _getGanttTasksPrivate.SetField("hshItemNodes", hshItemNodes);
 
-            ShimSharePoint(internalname, fieldType, listId, webId);
+            ShimSharePoint(internalName, fieldType, listId, webId);
 
             ShimPage.AllInstances.RequestGet = _ => new ShimHttpRequest();
             ShimHttpRequest.AllInstances.ItemGetString = (_, __) => DummyVal;
@@ -989,7 +990,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             return indexer;
         }
 
-        private void ShimSharePoint(string internalname, SPFieldType fieldType, string listId, string webId)
+        private void ShimSharePoint(string internalName, SPFieldType fieldType, string listId, string webId)
         {
             ShimSPView.AllInstances.UrlGet = _ => ExampleUrl;
             ShimSPContentTypeCollection.AllInstances.ItemGetInt32 = (_, __) => new ShimSPContentType { NameGet = () => TypeTextPlain };
@@ -1000,7 +1001,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             ShimSPContext.AllInstances.WebGet = _ => new ShimSPWeb();
 
             PrepareSpListRelatedShims(listId);
-            PrepareSpFieldRelatedShims(internalname, fieldType);
+            PrepareSpFieldRelatedShims(internalName, fieldType);
             PrepareSpWebRelatedShims(webId);
             PrepareSpFileRelatedShims();
             PrepareSpUserRelatedShims();
