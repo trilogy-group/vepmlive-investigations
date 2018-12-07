@@ -162,6 +162,7 @@
     <Compile Include="Resources\RPEditorResourcesTests.cs" />
     <Compile Include="Setup\SetupSiteTests.cs" />
     <Compile Include="Testables\BaseDetailRowDataTestable.cs" />
+    <Compile Include="WEIntegration\WEIntegrationTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
