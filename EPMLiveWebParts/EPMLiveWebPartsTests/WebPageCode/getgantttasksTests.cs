@@ -29,11 +29,21 @@ namespace EPMLiveWebParts.Tests.WebPageCode
         private AdoShims _adoShims;
         private getgantttasks _getGanttTasks;
         private PrivateObject _getGanttTasksPrivate;
+
+
+
+
         private Hashtable _hshItemNodes;
         private bool _didAddItemFromList;
         private bool _didAddItemFromDataRow;
         private bool _didAddGroups;
+        private const string One = "1";
+        private const string DummyVal = "DummyVal";
+        private const string DummyText = "DummyText";
+        private const string DummyFieldName = "DummyFieldName";
         private const string DummyString = "DummyString";
+        private const string ExampleUrl = "http://www.example.com";
+        private const string TypeTextXml = "text/xml";
         private const string IgnoreListId = "ignorelistid";
         private const string PageLoadMethodName = "Page_Load";
         private const string MethodAddItems = "addItems";
