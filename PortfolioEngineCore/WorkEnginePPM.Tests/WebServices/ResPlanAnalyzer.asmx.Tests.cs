@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Fakes;
+using System.Web.Services.Fakes;
 using System.Xml;
 using System.Xml.Linq;
 using EPMLiveCore.API.Fakes;
@@ -27,8 +28,13 @@ using Microsoft.SharePoint.WebControls.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortfolioEngineCore;
 using PortfolioEngineCore.Fakes;
+using RPADataCache;
 using Shouldly;
 using WorkEnginePPM.Fakes;
+using WebServiceFakes = System.Web.Services.Fakes;
+using PortfolioEngineCoreFakes = PortfolioEngineCore.Fakes;
+using PortfolioEngineCore.PortfolioItems.Fakes;
+using PortfolioEngineCore.PortfolioItems;
 
 namespace WorkEnginePPM.Tests.WebServices
 {
@@ -62,6 +68,7 @@ namespace WorkEnginePPM.Tests.WebServices
         private ShimSPContentTypeCollection spContentTypeCollection;
         private ShimSPContentType spContentType;
         private ShimSqlTransaction transaction;
+        private ShimSqlDataReader dataReader;
         private Guid guid;
         private DateTime currentDate;
         private int validations;
@@ -79,6 +86,7 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string GetRPSessionKeyMethodName = "GetRPSessionKey";
         private const string ExecuteMethodName = "Execute";
         private const string GetRAUserCalendarInfoMethodName = "GetRAUserCalendarInfo";
+        private const string GetPortfolioItemListMethodName = "GetPortfolioItemList";
 
         [TestInitialize]
         public void Setup()
@@ -100,7 +108,9 @@ namespace WorkEnginePPM.Tests.WebServices
             ShimSqlConnection.AllInstances.BeginTransaction = _ => transaction;
             ShimDbTransaction.AllInstances.Dispose = _ => { };
             ShimSqlConnection.AllInstances.CreateCommand = _ => new SqlCommand();
+            ShimSqlCommand.AllInstances.ExecuteScalar = _ => true;
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => DummyInt;
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => dataReader;
             ShimComponent.AllInstances.Dispose = _ => { };
             ShimSqlCommand.AllInstances.TransactionSetSqlTransaction = (_, __) => { };
             ShimSPDatabase.AllInstances.DatabaseConnectionStringGet = _ => DummyString;
@@ -115,10 +125,11 @@ namespace WorkEnginePPM.Tests.WebServices
             ShimSPSite.AllInstances.Dispose = _ => { };
             ShimSPWeb.AllInstances.Dispose = _ => { };
             ShimCoreFunctions.getLockedWebSPWeb = _ => guid;
-            ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => DummyString;
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, input) => input;
             ShimCoreFunctions.getListSettingStringSPList = (_, __) => DummyString;
             ShimCoreFunctions.getConnectionStringGuid = _ => DummyString;
             ShimCoreFunctions.getLockConfigSettingSPWebStringBoolean = (_1, _2, _3) => DummyString;
+            ShimConfigFunctions.getConfigSettingSPWebString = (_, input) => input;
             ShimSPList.AllInstances.GetItemsSPQuery = (_, __) => spListItemCollection;
             ShimSPPersistedObject.AllInstances.IdGet = _ => guid;
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
@@ -147,11 +158,26 @@ namespace WorkEnginePPM.Tests.WebServices
             ShimSqlDb.ReadBoolValueObject = _ => true;
             ShimSqlDb.ReadDateValueObject = _ => currentDate;
             ShimSqlDb.AllInstances.HandleExceptionStringStatusEnumExceptionBoolean = (_, _1, _2, _3, _4) => StatusEnum.rsRequestInvalid;
-            //ShimActivation.AllInstances.checkActivationStringStringString = (_, _1, _2, _3) => { };
-            //ShimPFEEncrypt.DecryptStringString = (_, input) => input;
-            //ShimDatabase.AllInstances.OpenDatabaseStringString = (_, _1, _2) => new SqlConnection();
-            //ShimBaseSecurity.AllInstances.ChecksScurityStringSecurityLevels = (_, _1, _2) => true;
-            System.Web.Services.Fakes.ShimWebService.AllInstances.ContextGet = _ => null;
+            WebServiceFakes.ShimWebService.AllInstances.ContextGet = _ => null;
+            PortfolioEngineCoreFakes.ShimUtilities.GetConnectionStringString = _ => DummyString;
+            ShimDbConnectionStringBuilder.AllInstances.ConnectionStringGet = _ => DummyString;
+            ShimDbConnectionStringBuilder.AllInstances.ConnectionStringSetString = (_, __) => { };
+            ShimDbConnectionStringBuilder.AllInstances.RemoveString = (_, __) => true;
+            ShimWebAdmin.CapturePFEBaseInfoStringOutStringOutStringOutStringOutStringOutSecurityLevelsOut =
+                (out string basepath, out string username, out string ppmId, out string ppmCompany, out string ppmDbConn, out SecurityLevels secLevel) =>
+                {
+                    basepath = DummyString;
+                    username = DummyString;
+                    ppmId = DummyString;
+                    ppmCompany = DummyString;
+                    ppmDbConn = DummyString;
+                    secLevel = SecurityLevels.AdminCalc;
+                };
+            ShimWebAdmin.AuthenticateUserAndProductHttpContextStringOut = (HttpContext context, out string stage) =>
+            {
+                stage = DummyString;
+                return true;
+            };
         }
 
         private void SetupVariables()
@@ -304,6 +330,10 @@ namespace WorkEnginePPM.Tests.WebServices
                 Commit = () => { },
                 Rollback = () => { }
             };
+            dataReader = new ShimSqlDataReader()
+            {
+                Read = () => false
+            };
         }
 
         [TestCleanup]
@@ -318,18 +348,6 @@ namespace WorkEnginePPM.Tests.WebServices
             // Arrange
             var expected = $"EPKBasepath_RPA{DummyString}";
 
-            ShimConfigFunctions.getConfigSettingSPWebString = (_, input) => input;
-            ShimWebAdmin.CapturePFEBaseInfoStringOutStringOutStringOutStringOutStringOutSecurityLevelsOut =
-                (out string basepath, out string username, out string ppmId, out string ppmCompany, out string ppmDbConn, out SecurityLevels secLevel) =>
-                {
-                    basepath = DummyString;
-                    username = DummyString;
-                    ppmId = DummyString;
-                    ppmCompany = DummyString;
-                    ppmDbConn = DummyString;
-                    secLevel = SecurityLevels.AdminCalc;
-                };
-
             // Act
             var actual = (string)privateObject.Invoke(GetRPSessionKeyMethodName, nonPublicInstance, new object[] { });
 
@@ -338,7 +356,7 @@ namespace WorkEnginePPM.Tests.WebServices
         }
 
         [TestMethod]
-        public void Execute_FunctionReloadPlanData_ReturnsMethodOutput()
+        public void Execute_FunctionIsReloadPlanData_ReturnsMethodOutput()
         {
             // Arrange
             const string function = "ReloadPlanData";
@@ -359,12 +377,6 @@ namespace WorkEnginePPM.Tests.WebServices
                 validations += 1;
                 return DummyString;
             };
-            ShimWebAdmin.AuthenticateUserAndProductHttpContextStringOut = (HttpContext context, out string stage) =>
-            {
-                validations += 1;
-                stage = DummyString;
-                return true;
-            };
 
             // Act
             var actual = (string)privateObject.Invoke(
@@ -379,30 +391,79 @@ namespace WorkEnginePPM.Tests.WebServices
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual.ShouldBe(DummyString),
-                () => validations.ShouldBe(4));
+                () => validations.ShouldBe(3));
         }
 
         [TestMethod]
-        public void GetRAUserCalendarInfo_WhenCalled_Returns()
+        public void GetRAUserCalendarInfo_WhenCalled_ReturnsCalenderInfo()
         {
             // Arrange
-            ShimWebAdmin.CapturePFEBaseInfoStringOutStringOutStringOutStringOutStringOutSecurityLevelsOut =
-                (out string basepath, out string username, out string ppmId, out string ppmCompany, out string ppmDbConn, out SecurityLevels secLevel) =>
+            const string calInfoXml = @"<xmlcfg/>";
+            var actual = new XmlDocument();
+
+            ShimResourceAnalyzer.AllInstances.GetResourceAnalyzerUserCalendarSettingsXMLStringOut =
+                (ResourceAnalyzer instance, out string xml) =>
                 {
-                    basepath = DummyString;
-                    username = DummyString;
-                    ppmId = DummyString;
-                    ppmCompany = DummyString;
-                    ppmDbConn = DummyString;
-                    secLevel = SecurityLevels.AdminCalc;
+                    validations += 1;
+                    xml = calInfoXml;
+                    return true;
                 };
 
             // Act
-            var actual = privateObject.Invoke(GetRAUserCalendarInfoMethodName, publicInstance, new object[] { });
+            actual.LoadXml((string)privateObject.Invoke(
+                GetRAUserCalendarInfoMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    DummyString,
+                    new RPAData()
+                }));
 
             // Assert
             actual.ShouldSatisfyAllConditions(
-                () => actual.ShouldBe(1),
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("GetRAUserCalendarInfo"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(1),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetPortfolioItemList_WhenCalled_Returns()
+        {
+            // Arrange
+            const string calInfoXml = @"<xmlcfg/>";
+            var actual = new XmlDocument();
+
+            ShimPortfolioItems.AllInstances.ObtainManagedPortfolioItemsStringOutStringOutStringOut =
+                (PortfolioItems instance, out string value1, out string value2, out string xml) =>
+                {
+                    validations += 1;
+                    value1 = DummyString;
+                    value2 = DummyString;
+                    xml = calInfoXml;
+                };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(
+                GetPortfolioItemListMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    DummyString,
+                    new RPAData()
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("GetPortfolioItemList"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.SelectSingleNode("//IDLists").Attributes["EXTLIST"].Value.ShouldBe(DummyString),
+                () => actual.FirstChild.SelectSingleNode("//IDLists").Attributes["IDLIST"].Value.ShouldBe(DummyString),
+                () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(1),
                 () => validations.ShouldBe(1));
         }
     }
