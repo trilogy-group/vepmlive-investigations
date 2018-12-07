@@ -18,6 +18,12 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
     public class DBAdminTests
     {
         private const string XmlData = @"<Data PROJECT_ID=""1"" WRES_ID=""2""></Data>";
+        private const string DeletePiRequestContext = "DeletePI";
+        private const string ClosePiRequestContext = "ClosePI";
+        private const string OpenPiRequestContext = "OpenPI";
+        private const string CheckInPiRequestContext = "CheckInPI";
+        private const string CanDeleteResRequestContext = "CanDeleteRes";
+        private const string DeleteResRequestContext = "DeleteRes";
         private IDisposable _shimsContext;
         private DBAdminHandler _dbAdminHandler;
         private ShimHttpContext _shimHttpContext;
@@ -49,13 +55,10 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         [TestMethod]
         public void DBAdminRequest_Always_ReturnExpectedClosePiValue()
         {
-            // Arrange
-            var requestContext = "ClosePI";
-
-            // Act
+            // Arrange, Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                ClosePiRequestContext,
                 _cStruct);
 
             // Assert
@@ -66,13 +69,12 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         public void DBAdminRequest_Always_ReturnExpectedClosePiValueWithError()
         {
             // Arrange
-            var requestContext = "ClosePI";
             ShimSqlDb.AllInstances.StatusGet = instance => StatusEnum.rsRequestCannotBeCompleted;
 
             // Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                ClosePiRequestContext,
                 _cStruct);
 
             // Assert
@@ -83,7 +85,6 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         public void DBAdminRequest_Always_ReturnExpectedClosePiValueWithException()
         {
             // Arrange
-            var requestContext = "ClosePI";
             ShimdbaDBAdmin.ClosePIDBAccessInt32StringOut =
                 (DBAccess dba, int nPROJECTID, out string sReply) =>
                 {
@@ -93,7 +94,7 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
             // Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                ClosePiRequestContext,
                 _cStruct);
 
             // Assert
@@ -103,13 +104,10 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         [TestMethod]
         public void DBAdminRequest_Always_ReturnExpectedOpenPiValue()
         {
-            // Arrange
-            var requestContext = "OpenPI";
-
-            // Act
+            // Arrange, Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                OpenPiRequestContext,
                 _cStruct);
 
             // Assert
@@ -120,13 +118,12 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         public void DBAdminRequest_Always_ReturnExpectedOpenPiValueWithError()
         {
             // Arrange
-            var requestContext = "OpenPI";
             ShimSqlDb.AllInstances.StatusGet = instance => StatusEnum.rsRequestCannotBeCompleted;
 
             // Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                OpenPiRequestContext,
                 _cStruct);
 
             // Assert
@@ -137,7 +134,6 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         public void DBAdminRequest_Always_ReturnExpectedOpenPiValueWithException()
         {
             // Arrange
-            var requestContext = "OpenPI";
             ShimdbaDBAdmin.OpenPIDBAccessInt32StringOut =
                 (DBAccess dba, int nPROJECTID, out string sReply) =>
                 {
@@ -147,7 +143,7 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
             // Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                OpenPiRequestContext,
                 _cStruct);
 
             // Assert
@@ -157,13 +153,10 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         [TestMethod]
         public void DBAdminRequest_Always_ReturnExpectedCheckInPiValue()
         {
-            // Arrange
-            var requestContext = "CheckInPI";
-
-            // Act
+            // Arrange, Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                CheckInPiRequestContext,
                 _cStruct);
 
             // Assert
@@ -174,13 +167,12 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         public void DBAdminRequest_Always_ReturnExpectedCheckInPiValueWithError()
         {
             // Arrange
-            var requestContext = "CheckInPI";
             ShimSqlDb.AllInstances.StatusGet = instance => StatusEnum.rsRequestCannotBeCompleted;
 
             // Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                CheckInPiRequestContext,
                 _cStruct);
 
             // Assert
@@ -191,7 +183,6 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         public void DBAdminRequest_Always_ReturnExpectedCheckInPiValueWithException()
         {
             // Arrange
-            var requestContext = "CheckInPI";
             ShimdbaDBAdmin.CheckInPIDBAccessInt32StringOut =
                 (DBAccess dba, int nPROJECTID, out string sReply) =>
                 {
@@ -201,7 +192,7 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
             // Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                CheckInPiRequestContext,
                 _cStruct);
 
             // Assert
@@ -211,13 +202,10 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         [TestMethod]
         public void DBAdminRequest_Always_ReturnExpectedDeletePiValue()
         {
-            // Arrange
-            var requestContext = "DeletePI";
-
-            // Act
+            // Arrange, Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                DeletePiRequestContext,
                 _cStruct);
 
             // Assert
@@ -228,13 +216,12 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         public void DBAdminRequest_Always_ReturnExpectedDeletePiValueWithError()
         {
             // Arrange
-            var requestContext = "DeletePI";
             ShimSqlDb.AllInstances.StatusGet = instance => StatusEnum.rsRequestCannotBeCompleted;
 
             // Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                DeletePiRequestContext,
                 _cStruct);
 
             // Assert
@@ -245,7 +232,6 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         public void DBAdminRequest_Always_ReturnExpectedDeletePiValueWithException()
         {
             // Arrange
-            var requestContext = "DeletePI";
             ShimdbaDBAdmin.DeletePIDBAccessInt32StringOut =
                 (DBAccess dba, int nPROJECTID, out string sReply) =>
                 {
@@ -255,7 +241,7 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
             // Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                DeletePiRequestContext,
                 _cStruct);
 
             // Assert
@@ -265,13 +251,10 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         [TestMethod]
         public void DBAdminRequest_Always_ReturnExpectedCanDeleteResValue()
         {
-            // Arrange
-            var requestContext = "CanDeleteRes";
-
-            // Act
+            // Arrange, Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                CanDeleteResRequestContext,
                 _cStruct);
 
             // Assert
@@ -282,7 +265,6 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         public void DBAdminRequest_Always_ReturnExpectedCanDeleteResValueWithError()
         {
             // Arrange
-            var requestContext = "CanDeleteRes";
             var index = 0;
             ShimSqlCommand.AllInstances.ExecuteReader = instance =>
             {
@@ -297,7 +279,7 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
             // Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                CanDeleteResRequestContext,
                 _cStruct);
 
             // Assert
@@ -309,7 +291,6 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         public void DBAdminRequest_Always_ReturnExpectedCanDeleteResValueWithException()
         {
             // Arrange
-            var requestContext = "CanDeleteRes";
             ShimdbaDBAdmin.CanDeleteResourceDBAccessInt32StringOut =
                 (DBAccess dba, int nPROJECTID, out string sReply) =>
                 {
@@ -319,7 +300,7 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
             // Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                CanDeleteResRequestContext,
                 _cStruct);
 
             // Assert
@@ -329,13 +310,10 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         [TestMethod]
         public void DBAdminRequest_Always_ReturnExpectedDeleteResValue()
         {
-            // Arrange
-            var requestContext = "DeleteRes";
-
-            // Act
+            // Arrange, Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                DeleteResRequestContext,
                 _cStruct);
 
             // Assert
@@ -346,7 +324,6 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         public void DBAdminRequest_Always_ReturnExpectedDeleteResValueWithException()
         {
             // Arrange
-            var requestContext = "DeleteRes";
             ShimdbaDBAdmin.DeleteResourceDBAccessInt32StringOut =
                 (DBAccess dba, int nPROJECTID, out string sReply) =>
                 {
@@ -356,7 +333,7 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
             // Act
             var result = DBAdminHandler.DBAdminRequest(
                 _shimHttpContext,
-                requestContext,
+                DeleteResRequestContext,
                 _cStruct);
 
             // Assert
