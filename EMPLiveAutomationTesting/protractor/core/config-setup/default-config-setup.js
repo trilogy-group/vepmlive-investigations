@@ -69,6 +69,7 @@ const configSetup = {
         maxInstances: maxBrowserInstances
     }],
     params: {
+        siteCollection: setupUtilities.getParam('/epm', "--siteCollection", false),
         maxInstances: maxBrowserInstances,
         maxSessions: maxBrowserInstances,
         testrail: {
@@ -126,7 +127,7 @@ const configSetup = {
         }
     },
     baseUrl: setupUtilities.getParam('http://tenant02.epmldev.com', "--baseUrl", false),
-    siteCollection: setupUtilities.getParam('/epm', "--siteCollection", false),
+    
     framework: 'jasmine',
     jasmineNodeOpts: {
         showColors: true,
