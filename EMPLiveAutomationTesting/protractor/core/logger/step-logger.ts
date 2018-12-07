@@ -35,28 +35,21 @@ export class StepLogger {
     }
 
     static commonLogger(operation: string, step: string) {
-        
-        let publicUrl;
-        browser.wait(()=>{
-            browser.getCurrentUrl().then((url)=>{
-                publicUrl = url;
-                const message = `${this.stepIdVar}- *${operation}* - ${step} - url:` + publicUrl;
+        const message = `${this.stepIdVar}- *${operation}* - ${step} - url:`;
 
-                if (this.debug) {
-                    console.log(`${this.testCaseId || ''}${message}`);
-                }
-                if (!process.env.NO_ALLURE) {
-                    // tslint:disable-next-line:no-empty
-                    allure.createStep(message, () => {
-                    })();
-                }
-                if (this.logger) {
-                    this.logger.debug(message);
-                } else {
-                    this.logMessages += message;
-                }
-            });
-        });
+        if (this.debug) {
+            console.log(`${this.testCaseId || ''}${message}`);
+        }
+        if (!process.env.NO_ALLURE) {
+            // tslint:disable-next-line:no-empty
+            allure.createStep(message, () => {
+            })();
+        }
+        if (this.logger) {
+            this.logger.debug(message);
+        } else {
+            this.logMessages += message;
+        }
     }
 
     static verification(verificationDescription: string) {
