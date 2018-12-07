@@ -216,7 +216,6 @@
     <Compile Include="API\SPAdmin\EventReceiverManagerTests.cs" />
     <Compile Include="API\TimerTests.cs" />
     <Compile Include="AppSettingsHelperTests.cs" />
-    <Compile Include="AssignmentPlanner\GridListViewToolpartTests.cs" />
     <Compile Include="AssignmentPlanner\GridManagerTests.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControlTests.cs" />
     <Compile Include="CascadingLookup\CascadingLookup.FieldSettingsTests.cs" />

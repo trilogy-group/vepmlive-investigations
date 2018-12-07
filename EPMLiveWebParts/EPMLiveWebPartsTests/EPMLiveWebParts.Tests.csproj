@@ -146,6 +146,7 @@
     <Compile Include="GridListView\GridListViewTests.RemainingMethods.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderActionMenu.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderGantt.cs" />
+    <Compile Include="GridListView\GridListViewToolpartTests.cs" />
     <Compile Include="IntegrationModuleDisplay\IntegrationModuleDisplayTest.cs" />
     <Compile Include="Layouts\epmlive\Admin\SSLogsTests.cs" />
     <Compile Include="Layouts\epmlive\TlwizardTests.cs" />
