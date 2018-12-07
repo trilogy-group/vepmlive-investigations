@@ -144,6 +144,7 @@
     <Compile Include="WebServices\IntegrationGetMissingEventHandlersTests.cs" />
     <Compile Include="WebServices\IntegrationGetUpdatesTests.cs" />
     <Compile Include="WebServices\IntegrationProcessUpdatesTests.cs" />
+    <Compile Include="WebServices\IntegrationTests.cs" />
     <Compile Include="WebServices\IntegrationUpdatesTestsBase.cs" />
     <Compile Include="WebServices\IntegrationTestsBase.cs" />
     <Compile Include="WebServices\IntegrationUpdateItemsTests.cs" />
