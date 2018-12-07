@@ -6,7 +6,7 @@ using PortfolioEngineCore;
 
 namespace WorkEnginePPM
 {
-    internal class FteHelper
+    public class FteHelper
     {
         internal static void InitializeFTEColumns(DBAccess dbAccess, int calendarId, _TGrid tGrid)
         {
@@ -32,6 +32,8 @@ namespace WorkEnginePPM
 
         internal static string ReadCalendarFTEsInfo(HttpContext context, CStruct data)
         {
+            const string CbId = "CB_ID";
+
             var reply = string.Empty;
             var baseInfo = WebAdmin.BuildBaseInfo(context);
             using (var dataAccess = new DataAccess(baseInfo))
@@ -49,7 +51,7 @@ namespace WorkEnginePPM
                         }
                         var xCostCategory = new CStruct();
                         xCostCategory.Initialize("FTEs");
-                        xCostCategory.CreateIntAttr("CB_ID", calendarId);
+                        xCostCategory.CreateIntAttr(CbId, calendarId);
                         DataTable dataTable;
                         dbaCalendars.SelectCalendars(dbAccess, out dataTable);
                         var calendars = xCostCategory.CreateSubStruct("calendars");
@@ -59,7 +61,7 @@ namespace WorkEnginePPM
                         foreach (DataRow row in dataTable.Rows)
                         {
                             item = calendars.CreateSubStruct("item");
-                            var nCalendar = SqlDb.ReadIntValue(row["CB_ID"]);
+                            var nCalendar = SqlDb.ReadIntValue(row[CbId]);
                             item.CreateIntAttr("id", nCalendar);
                             item.CreateStringAttr("name", SqlDb.ReadStringValue(row["CB_NAME"]));
                         }
@@ -96,11 +98,11 @@ namespace WorkEnginePPM
                     try
                     {
                         var nCalendarId = data.GetIntAttr("CB_ID");
-                        var tg = new _TGrid();
-                        InitializeFTEColumns(dbAcess, nCalendarId, tg);
+                        var tGrid = new _TGrid();
+                        InitializeFTEColumns(dbAcess, nCalendarId, tGrid);
 
                         var stgridFTEs = data.InnerText;
-                        var dt = tg.SetXmlData(stgridFTEs);
+                        var dt = tGrid.SetXmlData(stgridFTEs);
                         if (dbaCostCategories.UpdateCostCategoryFTEs(dbAcess, nCalendarId, dt, out reply)
                             != StatusEnum.rsSuccess)
                         {
