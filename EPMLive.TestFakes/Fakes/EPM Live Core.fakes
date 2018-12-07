@@ -7,6 +7,7 @@
   <ShimGeneration>
     <Clear/>
     <Add FullName="EPMLiveCore.Security!"/>
+    <Add FullName="EPMLiveCore.Jobs.SecurityUpdate!"/>
     <Add FullName="EPMLiveCore.AssignmentPlanner.GridManager!"/>
     <Add FullName="EPMLiveCore.AppSettingsHelper!"/>
     <Add FullName="EPMLiveCore.EditableFieldDisplay!"/>
@@ -119,5 +120,11 @@
     <Add Namespace="EPMLiveCore.Integrations.Salesforce!"/>
     <Add FullName="EPMLiveCore.CascadingLookupField!"/>
     <Add FullName="EPMLiveCore.CascadingLookupFieldSettings!"/>
+    <Add FullName="EPMLiveCore.ViewPermissionPage!"/>
+    <Add FullName="EPMLiveCore.ViewPermissionUtil!"/>
+    <Add FullName="EPMLiveCore.tpreport!"/>
+    <Add FullName="EPMLiveCore.Jobs.TimerFix!"/>
+    <Add FullName="EPMLiveCore.Helpers.WebServicesHelper!"/>
+    <Add FullName="EPMLiveCore.adsyncadmin!"/>
   </ShimGeneration>
 </Fakes>

@@ -14,6 +14,7 @@ using System.Xml;
 using System.Xml.Linq;
 using EPMLiveCore.API;
 using EPMLiveCore.ReportingProxy;
+using EPMLiveWebParts;
 using Microsoft.SharePoint;
 using TimeSheets.Log;
 using TimeSheets.Models;
@@ -508,22 +509,7 @@ namespace TimeSheets
                         connection.Open();
                     });
 
-                    var userid = 0;
-                    using (var command = new SqlCommand(
-                        @"SELECT dbo.TSUSER.USER_ID FROM dbo.TSUSER 
-                        INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID 
-                        WHERE TS_UID=@tsuid",
-                        connection))
-                    {
-                        command.Parameters.AddWithValue("@tsuid", tsuid);
-                        using (var reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                userid = reader.GetInt32(0);
-                            }
-                        }
-                    }
+                    var userid = ReadSelectCommand(connection, tsuid);
 
                     if (userid != 0)
                     {
@@ -612,32 +598,7 @@ namespace TimeSheets
                 using (var connection =
                     GetOpenedConnection(EpmCoreFunctions.getConnectionString(sharepointWeb.Site.WebApplication.Id)))
                 {
-                    var userid = 0;
-                    using (var command = new SqlCommand("SELECT dbo.TSUSER.USER_ID " +
-                                            "FROM dbo.TSUSER INNER JOIN dbo.TSTIMESHEET " +
-                                            "    ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID " +
-                                            "WHERE TS_UID=@tsuid",
-                                            connection))
-                    {
-                        command.Parameters.AddWithValue("@tsuid", timesheetGuid);
-                        using (var reader = command.ExecuteReader())
-                        {
-                            try
-                            {
-                                if (reader.Read())
-                                {
-                                    userid = reader.GetInt32(0);
-                                }
-                            }
-                            catch(Exception exception)
-                            {
-                                Logger.WriteLog(
-                                    Logger.Category.Unexpected,
-                                    "Timesheet SubmitTimesheet",
-                                    exception.ToString());
-                            }
-                        }
-                    }
+                    var userid = ReadSelectCommand(connection, timesheetGuid);
 
                     if (userid != 0)
                     {
@@ -719,6 +680,35 @@ namespace TimeSheets
             {
                 return "<SubmitTimesheet Status=\"1\">Error: " + ex.Message + "</SubmitTimesheet>";
             }
+        }
+
+        private static int ReadSelectCommand(SqlConnection connection, string timesheetGuid)
+        {
+            var userid = 0;
+            using (var command = new SqlCommand(
+                "SELECT dbo.TSUSER.USER_ID "
+                + "FROM dbo.TSUSER INNER JOIN dbo.TSTIMESHEET "
+                + "    ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID "
+                + "WHERE TS_UID=@tsuid",
+                connection))
+            {
+                command.Parameters.AddWithValue("@tsuid", timesheetGuid);
+                using (var reader = command.ExecuteReader())
+                {
+                    try
+                    {
+                        if (reader.Read())
+                        {
+                            userid = reader.GetInt32(0);
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        Logger.WriteLog(Logger.Category.Unexpected, "Timesheet SubmitTimesheet", exception.ToString());
+                    }
+                }
+            }
+            return userid;
         }
 
         public static void ProcessFullMeta(SPSite site, SqlConnection cn, string ts_uid)
@@ -2505,95 +2495,12 @@ namespace TimeSheets
 
         private static string getFormat(SPField oField, XmlDocument oDoc, SPWeb oWeb)
         {
-            string format = "";
-
-            switch (oField.Type)
-            {
-                case SPFieldType.DateTime:
-                    try
-                    {
-
-                        if (oDoc.FirstChild.Attributes["Format"].Value == "DateOnly")
-                        {
-                            format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
-                        }
-                        else
-                        {
-                            format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern;
-                        }
-                    }
-                    catch { }
-                    break;
-                case SPFieldType.Number:
-                    if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
-                    {
-                        format = "0\\%;0\\%;0\\%";
-                    }
-                    else
-                    {
-                        int decCount = 0;
-                        string decimals = "";
-                        try
-                        {
-                            decCount = int.Parse(oDoc.FirstChild.Attributes["Decimals"].Value);
-                        }
-                        catch { }
-
-                        for (int i = 0; i < decCount; i++)
-                        {
-                            decimals += "0";
-                        }
-
-                        if (decCount > 0)
-                            decimals = "." + decimals;
-
-                        format = ",0" + decimals;
-                        break;
-                    }
-                    break;
-                case SPFieldType.Currency:
-                    SPFieldCurrency c = (SPFieldCurrency)oField;
-                    System.Globalization.NumberFormatInfo nInfo = System.Globalization.CultureInfo.GetCultureInfo(c.CurrencyLocaleId).NumberFormat;
-                    format = nInfo.CurrencySymbol + nInfo.CurrencyGroupSeparator + "0" + nInfo.CurrencyDecimalSeparator + "00";
-                    break;
-                case SPFieldType.Calculated:
-                    switch (oDoc.FirstChild.Attributes["ResultType"].Value)
-                    {
-                        case "Currency":
-                            format = oWeb.Locale.NumberFormat.CurrencySymbol + ",0.00";
-                            break;
-                        case "Number":
-                            if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
-                            {
-                                format = "0\\%;0\\%;0\\%";
-                            }
-                            else
-                            {
-                                int decCount = 0;
-                                string decimals = "";
-                                try
-                                {
-                                    decCount = int.Parse(oDoc.FirstChild.Attributes["Decimals"].Value);
-                                }
-                                catch { }
-
-                                for (int i = 0; i < decCount; i++)
-                                {
-                                    decimals += "0";
-                                }
-
-                                if (decCount > 0)
-                                    decimals = "." + decimals;
-
-                                format = ",0" + decimals;
-                            }
-                            break;
-                    };
-                    break;
-
-            };
-
-            return format;
+            return FormatHelper.GetFormat(
+                oField,
+                oDoc,
+                oWeb,
+                nInfo => $"{nInfo.CurrencySymbol}{nInfo.CurrencyGroupSeparator}0{nInfo.CurrencyDecimalSeparator}00",
+                "0\\%;0\\%;0\\%");
         }
 
         private static void PopulateTimesheetGridLayout(SPWeb web, ref XmlDocument docLayout, TimesheetSettings settings, ref int MidWidth, Dictionary<string, string> viewInfo, bool isWork, string InputList)

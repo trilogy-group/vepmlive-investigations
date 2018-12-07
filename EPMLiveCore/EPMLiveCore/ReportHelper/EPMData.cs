@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 using EPMLiveCore.Properties;
 using Microsoft.SharePoint;
@@ -789,17 +790,24 @@ namespace EPMLiveCore.ReportHelper
             return _DefaultLists;
         }
 
-        public void AddParam(string name, object value)
-        {
-            Params.Add(new SqlParameter(name, value));
-        }
+		public void AddParam(string name, object value)
+		{
+			Params.Add(new SqlParameter(name, value));
+		}
 
-        public static bool CheckConnection(string cs)
-        {
-            bool success = true;
-            SPSecurity.RunWithElevatedPrivileges(() => { success = TryToConnect(cs); });
-            return success;
-        }
+		public void AddParam(string name, object value, int size)
+		{
+			var parameter = new SqlParameter(name, value);
+			parameter.Size = size;
+			Params.Add(parameter);
+		}
+
+		public static bool CheckConnection(string cs)
+		{
+			bool success = true;
+			SPSecurity.RunWithElevatedPrivileges(() => { success = TryToConnect(cs); });
+			return success;
+		}
 
         public static bool TryToConnect(string connectionString)
         {
@@ -853,6 +861,34 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
+
+
+        public object ExecuteScalarAsync(SqlConnection con, string sqlCommand, CommandType commandType, List<SqlParameter> sqlParams)
+        {
+            try
+            {
+                object value;
+                using (var command = new SqlCommand { CommandType = commandType, CommandText = sqlCommand, Connection = con })
+                {
+                    command.CommandTimeout = 3600; // 1hour
+                    command.Parameters.AddRange(sqlParams.ToArray());
+                    value = command.ExecuteScalar();
+                }
+                return value;
+            }
+            catch (SqlException ex)
+            {
+                SPSecurity.RunWithElevatedPrivileges(() =>
+                {
+                    var eventMessage = CreateEventMessageWithParams(ex, Command, Params);
+                    LogWindowsEvents(EpmLiveKey, ExecuteScalarKey, eventMessage, false, ExecuteScalarEvent);
+                });
+                _sqlErrorOccurred = true;
+                _sqlError = ex.Message;
+                return false;
+            }
+
+        }
         public bool ExecuteNonQuery(SqlConnection con)
         {
             try
@@ -1998,6 +2034,63 @@ namespace EPMLiveCore.ReportHelper
             return blnWorkSaved;
         }
 
+
+        public Task SaveWorkAsync(SPListItem item)
+        {
+            bool hasWork = false, hasAssignedTo = false, hasStartDate = false, hasDueDate = false;
+            try
+            {
+                if (ItemHasValue(item, "Work"))
+                {
+                    hasWork = true;
+                }
+
+                if (ItemHasValue(item, "AssignedTo"))
+                {
+                    hasAssignedTo = true;
+                }
+
+                if (ItemHasValue(item, "StartDate"))
+                {
+                    hasStartDate = true;
+                }
+
+                if (ItemHasValue(item, "DueDate"))
+                {
+                    hasDueDate = true;
+                }
+                if (hasWork && hasAssignedTo && hasStartDate && hasDueDate)
+                {
+                    Guid listId = item.ParentList.ID;
+                    string sWork = Convert.ToString(item["Work"]);
+                    string sAssignedTo = ReportData.AddLookUpFieldValues(Convert.ToString(item["AssignedTo"]), "id");
+                    object startDate = DateTime.Parse(Convert.ToString(item["StartDate"]));
+                    object dueDate = DateTime.Parse(Convert.ToString(item["DueDate"]));
+                    Task saveTask = new Task(() => {
+                        try
+                        {
+                            ProcessAssignmentsAsync(sWork, sAssignedTo, startDate, dueDate, listId, SiteId, item.ID,
+                                    item.ParentList.Title);
+                        }catch(Exception ex)
+                        {
+                            LogStatus(string.Empty, string.Empty, "SaveWork() failed.", ex.Message.Replace("'", ""), 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        }
+                    }
+                    );
+					saveTask.Start();
+                    return saveTask;
+                }
+                // don't do anything if missing value
+                // NOTE: Discussed with JB and we are assumeing values are missing because user intended to NOT submit work
+            }
+            catch (Exception ex)
+            {
+                LogStatus(string.Empty, string.Empty, "SaveWork() failed.", ex.Message.Replace("'", ""), 2, 3,
+                    string.Empty); 
+            }
+            return null;
+        }
+
         public bool ProcessAssignments(string sWork, string sAssignedTo, object StartDate, object DueDate, Guid ListID,
             Guid SiteID, int ItemID, string sListName)
         {
@@ -2018,7 +2111,28 @@ namespace EPMLiveCore.ReportHelper
             objResults = ExecuteScalar(GetClientReportingConnection);
             return blnProcess;
         }
+        public object ProcessAssignmentsAsync(string sWork, string sAssignedTo, object StartDate, object DueDate, Guid ListID,
+            Guid SiteID, int ItemID, string sListName)
+        {
+            string command = "spRPTProcessAssignments";
+            CommandType = CommandType.StoredProcedure;
+            List<SqlParameter> sqlParams = new List<SqlParameter>();
+            sqlParams.Add(new SqlParameter("@Work", sWork));
+            sqlParams.Add(new SqlParameter("@AssignedTo", sAssignedTo));
+            sqlParams.Add(new SqlParameter("@Start", StartDate));
+            sqlParams.Add(new SqlParameter("@Finish", DueDate));
+            sqlParams.Add(new SqlParameter("@ListID", ListID));
+            sqlParams.Add(new SqlParameter("@SiteID", SiteID));
+            sqlParams.Add(new SqlParameter("@ItemID", ItemID));
 
+            //Need to implement further. Need to check result for status/errors
+            using (var connection = new SqlConnection(_remoteCs))
+            {
+                connection.Open();
+                return ExecuteScalarAsync(connection, command, CommandType.StoredProcedure, sqlParams);
+            }
+            
+        }
         private int GetDbVersion()
         {
             int version = 2005;
@@ -2366,9 +2480,27 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-        #region HELPER METHODS
+		public string GetSharepointType(string listName, string columnName)
+		{
+			const string sql =
+					"SELECT dbo.RPTColumn.SharePointType, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND (ColumnName=@colName)";
+			AddParam("@listName", listName, 500);
+			AddParam("@colName", columnName, 50);
+			Command = sql;
+			object objType = ExecuteScalar(GetClientReportingConnection);
+			return objType?.ToString();
+		}
 
-        private bool ItemHasValue(SPListItem item, string fldName)
+		public bool IsLookUpField(string listName, string columnName)
+		{
+			var objType = GetSharepointType(listName, columnName);
+			return objType != null & (objType.ToLower().Equals("lookup") || objType.ToLower().Equals("user") ||
+				   objType.ToLower().Equals("flookup"));
+		}
+
+		#region HELPER METHODS
+
+		private bool ItemHasValue(SPListItem item, string fldName)
         {
             string test = string.Empty;
             try

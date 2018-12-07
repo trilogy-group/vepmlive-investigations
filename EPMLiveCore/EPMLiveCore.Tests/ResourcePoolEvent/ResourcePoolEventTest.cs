@@ -317,7 +317,7 @@ namespace EPMLiveCore.Tests.ResourcePoolEvent
         public void ProcessLevel_SPItemEventPropertiesIsNotNull_ConfirmResult()
         {
             // Arrange
-            var parameters = new object[] { new ShimSPItemEventProperties().Instance };
+            var parameters = new object[] { new ShimSPItemEventProperties().Instance, false };
             ShimSPUser.AllInstances.IsSiteAdminGet = _ => true;
             ShimSPItemEventProperties.AllInstances.AfterPropertiesGet = _ => new ShimSPItemEventDataCollection()
             {
@@ -344,7 +344,7 @@ namespace EPMLiveCore.Tests.ResourcePoolEvent
         public void ProcessLevel_SPItemEventPropertiesIsNotNullAndIdNotMatched_ConfirmResult()
         {
             // Arrange
-            var parameters = new object[] { new ShimSPItemEventProperties().Instance };
+            var parameters = new object[] { new ShimSPItemEventProperties().Instance, false };
             ShimSPUser.AllInstances.IsSiteAdminGet = _ => true;
             ShimSPItemEventProperties.AllInstances.AfterPropertiesGet = _ => new ShimSPItemEventDataCollection()
             {

@@ -3139,6 +3139,11 @@ function AlertBlankTitle() {
         for (var R in grid.Rows) {
             var row = grid.GetRowById(R);
             if ((row.Def.Name == "Task" || row.Def.Name == "Summary") && row.Def.Name != "Header") {
+                if (!row.Visible) {
+                    //Removing all temporary deleted row
+                    grid.RemoveRow(row);
+                    continue;
+                }
                 var val1 = grid.GetValue(row, "Title");
                 val1 = val1.toString().trim();
                 if (val1 === "") {

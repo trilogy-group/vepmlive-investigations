@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -20,15 +21,21 @@ using Shouldly;
 
 namespace EPMLiveWebParts.Tests.WebPageCode
 {
-    [TestClass]
-    public class GetGanttTasksTests
+    [TestClass, ExcludeFromCodeCoverage]
+    public partial class GetGanttTasksTests
     {
         private IDisposable _shimContext;
         private SharepointShims _sharepointShims;
         private AdoShims _adoShims;
         private getgantttasks _getGanttTasks;
         private PrivateObject _getGanttTasksPrivate;
+        private const string One = "1";
+        private const string DummyVal = "DummyVal";
+        private const string DummyText = "DummyText";
+        private const string DummyFieldName = "DummyFieldName";
         private const string DummyString = "DummyString";
+        private const string ExampleUrl = "http://www.example.com";
+        private const string TypeTextXml = "text/xml";
         private const string PageLoadMethodName = "Page_Load";
         private const string IgnoreListId = "ignorelistid";
 

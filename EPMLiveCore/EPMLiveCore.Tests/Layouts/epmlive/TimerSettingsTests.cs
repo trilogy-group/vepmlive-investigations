@@ -204,7 +204,8 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         {
             // Arrange
             const int ExpectedSqlCommandCount = 2;
-            const int ExpectedSqlConnectionCount = 1;
+            const int ExpectedSqlConnectionCount = 2;
+            const int ExpectedSqlConstCount = 1;
 
             var sqlCommandCtorCallCount = 0;
             var sqlConnectionCtorCallCount = 0;
@@ -273,7 +274,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             this.ShouldSatisfyAllConditions(
                 () => sqlCommandCtorCallCount.ShouldBe(ExpectedSqlCommandCount),
                 () => sqlCommandDisposedCount.ShouldBe(ExpectedSqlCommandCount),
-                () => sqlConnectionCtorCallCount.ShouldBe(ExpectedSqlConnectionCount),
+                () => sqlConnectionCtorCallCount.ShouldBe(ExpectedSqlConstCount),
                 () => sqlConnectionDisposedCount.ShouldBe(ExpectedSqlConnectionCount));
         }
 
@@ -283,6 +284,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
             // Arrange
             const int ExpectedSqlCommandCount = 2;
             const int ExpectedSqlConnectionCount = 1;
+            const int ExpectedSqlConnectionDisposeCount = 2;
 
             var sqlCommandCtorCallCount = 0;
             var sqlConnectionCtorCallCount = 0;
@@ -352,7 +354,7 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
                 () => sqlCommandCtorCallCount.ShouldBe(ExpectedSqlCommandCount),
                 () => sqlCommandDisposedCount.ShouldBe(ExpectedSqlCommandCount),
                 () => sqlConnectionCtorCallCount.ShouldBe(ExpectedSqlConnectionCount),
-                () => sqlConnectionDisposedCount.ShouldBe(ExpectedSqlConnectionCount));
+                () => sqlConnectionDisposedCount.ShouldBe(ExpectedSqlConnectionDisposeCount));
         }
     }
 }
