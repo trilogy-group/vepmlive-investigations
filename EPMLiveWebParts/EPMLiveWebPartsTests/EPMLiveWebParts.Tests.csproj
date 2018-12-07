@@ -165,6 +165,8 @@
     <Compile Include="ReportingFilter\ReportingFilterTests.cs" />
     <Compile Include="UserProfileDisplay\DisplayProfilePicturesTests.cs" />
     <Compile Include="WebPageCode\GetGanttItemsTests.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.AddItem.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.AddItemDataRow.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.HelperMethods.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.AddGroup.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.cs" />

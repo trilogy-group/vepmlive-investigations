@@ -17,18 +17,6 @@ namespace EPMLiveWebParts.Tests.WebPageCode
 {
     public partial class GetGanttTasksTests
     {
-        private const string DummyListId = "DummyListId";
-        private const string WorkspaceUrlView = "WorkspaceUrl";
-        private const string DefaultErrorMessage = "DefaultErrorMessage";
-        private const string FieldRollupLists = "rolluplists";
-        private const string FieldGlobalError = "globalError";
-        private const string FieldUsePerformance = "usePerformance";
-        private const string FieldFilterField = "filterfield";
-        private const string MethodAddGroups = "addGroups";
-        private static readonly Guid DefaultWebId = Guid.NewGuid();
-        private static readonly Guid DefaultListId = Guid.NewGuid();
-        private static readonly Guid DefaultId = Guid.NewGuid();
-
         [TestMethod]
         public void AddGroups_NullRollupLists_ProcessesList()
         {
