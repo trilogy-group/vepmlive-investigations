@@ -8,7 +8,7 @@ using Microsoft.QualityTools.Testing.Fakes;
 using Shouldly;
 using System.Data;
 
-namespace PortfolioEngineCore.Tests.Base.DBAccess
+namespace PortfolioEngineCore.Tests.Base
 {
     [TestClass]
     public class LmrIfTests
