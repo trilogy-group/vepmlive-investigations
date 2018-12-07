@@ -44,7 +44,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             };
             ShimSPListItem.AllInstances.ItemGetGuid = (_, __) => DummyVal;
 
-            var listGuid = listId == null ? Guid.NewGuid() : new Guid(listId);
+            var listGuid = listId == null ? DefaultListId : new Guid(listId);
             ShimSPList.AllInstances.IDGet = _ => listGuid;
             ShimSPList.AllInstances.TitleGet = _ => DummyVal;
             ShimSPList.AllInstances.ImageUrlGet = _ => $"image.png";
@@ -116,7 +116,7 @@ namespace EPMLiveWebParts.Tests.WebPageCode
 
         private void PrepareSpWebRelatedShims(string webId = null)
         {
-            var webGuid = webId == null ? Guid.NewGuid() : new Guid(webId);
+            var webGuid = webId == null ? DefaultWebId : new Guid(webId);
             ShimSPWeb.AllInstances.IDGet = _ => webGuid;
             ShimSPWeb.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
             ShimSPWeb.AllInstances.UrlGet = _ => ExampleUrl;
@@ -140,6 +140,22 @@ namespace EPMLiveWebParts.Tests.WebPageCode
             propertyBag.Bind(properties);
             ShimSPWeb.AllInstances.PropertiesGet = _ => propertyBag.Instance;
             ShimSPSite.AllInstances.UrlGet = _ => ExampleUrl;
+        }
+
+        private void PrepareSpUserRelatedShims()
+        {
+            ShimSPUser.AllInstances.IDGet = _ => 1;
+            ShimSPUser.AllInstances.LoginNameGet = _ => DummyText;
+            ShimSPUser.AllInstances.NameGet = _ => DummyText;
+        }
+
+        private void PrepareSpFileRelatedShims()
+        {
+            ShimSPFolderCollection.AllInstances.ItemGetString = (_, __) => new ShimSPFolder();
+            ShimSPFolder.AllInstances.SubFoldersGet = _ => new ShimSPFolderCollection();
+            ShimSPFolder.AllInstances.FilesGet = _ => new ShimSPFileCollection();
+            ShimSPFileCollection.AllInstances.ItemGetInt32 = (_, __) => new ShimSPFile();
+            ShimSPFile.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
         }
     }
 }
