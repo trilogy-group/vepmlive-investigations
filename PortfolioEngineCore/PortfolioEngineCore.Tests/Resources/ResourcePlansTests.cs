@@ -19,18 +19,17 @@ namespace PortfolioEngineCore.Tests.Resources
     {
         private const int DummyInt = 1;
         private const string DummyString = "DummyString";
-        private const bool DummyBool = true;
         private PrivateType _privateType;
         private PrivateObject _privateObject;
         private ResourcePlans _testEntity;
         private IDisposable _shimsContext;
-        private StringBuilder query = new StringBuilder();
+        private readonly StringBuilder query = new StringBuilder();
         private int currentDataReaderCount;
         private int maxDatareaderCount;
         private int DataReaderResult = 0;
         private int tosetMainKey = 0;
         private object DeptUID = 15000;
-        private object WRES_ID = 15001;
+        private object WresId = 15001;
 
         // Function Names
         private const string GetResourcePlanStruct = "GetResourcePlanStruct";
@@ -150,7 +149,7 @@ namespace PortfolioEngineCore.Tests.Resources
             };
             ShimCommon.AddIDToListStringRefInt32 = (ref string sList, int lID) =>
             {
-                sList = "";
+                sList = string.Empty;
                 return true;
             };
             var expectedQueries = new string[]
@@ -299,7 +298,7 @@ namespace PortfolioEngineCore.Tests.Resources
             };
             ShimSecurity.CheckUserGlobalPermissionDBAccessInt32GlobalPermissionsEnum = (_, _1, _2) =>
             {
-                return _2 == GlobalPermissionsEnum.gpSuperRM ? false : true;
+                return GlobalPermissionsEnum.gpSuperRM != _2;
             };
             ShimResourcePlans.AllInstances.GetResourcePlanViewsXMLCStructOut = (ResourcePlans resourcePlans, out CStruct xPlanViews) =>
             {
@@ -1115,7 +1114,7 @@ namespace PortfolioEngineCore.Tests.Resources
                         }
                         else if (key == "WRES_ID")
                         {
-                            return WRES_ID;
+                            return WresId;
                         }
                         else if (key == "ADM_PORT_COMMITMENTS_OPMODE")
                         {
