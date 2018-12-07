@@ -9,7 +9,7 @@ export class BasePage implements Page {
 
     async goTo() {
         await browser.waitForAngularEnabled(false);
-        await this.get(browser.params.siteCollection + this.url);
+        await this.get(browser.siteCollection + this.url);
     }
 
     async get(url: string) {
