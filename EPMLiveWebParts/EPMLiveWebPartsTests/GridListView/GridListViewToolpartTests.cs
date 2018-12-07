@@ -327,7 +327,7 @@ namespace EPMLiveCore.Tests.AssignmentPlanner
         {
             ShimPage.AllInstances.RequestGet = _ => new ShimHttpRequest();
             ShimHttpRequest.AllInstances.ItemGetString = (_, key) =>
-                (key.Contains("chk"))
+                key.Contains("chk")
                 ? checkItems
                 : key;
         }
