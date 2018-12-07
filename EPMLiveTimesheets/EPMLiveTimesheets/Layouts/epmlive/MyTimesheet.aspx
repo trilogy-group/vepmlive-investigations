@@ -21,7 +21,9 @@
             border: none !important;
         }
         
-
+        td.GMClassReadOnly  {
+            background-color: #e8e1e1;
+        }
 
     </style>
 
