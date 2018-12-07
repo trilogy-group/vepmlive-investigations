@@ -261,6 +261,7 @@
     <Compile Include="Layouts\epmlive\MyWorkSettingsTests.cs" />
     <Compile Include="Layouts\epmlive\QueueJobsTests.cs" />
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
+    <Compile Include="Layouts\epmlive\SitePermissionsTests.cs" />
     <Compile Include="Layouts\epmlive\SolutionStoreProxyTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsRemTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsTests.cs" />
