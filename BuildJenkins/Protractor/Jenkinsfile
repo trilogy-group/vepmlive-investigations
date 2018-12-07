@@ -5,7 +5,8 @@ pipeline {
 	  parameters {
 		string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')
 		string(name: 'FullHostName', defaultValue: 'tenant02.epmldev.com', description: 'Target full host name')
-		string(name: 'BaseUrl', defaultValue: 'http://tenant02.epmldev.com/epm', description: 'Protractor baseUrl')
+		string(name: 'BaseUrl', defaultValue: 'http://tenant02.epmldev.com', description: 'Protractor baseUrl')
+		string(name: 'SiteCollection', defaultValue: '/epm', description: 'Protractor siteCollection')
 		string(name: 'Username', defaultValue: 'farmadmin', description: 'Protractor username')
 		string(name: 'Password', defaultValue: 'Pass@word1', description: 'Protractor password')
 	}
@@ -36,7 +37,7 @@ pipeline {
 			steps {
 				echo 'Run tests...'
 				dir ("${env.WORKSPACE}/EMPLiveAutomationTesting/protractor") {
-					sh "npm install; npm run e2e-tc -- --params.headlessBrowser=true --baseUrl='${params.BaseUrl}' --params.login.admin.user='${params.Username}' --params.login.admin.password='${params.Password}'"
+					sh "npm install; npm run e2e-tc -- --params.headlessBrowser=true --baseUrl='${params.BaseUrl}' --params.login.admin.user='${params.Username}'  --params.login.admin.password='${params.Password}'  --sitecollection='${params.SiteCollection}'"
 				}
 			}
 		}
