@@ -1,17 +1,16 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Web;
-using PortfolioEngineCore;
-using System.Web.Fakes;
-using Microsoft.QualityTools.Testing.Fakes;
-using System.Data.SqlClient.Fakes;
 using System.Data;
-using Microsoft.SharePoint.Fakes;
-using EPMLiveCore.Fakes;
-using WorkEnginePPM.Fakes;
-using Shouldly;
-using PortfolioEngineCore.Fakes;
 using System.Data.Fakes;
+using System.Data.SqlClient.Fakes;
+using System.Web.Fakes;
+using EPMLiveCore.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.SharePoint.Fakes;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PortfolioEngineCore;
+using PortfolioEngineCore.Fakes;
+using Shouldly;
+using WorkEnginePPM.Fakes;
 
 namespace WorkEnginePPM.Tests.Layouts.ppm
 {
