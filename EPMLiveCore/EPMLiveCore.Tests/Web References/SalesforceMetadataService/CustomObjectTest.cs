@@ -84,14 +84,14 @@ namespace EPMLiveCore.Tests.Web_References.SalesforceMetadataService
             };
 
             // Act
-            foreach (KeyValuePair<string, object> kvp in propertiesDictionary)
+            foreach (var kvp in propertiesDictionary)
             {
                 _privateObject.SetProperty(kvp.Key, kvp.Value);
             }
 
             // Assert
             var assertions = new List<Action>();
-            foreach (KeyValuePair<string, object> kvp in propertiesDictionary)
+            foreach (var kvp in propertiesDictionary)
             {
                 assertions.Add(() => _privateObject.GetProperty(kvp.Key).ShouldBe(kvp.Value));
             }
