@@ -71,6 +71,7 @@ export class WorkspacePageHelper {
             optionName.favoriteWorkspaces));
 
         StepLogger.verification(`verify "All Workspaces" option is displayed`);
+        await ElementHelper.scrollToElement(option.allWorkspaces);
         const AllWorkspacesDisplayed = await PageHelper.isElementDisplayed(option.allWorkspaces);
         await expect(AllWorkspacesDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             optionName.allWorkspaces));

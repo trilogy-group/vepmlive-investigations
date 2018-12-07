@@ -12,6 +12,7 @@ import {ElementHelper} from '../../../../../components/html/element-helper';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {ProjectItemPageHelper} from '../project-item-page.helper';
 import {ProjectItemPageConstants} from '../project-item-page.constants';
+import {LoginPageHelper} from '../../../login/login-page.helper';
 
 export class EditCostHelper {
 
@@ -229,19 +230,11 @@ export class EditCostHelper {
     static async createProjectWithCost(uniqueId = PageHelper.getUniqueId()) {
         const cost = 4;
         StepLogger.subStep('Create a project');
-
         const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, );
-        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
-            projectNameValue,
-            ProjectItemPageConstants.columnNames.title);
-
-        StepLogger.subStep('Select created project');
-        await CommonPageHelper.selectRecordFromGrid();
-
         StepLogger.subStep('Click on edit cost');
-        await this.clickEditByCostFromEllipsis();
+        // Even though buttons is enabled but need to wait for click event to take place
+        await PageHelper.sleepForXSec(PageHelper.timeout.m);
+        await PageHelper.click(EditCost.editCostButton);
         await CommonPageHelper.switchToFirstContentFrame();
         StepLogger.subVerification('verify Edit cost pop up');
         await PageHelper.sleepForXSec(PageHelper.timeout.m);
@@ -273,5 +266,27 @@ export class EditCostHelper {
         await CommonPageHelper.verifyVariousOptionsOnContextMenu();
         StepLogger.subStep('Click on Edit Cost link');
         await PageHelper.click(EditCost.editCostLinkViaEllipse);
+    }
+
+    static async createTwoProjectWithCost() {
+        StepLogger.subStep('Navigate to Project Page');
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+        );
+        const id = PageHelper.getUniqueId();
+        StepLogger.subStep('Create first project');
+        const project1 = await this.createProjectWithCost(`${id} 1`);
+        StepLogger.subStep(`${project1} is created`);
+        await this.clickCloseCostPlanner();
+        StepLogger.subStep('Create second project');
+        const project2 = await this.createProjectWithCost(`${id} 2`);
+        StepLogger.subStep(`${project2} is created`);
+        StepLogger.subStep('Click On close cost planner button');
+        await this.clickCloseCostPlanner();
+        StepLogger.subStep('logout from application');
+        await LoginPageHelper.logout();
+        return id;
     }
 }
