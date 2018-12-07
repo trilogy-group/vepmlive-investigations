@@ -19,7 +19,6 @@ namespace EPMLiveCore.Tests.AssignmentPlanner
     [TestClass, ExcludeFromCodeCoverage]
     public class GridListViewToolpartTests
     {
-        private const int Id = 1;
         private const string One = "1";
         private const string DummyString = "DummyString";
         private const string ExampleUrl = "http://example.com";
