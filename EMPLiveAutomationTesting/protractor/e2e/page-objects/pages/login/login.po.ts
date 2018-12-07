@@ -4,8 +4,8 @@ import {LoginPageHelper} from './login-page.helper';
 import { browser } from '../../../../node_modules/protractor';
 
 export class LoginPage extends BasePage {
-    url = '/epm';
-    logout = '/epm/_layouts/15/SignOut.aspx';
+    url = '/';
+    logout = '/_layouts/15/SignOut.aspx';
 
     static get usernameTextBox() {
         return LoginPageHelper.getFormControlById(LoginPageConstants.signInFormIDs.userName);
