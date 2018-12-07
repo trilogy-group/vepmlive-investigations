@@ -171,6 +171,7 @@
     <Compile Include="ADSyncTests.cs" />
     <Compile Include="API\Analytics\AnalyticsDataTests.cs" />
     <Compile Include="API\Analytics\FRFQueryFactoryTests.cs" />
+    <Compile Include="API\Analytics\FRFQueryParamFactoryTests.cs" />
     <Compile Include="API\Analytics\RecentItemsTests.cs" />
     <Compile Include="API\APITeamTests.cs" />
     <Compile Include="API\Applications\ApplicationInstallerTestsPartOne.cs" />
@@ -260,6 +261,7 @@
     <Compile Include="Layouts\epmlive\MyWorkSettingsTests.cs" />
     <Compile Include="Layouts\epmlive\QueueJobsTests.cs" />
     <Compile Include="Layouts\epmlive\SetupTest.cs" />
+    <Compile Include="Layouts\epmlive\SitePermissionsTests.cs" />
     <Compile Include="Layouts\epmlive\SolutionStoreProxyTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsRemTests.cs" />
     <Compile Include="Layouts\epmlive\TimerSettingsTests.cs" />
@@ -310,9 +312,11 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="TestCheck.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\CustomObjectTest.cs" />
     <Compile Include="WebPageCode\AdminConnsTest.cs" />
     <Compile Include="WebPageCode\AdminQueueTests.cs" />
     <Compile Include="WebPageCode\CreateDatabaseTest.cs" />
+    <Compile Include="WebPageCode\GetWorkspaceXmlTests.cs" />
     <Compile Include="WebPageCode\ListDisplayPageTests.cs" />
     <Compile Include="WebPageCode\ViewPermissionPageTests.cs" />
     <Compile Include="WebPageCode\TpreportTests.cs" />

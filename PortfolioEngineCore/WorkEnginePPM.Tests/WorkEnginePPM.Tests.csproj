@@ -144,6 +144,7 @@
     <Compile Include="WebServices\IntegrationGetMissingEventHandlersTests.cs" />
     <Compile Include="WebServices\IntegrationGetUpdatesTests.cs" />
     <Compile Include="WebServices\IntegrationProcessUpdatesTests.cs" />
+    <Compile Include="WebServices\IntegrationTests.cs" />
     <Compile Include="WebServices\IntegrationUpdatesTestsBase.cs" />
     <Compile Include="WebServices\IntegrationTestsBase.cs" />
     <Compile Include="WebServices\IntegrationUpdateItemsTests.cs" />
@@ -158,8 +159,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HelperFunctionsTests.cs" />
     <Compile Include="WebServices\OptGridsTests.cs" />
+    <Compile Include="WebServices\PFEAdminManagerTests.cs" />
     <Compile Include="WebServices\PortfolioEngineAPITests.cs" />
+    <Compile Include="WebServices\ResPlanAnalyzerTests.cs" />
     <Compile Include="WebServices\RPADataTests.cs" />
+    <Compile Include="WebServices\RPEditorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">

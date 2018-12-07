@@ -38,7 +38,7 @@ using Shouldly;
 
 namespace EPMLiveWebParts.Tests
 {
-    public partial class getgriditemsTests
+    public partial class GetGridItemsTests
     {
         private const string DefaultListId = "F316E11-C842-4440-9918-39A8F1C12DA9";
         private const string DefaultWebId = "1A8F7946-CCA1-4A24-8785-CE8E32D012BE";

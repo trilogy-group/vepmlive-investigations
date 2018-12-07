@@ -127,7 +127,6 @@ const configSetup = {
         }
     },
     baseUrl: setupUtilities.getParam('http://tenant02.epmldev.com', "--baseUrl", false),
-    
     framework: 'jasmine',
     jasmineNodeOpts: {
         showColors: true,

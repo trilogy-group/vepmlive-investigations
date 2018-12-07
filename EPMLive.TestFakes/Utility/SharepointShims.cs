@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 
 namespace EPMLive.TestFakes.Utility
 {
+    [ExcludeFromCodeCoverage]
     public class SharepointShims
     {
         public readonly static string DatabaseConnectionString = "test-db-connection-string";
@@ -196,6 +198,7 @@ namespace EPMLive.TestFakes.Utility
                     }
                 },
                 Update = () => IsDbUpdateExecuted = true,
+                FieldsGet = () => FieldsShim
             };
         }
 

@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="OutputXmlAlwaysSetExpectedValuesExpectedXml" xml:space="preserve">
+    <value>&lt;head&gt;&lt;beforeInit&gt;&lt;call command="attachHeader"&gt;&lt;child&gt;&lt;/child&gt;&lt;/call&gt;&lt;/beforeInit&gt;&lt;column type="ch" width="25" align="center" color="#F0F0F0"&gt;&lt;![CDATA[#master_checkbox]]&gt;&lt;/column&gt;&lt;column type="ro" width="25" align="center" color="#F0F0F0"&gt;&lt;![CDATA[&amp;nbsp;]]&gt;&lt;/column&gt;&lt;column id="culumnId1" width="50" type="ro"&gt;&lt;/column&gt;&lt;row id="1"&gt;&lt;userdata name="listid"&gt;&lt;/userdata&gt;&lt;userdata name="itemid"&gt;&lt;/userdata&gt;&lt;userdata name="Work"&gt;&lt;/userdata&gt;&lt;cell style="background: #EFEFEF"&gt;&lt;/cell&gt;&lt;cell style="background: #EFEFEF"&gt;&lt;![CDATA[&lt;img src="_layouts/images/yellow.gif" alt="Submitted"&gt;]]&gt;&lt;/cell&gt;&lt;cell&gt;&amp;lt;img src="/_layouts/images/columnvalue.gif"&amp;gt;&lt;/cell&gt;&lt;cell type="timeeditor"&gt;10|10|10|10|10|10|N|TS_ITEM_NOTES&lt;/cell&gt;&lt;cell style="background: #EFEFEF; font-weight: bold"&gt;30&lt;/cell&gt;&lt;cell style="background: #EFEFEF; font-weight: bold"&gt;|10&lt;/cell&gt;&lt;userdata name="fieldcount"&gt;1&lt;/userdata&gt;&lt;userdata name="firstdate"&gt;6/11/2018 12:00:00 AM&lt;/userdata&gt;&lt;userdata name="datecount"&gt;1&lt;/userdata&gt;&lt;userdata name="tsitemuid"&gt;00000000-0000-0000-0000-000000000000&lt;/userdata&gt;&lt;userdata name="submitted"&gt;True&lt;/userdata&gt;&lt;/row&gt;&lt;column type="ro[=sum]" width="40" align="right" id="_TsDate_6_11_2018"&gt;&lt;![CDATA[Mon&lt;br&gt;11]]&gt;&lt;/column&gt;&lt;column type="ro[=sum]" width="50" align="right" id="_TsTotal_"&gt;Total&lt;/column&gt;&lt;column type="percentwork" width="125" align="left" color="#F0F0F0" id="_PercentWork_"&gt;&lt;![CDATA[% Work Spent]]&gt;&lt;/column&gt;&lt;/head&gt;</value>
+  </data>
+  <data name="OutputXmlAlwaysWithoutUserDataSetExpectedValuesExpectedXml" xml:space="preserve">
+    <value>&lt;head&gt;&lt;beforeInit&gt;&lt;call command="attachHeader"&gt;&lt;child&gt;&lt;/child&gt;&lt;/call&gt;&lt;/beforeInit&gt;&lt;column type="ch" width="25" align="center" color="#F0F0F0"&gt;&lt;![CDATA[#master_checkbox]]&gt;&lt;/column&gt;&lt;column type="ro" width="25" align="center" color="#F0F0F0"&gt;&lt;![CDATA[&amp;nbsp;]]&gt;&lt;/column&gt;&lt;column id="culumnId1" width="50" type="ro"&gt;&lt;/column&gt;&lt;row id="1"&gt;&lt;userdata name="itemid"&gt;&lt;/userdata&gt;&lt;userdata name="Work"&gt;&lt;/userdata&gt;&lt;cell type="ro" style="background: #EFEFEF; font-weight: bold;"&gt;&lt;/cell&gt;&lt;cell type="ro" style="background: #EFEFEF; font-weight: bold;"&gt;&lt;/cell&gt;&lt;cell style="background: #EFEFEF; font-weight: bold;"&gt;culumnId1&lt;/cell&gt;&lt;cell style="background: #EFEFEF"&gt;&lt;/cell&gt;&lt;cell style="background: #EFEFEF;font-weight: bold;"&gt;&lt;/cell&gt;&lt;/row&gt;&lt;column type="ro[=sum]" width="40" align="right" id="_TsDate_6_11_2018"&gt;&lt;![CDATA[Mon&lt;br&gt;11]]&gt;&lt;/column&gt;&lt;column type="ro[=sum]" width="50" align="right" id="_TsTotal_"&gt;Total&lt;/column&gt;&lt;column type="percentwork" width="125" align="left" color="#F0F0F0" id="_PercentWork_"&gt;&lt;![CDATA[% Work Spent]]&gt;&lt;/column&gt;&lt;/head&gt;</value>
+  </data>
+  <data name="OutputXmlAlwaysWithTimeEditorFalseSetExpectedValuesExpectedXml" xml:space="preserve">
+    <value>&lt;head&gt;&lt;beforeInit&gt;&lt;call command="attachHeader"&gt;&lt;child&gt;&lt;/child&gt;&lt;/call&gt;&lt;/beforeInit&gt;&lt;column type="ch" width="25" align="center" color="#F0F0F0"&gt;&lt;![CDATA[#master_checkbox]]&gt;&lt;/column&gt;&lt;column type="ro" width="25" align="center" color="#F0F0F0"&gt;&lt;![CDATA[&amp;nbsp;]]&gt;&lt;/column&gt;&lt;column id="culumnId1" width="50" type="ro"&gt;&lt;/column&gt;&lt;row id="1"&gt;&lt;userdata name="listid"&gt;&lt;/userdata&gt;&lt;userdata name="itemid"&gt;&lt;/userdata&gt;&lt;userdata name="Work"&gt;&lt;/userdata&gt;&lt;cell style="background: #EFEFEF"&gt;&lt;/cell&gt;&lt;cell style="background: #EFEFEF"&gt;&lt;![CDATA[&lt;img src="_layouts/images/yellow.gif" alt="Submitted"&gt;]]&gt;&lt;/cell&gt;&lt;cell&gt;&amp;lt;img src="/_layouts/images/columnvalue.gif"&amp;gt;&lt;/cell&gt;&lt;cell type="ro"&gt;10&lt;/cell&gt;&lt;cell style="background: #EFEFEF; font-weight: bold"&gt;10&lt;/cell&gt;&lt;cell style="background: #EFEFEF; font-weight: bold"&gt;|10&lt;/cell&gt;&lt;userdata name="fieldcount"&gt;1&lt;/userdata&gt;&lt;userdata name="firstdate"&gt;6/11/2018 12:00:00 AM&lt;/userdata&gt;&lt;userdata name="datecount"&gt;1&lt;/userdata&gt;&lt;userdata name="tsitemuid"&gt;00000000-0000-0000-0000-000000000000&lt;/userdata&gt;&lt;userdata name="submitted"&gt;True&lt;/userdata&gt;&lt;/row&gt;&lt;column type="ro[=sum]" width="40" align="right" id="_TsDate_6_11_2018"&gt;&lt;![CDATA[Mon&lt;br&gt;11]]&gt;&lt;/column&gt;&lt;column type="ro[=sum]" width="50" align="right" id="_TsTotal_"&gt;Total&lt;/column&gt;&lt;column type="percentwork" width="125" align="left" color="#F0F0F0" id="_PercentWork_"&gt;&lt;![CDATA[% Work Spent]]&gt;&lt;/column&gt;&lt;/head&gt;</value>
+  </data>
+</root>
