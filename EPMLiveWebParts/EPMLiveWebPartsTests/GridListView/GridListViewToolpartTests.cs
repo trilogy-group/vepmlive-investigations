@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Web.Fakes;
@@ -15,7 +16,7 @@ using Shouldly;
 
 namespace EPMLiveCore.Tests.AssignmentPlanner
 {
-    [TestClass]
+    [TestClass, ExcludeFromCodeCoverage]
     public class GridListViewToolpartTests
     {
         private const int Id = 1;
