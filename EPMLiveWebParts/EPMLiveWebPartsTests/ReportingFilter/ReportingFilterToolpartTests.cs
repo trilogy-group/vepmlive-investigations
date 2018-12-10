@@ -59,7 +59,6 @@ namespace EPMLiveWebParts.Tests.ReportingFilter
 
             _didRebuildControl = false;
             _didRegisterClientScript = false;
-
             PrepareSpContext();
             ShimCoreFunctions.getSiteItemsSPWebSPViewStringStringStringStringIListOfString =
                 (a, b, c, d, e, f, g) => GetSiteItemsDataTable();
