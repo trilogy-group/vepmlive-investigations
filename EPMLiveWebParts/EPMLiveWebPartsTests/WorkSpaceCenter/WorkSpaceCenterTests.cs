@@ -25,9 +25,6 @@ namespace EPMLiveWebParts.Tests.WorkSpaceCenter
     [TestClass]
     public class WorkSpaceCenterTests
     {
-        //private const int Id = 1;
-        //private const string One = "1";
-        //private const string DummyString = "DummyString";
         private const string ExampleUrl = "http://example.com";
         private const string MethodOnInit = "OnInit";
         private const string MethodOnPreRender = "OnPreRender";
