@@ -36,6 +36,7 @@ using PortfolioEngineCoreFakes = PortfolioEngineCore.Fakes;
 using PortfolioEngineCore.PortfolioItems.Fakes;
 using PortfolioEngineCore.PortfolioItems;
 using RPADataCache.Fakes;
+using EPMLiveCore.Infrastructure.Logging.Fakes;
 
 namespace WorkEnginePPM.Tests.WebServices
 {
@@ -99,6 +100,14 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string SetRADragRowsMethodName = "SetRADragRows";
         private const string SetRADetailsFilteredFlagMethodName = "SetRADetailsFilteredFlag";
         private const string GetResourceAnalyzerViewsMethodName = "GetResourceAnalyzerViews";
+        private const string GetResourceAnalyzerViewMethodName = "GetResourceAnalyzerView";
+        private const string SaveResourceAnalyzerViewMethodName = "SaveResourceAnalyzerView";
+        private const string DeleteResourceAnalyzerViewMethodName = "DeleteResourceAnalyzerView";
+        private const string RenameResourceAnalyzerViewMethodName = "RenameResourceAnalyzerView";
+        private const string ApplyResourceAnalyzerViewServerSideSettingsMethodName = "ApplyResourceAnalyzerViewServerSideSettings";
+        private const string GetCapacityScenarioListMethodName = "GetCapacityScenarioList";
+        private const string DeleteCapacityScenarioMethodName = "DeleteCapacityScenario";
+        private const string GetCapacityScenarioDataMethodName = "GetCapacityScenarioData";
 
         [TestInitialize]
         public void Setup()
@@ -190,6 +199,9 @@ namespace WorkEnginePPM.Tests.WebServices
                 stage = DummyString;
                 return true;
             };
+            ShimLogger.AllInstances.LogMessageStringStringLogKindString = (_, _1, _2, _3, _4) => { };
+            ShimLogger.AllInstances.Dispose = _ => { };
+            ShimLogger.AllInstances.DisposeBoolean = (_, __) => { };
         }
 
         private void SetupVariables()
@@ -616,7 +628,7 @@ namespace WorkEnginePPM.Tests.WebServices
             // Act
             actual.LoadXml((string)privateObject.Invoke(
                 GetTotalsColumnsConfigurationMethodName,
-                publicStatic,   
+                publicStatic,
                 new object[]
                 {
                     default(HttpContext),
@@ -811,6 +823,428 @@ namespace WorkEnginePPM.Tests.WebServices
                 () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
                 () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(One),
                 () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetResourceAnalyzerView_WhenCalled_GetResourceAnalyzerView()
+        {
+            // Arrange
+            var calInfoXml = $@"<xmlcfg ViewGUID=""{SampleGuidString1}""/>";
+            var actual = new XmlDocument();
+
+            ShimResourceAnalyzer.AllInstances.GetResourceAnalyzerViewXMLGuidStringOut =
+                (ResourceAnalyzer instance, Guid viewGuid, out string xml) =>
+                {
+                    validations += 1;
+                    xml = calInfoXml;
+                    return true;
+                };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(
+                GetResourceAnalyzerViewMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    calInfoXml,
+                    new RPAData()
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("GetResourceAnalyzerView"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(One),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void SaveResourceAnalyzerView_WhenCalled_SaveResourceAnalyzerView()
+        {
+            // Arrange
+            var calInfoXml = $@"
+                <xmlcfg>
+                    <View ViewGUID=""{SampleGuidString1}"" Name=""{DummyString}"" Personal=""1"" Default=""1""/>
+                </xmlcfg>";
+            var actual = new XmlDocument();
+
+            ShimResourceAnalyzer.AllInstances.SaveResourceAnalyzerViewXMLGuidStringBooleanBooleanString = (_, _1, _2, _3, _4, _5) =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimResourceAnalyzer.AllInstances.GetResourceAnalyzerViewsXMLStringOut =
+                (ResourceAnalyzer instance, out string xml) =>
+                {
+                    validations += 1;
+                    xml = calInfoXml;
+                    return false;
+                };
+            ShimRPAData.AllInstances.StashViewsString = (_, input) =>
+            {
+                if (input.Equals(string.Empty))
+                {
+                    validations += 1;
+                }
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(
+                SaveResourceAnalyzerViewMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    calInfoXml,
+                    new RPAData()
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("SaveResourceAnalyzerView"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.SelectNodes("//View").Count.ShouldBe(One),
+                () => validations.ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void DeleteResourceAnalyzerView_WhenCalled_DeleteResourceAnalyzerView()
+        {
+            // Arrange
+            var calInfoXml = $@"
+                <xmlcfg>
+                    <View ViewGUID=""{SampleGuidString1}"" Name=""{DummyString}"" Personal=""1"" Default=""1""/>
+                </xmlcfg>";
+            var actual = new XmlDocument();
+
+            ShimResourceAnalyzer.AllInstances.DeleteResourceAnalyzerViewXMLGuid = (_, _1) =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimResourceAnalyzer.AllInstances.GetResourceAnalyzerViewsXMLStringOut =
+                (ResourceAnalyzer instance, out string xml) =>
+                {
+                    validations += 1;
+                    xml = calInfoXml;
+                    return false;
+                };
+            ShimRPAData.AllInstances.StashViewsString = (_, input) =>
+            {
+                if (input.Equals(string.Empty))
+                {
+                    validations += 1;
+                }
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(
+                DeleteResourceAnalyzerViewMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    calInfoXml,
+                    new RPAData()
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("DeleteResourceAnalyzerView"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.SelectNodes("//View").Count.ShouldBe(One),
+                () => validations.ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void RenameResourceAnalyzerView_WhenCalled_RenameResourceAnalyzerView()
+        {
+            // Arrange
+            var calInfoXml = $@"
+                <xmlcfg>
+                    <View ViewGUID=""{SampleGuidString1}"" Name=""{DummyString}"" Personal=""1"" Default=""1""/>
+                </xmlcfg>";
+            var actual = new XmlDocument();
+
+            ShimResourceAnalyzer.AllInstances.RenameResourceAnalyzerViewXMLGuidString = (_, _1, _2) =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimResourceAnalyzer.AllInstances.GetResourceAnalyzerViewsXMLStringOut =
+                (ResourceAnalyzer instance, out string xml) =>
+                {
+                    validations += 1;
+                    xml = calInfoXml;
+                    return false;
+                };
+            ShimRPAData.AllInstances.StashViewsString = (_, input) =>
+            {
+                if (input.Equals(string.Empty))
+                {
+                    validations += 1;
+                }
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(
+                RenameResourceAnalyzerViewMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    calInfoXml,
+                    new RPAData()
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("RenameResourceAnalyzerView"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.SelectNodes("//View").Count.ShouldBe(One),
+                () => validations.ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void ApplyResourceAnalyzerViewServerSideSettings_WhenCalled_ApplyResourceAnalyzerViewServerSideSettings()
+        {
+            // Arrange
+            var calInfoXml = $@"<xmlcfg ViewGUID=""{SampleGuidString1}""/>";
+            var actual = new XmlDocument();
+
+            ShimRPAData.AllInstances.ApplyServerSideViewSettingsString = (_, input) =>
+            {
+                validations += 1;
+                return calInfoXml;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(
+                ApplyResourceAnalyzerViewServerSideSettingsMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    calInfoXml,
+                    new RPAData()
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("ApplyResourceAnalyzerViewServerSideSettings"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(One),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetCapacityScenarioList_WhenCalled_GetCapacityScenarioList()
+        {
+            // Arrange
+            const string calInfoXml = @"<xmlcfg/>";
+            var actual = new XmlDocument();
+
+            ShimCapacityScenarios.AllInstances.GetCapacityScenariosXMLStringOutBooleanString =
+                (CapacityScenarios instance, out string sReply, bool CSRoleAllowed, string DeptUIDs) =>
+                {
+                    validations += 1;
+                    sReply = calInfoXml;
+                    return true;
+                };
+            ShimRPAData.AllInstances.GetCSDeptUIDs = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimRPAData.AllInstances.IsCSRoleAllowed = _ =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimRPAData.AllInstances.GetCSDeptList = _ =>
+            {
+                validations += 1;
+                return calInfoXml;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(
+                GetCapacityScenarioListMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    calInfoXml,
+                    new RPAData()
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("GetCapacityScenarioList"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(Two),
+                () => validations.ShouldBe(4));
+        }
+
+        [TestMethod]
+        public void DeleteCapacityScenario_WhenCalled_DeleteCapacityScenario()
+        {
+            // Arrange
+            ShimRPAData.AllInstances.RemoveCapacityScenarioInt32 = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimCapacityScenarios.AllInstances.DeleteCapacityScenarioInt32 = (_, __) =>
+            {
+                validations += 1;
+                return true;
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                DeleteCapacityScenarioMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    One.ToString(),
+                    new RPAData()
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(string.Empty),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetCapacityScenarioData_MethodFalse_GetsCapacityScenarioData()
+        {
+            // Arrange
+            const string calInfoXml = @"<xmlcfg ID=""1"" MODE=""1""/>";
+            var actual = new XmlDocument();
+
+            ShimCapacityScenarios.AllInstances.GetCapacityScenarioValuesXMLInt32StringOutInt32Out =
+                (CapacityScenarios instance, int csid, out string sReply, out int statusNum) =>
+                {
+                    validations += 1;
+                    sReply = calInfoXml;
+                    statusNum = Five;
+                    return false;
+                };
+            ShimRPAData.AllInstances.PrepareCSGridStringInt32 = (_, _1, _2) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(
+                GetCapacityScenarioDataMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    calInfoXml,
+                    new RPAData()
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("GetCapacityScenarioData"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe(Five.ToString()),
+                () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(One),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetCapacityScenarioData_MethodTrue_GetsCapacityScenarioData()
+        {
+            // Arrange
+            const string calInfoXml = @"<xmlcfg ID=""1"" MODE=""1""/>";
+            var actual = new XmlDocument();
+
+            ShimCapacityScenarios.AllInstances.GetCapacityScenarioValuesXMLInt32StringOutInt32Out =
+                (CapacityScenarios instance, int csid, out string sReply, out int statusNum) =>
+                {
+                    validations += 1;
+                    sReply = calInfoXml;
+                    statusNum = Five;
+                    return true;
+                };
+            ShimRPAData.AllInstances.PrepareCSGridStringInt32 = (_, _1, _2) =>
+            {
+                validations += 1;
+                return calInfoXml;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(
+                GetCapacityScenarioDataMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    calInfoXml,
+                    new RPAData()
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("GetCapacityScenarioData"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(One),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetCapacityScenarioData_WithException_GetsCapacityScenarioData()
+        {
+            // Arrange
+            const string calInfoXml = @"<xmlcfg ID=""1"" MODE=""1""/>";
+            var actual = new XmlDocument();
+
+            ShimCapacityScenarios.AllInstances.GetCapacityScenarioValuesXMLInt32StringOutInt32Out =
+                (CapacityScenarios instance, int csid, out string sReply, out int statusNum) =>
+                {
+                    validations += 1;
+                    sReply = calInfoXml;
+                    statusNum = Five;
+                    return true;
+                };
+            ShimRPAData.AllInstances.PrepareCSGridStringInt32 = (_, _1, _2) =>
+            {
+                validations += 1;
+                throw new Exception(DummyString);
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(
+                GetCapacityScenarioDataMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    calInfoXml,
+                    new RPAData()
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("GetCapacityScenarioData"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("-99"),
+                () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(0),
+                () => validations.ShouldBe(2));
         }
     }
 }
