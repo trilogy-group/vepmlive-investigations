@@ -1,28 +1,16 @@
-﻿using System;
+﻿using Microsoft.SharePoint;
+using Microsoft.SharePoint.WebPartPages;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Runtime.InteropServices;
 using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
-using System.Xml.Serialization;
-using EPMLiveWebParts.Utilities;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
-using Microsoft.SharePoint.WebPartPages;
-
-using System.Collections;
-using System.ComponentModel;
-
-using System.Data;
-using System.Data.SqlClient;
-
-using System.Collections.Generic;
-using System.Linq;
-
 using System.Xml;
-
-using System.Text;
-using ReportFiltering;
+using System.Xml.Serialization;
 
 namespace EPMLiveWebParts
 {
@@ -31,27 +19,18 @@ namespace EPMLiveWebParts
     [XmlRoot(Namespace = "ListSummary")]
     public class ListSummary : Microsoft.SharePoint.WebPartPages.WebPart
     {
-        private const int MAX_LOOKUPFILTER = 300;
-
         private IReportID _myProvider;
-
         private EPMLiveCore.Act act;
-
         private string strList;
         private string strView;
         private string strRollupList;
         private string strRollupSites;
         private string strStatus;
         private string strUrl;
-
         private int activation;
-
         private string sErrors = "";
-
         int totalItems = 0;
-
         private SortedList<string, int> slStatus = new SortedList<string,int>();
-
         private string reportFilterField = "";
         ArrayList reportFilterIDs = new ArrayList();
         private string _lookupField;
@@ -191,22 +170,6 @@ namespace EPMLiveWebParts
             base.CreateChildControls();
 
             // TODO: add custom rendering code here.
-            // Label label = new Label();
-            // label.Text = "Hello World";
-            // this.Controls.Add(label);
-        }
-
-        private string GetReportFilters()
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach(string s in reportFilterIDs)
-            {
-                sb.Append("<Value Type=\"Text\">");
-                sb.Append(System.Web.HttpUtility.HtmlEncode(s));
-                sb.Append("</Value>");
-            }
-
-            return sb.ToString();
         }
 
         protected override void RenderWebPart(HtmlTextWriter output)
@@ -301,252 +264,28 @@ namespace EPMLiveWebParts
 
         private string ProcessReportFilter(XmlDocument xmlQuery, SPList list, SPWeb web)
         {
-            string ret = "";
-            if(_myProvider != null)
-            {
-                Guid listid = Guid.Empty;
-
-
-                SPSecurity.RunWithElevatedPrivileges(delegate()
-                {
-                    try
-                    {
-                        SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                        cn.Open();
-
-                        SqlCommand cmd = new SqlCommand("SELECT VALUE,listid FROM PERSONALIZATIONS where userid=@userid and [key]=@key and FK=@FK", cn);
-                        cmd.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
-                        cmd.Parameters.AddWithValue("@key", "ReportFilterWebPartSelections");
-                        cmd.Parameters.AddWithValue("@FK", _myProvider.ReportID.Replace("g_","").Replace("_","-"));
-                        cmd.ExecuteNonQuery();
-                        SqlDataReader dr = cmd.ExecuteReader();
-                        if(dr.Read())
-                        {
-                            reportFilterIDs = new ArrayList(dr.GetString(0).Split('|')[0].Split(','));
-                            listid = dr.GetGuid(1);
-                        }
-                        dr.Close();
-                        cn.Close();
-                    }
-                    catch { }
-                });
-
-                if(listid == list.ID)
-                {
-                    reportFilterField = "Title";
-
-                    if(reportFilterIDs.Count < MAX_LOOKUPFILTER)
-                    {
-
-                        ret = "<In><FieldRef Name=\"Title\"/><Values>" + GetReportFilters() + "</Values></In>";
-
-                    }
-                }
-                else if(listid != Guid.Empty)
-                {
-
-
-
-                    foreach(SPField oField in list.Fields)
-                    {
-                        if(oField.Type == SPFieldType.Lookup)
-                        {
-                            try
-                            {
-                                SPFieldLookup oLookup = (SPFieldLookup)oField;
-                                if(new Guid(oLookup.LookupList) == listid)
-                                {
-                                    reportFilterField = oLookup.InternalName;
-                                    break;
-                                }
-                            }
-                            catch { }
-                        }
-                    }
-
-
-                    if(reportFilterIDs.Count < MAX_LOOKUPFILTER && reportFilterField != "")
-                    {
-                        ret = "<In><FieldRef Name=\"" + reportFilterField + "\"/><Values>" + GetReportFilters() + "</Values></In>";
-                    }
-                }
-            }
-
-            return ret;
+            return ListSummaryProcessHelper.ProcessReportFilter(list, web, _myProvider, ref reportFilterIDs, ref reportFilterField);
         }
 
         private void processWeb(SPWeb web)
         {
-            try
-            {
-                string siteurl = web.ServerRelativeUrl.Substring(1);
-
-                SPList list = web.GetListFromUrl(PropList);
-                SPView view = list.Views[PropView];
-                string spquery = view.Query;
-
-                SPField f = list.Fields.GetFieldByInternalName(PropStatus);
-                if (f.Type == SPFieldType.Choice || f.Type == SPFieldType.MultiChoice)
-                {
-                    XmlDocument docfield = new XmlDocument();
-                    docfield.LoadXml(f.SchemaXml);
-                    foreach (XmlNode ndChoice in docfield.FirstChild.SelectNodes("//CHOICE"))
-                    {
-                        slStatus.Add(ndChoice.InnerText, 0);
-                    }
-                }
-
-                ArrayList arr = new ArrayList();
-                string dqFields = "<FieldRef Name='" + PropStatus + "' Nullable='TRUE'/>";
-                string dquery = "";
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml("<Query>" + view.Query + "</Query>");
-
-                string reportInternal = ProcessReportFilter(doc, list, web);
-                LookupFilterHelper.AppendLookupQueryToExistingQuery(ref doc, _lookupField, _lookupFieldList);
-                XmlNode ndWhere = doc.FirstChild.SelectSingleNode("//Where");
-
-                if(reportInternal != "")
-                {
-                    if(ndWhere == null)
-                    {
-                        ndWhere = doc.CreateElement("Where");
-                        doc.FirstChild.PrependChild(ndWhere);
-
-                        ndWhere.InnerXml = reportInternal;
-                    }
-                    else
-                    {
-                        ndWhere.InnerXml = "<And>" + reportInternal + ndWhere.InnerXml + "</And>";
-                    }
-                }
-
-                if (ndWhere != null)
-                    dquery = ndWhere.OuterXml;
-
-                dquery = dquery + "<OrderBy><FieldRef Name='" + PropStatus + "'/></OrderBy>";
-
-
-                if (PropRollupList != "")
-                {
-                    string lists = "";
-                    SqlConnection cn = null;
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
-                    {
-                        using (SPSite s1 = new SPSite(web.Site.ID))
-                        {
-                            string dbCon = s1.ContentDatabase.DatabaseConnectionString;
-                            cn = new SqlConnection(dbCon);
-                            cn.Open();
-                        }
-                    });
-
-                    foreach (string rlist in PropRollupList.Replace("\r\n", "\n").Split('\n').Distinct().ToArray())
-                    {
-                        try
-                        {
-                            lists = "";
-                            string query = "";
-                            if (siteurl == "")
-                                query = "SELECT     dbo.AllLists.tp_ID FROM         dbo.Webs INNER JOIN dbo.AllLists ON dbo.Webs.Id = dbo.AllLists.tp_WebId WHERE     webs.siteid='" + web.Site.ID + "' AND (dbo.AllLists.tp_Title like '" + rlist.Replace("'", "''") + "')";
-                            else
-                                query = "SELECT     dbo.AllLists.tp_ID FROM         dbo.Webs INNER JOIN dbo.AllLists ON dbo.Webs.Id = dbo.AllLists.tp_WebId WHERE     (dbo.Webs.FullUrl LIKE '" + siteurl + "/%' OR dbo.Webs.FullUrl = '" + siteurl + "') AND (dbo.AllLists.tp_Title like '" + rlist.Replace("'", "''") + "')";
-
-                            
-                            SqlCommand cmd = new SqlCommand(query, cn);
-                            //cmd.Parameters.AddWithValue("@rlist", rlist);
-                            SqlDataReader dr = cmd.ExecuteReader();
-
-                            while (dr.Read())
-                            {
-                                lists += "<List ID='" + dr.GetGuid(0).ToString() + "'/>";
-                            }
-                            dr.Close();
-
-                            if(lists != "")
-                            {
-                                SPSiteDataQuery dq = new SPSiteDataQuery();
-                                dq.Lists = "<Lists MaxListLimit='0'>" + lists + "</Lists>";
-                                dq.Query = dquery;
-                                dq.Webs = "<Webs Scope='Recursive'/>";
-                                dq.ViewFields = dqFields;
-                                dq.QueryThrottleMode = SPQueryThrottleOption.Override;
-
-                                try
-                                {
-                                    DataTable dt = new DataTable();
-                                    SPSecurity.RunWithElevatedPrivileges(delegate()
-                                    {
-                                        dt = web.GetSiteData(dq);
-                                    });
-
-                                    processList(dt);
-                                }
-                                catch(Exception ex)
-                                {
-                                    sErrors += "Get Rollup Site Data Error: " + ex.Message + "<br>";
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            sErrors += "Rollup List Error: " + ex.Message + "<br>";
-                        }
-
-                    }
-                    cn.Close();
-                }
-                else
-                {
-                    SPSiteDataQuery dq = new SPSiteDataQuery();
-                    dq.Lists = "<Lists MaxListLimit='0'><List ID='" + list.ID.ToString() + "'/></Lists>";
-                    dq.Query = dquery;
-                    dq.ViewFields = dqFields;
-                    dq.QueryThrottleMode = SPQueryThrottleOption.Override;
-
-                    try
-                    {
-                        DataTable dt = web.GetSiteData(dq);
-
-                        processList(dt);
-                    }
-                    catch (Exception ex)
-                    {
-                        sErrors += "Get Site Data Error: " + ex.Message + "<br>";
-                    }
-                }
-            }
-            catch(Exception ex) {
-                sErrors += "General Error: " + ex.Message + "<br>";
-            }
+            ListSummaryProcessHelper.ProcessWeb(
+                web,
+                slStatus,
+                PropRollupList,
+                ref sErrors,
+                ProcessReportFilter,
+                processList,
+                PropList,
+                PropView,
+                PropStatus,
+                _lookupField,
+                _lookupFieldList);
         }
 
         private void processList(DataTable dt)
         {
-            foreach (DataRow dr in dt.Rows)
-            {
-
-                bool canCount = true;
-                if(reportFilterIDs.Count >= MAX_LOOKUPFILTER)
-                {
-                    if(!reportFilterIDs.Contains(dr[reportFilterField]))
-                        canCount = false;
-                }
-
-                if(canCount)
-                {
-                    if(slStatus.ContainsKey(dr[PropStatus].ToString()))
-                    {
-                        slStatus[dr[PropStatus].ToString()] = slStatus[dr[PropStatus].ToString()] + 1;
-                    }
-                    else
-                    {
-                        slStatus.Add(dr[PropStatus].ToString(), 1);
-                    }
-
-                    totalItems++;
-                }
-            }
+            ListSummaryProcessHelper.ProcessList(dt, reportFilterIDs, reportFilterField, slStatus, PropStatus, ref totalItems);
         }
 
         public override ToolPart[] GetToolParts()
