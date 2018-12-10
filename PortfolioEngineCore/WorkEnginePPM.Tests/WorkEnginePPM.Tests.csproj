@@ -160,6 +160,7 @@
     <Compile Include="WebServices\OptGridsTests.cs" />
     <Compile Include="WebServices\PFEAdminManagerTests.cs" />
     <Compile Include="WebServices\PortfolioEngineAPITests.cs" />
+    <Compile Include="WebServices\ResPlanAnalyzer.asmx.Tests.cs" />
     <Compile Include="WebServices\ResPlanAnalyzerTests.cs" />
     <Compile Include="WebServices\RPADataTests.cs" />
     <Compile Include="WebServices\RPEditorTests.cs" />
