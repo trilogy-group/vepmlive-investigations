@@ -34,7 +34,7 @@ pipeline {
 			steps {
 				echo 'Run tests...'
 				dir ("${env.WORKSPACE}/EMPLiveAutomationTesting/protractor") {
-					sh "npm install; npm run e2e-tc -- --params.headlessBrowser=true --baseUrl='${params.BaseUrl}' --params.login.admin.user='${params.Username}'  --params.login.admin.password='${params.Password}'  --params.siteCollection='${params.SiteCollection}'"
+					sh "npm install; npm run e2e-tc -- --params.testrail.versionName='${env.BRANCH_NAME}#${env.BUILD_NUMBER}' --params.headlessBrowser=true --baseUrl='${params.BaseUrl}' --params.login.admin.user='${params.Username}'  --params.login.admin.password='${params.Password}'  --params.siteCollection='${params.SiteCollection}'"
 				}
 			}
 		}
