@@ -1,26 +1,24 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics.CodeAnalysis;
-using EPMLiveCore.API;
-using Microsoft.QualityTools.Testing.Fakes;
-using Shouldly;
-using System.Data.SqlClient.Fakes;
-using PortfolioEngineCore.Fakes;
-using System.Fakes;
-using System.Linq;
-using Microsoft.SharePoint.Fakes;
-using EPMLiveCore.API.Fakes;
-using System.Data;
 using System.Collections;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.Administration.Fakes;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.Common.Fakes;
 using System.Data.SqlClient;
-using Microsoft.SharePoint.Administration;
-using System.Net.Mail.Fakes;
+using System.Data.SqlClient.Fakes;
+using System.Diagnostics.CodeAnalysis;
+using System.Fakes;
 using System.Net.Mail;
+using System.Net.Mail.Fakes;
+using System.Text;
+using EPMLiveCore.API;
+using EPMLiveCore.API.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
+using Microsoft.SharePoint.Administration.Fakes;
+using Microsoft.SharePoint.Fakes;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Shouldly;
 
 namespace EPMLiveCore.Tests.API
 {
@@ -54,8 +52,6 @@ namespace EPMLiveCore.Tests.API
         private const string GetCoreInformation = "GetCoreInformation";
         private const string UnInstallAssignedToEvent = "UnInstallAssignedToEvent";
         private const string ClearNotificationItem = "ClearNotificationItem";
-        private const string QueueItemMessage = "QueueItemMessage";
-        private const string sendEmailHideReply = "sendEmailHideReply";
 
         [TestInitialize]
         public void SetUp()
@@ -115,7 +111,7 @@ namespace EPMLiveCore.Tests.API
         public void iQueueItemMessage_ParametersGiven_CheckBehaviour()
         {
             // Arrange
-            var parameters = new object[] 
+            var parameters = new object[]
             {
                 DummyInt,
                 false,
@@ -145,7 +141,7 @@ namespace EPMLiveCore.Tests.API
                                 IDGet = () => new Guid(),
                             }.Instance,
                         }.Instance,
-                        FormsGet = () => 
+                        FormsGet = () =>
                         {
                             return new ShimSPFormCollection()
                             {
@@ -172,7 +168,7 @@ namespace EPMLiveCore.Tests.API
                 _1.Tables.Add(dataTable);
                 return DummyInt;
             };
-            var expectedQueries = new string[] 
+            var expectedQueries = new string[]
             {
                 "SELECT id from NOTIFICATIONS where listid=@listid and itemid=@itemid and type=@type",
                 "INSERT INTO NOTIFICATIONS (id, title, message, type, createdby, createdat, siteid, webid, listid, itemid, emailed) VALUES (@id, @title, @message, @type, @createdby, GETDATE(), @siteid, @webid, @listid, @itemid, @emailed)",
@@ -251,7 +247,7 @@ namespace EPMLiveCore.Tests.API
         public void iSendEmail_ParametersGiven_ExceptionThrown()
         {
             // Arrange
-            var parameters = new object[] 
+            var parameters = new object[]
             {
                 DummyInt,
                 false,
@@ -279,7 +275,7 @@ namespace EPMLiveCore.Tests.API
         public void sendEmail_ParametersGiven_CheckBehaviour()
         {
             // Arrange
-            var parameters = new object[] 
+            var parameters = new object[]
             {
                 DummyInt,
                 new Hashtable()
@@ -305,8 +301,143 @@ namespace EPMLiveCore.Tests.API
                 () => mailMessage.Body.ShouldBe(DummyString));
         }
 
+        [TestMethod]
+        public void InstallAssignedToEvent_ParametersGiven_CheckBehaviour()
+        {
+            // Arrange
+            var parameters = new object[] { new ShimSPList().Instance };
+
+            // Act
+            var result = _privateType.InvokeStatic(
+                InstallAssignedToEvent,
+                parameters);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => functionsInvoked.ToString().ShouldContain("SPList.Update"));
+        }
+
+        [TestMethod]
+        public void GetCoreInformation_ParametersGiven_CheckBehaviour()
+        {
+            // Arrange
+            var parameters = new object[]
+            {
+                new ShimSqlConnection().Instance,
+                DummyInt,
+                DummyString,
+                DummyString,
+                new ShimSPWeb().Instance,
+                new ShimSPUser().Instance,
+            };
+            ShimAPIEmail.GetCoreInformationSqlConnectionInt32StringOutStringOutSPWebSPUser = null;
+            var expectedQuery = "SELECT subject,body from EMAILTEMPLATES where emailid=@id";
+
+            // Act
+            var result = _privateType.InvokeStatic(
+                GetCoreInformation,
+                parameters);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => query.ToString().ShouldContain(expectedQuery));
+        }
+
+        [TestMethod]
+        public void UnInstallAssignedToEvent_ParametersGiven_CheckBehaviour()
+        {
+            // Arrange
+            var parameters = new object[] { new ShimSPList().Instance };
+
+            // Act
+            var result = _privateType.InvokeStatic(
+                UnInstallAssignedToEvent,
+                parameters);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => functionsInvoked.ToString().ShouldContain("SPList.Update"));
+        }
+
+        [TestMethod]
+        public void ClearNotificationItem_ParametersGiven_CheckBehaviour()
+        {
+            // Arrange
+            var parameters = new object[] { new ShimSPListItem().Instance };
+
+            // Act
+            var result = _privateType.InvokeStatic(
+                ClearNotificationItem,
+                parameters);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => query.ToString().ShouldContain("spNDeleteNotification"));
+        }
+
+        [TestMethod]
+        public void sendEmail_3ParametersGiven_CheckBehaviour()
+        {
+            // Arrange
+            var parameters = new object[]
+            {
+                DummyInt,
+                DummyInt,
+                new Hashtable()
+                {
+                    [DummyString] = DummyString,
+                },
+            };
+
+            // Act
+            var result = _privateType.InvokeStatic(
+                sendEmail,
+                parameters);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => functionsInvoked.ToString().ShouldContain("SPUserCollection.GetByID"),
+                () => functionsInvoked.ToString().ShouldContain("SPSite.OpenWeb"),
+                () => functionsInvoked.ToString().ShouldContain("SmtpClient.SendMail"));
+        }
+
         private void InitShims()
         {
+            ShimSPWeb.AllInstances.SiteUsersGet = _ => new ShimSPUserCollection().Instance;
+            ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, _1) =>
+            {
+                functionsInvoked.Append("\nSPUserCollection.GetByID");
+                return new ShimSPUser().Instance;
+            };
+            ShimSPList.AllInstances.ParentWebGet = _ => new ShimSPWeb().Instance;
+            ShimSPListItem.AllInstances.ParentListGet = _ => new ShimSPList().Instance;
+            ShimSPWeb.AllInstances.TitleGet = _ => DummyString;
+            ShimSPWeb.AllInstances.UrlGet = _ => DummyUrl;
+            ShimSPUser.AllInstances.LoginNameGet = _ => DummyEmail;
+            ShimSPList.AllInstances.Update = _ =>
+            {
+                functionsInvoked.Append("\nSPList.Update");
+            };
+            var sPEventReceiverDefinitionCollection = new List<SPEventReceiverDefinition>()
+            {
+                new ShimSPEventReceiverDefinition()
+                {
+                    ClassGet = () => DummyString,
+                    AssemblyGet = () => DummyString,
+                }.Instance,
+            };
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => sPEventReceiverDefinitionCollection.GetEnumerator();
+            ShimSPEventReceiverDefinitionCollection.AllInstances.CountGet = _ => sPEventReceiverDefinitionCollection.Count;
+            ShimSPList.AllInstances.EventReceiversGet = _ =>
+            {
+                return new ShimSPEventReceiverDefinitionCollection().Instance;
+            };
+            ShimSPUser.AllInstances.NameGet = _ => DummyString;
+            ShimSPUser.AllInstances.EmailGet = _ => DummyEmail;
+            ShimSPWeb.AllInstances.CurrentUserGet = _ => new ShimSPUser();
+            ShimSPContext.AllInstances.WebGet = _ => new ShimSPWeb().Instance;
+            ShimSPContext.AllInstances.SiteGet = _ => new ShimSPSite().Instance;
+            ShimSPContext.CurrentGet = () => new ShimSPContext().Instance;
             ShimSmtpClient.AllInstances.SendMailMessage = (_, _1) =>
             {
                 functionsInvoked.Append("\nSmtpClient.SendMail");
@@ -336,7 +467,7 @@ namespace EPMLiveCore.Tests.API
             {
                 return new ShimSPWebApplication()
                 {
-                    
+
                 }.Instance;
             };
             ShimSPPersistedObject.AllInstances.IdGet = _ =>
@@ -375,6 +506,7 @@ namespace EPMLiveCore.Tests.API
                         return currentDataReaderCount <= maxDatareaderCount;
                     },
                     GetSqlInt32Int32 = indx => DummyInt,
+                    GetStringInt32 = _ => DummyString,
                     ItemGetString = key =>
                     {
                         DataReaderResult++;
