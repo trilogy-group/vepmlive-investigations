@@ -215,6 +215,7 @@
     <Compile Include="API\ResourceGrid\ResourceImporterTests.cs" />
     <Compile Include="API\SPAdmin\EventReceiverManagerTests.cs" />
     <Compile Include="API\TimerTests.cs" />
+    <Compile Include="API\WorkspaceCenter\WorkspaceCenterTests.cs" />
     <Compile Include="AppSettingsHelperTests.cs" />
     <Compile Include="AssignmentPlanner\GridManagerTests.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControlTests.cs" />
