@@ -108,6 +108,7 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string GetCapacityScenarioListMethodName = "GetCapacityScenarioList";
         private const string DeleteCapacityScenarioMethodName = "DeleteCapacityScenario";
         private const string GetCapacityScenarioDataMethodName = "GetCapacityScenarioData";
+        private const string SaveCapacityScenarioDataMethodName = "SaveCapacityScenarioData";
 
         [TestInitialize]
         public void Setup()
@@ -202,6 +203,7 @@ namespace WorkEnginePPM.Tests.WebServices
             ShimLogger.AllInstances.LogMessageStringStringLogKindString = (_, _1, _2, _3, _4) => { };
             ShimLogger.AllInstances.Dispose = _ => { };
             ShimLogger.AllInstances.DisposeBoolean = (_, __) => { };
+            ShimCapacity.ConstructorString = (_, __) => new ShimCapacity();
         }
 
         private void SetupVariables()
@@ -1245,6 +1247,155 @@ namespace WorkEnginePPM.Tests.WebServices
                 () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("-99"),
                 () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(0),
                 () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void SaveCapacityScenarioData_SaveMethodFalse_SavesCapacityScenarioData()
+        {
+            // Arrange
+            const string calInfoXml = @"<xmlcfg ID=""1"" MODE=""1""/>";
+            var actual = new XmlDocument();
+
+            ShimCapacityScenarios.AllInstances.SaveCapacityScenarioDataStringStringOutInt32Out =
+                (CapacityScenarios instance, string csid, out string sReply, out int statusNum) =>
+                {
+                    validations += 1;
+                    sReply = calInfoXml;
+                    statusNum = Five;
+                    return false;
+                };
+            ShimWebAdmin.BuildBaseInfoHttpContext = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(
+                SaveCapacityScenarioDataMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    calInfoXml,
+                    new RPAData()
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("SaveCapacityScenarioData"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("5"),
+                () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(1),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void SaveCapacityScenarioData_SaveMethodTrue_SavesCapacityScenarioData()
+        {
+            // Arrange
+            const string calInfoXml = @"
+                <xmlcfg basepath=""\path"" username=""1"" pid=""1"" company=""1"" dbcnstring=""1"" port=""1"" session=""1"">
+                    <Options
+                        CalendarID=""1"" 
+                        PlanningCalendarID=""1""
+                        FromPeriodID=""1""
+                        ToPeriodID=""1""
+                        gpPMOAdmin=""1""
+                        CommitmentsOpMode=""1"" 
+                        RequestNo=""1""
+                        RoleFieldID=""1""
+                        MajorCategoryFieldID=""1""
+                        CalendarName=""1"">
+                    </Options>
+                    <Tgts>
+                        <Tgt ID=""1"" UID=""1"" Name=""1"" Flag=""1""/>
+                    </Tgts>
+                    <TgtVs>
+                        <TgtV ID=""1"" PD=""1"" DeptUID=""1"" RoleUID=""1"" FTES=""1"" Hrs=""1""/>
+                    </TgtVs>
+                </xmlcfg>";
+            var actual = new XmlDocument();
+
+            ShimCapacityScenarios.AllInstances.SaveCapacityScenarioDataStringStringOutInt32Out =
+                (CapacityScenarios instance, string csid, out string sReply, out int statusNum) =>
+                {
+                    validations += 1;
+                    sReply = calInfoXml;
+                    statusNum = Five;
+                    return true;
+                };
+            ShimCapacity.AllInstances.GetRVInfoStringStringOutStringOut =
+                (Capacity instance, string sParmXML, out string sReplyXML, out string sResult) =>
+                {
+                    sParmXML = calInfoXml;
+                    sReplyXML = calInfoXml;
+                    sResult = calInfoXml;
+                    return (int)StatusEnum.rsSuccess;
+                };
+            ShimWebAdmin.BuildBaseInfoHttpContext = _ =>
+            {
+                validations += 1;
+                return calInfoXml;
+            };
+            ShimRPAData.AllInstances.PopulateInternalsStringOut = (RPAData instance, out string reply) =>
+            {
+                validations += 1;
+                reply = DummyString;
+            };
+            ShimRPAData.AllInstances.ReDrawGrid = _ =>
+            {
+                validations += 1;
+            };
+            ShimRPAData.AllInstances.IsCSRoleAllowed = _ =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimRPAData.AllInstances.GetCSDeptUIDs = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimCapacityScenarios.AllInstances.GetCapacityScenariosXMLStringOutBooleanString =
+                (CapacityScenarios instance, out string sReply, bool CSRoleAllowed, string DeptUIDs) =>
+                {
+                    validations += 1;
+                    sReply = calInfoXml;
+                    return true;
+                };
+
+            var rpaData = new RPAData();
+            var outVariable = string.Empty;
+            rpaData.GrabRAData
+                (
+                    new ResourceValues.clsResourceValues(),
+                    DummyString,
+                    DummyString,
+                    One,
+                    One,
+                    DummyString,
+                    out outVariable
+                );
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(
+                SaveCapacityScenarioDataMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    calInfoXml,
+                    rpaData
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("SaveCapacityScenarioData"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(1),
+                () => validations.ShouldBe(9));
         }
     }
 }
