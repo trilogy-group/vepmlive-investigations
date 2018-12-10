@@ -109,6 +109,10 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string DeleteCapacityScenarioMethodName = "DeleteCapacityScenario";
         private const string GetCapacityScenarioDataMethodName = "GetCapacityScenarioData";
         private const string SaveCapacityScenarioDataMethodName = "SaveCapacityScenarioData";
+        private const string ReloadPlanDataMethodName = "ReloadPlanData";
+        private const string SaveCurrentToScenarioMethodName = "SaveCurrentToScenario";
+        private const string EditResPlanTicketMethodName = "EditResPlanTicket";
+        private const string GetTotalsGridChartDataMethodName = "GetTotalsGridChartData";
 
         [TestInitialize]
         public void Setup()
@@ -1396,6 +1400,330 @@ namespace WorkEnginePPM.Tests.WebServices
                 () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
                 () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(1),
                 () => validations.ShouldBe(9));
+        }
+
+        [TestMethod]
+        public void ReloadPlanData_WhenCalled_ReloadPlanData()
+        {
+            // Arrange
+            const string calInfoXml = @"
+                <xmlcfg basepath=""\path"" username=""1"" pid=""1"" company=""1"" dbcnstring=""1"" port=""1"" session=""1"">
+                    <Options
+                        CalendarID=""1"" 
+                        PlanningCalendarID=""1""
+                        FromPeriodID=""1""
+                        ToPeriodID=""1""
+                        gpPMOAdmin=""1""
+                        CommitmentsOpMode=""1"" 
+                        RequestNo=""1""
+                        RoleFieldID=""1""
+                        MajorCategoryFieldID=""1""
+                        CalendarName=""1"">
+                    </Options>
+                    <Tgts>
+                        <Tgt ID=""1"" UID=""1"" Name=""1"" Flag=""1""/>
+                    </Tgts>
+                    <TgtVs>
+                        <TgtV ID=""1"" PD=""1"" DeptUID=""1"" RoleUID=""1"" FTES=""1"" Hrs=""1""/>
+                    </TgtVs>
+                </xmlcfg>";
+
+            ShimWebAdmin.BuildBaseInfoHttpContext = _ =>
+            {
+                validations += 1;
+                return calInfoXml;
+            };
+            ShimRPAData.AllInstances.GetInitialParamXML = _ =>
+            {
+                validations += 1;
+                return calInfoXml;
+            };
+            ShimRPAData.AllInstances.GetDisplayMode = _ =>
+            {
+                validations += 1;
+                return calInfoXml;
+            };
+            ShimRPAData.AllInstances.GetCalledFromResources = _ =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimRPAData.AllInstances.SetCalledFromResourcesBoolean = (_, __) =>
+            {
+                validations += 1;
+            };
+            ShimCapacity.AllInstances.GetRVInfoStringStringOutStringOut =
+                (Capacity instance, string paramsXml, out string replyXml, out string replyMessage) =>
+                {
+                    validations += 1;
+                    replyXml = calInfoXml;
+                    replyMessage = DummyString;
+                    return One;
+                };
+            ShimResPlanAnalyzer.SetRAWorkDisplayModeHttpContextStringRPAData = (_1, _2, _3) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimResPlanAnalyzer.AllInstances.GetRPSessionKey = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimResPlanAnalyzer.SaveCachedDataHttpContextStringObject = (_1, _2, _3) =>
+            {
+                validations += 1;
+            };
+            ShimRPAData.AllInstances.PopulateInternalsStringOut = (RPAData instance, out string reply) =>
+            {
+                validations += 1;
+                reply = DummyString;
+            };
+            ShimRPAData.AllInstances.DoUserDepts = _ =>
+            {
+                validations += 1;
+            };
+            ShimRPAData.AllInstances.setupdispcolnsStringOut = (RPAData instance, out string reply) =>
+            {
+                validations += 1;
+                reply = DummyString;
+            };
+            ShimRPAData.AllInstances.ReDrawGrid = _ =>
+            {
+                validations += 1;
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                ReloadPlanDataMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(HttpContext),
+                    new RPAData()
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(string.Empty),
+                () => validations.ShouldBe(13));
+        }
+
+        [TestMethod]
+        public void SaveCurrentToScenario_SaveMethodTrue_SavesCurrentToScenario()
+        {
+            // Arrange
+            const string calInfoXml = @"
+                <xmlcfg basepath=""\path"" username=""1"" pid=""1"" company=""1"" dbcnstring=""1"" port=""1"" session=""1"">
+                    <Options
+                        CalendarID=""1"" 
+                        PlanningCalendarID=""1""
+                        FromPeriodID=""1""
+                        ToPeriodID=""1""
+                        gpPMOAdmin=""1""
+                        CommitmentsOpMode=""1"" 
+                        RequestNo=""1""
+                        RoleFieldID=""1""
+                        MajorCategoryFieldID=""1""
+                        CalendarName=""1"">
+                    </Options>
+                    <Tgts>
+                        <Tgt ID=""1"" UID=""1"" Name=""1"" Flag=""1""/>
+                    </Tgts>
+                    <TgtVs>
+                        <TgtV ID=""1"" PD=""1"" DeptUID=""1"" RoleUID=""1"" FTES=""1"" Hrs=""1""/>
+                    </TgtVs>
+                </xmlcfg>";
+            var actual = new XmlDocument();
+
+            ShimCapacityScenarios.AllInstances.SaveCapacityScenarioDataStringStringOutInt32Out =
+                (CapacityScenarios instance, string csid, out string sReply, out int statusNum) =>
+                {
+                    validations += 1;
+                    sReply = calInfoXml;
+                    statusNum = Five;
+                    return true;
+                };
+            ShimCapacity.AllInstances.GetRVInfoStringStringOutStringOut =
+                (Capacity instance, string sParmXML, out string sReplyXML, out string sResult) =>
+                {
+                    sParmXML = calInfoXml;
+                    sReplyXML = calInfoXml;
+                    sResult = calInfoXml;
+                    return (int)StatusEnum.rsSuccess;
+                };
+            ShimWebAdmin.BuildBaseInfoHttpContext = _ =>
+            {
+                validations += 1;
+                return calInfoXml;
+            };
+            ShimRPAData.AllInstances.PopulateInternalsStringOut = (RPAData instance, out string reply) =>
+            {
+                validations += 1;
+                reply = DummyString;
+            };
+            ShimRPAData.AllInstances.GetRoleScrenarioDataStringString = (_, _1, _2) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimCapacityScenarios.AllInstances.SaveCurrentScenarioDataStringString = (_, _1, _2) =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimRPAData.AllInstances.GetCapacityReloadXML = _ =>
+            {
+                validations += 1;
+                return calInfoXml;
+            };
+            ShimRPAData.AllInstances.ReDrawGrid = _ =>
+            {
+                validations += 1;
+            };
+            ShimRPAData.AllInstances.IsCSRoleAllowed = _ =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimRPAData.AllInstances.GetCSDeptUIDs = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimCapacityScenarios.AllInstances.GetCapacityScenariosXMLStringOutBooleanString =
+                (CapacityScenarios instance, out string sReply, bool CSRoleAllowed, string DeptUIDs) =>
+                {
+                    validations += 1;
+                    sReply = calInfoXml;
+                    return true;
+                };
+            ShimCapacityScenarios.AllInstances.GetCapacityScenarioValuesXMLInt32StringOutInt32Out =
+                (CapacityScenarios instance, int csid, out string sReply, out int statusNum) =>
+                {
+                    validations += 1;
+                    sReply = calInfoXml;
+                    statusNum = Five;
+                    return false;
+                };
+
+            var rpaData = new RPAData();
+            var outVariable = string.Empty;
+            rpaData.GrabRAData
+                (
+                    new ResourceValues.clsResourceValues(),
+                    DummyString,
+                    DummyString,
+                    One,
+                    One,
+                    DummyString,
+                    out outVariable
+                );
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(
+                SaveCurrentToScenarioMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    calInfoXml,
+                    rpaData
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("SaveCurrentToScenario"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(0),
+                () => validations.ShouldBe(12));
+        }
+
+        [TestMethod]
+        public void EditResPlanTicket_WhenCalled_EditsResPlanTicket()
+        {
+            // Arrange
+            const string calInfoXml = @"<xmlcfg/>";
+            var actual = new XmlDocument();
+
+            ShimRPAData.AllInstances.GetEditResPlanPIList = _ =>
+            {
+                validations += 1;
+                return One.ToString();
+            };
+            ShimRPAData.AllInstances.GetEditResPlanResList = _ =>
+            {
+                validations += 1;
+                return One.ToString();
+            };
+            ShimRPAData.AllInstances.GetCalledFromResources = _ =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimRPAData.AllInstances.GetEditResPlanTicketString = (_, __) =>
+            {
+                validations += 1;
+                return calInfoXml;
+            };
+            ShimCapacityScenarios.AllInstances.GetListTicketStringBoolean = (_, _1, _2) =>
+            {
+                validations += 1;
+                return calInfoXml;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(
+                EditResPlanTicketMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    calInfoXml,
+                    new RPAData()
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("EditResPlanTicket"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(1),
+                () => validations.ShouldBe(5));
+        }
+
+        [TestMethod]
+        public void GetTotalsGridChartData_WhenCalled_GetsTotalsGridChartData()
+        {
+            // Arrange
+            const string calInfoXml = @"<xmlcfg/>";
+            var actual = new XmlDocument();
+
+            ShimRPAData.AllInstances.GetTotalsGridChartData = _ =>
+            {
+                validations += 1;
+                return calInfoXml;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(
+                GetTotalsGridChartDataMethodName,
+                publicStatic,
+                new object[]
+                {
+                    default(HttpContext),
+                    calInfoXml,
+                    new RPAData()
+                }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe("GetTotalsGridChartData"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.SelectNodes("//xmlcfg").Count.ShouldBe(1),
+                () => validations.ShouldBe(1));
         }
     }
 }
