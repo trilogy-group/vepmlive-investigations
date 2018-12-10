@@ -348,14 +348,10 @@ namespace EPMLiveWebParts.Tests.ReportingFilter
         {
             ShimSPContext.CurrentGet = () => new ShimSPContext();
             ShimSPContext.AllInstances.WebGet = _ => new ShimSPWeb();
-            //ShimSPContext.AllInstances.ViewContextGet = _ => new ShimSPViewContext();
-            //ShimSPContext.AllInstances.ListGet = _ => new ShimSPList();
 
             ShimSPWebCollection.AllInstances.ItemGetGuid = (_, __) => new ShimSPWeb();
             var listCollection = new ShimSPListCollection();
             ShimSPWeb.AllInstances.ListsGet = _ => listCollection.Bind(new SPList[] { new ShimSPList() });
-            //ShimSPWeb.AllInstances.GetListFromUrlString = (_, __) => new ShimSPList();
-            //ShimSPWeb.AllInstances.CurrentUserGet = _ => new ShimSPUser();
             ShimSPWeb.AllInstances.SiteGet = _ => new ShimSPSite();
 
             ShimSPSite.AllInstances.AllWebsGet = _ => new ShimSPWebCollection();
@@ -366,26 +362,13 @@ namespace EPMLiveWebParts.Tests.ReportingFilter
             ShimSPList.AllInstances.TitleGet = _ => ListTitle;
             var listItemCollection = new ShimSPListItemCollection();
             ShimSPList.AllInstances.GetItemsSPQuery = (_, __) => listItemCollection.Bind(new SPListItem[] { new ShimSPListItem() });
-            //ShimSPList.AllInstances.HiddenGet = _ => false;
-            //ShimSPList.AllInstances.FormsGet = _ => new ShimSPFormCollection();
-            //var viewCollection = new ShimSPViewCollection();
-            //ShimSPList.AllInstances.ViewsGet = _ => viewCollection.Bind(new SPView[] { new ShimSPView() });
             var fieldCollection = new ShimSPFieldCollection();
             ShimSPList.AllInstances.FieldsGet = _ => fieldCollection.Bind(new SPField[] { new ShimSPField() });
             ShimSPListItem.AllInstances.TitleGet = _ => DummyString;
 
-            //ShimSPFormCollection.AllInstances.ItemGetPAGETYPE = (_, __) => new ShimSPForm();
-            //ShimSPForm.AllInstances.UrlGet = _ => ExampleUrl;
-
-            //ShimSPViewContext.AllInstances.ViewGet = _ => new ShimSPView();
-            //ShimSPView.AllInstances.TitleGet = _ => "View Title";
-            //ShimSPView.AllInstances.HiddenGet = _ => false;
-            //ShimSPView.AllInstances.PersonalViewGet = _ => false;
-
             ShimSPFieldCollection.AllInstances.ItemGetString = (_, __) => new ShimSPField();
             ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPField();
             ShimSPFieldCollection.AllInstances.ContainsFieldString = (_, __) => true;
-            //ShimSPField.AllInstances.HiddenGet = _ => false;
             ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Text;
             ShimSPField.AllInstances.TitleGet = _ => FieldTitle;
             ShimSPField.AllInstances.InternalNameGet = _ => Title;
@@ -394,8 +377,6 @@ namespace EPMLiveWebParts.Tests.ReportingFilter
             ShimSPFieldMultiChoice.AllInstances.ChoicesGet = _ => new StringCollection { DummyString };
             ShimSPFieldLookup.AllInstances.LookupListGet = _ => DefaultListId.ToString();
             ShimSPFieldLookup.AllInstances.LookupWebIdGet = _ => DefaultWebId;
-
-            //ShimSPUser.AllInstances.IsSiteAdminGet = _ => true;
         }
 
         private DataTable GetSiteItemsDataTable()
