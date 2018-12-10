@@ -146,12 +146,14 @@
     <Compile Include="GridListView\GridListViewTests.RemainingMethods.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderActionMenu.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderGantt.cs" />
+    <Compile Include="GridListView\GridListViewToolpartTests.cs" />
     <Compile Include="IntegrationModuleDisplay\IntegrationModuleDisplayTest.cs" />
     <Compile Include="Layouts\epmlive\Admin\SSLogsTests.cs" />
     <Compile Include="Layouts\epmlive\TlwizardTests.cs" />
     <Compile Include="Layouts\epmlive\UpdateWebPartTests.cs" />
     <Compile Include="ListReportView\ListReportViewTest.cs" />
     <Compile Include="ListSummaryTest.cs" />
+    <Compile Include="ListSummary\ListSummaryTests.cs" />
     <Compile Include="MyWorkWebPart\MyWorkToolpartTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -168,8 +170,10 @@
     <Compile Include="WebPageCode\GetGanttItemsTests.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.AddItem.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.AddItemDataRow.cs" />
-    <Compile Include="WebPageCode\GetGanttTasksTests.HelperMethods.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.HelperMethodsAndFields.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.AddItems.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.AddGroup.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.Aggregations.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.cs" />
     <Compile Include="GridListView\GridListViewTests.cs" />
     <Compile Include="Helpers\SpListItemDefinition.cs" />
@@ -178,6 +182,7 @@
     <Compile Include="ReportWebPartsTestBase.cs" />
     <Compile Include="ReportViewerTest.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.Fields.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.GetField.cs" />
     <Compile Include="WebPageCode\GetGridItemsTests.Fields.cs" />
     <Compile Include="WebPageCode\GetGridItemsTests.addItem.cs" />
     <Compile Include="WebPageCode\GetGridItemsTests.addItemDataRow.cs" />

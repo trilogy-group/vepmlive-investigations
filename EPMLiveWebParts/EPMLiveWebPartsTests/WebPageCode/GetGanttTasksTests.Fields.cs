@@ -1,24 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Generic.Fakes;
-using System.Collections.Specialized;
 using System.Data;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Web.Fakes;
-using System.Web.UI.Fakes;
-using System.Xml;
-using System.Xml.Fakes;
-using EPMLive.TestFakes.Utility;
-using EPMLiveCore.Fakes;
-using EPMLiveWebParts.Fakes;
-using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
-using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
@@ -26,20 +9,6 @@ namespace EPMLiveWebParts.Tests.WebPageCode
 {
     public partial class GetGanttTasksTests
     {
-        private const string FormatDateOnly = "Format='DateOnly'";
-        private const string FormatTwoDecimals = "Decimals=\"2\"";
-        private const string FormatTwoDecimalsPercentage = "Decimals=\"2\" Percentage=\"TRUE\"";
-        private const string TypeText = "Text";
-        private const string TypeCurrency = "Currency";
-        private const string TypeDateTime = "DateTime";
-        private const string TypeNumber = "Number";
-        private const string TypeDefault = "Default";
-        private const string TypeLookupMulti = "LookupMulti";
-        private const string TypeComputed = "Computed";
-        private const string TypeTotalRollup = "TotalRollup";
-        private const string TypeInvalid = "Invalid";
-        private const string MethodFormatField = "formatField";
-
         [TestMethod]
         public void FormatField_User_ReturnsValue()
         {

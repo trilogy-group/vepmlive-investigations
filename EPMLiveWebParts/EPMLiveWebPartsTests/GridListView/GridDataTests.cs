@@ -129,6 +129,10 @@ namespace EPMLiveWebParts.Tests
         private const string ProcessChildRowsMethodName = "ProcessChildRows";
         private const string IsHyperLinkMethodName = "IsHyperLink";
         private const string InitViewFieldNamesMethodName = "InitViewFieldNames";
+        private const string RemoveNonViewFieldsMethodName = "RemoveNonViewFields";
+        private const string GetTaskIdMethodName = "GetTaskId";
+        private const string GetLinkTypeMethodName = "GetLinkType";
+        private const string GetPredecessorsMethodName = "GetPredecessors";
 
         [TestInitialize]
         public void Setup()
@@ -2531,6 +2535,462 @@ namespace EPMLiveWebParts.Tests
             actual.ShouldSatisfyAllConditions(
                 () => actual.Count.ShouldBe(3),
                 () => expectedNames.Any(x => !actual.Contains(x)).ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void RemoveNonViewFields_WhenCalled_Returns()
+        {
+            // Arrange
+            const string title = "My Work";
+            const string orderByField = "orderByField";
+            var dataTable = new DataTable();
+            var viewFields = new StringCollection()
+            {
+                "linktitle",
+                DummyString
+            };
+            var groupByFields = new string[]
+            {
+                DummyString
+            };
+
+            foreach (var field in viewFields)
+            {
+                dataTable.Columns.Add(field);
+            }
+            dataTable.Columns.Add(One.ToString());
+            dataTable.Columns.Add(Two.ToString());
+            dataTable.Columns.Add(Three.ToString());
+            dataTable.Columns.Add(Four.ToString());
+            dataTable.Columns.Add(Five.ToString());
+            dataTable.Columns.Add(6.ToString());
+            dataTable.Columns.Add(7.ToString());
+            dataTable.Columns.Add(8.ToString());
+
+            spList.TitleGet = () => title;
+
+            ShimGridData.AllInstances.GetInternalNameString = (_, input) => input;
+            ShimGridData.AllInstances.GetDisplayNameString = (_, input) => input;
+
+            privateObject.SetFieldOrProperty(SPListFieldName, nonPublicInstance, spList.Instance);
+            privateObject.SetFieldOrProperty(SPViewFieldsFieldName, nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty("GroupByFields", publicInstance, groupByFields);
+            privateObject.SetFieldOrProperty("OrderByField", publicInstance, orderByField);
+
+            // Act
+            var actual = (DataTable)privateObject.Invoke(RemoveNonViewFieldsMethodName, nonPublicInstance, new object[] { dataTable });
+
+            // Assert
+            actual.Columns.Count.ShouldBe(9);
+        }
+
+        [TestMethod]
+        public void GetTaskId_SFCharactersPresent_ReturnsTaskId()
+        {
+            // Arrange
+            var predecessorString = $"{Five}FS";
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetTaskIdMethodName, nonPublicInstance, new object[] { predecessorString });
+
+            // Assert
+            actual.ShouldBe(Five.ToString());
+        }
+
+        [TestMethod]
+        public void GetTaskId_PlusMinusCharactersPresent_ReturnsTaskId()
+        {
+            // Arrange
+            var predecessorString = $"{Five}+";
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetTaskIdMethodName, nonPublicInstance, new object[] { predecessorString });
+
+            // Assert
+            actual.ShouldBe(Five.ToString());
+        }
+
+        [TestMethod]
+        public void GetTaskId_CharactersNotPresent_ReturnsTaskId()
+        {
+            // Arrange
+            var predecessorString = $"{Five}zzzz";
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetTaskIdMethodName, nonPublicInstance, new object[] { predecessorString });
+
+            // Assert
+            actual.ShouldBe(predecessorString);
+        }
+
+        [TestMethod]
+        public void GetLinkType_TypeFS_ReturnsLinkType()
+        {
+            // Arrange
+            const LinkType expected = LinkType.FinishStart;
+            var predecessorString = $"{Five}zzzz";
+
+            // Act
+            var actual = (LinkType)privateObject.Invoke(GetLinkTypeMethodName, nonPublicInstance, new object[] { predecessorString });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetLinkType_TypeSS_ReturnsLinkType()
+        {
+            // Arrange
+            const LinkType expected = LinkType.StartStart;
+            var predecessorString = $"{Five}SS";
+
+            // Act
+            var actual = (LinkType)privateObject.Invoke(GetLinkTypeMethodName, nonPublicInstance, new object[] { predecessorString });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetLinkType_TypeSF_ReturnsLinkType()
+        {
+            // Arrange
+            const LinkType expected = LinkType.StartFinish;
+            var predecessorString = $"{Five}SF";
+
+            // Act
+            var actual = (LinkType)privateObject.Invoke(GetLinkTypeMethodName, nonPublicInstance, new object[] { predecessorString });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetLinkType_TypeFF_ReturnsLinkType()
+        {
+            // Arrange
+            const LinkType expected = LinkType.FinishFinish;
+            var predecessorString = $"{Five}FF";
+
+            // Act
+            var actual = (LinkType)privateObject.Invoke(GetLinkTypeMethodName, nonPublicInstance, new object[] { predecessorString });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetPredecessors_RollupListNotNullFieldsCollectionContainsProjectFalse_GetsPredecessors()
+        {
+            // Arrange
+            const string predecessors = "1";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var rollupLists = new string[]
+            {
+                DummyString
+            };
+
+            dataTable.Columns.Add("Predecessors");
+            dataTable.Columns.Add("task id");
+            dataTable.Columns.Add("ListId");
+            dataTable.Columns.Add("Project");
+            dataTable.Columns.Add(KeyString);
+            dataTable.Columns.Add("DependencyType", typeof(Dependency[]));
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["task id"] = One;
+            row["ListId"] = Five;
+            row[KeyString] = DummyString;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["ListId"] = Five;
+
+            var parameters = new object[]
+            {
+                row,
+                dataTable
+            };
+
+            spFieldCollection.ContainsFieldString = _ => false;
+
+            ShimGridData.AllInstances.GetTaskIdString = (_, __) => One.ToString();
+            ShimGridData.AllInstances.GetLinkTypeString = (_, __) => LinkType.StartFinish;
+
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, rollupLists);
+
+            // Act
+            privateObject.Invoke(GetPredecessorsMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => ((Dependency[])actual["DependencyType"]).Length.ShouldBe(One),
+                () => ((Dependency[])actual["DependencyType"])[0].Key.ShouldBe(DummyString),
+                () => ((Dependency[])actual["DependencyType"])[0].Type.ShouldBe(LinkType.StartFinish));
+        }
+
+        [TestMethod]
+        public void GetPredecessors_RollupListNotNullFieldsCollectionContainsProjectTrueAndProjectNotNull_GetsPredecessors()
+        {
+            // Arrange
+            const string predecessors = "1";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var rollupLists = new string[]
+            {
+                DummyString
+            };
+
+            dataTable.Columns.Add("Predecessors");
+            dataTable.Columns.Add("task id");
+            dataTable.Columns.Add("ListId");
+            dataTable.Columns.Add("Project");
+            dataTable.Columns.Add(KeyString);
+            dataTable.Columns.Add("DependencyType", typeof(Dependency[]));
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["task id"] = One;
+            row["ListId"] = Five;
+            row["Project"] = DummyString;
+            row[KeyString] = DummyString;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["ListId"] = Five;
+            row["Project"] = DummyString;
+
+            var parameters = new object[]
+            {
+                row,
+                dataTable
+            };
+
+            spFieldCollection.ContainsFieldString = _ => false;
+
+            ShimGridData.AllInstances.GetTaskIdString = (_, __) => One.ToString();
+            ShimGridData.AllInstances.GetLinkTypeString = (_, __) => LinkType.StartFinish;
+
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, rollupLists);
+
+            // Act
+            privateObject.Invoke(GetPredecessorsMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => ((Dependency[])actual["DependencyType"]).Length.ShouldBe(One),
+                () => ((Dependency[])actual["DependencyType"])[0].Key.ShouldBe(DummyString),
+                () => ((Dependency[])actual["DependencyType"])[0].Type.ShouldBe(LinkType.StartFinish));
+        }
+
+        [TestMethod]
+        public void GetPredecessors_RollupListNotNullFieldsCollectionContainsProjectTrueAndProjectNull_GetsPredecessors()
+        {
+            // Arrange
+            const string predecessors = "1";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var rollupLists = new string[]
+            {
+                DummyString
+            };
+
+            dataTable.Columns.Add("Predecessors");
+            dataTable.Columns.Add("task id");
+            dataTable.Columns.Add("ListId");
+            dataTable.Columns.Add("Project");
+            dataTable.Columns.Add(KeyString);
+            dataTable.Columns.Add("DependencyType", typeof(Dependency[]));
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["task id"] = One;
+            row["ListId"] = Five;
+            row["Project"] = null;
+            row[KeyString] = DummyString;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["ListId"] = Five;
+            row["Project"] = string.Empty;
+
+            var parameters = new object[]
+            {
+                row,
+                dataTable
+            };
+
+            spFieldCollection.ContainsFieldString = _ => false;
+
+            ShimGridData.AllInstances.GetTaskIdString = (_, __) => One.ToString();
+            ShimGridData.AllInstances.GetLinkTypeString = (_, __) => LinkType.StartFinish;
+
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, rollupLists);
+
+            // Act
+            privateObject.Invoke(GetPredecessorsMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => ((Dependency[])actual["DependencyType"]).Length.ShouldBe(One),
+                () => ((Dependency[])actual["DependencyType"])[0].Key.ShouldBe(DummyString),
+                () => ((Dependency[])actual["DependencyType"])[0].Type.ShouldBe(LinkType.StartFinish));
+        }
+
+        [TestMethod]
+        public void GetPredecessors_RollupListNullFieldsCollectionContainsProjectFalse_GetsPredecessors()
+        {
+            // Arrange
+            const string predecessors = "1";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            dataTable.Columns.Add("Predecessors");
+            dataTable.Columns.Add("task id");
+            dataTable.Columns.Add("ListId");
+            dataTable.Columns.Add("Project");
+            dataTable.Columns.Add(KeyString);
+            dataTable.Columns.Add("DependencyType", typeof(Dependency[]));
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["task id"] = One;
+            row["ListId"] = Five;
+            row[KeyString] = DummyString;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["ListId"] = Five;
+
+            var parameters = new object[]
+            {
+                row,
+                dataTable
+            };
+
+            spFieldCollection.ContainsFieldString = _ => false;
+
+            ShimGridData.AllInstances.GetTaskIdString = (_, __) => One.ToString();
+            ShimGridData.AllInstances.GetLinkTypeString = (_, __) => LinkType.StartFinish;
+
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, null);
+
+            // Act
+            privateObject.Invoke(GetPredecessorsMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => ((Dependency[])actual["DependencyType"]).Length.ShouldBe(One),
+                () => ((Dependency[])actual["DependencyType"])[0].Key.ShouldBe(DummyString),
+                () => ((Dependency[])actual["DependencyType"])[0].Type.ShouldBe(LinkType.StartFinish));
+        }
+
+        [TestMethod]
+        public void GetPredecessors_RollupListNullFieldsCollectionContainsProjectTrueAndProjectNotNull_GetsPredecessors()
+        {
+            // Arrange
+            const string predecessors = "1";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            dataTable.Columns.Add("Predecessors");
+            dataTable.Columns.Add("task id");
+            dataTable.Columns.Add("ListId");
+            dataTable.Columns.Add("Project");
+            dataTable.Columns.Add(KeyString);
+            dataTable.Columns.Add("DependencyType", typeof(Dependency[]));
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["task id"] = One;
+            row["ListId"] = Five;
+            row["Project"] = DummyString;
+            row[KeyString] = DummyString;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["ListId"] = Five;
+            row["Project"] = DummyString;
+
+            var parameters = new object[]
+            {
+                row,
+                dataTable
+            };
+
+            spFieldCollection.ContainsFieldString = _ => false;
+
+            ShimGridData.AllInstances.GetTaskIdString = (_, __) => One.ToString();
+            ShimGridData.AllInstances.GetLinkTypeString = (_, __) => LinkType.StartFinish;
+
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, null);
+
+            // Act
+            privateObject.Invoke(GetPredecessorsMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => ((Dependency[])actual["DependencyType"]).Length.ShouldBe(One),
+                () => ((Dependency[])actual["DependencyType"])[0].Key.ShouldBe(DummyString),
+                () => ((Dependency[])actual["DependencyType"])[0].Type.ShouldBe(LinkType.StartFinish));
+        }
+
+        [TestMethod]
+        public void GetPredecessors_RollupListNullFieldsCollectionContainsProjectTrueAndProjectNull_GetsPredecessors()
+        {
+            // Arrange
+            const string predecessors = "1";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            dataTable.Columns.Add("Predecessors");
+            dataTable.Columns.Add("task id");
+            dataTable.Columns.Add("ListId");
+            dataTable.Columns.Add("Project");
+            dataTable.Columns.Add(KeyString);
+            dataTable.Columns.Add("DependencyType", typeof(Dependency[]));
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["task id"] = One;
+            row["ListId"] = Five;
+            row["Project"] = null;
+            row[KeyString] = DummyString;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["ListId"] = Five;
+            row["Project"] = string.Empty;
+
+            var parameters = new object[]
+            {
+                row,
+                dataTable
+            };
+
+            spFieldCollection.ContainsFieldString = _ => false;
+
+            ShimGridData.AllInstances.GetTaskIdString = (_, __) => One.ToString();
+            ShimGridData.AllInstances.GetLinkTypeString = (_, __) => LinkType.StartFinish;
+
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, null);
+
+            // Act
+            privateObject.Invoke(GetPredecessorsMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => ((Dependency[])actual["DependencyType"]).Length.ShouldBe(One),
+                () => ((Dependency[])actual["DependencyType"])[0].Key.ShouldBe(DummyString),
+                () => ((Dependency[])actual["DependencyType"])[0].Type.ShouldBe(LinkType.StartFinish));
         }
     }
 }

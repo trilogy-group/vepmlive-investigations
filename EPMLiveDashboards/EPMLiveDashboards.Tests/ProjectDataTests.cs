@@ -275,7 +275,7 @@ namespace EPMLiveDashboards.Tests
             var actualResult = _testEntity.buildData(true, true, true);
 
             // Assert
-            actualResult.ShouldContain("Object reference not set to an instance of an object.   at Dashboard.ProjectData.buildData(Boolean pTasks, Boolean pRisks, Boolean pIssues)");
+            actualResult.ShouldContain("Object reference not set to an instance of an object.");
         }
 
         [TestMethod]

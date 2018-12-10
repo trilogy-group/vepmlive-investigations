@@ -51,4 +51,8 @@ export class EditCost {
     static get veil() {
         return element(By.id('veil'));
     }
+
+    static get editCostButton() {
+        return element(By.id('Ribbon.ListItem.Manage.EPKCosts-Large'));
+    }
 }
