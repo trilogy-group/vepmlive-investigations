@@ -35,7 +35,8 @@ export class StepLogger {
     }
 
     static commonLogger(operation: string, step: string) {
-        const message = `${this.stepIdVar}- *${operation}* - ${step}`;
+        const message = `${this.stepIdVar}- *${operation}* - ${step} - url:`;
+
         if (this.debug) {
             console.log(`${this.testCaseId || ''}${message}`);
         }
