@@ -26,7 +26,6 @@ namespace EPMLiveWebParts.Tests.ReportingFilter
     {
         private const string One = "1";
         private const string DummyString = "DummyString";
-        private const string ExampleUrl = "http://example.com";
         private const string Title = "Title";
         private const string ListTitle = "List Title";
         private const string FieldTitle = "Field Title";
@@ -282,6 +281,7 @@ namespace EPMLiveWebParts.Tests.ReportingFilter
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => _didRebuildControl.ShouldBeTrue(),
+                () => _didRegisterClientScript.ShouldBeTrue(),
                 () => _reportingFilter.DefaultValueForFieldFilter.ShouldBe(Title));
         }
 
@@ -301,6 +301,7 @@ namespace EPMLiveWebParts.Tests.ReportingFilter
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => _didRebuildControl.ShouldBeTrue(),
+                () => _didRegisterClientScript.ShouldBeTrue(),
                 () => _reportingFilter.DefaultValueForFieldFilter.ShouldBe(DummyString));
         }
 
@@ -320,6 +321,7 @@ namespace EPMLiveWebParts.Tests.ReportingFilter
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => _didRebuildControl.ShouldBeTrue(),
+                () => _didRegisterClientScript.ShouldBeTrue(),
                 () => _reportingFilter.DefaultValueForFieldFilter.ShouldBe(string.Empty));
         }
 
@@ -340,6 +342,7 @@ namespace EPMLiveWebParts.Tests.ReportingFilter
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => _didRebuildControl.ShouldBeTrue(),
+                () => _didRegisterClientScript.ShouldBeTrue(),
                 () => _reportingFilter.DefaultValueForFieldFilter.ShouldBe($"{DefaultDate.ToShortDateString()},{DefaultDate.ToShortDateString()}"));
         }
 
