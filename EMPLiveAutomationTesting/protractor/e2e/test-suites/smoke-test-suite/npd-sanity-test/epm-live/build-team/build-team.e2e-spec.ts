@@ -396,7 +396,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
     */
 
-    it('Verify functionality of "Always follow Web-Settings" check-box. - [778281][BUG:SKYVERA-1795]', async () => {
+    it('Verify functionality of "Always follow Web-Settings" check-box. - [778281]', async () => {
         StepLogger.caseId = 778281;
         StepLogger.stepId(1);
         StepLogger.step('Select "Navigation" icon  from left side menu');

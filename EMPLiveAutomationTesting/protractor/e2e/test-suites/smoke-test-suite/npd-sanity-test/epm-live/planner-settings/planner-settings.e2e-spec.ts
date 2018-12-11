@@ -28,7 +28,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    it('Add new planner - [1032747] [BUG:SKYVERA-1584]', async () => {
+    it('Add new planner - [1032747]', async () => {
         StepLogger.caseId = 1032747;
         StepLogger.stepId(1);
         const uniqueId = PageHelper.getUniqueId();
@@ -88,7 +88,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PlannerSettingsPageHelper.saveAndVerifyCreatePlanner(plannerName, true);
     });
 
-    it('Edit Planner name - [1032780] [BUG:SKYVERA-1584]', async () => {
+    it('Edit Planner name - [1032780]', async () => {
         StepLogger.caseId = 1032780;
         const uniqueId = PageHelper.getUniqueId();
         StepLogger.preCondition('Add new planner');
