@@ -22,7 +22,7 @@ using Shouldly;
 
 namespace EPMLiveCore.Tests.API
 {
-    /// <summary>
+    /// <summary> 
     /// Unit Tests for <see cref="EPMLiveCore.API.APIEmail"/>
     /// </summary>
     [TestClass, ExcludeFromCodeCoverage]
