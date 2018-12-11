@@ -49,6 +49,10 @@
     <Reference Include="EPMLiveIntegration.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPMLiveIntegration.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Web.CommandUI.16.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\Microsoft.Web.CommandUI.16.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="PortfolioEngineCore.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\PortfolioEngineCore.Fakes.dll</HintPath>
     </Reference>
@@ -226,6 +230,7 @@
     <Compile Include="CoreFunctionsRemTestsSplitThree.cs" />
     <Compile Include="CoreFunctionsRemTestsSplitTwo.cs" />
     <Compile Include="CoreFunctionsTest.cs" />
+    <Compile Include="DispFormTests.cs" />
     <Compile Include="EditableFieldDisplayTests.cs" />
     <Compile Include="EditInTests.cs" />
     <Compile Include="EPMLivePCForm\ManageableListsTests.cs" />
