@@ -15,8 +15,8 @@ namespace EPMLiveCore.Tests.Web_References.SalesforceMetadataService
     {
         private PrivateObject _privateObject;
         private DashboardComponent _testEntity;
-        private readonly string DummyString = "DummyString";
-        private readonly int DummyInt = 1;
+        private const string DummyString = "DummyString";
+        private const int DummyInt = 1;
 
         [TestInitialize]
         public void SetUp()
