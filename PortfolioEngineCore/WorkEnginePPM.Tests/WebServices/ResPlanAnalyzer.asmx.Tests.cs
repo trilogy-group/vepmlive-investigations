@@ -1,29 +1,18 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel.Fakes;
-using System.Data;
 using System.Data.Common.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
-using System.IO.Fakes;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Fakes;
-using System.Web.Services.Fakes;
 using System.Xml;
-using System.Xml.Linq;
-using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
-using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.SharePoint.WebControls.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortfolioEngineCore;
@@ -1371,16 +1360,14 @@ namespace WorkEnginePPM.Tests.WebServices
 
             var rpaData = new RPAData();
             var outVariable = string.Empty;
-            rpaData.GrabRAData
-                (
-                    new ResourceValues.clsResourceValues(),
-                    DummyString,
-                    DummyString,
-                    One,
-                    One,
-                    DummyString,
-                    out outVariable
-                );
+            rpaData.GrabRAData(
+                new ResourceValues.clsResourceValues(),
+                DummyString,
+                DummyString,
+                One,
+                One,
+                DummyString,
+                out outVariable);
 
             // Act
             actual.LoadXml((string)privateObject.Invoke(
@@ -1609,16 +1596,14 @@ namespace WorkEnginePPM.Tests.WebServices
 
             var rpaData = new RPAData();
             var outVariable = string.Empty;
-            rpaData.GrabRAData
-                (
-                    new ResourceValues.clsResourceValues(),
-                    DummyString,
-                    DummyString,
-                    One,
-                    One,
-                    DummyString,
-                    out outVariable
-                );
+            rpaData.GrabRAData(
+                new ResourceValues.clsResourceValues(),
+                DummyString,
+                DummyString,
+                One,
+                One,
+                DummyString,
+                out outVariable);
 
             // Act
             actual.LoadXml((string)privateObject.Invoke(
