@@ -52,6 +52,10 @@
     <Reference Include="PortfolioEngineCore.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\PortfolioEngineCore.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Extensions.4.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.Extensions.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.Services" />
   </ItemGroup>
   <PropertyGroup>
@@ -294,6 +298,7 @@
     <Compile Include="Shared\AssertException.cs" />
     <Compile Include="SocialEngine\Core\ThreadManagerTest.cs" />
     <Compile Include="SocialEngine\Modules\ListItemTests.cs" />
+    <Compile Include="SPFields\DaysHoursBreakdownFieldControlTests.cs" />
     <Compile Include="SPUtilities\SPListUtilityTest.cs" />
     <Compile Include="StatusingEventTests.cs" />
     <Compile Include="Testables\InputFormControlTestable.cs">
