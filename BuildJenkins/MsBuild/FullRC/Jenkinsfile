@@ -63,33 +63,33 @@ pipeline {
                 }
             }
         }
-		stage('Deploy Quality') {
-			steps {
-				timestamps {
-					script {
-						echo 'Triggering Deploy job...'
-						env.DEPLOY_BRANCH = currentBuild.getProjectName()
-						if (params.DeployBranch?.trim()) {
-							env.DEPLOY_BRANCH = params.DeployBranch
+		stage('Deploy') {
+			parallel {
+				stage('Deploy Quality') {
+					steps {
+						timestamps {
+							script {
+								echo 'Triggering Deploy job...'
+								env.DEPLOY_BRANCH = currentBuild.getProjectName()
+								if (params.DeployBranch?.trim()) {
+									env.DEPLOY_BRANCH = params.DeployBranch
+								}
+								build(
+									job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
+									wait: true,
+									parameters: [
+										[$class: 'StringParameterValue', name: 'TargetHost', value: params.TargetHost],
+										[$class: 'StringParameterValue', name: 'UserName', value: params.UserName],
+										[$class: 'StringParameterValue', name: 'Password', value: params.Password],
+										[$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
+										[$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD],
+										[$class: 'StringParameterValue', name: 'FullHostName', value: params.AppUrl]
+									]
+								)
+							}
 						}
-						build(
-							job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
-							wait: true,
-							parameters: [
-								[$class: 'StringParameterValue', name: 'TargetHost', value: params.TargetHost],
-								[$class: 'StringParameterValue', name: 'UserName', value: params.UserName],
-								[$class: 'StringParameterValue', name: 'Password', value: params.Password],
-								[$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
-								[$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD],
-								[$class: 'StringParameterValue', name: 'FullHostName', value: params.AppUrl]
-							]
-						)
 					}
 				}
-			}
-		}
-		stage('Parallel Jobs') {
-			parallel {
 				stage('Deploy Staging') {
 					steps {
 						timestamps {
@@ -115,6 +115,10 @@ pipeline {
 						}
 					}
 				}
+			}
+		}
+		stage('Tests') {
+			parallel {
 				stage('Automated Tests') {
 					stages {
 						stage('Protractor Tests') {
