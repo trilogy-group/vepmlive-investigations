@@ -263,7 +263,7 @@ namespace EPMLiveCore.Tests.API
             ShimSmtpClient.AllInstances.SendMailMessage = null;
 
             // Act
-            var ex = Should.Throw<Exception>(() => { _privateType.InvokeStatic(iSendEmail, parameters); });
+            var ex = Should.Throw<Exception>(() => _privateType.InvokeStatic(iSendEmail, parameters));
 
             // Assert
             this.ShouldSatisfyAllConditions(
