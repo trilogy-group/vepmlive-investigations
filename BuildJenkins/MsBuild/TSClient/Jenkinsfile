@@ -50,7 +50,8 @@ pipeline {
 		stage('Running Tests') {
 			steps {
 				echo 'Executing deploy (upgrade) script...'
-				bat '"C:/Program Files/nodejs/node.exe" C:/ts-client/bin/ts-cli start-job SilentInstaller.zip %BUILD_VERSION%'
+				zip(zipFile: "epmlive_SI_${env.BUILD_VERSION}.zip", glob: "SilentInstaller.zip", archive: true)
+				bat '"C:/Program Files/nodejs/node.exe" C:/ts-client/bin/ts-cli start-job "epmlive_SI_%BUILD_VERSION%.zip" %BUILD_VERSION%'
 			}
 		}
 	}

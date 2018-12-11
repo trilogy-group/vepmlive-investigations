@@ -102,6 +102,7 @@ pipeline {
 								build(
 									job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
 									wait: true,
+									propagate: false,
 									parameters: [
 										[$class: 'StringParameterValue', name: 'TargetHost', value: params.StagingTargetHost],
 										[$class: 'StringParameterValue', name: 'UserName', value: params.StagingUserName],
