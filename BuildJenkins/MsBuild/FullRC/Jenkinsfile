@@ -115,23 +115,43 @@ pipeline {
 						}
 					}
 				}
-				stage('Protractor UI Tests') {
-					steps {
-						timestamps {
-							script {
-								echo 'Triggering Protractor UI tests job...'
-								env.PROTRACTOR_BRANCH = currentBuild.getProjectName()
-								if (params.ProtractorBranch?.trim()) {
-									env.PROTRACTOR_BRANCH = params.ProtractorBranch
+				stage('Automated Tests') {
+					stage('Protractor Tests') {
+						steps {
+							timestamps {
+								script {
+									echo 'Triggering Protractor UI tests job...'
+									env.PROTRACTOR_BRANCH = currentBuild.getProjectName()
+									if (params.ProtractorBranch?.trim()) {
+										env.PROTRACTOR_BRANCH = params.ProtractorBranch
+									}
+									build(
+										job: "../EPML-Regression/${env.PROTRACTOR_BRANCH}", 
+										wait: true,
+										propagate: false,	
+										parameters: [
+											[$class: 'StringParameterValue', name: 'TargetHost', value: params.TargetHost],
+											[$class: 'StringParameterValue', name: 'FullHostName', value: params.ProtractorHostsName]
+										]
+									)
 								}
-								build(
-									job: "../EPML-Regression/${env.PROTRACTOR_BRANCH}", 
-									wait: true,
-									parameters: [
-										[$class: 'StringParameterValue', name: 'TargetHost', value: params.TargetHost],
-										[$class: 'StringParameterValue', name: 'FullHostName', value: params.ProtractorHostsName]
-									]
-								)
+							}
+						}
+					}
+					stage('Performance Tests') {
+						steps {
+							timestamps {
+								script {
+									echo 'Triggering performance tests job...'
+									build(
+										job: "../EPML-Perf/EPML-Perf", 
+										wait: true,
+										propagate: false,	
+										parameters: [
+											[$class: 'StringParameterValue', name: 'APP_URL', value: params.TargetHost]
+										]
+									)
+								}
 							}
 						}
 					}

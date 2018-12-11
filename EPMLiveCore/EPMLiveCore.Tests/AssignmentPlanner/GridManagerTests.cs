@@ -19,6 +19,7 @@ using EPMLiveCore.Infrastructure.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
+using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Shouldly;
@@ -55,6 +56,11 @@ namespace EPMLiveCore.Tests.AssignmentPlanner
         private const string RegisterGridIdAndCssMethodName = "RegisterGridIdAndCss";
         private const string ValidateMyWorkDataResponseMethodName = "ValidateMyWorkDataResponse";
         private const string GetLayoutMethodName = "GetLayout";
+        private const string ExampleUrl = "http://www.example.com";
+        private readonly Guid ListId = Guid.NewGuid();
+        private readonly Guid WebId = Guid.NewGuid();
+        private readonly Guid SiteId = Guid.NewGuid();
+        private readonly DateTime DefaultDate = new DateTime(2019, 1, 1);
 
         [TestInitialize]
         public void Setup()
@@ -722,6 +728,87 @@ namespace EPMLiveCore.Tests.AssignmentPlanner
 
             // Assert
             validationCount.ShouldBe(4);
+        }
+
+        [TestMethod]
+        public void GetData_Invoke_ReturnsXmlResult()
+        {
+            // Arrange
+            var didValidate = false;
+            var data = "<root>M</root>";
+            var response = GetResponse();
+            ShimWorkEngineAPI.AllInstances.ExecuteStringString = (a, b, c) => response;
+            ShimGridManager.ValidateMyWorkDataResponseXDocument = _ => didValidate = true;
+
+            PrepareForGetData();
+
+            // Act
+            var result = testObject.GetData(data);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => didValidate.ShouldBeTrue(),
+                () =>
+                {
+                    result.ShouldNotBeNull();
+                    result = string.Join(string.Empty, result.Split("\n".ToCharArray()).Select(x => x.Trim()).ToArray());
+                    result.ShouldSatisfyAllConditions(
+                        () => result.ShouldContainWithoutWhitespace($"<Grid><Body><B><I id=\"1\" listid=\"{ListId}\" webid=\"{WebId}\" siteid=\"{SiteId}\""),
+                        () => result.ShouldContainWithoutWhitespace($"assignedtoid=\"2\" assignedtotext=\"DummyString\" startdate=\"{DefaultDate.ToShortDateString()}\" duedate=\"{DefaultDate.ToShortDateString()}\" Duration=\"\""),
+                        () => result.ShouldContainWithoutWhitespace("Flag=\"&lt;img src=&quot;/_layouts/epmlive/images/mywork/unflagged.png&quot; class=&quot;AP_Flag&quot;/&gt;\" FlagValue=\"0\" Height=\"23\" /></B></Body>"),
+                        () => result.ShouldContainWithoutWhitespace("<Resources><R Name=\"DummyString\" Availability=\"8\" Type=\"1\" /></Resources><Foot><I id=\"-2\" Def=\"Resource\" Title=\"DummyString\" /></Foot></Grid>"));
+                });
+        }
+
+        private string GetResponse()
+        {
+            return $@"<Result>
+                        <GetMyWorkData>
+                            <Data>
+                                <Resource>
+                                    <Result Status='0'></Result>
+                                    <Data>
+                                        <Item>
+                                            <Field Name='id'>1</Field>
+                                            <Field Name='listid'>{ListId}</Field>
+                                            <Field Name='webid'>{WebId}</Field>
+                                            <Field Name='siteid'>{SiteId}</Field>
+                                            <Field Name='assignedtoid'>2</Field>
+                                            <Field Name='assignedtotext'>{DummyString}</Field>
+                                            <Field Name='startdate' Type='System.DateTime'>{DefaultDate}</Field>
+                                            <Field Name='duedate' Type='System.DateTime'>{DefaultDate}</Field>
+                                        </Item>
+                                    </Data>
+                                </Resource>
+                            </Data>
+                        </GetMyWorkData>
+                    </Result>";
+        }
+
+        private void PrepareForGetData()
+        {
+            privateObject.SetField("_spWeb", new ShimSPWeb().Instance);
+
+            ShimMyPersonalization.GetMyPersonalizationString = _ => @"
+                <MyPersonalization>
+                    <Personalization Key='AssignmentPlannerFlag' Value='0'></Personalization>
+                </MyPersonalization>";
+
+            ShimSPWeb.AllInstances.CurrentUserGet = _ => new ShimSPUser();
+            ShimSPWeb.AllInstances.SiteGet = _ => new ShimSPSite();
+            ShimSPWeb.AllInstances.RegionalSettingsGet = _ => new ShimSPRegionalSettings();
+            ShimSPWeb.AllInstances.ServerRelativeUrlGet = _ => "/";
+
+            ShimSPSite.AllInstances.RootWebGet = _ => new ShimSPWeb();
+            ShimSPSite.AllInstances.UrlGet = _ => ExampleUrl;
+
+            ShimSPUser.AllInstances.RegionalSettingsGet = _ => null;
+
+            ShimSPRegionalSettings.AllInstances.WorkDayStartHourGet = _ => 8 * 60;
+            ShimSPRegionalSettings.AllInstances.WorkDayEndHourGet = _ => 18 * 60;
+
+            ShimSPUtility.CreateDateTimeFromISO8601DateTimeStringString = _ => DefaultDate;
+            ShimSPUtility.CreateISO8601DateTimeFromSystemDateTimeDateTime = _ => DefaultDate.ToShortDateString();
         }
     }
 }

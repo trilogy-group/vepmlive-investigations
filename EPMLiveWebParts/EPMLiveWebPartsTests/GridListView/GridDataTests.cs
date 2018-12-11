@@ -1186,17 +1186,18 @@ namespace EPMLiveWebParts.Tests
         public void InitializeGanttStartAndFinish_WhenCalled_InitializesGanttStartAndFinish()
         {
             // Arrange
+            const string format = "yyyy-MM-dd HH:mm:ss";
             currentDateTime = currentDateTime.Date;
 
             var row = default(DataRow);
             var dataTable = new DataTable();
             var rows = new string[]
             {
-                currentDateTime.AddDays(-1).ToString(),
-                currentDateTime.AddDays(-2).ToString(),
-                currentDateTime.ToString(),
-                currentDateTime.AddDays(1).ToString(),
-                currentDateTime.AddDays(2).ToString()
+                currentDateTime.AddDays(-1).ToString(format),
+                currentDateTime.AddDays(-2).ToString(format),
+                currentDateTime.ToString(format),
+                currentDateTime.AddDays(1).ToString(format),
+                currentDateTime.AddDays(2).ToString(format)
             };
 
             dataTable.Columns.Add(DummyString);

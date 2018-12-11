@@ -51,125 +51,146 @@ namespace Dashboard
         {
             try
             {
-                dt = new DataTable();
-                dt.Columns.Add("name");
-                dt.Columns.Add("pctcomplete");
-                dt.Columns.Add("latetasks");
-                dt.Columns.Add("schedulestatus");
-                dt.Columns.Add("issuestatus");
-                dt.Columns.Add("riskstatus");
-
-                gvPJSummary = new SPGridView();
-                gvPJSummary.AutoGenerateColumns = false;
-
-                BoundField colTitle = new BoundField();
-                colTitle.DataField = "name";
-                colTitle.HeaderText = "Project Name";
-                colTitle.HtmlEncode = false;
-                //colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-                gvPJSummary.Columns.Add(colTitle);
-
-                colTitle = new BoundField();
-                colTitle.DataField = "pctcomplete";
-                colTitle.HeaderText = "% Complete";
-                colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-                gvPJSummary.Columns.Add(colTitle);
-
-                colTitle = new BoundField();
-                colTitle.DataField = "latetasks";
-                colTitle.HeaderText = "# of Late Tasks";
-                colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-                gvPJSummary.Columns.Add(colTitle);
-
-                colTitle = new BoundField();
-                colTitle.DataField = "schedulestatus";
-                colTitle.HeaderText = "Schedule Status";
-                colTitle.HtmlEncode = false;
-                colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-                gvPJSummary.Columns.Add(colTitle);
-
-                colTitle = new BoundField();
-                colTitle.DataField = "issuestatus";
-                colTitle.HeaderText = "Issue Status";
-                colTitle.HtmlEncode = false;
-                colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-                gvPJSummary.Columns.Add(colTitle);
-
-                colTitle = new BoundField();
-                colTitle.DataField = "riskstatus";
-                colTitle.HeaderText = "Risk Status";
-                colTitle.HtmlEncode = false;
-                colTitle.ControlStyle.CssClass = "ms-vh";
-                colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-                gvPJSummary.Columns.Add(colTitle);
-
-                //gvPJSummary.GroupField = "Status";
-                //gvPJSummary.GroupFieldDisplayName = "Status";
-
-                gvPJSummary.AllowGrouping = false;
-                gvPJSummary.ID = "gvPJSummary";
-                gvPJSummary.Width = Unit.Percentage(100);
-                gvPJSummary.HeaderStyle.CssClass = "ms-vh";
+                PopulateDataTable();
+                PopulateSummaryGrid();
 
                 try
                 {
                     projectList = site.Lists["Project Center"];
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
                     return "The Project Center list does not exist on this site.";
                 }
                 try
                 {
                     taskList = site.Lists["Task Center"];
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
                     try
                     {
                         taskList = site.Lists["My Tasks"];
-                        return "In order to take advantage of the new EPM Live functionality, please follow the instructions located <a href=\"http://www.projectpublisher.com/downloads/ProjectPublisherUpdateProcess.pdf\" target=\"_blank\">here</a>.";
+                        return
+                            "In order to take advantage of the new EPM Live functionality, please follow the instructions located <a href=\"http://www.projectpublisher.com/downloads/ProjectPublisherUpdateProcess.pdf\" target=\"_blank\">here</a>.";
                     }
-                    catch { return "No Tasks List Found"; }
-
+                    catch (Exception exc)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", exc);
+                        return "No Tasks List Found";
+                    }
                 }
 
                 try
                 {
                     issueList = site.Lists["Issues"];
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
                     pIssues = false;
                 }
                 try
                 {
                     riskList = site.Lists["Risks"];
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
                     pRisks = false;
                 }
-                
-                foreach (SPListItem li in projectList.Items)
-                {
-                    try
-                    {
-                        if (li["State"].ToString() == "(2) Active")
-                        {
-                            processProjectSummaryItem(li, pTasks, pRisks, pIssues);
-                        }
-                    }
-                    catch { }
-                }
+
+                ProcessListItems(pTasks, pRisks, pIssues);
                 gvPJSummary.DataSource = dt;
                 gvPJSummary.DataBind();
-                return "";
+                return string.Empty;
             }
             catch (Exception ex)
             {
-                return ex.Message + ex.StackTrace;
+                Trace.TraceError("Exception Suppressed {0}", ex);
+                return string.Format("{0}{1}", ex.Message, ex.StackTrace);
             }
+        }
+
+        private void ProcessListItems(bool pTasks, bool pRisks, bool pIssues)
+        {
+            foreach (SPListItem listItem in projectList.Items)
+            {
+                try
+                {
+                    if (string.Equals(listItem["State"].ToString(), "(2) Active", StringComparison.Ordinal))
+                    {
+                        processProjectSummaryItem(listItem, pTasks, pRisks, pIssues);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+        }
+
+        private void PopulateSummaryGrid()
+        {
+            gvPJSummary = new SPGridView
+            {
+                AutoGenerateColumns = false
+            };
+
+            var colTitle = new BoundField
+            {
+                DataField = "name",
+                HeaderText = "Project Name",
+                HtmlEncode = false
+            };
+
+            gvPJSummary.Columns.Add(colTitle);
+
+            AddField("pctcomplete", "% Complete", HorizontalAlign.Center);
+            AddField("latetasks", "# of Late Tasks", HorizontalAlign.Center);
+            AddField("schedulestatus", "Schedule Status", HorizontalAlign.Center, false);
+            AddField("issuestatus", "Issue Status", HorizontalAlign.Center, false);
+            AddField("riskstatus", "Risk Status", HorizontalAlign.Center, false, "ms-vh");
+
+            gvPJSummary.AllowGrouping = false;
+            gvPJSummary.ID = "gvPJSummary";
+            gvPJSummary.Width = Unit.Percentage(100);
+            gvPJSummary.HeaderStyle.CssClass = "ms-vh";
+        }
+
+        private void PopulateDataTable()
+        {
+            dt = new DataTable();
+            dt.Columns.Add("name");
+            dt.Columns.Add("pctcomplete");
+            dt.Columns.Add("latetasks");
+            dt.Columns.Add("schedulestatus");
+            dt.Columns.Add("issuestatus");
+            dt.Columns.Add("riskstatus");
+        }
+
+        private void AddField(
+            string fieldName,
+            string fieldHeader,
+            HorizontalAlign horizontalAlignment,
+            bool? fieldEncode = null,
+            string controlStyleCss = null)
+        {
+            var boundField = new BoundField();
+            boundField.DataField = fieldName;
+            boundField.HeaderText = fieldHeader;
+            if (fieldEncode.HasValue)
+            {
+                boundField.HtmlEncode = fieldEncode.Value;
+            }
+            if (controlStyleCss != null)
+            {
+                boundField.ControlStyle.CssClass = controlStyleCss;
+            }
+            boundField.ItemStyle.HorizontalAlign = horizontalAlignment;
+            gvPJSummary.Columns.Add(boundField);
         }
 
         public string buildData2()
