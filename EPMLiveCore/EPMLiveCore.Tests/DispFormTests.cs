@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Web.UI;
 using System.Xml;
 using EPMLiveCore.API;
@@ -21,7 +22,7 @@ using Shouldly;
 
 namespace EPMLiveCore.Tests
 {
-    [TestClass]
+    [TestClass, ExcludeFromCodeCoverage]
     public class DispFormTests
     {
         private const int Id = 1;
