@@ -69,7 +69,7 @@ const configSetup = {
         maxInstances: maxBrowserInstances
     }],
     params: {
-        siteCollection: setupUtilities.getParam('/epm', "--siteCollection", false),
+        siteCollection: setupUtilities.getParam('/epm', "--params.siteCollection", false),
         maxInstances: maxBrowserInstances,
         maxSessions: maxBrowserInstances,
         testrail: {
