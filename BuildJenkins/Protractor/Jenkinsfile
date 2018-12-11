@@ -43,7 +43,7 @@ pipeline {
 		always {
 			echo 'Publishing Results to TestRail'
 			dir ("${env.WORKSPACE}/EMPLiveAutomationTesting/ProtractorTesting") {
-					sh "npm run publish:testrail'"
+					sh "npm run publish:testrail"
 			}
 			echo 'Generating Allure report...'
 			script {
