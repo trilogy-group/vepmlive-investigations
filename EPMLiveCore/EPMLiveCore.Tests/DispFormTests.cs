@@ -24,7 +24,6 @@ namespace EPMLiveCore.Tests
     [TestClass]
     public class DispFormTests
     {
-        //private const string One = "1";
         private const int Id = 1;
         private const string DummyString = "DummyString";
         private const string ExampleUrl = "http://example.com";
