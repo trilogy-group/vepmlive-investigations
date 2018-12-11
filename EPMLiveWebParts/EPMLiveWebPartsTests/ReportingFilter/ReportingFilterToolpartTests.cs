@@ -90,6 +90,8 @@ namespace EPMLiveWebParts.Tests.ReportingFilter
         public void TestCleanup()
         {
             _shimsContext?.Dispose();
+            _resultWriter?.Dispose();
+            _stringWriter?.Dispose();
         }
 
         [TestMethod]
