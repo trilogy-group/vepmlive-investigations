@@ -9,10 +9,12 @@ using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Fakes;
 using System.Linq;
+using System.Net.Mail.Fakes;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Fakes;
+using System.Web.UI.Fakes;
 using System.Xml;
 using System.Xml.Linq;
 using EPMLiveCore.API.Fakes;
@@ -62,6 +64,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
         private ShimSPContentType spContentType;
         private ShimSqlTransaction transaction;
         private ShimSqlDataReader dataReader;
+        private Dictionary<string, string> request;
         private Guid guid;
         private DateTime currentDate;
         private int validations;
@@ -78,6 +81,8 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
         private const string SampleUrl = "http://www.sampleurl.com";
         private const string CreatePeriodsMethodName = "CreatePeriods";
         private const string ApproveMethodName = "approve";
+        private const string AutoAddMethodName = "autoAdd";
+        private const string PageLoadMethodName = "Page_Load";
 
         [TestInitialize]
         public void Setup()
@@ -115,7 +120,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             ShimSPSite.AllInstances.Dispose = _ => { };
             ShimSPWeb.AllInstances.Dispose = _ => { };
             ShimCoreFunctions.getLockedWebSPWeb = _ => guid;
-            ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => DummyString;
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, __) => bool.FalseString;
             ShimCoreFunctions.getListSettingStringSPList = (_, __) => DummyString;
             ShimCoreFunctions.getConnectionStringGuid = _ => DummyString;
             ShimCoreFunctions.getLockConfigSettingSPWebStringBoolean = (_1, _2, _3) => DummyString;
@@ -134,23 +139,31 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             ShimDisabledItemEventScope.Constructor = _ => new ShimDisabledItemEventScope();
             ShimDisabledItemEventScope.AllInstances.Dispose = _ => { };
             ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => spUser;
+            ShimSPUserCollection.AllInstances.ItemGetString = (_, __) => spUser;
             ShimSPSiteDataQuery.Constructor = _ => new ShimSPSiteDataQuery();
-            //ShimSqlDb.AllInstances.TransactionGet = _ => transaction;
-            //ShimSqlDb.ReadIntValueObject = _ => DummyInt;
-            //ShimSqlDb.ReadDoubleValueObject = _ => DummyInt;
-            //ShimSqlDb.ReadIntValueObjectBooleanOut = (object input, out bool output) =>
-            //{
-            //    output = false;
-            //    return DummyInt;
-            //};
-            //ShimSqlDb.ReadStringValueObject = _ => DummyString;
-            //ShimSqlDb.ReadBoolValueObject = _ => true;
-            //ShimSqlDb.ReadDateValueObject = _ => currentDate;
-            //ShimSqlDb.AllInstances.HandleExceptionStringStatusEnumExceptionBoolean = (_, _1, _2, _3, _4) => StatusEnum.rsRequestInvalid;
-            //ShimActivation.AllInstances.checkActivationStringStringString = (_, _1, _2, _3) => { };
-            //ShimPFEEncrypt.DecryptStringString = (_, input) => input;
-            //ShimDatabase.AllInstances.OpenDatabaseStringString = (_, _1, _2) => new SqlConnection();
-            //ShimBaseSecurity.AllInstances.ChecksScurityStringSecurityLevels = (_, _1, _2) => true;
+            ShimPage.AllInstances.ResponseGet = _ => new ShimHttpResponse();
+            ShimPage.AllInstances.RequestGet = _ => new ShimHttpRequest();
+            ShimHttpRequest.AllInstances.ItemGetString = (_, key) =>
+            {
+                if (request.ContainsKey(key))
+                {
+                    return request[key];
+                }
+                return DummyString;
+            };
+            ShimSharedFunctions.canUserImpersonateStringStringSPWebStringOut =
+                (string curuser, string iuser, SPWeb web, out string resName) =>
+                {
+                    resName = DummyString;
+                    return true;
+                };
+            ShimHttpResponse.AllInstances.ExpiresSetInt32 = (_, __) => { };
+            ShimHttpResponse.AllInstances.CacheGet = _ => new ShimHttpCachePolicy();
+            ShimHttpCachePolicy.AllInstances.SetCacheabilityHttpCacheability = (_, __) => { };
+            ShimSPAdministrationWebApplication.LocalGet = () => new ShimSPAdministrationWebApplication();
+            ShimSPWebApplication.AllInstances.OutboundMailServiceInstanceGet = _ => new ShimSPOutboundMailServiceInstance();
+            ShimSPServiceInstance.AllInstances.ServerGet = _ => new ShimSPServer();
+            ShimSPPersistedObject.AllInstances.NameGet = _ => DummyString;
         }
 
         private void SetupVariables()
@@ -161,6 +174,14 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             publicInstance = BindingFlags.Instance | BindingFlags.Public;
             nonPublicInstance = BindingFlags.Instance | BindingFlags.NonPublic;
             guid = Guid.Parse(SampleGuidString1);
+            request = new Dictionary<string, string>()
+            {
+                ["period"] = DummyString,
+                ["action"] = DummyString,
+                ["duser"] = DummyString,
+                ["ts_uids"] = DummyString,
+                ["tsitemuids"] = DummyString
+            };
             currentDate = DateTime.Now;
             spWeb = new ShimSPWeb()
             {
@@ -174,6 +195,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
                 ServerRelativeUrlGet = () => SampleUrl,
                 AllUsersGet = () => new ShimSPUserCollection(),
                 SiteUsersGet = () => new ShimSPUserCollection(),
+                TitleGet = () => DummyString
             };
             spSite = new ShimSPSite()
             {
@@ -246,7 +268,8 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             {
                 IDGet = () => DummyInt,
                 IsSiteAdminGet = () => true,
-                UserTokenGet = () => new ShimSPUserToken()
+                UserTokenGet = () => new ShimSPUserToken(),
+                EmailGet = () => DummyString
             };
             spFolderCollection = new ShimSPFolderCollection()
             {
@@ -307,7 +330,11 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             dataReader = new ShimSqlDataReader()
             {
                 Read = () => false,
-                GetInt32Int32 = _ => One
+                GetInt32Int32 = _ => One,
+                GetDateTimeInt32 = _ => currentDate,
+                GetStringInt32 = _ => DummyString,
+                GetGuidInt32 = _ => guid,
+                Close = () => { }
             };
         }
 
@@ -432,6 +459,799 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             actual.ShouldSatisfyAllConditions(
                 () => actual.ShouldBe(expected),
                 () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void AutoAdd_WhenCalled_InsertsIntoDatabase()
+        {
+            // Arrange
+            var rollupLists = "1";
+            var readHit = 0;
+            var dataTable = new DataTable();
+            var row = default(DataRow);
+            var columns = new List<string>()
+            {
+                "WEBID",
+                "LISTID",
+                "ID",
+                "Title"
+            };
+
+            foreach (var column in columns)
+            {
+                dataTable.Columns.Add(column);
+            }
+
+            dataTable.Rows.Add(dataTable.NewRow());
+
+            dataTable.Rows[0]["WEBID"] = SampleGuidString1;
+            dataTable.Rows[0]["LISTID"] = SampleGuidString2;
+            dataTable.Rows[0]["ID"] = One;
+
+            dataReader.Read = () =>
+            {
+                readHit += 1;
+                return readHit <= One;
+            };
+            spWeb.GetSiteDataSPSiteDataQuery = _ => dataTable;
+
+            ShimSPFieldLookupValue.AllInstances.LookupValueGet = _ => null;
+            ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => DummyInt;
+            ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                readHit = 0;
+                if (instance.CommandText.Equals("SELECT * FROM TSITEM where WEB_UID=@web_uid and LIST_UID = @list_uid and item_id=@item_id and ts_uid=@ts_uid"))
+                {
+                    readHit = 111;
+                }
+                return dataReader;
+            };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            {
+                validations += 1;
+                return DummyInt;
+            };
+            ShimSharedFunctions.processResourcesSqlConnectionStringSPWebString = (_1, _2, _3, _4) =>
+            {
+                validations += 1;
+            };
+            ShimSharedFunctions.getProjectCenterListSPList = _ =>
+            {
+                validations += 1;
+                return spList;
+            };
+            ShimSharedFunctions.processMetaSPWebSPListSPListItemGuidStringSqlConnectionSPList =
+                (_1, _2, _3, _4, _5, _6, _7) =>
+                {
+                    validations += 1;
+                };
+
+            // Act
+            privateObject.Invoke(
+                AutoAddMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(SqlConnection),
+                    string.Empty,
+                    spWeb.Instance,
+                    rollupLists
+                });
+
+            // Assert
+            validations.ShouldBe(6);
+        }
+
+        [TestMethod]
+        public void PageLoad_ActionDeleteTS_DoesLoadEvents()
+        {
+            // Arrange
+            const string expectedOutput = "Success";
+            const string expectedQuery = "DELETE FROM TSTIMESHEET where ts_uid=@ts_uid";
+
+            request["action"] = "deleteTS";
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                if (instance.CommandText.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+                return DummyInt;
+            };
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(expectedOutput),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void PageLoad_ActionclosePeriod_DoesLoadEvents()
+        {
+            // Arrange
+            const string expectedQuery = "update tsperiod set locked=1 where period_id=@periodid and site_id=@siteid";
+
+            request["action"] = "closePeriod";
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                if (instance.CommandText.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+                return DummyInt;
+            };
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void PageLoad_ActionopenPeriod_DoesLoadEvents()
+        {
+            // Arrange
+            const string expectedQuery = "update tsperiod set locked=0 where period_id=@periodid and site_id=@siteid";
+
+            request["action"] = "openPeriod";
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                if (instance.CommandText.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+                return DummyInt;
+            };
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void PageLoad_ActiondeletePeriod_DoesLoadEvents()
+        {
+            // Arrange
+            const string expectedQuery = "delete from tsperiod where period_id=@periodid and site_id=@siteid";
+
+            request["action"] = "deletePeriod";
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                if (instance.CommandText.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+                return DummyInt;
+            };
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe("Success"),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void PageLoad_ActionaddPeriod_DoesLoadEvents()
+        {
+            // Arrange
+            const string expectedQuery = "insert into tsperiod (period_start,period_end,period_id,site_id) values (@periodstart,@periodend,@period_id,@siteid)";
+            const string expectedReaderQuery = "select top 1 period_id from tsperiod where site_id=@siteid order by period_id desc";
+
+            request["action"] = "addPeriod";
+
+            dataReader.Read = () => true;
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                if (instance.CommandText.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+                return DummyInt;
+            };
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                if (instance.CommandText.Equals(expectedReaderQuery))
+                {
+                    validations += 1;
+                }
+                return dataReader;
+            };
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe("Success"),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void PageLoad_ActionaddType_DoesLoadEvents()
+        {
+            // Arrange
+            const string expectedQuery = "insert into tstype (tstype_id,tstype_name,site_uid) values (@tstype_id,@tstype_name,@siteid)";
+            const string expectedReaderQuery = "select top 1 tstype_id from tstype where site_uid=@siteid order by tstype_id desc";
+
+            request["action"] = "addType";
+
+            dataReader.Read = () => true;
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                if (instance.CommandText.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+                return DummyInt;
+            };
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                if (instance.CommandText.Equals(expectedReaderQuery))
+                {
+                    validations += 1;
+                }
+                return dataReader;
+            };
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe("Success"),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void PageLoad_ActioneditType_DoesLoadEvents()
+        {
+            // Arrange
+            const string expectedQuery = "update tstype set tstype_name = @tstype_name where tstype_id=@tstype_id and site_uid=@siteid";
+
+            request["action"] = "editType";
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                if (instance.CommandText.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+                return DummyInt;
+            };
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe("Success"),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void PageLoad_ActionrejectTS_DoesLoadEvents()
+        {
+            // Arrange
+            const string expectedQuery = "update TSTIMESHEET set approval_status=2,approval_notes=@notes where ts_uid=@ts_uid";
+
+            request["action"] = "rejectTS";
+            request["ts_uids"] = "1|2";
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                if (instance.CommandText.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+                return DummyInt;
+            };
+            ShimSharedFunctions.processActualWorkSqlConnectionStringSPSiteBooleanBoolean =
+                (_1, _2, _3, _4, _5) => string.Empty;
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe("Success"),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void PageLoad_ActionunlockTS_DoesLoadEvents()
+        {
+            // Arrange
+            const string expectedQuery = "update TSTIMESHEET set approval_status=0 where ts_uid=@ts_uid";
+
+            request["action"] = "unlockTS";
+            request["ts_uids"] = "1|2";
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                if (instance.CommandText.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+                return DummyInt;
+            };
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe("Success"),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void PageLoad_ActionapprovePM_DoesLoadEvents()
+        {
+            // Arrange
+            const string expectedQuery = "update tsitem set approval_status=1 where ts_item_uid=@tsitemuid";
+
+            request["action"] = "approvePM";
+            request["tsitemuids"] = "1|2";
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                if (instance.CommandText.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+                return DummyInt;
+            };
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe("Success"),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void PageLoad_ActionrejectPM_DoesLoadEvents()
+        {
+            // Arrange
+            const string expectedQuery = "update tsitem set approval_status=2 where ts_item_uid=@tsitemuid";
+
+            request["action"] = "rejectPM";
+            request["tsitemuids"] = "1|2";
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                if (instance.CommandText.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+                return DummyInt;
+            };
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe("Success"),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void PageLoad_ActionsubmitTimeSettingTrue_DoesLoadEvents()
+        {
+            // Arrange
+            const string expectedQuery = "update TSTIMESHEET set submitted=1,approval_status=0,lastmodifiedbyu=@u,lastmodifiedbyn=@n where ts_uid=@ts_uid";
+            var columns = new List<string>()
+            {
+                "WEB_UID",
+                "LIST_UID",
+                "ITEM_ID",
+                "ts_item_uid",
+                "project"
+            };
+            var dataTable = new DataTable();
+            var row = default(DataRow);
+
+            foreach (var column in columns)
+            {
+                dataTable.Columns.Add(column);
+            }
+            for (var index = 0; index < 2; index++)
+            {
+                row = dataTable.NewRow();
+                row["WEB_UID"] = SampleGuidString2;
+                row["LIST_UID"] = SampleGuidString2;
+                row["ITEM_ID"] = One;
+                row["ts_item_uid"] = SampleGuidString2;
+                row["project"] = DummyString;
+                dataTable.Rows.Add(row);
+            }
+
+            request["action"] = "submitTime";
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                if (instance.CommandText.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+                return DummyInt;
+            };
+            ShimSharedFunctions.processResourcesSqlConnectionStringSPWebString = (_1, _2, _3, _4) =>
+            {
+                validations += 1;
+            };
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, __) =>
+            {
+                validations += 1;
+                return bool.TrueString;
+            };
+            Shimdotsaction.AllInstances.approveStringSPWebString = (_, _1, _2, _3) =>
+            {
+                validations += 1;
+            };
+            ShimDbDataAdapter.AllInstances.FillDataSet = (instance, dataSet) =>
+            {
+                dataSet.Tables.Add(dataTable);
+                return DummyInt;
+            };
+            ShimSharedFunctions.processMetaSPWebSPListSPListItemGuidStringSqlConnectionSPList =
+                (_1, _2, _3, _4, _5, _6, _7) =>
+                {
+                    validations += 1;
+                };
+            ShimSharedFunctions.getProjectCenterListSPList = _ =>
+            {
+                validations += 1;
+                return spList;
+            };
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe("Success"),
+                () => validations.ShouldBe(9));
+        }
+
+        [TestMethod]
+        public void PageLoad_ActionsubmitTimeSettingFalse_DoesLoadEvents()
+        {
+            // Arrange
+            const string expectedQuery = "update TSTIMESHEET set submitted=1,approval_status=0,lastmodifiedbyu=@u,lastmodifiedbyn=@n where ts_uid=@ts_uid";
+            var columns = new List<string>()
+            {
+                "WEB_UID",
+                "LIST_UID",
+                "ITEM_ID",
+                "ts_item_uid",
+                "project"
+            };
+            var dataTable = new DataTable();
+            var row = default(DataRow);
+
+            foreach (var column in columns)
+            {
+                dataTable.Columns.Add(column);
+            }
+            for (var index = 0; index < 2; index++)
+            {
+                row = dataTable.NewRow();
+                row["WEB_UID"] = SampleGuidString2;
+                row["LIST_UID"] = SampleGuidString2;
+                row["ITEM_ID"] = One;
+                row["ts_item_uid"] = SampleGuidString2;
+                row["project"] = DummyString;
+                dataTable.Rows.Add(row);
+            }
+
+            request["action"] = "submitTime";
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                if (instance.CommandText.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+                return DummyInt;
+            };
+            ShimSharedFunctions.processResourcesSqlConnectionStringSPWebString = (_1, _2, _3, _4) =>
+            {
+                validations += 1;
+            };
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, __) =>
+            {
+                validations += 1;
+                return bool.FalseString;
+            };
+            Shimdotsaction.AllInstances.approveStringSPWebString = (_, _1, _2, _3) =>
+            {
+                validations += 1;
+            };
+            ShimDbDataAdapter.AllInstances.FillDataSet = (instance, dataSet) =>
+            {
+                dataSet.Tables.Add(dataTable);
+                return DummyInt;
+            };
+            ShimSharedFunctions.processMetaSPWebSPListSPListItemGuidStringSqlConnectionSPList =
+                (_1, _2, _3, _4, _5, _6, _7) =>
+                {
+                    validations += 1;
+                };
+            ShimSharedFunctions.getProjectCenterListSPList = _ =>
+            {
+                validations += 1;
+                return spList;
+            };
+            ShimSharedFunctions.processActualWorkSqlConnectionStringSPSiteBooleanBoolean =
+                (_1, _2, _3, _4, _5) =>
+                {
+                    validations += 1;
+                    return DummyString;
+                };
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(DummyString),
+                () => validations.ShouldBe(9));
+        }
+
+        [TestMethod]
+        public void PageLoad_ActionunsubmitTime_DoesLoadEvents()
+        {
+            // Arrange
+            const string expectedQuery = "update TSTIMESHEET set submitted=0,approval_status=0,lastmodifiedbyu=@u,lastmodifiedbyn=@n where ts_uid=@ts_uid";
+            var methodHit = 0;
+
+            request["action"] = "unsubmitTime";
+
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                if (instance.CommandText.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+                return DummyInt;
+            };
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, __) =>
+            {
+                validations += 1;
+                methodHit += 1;
+                return methodHit.Equals(1) ? bool.FalseString : bool.TrueString;
+            };
+            ShimSharedFunctions.processActualWorkSqlConnectionStringSPSiteBooleanBoolean =
+                (_1, _2, _3, _4, _5) =>
+                {
+                    validations += 1;
+                    return string.Empty;
+                };
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe("Success"),
+                () => validations.ShouldBe(4));
+        }
+
+        [TestMethod]
+        public void PageLoad_Actionautoadd_DoesLoadEvents()
+        {
+            // Arrange
+            request["action"] = "autoadd";
+
+            Shimdotsaction.AllInstances.autoAddSqlConnectionStringSPWebString = (_, _1, _2, _3, _4) =>
+            {
+                validations += 1;
+            };
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe("Success"),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void PageLoad_ActionrejectEmail_DoesLoadEvents()
+        {
+            // Arrange
+            const string expectedQuery = "select username,approval_notes,period_start,period_end from vwTSApprovalNotes where ts_uid=@ts_uid";
+            var expectedSubject = $"{DummyString} Timesheet approval notice";
+            var expectedBody = $"Your timesheet for period ({currentDate.ToShortDateString()} - {currentDate.ToShortDateString()}) has been rejected:<br>{DummyString}";
+
+            request["action"] = "rejectEmail";
+            spUser.EmailGet = () => $"{DummyString}@{DummyString}.com";
+            dataReader.Read = () => true;
+
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                if (instance.CommandText.Equals(expectedQuery))
+                {
+                    validations += 1;
+                }
+                return dataReader;
+            };
+            ShimSmtpClient.AllInstances.SendMailMessage = (smtpClient, message) =>
+            {
+                if(smtpClient.Host.Equals(DummyString))
+                {
+                    validations += 1;
+                }
+                if(message.Subject.Equals(expectedSubject))
+                {
+                    validations += 1;
+                }
+                if (message.Body.Equals(expectedBody))
+                {
+                    validations += 1;
+                }
+            };
+
+            // Act
+            privateObject.Invoke(
+                PageLoadMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    default(object),
+                    EventArgs.Empty
+                });
+            var actual = (string)privateObject.GetFieldOrProperty("data", nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe("Success"),
+                () => validations.ShouldBe(4));
         }
     }
 }
