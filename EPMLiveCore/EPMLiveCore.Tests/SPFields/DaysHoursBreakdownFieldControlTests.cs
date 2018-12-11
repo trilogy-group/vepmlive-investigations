@@ -33,11 +33,6 @@ namespace EPMLiveCore.Tests.SPFields
         private const string One = "1";
         private const string WrongTimeValue = "10";
         private const string DummyString = "DummyString";
-        private const string Title = "Title";
-        private const string ListTitle = "List Title";
-        private const string FieldTitle = "Field Title";
-        private const string MethodRenderToolPart = "RenderToolPart";
-        private const string MethodOnPreRender = "OnPreRender";
         private const string MethodCreateChildControls = "CreateChildControls";
         private const string MethodFinishDateTextBoxTextChanged = "FinishDateTextBoxTextChanged";
         private const string MethodStartDateTextBoxTextChanged = "StartDateTextBoxTextChanged";
@@ -47,9 +42,6 @@ namespace EPMLiveCore.Tests.SPFields
         private DaysHoursBreakdownFieldControl _testObject;
         private PrivateObject _privateObject;
         private IDisposable _shimsContext;
-        private StringBuilder _resultBuilder;
-        private HtmlTextWriter _resultWriter;
-        private StringWriter _stringWriter;
         private bool _didRegisterScript;
         private DataControlFieldCollection _columns;
         private object _itemFieldValue;
@@ -97,18 +89,12 @@ namespace EPMLiveCore.Tests.SPFields
             _columns = new DataControlFieldCollection();
             ShimGridView.AllInstances.ColumnsGet = _ => _columns;
             ShimGridView.AllInstances.DataBind = _ => { };
-
-            _resultBuilder = new StringBuilder();
-            _stringWriter = new StringWriter(_resultBuilder);
-            _resultWriter = new HtmlTextWriter(_stringWriter);
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
             _shimsContext?.Dispose();
-            _resultWriter?.Dispose();
-            _stringWriter?.Dispose();
         }
 
         [TestMethod]
@@ -250,13 +236,11 @@ namespace EPMLiveCore.Tests.SPFields
             ShimSPContext.AllInstances.WebGet = _ => new ShimSPWeb();
             ShimSPContext.AllInstances.ListItemGet = _ => new ShimSPListItem();
 
-            ShimCoreFunctions.getLockedWebSPWeb = (web) => DefaultWebId;
+            ShimCoreFunctions.getLockedWebSPWeb = web => DefaultWebId;
             ShimCoreFunctions.iGetConfigSettingSPWebStringBooleanBoolean = (a, b, c, d) => string.Empty;
             ShimUtils.GetConfigWebSPWebGuid = (_, __) => new ShimSPWeb();
-            //ShimSPWebCollection.AllInstances.ItemGetGuid = (_, __) => new ShimSPWeb();
             var listCollection = new ShimSPListCollection();
             ShimSPWeb.AllInstances.ListsGet = _ => listCollection.Bind(new SPList[] { new ShimSPList() });
-            //ShimSPWeb.AllInstances.SiteGet = _ => new ShimSPSite();
             ShimSPWeb.AllInstances.CurrentUserGet = _ => new ShimSPUser();
             ShimSPWeb.AllInstances.RegionalSettingsGet = _ => new ShimSPRegionalSettings();
             ShimSPWeb.AllInstances.Close = _ => { };
@@ -266,14 +250,9 @@ namespace EPMLiveCore.Tests.SPFields
                 ShimSPSite.AllInstances.OpenWeb = x => new ShimSPWeb();
                 ShimSPSite.AllInstances.Close = x => { };
             };
-            //ShimSPSite.AllInstances.AllWebsGet = _ => new ShimSPWebCollection();
 
             ShimSPListCollection.AllInstances.GetListGuidBoolean = (a, b, c) => new ShimSPList();
             ShimSPListCollection.AllInstances.ItemGetString = (_, __) => new ShimSPList();
-            //ShimSPListCollection.AllInstances.ItemGetGuid = (_, __) => new ShimSPList();
-            //ShimSPList.AllInstances.IDGet = _ => DefaultListId;
-            //ShimSPList.AllInstances.TitleGet = _ => ListTitle;
-            //ShimSPList.AllInstances.GetItemsSPQuery = (_, __) => listItemCollection.Bind(new SPListItem[] { new ShimSPListItem() });
             var fieldCollection = new ShimSPFieldCollection();
             ShimSPList.AllInstances.FieldsGet = _ => fieldCollection.Bind(new SPField[] { new ShimSPField() });
             var listItemCollection = new ShimSPListItemCollection();
@@ -282,18 +261,10 @@ namespace EPMLiveCore.Tests.SPFields
             ShimSPListItem.AllInstances.TitleGet = _ => "LITitle";
             ShimSPListItem.AllInstances.ItemGetString = (_, key) => GetListItemValue(key);
 
-            //ShimSPFieldCollection.AllInstances.ItemGetString = (_, __) => new ShimSPField();
             ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPFieldLookup();
-            //ShimSPFieldCollection.AllInstances.ContainsFieldString = (_, __) => true;
-            //ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Text;
-            //ShimSPField.AllInstances.TitleGet = _ => FieldTitle;
-            //ShimSPField.AllInstances.InternalNameGet = _ => Title;
-            //ShimSPField.AllInstances.ReorderableGet = _ => true;
             ShimSPField.AllInstances.GetCustomPropertyString = (_, key) => key;
 
-            //ShimSPFieldMultiChoice.AllInstances.ChoicesGet = _ => new StringCollection { DummyString };
             ShimSPFieldLookup.AllInstances.LookupListGet = _ => DefaultListId.ToString();
-            //ShimSPFieldLookup.AllInstances.LookupWebIdGet = _ => DefaultWebId;
 
             ShimSPFieldUserValue.ConstructorSPWebString = (a, b, c) => { };
             ShimSPFieldUserValue.AllInstances.UserGet = _ => new ShimSPUser();
