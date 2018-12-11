@@ -7,7 +7,7 @@ using Shouldly;
 
 namespace EPMLiveCore.Tests.Web_References.SalesforceMetadataService
 {
-    /// <summary>
+    /// <summary> 
     /// Unit Tests for <see cref="EPMLiveCore.SalesforceMetadataService.DashboardComponent"/>
     /// </summary>
     [TestClass, ExcludeFromCodeCoverage]
