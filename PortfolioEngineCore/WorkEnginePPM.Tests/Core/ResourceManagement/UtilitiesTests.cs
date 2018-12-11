@@ -30,7 +30,7 @@ using Shouldly;
 using WorkEnginePPM.Core.ResourceManagement;
 using WorkEnginePPM.Fakes;
 
-namespace WorkEnginePPM.Tests.Core.ResourceManagement
+namespace WorkEnginePPM.Tests
 {
     [TestClass]
     [ExcludeFromCodeCoverage]
