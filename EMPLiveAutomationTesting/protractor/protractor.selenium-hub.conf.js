@@ -14,5 +14,4 @@ exports.config = {
     onPrepare() {
         reportersSetup.configureAllReporters();
     },
-    onComplete: reportersSetup.testRailSetupOnComplete
 };
