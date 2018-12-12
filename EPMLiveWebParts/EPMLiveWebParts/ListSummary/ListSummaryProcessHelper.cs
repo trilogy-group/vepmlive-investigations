@@ -16,16 +16,14 @@ namespace EPMLiveWebParts
 {
     internal class ListSummaryProcessHelper
     {
-        private const int MAX_LOOKUPFILTER = 300;
+        private const int MaxLookupFilter = 300;
 
         internal static string GetReportFilters(ArrayList reportFilterIds)
         {
             var stringBuilder = new StringBuilder();
             foreach (string str in reportFilterIds)
             {
-                stringBuilder.Append("<Value Type=\"Text\">");
-                stringBuilder.Append(HttpUtility.HtmlEncode(str));
-                stringBuilder.Append("</Value>");
+                stringBuilder.Append("<Value Type=\"Text\">").Append(HttpUtility.HtmlEncode(str)).Append("</Value>");
             }
 
             return stringBuilder.ToString();
@@ -38,7 +36,7 @@ namespace EPMLiveWebParts
             ref ArrayList reportFilterIds,
             ref string reportFilterField)
         {
-            var ret = string.Empty;
+            var returnValue = string.Empty;
             if (provider != null)
             {
                 var listId = Guid.Empty;
@@ -68,7 +66,6 @@ namespace EPMLiveWebParts
                                             localReportFilterIds = new ArrayList(dataReader.GetString(0).Split('|')[0].Split(','));
                                             listId = dataReader.GetGuid(1);
                                         }
-                                        dataReader.Close();
                                     }
                                 }
                             }
@@ -85,9 +82,9 @@ namespace EPMLiveWebParts
                 {
                     reportFilterField = "Title";
 
-                    if (reportFilterIds.Count < MAX_LOOKUPFILTER)
+                    if (reportFilterIds.Count < MaxLookupFilter)
                     {
-                        ret = "<In><FieldRef Name=\"Title\"/><Values>" + GetReportFilters(reportFilterIds) + "</Values></In>";
+                        returnValue = "<In><FieldRef Name=\"Title\"/><Values>" + GetReportFilters(reportFilterIds) + "</Values></In>";
                     }
                 }
                 else if (listId != Guid.Empty)
@@ -112,9 +109,9 @@ namespace EPMLiveWebParts
                         }
                     }
 
-                    if (reportFilterIds.Count < MAX_LOOKUPFILTER && reportFilterField != "")
+                    if (reportFilterIds.Count < MaxLookupFilter && reportFilterField != string.Empty)
                     {
-                        ret = string.Format(
+                        returnValue = string.Format(
                             "<In><FieldRef Name=\"{0}\"/><Values>{1}</Values></In>",
                             reportFilterField,
                             GetReportFilters(reportFilterIds));
@@ -122,7 +119,7 @@ namespace EPMLiveWebParts
                 }
             }
 
-            return ret;
+            return returnValue;
         }
 
         internal static void ProcessWeb(
@@ -355,7 +352,7 @@ namespace EPMLiveWebParts
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 var canCount = true;
-                if (reportFilterIds.Count >= MAX_LOOKUPFILTER)
+                if (reportFilterIds.Count >= MaxLookupFilter)
                 {
                     if (!reportFilterIds.Contains(dataRow[reportFilterField]))
                     {
@@ -365,13 +362,14 @@ namespace EPMLiveWebParts
 
                 if (canCount)
                 {
-                    if (statusList.ContainsKey(dataRow[status].ToString()))
+                    var statusValue = dataRow[status].ToString();
+                    if (statusList.ContainsKey(statusValue))
                     {
-                        statusList[dataRow[status].ToString()] = statusList[dataRow[status].ToString()] + 1;
+                        statusList[statusValue] = statusList[statusValue] + 1;
                     }
                     else
                     {
-                        statusList.Add(dataRow[status].ToString(), 1);
+                        statusList.Add(statusValue, 1);
                     }
 
                     totalItems++;

@@ -1,6 +1,4 @@
-﻿using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebPartPages;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,6 +9,8 @@ using System.Web.UI;
 using System.Web.UI.WebControls.WebParts;
 using System.Xml;
 using System.Xml.Serialization;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.WebPartPages;
 
 namespace EPMLiveWebParts
 {
@@ -234,6 +234,11 @@ namespace EPMLiveWebParts
             }
 
             output.Write(sErrors);
+        }
+
+        private string GetReportFilters()
+        {
+            return ListSummaryProcessHelper.GetReportFilters(reportFilterIDs);
         }
 
         private void getData()
