@@ -465,10 +465,8 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
         public void AutoAdd_WhenCalled_InsertsIntoDatabase()
         {
             // Arrange
-            var rollupLists = "1";
             var readHit = 0;
             var dataTable = new DataTable();
-            var row = default(DataRow);
             var columns = new List<string>()
             {
                 "WEBID",
@@ -536,7 +534,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
                     default(SqlConnection),
                     string.Empty,
                     spWeb.Instance,
-                    rollupLists
+                    One.ToString()
                 });
 
             // Assert
@@ -1223,11 +1221,11 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             };
             ShimSmtpClient.AllInstances.SendMailMessage = (smtpClient, message) =>
             {
-                if(smtpClient.Host.Equals(DummyString))
+                if (smtpClient.Host.Equals(DummyString))
                 {
                     validations += 1;
                 }
-                if(message.Subject.Equals(expectedSubject))
+                if (message.Subject.Equals(expectedSubject))
                 {
                     validations += 1;
                 }
