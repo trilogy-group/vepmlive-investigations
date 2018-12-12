@@ -116,5 +116,59 @@ namespace WorkEnginePPM.Layouts.ppm
                 throw new ArgumentNullException(argumentName);
             }
         }
+
+        internal delegate StatusEnum SelectCustomFieldDelegate(DBAccess dataAccess, int fieldId, out DataTable dataTable);
+
+        internal static string ReadCustomFieldInfo(DBAccess dataAccess, int fieldId, SelectCustomFieldDelegate selectCustomFieldFunc)
+        {
+            var customField = new CStruct();
+            customField.Initialize("customfield");
+            DataTable dataTable;
+            selectCustomFieldFunc.Invoke(dataAccess, fieldId, out dataTable);
+            var lookUpUId = 0;
+            const string FaFieldId = "FA_FIELD_ID";
+            const string FaName = "FA_NAME";
+
+            const string FaLookupUId = "FA_LOOKUP_UID";
+            const string FaLookupOnly = "FA_LOOKUPONLY";
+            const string FaLeafOnly = "FA_LEAFONLY";
+            const string FaUsefulName = "FA_USEFULLNAME";
+
+            if (dataTable.Rows.Count == 1)
+            {
+                var row = dataTable.Rows[0];
+                customField.CreateInt(FaFieldId, SqlDb.ReadIntValue(row[FaFieldId]));
+                customField.CreateString(FaName, SqlDb.ReadStringValue(row[FaName], string.Empty));
+                lookUpUId = SqlDb.ReadIntValue(row[FaLookupUId]);
+                customField.CreateInt(FaLookupUId, lookUpUId);
+                customField.CreateInt(FaLookupOnly, SqlDb.ReadIntValue(row[FaLookupOnly]));
+                customField.CreateInt(FaLeafOnly, SqlDb.ReadIntValue(row[FaLeafOnly]));
+                customField.CreateInt(FaUsefulName, SqlDb.ReadIntValue(row[FaUsefulName]));
+            }
+            else
+            {
+                customField.CreateInt(FaFieldId, fieldId);
+                customField.CreateString(FaName, string.Empty);
+                customField.CreateInt(FaLookupUId, 0);
+                customField.CreateInt(FaLookupOnly, 0);
+                customField.CreateInt(FaLeafOnly, 0);
+                customField.CreateInt(FaUsefulName, 0);
+            }
+            dbaGeneral.SelectLookup(dataAccess, lookUpUId, out dataTable);
+
+            var tGrid = new _TGrid();
+            InitializeColumns(tGrid);
+            tGrid.SetDataTable(dataTable);
+            string tGridData;
+            tGrid.Build(out tGridData);
+            customField.CreateString("tgridData", tGridData);
+
+            dbaGeneral.SelectLookups(dataAccess, out dataTable);
+
+            dataAccess.Close();
+
+            var reply = customField.XML();
+            return reply;
+        }
     }
 }
