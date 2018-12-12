@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Generic.Fakes;
 using System.ComponentModel.Fakes;
 using System.Data;
 using System.Data.Common.Fakes;
@@ -10,12 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO.Fakes;
 using System.Linq;
 using System.Reflection;
-using System.Resources.Fakes;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Fakes;
-using System.Xml;
-using System.Xml.Linq;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
@@ -28,7 +23,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortfolioEngineCore;
 using PortfolioEngineCore.Fakes;
 using Shouldly;
-using WorkEnginePPM.Core.ResourceManagement;
 using WorkEnginePPM.Fakes;
 using currentNamespace = WorkEnginePPM.Core.ResourceManagement;
 using currentNamespaceFake = WorkEnginePPM.Core.ResourceManagement.Fakes;
@@ -43,8 +37,6 @@ namespace WorkEnginePPM.Tests
         private IDisposable shimsContext;
         private BindingFlags publicStatic;
         private BindingFlags nonPublicStatic;
-        private BindingFlags publicInstance;
-        private BindingFlags nonPublicInstance;
         private ShimSPWeb spWeb;
         private ShimSPSite spSite;
         private ShimSPListCollection spListCollection;
@@ -90,6 +82,7 @@ namespace WorkEnginePPM.Tests
         private const string GetUserNameMethodName = "GetUserName";
         private const string GetValidDateInFormatMethodName = "GetValidDateInFormat";
         private const string CheckPFEResourceCenterPermissionMethodName = "CheckPFEResourceCenterPermission";
+        private const string GetCleanFieldValueMethodName = "GetCleanFieldValue";
 
         [TestInitialize]
         public void Setup()
@@ -148,6 +141,7 @@ namespace WorkEnginePPM.Tests
             ShimDisabledItemEventScope.AllInstances.Dispose = _ => { };
             ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => spUser;
             ShimSPSiteDataQuery.Constructor = _ => new ShimSPSiteDataQuery();
+            ShimSPFieldUserValueCollection.ConstructorSPWebString = (_, _1, input) => new ShimSPFieldUserValueCollection();
             ShimSPFieldUserValue.Constructor = _ => new ShimSPFieldUserValue();
             ShimSPFieldUserValue.ConstructorSPWebString = (_, _1, _2) => new ShimSPFieldUserValue();
             ShimSPWebApplication.AllInstances.FeaturesGet = _ => new ShimSPFeatureCollection()
@@ -161,8 +155,6 @@ namespace WorkEnginePPM.Tests
             validations = 0;
             publicStatic = BindingFlags.Static | BindingFlags.Public;
             nonPublicStatic = BindingFlags.Static | BindingFlags.NonPublic;
-            publicInstance = BindingFlags.Instance | BindingFlags.Public;
-            nonPublicInstance = BindingFlags.Instance | BindingFlags.NonPublic;
             guid = Guid.Parse(SampleGuidString1);
             currentDate = DateTime.Now;
             spWeb = new ShimSPWeb()
@@ -993,6 +985,407 @@ namespace WorkEnginePPM.Tests
                 () => actual.ShouldBeTrue(),
                 () => ((bool)parameters[3]).ShouldBeTrue(),
                 () => validations.ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void GetCleanFieldValue_SPFieldTypeDateTime_ReturnsCleanFieldValue()
+        {
+            // Arrange
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.TypeAsStringGet = () => DummyString;
+
+            ShimSPUtility.CreateISO8601DateTimeFromSystemDateTimeDateTime = input =>
+            {
+                validations += 1;
+                return input.ToString();
+            };
+
+            // Act
+            var actual = (string)privateObject.InvokeStatic(
+                GetCleanFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spWeb.Instance,
+                    currentDate,
+                    spField.Instance,
+                    true
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(currentDate.ToString()),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetCleanFieldValue_SPFieldTypeUserRawValueString_ReturnsCleanFieldValue()
+        {
+            // Arrange
+            var user = new ShimSPFieldUser();
+            var customEnumerator = new List<SPFieldUserValue>()
+            {
+                new ShimSPFieldUserValue().Instance,
+                new ShimSPFieldUserValue().Instance
+            }.GetEnumerator();
+
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.User;
+            ShimSPField.AllInstances.TypeAsStringGet = _ => DummyString;
+            ShimSPFieldLookup.AllInstances.AllowMultipleValuesGet = _ => true;
+            ShimList<SPFieldUserValue>.AllInstances.GetEnumerator = _ => customEnumerator;
+            currentNamespaceFake.ShimUtilities.GetUserNameSPWebSPFieldUserValue = (_, _1) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            var actual = (string)privateObject.InvokeStatic(
+                GetCleanFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spWeb.Instance,
+                    DummyString,
+                    user.Instance,
+                    true
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe($"{DummyString},{DummyString}"),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetCleanFieldValue_SPFieldTypeUserRawValueNotString_ReturnsCleanFieldValue()
+        {
+            // Arrange
+            var user = new ShimSPFieldUser();
+            var customEnumerator = new List<SPFieldUserValue>()
+            {
+                new ShimSPFieldUserValue().Instance,
+                new ShimSPFieldUserValue().Instance
+            }.GetEnumerator();
+
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.User;
+            ShimSPField.AllInstances.TypeAsStringGet = _ => DummyString;
+            ShimSPFieldLookup.AllInstances.AllowMultipleValuesGet = _ => true;
+            ShimList<SPFieldUserValue>.AllInstances.GetEnumerator = _ => customEnumerator;
+            currentNamespaceFake.ShimUtilities.GetUserNameSPWebSPFieldUserValue = (_, _1) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            var actual = (string)privateObject.InvokeStatic(
+                GetCleanFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spWeb.Instance,
+                    new SPFieldUserValueCollection(),
+                    user.Instance,
+                    true
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe($"{DummyString},{DummyString}"),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetCleanFieldValue_SPFieldTypeUserAllowMultipleValuesFalse_ReturnsCleanFieldValue()
+        {
+            // Arrange
+            var user = new ShimSPFieldUser();
+            var customEnumerator = new List<SPFieldUserValue>()
+            {
+                new ShimSPFieldUserValue().Instance,
+                new ShimSPFieldUserValue().Instance
+            }.GetEnumerator();
+
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.User;
+            ShimSPField.AllInstances.TypeAsStringGet = _ => DummyString;
+            ShimSPFieldLookup.AllInstances.AllowMultipleValuesGet = _ => false;
+            ShimList<SPFieldUserValue>.AllInstances.GetEnumerator = _ => customEnumerator;
+            currentNamespaceFake.ShimUtilities.GetUserNameSPWebSPFieldUserValue = (_, _1) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            var actual = (string)privateObject.InvokeStatic(
+                GetCleanFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spWeb.Instance,
+                    DummyString,
+                    user.Instance,
+                    true
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetCleanFieldValue_SPFieldTypeLookup_ReturnsCleanFieldValue()
+        {
+            // Arrange
+            var field = new ShimSPFieldLookup()
+            {
+                LookupListGet = () => SampleGuidString1
+            };
+            var lookupValueCollection = new ShimSPFieldLookupValueCollection();
+            var customEnumerator = new List<SPFieldLookupValue>()
+            {
+                new ShimSPFieldLookupValue()
+                {
+                    LookupIdGet = () => One
+                }.Instance
+            }.GetEnumerator();
+
+            spListItem.ItemGetString = _ => One;
+
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Lookup;
+            ShimSPField.AllInstances.TypeAsStringGet = _ => DummyString;
+            ShimSPFieldLookup.AllInstances.AllowMultipleValuesGet = _ => true;
+            ShimSPFieldLookup.AllInstances.GetFieldValueString = (_, __) =>
+            {
+                validations += 1;
+                return lookupValueCollection.Instance;
+            };
+            ShimList<SPFieldLookupValue>.AllInstances.GetEnumerator = _ => customEnumerator;
+            ShimSPListItemCollection.AllInstances.GetEnumerator = _ => new List<SPListItem>()
+            {
+                spListItem.Instance,
+                spListItem.Instance,
+                spListItem.Instance
+            }.GetEnumerator();
+
+            // Act
+            var actual = (string)privateObject.InvokeStatic(
+                GetCleanFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spWeb.Instance,
+                    DummyString,
+                    field.Instance,
+                    true
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe("1,1,1"),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetCleanFieldValue_SPFieldTypeLookupReturnIdFalse_ReturnsCleanFieldValue()
+        {
+            // Arrange
+            var field = new ShimSPFieldLookup()
+            {
+                LookupListGet = () => SampleGuidString1
+            };
+            var lookupValueCollection = new ShimSPFieldLookupValueCollection();
+            var lookupValue = new ShimSPFieldLookupValue()
+            {
+                LookupIdGet = () => One
+            };
+            var customEnumerator = new List<SPFieldLookupValue>()
+            {
+                lookupValue.Instance
+            }.GetEnumerator();
+
+            spListItem.ItemGetString = _ => One;
+
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Lookup;
+            ShimSPField.AllInstances.TypeAsStringGet = _ => DummyString;
+            ShimSPFieldLookup.AllInstances.AllowMultipleValuesGet = _ => true;
+            ShimSPFieldLookup.AllInstances.GetFieldValueString = (_, __) =>
+            {
+                validations += 1;
+                return lookupValueCollection.Instance;
+            };
+            ShimList<SPFieldLookupValue>.AllInstances.GetEnumerator = _ => customEnumerator;
+            ShimSPListItemCollection.AllInstances.GetEnumerator = _ => new List<SPListItem>()
+            {
+                spListItem.Instance,
+                spListItem.Instance,
+                spListItem.Instance
+            }.GetEnumerator();
+
+            // Act
+            var actual = (string)privateObject.InvokeStatic(
+                GetCleanFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spWeb.Instance,
+                    DummyString,
+                    field.Instance,
+                    false
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe("1,1,1"),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetCleanFieldValue_SPFieldTypeLookupAllowMultipleValuesFalseReturnIdFalse_ReturnsCleanFieldValue()
+        {
+            // Arrange
+            var field = new ShimSPFieldLookup()
+            {
+                LookupListGet = () => SampleGuidString1
+            };
+            var lookupValue = new ShimSPFieldLookupValue()
+            {
+                LookupIdGet = () => One
+            };
+
+            spListItem.ItemGetString = _ => One;
+
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Lookup;
+            ShimSPField.AllInstances.TypeAsStringGet = _ => DummyString;
+            ShimSPFieldLookup.AllInstances.AllowMultipleValuesGet = _ => false;
+            ShimSPFieldLookup.AllInstances.GetFieldValueString = (_, __) =>
+            {
+                validations += 1;
+                return lookupValue.Instance;
+            };
+            ShimSPListItemCollection.AllInstances.GetEnumerator = _ => new List<SPListItem>()
+            {
+                spListItem.Instance,
+                spListItem.Instance,
+                spListItem.Instance
+            }.GetEnumerator();
+
+            // Act
+            var actual = (string)privateObject.InvokeStatic(
+                GetCleanFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spWeb.Instance,
+                    DummyString,
+                    field.Instance,
+                    false
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(One.ToString()),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetCleanFieldValue_SPFieldTypeLookupAllowMultipleValuesFalseContainsFieldTrue_ReturnsCleanFieldValue()
+        {
+            // Arrange
+            var field = new ShimSPFieldLookup()
+            {
+                LookupListGet = () => SampleGuidString1
+            };
+            var lookupValue = new ShimSPFieldLookupValue()
+            {
+                LookupIdGet = () => One
+            };
+
+            spListItem.ItemGetString = _ => One;
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Lookup;
+            ShimSPField.AllInstances.TypeAsStringGet = _ => DummyString;
+            ShimSPFieldLookup.AllInstances.AllowMultipleValuesGet = _ => false;
+            ShimSPFieldLookup.AllInstances.GetFieldValueString = (_, __) =>
+            {
+                validations += 1;
+                return lookupValue.Instance;
+            };
+            ShimSPListItemCollection.AllInstances.GetEnumerator = _ => new List<SPListItem>()
+            {
+                spListItem.Instance,
+                spListItem.Instance,
+                spListItem.Instance
+            }.GetEnumerator();
+
+            // Act
+            var actual = (string)privateObject.InvokeStatic(
+                GetCleanFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spWeb.Instance,
+                    DummyString,
+                    field.Instance,
+                    false
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(One.ToString()),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetCleanFieldValue_SPFieldTypeLookupAllowMultipleValuesFalseContainsFieldFalse_ReturnsCleanFieldValue()
+        {
+            // Arrange
+            var field = new ShimSPFieldLookup()
+            {
+                LookupListGet = () => SampleGuidString1
+            };
+            var lookupValue = new ShimSPFieldLookupValue()
+            {
+                LookupIdGet = () => One
+            };
+
+            spListItem.ItemGetString = _ => One;
+            spFieldCollection.ContainsFieldString = _ => false;
+
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Lookup;
+            ShimSPField.AllInstances.TypeAsStringGet = _ => DummyString;
+            ShimSPFieldLookup.AllInstances.AllowMultipleValuesGet = _ => false;
+            ShimSPFieldLookup.AllInstances.GetFieldValueString = (_, __) =>
+            {
+                validations += 1;
+                return lookupValue.Instance;
+            };
+            ShimSPListItemCollection.AllInstances.GetEnumerator = _ => new List<SPListItem>()
+            {
+                spListItem.Instance,
+                spListItem.Instance,
+                spListItem.Instance
+            }.GetEnumerator();
+
+            // Act
+            var actual = (string)privateObject.InvokeStatic(
+                GetCleanFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spWeb.Instance,
+                    DummyString,
+                    field.Instance,
+                    false
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(One.ToString()),
+                () => validations.ShouldBe(1));
         }
     }
 }
