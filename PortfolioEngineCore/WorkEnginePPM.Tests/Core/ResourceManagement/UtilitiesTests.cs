@@ -29,6 +29,7 @@ using PortfolioEngineCore.Fakes;
 using Shouldly;
 using WorkEnginePPM.Core.ResourceManagement;
 using WorkEnginePPM.Fakes;
+using currentNamespaceFake = WorkEnginePPM.Core.ResourceManagement.Fakes;
 
 namespace WorkEnginePPM.Tests
 {
@@ -79,6 +80,7 @@ namespace WorkEnginePPM.Tests
         private const string IDStringCaps = "ID";
         private const string SampleUrl = "http://www.sampleurl.com";
         private const string AddUpdateResourceMethodName = "AddUpdateResource";
+        private const string BuildFieldsTableMethodName = "BuildFieldsTable";
 
         [TestInitialize]
         public void Setup()
@@ -109,6 +111,7 @@ namespace WorkEnginePPM.Tests
             ShimSPSite.ConstructorString = (_, __) => new ShimSPSite();
             ShimSPSite.ConstructorGuid = (_, __) => new ShimSPSite();
             ShimSPSite.ConstructorGuidSPUserToken = (_, _1, _2) => new ShimSPSite();
+            ShimSPSite.AllInstances.WebApplicationGet = _ => new ShimSPWebApplication();
             ShimSPSite.AllInstances.OpenWeb = _ => spWeb;
             ShimSPSite.AllInstances.OpenWebString = (_, __) => spWeb;
             ShimSPSite.AllInstances.OpenWebGuid = (_, __) => spWeb;
@@ -136,6 +139,12 @@ namespace WorkEnginePPM.Tests
             ShimDisabledItemEventScope.AllInstances.Dispose = _ => { };
             ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => spUser;
             ShimSPSiteDataQuery.Constructor = _ => new ShimSPSiteDataQuery();
+            ShimSPFieldUserValue.Constructor = _ => new ShimSPFieldUserValue();
+            ShimSPFieldUserValue.ConstructorSPWebString = (_, _1, _2) => new ShimSPFieldUserValue();
+            ShimSPWebApplication.AllInstances.FeaturesGet = _ => new ShimSPFeatureCollection()
+            {
+                ItemGetGuid = __ => new ShimSPFeature()
+            };
         }
 
         private void SetupVariables()
@@ -361,13 +370,217 @@ namespace WorkEnginePPM.Tests
             var actual = (int)privateObject.InvokeStatic(
                 AddUpdateResourceMethodName,
                 publicStatic,
-                parameters
-                );
+                parameters);
 
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual.ShouldBe(Five),
                 () => validations.ShouldBe(0));
+        }
+
+        [TestMethod]
+        public void BuildFieldsTable_IsNewResourceFalse_ReturnsFieldsTable()
+        {
+            // Arrange
+            var values = new Dictionary<string, string>()
+            {
+                ["ID"] = "ID",
+                ["EXTID"] = "EXTID",
+                ["Permissions"] = "1,2",
+                ["Generic"] = "Generic",
+                ["CanLogin"] = "CanLogin",
+                ["Email"] = "Email"
+            };
+            var properties = new ShimSPItemEventProperties()
+            {
+                AfterPropertiesGet = () => new ShimSPItemEventDataCollection()
+                {
+                    ItemGetString = key =>
+                    {
+                        if (values.ContainsKey(key))
+                        {
+                            return values[key];
+                        }
+                        return null;
+                    }
+                },
+                WebGet = () => spWeb,
+                ListGet = () => spList,
+                ListItemGet = () => spListItem
+            };
+            var resourceFields = $"111,CanLogin";
+
+            spListItem.ItemGetString = key =>
+            {
+                if (values.ContainsKey(key))
+                {
+                    return values[key];
+                }
+                return null;
+            };
+
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPField>()
+            {
+                new ShimSPField()
+                {
+                    InternalNameGet = () => "ID"
+                },
+                new ShimSPField()
+                {
+                    InternalNameGet = () => "Permissions"
+                },
+                new ShimSPField()
+                {
+                    InternalNameGet = () => "Generic"
+                },
+                new ShimSPField()
+                {
+                    InternalNameGet = () => "SharePointAccount"
+                }
+            }.GetEnumerator();
+            ShimAPITeam.GetWebGroupsSPWeb = _ => new List<SPGroup>()
+            {
+                new ShimSPGroup()
+                {
+                    IDGet = () => 1,
+                    NameGet = () => "1"
+                },
+                new ShimSPGroup()
+                {
+                    IDGet = () => 2,
+                    NameGet = () => DummyString
+                },
+                new ShimSPGroup()
+                {
+                    IDGet = () => 3,
+                    NameGet = () => "3"
+                }
+            };
+            ShimSPGroup.AllInstances.UsersGet = _ => new ShimSPUserCollection();
+            ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => spUser;
+            ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => DummyInt;
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, input) => resourceFields;
+            currentNamespaceFake.ShimUtilities.AreEqualObjectsObjectObjectSPFieldSPWeb = (_1, _2, _3, _4) => false;
+            ShimSPField.AllInstances.ToString01 = instance => instance.InternalName;
+
+            // Act
+            var actual = (DataTable)privateObject.InvokeStatic(
+                BuildFieldsTableMethodName,
+                publicStatic,
+                new object[]
+                {
+                    properties.Instance,
+                    false
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldNotBeNull(),
+                () => actual.Select("Id=3200")[0]["Value"].ToString().ShouldBe($"1:{true},{DummyString}:{true},3:{true}"),
+                () => actual.Select("Id=3011")[0]["Value"].ToString().ShouldBe("Email"));
+        }
+
+        [TestMethod]
+        public void BuildFieldsTable_IsNewResourceTrue_ReturnsFieldsTable()
+        {
+            // Arrange
+            var values = new Dictionary<string, string>()
+            {
+                ["ID"] = "ID",
+                ["EXTID"] = "EXTID",
+                ["Permissions"] = "1,2",
+                ["Generic"] = "Generic",
+                ["CanLogin"] = "CanLogin",
+                ["Email"] = "Email"
+            };
+            var properties = new ShimSPItemEventProperties()
+            {
+                AfterPropertiesGet = () => new ShimSPItemEventDataCollection()
+                {
+                    ItemGetString = key =>
+                    {
+                        if (values.ContainsKey(key))
+                        {
+                            return values[key];
+                        }
+                        return null;
+                    }
+                },
+                WebGet = () => spWeb,
+                ListGet = () => spList,
+                ListItemGet = () => spListItem
+            };
+            var resourceFields = $"111,CanLogin";
+
+            spListItem.ItemGetString = key =>
+            {
+                if (values.ContainsKey(key))
+                {
+                    return values[key];
+                }
+                return null;
+            };
+
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPField>()
+            {
+                new ShimSPField()
+                {
+                    InternalNameGet = () => "ID"
+                },
+                new ShimSPField()
+                {
+                    InternalNameGet = () => "Permissions"
+                },
+                new ShimSPField()
+                {
+                    InternalNameGet = () => "Generic"
+                },
+                new ShimSPField()
+                {
+                    InternalNameGet = () => "SharePointAccount"
+                }
+            }.GetEnumerator();
+            ShimAPITeam.GetWebGroupsSPWeb = _ => new List<SPGroup>()
+            {
+                new ShimSPGroup()
+                {
+                    IDGet = () => 1,
+                    NameGet = () => "1"
+                },
+                new ShimSPGroup()
+                {
+                    IDGet = () => 2,
+                    NameGet = () => DummyString
+                },
+                new ShimSPGroup()
+                {
+                    IDGet = () => 3,
+                    NameGet = () => "3"
+                }
+            };
+            ShimSPGroup.AllInstances.UsersGet = _ => new ShimSPUserCollection();
+            ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => spUser;
+            ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => DummyInt;
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, input) => resourceFields;
+            currentNamespaceFake.ShimUtilities.AreEqualObjectsObjectObjectSPFieldSPWeb = (_1, _2, _3, _4) => false;
+            ShimSPField.AllInstances.ToString01 = instance => instance.InternalName;
+
+            // Act
+            var actual = (DataTable)privateObject.InvokeStatic(
+                BuildFieldsTableMethodName,
+                publicStatic,
+                new object[]
+                {
+                    properties.Instance,
+                    true
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldNotBeNull(),
+                () => actual.Select("Id=3200")[0]["Value"].ToString().ShouldBe($"1:{true},{DummyString}:{true},3:{true}"),
+                () => actual.Select("Id=3006")[0]["Value"].ToString().ShouldBe(bool.FalseString),
+                () => actual.Select("Id=111")[0]["Value"].ToString().ShouldBe(bool.FalseString));
         }
     }
 }
