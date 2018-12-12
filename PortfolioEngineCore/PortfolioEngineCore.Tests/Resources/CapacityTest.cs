@@ -80,7 +80,7 @@ namespace PortfolioEngineCore.Tests.Resources
         public void GetRVInfo_ParametersGiven_CheckBehaviour()
         {
             // Arrange
-            string sParmXML = $@"<dummy>
+            var sParmXML = $@"<dummy>
                                     <CalID>-1</CalID>
                                     <StartPeriodID>1</StartPeriodID>
                                     <FinishPeriodID>10</FinishPeriodID>
