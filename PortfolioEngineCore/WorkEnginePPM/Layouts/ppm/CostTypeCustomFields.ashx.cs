@@ -94,54 +94,9 @@ namespace WorkEnginePPM
 
         private static string ReadCustomFieldInfo(DBAccess dba, int nFieldId)
         {
-            string sReply = "";
-            CStruct xCustomfield = new CStruct();
-            xCustomfield.Initialize("customfield");
-            DataTable dt;
-            dbaCostTypes.SelectCostTypeCustomField(dba, nFieldId, out dt);
-            int lookupuid = 0;
-            if (dt.Rows.Count == 1)
-            {
-                DataRow row = dt.Rows[0];
-                xCustomfield.CreateInt("FA_FIELD_ID", DBAccess.ReadIntValue(row["FA_FIELD_ID"]));
-                xCustomfield.CreateString("FA_NAME", DBAccess.ReadStringValue(row["FA_NAME"], ""));
-                lookupuid = DBAccess.ReadIntValue(row["FA_LOOKUP_UID"]);
-                xCustomfield.CreateInt("FA_LOOKUP_UID", lookupuid);
-                xCustomfield.CreateInt("FA_LOOKUPONLY", DBAccess.ReadIntValue(row["FA_LOOKUPONLY"]));
-                xCustomfield.CreateInt("FA_LEAFONLY", DBAccess.ReadIntValue(row["FA_LEAFONLY"]));
-                xCustomfield.CreateInt("FA_USEFULLNAME", DBAccess.ReadIntValue(row["FA_USEFULLNAME"]));
-            }
-            else
-            {
-                xCustomfield.CreateInt("FA_FIELD_ID", nFieldId);
-                xCustomfield.CreateString("FA_NAME", "");
-                xCustomfield.CreateInt("FA_LOOKUP_UID", 0);
-                xCustomfield.CreateInt("FA_LOOKUPONLY", 0);
-                xCustomfield.CreateInt("FA_LEAFONLY", 0);
-                xCustomfield.CreateInt("FA_USEFULLNAME", 0);
-            }
-
-            //if (lookupuid > 0)
-            {
-                dbaGeneral.SelectLookup(dba, lookupuid, out dt);
-
-                _TGrid tg = new _TGrid();
-                InitializeColumns(tg);
-                tg.SetDataTable(dt);
-                string tgridData = "";
-                tg.Build(out tgridData);
-                xCustomfield.CreateString("tgridData", tgridData);
-
-            }
-
-            dbaGeneral.SelectLookups(dba, out dt);
-            
-
-            dba.Close();
-
-            sReply = xCustomfield.XML();
-            return sReply;
+            return CustomFieldHelper.ReadCustomFieldInfo(dba, nFieldId, dbaCostTypes.SelectCostTypeCustomField);
         }
+
         private static string UpdateCustomFieldInfo(HttpContext Context, CStruct xData)
         {
             string sReply = "";
