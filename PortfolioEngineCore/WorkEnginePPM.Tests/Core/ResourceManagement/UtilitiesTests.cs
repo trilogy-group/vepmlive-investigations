@@ -86,6 +86,10 @@ namespace WorkEnginePPM.Tests
         private const string DeleteResourceMethodName = "DeleteResource";
         private const string PerformDeleteResourceCheckMethodName = "PerformDeleteResourceCheck";
         private const string WriteDataTableToFileMethodName = "WriteDataTableToFile";
+        private const string AreEqualObjectsMethodName = "AreEqualObjects";
+        private const string GetUserNameMethodName = "GetUserName";
+        private const string GetValidDateInFormatMethodName = "GetValidDateInFormat";
+        private const string CheckPFEResourceCenterPermissionMethodName = "CheckPFEResourceCenterPermission";
 
         [TestInitialize]
         public void Setup()
@@ -716,6 +720,279 @@ namespace WorkEnginePPM.Tests
             output.ShouldSatisfyAllConditions(
                 () => output.Any(line => line.Contains(DummyString)).ShouldBeTrue(),
                 () => output.Any(line => line.Contains(expected)).ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void AreEqualObjects_WhenCalled_ReturnCompareResult()
+        {
+            // Arrange
+            currentNamespaceFake.ShimUtilities.GetCleanFieldValueSPWebObjectSPFieldBoolean = (_1, input, _2, _3) =>
+            {
+                validations += 1;
+                return input.ToString();
+            };
+
+            // Act
+            var actual = (bool)privateObject.InvokeStatic(
+                AreEqualObjectsMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    DummyString,
+                    DummyString,
+                    spField.Instance,
+                    spWeb.Instance
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBeTrue(),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetUserName_UserNotNull_ReturnsUserName()
+        {
+            // Arrange
+            var spFieldUserValue = new ShimSPFieldUserValue()
+            {
+                UserGet = () => spUser,
+                LookupValueGet = () => DummyString
+            };
+
+            spUser.LoginNameGet = () => DummyString;
+
+            ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ =>
+            {
+                validations += 10;
+                return -1;
+            };
+            ShimCoreFunctions.GetUserNameWithDomainString = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimCoreFunctions.GetRealUserNameStringSPSite = (_, __) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            var actual = (string)privateObject.InvokeStatic(
+                GetUserNameMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    spWeb.Instance,
+                    spFieldUserValue.Instance
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(DummyString),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GetUserName_UserNull_ReturnsUserName()
+        {
+            // Arrange
+            var spFieldUserValue = new ShimSPFieldUserValue()
+            {
+                UserGet = () => null,
+                LookupValueGet = () => DummyString
+            };
+
+            spUser.LoginNameGet = () => DummyString;
+
+            ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ =>
+            {
+                validations += 10;
+                return -1;
+            };
+            ShimCoreFunctions.GetUserNameWithDomainString = _ =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+            ShimCoreFunctions.GetRealUserNameStringSPSite = (_, __) =>
+            {
+                validations += 1;
+                return DummyString;
+            };
+
+            // Act
+            var actual = (string)privateObject.InvokeStatic(
+                GetUserNameMethodName,
+                nonPublicStatic,
+                new object[]
+                {
+                    spWeb.Instance,
+                    spFieldUserValue.Instance
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(DummyString),
+                () => validations.ShouldBe(11));
+        }
+
+        [TestMethod]
+        public void GetValidDateInFormat_OrderMDY_ReturnsDateInFormat()
+        {
+            // Arrange
+            const SPCalendarOrderType orderType = SPCalendarOrderType.MDY;
+            const string dateSeparator = "-";
+            const string format = "MM-dd-yyyy";
+
+            // Act
+            var actual = (string)privateObject.InvokeStatic(
+                GetValidDateInFormatMethodName,
+                publicStatic,
+                new object[]
+                {
+                    orderType,
+                    currentDate.ToString(format),
+                    dateSeparator
+                });
+
+            // Assert
+            actual.ShouldBe(currentDate.Date.ToString());
+        }
+
+        [TestMethod]
+        public void GetValidDateInFormat_OrderDMY_ReturnsDateInFormat()
+        {
+            // Arrange
+            const SPCalendarOrderType orderType = SPCalendarOrderType.DMY;
+            const string dateSeparator = "-";
+            const string format = "dd-MM-yyyy";
+
+            // Act
+            var actual = (string)privateObject.InvokeStatic(
+                GetValidDateInFormatMethodName,
+                publicStatic,
+                new object[]
+                {
+                    orderType,
+                    currentDate.ToString(format),
+                    dateSeparator
+                });
+
+            // Assert
+            actual.ShouldBe(currentDate.Date.ToString());
+        }
+
+        [TestMethod]
+        public void GetValidDateInFormat_OrderYMD_ReturnsDateInFormat()
+        {
+            // Arrange
+            const SPCalendarOrderType orderType = SPCalendarOrderType.YMD;
+            const string dateSeparator = "-";
+            const string format = "yyyy-MM-dd";
+
+            // Act
+            var actual = (string)privateObject.InvokeStatic(
+                GetValidDateInFormatMethodName,
+                publicStatic,
+                new object[]
+                {
+                    orderType,
+                    currentDate.ToString(format),
+                    dateSeparator
+                });
+
+            // Assert
+            actual.ShouldBe(currentDate.Date.ToString());
+        }
+
+        [TestMethod]
+        public void CheckPFEResourceCenterPermission_HasDeletePermissionTrue_ChecksPermission()
+        {
+            // Arrange
+            var parameters = new object[]
+            {
+                spWeb.Instance,
+                One,
+                true,
+                false
+            };
+            const string baseInfo = @"<baseInfo basepath=""1"" username=""1"" pid=""1"" company=""1"" dbcnstring=""1"" port=""1"" session=""1""/>";
+
+            ShimDataAccess.ConstructorStringSecurityLevels = (_, _1, _2) => new ShimDataAccess();
+            ShimDataAccess.AllInstances.dbaGet = _ => new ShimDBAccess();
+            ShimWebAdmin.BuildBaseInfoHttpContextSPWeb = (_, __) =>
+            {
+                validations += 1;
+                return baseInfo;
+            };
+            ShimSqlDb.AllInstances.Open = _ =>
+            {
+                validations += 1;
+                return StatusEnum.rsSuccess;
+            };
+            ShimdbaGeneral.CheckUserGlobalPermissionDBAccessGlobalPermissionsEnum = (_, __) =>
+            {
+                validations += 1;
+                return true;
+            };
+
+            // Act
+            var actual = (bool)privateObject.InvokeStatic(
+                CheckPFEResourceCenterPermissionMethodName,
+                publicStatic,
+                parameters);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBeTrue(),
+                () => ((bool)parameters[3]).ShouldBeTrue(),
+                () => validations.ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void CheckPFEResourceCenterPermission_HasDeletePermissionFalse_ChecksPermission()
+        {
+            // Arrange
+            var parameters = new object[]
+            {
+                spWeb.Instance,
+                One,
+                false,
+                false
+            };
+            const string baseInfo = @"<baseInfo basepath=""1"" username=""1"" pid=""1"" company=""1"" dbcnstring=""1"" port=""1"" session=""1""/>";
+
+            ShimDataAccess.ConstructorStringSecurityLevels = (_, _1, _2) => new ShimDataAccess();
+            ShimDataAccess.AllInstances.dbaGet = _ => new ShimDBAccess();
+            ShimWebAdmin.BuildBaseInfoHttpContextSPWeb = (_, __) =>
+            {
+                validations += 1;
+                return baseInfo;
+            };
+            ShimSqlDb.AllInstances.Open = _ =>
+            {
+                validations += 1;
+                return StatusEnum.rsSuccess;
+            };
+            ShimdbaGeneral.CheckUserGlobalPermissionDBAccessGlobalPermissionsEnum = (_, __) =>
+            {
+                validations += 1;
+                return true;
+            };
+
+            // Act
+            var actual = (bool)privateObject.InvokeStatic(
+                CheckPFEResourceCenterPermissionMethodName,
+                publicStatic,
+                parameters);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBeTrue(),
+                () => ((bool)parameters[3]).ShouldBeTrue(),
+                () => validations.ShouldBe(3));
         }
     }
 }
