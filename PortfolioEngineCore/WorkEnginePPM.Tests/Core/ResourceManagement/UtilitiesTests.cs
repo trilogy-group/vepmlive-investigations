@@ -136,22 +136,6 @@ namespace WorkEnginePPM.Tests
             ShimDisabledItemEventScope.AllInstances.Dispose = _ => { };
             ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => spUser;
             ShimSPSiteDataQuery.Constructor = _ => new ShimSPSiteDataQuery();
-            //ShimSqlDb.AllInstances.TransactionGet = _ => transaction;
-            //ShimSqlDb.ReadIntValueObject = _ => DummyInt;
-            //ShimSqlDb.ReadDoubleValueObject = _ => DummyInt;
-            //ShimSqlDb.ReadIntValueObjectBooleanOut = (object input, out bool output) =>
-            //{
-            //    output = false;
-            //    return DummyInt;
-            //};
-            //ShimSqlDb.ReadStringValueObject = _ => DummyString;
-            //ShimSqlDb.ReadBoolValueObject = _ => true;
-            //ShimSqlDb.ReadDateValueObject = _ => currentDate;
-            //ShimSqlDb.AllInstances.HandleExceptionStringStatusEnumExceptionBoolean = (_, _1, _2, _3, _4) => StatusEnum.rsRequestInvalid;
-            //ShimActivation.AllInstances.checkActivationStringStringString = (_, _1, _2, _3) => { };
-            //ShimPFEEncrypt.DecryptStringString = (_, input) => input;
-            //ShimDatabase.AllInstances.OpenDatabaseStringString = (_, _1, _2) => new SqlConnection();
-            //ShimBaseSecurity.AllInstances.ChecksScurityStringSecurityLevels = (_, _1, _2) => true;
         }
 
         private void SetupVariables()
