@@ -121,6 +121,22 @@ pipeline {
 			parallel {
 				stage('Automated Tests') {
 					stages {
+						stage('Performance Tests') {
+							steps {
+								timestamps {
+									script {
+										echo 'Triggering performance tests job...'
+										build(
+											job: "../EPML-Perf/EPML-Perf", 
+											wait: true,
+											parameters: [
+												[$class: 'StringParameterValue', name: 'APP_URL', value: params.TargetHost]
+											]
+										)
+									}
+								}
+							}
+						}
 						stage('Protractor Tests') {
 							steps {
 								timestamps {
@@ -136,22 +152,6 @@ pipeline {
 											parameters: [
 												[$class: 'StringParameterValue', name: 'TargetHost', value: params.TargetHost],
 												[$class: 'StringParameterValue', name: 'FullHostName', value: params.ProtractorHostsName]
-											]
-										)
-									}
-								}
-							}
-						}
-						stage('Performance Tests') {
-							steps {
-								timestamps {
-									script {
-										echo 'Triggering performance tests job...'
-										build(
-											job: "../EPML-Perf/EPML-Perf", 
-											wait: true,
-											parameters: [
-												[$class: 'StringParameterValue', name: 'APP_URL', value: params.TargetHost]
 											]
 										)
 									}
