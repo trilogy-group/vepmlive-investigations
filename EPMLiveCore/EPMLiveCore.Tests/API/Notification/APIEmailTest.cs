@@ -476,6 +476,7 @@ namespace EPMLiveCore.Tests.API
             };
             ShimSPSite.ConstructorGuid = (_, _1) => { };
             ShimDateTime.NowGet = () => new DateTime(2010, 10, 10, 10, 10, 10);
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = action => action();
             SetupSqlShims();
         }
 
