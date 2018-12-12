@@ -25,10 +25,12 @@ using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.SharePoint.WebControls.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PortfolioEngineCore;
 using PortfolioEngineCore.Fakes;
 using Shouldly;
 using WorkEnginePPM.Core.ResourceManagement;
 using WorkEnginePPM.Fakes;
+using currentNamespace = WorkEnginePPM.Core.ResourceManagement;
 using currentNamespaceFake = WorkEnginePPM.Core.ResourceManagement.Fakes;
 
 namespace WorkEnginePPM.Tests
@@ -82,12 +84,14 @@ namespace WorkEnginePPM.Tests
         private const string AddUpdateResourceMethodName = "AddUpdateResource";
         private const string BuildFieldsTableMethodName = "BuildFieldsTable";
         private const string DeleteResourceMethodName = "DeleteResource";
+        private const string PerformDeleteResourceCheckMethodName = "PerformDeleteResourceCheck";
+        private const string WriteDataTableToFileMethodName = "WriteDataTableToFile";
 
         [TestInitialize]
         public void Setup()
         {
             SetupShims();
-            privateObject = new PrivateType(typeof(Utilities));
+            privateObject = new PrivateType(typeof(currentNamespace.Utilities));
         }
 
         private void SetupShims()
@@ -623,6 +627,95 @@ namespace WorkEnginePPM.Tests
 
             // Assert
             validations.ShouldBe(3);
+        }
+
+        [TestMethod]
+        public void PerformDeleteResourceCheck_WhenCalled_ChecksResourceDelete()
+        {
+            // Arrange
+            const string yesString = "YES";
+            var resource = new ShimResource()
+            {
+                IdGet = () => One,
+                ExternalUIdGet = () => DummyString,
+                NTAccountGet = () => DummyString
+            };
+            var parameters = new object[]
+            {
+                One,
+                guid,
+                spWeb.Instance,
+                DummyString,
+                DummyString
+            };
+
+            ShimResources.AllInstances.BuildResourceDataRow = (_, __) =>
+            {
+                validations += 1;
+                return resource;
+            };
+            ShimResources.AllInstances.CanDeleteResourceStringOut = (Resources instance, Resource resourceInstance, out string message) =>
+            {
+                validations += 1;
+                message = DummyString;
+                return yesString;
+            };
+
+            // Act
+            var actual = (bool)privateObject.InvokeStatic(
+                PerformDeleteResourceCheckMethodName,
+                publicStatic,
+                parameters);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBeTrue(),
+                () => parameters[3].ShouldBe(yesString),
+                () => parameters[4].ShouldBe(DummyString),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void WriteDataTableToFile_WhenCalled_WritesDataTableToFile()
+        {
+            // Arrange
+            const string expected = "some random string longer than column name";
+            var dataTable = new DataTable();
+            var row = default(DataRow);
+            var output = new List<string>();
+
+            dataTable.Columns.Add(DummyString);
+            row = dataTable.NewRow();
+            row[DummyString] = expected;
+            dataTable.Rows.Add(row);
+
+            ShimStreamWriter.ConstructorStringBoolean = (_, _1, _2) => new ShimStreamWriter();
+            ShimStreamWriter.AllInstances.DisposeBoolean = (_, __) => { };
+            ShimStreamWriter.AllInstances.Close = _ => { };
+            ShimStreamWriter.AllInstances.WriteString = (_, input) =>
+            {
+                output[output.Count - 1] += input;
+            };
+            ShimTextWriter.AllInstances.WriteLine = _ => { };
+            ShimTextWriter.AllInstances.WriteLineString = (_, input) =>
+            {
+                output.Add(input);
+            };
+
+            // Act
+            privateObject.InvokeStatic(
+                WriteDataTableToFileMethodName,
+                publicStatic,
+                new object[]
+                {
+                    dataTable,
+                    DummyString
+                });
+
+            // Assert
+            output.ShouldSatisfyAllConditions(
+                () => output.Any(line => line.Contains(DummyString)).ShouldBeTrue(),
+                () => output.Any(line => line.Contains(expected)).ShouldBeTrue());
         }
     }
 }
