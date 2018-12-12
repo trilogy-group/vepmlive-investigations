@@ -326,6 +326,10 @@
     <Compile Include="Web References\SalesforceMetadataService\CustomFieldTest.cs" />
     <Compile Include="Web References\SalesforceMetadataService\CustomObjectTest.cs" />
     <Compile Include="Web References\SalesforceMetadataService\DashboardComponentTest.cs" />
+    <Compile Include="Web References\SalesforcePartnerService\DescribeGlobalSObjectResultTest.cs" />
+    <Compile Include="Web References\SalesforcePartnerService\DescribeSObjectResultTest.cs" />
+    <Compile Include="Web References\SalesforcePartnerService\GetUserInfoResultTest.cs" />
+    <Compile Include="Web References\SalesforcePartnerService\SingleEmailMessageTest.cs" />
     <Compile Include="WebPageCode\AdminConnsTest.cs" />
     <Compile Include="WebPageCode\AdminQueueTests.cs" />
     <Compile Include="WebPageCode\CreateDatabaseTest.cs" />
