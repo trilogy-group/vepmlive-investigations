@@ -120,7 +120,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Admininfos\AllWorkhoursTests.cs" />
-    <Compile Include="Core\ResourceManagement\UtilitiesTests.cs" />
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="ConfigFunctionsTest.cs" />
     <Compile Include="DataServiceModules\DSMCostPlannerTests.cs" />
@@ -190,7 +189,9 @@
     <None Include="packages.config" />
     <None Include="signature.snk" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Core\ResourceManagement\" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
