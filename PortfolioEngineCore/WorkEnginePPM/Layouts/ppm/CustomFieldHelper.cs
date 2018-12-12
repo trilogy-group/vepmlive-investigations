@@ -126,25 +126,33 @@ namespace WorkEnginePPM.Layouts.ppm
             DataTable dataTable;
             selectCustomFieldFunc.Invoke(dataAccess, fieldId, out dataTable);
             var lookUpUId = 0;
+            const string FaFieldId = "FA_FIELD_ID";
+            const string FaName = "FA_NAME";
+
+            const string FaLookupUId = "FA_LOOKUP_UID";
+            const string FaLookupOnly = "FA_LOOKUPONLY";
+            const string FaLeafOnly = "FA_LEAFONLY";
+            const string FaUsefulName = "FA_USEFULLNAME";
+
             if (dataTable.Rows.Count == 1)
             {
                 var row = dataTable.Rows[0];
-                customField.CreateInt("FA_FIELD_ID", SqlDb.ReadIntValue(row["FA_FIELD_ID"]));
-                customField.CreateString("FA_NAME", SqlDb.ReadStringValue(row["FA_NAME"], ""));
-                lookUpUId = SqlDb.ReadIntValue(row["FA_LOOKUP_UID"]);
-                customField.CreateInt("FA_LOOKUP_UID", lookUpUId);
-                customField.CreateInt("FA_LOOKUPONLY", SqlDb.ReadIntValue(row["FA_LOOKUPONLY"]));
-                customField.CreateInt("FA_LEAFONLY", SqlDb.ReadIntValue(row["FA_LEAFONLY"]));
-                customField.CreateInt("FA_USEFULLNAME", SqlDb.ReadIntValue(row["FA_USEFULLNAME"]));
+                customField.CreateInt(FaFieldId, SqlDb.ReadIntValue(row[FaFieldId]));
+                customField.CreateString(FaName, SqlDb.ReadStringValue(row[FaName], string.Empty));
+                lookUpUId = SqlDb.ReadIntValue(row[FaLookupUId]);
+                customField.CreateInt(FaLookupUId, lookUpUId);
+                customField.CreateInt(FaLookupOnly, SqlDb.ReadIntValue(row[FaLookupOnly]));
+                customField.CreateInt(FaLeafOnly, SqlDb.ReadIntValue(row[FaLeafOnly]));
+                customField.CreateInt(FaUsefulName, SqlDb.ReadIntValue(row[FaUsefulName]));
             }
             else
             {
-                customField.CreateInt("FA_FIELD_ID", fieldId);
-                customField.CreateString("FA_NAME", "");
-                customField.CreateInt("FA_LOOKUP_UID", 0);
-                customField.CreateInt("FA_LOOKUPONLY", 0);
-                customField.CreateInt("FA_LEAFONLY", 0);
-                customField.CreateInt("FA_USEFULLNAME", 0);
+                customField.CreateInt(FaFieldId, fieldId);
+                customField.CreateString(FaName, string.Empty);
+                customField.CreateInt(FaLookupUId, 0);
+                customField.CreateInt(FaLookupOnly, 0);
+                customField.CreateInt(FaLeafOnly, 0);
+                customField.CreateInt(FaUsefulName, 0);
             }
             dbaGeneral.SelectLookup(dataAccess, lookUpUId, out dataTable);
 
