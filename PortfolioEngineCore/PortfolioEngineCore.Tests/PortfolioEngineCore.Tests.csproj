@@ -157,6 +157,7 @@
     <Compile Include="PortfolioItems\PortfolioItemsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\CapacityScenariosTests.cs" />
+    <Compile Include="Resources\CapacityTest.cs" />
     <Compile Include="Resources\ClsResourceValuesTests.cs" />
     <Compile Include="Resources\ResourceAnalyzerTests.cs" />
     <Compile Include="Resources\ResourcePlansTests.cs" />
