@@ -358,6 +358,7 @@
     <Compile Include="ListReportView\ListReportViewToolPart.cs" />
     <Compile Include="ListReportView\ReportingServicesToolPart.cs" />
     <Compile Include="ListSummary\ListSummary.cs" />
+    <Compile Include="ListSummary\ListSummaryProcessHelper.cs" />
     <Compile Include="ListSummary\ListSummaryToolpart.cs" />
     <Compile Include="MyWorkSummary\MyWorkSummary.ascx.cs">
       <DependentUpon>MyWorkSummary.ascx</DependentUpon>
