@@ -26,8 +26,7 @@ Set-Location -Path $rootDir
 Write-Host "Write build number"
 "[assembly:System.Reflection.AssemblyFileVersion(""$version"")]" > CommonAssemblyInfo.cs
 $env:build_number = $version
-Write-Host "Noted Version: $version"
-Write-Host "Noted env.build_number: $env:build_number"
+
 
 Write-Host "Marking fake dlls as recent"
 Get-ChildItem -Include *.dll -Recurse | Where-Object {$_.FullName -like '*\FakesAssemblies\*.dll'} | ForEach-Object { $_.LastWriteTime = [System.DateTime]::Now }

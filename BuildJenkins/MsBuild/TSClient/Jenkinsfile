@@ -10,13 +10,8 @@ pipeline {
 		timestamps()
 	}
 	parameters {
-		string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')
-		string(name: 'UserName', defaultValue: 'epmldev\\farmadmin', description: 'Name of the user to use when connecting PowerShell to the target host')
-		string(name: 'Password', defaultValue: 'Pass@word1', description: 'Password used along with the User name')
-		string(name: 'PackageTarget', defaultValue: 'c:\\SilentInstaller', description: 'Folder on the target host to copy packages to')
 		string(name: 'FullRcBranch', defaultValue: '', description: 'Full RC branch to get artifacts from (leave empty to use the same branch name as this build, replace "/" with "%2F")')
 		string(name: 'FullRcBranchBuild', defaultValue: '', description: 'Full RC build number to get artifacts from (leave empty to get latest successful build)')
-		string(name: 'FullHostName', defaultValue: 'http://tenant01.epmldev.com', description: 'Target full host name')
 	
 	}
 	stages {
@@ -27,9 +22,7 @@ pipeline {
 					deleteDir()
 				}
 				powershell "Write-Host 'Disk space usage:'(Get-PSDrive C | Select-Object Used,Free)"
-				
-				echo 'Checkout SCM...'
-				checkout scm
+
 			}
 		}
 		stage('Downloading artifacts') {
@@ -54,10 +47,11 @@ pipeline {
 				}
 			}
 		}
-		stage('Deploying') {
+		stage('Running Tests') {
 			steps {
 				echo 'Executing deploy (upgrade) script...'
-				powershell "${env.WORKSPACE}/BuildTeamcity/DeployRemotely.ps1 -username \"${params.UserName}\" -password \"${params.Password}\" -webAppName \"${params.FullHostName}\" -buildNumber \"${env.BUILD_VERSION}\" -serverIPs ${params.TargetHost} "
+				zip(zipFile: "epmlive_SI_${env.BUILD_VERSION}.zip", glob: "SilentInstaller.zip", archive: true)
+				bat '"C:/Program Files/nodejs/node.exe" C:/ts-client/bin/ts-cli start-job "epmlive_SI_%BUILD_VERSION%.zip" %BUILD_VERSION%'
 			}
 		}
 	}
