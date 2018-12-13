@@ -89,7 +89,7 @@ export class CommonPageHelper {
     }
 
     static getElementByText(text: string, isContains = false) {
-        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
+        return element.all(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`)).first();
     }
 
     static getSidebarLinkByTextUnderCreateNew(title: string) {
