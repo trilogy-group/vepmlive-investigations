@@ -165,6 +165,7 @@
     <Compile Include="WebServices\ResPlanAnalyzer.asmx.Tests.cs" />
     <Compile Include="WebServices\ResPlanAnalyzerTests.cs" />
     <Compile Include="WebServices\RPADataTests.cs" />
+    <Compile Include="WebServices\RPEditorRemTests.cs" />
     <Compile Include="WebServices\RPEditorTests.cs" />
   </ItemGroup>
   <ItemGroup>
