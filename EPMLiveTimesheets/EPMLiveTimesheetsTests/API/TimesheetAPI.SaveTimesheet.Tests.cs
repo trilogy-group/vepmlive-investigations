@@ -26,7 +26,7 @@ namespace TimeSheets.Tests
             // Assert
             Assert.AreEqual("<SaveTimesheet Status=\"0\">Save Queued</SaveTimesheet>", message);
             Assert.IsTrue(_adoShims.ConnectionsDisposed.Any());
-            Assert.AreEqual(4, _adoShims.CommandsDisposed.Count);
+            Assert.AreEqual(6, _adoShims.CommandsDisposed.Count);
             Assert.AreEqual(2, _adoShims.DataReadersDisposed.Count);
         }
 

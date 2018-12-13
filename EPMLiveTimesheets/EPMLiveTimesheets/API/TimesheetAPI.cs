@@ -526,7 +526,7 @@ namespace TimeSheets
                             var bLocked = false;
                             var approval = 0;
                             using (var command = new SqlCommand(
-                                "SELECT LOCKED,APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid", 
+                                "SELECT LOCKED,APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid",
                                 connection))
                             {
                                 command.Parameters.AddWithValue("@tsuid", tsuid);
@@ -652,7 +652,7 @@ namespace TimeSheets
                                 }
                                 transaction.Commit();
                             }
-                            catch(Exception exception)
+                            catch (Exception exception)
                             {
                                 if (transaction != null)
                                 {
@@ -726,7 +726,7 @@ namespace TimeSheets
             Guid webGuid = Guid.Empty;
             Guid listGuid = Guid.Empty;
 
-            if(ds.Tables.Count > 0)
+            if (ds.Tables.Count > 0)
             {
                 try
                 {
@@ -755,19 +755,19 @@ namespace TimeSheets
 
                             listGuid = iList.ID;
                         }
-                        
+
                         try
                         {
                             // This will throw error if task is deleted
                             SPListItem li = iList.GetItemById(int.Parse(dataRow["ITEM_ID"].ToString()));
                             SharedFunctions.processMeta(iWeb, iList, li, new Guid(dataRow["ts_item_uid"].ToString()), dataRow["project"].ToString(), cn, pList);
                         }
-                        catch(ArgumentException ex)
+                        catch (ArgumentException ex)
                         {
                             //The item is deleted and not found in SPList
                             Logger.WriteLog(Logger.Category.Unexpected, "Timesheet submission", ex.ToString());
                         }
-                        
+
                     }
                 }
                 finally
@@ -783,7 +783,7 @@ namespace TimeSheets
         {
             List<TimeSheetItem> timeSheetItems;
             double qtdAllocatedHours = 0;
-			
+
             timeSheetItems = GetTimeSheetItems(data, cn);
             qtdAllocatedHours = CalculateAllocatedHours(timeSheetItems, cn);
 
@@ -1164,12 +1164,12 @@ namespace TimeSheets
                 SqlConnection connection = null;
                 try
                 {
-					string connectionString = null;
+                    string connectionString = null;
 
-					SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-						connectionString = EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id); 
-						connection = new SqlConnection(connectionString);
+                        connectionString = EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id);
+                        connection = new SqlConnection(connectionString);
                         connection.Open();
                     });
 
@@ -1207,7 +1207,24 @@ namespace TimeSheets
                             // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of
                             if (bool.Parse(EpmCoreFunctions.getConfigSetting(oWeb, "EPMLiveEnableNonTeamNotf")))
                             {
-                                CheckNonTeamMemberAllocation(oWeb, tsuid, connectionString, data);
+                                using (var command = new SqlCommand(
+                                 "DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=33",
+                                 connection))
+                                {
+                                    command.Parameters.AddWithValue("@tsuid", tsuid);
+                                    command.ExecuteNonQuery();
+                                }
+
+                                using (var command = new SqlCommand(
+                                   @"INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) 
+                              VALUES(@tsuid,0,33,@USERID,@JOBDATA)",
+                                   connection))
+                                {
+                                    command.Parameters.AddWithValue("@tsuid", tsuid);
+                                    command.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
+                                    command.Parameters.AddWithValue("@JOBDATA", data);
+                                    command.ExecuteNonQuery();
+                                }
                             }
 
                             using (var command = new SqlCommand(
@@ -1278,10 +1295,10 @@ namespace TimeSheets
                 try
                 {
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
-                        {
-                            connection = new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                            connection.Open();
-                        });
+                    {
+                        connection = new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                        connection.Open();
+                    });
 
                     var user = GetUser(oWeb, userid);
 
@@ -1289,7 +1306,7 @@ namespace TimeSheets
                         @"SELECT * FROM dbo.TSITEM 
                          INNER JOIN dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID 
                          INNER JOIN dbo.TSSW ON dbo.TSITEM.TS_ITEM_UID = dbo.TSSW.TSITEMUID 
-                         where USER_ID=@userid and site_uid=@siteid", 
+                         where USER_ID=@userid and site_uid=@siteid",
                         connection))
                     {
                         command.Parameters.AddWithValue("@userid", user.ID);
@@ -1703,7 +1720,7 @@ namespace TimeSheets
                 {
                     approvalStatus = doc.FirstChild.Attributes["ApproveStatus"].Value;
                 }
-                catch(Exception exception)
+                catch (Exception exception)
                 {
                     Trace.TraceError(exception.ToString());
                 }
@@ -1747,12 +1764,12 @@ namespace TimeSheets
                                         command.Parameters.AddWithValue("@notes", timesheetNode.InnerText);
                                         command.Parameters.AddWithValue("@status", approvalStatus);
 
-                                        command.ExecuteNonQuery(); 
+                                        command.ExecuteNonQuery();
                                     }
 
                                     if (!liveHours)
                                     {
-                                        using(var command = new SqlCommand(
+                                        using (var command = new SqlCommand(
                                             "SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30",
                                             connection))
                                         {
@@ -1777,7 +1794,7 @@ namespace TimeSheets
                                                 command.ExecuteNonQuery();
                                             }
 
-                                            using (var command = 
+                                            using (var command =
                                                 new SqlCommand(
                                                     "INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,30,@USERID,@JOBDATA)",
                                                     connection))
@@ -2127,7 +2144,7 @@ namespace TimeSheets
 
                         if (starts.Count > 0)
                         {
-                            nodeRDef.Attributes["CalcOrder"].Value = 
+                            nodeRDef.Attributes["CalcOrder"].Value =
                                 string.Concat(nodeRDef.Attributes["CalcOrder"].Value, calcOrder.ToString());
                             nodeGroupDef.Attributes["CalcOrder"].Value =
                                 string.Concat(nodeGroupDef.Attributes["CalcOrder"].Value, calcOrder.ToString());
@@ -3630,7 +3647,7 @@ namespace TimeSheets
                             }
                         }
                     }
-                    catch(Exception exception)
+                    catch (Exception exception)
                     {
                         Trace.TraceError(exception.ToString());
                     }
@@ -4040,7 +4057,7 @@ namespace TimeSheets
                             }
                         }
                     }
-                    catch(Exception exception)
+                    catch (Exception exception)
                     {
                         Logger.WriteLog(
                             Logger.Category.Unexpected,
