@@ -526,7 +526,7 @@ namespace TimeSheets
                             var bLocked = false;
                             var approval = 0;
                             using (var command = new SqlCommand(
-                                "SELECT LOCKED,APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid", 
+                                "SELECT LOCKED,APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid",
                                 connection))
                             {
                                 command.Parameters.AddWithValue("@tsuid", tsuid);
@@ -652,7 +652,7 @@ namespace TimeSheets
                                 }
                                 transaction.Commit();
                             }
-                            catch(Exception exception)
+                            catch (Exception exception)
                             {
                                 if (transaction != null)
                                 {
@@ -726,7 +726,7 @@ namespace TimeSheets
             Guid webGuid = Guid.Empty;
             Guid listGuid = Guid.Empty;
 
-            if(ds.Tables.Count > 0)
+            if (ds.Tables.Count > 0)
             {
                 try
                 {
@@ -755,19 +755,19 @@ namespace TimeSheets
 
                             listGuid = iList.ID;
                         }
-                        
+
                         try
                         {
                             // This will throw error if task is deleted
                             SPListItem li = iList.GetItemById(int.Parse(dataRow["ITEM_ID"].ToString()));
                             SharedFunctions.processMeta(iWeb, iList, li, new Guid(dataRow["ts_item_uid"].ToString()), dataRow["project"].ToString(), cn, pList);
                         }
-                        catch(ArgumentException ex)
+                        catch (ArgumentException ex)
                         {
                             //The item is deleted and not found in SPList
                             Logger.WriteLog(Logger.Category.Unexpected, "Timesheet submission", ex.ToString());
                         }
-                        
+
                     }
                 }
                 finally
@@ -778,6 +778,7 @@ namespace TimeSheets
             }
         }
 
+        // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of.
         public static void CheckNonTeamMemberAllocation(SPWeb oWeb, string tsuid, string cn, string data)
         {
             List<TimeSheetItem> timeSheetItems;
@@ -789,76 +790,6 @@ namespace TimeSheets
             if (qtdAllocatedHours > 0)
                 RunPermissionsChecks(timeSheetItems, qtdAllocatedHours, oWeb);
 
-        }
-
-        private static List<TimeSheetItem> GetTimeSheetItems(string data, string connectionString)
-        {
-            XDocument doc = XDocument.Parse(data);
-
-            var items = doc.Element("Timesheet")?.Elements("Item").ToList();
-
-            var timeSheetItems = (from item in items
-                                  select new TimeSheetItem()
-                                  {
-                                      ItemID = int.Parse(item.Attribute("ItemID")?.Value),
-                                      ProjectName = item.Attribute("Project")?.Value,
-                                      Uid = Guid.Parse(item.Attribute("UID")?.Value ?? Guid.Empty.ToString()),
-                                      Hours = (from hour in item.Element("Hours")?.Elements("Date")
-                                               select new TimeSheetHourItem()
-                                               {
-                                                   Date = DateTime.Parse(hour.Attribute("Value")?.Value),
-                                                   Hour = Convert.ToDouble(hour.Element("Time")?.Attribute("Hours")?.Value)
-                                               }).ToList(),
-                                      Changed = false,
-                                      AssignedToID = item.Attribute("AssignedToID")?.Value.ToString(),
-                                      ItemTitle = item.Attribute("Title")?.Value.ToString(),
-                                      WorkTypeField = item.Attribute("WorkTypeField")?.Value.ToString()
-                                  }).ToList();
-
-            return timeSheetItems;
-        }
-
-        private static double CalculateAllocatedHours(List<TimeSheetItem> timeSheetItems, string connectionString)
-        {
-            double result = 0;
-
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
-            {
-                using (SqlConnection cn = new SqlConnection(connectionString))
-                {
-                    cn.Open();
-
-                    timeSheetItems.ForEach(timeSheetItem =>
-                    {
-                        List<TimeSheetHourItem> dbHourItems = new List<TimeSheetHourItem>();
-                        SqlCommand cmd = new SqlCommand("SELECT TS_ITEM_DATE,TS_ITEM_HOURS  FROM TSITEMHOURS where TS_ITEM_UID=@tsitemuid", cn);
-                        cmd.Parameters.AddWithValue("@tsitemuid", timeSheetItem.Uid);
-                        using (SqlDataReader dr = cmd.ExecuteReader())
-                        {
-                            while (dr.Read())
-                            {
-                                dbHourItems.Add(new TimeSheetHourItem()
-                                {
-                                    Date = dr.GetDateTime(0),
-                                    Hour = dr.GetDouble(1)
-                                });
-                            }
-                        }
-
-                        timeSheetItem.Hours.ForEach(hourItem =>
-                        {
-                            var dbItem = dbHourItems.FirstOrDefault(x => x.Date == hourItem.Date);
-                            if (dbItem == null || dbItem.Hour != hourItem.Hour)
-                            {
-                                result += hourItem.Hour;
-                                timeSheetItem.Changed = true;
-                            }
-                        });
-                    });
-                }
-            });
-
-            return Math.Round(result * 4, 0) / 4;
         }
 
         private const string PROJECT_WORK_FIELD_NAME = "Project Center";
@@ -889,6 +820,69 @@ namespace TimeSheets
                 }
 
             });
+        }
+        private static void CheckPortfloioTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours)
+        {
+            var user = IsResourceTeamMember(oWeb, timeSheetItem, PORTFLOIO_WORK_FIELD_NAME);
+            var emailToList = new List<string>();
+            var idToList = new List<int>();
+            var userList = new List<SPUser>();
+
+            if (!user.Item2) // Item2 = isMember
+            {
+                var resourcesToNotify = GetResourceToNotifyPortfolios(timeSheetItem.ItemID, oWeb);
+
+                if (!string.IsNullOrWhiteSpace(resourcesToNotify))
+                {
+                    resourcesToNotify.Split(',').ToList().ForEach(userGroupID =>
+                    {
+                        userList = GetUserFromField(userGroupID, oWeb);
+                        userList.ForEach(userItem =>
+                        {
+                            emailToList.Add(string.IsNullOrWhiteSpace(userItem.Email) ? GetEmailFromDB(userItem.ID, oWeb) : userItem.Email);
+                            idToList.Add(userItem.ID);
+                        });
+                    });
+                }
+
+                SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{ timeSheetItem.ItemTitle } portfolio",
+                    "an outside", "is not currently assigned to the Portfolio Team", PORTFLOIO_WORK_FIELD_NAME);
+            }
+        }
+
+        private static string GetResourceToNotifyPortfolios(int portfolioID, SPWeb oWeb)
+        {
+            var rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(oWeb.Site.ID);
+            var epmLPortManagerColumn = EPMLiveCore.CoreFunctions.getConfigSetting(oWeb, "EPMPortManagerColumn");
+            var sql = string.Format(@"SELECT [{0}] FROM dbo.LSTProjectPortfolios WHERE [id] = {1}",
+                                    string.IsNullOrWhiteSpace(epmLPortManagerColumn) ? "OwnerID" : epmLPortManagerColumn, portfolioID);
+            var dataTable = rptData?.ExecuteSql(sql);
+
+            if (dataTable?.Rows?.Count > 0)
+                return dataTable.Rows[0][0].ToString();
+            else
+                return string.Empty;
+        }
+
+        private static void CheckProjectTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours)
+        {
+            var user = IsResourceTeamMember(oWeb, timeSheetItem, PROJECT_WORK_FIELD_NAME);
+            var emailToList = new List<string>();
+            var userTypesTosend = new List<string>() { "Owner", "Planners", "ProjectManagers" };
+            var idToList = new List<int>();
+
+            if (!user.Item2) // Item2 = isMember
+            {
+                userTypesTosend.ForEach(userType =>
+                {
+                    var usersToSendNotification = GetUsersToSendNotification(user.Item1, userType, oWeb);
+                    emailToList.AddRange(usersToSendNotification.Item1);
+                    idToList.AddRange(usersToSendNotification.Item2);
+                });
+
+                SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{ timeSheetItem.ItemTitle } project",
+                    "an outside", "is not currently assigned to the Project Team", PROJECT_WORK_FIELD_NAME);
+            }
         }
 
         private static void CheckTaskTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours)
@@ -959,18 +953,6 @@ namespace TimeSheets
             }
 
             return new Tuple<List<string>, List<int>>(emailList, idList);
-        }
-
-        private static string GetEmailFromDB(int iD, SPWeb oWeb)
-        {
-            var rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(oWeb.Site.ID);
-            var sql = string.Format(@"Select [Email] from [LSTResourcepool] WHERE [SharePointAccountID] = {0}", iD);
-            var tblEmail = rptData.ExecuteSql(sql);
-
-            if (tblEmail?.Rows?.Count > 0 && tblEmail.Rows[0][0] != null)
-                return tblEmail.Rows[0][0].ToString();
-            else
-                return string.Empty;
         }
 
         private static void CheckProgramTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours)
@@ -1055,6 +1037,76 @@ namespace TimeSheets
             return returnList;
         }
 
+        private static List<TimeSheetItem> GetTimeSheetItems(string data, string connectionString)
+        {
+            XDocument doc = XDocument.Parse(data);
+
+            var items = doc.Element("Timesheet")?.Elements("Item").ToList();
+
+            var timeSheetItems = (from item in items
+                                  select new TimeSheetItem()
+                                  {
+                                      ItemID = int.Parse(item.Attribute("ItemID")?.Value),
+                                      ProjectName = item.Attribute("Project")?.Value,
+                                      Uid = Guid.Parse(item.Attribute("UID")?.Value ?? Guid.Empty.ToString()),
+                                      Hours = (from hour in item.Element("Hours")?.Elements("Date")
+                                               select new TimeSheetHourItem()
+                                               {
+                                                   Date = DateTime.Parse(hour.Attribute("Value")?.Value),
+                                                   Hour = Convert.ToDouble(hour.Element("Time")?.Attribute("Hours")?.Value)
+                                               }).ToList(),
+                                      Changed = false,
+                                      AssignedToID = item.Attribute("AssignedToID")?.Value.ToString(),
+                                      ItemTitle = item.Attribute("Title")?.Value.ToString(),
+                                      WorkTypeField = item.Attribute("WorkTypeField")?.Value.ToString()
+                                  }).ToList();
+
+            return timeSheetItems;
+        }
+
+        private static double CalculateAllocatedHours(List<TimeSheetItem> timeSheetItems, string connectionString)
+        {
+            double result = 0;
+
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                using (SqlConnection cn = new SqlConnection(connectionString))
+                {
+                    cn.Open();
+
+                    timeSheetItems.ForEach(timeSheetItem =>
+                    {
+                        List<TimeSheetHourItem> dbHourItems = new List<TimeSheetHourItem>();
+                        SqlCommand cmd = new SqlCommand("SELECT TS_ITEM_DATE,TS_ITEM_HOURS  FROM TSITEMHOURS where TS_ITEM_UID=@tsitemuid", cn);
+                        cmd.Parameters.AddWithValue("@tsitemuid", timeSheetItem.Uid);
+                        using (SqlDataReader dr = cmd.ExecuteReader())
+                        {
+                            while (dr.Read())
+                            {
+                                dbHourItems.Add(new TimeSheetHourItem()
+                                {
+                                    Date = dr.GetDateTime(0),
+                                    Hour = dr.GetDouble(1)
+                                });
+                            }
+                        }
+
+                        timeSheetItem.Hours.ForEach(hourItem =>
+                        {
+                            var dbItem = dbHourItems.FirstOrDefault(x => x.Date == hourItem.Date);
+                            if (dbItem == null || dbItem.Hour != hourItem.Hour)
+                            {
+                                result += hourItem.Hour;
+                                timeSheetItem.Changed = true;
+                            }
+                        });
+                    });
+                }
+            });
+
+            return Math.Round(result * 4, 0) / 4;
+        }
+
         private const int NON_TEAM_MEMBER_ALLOCATION_EMAIL = 16;
         private const int NON_TEAM_MEMBER_ALLOCATION_GENERAL_NOTIFICATION = 17;
         public static void SendNotifications(SPWeb oWeb, List<string> emailToList, List<int> idToList, double allocatedHours,
@@ -1088,66 +1140,14 @@ namespace TimeSheets
                     emailToList, string.Empty, oWeb, true);
         }
 
-        private static void CheckProjectTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours)
-        {
-            var user = IsResourceTeamMember(oWeb, timeSheetItem, PROJECT_WORK_FIELD_NAME);
-            var emailToList = new List<string>();
-            var userTypesTosend = new List<string>() { "Owner", "Planners", "ProjectManagers" };
-            var idToList = new List<int>();
-
-            if (!user.Item2) // Item2 = isMember
-            {
-                userTypesTosend.ForEach(userType =>
-                {
-                    var usersToSendNotification = GetUsersToSendNotification(user.Item1, userType, oWeb);
-                    emailToList.AddRange(usersToSendNotification.Item1);
-                    idToList.AddRange(usersToSendNotification.Item2);
-                });
-
-                SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{ timeSheetItem.ItemTitle } project",
-                    "an outside", "is not currently assigned to the Project Team", PROJECT_WORK_FIELD_NAME);
-            }
-        }
-
-        private static void CheckPortfloioTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours)
-        {
-            var user = IsResourceTeamMember(oWeb, timeSheetItem, PORTFLOIO_WORK_FIELD_NAME);
-            var emailToList = new List<string>();
-            var idToList = new List<int>();
-            var userList = new List<SPUser>();
-
-            if (!user.Item2) // Item2 = isMember
-            {
-                var resourcesToNotify = GetResourceToNotifyPortfolios(timeSheetItem.ItemID, oWeb);
-
-                if (!string.IsNullOrWhiteSpace(resourcesToNotify))
-                {
-                    resourcesToNotify.Split(',').ToList().ForEach(userGroupID =>
-                    {
-                        userList = GetUserFromField(userGroupID, oWeb);
-                        userList.ForEach(userItem =>
-                        {
-                            emailToList.Add(string.IsNullOrWhiteSpace(userItem.Email) ? GetEmailFromDB(userItem.ID, oWeb) : userItem.Email);
-                            idToList.Add(userItem.ID);
-                        });
-                    });
-                }
-
-                SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{ timeSheetItem.ItemTitle } portfolio",
-                    "an outside", "is not currently assigned to the Portfolio Team", PORTFLOIO_WORK_FIELD_NAME);
-            }
-        }
-
-        private static string GetResourceToNotifyPortfolios(int portfolioID, SPWeb oWeb)
+        private static string GetEmailFromDB(int iD, SPWeb oWeb)
         {
             var rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(oWeb.Site.ID);
-            var epmLPortManagerColumn = EPMLiveCore.CoreFunctions.getConfigSetting(oWeb, "EPMPortManagerColumn");
-            var sql = string.Format(@"SELECT [{0}] FROM dbo.LSTProjectPortfolios WHERE [id] = {1}",
-                                    string.IsNullOrWhiteSpace(epmLPortManagerColumn) ? "OwnerID" : epmLPortManagerColumn, portfolioID);
-            var dataTable = rptData?.ExecuteSql(sql);
+            var sql = string.Format(@"Select [Email] from [LSTResourcepool] WHERE [SharePointAccountID] = {0}", iD);
+            var tblEmail = rptData.ExecuteSql(sql);
 
-            if (dataTable?.Rows?.Count > 0)
-                return dataTable.Rows[0][0].ToString();
+            if (tblEmail?.Rows?.Count > 0 && tblEmail.Rows[0][0] != null)
+                return tblEmail.Rows[0][0].ToString();
             else
                 return string.Empty;
         }
@@ -1164,12 +1164,12 @@ namespace TimeSheets
                 SqlConnection connection = null;
                 try
                 {
-					string connectionString = null;
+                    string connectionString = null;
 
-					SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-						connectionString = EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id); 
-						connection = new SqlConnection(connectionString);
+                        connectionString = EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id);
+                        connection = new SqlConnection(connectionString);
                         connection.Open();
                     });
 
@@ -1295,10 +1295,10 @@ namespace TimeSheets
                 try
                 {
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
-                        {
-                            connection = new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                            connection.Open();
-                        });
+                    {
+                        connection = new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                        connection.Open();
+                    });
 
                     var user = GetUser(oWeb, userid);
 
@@ -1306,7 +1306,7 @@ namespace TimeSheets
                         @"SELECT * FROM dbo.TSITEM 
                          INNER JOIN dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID 
                          INNER JOIN dbo.TSSW ON dbo.TSITEM.TS_ITEM_UID = dbo.TSSW.TSITEMUID 
-                         where USER_ID=@userid and site_uid=@siteid", 
+                         where USER_ID=@userid and site_uid=@siteid",
                         connection))
                     {
                         command.Parameters.AddWithValue("@userid", user.ID);
@@ -1720,7 +1720,7 @@ namespace TimeSheets
                 {
                     approvalStatus = doc.FirstChild.Attributes["ApproveStatus"].Value;
                 }
-                catch(Exception exception)
+                catch (Exception exception)
                 {
                     Trace.TraceError(exception.ToString());
                 }
@@ -1764,12 +1764,12 @@ namespace TimeSheets
                                         command.Parameters.AddWithValue("@notes", timesheetNode.InnerText);
                                         command.Parameters.AddWithValue("@status", approvalStatus);
 
-                                        command.ExecuteNonQuery(); 
+                                        command.ExecuteNonQuery();
                                     }
 
                                     if (!liveHours)
                                     {
-                                        using(var command = new SqlCommand(
+                                        using (var command = new SqlCommand(
                                             "SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30",
                                             connection))
                                         {
@@ -1794,7 +1794,7 @@ namespace TimeSheets
                                                 command.ExecuteNonQuery();
                                             }
 
-                                            using (var command = 
+                                            using (var command =
                                                 new SqlCommand(
                                                     "INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,30,@USERID,@JOBDATA)",
                                                     connection))
@@ -2144,7 +2144,7 @@ namespace TimeSheets
 
                         if (starts.Count > 0)
                         {
-                            nodeRDef.Attributes["CalcOrder"].Value = 
+                            nodeRDef.Attributes["CalcOrder"].Value =
                                 string.Concat(nodeRDef.Attributes["CalcOrder"].Value, calcOrder.ToString());
                             nodeGroupDef.Attributes["CalcOrder"].Value =
                                 string.Concat(nodeGroupDef.Attributes["CalcOrder"].Value, calcOrder.ToString());
@@ -3647,7 +3647,7 @@ namespace TimeSheets
                             }
                         }
                     }
-                    catch(Exception exception)
+                    catch (Exception exception)
                     {
                         Trace.TraceError(exception.ToString());
                     }
@@ -4057,7 +4057,7 @@ namespace TimeSheets
                             }
                         }
                     }
-                    catch(Exception exception)
+                    catch (Exception exception)
                     {
                         Logger.WriteLog(
                             Logger.Category.Unexpected,
