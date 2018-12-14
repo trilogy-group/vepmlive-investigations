@@ -80,6 +80,7 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string IDStringCaps = "ID";
         private const string SampleUrl = "http://www.sampleurl.com";
         private const string ResourcePlansMethodName = "ResourcePlans";
+        private const string AdminFunctionsMethodName = "AdminFunctions";
 
         [TestInitialize]
         public void Setup()
@@ -448,6 +449,56 @@ namespace WorkEnginePPM.Tests.WebServices
                 () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
                 () => actual.FirstChild.SelectSingleNode("//Grid/IO").Attributes["Result"].Value.ShouldBe("0"),
                 () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void AdminFunctions_WhenCalled_ReturnsResultXml()
+        {
+            // Arrange
+            var xmlString = $@"
+                <xmlcfg guid=""{guid}"">
+                    <Data Function=""SaveReportingConnection"">
+                        <Grid/>
+                    </Data>
+                </xmlcfg>";
+            var context = new ShimHttpContext()
+            {
+                RequestGet = () => new ShimHttpRequest()
+            };
+            var readhit = 0;
+
+            dataReader.Read = () =>
+            {
+                readhit += 1;
+                return readhit <= Two;
+            };
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                readhit = 0;
+                return dataReader;
+            };
+            ShimSqlDb.AllInstances.StatusGet = _ => StatusEnum.rsSuccess;
+            ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
+            ShimAdminFunctions.AllInstances.SaveReportingConnectionCStruct = (_, __) =>
+            {
+                validations += 1;
+                return true;
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                AdminFunctionsMethodName,
+                publicStatic,
+                new object[]
+                {
+                    context.Instance,
+                    xmlString
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(string.Empty),
+                () => validations.ShouldBe(1));
         }
     }
 }
