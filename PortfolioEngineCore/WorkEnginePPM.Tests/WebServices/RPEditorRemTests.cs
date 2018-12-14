@@ -1,30 +1,19 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Fakes;
 using System.Data;
-using System.Data.Common.Fakes;
-using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
 using System.Fakes;
-using System.IO.Fakes;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Fakes;
 using System.Web.SessionState.Fakes;
 using System.Xml;
-using System.Xml.Linq;
-using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
-using Microsoft.SharePoint.Utilities.Fakes;
-using Microsoft.SharePoint.WebControls.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortfolioEngineCore;
 using PortfolioEngineCore.Fakes;
@@ -42,8 +31,6 @@ namespace WorkEnginePPM.Tests.WebServices
         private IDisposable shimsContext;
         private BindingFlags publicStatic;
         private BindingFlags nonPublicStatic;
-        private BindingFlags publicInstance;
-        private BindingFlags nonPublicInstance;
         private ShimSPWeb spWeb;
         private ShimSPSite spSite;
         private ShimSPListCollection spListCollection;
@@ -102,27 +89,12 @@ namespace WorkEnginePPM.Tests.WebServices
             ShimSqlConnection.ConstructorString = (_, __) => new ShimSqlConnection();
             ShimSqlConnection.AllInstances.Open = _ => { };
             ShimSqlConnection.AllInstances.Close = _ => { };
-            ShimSqlConnection.AllInstances.BeginTransaction = _ => transaction;
-            ShimDbTransaction.AllInstances.Dispose = _ => { };
-            ShimSqlConnection.AllInstances.CreateCommand = _ => new SqlCommand();
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => DummyInt;
-            ShimSqlCommand.AllInstances.ExecuteScalar = _ => DummyInt;
-            ShimSqlCommand.AllInstances.ExecuteReader = _ => dataReader;
             ShimComponent.AllInstances.Dispose = _ => { };
             ShimSqlCommand.AllInstances.TransactionSetSqlTransaction = (_, __) => { };
-            ShimSPDatabase.AllInstances.DatabaseConnectionStringGet = _ => DummyString;
-            ShimGridGanttSettings.ConstructorSPList = (_, __) => new ShimGridGanttSettings();
-            ShimHttpUtility.HtmlEncodeString = input => input;
-            ShimSPSite.ConstructorString = (_, __) => new ShimSPSite();
             ShimSPSite.ConstructorGuid = (_, __) => new ShimSPSite();
-            ShimSPSite.ConstructorGuidSPUserToken = (_, _1, _2) => new ShimSPSite();
             ShimSPSite.AllInstances.RootWebGet = _ => spWeb;
-            ShimSPSite.AllInstances.OpenWeb = _ => spWeb;
-            ShimSPSite.AllInstances.OpenWebString = (_, __) => spWeb;
-            ShimSPSite.AllInstances.OpenWebGuid = (_, __) => spWeb;
             ShimSPSite.AllInstances.Dispose = _ => { };
-            ShimSPWeb.AllInstances.Dispose = _ => { };
-            ShimCoreFunctions.getLockedWebSPWeb = _ => guid;
             ShimCoreFunctions.getConfigSettingSPWebString = (_, key) =>
             {
                 if (configSettings.ContainsKey(key))
@@ -131,29 +103,11 @@ namespace WorkEnginePPM.Tests.WebServices
                 }
                 return DummyString;
             };
-            ShimCoreFunctions.getListSettingStringSPList = (_, __) => DummyString;
-            ShimCoreFunctions.getConnectionStringGuid = _ => DummyString;
-            ShimCoreFunctions.getLockConfigSettingSPWebStringBoolean = (_1, _2, _3) => DummyString;
             ShimConfigFunctions.GetCleanUsernameSPWeb = _ => DummyString;
-            ShimSPList.AllInstances.GetItemsSPQuery = (_, __) => spListItemCollection;
-            ShimSPPersistedObject.AllInstances.IdGet = _ => guid;
-            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
-            ShimUnsecuredLayoutsPageBase.AllInstances.SiteGet = _ => spSite;
-            ShimUnsecuredLayoutsPageBase.AllInstances.WebGet = _ => spWeb;
-            ShimAct.ConstructorSPWeb = (_, __) => new ShimAct();
             ShimSPContext.CurrentGet = () => new ShimSPContext();
             ShimSPContext.AllInstances.WebGet = _ => spWeb;
-            ShimSPContext.AllInstances.SiteGet = _ => spSite;
-            ShimSPFieldLookupValueCollection.ConstructorString = (_, __) => new ShimSPFieldLookupValueCollection();
-            ShimSPFieldLookupValue.ConstructorString = (_, __) => new ShimSPFieldLookupValue();
-            ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => DummyInt;
-            ShimDisabledItemEventScope.Constructor = _ => new ShimDisabledItemEventScope();
-            ShimDisabledItemEventScope.AllInstances.Dispose = _ => { };
-            ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => spUser;
-            ShimSPSiteDataQuery.Constructor = _ => new ShimSPSiteDataQuery();
             ShimSqlDb.AllInstances.TransactionGet = _ => transaction;
             ShimSqlDb.ReadIntValueObject = _ => DummyInt;
-            ShimSqlDb.ReadDoubleValueObject = _ => DummyInt;
             ShimSqlDb.ReadIntValueObjectBooleanOut = (object input, out bool output) =>
             {
                 output = false;
@@ -173,8 +127,6 @@ namespace WorkEnginePPM.Tests.WebServices
             validations = 0;
             publicStatic = BindingFlags.Static | BindingFlags.Public;
             nonPublicStatic = BindingFlags.Static | BindingFlags.NonPublic;
-            publicInstance = BindingFlags.Instance | BindingFlags.Public;
-            nonPublicInstance = BindingFlags.Instance | BindingFlags.NonPublic;
             guid = Guid.Parse(SampleGuidString1);
             currentDate = DateTime.Now;
             configSettings = new Dictionary<string, string>()
@@ -529,7 +481,7 @@ namespace WorkEnginePPM.Tests.WebServices
         }
 
         [TestMethod]
-        public void GeneralFunctions_WhenCalled_ReturnsResultXml()
+        public void GeneralFunctions_FunctionCreateTicket_ReturnsResultXml()
         {
             // Arrange
             const string functionName = "CreateTicket";
@@ -585,6 +537,437 @@ namespace WorkEnginePPM.Tests.WebServices
                 () => actual.FirstChild.Attributes["Context"].Value.ShouldBe(DummyString),
                 () => Guid.TryParse(actual.FirstChild.Attributes["Ticket"].Value, out guid).ShouldBeTrue(),
                 () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GeneralFunctions_FunctionSynchronizeTeamExportNotSuccess_ReturnsResultXml()
+        {
+            // Arrange
+            const string functionName = "SynchronizeTeam";
+            var xmlString = $@"
+                <xmlcfg Function=""{functionName}"" Context=""{DummyString}"">
+                    <SynchronizeTeam Project_UIDs=""1,2"">
+                    </SynchronizeTeam>
+                </xmlcfg>";
+            var readhit = 0;
+            var context = new ShimHttpContext()
+            {
+                SessionGet = () => new ShimHttpSessionState()
+                {
+                    ItemGetString = _ => DummyString,
+                    RemoveString = _ =>
+                    {
+                        validations += 1;
+                    }
+                }
+            };
+            var actual = new XmlDocument();
+            var parameters = new object[]
+            {
+                context.Instance,
+                xmlString
+            };
+
+            dataReader.Read = () =>
+            {
+                readhit += 1;
+                return readhit <= Two;
+            };
+
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                readhit = 0;
+                return dataReader;
+            };
+            ShimSqlDb.AllInstances.StatusGet = _ => StatusEnum.rsSuccess;
+            ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
+            ShimWebAdmin.GetConnectionStringHttpContext = _ => DummyString;
+            ShimHttpContext.CurrentGet = () => context;
+            ShimSqlDb.AllInstances.Open = _ => StatusEnum.rsSuccess;
+            ShimdbaUsers.ExportPIInfoDBAccessStringStringOut = (DBAccess instance, string id, out string xmlOut) =>
+            {
+                validations += 1;
+                xmlOut = DummyString;
+                return StatusEnum.rsServerError;
+            };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GeneralFunctionsMethodName, publicStatic, parameters));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.Attributes["Function"].Value.ShouldBe("GeneralFunctions2"),
+                () => actual.FirstChild.SelectSingleNode("//Error").Attributes["ID"].Value.ShouldBe("0"),
+                () => validations.ShouldBe(2));
+        }
+
+        [TestMethod]
+        public void GeneralFunctions_FunctionSynchronizeTeamXmlNodeNull_ReturnsResultXml()
+        {
+            // Arrange
+            const string functionName = "SynchronizeTeam";
+            var xmlString = $@"
+                <xmlcfg Function=""{functionName}"" Context=""{DummyString}"">
+                    <SynchronizeTeam Project_UIDs=""1,2"">
+                    </SynchronizeTeam>
+                </xmlcfg>";
+            var readhit = 0;
+            var context = new ShimHttpContext()
+            {
+                SessionGet = () => new ShimHttpSessionState()
+                {
+                    ItemGetString = _ => DummyString,
+                    RemoveString = _ =>
+                    {
+                        validations += 1;
+                    }
+                }
+            };
+            var actual = new XmlDocument();
+            var parameters = new object[]
+            {
+                context.Instance,
+                xmlString
+            };
+
+            dataReader.Read = () =>
+            {
+                readhit += 1;
+                return readhit <= Two;
+            };
+
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                readhit = 0;
+                return dataReader;
+            };
+            ShimSqlDb.AllInstances.StatusGet = _ => StatusEnum.rsSuccess;
+            ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
+            ShimWebAdmin.GetConnectionStringHttpContext = _ => DummyString;
+            ShimHttpContext.CurrentGet = () => context;
+            ShimSqlDb.AllInstances.Open = _ => StatusEnum.rsSuccess;
+            ShimdbaUsers.ExportPIInfoDBAccessStringStringOut = (DBAccess instance, string id, out string xmlOut) =>
+            {
+                validations += 1;
+                xmlOut = DummyString;
+                return StatusEnum.rsSuccess;
+            };
+            ShimRPEditor.SendXMLToWorkEngineDBAccessStringStringXmlNodeOut =
+                (DBAccess dba, string sContext, string sXMLRequest, out XmlNode xNode) =>
+                {
+                    validations += 1;
+                    xNode = null;
+                    return StatusEnum.rsSuccess;
+                };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GeneralFunctionsMethodName, publicStatic, parameters));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.Attributes["Function"].Value.ShouldBe("GeneralFunctions4"),
+                () => actual.FirstChild.SelectSingleNode("//Error").Attributes["ID"].Value.ShouldBe("0"),
+                () => validations.ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void GeneralFunctions_FunctionSynchronizeTeamStatusNotZero_ReturnsResultXml()
+        {
+            // Arrange
+            const string functionName = "SynchronizeTeam";
+            var xmlString = $@"
+                <xmlcfg Function=""{functionName}"" Context=""{DummyString}"">
+                    <SynchronizeTeam Project_UIDs=""1,2"">
+                    </SynchronizeTeam>
+                    <Result Status=""1""/>
+                </xmlcfg>";
+            var readhit = 0;
+            var context = new ShimHttpContext()
+            {
+                SessionGet = () => new ShimHttpSessionState()
+                {
+                    ItemGetString = _ => DummyString,
+                    RemoveString = _ =>
+                    {
+                        validations += 1;
+                    }
+                }
+            };
+            var actual = new XmlDocument();
+            var parameters = new object[]
+            {
+                context.Instance,
+                xmlString
+            };
+
+            dataReader.Read = () =>
+            {
+                readhit += 1;
+                return readhit <= Two;
+            };
+
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                readhit = 0;
+                return dataReader;
+            };
+            ShimSqlDb.AllInstances.StatusGet = _ => StatusEnum.rsSuccess;
+            ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
+            ShimWebAdmin.GetConnectionStringHttpContext = _ => DummyString;
+            ShimHttpContext.CurrentGet = () => context;
+            ShimSqlDb.AllInstances.Open = _ => StatusEnum.rsSuccess;
+            ShimdbaUsers.ExportPIInfoDBAccessStringStringOut = (DBAccess instance, string id, out string xmlOut) =>
+            {
+                validations += 1;
+                xmlOut = DummyString;
+                return StatusEnum.rsSuccess;
+            };
+            ShimRPEditor.SendXMLToWorkEngineDBAccessStringStringXmlNodeOut =
+                (DBAccess dba, string sContext, string sXMLRequest, out XmlNode xNode) =>
+                {
+                    validations += 1;
+                    actual.LoadXml(xmlString);
+                    xNode = actual.FirstChild.SelectSingleNode("//Result");
+                    return StatusEnum.rsSuccess;
+                };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GeneralFunctionsMethodName, publicStatic, parameters));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.Attributes["Function"].Value.ShouldBe("GeneralFunctions8"),
+                () => actual.FirstChild.SelectSingleNode("//Error").Attributes["ID"].Value.ShouldBe("0"),
+                () => validations.ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void GeneralFunctions_FunctionSynchronizeTeamErrorNodeNotNull_ReturnsResultXml()
+        {
+            // Arrange
+            const string functionName = "SynchronizeTeam";
+            var xmlString = $@"
+                <xmlcfg Function=""{functionName}"" Context=""{DummyString}"">
+                    <SynchronizeTeam Project_UIDs=""1,2"">
+                    </SynchronizeTeam>
+                    <Result Status=""1"">
+                        <Error ID=""1"">{DummyString}</Error>
+                    </Result>
+                </xmlcfg>";
+            var readhit = 0;
+            var context = new ShimHttpContext()
+            {
+                SessionGet = () => new ShimHttpSessionState()
+                {
+                    ItemGetString = _ => DummyString,
+                    RemoveString = _ =>
+                    {
+                        validations += 1;
+                    }
+                }
+            };
+            var actual = new XmlDocument();
+            var parameters = new object[]
+            {
+                context.Instance,
+                xmlString
+            };
+
+            dataReader.Read = () =>
+            {
+                readhit += 1;
+                return readhit <= Two;
+            };
+
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                readhit = 0;
+                return dataReader;
+            };
+            ShimSqlDb.AllInstances.StatusGet = _ => StatusEnum.rsSuccess;
+            ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
+            ShimWebAdmin.GetConnectionStringHttpContext = _ => DummyString;
+            ShimHttpContext.CurrentGet = () => context;
+            ShimSqlDb.AllInstances.Open = _ => StatusEnum.rsSuccess;
+            ShimdbaUsers.ExportPIInfoDBAccessStringStringOut = (DBAccess instance, string id, out string xmlOut) =>
+            {
+                validations += 1;
+                xmlOut = DummyString;
+                return StatusEnum.rsSuccess;
+            };
+            ShimRPEditor.SendXMLToWorkEngineDBAccessStringStringXmlNodeOut =
+                (DBAccess dba, string sContext, string sXMLRequest, out XmlNode xNode) =>
+                {
+                    validations += 1;
+                    actual.LoadXml(xmlString);
+                    xNode = actual.FirstChild.SelectSingleNode("//Result");
+                    return StatusEnum.rsSuccess;
+                };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GeneralFunctionsMethodName, publicStatic, parameters));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.Attributes["Function"].Value.ShouldBe("GeneralFunctions6"),
+                () => actual.FirstChild.SelectSingleNode("//Error").Attributes["ID"].Value.ShouldBe("0"),
+                () => validations.ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void GeneralFunctions_FunctionSynchronizeTeamItemNotNull_ReturnsResultXml()
+        {
+            // Arrange
+            const string functionName = "SynchronizeTeam";
+            var xmlString = $@"
+                <xmlcfg Function=""{functionName}"" Context=""{DummyString}"">
+                    <SynchronizeTeam Project_UIDs=""1,2"">
+                    </SynchronizeTeam>
+                    <Result Status=""1"">
+                        <Item Error=""ErrorMessage"">{DummyString}</Item>
+                    </Result>
+                </xmlcfg>";
+            var readhit = 0;
+            var context = new ShimHttpContext()
+            {
+                SessionGet = () => new ShimHttpSessionState()
+                {
+                    ItemGetString = _ => DummyString,
+                    RemoveString = _ =>
+                    {
+                        validations += 1;
+                    }
+                }
+            };
+            var actual = new XmlDocument();
+            var parameters = new object[]
+            {
+                context.Instance,
+                xmlString
+            };
+
+            dataReader.Read = () =>
+            {
+                readhit += 1;
+                return readhit <= Two;
+            };
+
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                readhit = 0;
+                return dataReader;
+            };
+            ShimSqlDb.AllInstances.StatusGet = _ => StatusEnum.rsSuccess;
+            ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
+            ShimWebAdmin.GetConnectionStringHttpContext = _ => DummyString;
+            ShimHttpContext.CurrentGet = () => context;
+            ShimSqlDb.AllInstances.Open = _ => StatusEnum.rsSuccess;
+            ShimdbaUsers.ExportPIInfoDBAccessStringStringOut = (DBAccess instance, string id, out string xmlOut) =>
+            {
+                validations += 1;
+                xmlOut = DummyString;
+                return StatusEnum.rsSuccess;
+            };
+            ShimRPEditor.SendXMLToWorkEngineDBAccessStringStringXmlNodeOut =
+                (DBAccess dba, string sContext, string sXMLRequest, out XmlNode xNode) =>
+                {
+                    validations += 1;
+                    actual.LoadXml(xmlString);
+                    xNode = actual.FirstChild.SelectSingleNode("//Result");
+                    return StatusEnum.rsSuccess;
+                };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GeneralFunctionsMethodName, publicStatic, parameters));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.Attributes["Function"].Value.ShouldBe("GeneralFunctions7"),
+                () => actual.FirstChild.SelectSingleNode("//Error").Attributes["ID"].Value.ShouldBe("0"),
+                () => validations.ShouldBe(3));
+        }
+
+        [TestMethod]
+        public void GeneralFunctions_FunctionSynchronizeTeam_ReturnsResultXml()
+        {
+            // Arrange
+            const string functionName = "SynchronizeTeam";
+            var xmlString = $@"
+                <xmlcfg Function=""{functionName}"" Context=""{DummyString}"">
+                    <SynchronizeTeam Project_UIDs=""1,2"">
+                    </SynchronizeTeam>
+                    <Result Status=""0""/>
+                </xmlcfg>";
+            var readhit = 0;
+            var context = new ShimHttpContext()
+            {
+                SessionGet = () => new ShimHttpSessionState()
+                {
+                    ItemGetString = _ => DummyString,
+                    RemoveString = _ =>
+                    {
+                        validations += 1;
+                    }
+                },
+                RequestGet = () => new ShimHttpRequest()
+            };
+            var actual = new XmlDocument();
+            var parameters = new object[]
+            {
+                context.Instance,
+                xmlString
+            };
+
+            dataReader.Read = () =>
+            {
+                readhit += 1;
+                return readhit <= Two;
+            };
+
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                readhit = 0;
+                return dataReader;
+            };
+            ShimSqlDb.AllInstances.StatusGet = _ => StatusEnum.rsSuccess;
+            ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
+            ShimWebAdmin.GetConnectionStringHttpContext = _ => DummyString;
+            ShimHttpContext.CurrentGet = () => context;
+            ShimSqlDb.AllInstances.Open = _ => StatusEnum.rsSuccess;
+            ShimdbaUsers.ExportPIInfoDBAccessStringStringOut = (DBAccess instance, string id, out string xmlOut) =>
+            {
+                validations += 1;
+                xmlOut = DummyString;
+                return StatusEnum.rsSuccess;
+            };
+            ShimRPEditor.SendXMLToWorkEngineDBAccessStringStringXmlNodeOut =
+                (DBAccess dba, string sContext, string sXMLRequest, out XmlNode xNode) =>
+                {
+                    validations += 1;
+                    actual.LoadXml(xmlString);
+                    xNode = actual.FirstChild.SelectSingleNode("//Result");
+                    return StatusEnum.rsSuccess;
+                };
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GeneralFunctionsMethodName, publicStatic, parameters));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.Attributes["Function"].Value.ShouldBe("SynchronizeTeam"),
+                () => validations.ShouldBe(5));
         }
     }
 }
