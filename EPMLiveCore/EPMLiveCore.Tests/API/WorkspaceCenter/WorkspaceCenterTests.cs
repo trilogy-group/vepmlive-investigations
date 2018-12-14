@@ -50,35 +50,9 @@ namespace EPMLiveCore.Tests.API
             PrepareSpContext();
             ShimConnectionMethods();
 
+            ShimQueryExecutor.ConstructorSPWeb = (_, __) => { };
             ShimQueryExecutor.AllInstances.ExecuteQueryStringIEnumerableOfKeyValuePairOfStringObjectCommandTypeString =
-                (a, b, c, d, e) =>
-                {
-                    var dataTable = new DataTable();
-                    dataTable.Columns.Add(KeyId);
-                    dataTable.Columns.Add("WebId", typeof(Guid));
-                    dataTable.Columns.Add("WEB_ID", typeof(Guid));
-                    dataTable.Columns.Add("HasAccess", typeof(int));
-                    dataTable.Columns.Add(KeySiteId, typeof(Guid));
-                    dataTable.Columns.Add("WebUrl");
-                    dataTable.Columns.Add(WebTitle);
-                    dataTable.Columns.Add(WebDescription);
-                    dataTable.Columns.Add(Members);
-                    dataTable.Columns.Add(SharePointAccountText);
-
-                    dataTable.Rows.Add(new object[]
-                    {
-                        DefaultWebId,
-                        DefaultWebId,
-                        DefaultWebId,
-                        Id,
-                        DefaultSiteId,
-                        ExampleUrl,
-                        WebTitle,
-                        WebDescription,
-                        Members,
-                        SharePointAccountText });
-                    return dataTable;
-                };
+                (a, b, c, d, e) => GetQueryResult();
         }
 
         [TestCleanup]
@@ -176,6 +150,7 @@ namespace EPMLiveCore.Tests.API
             ShimSPWeb.AllInstances.ListsGet = _ => listCollection.Bind(new SPList[] { new ShimSPList() });
             ShimSPWeb.AllInstances.SiteGet = _ => new ShimSPSite();
             ShimSPWeb.AllInstances.CurrentUserGet = _ => new ShimSPUser();
+            ShimSPWeb.AllInstances.Close = _ => { };
             ShimSPUser.AllInstances.IDGet = _ => Id;
 
             ShimSPSite.ConstructorGuid = (_, __) => { };
@@ -185,6 +160,7 @@ namespace EPMLiveCore.Tests.API
             ShimSPSite.AllInstances.ContentDatabaseGet = _ => new ShimSPContentDatabase();
             ShimSPSite.AllInstances.SiteIdGet = _ => DefaultSiteId;
             ShimSPSite.AllInstances.IDGet = _ => DefaultSiteId;
+            ShimSPSite.AllInstances.Close = _ => { };
 
             ShimSPListCollection.AllInstances.ItemGetString = (_, __) => new ShimSPList();
             ShimSPListCollection.AllInstances.ItemGetGuid = (_, __) => new ShimSPList();
@@ -224,6 +200,35 @@ namespace EPMLiveCore.Tests.API
                 dataTable.Rows.Add(new object[] { DefaultWebId, DefaultSiteId, DefaultDate, DefaultDate });
                 return 1;
             };
+        }
+
+        private static DataTable GetQueryResult()
+        {
+            var dataTable = new DataTable();
+            dataTable.Columns.Add(KeyId);
+            dataTable.Columns.Add("WebId", typeof(Guid));
+            dataTable.Columns.Add("WEB_ID", typeof(Guid));
+            dataTable.Columns.Add("HasAccess", typeof(int));
+            dataTable.Columns.Add(KeySiteId, typeof(Guid));
+            dataTable.Columns.Add("WebUrl");
+            dataTable.Columns.Add(WebTitle);
+            dataTable.Columns.Add(WebDescription);
+            dataTable.Columns.Add(Members);
+            dataTable.Columns.Add(SharePointAccountText);
+
+            dataTable.Rows.Add(new object[]
+            {
+                        DefaultWebId,
+                        DefaultWebId,
+                        DefaultWebId,
+                        Id,
+                        DefaultSiteId,
+                        ExampleUrl,
+                        WebTitle,
+                        WebDescription,
+                        Members,
+                        SharePointAccountText });
+            return dataTable;
         }
     }
 }
