@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Fakes;
+using System.Web.SessionState.Fakes;
 using System.Xml;
 using System.Xml.Linq;
 using EPMLiveCore.API.Fakes;
@@ -81,6 +82,8 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string SampleUrl = "http://www.sampleurl.com";
         private const string ResourcePlansMethodName = "ResourcePlans";
         private const string AdminFunctionsMethodName = "AdminFunctions";
+        private const string BuildResultXMLMethodName = "BuildResultXML";
+        private const string GeneralFunctionsMethodName = "GeneralFunctions";
 
         [TestInitialize]
         public void Setup()
@@ -498,6 +501,89 @@ namespace WorkEnginePPM.Tests.WebServices
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual.ShouldBe(string.Empty),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void BuildResultXML_WhenCalled_ReturnsResultXml()
+        {
+            // Arrange
+            var parameters = new object[]
+            {
+                DummyString,
+                Five,
+                DummyString
+            };
+            var actual = new XmlDocument();
+
+            // Act
+            var result = (CStruct)privateObject.Invoke(BuildResultXMLMethodName, nonPublicStatic, parameters);
+            actual.LoadXml(result.XML());
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe(Five.ToString()),
+                () => actual.FirstChild.Attributes["Function"].Value.ShouldBe(DummyString),
+                () => actual.FirstChild.Attributes["Message"].Value.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void GeneralFunctions_WhenCalled_ReturnsResultXml()
+        {
+            // Arrange
+            const string functionName = "CreateTicket";
+            var xmlString = $@"
+                <xmlcfg Function=""{functionName}"" Context=""{DummyString}"">
+                    <Data>
+                    </Data>
+                </xmlcfg>";
+            var readhit = 0;
+            var context = new ShimHttpContext()
+            {
+                SessionGet = () => new ShimHttpSessionState()
+                {
+                    ItemGetString = _ => DummyString,
+                    RemoveString = _ =>
+                    {
+                        validations += 1;
+                    }
+                }
+            };
+            var actual = new XmlDocument();
+            var parameters = new object[]
+            {
+                context.Instance,
+                xmlString
+            };
+
+            dataReader.Read = () =>
+            {
+                readhit += 1;
+                return readhit <= Two;
+            };
+
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                readhit = 0;
+                return dataReader;
+            };
+            ShimSqlDb.AllInstances.StatusGet = _ => StatusEnum.rsSuccess;
+            ShimSqlConnection.AllInstances.StateGet = _ => ConnectionState.Open;
+            ShimWebAdmin.GetConnectionStringHttpContext = _ => DummyString;
+            ShimHttpContext.CurrentGet = () => context;
+            ShimSqlDb.AllInstances.Open = _ => StatusEnum.rsSuccess;
+
+            // Act
+            actual.LoadXml((string)privateObject.Invoke(GeneralFunctionsMethodName, publicStatic, parameters));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.FirstChild.Name.ShouldBe("Result"),
+                () => actual.FirstChild.Attributes["Status"].Value.ShouldBe("0"),
+                () => actual.FirstChild.Attributes["Function"].Value.ShouldBe(functionName),
+                () => actual.FirstChild.Attributes["Context"].Value.ShouldBe(DummyString),
+                () => Guid.TryParse(actual.FirstChild.Attributes["Ticket"].Value, out guid).ShouldBeTrue(),
                 () => validations.ShouldBe(1));
         }
     }
