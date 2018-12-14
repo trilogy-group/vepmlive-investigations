@@ -301,18 +301,19 @@ namespace WorkEnginePPM.Tests.WebServices
         {
             // Arrange
             var xmlString = $@"<xmlcfg Function=""GetPlanRowNotes"" guid=""{guid}""/>";
+            var actual = new XmlDocument();
+            var readhit = 0;
             var context = new ShimHttpContext()
             {
                 RequestGet = () => new ShimHttpRequest()
             };
-            var readhit = 0;
-            var actual = new XmlDocument();
 
             dataReader.Read = () =>
             {
                 readhit += 1;
                 return readhit <= Two;
             };
+
             ShimSqlCommand.AllInstances.ExecuteReader = instance =>
             {
                 readhit = 0;
@@ -357,18 +358,19 @@ namespace WorkEnginePPM.Tests.WebServices
                         <Grid/>
                     </Data>
                 </xmlcfg>";
+            var readhit = 0;
+            var actual = new XmlDocument();
             var context = new ShimHttpContext()
             {
                 RequestGet = () => new ShimHttpRequest()
             };
-            var readhit = 0;
-            var actual = new XmlDocument();
 
             dataReader.Read = () =>
             {
                 readhit += 1;
                 return readhit <= Two;
             };
+
             ShimSqlCommand.AllInstances.ExecuteReader = instance =>
             {
                 readhit = 0;
@@ -416,17 +418,18 @@ namespace WorkEnginePPM.Tests.WebServices
                         <Grid/>
                     </Data>
                 </xmlcfg>";
+            var readhit = 0;
             var context = new ShimHttpContext()
             {
                 RequestGet = () => new ShimHttpRequest()
             };
-            var readhit = 0;
 
             dataReader.Read = () =>
             {
                 readhit += 1;
                 return readhit <= Two;
             };
+
             ShimSqlCommand.AllInstances.ExecuteReader = instance =>
             {
                 readhit = 0;
@@ -490,6 +493,7 @@ namespace WorkEnginePPM.Tests.WebServices
                     <Data>
                     </Data>
                 </xmlcfg>";
+            var actual = new XmlDocument();
             var readhit = 0;
             var context = new ShimHttpContext()
             {
@@ -502,7 +506,6 @@ namespace WorkEnginePPM.Tests.WebServices
                     }
                 }
             };
-            var actual = new XmlDocument();
             var parameters = new object[]
             {
                 context.Instance,
@@ -550,6 +553,7 @@ namespace WorkEnginePPM.Tests.WebServices
                     </SynchronizeTeam>
                 </xmlcfg>";
             var readhit = 0;
+            var actual = new XmlDocument();
             var context = new ShimHttpContext()
             {
                 SessionGet = () => new ShimHttpSessionState()
@@ -561,7 +565,6 @@ namespace WorkEnginePPM.Tests.WebServices
                     }
                 }
             };
-            var actual = new XmlDocument();
             var parameters = new object[]
             {
                 context.Instance,
@@ -614,6 +617,7 @@ namespace WorkEnginePPM.Tests.WebServices
                     </SynchronizeTeam>
                 </xmlcfg>";
             var readhit = 0;
+            var actual = new XmlDocument();
             var context = new ShimHttpContext()
             {
                 SessionGet = () => new ShimHttpSessionState()
@@ -625,7 +629,6 @@ namespace WorkEnginePPM.Tests.WebServices
                     }
                 }
             };
-            var actual = new XmlDocument();
             var parameters = new object[]
             {
                 context.Instance,
@@ -686,6 +689,7 @@ namespace WorkEnginePPM.Tests.WebServices
                     <Result Status=""1""/>
                 </xmlcfg>";
             var readhit = 0;
+            var actual = new XmlDocument();
             var context = new ShimHttpContext()
             {
                 SessionGet = () => new ShimHttpSessionState()
@@ -697,7 +701,6 @@ namespace WorkEnginePPM.Tests.WebServices
                     }
                 }
             };
-            var actual = new XmlDocument();
             var parameters = new object[]
             {
                 context.Instance,
@@ -761,6 +764,7 @@ namespace WorkEnginePPM.Tests.WebServices
                     </Result>
                 </xmlcfg>";
             var readhit = 0;
+            var actual = new XmlDocument();
             var context = new ShimHttpContext()
             {
                 SessionGet = () => new ShimHttpSessionState()
@@ -772,7 +776,6 @@ namespace WorkEnginePPM.Tests.WebServices
                     }
                 }
             };
-            var actual = new XmlDocument();
             var parameters = new object[]
             {
                 context.Instance,
@@ -836,6 +839,7 @@ namespace WorkEnginePPM.Tests.WebServices
                     </Result>
                 </xmlcfg>";
             var readhit = 0;
+            var actual = new XmlDocument();
             var context = new ShimHttpContext()
             {
                 SessionGet = () => new ShimHttpSessionState()
@@ -847,7 +851,6 @@ namespace WorkEnginePPM.Tests.WebServices
                     }
                 }
             };
-            var actual = new XmlDocument();
             var parameters = new object[]
             {
                 context.Instance,
@@ -909,6 +912,7 @@ namespace WorkEnginePPM.Tests.WebServices
                     <Result Status=""0""/>
                 </xmlcfg>";
             var readhit = 0;
+            var actual = new XmlDocument();
             var context = new ShimHttpContext()
             {
                 SessionGet = () => new ShimHttpSessionState()
@@ -921,7 +925,6 @@ namespace WorkEnginePPM.Tests.WebServices
                 },
                 RequestGet = () => new ShimHttpRequest()
             };
-            var actual = new XmlDocument();
             var parameters = new object[]
             {
                 context.Instance,
