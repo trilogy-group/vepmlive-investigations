@@ -4087,9 +4087,9 @@ namespace TimeSheets
 
                             if (dtTSItem != null)
                             {
-                                string project = EpmCoreFunctions.GetSafeGroupTitle(Convert.ToString(dtTSItem.Rows[0]["PROJECT"]));
+                            string project = EpmCoreFunctions.GetSafeGroupTitle(Convert.ToString(dtTSItem.Rows[0]["PROJECT"]));
                                 string projectID = Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]) == "" ? "null" : Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]);
-                                sql = string.Format(@"select '{0}' SiteId,'{1}' WebId,'{2}' ListId,{3} ItemId,{4} ProjectID, '{5}' ProjectText,0 IsAssignment,'{6}' WorkType,'true' IsDeleted ", Convert.ToString(dtTSItem.Rows[0]["SITE_UID"]), Convert.ToString(dtTSItem.Rows[0]["WEB_UID"]), Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]), Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]), projectID, project, dtTSItem.Rows[0]["LIST"]);
+                            sql = string.Format(@"select '{0}' SiteId,'{1}' WebId,'{2}' ListId,{3} ItemId,{4} ProjectID, '{5}' ProjectText,0 IsAssignment,'{6}' WorkType,'true' IsDeleted ", Convert.ToString(dtTSItem.Rows[0]["SITE_UID"]), Convert.ToString(dtTSItem.Rows[0]["WEB_UID"]), Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]), Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]), projectID, project, dtTSItem.Rows[0]["LIST"]);
                                 myWorkDataTable = rptData.ExecuteSql(sql);
 
                                 if (myWorkDataTable.Rows.Count > 0)
@@ -4110,7 +4110,7 @@ namespace TimeSheets
                                     }
                                         catch (Exception ex)
                                         {
-                                            dr[item.ColumnName] = DBNull.Value;
+                                        dr[item.ColumnName] = DBNull.Value;
                                             Logger.WriteLog(Logger.Category.Unexpected, "TimeSheetAPI iiGetTSData", ex.ToString());
                                         }
                                     }
