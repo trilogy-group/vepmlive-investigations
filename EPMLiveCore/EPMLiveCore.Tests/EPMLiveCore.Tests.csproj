@@ -323,9 +323,13 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="TestCheck.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\CaseSettingsTest.cs" />
     <Compile Include="Web References\SalesforceMetadataService\CustomFieldTest.cs" />
     <Compile Include="Web References\SalesforceMetadataService\CustomObjectTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\CustomPageWebLinkTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\CustomSiteTest.cs" />
     <Compile Include="Web References\SalesforceMetadataService\DashboardComponentTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\ReportChartTest.cs" />
     <Compile Include="Web References\SalesforcePartnerService\FieldTest.cs" />
     <Compile Include="Web References\SalesforcePartnerService\DescribeGlobalSObjectResultTest.cs" />
     <Compile Include="Web References\SalesforcePartnerService\DescribeSObjectResultTest.cs" />
