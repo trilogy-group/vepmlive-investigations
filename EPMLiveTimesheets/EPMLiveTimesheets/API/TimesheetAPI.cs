@@ -14,7 +14,6 @@ using System.Xml;
 using System.Xml.Linq;
 using EPMLiveCore.API;
 using EPMLiveCore.ReportingProxy;
-using EPMLiveWebParts;
 using Microsoft.SharePoint;
 using TimeSheets.Log;
 using TimeSheets.Models;
@@ -2513,12 +2512,95 @@ namespace TimeSheets
 
         private static string getFormat(SPField oField, XmlDocument oDoc, SPWeb oWeb)
         {
-            return FormatHelper.GetFormat(
-                oField,
-                oDoc,
-                oWeb,
-                nInfo => $"{nInfo.CurrencySymbol}{nInfo.CurrencyGroupSeparator}0{nInfo.CurrencyDecimalSeparator}00",
-                "0\\%;0\\%;0\\%");
+            string format = "";
+
+            switch (oField.Type)
+            {
+                case SPFieldType.DateTime:
+                    try
+                    {
+
+                        if (oDoc.FirstChild.Attributes["Format"].Value == "DateOnly")
+                        {
+                            format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+                        }
+                        else
+                        {
+                            format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern;
+                        }
+                    }
+                    catch { }
+                    break;
+                case SPFieldType.Number:
+                    if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
+                    {
+                        format = "0\\%;0\\%;0\\%";
+                    }
+                    else
+                    {
+                        int decCount = 0;
+                        string decimals = "";
+                        try
+                        {
+                            decCount = int.Parse(oDoc.FirstChild.Attributes["Decimals"].Value);
+                        }
+                        catch { }
+
+                        for (int i = 0; i < decCount; i++)
+                        {
+                            decimals += "0";
+                        }
+
+                        if (decCount > 0)
+                            decimals = "." + decimals;
+
+                        format = ",0" + decimals;
+                        break;
+                    }
+                    break;
+                case SPFieldType.Currency:
+                    SPFieldCurrency c = (SPFieldCurrency)oField;
+                    System.Globalization.NumberFormatInfo nInfo = System.Globalization.CultureInfo.GetCultureInfo(c.CurrencyLocaleId).NumberFormat;
+                    format = nInfo.CurrencySymbol + nInfo.CurrencyGroupSeparator + "0" + nInfo.CurrencyDecimalSeparator + "00";
+                    break;
+                case SPFieldType.Calculated:
+                    switch (oDoc.FirstChild.Attributes["ResultType"].Value)
+                    {
+                        case "Currency":
+                            format = oWeb.Locale.NumberFormat.CurrencySymbol + ",0.00";
+                            break;
+                        case "Number":
+                            if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
+                            {
+                                format = "0\\%;0\\%;0\\%";
+                            }
+                            else
+                            {
+                                int decCount = 0;
+                                string decimals = "";
+                                try
+                                {
+                                    decCount = int.Parse(oDoc.FirstChild.Attributes["Decimals"].Value);
+                                }
+                                catch { }
+
+                                for (int i = 0; i < decCount; i++)
+                                {
+                                    decimals += "0";
+                                }
+
+                                if (decCount > 0)
+                                    decimals = "." + decimals;
+
+                                format = ",0" + decimals;
+                            }
+                            break;
+                    };
+                    break;
+
+            };
+
+            return format;
         }
 
         private static void PopulateTimesheetGridLayout(SPWeb web, ref XmlDocument docLayout, TimesheetSettings settings, ref int MidWidth, Dictionary<string, string> viewInfo, bool isWork, string InputList)
