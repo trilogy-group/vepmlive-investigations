@@ -3863,9 +3863,9 @@ namespace TimeSheets
 
                         if (dtTSItem != null)
                         {
-                            string project = Regex.Replace(Convert.ToString(dtTSItem.Rows[0]["PROJECT"]), @"(\s+|@|&|'|\(|\)|<|>|#)", " ");
+                            string project = EpmCoreFunctions.GetSafeGroupTitle(Convert.ToString(dtTSItem.Rows[0]["PROJECT"]));
                             string projectID = Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]) == "" ? "null" : Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]);
-                            sql = string.Format(@"select '" + Convert.ToString(dtTSItem.Rows[0]["SITE_UID"]) + "' SiteId,'" + Convert.ToString(dtTSItem.Rows[0]["WEB_UID"]) + "' WebId,'" + Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]) + "' ListId," + Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]) + " ItemId,null WebUrl,null Commenters,null CommentersRead,null CommentCount,null WorkspaceUrl,null ID,null Title,null _UIVersionString,null Attachments,null ItemChildCountID,null ItemChildCountText,null FolderChildCountID,null FolderChildCountText,null AppAuthorID,null AppAuthorText,null AppEditorID,null AppEditorText," + projectID + " ProjectID, '" + project + "' ProjectText,null AssignedToID,null AssignedToText,null OwnerID,null OwnerText,null Status,null Priority,null Body,null ScheduleStatus,null PercentComplete,null Due,null StartDate,null ActualStart,null DueDate,null ActualFinish,null Work,null ActualWork,null RemainingWork,null TimesheetHours,null RemainingHours,null WorkPercentSpent,null WorkStatus,null taskorder,null TaskHierarchy,null Site,null DaysOverdue,null Complete,null Timesheet,0 IsAssignment,null ContentType,null Modified,null Created,null AuthorID,null AuthorText,null EditorID,null EditorText,'" + dtTSItem.Rows[0]["LIST"] + "' WorkType, null DataSource,'true' IsDeleted ");
+                            sql = string.Format(@"select '{0}' SiteId,'{1}' WebId,'{2}' ListId,{3} ItemId,{4} ProjectID, '{5}' ProjectText,0 IsAssignment,'{6}' WorkType,'true' IsDeleted ", Convert.ToString(dtTSItem.Rows[0]["SITE_UID"]), Convert.ToString(dtTSItem.Rows[0]["WEB_UID"]), Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]), Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]), projectID, project, dtTSItem.Rows[0]["LIST"]);
                             myWorkDataTable = rptData.ExecuteSql(sql);
 
                             if (myWorkDataTable.Rows.Count > 0)
@@ -3883,6 +3883,7 @@ namespace TimeSheets
                                     }
                                     catch (Exception ex)
                                     {
+                                        dr[item.ColumnName] = DBNull.Value;
                                         Logger.WriteLog(Logger.Category.Unexpected, "TimeSheetAPI iiGetTSData", ex.ToString());
                                     }
                                 }
