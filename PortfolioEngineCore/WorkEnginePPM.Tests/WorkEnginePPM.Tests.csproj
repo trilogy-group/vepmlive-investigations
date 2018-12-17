@@ -134,6 +134,7 @@
     <Compile Include="Events\ResourceManagementEvent\ResourceManagementEventTests.cs" />
     <Compile Include="Layouts\ppm\GroupPermissionsTests.cs" />
     <Compile Include="Layouts\ppm\DBAdminTests.cs" />
+    <Compile Include="Layouts\ppm\CalendarsTests.cs" />
     <Compile Include="WebServices\CADataCacheTests.cs" />
     <Compile Include="WebServices\CostAnalyzerDataCacheTests.cs" />
     <Compile Include="WebServices\EditCalendarTests.cs" />
@@ -166,6 +167,7 @@
     <Compile Include="WebServices\ResPlanAnalyzer.asmx.Tests.cs" />
     <Compile Include="WebServices\ResPlanAnalyzerTests.cs" />
     <Compile Include="WebServices\RPADataTests.cs" />
+    <Compile Include="WebServices\RPEditorRemTests.cs" />
     <Compile Include="WebServices\RPEditorTests.cs" />
   </ItemGroup>
   <ItemGroup>
