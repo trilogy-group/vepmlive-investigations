@@ -13,6 +13,7 @@ using System.IO;
 using EPMLiveCore.Infrastructure.Logging;
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 using Microsoft.SharePoint.Administration;
+using static System.Diagnostics.Trace;
 
 namespace EPMLiveCore
 {
@@ -334,36 +335,44 @@ namespace EPMLiveCore
 
         private void buildResourceCap(SPList list, string field)
         {
-            //lstResourceCap
+            BuildResourceCap(list, field, lstResourceCap);
+        }
 
-            SortedList lstRes = new SortedList();
+        internal static void BuildResourceCap(SPList list, string field, SortedList resourceCaps)
+        {
+            var resultList = new SortedList();
 
-            foreach (SPListItem li in list.Items)
+            foreach (SPListItem listItem in list.Items)
             {
-                string val = "";
+                var itemValue = string.Empty;
+
                 try
                 {
-                    val = li[field].ToString();
+                    itemValue = listItem[field].ToString();
                 }
-                catch { }
-                if (val != "")
+                catch (Exception ex)
                 {
-                    if (lstRes.Contains(val))
+                    TraceError("Exception Suppressed {0}", ex);
+                }
+
+                if (itemValue != string.Empty)
+                {
+                    if (resultList.Contains(itemValue))
                     {
-                        int i = (int)lstRes[val];
+                        var i = (int)resultList[itemValue];
                         i++;
-                        lstRes[val] = i;
+                        resultList[itemValue] = i;
                     }
                     else
                     {
-                        lstRes.Add(val, 1);
+                        resultList.Add(itemValue, 1);
                     }
                 }
             }
 
-            foreach (DictionaryEntry de in lstRes)
+            foreach (DictionaryEntry de in resultList)
             {
-                lstResourceCap.Add(field + "\n" + de.Key, de.Value);
+                resourceCaps?.Add(string.Format("{0}\n{1}", field, de.Key), de.Value);
             }
         }
 

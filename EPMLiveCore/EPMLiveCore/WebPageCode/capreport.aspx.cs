@@ -245,37 +245,7 @@ namespace EPMLiveCore
 
         private void buildResourceCap(SPList list, string field)
         {
-            //lstResourceCap
-
-            SortedList lstRes = new SortedList();
-
-            foreach (SPListItem li in list.Items)
-            {
-                string val = "";
-                try
-                {
-                    val = li[field].ToString();
-                }
-                catch { }
-                if (val != "")
-                {
-                    if (lstRes.Contains(val))
-                    {
-                        int i = (int)lstRes[val];
-                        i++;
-                        lstRes[val] = i;
-                    }
-                    else
-                    {
-                        lstRes.Add(val, 1);
-                    }
-                }
-            }
-
-            foreach (DictionaryEntry de in lstRes)
-            {
-                lstResourceCap.Add(field + "\n" + de.Key, de.Value);
-            }
+            tpreport.BuildResourceCap(list, field, lstResourceCap);
         }
 
         private void buildColumns(SPWeb web)
