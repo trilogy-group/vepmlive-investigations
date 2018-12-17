@@ -331,6 +331,10 @@
     <Compile Include="Web References\SalesforceMetadataService\CustomSiteTest.cs" />
     <Compile Include="Web References\SalesforceMetadataService\DashboardComponentTest.cs" />
     <Compile Include="Web References\SalesforceMetadataService\ReportChartTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\LayoutTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\PortalTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\ReportTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\WebLinkTest.cs" />
     <Compile Include="Web References\SalesforcePartnerService\FieldTest.cs" />
     <Compile Include="Web References\SalesforcePartnerService\DescribeGlobalSObjectResultTest.cs" />
     <Compile Include="Web References\SalesforcePartnerService\DescribeSObjectResultTest.cs" />
