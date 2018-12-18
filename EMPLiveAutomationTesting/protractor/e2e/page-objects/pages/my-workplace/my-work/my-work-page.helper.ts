@@ -863,7 +863,7 @@ export class MyWorkPageHelper {
         await ElementHelper.actionHoverOver(ellipseMyWorkPageItems.workTypes);
         const workType = await PageHelper.getText(ellipseMyWorkPageItems.workTypeSubmenuItem);
         await ElementHelper.actionHoverOver(ellipseMyWorkPageItems.workTypes);
-        await PageHelper.click(ellipseMyWorkPageItems.workTypeSubmenuItem);
+        await ElementHelper.clickUsingJs(ellipseMyWorkPageItems.workTypeSubmenuItem);
         return workType;
     }
 

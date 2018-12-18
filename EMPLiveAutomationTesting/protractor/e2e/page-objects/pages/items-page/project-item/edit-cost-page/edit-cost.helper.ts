@@ -288,4 +288,16 @@ export class EditCostHelper {
         await LoginPageHelper.logout();
         return id;
     }
+
+    static async createOneProjectWithCost() {
+        StepLogger.subStep('Navigate to Project Page');
+        const id = PageHelper.getUniqueId();
+        StepLogger.subStep('Create first project');
+        const project1 = await this.createProjectWithCost(id);
+        StepLogger.subStep(`${project1} is created`);
+        await this.clickCloseCostPlanner();
+        StepLogger.subStep('logout from application');
+        await LoginPageHelper.logout();
+        return project1;
+    }
 }

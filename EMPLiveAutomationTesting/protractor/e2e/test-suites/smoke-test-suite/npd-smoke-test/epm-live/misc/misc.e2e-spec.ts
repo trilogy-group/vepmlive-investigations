@@ -36,7 +36,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    fit('Create New Strategy in Optimizer Functionality - [1124301][BUG:SKYVERA-1844]', async () => {
+    it('Create New Strategy in Optimizer Functionality - [1124301][BUG:SKYVERA-1844]', async () => {
         StepLogger.caseId = 1124301;
 
         StepLogger.stepId(1);
