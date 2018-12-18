@@ -359,7 +359,7 @@ export class CommonPage extends BasePage {
 
     static get project() {
         // This xpath is best we have. Onmouse click is required
-        return element(By.css(`${CommonPage.projectFirstRow} [href*='Lists/Project']`));
+        return element(By.css(`${CommonPage.projectFirstRow} [href]`));
     }
 
     static get costButton() {
