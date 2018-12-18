@@ -225,6 +225,7 @@
     <Compile Include="API\Template\Template.cs" />
     <Compile Include="API\Timer.cs" />
     <Compile Include="API\ViewManager.cs" />
+    <Compile Include="API\WebInitHelper.cs" />
     <Compile Include="API\WorkspaceCenter\WorkspaceCenter.cs" />
     <Compile Include="AppNavFixUp.cs" />
     <Compile Include="AppSettingsHelper.cs" />
