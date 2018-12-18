@@ -121,7 +121,6 @@ namespace PortfolioEngineCore.Tests.Resources
 
             // Assert
             var assertions = AssertQueries(expectedQueries);
-            assertions.Add(() => result.ShouldBeTrue());
             this.ShouldSatisfyAllConditions(assertions.ToArray());
         }
 

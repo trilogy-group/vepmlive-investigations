@@ -49,8 +49,16 @@
     <Reference Include="EPMLiveIntegration.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPMLiveIntegration.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Web.CommandUI.16.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\Microsoft.Web.CommandUI.16.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="PortfolioEngineCore.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\PortfolioEngineCore.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Extensions.4.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.Extensions.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Services" />
   </ItemGroup>
@@ -205,6 +213,7 @@
     <Compile Include="API\MyWork\UtilsTests.cs" />
     <Compile Include="API\NavigationServiceTests.cs" />
     <Compile Include="API\Applications\ApplicationUninstallerTests.cs" />
+    <Compile Include="API\Notification\APIEmailTest.cs" />
     <Compile Include="API\Notification\NotificationTests.cs" />
     <Compile Include="API\PersonalizationManagerTests.cs" />
     <Compile Include="API\Publish\APIPublishTests.cs" />
@@ -215,6 +224,7 @@
     <Compile Include="API\ResourceGrid\ResourceImporterTests.cs" />
     <Compile Include="API\SPAdmin\EventReceiverManagerTests.cs" />
     <Compile Include="API\TimerTests.cs" />
+    <Compile Include="API\WorkspaceCenter\WorkspaceCenterTests.cs" />
     <Compile Include="AppSettingsHelperTests.cs" />
     <Compile Include="AssignmentPlanner\GridManagerTests.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControlTests.cs" />
@@ -226,6 +236,7 @@
     <Compile Include="CoreFunctionsRemTestsSplitThree.cs" />
     <Compile Include="CoreFunctionsRemTestsSplitTwo.cs" />
     <Compile Include="CoreFunctionsTest.cs" />
+    <Compile Include="DispFormTests.cs" />
     <Compile Include="EditableFieldDisplayTests.cs" />
     <Compile Include="EditInTests.cs" />
     <Compile Include="EPMLivePCForm\ManageableListsTests.cs" />
@@ -294,6 +305,7 @@
     <Compile Include="Shared\AssertException.cs" />
     <Compile Include="SocialEngine\Core\ThreadManagerTest.cs" />
     <Compile Include="SocialEngine\Modules\ListItemTests.cs" />
+    <Compile Include="SPFields\DaysHoursBreakdownFieldControlTests.cs" />
     <Compile Include="SPUtilities\SPListUtilityTest.cs" />
     <Compile Include="StatusingEventTests.cs" />
     <Compile Include="Testables\InputFormControlTestable.cs">
@@ -312,7 +324,27 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="TestCheck.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\AsyncResultTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\CaseSettingsTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\CustomFieldTest.cs" />
     <Compile Include="Web References\SalesforceMetadataService\CustomObjectTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\CustomPageWebLinkTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\CustomSiteTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\DashboardComponentTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\PicklistValueTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\ReportChartTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\RuleEntryTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\SessionSettingsTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\LayoutTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\PortalTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\ReportTest.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\WebLinkTest.cs" />
+    <Compile Include="Web References\SalesforcePartnerService\FieldTest.cs" />
+    <Compile Include="Web References\SalesforcePartnerService\DescribeGlobalSObjectResultTest.cs" />
+    <Compile Include="Web References\SalesforcePartnerService\DescribeSObjectResultTest.cs" />
+    <Compile Include="Web References\SalesforcePartnerService\GetUserInfoResultTest.cs" />
+    <Compile Include="Web References\SalesforcePartnerService\Reference.RemainingSmallClasses1.cs" />
+    <Compile Include="Web References\SalesforcePartnerService\SingleEmailMessageTest.cs" />
     <Compile Include="WebPageCode\AdminConnsTest.cs" />
     <Compile Include="WebPageCode\AdminQueueTests.cs" />
     <Compile Include="WebPageCode\CreateDatabaseTest.cs" />

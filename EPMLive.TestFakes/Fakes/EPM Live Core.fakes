@@ -52,6 +52,7 @@
     <Add FullName="EPMLiveCore.GenericEntityPickerPropertyBag"/>
     <Add FullName="EPMLiveCore.API.CommentManager!"/>
     <Add FullName="EPMLiveCore.SocialEngine.Core.Logger!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.Logging.Logger!"/>
     <Add FullName="EPMLiveCore.ExtensionMethods!"/>
     <Add FullName="EPMLiveCore.XMLDataManager!"/>
     <Add Namespace="EPMLiveCore.SocialEngine!"/>

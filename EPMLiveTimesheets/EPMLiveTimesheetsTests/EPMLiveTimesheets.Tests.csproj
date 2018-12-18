@@ -155,6 +155,7 @@
     <Compile Include="TimesheetApprovalsTest.cs" />
     <Compile Include="TimesheetTest.cs" />
     <Compile Include="PMApprovalsTest.cs" />
+    <Compile Include="WebPageCode\dotsactionTests.cs" />
     <Compile Include="WebPageCode\GetTimesheetTest.cs" />
     <Compile Include="WebPageCode\SavetimesheetTests.cs" />
   </ItemGroup>
