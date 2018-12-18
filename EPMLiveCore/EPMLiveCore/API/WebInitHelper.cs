@@ -6,6 +6,8 @@ namespace EPMLiveCore.API
 {
     internal class WebInitHelper
     {
+        private const string featureGuid = "f78dc45f-b6bb-4d59-8f45-c73bbcd28a61";
+
         public static bool EeEnsureWebInitFeature(string webId, SPSite site, SPWeb web, SPSite eSite)
         {
             var success = true;
@@ -20,7 +22,7 @@ namespace EPMLiveCore.API
                     {
                         foreach (var feat in web.Features)
                         {
-                            if (feat.DefinitionId.Equals(new Guid("f78dc45f-b6bb-4d59-8f45-c73bbcd28a61")))
+                            if (feat.DefinitionId.Equals(new Guid(featureGuid)))
                             {
                                 workEngineListEventsFeatEnabled = true;
                                 break;
@@ -33,7 +35,7 @@ namespace EPMLiveCore.API
                         {
                             foreach (var feat in spWeb.Features)
                             {
-                                if (feat.DefinitionId.Equals(new Guid("f78dc45f-b6bb-4d59-8f45-c73bbcd28a61")))
+                                if (feat.DefinitionId.Equals(new Guid(featureGuid)))
                                 {
                                     workEngineListEventsFeatEnabled = true;
                                     break;
@@ -49,7 +51,7 @@ namespace EPMLiveCore.API
                             tempWeb.Site.AllowUnsafeUpdates = true;
                             tempWeb.Site.RootWeb.AllowUnsafeUpdates = true;
                             tempWeb.AllowUnsafeUpdates = true;
-                            tempWeb.Features.Add(new Guid("f78dc45f-b6bb-4d59-8f45-c73bbcd28a61"));
+                            tempWeb.Features.Add(new Guid(featureGuid));
                             tempWeb.Update();
                         }
                     }
@@ -60,15 +62,15 @@ namespace EPMLiveCore.API
                             tempWeb.Site.AllowUnsafeUpdates = true;
                             tempWeb.Site.RootWeb.AllowUnsafeUpdates = true;
                             tempWeb.AllowUnsafeUpdates = true;
-                            tempWeb.Features.Remove(new Guid("f78dc45f-b6bb-4d59-8f45-c73bbcd28a61"));
-                            tempWeb.Features.Add(new Guid("f78dc45f-b6bb-4d59-8f45-c73bbcd28a61"));
+                            tempWeb.Features.Remove(new Guid(featureGuid));
+                            tempWeb.Features.Add(new Guid(featureGuid));
                             tempWeb.Update();
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Trace.TraceError("Exception Suppressed {0}", 0);
+                    Trace.TraceError("Exception Suppressed {0}", ex);
                     success = false;
                 }
             }
