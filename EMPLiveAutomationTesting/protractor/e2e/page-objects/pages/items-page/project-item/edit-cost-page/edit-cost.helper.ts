@@ -43,9 +43,10 @@ export class EditCostHelper {
     }
 
     static async verifyValueInBudgetCost(cost: number) {
+        // Need this wait as budget is not reflected right away.
         await PageHelper.sleepForXSec(PageHelper.timeout.s);
         StepLogger.subVerification('Verify Value in budget tab');
-        await ExpectationHelper.verifyTextContains(EditCost.inputTextBoxForBudgetTab, '', cost.toString(), );
+        await ExpectationHelper.verifyTextContains(EditCost.inputTextBoxForBudgetTab, CommonPageConstants.costButtonLabel.budget, cost.toString());
     }
 
     static async clickActualCostsTab() {
