@@ -1329,7 +1329,24 @@ namespace EPMLiveWebParts
                                         {
                                             SPFieldUserValue uv = (SPFieldUserValue)field.GetFieldValue(val);
                                             displayValue = "";
-                                            displayValue += "<a href=\"" + list.ParentWeb.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
+                                            string loginName = uv.LookupValue;
+
+                                            try
+                                            {
+                                                //SKYVERA-2119: Check if we have a group with this ID
+                                                if (string.IsNullOrEmpty(loginName))
+                                                {
+                                                    var group = field.ParentList.ParentWeb.SiteGroups.GetByID(int.Parse(val));
+
+                                                    if (group != null)
+                                                    {
+                                                        loginName = group.LoginName;
+                                                    }
+                                                }
+                                            }
+                                            catch { }
+
+                                            displayValue += "<a href=\"" + list.ParentWeb.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + loginName + "</a>";
                                         }
                                         else
                                         {
