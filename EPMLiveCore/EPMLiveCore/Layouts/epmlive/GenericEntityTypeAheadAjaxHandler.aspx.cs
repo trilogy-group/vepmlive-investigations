@@ -120,6 +120,13 @@ namespace EPMLiveCore
                 {
                     query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='" + _parentListField + "' /><FieldRef Name='ID' /><FieldRef Name='Title' />";
                 }
+
+                if (list.Fields.ContainsFieldWithInternalName(ProjectArchiverService.ArchivedColumn))
+                {
+                    query.ViewFields += "<FieldRef Type=\"Boolean\" Name='" + ProjectArchiverService.ArchivedColumn + "'/>";
+                    query.Query = string.Format("<Where><Or><Eq><FieldRef Name='{0}' /><Value Type='Boolean'>0</Value></Eq><IsNull><FieldRef Name='{0}'></FieldRef></IsNull></Or></Where>", ProjectArchiverService.ArchivedColumn);
+                }
+
                 query.Query += "<OrderBy><FieldRef Name='" + _field + "' Ascending='True' /></OrderBy>";
 
                 query.ViewFieldsOnly = true;
@@ -161,12 +168,15 @@ namespace EPMLiveCore
                 {
                     query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='ID' /><FieldRef Name='Title' />";
                 }
+
                 if (list.Fields.ContainsFieldWithInternalName(ProjectArchiverService.ArchivedColumn))
                 {
                     query.ViewFields += "<FieldRef Type=\"Boolean\" Name='" + ProjectArchiverService.ArchivedColumn + "'/>";
+                    query.Query = string.Format("<Where><Or><Eq><FieldRef Name='{0}' /><Value Type='Boolean'>0</Value></Eq><IsNull><FieldRef Name='{0}'></FieldRef></IsNull></Or></Where>", ProjectArchiverService.ArchivedColumn);
                 }
                 //This special check needs to add to load Roles and Departments and few other lists which won't configured / added as part of List mapping screen.
                 bool isEmptyTableName = true;
+
                 if (list.EnableThrottling)
                 {
                     try
@@ -177,7 +187,12 @@ namespace EPMLiveCore
                         if (!string.IsNullOrEmpty(tableName))
                         {
                             isEmptyTableName = false;
-                            var dataTable = ReportingData.GetReportingData(SPContext.Current.Web, list.Title, false, string.Empty, _field);
+                            var filterQuery = string.Empty;
+                            if (list.Fields.ContainsFieldWithInternalName(ProjectArchiverService.ArchivedColumn))
+                            {
+                                filterQuery = string.Format("{0} is null OR {0} = 0", ProjectArchiverService.ArchivedColumn);
+                            }
+                            var dataTable = ReportingData.GetReportingData(SPContext.Current.Web, list.Title, false, filterQuery, _field);
                             ApplyFiltersAndCreateOutput(dataTable?.Select(string.Empty));
                         }
                     }
@@ -189,7 +204,8 @@ namespace EPMLiveCore
                     query.Query += "<OrderBy><FieldRef Name='" + _field + "' Ascending='True' /></OrderBy>";
                     query.ViewFieldsOnly = true;
                     var items = list.GetItems(query);
-                    ApplyFiltersAndCreateOutput(items);
+                    var dataTable = items.Count > 0 ? items.GetDataTable() : null;
+                    ApplyFiltersAndCreateOutput(dataTable?.Select(string.Empty, _field + " ASC"));
                 }
             }
         }
@@ -202,19 +218,9 @@ namespace EPMLiveCore
                 return;
             }
 
-            // check for archived status only if archived column exists
-            var checkArchivedRecords = results.Length > 0 && results[0].Table.Columns.Contains(ProjectArchiverService.ArchivedColumn);
-
             _sbResult = new StringBuilder();
             foreach (var row in results)
             {
-                // skip record if status is archived
-                if (checkArchivedRecords && RecordIsArchived(row))
-                {
-                    continue;
-                }
-
-                // otherwise add row to output
                 _sbResult.Append(row["ID"] + "^^" + row[_field] + "^^" +
                                  (!string.IsNullOrEmpty(row[_field].ToString()) ? row[_field].ToString() : string.Empty) + ";#");
             }
@@ -227,29 +233,6 @@ namespace EPMLiveCore
                           && (bool)row[ProjectArchiverService.ArchivedColumn];
         }
 
-        private void ApplyFiltersAndCreateOutput(SPListItemCollection results)
-        {
-            // if no results do not add anything
-            if (results == null)
-            {
-                return;
-            }
-
-            // check for archived status only if archived column exists
-            var checkArchivedRecords = results.Count > 0 && results.Fields.ContainsFieldWithInternalName(ProjectArchiverService.ArchivedColumn);
-
-            _sbResult = new StringBuilder();
-            foreach (SPListItem li in results)
-            {
-                // skip record if status is archived
-                if (checkArchivedRecords && li[ProjectArchiverService.ArchivedColumn] != null && (bool)li[ProjectArchiverService.ArchivedColumn])
-                    continue;
-
-                // otherwise add row to output
-                _sbResult.Append(li["ID"] + "^^" + li[_field] + "^^" +
-                                 (!string.IsNullOrEmpty(li[_field].ToString()) ? li[_field].ToString() : string.Empty) + ";#");
-            }
-        }
         private string GetTableName(Guid listID)
         {
             string sql;
