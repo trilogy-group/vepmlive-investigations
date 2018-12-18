@@ -200,11 +200,9 @@ export class EditCostHelper {
 
         StepLogger.verification('Verify  Value in Benefit Cell1');
         await ExpectationHelper.verifyTextContains(CommonPage.getCostCell.cell1, '', cost.toString());
-        // await CommonPageHelper.textPresentValidation(CommonPage.getCostCell.cell1, cost.toString());
 
         StepLogger.verification('Verify  Value in Benefit Cell2');
         await ExpectationHelper.verifyTextContains(CommonPage.getCostCell.cell2, '', cost.toString());
-        // await CommonPageHelper.textPresentValidation(CommonPage.getCostCell.cell2, cost.toString());
     }
 
     static async clickEditCostFromContextMenu() {
