@@ -372,7 +372,7 @@ Exit_Function:
                         var id = SqlDb.ReadIntValue(reader["CL_UID"]);
                         var fieldInTable = 0;
 
-                        dbaPrioritz.HandleLastFieldCase(
+                        HandleLastFieldCase(
                             ref lastId,
                             id,
                             ref seqStmt,
@@ -403,6 +403,46 @@ Exit_Function:
             string projectIds;
             var weServerUrl = ReadServerUrls(dba, out projectIds);
             ProcessServerUrl(dba, weServerUrl, projectIds);
+        }
+
+        private static void HandleLastFieldCase(
+            ref int lastId,
+            int id,
+            ref string seqStmt,
+            List<string> sqlStatements,
+            SqlDataReader reader,
+            ref StringBuilder seqStmtStringBuilder,
+            ref string whereClause,
+            ref string errSql)
+        {
+            int fieldInTable;
+            if (lastId != id)
+            {
+                if (!string.IsNullOrWhiteSpace(seqStmt))
+                {
+                    seqStmtStringBuilder.Append(
+                        "  FROM EPGP_PROJECT_DEC_VALUES  INNER JOIN  EPGP_PROJECT_TEXT_VALUES ON EPGP_PROJECT_DEC_VALUES.PROJECT_ID = EPGP_PROJECT_TEXT_VALUES.PROJECT_ID ");
+                    seqStmt = seqStmtStringBuilder.ToString();
+
+                    sqlStatements.Add(string.Format("{0}{1}", seqStmt, whereClause));
+
+                    if (!string.IsNullOrWhiteSpace(whereClause))
+                    {
+                        sqlStatements.Add(string.Format("{0}{1}", errSql, whereClause));
+                    }
+                }
+
+                whereClause = string.Empty;
+
+                lastId = id;
+
+                fieldInTable = SqlDb.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
+
+                seqStmt = string.Format("UPDATE EPGP_PROJECT_DEC_VALUES SET PC_{0:000} = ", fieldInTable);
+                seqStmtStringBuilder = new StringBuilder(seqStmt);
+
+                errSql = string.Format("UPDATE EPGP_PROJECT_DEC_VALUES SET PC_{0:000} = 999999 ", fieldInTable);
+            }
         }
 
         private static void HandleMiddleFieldCase(int seq, int operationId, StringBuilder seqStmtStringBuilder, ref string seqStmt)
@@ -578,8 +618,6 @@ Exit_Function:
                     {
                         weServerUrl = SqlDb.ReadStringValue(reader["ADM_WE_SERVERURL"]);
                     }
-
-                    reader.Close();
                 }
             }
             return weServerUrl;

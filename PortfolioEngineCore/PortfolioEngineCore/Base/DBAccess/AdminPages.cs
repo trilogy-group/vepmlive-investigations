@@ -1274,7 +1274,7 @@ namespace PortfolioEngineCore
             return dba.Status;
         }
 
-        public static void HandleLastFieldCase(
+        private static void HandleLastFieldCase(
             ref int lastId,
             int id,
             ref string seqStmt,
@@ -1427,7 +1427,7 @@ namespace PortfolioEngineCore
             }
         }
 
-        public static string GetCustFieldVal(int lfit, int lfat)
+        private static string GetCustFieldVal(int lfit, int lfat)
         {
             string sfn = "0";
             if (lfat == 203)
