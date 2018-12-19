@@ -25,7 +25,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 using RC = EPMLiveWebParts.ReportingChart;
 
-namespace EPMLiveWebParts.Tests.ReportingChart
+namespace EPMLiveWebParts.Tests.ReportingChartTests
 {
     [TestClass, ExcludeFromCodeCoverage]
     public partial class ReportingChartToolPartTests

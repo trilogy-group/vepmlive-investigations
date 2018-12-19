@@ -1445,8 +1445,10 @@ namespace EPMLiveCore.ReportHelper.Tests
         [TestMethod]
         public void IsLookUpField_OnValidCall_ReturnBoolean()
         {
-            // Arrange
-            PrivateObject.SetField("_DAO", new ShimEPMData().Instance);
+			// Arrange
+			var epmData =  new ShimEPMData();
+			epmData.IsLookUpFieldStringString = (s1, s2) => true;
+			PrivateObject.SetField("_DAO", epmData.Instance);
             ShimEPMData.AllInstances.GetClientReportingConnectionGet = _ => new SqlConnection();
             ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, _2) => "lookup";
             ShimEPMData.AllInstances.SqlErrorOccurredGet = _ => true;

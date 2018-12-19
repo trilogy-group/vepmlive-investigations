@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Security.Permissions;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.Security;
-using Microsoft.SharePoint.Utilities;
-using Microsoft.SharePoint.Workflow;
-using System.Data.SqlClient;
-using System.Data;
-using System.Reflection;
 using System.Collections;
+using System.Diagnostics;
+using Microsoft.SharePoint;
 
 namespace EPMLiveCore
 {
@@ -23,23 +17,10 @@ namespace EPMLiveCore
 
         private void processItem(SPItemEventProperties properties, bool isAdd)
         {
-            bool allHidden = true;
-
-            try
+            if (!VerifyHiddenItems(properties))
             {
-                foreach (System.Collections.DictionaryEntry sField in properties.AfterProperties)
-                {
-                    if (!properties.List.Fields.GetFieldByInternalName(sField.Key.ToString()).Hidden)
-                    {
-                        allHidden = false;
-                        break;
-                    }
-                }
-            }
-            catch { allHidden = false; }
-
-            if (allHidden)
                 return;
+            }
 
             string newPercent = null;
             string newComplete = null;
@@ -47,125 +28,143 @@ namespace EPMLiveCore
 
             string oldPercent = null;
             string oldStatus = null;
-            string method = "";
+            var method = string.Empty;
 
-            try
-            {
-                newPercent = properties.AfterProperties["PercentComplete"].ToString();
-            }
-            catch { }
-            try
-            {
-                newComplete = properties.AfterProperties["Complete"].ToString();
-            }
-            catch { }
-            try
-            {
-                if (properties.AfterProperties["Status"] == null)
+            GetPercentComplete(properties, ref newPercent);
+            GetCompleteStatus(properties, ref newComplete);
+            GetStatus(properties, ref newStatus);
+            GetOldPercentComplete(properties, ref oldPercent);
+            GetOldStatus(properties, ref oldStatus);
+
+            SPSecurity.RunWithElevatedPrivileges(
+                delegate
                 {
-                    if (properties.List.Fields["Status"].DefaultValue != null)
+                    using (var site = new SPSite(properties.SiteId))
                     {
-                        newStatus = properties.List.Fields["Status"].DefaultValue;
-                    }
-                }
-                else
-                {
-                    newStatus = properties.AfterProperties["Status"].ToString();
-                }
-            }
-            catch { }
-            try
-            {
-                oldPercent = properties.ListItem["PercentComplete"].ToString();
-            }
-            catch { }
-            try
-            {
-                oldStatus = properties.ListItem["Status"].ToString();
-            }
-            catch { }
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                using (SPSite site = new SPSite(properties.SiteId))
-                {
-                    using (SPWeb web = site.OpenWeb(properties.Web.ID))
-                    {
-                        method = ReflectionMethods.GetStatusMethod(web, properties.ListTitle);
-
-                        if (method == "1")
+                        using (var web = site.OpenWeb(properties.Web.ID))
                         {
-                            try
-                            {
-                                float aWork = float.Parse(properties.AfterProperties["ActualWork"].ToString());
-                                float rWork = float.Parse(properties.AfterProperties["RemainingWork"].ToString());
-
-                                if (aWork == 0 && rWork == 0)
-                                    newPercent = "0";
-                                else
-                                    newPercent = (aWork / (rWork + aWork)).ToString();
-                            }
-                            catch { }
-                        }
-
-                        if (method == "2")
-                        {
-                            try
-                            {
-                                float Work = float.Parse(properties.ListItem["Work"].ToString());
-                                float rWork = float.Parse(properties.AfterProperties["RemainingWork"].ToString());
-
-                                if (Work == 0)
-                                    newPercent = "0";
-                                else
-                                    newPercent = ((Work - rWork) / (Work)).ToString();
-                            }
-                            catch { }
+                            ProcessMethod(properties, web, ref newPercent, out method);
                         }
                     }
-                }
-            });
+                });
 
-            if (newPercent == null)
+            UpdatePercent(properties, ref newPercent, newComplete, newStatus, oldPercent);
+            UpdateStatus(properties, ref newStatus, newComplete, newPercent);
+            UpdateComplete(ref newComplete, newStatus, newPercent);
+            UpdateNewStatus(method, ref newStatus, oldStatus, oldPercent, ref newPercent);
+            SetNewProperties(properties, newPercent, newComplete, newStatus);
+        }
+
+        private static void ProcessMethod(SPItemEventProperties properties, SPWeb web, ref string newPercent, out string method)
+        {
+            method = ReflectionMethods.GetStatusMethod(web, properties.ListTitle);
+
+            if (method == "1")
             {
-                if (newComplete != null)
+                try
                 {
-                    if (newComplete == "1" || newComplete.ToLower() == "true")
-                        newPercent = "1";
-                    else if (!string.IsNullOrEmpty(newStatus))
-                        newPercent = getPercentFromStatus(newStatus, oldPercent);
+                    var workDone = float.Parse(properties.AfterProperties["ActualWork"].ToString());
+                    var remainingWork = float.Parse(properties.AfterProperties["RemainingWork"].ToString());
+
+                    newPercent = workDone == 0 && remainingWork == 0
+                        ? "0"
+                        : (workDone / (remainingWork + workDone)).ToString();
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+
+            if (method == "2")
+            {
+                try
+                {
+                    var Work = float.Parse(properties.ListItem["Work"].ToString());
+                    var rWork = float.Parse(properties.AfterProperties["RemainingWork"].ToString());
+
+                    if (Work == 0)
+                    {
+                        newPercent = "0";
+                    }
                     else
                     {
-                        if (properties.ListItem["PercentComplete"] != null)
-                            newPercent = properties.ListItem["PercentComplete"].ToString();
-                        else
-                            newPercent = "0";
+                        newPercent = ((Work - rWork) / Work).ToString();
                     }
                 }
-                else if (!string.IsNullOrEmpty(newStatus))
+                catch (Exception ex)
                 {
-                    newPercent = getPercentFromStatus(newStatus, oldPercent);
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+        }
+
+        private static void SetNewProperties(
+            SPItemEventProperties properties,
+            string newPercent,
+            string newComplete,
+            string newStatus)
+        {
+            properties.AfterProperties["PercentComplete"] = newPercent;
+            properties.AfterProperties["Complete"] = newComplete;
+            properties.AfterProperties["Status"] = newStatus;
+        }
+
+        private void UpdateNewStatus(
+            string method,
+            ref string newStatus,
+            string oldStatus,
+            string oldPercent,
+            ref string newPercent)
+        {
+            if (method != "1" && method != "2" && newStatus != oldStatus && newPercent == oldPercent)
+            {
+                newPercent = getPercentFromStatus(newStatus, oldPercent);
+            }
+            else if (newPercent != oldPercent && newStatus == oldStatus)
+            {
+                newStatus = getStatusFromPercent(newPercent);
+            }
+        }
+
+        private static void UpdateComplete(ref string newComplete, string newStatus, string newPercent)
+        {
+            if (newComplete == null)
+            {
+                if (!string.IsNullOrWhiteSpace(newStatus))
+                {
+                    newComplete = newStatus == "Completed"
+                        ? "1"
+                        : "0";
                 }
                 else
                 {
-                    try
-                    {
-                        newPercent = properties.ListItem["PercentComplete"].ToString();
-                    }
-                    catch { }
+                    newComplete = newPercent == "1"
+                        ? "1"
+                        : "0";
                 }
             }
+        }
 
-            if (string.IsNullOrEmpty(newStatus))
+        private void UpdateStatus(SPItemEventProperties properties, ref string newStatus, string newComplete, string newPercent)
+        {
+            if (string.IsNullOrWhiteSpace(newStatus))
             {
                 if (newComplete != null)
                 {
-                    if (newComplete == "1" || newComplete.ToLower() == "true")
+                    const string CompleteFlag = "1";
+                    if (newComplete == CompleteFlag || string.Equals(newComplete, bool.TrueString, StringComparison.OrdinalIgnoreCase))
+                    {
                         newStatus = "Completed";
+                    }
                     else if (newPercent != null)
+                    {
                         newStatus = getStatusFromPercent(newPercent);
+                    }
                     else
+                    {
                         newStatus = "Not Started";
+                    }
                 }
                 else if (newPercent != null)
                 {
@@ -177,40 +176,148 @@ namespace EPMLiveCore
                     {
                         newStatus = properties.ListItem["Status"].ToString();
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", ex);
+                    }
                 }
             }
+        }
 
-            if (newComplete == null)
+        private void UpdatePercent(
+            SPItemEventProperties properties,
+            ref string newPercent,
+            string newComplete,
+            string newStatus,
+            string oldPercent)
+        {
+            if (newPercent == null)
             {
-                if (!string.IsNullOrEmpty(newStatus))
+                if (newComplete != null)
                 {
-                    if (newStatus == "Completed")
-                        newComplete = "1";
+                    if (newComplete == "1" || string.Equals(newComplete, "true", StringComparison.OrdinalIgnoreCase))
+                    {
+                        newPercent = "1";
+                    }
                     else
-                        newComplete = "0";
+                    {
+                        newPercent = !string.IsNullOrWhiteSpace(newStatus)
+                            ? getPercentFromStatus(newStatus, oldPercent)
+                            : properties.ListItem["PercentComplete"] != null
+                                ? properties.ListItem["PercentComplete"].ToString()
+                                : "0";
+                    }
+                }
+                else if (!string.IsNullOrWhiteSpace(newStatus))
+                {
+                    newPercent = getPercentFromStatus(newStatus, oldPercent);
                 }
                 else
                 {
-                    if (newPercent == "1")
-                        newComplete = "1";
-                    else
-                        newComplete = "0";
+                    try
+                    {
+                        newPercent = properties.ListItem["PercentComplete"].ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", ex);
+                    }
                 }
             }
+        }
 
-            if (method != "1" && method != "2" && newStatus != oldStatus && newPercent == oldPercent)
+        private static void GetOldStatus(SPItemEventProperties properties, ref string oldStatus)
+        {
+            try
             {
-                newPercent = getPercentFromStatus(newStatus, oldPercent);
+                oldStatus = properties.ListItem["Status"].ToString();
             }
-            else if (newPercent != oldPercent && newStatus == oldStatus)
+            catch (Exception ex)
             {
-                newStatus = getStatusFromPercent(newPercent);
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private static void GetOldPercentComplete(SPItemEventProperties properties, ref string oldPercent)
+        {
+            try
+            {
+                oldPercent = properties.ListItem["PercentComplete"].ToString();
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private static void GetStatus(SPItemEventProperties properties, ref string status)
+        {
+            try
+            {
+                if (properties.AfterProperties["Status"] == null)
+                {
+                    if (properties.List.Fields["Status"].DefaultValue != null)
+                    {
+                        status = properties.List.Fields["Status"].DefaultValue;
+                    }
+                }
+                else
+                {
+                    status = properties.AfterProperties["Status"].ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private static void GetCompleteStatus(SPItemEventProperties properties, ref string complete)
+        {
+            try
+            {
+                complete = properties.AfterProperties["Complete"].ToString();
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private static void GetPercentComplete(SPItemEventProperties properties, ref string percent)
+        {
+            try
+            {
+                percent = properties.AfterProperties["PercentComplete"].ToString();
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private static bool VerifyHiddenItems(SPItemEventProperties properties)
+        {
+            var allHidden = true;
+
+            try
+            {
+                foreach (DictionaryEntry field in properties.AfterProperties)
+                {
+                    if (!properties.List.Fields.GetFieldByInternalName(field.Key.ToString()).Hidden)
+                    {
+                        allHidden = false;
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+                allHidden = false;
             }
 
-            properties.AfterProperties["PercentComplete"] = newPercent;
-            properties.AfterProperties["Complete"] = newComplete;
-            properties.AfterProperties["Status"] = newStatus;
+            return !allHidden;
         }
 
         private string getPercentFromStatus(string newStatus, string oldPercent)

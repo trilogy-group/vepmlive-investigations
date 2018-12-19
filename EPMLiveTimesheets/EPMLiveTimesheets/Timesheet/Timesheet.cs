@@ -23,6 +23,7 @@ using System.Web;
 using System.Text;
 
 using System.Collections;
+using EPMLiveWebParts;
 
 namespace TimeSheets
 {
@@ -1820,27 +1821,14 @@ namespace TimeSheets
 
                 if (childControl.ToString().ToUpper() == "MICROSOFT.SHAREPOINT.WEBCONTROLS.ACTIONSMENU")
                 {
-                    ActionsMenu menu = (ActionsMenu)childControl;
+                    var menu = (ActionsMenu)childControl;
 
-                    try { menu.GetMenuItem("EditInGridButton").Visible = false; }
-                    catch { }
-                    try { menu.GetMenuItem("ExportToDatabase").Visible = false; }
-                    catch { }
-                    try
-                    {
-                        menu.GetMenuItem("ExportToSpreadsheet").Visible = false;
-                    }
-                    catch { }
-                    try
-                    {
-                        menu.GetMenuItem("ViewRSS").Visible = false;
-                    }
-                    catch { }
-                    try
-                    {
-                        menu.GetMenuItem("SubscribeButton").Visible = false;
-                    }
-                    catch { }
+                    ResourcePlanning.SetMenuVisibility(menu, "EditInGridButton", false);
+                    ResourcePlanning.SetMenuVisibility(menu, "ExportToDatabase", false);
+                    ResourcePlanning.SetMenuVisibility(menu, "ExportToSpreadsheet", false);
+                    ResourcePlanning.SetMenuVisibility(menu, "ViewRSS", false);
+                    ResourcePlanning.SetMenuVisibility(menu, "SubscribeButton", false);
+
                     menu.AddMenuItem("PrintGrid", "Print Grid", "/_layouts/epmlive/images/printmenu.GIF", "View printable list.", "", "printgrid" + ZoneIndex + "()");
 
                     string url = System.Web.HttpContext.Current.Request.Url.AbsolutePath;

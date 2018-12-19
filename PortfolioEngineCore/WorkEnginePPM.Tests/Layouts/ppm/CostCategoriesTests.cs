@@ -198,7 +198,7 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         {
             // Arrange
             var parameters = new object[] { new ShimHttpContext().Instance, "ReadCalendarFTEsInfo", new ShimCStruct().Instance };
-            ShimCostCategories.ReadCalendarFTEsInfoHttpContextCStruct = (_, _1) => DummyString;
+            ShimFteHelper.ReadCalendarFTEsInfoHttpContextCStruct = (_, _1) => DummyString;
 
             // Act
             var actualResult = _privateType.InvokeStatic(
@@ -230,7 +230,7 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         {
             // Arrange
             var parameters = new object[] { new ShimHttpContext().Instance, "SaveCalendarFTEsInfo", new ShimCStruct().Instance };
-            ShimCostCategories.SaveCalendarFTEsInfoHttpContextCStruct = (_, _1) => DummyString;
+            ShimFteHelper.SaveCalendarFTEsInfoHttpContextCStruct = (_, _1) => DummyString;
 
             // Act
             var actualResult = _privateType.InvokeStatic(
@@ -443,9 +443,10 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
                     dt = new ShimDataTable().Instance;
                     return StatusEnum.rsSuccess;
                 };
+            var privateType = new PrivateType(typeof(FteHelper));
 
             // Act
-            var actualResult = _privateType.InvokeStatic(
+            var actualResult = privateType.InvokeStatic(
                 InitializeFTEColumns,
                 parameters);
 
@@ -460,7 +461,7 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
             var parameters = new object[] { new ShimHttpContext().Instance, new ShimCStruct().Instance };
             ShimWebAdmin.BuildBaseInfoHttpContext = _ => DummyString;
             ShimCStruct.AllInstances.InnerTextGet = _ => DummyInt.ToString();
-            ShimCostCategories.InitializeFTEColumnsDBAccessInt32_TGrid = (_, _1, _2) => { };
+            ShimFteHelper.InitializeFTEColumnsDBAccessInt32_TGrid = (_, _1, _2) => { };
             ShimdbaCalendars.SelectCalendarsDBAccessDataTableOut = (DBAccess dba, out DataTable dt) =>
             {
                 dt = new ShimDataTable().Instance;
@@ -471,9 +472,10 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
                 dt = new ShimDataTable().Instance;
                 return StatusEnum.rsSuccess;
             };
+            var privateType = new PrivateType(typeof(FteHelper));
 
             // Act
-            var actualResult = _privateType.InvokeStatic(
+            var actualResult = privateType.InvokeStatic(
                 ReadCalendarFTEsInfo,
                 parameters);
 
@@ -488,7 +490,7 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
             var parameters = new object[] { new ShimHttpContext().Instance, new ShimCStruct().Instance };
             ShimWebAdmin.BuildBaseInfoHttpContext = _ => DummyString;
             ShimCStruct.AllInstances.InnerTextGet = _ => DummyInt.ToString();
-            ShimCostCategories.InitializeFTEColumnsDBAccessInt32_TGrid = (_, _1, _2) => { };
+            ShimFteHelper.InitializeFTEColumnsDBAccessInt32_TGrid = (_, _1, _2) => { };
             ShimdbaCostCategories.UpdateCostCategoryFTEsDBAccessInt32DataTableStringOut =
                 (DBAccess dba, int nCalendar, DataTable dt, out string sReply) =>
                 {
@@ -498,9 +500,10 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
             ShimWebAdmin.FormatErrorStringStringStringString = (_, _1, _2, _3) => DummyString;
             ShimCStruct.AllInstances.LoadXMLString = (_, _1) => true;
             Shim_TGrid.AllInstances.HandleRowsDataTableInt32ListOfCStructBoolean = (_, _1, _2, _3, _4) => { };
+            var privateType = new PrivateType(typeof(FteHelper));
 
             // Act
-            var actualResult = _privateType.InvokeStatic(
+            var actualResult = privateType.InvokeStatic(
                 SaveCalendarFTEsInfo,
                 parameters);
 

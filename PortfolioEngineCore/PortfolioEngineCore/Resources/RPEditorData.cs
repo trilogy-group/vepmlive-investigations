@@ -40,31 +40,7 @@ namespace PortfolioEngineCore
             xCfg.CreateIntAttr("ColsMoving", 1);
             xCfg.CreateIntAttr("ColsPosLap", 1);
             xCfg.CreateIntAttr("ColsLap", 1);
-            xCfg.CreateIntAttr("VisibleLap", 1);
-            xCfg.CreateIntAttr("SectionWidthLap", 1);
-            xCfg.CreateIntAttr("GroupLap", 1);
-            xCfg.CreateIntAttr("WideHScroll", 0);
-            xCfg.CreateIntAttr("LeftWidth", 400);
-            xCfg.CreateIntAttr("Width", 400);
-            xCfg.CreateIntAttr("RightWidth", 400);
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateIntAttr("ShowDeleted", 0);
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("MaxSort", 2);
-            xCfg.CreateStringAttr("DefaultSort", "ItemName");
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            xCfg.CreateIntAttr("LastId", 1);
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "RPEditor");
-            xCfg.CreateIntAttr("FastColumns", 1);
-            xCfg.CreateIntAttr("ExpandAllLevels", 3);
-            xCfg.CreateIntAttr("GroupSortMain", 1);
-            xCfg.CreateIntAttr("GroupRestoreSort", 1);
+            CreateConfigAttributes(xCfg);
             //xCfg.CreateStringAttr("IdNames", "ItemName");
             xCfg.CreateIntAttr("NoTreeLines", 1);
             // setting this causes grid to scroll back to top when resized
@@ -923,6 +899,35 @@ namespace PortfolioEngineCore
                 }
             }
             return StatusEnum.rsSuccess;
+        }
+
+        internal static void CreateConfigAttributes(CStruct config)
+        {
+            config.CreateIntAttr("VisibleLap", 1);
+            config.CreateIntAttr("SectionWidthLap", 1);
+            config.CreateIntAttr("GroupLap", 1);
+            config.CreateIntAttr("WideHScroll", 0);
+            config.CreateIntAttr("LeftWidth", 400);
+            config.CreateIntAttr("Width", 400);
+            config.CreateIntAttr("RightWidth", 400);
+            config.CreateIntAttr("MaxHeight", 0);
+            config.CreateIntAttr("ShowDeleted", 0);
+            config.CreateBooleanAttr("DateStrings", true);
+            config.CreateIntAttr("MaxWidth", 1);
+            config.CreateIntAttr("MaxSort", 2);
+            config.CreateStringAttr("DefaultSort", "ItemName");
+            config.CreateIntAttr("AppendId", 0);
+            config.CreateIntAttr("FullId", 0);
+            config.CreateStringAttr("IdChars", "0123456789");
+            config.CreateIntAttr("NumberId", 1);
+            config.CreateIntAttr("LastId", 1);
+            config.CreateIntAttr("CaseSensitiveId", 0);
+            config.CreateStringAttr("Style", "GM");
+            config.CreateStringAttr("CSS", "RPEditor");
+            config.CreateIntAttr("FastColumns", 1);
+            config.CreateIntAttr("ExpandAllLevels", 3);
+            config.CreateIntAttr("GroupSortMain", 1);
+            config.CreateIntAttr("GroupRestoreSort", 1);
         }
 
         private static string FormatPendingNames(string sResName, string sPendingResName)

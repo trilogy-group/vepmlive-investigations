@@ -97,42 +97,32 @@ namespace WorkEnginePPM.Events.DataSync
 
                 bool Default = bool.Parse(isDefault.ToString());
 
-                List<WorkSchedule> workSchedules;
 
                 Guid uniqueId = Guid.NewGuid();
 
                 WorkSchedule workSchedule;
-
+                //SKYVERA-919
                 using (var workScheduleManager = new WorkScheduleManager(properties.Web))
                 {
-                    workSchedules = workScheduleManager.GetExistingWorkSchedules(properties.List.Items);
-
                     workSchedule = new WorkSchedule
                     {
-                        Title = (string) title,
-                        Sunday = (decimal) sunday,
-                        Monday = (decimal) monday,
-                        Tuesday = (decimal) tuesday,
-                        Wednesday = (decimal) wednesday,
-                        Thursday = (decimal) thursday,
-                        Friday = (decimal) friday,
-                        Saturday = (decimal) saturday,
+                        Title = (string)title,
+                        Sunday = (decimal)sunday,
+                        Monday = (decimal)monday,
+                        Tuesday = (decimal)tuesday,
+                        Wednesday = (decimal)wednesday,
+                        Thursday = (decimal)thursday,
+                        Friday = (decimal)friday,
+                        Saturday = (decimal)saturday,
                         IsDefault = Default,
                         UniqueId = uniqueId
                     };
-
-                    workSchedules.Add(workSchedule);
-
-                    workScheduleManager.Synchronize(workSchedules);
+                    workScheduleManager.Synchronize(new List<WorkSchedule>() { workSchedule });
+                    SetExtId(properties, uniqueId, workScheduleManager.GetExistingWorkSchedules(properties.List.Items));
+                    workScheduleManager.AddPFEWorkSchedules(workSchedule);
                 }
 
                 UpdateDefault(properties, uniqueId, Default);
-                SetExtId(properties, uniqueId, workSchedules);
-
-                using (var workScheduleManager = new WorkScheduleManager(properties.Web))
-                {
-                    workScheduleManager.AddPFEWorkSchedules(workSchedule);
-                }
             }
             catch (Exception exception)
             {
@@ -141,7 +131,6 @@ namespace WorkEnginePPM.Events.DataSync
                 properties.Status = SPEventReceiverStatus.CancelWithError;
             }
         }
-
         /// <summary>
         ///     An item is being deleted.
         /// </summary>

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using PortfolioEngineCore.Infrastructure.Entities;
 
 namespace PortfolioEngineCore
@@ -187,238 +189,346 @@ namespace PortfolioEngineCore
             // there is a version of this in Lookup.cs but that works differently - passed in a list of items and it checks each one in turn
             try
             {
-                string smessage = "";
-                SqlCommand SqlCommand;
-                SqlDataReader SqlReader;
-                string sCommand;
+                var messageString = string.Empty;
+                var messageStringBuilder = new StringBuilder(messageString);
 
-                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
+                if (_sqlConnection.State == ConnectionState.Open)
+                {
+                    _sqlConnection.Close();
+                }
                 _sqlConnection.Open();
 
-                // we must check if this is a summary row and if so check it and all its children - read lookup and make a list
+                var lookupValues = GetLookUpValues(checklookupUID);
+                ProcessLookUpValues(checklookupUID, lookupValues, messageStringBuilder, ref messageString);
 
-                List<EPKLookupValue> LVlist = new List<EPKLookupValue>();
-                EPKLookupValue LVitem;
-
-                sCommand = "SELECT LV_UID,LV_VALUE,LV_ID,LV_LEVEL FROM EPGP_LOOKUP_VALUES" +
-                    " WHERE LOOKUP_UID =(Select LOOKUP_UID From EPGP_LOOKUP_VALUES Where LV_UID=@LV_uid)" +
-                    " ORDER BY LV_ID";
-                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                SqlCommand.Parameters.AddWithValue("@LV_uid", checklookupUID);
-                SqlReader = SqlCommand.ExecuteReader();
-
-                bool bfound = false;
-                int levelthisvalue = 0;
-                while (SqlReader.Read())
-                {
-                    int uid = DBAccess.ReadIntValue(SqlReader["LV_UID"]);
-                    int level = DBAccess.ReadIntValue(SqlReader["LV_LEVEL"]);
-                    string name = DBAccess.ReadStringValue(SqlReader["LV_VALUE"]);
-
-                    if (bfound == false)
-                    {
-                        if (uid == checklookupUID)
-                        {
-                            bfound = true;
-                            levelthisvalue = level;
-                            LVitem = new EPKLookupValue();
-                            LVitem.UID = uid;
-                            LVitem.Name = name;
-                            LVlist.Add(LVitem);
-                        }
-                    }
-                    else
-                    {
-                        if (level <= levelthisvalue) break;
-                        else
-                        {
-                            LVitem = new EPKLookupValue();
-                            LVitem.UID = uid;
-                            LVitem.Name = name;
-                            LVlist.Add(LVitem);
-                        }
-                    }
-                }
-                SqlReader.Close();
-
-                foreach (EPKLookupValue LVcheckitem in LVlist)
-                {
-                    int lookupUID = LVcheckitem.UID;
-                    string lookupname = LVcheckitem.Name;
-
-                    // this is a complicated check, first part as per usual using SP but then much much more added
-
-                    SqlCommand = new SqlCommand("EPG_SP_ReadUsedListValue", _sqlConnection);
-                    SqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                    SqlCommand.Parameters.AddWithValue("LV_UID", lookupUID);
-                    SqlReader = SqlCommand.ExecuteReader();
-
-                    while (SqlReader.Read())
-                    {
-                        smessage += DBAccess.ReadStringValue(SqlReader["UsedMessage"]) + ": ";
-                        smessage += DBAccess.ReadStringValue(SqlReader["UsedData"]) + "\n";
-                    }
-                    SqlReader.Close();
-
-                    //  read list of Code fields used anywhere
-                    sCommand = "Select FA_NAME as Field_Name,FA_FIELD_ID as Field_ID,0 as Table_ID,0 as Field_IN_TABLE" +
-                                 " From EPGP_FIELD_ATTRIBS" +
-                                 " Where (FA_FIELD_ID >= 9105 And FA_FIELD_ID <= 9109) Or (FA_FIELD_ID >= 9305 And FA_FIELD_ID <= 9309)" +
-                                 " Or (FA_FIELD_ID >= 9505 And FA_FIELD_ID <= 9509)Or (FA_FIELD_ID >= 11801 And FA_FIELD_ID <= 11805)" +
-                                 " Union" +
-                                 " Select FA_NAME as Field_Name,FA_FIELD_ID as Field_ID,FA_TABLE_ID as Table_ID,FA_FIELD_IN_TABLE as Field_IN_TABLE" +
-                                 " From EPGC_FIELD_ATTRIBS" +
-                                 " Where FA_FORMAT = 4" +
-                                 " Order by Field_ID";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlReader = SqlCommand.ExecuteReader();
-
-                    List<CField> clnFields = new List<CField>();
-                    CField oField;
-                    while (SqlReader.Read())
-                    {
-                        oField = new CField();
-                        oField.Id = DBAccess.ReadIntValue(SqlReader["Field_ID"]);
-                        oField.Name = DBAccess.ReadStringValue(SqlReader["Field_Name"]);
-                        oField.CFTable = DBAccess.ReadIntValue(SqlReader["Table_ID"]);
-                        oField.CFField = DBAccess.ReadIntValue(SqlReader["Field_IN_TABLE"]);
-                        clnFields.Add(oField);
-                    }
-                    SqlReader.Close();
-
-                    string sField;
-                    foreach (CField field in clnFields)
-                    {
-                        if (field.Id >= 9105 && field.Id <= 9109)
-                        {
-                            // TS Code fields
-                            sField = string.Format("CAT_CODE_{0:0}", field.Id - 9104);
-                            sCommand = "Select DISTINCT Top 3 RES_NAME,PRD_NAME" +
-                                " From EPG_TS_CATEGORY_VALUES cv" +
-                                " Inner Join EPG_TS_CHARGES ch ON ch.CHG_UID = cv.CAT_CHG_UID" +
-                                " Inner Join EPG_TS_TIMESHEETS ts ON ts.TS_UID = ch.TS_UID" +
-                                " Inner Join EPG_PERIODS p On p.PRD_ID = ts.PRD_ID and p.CB_ID=0" +
-                                " Inner Join EPG_RESOURCES r On r.WRES_ID = ts.WRES_ID" +
-                                " Where cv." + sField + " = " + lookupUID.ToString();
-                            SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            SqlReader = SqlCommand.ExecuteReader();
-                            while (SqlReader.Read())
-                            {
-                                smessage += "Timesheet  " + DBAccess.ReadStringValue(SqlReader["PRD_NAME"]) + "  " +
-                                                           field.Name + ":  " + DBAccess.ReadStringValue(SqlReader["RES_NAME"]) + "\n";
-                            }
-                            SqlReader.Close();
-                        }
-                        else if (field.Id >= 9305 && field.Id <= 9309)
-                        {
-                            // RP Code fields
-                            sField = string.Format("CAT_CODE_{0:0}", field.Id - 9304);
-                            sCommand = "Select DISTINCT TOP 3 PROJECT_NAME" +
-                                " From EPGP_RP_CATEGORY_VALUES cv" +
-                                " Inner Join EPG_RESOURCEPLANS c On c.CMT_UID=cv.CAT_CMT_UID" +
-                                " Inner Join EPGP_PROJECTS p On p.PROJECT_ID=c.PROJECT_ID" +
-                                " Where cv." + sField + " = " + lookupUID.ToString();
-                            SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            SqlReader = SqlCommand.ExecuteReader();
-                            while (SqlReader.Read())
-                            {
-                                smessage += "Resource Plan  " + field.Name + ":  " + DBAccess.ReadStringValue(SqlReader["PROJECT_NAME"]) + "\n";
-                            }
-                            SqlReader.Close();
-                        }
-                        else if (field.Id >= 11801 && field.Id <= 11805)
-                        {
-                            // CT Code fields
-                            sField = string.Format("OC_{0:00}", field.Id - 11800);
-                            sCommand = "Select DISTINCT Top 3 PROJECT_NAME,CT_NAME,BC_NAME,CB_NAME" +
-                                " From EPGP_COST_DETAILS cv" +
-                                " Inner Join EPGP_PROJECTS p On p.PROJECT_ID=cv.PROJECT_ID" +
-                                " Inner Join EPGP_COST_TYPES ct On ct.CT_ID=cv.CT_ID" +
-                                " Inner Join EPGP_COST_CATEGORIES cc On cc.BC_UID=cv.BC_UID" +
-                                " Inner Join EPGP_COST_BREAKDOWNS cb On cb.CB_ID=cv.CB_ID" +
-                                " Where cv." + sField + " = " + lookupUID.ToString();
-                            SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            SqlReader = SqlCommand.ExecuteReader();
-                            while (SqlReader.Read())
-                            {
-                                smessage += "PI Cost Value  " +
-                                    DBAccess.ReadStringValue(SqlReader["CT_NAME"]) + "  " +
-                                    DBAccess.ReadStringValue(SqlReader["CB_NAME"]) + "  " +
-                                    DBAccess.ReadStringValue(SqlReader["BC_NAME"]) + "  " +
-                                    field.Name + ":  " +
-                                    DBAccess.ReadStringValue(SqlReader["PROJECT_NAME"]) + "\n";
-                            }
-                            SqlReader.Close();
-                        }
-                        else if (field.Id > 20000)
-                        {
-                            // PI or Resource fields Code fields
-                            string tableName;
-                            string fieldName;
-                            Common.CalculateTableFieldName(field.CFField, field.CFTable, out tableName, out fieldName);
-
-                            if ((Common.CustomFieldTable)field.CFTable == Common.CustomFieldTable.ResourceINT)
-                            {
-                                // resource code fields
-                                sCommand = "Select Top 3 RES_NAME" +
-                                    " From EPGC_RESOURCE_INT_VALUES iv" +
-                                    " Inner Join EPG_RESOURCES r On r.WRES_ID=iv.WRES_ID" +
-                                    " Where iv." + fieldName + " = " + lookupUID.ToString();
-                                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                                SqlReader = SqlCommand.ExecuteReader();
-                                while (SqlReader.Read())
-                                {
-                                    smessage += "Resource  " + field.Name + ":  " + DBAccess.ReadStringValue(SqlReader["RES_NAME"]) + "\n";
-                                }
-                                SqlReader.Close();
-                            }
-                            else if ((Common.CustomFieldTable)field.CFTable == Common.CustomFieldTable.PortfolioINT)
-                            {
-                                //  PI code fields
-                                sCommand = "Select Top 3 PROJECT_NAME" +
-                                    " From EPGP_PROJECT_INT_VALUES iv" +
-                                    " Inner Join EPGP_PROJECTS p On p.PROJECT_ID=iv.PROJECT_ID" +
-                                    " Where iv." + fieldName + " = " + lookupUID.ToString();
-                                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                                SqlReader = SqlCommand.ExecuteReader();
-                                while (SqlReader.Read())
-                                {
-                                    smessage += "PI  " + field.Name + ":  " + DBAccess.ReadStringValue(SqlReader["PROJECT_NAME"]) + "\n";
-                                }
-                                SqlReader.Close();
-
-                                //  PI codes also used for Program Data
-                                sCommand = "Select Top 3 LV_VALUE as Program_Name" +
-                                    " From EPGP_PROG_INT_VALUES iv" +
-                                    " Inner Join EPGP_LOOKUP_VALUES p On p.LV_UID=iv.PROG_UID" +
-                                    " Where iv." + fieldName + " = " + lookupUID.ToString();
-                                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                                SqlReader = SqlCommand.ExecuteReader();
-                                while (SqlReader.Read())
-                                {
-                                    smessage += "Program Data  " + field.Name + ":  " + DBAccess.ReadStringValue(SqlReader["Program_Name"]) + "\n";
-                                }
-                                SqlReader.Close();
-                            }
-                        }
-                    }
-                    if (smessage.Length > 0)
-                    {
-                        if (lookupUID != checklookupUID) smessage = "Child item:" + lookupname + "\n" + smessage;
-                        break;
-                    }
-                }
-                _sqlConnection.Close();
-
-                sresult = smessage;
-                return ((smessage.Length > 0) == false);
+                sresult = messageString;
+                return messageString.Length > 0 == false;
             }
             catch (Exception exception)
             {
+                Trace.TraceError("Exception Suppressed: {0}", exception);
                 throw new PFEException((int)PFEError.CanDeleteLookupValue, exception.GetBaseMessage());
+            }
+            finally
+            {
+                _sqlConnection?.Close();
             }
         }
 
+        private List<EPKLookupValue> GetLookUpValues(int checklookupUID)
+        {
+            var lookupValues = new List<EPKLookupValue>();
+
+            var command = "SELECT LV_UID,LV_VALUE,LV_ID,LV_LEVEL FROM EPGP_LOOKUP_VALUES"
+                + " WHERE LOOKUP_UID =(Select LOOKUP_UID From EPGP_LOOKUP_VALUES Where LV_UID=@LV_uid)"
+                + " ORDER BY LV_ID";
+            using (var sqlCommand = new SqlCommand(command, _sqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@LV_uid", checklookupUID);
+                using (var sqlReader = sqlCommand.ExecuteReader())
+                {
+                    var found = false;
+                    var levelThisValue = 0;
+                    while (sqlReader.Read())
+                    {
+                        var uId = SqlDb.ReadIntValue(sqlReader["LV_UID"]);
+                        var level = SqlDb.ReadIntValue(sqlReader["LV_LEVEL"]);
+                        var name = SqlDb.ReadStringValue(sqlReader["LV_VALUE"]);
+
+                        if (found == false)
+                        {
+                            if (uId == checklookupUID)
+                            {
+                                found = true;
+                                levelThisValue = level;
+                                CreateAndAddItem(uId, name, lookupValues);
+                            }
+                        }
+                        else
+                        {
+                            if (level <= levelThisValue)
+                            {
+                                break;
+                            }
+                            CreateAndAddItem(uId, name, lookupValues);
+                        }
+                    }
+                }
+            }
+            return lookupValues;
+        }
+
+        private void ProcessLookUpValues(int checklookupUID, List<EPKLookupValue> lookupValues, StringBuilder messageStringBuilder, ref string messageString)
+        {
+            foreach (var LVcheckitem in lookupValues)
+            {
+                int lookupUId;
+                string lookupName;
+                List<CField> clnFields;
+
+                GetFieldsFromLookUp(LVcheckitem, messageStringBuilder, out lookupUId, out lookupName, out clnFields);
+
+                foreach (var field in clnFields)
+                {
+                    if (field.Id >= 9105 && field.Id <= 9109)
+                    {
+                        ProcessTsCodeField(field, lookupUId, messageStringBuilder);
+                    }
+                    else if (field.Id >= 9305 && field.Id <= 9309)
+                    {
+                        ProcessRpCodeField(field, lookupUId, messageStringBuilder);
+                    }
+                    else if (field.Id >= 11801 && field.Id <= 11805)
+                    {
+                        ProcessCtCodeField(field, lookupUId, messageStringBuilder);
+                    }
+                    else if (field.Id > 20000)
+                    {
+                        string tableName;
+                        string fieldName;
+                        Common.CalculateTableFieldName(field.CFField, field.CFTable, out tableName, out fieldName);
+
+                        if ((Common.CustomFieldTable)field.CFTable == Common.CustomFieldTable.ResourceINT)
+                        {
+                            ProcessResourceField(fieldName, lookupUId, messageStringBuilder, field);
+                        }
+                        else if ((Common.CustomFieldTable)field.CFTable == Common.CustomFieldTable.PortfolioINT)
+                        {
+                            ProcessPortfolioField(fieldName, lookupUId, messageStringBuilder, field);
+                        }
+                    }
+                    messageString = messageStringBuilder.ToString();
+                }
+                if (!ProcessMessage(checklookupUID, lookupUId, lookupName, ref messageString))
+                {
+                    break;
+                }
+            }
+        }
+
+        private void GetFieldsFromLookUp(
+            EPKLookupValue LVcheckitem,
+            StringBuilder messageStringBuilder,
+            out int lookupUId,
+            out string lookupName,
+            out List<CField> clnFields)
+        {
+            lookupUId = LVcheckitem.UID;
+            lookupName = LVcheckitem.Name;
+
+            // this is a complicated check, first part as per usual using SP but then much much more added
+
+            using (var readUsedListCommand = new SqlCommand("EPG_SP_ReadUsedListValue", _sqlConnection))
+            {
+                readUsedListCommand.CommandType = CommandType.StoredProcedure;
+                readUsedListCommand.Parameters.AddWithValue("LV_UID", lookupUId);
+                using (var usedListReader = readUsedListCommand.ExecuteReader())
+                {
+                    while (usedListReader.Read())
+                    {
+                        messageStringBuilder.Append(string.Format("{0}: ", SqlDb.ReadStringValue(usedListReader["UsedMessage"])));
+                        messageStringBuilder.Append(string.Format("{0}\n", SqlDb.ReadStringValue(usedListReader["UsedData"])));
+                    }
+                }
+            }
+
+            const string Command = "Select FA_NAME as Field_Name,FA_FIELD_ID as Field_ID,0 as Table_ID,0 as Field_IN_TABLE"
+                + " From EPGP_FIELD_ATTRIBS"
+                + " Where (FA_FIELD_ID >= 9105 And FA_FIELD_ID <= 9109) Or (FA_FIELD_ID >= 9305 And FA_FIELD_ID <= 9309)"
+                + " Or (FA_FIELD_ID >= 9505 And FA_FIELD_ID <= 9509)Or (FA_FIELD_ID >= 11801 And FA_FIELD_ID <= 11805)"
+                + " Union"
+                + " Select FA_NAME as Field_Name,FA_FIELD_ID as Field_ID,FA_TABLE_ID as Table_ID,FA_FIELD_IN_TABLE as Field_IN_TABLE"
+                + " From EPGC_FIELD_ATTRIBS"
+                + " Where FA_FORMAT = 4"
+                + " Order by Field_ID";
+            using (var selectCommand = new SqlCommand(Command, _sqlConnection))
+            {
+                using (var selectReader = selectCommand.ExecuteReader())
+                {
+                    clnFields = new List<CField>();
+                    while (selectReader.Read())
+                    {
+                        var cField = new CField
+                        {
+                            Id = SqlDb.ReadIntValue(selectReader["Field_ID"]),
+                            Name = SqlDb.ReadStringValue(selectReader["Field_Name"]),
+                            CFTable = SqlDb.ReadIntValue(selectReader["Table_ID"]),
+                            CFField = SqlDb.ReadIntValue(selectReader["Field_IN_TABLE"])
+                        };
+                        clnFields.Add(cField);
+                    }
+                }
+            }
+        }
+
+        private void ProcessTsCodeField(CField field, int lookupUId, StringBuilder messageStringBuilder)
+        {
+            var fieldString = string.Format("CAT_CODE_{0:0}", field.Id - 9104);
+            var command = string.Format(
+                "Select DISTINCT Top 3 RES_NAME,PRD_NAME"
+                + " From EPG_TS_CATEGORY_VALUES cv"
+                + " Inner Join EPG_TS_CHARGES ch ON ch.CHG_UID = cv.CAT_CHG_UID"
+                + " Inner Join EPG_TS_TIMESHEETS ts ON ts.TS_UID = ch.TS_UID"
+                + " Inner Join EPG_PERIODS p On p.PRD_ID = ts.PRD_ID and p.CB_ID=0"
+                + " Inner Join EPG_RESOURCES r On r.WRES_ID = ts.WRES_ID"
+                + " Where cv.{0} = {1}",
+                fieldString,
+                lookupUId);
+            using (var sqlCommand = new SqlCommand(command, _sqlConnection))
+            {
+                using (var sqlReader = sqlCommand.ExecuteReader())
+                {
+                    while (sqlReader.Read())
+                    {
+                        messageStringBuilder.Append(
+                            string.Format(
+                                "Timesheet  {0}  {1}:  {2}\n",
+                                SqlDb.ReadStringValue(sqlReader["PRD_NAME"]),
+                                field.Name,
+                                SqlDb.ReadStringValue(sqlReader["RES_NAME"])));
+                    }
+                }
+            }
+        }
+
+        private void ProcessRpCodeField(CField field, int lookupUId, StringBuilder messageStringBuilder)
+        {
+            var fieldString = string.Format("CAT_CODE_{0:0}", field.Id - 9304);
+            var command = string.Format(
+                "Select DISTINCT TOP 3 PROJECT_NAME"
+                + " From EPGP_RP_CATEGORY_VALUES cv"
+                + " Inner Join EPG_RESOURCEPLANS c On c.CMT_UID=cv.CAT_CMT_UID"
+                + " Inner Join EPGP_PROJECTS p On p.PROJECT_ID=c.PROJECT_ID"
+                + " Where cv.{0} = {1}",
+                fieldString,
+                lookupUId);
+            using (var sqlCommand = new SqlCommand(command, _sqlConnection))
+            {
+                using (var sqlReader = sqlCommand.ExecuteReader())
+                {
+                    while (sqlReader.Read())
+                    {
+                        messageStringBuilder.Append(
+                            string.Format("Resource Plan  {0}:  {1}\n", field.Name, SqlDb.ReadStringValue(sqlReader["PROJECT_NAME"])));
+                    }
+                }
+            }
+        }
+
+        private void ProcessCtCodeField(CField field, int lookupUId, StringBuilder messageStringBuilder)
+        {
+            var fieldString = string.Format("OC_{0:00}", field.Id - 11800);
+            var command = string.Format(
+                "Select DISTINCT Top 3 PROJECT_NAME,CT_NAME,BC_NAME,CB_NAME"
+                + " From EPGP_COST_DETAILS cv"
+                + " Inner Join EPGP_PROJECTS p On p.PROJECT_ID=cv.PROJECT_ID"
+                + " Inner Join EPGP_COST_TYPES ct On ct.CT_ID=cv.CT_ID"
+                + " Inner Join EPGP_COST_CATEGORIES cc On cc.BC_UID=cv.BC_UID"
+                + " Inner Join EPGP_COST_BREAKDOWNS cb On cb.CB_ID=cv.CB_ID"
+                + " Where cv.{0} = {1}",
+                fieldString,
+                lookupUId);
+            var sqlCommand = new SqlCommand(command, _sqlConnection);
+            using (var sqlReader = sqlCommand.ExecuteReader())
+            {
+                while (sqlReader.Read())
+                {
+                    messageStringBuilder.Append(
+                        string.Format(
+                            "PI Cost Value  {0}  {1}  {2}  {3}:  {4}\n",
+                            SqlDb.ReadStringValue(sqlReader["CT_NAME"]),
+                            SqlDb.ReadStringValue(sqlReader["CB_NAME"]),
+                            SqlDb.ReadStringValue(sqlReader["BC_NAME"]),
+                            field.Name,
+                            SqlDb.ReadStringValue(sqlReader["PROJECT_NAME"])));
+                }
+            }
+        }
+
+        private void ProcessResourceField(string fieldName, int lookupUId, StringBuilder messageStringBuilder, CField field)
+        {
+            var command = string.Format(
+                "Select Top 3 RES_NAME"
+                + " From EPGC_RESOURCE_INT_VALUES iv"
+                + " Inner Join EPG_RESOURCES r On r.WRES_ID=iv.WRES_ID"
+                + " Where iv.{0} = {1}",
+                fieldName,
+                lookupUId);
+            using (var sqlCommand = new SqlCommand(command, _sqlConnection))
+            {
+                using (var sqlReader = sqlCommand.ExecuteReader())
+                {
+                    while (sqlReader.Read())
+                    {
+                        messageStringBuilder.Append(string.Format("Resource  {0}:  {1}\n", field.Name, SqlDb.ReadStringValue(sqlReader["RES_NAME"])));
+                    }
+                }
+            }
+        }
+
+        private void ProcessPortfolioField(string fieldName, int lookupUId, StringBuilder messageStringBuilder, CField field)
+        {
+            var command = string.Format(
+                "Select Top 3 PROJECT_NAME"
+                + " From EPGP_PROJECT_INT_VALUES iv"
+                + " Inner Join EPGP_PROJECTS p On p.PROJECT_ID=iv.PROJECT_ID"
+                + " Where iv.{0} = {1}",
+                fieldName,
+                lookupUId);
+            using (var selectProjectCommand = new SqlCommand(command, _sqlConnection))
+            {
+                using (var projectReader = selectProjectCommand.ExecuteReader())
+                {
+                    while (projectReader.Read())
+                    {
+                        messageStringBuilder.Append(string.Format("PI  {0}:  {1}\n", field.Name, SqlDb.ReadStringValue(projectReader["PROJECT_NAME"])));
+                    }
+                }
+            }
+
+            //  PI codes also used for Program Data
+            command = string.Format(
+                "Select Top 3 LV_VALUE as Program_Name"
+                + " From EPGP_PROG_INT_VALUES iv"
+                + " Inner Join EPGP_LOOKUP_VALUES p On p.LV_UID=iv.PROG_UID"
+                + " Where iv.{0} = {1}",
+                fieldName,
+                lookupUId);
+            using (var selectValueCommand = new SqlCommand(command, _sqlConnection))
+            {
+                using (var valueReader = selectValueCommand.ExecuteReader())
+                {
+                    while (valueReader.Read())
+                    {
+                        messageStringBuilder.Append(string.Format("Program Data  {0}:  {1}\n", field.Name, SqlDb.ReadStringValue(valueReader["Program_Name"])));
+                    }
+                }
+            }
+        }
+
+        private static bool ProcessMessage(int checklookupUID, int lookupUId, string lookupName, ref string messageString)
+        {
+            if (messageString.Length > 0)
+            {
+                if (lookupUId != checklookupUID)
+                {
+                    messageString = string.Format("Child item:{0}\n{1}", lookupName, messageString);
+                }
+                return false;
+            }
+            return true;
+        }
+
+        private static void CreateAndAddItem(int uId, string name, List<EPKLookupValue> LVlist)
+        {
+            EPKLookupValue LVitem;
+            LVitem = new EPKLookupValue
+            {
+                UID = uId,
+                Name = name
+            };
+            LVlist.Add(LVitem);
+        }
 
         /// <summary>
         /// checks if a lookup value can be deleted, returns reason or empty in string

@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Generic.Fakes;
 using System.Data;
 using System.IO;
 using System.IO.Fakes;
 using System.Linq;
+using System.Resources.Fakes;
 using System.Xml;
 using System.Xml.Linq;
 using EPMLiveCore.Fakes;
 using EPMLiveWorkPlanner.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -31,6 +34,10 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
         private const string AppendNewAgileTasksMethodName = "AppendNewAgileTasks";
         private const string GetAgileFolderFieldFormulaMethodName = "GetAgileFolderFieldFormula";
         private const string AddCalculationsMethodName = "addCalculations";
+        private const string GetFolderLayoutMethodName = "GetFolderLayout";
+        private const string GetViewsMethodName = "GetViews";
+        private const string GetDetailLayoutMethodName = "GetDetailLayout";
+        private const string SetupProjectCenterListMethodName = "SetupProjectCenterList";
 
         [TestMethod]
         public void PublishProcessTasks_WhenCalled_ProcessTasks()
@@ -414,11 +421,11 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
             dataSet.Tables.Add(new DataTable());
 
             dataSet.Tables[2].Columns.Add(IDStringCaps);
-            dataSet.Tables[2].Columns.Add(AccountInfpString);
+            dataSet.Tables[2].Columns.Add(AccountInfoString);
 
             row = dataSet.Tables[2].NewRow();
             row[IDStringCaps] = 1;
-            row[AccountInfpString] = DummyString;
+            row[AccountInfoString] = DummyString;
 
             dataSet.Tables[2].Rows.Add(row);
 
@@ -1185,6 +1192,630 @@ namespace EPMLiveWorkPlanner.Tests.ISAPI
                 () => defNode.SelectNodes("//D[@StartDateFormula='min()']").Count.ShouldBe(1),
                 () => defNode.SelectNodes("//D[@DueDateFormula='max()']").Count.ShouldBe(1),
                 () => defNode.SelectNodes("//D[@WorkCapacityFormula='sum()']").Count.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetFolderLayout_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string dataXmlString = @"<xmlcfg Planner=""1"" View="""" ID=""1""/>";
+            const string docXmlString = @"
+                <xmlcfg>
+                    <C Name=""Title"" Width=""""/>
+                    <Cols/>
+                    <Header/>
+                    <Def/>
+                </xmlcfg>";
+            var data = new XmlDocument();
+            var props = new PlannerProps()
+            {
+                sListTaskCenter = DummyString,
+                sListProjectCenter = DummyString
+            };
+
+            data.LoadXml(dataXmlString);
+
+            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => docXmlString;
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_1, _2) =>
+            {
+                validations += 1;
+                return props;
+            };
+            ShimWorkPlannerAPI.GetResourceTableWorkPlannerAPIPlannerPropsGuidStringSPWeb = (_1, _2, _3, _4) =>
+            {
+                validations += 1;
+                return default(DataSet);
+            };
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPField>()
+            {
+                spField
+            }.GetEnumerator();
+            ShimWorkPlannerAPI.getRealFieldSPField = _ =>
+            {
+                validations += 1;
+                return spField;
+            };
+            ShimWorkPlannerAPI.isValidFieldStringBoolean = (_1, _2) =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimWorkPlannerAPI.processFieldXmlDocumentRefSPFieldStringXmlNodeRefXmlNodeRefWorkPlannerAPIPlannerPropsSPWebDataSet = (ref XmlDocument docOut, SPField oField, string visible, ref XmlNode ndCols, ref XmlNode ndHeader, PlannerProps p, SPWeb web, DataSet dsResources) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlannerAPI.appendSpecialColumnsXmlDocumentRefXmlNodeRef = (ref XmlDocument docOut, ref XmlNode ndCols) =>
+            {
+                validations += 1;
+            };
+            ShimWorkPlannerAPI.addCalculationsWorkPlannerAPIPlannerPropsXmlDocumentRefXmlNodeRefBoolean = (PlannerProps p, ref XmlDocument docOut, ref XmlNode ndDef, bool bAgile) =>
+            {
+                validations += 1;
+            };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetFolderLayoutMethodName, publicStatic, new object[] { data, spWeb.Instance }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("xmlcfg")
+                    .Elements("C")
+                    .FirstOrDefault(x => x.Attribute("Name").Value.Equals("Title"))
+                    .Attribute("Width")
+                    .ShouldBeNull(),
+                () => actual
+                    .Element("xmlcfg")
+                    .Elements("C")
+                    .FirstOrDefault(x => x.Attribute("Name").Value.Equals("Title"))
+                    .Attribute("RelWidth")
+                    .Value
+                    .ShouldBe("100"),
+                () => validations
+                    .ShouldBe(7));
+        }
+
+        [TestMethod]
+        public void GetViews_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string dataXmlString = @"<xmlcfg Planner=""1""/>";
+            const string docXmlString = @"
+                <xmlcfg>
+                    <C/>
+                    <Cols/>
+                    <Header/>
+                    <Def/>
+                </xmlcfg>";
+            var data = new XmlDocument();
+
+            data.LoadXml(dataXmlString);
+            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => docXmlString;
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_1, _2) =>
+            {
+                validations += 1;
+                return default(PlannerProps);
+            };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetViewsMethodName, publicStatic, new object[] { data, spWeb.Instance }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("C")
+                    .ShouldNotBeNull(),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("Cols")
+                    .ShouldNotBeNull(),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("Header")
+                    .ShouldNotBeNull(),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("Def")
+                    .ShouldNotBeNull(),
+                () => validations
+                    .ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void GetDetailLayout_WhenCalled_ReturnsString()
+        {
+            // Arrange
+            const string dataXmlString = @"<xmlcfg Planner=""1"" View=""1"" ID=""1""/>";
+            const string docXmlString = @"
+                <xmlcfg>
+                    <B/>
+                </xmlcfg>";
+            var data = new XmlDocument();
+            var props = new PlannerProps()
+            {
+                sListTaskCenter = DummyString,
+                sListProjectCenter = DummyString
+            };
+
+            data.LoadXml(dataXmlString);
+
+            spField.TypeGet = () => SPFieldType.MultiChoice;
+            spField.SchemaXmlGet = () => docXmlString;
+            ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => docXmlString;
+            ShimWorkPlannerAPI.getSettingsSPWebString = (_1, _2) =>
+            {
+                validations += 1;
+                return props;
+            };
+            ShimWorkPlannerAPI.GetResourceTableWorkPlannerAPIPlannerPropsGuidStringSPWeb = (_1, _2, _3, _4) =>
+            {
+                validations += 1;
+                return default(DataSet);
+            };
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPField>()
+            {
+                spField
+            }.GetEnumerator();
+            ShimWorkPlannerAPI.isValidFieldStringBoolean = (_1, _2) =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimWorkPlannerAPI.getFormatSPFieldXmlDocumentStringOutSPWeb = (SPField oField, XmlDocument oDoc, out string EditFormat, SPWeb oWeb) =>
+            {
+                validations += 1;
+                EditFormat = DummyString;
+                return DummyString;
+            };
+            ShimWorkPlannerAPI.ReadOnlyFieldSPFieldWorkPlannerAPIPlannerProps = (_, __) =>
+            {
+                validations += 1;
+                return true;
+            };
+            ShimWorkPlannerAPI.setEnumFieldSPFieldXmlNodeRefXmlDocumentXmlDocumentSPWebBooleanStringDataSet = (SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources) =>
+            {
+                validations += 1;
+            };
+
+            // Act
+            var actual = XDocument.Parse((string)privateObject.Invoke(GetDetailLayoutMethodName, publicStatic, new object[] { data, spWeb.Instance }));
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("B")
+                    .Element("I")
+                    .Attribute("id")
+                    .Value
+                    .ShouldBe(DummyString),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("B")
+                    .Element("I")
+                    .Attribute("VType")
+                    .Value
+                    .ShouldBe("Enum"),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("B")
+                    .Element("I")
+                    .Attribute("VCanEdit")
+                    .Value
+                    .ShouldBe("0"),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("B")
+                    .Element("I")
+                    .Attribute("VFormat")
+                    .Value
+                    .ShouldBe(DummyString),
+                () => actual
+                    .Element("xmlcfg")
+                    .Element("B")
+                    .Element("I")
+                    .Attribute("VEditFormat")
+                    .Value
+                    .ShouldBe(DummyString),
+                () => validations
+                .ShouldBe(6));
+        }
+
+        [TestMethod]
+        public void GetFieldValue_SPFieldTypeDateTime_ReturnsString()
+        {
+            // Arrange
+            const string format = "yyyy-MM-dd HH:mm:ss";
+            var now = DateTime.Now;
+            var dataSet = default(DataSet);
+            var expected = now.ToString(format);
+
+            spField.TypeGet = () => SPFieldType.DateTime;
+            spField.DescriptionGet = () => DummyString;
+            spListItem.ItemGetGuid = _ => now;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetFieldValue_SPFieldTypeUser_ReturnsString()
+        {
+            // Arrange
+            var expected = $"{One};{One}";
+            var dataSet = new DataSet();
+            var row = default(DataRow);
+
+            dataSet.Tables.Add(new DataTable());
+            dataSet.Tables.Add(new DataTable());
+            dataSet.Tables.Add(new DataTable());
+
+            dataSet.Tables[2].Columns.Add(IDStringCaps);
+            dataSet.Tables[2].Columns.Add(AccountInfoString);
+
+            row = dataSet.Tables[2].NewRow();
+            row[IDStringCaps] = One;
+            row[AccountInfoString] = DummyString;
+
+            dataSet.Tables[2].Rows.Add(row);
+
+            spField.TypeGet = () => SPFieldType.User;
+            spField.DescriptionGet = () => DummyString;
+            spListItem.ItemGetGuid = _ => DummyString;
+
+            ShimList<SPFieldUserValue>.AllInstances.GetEnumerator = _ =>
+            {
+                var result = default(List<SPFieldUserValue>.Enumerator);
+                var userValue = new ShimSPFieldUserValue();
+                ShimsContext.ExecuteWithoutShims(() =>
+                {
+                    result = new List<SPFieldUserValue>()
+                    {
+                        userValue,
+                        userValue
+                    }.GetEnumerator();
+                });
+                return result;
+            };
+            ShimSPFieldLookupValue.AllInstances.ToString01 = _ => DummyString;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetFieldValue_SPFieldTypeNote_ReturnsString()
+        {
+            // Arrange
+            const string indicatorString = "Indicator";
+            var dataSet = default(DataSet);
+            var expected = $"<img src=\"{DummyString}/_layouts/images/{DummyString}\">";
+
+            spField.TypeGet = () => SPFieldType.Note;
+            spField.DescriptionGet = () => indicatorString;
+            spListItem.ItemGetGuid = _ => DummyString;
+            spWeb.ServerRelativeUrlGet = () => DummyString;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetFieldValue_SPFieldTypeCalculatedNumber_ReturnsString()
+        {
+            // Arrange
+            var dataSet = default(DataSet);
+            var newField = new ShimSPFieldCalculated()
+            {
+                OutputTypeGet = () => SPFieldType.Number
+            };
+
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Calculated;
+            ShimSPField.AllInstances.DescriptionGet = _ => DummyString;
+            spListItem.ItemGetGuid = _ => $"{DummyString};#{DummyString}";
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetFieldValueMethodName, publicStatic, new object[] { spListItem.Instance, newField.Instance, dataSet });
+
+            // Assert
+            actual.ShouldBe(DummyString);
+        }
+
+        [TestMethod]
+        public void GetFieldValue_SPFieldTypeCalculatedOther_ReturnsString()
+        {
+            // Arrange
+            var dataSet = default(DataSet);
+            var newField = new ShimSPFieldCalculated()
+            {
+                OutputTypeGet = () => SPFieldType.Attachments
+            };
+
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Calculated;
+            ShimSPField.AllInstances.DescriptionGet = _ => DummyString;
+            spListItem.ItemGetGuid = _ => DummyString;
+            ShimSPFieldCalculated.AllInstances.GetFieldValueAsTextObject = (_, __) => DummyString;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    newField.Instance,
+                    dataSet
+                });
+
+            // Assert
+            actual.ShouldBe(DummyString);
+        }
+
+        [TestMethod]
+        public void GetFieldValue_SPFieldTypeNumber_ReturnsString()
+        {
+            // Arrange
+            const string expected = "100";
+            var dataSet = default(DataSet);
+            var newField = new ShimSPFieldNumber()
+            {
+                ShowAsPercentageGet = () => true
+            };
+
+            ShimSPField.AllInstances.TypeGet = _ => SPFieldType.Number;
+            ShimSPField.AllInstances.DescriptionGet = _ => DummyString;
+            spListItem.ItemGetGuid = _ => One;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    newField.Instance,
+                    dataSet
+                });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetFieldValue_SPFieldTypeCurrency_ReturnsString()
+        {
+            // Arrange
+            var dataSet = default(DataSet);
+
+            spField.TypeGet = () => SPFieldType.Currency;
+            spField.DescriptionGet = () => DummyString;
+            spListItem.ItemGetGuid = _ => DummyString;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
+
+            // Assert
+            actual.ShouldBe(DummyString);
+        }
+
+        [TestMethod]
+        public void GetFieldValue_SPFieldTypeBooleanTrue_ReturnsString()
+        {
+            // Arrange
+            const string expected = "1";
+            var dataSet = default(DataSet);
+
+            spField.TypeGet = () => SPFieldType.Boolean;
+            spField.DescriptionGet = () => DummyString;
+            spListItem.ItemGetGuid = _ => bool.TrueString;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetFieldValue_SPFieldTypeBooleanFalse_ReturnsString()
+        {
+            // Arrange
+            const string expected = "0";
+            var dataSet = default(DataSet);
+
+            spField.TypeGet = () => SPFieldType.Boolean;
+            spField.DescriptionGet = () => DummyString;
+            spListItem.ItemGetGuid = _ => bool.FalseString;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetFieldValue_SPFieldTypeOther_ReturnsString()
+        {
+            // Arrange
+            var dataSet = default(DataSet);
+
+            spField.TypeGet = () => SPFieldType.Attachments;
+            spField.DescriptionGet = () => DummyString;
+            spListItem.ItemGetGuid = _ => DummyString;
+            spField.GetFieldValueAsTextObject = _ => DummyString;
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
+
+            // Assert
+            actual.ShouldBe(DummyString);
+        }
+
+        [TestMethod]
+        public void GetFieldValue_SPFieldTypeLookup_ReturnsString()
+        {
+            // Arrange
+            var expected = $"{One};{One}";
+            var dataSet = default(DataSet);
+
+            spField.TypeGet = () => SPFieldType.Lookup;
+            spField.DescriptionGet = () => DummyString;
+            spListItem.ItemGetGuid = _ => DummyString;
+
+            ShimList<SPFieldLookupValue>.AllInstances.GetEnumerator = _ =>
+            {
+                var result = default(List<SPFieldLookupValue>.Enumerator);
+                var lookupValue = new ShimSPFieldLookupValue()
+                {
+                    LookupIdGet = () => One
+                };
+                ShimsContext.ExecuteWithoutShims(() =>
+                {
+                    result = new List<SPFieldLookupValue>()
+                    {
+                        lookupValue,
+                        lookupValue
+                    }.GetEnumerator();
+                });
+                return result;
+            };
+
+            // Act
+            var actual = (string)privateObject.Invoke(
+                GetFieldValueMethodName,
+                publicStatic,
+                new object[]
+                {
+                    spListItem.Instance,
+                    spField.Instance,
+                    dataSet
+                });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void SetupProjectCenterList_WhenCalled_Returns()
+        {
+            // Arrange
+            var actual = new Dictionary<string, bool>()
+            {
+                [$"{DummyString}FAC"] = false,
+                [$"{DummyString}FRL"] = false,
+                [$"{DummyString}FSC"] = false,
+                [$"{DummyString}BD"] = false,
+            };
+
+            spFieldCollection.AddStringSPFieldTypeBoolean = (input, _1, _2) =>
+            {
+                if (actual.ContainsKey(input))
+                {
+                    actual[input] = true;
+                    validations += 1;
+                }
+                return input;
+            };
+            spFieldCollection.ItemGetString = _ =>
+            {
+                validations += 1;
+                return spField;
+            };
+            spField.TitleSetString = _ =>
+            {
+                validations += 1;
+            };
+            spField.HiddenSetBoolean = _ =>
+            {
+                validations += 1;
+            };
+            spField.SealedSetBoolean = _ =>
+            {
+                validations += 1;
+            };
+            spField.Update = () =>
+            {
+                validations += 1;
+            };
+            spList.Update = () =>
+            {
+                validations += 1;
+            };
+
+            // Act
+            privateObject.Invoke(SetupProjectCenterListMethodName, nonPublicStatic, new object[] { spList.Instance, DummyString });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Count(x => x.Value.Equals(true)).ShouldBe(4),
+                () => validations.ShouldBe(28));
         }
     }
 }

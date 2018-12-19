@@ -1,16 +1,12 @@
 using System;
-using System.Data;
-using System.Configuration;
 using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using Microsoft.SharePoint;
-using System.Text.RegularExpressions;
+using System.Data;
 using System.Data.SqlClient;
+using System.Web;
+using System.Web.UI;
+using EPMLiveWebParts;
+using Microsoft.SharePoint;
+using static System.Diagnostics.Trace;
 
 namespace TimeSheets
 {
@@ -106,59 +102,25 @@ namespace TimeSheets
                         {
                             if (id != "")
                             {
-                                string strWebId = "";
-                                string strListId = "";
-                                string strSiteId = "";
-                                try
-                                {
-                                    strWebId = Request[id + "_webid"].ToString();
-                                }
-                                catch { }
-                                try
-                                {
-                                    strListId = Request[id + "_listid"].ToString();
-                                }
-                                catch { }
-                                try
-                                {
-                                    strSiteId = Request[id + "_siteid"].ToString();
-                                }
-                                catch { }
-                                if (strWebId != "" && strListId != "" && strSiteId != "")
+                                string webId;
+                                string listId;
+                                string siteId;
+                                SaveHelper.ParseSiteFromRequest(Request, id, out webId, out listId, out siteId);
+                                if (!string.IsNullOrWhiteSpace(webId) && !string.IsNullOrWhiteSpace(listId) && !string.IsNullOrWhiteSpace(siteId))
                                 {
                                     try
                                     {
-                                        Guid wGuid = new Guid(strWebId);
-                                        Guid lGuid = new Guid(strListId);
-                                        Guid sGuid = new Guid(strSiteId);
-                                        if (siteGuid != sGuid)
-                                        {
-                                            if (iWeb != null)
-                                            {
-                                                iWeb.Close();
-                                                iWeb = null;
-                                                iSite.Close();
-                                            }
-                                            iSite = new SPSite(sGuid);
-                                            siteGuid = iSite.ID;
-                                        }
-                                        if (webGuid != wGuid)
-                                        {
-                                            if (iWeb != null)
-                                            {
-                                                iWeb.Close();
-                                                iWeb = iSite.OpenWeb(wGuid);
-                                            }
-                                            else
-                                                iWeb = iSite.OpenWeb(wGuid);
-                                            webGuid = iWeb.ID;
-                                        }
-                                        if (listGuid != lGuid)
-                                        {
-                                            iList = iWeb.Lists[lGuid];
-                                            pList = SharedFunctions.getProjectCenterList(iList);
-                                            listGuid = iList.ID;
-                                        }
+                                        SaveHelper.PopulateGuidData(
+                                            webId,
+                                            listId,
+                                            siteId,
+                                            list => pList = SharedFunctions.getProjectCenterList(list),
+                                            ref siteGuid,
+                                            ref iWeb,
+                                            ref iSite,
+                                            ref webGuid,
+                                            ref listGuid,
+                                            ref iList);
                                     }
                                     catch (Exception ex)
                                     {
@@ -342,25 +304,7 @@ namespace TimeSheets
                                             case SPFieldType.User:
                                                 if (field.TypeAsString == "UserMulti")
                                                 {
-                                                    string[] sUsers = val.Split('\n');
-                                                    SPFieldUserValueCollection uvc = new SPFieldUserValueCollection();
-                                                    for (int i = 0; i < sUsers.Length; i = i + 2)
-                                                    {
-                                                        int iGroup = 0;
-                                                        if (int.TryParse(sUsers[i], out iGroup))
-                                                        {
-                                                            SPFieldUserValue uv = new SPFieldUserValue(web, sUsers[i] + ";#" + sUsers[i + 1]);
-                                                            uvc.Add(uv);
-                                                        }
-                                                        else
-                                                        {
-                                                            SPUser u = web.AllUsers[sUsers[i]];
-                                                            SPFieldUserValue uv = new SPFieldUserValue(web, u.ID + ";#" + u.Name);
-                                                            uvc.Add(uv);
-                                                        }
-                                                    }
-                                                    li[field.Id] = uvc;
-                                                }
+                                                    SaveHelper.HandleMultiUserCase(web, val, li, field);                                                }
                                                 else
                                                 {
                                                     string[] sUsers = val.Split('\n');
@@ -650,29 +594,7 @@ namespace TimeSheets
                                             string[] strFieldData = fieldData.Split('|');
                                             for (int j = 0; j < strFieldData.Length; j += 2)
                                             {
-                                                if (strFieldData[j] == "N")
-                                                {
-                                                    if (strFieldData[j + 1] != "")
-                                                    {
-                                                        cmd = new SqlCommand("INSERT INTO TSNOTES (TS_ITEM_UID,TS_ITEM_DATE,TS_ITEM_NOTES) VALUES (@itemuid,@itemdate,@notes)", cn);
-                                                        cmd.Parameters.AddWithValue("@itemuid", tsitemuid);
-                                                        cmd.Parameters.AddWithValue("@itemdate", dtStart.AddDays(daycounter));
-                                                        cmd.Parameters.AddWithValue("@notes", strFieldData[j + 1]);
-                                                        cmd.ExecuteNonQuery();
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    if (strFieldData[j + 1] != "0")
-                                                    {
-                                                        cmd = new SqlCommand("INSERT INTO TSITEMHOURS (TS_ITEM_UID,TS_ITEM_DATE,TS_ITEM_HOURS,TS_ITEM_TYPE_ID) VALUES (@itemuid,@itemdate,@hours,@type)", cn);
-                                                        cmd.Parameters.AddWithValue("@itemuid", tsitemuid);
-                                                        cmd.Parameters.AddWithValue("@itemdate", dtStart.AddDays(daycounter));
-                                                        cmd.Parameters.AddWithValue("@hours", strFieldData[j + 1]);
-                                                        cmd.Parameters.AddWithValue("@type", strFieldData[j]);
-                                                        cmd.ExecuteNonQuery();
-                                                    }
-                                                }
+                                                ExecuteInsertCommand(strFieldData, j, tsitemuid, dtStart, daycounter);
                                             }
                                         }
                                         else
@@ -797,29 +719,7 @@ namespace TimeSheets
                                         string[] strFieldData = fieldData.Split('|');
                                         for (int j = 0; j < strFieldData.Length; j += 2)
                                         {
-                                            if (strFieldData[j] == "N")
-                                            {
-                                                if (strFieldData[j + 1] != "")
-                                                {
-                                                    cmd = new SqlCommand("INSERT INTO TSNOTES (TS_ITEM_UID,TS_ITEM_DATE,TS_ITEM_NOTES) VALUES (@itemuid,@itemdate,@notes)", cn);
-                                                    cmd.Parameters.AddWithValue("@itemuid", tsitemuid);
-                                                    cmd.Parameters.AddWithValue("@itemdate", dtStart.AddDays(daycounter));
-                                                    cmd.Parameters.AddWithValue("@notes", strFieldData[j + 1]);
-                                                    cmd.ExecuteNonQuery();
-                                                }
-                                            }
-                                            else
-                                            {
-                                                if (strFieldData[j + 1] != "0")
-                                                {
-                                                    cmd = new SqlCommand("INSERT INTO TSITEMHOURS (TS_ITEM_UID,TS_ITEM_DATE,TS_ITEM_HOURS,TS_ITEM_TYPE_ID) VALUES (@itemuid,@itemdate,@hours,@type)", cn);
-                                                    cmd.Parameters.AddWithValue("@itemuid", tsitemuid);
-                                                    cmd.Parameters.AddWithValue("@itemdate", dtStart.AddDays(daycounter));
-                                                    cmd.Parameters.AddWithValue("@hours", strFieldData[j + 1]);
-                                                    cmd.Parameters.AddWithValue("@type", strFieldData[j]);
-                                                    cmd.ExecuteNonQuery();
-                                                }
-                                            }
+                                            ExecuteInsertCommand(strFieldData, j, tsitemuid, dtStart, daycounter);
                                         }
                                     }
                                     else
@@ -848,5 +748,35 @@ namespace TimeSheets
             }
         }
 
+        private void ExecuteInsertCommand(string[] fieldData, int index, string itemUId, DateTime start, int dayCounter)
+        {
+            if (fieldData[index] == "N")
+            {
+                if (fieldData[index + 1] != string.Empty)
+                {
+                    using (var sqlCommand = new SqlCommand("INSERT INTO TSNOTES (TS_ITEM_UID,TS_ITEM_DATE,TS_ITEM_NOTES) VALUES (@itemuid,@itemdate,@notes)", cn))
+                    {
+                        sqlCommand.Parameters.AddWithValue("@itemuid", itemUId);
+                        sqlCommand.Parameters.AddWithValue("@itemdate", start.AddDays(dayCounter));
+                        sqlCommand.Parameters.AddWithValue("@notes", fieldData[index + 1]);
+                        sqlCommand.ExecuteNonQuery();
+                    }
+                }
+            }
+            else
+            {
+                if (fieldData[index + 1] != "0")
+                {
+                    using (var sqlCommand = new SqlCommand("INSERT INTO TSITEMHOURS (TS_ITEM_UID,TS_ITEM_DATE,TS_ITEM_HOURS,TS_ITEM_TYPE_ID) VALUES (@itemuid,@itemdate,@hours,@type)", cn))
+                    {
+                        sqlCommand.Parameters.AddWithValue("@itemuid", itemUId);
+                        sqlCommand.Parameters.AddWithValue("@itemdate", start.AddDays(dayCounter));
+                        sqlCommand.Parameters.AddWithValue("@hours", fieldData[index + 1]);
+                        sqlCommand.Parameters.AddWithValue("@type", fieldData[index]);
+                        sqlCommand.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
     }
 }
