@@ -7,12 +7,12 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore
 {
-    internal class WebSettingsHelper
+    internal class WebSettingsAdditionalInfo
     {
         private SPWeb Web { get; set; }
         private string EPMLiveConnection { get; set; }
 
-        internal WebSettingsHelper(SPWeb spWeb)
+        internal WebSettingsAdditionalInfo(SPWeb spWeb)
         {
             Web = spWeb;
             EPMLiveConnection = string.Empty;
@@ -100,7 +100,7 @@ namespace EPMLiveCore
 
         internal void SetEPMLiveDatabase(Label lblEPMLDB, Label lblEPMLDBServer)
         {
-            var errMsg = "Cannot get EPMLive database information.";
+            const string errMsg = "Cannot get EPMLive database information.";
             try
             {
                 EPMLiveConnection = CoreFunctions.getConnectionString(Web.Site.WebApplication.Id);

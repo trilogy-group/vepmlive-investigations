@@ -11,8 +11,8 @@ namespace EPMLiveCore
 {
     public partial class websettings : LayoutsPageBase
     {
-        protected string StrSiteUrl { get; set; }
-        protected string StrCurrentTemplate { get; set; }
+        protected string SiteUrl { get; set; }
+        protected string CurrentTemplate { get; set; }
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -94,13 +94,13 @@ namespace EPMLiveCore
                 {
                     connection.Open();
 
-                    using (var cmd = new SqlCommand(
+                    using (var command = new SqlCommand(
                         "SELECT * FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid",
                         connection))
                     {
-                        cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                        cmd.Parameters.AddWithValue("@webid", web.ID);
-                        using (var dataReader = cmd.ExecuteReader())
+                        command.Parameters.AddWithValue("@siteid", web.Site.ID);
+                        command.Parameters.AddWithValue("@webid", web.ID);
+                        using (var dataReader = command.ExecuteReader())
                         {
                             if (dataReader.Read())
                             {
@@ -126,7 +126,7 @@ namespace EPMLiveCore
                     : false;
                 if (web.Properties.ContainsKey("EPMLiveTemplateID"))
                 {
-                    var sChildSiteTemplateID = web.Properties["EPMLiveTemplateID"].ToString();
+                    var childSiteTemplateID = web.Properties["EPMLiveTemplateID"].ToString();
                     var site = SPContext.Current.Site;
                     foreach (SPWeb subWeb in site.AllWebs)
                     {
@@ -135,14 +135,14 @@ namespace EPMLiveCore
                             if (subWeb.Properties.ContainsKey("EPMLiveTemplateID"))
                             {
                                 var idCheck = subWeb.Properties["EPMLiveTemplateID"].ToString();
-                                if (sChildSiteTemplateID == idCheck)
+                                if (childSiteTemplateID == idCheck)
                                 {
                                     var templateId = subWeb.ID.ToString();
                                     var Ids = web.Site.RootWeb.Properties["EPMLiveSiteTemplateIDs"];
                                     if (Ids != null && Ids.Contains(templateId))
                                     {
                                         lblSelectedTemplate.Text = subWeb.Title;
-                                        StrCurrentTemplate = templateId;
+                                        CurrentTemplate = templateId;
                                     }
                                 }
                             }
@@ -160,31 +160,31 @@ namespace EPMLiveCore
 
         private void AddMasterPages(SPWeb web)
         {
-            var oList = web.Lists["Master Page Gallery"] as SPList;
-            if (oList != null)
+            var masterPageGallerList = web.Lists["Master Page Gallery"] as SPList;
+            if (masterPageGallerList != null)
             {
-                var sFullFileNameAndPath = string.Empty;
-                var sFileName = string.Empty;
-                StrSiteUrl = web.Url;
-                foreach (SPListItem masterPageItem in oList.Items)
+                var fullFileNameAndPath = string.Empty;
+                var fileName = string.Empty;
+                SiteUrl = web.Url;
+                foreach (SPListItem masterPageItem in masterPageGallerList.Items)
                 {
                     var fldFullFileNameAndPath = masterPageItem.Fields.GetFieldByInternalName("FileRef");
                     if (masterPageItem[fldFullFileNameAndPath.Id] != null)
                     {
-                        sFullFileNameAndPath = masterPageItem[fldFullFileNameAndPath.Id].ToString();
+                        fullFileNameAndPath = masterPageItem[fldFullFileNameAndPath.Id].ToString();
                     }
 
-                    var fldFileName = masterPageItem.Fields.GetFieldByInternalName("FilenameNoLink");
-                    if (masterPageItem[fldFileName.Id] != null)
+                    var fieldFileName = masterPageItem.Fields.GetFieldByInternalName("FilenameNoLink");
+                    if (masterPageItem[fieldFileName.Id] != null)
                     {
-                        sFileName = masterPageItem[fldFileName.Id].ToString();
+                        fileName = masterPageItem[fieldFileName.Id].ToString();
                     }
 
-                    if (sFileName.IndexOf(".master", 0, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                    if (fileName.IndexOf(".master", 0, StringComparison.InvariantCultureIgnoreCase) >= 0)
                     {
                         var listItem = new ListItem(
-                            sFileName.Replace(".master", string.Empty).Replace(".MASTER", string.Empty),
-                            sFullFileNameAndPath);
+                            fileName.Replace(".master", string.Empty).Replace(".MASTER", string.Empty),
+                            fullFileNameAndPath);
                         ddlMasterPages.Items.Add(listItem);
                     }
                 }
@@ -214,12 +214,12 @@ namespace EPMLiveCore
         /// </summary>
         private void SetProductAdditionalInfo(SPWeb web)
         {
-            var WebSettingsHelper = new WebSettingsHelper(web);
-            WebSettingsHelper.SetEPMLiveVersion(lblEPMLVersion);
-            WebSettingsHelper.SetSharePointVersion(lblSPVersion);
-            WebSettingsHelper.SetEPMLiveDatabase(lblEMPLDB, lblEPMLDBServer);
-            WebSettingsHelper.SetReportingDatabase(lblReportingDB, lblReportingDBServer);
-            WebSettingsHelper.SetPFEDatabase(lblPFEDB, lblPFEDBServer);
+            var webSettingsAdditionalInfo = new WebSettingsAdditionalInfo(web);
+            webSettingsAdditionalInfo.SetEPMLiveVersion(lblEPMLVersion);
+            webSettingsAdditionalInfo.SetSharePointVersion(lblSPVersion);
+            webSettingsAdditionalInfo.SetEPMLiveDatabase(lblEMPLDB, lblEPMLDBServer);
+            webSettingsAdditionalInfo.SetReportingDatabase(lblReportingDB, lblReportingDBServer);
+            webSettingsAdditionalInfo.SetPFEDatabase(lblPFEDB, lblPFEDBServer);
         }
 
         protected void Button1_Click(object sender, EventArgs e)
@@ -273,36 +273,38 @@ namespace EPMLiveCore
                     if (chkArchive.Checked)
                     {
                         var recordExists = true;
-                        using (var cmd = new SqlCommand("SELECT * FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid", connection))
+                        using (var command = new SqlCommand(
+                            "SELECT * FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid",
+                            connection))
                         {
-                            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                            cmd.Parameters.AddWithValue("@webid", web.ID);
-                            using (var dataReader = cmd.ExecuteReader())
+                            command.Parameters.AddWithValue("@siteid", web.Site.ID);
+                            command.Parameters.AddWithValue("@webid", web.ID);
+                            using (var dataReader = command.ExecuteReader())
                             {
                                 recordExists = dataReader.Read();
                             }
                         }
                         if (!recordExists)
                         {
-                            using (var cmd = new SqlCommand(
+                            using (var command = new SqlCommand(
                                 "INSERT INTO PERSONALIZATIONS ([Key],SiteId,webid) Values ('webarchived', @siteId, @webid)",
                                 connection))
                             {
-                                cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                                cmd.Parameters.AddWithValue("@webid", web.ID);
-                                cmd.ExecuteNonQuery();
+                                command.Parameters.AddWithValue("@siteid", web.Site.ID);
+                                command.Parameters.AddWithValue("@webid", web.ID);
+                                command.ExecuteNonQuery();
                             }
                         }
                     }
                     else
                     {
-                        using (var cmd = new SqlCommand(
+                        using (var command = new SqlCommand(
                             "DELETE FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid",
                             connection))
                         {
-                            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                            cmd.Parameters.AddWithValue("@webid", web.ID);
-                            cmd.ExecuteNonQuery();
+                            command.Parameters.AddWithValue("@siteid", web.Site.ID);
+                            command.Parameters.AddWithValue("@webid", web.ID);
+                            command.ExecuteNonQuery();
                         }
                     }
                 }
