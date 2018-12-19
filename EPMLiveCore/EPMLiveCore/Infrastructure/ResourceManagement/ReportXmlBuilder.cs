@@ -8,7 +8,7 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Infrastructure
 {
-    internal class ReportXmlBuilder
+    public class ReportXmlBuilder
     {
         private readonly ResourcePoolManager _resourcePoolManager;
         private readonly string _elementName;
@@ -23,7 +23,7 @@ namespace EPMLiveCore.Infrastructure
             _elementName = elementName;
         }
 
-        internal IList<XElement> BuildXmlElements(
+        public IList<XElement> BuildXmlElements(
             bool includeHidden,
             bool includeReadOnly,
             IEnumerable<DataRow> rowCollection,
