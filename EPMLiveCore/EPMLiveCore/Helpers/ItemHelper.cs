@@ -25,7 +25,7 @@ namespace EPMLiveCore.Helpers
                 OnClientClick = "closePage();"
             };
 
-            var closeButton2 = new Button
+            var secondCloseButton = new Button
             {
                 Text = "Close",
                 CssClass = "ms-ButtonHeightWidth",
@@ -40,7 +40,7 @@ namespace EPMLiveCore.Helpers
             listFormWebPart.Controls[0]
                 .FindControl("toolBarTbl")
                 .FindControl("RightRptControls")
-                .Controls.AddAt(2, closeButton2);
+                .Controls.AddAt(2, secondCloseButton);
 
             var backButton = (GoBackButton)listFormWebPart.Controls[0]
                 .FindControl("toolBarTbltop")
