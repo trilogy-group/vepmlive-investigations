@@ -31,8 +31,8 @@ namespace EPMLiveCore
         private const string MethodSetProductAdditionalInfo = "SetProductAdditionalInfo";
         private const string MethodGetBasePath = "GetBasePath";
         private const string MethodButton1_Click = "Button1_Click";
-        private const string FieldstrSiteUrl = "strSiteUrl";
-        private const string FieldstrCurrentTemplate = "strCurrentTemplate";
+        private const string PropertySiteUrl = "SiteUrl";
+        private const string PropertyCurrentTemplate = "CurrentTemplate";
         private Type _websettingsInstanceType;
         private const int TestsTimeOut = TestContants.TimeOutFiveSeconds;
         private websettings _websettingsInstance;
@@ -86,28 +86,25 @@ namespace EPMLiveCore
 
         #endregion
 
-        #region General Initializer : Class (websettings) All Fields Explore By Name
+        #region General Initializer : Class (websettings) All Properties Explore By Name
 
-        /// <summary>
-        ///     Class (<see cref="websettings" />) explore and verify fields for coverage gain.
-        /// </summary>
         [Test]
         [Timeout(TestsTimeOut)]
         [Category("AUT Initializer")]
-        [TestCase(FieldstrSiteUrl)]
-        [TestCase(FieldstrCurrentTemplate)]
-        public void AUT_Websettings_All_Fields_Explore_Verify_By_Name_Test(string name)
+        [TestCase(PropertySiteUrl)]
+        [TestCase(PropertyCurrentTemplate)]
+        public void AUT_Websettings_All_Properties_Explore_Verify_By_Name_Test(string name)
         {
             // Arrange
-            var fieldInfo = GetFieldInfo(name);
+            var propertyInfo = GetPropertyInfo(name);
 
             // Act
-            ShouldlyExtension.ExploreFieldWithOrWithoutInstance(_websettingsInstanceFixture, 
-                                                                Fixture, 
-                                                                fieldInfo);
+            ShouldlyExtension.ExploreProperty(_websettingsInstance,
+                                              Fixture,
+                                              propertyInfo);
 
             // Assert
-            fieldInfo.ShouldNotBeNull();
+            propertyInfo.ShouldNotBeNull();
         }
 
         #endregion
