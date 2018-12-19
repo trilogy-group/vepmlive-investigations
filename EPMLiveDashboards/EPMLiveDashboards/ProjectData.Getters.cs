@@ -61,8 +61,9 @@ namespace Dashboard
 
                 return status;
             }
-            catch
+            catch (Exception ex)
             {
+                Trace.TraceError("Exception Suppressed {0}", ex);
                 return string.Empty;
             }
         }
@@ -123,8 +124,9 @@ namespace Dashboard
 
                 return status;
             }
-            catch
+            catch (Exception ex)
             {
+                Trace.TraceError("Exception Suppressed {0}", ex);
                 return string.Empty;
             }
         }
