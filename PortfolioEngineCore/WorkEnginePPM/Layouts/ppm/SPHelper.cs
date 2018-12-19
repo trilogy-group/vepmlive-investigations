@@ -61,28 +61,15 @@ namespace WorkEnginePPM
                                 break;
                         }
                     }
-
-                    if (lastRunLabel != null)
-                    {
-                        lastRunLabel.Text = ndTimer.Attributes["LastRun"].Value;
-                    }
-                    if (lastRunResultLabel != null)
-                    {
-                        lastRunResultLabel.Text = ndTimer.Attributes["LastResult"].Value;
-                    }
-                    if (logLabel != null)
-                    {
-                        logLabel.Text = ndTimer.InnerText;
-                    }
+                    lastRunLabel.Text = ndTimer.Attributes["LastRun"].Value;
+                    lastRunResultLabel.Text = ndTimer.Attributes["LastResult"].Value;
+                    logLabel.Text = ndTimer.InnerText;
                 }
             }
             else
             {
-                if (errorLabel != null)
-                {
-                    errorLabel.Text = string.Format("Error Getting Status: {0}", statusNode.SelectSingleNode("Error").InnerText);
-                    errorLabel.Visible = true;
-                }
+                errorLabel.Text = string.Format("Error Getting Status: {0}", statusNode.SelectSingleNode("Error").InnerText);
+                errorLabel.Visible = true;
             }
         }
     }
