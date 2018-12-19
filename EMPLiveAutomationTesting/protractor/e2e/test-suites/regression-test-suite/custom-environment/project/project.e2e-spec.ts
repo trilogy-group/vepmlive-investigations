@@ -15,7 +15,7 @@ import {EditCost} from '../../../../page-objects/pages/items-page/project-item/e
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
-    let projectName  = '';
+    let projectName = '';
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
         loginPage = new LoginPage();

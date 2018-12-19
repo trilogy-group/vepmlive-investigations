@@ -101,7 +101,7 @@ export class MyWorkPageSubHelper {
             await WaitHelper.waitForPageToStable();
             await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.searchItem);
         }
-        StepLogger.subStep('Enter serach key');
+        StepLogger.subStep('Enter search key');
         await TextboxHelper.sendKeys(MyWorkPage.searchItem, itemTitle, true);
         StepLogger.subVerification('Verify item is displayed');
         await ExpectationHelper.verifyDisplayedStatus(MyWorkPage.getItemByName(itemTitle), itemTitle);

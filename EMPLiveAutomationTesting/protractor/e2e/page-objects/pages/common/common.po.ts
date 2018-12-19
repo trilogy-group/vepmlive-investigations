@@ -286,7 +286,7 @@ export class CommonPage extends BasePage {
     }
 
     static get projectFirstRow() {
-        return `[onmousemove*='Rows["1"]']`;
+        return `[onmousemove*='Rows["0"]'] [href*='ID']`;
     }
 
     static get selectorForRecordsWithoutGreenTick() {
