@@ -2,9 +2,9 @@
 
 namespace EPMLiveCore.API
 {
-    internal static class FRFQueries
+    public static class FRFQueries
     {
-        internal static readonly string QueryCheckFavStatusItem =
+        public static readonly string QueryCheckFavStatusItem =
                    @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @")
                     BEGIN
 	                    SELECT 'true'
@@ -14,7 +14,7 @@ namespace EPMLiveCore.API
                         SELECT 'false'
                     END";
 
-        internal static readonly string QueryCheckFavStatusNonItem =
+        public static readonly string QueryCheckFavStatusNonItem =
                    @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @")
                     BEGIN
 	                    SELECT 'true'
@@ -24,7 +24,7 @@ namespace EPMLiveCore.API
                         SELECT 'false'
                     END";
 
-        internal static readonly string QueryCreateFavItem =
+        public static readonly string QueryCreateFavItem =
                    @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @")
                     BEGIN
                         IF ((SELECT COUNT(*) FROM FRF WHERE [Type] = 1) = 0)
@@ -41,7 +41,7 @@ namespace EPMLiveCore.API
                         END
                     END";
 
-        internal static readonly string QueryCreateFavNonItem =
+        public static readonly string QueryCreateFavNonItem =
                    @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @")
                     BEGIN
                         IF ((SELECT COUNT(*) FROM FRF WHERE [Type] = 1) = 0)
@@ -60,7 +60,7 @@ namespace EPMLiveCore.API
                     SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @"
                     ";
 
-        internal static readonly string QueryRemoveFavItem =
+        public static readonly string QueryRemoveFavItem =
                    @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @")
                     BEGIN
                         DECLARE @dbid uniqueidentifier
@@ -69,7 +69,7 @@ namespace EPMLiveCore.API
                         SELECT @dbid
                     END";
 
-        internal static readonly string QueryRemoveFavNonItem =
+        public static readonly string QueryRemoveFavNonItem =
                    @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @")
                     BEGIN
                         DECLARE @dbid uniqueidentifier
@@ -78,7 +78,7 @@ namespace EPMLiveCore.API
                         SELECT @dbid
                     END";
 
-        internal static readonly string QueryReadFavWSStatusItem =
+        public static readonly string QueryReadFavWSStatusItem =
                    @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @")
                     BEGIN
 	                    SELECT 'true'
@@ -88,7 +88,7 @@ namespace EPMLiveCore.API
                         SELECT 'false'
                     END";
 
-        internal static readonly string QueryReadFavWSStatusNonItem =
+        public static readonly string QueryReadFavWSStatusNonItem =
                    @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @")
                     BEGIN
 	                    SELECT 'true'
@@ -98,7 +98,7 @@ namespace EPMLiveCore.API
                         SELECT 'false'
                     END";
 
-        internal static readonly string QueryCreateFavWSItem =
+        public static readonly string QueryCreateFavWSItem =
                    @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @")
                     BEGIN
                         IF ((SELECT COUNT(*) FROM FRF WHERE [Type] = 1) = 0)
@@ -117,7 +117,7 @@ namespace EPMLiveCore.API
                     SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @"    
                     ";
 
-        internal static readonly string QueryCreateFavWSNonItem =
+        public static readonly string QueryCreateFavWSNonItem =
                    @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @")
                     BEGIN
                         IF ((SELECT COUNT(*) FROM FRF WHERE [Type] = 1) = 0)
@@ -136,7 +136,7 @@ namespace EPMLiveCore.API
                     SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @"
                     ";
 
-        internal static readonly string QueryRemoveFavWSItem =
+        public static readonly string QueryRemoveFavWSItem =
                    @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @")
                     BEGIN
                         DECLARE @dbid uniqueidentifier
@@ -145,7 +145,7 @@ namespace EPMLiveCore.API
                         SELECT @dbid
                     END";
 
-        internal static readonly string QueryRemoveFavWSNonItem =
+        public static readonly string QueryRemoveFavWSNonItem =
                    @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @")
                     BEGIN
                         DECLARE @dbid uniqueidentifier
@@ -154,7 +154,7 @@ namespace EPMLiveCore.API
                         SELECT @dbid
                     END";
 
-        internal static readonly string QueryCheckFrequentStatusItem =
+        public static readonly string QueryCheckFrequentStatusItem =
                    @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @")
                     BEGIN
 	                    SELECT 'true'
@@ -164,7 +164,7 @@ namespace EPMLiveCore.API
                         SELECT 'false'
                     END";
 
-        internal static readonly string QueryCheckFrequentStatusNonItem =
+        public static readonly string QueryCheckFrequentStatusNonItem =
                    @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @")
                     BEGIN
 	                    SELECT 'true'
@@ -174,7 +174,7 @@ namespace EPMLiveCore.API
                         SELECT 'false'
                     END";
 
-        internal static readonly string QueryCreateFrequent =
+        public static readonly string QueryCreateFrequent =
                    @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @")
                     BEGIN
 	                    INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [USER_ID], [Icon], [Title], [Type], [F_Date], [F_Int])
@@ -188,13 +188,13 @@ namespace EPMLiveCore.API
                         SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @"
                     END";
 
-        internal static readonly string QueryRemoveFrequentItem =
+        public static readonly string QueryRemoveFrequentItem =
                    @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @")
                     BEGIN
 	                    DELETE FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @"
                     END";
 
-        internal static readonly string QueryRemoveFrequentNonItem =
+        public static readonly string QueryRemoveFrequentNonItem =
                    @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @")
                     BEGIN
                         DECLARE @dbid uniqueidentifier
@@ -203,7 +203,7 @@ namespace EPMLiveCore.API
                         SELECT @dbid
                     END";
 
-        internal static readonly string QueryCreateRecentItem =
+        public static readonly string QueryCreateRecentItem =
                     @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Recent) + @")
                     BEGIN
                         UPDATE FRF SET [F_Date] = GETDATE() 
