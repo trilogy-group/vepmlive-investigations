@@ -344,8 +344,8 @@ Exit_Function:
         private void PerformCustomFieldsCalculate(DBAccess dba)
         {
             var sqlStatements = new List<string>();
-            var seqStmt = string.Empty;
-            var seqStmtStringBuilder = new StringBuilder(seqStmt);
+            var seqStatement = string.Empty;
+            var seqStmtStringBuilder = new StringBuilder(seqStatement);
             var lastId = -1;
 
             //CC-78062 - leaving as concatenation because since it's all static strings it will be inlined by the compiler, and keeps the formatting nicer than using interpolation or string format.
@@ -375,7 +375,7 @@ Exit_Function:
                         HandleLastFieldCase(
                             ref lastId,
                             id,
-                            ref seqStmt,
+                            ref seqStatement,
                             sqlStatements,
                             reader,
                             ref seqStmtStringBuilder,
@@ -385,16 +385,16 @@ Exit_Function:
                         var seq = SqlDb.ReadIntValue(reader["CL_SEQ"]);
                         var operationId = SqlDb.ReadIntValue(reader["CL_OP"]);
 
-                        HandleMiddleFieldCase(seq, operationId, seqStmtStringBuilder, ref seqStmt);
+                        HandleMiddleFieldCase(seq, operationId, seqStmtStringBuilder, ref seqStatement);
 
                         fieldInTable = SqlDb.ReadIntValue(reader["Expr1"]);
                         var fat = SqlDb.ReadIntValue(reader["EXFAT"]);
                         var ratio = SqlDb.ReadDoubleValue(reader["CL_RATIO"]);
 
-                        HandleFirstFieldCase(fieldInTable, seqStmtStringBuilder, ratio, fat, seq, operationId, out seqStmt, ref whereClause);
+                        HandleFirstFieldCase(fieldInTable, seqStmtStringBuilder, ratio, fat, seq, operationId, out seqStatement, ref whereClause);
                     }
 
-                    AddCommands(seqStmt, seqStmtStringBuilder, sqlStatements, whereClause, errSql);
+                    AddCommands(seqStatement, seqStmtStringBuilder, sqlStatements, whereClause, errSql);
                 }
             }
 
