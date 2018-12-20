@@ -398,7 +398,7 @@ namespace EPMLiveCore.Infrastructure
             var includeHidden = CreateType<bool>();
             var includeReadOnly = CreateType<bool>();
             var rowCollection = CreateType<IEnumerable<DataRow>>();
-            var spFieldCollection = CreateType<List<SPField>>();
+            var spFieldCollection = CreateType<IList<SPField>>();
             var dataColumnCollection = CreateType<DataColumnCollection>();
             var resources = CreateType<DataTable>();
             var valueDictionary = CreateType<Dictionary<string, object[]>>();
