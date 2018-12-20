@@ -402,7 +402,7 @@ namespace EPMLiveCore.Infrastructure
             var dataColumnCollection = CreateType<DataColumnCollection>();
             var resources = CreateType<DataTable>();
             var valueDictionary = CreateType<Dictionary<string, object[]>>();
-            var methodBuildXmlElementsPrametersTypes = new Type[] { typeof(bool), typeof(bool), typeof(IEnumerable<DataRow>), typeof(List<SPField>), typeof(DataColumnCollection), typeof(DataTable), typeof(Dictionary<string, object[]>) };
+            var methodBuildXmlElementsPrametersTypes = new Type[] { typeof(bool), typeof(bool), typeof(IEnumerable<DataRow>), typeof(IList<SPField>), typeof(DataColumnCollection), typeof(DataTable), typeof(Dictionary<string, object[]>) };
             object[] parametersOfBuildXmlElements = { includeHidden, includeReadOnly, rowCollection, spFieldCollection, dataColumnCollection, resources, valueDictionary };
             Exception exception;
             var reportXmlBuilder = new ReportXmlBuilder(_resourcePoolManagerInstanceFixture, string.Empty);
