@@ -1,14 +1,15 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using Action = System.Action;
+using System.Reflection;
 using AUT.ConfigureTestProjects.Analyzer;
 using AUT.ConfigureTestProjects.BaseSetup;
 using AUT.ConfigureTestProjects.Extensions;
 using AUT.ConfigureTestProjects.StaticTypes;
 using Microsoft.SharePoint;
 using NUnit.Framework;
-using Should = Shouldly.Should;
 using Shouldly;
+using Action = System.Action;
+using Should = Shouldly.Should;
 
 namespace EPMLiveCore
 {
@@ -93,7 +94,7 @@ namespace EPMLiveCore
         public void AUT_Websettings_GetBasePath_Methods_Explore_Verify_Test()
         {
             // Arrange
-            var currentMethodInfo = typeof(WebSettingsAdditionalInfo).GetMethod(MethodGetBasePath);
+            var currentMethodInfo = GetBasePathMethodInfo();
 
             // Act
             ShouldlyExtension.ExploreMethodWithOrWithoutInstance(_webSettingsAdditionalInfo,
@@ -102,6 +103,13 @@ namespace EPMLiveCore
 
             // Assert
             currentMethodInfo.ShouldNotBeNull();
+        }
+
+        private static MethodInfo GetBasePathMethodInfo()
+        {
+            return typeof(WebSettingsAdditionalInfo).GetMethod(
+                MethodGetBasePath,
+                BindingFlags.Instance | BindingFlags.NonPublic);
         }
 
         #endregion
@@ -194,7 +202,6 @@ namespace EPMLiveCore
         [Category("AUT MethodCallTest")]
         [TestCase(MethodPage_Load)]
         [TestCase(MethodSetProductAdditionalInfo)]
-        [TestCase(MethodGetBasePath)]
         [TestCase(MethodButton1_Click)]
         public void AUT_Websettings_NonStatic_Methods_Explore_Verify_Test(string methodName)
         {
@@ -486,10 +493,10 @@ namespace EPMLiveCore
         public void AUT_Websettings_GetBasePath_Method_Call_With_Results_Should_Not_Be_Null_Test()
         {
             // Arrange
-            Type [] methodGetBasePathPrametersTypes = null;
+            Type[] methodGetBasePathPrametersTypes = null;
             object[] parametersOfGetBasePath = null; // no parameter present
             Exception exception1;
-            var methodInfo = typeof(WebSettingsAdditionalInfo).GetMethod(MethodGetBasePath, methodGetBasePathPrametersTypes);
+            var methodInfo = GetBasePathMethodInfo();
 
             // Act
             var result1 = methodInfo.GetResultMethodInfo<WebSettingsAdditionalInfo, string>(_webSettingsAdditionalInfo, out exception1, parametersOfGetBasePath);
@@ -521,7 +528,7 @@ namespace EPMLiveCore
             // Arrange
             Type [] methodGetBasePathPrametersTypes = null;
             object[] parametersOfGetBasePath = null; // no parameter present
-            var methodInfo = typeof(WebSettingsAdditionalInfo).GetMethod(MethodGetBasePath, methodGetBasePathPrametersTypes);
+            var methodInfo = GetBasePathMethodInfo();
 
             // Assert
             methodInfo.ShouldNotBeNull();
@@ -605,7 +612,7 @@ namespace EPMLiveCore
         {
             // Arrange
             Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetBasePath, 0);
+            var methodInfo = GetBasePathMethodInfo();
 
             // Act
             var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_webSettingsAdditionalInfo, Fixture, out exception);
