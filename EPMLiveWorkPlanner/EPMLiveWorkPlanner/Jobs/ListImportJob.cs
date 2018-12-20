@@ -9,6 +9,7 @@ using Microsoft.SharePoint;
 using System.Xml;
 using System.Data;
 using System.Collections;
+using System.Diagnostics;
 
 namespace EPMLiveWorkPlanner
 {
@@ -27,159 +28,226 @@ namespace EPMLiveWorkPlanner
         public void execute(SPSite osite, SPWeb oweb, string data)
         {
             sbErrors = new StringBuilder();
-            XmlDocument docNew = null;
-            Hashtable hshMapping = null;
-            DataSet dsResources = null;
-            XmlDocument docRet = null;
+            DataSet resources = null;
             try
             {
-                docNew = new XmlDocument();
-                docNew.LoadXml(data);
+                var docNew = LoadDocument(data);
+                CreateAttributes(docNew);
 
-                XmlAttribute attr = docNew.CreateAttribute("UIDColumn");
-                attr.Value = "ID";
-                docNew.FirstChild.Attributes.Append(attr);
+                var attachedItemsOnly = true;
+                var mapping = new Hashtable();
+                var id = ItemID.ToString();
+                var planner = string.Empty;
+                var list = string.Empty;
 
-                attr = docNew.CreateAttribute("ID");
-                attr.Value = base.ItemID.ToString();
-                docNew.FirstChild.Attributes.Append(attr);
-
-                attr = docNew.CreateAttribute("Planner");
-                attr.Value = base.key;
-                docNew.FirstChild.Attributes.Append(attr);
-
-                bool bAttachedItemsOnly = true;
-                hshMapping = new Hashtable();
-                string sID = base.ItemID.ToString();
-                string sPlanner = "";
-                string sList = "";
-                try
-                {
-                    sList = docNew.FirstChild.Attributes["List"].Value;
-                }
-                catch { }
-                try
-                {
-                    sPlanner = base.key;
-                }
-                catch { }
-
-                try
-                {
-                    bAttachedItemsOnly = bool.Parse(docNew.FirstChild.Attributes["AttachedItemsOnly"].Value);
-                }
-                catch { }
-                try
-                {
-                    XmlNode ndColumns = docNew.FirstChild.SelectSingleNode("Columns");
-                    foreach (XmlNode ndField in ndColumns.SelectNodes("Column"))
-                    {
-                        string ListField = getAttribute(ndField, "ListField");
-                        string PlannerField = getAttribute(ndField, "PlannerField");
-
-                        if (ListField != "" && PlannerField != "")
-                        {
-                            if (!hshMapping.ContainsKey(ListField) && !hshMapping.ContainsValue(PlannerField))
-                            {
-                                hshMapping.Add(ListField, PlannerField);
-                            }
-                        }
-                    }
-                }
-                catch { }
-
-                if (sPlanner == "")
-                {
-                    bErrors = true;
-                    sbErrors.Append("No Planner Specified");
-                }
-                else if (sID == "")
-                {
-                    bErrors = true;
-                    sbErrors.Append("No ID Specified");
-                }
-                else if (sList == "")
-                {
-                    bErrors = true;
-                    sbErrors.Append("No List Specified");
-                }
-                else
-                {
-
-                    SPList oList = oweb.Lists.TryGetList(sList);
-
-                    if (oList != null)
-                    {
-                        WorkPlannerAPI.PlannerProps props = WorkPlannerAPI.getSettings(oweb, sPlanner);
-
-                        SPList oProjectList = oweb.Lists[props.sListProjectCenter];
-                        dsResources = new DataSet();
-                        dsResources = WorkPlannerAPI.GetResourceTable(props, oProjectList.ID, sID, oweb);
-
-                        bool bMatchingTaskCenter = false;
-
-                        if (oList.Title.ToLower() == props.sListTaskCenter.ToLower())
-                            bMatchingTaskCenter = true;
-
-                        XmlDocument docPlanInfo = new XmlDocument();
-                        docPlanInfo.LoadXml("<GetTasks Planner=\"" + sPlanner + "\" ID=\"" + sID + "\" View=\"\"/>");
-
-                        XmlDocument docPlan = new XmlDocument();
-                        docPlan.LoadXml(WorkPlannerAPI.GetTasks(docPlanInfo, oweb));
-
-                        if (bAttachedItemsOnly)
-                        {
-                            SPQuery query = new SPQuery();
-                            query.Query = "<Where><Eq><FieldRef Name='Project' LookupId='TRUE'/><Value Type='Lookup'>" + sID + "</Value></Eq></Where>";
-
-                            if (oList.Fields.ContainsField("taskorder"))
-                                query.Query += "<OrderBy><FieldRef Name='taskorder'/></OrderBy>";
-
-                            ImportTasksFromListTasks(oList.GetItems(query), docNew, hshMapping, dsResources, bMatchingTaskCenter, docPlan);
-                        }
-                        else
-                        {
-                            ImportTasksFromListTasks(oList.Items, docNew, hshMapping, dsResources, bMatchingTaskCenter, docPlan);
-                        }
-
-                        docRet = new XmlDocument();
-                        docRet.LoadXml(WorkPlannerAPI.ImportTasks(docNew, oweb));
-
-                        if (docRet.FirstChild.Attributes["Status"].Value == "1")
-                        {
-                            bErrors = true;
-                        }
-
-                        sbErrors.Append(docRet.OuterXml);
-                    }
-                    else
-                    {
-                        bErrors = true;
-                        sbErrors.Append("List could not be found.");
-                    }
-                }
+                GetList(ref list, docNew);
+                GetPlanner(ref planner);
+                GetAttachedItemsOnly(ref attachedItemsOnly, docNew);
+                PopulateListField(docNew, mapping);
+                ExecuteAndHandleErrors(oweb, planner, id, list, ref resources, attachedItemsOnly, docNew, mapping);
             }
             catch (Exception ex)
             {
+                Trace.TraceError("Exception Suppressed {0}", ex);
                 bErrors = true;
-                sbErrors.Append("Error importing list: " + ex.Message + "");
+                sbErrors.Append(string.Format("Error importing list: {0}", ex.Message));
             }
             finally
             {
                 sErrors = sbErrors.ToString();
                 sbErrors = null;
-                docNew = null;
-                hshMapping = null;
-                if (dsResources != null)
-                    dsResources.Dispose();
-                docRet = null;
-                if (oweb != null)
-                    oweb.Dispose();
-                if (osite != null)
-                    osite.Dispose();
-                data = null;
+
+                resources?.Dispose();
+                oweb?.Dispose();
+                osite?.Dispose();
             }
 
+        }
+
+        private void ExecuteAndHandleErrors(
+            SPWeb oweb,
+            string planner,
+            string id,
+            string list,
+            ref DataSet resources,
+            bool attachedItemsOnly,
+            XmlDocument docNew,
+            Hashtable mapping)
+        {
+            if (planner == string.Empty)
+            {
+                bErrors = true;
+                sbErrors.Append("No Planner Specified");
+            }
+            else if (id == string.Empty)
+            {
+                bErrors = true;
+                sbErrors.Append("No ID Specified");
+            }
+            else if (list == string.Empty)
+            {
+                bErrors = true;
+                sbErrors.Append("No List Specified");
+            }
+            else
+            {
+                var spList = oweb.Lists.TryGetList(list);
+
+                if (spList != null)
+                {
+                    var props = WorkPlannerAPI.getSettings(oweb, planner);
+                    resources = GetResources(oweb, props, id);
+                    ImportTasks(oweb, spList, props, planner, id, attachedItemsOnly, docNew, mapping, resources);
+                }
+                else
+                {
+                    bErrors = true;
+                    sbErrors.Append("List could not be found.");
+                }
+            }
+        }
+
+        private void ImportTasks(
+            SPWeb spWeb,
+            SPList spList,
+            WorkPlannerAPI.PlannerProps props,
+            string planner,
+            string id,
+            bool attachedItemsOnly,
+            XmlDocument docNew,
+            Hashtable mapping,
+            DataSet resources)
+        {
+            var taskCenter = string.Equals(spList.Title, props.sListTaskCenter, StringComparison.CurrentCultureIgnoreCase);
+
+            var docPlanInfo = new XmlDocument();
+            docPlanInfo.LoadXml(string.Format("<GetTasks Planner=\"{0}\" ID=\"{1}\" View=\"\"/>", planner, id));
+
+            var docPlan = new XmlDocument();
+            docPlan.LoadXml(WorkPlannerAPI.GetTasks(docPlanInfo, spWeb));
+
+            if (attachedItemsOnly)
+            {
+                var query = new SPQuery
+                {
+                    Query = string.Format(
+                        "<Where><Eq><FieldRef Name='Project' LookupId='TRUE'/><Value Type='Lookup'>{0}</Value></Eq></Where>",
+                        id)
+                };
+
+                if (spList.Fields.ContainsField("taskorder"))
+                {
+                    query.Query += "<OrderBy><FieldRef Name='taskorder'/></OrderBy>";
+                }
+
+                ImportTasksFromListTasks(spList.GetItems(query), docNew, mapping, resources, taskCenter, docPlan);
+            }
+            else
+            {
+                ImportTasksFromListTasks(spList.Items, docNew, mapping, resources, taskCenter, docPlan);
+            }
+
+            var docRet = new XmlDocument();
+            docRet.LoadXml(WorkPlannerAPI.ImportTasks(docNew, spWeb));
+
+            if (docRet.FirstChild.Attributes["Status"].Value == "1")
+            {
+                bErrors = true;
+            }
+
+            sbErrors.Append(docRet.OuterXml);
+        }
+
+        private static DataSet GetResources(SPWeb oweb, WorkPlannerAPI.PlannerProps props, string id)
+        {
+            DataSet resources;
+            var projectList = oweb.Lists[props.sListProjectCenter];
+            resources = new DataSet();
+            resources = WorkPlannerAPI.GetResourceTable(props, projectList.ID, id, oweb);
+            return resources;
+        }
+
+        private static void PopulateListField(XmlDocument docNew, Hashtable mapping)
+        {
+            try
+            {
+                var columns = docNew.FirstChild.SelectSingleNode("Columns");
+                foreach (XmlNode ndField in columns.SelectNodes("Column"))
+                {
+                    var listField = getAttribute(ndField, "ListField");
+                    var plannerField = getAttribute(ndField, "PlannerField");
+
+                    if (!string.IsNullOrWhiteSpace(listField) && !string.IsNullOrWhiteSpace(plannerField))
+                    {
+                        if (!mapping.ContainsKey(listField) && !mapping.ContainsValue(plannerField))
+                        {
+                            mapping.Add(listField, plannerField);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private static void GetAttachedItemsOnly(ref bool attachedItemsOnly, XmlDocument docNew)
+        {
+            try
+            {
+                attachedItemsOnly = bool.Parse(docNew.FirstChild.Attributes["AttachedItemsOnly"].Value);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private void GetPlanner(ref string planner)
+        {
+            try
+            {
+                planner = key;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private static void GetList(ref string list, XmlDocument docNew)
+        {
+            try
+            {
+                list = docNew.FirstChild.Attributes["List"].Value;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private void CreateAttributes(XmlDocument docNew)
+        {
+            var attribute = docNew.CreateAttribute("UIDColumn");
+            attribute.Value = "ID";
+            docNew.FirstChild.Attributes.Append(attribute);
+
+            attribute = docNew.CreateAttribute("ID");
+            attribute.Value = ItemID.ToString();
+            docNew.FirstChild.Attributes.Append(attribute);
+
+            attribute = docNew.CreateAttribute("Planner");
+            attribute.Value = key;
+            docNew.FirstChild.Attributes.Append(attribute);
+        }
+
+        private static XmlDocument LoadDocument(string data)
+        {
+            var docNew = new XmlDocument();
+            docNew.LoadXml(data);
+            return docNew;
         }
 
         private void ImportTasksFromListTasks(SPListItemCollection lic, XmlDocument docNew, Hashtable hshMapping, DataSet dsResources, bool bMatchingTaskCenter, XmlDocument docPlan)
@@ -248,106 +316,7 @@ namespace EPMLiveWorkPlanner
 
         public string getFieldValue(SPListItem li, SPField oField, DataSet dsResources)
         {
-            string val = "";
-            try
-            {
-                switch (oField.Type)
-                {
-                    case SPFieldType.DateTime:
-                        try
-                        {
-                            val = DateTime.Parse(li[oField.Id].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
-                        }
-                        catch { }
-                        break;
-                    case SPFieldType.User:
-                        SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(li.ParentList.ParentWeb, li[oField.Id].ToString());
-                        foreach (SPFieldUserValue uv in uvc)
-                        {
-                            DataRow[] dr = dsResources.Tables[2].Select("SPAccountInfo = '" + uv.ToString() + "'");
-                            if (dr.Length > 0)
-                            {
-                                val += ";" + dr[0]["ID"].ToString();
-                            }
-                        }
-                        val = val.Trim(';');
-                        break;
-                    case SPFieldType.Note:
-                        try
-                        {
-                            val = li[oField.Id].ToString();
-                        }
-                        catch { }
-                        break;
-                    case SPFieldType.Calculated:
-                        SPFieldCalculated c = (SPFieldCalculated)oField;
-                        switch (c.OutputType)
-                        {
-                            case SPFieldType.Number:
-                            case SPFieldType.Currency:
-                                val = li[oField.Id].ToString();
-                                val = val.Replace(";#", "\n").Split('\n')[1];
-                                break;
-                            default:
-                                val = oField.GetFieldValueAsText(li[oField.Id].ToString());
-                                break;
-                        };
-                        break;
-                    case SPFieldType.Number:
-                        SPFieldNumber num = (SPFieldNumber)oField;
-                        if (num.ShowAsPercentage)
-                        {
-                            try
-                            {
-                                val = (float.Parse(li[oField.Id].ToString()) * 100).ToString();
-                            }
-                            catch { val = li[oField.Id].ToString(); }
-
-                        }
-                        else
-                        {
-                            val = li[oField.Id].ToString();
-                        }
-                        break;
-                    case SPFieldType.Currency:
-                        val = li[oField.Id].ToString();
-                        break;
-                    case SPFieldType.Lookup:
-                        try
-                        {
-                            SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(li[oField.Id].ToString());
-                            foreach (SPFieldLookupValue uv in lvc)
-                            {
-                                val += ";" + uv.LookupId;
-                            }
-                            val = val.Trim(';');
-                        }
-                        catch { }
-                        break;
-                    case SPFieldType.Boolean:
-                        try
-                        {
-                            if (li[oField.Id].ToString().ToLower() == "true")
-                                val = "1";
-                            else
-                                val = "0";
-                        }
-                        catch { val = "0"; }
-                        break;
-                    default:
-                        val = oField.GetFieldValueAsText(li[oField.Id].ToString());
-                        break;
-
-                };
-
-                if (oField.Description == "Indicator")
-                {
-                    string url = li.ParentList.ParentWeb.ServerRelativeUrl;
-                    val = "<img src=\"" + ((url == "/") ? "" : url) + "/_layouts/images/" + val + "\">";
-                }
-            }
-            catch { }
-            return val;
+            return WorkPlannerAPI.FieldValue(li, oField, dsResources, false);
         }
     }
 }

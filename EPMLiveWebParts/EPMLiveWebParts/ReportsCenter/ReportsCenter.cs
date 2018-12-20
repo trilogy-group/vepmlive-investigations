@@ -80,34 +80,19 @@ namespace EPMLiveWebParts
 
         protected override void RenderWebPart(HtmlTextWriter output)
         {
-            EPMLiveCore.Act act = new EPMLiveCore.Act(SPContext.Current.Web );
-            int activation = act.CheckFeatureLicense(EPMLiveCore.ActFeature.WebParts);
-
-            if (activation != 0)
+            if (!ReportViewer.CheckActivationStatus(output))
             {
-                output.Write(act.translateStatus(activation));
                 return;
             }
 
-            if (UseDefaults)
-            {
-                ReportingServicesURL = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
-
-                try
-                {
-                    Integrated = bool.Parse(EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportsUseIntegrated"));
-                }
-                catch { }
-            }
-            else
-            {
-                ReportingServicesURL = PropSRSUrl;
-                Integrated = IsIntegratedMode;
-            }
-
-            ReportsRootFolderName = PropReportsPath;
-            if (ReportsRootFolderName == "")
-                ReportsRootFolderName = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportsRootFolder");
+            ReportViewer.SetReportsLinksAndPaths(
+                PropReportsPath,
+                IsIntegratedMode,
+                PropSRSUrl,
+                UseDefaults,
+                ref ReportingServicesURL,
+                ref Integrated,
+                ref ReportsRootFolderName);
 
 
             if (ReportingServicesURL == null || ReportingServicesURL == "")

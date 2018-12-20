@@ -46,7 +46,6 @@ namespace EPMLiveWebParts
         private const string MethodprocessWeb = "processWeb";
         private const string MethodprocessList = "processList";
         private const string MethodGetToolParts = "GetToolParts";
-        private const string FieldMAX_LOOKUPFILTER = "MAX_LOOKUPFILTER";
         private const string Field_myProvider = "_myProvider";
         private const string Fieldact = "act";
         private const string FieldstrList = "strList";
@@ -159,7 +158,6 @@ namespace EPMLiveWebParts
         [Test]
         [Timeout(TestsTimeOut)]
         [NUnit.Framework.Category("AUT Initializer")]
-        [TestCase(FieldMAX_LOOKUPFILTER)]
         [TestCase(Field_myProvider)]
         [TestCase(Fieldact)]
         [TestCase(FieldstrList)]

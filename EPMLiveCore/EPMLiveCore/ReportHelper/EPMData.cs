@@ -790,17 +790,24 @@ namespace EPMLiveCore.ReportHelper
             return _DefaultLists;
         }
 
-        public void AddParam(string name, object value)
-        {
-            Params.Add(new SqlParameter(name, value));
-        }
+		public void AddParam(string name, object value)
+		{
+			Params.Add(new SqlParameter(name, value));
+		}
 
-        public static bool CheckConnection(string cs)
-        {
-            bool success = true;
-            SPSecurity.RunWithElevatedPrivileges(() => { success = TryToConnect(cs); });
-            return success;
-        }
+		public void AddParam(string name, object value, int size)
+		{
+			var parameter = new SqlParameter(name, value);
+			parameter.Size = size;
+			Params.Add(parameter);
+		}
+
+		public static bool CheckConnection(string cs)
+		{
+			bool success = true;
+			SPSecurity.RunWithElevatedPrivileges(() => { success = TryToConnect(cs); });
+			return success;
+		}
 
         public static bool TryToConnect(string connectionString)
         {
@@ -2473,9 +2480,27 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-        #region HELPER METHODS
+		public string GetSharepointType(string listName, string columnName)
+		{
+			const string sql =
+					"SELECT dbo.RPTColumn.SharePointType, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND (ColumnName=@colName)";
+			AddParam("@listName", listName, 500);
+			AddParam("@colName", columnName, 50);
+			Command = sql;
+			object objType = ExecuteScalar(GetClientReportingConnection);
+			return objType?.ToString();
+		}
 
-        private bool ItemHasValue(SPListItem item, string fldName)
+		public bool IsLookUpField(string listName, string columnName)
+		{
+			var objType = GetSharepointType(listName, columnName);
+			return objType != null & (objType.ToLower().Equals("lookup") || objType.ToLower().Equals("user") ||
+				   objType.ToLower().Equals("flookup"));
+		}
+
+		#region HELPER METHODS
+
+		private bool ItemHasValue(SPListItem item, string fldName)
         {
             string test = string.Empty;
             try

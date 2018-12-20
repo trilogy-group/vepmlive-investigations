@@ -3,6 +3,7 @@ using System.Collections;
 using System.Data;
 using System.Linq;
 using EPMLiveCore.Helpers;
+using EPMLiveWebParts.WebPageCode;
 using Microsoft.SharePoint;
 using DiagTrace = System.Diagnostics.Trace;
 
@@ -73,55 +74,7 @@ namespace TimeSheets
                         newGroup = $" No {field.Title}";
                     }
 
-                    if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice)
-                    {
-                        var sGroups = newGroup.Split('\n');
-                        var tmpGroups = new string[tempGroup.Length * sGroups.Length];
-                        var tmpCounter = 0;
-
-                        foreach (var str in tempGroup)
-                        {
-                            foreach (var sGroup in sGroups)
-                            {
-                                if (str == null)
-                                {
-                                    tmpGroups[tmpCounter] = sGroup.Trim();
-                                }
-                                else
-                                {
-                                    tmpGroups[tmpCounter] = $"{str}\n{sGroup.Trim()}";
-                                }
-
-                                if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
-                                {
-                                    arrGTemp.Add(tmpGroups[tmpCounter], string.Empty);
-                                }
-
-                                tmpCounter++;
-                            }
-                        }
-
-                        tempGroup = tmpGroups;
-                    }
-                    else
-                    {
-                        for (var i = 0; i < tempGroup.Length; i++)
-                        {
-                            if (tempGroup[i] == null)
-                            {
-                                tempGroup[i] = newGroup;
-                            }
-                            else
-                            {
-                                tempGroup[i] += $"\n{newGroup}";
-                            }
-
-                            if (!arrGTemp.Contains(tempGroup[i]))
-                            {
-                                arrGTemp.Add(tempGroup[i], string.Empty);
-                            }
-                        }
-                    }
+                    GroupHelper.ProcessTempGroups(arrGTemp, field, newGroup, ref tempGroup);
                 }
             }
 
@@ -157,55 +110,7 @@ namespace TimeSheets
                         newGroup = $" No {field.Title}";
                     }
 
-                    if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice)
-                    {
-                        var sGroups = newGroup.Split('\n');
-                        var tmpGroups = new string[tempGroup.Length * sGroups.Length];
-                        var tmpCounter = 0;
-
-                        foreach (var str in tempGroup)
-                        {
-                            foreach (var sGroup in sGroups)
-                            {
-                                if (str == null)
-                                {
-                                    tmpGroups[tmpCounter] = sGroup.Trim();
-                                }
-                                else
-                                {
-                                    tmpGroups[tmpCounter] = $"{str}\n{sGroup.Trim()}";
-                                }
-
-                                if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
-                                {
-                                    arrGTemp.Add(tmpGroups[tmpCounter], string.Empty);
-                                }
-
-                                tmpCounter++;
-                            }
-                        }
-
-                        tempGroup = tmpGroups;
-                    }
-                    else
-                    {
-                        for (var i = 0; i < tempGroup.Length; i++)
-                        {
-                            if (tempGroup[i] == null)
-                            {
-                                tempGroup[i] = newGroup;
-                            }
-                            else
-                            {
-                                tempGroup[i] += $"\n{newGroup}";
-                            }
-
-                            if (!arrGTemp.Contains(tempGroup[i]))
-                            {
-                                arrGTemp.Add(tempGroup[i], string.Empty);
-                            }
-                        }
-                    }
+                    GroupHelper.ProcessTempGroups(arrGTemp, field, newGroup, ref tempGroup);
                 }
             }
 

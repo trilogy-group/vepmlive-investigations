@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace PortfolioEngineCore
@@ -553,232 +554,317 @@ namespace PortfolioEngineCore
 
         public static string ValidateAndSaveCustomFieldFormula(DBAccess dba, int nFieldId, ref string sFormula, bool bSave = false)
         {
-            string sError = "";
+            var error = string.Empty;
             sFormula = sFormula.Trim();
             if (sFormula == string.Empty)
             {
                 if (bSave)
                 {
-                    int lRowsAffected;
-                    dbaCustomFields.DeleteCustomFieldFormula(dba, nFieldId, out  lRowsAffected);
+                    int rowsAffected;
+                    DeleteCustomFieldFormula(dba, nFieldId, out rowsAffected);
                 }
-                goto Exit_Function;
+                return error;
             }
 
-            // read in the valid operands (other than constants)
-            DataTable dt;
-            dbaCustomFields.SelectPortfolioFormulaCustomFields(dba, out dt);
-            // split formula on operators but keep operators in array
-            string[] arrFormula = Regex.Split(sFormula, @"([-+/*])");
-            // validate and trim the array
-            int opCount = 0;
-            int fieldCount = 0;
-            int decCount = 0;
-            List<ItemRow> itemRows = new List<ItemRow>();
-            for (int i = 0; i < arrFormula.Length; i++)
+            DataTable dataTable;
+            SelectPortfolioFormulaCustomFields(dba, out dataTable);
+
+            var formulas = Regex.Split(sFormula, @"([-+/*])");
+
+            var itemRows = new List<ItemRow>();
+            if (!ValidateAndTrimFormula(nFieldId, formulas, itemRows, dataTable, ref error))
             {
-                arrFormula[i] = arrFormula[i].Trim();
-                if (arrFormula[i] != string.Empty)
+                return error;
+            }
+            ProcessPreValidatedElements(ref itemRows);
+            SaveValidFormula(dba, nFieldId, bSave, itemRows);
+            return error;
+        }
+
+        private static bool ValidateAndTrimFormula(
+            int nFieldId,
+            string[] formulas,
+            List<ItemRow> itemRows,
+            DataTable dataTable,
+            ref string error)
+        {
+            var opCount = 0;
+            var fieldCount = 0;
+            var decCount = 0;
+            for (var i = 0; i < formulas.Length; i++)
+            {
+                formulas[i] = formulas[i].Trim();
+                if (formulas[i] != string.Empty)
                 {
-                    ItemRow itemRow = new ItemRow();
-                    itemRow.value = arrFormula[i];
-                    switch (arrFormula[i])
+                    var itemRow = new ItemRow
+                    {
+                        value = formulas[i]
+                    };
+                    switch (formulas[i])
                     {
                         case "*":
                         case "/":
                         case "+":
                         case "-":
-                            itemRow.hasOp = true;
-                            switch (arrFormula[i])
+                            if (!ProcessMathOpCase(formulas, itemRows, itemRow, i, decCount, fieldCount, ref opCount, ref error))
                             {
-                                case "+":
-                                    itemRow.opId = 0;
-                                    break;
-                                case "-":
-                                    itemRow.opId = 1;
-                                    break;
-                                case "*":
-                                    itemRow.opId = 2;
-                                    break;
-                                case "/":
-                                    itemRow.opId = 3;
-                                    break;
-                            }
-                            itemRows.Add(itemRow);
-                            opCount++;
-                            if (opCount > decCount + fieldCount)
-                            {
-                                sError = DBAccess.FormatAdminError("error", "dbaCustomFields.ValidateAndSaveCustomFieldFormula", "Too many operators");
-                                goto Exit_Function;
+                                return false;
                             }
                             break;
                         default:
-                            // check for field or constant
-                            if (Regex.IsMatch(arrFormula[i], @"\A[0-9]*(\.[0-9]+)\z|\A[0-9]+\z") != true)
+                            if (!ProcessFieldsAndConstants(nFieldId, formulas, itemRows, dataTable, i, itemRow, opCount, ref fieldCount, ref error, ref decCount))
                             {
-                                // field
-                                foreach (DataRow row in dt.Rows)
-                                {
-                                    if (DBAccess.ReadStringValue(row["FA_NAME"]) == arrFormula[i])
-                                    {
-                                        int nFoundFieldId = DBAccess.ReadIntValue(row["FA_FIELD_ID"]);
-                                        if (nFoundFieldId == nFieldId)
-                                        {
-                                            sError = DBAccess.FormatAdminError("error", "dbaCustomFields.ValidateAndSaveCustomFieldFormula", "Cannot use custom field in its own formula");
-                                            goto Exit_Function;
-                                        }
-                                        itemRow.hasField = true;
-                                        itemRow.fieldId = nFoundFieldId;
-                                        itemRows.Add(itemRow);
-                                        fieldCount++;
-                                        break;
-                                    }
-                                }
-                                if (itemRow.hasField == false)
-                                {
-                                    sError = DBAccess.FormatAdminError("error", "dbaCustomFields.ValidateAndSaveCustomFieldFormula", "Unknown custom field name: " + itemRow.value);
-                                    goto Exit_Function;
-                                }
-                            }
-                            else
-                            {
-                                decimal dec;
-                                if (decimal.TryParse(arrFormula[i], out dec))
-                                {
-                                    itemRow.hasConstant = true;
-                                    itemRow.ratio = dec;
-                                    itemRows.Add(itemRow);
-                                    decCount++;
-                                }
-                                else
-                                {
-                                    sError = DBAccess.FormatAdminError("error", "dbaCustomFields.ValidateAndSaveCustomFieldFormula", "invalid value: " + itemRow.value);
-                                    goto Exit_Function;
-                                }
-                            }
-                            if (opCount+1 < decCount + fieldCount)
-                            {
-                                sError = DBAccess.FormatAdminError("error", "dbaCustomFields.ValidateAndSaveCustomFieldFormula", "Too few operators");
-                                goto Exit_Function;
+                                return false;
                             }
                             break;
                     }
                 }
             }
+
             if (opCount >= decCount + fieldCount)
             {
-                sError = DBAccess.FormatAdminError("error", "dbaCustomFields.ValidateAndSaveCustomFieldFormula", "Formula cannot start or finish with an operator");
-                goto Exit_Function;
+                error = SqlDb.FormatAdminError(
+                    "error",
+                    "dbaCustomFields.ValidateAndSaveCustomFieldFormula",
+                    "Formula cannot start or finish with an operator");
+                return false;
             }
+            return true;
+        }
 
-            // if we get here then have a list of pre-validated operators, fields and constants.
-
-            ItemRow[] arrItemRows = itemRows.ToArray();
-
-            // reinit list to put consolidated items in
-            itemRows = new List<ItemRow>();
-
+        private static bool ProcessFieldsAndConstants(
+            int nFieldId,
+            string[] formulas,
+            List<ItemRow> itemRows,
+            DataTable dataTable,
+            int index,
+            ItemRow itemRow,
+            int opCount,
+            ref int fieldCount,
+            ref string error,
+            ref int decCount)
+        {
+            if (Regex.IsMatch(formulas[index], @"\A[0-9]*(\.[0-9]+)\z|\A[0-9]+\z") != true)
             {
-                int i = 0;
-                ItemRow itemRow = new ItemRow();
-                while (i < arrItemRows.Length)
+                if (!ProcessField(nFieldId, formulas, itemRows, dataTable, index, itemRow, ref fieldCount, ref error))
                 {
-                    int nInc = 1;
-                    if (arrItemRows[i].hasOp)
-                        itemRow.opId = arrItemRows[i].opId;
-                    else
+                    return false;
+                }
+            }
+            else
+            {
+                if (!ProcessConstant(formulas, itemRows, index, itemRow, ref error, ref decCount))
+                {
+                    return false;
+                }
+            }
+            if (opCount + 1 < decCount + fieldCount)
+            {
+                error = SqlDb.FormatAdminError("error", "dbaCustomFields.ValidateAndSaveCustomFieldFormula", "Too few operators");
+                return false;
+            }
+            return true;
+        }
+
+        private static bool ProcessConstant(string[] formulas, List<ItemRow> itemRows, int i, ItemRow itemRow, ref string error, ref int decCount)
+        {
+            decimal dec;
+            if (decimal.TryParse(formulas[i], out dec))
+            {
+                itemRow.hasConstant = true;
+                itemRow.ratio = dec;
+                itemRows.Add(itemRow);
+                decCount++;
+            }
+            else
+            {
+                error = SqlDb.FormatAdminError("error", "dbaCustomFields.ValidateAndSaveCustomFieldFormula", "invalid value: " + itemRow.value);
+                return false;
+            }
+            return true;
+        }
+
+        private static bool ProcessField(
+            int nFieldId,
+            string[] formulas,
+            List<ItemRow> itemRows,
+            DataTable dataTable,
+            int i,
+            ItemRow itemRow,
+            ref int fieldCount,
+            ref string error)
+        {
+            foreach (DataRow row in dataTable.Rows)
+            {
+                if (SqlDb.ReadStringValue(row["FA_NAME"]) == formulas[i])
+                {
+                    var nFoundFieldId = SqlDb.ReadIntValue(row["FA_FIELD_ID"]);
+                    if (nFoundFieldId == nFieldId)
                     {
-                        bool bRowComplete = false;
-                        if (i + 2 < arrItemRows.Length)
+                        error = SqlDb.FormatAdminError(
+                            "error",
+                            "dbaCustomFields.ValidateAndSaveCustomFieldFormula",
+                            "Cannot use custom field in its own formula");
+                        return false;
+                    }
+                    itemRow.hasField = true;
+                    itemRow.fieldId = nFoundFieldId;
+                    itemRows.Add(itemRow);
+                    fieldCount++;
+                    break;
+                }
+            }
+            if (itemRow.hasField == false)
+            {
+                error = SqlDb.FormatAdminError("error", "dbaCustomFields.ValidateAndSaveCustomFieldFormula", "Unknown custom field name: " + itemRow.value);
+                return false;
+            }
+            return true;
+        }
+
+        private static bool ProcessMathOpCase(
+            string[] formulas,
+            List<ItemRow> itemRows,
+            ItemRow itemRow,
+            int i,
+            int decCount,
+            int fieldCount,
+            ref int opCount,
+            ref string error)
+        {
+            itemRow.hasOp = true;
+            switch (formulas[i])
+            {
+                case "+":
+                    itemRow.opId = 0;
+                    break;
+                case "-":
+                    itemRow.opId = 1;
+                    break;
+                case "*":
+                    itemRow.opId = 2;
+                    break;
+                case "/":
+                    itemRow.opId = 3;
+                    break;
+                default:
+                    break;
+            }
+            itemRows.Add(itemRow);
+            opCount++;
+            if (opCount > decCount + fieldCount)
+            {
+                error = SqlDb.FormatAdminError("error", "dbaCustomFields.ValidateAndSaveCustomFieldFormula", "Too many operators");
+                return false;
+            }
+            return true;
+        }
+
+        private static void ProcessPreValidatedElements(ref List<ItemRow> itemRows)
+        {
+            var arrItemRows = itemRows.ToArray();
+            itemRows = new List<ItemRow>();
+            
+            var i = 0;
+            var itemRow = new ItemRow();
+            while (i < arrItemRows.Length)
+            {
+                var inc = 1;
+                if (arrItemRows[i].hasOp)
+                {
+                    itemRow.opId = arrItemRows[i].opId;
+                }
+                else
+                {
+                    var rowComplete = false;
+                    if (i + 2 < arrItemRows.Length)
+                    {
+                        if (arrItemRows[i].hasField && arrItemRows[i + 1].value == "*" && arrItemRows[i + 2].hasConstant)
                         {
-                            if (arrItemRows[i].hasField && arrItemRows[i + 1].value == "*" && arrItemRows[i + 2].hasConstant)
-                            {
-                                itemRow.fieldId = arrItemRows[i].fieldId;
-                                itemRow.ratio = arrItemRows[i + 2].ratio;
-                                nInc = 3;
-                                bRowComplete = true;
-                            }
-                            else if (arrItemRows[i].hasConstant && arrItemRows[i + 1].value == "*" && arrItemRows[i + 2].hasField)
-                            {
-                                itemRow.fieldId = arrItemRows[i + 2].fieldId;
-                                itemRow.ratio = arrItemRows[i].ratio;
-                                nInc = 3;
-                                bRowComplete = true;
-                            }
+                            itemRow.fieldId = arrItemRows[i].fieldId;
+                            itemRow.ratio = arrItemRows[i + 2].ratio;
+                            inc = 3;
+                            rowComplete = true;
                         }
-                        if (bRowComplete == false)
+                        else if (arrItemRows[i].hasConstant && arrItemRows[i + 1].value == "*" && arrItemRows[i + 2].hasField)
                         {
-                            if (arrItemRows[i].hasField)
-                            {
-                                itemRow.fieldId = arrItemRows[i].fieldId;
-                                itemRow.ratio = 1;
-                                bRowComplete = true;
-                            }
-                            else if (arrItemRows[i].hasConstant)
-                            {
-                                itemRow.fieldId = 0;
-                                itemRow.ratio = arrItemRows[i].ratio;
-                                bRowComplete = true;
-                            }
-                        }
-                        if (bRowComplete)
-                        {
-                            itemRows.Add(itemRow);
-                            itemRow = new ItemRow();
+                            itemRow.fieldId = arrItemRows[i + 2].fieldId;
+                            itemRow.ratio = arrItemRows[i].ratio;
+                            inc = 3;
+                            rowComplete = true;
                         }
                     }
-                    i += nInc;
+                    if (rowComplete == false)
+                    {
+                        if (arrItemRows[i].hasField)
+                        {
+                            itemRow.fieldId = arrItemRows[i].fieldId;
+                            itemRow.ratio = 1;
+                            rowComplete = true;
+                        }
+                        else if (arrItemRows[i].hasConstant)
+                        {
+                            itemRow.fieldId = 0;
+                            itemRow.ratio = arrItemRows[i].ratio;
+                            rowComplete = true;
+                        }
+                    }
+                    if (rowComplete)
+                    {
+                        itemRows.Add(itemRow);
+                        itemRow = new ItemRow();
+                    }
                 }
+                i += inc;
             }
+        }
 
-
-            // if we get here we can assume formula is valid.
+        private static void SaveValidFormula(DBAccess dba, int nFieldId, bool bSave, List<ItemRow> itemRows)
+        {
             if (bSave)
             {
-                int lRowsAffected;
-                dbaCustomFields.DeleteCustomFieldFormula(dba, nFieldId, out  lRowsAffected);
-                int nNewCLUID = 0;
+                int rowsAffected;
+                DeleteCustomFieldFormula(dba, nFieldId, out rowsAffected);
+                var newClUId = 0;
                 const string cmdText = "SELECT MAX(CL_UID) As maxUID FROM EPGP_CALCS";
-                dba.SelectData(cmdText, (StatusEnum)99999, out dt);
-                if (dt.Rows.Count == 1)
+                DataTable dataTable;
+                dba.SelectData(cmdText, (StatusEnum)99999, out dataTable);
+
+                if (dataTable.Rows.Count == 1)
                 {
-                    DataRow row = dt.Rows[0];
-                    nNewCLUID = DBAccess.ReadIntValue(row["maxUID"]) + 1;
+                    var row = dataTable.Rows[0];
+                    newClUId = SqlDb.ReadIntValue(row["maxUID"]) + 1;
                 }
 
+                const string Command = "INSERT INTO  EPGP_CALCS (CL_OBJECT, CL_PRI, CL_OP, CL_UID, CL_SEQ, CL_RESULT, CL_COMPONENT, CL_RATIO) "
+                    + "VALUES(1, 0, @CL_OP, @CL_UID, @CL_SEQ, @CL_RESULT, @CL_COMPONENT, @CL_RATIO)";
 
-                const string sCommand = "INSERT INTO  EPGP_CALCS (CL_OBJECT, CL_PRI, CL_OP, CL_UID, CL_SEQ, CL_RESULT, CL_COMPONENT, CL_RATIO) " +
-                            "VALUES(1, 0, @CL_OP, @CL_UID, @CL_SEQ, @CL_RESULT, @CL_COMPONENT, @CL_RATIO)";
-
-                SqlCommand oCmdCL = new SqlCommand(sCommand, dba.Connection);
-                SqlParameter cl_op = oCmdCL.Parameters.Add("@CL_OP", SqlDbType.Int);
-                SqlParameter cl_uid = oCmdCL.Parameters.Add("@CL_UID", SqlDbType.Int);
-                SqlParameter cl_seq = oCmdCL.Parameters.Add("@CL_SEQ", SqlDbType.Int);
-                SqlParameter cl_result = oCmdCL.Parameters.Add("@CL_RESULT", SqlDbType.Int);
-                SqlParameter cl_component = oCmdCL.Parameters.Add("@CL_COMPONENT", SqlDbType.Int);
-                SqlParameter cl_ratio = oCmdCL.Parameters.Add("@CL_RATIO", SqlDbType.Decimal);
-
-                cl_ratio.Precision = 25;
-                cl_ratio.Scale = 6;
-
-                //PriItemDefn ritem;
-                //PriItemDefn citem;
-                int seq = 0;
-                foreach (ItemRow itemRow in itemRows)
+                using (var sqlCommand = new SqlCommand(Command, dba.Connection))
                 {
-                    cl_op.Value = itemRow.opId;
-                    cl_uid.Value = nNewCLUID;
-                    cl_seq.Value = ++seq;
-                    cl_result.Value = nFieldId;
-                    cl_component.Value = itemRow.fieldId;
-                    cl_ratio.Value = itemRow.ratio;
+                    var clOp = sqlCommand.Parameters.Add("@CL_OP", SqlDbType.Int);
+                    var clUId = sqlCommand.Parameters.Add("@CL_UID", SqlDbType.Int);
+                    var clSeq = sqlCommand.Parameters.Add("@CL_SEQ", SqlDbType.Int);
+                    var clResult = sqlCommand.Parameters.Add("@CL_RESULT", SqlDbType.Int);
+                    var clComponent = sqlCommand.Parameters.Add("@CL_COMPONENT", SqlDbType.Int);
+                    var clRatio = sqlCommand.Parameters.Add("@CL_RATIO", SqlDbType.Decimal);
 
-                    oCmdCL.ExecuteNonQuery();
+                    clRatio.Precision = 25;
+                    clRatio.Scale = 6;
+
+                    var seq = 0;
+                    foreach (var itemRow in itemRows)
+                    {
+                        clOp.Value = itemRow.opId;
+                        clUId.Value = newClUId;
+                        clSeq.Value = ++seq;
+                        clResult.Value = nFieldId;
+                        clComponent.Value = itemRow.fieldId;
+                        clRatio.Value = itemRow.ratio;
+
+                        sqlCommand.ExecuteNonQuery();
+                    }
                 }
             }
-
-        Exit_Function:
-            return sError;
         }
     }
 
@@ -1127,198 +1213,218 @@ namespace PortfolioEngineCore
 
         private static StatusEnum PerformCustomFieldsCalculate(DBAccess dba)
         {
-            //StatusEnum eStatus = StatusEnum.rsSuccess;
+            var sqlStatements = new List<string>();
+            var seqStmt = string.Empty;
+            var seqStmtStringBuilder = new StringBuilder(seqStmt);
+            var lastId = -1;
 
-            List<string> sqlstatements = new List<string>();
-            string seqStmt = "";
-            SqlCommand oCommand = null;
-            SqlDataReader reader = null;
-            int lastuid = -1;
-            int uid = 0;
-            int fit = 0;
-            int fat = 0;
-            double dRatio = 0;
-            int seq = 0;
-            int op = 0;
-            string sOp = "";
+            //CC-78062 - leaving as concatenation because since it's all static strings it will be inlined by the compiler, and keeps the formatting nicer than using interpolation or string format.
+            const string Command = "SELECT     EPGP_CALCS.CL_UID, EPGP_CALCS.CL_SEQ, EPGP_CALCS.CL_RESULT, EPGC_FIELD_ATTRIBS.FA_FIELD_IN_TABLE, "
+                + "EPGP_CALCS.CL_COMPONENT, EPGC_FIELD_ATTRIBS_1.FA_FIELD_IN_TABLE AS Expr1, EPGP_CALCS.CL_RATIO, EPGP_CALCS.CL_OP, "
+                + "EPGC_FIELD_ATTRIBS_1.FA_TABLE_ID AS EXFAT "
+                + "FROM         EPGP_CALCS INNER JOIN "
+                + "EPGC_FIELD_ATTRIBS ON EPGP_CALCS.CL_RESULT = EPGC_FIELD_ATTRIBS.FA_FIELD_ID LEFT JOIN "
+                + "EPGC_FIELD_ATTRIBS AS EPGC_FIELD_ATTRIBS_1 ON EPGP_CALCS.CL_COMPONENT = EPGC_FIELD_ATTRIBS_1.FA_FIELD_ID "
+                + "Where (EPGP_CALCS.CL_OBJECT = 1) "
+                + " AND (EPGP_CALCS.CL_PRI = 1) "
+                + " ORDER BY EPGP_CALCS.CL_UID, EPGP_CALCS.CL_SEQ";
 
-            string sCommand =
-                "SELECT     EPGP_CALCS.CL_UID, EPGP_CALCS.CL_SEQ, EPGP_CALCS.CL_RESULT, EPGC_FIELD_ATTRIBS.FA_FIELD_IN_TABLE, " +
-                "EPGP_CALCS.CL_COMPONENT, EPGC_FIELD_ATTRIBS_1.FA_FIELD_IN_TABLE AS Expr1, EPGP_CALCS.CL_RATIO, EPGP_CALCS.CL_OP, " +
-                "EPGC_FIELD_ATTRIBS_1.FA_TABLE_ID AS EXFAT " +
-                "FROM         EPGP_CALCS INNER JOIN " +
-                "EPGC_FIELD_ATTRIBS ON EPGP_CALCS.CL_RESULT = EPGC_FIELD_ATTRIBS.FA_FIELD_ID LEFT JOIN " +
-                "EPGC_FIELD_ATTRIBS AS EPGC_FIELD_ATTRIBS_1 ON EPGP_CALCS.CL_COMPONENT = EPGC_FIELD_ATTRIBS_1.FA_FIELD_ID " +
-                "Where (EPGP_CALCS.CL_OBJECT = 1) ";
+            var whereClause = string.Empty;
 
-            //          if (bonlyPRIs)
-            sCommand += " AND (EPGP_CALCS.CL_PRI = 1) ";
-
-            sCommand += " ORDER BY EPGP_CALCS.CL_UID, EPGP_CALCS.CL_SEQ";
-
-            string sWhereClause = "";
-
-            oCommand = new SqlCommand(sCommand, dba.Connection);
-            reader = oCommand.ExecuteReader();
-            string sErrSQL = "";
-
-
-            while (reader.Read())
+            using (var sqlCommand = new SqlCommand(Command, dba.Connection))
             {
-                uid = DBAccess.ReadIntValue(reader["CL_UID"]);
-
-                if (lastuid != uid)
+                using (var reader = sqlCommand.ExecuteReader())
                 {
-                    if (seqStmt != "")
-                    {
-                        seqStmt +=
-                            "  FROM EPGP_PROJECT_DEC_VALUES  INNER JOIN  EPGP_PROJECT_TEXT_VALUES ON EPGP_PROJECT_DEC_VALUES.PROJECT_ID = EPGP_PROJECT_TEXT_VALUES.PROJECT_ID ";
-                        sqlstatements.Add(seqStmt + sWhereClause);
+                    var errSql = string.Empty;
 
-                        if (sWhereClause != "")
-                            sqlstatements.Add(sErrSQL + sWhereClause);
+                    while (reader.Read())
+                    {
+                        var id = SqlDb.ReadIntValue(reader["CL_UID"]);
+                        var fieldInTable = 0;
+
+                        HandleLastFieldCase(
+                            ref lastId,
+                            id,
+                            ref seqStmt,
+                            sqlStatements,
+                            reader,
+                            ref seqStmtStringBuilder,
+                            ref whereClause,
+                            ref errSql);
+
+                        var seq = SqlDb.ReadIntValue(reader["CL_SEQ"]);
+                        var operationId = SqlDb.ReadIntValue(reader["CL_OP"]);
+
+                        HandleMiddleFieldCase(seq, operationId, seqStmtStringBuilder, ref seqStmt);
+
+                        fieldInTable = SqlDb.ReadIntValue(reader["Expr1"]);
+                        var fat = SqlDb.ReadIntValue(reader["EXFAT"]);
+                        var ratio = SqlDb.ReadDoubleValue(reader["CL_RATIO"]);
+
+                        HandleFirstFieldCase(fieldInTable, seqStmtStringBuilder, ratio, fat, seq, operationId, out seqStmt, ref whereClause);
                     }
 
-                    seqStmt = "";
-                    sWhereClause = "";
+                    AddCommands(seqStmt, seqStmtStringBuilder, sqlStatements, whereClause, errSql);
+                }
+            }
 
-                    lastuid = uid;
+            ExecuteSqlCommands(dba, sqlStatements);
+            ReadServerUrls(dba);
 
-                    fit = DBAccess.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
+            return dba.Status;
+        }
 
-                    seqStmt = "UPDATE EPGP_PROJECT_DEC_VALUES SET PC_" + fit.ToString("000") + " = ";
+        private static void HandleLastFieldCase(
+            ref int lastId,
+            int id,
+            ref string seqStmt,
+            List<string> sqlStatements,
+            SqlDataReader reader,
+            ref StringBuilder seqStmtStringBuilder,
+            ref string whereClause,
+            ref string errSql)
+        {
+            int fieldInTable;
+            if (lastId != id)
+            {
+                if (!string.IsNullOrWhiteSpace(seqStmt))
+                {
+                    seqStmtStringBuilder.Append(
+                        "  FROM EPGP_PROJECT_DEC_VALUES  INNER JOIN  EPGP_PROJECT_TEXT_VALUES ON EPGP_PROJECT_DEC_VALUES.PROJECT_ID = EPGP_PROJECT_TEXT_VALUES.PROJECT_ID ");
+                    seqStmt = seqStmtStringBuilder.ToString();
 
-                    sErrSQL = "UPDATE EPGP_PROJECT_DEC_VALUES SET PC_" + fit.ToString("000") + " = 999999 ";
+                    sqlStatements.Add(string.Format("{0}{1}", seqStmt, whereClause));
 
+                    if (!string.IsNullOrWhiteSpace(whereClause))
+                    {
+                        sqlStatements.Add(string.Format("{0}{1}", errSql, whereClause));
+                    }
                 }
 
+                whereClause = string.Empty;
 
+                lastId = id;
 
-                seq = DBAccess.ReadIntValue(reader["CL_SEQ"]);
-                op = DBAccess.ReadIntValue(reader["CL_OP"]);
+                fieldInTable = SqlDb.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
+
+                seqStmt = string.Format("UPDATE EPGP_PROJECT_DEC_VALUES SET PC_{0:000} = ", fieldInTable);
+                seqStmtStringBuilder = new StringBuilder(seqStmt);
+
+                errSql = string.Format("UPDATE EPGP_PROJECT_DEC_VALUES SET PC_{0:000} = 999999 ", fieldInTable);
+            }
+        }
+
+        private static void HandleMiddleFieldCase(int seq, int operationId, StringBuilder seqStmtStringBuilder, ref string seqStmt)
+        {
+            if (seq != 1)
+            {
+                string operation;
+                switch (operationId)
+                {
+                    case 1:
+                        operation = " - ";
+                        break;
+                    case 2:
+                        operation = " * ";
+                        break;
+                    case 3:
+                        operation = " / ";
+                        break;
+                    default:
+                        operation = " + ";
+                        break;
+                }
+
+                seqStmtStringBuilder.Append(operation);
+                seqStmt = seqStmtStringBuilder.ToString();
+            }
+        }
+
+        private static void HandleFirstFieldCase(
+            int fieldInTable,
+            StringBuilder seqStmtStringBuilder,
+            double ratio,
+            int fat,
+            int seq,
+            int operationId,
+            out string seqStmt,
+            ref string whereClause)
+        {
+            if (fieldInTable == 0)
+            {
+                seqStmtStringBuilder.Append(ratio.ToString());
+                seqStmt = seqStmtStringBuilder.ToString();
+            }
+            else
+            {
+                var sval = GetCustFieldVal(fieldInTable, fat);
+
+                seqStmtStringBuilder.Append(string.Format("({0} * {1})", sval, ratio));
+                seqStmt = seqStmtStringBuilder.ToString();
 
                 if (seq != 1)
                 {
-                    if (op == 1)
-                        sOp = " - ";
-                    else if (op == 2)
-                        sOp = " * ";
-                    else if (op == 3)
-                        sOp = " / ";
-                    else
-                        sOp = " + ";
-
-
-                    seqStmt += sOp;
-                }
-
-                fit = DBAccess.ReadIntValue(reader["Expr1"]);
-                fat = DBAccess.ReadIntValue(reader["EXFAT"]);
-
-                dRatio = DBAccess.ReadDoubleValue(reader["CL_RATIO"]);
-
-                if (fit == 0)
-                    seqStmt += dRatio.ToString();
-                else
-                {
-
-                    string sval = GetCustFieldVal(fit, fat); //  "PC_" + fit.ToString("000");
-
-                    seqStmt += "(" + sval + " * " + dRatio.ToString() + ")";
-
-                    if (seq != 1)
+                    const int operationIdToCheck = 3;
+                    if (operationId == operationIdToCheck)
                     {
-                        if (op == 3)
+                        if (whereClause == string.Empty)
                         {
-                            if (sWhereClause == "")
-                                sWhereClause = " WHERE (" + sval + "<> 0) ";
-                            else
-                                sWhereClause += " AND (" + sval + "<> 0) ";
+                            whereClause = string.Format(" WHERE ({0}<> 0) ", sval);
+                        }
+                        else
+                        {
+                            var whereStringBuilder = new StringBuilder(whereClause);
+                            whereStringBuilder.Append(string.Format(" AND ({0}<> 0) ", sval));
+                            whereClause = whereStringBuilder.ToString();
                         }
                     }
-
-
                 }
-
-
             }
+        }
 
-            if (seqStmt != "")
+        private static void AddCommands(string seqStmt, StringBuilder stringBuilder, List<string> sqlStatements, string whereClause, string errSql)
+        {
+            if (!string.IsNullOrWhiteSpace(seqStmt))
             {
-                seqStmt +=
-                    "  FROM EPGP_PROJECT_DEC_VALUES  INNER JOIN  EPGP_PROJECT_TEXT_VALUES ON EPGP_PROJECT_DEC_VALUES.PROJECT_ID = EPGP_PROJECT_TEXT_VALUES.PROJECT_ID ";
-                sqlstatements.Add(seqStmt + sWhereClause);
-                if (sWhereClause != "")
-                    sqlstatements.Add(sErrSQL + sWhereClause);
+                stringBuilder.Append(
+                    "  FROM EPGP_PROJECT_DEC_VALUES  INNER JOIN  EPGP_PROJECT_TEXT_VALUES ON EPGP_PROJECT_DEC_VALUES.PROJECT_ID = EPGP_PROJECT_TEXT_VALUES.PROJECT_ID ");
+                seqStmt = stringBuilder.ToString();
+
+                sqlStatements.Add(string.Format("{0}{1}", seqStmt, whereClause));
+                if (!string.IsNullOrWhiteSpace(whereClause))
+                {
+                    sqlStatements.Add(string.Format("{0}{1}", errSql, whereClause));
+                }
             }
+        }
 
-            reader.Close();
-
-            foreach (string sql in sqlstatements)
+        private static void ExecuteSqlCommands(DBAccess dbAccess, List<string> sqlStatements)
+        {
+            foreach (var sql in sqlStatements)
             {
-
-
-                oCommand = new SqlCommand(sql, dba.Connection);
-                int lRowsAffected = oCommand.ExecuteNonQuery();
+                using (var sqlCommand = new SqlCommand(sql, dbAccess.Connection))
+                {
+                    sqlCommand.ExecuteNonQuery();
+                }
             }
+        }
 
-            string sWEServerURL = "";
+        private static void ReadServerUrls(DBAccess dbAccess)
+        {
+            var weServerUrl = string.Empty;
 
-            sCommand = "SELECT ADM_WE_SERVERURL FROM EPG_ADMIN";
+            const string Command = "SELECT ADM_WE_SERVERURL FROM EPG_ADMIN";
 
-            oCommand = new SqlCommand(sCommand, dba.Connection);
-            reader = oCommand.ExecuteReader();
-
-
-            while (reader.Read())
+            using (var sqlCommand = new SqlCommand(Command, dbAccess.Connection))
             {
-                sWEServerURL = DBAccess.ReadStringValue(reader["ADM_WE_SERVERURL"]);
+                using (var reader = sqlCommand.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        weServerUrl = SqlDb.ReadStringValue(reader["ADM_WE_SERVERURL"]);
+                    }
+                }
             }
-
-            reader.Close();
-
-            //if (sWEServerURL.Length > 0)
-            //{
-            //    string sXMLRequest;
-            //    if (dbaUsers.ExportPIInfo(dba, Projectids, out sXMLRequest) == StatusEnum.rsSuccess)
-            //    {
-
-            //XmlNode xNode;
-            //if (SendXMLToWorkEngine(dba, sWEServerURL, "UpdateItems", sXMLRequest, out xNode) != StatusEnum.rsSuccess)
-            //    goto Exit_Function;
-
-            //if (xNode != null)
-            //{
-            //    CStruct xResult = new CStruct();
-            //    if (xResult.LoadXML(xNode.OuterXml) == false)
-            //    {
-            //        dba.HandleStatusError(SeverityEnum.Error, "PerformCustomFieldsCalculate", (StatusEnum)99843, "Invalid XML response from WorkEngine WebService");
-            //        goto Exit_Function;
-            //    }
-
-            //    if (xResult.GetIntAttr("Status") != 0)
-            //    {
-            //        CStruct xError = xResult.GetSubStruct("Error");
-            //        string sError = xError.GetStringAttr("ID") + " : " + xError.GetString("");
-            //        dba.HandleStatusError(SeverityEnum.Error, "PerformCustomFieldsCalculate", (StatusEnum)99842, "Invalid XML response from WorkEngine WebService\n\nStatus=" + xResult.GetStringAttr("Status") + "\n\nError=" + sError);
-            //        goto Exit_Function;
-            //    }
-            //}
-
-            //    }
-            //}
-
-            //Exit_Function:
-
-            //if (dba != null)
-            //{
-            //    if (dba.Status != StatusEnum.rsSuccess)
-            //    {
-            //        HandleDBAccessError("PerformCustomFieldsCalculate", dba);
-            //    }
-            //}
-
-            return dba.Status;
         }
 
         private static string GetCustFieldVal(int lfit, int lfat)

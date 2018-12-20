@@ -1,11 +1,10 @@
-﻿using EPMLiveCore.ReportingProxy;
-using Microsoft.SharePoint;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -14,6 +13,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web.Services;
 using System.Xml;
+using EPMLiveCore.ReportingProxy;
+using Microsoft.SharePoint;
 
 namespace EPMLiveWorkPlanner
 {
@@ -120,9 +121,9 @@ namespace EPMLiveWorkPlanner
                     using (SPWeb iweb = site.OpenWeb(oWeb.ID))
                     {
                         Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(iweb);
-                        if (lockWeb == Guid.Empty || lockWeb == oWeb.ID)
+                        if (lockWeb == Guid.Empty || lockWeb == iweb.ID)
                         {
-                            sListTaskCenter = EPMLiveCore.CoreFunctions.getConfigSetting(oWeb, "EPMLivePlanner" + PlannerID + "TaskCenter");
+                            sListTaskCenter = EPMLiveCore.CoreFunctions.getConfigSetting(iweb, "EPMLivePlanner" + PlannerID + "TaskCenter");
                         }
                         else
                         {
@@ -351,9 +352,9 @@ namespace EPMLiveWorkPlanner
                     using (SPWeb iweb = site.OpenWeb(oWeb.ID))
                     {
                         Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(iweb);
-                        if (lockWeb == Guid.Empty || lockWeb == oWeb.ID)
+                        if (lockWeb == Guid.Empty || lockWeb == iweb.ID)
                         {
-                            sListProjectCenter = EPMLiveCore.CoreFunctions.getConfigSetting(oWeb, "EPMLivePlanner" + PlannerID + "ProjectCenter");
+                            sListProjectCenter = EPMLiveCore.CoreFunctions.getConfigSetting(iweb, "EPMLivePlanner" + PlannerID + "ProjectCenter");
                         }
                         else
                         {
@@ -868,19 +869,32 @@ namespace EPMLiveWorkPlanner
                     {
                         using (SPWeb rweb = rsite.OpenWeb(web.ID))
                         {
-                            Guid lwebGuid = EPMLiveCore.CoreFunctions.getLockedWeb(web);
-
-                            using (SPWeb lweb = rsite.OpenWeb(lwebGuid))
-                            {
-                                if (lweb.Lists.TryGetList("Planner Templates") == null)
-                                {
-                                    arrPlanners.Add("MPP", "Microsoft Office Project");
-                                }
-                                else if (EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "useoldeditinproject") == "true")
-                                {
-                                    arrPlanners.Add("MPP", "Microsoft Office Project");
-                                }
-                            }
+                            Guid lwebGuid = EPMLiveCore.CoreFunctions.getLockedWeb(rweb);
+							if (lwebGuid == Guid.Empty || lwebGuid == rweb.ID)
+							{
+								if (rweb.Lists.TryGetList("Planner Templates") == null)
+								{
+									arrPlanners.Add("MPP", "Microsoft Office Project");
+								}
+								else if (EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "useoldeditinproject") == "true")
+								{
+									arrPlanners.Add("MPP", "Microsoft Office Project");
+								}
+							}
+							else
+							{
+								using (SPWeb lweb = rsite.OpenWeb(lwebGuid))
+								{
+									if (lweb.Lists.TryGetList("Planner Templates") == null)
+									{
+										arrPlanners.Add("MPP", "Microsoft Office Project");
+									}
+									else if (EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "useoldeditinproject") == "true")
+									{
+										arrPlanners.Add("MPP", "Microsoft Office Project");
+									}
+								}
+							}
                         }
                     }
 
@@ -1389,15 +1403,15 @@ namespace EPMLiveWorkPlanner
                     using (SPWeb iweb = site.OpenWeb(web.ID))
                     {
                         Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(iweb);
-                        if (lockWeb == Guid.Empty || lockWeb == web.ID)
+                        if (lockWeb == Guid.Empty || lockWeb == iweb.ID)
                         {
-                            iApplyNewTemplate(web, web, planner, templateid, itemid, type, projectname);
+                            iApplyNewTemplate(iweb, iweb, planner, templateid, itemid, type, projectname);
                         }
                         else
                         {
                             using (SPWeb w = site.OpenWeb(lockWeb))
                             {
-                                iApplyNewTemplate(web, w, planner, templateid, itemid, type, projectname);
+                                iApplyNewTemplate(iweb, w, planner, templateid, itemid, type, projectname);
                             }
 
                         }
@@ -1595,9 +1609,9 @@ namespace EPMLiveWorkPlanner
                     using (SPWeb iweb = site.OpenWeb(web.ID))
                     {
                         Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(iweb);
-                        if (lockWeb == Guid.Empty || lockWeb == web.ID)
+                        if (lockWeb == Guid.Empty || lockWeb == iweb.ID)
                         {
-                            dt = iGetTemplates(web, planner, type);
+                            dt = iGetTemplates(iweb, planner, type);
                         }
                         else
                         {
@@ -4080,107 +4094,200 @@ namespace EPMLiveWorkPlanner
 
         public static string getFieldValue(SPListItem li, SPField oField, DataSet dsResources)
         {
-            string val = "";
-            NumberFormatInfo providerEn = new System.Globalization.NumberFormatInfo();
-            providerEn.NumberDecimalSeparator = ".";
-            providerEn.NumberGroupSeparator = ",";
-            providerEn.NumberGroupSizes = new int[] { 3 };
+            return FieldValue(li, oField, dsResources, true);
+        }
+
+        internal static string FieldValue(SPListItem listItem, SPField field, DataSet resources, bool useFieldValue)
+        {
+            var fieldValue = string.Empty;
+            var providerEn = new NumberFormatInfo
+            {
+                NumberDecimalSeparator = ".",
+                NumberGroupSeparator = ",",
+                NumberGroupSizes = new[]
+                {
+                    3
+                }
+            };
             try
             {
-                switch (oField.Type)
+                switch (field.Type)
                 {
                     case SPFieldType.DateTime:
-                        try
-                        {
-                            val = DateTime.Parse(li[oField.Id].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
-                        }
-                        catch { }
+                        CalculateDateTimeFieldValue(listItem, field, ref fieldValue);
                         break;
                     case SPFieldType.User:
-                        SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(li.ParentList.ParentWeb, li[oField.Id].ToString());
-                        foreach (SPFieldUserValue uv in uvc)
-                        {
-                            DataRow[] dr = dsResources.Tables[2].Select("SPAccountInfo = '" + uv.ToString() + "'");
-                            if (dr.Length > 0)
-                            {
-                                val += ";" + dr[0]["ID"].ToString();
-                            }
-                        }
-                        val = val.Trim(';');
+                        CalculateUserFieldValue(listItem, field, resources, ref fieldValue);
                         break;
                     case SPFieldType.Note:
-                        try
-                        {
-                            val = li[oField.Id].ToString();
-                        }
-                        catch { }
+                        CalculateNoteFieldValue(listItem, field, ref fieldValue);
                         break;
                     case SPFieldType.Calculated:
-                        SPFieldCalculated c = (SPFieldCalculated)oField;
-                        switch (c.OutputType)
-                        {
-                            case SPFieldType.Number:
-                            case SPFieldType.Currency:
-                                val = li[oField.Id].ToString();
-                                val = val.Replace(";#", "\n").Split('\n')[1];
-                                break;
-                            default:
-                                val = oField.GetFieldValueAsText(li[oField.Id].ToString());
-                                break;
-                        };
+                        fieldValue = CalculateCalculatedFieldValue(listItem, field);
                         break;
                     case SPFieldType.Number:
-                        val = li[oField.Id].ToString();
-                        SPFieldNumber oNum = (SPFieldNumber)oField;
-                        if (oNum.ShowAsPercentage)
-                        {
-                            try
-                            {
-                                val = (float.Parse(val) * 100).ToString(providerEn);
-                            }
-                            catch { }
-                        }
+                        fieldValue = CalculateNumberFieldValue(listItem, field, providerEn, useFieldValue);
                         break;
                     case SPFieldType.Currency:
-                        val = li[oField.Id].ToString();
+                        fieldValue = CalculateCurrencyFieldValue(listItem, field);
                         break;
                     case SPFieldType.Lookup:
-                        try
-                        {
-                            SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(li[oField.Id].ToString());
-                            foreach (SPFieldLookupValue uv in lvc)
-                            {
-                                val += ";" + uv.LookupId;
-                            }
-                            val = val.Trim(';');
-                        }
-                        catch { }
+                        CalculateLookUpFieldValue(listItem, field, ref fieldValue);
                         break;
                     case SPFieldType.Boolean:
-                        try
-                        {
-                            if (li[oField.Id].ToString().ToLower() == "true")
-                                val = "1";
-                            else
-                                val = "0";
-                        }
-                        catch { val = "0"; }
+                        fieldValue = CalculateBooleanFieldValue(listItem, field);
                         break;
                     default:
-                        val = oField.GetFieldValueAsText(li[oField.Id].ToString());
+                        fieldValue = field.GetFieldValueAsText(listItem[field.Id].ToString());
                         break;
+                }
 
-                };
+                CalculateIndicatorFieldValue(listItem, field, ref fieldValue);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
 
-                if (oField.Description == "Indicator")
+            return fieldValue;
+        }
+
+        private static string CalculateNumberFieldValue(SPListItem listItem, SPField field, NumberFormatInfo providerEn, bool useFieldValue)
+        {
+            var fieldValue = listItem[field.Id].ToString();
+            var fieldNumber = (SPFieldNumber)field;
+            if (fieldNumber.ShowAsPercentage)
+            {
+                try
                 {
-                    string url = li.ParentList.ParentWeb.ServerRelativeUrl;
-                    val = "<img src=\"" + ((url == "/") ? "" : url) + "/_layouts/images/" + val + "\">";
+                    fieldValue = useFieldValue
+                        ? (float.Parse(fieldValue) * 100).ToString(providerEn)
+                        : (float.Parse(listItem[field.Id].ToString()) * 100).ToString();
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
                 }
             }
-            catch { }
+            return fieldValue;
+        }
 
-            return val;
+        private static void CalculateDateTimeFieldValue(SPListItem listItem, SPField field, ref string fieldValue)
+        {
+            try
+            {
+                fieldValue = DateTime.Parse(listItem[field.Id].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private static void CalculateUserFieldValue(
+            SPListItem listItem,
+            SPField field,
+            DataSet resources,
+            ref string fieldValue)
+        {
+            var userValueCollection = new SPFieldUserValueCollection(
+                listItem.ParentList.ParentWeb,
+                listItem[field.Id].ToString());
+            var stringBuilder = new StringBuilder(fieldValue);
+            foreach (var userValue in userValueCollection)
+            {
+                var dataRows = resources.Tables[2].Select(string.Format("SPAccountInfo = '{0}'", userValue));
+                if (dataRows.Length > 0)
+                {
+                    stringBuilder.Append(string.Format(";{0}", dataRows[0]["ID"]));
+                }
+            }
+            fieldValue = stringBuilder.ToString().Trim(';');
+        }
+
+        private static void CalculateNoteFieldValue(SPListItem listItem, SPField field, ref string fieldValue)
+        {
+            try
+            {
+                fieldValue = listItem[field.Id].ToString();
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private static string CalculateCalculatedFieldValue(SPListItem listItem, SPField field)
+        {
+            string fieldValue;
+            var calculated = (SPFieldCalculated)field;
+            switch (calculated.OutputType)
+            {
+                case SPFieldType.Number:
+                case SPFieldType.Currency:
+                    fieldValue = listItem[field.Id].ToString();
+                    fieldValue = fieldValue.Replace(";#", "\n").Split('\n')[1];
+                    break;
+                default:
+                    fieldValue = field.GetFieldValueAsText(listItem[field.Id].ToString());
+                    break;
+            }
+            return fieldValue;
+        }
+
+        private static string CalculateCurrencyFieldValue(SPListItem listItem, SPField field)
+        {
+            var fieldValue = listItem[field.Id].ToString();
+            return fieldValue;
+        }
+
+        private static void CalculateLookUpFieldValue(SPListItem listItem, SPField field, ref string fieldValue)
+        {
+            try
+            {
+                var lookupValueCollection = new SPFieldLookupValueCollection(listItem[field.Id].ToString());
+                var stringBuilder = new StringBuilder(fieldValue);
+                foreach (var lookupValue in lookupValueCollection)
+                {
+                    stringBuilder.Append(string.Format(";{0}", lookupValue.LookupId));
+                }
+                fieldValue = stringBuilder.ToString().Trim(';');
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private static string CalculateBooleanFieldValue(SPListItem listItem, SPField field)
+        {
+            string fieldValue;
+            try
+            {
+                fieldValue = string.Equals(listItem[field.Id].ToString(), bool.TrueString, StringComparison.OrdinalIgnoreCase)
+                    ? "1"
+                    : "0";
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+                fieldValue = "0";
+            }
+            return fieldValue;
+        }
+
+        private static void CalculateIndicatorFieldValue(SPListItem listItem, SPField field, ref string fieldValue)
+        {
+            if (field.Description == "Indicator")
+            {
+                var url = listItem?.ParentList.ParentWeb.ServerRelativeUrl;
+                fieldValue = string.Format(
+                    "<img src=\"{0}/_layouts/images/{1}\">",
+                    url == "/"
+                        ? string.Empty
+                        : url,
+                    fieldValue);
+            }
         }
 
         private static void SetupProjectCenterList(SPList oProjectCenter, string sPlanner)
@@ -4259,10 +4366,70 @@ namespace EPMLiveWorkPlanner
             return dsResources;
         }
 
+        private static void AddResourceToTeam(List<string> resources, SPList projectCenter, SPListItem pItem)
+        {
+            string resourceToAdd = string.Empty;
+            if (projectCenter != null)
+            {
+                SPFieldUserValueCollection assignedTo = null;
+                try
+                {
+                    assignedTo = new SPFieldUserValueCollection(SPContext.Current.Web, pItem["AssignedTo"].ToString());
+                }
+                catch { }
+
+                if (assignedTo == null)
+                    assignedTo = new SPFieldUserValueCollection();
+
+                foreach (string resource in resources)
+                {
+                    if (!assignedTo.ToString().Contains(resource))
+                    {
+                        resourceToAdd += "'" + resource + "',";
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(resourceToAdd))
+                {
+                    resourceToAdd = resourceToAdd.Substring(0, resourceToAdd.Length - 1);
+
+                    string sqlGetResources = "SELECT ID, Title, SharePointAccountID, SharePointAccountText FROM LSTResourcepool WHERE Title IN(" + resourceToAdd + ")";
+                    DataTable dtResources = null;
+
+                    try
+                    {
+                        var queryExecutor = new QueryExecutor(SPContext.Current.Web);
+                        dtResources = queryExecutor.ExecuteReportingDBQuery(sqlGetResources, new Dictionary<string, object> { });
+                    }
+                    catch { }
+
+                    if (dtResources != null && dtResources.Rows.Count > 0)
+                    {
+                        for (int row = 0; row < dtResources.Rows.Count; row++)
+                        {
+                            assignedTo.Add(new SPFieldUserValue(SPContext.Current.Web, Convert.ToInt32(dtResources.Rows[row]["SharePointAccountID"]), Convert.ToString(dtResources.Rows[row]["SharePointAccountText"])));
+                        }
+
+                        pItem["AssignedTo"] = assignedTo;
+
+                        SPContext.Current.Web.AllowUnsafeUpdates = true;
+
+                        try
+                        {
+                            pItem.Update();
+                            projectCenter.Update();
+                        }
+                        finally
+                        {
+                            SPContext.Current.Web.AllowUnsafeUpdates = false;
+                        }
+                    }
+                }
+            }
+        }
+
         public static string GetProjectInfo(XmlDocument data, SPWeb oWeb)
         {
-
-
             string sPlanner = data.FirstChild.Attributes["Planner"].Value;
 
             PlannerProps p = getSettings(oWeb, sPlanner);
@@ -4275,6 +4442,18 @@ namespace EPMLiveWorkPlanner
             SetupProjectCenterList(oListProjectCenter, sPlanner);
 
             SPListItem liProject = oListProjectCenter.GetItemById(int.Parse(data.FirstChild.Attributes["ID"].Value));
+
+            try
+            {
+                var planners = liProject["Planners"] as SPFieldUserValueCollection;
+                List<string> resources = new List<string>();
+                foreach (var uvc in planners)
+                {
+                    resources.Add(uvc.User.Name);
+                }
+                AddResourceToTeam(resources, oListProjectCenter, liProject);
+            }
+            catch { }
 
             XmlNode ndBody = docOut.SelectSingleNode("//B");
 
@@ -4537,24 +4716,24 @@ namespace EPMLiveWorkPlanner
 
             SPList resList = null;
 
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
-            {
-                try
-                {
-                    using (SPSite site = new SPSite(oWeb.Url))
-                    {
-                        using (SPWeb web = site.OpenWeb())
-                        {
-                            string resurl = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "EPMLiveResourceURL", true);
-                            using (SPWeb newweb = site.OpenWeb(resurl))
-                            {
-                                //ProcessAllocationResourcesCols(ndCols, newweb);
-                            }
-                        }
-                    }
-                }
-                catch { }
-            });
+            //SPSecurity.RunWithElevatedPrivileges(delegate ()
+            //{
+            //    try
+            //    {
+            //        using (SPSite site = new SPSite(oWeb.Url))
+            //        {
+            //            using (SPWeb web = site.OpenWeb())
+            //            {
+            //                string resurl = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "EPMLiveResourceURL", true);
+            //                using (SPWeb newweb = site.OpenWeb(resurl))
+            //                {
+            //                    //ProcessAllocationResourcesCols(ndCols, newweb);
+            //                }
+            //            }
+            //        }
+            //    }
+            //    catch { }
+            //});
 
             return docOut.OuterXml;
         }
