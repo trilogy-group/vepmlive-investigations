@@ -402,15 +402,43 @@ namespace EPMLiveCore.Infrastructure
             var dataColumnCollection = CreateType<DataColumnCollection>();
             var resources = CreateType<DataTable>();
             var valueDictionary = CreateType<Dictionary<string, object[]>>();
-            var methodBuildXmlElementsPrametersTypes = new Type[] { typeof(bool), typeof(bool), typeof(IEnumerable<DataRow>), typeof(IList<SPField>), typeof(DataColumnCollection), typeof(DataTable), typeof(Dictionary<string, object[]>) };
-            object[] parametersOfBuildXmlElements = { includeHidden, includeReadOnly, rowCollection, spFieldCollection, dataColumnCollection, resources, valueDictionary };
+            var methodBuildXmlElementsPrametersTypes = new Type[]
+            {
+                typeof(bool),
+                typeof(bool),
+                typeof(IEnumerable<DataRow>),
+                typeof(IList<SPField>),
+                typeof(DataColumnCollection),
+                typeof(DataTable),
+                typeof(Dictionary<string, object[]>)
+            };
+
+            object[] parametersOfBuildXmlElements =
+            {
+                includeHidden,
+                includeReadOnly,
+                rowCollection,
+                spFieldCollection,
+                dataColumnCollection,
+                resources,
+                valueDictionary
+            };
+
             Exception exception;
-            var reportXmlBuilder = new ReportXmlBuilder(_resourcePoolManagerInstanceFixture, string.Empty);
-            var methodInfo = typeof(ReportXmlBuilder).GetMethod(MethodBuildXmlElements, methodBuildXmlElementsPrametersTypes);
+            var reportXmlBuilder = new ReportXmlBuilder(_resourcePoolManagerInstance, string.Empty);
+            var methodInfo = typeof(ReportXmlBuilder).GetMethod(MethodBuildXmlElements);
 
             // Act
-            var result1 = methodInfo.GetResultMethodInfo<ReportXmlBuilder, IList<XElement>>(reportXmlBuilder, out exception, parametersOfBuildXmlElements);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<ReportXmlBuilder, IList<XElement>>(reportXmlBuilder, MethodBuildXmlElements, parametersOfBuildXmlElements, methodBuildXmlElementsPrametersTypes);
+            var result1 = methodInfo.GetResultMethodInfo<ReportXmlBuilder, IList<XElement>>(
+                reportXmlBuilder, 
+                out exception, 
+                parametersOfBuildXmlElements);
+
+            var result2 = ReflectionAnalyzer.GetResultOfMethod<ReportXmlBuilder, IList<XElement>>(
+                reportXmlBuilder,
+                MethodBuildXmlElements,
+                parametersOfBuildXmlElements,
+                methodBuildXmlElementsPrametersTypes);
 
             // Assert
             methodInfo.ShouldNotBeNull();
