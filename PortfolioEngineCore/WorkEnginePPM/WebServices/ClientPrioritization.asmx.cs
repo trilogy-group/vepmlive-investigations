@@ -345,7 +345,7 @@ Exit_Function:
         {
             var sqlStatements = new List<string>();
             var seqStatement = string.Empty;
-            var seqStmtStringBuilder = new StringBuilder(seqStatement);
+            var seqStatementStringBuilder = new StringBuilder(seqStatement);
             var lastId = -1;
 
             //CC-78062 - leaving as concatenation because since it's all static strings it will be inlined by the compiler, and keeps the formatting nicer than using interpolation or string format.
@@ -378,23 +378,23 @@ Exit_Function:
                             ref seqStatement,
                             sqlStatements,
                             reader,
-                            ref seqStmtStringBuilder,
+                            ref seqStatementStringBuilder,
                             ref whereClause,
                             ref errSql);
 
                         var seq = SqlDb.ReadIntValue(reader["CL_SEQ"]);
                         var operationId = SqlDb.ReadIntValue(reader["CL_OP"]);
 
-                        HandleMiddleFieldCase(seq, operationId, seqStmtStringBuilder, ref seqStatement);
+                        HandleMiddleFieldCase(seq, operationId, seqStatementStringBuilder, ref seqStatement);
 
                         fieldInTable = SqlDb.ReadIntValue(reader["Expr1"]);
                         var fat = SqlDb.ReadIntValue(reader["EXFAT"]);
                         var ratio = SqlDb.ReadDoubleValue(reader["CL_RATIO"]);
 
-                        HandleFirstFieldCase(fieldInTable, seqStmtStringBuilder, ratio, fat, seq, operationId, out seqStatement, ref whereClause);
+                        HandleFirstFieldCase(fieldInTable, seqStatementStringBuilder, ratio, fat, seq, operationId, out seqStatement, ref whereClause);
                     }
 
-                    AddCommands(seqStatement, seqStmtStringBuilder, sqlStatements, whereClause, errSql);
+                    AddCommands(seqStatement, seqStatementStringBuilder, sqlStatements, whereClause, errSql);
                 }
             }
 
