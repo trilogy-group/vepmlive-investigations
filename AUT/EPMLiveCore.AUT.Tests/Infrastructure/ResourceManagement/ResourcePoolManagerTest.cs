@@ -409,8 +409,8 @@ namespace EPMLiveCore.Infrastructure
             var methodInfo = typeof(ReportXmlBuilder).GetMethod(MethodBuildXmlElements, methodBuildXmlElementsPrametersTypes);
 
             // Act
-            var result1 = methodInfo.GetResultMethodInfo<ReportXmlBuilder, List<XElement>>(reportXmlBuilder, out exception, parametersOfBuildXmlElements);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<ReportXmlBuilder, List<XElement>>(reportXmlBuilder, MethodBuildXmlElements, parametersOfBuildXmlElements, methodBuildXmlElementsPrametersTypes);
+            var result1 = methodInfo.GetResultMethodInfo<ReportXmlBuilder, IList<XElement>>(reportXmlBuilder, out exception, parametersOfBuildXmlElements);
+            var result2 = ReflectionAnalyzer.GetResultOfMethod<ReportXmlBuilder, IList<XElement>>(reportXmlBuilder, MethodBuildXmlElements, parametersOfBuildXmlElements, methodBuildXmlElementsPrametersTypes);
 
             // Assert
             methodInfo.ShouldNotBeNull();
