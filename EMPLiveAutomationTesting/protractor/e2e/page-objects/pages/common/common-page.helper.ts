@@ -89,7 +89,7 @@ export class CommonPageHelper {
     }
 
     static getElementByText(text: string, isContains = false) {
-        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
+        return element.all(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`)).first();
     }
 
     static getSidebarLinkByTextUnderCreateNew(title: string) {
@@ -238,6 +238,7 @@ export class CommonPageHelper {
         StepLogger.step('Select "Navigation" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.navigation);
         await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader);
+        await WaitHelper.waitForPageToStable();
     }
 
     static async searchByTitle(linkOfThePage: ElementFinder,

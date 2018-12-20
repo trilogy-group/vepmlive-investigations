@@ -286,7 +286,7 @@ export class CommonPage extends BasePage {
     }
 
     static get projectFirstRow() {
-        return `[onmousemove*='Rows["1"]']`;
+        return `[onmousemove*='Rows["0"]'] [href*='ID']`;
     }
 
     static get selectorForRecordsWithoutGreenTick() {
@@ -359,7 +359,7 @@ export class CommonPage extends BasePage {
 
     static get project() {
         // This xpath is best we have. Onmouse click is required
-        return element(By.css(`${CommonPage.projectFirstRow} [href*='Lists/Project']`));
+        return element(By.css(`${CommonPage.projectFirstRow} [href*='ID']`));
     }
 
     static get costButton() {

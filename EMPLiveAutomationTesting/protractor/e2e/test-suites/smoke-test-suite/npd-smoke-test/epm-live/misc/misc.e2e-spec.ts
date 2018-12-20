@@ -7,14 +7,13 @@ import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {OptimizerPageHelper} from '../../../../../page-objects/pages/items-page/project-item/optimizer/optimizer-page.helper';
+import {OptimizerPageHelper as Optimizer} from '../../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer-page.helper';
 import { EditCostHelper } from '../../../../../page-objects/pages/items-page/project-item/edit-cost-page/edit-cost.helper';
-import { ProjectItemPageHelper } from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import { LoginPageHelper } from '../../../../../page-objects/pages/login/login-page.helper';
+import {CommonSubPageHelper} from '../../../../../page-objects/pages/common/common-page.subhelper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
-    let project1 = '';
-    let project2 = '';
+    let id = '';
 
     beforeAll(async () => {
         await new LoginPage().goToAndLogin();
@@ -23,11 +22,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
         );
-        project1 = await EditCostHelper.createProjectWithCost();
-        await EditCostHelper.clickCloseCostPlanner();
-        project2 = await EditCostHelper.createProjectWithCost();
-        await EditCostHelper.clickCloseCostPlanner();
-        await LoginPageHelper.logout();
+        id = await EditCostHelper.createTwoProjectWithCost();
     });
 
     beforeEach(async () => {
@@ -41,14 +36,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    afterAll(async () => {
-        await ProjectItemPageHelper.deleteProjectAndValidateIt(project1);
-        await ProjectItemPageHelper.deleteProjectAndValidateIt(project2);
-    });
-
     it('Create New Strategy in Optimizer Functionality - [1124301][BUG:SKYVERA-1844]', async () => {
         StepLogger.caseId = 1124301;
-        const uniqueId = PageHelper.getUniqueId();
 
         StepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -59,27 +48,24 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         StepLogger.stepId(2);
         StepLogger.stepId(3);
-        await CommonPageHelper.optimizerViaRibbon();
-
+        await CommonSubPageHelper.searchAndSelectUsingIdThenOpenOptimizer(id);
         await CommonPageHelper.verifyNavigation();
 
         StepLogger.stepId(4);
-        await OptimizerPageHelper.clickConfigrationButton();
-
+        await Optimizer.clickConfigure();
         await OptimizerPageHelper.verifyConfigrationPopUPDisplayed();
 
         StepLogger.stepId(5);
         await OptimizerPageHelper.addAvilabelFiled();
-
         await OptimizerPageHelper.verifyConfigrationPopUpClosed();
 
         StepLogger.stepId(6);
+        const strategyName = await Optimizer.enterNewStrategyNameAndSubmit();
         await OptimizerPageHelper.clickSaveStrategy();
-
         await OptimizerPageHelper.verifySaveStrategyPopUpOpen();
 
         StepLogger.stepId(7);
         StepLogger.stepId(8);
-        await OptimizerPageHelper.saveStrategyValidateIt(uniqueId);
+        await Optimizer.verifyCurrentStrategyName(strategyName);
     });
 });

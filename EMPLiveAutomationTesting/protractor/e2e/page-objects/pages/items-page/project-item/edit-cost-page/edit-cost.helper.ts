@@ -43,8 +43,10 @@ export class EditCostHelper {
     }
 
     static async verifyValueInBudgetCost(cost: number) {
+        // Need this wait as budget is not reflected right away.
+        await PageHelper.sleepForXSec(PageHelper.timeout.s);
         StepLogger.subVerification('Verify Value in budget tab');
-        await CommonPageHelper.textPresentValidation(EditCost.inputTextBoxForBudgetTab, cost.toString());
+        await ExpectationHelper.verifyTextContains(EditCost.inputTextBoxForBudgetTab, CommonPageConstants.costButtonLabel.budget, cost.toString());
     }
 
     static async clickActualCostsTab() {
@@ -193,13 +195,15 @@ export class EditCostHelper {
     }
 
     static async verifyValueInVariousCategories(cost: number) {
+        await PageHelper.sleepForXSec(PageHelper.timeout.s);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.getCostCell.cell1);
         await this.verifyValueInBudgetCost(cost);
 
         StepLogger.verification('Verify  Value in Benefit Cell1');
-        await CommonPageHelper.textPresentValidation(CommonPage.getCostCell.cell1, cost.toString());
+        await ExpectationHelper.verifyTextContains(CommonPage.getCostCell.cell1, CommonPageConstants.cell.cell1, cost.toString());
 
         StepLogger.verification('Verify  Value in Benefit Cell2');
-        await CommonPageHelper.textPresentValidation(CommonPage.getCostCell.cell2, cost.toString());
+        await ExpectationHelper.verifyTextContains(CommonPage.getCostCell.cell2, CommonPageConstants.cell.cell1, cost.toString());
     }
 
     static async clickEditCostFromContextMenu() {
@@ -242,10 +246,9 @@ export class EditCostHelper {
         StepLogger.subStep('Enter values in categories');
         await EditCostHelper.enterValueInVariousCategories(cost);
         StepLogger.subVerification('verify categories entered');
-        await EditCostHelper.verifyValueInVariousCategories(cost);
+        await EditCostHelper.verifyValueInBudgetCost(cost);
         StepLogger.subStep('Click on save');
         await EditCostHelper.clickSaveCostPlanner();
-        await EditCostHelper.verifyValueInVariousCategories(cost);
         return projectNameValue;
     }
 
@@ -270,11 +273,6 @@ export class EditCostHelper {
 
     static async createTwoProjectWithCost() {
         StepLogger.subStep('Navigate to Project Page');
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
-        );
         const id = PageHelper.getUniqueId();
         StepLogger.subStep('Create first project');
         const project1 = await this.createProjectWithCost(`${id} 1`);
@@ -288,5 +286,17 @@ export class EditCostHelper {
         StepLogger.subStep('logout from application');
         await LoginPageHelper.logout();
         return id;
+    }
+
+    static async createOneProjectWithCost() {
+        StepLogger.subStep('Navigate to Project Page');
+        const id = PageHelper.getUniqueId();
+        StepLogger.subStep('Create first project');
+        const project1 = await this.createProjectWithCost(id);
+        StepLogger.subStep(`${project1} is created`);
+        await this.clickCloseCostPlanner();
+        StepLogger.subStep('logout from application');
+        await LoginPageHelper.logout();
+        return project1;
     }
 }

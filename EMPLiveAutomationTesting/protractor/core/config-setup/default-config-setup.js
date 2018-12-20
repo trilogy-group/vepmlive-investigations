@@ -78,7 +78,10 @@ const configSetup = {
             versionName:  setupUtilities.getParam(process.env.BUILD_VERSION, "--params.testrail.versionName", false),
             host: process.env.TESTRAIL_HOST || setupUtilities.getParam("https://testrail.devfactory.com/", '--params.testrail.host', false),
             user: process.env.TESTRAIL_USER || setupUtilities.getParam('testrail.automation@aurea.com', "--params.testrail.user", false),
-            password: process.env.TESTRAIL_PASSWORD || setupUtilities.getParam('Dav8B6Mgcoa7Fcb1DqJK-qvEoZ0400eKfqw82Bh.F', '--params.testrail.password', false)
+            password: process.env.TESTRAIL_PASSWORD || setupUtilities.getParam('Dav8B6Mgcoa7Fcb1DqJK-qvEoZ0400eKfqw82Bh.F', '--params.testrail.password', false),
+            milestoneNamePrefix: process.env.TESTRAIL_MILESTONE_NAME_PREFIX || setupUtilities.getParam('Automation milestone week', '--params.testrail.milestoneNamePrefix', false),
+            planNamePrefix: process.env.TESTRAIL_PLAN_NAME_PREFIX || setupUtilities.getParam('Automation Test Plan', '--params.testrail.planNamePrefix', false),
+            planId: process.env.TESTRAIL_PLAN_ID || setupUtilities.getParam(0, '--params.testrail.planId', false),
         },
         version: process.env.VERSION || setupUtilities.getParam('7.5.0', "--params.testrail.versionName", false),
         selenium: {
