@@ -7,18 +7,18 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore
 {
-    internal class WebSettingsAdditionalInfo
+    public class WebSettingsAdditionalInfo
     {
         private SPWeb Web { get; set; }
         private string EPMLiveConnection { get; set; }
 
-        internal WebSettingsAdditionalInfo(SPWeb spWeb)
+        public WebSettingsAdditionalInfo(SPWeb spWeb)
         {
             Web = spWeb;
             EPMLiveConnection = string.Empty;
         }
 
-        internal void SetPFEDatabase(Label lblPFEDB, Label lblPFEDBServer)
+        public void SetPFEDatabase(Label lblPFEDB, Label lblPFEDBServer)
         {
             var basePath = GetBasePath();
             const string errMsg = "Cannot get PFE database information.";
@@ -60,7 +60,7 @@ namespace EPMLiveCore
             }
         }
 
-        internal void SetReportingDatabase(Label lblReportingDB, Label lblReportingDBServer)
+        public void SetReportingDatabase(Label lblReportingDB, Label lblReportingDBServer)
         {
             const string errMsg = "Cannot get Reporting database information.";
             if (!string.IsNullOrWhiteSpace(EPMLiveConnection))
@@ -98,7 +98,7 @@ namespace EPMLiveCore
             }
         }
 
-        internal void SetEPMLiveDatabase(Label lblEPMLDB, Label lblEPMLDBServer)
+        public void SetEPMLiveDatabase(Label lblEPMLDB, Label lblEPMLDBServer)
         {
             const string errMsg = "Cannot get EPMLive database information.";
             try
@@ -126,7 +126,7 @@ namespace EPMLiveCore
             }
         }
 
-        internal void SetSharePointVersion(Label lblSPVersion)
+        public void SetSharePointVersion(Label lblSPVersion)
         {
             try
             {
@@ -139,7 +139,7 @@ namespace EPMLiveCore
             }
         }
 
-        internal void SetEPMLiveVersion(Label lblEPMLVersion)
+        public void SetEPMLiveVersion(Label lblEPMLVersion)
         {
             Guard.ArgumentIsNotNull(lblEPMLVersion, nameof(lblEPMLVersion));
             lblEPMLVersion.Text = CoreFunctions.GetFullAssemblyVersion();

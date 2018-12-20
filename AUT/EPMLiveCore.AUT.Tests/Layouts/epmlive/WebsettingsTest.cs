@@ -37,6 +37,8 @@ namespace EPMLiveCore
         private const int TestsTimeOut = TestContants.TimeOutFiveSeconds;
         private websettings _websettingsInstance;
         private websettings _websettingsInstanceFixture;
+        private WebSettingsAdditionalInfo _webSettingsAdditionalInfo;
+
 
         #region General Initializer : Class (websettings) One time setup
 
@@ -50,6 +52,8 @@ namespace EPMLiveCore
             _websettingsInstanceType = typeof(websettings);
             _websettingsInstanceFixture = Create(true);
             _websettingsInstance = Create(false);
+            var web = CreateType<SPWeb>();
+            _webSettingsAdditionalInfo = new WebSettingsAdditionalInfo(web);
         }
 
         #endregion
@@ -68,7 +72,6 @@ namespace EPMLiveCore
         [Category("AUT Initializer")]
         [TestCase(MethodPage_Load, 0)]
         [TestCase(MethodSetProductAdditionalInfo, 0)]
-        [TestCase(MethodGetBasePath, 0)]
         [TestCase(MethodButton1_Click, 0)]
         public void AUT_Websettings_All_Methods_Explore_Verify_Test(string methodName, int overloadingIndex = 0)
         {
@@ -78,6 +81,23 @@ namespace EPMLiveCore
             // Act
             ShouldlyExtension.ExploreMethodWithOrWithoutInstance(_websettingsInstanceFixture, 
                                                                  Fixture, 
+                                                                 currentMethodInfo);
+
+            // Assert
+            currentMethodInfo.ShouldNotBeNull();
+        }
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Initializer")]
+        public void AUT_Websettings_GetBasePath_Methods_Explore_Verify_Test()
+        {
+            // Arrange
+            var currentMethodInfo = typeof(WebSettingsAdditionalInfo).GetMethod(MethodGetBasePath);
+
+            // Act
+            ShouldlyExtension.ExploreMethodWithOrWithoutInstance(_webSettingsAdditionalInfo,
+                                                                 Fixture,
                                                                  currentMethodInfo);
 
             // Assert
@@ -180,6 +200,15 @@ namespace EPMLiveCore
         {
             // AAA: Arrange, Act, Assert
             ShouldlyExtension.ExploreVerifyMethods<websettings>(Fixture, methodName);
+        }
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_Websettings_NonStatic_GetBasePath_Explore_Verify_Test()
+        {
+            // AAA: Arrange, Act, Assert
+            ShouldlyExtension.ExploreVerifyMethods<WebSettingsAdditionalInfo>(Fixture, MethodGetBasePath);
         }
 
         #endregion
@@ -459,22 +488,25 @@ namespace EPMLiveCore
             // Arrange
             Type [] methodGetBasePathPrametersTypes = null;
             object[] parametersOfGetBasePath = null; // no parameter present
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodGetBasePath, methodGetBasePathPrametersTypes, out exception);
+            Exception exception1;
+            var methodInfo = typeof(WebSettingsAdditionalInfo).GetMethod(MethodGetBasePath, methodGetBasePathPrametersTypes);
 
             // Act
-            var result1 = methodInfo.GetResultMethodInfo<websettings, string>(_websettingsInstanceFixture, out exception1, parametersOfGetBasePath);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<websettings, string>(_websettingsInstance, MethodGetBasePath, parametersOfGetBasePath, methodGetBasePathPrametersTypes);
+            var result1 = methodInfo.GetResultMethodInfo<WebSettingsAdditionalInfo, string>(_webSettingsAdditionalInfo, out exception1, parametersOfGetBasePath);
+            var result2 = ReflectionAnalyzer.GetResultOfMethod<WebSettingsAdditionalInfo, string>(_webSettingsAdditionalInfo, MethodGetBasePath, parametersOfGetBasePath, methodGetBasePathPrametersTypes);
 
             // Assert
             methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
             result1.ShouldNotBeNull();
             result2.ShouldNotBeNull();
             result1.ShouldBe(result2);
             parametersOfGetBasePath.ShouldBeNull();
             methodGetBasePathPrametersTypes.ShouldBeNull();
-            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfMethod<websettings, string>(_websettingsInstance, MethodGetBasePath, parametersOfGetBasePath, methodGetBasePathPrametersTypes));
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfMethod<WebSettingsAdditionalInfo, string>(
+                _webSettingsAdditionalInfo,
+                MethodGetBasePath,
+                parametersOfGetBasePath,
+                methodGetBasePathPrametersTypes));
         }
 
         #endregion
@@ -489,15 +521,13 @@ namespace EPMLiveCore
             // Arrange
             Type [] methodGetBasePathPrametersTypes = null;
             object[] parametersOfGetBasePath = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetBasePath, methodGetBasePathPrametersTypes, out exception);
+            var methodInfo = typeof(WebSettingsAdditionalInfo).GetMethod(MethodGetBasePath, methodGetBasePathPrametersTypes);
 
             // Assert
             methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
             parametersOfGetBasePath.ShouldBeNull();
             methodGetBasePathPrametersTypes.ShouldBeNull();
-            Should.NotThrow(() => methodInfo.Invoke(_websettingsInstanceFixture, parametersOfGetBasePath));
+            Should.NotThrow(() => methodInfo.Invoke(_webSettingsAdditionalInfo, parametersOfGetBasePath));
         }
 
         #endregion
@@ -532,7 +562,11 @@ namespace EPMLiveCore
             Type [] methodGetBasePathPrametersTypes = null;
 
             // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_websettingsInstance, MethodGetBasePath, Fixture, methodGetBasePathPrametersTypes);
+            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(
+                _webSettingsAdditionalInfo,
+                MethodGetBasePath,
+                Fixture,
+                methodGetBasePathPrametersTypes);
 
             // Assert
             result.ShouldNotBeNull();
@@ -574,7 +608,7 @@ namespace EPMLiveCore
             var methodInfo = GetMethodInfo(MethodGetBasePath, 0);
 
             // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_websettingsInstanceFixture, Fixture, out exception);
+            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_webSettingsAdditionalInfo, Fixture, out exception);
 
             // Assert
             methodInfo.ShouldNotBeNull();

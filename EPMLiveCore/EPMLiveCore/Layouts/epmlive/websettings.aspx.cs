@@ -23,7 +23,7 @@ namespace EPMLiveCore
                 lblWebId.Text = web.ID.ToString();
                 AddMasterPages(web);
 
-                chkDisablePublishing.Checked = CoreFunctions.getConfigSetting(web, "EPMLiveDisablePublishing") == "True"
+                chkDisablePublishing.Checked = CoreFunctions.getConfigSetting(web, "EPMLiveDisablePublishing") == bool.TrueString
                     ? true
                     : false;
                 TrySetCheckedProperty(web, chkDisablePlanners, "EPMLiveDisablePlanners");
