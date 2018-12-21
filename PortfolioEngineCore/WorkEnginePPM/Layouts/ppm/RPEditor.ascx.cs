@@ -59,7 +59,7 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
         public string IsDlg
         {
             get { return m_sIsDlg; }
-            set { m_sIsDlg = value.TrimStart().Substring(0, 1); }
+            set { m_sIsDlg = value?.TrimStart().Substring(0, 1); }
         }
 
         private string m_hideCloseBtn = "";
@@ -84,7 +84,7 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
                     m_sWebservice = "~" + WebserviceSuffix;
                 return m_sWebservice;
             }
-            set { m_sWebservice = value.Trim(); }
+            set { m_sWebservice = value?.Trim(); }
         }
 
         protected void Page_Load(object sender, EventArgs e)
