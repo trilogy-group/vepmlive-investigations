@@ -251,6 +251,7 @@
     </Compile>
     <Compile Include="ChildParentSync.cs" />
     <Compile Include="Helpers\Guard.cs" />
+    <Compile Include="Infrastructure\ResourceManagement\ReportXmlBuilder.cs" />
     <Compile Include="Helpers\ItemHelper.cs" />
     <Compile Include="Helpers\WebServicesHelper.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\703Steps.cs" />
