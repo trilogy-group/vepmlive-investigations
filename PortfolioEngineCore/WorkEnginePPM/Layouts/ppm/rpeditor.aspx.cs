@@ -116,7 +116,7 @@ namespace WorkEnginePPM
                     ctl.WEPID = Request["itemid"];
                     ctl.TicketVal = Request["dataid"];
                     ctl.IsResource = Request["isresource"];
-                    ctl.IsDlg = Request["IsDlg"];
+                    ctl.IsDlg = string.IsNullOrEmpty(Request["IsDlg"]) ? "0" : Request["IsDlg"];
                     ctl.HideCloseBtn = Request["hideCloseBtn"];
                     ctl.MaxPeriodLimit = GetMaxPeriodLimit();
                     if (string.IsNullOrEmpty(Request["isresource"]) == true || Request["isresource"] == "0")
