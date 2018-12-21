@@ -75,15 +75,25 @@ namespace EPMLiveCore
             }
         }
 
+        private void ListGetListInJSON()
+        {
+            ListGetListInXml(true);
+        }
+
+        private void ListGetListItemsInJSON()
+        {
+            ListGetListItemsInXml(true);
+        }
+
         private void CallWorkEngineListSvc()
         {
             switch (_webSvcMethod)
             {
                 case "GetListItems":
-                    ListGetListItemsInXml(true);
+                    ListGetListItemsInJSON();
                     break;
                 case "GetList":
-                    ListGetListInXml(true);
+                    ListGetListInJSON();
                     break;
                 case "GetListItemsInXML":
                     ListGetListItemsInXml();

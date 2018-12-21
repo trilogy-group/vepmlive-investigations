@@ -8,12 +8,12 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore
 {
-    internal static class XmlDataSimplifier
+    public static class XmlDataSimplifier
     {
-        internal static IList<string> CompLevels;
-        internal static string SolutionType;
+        public static IList<string> CompLevels;
+        public static string SolutionType;
 
-        internal static string SimplifySPGetListItemsXml(XmlNode data)
+        public static string SimplifySPGetListItemsXml(XmlNode data)
         {
             var result = new StringBuilder();
             var currentWeb = SPContext.Current.Web;
@@ -167,7 +167,7 @@ namespace EPMLiveCore
                 : string.Empty;
         }
 
-        internal static string SimplifySPGetListXml(XmlNode data)
+        public static string SimplifySPGetListXml(XmlNode data)
         {
             var result = new StringBuilder();
             var currentWeb = SPContext.Current.Web;
