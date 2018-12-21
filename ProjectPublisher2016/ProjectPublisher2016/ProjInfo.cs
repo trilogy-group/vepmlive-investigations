@@ -4,7 +4,6 @@ using System.Xml;
 using System.Drawing;
 using System.Collections;
 using System.Linq;
-
 namespace ProjectPublisher2016
 {
     /// <summary>
@@ -63,9 +62,7 @@ namespace ProjectPublisher2016
             Connect.projectCenterFields = new Hashtable();
 
             bool propsSet;
-            
-            var disabledFields = Connect.getProperty("EPMLiveMSProjectDisabledFields", pj).Split(',');
-            
+
             frmProjInfo = new FormProjInfo();
 
             spsList = Connection.GetListService(Connection.url);
@@ -96,7 +93,7 @@ namespace ProjectPublisher2016
                 catch { }
             }
 
-
+            var disabledFields = Connect.getProperty("EPMLiveMSProjectDisabledFields", pj).Split(',');
 
             foreach (XmlNode nd in node["Fields"].ChildNodes)
             {
@@ -107,7 +104,6 @@ namespace ProjectPublisher2016
                 string type = getAttribute(nd, "Type");
                 string required = getAttribute(nd, "Required");
                 string editable = getAttribute(nd, "ShowInEditForm").ToLower();
-
                 string disabled = "0";
                 if (disabledFields.Contains(name))
                 {
@@ -767,6 +763,7 @@ namespace ProjectPublisher2016
             cbo.DropDownStyle = ComboBoxStyle.DropDownList;
             cbo.Top = li.Bounds.Top - 1;
             cbo.Tag = li.Index;
+
             if (disabled == "1")
             {
                 cbo.Enabled = false;
