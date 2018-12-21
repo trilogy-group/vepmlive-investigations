@@ -1,15 +1,15 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Xml;
-using Action = System.Action;
 using AUT.ConfigureTestProjects.Analyzer;
 using AUT.ConfigureTestProjects.BaseSetup;
 using AUT.ConfigureTestProjects.Extensions;
 using AUT.ConfigureTestProjects.StaticTypes;
 using NUnit.Framework;
-using Should = Shouldly.Should;
 using Shouldly;
-using System.Reflection;
+using Action = System.Action;
+using Should = Shouldly.Should;
 
 namespace EPMLiveCore
 {
@@ -1271,11 +1271,11 @@ namespace EPMLiveCore
             var methodInfo = typeof(XmlDataSimplifier).GetMethod(MethodSimplifySPGetListItemsXml);
 
             // Act
-            var result1 = methodInfo.GetObjectResultMethodInfo(
+            var firstResult = methodInfo.GetObjectResultMethodInfo(
                 typeof(XmlDataSimplifier),
                 out exception, 
                 parametersOfSimplifySPGetListItemsXml);
-            var result2 = ReflectionAnalyzer.GetResultOfStaticMethod<string>(
+            var secondResult = ReflectionAnalyzer.GetResultOfStaticMethod<string>(
                 null,
                 typeof(XmlDataSimplifier),
                 MethodSimplifySPGetListItemsXml,
@@ -1284,8 +1284,8 @@ namespace EPMLiveCore
 
             // Assert
             methodInfo.ShouldNotBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
+            firstResult.ShouldBeNull();
+            secondResult.ShouldBeNull();
             parametersOfSimplifySPGetListItemsXml.ShouldNotBeNull();
             parametersOfSimplifySPGetListItemsXml.Length.ShouldBe(1);
             methodSimplifySPGetListItemsXmlPrametersTypes.Length.ShouldBe(1);
@@ -1423,11 +1423,11 @@ namespace EPMLiveCore
             var methodInfo = typeof(XmlDataSimplifier).GetMethod(MethodSimplifySPGetListXml);
 
             // Act
-            var result1 = methodInfo.GetObjectResultMethodInfo(
+            var firstResult = methodInfo.GetObjectResultMethodInfo(
                 typeof(XmlDataSimplifier), 
                 out exception, 
                 parametersOfSimplifySPGetListXml);
-            var result2 = ReflectionAnalyzer.GetResultOfStaticMethod<string>(
+            var secondResult = ReflectionAnalyzer.GetResultOfStaticMethod<string>(
                 null, 
                 typeof(XmlDataSimplifier),
                 MethodSimplifySPGetListXml, 
@@ -1436,8 +1436,8 @@ namespace EPMLiveCore
 
             // Assert
             methodInfo.ShouldNotBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
+            firstResult.ShouldBeNull();
+            secondResult.ShouldBeNull();
             parametersOfSimplifySPGetListXml.ShouldNotBeNull();
             parametersOfSimplifySPGetListXml.Length.ShouldBe(1);
             methodSimplifySPGetListXmlPrametersTypes.Length.ShouldBe(1);
