@@ -45,24 +45,24 @@ namespace EPMLiveCore.API
         private const string MethodGetReadFrequentQuery = "GetReadFrequentQuery";
         private const string MethodGetUpdateFrequentQuery = "GetUpdateFrequentQuery";
         private const string MethodGetCreateRecentItemQuery = "GetCreateRecentItemQuery";
-        private const string FieldqueryCheckFavStatus_Item = "QueryCheckFavStatusItem";
-        private const string FieldqueryCheckFavStatus_NonItem = "QueryCheckFavStatusNonItem";
-        private const string FieldqueryCreateFav_Item = "QueryCreateFavItem";
-        private const string FieldqueryCreateFav_NonItem = "QueryCreateFavNonItem";
-        private const string FieldqueryRemoveFav_Item = "QueryRemoveFavItem";
-        private const string FieldqueryRemoveFav_NonItem = "QueryRemoveFavNonItem";
-        private const string FieldqueryReadFavWSStatus_Item = "QueryReadFavWSStatusItem";
-        private const string FieldqueryReadFavWSStatus_NonItem = "QueryReadFavWSStatusNonItem";
-        private const string FieldqueryCreateFavWS_Item = "QueryCreateFavWSItem";
-        private const string FieldqueryCreateFavWS_NonItem = "QueryCreateFavWSNonItem";
-        private const string FieldqueryRemoveFavWS_Item = "QueryRemoveFavWSItem";
-        private const string FieldqueryRemoveFavWS_NonItem = "QueryRemoveFavWSNonItem";
-        private const string FieldqueryCheckFrequentStatus_Item = "QueryCheckFrequentStatusItem";
-        private const string FieldqueryCheckFrequentStatus_NonItem = "QueryCheckFrequentStatusNonItem";
-        private const string FieldqueryCreateFrequent = "QueryCreateFrequent";
-        private const string FieldqueryRemoveFrequent_Item = "QueryRemoveFrequentItem";
-        private const string FieldqueryRemoveFrequent_NonItem = "QueryRemoveFrequentNonItem";
-        private const string FieldqueryCreateRecentItem = "QueryCreateRecentItem";
+        private const string FieldqueryCheckFavStatus_Item = "queryCheckFavStatus_Item";
+        private const string FieldqueryCheckFavStatus_NonItem = "queryCheckFavStatus_NonItem";
+        private const string FieldqueryCreateFav_Item = "queryCreateFav_Item";
+        private const string FieldqueryCreateFav_NonItem = "queryCreateFav_NonItem";
+        private const string FieldqueryRemoveFav_Item = "queryRemoveFav_Item";
+        private const string FieldqueryRemoveFav_NonItem = "queryRemoveFav_NonItem";
+        private const string FieldqueryReadFavWSStatus_Item = "queryReadFavWSStatus_Item";
+        private const string FieldqueryReadFavWSStatus_NonItem = "queryReadFavWSStatus_NonItem";
+        private const string FieldqueryCreateFavWS_Item = "queryCreateFavWS_Item";
+        private const string FieldqueryCreateFavWS_NonItem = "queryCreateFavWS_NonItem";
+        private const string FieldqueryRemoveFavWS_Item = "queryRemoveFavWS_Item";
+        private const string FieldqueryRemoveFavWS_NonItem = "queryRemoveFavWS_NonItem";
+        private const string FieldqueryCheckFrequentStatus_Item = "queryCheckFrequentStatus_Item";
+        private const string FieldqueryCheckFrequentStatus_NonItem = "queryCheckFrequentStatus_NonItem";
+        private const string FieldqueryCreateFrequent = "queryCreateFrequent";
+        private const string FieldqueryRemoveFrequent_Item = "queryRemoveFrequent_Item";
+        private const string FieldqueryRemoveFrequent_NonItem = "queryRemoveFrequent_NonItem";
+        private const string FieldqueryCreateRecentItem = "queryCreateRecentItem";
         private Type _fRFQueryFactoryInstanceType;
         private const int TestsTimeOut = TestContants.TimeOutFiveSeconds;
 
@@ -150,18 +150,18 @@ namespace EPMLiveCore.API
         [TestCase(FieldqueryRemoveFrequent_Item)]
         [TestCase(FieldqueryRemoveFrequent_NonItem)]
         [TestCase(FieldqueryCreateRecentItem)]
-        public void AUT_FRFQueryFactory_All_Properties_Explore_Verify_By_Name_Test(string name)
+        public void AUT_FRFQueryFactory_All_Fields_Explore_Verify_By_Name_Test(string name)
         {
             // Arrange
-            var propertyInfo = typeof(FRFQueries).GetProperty(name);
+            var fieldInfo = GetFieldInfo(name);
 
             // Act
-            ShouldlyExtension.ExploreProperty(null,
-                                              Fixture,
-                                              propertyInfo);
+            ShouldlyExtension.ExploreFieldWithOrWithoutInstance(null, 
+                                                                Fixture, 
+                                                                fieldInfo);
 
             // Assert
-            propertyInfo.ShouldNotBeNull();
+            fieldInfo.ShouldNotBeNull();
         }
 
         #endregion
